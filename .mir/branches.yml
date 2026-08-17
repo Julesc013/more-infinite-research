@@ -21,7 +21,7 @@ remote_topology:
   rules:
     - main is the published Factorio 2.1 line rooted at immutable tag MIR 3.2.5 and may receive synchronized planning records or qualified promotion
     - dev owns the MIR 3 terminal .9 programme, the shared Control Plane and tooling, and canonical target-neutral corrections
-    - legacy is the movable previous-major terminal alias; it currently names MIR 3.2.10, may advance to qualified MIR 3.2.11 after publication, and may later advance once to the sealed MIR 4 terminal authority when MIR 5 opens, always through a non-force two-parent commit whose tree exactly matches the outgoing major terminal authority
+    - legacy is the movable previous-major terminal alias; it advances to published MIR 3.2.11 through a governed non-force two-parent commit and may later advance once to the sealed MIR 4 terminal authority when MIR 5 opens, always with a tree exactly matching the outgoing major terminal authority
     - immutable Factorio 2.0 releases 2.5.9 and 2.5.10 remain preserved by their annotated tags and public releases after the movable legacy branch changes role; authorized 2.5.11 is rooted at immutable 2.5.10 rather than legacy
     - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
     - main and dev must not be made identical to Factorio 2.0 target branches
@@ -30,7 +30,7 @@ remote_topology:
 branches:
   main:
     remote_state: permanent
-    purpose: published Factorio 2.1 line at immutable MIR 3.2.10 and authorized MIR 3.2.11 emergency-hotfix promotion target
+    purpose: published Factorio 2.1 line at immutable MIR 3.2.11
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -57,7 +57,7 @@ branches:
 
   legacy:
     remote_state: permanent
-    purpose: movable previous-major terminal alias, currently MIR 3.2.10 and intended to pin the sealed MIR 4 terminal throughout MIR 5; immutable earlier releases remain tag-addressable
+    purpose: movable previous-major terminal alias advancing to MIR 3.2.11 and intended to pin the sealed MIR 4 terminal throughout MIR 5; immutable earlier releases remain tag-addressable
     factorio_version: "2.1"
     accepts:
       - exact-main-release-alias

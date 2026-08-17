@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "kind": "MIR4TerminalNormalizedSnapshotV1",
+  "status": "importable-pre-eol-public-custody-pending",
+  "semantic_authority": false,
+  "release": "3.2.11",
+  "target": "2.1",
+  "successor_target": "MIR4-R0/2.1",
+  "source_identity": {
+    "candidate_id": "C35",
+    "candidate_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_3.2.11.zip",
+    "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "bytes": 1067720,
+    "entries": 305,
+    "tag": "3.2.11"
+  },
+  "engine": {
+    "version": "2.1.14",
+    "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json",
+    "status": "passed-exact-engine-qualification"
+  },
+  "predecessors": [
+    {
+      "release": "3.2.10",
+      "role": "immutable-terminal-predecessor",
+      "upgrade_id": "3.2.10-to-3.2.11"
+    },
+    {
+      "release": "3.2.9",
+      "role": "older-governed-predecessor",
+      "upgrade_id": "3.2.9-to-3.2.11"
+    },
+    {
+      "release": "3.2.5",
+      "role": "older-governed-predecessor",
+      "upgrade_id": "3.2.5-to-3.2.11"
+    }
+  ],
+  "foundation": {
+    "release": "3.2.10",
+    "manifest": ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
+    "root_sha256": "6456A368697CEF8FB31B07F0712EB530AA3888CC640740117410E5409D741829"
+  },
+  "inventories": {
+    "features": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "package_composition": ".mir/releases/terminal/baselines/3.2.11/package-composition.json",
+      "disposition": "3.2.10-plus-approved-emergency-contract-v2-delta"
+    },
+    "technologies": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "emergency_delta": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+      "closed_findings": [
+        ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+        ".mir/releases/emergency/findings/MIR3-TERM-0034.json"
+      ],
+      "stable_ids_preserved": true
+    },
+    "settings": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "emergency_delta": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+      "released_id_or_type_changes": 0,
+      "codec": "MIRSET1"
+    },
+    "owners_aliases_tombstones": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "emergency_delta": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+      "transactional_replacement": true,
+      "open_follow_up": null
+    },
+    "migrations": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "watermark": {
+        "from": [
+          "3.2.10",
+          "3.2.9",
+          "3.2.5"
+        ],
+        "stable_ids": true,
+        "to": "3.2.11"
+      }
+    },
+    "locales": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "package_composition": ".mir/releases/terminal/baselines/3.2.11/package-composition.json"
+    },
+    "runtime_profiles": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
+      "qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json",
+      "target_backend": "storage"
+    },
+    "upgrades": {
+      "qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json",
+      "required": [
+        "3.2.10-to-3.2.11",
+        "3.2.9-to-3.2.11",
+        "3.2.5-to-3.2.11"
+      ]
+    }
+  },
+  "capability_omissions": [],
+  "compatibility_import": {
+    "authority": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "level_counts": {
+      "COEXISTS_EXACT": 1,
+      "KNOWN_CONFLICT": 1,
+      "OBSERVED_ONLY": 9,
+      "UNQUALIFIED": 4,
+      "UPSTREAM_BLOCKED": 1
+    },
+    "public_claims_allowed": 1,
+    "promoted_claims": 0,
+    "rule": "preserve-3.2.10-claim-envelope-and-add-no-hotfix-claims"
+  },
+  "record_sha256": "2F069E77C50E5D1E080CA3B2D5FDC8E9290C468F55D94F232EF6F24F2B905689"
+}

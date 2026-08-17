@@ -139,14 +139,14 @@ paths:
   releases.waves.mir4-r0-target-registry-historical: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json
   releases.waves.mir4-r0-version-authority-historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
   releases.waves.mir4-r0-target-registry-historical-v2: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
-  releases.waves.mir4-r0-target-registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
+  releases.waves.mir4-r0-target-registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json
   releases.waves.mir4-r0-version-authority: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json
   releases.waves.mir4-r0-codec-vectors: .mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json
   releases.waves.mir4-terminal-baseline-import: .mir/releases/waves/mir4-r0/terminal-baseline-import.json
   releases.waves.mir4-r0-bootstrap-root-set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
   releases.waves.mir4-r0-bootstrap-local-candidate-plan-historical: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
-  releases.waves.mir4-r0-bootstrap-local-candidate-plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
-  releases.waves.mir4-r0-private-lane-authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
+  releases.waves.mir4-r0-bootstrap-local-candidate-plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json
+  releases.waves.mir4-r0-private-lane-authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json
   releases.waves.mir4-r0-bootstrap-target-readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
   releases.waves.mir4-r0-final-programme-reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json

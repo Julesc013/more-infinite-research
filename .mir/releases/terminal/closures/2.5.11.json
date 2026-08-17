@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalReleaseClosureV1",
+  "release": "2.5.11",
+  "status": "github-closed-mod-portal-pending",
+  "package_visible": false,
+  "frozen_manifest": {
+    "path": ".mir/releases/records/2.5.11.json",
+    "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1"
+  },
+  "review": {
+    "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+    "sha256": "1BE04C2D705EB86740FE99E53F7C67AC9B9AD34298EE9BB0DB41C0B99B2CAF44",
+    "decision": "explicit-emergency-backport-authorization"
+  },
+  "seal": {
+    "path": ".mir/releases/records/2.5.11.json",
+    "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1",
+    "status": "deterministically-reconstructed-and-publicly-verified"
+  },
+  "tag": {
+    "name": "2.5.11",
+    "object_sha": "d99a004381dffde9f706ffeee4ed23a768121578",
+    "peeled_commit": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af",
+    "immutable": true
+  },
+  "github": {
+    "receipt": ".mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
+    "status": "published-and-verified",
+    "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/2.5.11",
+    "download_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C"
+  },
+  "mod_portal": {
+    "state": "maintainer-upload-not-independently-custody-verified",
+    "authenticated_redownload": "pending"
+  },
+  "final_channel_state": "github-published-and-verified-mod-portal-custody-pending",
+  "record_sha256": "C9BBC1145CB7F4DA7119E4B7E8E37CA7EF379040BF6327156A3723EE53771FFA"
+}

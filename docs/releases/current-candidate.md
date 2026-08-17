@@ -5,7 +5,7 @@ applies_to: "3.2.11"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-17
+last_reviewed: 2026-08-18
 supersedes: []
 superseded_by: []
 ---
@@ -24,7 +24,7 @@ superseded_by: []
 | Assignment condition | `exact-source-freeze-and-three-build-reconstruction-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `package-built` |
+| State | `publicly-verified` |
 | Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
 | Package source tree | `b6102e8ed616955fc335d784a98357b62111322a` |
 | Package source SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
@@ -36,16 +36,7 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `focused-qualified`
-- [ ] `candidate-qualified`
-- [ ] `automated-qualified-awaiting-human-review`
-- [ ] `manually-accepted`
-- [ ] `protected-qualified`
-- [ ] `sealed`
-- [ ] `promoted`
-- [ ] `tagged`
-- [ ] `published`
-- [ ] `publicly-verified`
+None.
 
 ## Assurance exceptions
 

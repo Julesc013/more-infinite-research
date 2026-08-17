@@ -1230,6 +1230,7 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
   $paths = @(
     '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json',
     '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json',
@@ -1237,6 +1238,7 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json',
     '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json',
     '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json',
     '.mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json',
     '.mir/releases/waves/mir4-r0/terminal-baseline-import.json',
     '.mir/releases/waves/mir4-r0/bootstrap-root-set.json',
@@ -1245,6 +1247,12 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     '.mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json',
     '.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json',
+    '.mir/releases/terminal/baselines/3.2.11/baseline-manifest.json',
+    '.mir/releases/terminal/baselines/3.2.11/normalized-snapshot.json',
+    '.mir/releases/terminal/baselines/3.2.11/package-composition.json',
+    '.mir/releases/records/3.2.11.json',
     '.mir/releases/terminal/baselines/3.2.10/baseline-manifest.json',
     '.mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json',
     '.mir/releases/terminal/baselines/3.2.10/package-composition.json',
@@ -1257,12 +1265,17 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
     $paths += @(
       '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json',
       '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json',
+      '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json',
       '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json',
       '.mir/targets.json',
       '.mir/releases/terminal/baselines/2.5.10/baseline-manifest.json',
       '.mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json',
       '.mir/releases/terminal/baselines/2.5.10/package-composition.json',
       '.mir/releases/records/2.5.10.json',
+      '.mir/releases/terminal/baselines/2.5.11/baseline-manifest.json',
+      '.mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json',
+      '.mir/releases/terminal/baselines/2.5.11/package-composition.json',
+      '.mir/releases/records/2.5.11.json',
       '.mir/releases/terminal/baselines/2.5.9/baseline-manifest.json',
       '.mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json',
       '.mir/releases/terminal/baselines/2.5.9/package-composition.json',
@@ -1286,6 +1299,7 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
   $paths = @(
     'spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json',
     'spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json',
+    'spec/schemas/mir4-bootstrap-local-candidate-plan-v3.schema.json',
     'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json',
     'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json',
     'spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json',
@@ -1299,12 +1313,14 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
     'spec/schemas/mir4-r0-authority.schema.json',
     'spec/schemas/mir4-target-registry-v2.schema.json',
     'spec/schemas/mir4-target-registry-v3.schema.json',
+    'spec/schemas/mir4-target-registry-v4.schema.json',
     'spec/schemas/mir4-versioning-distribution-identity-v2.schema.json'
   )
   if ($Lane -ceq 'local-playtest-shadow') {
     $paths += @(
       'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json',
       'spec/schemas/mir4-private-lane-authorization-v2.schema.json',
+      'spec/schemas/mir4-private-lane-authorization-v3.schema.json',
       'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json',
       'spec/schemas/mir4-bootstrap-target-readiness.schema.json'
     )
@@ -1705,10 +1721,10 @@ function New-MIR4BootstrapSourceCapsule {
   }
   $laneBinding = $null
   if ($Lane -ceq 'local-playtest-shadow') {
-    $laneRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
+    $laneRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json'
     $lanePath = Join-Path $repo $laneRelativePath
     $laneText = Get-Content -Raw -LiteralPath $lanePath
-    if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-private-lane-authorization-v2.schema.json'))) {
+    if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-private-lane-authorization-v3.schema.json'))) {
       throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.'
     }
     $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String

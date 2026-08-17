@@ -27,9 +27,9 @@ if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) {
   throw "Test-Json is required for fail-closed MIR 4 local-playtest tests."
 }
 
-$authorityRelative = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
+$authorityRelative = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json'
 $authorityPath = Join-Path $RepoRoot $authorityRelative
-$authoritySchema = Join-Path $RepoRoot 'spec/schemas/mir4-private-lane-authorization-v2.schema.json'
+$authoritySchema = Join-Path $RepoRoot 'spec/schemas/mir4-private-lane-authorization-v3.schema.json'
 $manifestSchema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json'
 $text = Get-Content -Raw -LiteralPath $authorityPath
 $authority = $text | ConvertFrom-Json -Depth 100 -DateKind String
@@ -80,10 +80,10 @@ foreach ($target in @($authority.authorized_targets)) {
   Assert-True ([string]$importRows[0].distribution.archive_sha256 -ceq [string]$target.predecessor_archive_sha256 -and
     [string]$rootRows[0].predecessor_release -ceq [string]$target.predecessor_release) "Current terminal import or bootstrap root drifted: $($target.target_key)"
 }
-Assert-True ([string]$authority.authorized_targets[0].predecessor_release -ceq '2.5.10') 'The f200 private lane did not advance to the immutable 2.5.10 predecessor.'
+Assert-True ([string]$authority.authorized_targets[0].predecessor_release -ceq '2.5.11') 'The f200 private lane did not advance to the immutable 2.5.11 predecessor.'
 
 $packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
-foreach ($relative in @($authorityRelative, 'spec/schemas/mir4-private-lane-authorization-v2.schema.json', 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json')) {
+foreach ($relative in @($authorityRelative, 'spec/schemas/mir4-private-lane-authorization-v3.schema.json', 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json')) {
   Assert-True ($relative -cnotin $packageFiles) "Package-excluded local-playtest path became package-visible: $relative"
 }
 Assert-True (Test-Path -LiteralPath $manifestSchema -PathType Leaf) 'Local-playtest candidate manifest schema is absent.'

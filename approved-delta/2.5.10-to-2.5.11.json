@@ -1,0 +1,797 @@
+{
+  "schema": 1,
+  "kind": "mir-approved-delta",
+  "baseline": {
+    "version": "2.5.10",
+    "factorio_version": "2.0",
+    "source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+    "package_content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
+  },
+  "current": {
+    "version": "2.5.11",
+    "factorio_version": "2.0",
+    "source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
+    "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
+    "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+    "package_content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
+  },
+  "exporter": {
+    "fixture": "fixtures/export-approved-delta",
+    "script": "scripts/Export-MIRApprovedDelta.ps1",
+    "qualification_source_commit": "f9fc16d81383fc434f75753c9b404833a569b614",
+    "producer_sha256": "7EA0F4D1D309E3BB65992CD05E6A6E07AC0E1AFAC57D51FD57E329376A5229E7",
+    "factorio_binary_version": "2.0.77.84539",
+    "scenarios": [
+      "approved-delta-automatic-family-controls",
+      "approved-delta-base",
+      "approved-delta-base-continuations",
+      "approved-delta-compat-atan",
+      "approved-delta-compat-space-age-galore",
+      "approved-delta-native-owner-adoption",
+      "approved-delta-space-age"
+    ]
+  },
+  "scenario_evidence": [
+    {
+      "scenario": "approved-delta-automatic-family-controls",
+      "baseline_fingerprint": "EE97F7E34DDE98FCF408E6DC618321F84D50D6A74F0B86CE22947F2E72B41EC8",
+      "current_fingerprint": "3519C0DF4CF5A47B84729CF5AD09A519F34F84788DA105BC3F71721D609BBF9B",
+      "baseline_technology_count": 54,
+      "current_technology_count": 54,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-base",
+      "baseline_fingerprint": "658FA90CE3A4C77D9383735EC4A28674F8E7FFF65E5AFFC795D8EF7D5A7D4920",
+      "current_fingerprint": "C4FFBFA072C21D34006553413513FA9D9CEA71B08AD039607E4763D151728523",
+      "baseline_technology_count": 54,
+      "current_technology_count": 54,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-base-continuations",
+      "baseline_fingerprint": "658FA90CE3A4C77D9383735EC4A28674F8E7FFF65E5AFFC795D8EF7D5A7D4920",
+      "current_fingerprint": "C4FFBFA072C21D34006553413513FA9D9CEA71B08AD039607E4763D151728523",
+      "baseline_technology_count": 54,
+      "current_technology_count": 54,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-compat-atan",
+      "baseline_fingerprint": "7A02D9B727D922B6CF51F4F0EF1F1A3F36ADE8B157F1F9A6B8ED4B61C3895046",
+      "current_fingerprint": "6074FDA1316A4210E87C58A4308BD42F27AB51EF073713CBA53EBF620406F97D",
+      "baseline_technology_count": 54,
+      "current_technology_count": 54,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-compat-space-age-galore",
+      "baseline_fingerprint": "FDF7F9AEEAE742D6FFCA64BD3795CFA8F3AF5D05F8B106F05094A482F83EF004",
+      "current_fingerprint": "B0517DB4B32050C7834B97DB7FE784C50F7AF326BFEBC729F87098FDA6C2EF47",
+      "baseline_technology_count": 69,
+      "current_technology_count": 69,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-native-owner-adoption",
+      "baseline_fingerprint": "E5A7F8332936A6FDE58288F6C2C666CA4C2714B340649175D8E871A819E32A69",
+      "current_fingerprint": "5499D0D17078B4F8F562B60E18A5EDFA76080F952CE69F8D8E50EC40EA735F96",
+      "baseline_technology_count": 74,
+      "current_technology_count": 74,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    },
+    {
+      "scenario": "approved-delta-space-age",
+      "baseline_fingerprint": "C5539C941A5BD70291EB5A7707983C0C9AB7EF1644456991EA630012AFBEF79D",
+      "current_fingerprint": "1FC7488C60AA2F1720B3A76C0035FE2505AAE9B59A24717BCBCDB714CE78F636",
+      "baseline_technology_count": 69,
+      "current_technology_count": 69,
+      "difference_count": 7,
+      "technology_difference_count": 6
+    }
+  ],
+  "differences": [
+    {
+      "field": "package.archive_sha256",
+      "before": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "after": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "reason": "The archive identity advances to the deterministic 2.5-P15 package.",
+      "intentional": true,
+      "migration_impact": "Package custody changes; semantic rows remain independently classified.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "package.package_content_sha256",
+      "before": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+      "after": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+      "reason": "The normalized package identity advances to the exact 2.5-P15 projection.",
+      "intentional": true,
+      "migration_impact": "All observed prototype differences remain independently classified.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "package.runtime_source_fingerprints.prototypes/mir/runtime/maximum_level_control.lua",
+      "before": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+      "after": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+      "reason": "The bounded runtime controller correction makes cap-boundary enforcement and visibility restoration explicit.",
+      "intentional": true,
+      "migration_impact": "Invalid current or queued research remains rejected while completed levels and valid progress remain preserved.",
+      "required_evidence": [
+        "maximum-level transition fixtures",
+        "configuration-change proof",
+        "first and second reload proof"
+      ]
+    },
+    {
+      "field": "package.version",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The package version advances from immutable 2.5.10 to the corrected 2.5.11 emergency release.",
+      "intentional": true,
+      "migration_impact": "Factorio performs the governed package upgrade.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-automatic-family-controls.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base-continuations.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-base.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-atan.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-compat-space-age-galore.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-native-owner-adoption.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.active_mods.more-infinite-research",
+      "before": "2.5.10",
+      "after": "2.5.11",
+      "reason": "The scenario binds the exact predecessor and candidate package versions.",
+      "intentional": true,
+      "migration_impact": "Package version transition only.",
+      "required_evidence": [
+        "fourteen exact Factorio 2.0.77 runtime exports",
+        "2.5.10 to 2.5.11 governed upgrade matrix",
+        "MIR3-TERM-0033 and MIR3-TERM-0034"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.braking-force-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.inserter-capacity-bonus-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.laser-shooting-speed-8.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.research-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.weapon-shooting-speed-7.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    },
+    {
+      "field": "scenarios.approved-delta-space-age.technologies.worker-robots-storage-4.presentation.hidden",
+      "before": null,
+      "after": false,
+      "reason": "The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.",
+      "intentional": true,
+      "migration_impact": "The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.",
+      "required_evidence": [
+        "base-continuation boundary fixture",
+        "exact seven-scenario prototype delta",
+        "zero technology identity, effect, prerequisite, science, setting, or maximum-level drift"
+      ]
+    }
+  ],
+  "summary": {
+    "difference_count": 53,
+    "intentional_count": 53,
+    "unapproved_count": 0,
+    "status": "approved"
+  }
+}

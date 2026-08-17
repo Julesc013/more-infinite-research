@@ -33,17 +33,27 @@
     },
     {
       "target": "MIR4",
-      "disposition": "required-m4-003-follow-up"
+      "disposition": "import-corrected-3.2.11-and-2.5.11-predecessors"
     },
     {
       "target": "2.5.10",
-      "disposition": "not-authorized-without-independent-2.0-applicability"
+      "disposition": "immutable-published-release-no-byte-rewrite"
+    },
+    {
+      "target": "3.2.11",
+      "disposition": "corrected-qualified-and-publicly-verified"
+    },
+    {
+      "target": "2.5.11",
+      "disposition": "corrected-qualified-and-publicly-verified"
     }
   ],
   "required_correction": "Make external-owner removal transactional with the complete replacement plan, so a cap-based skipped generation leaves the owner and every dependent prerequisite untouched.",
   "closure": {
-    "status": "open-deferred-to-mir4-under-maintainer-direction",
+    "status": "closed-by-3.2.11-and-2.5.11",
     "release_blocking": false,
-    "reason": "3.2.10 is already immutable on GitHub; the maintainer directed remaining issues to MIR 4.0.0."
+    "reason": "Transactional replacement now validates materialization before removing an external owner; exact target qualification passed and both corrected releases were publicly byte-verified on GitHub.",
+    "closed_releases": ["3.2.11", "2.5.11"],
+    "closed_at": "2026-08-18T02:53:00+10:00"
   }
 }

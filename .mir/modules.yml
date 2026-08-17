@@ -781,10 +781,13 @@ validation_tooling:
     mir4_r0_version_authority_historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
     mir4_r0_target_registry_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
     mir4_r0_target_registry_historical_v2_schema: spec/schemas/mir4-target-registry-v2.schema.json
-    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
-    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v3.schema.json
+    mir4_r0_target_registry_historical_v3: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
+    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json
+    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v4.schema.json
     mir4_terminal_predecessor_refresh_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json
-    mir4_terminal_predecessor_refresh: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json
+    mir4_terminal_predecessor_refresh_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json
+    mir4_terminal_predecessor_refresh: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json
+    mir4_terminal_import_composite: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json
     mir4_terminal_import_contract_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json
     mir4_terminal_import_contract: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json
     mir3_factorio_2_0_post_terminal_continuation_schema: spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json
@@ -798,20 +801,24 @@ validation_tooling:
     mir4_r0_bootstrap_root_set_schema: spec/schemas/mir4-bootstrap-root-set.schema.json
     mir4_r0_bootstrap_root_set_generator: tools/commands/release/New-MIR4BootstrapRootSet.ps1
     mir4_r0_bootstrap_gate: tools/commands/release/Test-MIR4R0Bootstrap.ps1
-    mir3_factorio_2_0_post_terminal_continuation_generator: tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1
+    mir3_factorio_2_0_post_terminal_continuation_generator: tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1
+    mir3_factorio_2_1_post_terminal_continuation_generator: tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuationV2.ps1
     mir4_terminal_baseline_import_generator: tools/commands/release/Import-MIR3TerminalBaselines.ps1
     mir4_bootstrap_candidate_plan_historical: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
     mir4_bootstrap_candidate_plan_historical_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
-    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
-    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json
+    mir4_bootstrap_candidate_plan_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
+    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json
+    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan-v3.schema.json
+    mir4_dot11_predecessor_refresh_generator: tools/commands/release/New-MIR4Dot11PredecessorRefreshV3.ps1
     mir4_bootstrap_approved_correction_historical: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json
     mir4_bootstrap_approved_correction_historical_schema: spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json
     mir4_bootstrap_approved_correction: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json
     mir4_bootstrap_approved_correction_schema: spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json
     mir4_local_artifact_lane_authorization_historical: .mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json
     mir4_local_artifact_lane_authorization_historical_schema: spec/schemas/mir4-local-playtest-shadow-authorization.schema.json
-    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
-    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v2.schema.json
+    mir4_local_artifact_lane_authorization_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
+    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json
+    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v3.schema.json
     mir4_local_playtest_candidate_manifest_schema: spec/schemas/mir4-local-playtest-candidate-manifest.schema.json
     mir4_local_artifact_lane_gate: validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json

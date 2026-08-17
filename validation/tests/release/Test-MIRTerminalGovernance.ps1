@@ -17,7 +17,10 @@ if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
 $promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
 $promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
 foreach ($snippet in @(
-  'ValidateSet("3.2.10", "3.2.9", "2.5.9")',
+  'ValidateSet("3.2.11", "3.2.10", "3.2.9", "2.5.9")',
+  'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json',
+  'MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json',
+  'MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json',
   'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
@@ -1322,11 +1325,30 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
     "3.2.10-published-publicly-verified-branch-and-mir4-handoff",
     "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff"
   ))
+$emergencyV2Family = @("3.2.11", "2.5.11", "3.2.10", "2.5.10") + $family
+$emergencyV2Current = (($current.planned_releases -join "|") -eq ($emergencyV2Family -join "|") -and
+  $current.roles.canonical -eq "3.2.11" -and $current.roles.planned_canonical -eq "3.2.11" -and
+  $current.roles.planned_backport -eq "2.5.11" -and
+  $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV2" -and
+  [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json" -and
+  [string]$current.active_programme.status -eq "3.2.11-and-2.5.11-published-publicly-verified-mir4-handoff")
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
-    (-not $terminalCurrent -and -not $emergencyCurrent)) {
+    (-not $terminalCurrent -and -not $emergencyCurrent -and -not $emergencyV2Current)) {
   throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
+if ($emergencyV2Current) {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.tagged_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.backport_calibration -ne "2.5.11") {
+    throw "Post-terminal publication roles do not identify the immutable 3.2.11 and 2.5.11 authorities."
+  }
+} elseif ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
       $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
       $current.roles.published_factorio_2_1 -ne "3.2.10" -or

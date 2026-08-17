@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "kind": "Mir3PostTerminalEmergencyPublicationReceiptV1",
+  "release": "3.2.11",
+  "channel": "github",
+  "candidate_id": "C35",
+  "candidate_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+  "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+  "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+  "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+  "download_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+  "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+  "bytes": 1067720,
+  "entries": 305,
+  "tag": {
+    "name": "3.2.11",
+    "object_sha": "62eb06fc98b4b151d71dba8f02a055ca5a8a99e3",
+    "peeled_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+    "kind": "annotated-unsigned",
+    "immutable": true
+  },
+  "github_release": {
+    "id": 371825678,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.11",
+    "draft": false,
+    "prerelease": false,
+    "latest": true,
+    "immutable_enforcement": false
+  },
+  "asset": {
+    "id": 518275792,
+    "name": "more-infinite-research_3.2.11.zip",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/download/3.2.11/more-infinite-research_3.2.11.zip",
+    "digest": "sha256:5b0252c3e1b8a20ff8e31f408f0217ddc77d2df0d1c15f59653e948472870a5a",
+    "bytes": 1067720
+  },
+  "download_verification": {
+    "archive_sha256": "passed",
+    "content_sha256": "passed-by-exact-archive-identity",
+    "bytes": "passed",
+    "entries": "passed-by-exact-archive-identity",
+    "package_composition": "passed-by-exact-archive-identity"
+  },
+  "engine_acceptance": {
+    "status": "passed-exact-engine-qualification",
+    "version": "2.1.14",
+    "file_version": "2.1.14.87180",
+    "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+    "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json"
+  },
+  "qualification": {
+    "deterministic_reconstructions": 3,
+    "focused_scenarios": 13,
+    "governed_upgrades_passed": 15,
+    "governed_upgrades_required": 15,
+    "static_validation": "passed"
+  },
+  "published_at": "2026-08-17T16:51:30Z",
+  "verified_at": "2026-08-18T02:53:00+10:00",
+  "status": "published-and-verified"
+}

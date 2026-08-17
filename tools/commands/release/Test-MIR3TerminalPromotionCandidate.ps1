@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet("3.2.10", "3.2.9", "2.5.9")][string]$Release,
+  [Parameter(Mandatory)][ValidateSet("3.2.11", "3.2.10", "3.2.9", "2.5.9")][string]$Release,
   [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$CandidateSha,
   [ValidateSet("promotion", "post-publication-sync")][string]$Operation = "promotion",
   [string]$CandidateRef = "",
@@ -18,6 +18,130 @@ function Invoke-MIRPromotionGit {
   $output = @(& git -C $repo @Arguments 2>&1)
   if ($LASTEXITCODE -ne 0) { throw "git $($Arguments -join ' ') failed: $($output -join [Environment]::NewLine)" }
   return $output
+}
+
+if ($Release -eq "3.2.11") {
+  if ($Operation -ne "promotion" -or $PromotionBranch -ne "main") {
+    throw "The sealed 3.2.11 controller currently authorizes only initial promotion to main."
+  }
+
+  $head = (Invoke-MIRPromotionGit rev-parse "HEAD^{commit}" | Select-Object -First 1).Trim()
+  $resolvedCommit = (Invoke-MIRPromotionGit rev-parse "$CandidateSha`^{commit}" | Select-Object -First 1).Trim()
+  $resolvedTree = (Invoke-MIRPromotionGit rev-parse "$CandidateSha`^{tree}" | Select-Object -First 1).Trim()
+  $resolvedParents = @(((Invoke-MIRPromotionGit show -s --format=%P $CandidateSha | Select-Object -First 1).Trim() -split '\s+') | Where-Object { $_ })
+  if ($head -ne $CandidateSha -or $resolvedCommit -ne $CandidateSha) {
+    throw "The 3.2.11 promotion workflow must check out the exact requested sealed head."
+  }
+
+  $releaseRecordPath = Join-Path $repo ".mir/releases/records/3.2.11.json"
+  $overridePath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json"
+  $reconstructionPath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json"
+  $qualificationPath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json"
+  $releaseRecord = Get-Content -Raw -LiteralPath $releaseRecordPath | ConvertFrom-Json -Depth 100
+  $override = Get-Content -Raw -LiteralPath $overridePath | ConvertFrom-Json -Depth 100
+  $reconstruction = Get-Content -Raw -LiteralPath $reconstructionPath | ConvertFrom-Json -Depth 100
+  $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json -Depth 100
+
+  $packageSourceCommit = [string]$releaseRecord.package.source_commit
+  $packageSourceTree = (Invoke-MIRPromotionGit rev-parse "$packageSourceCommit`^{tree}" | Select-Object -First 1).Trim()
+  Invoke-MIRPromotionGit merge-base --is-ancestor $packageSourceCommit $CandidateSha | Out-Null
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(Invoke-MIRPromotionGit diff --name-only $packageSourceCommit $CandidateSha -- @packageRoots)
+  if ($packageSourceTree -ne [string]$releaseRecord.package.source_tree -or $changedPackagePaths.Count -ne 0) {
+    throw "Package-visible source changed after the accepted C35 package-source commit."
+  }
+
+  $zipRelative = [string]$releaseRecord.package.archive
+  $zip = Join-Path $repo $zipRelative
+  if (-not (Test-Path -LiteralPath $zip -PathType Leaf)) { throw "Accepted C35 ZIP is missing: $zipRelative" }
+  $archiveSha = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+  $contentSha = Get-MIRZipContentFingerprint -Path $zip
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+  try { $entries = @($archive.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count }
+  finally { $archive.Dispose() }
+  $bytes = (Get-Item -LiteralPath $zip).Length
+
+  if ($archiveSha -ne [string]$releaseRecord.package.archive_sha256 -or
+      $contentSha -ne [string]$releaseRecord.package.content_sha256 -or
+      $bytes -ne [long]$releaseRecord.package.bytes -or $entries -ne [int]$releaseRecord.package.entries -or
+      [string]$releaseRecord.state -ne "sealed" -or [string]$releaseRecord.candidate_id -ne "C35" -or
+      @($releaseRecord.assurance_exceptions).Count -ne 0 -or
+      [string]$releaseRecord.source_release.tag -ne "3.2.10" -or
+      [string]$releaseRecord.source_release.tag_commit -ne "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6" -or
+      [string]$override.status -ne "accepted-for-immediate-promotion" -or
+      [string]$override.release -ne "3.2.11" -or [string]$override.candidate_id -ne "C35" -or
+      [string]$override.candidate.archive_sha256 -ne $archiveSha -or
+      [string]$override.candidate.content_sha256 -ne $contentSha -or
+      [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
+      [string]$override.maintainer_decision.accepted_factorio.file_version -ne "2.1.14.87180" -or
+      [string]$reconstruction.status -ne "passed" -or [string]$reconstruction.release -ne "3.2.11" -or
+      [string]$reconstruction.candidate_id -ne "C35" -or [string]$reconstruction.archive.sha256 -ne $archiveSha -or
+      @($reconstruction.builds).Count -ne 3 -or @($reconstruction.builds.sha256 | Select-Object -Unique).Count -ne 1 -or
+      [string]$qualification.status -ne "exact-engine-and-governed-upgrades-passed" -or
+      [string]$qualification.release -ne "3.2.11" -or [string]$qualification.candidate_id -ne "C35" -or
+      [string]$qualification.candidate.archive_sha256 -ne $archiveSha -or
+      [string]$qualification.candidate.content_sha256 -ne $contentSha -or
+      [string]$qualification.engine.version -ne "2.1.14" -or
+      [string]$qualification.engine.file_version -ne "2.1.14.87180" -or
+      [string]$qualification.engine.binary_sha256 -ne "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F" -or
+      [int]$qualification.governed_upgrades.passed -ne 15 -or [int]$qualification.governed_upgrades.required -ne 15 -or
+      [string]$qualification.static_validation.status -ne "passed") {
+    throw "The C35 seal, acceptance, deterministic reconstruction, exact-engine qualification, or archive identity is not exact."
+  }
+
+  foreach ($historical in @(
+    [pscustomobject]@{tag="3.2.10";commit="4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"},
+    [pscustomobject]@{tag="2.5.10";commit="6bb483de9042a7ec4c93674933e7f6c1670d79aa"}
+  )) {
+    $historicalCommit = (Invoke-MIRPromotionGit rev-parse "$($historical.tag)^{commit}" | Select-Object -First 1).Trim()
+    if ($historicalCommit -ne [string]$historical.commit) { throw "Historical tag $($historical.tag) moved." }
+  }
+
+  $candidateRef = "refs/heads/agent/mir3-2.5.11-cap-display-fix"
+  $candidateRemote = "not-checked"
+  $mainRemote = "not-checked"
+  if (-not $SkipRemote) {
+    $candidateRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin $candidateRef)
+    $candidateRemote = if ($candidateRemoteLine.Count -eq 1) { ([string]$candidateRemoteLine[0] -split '\s+')[0] } else { "" }
+    $mainRemoteLine = @(Invoke-MIRPromotionGit ls-remote --heads origin refs/heads/main)
+    $mainRemote = if ($mainRemoteLine.Count -eq 1) { ([string]$mainRemoteLine[0] -split '\s+')[0] } else { "" }
+    if ($candidateRemote -ne $CandidateSha -or $mainRemote -ne "4ff688c58c07b695be6ae6ebe021c5c7e5e1fa95") {
+      throw "Remote C35 head or protected main predecessor changed before 3.2.11 promotion."
+    }
+    Invoke-MIRPromotionGit merge-base --is-ancestor $mainRemote $CandidateSha | Out-Null
+  }
+
+  $result = [ordered]@{
+    schema = 1
+    status = "passed"
+    operation = "post-terminal-emergency-candidate-promotion-verification"
+    release = $Release
+    candidate_commit = $CandidateSha
+    candidate_tree = $resolvedTree
+    parents = $resolvedParents
+    candidate_ref = $candidateRef
+    candidate_remote = $candidateRemote
+    package_source_commit = $packageSourceCommit
+    package_visible_changes_after_freeze = @($changedPackagePaths)
+    promotion_branch = "main"
+    promotion_from = $mainRemote
+    promotion_to = $CandidateSha
+    archive = [ordered]@{path=$zipRelative;sha256=$archiveSha;content_sha256=$contentSha;bytes=$bytes;entries=$entries}
+    acceptance = $overridePath.Substring($repo.Length + 1).Replace('\', '/')
+    reconstruction = $reconstructionPath.Substring($repo.Length + 1).Replace('\', '/')
+    qualification = $qualificationPath.Substring($repo.Length + 1).Replace('\', '/')
+    authorization = "github-publication-only"
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
+    $resolvedOutput = if ([IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $repo $OutputPath }
+    $parent = Split-Path -Parent $resolvedOutput
+    if (-not (Test-Path -LiteralPath $parent -PathType Container)) { [void](New-Item -ItemType Directory -Force -Path $parent) }
+    [IO.File]::WriteAllText($resolvedOutput, (($result | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
+  }
+  $result | ConvertTo-Json -Depth 20
+  exit 0
 }
 
 if ($Release -eq "3.2.10") {

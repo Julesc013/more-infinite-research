@@ -693,6 +693,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "assert-generated-max-level-2-0" = "2.0"
       "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
+      "assert-upgrade-2-5-10-to-2-5-11" = "2.0"
     }
     $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
       $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and

@@ -59,6 +59,29 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
     Write-Host "[ok] exact 3.2.10 emergency delta is bounded to MIR3-TERM-0032 and the accepted C34 bytes."
     exit 0
   }
+  if ($activeVersion -eq "3.2.11" -and [string]$activeRelease.state -in $admittedEmergencyStates) {
+    $changeSetPath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json"
+    $overridePath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json"
+    $qualificationPath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json"
+    $changeSet = Get-Content -Raw -LiteralPath $changeSetPath | ConvertFrom-Json
+    $override = Get-Content -Raw -LiteralPath $overridePath | ConvertFrom-Json
+    $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json
+    $candidatePath = Join-Path $repo ([string]$activeRelease.package.archive)
+    if ([string]$changeSet.status -ne "two-findings-admitted" -or
+        (@($changeSet.finding_records) -join "|") -ne ".mir/releases/emergency/findings/MIR3-TERM-0033.json|.mir/releases/emergency/findings/MIR3-TERM-0034.json" -or
+        [string]$override.status -ne "accepted-for-immediate-promotion" -or
+        [string]$override.candidate.archive_sha256 -ne [string]$activeRelease.package.archive_sha256 -or
+        [string]$qualification.status -ne "exact-engine-and-governed-upgrades-passed" -or
+        [int]$qualification.governed_upgrades.passed -ne 15 -or
+        [int]$qualification.governed_upgrades.required -ne 15 -or
+        -not (Test-Path -LiteralPath $candidatePath -PathType Leaf) -or
+        (Get-MIRFileSha256 -Path $candidatePath) -ne [string]$activeRelease.package.archive_sha256 -or
+        (Get-MIRZipContentFingerprint -Path $candidatePath) -ne [string]$activeRelease.package.content_sha256) {
+      throw "The 3.2.11 emergency change set, qualification, maintainer override, or exact candidate delta boundary is invalid."
+    }
+    Write-Host "[ok] exact 3.2.11 emergency delta is bounded to MIR3-TERM-0033/0034 and the accepted C35 bytes."
+    exit 0
+  }
 }
 if ([string]::IsNullOrWhiteSpace($Path)) {
   if (-not $defaultDeltaByVersion.ContainsKey($activeVersion)) {

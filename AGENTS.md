@@ -4,6 +4,12 @@
 
 More Infinite Research is a Factorio mod. The 3.x direction is a modular compatibility compiler for infinite research technologies.
 
+## Local Factorio Engine Authority
+
+- Use the Steam installation at `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
+- Use the preserved installations under `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; for example, Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Do not download, replace, retarget, or mutate Steam depots to obtain historical engines unless the maintainer explicitly requests it.
+
 ## Required Reading By Task
 
 - Docs work: read `.mir/docs.yml` and `docs/maintainer/documentation-governance.md`.
