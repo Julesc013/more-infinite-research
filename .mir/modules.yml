@@ -130,9 +130,10 @@ modules:
     - prototypes/mir/pipeline/module_permissions.lua
     - prototypes/mir/pipeline/recipe_productivity_permissions.lua
     - prototypes/mir/pipeline/mutations/competing_productivity.lua
-    - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
-    - prototypes/mir/pipeline/mutations/weapon_speed.lua
-    - prototypes/mir/pipeline/mutations/max_level.lua
+      - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
+      - prototypes/mir/pipeline/mutations/weapon_speed.lua
+      - prototypes/mir/pipeline/mutations/max_level.lua
+      - prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/item_prototype_facts.lua
