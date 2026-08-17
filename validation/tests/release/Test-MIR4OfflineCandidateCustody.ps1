@@ -22,6 +22,21 @@ function Get-OpenSshKeygenPath {
   return (Resolve-Path -LiteralPath $found[0]).Path
 }
 
+$currentPlanPath = (Resolve-Path (Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json")).Path
+$currentPlan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $currentPlanPath -SchemaPath (Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json")
+$currentF210 = @($currentPlan.targets | Where-Object { [string]$_.target_key -ceq "f210" })[0]
+$currentBaseline = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$currentF210.predecessor.baseline_manifest)) | ConvertFrom-Json -Depth 100
+if ([string]$currentBaseline.record_sha256 -cne [string]$currentF210.predecessor.baseline_record_sha256) {
+  $staleProbeRoot = Join-Path $RepoRoot ("build/mir4/stale-plan-v1-probe-" + [guid]::NewGuid().ToString("N"))
+  Assert-Throws {
+    & (Join-Path $RepoRoot "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1") `
+      -RepoRoot $RepoRoot -PlanPath $currentPlanPath -Target f210 -OutputRoot $staleProbeRoot
+  } "The hash-bound MIR 4 candidate plan V1 materialized after its terminal baseline changed."
+  Assert-True (-not (Test-Path -LiteralPath $staleProbeRoot)) "Rejected candidate plan V1 left a materialized output root."
+  Write-Host "[ok] stale MIR 4 plan V1 fails closed before custody; append-only plan V2 and private-lane V2 are required"
+  exit 0
+}
+
 $sshKeygen = Get-OpenSshKeygenPath
 $buildTests = Join-Path $RepoRoot "build/tests"
 $testRoot = Join-Path $buildTests ("mir4-offline-custody-" + [guid]::NewGuid().ToString("N"))

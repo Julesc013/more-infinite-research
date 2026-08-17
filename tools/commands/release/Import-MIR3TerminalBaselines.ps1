@@ -56,12 +56,19 @@ function Assert-RecordSha256($Record, [string]$Context) {
   if ($expected -ne [string]$Record.record_sha256) { throw "$Context self-hash mismatch." }
 }
 
+function Get-CanonicalTextFileIdentity([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  return [pscustomobject][ordered]@{sha256=(Get-Sha256Bytes $bytes);bytes=[long]$bytes.Length}
+}
+
 function Get-AuthorityIdentity([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Required authority is missing: $RelativePath" }
+  $identity = Get-CanonicalTextFileIdentity $path
   return [pscustomobject][ordered]@{
     path = $RelativePath.Replace("\", "/")
-    sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
+    sha256 = [string]$identity.sha256
   }
 }
 
@@ -201,9 +208,10 @@ if ([string]$continuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineConti
 }
 foreach ($file in @($continuationManifest.files)) {
   $path = Join-Path $RepoRoot ([string]$file.source_path)
+  $identity = if (Test-Path -LiteralPath $path -PathType Leaf) { Get-CanonicalTextFileIdentity $path } else { $null }
   if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$file.sha256 -or
-      [long](Get-Item -LiteralPath $path).Length -ne [long]$file.bytes) {
+      [string]$identity.sha256 -cne [string]$file.sha256 -or
+      [long]$identity.bytes -ne [long]$file.bytes) {
     throw "Logical continuation input drift for ${continuationVersion}: $($file.source_path)"
   }
   $allInputs.Add((Get-AuthorityIdentity ([string]$file.source_path)))
@@ -254,9 +262,10 @@ if ([string]$f200ContinuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineC
 }
 foreach ($file in @($f200ContinuationManifest.files)) {
   $path = Join-Path $RepoRoot ([string]$file.source_path)
+  $identity = if (Test-Path -LiteralPath $path -PathType Leaf) { Get-CanonicalTextFileIdentity $path } else { $null }
   if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant() -cne [string]$file.sha256 -or
-      [long](Get-Item -LiteralPath $path).Length -ne [long]$file.bytes) {
+      [string]$identity.sha256 -cne [string]$file.sha256 -or
+      [long]$identity.bytes -ne [long]$file.bytes) {
     throw "Logical continuation input drift for ${f200ContinuationVersion}: $($file.source_path)"
   }
   $allInputs.Add((Get-AuthorityIdentity ([string]$file.source_path)))

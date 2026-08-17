@@ -665,7 +665,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
+  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -686,8 +686,27 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
       throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
+    $mir4TargetNativeFixtures = @{
+      "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
+      "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
+      "assert-generated-cap-transition-2-0" = "2.0"
+      "assert-generated-max-level-2-0" = "2.0"
+      "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
+      "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
+    }
+    $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
+      $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
+      [string]$info.factorio_version -eq [string]$mir4TargetNativeFixtures[$fixture.Name]
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
+      if ($allowedMIR4TargetNativeFixture) {
+        $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
+        $expectedFixtureLine = [regex]::Escape([string]$mir4TargetNativeFixtures[$fixture.Name])
+        if ($fixtureBaseDependency -notmatch "^base\s+>=\s+$expectedFixtureLine(\.|$)") {
+          throw "Target-native MIR 4 fixture $($info.name) must use its Factorio $($mir4TargetNativeFixtures[$fixture.Name]) base dependency; found '$fixtureBaseDependency'."
+        }
+        continue
+      }
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
@@ -2532,7 +2551,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",

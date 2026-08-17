@@ -281,7 +281,7 @@ Use `tools/mir.ps1 release docs-only` or `tools/mir.ps1 release docs-refresh` fo
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 
-Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/run-profiles/` are excluded from fixture-mod validation; scenarios and assertions live under `validation/` instead of masquerading as fixture mods. Settings visibility linting also verifies the hidden-setting readability fixture is present.
+Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit and contract inputs under `fixtures/compat-matrix/`, `fixtures/golden-plans/`, `fixtures/mir4-api-v0/`, `fixtures/museum/`, and `fixtures/run-profiles/` are excluded from fixture-mod validation; scenarios and assertions live under `validation/` instead of masquerading as fixture mods. Settings visibility linting also verifies the hidden-setting readability fixture is present.
 
 Static validation rejects runtime tick handlers in `control.lua` and `prototypes/mir/runtime/**/*.lua`.
 

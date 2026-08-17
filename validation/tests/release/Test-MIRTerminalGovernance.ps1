@@ -184,6 +184,36 @@ function Get-MIRTerminalCanonicalTextSha256 {
   $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
 }
+function Get-MIRTerminalCommitCanonicalTextSha256 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = "git"
+  $startInfo.WorkingDirectory = $RepoRoot
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  $startInfo.UseShellExecute = $false
+  foreach ($argument in @("cat-file", "blob", "$Commit`:$Path")) { [void]$startInfo.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  [void]$process.Start()
+  $bytes = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $errorText = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Unable to read frozen authority root $Commit`:$Path`: $errorText" }
+    $text = [Text.UTF8Encoding]::new($false, $true).GetString($bytes.ToArray())
+    return Get-MIRTerminalCanonicalTextSha256 -Text $text
+  } finally {
+    $bytes.Dispose()
+    $process.Dispose()
+  }
+}
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
   $row = @($wave.releases | Where-Object version -eq $identity.version)
@@ -964,7 +994,7 @@ foreach ($binding in @($sourceFreeze.fixed_point, $sourceFreeze.repository_prote
   if (-not (Test-Path -LiteralPath $bindingPath -PathType Leaf)) {
     throw "Terminal source-freeze authority root drifted: $($binding.path)"
   }
-  $bindingHash = Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($bindingPath))
+  $bindingHash = Get-MIRTerminalCommitCanonicalTextSha256 -RepoRoot $RepoRoot -Commit ([string]$sourceFreeze.common_source.commit) -Path ([string]$binding.path)
   if ($bindingHash -ne [string]$binding.canonical_text_sha256) { throw "Terminal source-freeze authority root drifted: $($binding.path)" }
 }
 $commonTree = (& git -C $RepoRoot rev-parse "$($sourceFreeze.common_source.commit)^{tree}").Trim()

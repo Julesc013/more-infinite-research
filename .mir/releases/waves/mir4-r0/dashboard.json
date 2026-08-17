@@ -13,6 +13,10 @@
       "sha256": "E0306AF363CADA74293A0C40FC834AB7BF7C4361732E2EC0A59796699D55B71C"
     },
     {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
+      "sha256": "E42E639CB2B995FE5327DB7F9A24B1B3B601D9812E8189EE8F538FBCEB58C7CE"
+    },
+    {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
       "sha256": "30384EBDE2888EEEB2CA44B987B36FBFE32754299B76BB25B78DA055BED95053"
     },
@@ -57,12 +61,12 @@
       "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
     },
     {
-      "path": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
-      "sha256": "9F6F062BAB178789314B4484F88F9DD413F3D7C19F50D12DF403379566F9F2FE"
+      "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
+      "sha256": "369CAEEB42FEDEC9B45F047A4A1318A4401CC67E174A9607163CC3C0190B149D"
     },
     {
-      "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "43161F404D317F3F3346B7629D51A1CE1AAE28BDCA7B5824147547C253B3C9C5"
+      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
+      "sha256": "3ED34B28A5E3AA1BEF6396571DF3C54BCCAC19C4805F7D48ED549BB3E98A542D"
     },
     {
       "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
@@ -113,12 +117,12 @@
       "sha256": "96662013142D5CEADF24381DFD7A87F119E5C8708111CB0CD35485EB76C1F703"
     },
     {
-      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "F86348116276015EFFEE33816338605A0977B056AEA8D8D3CBED614C039BCFE6"
+      "path": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+      "sha256": "9F6F062BAB178789314B4484F88F9DD413F3D7C19F50D12DF403379566F9F2FE"
     },
     {
       "path": ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
-      "sha256": "B0CFDFB842823ADE108CA26B928F6A16CD63C77E263C6D9232EE5E15E3A4DFB2"
+      "sha256": "B02B046EC781428AB8362D9E3E2CAC12A572B10CEB402741E96F67F56C223E82"
     }
   ],
   "payload": {
@@ -140,12 +144,12 @@
       "historical_v1_v2_registries_executable": false,
       "programme_reconciliation": "accepted-no-public-allocation",
       "target_readiness": "f210-3.2.10-and-f200-2.5.10-predecessors-bound",
-      "f200_materialization": "blocked-until-append-only-plan-and-lane-refresh",
+      "materialization": "blocked-until-plan-v2-and-private-lane-import-composite-v2",
       "public_4x": "forbidden-until-mir3-eol",
-      "emergency_lane": "admitted-not-yet-proven"
+      "emergency_lane": "plan-v1-historical-plan-v2-required"
     },
     "package_delta": 0,
-    "next_executable_task": "M4-003-local-offline-emergency-lane"
+    "next_executable_task": "M4-003-plan-v2-and-private-lane-refresh"
   },
-  "record_sha256": "45062E5C3313BCC2D769ED9451353267924A5EB69993AD0688778AA75CD5AAA6"
+  "record_sha256": "4EA901A348E815E3004954680F1923AC62A194347CDCF1D035DBBDF3CFBDD940"
 }

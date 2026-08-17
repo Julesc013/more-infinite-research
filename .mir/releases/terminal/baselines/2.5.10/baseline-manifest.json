@@ -8,7 +8,7 @@
   "capture_tool": {
     "path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1",
     "version": "1",
-    "sha256": "3D413B2730F9E6A7DD842D8C65365AFD4EB2EE84529009C7A112EC9C19E98D7E"
+    "sha256": "01237CD9887F09D530131210186AC580B9CD25483442D84BDAB34C2F61DBDF9D"
   },
   "foundation": {
     "release": "2.5.9",
@@ -24,7 +24,7 @@
     "entries": 302,
     "tag": "2.5.10"
   },
-  "input_root_sha256": "2E90F4E650A8044B4825DA3F754FD6440715450CC89B11C0BF0266C0230072B9",
+  "input_root_sha256": "5A96D672E2E6318BB2BFA6EB25D4287439F693746F14D398E17362E01F3F7912",
   "files": [
     {
       "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
@@ -36,22 +36,22 @@
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
-      "sha256": "A1516A786862003054523947DFB961572BF4BBF0A5E1DF28C2C105C1358BD6E6",
-      "bytes": 1374,
+      "sha256": "14D1E48A9504D358179E6D8A4B32384F35F333403CC87FFDC199F8A3173442B4",
+      "bytes": 1341,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
-      "sha256": "D5920AAC1ACB4694C14A43463815A13E273748F95F49A4A0FB574102971402DC",
-      "bytes": 1622,
+      "sha256": "4BF0EEE416BD5C9E2B02FE03961A215B276C1F68096F4429EE916DE55C5EF024",
+      "bytes": 1587,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
-      "sha256": "B8EE3D22DD8F7BBD5BC9C00C447CF7FE6ACC27B0AFF8B5989B1FBA1327ABB8E9",
-      "bytes": 1199,
+      "sha256": "3B976C05BB6FA8247E2492B5E62742383AD824B6119C8182CB01D676ABE58930",
+      "bytes": 1168,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -113,8 +113,8 @@
     {
       "logical_path": "authority/tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1",
       "source_path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1",
-      "sha256": "3D413B2730F9E6A7DD842D8C65365AFD4EB2EE84529009C7A112EC9C19E98D7E",
-      "bytes": 13573,
+      "sha256": "01237CD9887F09D530131210186AC580B9CD25483442D84BDAB34C2F61DBDF9D",
+      "bytes": 13639,
       "role": "post-terminal-hotfix-authority"
     }
   ],
@@ -143,5 +143,5 @@
     "open_findings": [],
     "mir4_behavioral_proof_required": true
   },
-  "record_sha256": "AF990283906760E451E9DA0646CD2FADF98E6B0F46C52823BF114CF770D5C53A"
+  "record_sha256": "F5FC00488C1692DD5B1858FE70EF9752E92076720F3CB3E629C46CB5FA867F30"
 }

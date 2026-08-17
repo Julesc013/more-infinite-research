@@ -263,6 +263,7 @@ $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-RefreshV2.json"
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Import-ContractV2.json"
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Target-RegistryV3.json"
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Approved-Bootstrap-Correction-CompositeV2.json"
 $generatedSources += Get-Binding ".mir/releases/records/2.5.10.json"
 $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json"
 $generatedSources += Get-Binding ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json"
@@ -276,9 +277,9 @@ $dashboard = Add-RecordSha256 ([ordered]@{
   generated_from = $generatedSources
   payload = [ordered]@{
     mir3 = [ordered]@{ product_development="closed-except-immutable-post-terminal-hotfixes"; github_publication="3.2.10-latest-and-2.5.10-published-verified"; mod_portal_custody="maintainer-upload-not-independently-redownload-verified"; terminal_dot9_baselines="retained-immutable"; terminal_2_1_continuation="3.2.10-captured-and-imported"; terminal_2_0_continuation="2.5.10-public-release-bound-refresh-v2"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v3-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-and-f200-2.5.10-predecessors-bound"; f200_materialization="blocked-until-append-only-plan-and-lane-refresh"; public_4x="forbidden-until-mir3-eol"; emergency_lane="admitted-not-yet-proven" }
+    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v3-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-and-f200-2.5.10-predecessors-bound"; materialization="blocked-until-plan-v2-and-private-lane-import-composite-v2"; public_4x="forbidden-until-mir3-eol"; emergency_lane="plan-v1-historical-plan-v2-required" }
     package_delta = 0
-    next_executable_task = "M4-003-local-offline-emergency-lane"
+    next_executable_task = "M4-003-plan-v2-and-private-lane-refresh"
   }
 })
 $queue = Add-RecordSha256 ([ordered]@{
@@ -290,9 +291,9 @@ $queue = Add-RecordSha256 ([ordered]@{
   payload = [ordered]@{
     tasks = @(
       [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="2.5.10-predecessor-bound-normalized-continuation-pending";blocked_by=@("f200-plan-v2-and-baseline-continuation")},
+      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="terminal-continuations-imported-plan-v2-pending";blocked_by=@("mir4-plan-v2")},
       [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
-      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="f210-ready-f200-plan-refresh-required";blocked_by=@("f200-plan-v2-and-lane-authorization-refresh")},
+      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="plan-v2-required-before-f210-or-f200-materialization";blocked_by=@("plan-v2-import-composite-v2", "private-lane-authorization-v2")},
       [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
       [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
       [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
@@ -307,4 +308,4 @@ if (-not $Update) {
 }
 
 Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: refresh the f200 plan/lane to 2.5.10, then resume M4-003 (MIR3-TERM-0033 required)"
+Write-Host "[ok] next executable task: create append-only plan V2 and private-lane authorization V2, then resume M4-003"
