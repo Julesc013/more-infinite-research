@@ -5,18 +5,12 @@
       "candidate_id": "C35",
       "release": "3.2.11",
       "remaining_states": [
-        "focused-qualified",
-        "candidate-qualified",
-        "automated-qualified-awaiting-human-review",
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
-      "state": "package-built",
+      "state": "sealed",
       "target_seal_present": false
     },
     {

@@ -61,29 +61,21 @@
       "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
       "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
       "protected_qualification": "pending",
-      "publication_status": "package-built",
-      "qualification": "package-built",
+      "publication_status": "sealed",
+      "qualification": "sealed",
       "remaining_obligations": [
-        "focused-qualification",
-        "root-cause-regression",
-        "exact-engine-qualification",
         "protected-promotion",
-        "tag-and-publication"
+        "github-publication-and-public-byte-verification",
+        "mod-portal-maintainer-upload"
       ],
       "remaining_states": [
-        "focused-qualified",
-        "candidate-qualified",
-        "automated-qualified-awaiting-human-review",
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
         "promoted",
         "tagged",
         "published",
         "publicly-verified"
       ],
       "source_anchor": "3.2.10",
-      "status": "C35-package-built"
+      "status": "C35-sealed"
     }
   },
   "generated_from": [
@@ -124,7 +116,7 @@
     "typed_release_records_are_authoritative": true
   },
   "schema": 1,
-  "updated_at": "2026-08-17",
+  "updated_at": "2026-08-18",
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",

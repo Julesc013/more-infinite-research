@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR3PostTerminalEmergencyHotfixLocalQualificationV2",
-  "status": "focused-exact-engine-passed",
+  "status": "exact-engine-and-governed-upgrades-passed",
   "release": "3.2.11",
   "candidate_id": "C35",
   "candidate": {
@@ -36,14 +36,24 @@
     {"id": "scenario/2.1/space-age-native-owner-settings-max-level-profile-import", "fingerprint_sha256": "828F89694193E7F28F97469B19159812BD674F12FF8608B66B7429B1C6E05DE1", "status": "passed"},
     {"id": "scenario/2.1/space-age-native-owner-settings-max-level-late-conflict", "fingerprint_sha256": "BCEA3EA11E7659F70D1D34623E3E859FBC6E76F070FC1FDB3D05C6B0E23ED3B6", "status": "passed"}
   ],
+  "governed_upgrades": {
+    "fixture": "assert-upgrade-3-2-9-to-3-2-10",
+    "archetypes_per_source": 5,
+    "passed": 15,
+    "required": 15,
+    "sources": [
+      {"version": "3.2.10", "matrix_sha256": "CA5395F673F208D23E36025F7DBF73F7FDD886D695C51FAE1E4FEB39BCD8C9EE", "status": "passed"},
+      {"version": "3.2.9", "matrix_sha256": "8400261A808670D6428E93CDB0B3783E461FD496B8CB39F21363D9B3FC670AE7", "status": "passed"},
+      {"version": "3.2.5", "matrix_sha256": "5E7CBA1E15F8752F97FD4BC6E1DFD513397ED6C218EC49AA0B0DA3D385301A64", "status": "passed"}
+    ]
+  },
   "static_validation": {
     "command": ".\\scripts\\Invoke-MIRValidation.ps1 -StaticOnly",
     "status": "passed",
     "deterministic_build_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
   },
   "remaining": [
-    "complete-governed-upgrade-and-ecosystem-qualification",
     "protected-promotion-and-publication"
   ],
-  "recorded_at": "2026-08-17T23:50:00+10:00"
+  "recorded_at": "2026-08-18T02:06:00+10:00"
 }

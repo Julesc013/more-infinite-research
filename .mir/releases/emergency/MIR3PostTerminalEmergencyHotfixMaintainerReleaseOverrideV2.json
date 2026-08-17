@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2",
+  "status": "accepted-for-immediate-promotion",
+  "recorded_at": "2026-08-18T02:10:00+10:00",
+  "release": "3.2.11",
+  "candidate_id": "C35",
+  "scope": "release-specific post-terminal exception for MIR3-TERM-0033 and MIR3-TERM-0034",
+  "maintainer_decision": {
+    "publication": "authorized immediately after the exact local release gates pass",
+    "accepted_factorio": {
+      "distribution": "Steam",
+      "version": "2.1.14",
+      "file_version": "2.1.14.87180",
+      "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+    },
+    "local_2_1_14_qualification": "passed and accepted for publication",
+    "governed_upgrades": "15 of 15 required rows passed",
+    "cleanup": "no file, worktree, branch, tag, release, or archive deletion authorized"
+  },
+  "candidate": {
+    "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+    "archive": "dist/more-infinite-research_3.2.11.zip",
+    "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "bytes": 1067720,
+    "entries": 305
+  },
+  "invariants": {
+    "release_3_2_10_unchanged": true,
+    "release_2_5_10_unchanged": true,
+    "historical_tags_unchanged": true,
+    "historical_assets_unchanged": true,
+    "candidate_bytes_rebuilt_or_replaced_after_acceptance": false,
+    "mir4_r0_preserved": true
+  },
+  "evidence": [
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json",
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json",
+    "docs/releases/notes/release-notes-3.2.11.md"
+  ]
+}

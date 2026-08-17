@@ -30,7 +30,7 @@ MIR 3.2.10 remains unchanged and downloadable as the immutable predecessor.
 
 | Field | Value |
 | --- | --- |
-| State | `package-built` |
+| State | `sealed` |
 | Candidate | `C35` |
 | Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
 | Archive SHA-256 | `5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A` |

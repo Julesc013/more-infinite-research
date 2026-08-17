@@ -210,9 +210,9 @@ candidate:
   artifact: dist/more-infinite-research_3.2.11.zip
   source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
   package_source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
-  automated_gate: pending-qualification
-  manual_gate: pending-exact-candidate-review
-  status: package-built
+  automated_gate: passed-local-2.1.14-release-exception
+  manual_gate: accepted-for-publication
+  status: maintainer-accepted-emergency
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

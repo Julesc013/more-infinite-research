@@ -95,10 +95,10 @@
       "branch": "main",
       "candidate_floor": "C35",
       "candidate_id": "C35",
-      "effective_status": "package-built",
+      "effective_status": "sealed",
       "release": "3.2.11",
       "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
-      "state": "package-built",
+      "state": "sealed",
       "target": "2.1"
     },
     {
