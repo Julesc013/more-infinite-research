@@ -551,7 +551,7 @@ if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.11') {
     . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
     $candidate = Join-Path $repo ([string]$record.package.archive)
     if ([string]$record.candidate_id -ne '2.5-P15' -or
-        [string]$record.state -ne 'package-built' -or
+        [string]$record.state -ne 'sealed-awaiting-publication' -or
         [string]$record.source_release.tag_commit -ne '6bb483de9042a7ec4c93674933e7f6c1670d79aa' -or
         [string]$record.semantic_parent.source_commit -ne '0a32864d1f1d1fdea090369bc1a22fbd511e290a' -or
         (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$record.package.content_sha256 -or

@@ -15,7 +15,7 @@
   "target": "2.0",
   "branch": "hotfix/mir3-max-level-2.5.11",
   "development_branch": "dev",
-  "state": "package-built",
+  "state": "sealed-awaiting-publication",
   "package": {
     "source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
     "source_tree": "7786bdeaee398e069abdf7de797f82f645ccba45",
@@ -24,14 +24,20 @@
     "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
     "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
     "bytes": 1065193,
-    "entries": 303
+    "entries": 303,
+    "factorio_engine": "2.0.77",
+    "factorio_engine_build": "2.0.77.84539",
+    "factorio_engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "proofs": {
     "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
-    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json",
+    "factorio_2_0_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
+    "approved_delta": "approved-delta/2.5.10-to-2.5.11.json"
   },
-  "remaining_obligations": ["focused-qualification", "exact-engine-qualification", "governed-upgrades", "tag-and-publication", "mod-portal-maintainer-upload"],
+  "assurance_exceptions": [],
+  "remaining_obligations": ["github-publication-and-public-byte-verification", "mod-portal-maintainer-upload"],
   "source_release": {
     "release": "2.5.10",
     "candidate_id": "2.5-P14",

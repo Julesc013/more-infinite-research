@@ -180,7 +180,7 @@ if ($isEmergency2511) {
       [string]$campaign.baseline.version -ne '2.5.10' -or
       [string]$campaign.baseline.archive_sha256 -ne [string]$record.source_release.archive_sha256 -or
       [string]$campaign.baseline.package_content_sha256 -ne [string]$record.source_release.content_sha256 -or
-      [string]$campaign.candidate.state -ne 'package-built' -or
+      [string]$campaign.candidate.state -ne 'sealed-awaiting-publication' -or
       [string]$campaign.candidate.candidate_id -ne '2.5-P15' -or
       [string]$campaign.candidate.version -ne '2.5.11' -or
       [string]$campaign.candidate.package_source_commit -ne [string]$record.package.source_commit -or
@@ -190,7 +190,7 @@ if ($isEmergency2511) {
       -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf) -or
       (Get-MIRFileSha256 -Path $candidateArchive) -ne [string]$record.package.archive_sha256 -or
       (Get-MIRZipContentFingerprint -Path $candidateArchive) -ne [string]$record.package.content_sha256) {
-    throw 'The MIR 2.5.11 emergency performance authority does not bind package-built P15 and immutable 2.5.10.'
+    throw 'The MIR 2.5.11 emergency performance authority does not bind sealed P15 and immutable 2.5.10.'
   }
 } elseif ($isEmergency2510) {
   $record = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\releases\records\2.5.10.json') | ConvertFrom-Json -Depth 100

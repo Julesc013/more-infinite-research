@@ -30,7 +30,7 @@ MIR 2.5.10 remains unchanged and downloadable as the immutable predecessor.
 
 | Field | Value |
 | --- | --- |
-| State | `package-built` |
+| State | `sealed-awaiting-publication` |
 | Candidate | `2.5-P15` |
 | Package source commit | `57324642e7423d784d7f22b9be4a2b6b350bf012` |
 | Archive SHA-256 | `4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C` |

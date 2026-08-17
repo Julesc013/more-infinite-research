@@ -10,7 +10,7 @@
     "package_content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
   },
   "candidate": {
-    "state": "package-built",
+    "state": "sealed-awaiting-publication",
     "candidate_id": "2.5-P15",
     "version": "2.5.11",
     "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",

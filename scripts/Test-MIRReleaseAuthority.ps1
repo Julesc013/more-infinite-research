@@ -50,7 +50,7 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
   if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.11' -or
       [string]$record.target -ne '2.0' -or [string]$record.candidate_id -ne '2.5-P15' -or
       [string]$record.candidate_allocation.assigned_id -ne '2.5-P15' -or
-      [string]$record.state -ne 'package-built' -or
+      [string]$record.state -ne 'sealed-awaiting-publication' -or
       [string]$record.source_release.tag_commit -ne $expected.predecessor -or
       [string]$record.semantic_parent.source_commit -ne $expected.semantic_parent -or
       [string]$record.package.source_commit -ne $expected.source -or
@@ -58,7 +58,7 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
       [string]$record.package.archive_sha256 -ne $expected.archive -or
       [string]$record.package.content_sha256 -ne $expected.content -or
       [long]$record.package.bytes -ne $expected.bytes -or [int]$record.package.entries -ne $expected.entries) {
-    throw 'The MIR 2.5.11 P15 package-built authority is not exact.'
+    throw 'The MIR 2.5.11 P15 sealed authority is not exact.'
   }
 
   . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
