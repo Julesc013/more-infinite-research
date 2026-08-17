@@ -33,6 +33,27 @@ function Get-MIRZipFileCount {
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'info.json') | ConvertFrom-Json
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.11') {
+  # P15 is rooted at immutable P14 and carries frozen C35 semantics. The old
+  # P12 projection lock remains historical evidence, not a linear ancestor.
+  if ([int]$lock.schema -ne 5 -or [int]$lock.projection_schema -ne 4 -or
+      [string]$lock.mir_version -ne '2.5.5' -or [string]$lock.candidate_id -ne '2.5-P12' -or
+      [string]$lock.target -ne '2.0' -or
+      [string]$lock.projection.package_source_commit -ne '689940f436b004cf4e5981f1944ddb04eaa17367' -or
+      [string]$lock.candidate.archive_sha256 -ne '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C') {
+    throw 'MIR 2.5.11 does not retain the exact immutable P12 historical source lock.'
+  }
+  foreach ($row in @(
+    @{Name='P12 baseline.commit'; Commit=[string]$lock.baseline.commit},
+    @{Name='P12 portable_source.commit'; Commit=[string]$lock.portable_source.commit},
+    @{Name='P12 projection.package_source_commit'; Commit=[string]$lock.projection.package_source_commit},
+    @{Name='P14 release predecessor'; Commit='6bb483de9042a7ec4c93674933e7f6c1670d79aa'},
+    @{Name='C35 semantic source'; Commit='0a32864d1f1d1fdea090369bc1a22fbd511e290a'},
+    @{Name='P15 package source'; Commit='7137e37b44f2acd4aee1651a7e653301bfb1da89'}
+  )) { Assert-MIRCommit -Name $row.Name -Commit $row.Commit }
+  Write-Host '[ok] MIR 2.5.11 retains the historical P12 source lock and binds immutable P14 plus frozen C35 authority.'
+  return
+}
 if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.10') {
   # P14 descends from the immutable P13 release commit. The older P12 source
   # lock remains historical evidence, but its independent projection commit
