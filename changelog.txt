@@ -4,13 +4,16 @@ Date: 2026-08-17
 
   Bugfixes:
 
-    - Hid the misleading infinity badge when a positive maximum level is configured and displayed the exact selected cap in the technology description.
-    - Preserved completed levels above a newly lowered cap while preventing current, queued, or future research beyond the selected maximum.
+    - Hid the misleading infinity badge when a positive maximum level is configured and displayed the exact selected cap in
+      the technology description.
+    - Preserved completed levels above a newly lowered cap while preventing current, queued, or future research beyond the
+      selected maximum.
     - Kept competing base-extension replacement transactional when the selected cap omits MIR's replacement technology.
 
   Compatibility:
 
-    - Applied the presentation and enforcement correction to generated productivity streams, base continuations, and Space Age native owners.
+    - Applied the presentation and enforcement correction to generated productivity streams, base continuations, and Space
+      Age native owners.
     - Applied direct startup values and MIRSET1 profile imports through the same maximum-level contract.
 
 ---------------------------------------------------------------------------------------------------
