@@ -53,7 +53,9 @@ function Write-Or-Check([string]$RelativePath, $Value) {
 
 function Get-Binding([string]$RelativePath) {
   $path = Join-Path $RepoRoot $RelativePath
-  return [ordered]@{ path=$RelativePath; sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant() }
+  $text = [IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  return [ordered]@{ path=$RelativePath; sha256=Get-Sha256Bytes $bytes }
 }
 
 function Assert-Schema([string]$RelativePath, [string]$SchemaPath) {

@@ -42,7 +42,7 @@
     },
     {
       "path": ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
-      "sha256": "A23866B49705F095DE8E429CB3681A37B15B8C7474B3D91737D38F0E0BE7B17C"
+      "sha256": "FDF734AF28667BC4605DB42709C6DEE167DFF27A51E1D528D7AE2F33C98D267D"
     },
     {
       "path": ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
@@ -151,5 +151,5 @@
     "package_delta": 0,
     "next_executable_task": "M4-003-plan-v2-and-private-lane-refresh"
   },
-  "record_sha256": "4EA901A348E815E3004954680F1923AC62A194347CDCF1D035DBBDF3CFBDD940"
+  "record_sha256": "1CC230F3CA69AA37D477413EEA2D432CF6DF6782F30862B6DDB01199E8987DF7"
 }
