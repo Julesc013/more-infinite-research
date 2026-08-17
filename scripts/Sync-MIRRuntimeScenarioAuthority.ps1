@@ -177,6 +177,7 @@ if (($literalConfigurationNames -join "`n") -cne ($configurationNames -join "`n"
   throw "Configuration-change calls differ from target $factorioVersion authority. Expected [$($configurationNames -join ', ')]; actual [$($literalConfigurationNames -join ', ')]."
 }
 $expectedDynamic = @(
+  "generated-maximum-level-absolute",
   "space-age-native-owner-settings-combined",
   "space-age-native-owner-settings-cost-base",
   "space-age-native-owner-settings-cost-growth",
@@ -184,6 +185,11 @@ $expectedDynamic = @(
   "space-age-native-owner-settings-disabled",
   "space-age-native-owner-settings-effect",
   "space-age-native-owner-settings-max-level",
+  "space-age-native-owner-settings-max-level-1",
+  "space-age-native-owner-settings-max-level-2",
+  "space-age-native-owner-settings-max-level-7",
+  "space-age-native-owner-settings-max-level-late-conflict",
+  "space-age-native-owner-settings-max-level-profile-import",
   "space-age-native-owner-settings-research-time",
   "space-age-native-owner-settings-unrecognized-default",
   "space-age-native-owner-settings-unrecognized-override",
@@ -194,6 +200,24 @@ $expectedDynamic = @(
   "weapon-overlap-off-coverage-absent",
   "weapon-overlap-off-coverage-present"
 )
+if ($factorioVersion -eq '2.0') {
+  $notApplicableOn20 = @(
+    'generated-maximum-level-absolute',
+    'space-age-native-owner-settings-max-level-1',
+    'space-age-native-owner-settings-max-level-2',
+    'space-age-native-owner-settings-max-level-7',
+    'space-age-native-owner-settings-max-level-late-conflict',
+    'space-age-native-owner-settings-max-level-profile-import'
+  )
+  $expectedDynamic = @(
+    @($expectedDynamic | Where-Object { $_ -notin $notApplicableOn20 }) +
+    @(
+      'generated-maximum-level-five-streams-2-0',
+      'generated-maximum-level-five-streams-mirset1-2-0'
+    ) |
+      Sort-Object
+  )
+}
 $dynamicNames = @($runtimeNames | Where-Object { -not $literalInvocations.Contains($_) } | Sort-Object)
 if (($dynamicNames -join "`n") -cne ($expectedDynamic -join "`n")) {
   throw "Unexpected manifest-driven runtime calls for target $factorioVersion. Expected [$($expectedDynamic -join ', ')]; actual [$($dynamicNames -join ', ')]."

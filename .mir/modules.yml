@@ -50,6 +50,7 @@ runtime_boundaries:
       - prototypes/mir/runtime/startup_settings.lua
       - prototypes/mir/runtime/settings_profile.lua
       - prototypes/mir/runtime/productivity_family_adoption.lua
+      - prototypes/mir/runtime/maximum_level_control.lua
       - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
       - prototypes/mir/runtime/effects/spoilage_preservation.lua
     allowed_globals:
@@ -324,6 +325,7 @@ modules:
     - prototypes/mir/runtime/startup_settings.lua
     - prototypes/mir/runtime/settings_profile.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
+    - prototypes/mir/runtime/maximum_level_control.lua
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "MIR3TerminalFindingV1",
+  "id": "MIR3-TERM-0032",
+  "title": "Native-owner maximum research level is not enforced for five productivity technologies",
+  "source_observation": {
+    "observed_at": "2026-08-16T00:00:00+10:00",
+    "environment": "Exact public 3.2.9 archive SHA-256 0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20 reproduced on locally installed Factorio 2.1.14; exact supported 2.1.13 qualification remains mandatory.",
+    "fact": "A finite data-stage TechnologyPrototype.max_level clamps an already-completed infinite technology level before MIR's configuration-change handler can preserve it. The earlier fixture proved only final prototype assignment, not force/save/research behavior."
+  },
+  "reproducer": {
+    "status": "reproduced-nearby-engine-exact-package",
+    "evidence": "build/results/hotfix/reproduction-3.2.9-cap-lowering-2.1.14-v2.json",
+    "expected": "Completed level 8 remains completed when the absolute cap is lowered to 5; invalid current and queued research are removed.",
+    "observed": "Public 3.2.9 changed the completed level from 8 to 5 before runtime recovery."
+  },
+  "severity": "P0",
+  "visibility": {"package": true, "gameplay": true, "assurance": true},
+  "affected_contract_family": [
+    "generated-stream-technologies",
+    "generated-base-continuations",
+    "Factorio-2.1-native-productivity-owners"
+  ],
+  "affected_native_owners": [
+    "processing-unit-productivity",
+    "plastic-bar-productivity",
+    "low-density-structure-productivity",
+    "rocket-fuel-productivity",
+    "steel-plate-productivity"
+  ],
+  "target_dispositions": [
+    {"target": "3.2.10", "disposition": "required-after-exact-qualification"},
+    {"target": "2.5.10", "disposition": "positive-applicability-qualified-on-exact-2.0.77"},
+    {"target": "lower-dot9-lines", "disposition": "not-projected-without-package-impact"}
+  ],
+  "implementation": "Keep managed prototypes infinite on script-capable targets; publish a compiler-owned maximum-level policy; enforce finite absolute caps at runtime without unresearching completed levels; remove invalid current/queued levels; restore MIR-disabled technologies when caps rise or return to zero; refuse and diagnose late finite prototype conflicts.",
+  "closure": {
+    "status": "implemented-3.2.10-published-2.5.10-exact-engine-regressions-pass",
+    "evidence_root": "build/results/hotfix"
+  }
+}

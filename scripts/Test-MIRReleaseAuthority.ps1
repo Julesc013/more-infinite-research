@@ -34,6 +34,61 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
 $info = Read-MIRText "info.json" | ConvertFrom-Json
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.10') {
+  $record = Read-MIRText '.mir/releases/records/2.5.10.json' | ConvertFrom-Json -Depth 100
+  $expected = [ordered]@{
+    predecessor = '89719eb8ea5c938b6a0e9d816e6324d4d59b87bb'
+    semantic_parent = '4cbea531a1043e0cacb9ac5c496731c8d77bbdb6'
+    archive = '251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB'
+    content = '55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66'
+    bytes = 1062874
+    entries = 302
+  }
+  if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.10' -or
+      [string]$record.target -ne '2.0' -or [string]$record.candidate_id -ne '2.5-P14' -or
+      [string]$record.candidate_allocation.assigned_id -ne '2.5-P14' -or
+      [string]$record.state -ne 'sealed-awaiting-publication' -or
+      [string]$record.source_release.tag_commit -ne $expected.predecessor -or
+      [string]$record.semantic_parent.tag_commit -ne $expected.semantic_parent -or
+      [string]$record.package.archive_sha256 -ne $expected.archive -or
+      [string]$record.package.content_sha256 -ne $expected.content -or
+      [long]$record.package.bytes -ne $expected.bytes -or [int]$record.package.entries -ne $expected.entries -or
+      [string]$record.package.factorio_engine -ne '2.0.77') {
+    throw 'The MIR 2.5.10 P14 emergency release record is not exact and sealed.'
+  }
+
+  . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne $expected.content) {
+    throw 'Current package roots do not reproduce the exact MIR 2.5.10 package content identity.'
+  }
+  $candidatePath = Join-Path $repo 'dist\more-infinite-research_2.5.10.zip'
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+    throw 'The exact MIR 2.5.10 candidate archive is absent.'
+  }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidatePath)
+  try { $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count } finally { $candidateZip.Dispose() }
+  if ((Get-Item -LiteralPath $candidatePath).Length -ne $expected.bytes -or
+      $candidateEntries -ne $expected.entries -or
+      (Get-MIRFileSha256 -Path $candidatePath) -ne $expected.archive -or
+      (Get-MIRZipContentFingerprint -Path $candidatePath) -ne $expected.content) {
+    throw 'The MIR 2.5.10 P14 candidate archive differs from sealed authority.'
+  }
+
+  & git -C $repo cat-file -e "$($expected.predecessor)^{commit}"
+  if ($LASTEXITCODE -ne 0) { throw 'The immutable MIR 2.5.9 predecessor is unavailable.' }
+  & git -C $repo cat-file -e "$($expected.semantic_parent)^{commit}"
+  if ($LASTEXITCODE -ne 0) { throw 'The immutable MIR 3.2.10 semantic parent is unavailable.' }
+  $committedInfo = (& git -C $repo show 'HEAD:info.json' 2>$null) | Out-String | ConvertFrom-Json
+  if ([string]$committedInfo.version -eq '2.5.10') {
+    $parents = @(& git -C $repo rev-list --parents -n 1 HEAD)[0].Split(' ')
+    if ($parents.Count -ne 3 -or $parents[1] -ne $expected.predecessor -or $parents[2] -ne $expected.semantic_parent) {
+      throw 'The MIR 2.5.10 release commit must have exact 2.5.9 first parent and exact 3.2.10 second semantic parent.'
+    }
+  }
+  Write-Host '[ok] MIR 2.5.10 P14 authority, deterministic package identity, and emergency backport topology are exact.'
+  return
+}
 if ([string]$info.factorio_version -eq "2.0" -and [string]$info.version -eq "2.5.5") {
   if ([string]$backport.mir_version -ne "2.5.5" -or [string]$backport.candidate_id -ne "2.5-P12" -or
       [string]$backport.branch -ne "candidate/2.5.5-projection" -or [string]$backport.source_anchor -ne "C32" -or

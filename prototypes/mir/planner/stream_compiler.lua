@@ -291,6 +291,8 @@ local function plan_stream(key, raw_spec)
   local first_level = research_cost_classification.anchor_level(technology_name, 1)
   local cost_model = costs.model_for(key, spec, first_level)
   local max_level = costs.max_level_for(key, spec)
+  local prototype_max_level = target_line.feature_enabled("scripted_techs")
+    and "infinite" or max_level
   local count_formula = cost_model.count_formula
   local research_time = costs.research_time_for(key, spec)
 
@@ -340,12 +342,13 @@ local function plan_stream(key, raw_spec)
       cost_model = cost_model,
       ingredients = ingredients,
       research_time = research_time,
-      max_level = max_level,
+      max_level = prototype_max_level,
     }
     return plan_row(key, spec, "emit", "direct_effect",
       D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status), {
         technology_name = technology_name,
         fields = fields,
+        planned_max_level = max_level,
         direct_effects = true,
         overlap_effects = direct_effects
       })
@@ -411,12 +414,13 @@ local function plan_stream(key, raw_spec)
     cost_model = cost_model,
     ingredients = ingredients,
     research_time = research_time,
-    max_level = max_level,
+    max_level = prototype_max_level,
   }
   return plan_row(key, spec, "emit", "recipe_productivity",
     D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status), {
       technology_name = technology_name,
       fields = fields,
+      planned_max_level = max_level,
       direct_effects = false
     })
 end

@@ -3,6 +3,126 @@
   "profiles": {
     "2.0": [
       {
+        "name": "generated-maximum-level-five-streams-2-0",
+        "target_profile": "2.0",
+        "kind": "runtime",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-max-level-2-0"
+        ],
+        "settings": {
+          "StartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 5,
+            "ips-max-level-research_plastic": 5,
+            "ips-max-level-research_low_density_structure": 5,
+            "ips-max-level-research_rocket_fuel": 5,
+            "ips-max-level-research_steel": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-2-0-five-generated-maximum-level-caps-enforced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-five-streams-mirset1-2-0",
+        "target_profile": "2.0",
+        "kind": "runtime",
+        "group": "settings-codec",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs",
+          "settings_profiles"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-max-level-2-0"
+        ],
+        "settings": {
+          "SettingsProfileOverrides": {
+            "ips-max-level-research_processing_unit": 5,
+            "ips-max-level-research_plastic": 5,
+            "ips-max-level-research_low_density_structure": 5,
+            "ips-max-level-research_rocket_fuel": 5,
+            "ips-max-level-research_steel": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "maximum-level",
+          "runtime",
+          "settings-codec"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-2-0-mirset1-generated-maximum-level-caps-enforced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-lowering-config-change-2-0",
+        "target_profile": "2.0",
+        "kind": "configuration-change",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-cap-transition-2-0"
+        ],
+        "settings": {
+          "InitialFixtureNames": [
+            "mir-fixture-assert-generated-cap-transition-2-0"
+          ],
+          "ChangedFixtureNames": [
+            "mir-fixture-assert-generated-cap-transition-2-0"
+          ],
+          "InitialStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 0
+          },
+          "ChangedStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-2-0-completed-levels-retained-above-lowered-cap",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "factorio-2-0-invalid-current-and-queued-research-removed",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "aai-loader-belt-productivity",
         "target_profile": "2.0",
         "kind": "runtime",
@@ -5924,6 +6044,120 @@
         ]
       },
       {
+        "name": "generated-maximum-level-absolute",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-max-level"
+        ],
+        "settings": {
+          "StartupSettingOverrides": {
+            "ips-max-level-research_copper": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "generated-absolute-maximum-level-enforced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-lowering-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-cap-transition"
+        ],
+        "settings": {
+          "InitialStartupSettingOverrides": {
+            "ips-max-level-research_copper": 0
+          },
+          "ChangedStartupSettingOverrides": {
+            "ips-max-level-research_copper": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "generated-completed-levels-retained-above-lowered-cap",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "generated-invalid-research-removed-after-cap-lowering",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-continuation-maximum-level-lowering-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-base-continuation-cap-transition",
+          "mir-fixture-finite-base-extension-level"
+        ],
+        "settings": {
+          "InitialStartupSettingOverrides": {
+            "mir-max-level-research-speed": 0
+          },
+          "ChangedStartupSettingOverrides": {
+            "mir-max-level-research-speed": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "base-continuation",
+          "configuration-change",
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "base-continuation-retained-when-cap-falls-below-first-level",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "base-continuation-invalid-research-removed-after-cap-lowering",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "space-age-native-owner-settings-max-level",
         "target_profile": "2.1",
         "kind": "runtime",
@@ -5952,6 +6186,192 @@
         "assertions": [
           {
             "id": "native-owner-max-level-override",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level-1",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "productivity_family_adoption",
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "StartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 1,
+            "ips-max-level-research_plastic": 1,
+            "ips-max-level-research_low_density_structure": 1,
+            "ips-max-level-research_rocket_fuel": 1,
+            "ips-max-level-research_steel": 1
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-max-level-1-absolute-cap",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level-profile-import",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "productivity_family_adoption",
+          "recipe_productivity",
+          "settings_profiles"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "max-level-import"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "settings-codec",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-mirset1-maximum-level-enforced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level-late-conflict",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "productivity_family_adoption",
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-late-native-owner-max-level"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "max-level"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "conflict",
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-late-maximum-level-conflict-reported",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level-2",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "productivity_family_adoption",
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "StartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 2,
+            "ips-max-level-research_plastic": 2,
+            "ips-max-level-research_low_density_structure": 2,
+            "ips-max-level-research_rocket_fuel": 2,
+            "ips-max-level-research_steel": 2
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-max-level-2-absolute-cap",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level-7",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "productivity_family_adoption",
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-native-owner-settings-source",
+          "mir-fixture-assert-native-owner-settings"
+        ],
+        "settings": {
+          "StartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 7,
+            "ips-max-level-research_plastic": 7,
+            "ips-max-level-research_low_density_structure": 7,
+            "ips-max-level-research_rocket_fuel": 7,
+            "ips-max-level-research_steel": 7
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "native-owner-settings",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-max-level-above-native-start",
             "type": "factorio-load-and-assertion-fixtures-pass"
           }
         ]
@@ -6118,6 +6538,126 @@
           },
           {
             "id": "native-owner-current-research-progress-retained",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-cap-lowering-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-native-owner-cap-transition"
+        ],
+        "settings": {
+          "InitialNativeOwnerSettingsProfile": "default",
+          "ChangedNativeOwnerSettingsProfile": "max-level"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "native-owner-settings",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-completed-levels-retained-above-lowered-cap",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-invalid-current-research-removed-after-cap-lowering",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-invalid-queued-research-removed-after-cap-lowering",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-cap-raising-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-native-owner-cap-relaxation"
+        ],
+        "settings": {
+          "InitialStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 5
+          },
+          "ChangedStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 7
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "native-owner-settings",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-cap-raise-retains-valid-progress",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-cap-raise-restores-future-levels",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-cap-removal-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-native-owner-cap-relaxation"
+        ],
+        "settings": {
+          "InitialStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 5
+          },
+          "ChangedStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 0
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "native-owner-settings",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "native-owner-cap-removal-retains-valid-progress",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "native-owner-cap-removal-restores-infinite-progression",
             "type": "factorio-load-and-assertion-fixtures-pass"
           }
         ]

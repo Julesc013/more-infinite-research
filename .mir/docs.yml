@@ -2287,3 +2287,35 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.5.9-release-notes
+  - path: docs/releases/control-plane-dashboard.md
+    title: "MIR Control Plane Dashboard"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-release-control-plane-dashboard
+  - path: docs/releases/mir3-post-terminal-emergency-hotfix.md
+    title: "MIR 3 Post-Terminal Emergency Hotfix"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir3-post-terminal-emergency-hotfix
+  - path: docs/releases/notes/release-notes-2.5.10.md
+    title: "More Infinite Research 2.5.10 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.10-release-notes
+  - path: docs/releases/notes/release-notes-3.2.10.md
+    title: "More Infinite Research 3.2.10 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.10-release-notes

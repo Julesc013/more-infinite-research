@@ -1,13 +1,13 @@
 schema: 1
 
-release: 2.5.9
+release: 2.5.10
 factorio_line: "2.0"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: pending-source-freeze-candidate-performance
+accepted_evidence: retained-2.5.9-performance-plus-targeted-2.5.10-exact-engine-smoke
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.
-  - Shadow convergence uses the immutable published 2.5.5 archive and the exact current 2.5.9 development archive on one Factorio 2.0.77 installation; final acceptance requires the later assigned candidate.
+  - The emergency lane retains the immutable published 2.5.9 performance baseline and runs targeted 2.5.10 exact-engine smoke on the same Factorio 2.0.77 installation.
   - At least five measured runs per package follow one warm-up and a paired balanced baseline-candidate order.
   - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
   - Runtime scenario timings include Factorio process startup and save creation.
@@ -132,6 +132,6 @@ compiler_telemetry:
   witness_node_limit: 64
 
 regression_policy:
-  qualified_baseline: "2.5.5"
+  qualified_baseline: "2.5.9"
   absolute_budgets: .mir/performance-budgets.json
   maximum_regression_percent: 20

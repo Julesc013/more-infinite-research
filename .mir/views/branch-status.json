@@ -1,0 +1,270 @@
+{
+  "authority": "mir-generated-branch-status-v1",
+  "branches": [
+    {
+      "branch": "dev",
+      "candidate_floor": "",
+      "candidate_id": "C31",
+      "effective_status": "superseded-unpublished",
+      "release": "3.2.4",
+      "source_commit": "088e8a2758a63873addd22f32b3e83aaf24d03b4",
+      "state": "package-built",
+      "target": "2.1"
+    },
+    {
+      "branch": "legacy",
+      "candidate_floor": "",
+      "candidate_id": "2.4.9-final",
+      "effective_status": "publicly-verified",
+      "release": "2.4.9",
+      "source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
+      "candidate_floor": "",
+      "candidate_id": "2.5-P11",
+      "effective_status": "publicly-verified",
+      "release": "2.5.0",
+      "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
+      "candidate_floor": "2.5-P14",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "2.5.10",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
+      "candidate_floor": "",
+      "candidate_id": "2.5-P12",
+      "effective_status": "publicly-verified",
+      "release": "2.5.5",
+      "source_commit": "1def5da0d0791149770f84d8bbc4c164c426b7ce",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
+      "branch": "legacy",
+      "candidate_floor": "2.5-P13",
+      "candidate_id": "2.5-P13",
+      "effective_status": "publicly-verified",
+      "release": "2.5.9",
+      "source_commit": "89719eb8ea5c938b6a0e9d816e6324d4d59b87bb",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "",
+      "candidate_id": "C21",
+      "effective_status": "published",
+      "release": "3.2.1",
+      "source_commit": "f3f8cabd0f84be674d5cc190343a9b7df5ba65c5",
+      "state": "published",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "C34",
+      "candidate_id": "not-assigned",
+      "effective_status": "planned",
+      "release": "3.2.10",
+      "source_commit": "",
+      "state": "planned",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "",
+      "candidate_id": "C24",
+      "effective_status": "tagged",
+      "release": "3.2.2",
+      "source_commit": "29f81addc0eec9b571afd6428c9e3529c4497a1b",
+      "state": "tagged",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "",
+      "candidate_id": "C30",
+      "effective_status": "publicly-verified",
+      "release": "3.2.3",
+      "source_commit": "c1fd8b932c8d916a14925678056e08893b87b2db",
+      "state": "publicly-verified",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "C32",
+      "candidate_id": "C32",
+      "effective_status": "publicly-verified",
+      "release": "3.2.5",
+      "source_commit": "a3bfbc4524b52cede425900e775384eb9c1fc4b3",
+      "state": "publicly-verified",
+      "target": "2.1"
+    },
+    {
+      "branch": "main",
+      "candidate_floor": "C33",
+      "candidate_id": "C33",
+      "effective_status": "publicly-verified",
+      "release": "3.2.9",
+      "source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff",
+      "state": "publicly-verified",
+      "target": "2.1"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.3.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.3.5",
+      "source_commit": "db45a5b36955082fac197faaa057a9a43cc9e420",
+      "state": "publicly-verified",
+      "target": "0.13"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.3-P1",
+      "candidate_id": "1.3-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.3.9",
+      "source_commit": "b9459906a0971e237aed66855b51231e9b6bf028",
+      "state": "publicly-verified",
+      "target": "0.13"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.4.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.4.5",
+      "source_commit": "4698d9e84adc987453a02a6954690fce26c85c6a",
+      "state": "publicly-verified",
+      "target": "0.14"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.4-P1",
+      "candidate_id": "1.4-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.4.9",
+      "source_commit": "8f75fa45d52a55650e74423a99f04a0252db429b",
+      "state": "publicly-verified",
+      "target": "0.14"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.5.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.5.5",
+      "source_commit": "d855a68b88eb6864d537e8149f75ae73f50b0b39",
+      "state": "publicly-verified",
+      "target": "0.15"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.5-P1",
+      "candidate_id": "1.5-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.5.9",
+      "source_commit": "8098510acc3530321a2dc32b8d2292aa814bb9c3",
+      "state": "publicly-verified",
+      "target": "0.15"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.6.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.6.5",
+      "source_commit": "dad7f39b24a43203d74c883e9927e6d18e39eac4",
+      "state": "publicly-verified",
+      "target": "0.16"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.6-P1",
+      "candidate_id": "1.6-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.6.9",
+      "source_commit": "595ebcfc8b1f35b53906ea85fdb2d1de70f9bb2d",
+      "state": "publicly-verified",
+      "target": "0.16"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.7.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.7.5",
+      "source_commit": "c87818b34ccddb6b0166aeb6aec42887f420e86f",
+      "state": "publicly-verified",
+      "target": "0.17"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.7-P1",
+      "candidate_id": "1.7-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.7.9",
+      "source_commit": "215ccced7018aac70919221c73e15d795f9d1653",
+      "state": "publicly-verified",
+      "target": "0.17"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.8.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.8.5",
+      "source_commit": "2c70c8e8654f24227fba60f3f9c6cfff5e544b57",
+      "state": "publicly-verified",
+      "target": "1.0"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.8-P1",
+      "candidate_id": "1.8-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.8.9",
+      "source_commit": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309",
+      "state": "publicly-verified",
+      "target": "1.0"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "",
+      "candidate_id": "1.9.5-final",
+      "effective_status": "publicly-verified",
+      "release": "1.9.5",
+      "source_commit": "48dd671e9a2b5ab37d1676fbbd7254ce30c046fb",
+      "state": "publicly-verified",
+      "target": "1.1"
+    },
+    {
+      "branch": "tag-only",
+      "candidate_floor": "1.9-P1",
+      "candidate_id": "1.9-P1",
+      "effective_status": "publicly-verified",
+      "release": "1.9.9",
+      "source_commit": "2243cfd31c0d6c575782c5b004514c3845d1907c",
+      "state": "publicly-verified",
+      "target": "1.1"
+    }
+  ],
+  "generated_from": [
+    "path:releases.records/*.json",
+    "path:releases.candidate-closures/*.json"
+  ],
+  "schema": 1
+}

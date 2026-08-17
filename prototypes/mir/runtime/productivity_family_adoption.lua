@@ -27,9 +27,14 @@ local function current_adoption_state()
 
   local bindings = {}
   for _, binding in ipairs(data.bindings or {}) do
+    local prototype = prototypes and prototypes.technology and prototypes.technology[binding.owner]
     bindings[tostring(binding.owner)] = {
       input_descriptor = binding.input_descriptor,
-      output_descriptor = binding.output_descriptor
+      output_descriptor = binding.output_descriptor,
+      operation = binding.operation,
+      configured_fields = binding.configured_fields,
+      planned_max_level = binding.planned_max_level,
+      observed_max_level = prototype and prototype.max_level or nil
     }
   end
   return {

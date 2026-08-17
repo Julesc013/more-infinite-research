@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixProgrammeV1",
+  "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+  "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
+  "status": "3.2.10-published-2.5.10-qualified-and-sealed",
+  "contract": {
+    "zero": "infinite",
+    "positive_integer": "absolute-highest-technology-level-permitted",
+    "completed_above_lowered_cap": "retained",
+    "invalid_current_or_queued_research": "removed-safely",
+    "valid_fractional_progress": "retained",
+    "raised_or_removed_cap": "future-levels-restored",
+    "reload": "first-and-second-reload-idempotent"
+  },
+  "required_gates_3_2_10": [
+    "exact-public-3.2.9-reproduction",
+    "root-cause-established",
+    "all-five-native-owner-regressions",
+    "generated-stream-and-base-continuation-regressions",
+    "fresh-game-progression",
+    "existing-save-and-configuration-recovery",
+    "MIRSET1-profile-import",
+    "late-owner-conflict-diagnostics",
+    "deterministic-A-B-clean-C-construction",
+    "3.2.9-3.2.5-3.2.3-upgrades",
+    "exact-Factorio-2.1-engine-qualification",
+    "retained-K2-route-Tesla-regressions",
+    "target-seal",
+    "GitHub-public-byte-verification"
+  ],
+  "required_gate_2_5_10": "Satisfied: exact Factorio 2.0.77 proved a package-visible runtime-settings adapter is required and verified direct, MIRSET1, and configuration-change behavior.",
+  "release_order": "3.2.10 does not wait for an unaffected or unresolved 2.0 line."
+}

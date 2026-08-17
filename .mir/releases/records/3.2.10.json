@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "release": "3.2.10",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "C34",
+  "candidate_allocation": {
+    "namespace": "C",
+    "predecessor_max_ordinal": 33,
+    "minimum_next_ordinal": 34,
+    "assigned_id": null,
+    "assignment_condition": "emergency-fixed-point-and-source-freeze"
+  },
+  "target": "2.1",
+  "branch": "main",
+  "development_branch": "dev",
+  "state": "planned",
+  "package": {},
+  "proofs": {
+    "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+    "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+    "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
+    "finding": ".mir/releases/emergency/findings/MIR3-TERM-0032.json"
+  },
+  "assurance_exceptions": [],
+  "remaining_obligations": [
+    "focused-qualification",
+    "exact-2.1.13-qualification",
+    "deterministic-candidate-construction",
+    "governed-upgrades",
+    "target-seal",
+    "publication-and-public-byte-verification"
+  ],
+  "source_release": {
+    "release": "3.2.9",
+    "candidate_id": "C33",
+    "tag": "3.2.9",
+    "tag_commit": "a60230a0695d2dd8fd1e727744614e746cda0bd8",
+    "archive_sha256": "0E833FCDDA3017641CA99D0EBD2FA226938A1CEE91D2EBB4007E94B29787AE20",
+    "content_sha256": "FE68D37CCDB0685120579AF04AA62ABA7DD41F1F4AF01A02B72015A907794B25"
+  },
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+  "release_notes": "docs/releases/notes/release-notes-3.2.10.md",
+  "incident_ids": [],
+  "updated_at": "2026-08-16T00:00:00+10:00"
+}

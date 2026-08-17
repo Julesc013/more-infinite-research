@@ -545,7 +545,22 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
-if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.9') {
+if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.10') {
+  Invoke-RepoCheck 'the bounded 2.5.9 to 2.5.10 emergency delta is sealed' {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\releases\records\2.5.10.json') | ConvertFrom-Json -Depth 100
+    . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
+    $candidate = Join-Path $repo ([string]$record.package.archive)
+    if ([string]$record.candidate_id -ne '2.5-P14' -or
+        [string]$record.applicability.decision -ne 'positive-package-visible-factorio-2.0-runtime-adapter-required' -or
+        (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$record.package.content_sha256 -or
+        (Get-MIRFileSha256 -Path $candidate) -ne [string]$record.package.archive_sha256 -or
+        (Get-MIRZipContentFingerprint -Path $candidate) -ne [string]$record.package.content_sha256) {
+      throw 'The bounded MIR3-TERM-0032 Factorio 2.0 emergency delta is not exact.'
+    }
+    Write-Host '[ok] MIR 2.5.10 contains the exact bounded, package-visible P14 emergency delta.'
+  }
+}
+elseif ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.9') {
   Invoke-RepoCheck 'the normalized 2.5.5 to 2.5.9 shadow delta is complete' {
     $shadowDelta = Join-Path $repo 'approved-delta\2.5.5-to-2.5.9.json'
     & (Join-Path $repo 'scripts\Test-MIRApprovedDelta.ps1') -Path $shadowDelta -ValidateStructureOnly
@@ -676,6 +691,15 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
+      $crossTargetEmergencyFixtures = @(
+        'mir-fixture-assert-base-continuation-cap-transition',
+        'mir-fixture-assert-generated-cap-transition',
+        'mir-fixture-assert-generated-max-level',
+        'mir-fixture-assert-native-owner-cap-relaxation',
+        'mir-fixture-assert-native-owner-cap-transition',
+        'mir-fixture-late-native-owner-max-level'
+      )
+      if ($isLegacyFactorio20 -and [string]$info.name -in $crossTargetEmergencyFixtures) { continue }
       if ($isReducedLegacyLine) { continue }
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
@@ -2576,6 +2600,7 @@ function Initialize-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
+    [hashtable]$SettingsProfileOverrides = @{},
     [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
@@ -2735,6 +2760,9 @@ function Initialize-RuntimeScenario {
     $nativeOwnerOverrides[$name] = $StartupSettingOverrides[$name]
   }
   Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $nativeOwnerOverrides
+  if ($SettingsProfileOverrides.Count -gt 0) {
+    Set-CopiedMIRSettingsProfileDefault -ModsDir $modsDir -Settings $SettingsProfileOverrides
+  }
 
   Complete-MIRSettingsOverrideMod -ModsDir $modsDir
 
@@ -2812,6 +2840,7 @@ function Invoke-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [hashtable]$StartupSettingOverrides = @{},
+    [hashtable]$SettingsProfileOverrides = @{},
     [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
     [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
@@ -2857,7 +2886,7 @@ function Invoke-RuntimeScenario {
   }
   foreach ($parameterName in @(
     "EnabledStreamKeys", "EnabledBaseExtensionKeys", "DisabledStreamKeys", "DisabledBaseExtensionKeys",
-    "EffectPerLevelOverrides", "BaseEffectPerLevelOverrides", "BaseMaxLevelOverrides", "StartupSettingOverrides",
+    "EffectPerLevelOverrides", "BaseEffectPerLevelOverrides", "BaseMaxLevelOverrides", "StartupSettingOverrides", "SettingsProfileOverrides",
     "NativeOwnerSettingsProfile", "LabPolicySkip", "LabPolicyEngineDefault", "SciencePackIngredientPolicy",
     "WeaponSpeedAdjustmentMode", "PipelineExtentMultiplier", "PrototypeProductivityCap", "PrototypeEfficiencyCap",
     "PrototypePollutionCap", "PrototypeSpeedCap", "PrototypeSpeedFloor", "PrototypeQualityCap",
@@ -2883,6 +2912,7 @@ function Invoke-RuntimeScenario {
       -BaseEffectPerLevelOverrides $BaseEffectPerLevelOverrides `
       -BaseMaxLevelOverrides $BaseMaxLevelOverrides `
       -StartupSettingOverrides $StartupSettingOverrides `
+      -SettingsProfileOverrides $SettingsProfileOverrides `
       -NativeOwnerSettingsProfile $NativeOwnerSettingsProfile `
       -LabPolicySkip:$LabPolicySkip `
       -LabPolicyEngineDefault:$LabPolicyEngineDefault `
@@ -3568,6 +3598,17 @@ if ($selectionActive -and -not $checkpointActive) {
         }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
+          "generated-maximum-level-lowering-config-change-2-0" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 }
+            Assert-LogContains `
+              -Expected "[mir-fixture] Factorio 2.0 lowered cap retained completed levels and removed invalid research" `
+              -Context $declaration.name
+          }
           "space-age-native-owner-settings-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
               -ScenarioName $declaration.name `
@@ -4441,6 +4482,16 @@ if ([bool]$targetProfile.features.scripted_techs -and [bool]$targetProfile.suppo
     -Expected "[mir-fixture] scripted lifecycle enable proof complete" `
     -Context "Scripted runtime re-enable scenario"
 }
+
+Invoke-RuntimeConfigurationChangeScenario `
+  -ScenarioName "generated-maximum-level-lowering-config-change-2-0" `
+  -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+  -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+  -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+  -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 }
+Assert-LogContains `
+  -Expected "[mir-fixture] Factorio 2.0 lowered cap retained completed levels and removed invalid research" `
+  -Context "Factorio 2.0 generated maximum-level lowering configuration-change scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity",

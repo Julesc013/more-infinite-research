@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.10
+Date: 2026-08-17
+
+  Bugfixes:
+
+    - Enforced configured absolute maximum levels for generated productivity technologies on Factorio 2.0.77.
+    - Removed current and queued research above a newly lowered maximum while retaining completed levels.
+    - Restored future levels when a maximum is raised or returned to infinite.
+
+  Compatibility:
+
+    - Backported the 3.2.10 lossless maximum-level contract through the Factorio 2.0 runtime-settings transport.
+    - Preserved the immutable 2.5.9 package and every unrelated technology, setting, and compatibility behavior.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.5.9
 Date: 2026-08-12
 

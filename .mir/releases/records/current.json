@@ -1,0 +1,38 @@
+{
+  "active_programme": {
+    "authority": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
+    "id": "MIR3PostTerminalEmergencyHotfixProgrammeV1",
+    "status": "3.2.10-published-2.5.10-qualified-and-sealed"
+  },
+  "authority": "mir-current-release-roles-v2",
+  "implementation_admitted": true,
+  "planned_releases": [
+    "3.2.10",
+    "2.5.10",
+    "3.2.9",
+    "2.5.9",
+    "1.9.9",
+    "1.8.9",
+    "1.7.9",
+    "1.6.9",
+    "1.5.9",
+    "1.4.9",
+    "1.3.9"
+  ],
+  "roles": {
+    "backport_calibration": "2.5.9",
+    "canonical": "3.2.10",
+    "latest_published_factorio_2_0": "2.5.9",
+    "latest_published_factorio_2_1": "3.2.10",
+    "latest_tagged_factorio_2_0": "2.5.9",
+    "latest_tagged_factorio_2_1": "3.2.10",
+    "planned_backport": "2.5.10",
+    "planned_canonical": "3.2.10",
+    "published_factorio_2_0": "2.5.9",
+    "published_factorio_2_1": "3.2.10",
+    "tagged_factorio_2_1": "3.2.10",
+    "sealed_backport": "2.5.10"
+  },
+  "schema": 1,
+  "source_frozen": true
+}

@@ -170,7 +170,24 @@ $targetKey = "factorio-$([string]$campaign.factorio_line)"
 $activeCandidate = $releaseLedger.development.PSObject.Properties[$targetKey].Value
 $shadowManifestPath = Join-Path $RepoRoot ".mir\releases\terminal\shadows\$([string]$campaign.release)\package-manifest.json"
 $isShadowConvergence = [string]$campaign.phase -eq "shadow-convergence"
-if ($isShadowConvergence) {
+$isEmergency2510 = [string]$campaign.release -eq '2.5.10' -and [string]$info.version -eq '2.5.10'
+if ($isEmergency2510) {
+  $record = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir\releases\records\2.5.10.json') | ConvertFrom-Json -Depth 100
+  $candidateArchive = Join-Path $RepoRoot 'dist\more-infinite-research_2.5.10.zip'
+  . (Join-Path $RepoRoot 'scripts\validation\PackageIdentity.ps1')
+  if ([string]$campaign.phase -ne 'post-terminal-emergency-hotfix' -or
+      [string]$campaign.baseline.version -ne '2.5.9' -or
+      [string]$campaign.candidate.state -ne 'sealed-awaiting-publication' -or
+      [string]$campaign.candidate.candidate_id -ne '2.5-P14' -or
+      [string]$campaign.candidate.version -ne '2.5.10' -or
+      [string]$campaign.candidate.archive_sha256 -ne [string]$record.package.archive_sha256 -or
+      [string]$campaign.candidate.package_content_sha256 -ne [string]$record.package.content_sha256 -or
+      -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $candidateArchive) -ne [string]$record.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $candidateArchive) -ne [string]$record.package.content_sha256) {
+    throw 'The MIR 2.5.10 emergency performance authority does not bind the sealed P14 package and immutable 2.5.9 baseline.'
+  }
+} elseif ($isShadowConvergence) {
   if (-not (Test-Path -LiteralPath $shadowManifestPath -PathType Leaf)) { throw "Shadow performance campaign lacks a terminal package manifest." }
   $shadowManifest = Get-Content -Raw -LiteralPath $shadowManifestPath | ConvertFrom-Json -Depth 100
   $candidateArchive = Join-Path $RepoRoot "dist\more-infinite-research_$([string]$campaign.release).zip"

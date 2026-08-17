@@ -33,6 +33,27 @@ function Get-MIRZipFileCount {
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'info.json') | ConvertFrom-Json
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.10') {
+  # P14 descends from the immutable P13 release commit. The older P12 source
+  # lock remains historical evidence, but its independent projection commit
+  # is not required to become a linear ancestor of this emergency merge.
+  if ([int]$lock.schema -ne 5 -or [int]$lock.projection_schema -ne 4 -or
+      [string]$lock.mir_version -ne '2.5.5' -or [string]$lock.candidate_id -ne '2.5-P12' -or
+      [string]$lock.target -ne '2.0' -or
+      [string]$lock.projection.package_source_commit -ne '689940f436b004cf4e5981f1944ddb04eaa17367' -or
+      [string]$lock.candidate.archive_sha256 -ne '03DFC05F94435FAACB86F19D1BF0BCD160C515C46B8372C483EEBAEB5208A41C') {
+    throw 'MIR 2.5.10 does not retain the exact immutable P12 historical source lock.'
+  }
+  foreach ($row in @(
+    @{Name='P12 baseline.commit'; Commit=[string]$lock.baseline.commit},
+    @{Name='P12 portable_source.commit'; Commit=[string]$lock.portable_source.commit},
+    @{Name='P12 projection.package_source_commit'; Commit=[string]$lock.projection.package_source_commit},
+    @{Name='P13 release predecessor'; Commit='89719eb8ea5c938b6a0e9d816e6324d4d59b87bb'},
+    @{Name='3.2.10 semantic parent'; Commit='4cbea531a1043e0cacb9ac5c496731c8d77bbdb6'}
+  )) { Assert-MIRCommit -Name $row.Name -Commit $row.Commit }
+  Write-Host '[ok] MIR 2.5.10 retains the historical P12 source lock and binds immutable P13 plus 3.2.10 authority.'
+  return
+}
 if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.9') {
   # The terminal shadow is a deterministic projection from its own explicit
   # package-source authority.  Preserve and verify the immutable 2.5.5 lock,

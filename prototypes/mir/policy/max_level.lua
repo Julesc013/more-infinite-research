@@ -1,6 +1,7 @@
 local C = require("prototypes.mir.streams.registry")
 local costs = require("prototypes.mir.planner.costs")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -10,7 +11,11 @@ local function plan_max_level(key, spec)
   if not tech then return end
 
   local max_level = costs.max_level_for(key, spec)
-  return {technology = tech_name, max_level = max_level}
+  return {
+    technology = tech_name,
+    max_level = target_line.feature_enabled("scripted_techs") and "infinite" or max_level,
+    planned_max_level = max_level
+  }
 end
 
 function M.plan()
