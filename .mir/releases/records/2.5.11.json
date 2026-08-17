@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "release": "2.5.11",
+  "candidate_id": "2.5-P15",
+  "candidate_floor": "2.5-P15",
+  "candidate_allocation": {
+    "namespace": "2.5-P",
+    "predecessor_max_ordinal": 14,
+    "minimum_next_ordinal": 15,
+    "assigned_id": "2.5-P15",
+    "assigned_at": "2026-08-18T00:05:00+10:00",
+    "candidate_commit": "7137e37b44f2acd4aee1651a7e653301bfb1da89",
+    "assignment_condition": "exact-factorio-2.0-projection-and-deterministic-package-build-satisfied"
+  },
+  "target": "2.0",
+  "branch": "hotfix/mir3-max-level-2.5.11",
+  "development_branch": "dev",
+  "state": "package-built",
+  "package": {
+    "source_commit": "7137e37b44f2acd4aee1651a7e653301bfb1da89",
+    "source_tree": "642e642fd915991827594369fb67ecf678cf4789",
+    "source_sha256": "CD67D6C09926C11D4357234ED3FF1DD6C9718268FA023AB011CD7C4005B55EE9",
+    "archive": "dist/more-infinite-research_2.5.11.zip",
+    "archive_sha256": "6214F0A462B0322310878BA139FA3539C526134B51A93A2EBF59D9366BC09DDA",
+    "content_sha256": "CD67D6C09926C11D4357234ED3FF1DD6C9718268FA023AB011CD7C4005B55EE9",
+    "bytes": 1065158,
+    "entries": 303
+  },
+  "proofs": {
+    "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+    "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
+  },
+  "remaining_obligations": ["focused-qualification", "exact-engine-qualification", "deterministic-reconstruction", "tag-and-publication", "mod-portal-maintainer-upload"],
+  "source_release": {
+    "release": "2.5.10",
+    "candidate_id": "2.5-P14",
+    "tag": "2.5.10",
+    "tag_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+    "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
+  },
+  "semantic_parent": {"release": "3.2.11", "candidate_id": "C35", "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a"},
+  "upgrade": {"from_version": "2.5.10", "to_version": "2.5.11", "fixture": "assert-upgrade-3-2-9-to-3-2-10"},
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
+  "release_notes": "docs/releases/notes/release-notes-2.5.11.md",
+  "incident_ids": ["MIR3-TERM-0033", "MIR3-TERM-0034"],
+  "updated_at": "2026-08-18T00:05:00+10:00"
+}

@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "id": "MIR3-TERM-0034",
+  "title": "Finite maximum settings are displayed as infinite after the runtime-cap hotfix",
+  "status": "admitted-for-emergency-correction",
+  "reported_release": "2.5.10",
+  "affected_releases": ["3.2.10", "2.5.10"],
+  "target_releases": ["3.2.11", "2.5.11"],
+  "root_cause": "The .10 implementation deliberately emitted infinite technology prototypes for positive maximum settings and enforced the selection only through control-stage queue filtering and technology disabling. Factorio therefore displayed the prototype as infinite even when the runtime cap blocked further research.",
+  "required_contract": {
+    "zero": "normal-infinite-prototype-and-presentation",
+    "positive": "lossless-infinite-prototype-with-hidden-infinity-badge-and-exact-localized-cap-description",
+    "runtime": "absolute-boundary-enforcement-queue-normalization-cap-relaxation-and-visible-disabled-state",
+    "settings_transports": ["direct-startup-setting", "MIRSET1-profile-import"]
+  },
+  "finite_prototype_experiment": {
+    "engine": "Factorio 2.1.14.87180",
+    "transition": "infinite cap to finite cap 5 with completed level 8 and active progress",
+    "result": "unsafe-save-load-exited-before-configuration-change-handler",
+    "decision": "finite prototypes rejected because public .10 saves have no preexisting state journal and cannot be recovered before control is returned"
+  },
+  "disposition": "lossless-presentation-correction-portable-with-factorio-2.0-projection",
+  "recorded_at": "2026-08-17T16:00:00+10:00"
+}

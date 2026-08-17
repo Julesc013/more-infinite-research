@@ -34,6 +34,70 @@ if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBac
   throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
 }
 $info = Read-MIRText "info.json" | ConvertFrom-Json
+if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.11') {
+  $record = Read-MIRText '.mir/releases/records/2.5.11.json' | ConvertFrom-Json -Depth 100
+  $expected = [ordered]@{
+    predecessor = '6bb483de9042a7ec4c93674933e7f6c1670d79aa'
+    semantic_parent = '0a32864d1f1d1fdea090369bc1a22fbd511e290a'
+    source = '7137e37b44f2acd4aee1651a7e653301bfb1da89'
+    source_tree = '642e642fd915991827594369fb67ecf678cf4789'
+    archive = '6214F0A462B0322310878BA139FA3539C526134B51A93A2EBF59D9366BC09DDA'
+    content = 'CD67D6C09926C11D4357234ED3FF1DD6C9718268FA023AB011CD7C4005B55EE9'
+    bytes = 1065158
+    entries = 303
+  }
+  if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.11' -or
+      [string]$record.target -ne '2.0' -or [string]$record.candidate_id -ne '2.5-P15' -or
+      [string]$record.candidate_allocation.assigned_id -ne '2.5-P15' -or
+      [string]$record.state -ne 'package-built' -or
+      [string]$record.source_release.tag_commit -ne $expected.predecessor -or
+      [string]$record.semantic_parent.source_commit -ne $expected.semantic_parent -or
+      [string]$record.package.source_commit -ne $expected.source -or
+      [string]$record.package.source_tree -ne $expected.source_tree -or
+      [string]$record.package.archive_sha256 -ne $expected.archive -or
+      [string]$record.package.content_sha256 -ne $expected.content -or
+      [long]$record.package.bytes -ne $expected.bytes -or [int]$record.package.entries -ne $expected.entries) {
+    throw 'The MIR 2.5.11 P15 package-built authority is not exact.'
+  }
+
+  . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne $expected.content) {
+    throw 'Current package roots do not reproduce the exact MIR 2.5.11 package content identity.'
+  }
+  $candidatePath = Join-Path $repo 'dist\more-infinite-research_2.5.11.zip'
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+    throw 'The exact MIR 2.5.11 candidate archive is absent.'
+  }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $candidateZip = [IO.Compression.ZipFile]::OpenRead($candidatePath)
+  try { $candidateEntries = @($candidateZip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) }).Count } finally { $candidateZip.Dispose() }
+  if ((Get-Item -LiteralPath $candidatePath).Length -ne $expected.bytes -or
+      $candidateEntries -ne $expected.entries -or
+      (Get-MIRFileSha256 -Path $candidatePath) -ne $expected.archive -or
+      (Get-MIRZipContentFingerprint -Path $candidatePath) -ne $expected.content) {
+    throw 'The MIR 2.5.11 P15 archive differs from package-built authority.'
+  }
+
+  foreach ($commit in @($expected.predecessor, $expected.semantic_parent, $expected.source)) {
+    & git -C $repo cat-file -e "$commit`^{commit}"
+    if ($LASTEXITCODE -ne 0) { throw "Required MIR 2.5.11 topology commit is unavailable: $commit" }
+  }
+  $parents = @(& git -C $repo rev-list --parents -n 1 $expected.source)[0].Split(' ')
+  if ($parents.Count -ne 3 -or $parents[1] -ne $expected.predecessor -or $parents[2] -ne $expected.semantic_parent) {
+    throw 'The MIR 2.5.11 package source must have exact 2.5.10 first parent and exact frozen 3.2.11 semantic parent.'
+  }
+  $sourceTree = @(& git -C $repo rev-parse "$($expected.source)^{tree}")
+  if ($LASTEXITCODE -ne 0 -or @($sourceTree).Count -ne 1 -or [string]$sourceTree[0] -ne $expected.source_tree) {
+    throw 'The MIR 2.5.11 package source tree differs from package-built authority.'
+  }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $packageChanges = @(& git -C $repo diff --name-only $expected.source HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -gt 0) {
+    throw "Package-visible paths changed after the MIR 2.5.11 source freeze: $($packageChanges -join ', ')"
+  }
+  Write-Host '[ok] MIR 2.5.11 P15 package authority, deterministic identity, and emergency backport topology are exact.'
+  return
+}
 if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5.10') {
   $record = Read-MIRText '.mir/releases/records/2.5.10.json' | ConvertFrom-Json -Depth 100
   $expected = [ordered]@{
