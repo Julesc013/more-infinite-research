@@ -213,7 +213,10 @@ if ($factorioVersion -eq '2.0') {
     @($expectedDynamic | Where-Object { $_ -notin $notApplicableOn20 }) +
     @(
       'generated-maximum-level-five-streams-2-0',
-      'generated-maximum-level-five-streams-mirset1-2-0'
+      'generated-maximum-level-five-streams-mirset1-2-0',
+      'generated-maximum-level-five-streams-one-2-0',
+      'generated-maximum-level-five-streams-thirteen-2-0',
+      'generated-maximum-level-five-streams-zero-2-0'
     ) |
       Sort-Object
   )
