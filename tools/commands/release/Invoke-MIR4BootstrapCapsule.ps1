@@ -348,16 +348,16 @@ if ($lane -ceq 'emergency') {
     throw 'The capsule omits its bound approved correction authority.'
   }
   $correctionText = Get-Content -Raw -LiteralPath $correctionPath
-  if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta.schema.json'))) {
+  if (-not ($correctionText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-approved-bootstrap-correction-delta-v2.schema.json'))) {
     throw 'The capsule approved correction authority fails its exact schema.'
   }
   $correction = $correctionText | ConvertFrom-Json -Depth 100 -DateKind String
-  Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV1'
-  Assert-Exact $correction.finding 'MIR3-TERM-0033' 'Approved correction finding'
+  Assert-Record $correction 'MIR4ApprovedBootstrapCorrectionDeltaV2'
+  Assert-Exact (@($correction.findings | Sort-Object) -join '+') 'MIR3-TERM-0032+MIR3-TERM-0033' 'Approved correction findings'
   Assert-Exact $correction.target_key $envelope.target_key 'Approved correction target'
   Assert-Exact $correction.record_sha256 $envelope.correction_authority.record_sha256 'Approved correction record binding'
   Assert-Exact $correction.kind $envelope.correction_authority.kind 'Approved correction kind binding'
-  Assert-Exact $correction.finding $envelope.correction_authority.finding 'Approved correction finding binding'
+  Assert-Exact (@($correction.findings | Sort-Object) -join '+') $envelope.correction_authority.finding 'Approved correction finding binding'
 }
 $laneAuthority = $null
 if ($lane -ceq 'local-playtest-shadow') {
@@ -365,11 +365,11 @@ if ($lane -ceq 'local-playtest-shadow') {
   Assert-SafeRelativePath $laneRelativePath
   $lanePath = Assert-Descendant $workspace (Join-Path $workspace $laneRelativePath)
   $laneText = Get-Content -Raw -LiteralPath $lanePath
-  if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-local-playtest-shadow-authorization.schema.json'))) {
+  if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-private-lane-authorization-v2.schema.json'))) {
     throw 'The private local-playtest lane authority fails its exact schema.'
   }
   $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String
-  Assert-Record $laneAuthority 'MIR4LocalPlaytestShadowAuthorizationV1'
+  Assert-Record $laneAuthority 'MIR4PrivateLaneAuthorizationV2'
   Assert-Exact $laneAuthority.authority_family 'MIRLocalArtifactLaneAuthorizationV1' 'Local lane authority family'
   Assert-Exact $laneAuthority.record_sha256 $envelope.local_lane_authority.record_sha256 'Local lane record binding'
   Assert-Exact $laneAuthority.kind $envelope.local_lane_authority.kind 'Local lane kind binding'
@@ -598,7 +598,7 @@ if ($null -ne $correction) {
   $receipt | Add-Member -NotePropertyName correction_authority -NotePropertyValue ([pscustomobject][ordered]@{
     path = [string]$envelope.correction_authority.path
     kind = [string]$correction.kind
-    finding = [string]$correction.finding
+    finding = (@($correction.findings | Sort-Object) -join '+')
     record_sha256 = [string]$correction.record_sha256
   })
 }

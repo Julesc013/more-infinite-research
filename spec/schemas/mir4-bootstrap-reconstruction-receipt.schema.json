@@ -57,9 +57,9 @@
       "additionalProperties": false,
       "required": ["path", "kind", "finding", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
-        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
-        "finding": { "const": "MIR3-TERM-0033" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV2" },
+        "finding": { "const": "MIR3-TERM-0032+MIR3-TERM-0033" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }
     },
@@ -68,8 +68,8 @@
       "additionalProperties": false,
       "required": ["path", "kind", "authority_family", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json" },
-        "kind": { "const": "MIR4LocalPlaytestShadowAuthorizationV1" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json" },
+        "kind": { "const": "MIR4PrivateLaneAuthorizationV2" },
         "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }
@@ -97,12 +97,12 @@
       "properties": {
         "equivalent": { "const": true },
         "policy": { "const": "MIR4BootstrapApprovedCorrectionEquivalenceV1" },
-        "correction_kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
+        "correction_kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV2" },
         "correction_record_sha256": { "$ref": "#/$defs/sha256" },
-        "finding": { "const": "MIR3-TERM-0033" },
+        "finding": { "const": "MIR3-TERM-0032+MIR3-TERM-0033" },
         "added": { "const": [] },
         "removed": { "const": [] },
-        "changed": { "const": ["info.json", "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "prototypes/mir/planner/base_continuations.lua"] },
+        "changed": { "const": ["info.json", "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "prototypes/mir/planner/base_continuations.lua", "prototypes/mir/platform/factorio/target_profiles.lua", "prototypes/mir/runtime/maximum_level_control.lua"] },
         "metadata_equivalent": { "const": true },
         "exact_correction_delta": { "const": true },
         "candidate": { "$ref": "#/$defs/identity" },

@@ -39,7 +39,7 @@ function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
 
   $laneRoot = Join-Path $repo "build\mir4\local-playtest-shadow"
   $manifestPath = Join-Path $laneRoot "manifests\$($binding.target_key).json"
-  $authorityPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Local-Playtest-Shadow-AuthorizationV1.json"
+  $authorityPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Private-Lane-AuthorizationV2.json"
   if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf) -or
       -not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
     throw "Exact MIR 4 local-playtest planning authority is missing for target $($Context.target)."
@@ -51,7 +51,7 @@ function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
       -not (Test-MIR4BootstrapRecordHash -Record $authority)) {
     throw "MIR 4 local-playtest planning authority or candidate manifest self-hash is invalid."
   }
-  if ([string]$authority.kind -ne "MIR4LocalPlaytestShadowAuthorizationV1" -or
+  if ([string]$authority.kind -ne "MIR4PrivateLaneAuthorizationV2" -or
       [string]$authority.authority_family -ne "MIRLocalArtifactLaneAuthorizationV1" -or
       [bool]$authority.package_visible -or
       [bool]$authority.release_admission_authorized -or

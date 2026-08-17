@@ -86,9 +86,9 @@
       "additionalProperties": false,
       "required": ["path", "kind", "finding", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json" },
-        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV1" },
-        "finding": { "const": "MIR3-TERM-0033" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV2" },
+        "finding": { "const": "MIR3-TERM-0032+MIR3-TERM-0033" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }
     },
@@ -97,8 +97,8 @@
       "additionalProperties": false,
       "required": ["path", "kind", "authority_family", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json" },
-        "kind": { "const": "MIR4LocalPlaytestShadowAuthorizationV1" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json" },
+        "kind": { "const": "MIR4PrivateLaneAuthorizationV2" },
         "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }
@@ -108,8 +108,8 @@
       "additionalProperties": false,
       "required": ["release", "archive_path", "archive_sha256", "content_sha256", "bytes", "entry_count", "baseline_manifest", "baseline_record_sha256", "normalized_snapshot", "snapshot_record_sha256"],
       "properties": {
-        "release": { "enum": ["3.2.10", "2.5.9", "1.9.9", "1.8.9"] },
-        "archive_path": { "pattern": "^dist/more-infinite-research_(3\\.2\\.10|2\\.5\\.9|1\\.9\\.9|1\\.8\\.9)\\.zip$" },
+        "release": { "enum": ["3.2.10", "2.5.10", "1.9.9", "1.8.9"] },
+        "archive_path": { "pattern": "^dist/more-infinite-research_(3\\.2\\.10|2\\.5\\.10|1\\.9\\.9|1\\.8\\.9)\\.zip$" },
         "archive_sha256": { "$ref": "#/$defs/sha256" },
         "content_sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 1 },

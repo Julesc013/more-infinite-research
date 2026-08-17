@@ -70,7 +70,7 @@
           "uniqueItems": true,
           "allOf": [
               {"contains": {"type": "object", "properties": {"role": {"const": "candidate-manifest"}, "kind": {"const": "MIR4BootstrapLocalCandidateManifestV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
-              {"contains": {"type": "object", "properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
+              {"contains": {"type": "object", "properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV2"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
               {"contains": {"type": "object", "properties": {"role": {"const": "exact-engine-evidence"}, "kind": {"const": "MIR4ExactEngineQualificationEvidenceBundleV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
               {"contains": {"type": "object", "properties": {"role": {"const": "qualification"}, "kind": {"const": "MIR4OfflineQualificationRecordV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1},
               {"contains": {"type": "object", "properties": {"role": {"const": "review"}, "kind": {"const": "MIR4OfflineReviewRecordV1"}}, "required": ["role", "kind"]}, "minContains": 1, "maxContains": 1}

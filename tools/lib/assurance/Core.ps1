@@ -401,7 +401,7 @@ function Get-MIRAssuranceContext {
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption) -and
       [string]$target -eq "2.1" -and
       [string]$info.version -eq "3.2.10" -and
-      (Test-Path -LiteralPath (Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json") -PathType Leaf)) {
+      (Test-Path -LiteralPath (Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json") -PathType Leaf)) {
     $candidateOption = Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"
   }
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }

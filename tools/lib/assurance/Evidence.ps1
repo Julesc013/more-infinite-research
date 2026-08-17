@@ -2434,14 +2434,14 @@ function Invoke-MIRAssuranceBuild {
   }
   if ($isMir4BootstrapBuild) {
     . (Join-Path $repo "tools\lib\mir4\BootstrapMaterialization.ps1")
-    $correctionPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json"
+    $correctionPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json"
     if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
       throw "MIR 4 bootstrap assurance build requires the exact approved correction authority."
     }
     $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json
     if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
-        [string]$correction.kind -ne "MIR4ApprovedBootstrapCorrectionDeltaV1" -or
-        [string]$correction.finding -ne "MIR3-TERM-0033" -or
+        [string]$correction.kind -ne "MIR4ApprovedBootstrapCorrectionDeltaV2" -or
+        (@($correction.findings | Sort-Object) -join '+') -ne "MIR3-TERM-0032+MIR3-TERM-0033" -or
         [string]$correction.target_key -ne "f210" -or
         [bool]$correction.public_output_authorized -or
         [bool]$correction.authority_scope.release_admission_authorized -or

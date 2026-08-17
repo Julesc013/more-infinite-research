@@ -7,7 +7,7 @@
   "source_generation": "MIR4-R0-pre-release",
   "distribution_generation": null,
   "mir3_eol_status": "pending",
-  "input_root_sha256": "5C334F9E37293C503B914084ACB6B4A42D278CBFED5544639BDDF1B800510A11",
+  "input_root_sha256": "FD59494A33725D6B0BC9B780C347F619942DBA4D56576548CD1744B855E4ECB3",
   "inputs": [
     {
       "path": ".mir/evidence/terminal-publication/2026-08-15/github/1.3.9.json",
@@ -959,7 +959,7 @@
     },
     {
       "path": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
-      "sha256": "A7DF5C601879316C9C0B6AF29BCFD412CD651EEA44529FCC675CF0C772BCEA15"
+      "sha256": "E9BAC0A371B86E919599F7CEB781D5A991313E04645E1F40810B8FD996CE0BF4"
     },
     {
       "path": ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
@@ -1711,7 +1711,7 @@
     },
     {
       "path": "docs/releases/notes/release-notes-2.5.10.md",
-      "sha256": "20D2B128D0DBBBF78E18149B5406A8B9101B4F14E1E75AEDFC7162760ACB0714"
+      "sha256": "AAFE0EF13832D31E6CB67D9EE524C2A58D06F3C8D388027B7407C81B6AC6F66A"
     },
     {
       "path": "docs/releases/notes/release-notes-3.2.10.md",
@@ -1913,8 +1913,8 @@
       "successor_target": "MIR4-R0/2.0",
       "baseline_manifest": {
         "path": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
-        "record_sha256": "F5FC00488C1692DD5B1858FE70EF9752E92076720F3CB3E629C46CB5FA867F30",
-        "input_root_sha256": "5A96D672E2E6318BB2BFA6EB25D4287439F693746F14D398E17362E01F3F7912",
+        "record_sha256": "EA502219203357E6DAEA62B54196EBF3F21D62638CF61FD0D950D7EF6913DC05",
+        "input_root_sha256": "D8F7543D496D36AA1DC94A20F4D3D04BA78A834C42A3798684825D06ACC664AB",
         "status": "captured-public-custody-pending-open-mir4-follow-up"
       },
       "normalized_snapshot": {
@@ -3371,5 +3371,5 @@
     "no-version-4-package-tag-or-publication-created"
   ],
   "next_executable_task": "M4-003-local-offline-emergency-lane",
-  "record_sha256": "78E931D2CFF576B9FA4717EFF1676A52AE3C23CA7E135511343584F00503E65D"
+  "record_sha256": "85F7102DEBF0DABFE031B151241920174712748EE08554B52CC59B4AC3E9D78F"
 }

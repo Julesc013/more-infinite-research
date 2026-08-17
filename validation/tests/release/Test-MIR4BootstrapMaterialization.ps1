@@ -19,10 +19,10 @@ function Assert-Throws([scriptblock]$Action, [string]$Message) {
   if (-not $threw) { throw $Message }
 }
 
-$planPath = Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
+$planPath = Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json"
 $planText = Get-Content -Raw -LiteralPath $planPath
 $plan = $planText | ConvertFrom-Json -DateKind String
-Assert-True ($plan.kind -eq "MIR4BootstrapLocalCandidatePlanV1") "Unexpected MIR4 bootstrap plan kind."
+Assert-True ($plan.kind -eq "MIR4BootstrapLocalCandidatePlanV2") "Unexpected MIR4 bootstrap plan kind."
 Assert-True ($plan.public_output_authorized -eq $false) "MIR4 bootstrap plan must remain publication-forbidden."
 Assert-True (Test-MIR4BootstrapRecordHash -Record $plan) "MIR4 bootstrap plan self-hash is stale."
 Assert-True (@($plan.targets).Count -eq 4) "MIR4 bootstrap plan must bind four requested targets."
@@ -39,12 +39,12 @@ foreach ($target in $plan.targets) {
 }
 
 if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) { throw "Test-Json is required for fail-closed MIR 4 tests." }
-$planSchema = Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
+$planSchema = Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json"
 Assert-True ($planText | Test-Json -SchemaFile $planSchema) "MIR4 bootstrap plan schema validation failed."
 foreach ($schemaName in @(
   'mir4-bootstrap-source-capsule.schema.json',
   'mir4-bootstrap-capsule-manifest.schema.json',
-  'mir4-approved-bootstrap-correction-delta.schema.json',
+  'mir4-approved-bootstrap-correction-delta-v2.schema.json',
   'mir4-bootstrap-toolchain-lock.schema.json',
   'mir4-bootstrap-git-source-proof.schema.json',
   'mir4-bootstrap-reconstruction-receipt.schema.json',
@@ -79,11 +79,12 @@ Assert-True (@($plan.targets | Where-Object { $_.target_key -ne 'f210' -and $_.a
 $f210 = @($plan.targets | Where-Object { [string]$_.target_key -ceq 'f210' })[0]
 $correctionPath = Join-Path $RepoRoot ([string]$f210.correction_authority.path)
 $correctionText = Get-Content -Raw -LiteralPath $correctionPath
-Assert-True ($correctionText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json')) 'The exact MIR3-TERM-0033 correction authority fails its schema.'
+Assert-True ($correctionText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json')) 'The exact MIR3-TERM-0032 and MIR3-TERM-0033 composite correction authority fails its schema.'
 $correction = $correctionText | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-True (Test-MIR4BootstrapRecordHash -Record $correction) 'The exact MIR3-TERM-0033 correction authority self-hash is stale.'
 Assert-True ([string]$correction.record_sha256 -ceq [string]$f210.correction_authority.record_sha256) 'The f210 plan correction binding is stale.'
 Assert-True ([string]$correction.authority_family -ceq 'MIRApprovedDeltaV1') 'The correction does not use the reusable exact-delta authority family.'
+Assert-True ((@($correction.findings | Sort-Object) -join '+') -ceq 'MIR3-TERM-0032+MIR3-TERM-0033') 'The composite correction finding set drifted.'
 Assert-True ([bool]$correction.authority_scope.release_admission_authorized -eq $false -and
   [bool]$correction.authority_scope.publication_authorized -eq $false -and
   [bool]$correction.authority_scope.transitive_target_inheritance_authorized -eq $false) 'The exact correction improperly grants a higher or transitive authority.'

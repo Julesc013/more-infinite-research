@@ -103,7 +103,7 @@
     "candidatePlanBinding": {
       "allOf": [
         {"$ref": "#/$defs/recordBinding"},
-        {"properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV1"}}}
+        {"properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV2"}}}
       ]
     },
     "candidate": {
