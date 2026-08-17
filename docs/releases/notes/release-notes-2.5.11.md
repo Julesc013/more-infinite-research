@@ -32,9 +32,9 @@ MIR 2.5.10 remains unchanged and downloadable as the immutable predecessor.
 | --- | --- |
 | State | `package-built` |
 | Candidate | `2.5-P15` |
-| Package source commit | `7137e37b44f2acd4aee1651a7e653301bfb1da89` |
-| Archive SHA-256 | `6214F0A462B0322310878BA139FA3539C526134B51A93A2EBF59D9366BC09DDA` |
-| Content SHA-256 | `CD67D6C09926C11D4357234ED3FF1DD6C9718268FA023AB011CD7C4005B55EE9` |
+| Package source commit | `57324642e7423d784d7f22b9be4a2b6b350bf012` |
+| Archive SHA-256 | `4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C` |
+| Content SHA-256 | `F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D` |
 | Tag | `pending` |
 | Tag commit | `pending` |
 | Assurance exceptions | `none authorized` |

@@ -39,11 +39,12 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
   $expected = [ordered]@{
     predecessor = '6bb483de9042a7ec4c93674933e7f6c1670d79aa'
     semantic_parent = '0a32864d1f1d1fdea090369bc1a22fbd511e290a'
-    source = '7137e37b44f2acd4aee1651a7e653301bfb1da89'
-    source_tree = '642e642fd915991827594369fb67ecf678cf4789'
-    archive = '6214F0A462B0322310878BA139FA3539C526134B51A93A2EBF59D9366BC09DDA'
-    content = 'CD67D6C09926C11D4357234ED3FF1DD6C9718268FA023AB011CD7C4005B55EE9'
-    bytes = 1065158
+    semantic_merge = '7137e37b44f2acd4aee1651a7e653301bfb1da89'
+    source = '57324642e7423d784d7f22b9be4a2b6b350bf012'
+    source_tree = '7786bdeaee398e069abdf7de797f82f645ccba45'
+    archive = '4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C'
+    content = 'F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D'
+    bytes = 1065193
     entries = 303
   }
   if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.11' -or
@@ -78,14 +79,16 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
     throw 'The MIR 2.5.11 P15 archive differs from package-built authority.'
   }
 
-  foreach ($commit in @($expected.predecessor, $expected.semantic_parent, $expected.source)) {
+  foreach ($commit in @($expected.predecessor, $expected.semantic_parent, $expected.semantic_merge, $expected.source)) {
     & git -C $repo cat-file -e "$commit`^{commit}"
     if ($LASTEXITCODE -ne 0) { throw "Required MIR 2.5.11 topology commit is unavailable: $commit" }
   }
-  $parents = @(& git -C $repo rev-list --parents -n 1 $expected.source)[0].Split(' ')
+  $parents = @(& git -C $repo rev-list --parents -n 1 $expected.semantic_merge)[0].Split(' ')
   if ($parents.Count -ne 3 -or $parents[1] -ne $expected.predecessor -or $parents[2] -ne $expected.semantic_parent) {
-    throw 'The MIR 2.5.11 package source must have exact 2.5.10 first parent and exact frozen 3.2.11 semantic parent.'
+    throw 'The MIR 2.5.11 semantic merge must have exact 2.5.10 first parent and exact frozen 3.2.11 semantic parent.'
   }
+  & git -C $repo merge-base --is-ancestor $expected.semantic_merge $expected.source
+  if ($LASTEXITCODE -ne 0) { throw 'The final MIR 2.5.11 package source does not descend from its exact semantic merge.' }
   $sourceTree = @(& git -C $repo rev-parse "$($expected.source)^{tree}")
   if ($LASTEXITCODE -ne 0 -or @($sourceTree).Count -ne 1 -or [string]$sourceTree[0] -ne $expected.source_tree) {
     throw 'The MIR 2.5.11 package source tree differs from package-built authority.'

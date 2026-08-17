@@ -49,7 +49,8 @@ if ([string]$info.factorio_version -eq '2.0' -and [string]$info.version -eq '2.5
     @{Name='P12 projection.package_source_commit'; Commit=[string]$lock.projection.package_source_commit},
     @{Name='P14 release predecessor'; Commit='6bb483de9042a7ec4c93674933e7f6c1670d79aa'},
     @{Name='C35 semantic source'; Commit='0a32864d1f1d1fdea090369bc1a22fbd511e290a'},
-    @{Name='P15 package source'; Commit='7137e37b44f2acd4aee1651a7e653301bfb1da89'}
+    @{Name='P15 semantic merge'; Commit='7137e37b44f2acd4aee1651a7e653301bfb1da89'},
+    @{Name='P15 package source'; Commit='57324642e7423d784d7f22b9be4a2b6b350bf012'}
   )) { Assert-MIRCommit -Name $row.Name -Commit $row.Commit }
   Write-Host '[ok] MIR 2.5.11 retains the historical P12 source lock and binds immutable P14 plus frozen C35 authority.'
   return
