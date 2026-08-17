@@ -1,0 +1,13 @@
+{
+  "schema": 2,
+  "kind": "MIR3PostTerminalEmergencyHotfixTargetMatrixV2",
+  "status": "candidate-identities-allocated-after-local-and-remote-monotonic-check",
+  "candidate_floors": {"3.2.11": "C35", "2.5.11": "2.5-P15"},
+  "candidate_allocations": {"3.2.11": "C35", "2.5.11": "2.5-P15"},
+  "allocation_basis": "Local refs and origin heads/tags contained C34 and 2.5-P14 as the highest allocated identities and no C35, 2.5-P15, 3.2.11, or 2.5.11 ref.",
+  "targets": [
+    {"release": "3.2.11", "factorio": "2.1.14", "lineage": "main/3.2.10", "findings": ["MIR3-TERM-0033", "MIR3-TERM-0034"], "disposition": "required-after-exact-qualification"},
+    {"release": "2.5.11", "factorio": "2.0.77", "lineage": "immutable-2.5.10-release-commit", "semantic_source": "exact-qualified-3.2.11-source", "findings": ["MIR3-TERM-0033", "MIR3-TERM-0034"], "disposition": "required-after-exact-qualification"},
+    {"release_family": "1.3.9-through-1.9.9", "disposition": "unchanged-not-projected"}
+  ]
+}

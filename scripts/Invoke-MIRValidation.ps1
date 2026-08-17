@@ -545,7 +545,24 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
-if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.10') {
+if ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.11') {
+  Invoke-RepoCheck 'the bounded 2.5.10 to 2.5.11 emergency delta is package-bound' {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\releases\records\2.5.11.json') | ConvertFrom-Json -Depth 100
+    . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')
+    $candidate = Join-Path $repo ([string]$record.package.archive)
+    if ([string]$record.candidate_id -ne '2.5-P15' -or
+        [string]$record.state -ne 'sealed-awaiting-publication' -or
+        [string]$record.source_release.tag_commit -ne '6bb483de9042a7ec4c93674933e7f6c1670d79aa' -or
+        [string]$record.semantic_parent.source_commit -ne '0a32864d1f1d1fdea090369bc1a22fbd511e290a' -or
+        (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ne [string]$record.package.content_sha256 -or
+        (Get-MIRFileSha256 -Path $candidate) -ne [string]$record.package.archive_sha256 -or
+        (Get-MIRZipContentFingerprint -Path $candidate) -ne [string]$record.package.content_sha256) {
+      throw 'The bounded MIR3-TERM-0033/MIR3-TERM-0034 Factorio 2.0 emergency delta is not exact.'
+    }
+    Write-Host '[ok] MIR 2.5.11 contains the exact bounded, package-visible P15 emergency delta.'
+  }
+}
+elseif ($isLegacyFactorio20 -and [string]$repoInfo.version -eq '2.5.10') {
   Invoke-RepoCheck 'the bounded 2.5.9 to 2.5.10 emergency delta is sealed' {
     $record = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir\releases\records\2.5.10.json') | ConvertFrom-Json -Depth 100
     . (Join-Path $repo 'scripts\validation\PackageIdentity.ps1')

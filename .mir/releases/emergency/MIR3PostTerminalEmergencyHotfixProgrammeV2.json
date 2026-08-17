@@ -1,0 +1,23 @@
+{
+  "schema": 2,
+  "kind": "MIR3PostTerminalEmergencyHotfixProgrammeV2",
+  "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+  "findings": [
+    ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+    ".mir/releases/emergency/findings/MIR3-TERM-0034.json"
+  ],
+  "status": "implementation-and-qualification-active",
+  "maximum_level_contract": {
+    "zero": "infinite",
+    "positive_integer": "absolute-highest-technology-level-permitted",
+    "internal_prototype": "infinite-on-script-capable-targets-for-lossless-save-recovery",
+    "finite_presentation": "hide-native-infinity-badge-and-append-exact-localized-cap",
+    "completed_above_lowered_cap": "retained",
+    "invalid_current_or_queued_research": "removed-safely",
+    "valid_fractional_progress": "retained",
+    "raised_or_removed_cap": "future-levels-restored",
+    "reload": "first-and-second-reload-idempotent"
+  },
+  "replacement_contract": "validate replacement existence cap applicability and graph safety before external-owner removal or prerequisite rewiring",
+  "required_targets": ["3.2.11-factorio-2.1.14", "2.5.11-factorio-2.0.77"]
+}

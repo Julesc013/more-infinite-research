@@ -1,0 +1,21 @@
+{
+  "schema": 2,
+  "kind": "MIR3PostTerminalEmergencyHotfixChangeSetV2",
+  "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
+  "status": "two-findings-admitted",
+  "finding_records": [
+    ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+    ".mir/releases/emergency/findings/MIR3-TERM-0034.json"
+  ],
+  "allowed_product_scope": [
+    "truthful-finite-cap-presentation",
+    "lossless-absolute-maximum-level-runtime-control",
+    "generated-stream-base-continuation-and-native-owner-cap-policy",
+    "direct-and-MIRSET1-effective-setting-projection",
+    "configuration-change-and-upgrade-recovery",
+    "late-finalizer-conflict-diagnostics",
+    "transactional-competing-base-extension-replacement"
+  ],
+  "forbidden_scope": ["all-other-MIR3-product-work"]
+}

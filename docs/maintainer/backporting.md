@@ -126,7 +126,7 @@ Target capability classifications are centralized in `.mir/targets.json`. After 
 
 The immediate transition plan is:
 
-1. Install a real Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio`.
+1. Use the preserved Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio\2.0`; Steam is reserved for the current Factorio `2.1` installation.
 2. Create `tmp/2.0` from the validated `2.2.0` source point.
 3. Change the backport metadata for Factorio `2.0`:
    - `info.json` version becomes `1.9.2`;
@@ -138,8 +138,8 @@ The immediate transition plan is:
 
    ```powershell
    .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
-   .\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\bin\x64\factorio.exe'
-   .\scripts\mir.ps1 release gate --profile release-targeted-2.0 --factorio 'D:\Programs\Factorio\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.0' --no-git-pull
+   .\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+   .\scripts\mir.ps1 release gate --profile release-targeted-2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.0' --no-git-pull
    ```
 
 6. Bring portable bug fixes and validation-tool fixes from `tmp/2.0` back to `dev`.

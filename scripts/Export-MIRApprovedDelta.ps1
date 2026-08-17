@@ -708,12 +708,88 @@ function Get-MIR255DifferenceDisposition {
   return $null
 }
 
+function Get-MIR2511DifferenceDisposition {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    $Before,
+    $After
+  )
+
+  $evidence = @(
+    'fourteen exact Factorio 2.0.77 runtime exports',
+    '2.5.10 to 2.5.11 governed upgrade matrix',
+    'MIR3-TERM-0033 and MIR3-TERM-0034'
+  )
+  if ($Path -eq 'package.version' -and [string]$Before -eq '2.5.10' -and [string]$After -eq '2.5.11') {
+    return [ordered]@{ reason='The package version advances from immutable 2.5.10 to the corrected 2.5.11 emergency release.'; intentional=$true; migration_impact='Factorio performs the governed package upgrade.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.archive_sha256' -and
+      [string]$Before -eq '251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB' -and
+      [string]$After -eq '4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C') {
+    return [ordered]@{ reason='The archive identity advances to the deterministic 2.5-P15 package.'; intentional=$true; migration_impact='Package custody changes; semantic rows remain independently classified.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.package_content_sha256' -and
+      [string]$Before -eq '55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66' -and
+      [string]$After -eq 'F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D') {
+    return [ordered]@{ reason='The normalized package identity advances to the exact 2.5-P15 projection.'; intentional=$true; migration_impact='All observed prototype differences remain independently classified.'; required_evidence=$evidence }
+  }
+  if ($Path -eq 'package.runtime_source_fingerprints.prototypes/mir/runtime/maximum_level_control.lua' -and
+      [string]$Before -eq '0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9' -and
+      [string]$After -eq '687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA') {
+    return [ordered]@{ reason='The bounded runtime controller correction makes cap-boundary enforcement and visibility restoration explicit.'; intentional=$true; migration_impact='Invalid current or queued research remains rejected while completed levels and valid progress remain preserved.'; required_evidence=@('maximum-level transition fixtures', 'configuration-change proof', 'first and second reload proof') }
+  }
+
+  $scenarios = @(
+    'approved-delta-automatic-family-controls',
+    'approved-delta-base',
+    'approved-delta-base-continuations',
+    'approved-delta-compat-atan',
+    'approved-delta-compat-space-age-galore',
+    'approved-delta-native-owner-adoption',
+    'approved-delta-space-age'
+  )
+  if ($Path -match '^scenarios\.(?<scenario>[^.]+)\.active_mods\.more-infinite-research$' -and
+      $scenarios -contains $Matches.scenario -and [string]$Before -eq '2.5.10' -and [string]$After -eq '2.5.11') {
+    return [ordered]@{ reason='The scenario binds the exact predecessor and candidate package versions.'; intentional=$true; migration_impact='Package version transition only.'; required_evidence=$evidence }
+  }
+
+  $continuations = @(
+    'braking-force-8',
+    'inserter-capacity-bonus-8',
+    'laser-shooting-speed-8',
+    'research-speed-7',
+    'weapon-shooting-speed-7',
+    'worker-robots-storage-4'
+  )
+  if ($Path -match '^scenarios\.(?<scenario>[^.]+)\.technologies\.(?<technology>[^.]+)\.presentation\.hidden$' -and
+      $scenarios -contains $Matches.scenario -and $continuations -contains $Matches.technology -and
+      $null -eq $Before -and $After -eq $false) {
+    return [ordered]@{
+      reason = 'The transactional base-continuation plan records an explicit visible state for normal caps so only below-first-extension retained continuations are hidden.'
+      intentional = $true
+      migration_impact = 'The six existing continuation technologies remain visible and semantically unchanged; the explicit false is the counterpart to MIR3-TERM-0033 safe hidden retention.'
+      required_evidence = @('base-continuation boundary fixture', 'exact seven-scenario prototype delta', 'zero technology identity, effect, prerequisite, science, setting, or maximum-level drift')
+    }
+  }
+  return $null
+}
+
 function Get-DifferenceDisposition {
   param(
     [Parameter(Mandatory)][string]$Path,
     $Before,
     $After
   )
+  if ($script:IsFactorio20MaxLevel2511Delta) {
+    $mir2511Disposition = Get-MIR2511DifferenceDisposition -Path $Path -Before $Before -After $After
+    if ($null -ne $mir2511Disposition) { return $mir2511Disposition }
+    return [ordered]@{
+      reason = 'Unreviewed 2.5.11 emergency normalized difference.'
+      intentional = $false
+      migration_impact = 'Unknown until independently classified against MIR3-TERM-0033 and MIR3-TERM-0034.'
+      required_evidence = @('maintainer classification', 'exact 2.5.10 to 2.5.11 runtime delta', 'focused maximum-level regression')
+    }
+  }
   if ($script:IsFactorio20DotFiveReleaseDelta) {
     $mir255Disposition = Get-MIR255DifferenceDisposition -Path $Path -Before $Before -After $After
     if ($null -ne $mir255Disposition) { return $mir255Disposition }
@@ -1041,6 +1117,8 @@ $script:IsFactorio20DotFiveReleaseDelta = $baselineContract.version -eq '2.5.0' 
   $currentContract.version -eq '2.5.5' -and $currentContract.factorio_version -eq '2.0'
 $script:IsFactorio20TerminalShadowDelta = $baselineContract.version -eq '2.5.5' -and
   $currentContract.version -eq '2.5.9' -and $currentContract.factorio_version -eq '2.0'
+$script:IsFactorio20MaxLevel2511Delta = $baselineContract.version -eq '2.5.10' -and
+  $currentContract.version -eq '2.5.11' -and $currentContract.factorio_version -eq '2.0'
 $targetAuthorityKey = "factorio-$($currentContract.factorio_version)"
 $releaseAuthority = $releaseLedger.development.$targetAuthorityKey
 $baselineAuthority = $releaseLedger.published_baselines.$targetAuthorityKey
@@ -1089,6 +1167,34 @@ if ($script:IsFactorio20TerminalShadowDelta) {
     tag_commit = [string]$shadowManifest.source.immutable_dot5_predecessor.commit
     archive_sha256 = [string]$shadowBaseline.archive_sha256
     package_content_sha256 = [string]$shadowBaseline.package_content_sha256
+  }
+}
+if ($script:IsFactorio20MaxLevel2511Delta) {
+  $recordPath = Join-Path $repo '.mir\releases\records\2.5.11.json'
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 100
+  if ([int]$record.schema -ne 1 -or [string]$record.release -ne '2.5.11' -or
+      [string]$record.candidate_id -ne '2.5-P15' -or [string]$record.target -ne '2.0' -or
+      [string]$record.package.source_commit -ne '57324642e7423d784d7f22b9be4a2b6b350bf012' -or
+      [string]$record.package.archive_sha256 -ne '4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C' -or
+      [string]$record.package.content_sha256 -ne 'F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D' -or
+      [string]$record.source_release.tag_commit -ne '6bb483de9042a7ec4c93674933e7f6c1670d79aa' -or
+      [string]$record.source_release.archive_sha256 -ne '251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB' -or
+      [string]$record.source_release.content_sha256 -ne '55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66') {
+    throw 'Approved-delta 2.5.11 authority differs from the exact P15 emergency record.'
+  }
+  $releaseAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.11'
+    candidate_id = '2.5-P15'
+    package_source_commit = [string]$record.package.source_commit
+    package_source_sha256 = [string]$record.package.content_sha256
+    archive_sha256 = [string]$record.package.archive_sha256
+    package_content_sha256 = [string]$record.package.content_sha256
+  }
+  $baselineAuthority = [pscustomobject][ordered]@{
+    mir_version = '2.5.10'
+    tag_commit = [string]$record.source_release.tag_commit
+    archive_sha256 = [string]$record.source_release.archive_sha256
+    package_content_sha256 = [string]$record.source_release.content_sha256
   }
 }
 if ($null -eq $releaseAuthority -or $null -eq $baselineAuthority) {
