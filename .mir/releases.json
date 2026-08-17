@@ -64,6 +64,7 @@
       "publication_status": "planned",
       "qualification": "planned",
       "remaining_obligations": [
+        "focused-qualification",
         "root-cause-regression",
         "exact-engine-qualification",
         "deterministic-reconstruction",

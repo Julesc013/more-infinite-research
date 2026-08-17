@@ -101,11 +101,13 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
+- [ ] `focused-qualification` for `3.2.11`
 - [ ] `root-cause-regression` for `3.2.11`
 - [ ] `exact-engine-qualification` for `3.2.11`
 - [ ] `deterministic-reconstruction` for `3.2.11`
 - [ ] `protected-promotion` for `3.2.11`
 - [ ] `tag-and-publication` for `3.2.11`
+- [ ] `focused-qualification` for `2.5.11`
 - [ ] `factorio-2.0-projection` for `2.5.11`
 - [ ] `exact-engine-qualification` for `2.5.11`
 - [ ] `deterministic-reconstruction` for `2.5.11`

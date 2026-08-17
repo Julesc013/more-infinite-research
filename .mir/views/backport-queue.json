@@ -7,6 +7,7 @@
   ],
   "release": "2.5.11",
   "remaining_obligations": [
+    "focused-qualification",
     "factorio-2.0-projection",
     "exact-engine-qualification",
     "deterministic-reconstruction",
