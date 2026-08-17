@@ -1,20 +1,20 @@
 schema: 1
 
 release:
-  version: "2.5.10"
-  branch: hotfix/mir3-max-level-2.5.10
+  version: "2.5.11"
+  branch: hotfix/mir3-max-level-2.5.11
   factorio_version: "2.0"
-  baseline_commit: 89719eb8ea5c938b6a0e9d816e6324d4d59b87bb
-  baseline_tag: "2.5.9"
+  baseline_commit: 6bb483de9042a7ec4c93674933e7f6c1670d79aa
+  baseline_tag: "2.5.10"
   pre_dot5_public_predecessor: "2.5.0"
-  portable_source_release: "3.2.10"
-  portable_source_commit: 4cbea531a1043e0cacb9ac5c496731c8d77bbdb6
+  portable_source_release: "3.2.11"
+  portable_source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
   target_profile: "factorio-2.0"
-  target_adapter: "factorio-2.0-maximum-level-runtime-settings"
+  target_adapter: "factorio-2.0-truthful-maximum-level-presentation-and-runtime-settings"
   target_assurance_overlays: "factorio-2.0-resumable-assurance-v1@3d0a0204eb1bf72e766f87ac05941d89f4c10a39,factorio-2.0-graph-process-ceiling-v1@f4b0475861770b848cc48f57cf37fe8bac5e1f64,factorio-2.0-terminal-shadow-qualification-v1@98182f4aa303d7f48339b5e3cf50e56f4dbeb53c,factorio-2.0-terminal-shadow-performance-authority-v1@85598cb326502e6707c1d9d1101dfd42aab56978,factorio-2.0-terminal-shadow-review-authority-v1@0568025c6776470eb96fa0f597be656af406076c,factorio-2.0-validation-userdata-v1@02af30d18db2988a6b1ba724fb56a22317a18474,factorio-2.0-scenario-authority-parity-v1@49daec6d9ce1f20861ca73d28bfe584333433125,factorio-2.0-py-proof-transport-v1@e2bd416e6a38805f221a719f119de22c2a79d516,factorio-2.0-combined-effect-ownership-v1@ba4ccd539ef5e6e7d1fbbb462e0c0e31e5e3eb9b,factorio-2.0-late-p0-authority-reconciliation-v1@bde8eda3b3ccc59bfe50016a3729531d6dbed44f"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
-  terminal_shadow_status: source-frozen-p14-sealed
+  terminal_shadow_status: source-frozen-p15-package-built
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
