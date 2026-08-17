@@ -392,6 +392,37 @@ fixtures:
       - upgraded-save-two-reload-proof
       - exact-4-0-20000-candidate-normal-mod-directory-load
 
+  upgrade-2-5-10-to-2-5-11:
+    requires_features: [recipe_productivity]
+    targets: ["2.0"]
+    assertion_path: fixtures/assert-upgrade-2-5-10-to-2-5-11
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.10"
+    additional_source_versions: ["2.5.9", "2.5.5"]
+    target_candidate: "2.5.11"
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-2-5-10-source-archive-for-2-5-11
+      - exact-2-5-9-source-archive-for-2-5-11
+      - exact-2-5-5-source-archive-for-2-5-11
+      - stable-generated-technology-identities
+      - technology-level-retention
+      - current-research-and-completed-work-retention
+      - science-ingredient-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - fixture-storage-retention
+      - upgraded-save-reload
+
   upgrade-2-5-10-to-4-0-20000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-2-5-10-to-4-0-20000

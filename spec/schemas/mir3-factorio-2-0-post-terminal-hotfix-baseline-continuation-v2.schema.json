@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json",
+  "title": "MIR 3 Factorio 2.0 post-terminal hotfix baseline continuation V2",
+  "type": "object",
+  "required": ["schema", "kind", "release", "target", "status", "package_visible", "capture_tool", "foundation", "distribution", "input_root_sha256", "files", "normalized_snapshot", "public_custody", "continuation", "completion", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3PostTerminalHotfixBaselineContinuationV2"},
+    "release": {"const": "2.5.11"},
+    "target": {"const": "2.0"},
+    "status": {"const": "captured-public-custody-pending-mir4-refresh"},
+    "package_visible": {"const": false},
+    "capture_tool": {"type": "object"},
+    "foundation": {"type": "object"},
+    "distribution": {"type": "object"},
+    "input_root_sha256": {"$ref": "#/$defs/sha256"},
+    "files": {"type": "array", "minItems": 12, "items": {"$ref": "#/$defs/file"}},
+    "normalized_snapshot": {"$ref": "#/$defs/file"},
+    "public_custody": {"type": "object"},
+    "continuation": {"type": "object"},
+    "completion": {"type": "object"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "file": {
+      "type": "object",
+      "required": ["logical_path", "source_path", "sha256", "bytes", "role"],
+      "properties": {
+        "logical_path": {"type": "string", "minLength": 1},
+        "source_path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "role": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    }
+  }
+}

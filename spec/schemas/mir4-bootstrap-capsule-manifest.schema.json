@@ -53,7 +53,7 @@
     "record_sha256": { "$ref": "#/$defs/sha256" }
   },
   "allOf": [
-    { "if": { "properties": { "lane": { "const": "emergency" } }, "required": ["lane"] }, "then": { "properties": { "target": { "required": ["correction_authority"], "not": { "required": ["local_lane_authority"] }, "properties": { "target_key": { "const": "f210" }, "factorio_line": { "const": "2.1" }, "distribution_version": { "const": "4.0.21000" } } } } } },
+    { "if": { "properties": { "lane": { "const": "emergency" } }, "required": ["lane"] }, "then": { "properties": { "target": { "not": { "required": ["local_lane_authority"] }, "properties": { "target_key": { "const": "f210" }, "factorio_line": { "const": "2.1" }, "distribution_version": { "const": "4.0.21000" } } } } } },
     { "if": { "properties": { "lane": { "const": "local-playtest-shadow" } }, "required": ["lane"] }, "then": { "properties": { "target": { "required": ["local_lane_authority"], "not": { "required": ["correction_authority"] }, "properties": { "target_key": { "enum": ["f200", "f110", "f100"] } } } } } },
     { "if": { "properties": { "target": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] } } }, "then": { "properties": { "target": { "properties": { "factorio_line": { "const": "2.0" }, "distribution_version": { "const": "4.0.20000" } } } } } },
     { "if": { "properties": { "target": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] } } }, "then": { "properties": { "target": { "properties": { "factorio_line": { "const": "1.1" }, "distribution_version": { "const": "4.0.11000" } } } } } },
@@ -77,8 +77,8 @@
       "additionalProperties": false,
       "required": ["path", "kind", "authority_family", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json" },
-        "kind": { "const": "MIR4PrivateLaneAuthorizationV2" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json" },
+        "kind": { "const": "MIR4PrivateLaneAuthorizationV3" },
         "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }

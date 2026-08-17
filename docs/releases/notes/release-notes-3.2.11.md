@@ -30,13 +30,13 @@ MIR 3.2.10 remains unchanged and downloadable as the immutable predecessor.
 
 | Field | Value |
 | --- | --- |
-| State | `sealed` |
+| State | `publicly-verified` |
 | Candidate | `C35` |
 | Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
 | Archive SHA-256 | `5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A` |
 | Content SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
-| Tag | `pending` |
-| Tag commit | `pending` |
+| Tag | `3.2.11` |
+| Tag commit | `e3d787deb35ff30157bb2013fa1cc745a445e629` |
 | Assurance exceptions | `pending` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

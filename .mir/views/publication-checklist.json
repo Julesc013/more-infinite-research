@@ -4,33 +4,15 @@
     {
       "candidate_id": "C35",
       "release": "3.2.11",
-      "remaining_states": [
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
-      "state": "sealed",
+      "remaining_states": [],
+      "state": "publicly-verified",
       "target_seal_present": false
     },
     {
-      "candidate_id": "not-assigned",
+      "candidate_id": "2.5-P15",
       "release": "2.5.11",
-      "remaining_states": [
-        "source-frozen",
-        "package-built",
-        "focused-qualified",
-        "candidate-qualified",
-        "automated-qualified-awaiting-human-review",
-        "manually-accepted",
-        "protected-qualified",
-        "sealed",
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
-      "state": "planned",
+      "remaining_states": [],
+      "state": "publicly-verified",
       "target_seal_present": false
     },
     {

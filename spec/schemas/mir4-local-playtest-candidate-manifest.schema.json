@@ -66,8 +66,8 @@
     "laneAuthority": {
       "type": "object", "additionalProperties": false, "required": ["path", "kind", "authority_family", "record_sha256"],
       "properties": {
-        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json" },
-        "kind": { "const": "MIR4PrivateLaneAuthorizationV2" },
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json" },
+        "kind": { "const": "MIR4PrivateLaneAuthorizationV3" },
         "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
         "record_sha256": { "$ref": "#/$defs/sha256" }
       }

@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-16",
-  "distribution_count": 69,
+  "generated_at": "2026-08-18",
+  "distribution_count": 70,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -483,6 +483,14 @@
       "source_ref": "2.5.10"
     },
     {
+      "version": "2.5.11",
+      "path": "dist/more-infinite-research_2.5.11.zip",
+      "bytes": 1065193,
+      "sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "kind": "tagged-publicly-verified",
+      "source_ref": "2.5.11"
+    },
+    {
       "version": "3.2.9",
       "path": "dist/more-infinite-research_3.2.9.zip",
       "bytes": 1061572,
@@ -503,8 +511,8 @@
       "path": "dist/more-infinite-research_3.2.11.zip",
       "bytes": 1067720,
       "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
-      "kind": "emergency-probe-awaiting-candidate-qualification",
-      "source_ref": "planned/3.2.11-C35-floor"
+      "kind": "tagged-publicly-verified",
+      "source_ref": "3.2.11"
     }
   ]
 }

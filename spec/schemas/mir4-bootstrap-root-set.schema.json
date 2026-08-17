@@ -47,7 +47,7 @@
               "properties": {
                 "target_id": {"const": "f210"},
                 "factorio_line": {"const": "2.1"},
-                "predecessor_release": {"const": "3.2.10"}
+                "predecessor_release": {"const": "3.2.11"}
               }
             }
           ]
@@ -59,7 +59,7 @@
               "properties": {
                 "target_id": {"const": "f200"},
                 "factorio_line": {"const": "2.0"},
-                "predecessor_release": {"const": "2.5.10"}
+                "predecessor_release": {"const": "2.5.11"}
               }
             }
           ]
@@ -147,7 +147,7 @@
       "properties": {
         "target_id": {"enum": ["f210", "f200", "f110", "f100"]},
         "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]},
-        "predecessor_release": {"enum": ["3.2.10", "2.5.10", "1.9.9", "1.8.9"]},
+        "predecessor_release": {"enum": ["3.2.11", "2.5.11", "1.9.9", "1.8.9"]},
         "source_identity": {
           "type": "object",
           "required": ["candidate_commit", "candidate_tree", "common_source_commit"],

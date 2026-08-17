@@ -8,8 +8,8 @@ Generated: 2026-08-18
 
 | Release | Candidate | Namespace / minimum next ordinal | State | Next required state |
 | --- | --- | --- | --- | --- |
-| `3.2.11` | `C35` | `C / 35` | `sealed` | `promoted` |
-| `2.5.11` | `not-assigned` | `2.5-P15` | `planned` | `source-frozen` |
+| `3.2.11` | `C35` | `C / 35` | `publicly-verified` | `complete` |
+| `2.5.11` | `2.5-P15` | `2.5-P / 15` | `publicly-verified` | `complete` |
 | `3.2.10` | `C34` | `C / 34` | `publicly-verified` | `complete` |
 | `2.5.10` | `2.5-P14` | `2.5-P / 14` | `publicly-verified` | `complete` |
 | `3.2.9` | `C33` | `C / 33` | `publicly-verified` | `complete` |
@@ -101,15 +101,11 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 
 ## Explicit release obligations
 
-- [ ] `protected-promotion` for `3.2.11`
-- [ ] `github-publication-and-public-byte-verification` for `3.2.11`
 - [ ] `mod-portal-maintainer-upload` for `3.2.11`
-- [ ] `focused-qualification` for `2.5.11`
-- [ ] `factorio-2.0-projection` for `2.5.11`
-- [ ] `exact-engine-qualification` for `2.5.11`
-- [ ] `deterministic-reconstruction` for `2.5.11`
-- [ ] `tag-and-publication` for `2.5.11`
+- [ ] `legacy-branch-alias-repoint` for `3.2.11`
+- [ ] `mir4-f210-private-candidate-reproof` for `3.2.11`
 - [ ] `mod-portal-maintainer-upload` for `2.5.11`
+- [ ] `mir4-f200-private-candidate-reproof` for `2.5.11`
 - [ ] `legacy-branch-alias-repoint` for `3.2.10`
 - [ ] `corrected-terminal-baseline-handoff-to-mir4` for `3.2.10`
 - [ ] `mod-portal-maintainer-upload` for `2.5.10`

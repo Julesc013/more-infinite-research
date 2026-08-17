@@ -24,7 +24,7 @@ superseded_by: []
 | Assignment condition | `exact-source-freeze-and-three-build-reconstruction-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `sealed` |
+| State | `publicly-verified` |
 | Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
 | Package source tree | `b6102e8ed616955fc335d784a98357b62111322a` |
 | Package source SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
@@ -36,10 +36,7 @@ superseded_by: []
 
 ## Remaining state transitions
 
-- [ ] `promoted`
-- [ ] `tagged`
-- [ ] `published`
-- [ ] `publicly-verified`
+None.
 
 ## Assurance exceptions
 

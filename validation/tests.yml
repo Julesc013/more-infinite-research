@@ -234,7 +234,7 @@
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json",
-        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json",
         ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
         ".mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json",
         "spec/schemas/mir4-r0-authority.schema.json",
@@ -254,7 +254,7 @@
       "command": "./validation/tests/release/Test-MIR4BootstrapMaterialization.ps1",
       "requires_factorio": false,
       "inputs": [
-        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
         ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
         ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
         "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json",
@@ -340,8 +340,8 @@
       "command": "./validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
       "requires_factorio": false,
       "inputs": [
-        ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json",
-        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
         ".mir/targets.json",
         "spec/schemas/mir4-private-lane-authorization-v2.schema.json",
         "spec/schemas/mir4-local-playtest-candidate-manifest.schema.json",
@@ -396,7 +396,7 @@
       "requires_factorio": false,
       "inputs": [
         ".gitignore",
-        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
         ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
         ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
         ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
