@@ -1,17 +1,33 @@
 {
   "authority": "mir-generated-backport-queue-v1",
-  "candidate_id": "2.5-P14",
+  "candidate_id": "not-assigned",
   "generated_from": [
-    "path:releases.records/2.5.10.json",
+    "path:releases.records/2.5.11.json",
     ""
   ],
-  "release": "2.5.10",
+  "release": "2.5.11",
   "remaining_obligations": [
-    "mod-portal-maintainer-upload",
-    "corrected-terminal-baseline-handoff-to-mir4"
+    "factorio-2.0-projection",
+    "exact-engine-qualification",
+    "deterministic-reconstruction",
+    "tag-and-publication",
+    "mod-portal-maintainer-upload"
   ],
-  "remaining_states": [],
+  "remaining_states": [
+    "source-frozen",
+    "package-built",
+    "focused-qualified",
+    "candidate-qualified",
+    "automated-qualified-awaiting-human-review",
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  ],
   "schema": 1,
-  "state": "publicly-verified",
+  "state": "planned",
   "target": "2.0"
 }

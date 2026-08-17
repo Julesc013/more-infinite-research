@@ -1,7 +1,7 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.10"
+applies_to: "3.2.11"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
@@ -16,28 +16,39 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.10` |
-| Candidate identity | `C34` |
-| Candidate namespace | `C` |
-| Predecessor maximum ordinal | `33` |
-| Minimum next ordinal | `34` |
-| Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
+| MIR version | `3.2.11` |
+| Candidate identity | `not-assigned` |
+| Candidate namespace | `pending` |
+| Predecessor maximum ordinal | `pending` |
+| Minimum next ordinal | `C35` |
+| Assignment condition | `pending` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
-| Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
-| Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
-| Archive | `dist/more-infinite-research_3.2.10.zip` |
-| Archive bytes | `1065178` |
-| Archive entries | `304` |
-| Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
-| Package content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
+| State | `planned` |
+| Package source commit | `pending` |
+| Package source tree | `pending` |
+| Package source SHA-256 | `pending` |
+| Archive | `pending` |
+| Archive bytes | `pending` |
+| Archive entries | `pending` |
+| Archive SHA-256 | `pending` |
+| Package content SHA-256 | `pending` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `source-frozen`
+- [ ] `package-built`
+- [ ] `focused-qualified`
+- [ ] `candidate-qualified`
+- [ ] `automated-qualified-awaiting-human-review`
+- [ ] `manually-accepted`
+- [ ] `protected-qualified`
+- [ ] `sealed`
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 
-- `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`:  Disposition: `pending`.
+None.

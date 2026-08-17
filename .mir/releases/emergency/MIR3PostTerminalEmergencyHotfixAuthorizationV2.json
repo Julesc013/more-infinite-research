@@ -1,0 +1,23 @@
+{
+  "schema": 2,
+  "kind": "MIR3PostTerminalEmergencyHotfixAuthorizationV2",
+  "recorded_at": "2026-08-17T00:00:00+10:00",
+  "status": "authorized-subject-to-release-gates",
+  "supersedes_for_admitted_scope": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+  "scope": ["MIR3-TERM-0033", "MIR3-TERM-0034"],
+  "immutable_releases": ["3.2.10", "2.5.10"],
+  "authorized_releases": [
+    {"release": "3.2.11", "target": "Factorio 2.1", "candidate_floor": "C35"},
+    {"release": "2.5.11", "target": "Factorio 2.0", "candidate_floor": "2.5-P15"}
+  ],
+  "forbidden_scope": [
+    "unrelated-MIR3-product-work",
+    "mutation-replacement-or-retagging-of-any-published-release",
+    "MIR4-semantic-activation-before-corrected-predecessors"
+  ],
+  "mir4": {
+    "r0": "preserved-package-excluded-and-non-authoritative",
+    "m4_003": "exact-engine-and-private-candidate-qualification-paused",
+    "resume_after": "3.2.11-and-2.5.11-predecessor-decisions-settled"
+  }
+}

@@ -577,13 +577,9 @@ local function plan_chain(key)
   end
   new.effects = effect_scaling.scale_base_effects(key, desired_effects)
 
-  -- A finite prototype max_level makes Factorio clamp completed levels before
-  -- on_configuration_changed runs. Targets with the governed runtime-policy
-  -- transport therefore keep the prototype infinite and enforce the selected
-  -- absolute cap losslessly at runtime, including when the cap is below this
-  -- continuation's first level.
-  new.max_level = (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
-    and "infinite" or max_level_value
+  new.max_level = target_line.feature_enabled("scripted_techs")
+    and "infinite"
+    or max_level_value
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))

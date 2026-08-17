@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "release": "3.2.11",
+  "candidate_id": "not-assigned",
+  "candidate_floor": "C35",
+  "target": "2.1",
+  "branch": "main",
+  "development_branch": "dev",
+  "state": "planned",
+  "package": {},
+  "proofs": {
+    "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+    "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
+  },
+  "remaining_obligations": [
+    "root-cause-regression",
+    "exact-engine-qualification",
+    "deterministic-reconstruction",
+    "protected-promotion",
+    "tag-and-publication"
+  ],
+  "source_release": {
+    "release": "3.2.10",
+    "candidate_id": "C34",
+    "tag": "3.2.10",
+    "tag_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9"
+  },
+  "upgrade": {
+    "from_version": "3.2.10",
+    "to_version": "3.2.11",
+    "fixture": "assert-upgrade-3-2-9-to-3-2-10"
+  },
+  "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
+  "release_notes": "docs/releases/notes/release-notes-3.2.11.md",
+  "incident_ids": [
+    "MIR3-TERM-0033",
+    "MIR3-TERM-0034"
+  ],
+  "updated_at": "2026-08-17T16:00:00+10:00"
+}

@@ -2,7 +2,7 @@
   "schema": 1,
   "status": "tracked-root-dist-inventory",
   "generated_at": "2026-08-16",
-  "distribution_count": 68,
+  "distribution_count": 69,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -497,6 +497,14 @@
       "sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
       "kind": "tagged-publicly-verified",
       "source_ref": "3.2.10"
+    },
+    {
+      "version": "3.2.11",
+      "path": "dist/more-infinite-research_3.2.11.zip",
+      "bytes": 1067511,
+      "sha256": "751C94BD5C37E3814970DE0F73D076506822C1254F204B2B47D478EEBBB8FAC1",
+      "kind": "emergency-probe-awaiting-candidate-qualification",
+      "source_ref": "planned/3.2.11-C35-floor"
     }
   ]
 }

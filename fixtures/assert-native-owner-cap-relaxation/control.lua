@@ -30,6 +30,7 @@ script.on_event(defines.events.on_tick, function()
   local force = game.forces.player
   local technology = force.technologies[technology_name]
   local before = storage.mir_native_owner_cap_relaxation
+  if technology.prototype.max_level < 4294967295 then fail("prototype became finite") end
   if technology.level ~= before.level then fail("valid current research level changed") end
   if not force.current_research or force.current_research.name ~= technology_name then
     fail("valid current research was cancelled while relaxing the cap")
