@@ -33,7 +33,7 @@
       "type": "object",
       "required": ["release", "target", "successor_target", "baseline_manifest", "normalized_snapshot", "release_closure", "distribution", "import_disposition", "snapshot"],
       "properties": {
-        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.9$"},
+        "release": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
         "target": {"type": "string", "minLength": 1},
         "successor_target": {"type": "string", "minLength": 1},
         "baseline_manifest": {"type": "object"},

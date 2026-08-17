@@ -43,7 +43,9 @@ Invoke-RuntimeScenario -ScenarioName "k2-science-phase-policy" -EnabledFixtureNa
   "mir-fixture-assert-k2-science-phase-policy"
 )
 '@
-if (-not $validationFacade.Contains($k2ScenarioInvocation.Trim(), [StringComparison]::Ordinal)) {
+$validationFacadeCanonical = $validationFacade.Replace("`r`n", "`n").Replace("`r", "`n")
+$k2ScenarioInvocationCanonical = $k2ScenarioInvocation.Trim().Replace("`r`n", "`n").Replace("`r", "`n")
+if (-not $validationFacadeCanonical.Contains($k2ScenarioInvocationCanonical, [StringComparison]::Ordinal)) {
   throw "The manifest-required K2 science-phase policy scenario must be invoked by the complete validation facade."
 }
 

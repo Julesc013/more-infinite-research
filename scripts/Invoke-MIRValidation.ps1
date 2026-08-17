@@ -32,6 +32,37 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+if ($ScenarioWorker -and -not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+  $candidateMetadataPath = if ([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+  if (-not (Test-Path -LiteralPath $candidateMetadataPath -PathType Leaf)) {
+    throw "Scenario worker candidate package not found: $CandidateZip"
+  }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $candidateArchive = [IO.Compression.ZipFile]::OpenRead((Resolve-Path -LiteralPath $candidateMetadataPath).Path)
+  try {
+    $candidateInfoEntries = @($candidateArchive.Entries | Where-Object {
+      -not $_.FullName.EndsWith('/') -and $_.FullName -match '^[^/]+/info\.json$'
+    })
+    if ($candidateInfoEntries.Count -ne 1) {
+      throw "Scenario worker candidate must contain exactly one package-root info.json."
+    }
+    $candidateInfoReader = [IO.StreamReader]::new($candidateInfoEntries[0].Open(), [Text.UTF8Encoding]::new($false), $true)
+    try {
+      $candidateInfo = $candidateInfoReader.ReadToEnd() | ConvertFrom-Json
+    } finally {
+      $candidateInfoReader.Dispose()
+    }
+  } finally {
+    $candidateArchive.Dispose()
+  }
+  if ([string]$candidateInfo.name -ne [string]$repoInfo.name -or
+      [string]$candidateInfo.factorio_version -notin @('2.1', '2.0', '1.1', '1.0')) {
+    throw "Scenario worker candidate metadata does not identify a supported MIR target."
+  }
+  # Runtime evidence must describe the exact candidate target rather than the
+  # controller checkout's current product line.
+  $repoInfo = $candidateInfo
+}
 $expectedScenariosPath = Join-Path $repo "validation\scenarios\runtime.json"
 if ($List) {
   $listed = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
@@ -182,6 +213,20 @@ Invoke-RepoCheck "release authority views match the canonical ledger" {
 
 Invoke-RepoCheck "terminal baseline calibrations are exact and deterministic" {
   & (Join-Path $repo "validation\tests\release\Test-MIRTerminalBaselineCapture.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
+  & (Join-Path $repo "validation\tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 bootstrap materialization and offline custody are deterministic and proof-only" {
+  & (Join-Path $repo "tools\commands\release\Test-MIR4R0Bootstrap.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4FinalProgrammeReconciliation.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR3Dot9ModPortalVisibilityRecheck.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapTargetReadiness.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4LocalPlaytestShadow.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4BootstrapMaterialization.ps1") -RepoRoot $repo
+  & (Join-Path $repo "validation\tests\release\Test-MIR4OfflineCandidateCustody.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "terminal exact-engine observation normalization is deterministic" {
@@ -620,7 +665,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
+  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -641,8 +686,27 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
       throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
+    $mir4TargetNativeFixtures = @{
+      "assert-upgrade-1-8-9-to-4-0-10000" = "1.0"
+      "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
+      "assert-generated-cap-transition-2-0" = "2.0"
+      "assert-generated-max-level-2-0" = "2.0"
+      "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
+      "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
+    }
+    $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
+      $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
+      [string]$info.factorio_version -eq [string]$mir4TargetNativeFixtures[$fixture.Name]
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
+      if ($allowedMIR4TargetNativeFixture) {
+        $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
+        $expectedFixtureLine = [regex]::Escape([string]$mir4TargetNativeFixtures[$fixture.Name])
+        if ($fixtureBaseDependency -notmatch "^base\s+>=\s+$expectedFixtureLine(\.|$)") {
+          throw "Target-native MIR 4 fixture $($info.name) must use its Factorio $($mir4TargetNativeFixtures[$fixture.Name]) base dependency; found '$fixtureBaseDependency'."
+        }
+        continue
+      }
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
@@ -1566,7 +1630,6 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "shard_local_mod_zips" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "scenario_timeout_seconds" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/tmp/2.0'" },
-    @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.ref == 'refs/heads/legacy'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.head_ref == 'tmp/2.0'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "github.base_ref == 'tmp/2.0'" },
     @{ File = ".github\workflows\validate.yml"; Text = $validateWorkflowText; Snippet = "--target `$env:MIR_VALIDATION_TARGET" },
@@ -1596,6 +1659,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing compatibility audit automation wiring in $($check.File): $($check.Snippet)"
     }
+  }
+  if ($validateWorkflowText.Contains("refs/heads/legacy")) {
+    throw "The movable legacy terminal alias must use the Factorio 2.1 validation role; only tmp/2.0 selects Factorio 2.0."
   }
 }
 
@@ -2485,7 +2551,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "golden-plans", "museum", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",
@@ -2534,7 +2600,9 @@ function Get-FixtureInfos {
   $infos = @()
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
-    $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
+    $infoPath = Join-Path $fixture.FullName "info.json"
+    if (-not (Test-Path -LiteralPath $infoPath -PathType Leaf)) { continue }
+    $info = Get-Content -Raw $infoPath | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name
       Version = $info.version
@@ -3564,6 +3632,15 @@ if ($selectionActive -and -not $checkpointActive) {
               -InitialStartupSettingOverrides @{ "ips-max-level-research_copper" = 0 } `
               -ChangedStartupSettingOverrides @{ "ips-max-level-research_copper" = 5 }
             Assert-LogContains -Expected "[mir-fixture] generated lowered cap retained completed levels and removed invalid research" -Context $declaration.name
+          }
+          "generated-maximum-level-lowering-config-change-2-0" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -ChangedFixtureNames @("mir-fixture-assert-generated-cap-transition-2-0") `
+              -InitialStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 0 } `
+              -ChangedStartupSettingOverrides @{ "ips-max-level-research_processing_unit" = 5 }
+            Assert-LogContains -Expected "[mir-fixture] Factorio 2.0 lowered cap retained completed levels and removed invalid research" -Context $declaration.name
           }
           "base-continuation-maximum-level-lowering-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `

@@ -2,6 +2,9 @@ local M = {}
 M.requires_features = {"scripted_techs"}
 
 local runtime_state = require("prototypes.mir.runtime.state")
+local startup_settings = require("prototypes.mir.runtime.startup_settings")
+local stream_registry = require("prototypes.mir.streams.registry")
+local setting_defaults = require("prototypes.mir.settings.defaults")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 1
@@ -21,6 +24,70 @@ local function prototype_is_infinite(value)
     or (type(value) == "number" and value >= INFINITE_RUNTIME_MAX_LEVEL)
 end
 
+local function prototype_matches_selected(observed, selected)
+  if selected == "infinite" then return prototype_is_infinite(observed) end
+  return type(selected) == "number" and prototype_is_infinite(observed)
+end
+
+local function selected_maximum(setting_name)
+  local selected = tonumber(startup_settings.get(setting_name))
+  if not selected or selected <= 0 then return "infinite" end
+  return math.floor(selected)
+end
+
+local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
+  if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
+  managed[technology_name] = {
+    source = source,
+    operation = operation,
+    setting = setting_name,
+    selected = selected_maximum(setting_name)
+  }
+end
+
+local function add_generated_runtime_bindings(managed)
+  for key, spec in pairs(stream_registry.snapshot()) do
+    local technology_name = spec.technology_name or ("recipe-prod-" .. tostring(key) .. "-1")
+    add_runtime_binding(
+      managed,
+      technology_name,
+      "ips-max-level-" .. tostring(key),
+      "generated-stream",
+      "runtime-settings-transport"
+    )
+  end
+end
+
+local function add_base_continuation_runtime_bindings(managed)
+  for key, spec in pairs(setting_defaults.base_extensions or {}) do
+    local chain_key = spec.chain_key or key
+    local generated_key = spec.generated_key or chain_key
+    local pattern = "^" .. tostring(generated_key):gsub("([^%w])", "%%%1") .. "%-(%d+)$"
+    local selected_name, selected_level = nil, nil
+    for name, prototype in pairs((prototypes and prototypes.technology) or {}) do
+      local level = tonumber(string.match(name, pattern))
+      if level and prototype.max_level ~= nil
+          and (selected_level == nil or level < selected_level) then
+        selected_name, selected_level = name, level
+      end
+    end
+    if selected_name then
+      add_runtime_binding(
+        managed,
+        selected_name,
+        "mir-max-level-" .. tostring(key),
+        "base-continuation",
+        "runtime-settings-transport"
+      )
+    end
+  end
+end
+
+local function add_runtime_settings_policy(managed)
+  add_generated_runtime_bindings(managed)
+  add_base_continuation_runtime_bindings(managed)
+end
+
 local function current_policy()
   local managed = {}
   local caps = {}
@@ -36,12 +103,15 @@ local function current_policy()
       selected = binding.selected
     }
   end
+  if next(managed) == nil then
+    add_runtime_settings_policy(managed)
+  end
 
   for name, policy in pairs(managed) do
     local selected = policy.selected
     if type(selected) == "number" and selected > 0 then
       local observed = observed_max_level(name)
-      if prototype_is_infinite(observed) then
+      if prototype_matches_selected(observed, selected) then
         caps[name] = math.floor(selected)
       else
         log("[more-infinite-research] Maximum-level conflict technology=" .. name
@@ -52,7 +122,7 @@ local function current_policy()
           .. " source=" .. tostring(policy.source)
           .. " reason=late_prototype_mutation"
           .. " setting=" .. tostring(policy.setting)
-          .. "; lossless runtime cap enforcement was refused.")
+          .. "; runtime queue normalization was refused.")
       end
     end
   end
@@ -63,11 +133,13 @@ local function force_cap_state(force)
   local state = ensure_state()
   state.disabled_by_cap = state.disabled_by_cap or {}
   state.disabled_by_cap[force.index] = state.disabled_by_cap[force.index] or {}
-  return state.disabled_by_cap[force.index]
+  state.visibility_by_cap = state.visibility_by_cap or {}
+  state.visibility_by_cap[force.index] = state.visibility_by_cap[force.index] or {}
+  return state.disabled_by_cap[force.index], state.visibility_by_cap[force.index]
 end
 
 local function normalize_force(force, managed, caps)
-  local disabled_by_cap = force_cap_state(force)
+  local disabled_by_cap, visibility_by_cap = force_cap_state(force)
   local next_level = {}
   for technology_name, cap in pairs(caps) do
     local technology = force.technologies[technology_name]
@@ -113,6 +185,10 @@ local function normalize_force(force, managed, caps)
     local cap = caps[technology_name]
     local should_disable = technology and cap and technology.level > cap
     if should_disable then
+      if visibility_by_cap[technology_name] == nil then
+        visibility_by_cap[technology_name] = technology.visible_when_disabled
+      end
+      technology.visible_when_disabled = true
       if technology.enabled then
         technology.enabled = false
         disabled_by_cap[technology_name] = true
@@ -120,6 +196,36 @@ local function normalize_force(force, managed, caps)
     elseif technology and disabled_by_cap[technology_name] then
       technology.enabled = true
       disabled_by_cap[technology_name] = nil
+      if visibility_by_cap[technology_name] ~= nil then
+        technology.visible_when_disabled = visibility_by_cap[technology_name]
+        visibility_by_cap[technology_name] = nil
+      end
+    end
+
+    if technology and cap then
+      local observation = table.concat({
+        tostring(cap),
+        tostring(observed_max_level(technology_name)),
+        tostring(technology.level),
+        tostring(technology.enabled),
+        tostring(technology.visible_when_disabled)
+      }, "|")
+      local state = ensure_state()
+      state.observations = state.observations or {}
+      local key = tostring(force.index) .. "/" .. technology_name
+      if state.observations[key] ~= observation then
+        state.observations[key] = observation
+        log("[more-infinite-research] Maximum-level state"
+          .. " force=" .. tostring(force.name)
+          .. " technology=" .. technology_name
+          .. " selected-cap=" .. tostring(cap)
+          .. " effective-cap=" .. tostring(cap)
+          .. " prototype-max=" .. tostring(observed_max_level(technology_name))
+          .. " current-or-next-level=" .. tostring(technology.level)
+          .. " next-level-valid=" .. tostring(technology.level <= cap)
+          .. " enabled=" .. tostring(technology.enabled)
+          .. " visible-when-disabled=" .. tostring(technology.visible_when_disabled) .. ".")
+      end
     end
   end
 end

@@ -166,6 +166,20 @@ for _, stream in ipairs(streams) do
     if not string.find(signature, "|planned-max=" .. tostring(planned_max), 1, true) then
       fail(stream.owner .. " binding signature omitted selected runtime maximum " .. tostring(planned_max))
     end
+    if max_changed then
+      if owner.show_levels_info ~= false then
+        fail(stream.owner .. " still exposes the misleading infinity badge")
+      end
+      local function contains(value, expected)
+        if tostring(value) == tostring(expected) then return true end
+        if type(value) ~= "table" then return false end
+        for _, child in pairs(value) do if contains(child, expected) then return true end end
+        return false
+      end
+      if not contains(owner.localised_description, planned_max) then
+        fail(stream.owner .. " description omitted selected maximum " .. tostring(planned_max))
+      end
+    end
 
     local relevant = 0
     for _, owner_effect in ipairs(owner.effects or {}) do

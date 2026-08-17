@@ -23,6 +23,7 @@
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "museum-exact": ["static.museum", "runtime.museum-exact"],
+    "mir4-bootstrap": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
@@ -32,6 +33,11 @@
     "promotion-check": ["seal.verify"]
   },
   "classes": [
+    {
+      "id": "mir4-bootstrap",
+      "patterns": ["^\\.gitattributes$", "^\\.mir/targets\\.json$", "^\\.mir/releases/waves/mir4-r0/", "^\\.mir/evidence/mir4-r0/", "^\\.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-(?:CustodyObservation|VisibilityRecheck)V1\\.json$", "^dist/more-infinite-research_(?:3\\.2\\.9|2\\.5\\.9|1\\.9\\.9|1\\.8\\.9)\\.zip$", "^tools/lib/mir4/", "^tools/lib/assurance/Evidence\\.ps1$", "^tools/lib/validation/(?:MIR4DistributionIdentity|PackageIdentity)\\.ps1$", "^tools/commands/mir4/", "^tools/commands/package/Build-MIRPackage\\.ps1$", "^tools/commands/release/(?:Invoke-MIR4BootstrapCapsule|New-MIR4Bootstrap(?:RootSet|LocalCandidate)|Test-MIR4R0Bootstrap)\\.ps1$", "^spec/api/mir4-v0/", "^spec/schemas/experimental/", "^spec/schemas/mir4-", "^spec/schemas/mir3-dot9-mod-portal-visibility-recheck\\.schema\\.json$", "^sdk/experimental/mir4/", "^fixtures/mir4-api-v0/", "^validation/tests/mir4/", "^validation/tests/release/(?:Test-MIR4|Test-MIR3Dot9ModPortalVisibilityRecheck)", "^docs/architecture/(?:current-architecture-matrix|mir4-|decisions/000[1-5]-mir)", "^docs/reference/generated/mir4-experimental-api-v0\\.md$"],
+      "tests": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk"]
+    },
     {
       "id": "runtime-or-migration",
       "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^validation/tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
@@ -69,7 +75,7 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
+      "patterns": ["^\\.gitattributes$", "^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control)/|maintenance/)", "^spec/schemas/", "^validation/tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {

@@ -1,0 +1,1 @@
+-- Runtime-only direct-predecessor upgrade fixture.

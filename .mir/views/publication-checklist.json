@@ -2,15 +2,20 @@
   "authority": "mir-generated-terminal-family-publication-checklist-v1",
   "family": [
     {
-      "candidate_id": "C34",
-      "release": "3.2.10",
-      "remaining_states": [],
-      "state": "publicly-verified",
+      "candidate_id": "C35",
+      "release": "3.2.11",
+      "remaining_states": [
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "state": "sealed",
       "target_seal_present": false
     },
     {
       "candidate_id": "not-assigned",
-      "release": "2.5.10",
+      "release": "2.5.11",
       "remaining_states": [
         "source-frozen",
         "package-built",
@@ -26,6 +31,20 @@
         "publicly-verified"
       ],
       "state": "planned",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "C34",
+      "release": "3.2.10",
+      "remaining_states": [],
+      "state": "publicly-verified",
+      "target_seal_present": false
+    },
+    {
+      "candidate_id": "2.5-P14",
+      "release": "2.5.10",
+      "remaining_states": [],
+      "state": "publicly-verified",
       "target_seal_present": false
     },
     {

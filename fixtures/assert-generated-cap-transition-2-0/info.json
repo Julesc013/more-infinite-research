@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-assert-generated-cap-transition-2-0",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Generated Cap Transition (Factorio 2.0)",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research >= 2.5.10"
+  ]
+}

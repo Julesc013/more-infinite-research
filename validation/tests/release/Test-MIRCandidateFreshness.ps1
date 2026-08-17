@@ -11,6 +11,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
+. (Join-Path $repo "tools\lib\control\Records.ps1")
 
 function Get-MIRCandidateFields {
   param([Parameter(Mandatory)][string]$Text)
@@ -343,14 +344,23 @@ if ($status -eq "maintainer-accepted-emergency") {
   if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after emergency acceptance." }
   $packageRoots = @(Get-MIRPackageSourceRoots)
   $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
-  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+  if ($LASTEXITCODE -ne 0) {
     throw "Package-visible paths changed after emergency acceptance: $($changedPackagePaths -join ', ')"
+  }
+  if ($changedPackagePaths.Count -gt 0) {
+    try {
+      $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo
+    } catch {
+      throw "Package-visible paths changed after emergency acceptance outside the exact MIR 4 composite: $($changedPackagePaths -join ', '): $($_.Exception.Message)"
+    }
+    if ([string]$freeze.lock_id -cne "mir-3.2.10-c34") {
+      throw "The exact MIR 4 composite did not resolve against the immutable 3.2.10/C34 package lock."
+    }
   }
 
   $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
   $artifactPath = Join-Path $repo $artifactRelative
-  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.10.json") | ConvertFrom-Json
-  $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json") | ConvertFrom-Json
+  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
   $admittedEmergencyStates = @(
     "manually-accepted",
     "protected-qualified",
@@ -360,6 +370,32 @@ if ($status -eq "maintainer-accepted-emergency") {
     "published",
     "publicly-verified"
   )
+  if ([string]$currentInfo.version -eq "3.2.11") {
+    $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.11.json") | ConvertFrom-Json
+    $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json") | ConvertFrom-Json
+    $authorization = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json") | ConvertFrom-Json
+    $qualification = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json") | ConvertFrom-Json
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+        $admittedEmergencyStates -notcontains [string]$release.state -or [string]$release.candidate_id -ne "C35" -or
+        [string]$release.package.source_commit -ne $packageSourceCommit -or
+        [string]$release.package.archive -ne $artifactRelative -or
+        (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+        (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256 -or
+        [string]$override.status -ne "accepted-for-immediate-promotion" -or
+        [string]$override.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
+        [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
+        [string]$authorization.status -ne "authorized-subject-to-release-gates" -or
+        [string]$qualification.status -ne "exact-engine-and-governed-upgrades-passed" -or
+        [int]$qualification.governed_upgrades.passed -ne 15 -or
+        [int]$qualification.governed_upgrades.required -ne 15) {
+      throw "The C35 emergency candidate, V2 release record, qualification, override, or frozen ZIP identity disagrees."
+    }
+    Write-Host "[ok] exact C35 bytes remain frozen in emergency release state '$($release.state)' under the Factorio 2.1.14 V2 authorization."
+    exit 0
+  }
+
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.10.json") | ConvertFrom-Json
+  $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json") | ConvertFrom-Json
   if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
       $admittedEmergencyStates -notcontains [string]$release.state -or [string]$release.candidate_id -ne "C34" -or
       [string]$release.package.source_commit -ne $packageSourceCommit -or
@@ -370,7 +406,7 @@ if ($status -eq "maintainer-accepted-emergency") {
       [string]$override.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
       [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
       [string]$override.maintainer_decision.factorio_2_1_13_gate -ne "waived and superseded for 3.2.10 only") {
-    throw "The emergency accepted candidate, release record, override, or frozen ZIP identity disagrees."
+    throw "The C34 emergency accepted candidate, release record, override, or frozen ZIP identity disagrees."
   }
   Write-Host "[ok] exact C34 bytes remain frozen in emergency release state '$($release.state)' under the explicit Factorio 2.1.14 exception."
   exit 0

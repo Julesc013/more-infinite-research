@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-git-source-proof.schema.json",
+  "title": "MIR 4 bootstrap compact Git source identity proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "canonicalization", "candidate_commit", "source_tree", "commit", "tree_objects", "package_files", "record_sha256"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4BootstrapGitSourceProofV1" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "candidate_commit": { "$ref": "#/$defs/gitSha1" },
+    "source_tree": { "$ref": "#/$defs/gitSha1" },
+    "commit": { "$ref": "#/$defs/object" },
+    "tree_objects": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/object" } },
+    "package_files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "mode", "blob_sha1", "bytes", "sha256"],
+        "properties": {
+          "path": { "$ref": "#/$defs/path" },
+          "mode": { "enum": ["100644", "100755"] },
+          "blob_sha1": { "$ref": "#/$defs/gitSha1" },
+          "bytes": { "type": "integer", "minimum": 0 },
+          "sha256": { "$ref": "#/$defs/sha256" }
+        }
+      }
+    },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "path": { "type": "string", "pattern": "^(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" },
+    "object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha1", "payload_path", "bytes", "sha256"],
+      "properties": {
+        "sha1": { "$ref": "#/$defs/gitSha1" },
+        "payload_path": { "$ref": "#/$defs/path" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

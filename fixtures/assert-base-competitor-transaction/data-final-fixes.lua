@@ -17,7 +17,11 @@ local replacement_should_skip = maximum > 0 and maximum < 4
 
 if replacement_should_skip then
   if not technologies[old_name] then fail("external owner was deleted after MIR skipped generation") end
-  if technologies[new_name] then fail("MIR replacement generated despite maximum below first extension") end
+  local retained = technologies[new_name]
+  if not retained then fail("migration-safe MIR continuation was not retained below its first level") end
+  if retained.hidden ~= true then fail("migration-safe MIR continuation remained visible below its first level") end
+  if retained.max_level ~= "infinite" then fail("migration-safe MIR continuation was not internally infinite") end
+  if retained.show_levels_info ~= false then fail("migration-safe MIR continuation exposed an infinity badge") end
   if not prerequisites[old_name] then fail("rollback changed dependent prerequisite") end
 else
   if technologies[old_name] then fail("external owner remained after complete MIR replacement") end

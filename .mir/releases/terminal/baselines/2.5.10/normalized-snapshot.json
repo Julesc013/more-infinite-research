@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "kind": "MIR4TerminalNormalizedSnapshotV1",
+  "status": "importable-pre-eol-public-custody-pending",
+  "semantic_authority": false,
+  "release": "2.5.10",
+  "target": "2.0",
+  "successor_target": "MIR4-R0/2.0",
+  "source_identity": {
+    "candidate_id": "2.5-P14",
+    "candidate_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+    "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_2.5.10.zip",
+    "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+    "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+    "bytes": 1062874,
+    "entries": 302,
+    "tag": "2.5.10"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "qualification": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+    "status": "passed-exact-engine-qualification"
+  },
+  "predecessors": [
+    {
+      "release": "2.5.9",
+      "role": "immutable-terminal-predecessor",
+      "upgrade_id": "2.5.9-to-2.5.10"
+    },
+    {
+      "release": "2.5.5",
+      "role": "older-governed-predecessor",
+      "upgrade_id": "2.5.5-to-2.5.10"
+    }
+  ],
+  "foundation": {
+    "release": "2.5.9",
+    "manifest": ".mir/releases/terminal/baselines/2.5.9/baseline-manifest.json",
+    "root_sha256": "85FA62B7D8C7CA34DD9BFB096133B123570034E7D6BE5D766DFCF1C2AAD94748"
+  },
+  "inventories": {
+    "features": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "package_composition": ".mir/releases/terminal/baselines/2.5.10/package-composition.json",
+      "disposition": "2.5.9-plus-factorio-2.0-runtime-settings-transport"
+    },
+    "technologies": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "stable_ids_preserved": true,
+      "affected_family": "five-generated-productivity-streams"
+    },
+    "settings": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "released_id_or_type_changes": 0,
+      "codec": "MIRSET1",
+      "runtime_transport_added": true
+    },
+    "owners_aliases_tombstones": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "native_owner_adoption": false,
+      "generated_stream_runtime_caps": true
+    },
+    "migrations": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "watermark": {
+        "from": [
+          "2.5.9",
+          "2.5.5",
+          "2.5.0"
+        ],
+        "stable_ids": true,
+        "to": "2.5.10"
+      }
+    },
+    "locales": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "package_composition": ".mir/releases/terminal/baselines/2.5.10/package-composition.json"
+    },
+    "runtime_profiles": {
+      "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json",
+      "qualification": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+      "target_backend": "global"
+    },
+    "upgrades": {
+      "qualification": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+      "required": [
+        "2.5.9-to-2.5.10",
+        "2.5.5-to-2.5.10",
+        "2.5.0-to-2.5.10"
+      ]
+    }
+  },
+  "capability_omissions": [
+    {
+      "field": "feature:productivity_family_adoption",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    },
+    {
+      "field": "prototype-shape:mod_data",
+      "reason": "unsupported-by-terminal-target-profile",
+      "disposition": "explicit-omission"
+    }
+  ],
+  "compatibility_import": {
+    "authority": ".mir/releases/terminal/MIR3-Compatibility-ClaimsV1.json",
+    "level_counts": {
+      "COEXISTS_EXACT": 1,
+      "KNOWN_CONFLICT": 1,
+      "OBSERVED_ONLY": 9,
+      "UNQUALIFIED": 4,
+      "UPSTREAM_BLOCKED": 1
+    },
+    "public_claims_allowed": 1,
+    "promoted_claims": 0,
+    "rule": "preserve-2.5.9-claim-envelope-and-add-no-hotfix-claims"
+  },
+  "record_sha256": "2952CFBD3AE258DB71DF133A62BDAF992478BE8F637479CE3B8BF62A8E62B036"
+}

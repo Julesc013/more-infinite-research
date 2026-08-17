@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-bootstrap-reconstruction-receipt.schema.json",
+  "title": "MIR 4 capsule-local reconstruction receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "canonicalization", "lane", "target_key", "factorio_line", "distribution_version", "mode", "capsule_only", "checkout_argument_supplied", "source_capsule_record_sha256", "source_capsule_archive_sha256", "capsule_content_root_sha256", "toolchain_lock_record_sha256", "predecessor", "candidate", "package_manifest_sha256", "equivalence_sha256", "equivalence", "input_root_sha256", "result_root_sha256", "record_sha256"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4BootstrapCapsuleReconstructionReceiptV1" },
+    "status": { "const": "passed" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "lane": { "enum": ["emergency", "local-playtest-shadow"] },
+    "target_key": { "enum": ["f210", "f200", "f110", "f100"] },
+    "factorio_line": { "enum": ["2.1", "2.0", "1.1", "1.0"] },
+    "distribution_version": { "enum": ["4.0.21000", "4.0.20000", "4.0.11000", "4.0.10000"] },
+    "correction_authority": { "$ref": "#/$defs/correctionAuthority" },
+    "local_lane_authority": { "$ref": "#/$defs/laneAuthority" },
+    "mode": { "const": "capsule-local-fresh-process" },
+    "capsule_only": { "const": true },
+    "checkout_argument_supplied": { "const": false },
+    "source_capsule_record_sha256": { "$ref": "#/$defs/sha256" },
+    "source_capsule_archive_sha256": { "$ref": "#/$defs/sha256" },
+    "capsule_content_root_sha256": { "$ref": "#/$defs/sha256" },
+    "toolchain_lock_record_sha256": { "$ref": "#/$defs/sha256" },
+    "predecessor": { "$ref": "#/$defs/identity" },
+    "candidate": { "$ref": "#/$defs/identity" },
+    "package_manifest_sha256": { "$ref": "#/$defs/sha256" },
+    "equivalence_sha256": { "$ref": "#/$defs/sha256" },
+    "equivalence": { "oneOf": [{ "$ref": "#/$defs/baselineEquivalence" }, { "$ref": "#/$defs/correctedEquivalence" }] },
+    "input_root_sha256": { "$ref": "#/$defs/sha256" },
+    "result_root_sha256": { "$ref": "#/$defs/sha256" },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "allOf": [
+    { "if": { "properties": { "lane": { "const": "emergency" } }, "required": ["lane"] }, "then": { "required": ["correction_authority"], "not": { "required": ["local_lane_authority"] }, "properties": { "target_key": { "const": "f210" }, "factorio_line": { "const": "2.1" }, "distribution_version": { "const": "4.0.21000" }, "equivalence": { "$ref": "#/$defs/correctedEquivalence" } } } },
+    { "if": { "properties": { "lane": { "const": "local-playtest-shadow" } }, "required": ["lane"] }, "then": { "required": ["local_lane_authority"], "not": { "required": ["correction_authority"] }, "properties": { "target_key": { "enum": ["f200", "f110", "f100"] }, "equivalence": { "$ref": "#/$defs/baselineEquivalence" } } } },
+    { "if": { "properties": { "target_key": { "const": "f200" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "2.0" }, "distribution_version": { "const": "4.0.20000" } } } },
+    { "if": { "properties": { "target_key": { "const": "f110" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "1.1" }, "distribution_version": { "const": "4.0.11000" } } } },
+    { "if": { "properties": { "target_key": { "const": "f100" } }, "required": ["target_key"] }, "then": { "properties": { "factorio_line": { "const": "1.0" }, "distribution_version": { "const": "4.0.10000" } } } }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_sha256", "content_sha256", "bytes", "entry_count"],
+      "properties": {
+        "archive_sha256": { "$ref": "#/$defs/sha256" },
+        "content_sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "entry_count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "correctionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "finding", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json" },
+        "kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV2" },
+        "finding": { "const": "MIR3-TERM-0032+MIR3-TERM-0033" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "laneAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "authority_family", "record_sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json" },
+        "kind": { "const": "MIR4PrivateLaneAuthorizationV2" },
+        "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
+        "record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "baselineEquivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
+      "properties": {
+        "equivalent": { "const": true },
+        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
+        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "added": { "const": [] },
+        "removed": { "const": [] },
+        "changed": { "const": ["info.json"] },
+        "metadata_equivalent": { "const": true },
+        "candidate": { "$ref": "#/$defs/identity" },
+        "predecessor": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "correctedEquivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["equivalent", "policy", "correction_kind", "correction_record_sha256", "finding", "added", "removed", "changed", "metadata_equivalent", "exact_correction_delta", "candidate", "predecessor"],
+      "properties": {
+        "equivalent": { "const": true },
+        "policy": { "const": "MIR4BootstrapApprovedCorrectionEquivalenceV1" },
+        "correction_kind": { "const": "MIR4ApprovedBootstrapCorrectionDeltaV2" },
+        "correction_record_sha256": { "$ref": "#/$defs/sha256" },
+        "finding": { "const": "MIR3-TERM-0032+MIR3-TERM-0033" },
+        "added": { "const": [] },
+        "removed": { "const": [] },
+        "changed": { "const": ["info.json", "prototypes/mir/pipeline/mutations/competing_base_extensions.lua", "prototypes/mir/planner/base_continuations.lua", "prototypes/mir/platform/factorio/target_profiles.lua", "prototypes/mir/runtime/maximum_level_control.lua"] },
+        "metadata_equivalent": { "const": true },
+        "exact_correction_delta": { "const": true },
+        "candidate": { "$ref": "#/$defs/identity" },
+        "predecessor": { "$ref": "#/$defs/identity" }
+      }
+    }
+  }
+}

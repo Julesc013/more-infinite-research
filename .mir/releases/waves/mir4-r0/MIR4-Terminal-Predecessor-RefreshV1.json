@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Terminal-Predecessor-RefreshV1",
+  "status": "accepted-current-pre-eol-package-excluded",
+  "recorded_at": "2026-08-17T00:00:00+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-terminal-predecessor-refresh-v1",
+  "imports": [
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
+    ".mir/releases/records/3.2.10.json",
+    ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json",
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
+    ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+    ".mir/releases/terminal/baselines/3.2.9/baseline-manifest.json",
+    ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json"
+  ],
+  "semantic_reads": ["immutable-3.2.9-baseline", "post-terminal-3.2.10-continuation", "factorio-2.1-engine-acceptance", "open-mir3-term-0033"],
+  "semantic_writes": ["mir4-factorio-2.1-predecessor", "mir4-factorio-2.1-engine-lock", "m4-003-required-follow-up"],
+  "target_dispositions": {
+    "factorio-2.1": "advance-predecessor-to-3.2.10-and-require-mir3-term-0033-follow-up",
+    "factorio-2.0": "retain-2.5.9-no-2.5.10-applicability-proved",
+    "factorio-1.x": "retain-existing-dot9-predecessors",
+    "historical-3.2.9": "retain-immutable-baseline-snapshot"
+  },
+  "digest_classes": {
+    "semantic": "3.2.10-normalized-continuation",
+    "authority": "append-only-emergency-predecessor-refresh",
+    "qualification": "steam-factorio-2.1.14.87180-maintainer-accepted-lock"
+  },
+  "migration": {
+    "from": "factorio-2.1-predecessor-3.2.9",
+    "to": "factorio-2.1-predecessor-3.2.10",
+    "state": "accepted-before-m4-003-resumption"
+  },
+  "rollback": {
+    "strategy": "retain-both-immutable-baselines-and-block-m4-003-on-any-binding-mismatch",
+    "permitted_until": "mir4-semantic-authority-cutover"
+  },
+  "parity_test": ["exact-3.2.10-public-bytes", "direct-3.2.10-upgrade", "mir3-term-0033-transactional-owner-follow-up", "factorio-2.1.14-exact-lock", "second-reload-idempotence"],
+  "sunset_condition": "superseded-by-sealed-mir4-terminal-import-and-qualified-m4-003-completion",
+  "payload": {
+    "factorio_2_1": {
+      "predecessor_release": "3.2.10",
+      "historical_baseline_retained": "3.2.9",
+      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+      "engine": {
+        "version": "2.1.14",
+        "file_version": "2.1.14.87180",
+        "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      }
+    },
+    "factorio_2_0": {
+      "predecessor_release": "2.5.9",
+      "conditional_2.5.10_published": false
+    },
+    "required_m4_003_finding": "MIR3-TERM-0033",
+    "mir4_semantic_authority": false,
+    "public_4x_authorized": false
+  }
+}

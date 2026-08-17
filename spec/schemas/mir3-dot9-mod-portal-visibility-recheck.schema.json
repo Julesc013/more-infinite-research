@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json",
+  "title": "MIR 3 .9 Mod Portal public visibility recheck",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "observed_at",
+    "canonicalization",
+    "scope",
+    "package_visible",
+    "authority",
+    "prior_custody_observation",
+    "request_profile",
+    "sources",
+    "releases",
+    "claim_disposition",
+    "custody_state",
+    "hard_boundary",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3Dot9ModPortalVisibilityRecheckV1"},
+    "status": {"const": "api-and-rendered-table-two-visible-sha1-matched-redownloads-pending"},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "scope": {"const": "read-only-unauthenticated-public-visibility-recheck"},
+    "package_visible": {"const": false},
+    "authority": {
+      "type": "object",
+      "required": [
+        "semantic",
+        "build",
+        "upload",
+        "tag",
+        "allocation",
+        "public_output",
+        "mir3_eol_seal"
+      ],
+      "properties": {
+        "semantic": {"const": false},
+        "build": {"const": false},
+        "upload": {"const": false},
+        "tag": {"const": false},
+        "allocation": {"const": false},
+        "public_output": {"const": false},
+        "mir3_eol_seal": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "prior_custody_observation": {
+      "allOf": [
+        {"$ref": "#/$defs/fileBinding"},
+        {
+          "properties": {
+            "path": {
+              "const": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json"
+            }
+          }
+        }
+      ]
+    },
+    "request_profile": {
+      "type": "object",
+      "required": ["method", "authentication", "user_agent"],
+      "properties": {
+        "method": {"const": "GET"},
+        "authentication": {"const": "none"},
+        "user_agent": {"const": "MIR-custody-observer/1.0"}
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "allOf": [
+            {"$ref": "#/$defs/sourceObservation"},
+            {
+              "properties": {
+                "surface": {"const": "official-full-api"},
+                "url": {"const": "https://mods.factorio.com/api/mods/more-infinite-research/full"},
+                "media_type": {"const": "application/json"},
+                "parser": {"const": "ConvertFrom-Json/releases-exact-version-filter"},
+                "parser_outcome": {"const": "two-exact-terminal-releases-found"},
+                "matched_rows": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "prefixItems": [
+                    {"$ref": "#/$defs/api329"},
+                    {"$ref": "#/$defs/api259"}
+                  ],
+                  "items": false
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/sourceObservation"},
+            {
+              "properties": {
+                "surface": {"const": "official-rendered-download-table"},
+                "url": {"const": "https://mods.factorio.com/mod/more-infinite-research/downloads"},
+                "media_type": {"const": "text/html; charset=utf-8"},
+                "parser": {"const": "first-tbody/tr/direct-text-td[0,1]"},
+                "parser_outcome": {"const": "two-exact-terminal-release-rows-found"},
+                "matched_rows": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "prefixItems": [
+                    {"$ref": "#/$defs/rendered259"},
+                    {"$ref": "#/$defs/rendered329"}
+                  ],
+                  "items": false
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "releases": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "prefixItems": [
+        {"$ref": "#/$defs/release329"},
+        {"$ref": "#/$defs/release259"}
+      ],
+      "items": false
+    },
+    "claim_disposition": {
+      "type": "object",
+      "required": [
+        "api_two_release_visibility",
+        "rendered_table_two_release_visibility",
+        "api_ui_visibility_discrepancy",
+        "documentation_action"
+      ],
+      "properties": {
+        "api_two_release_visibility": {"const": "confirmed"},
+        "rendered_table_two_release_visibility": {"const": "confirmed"},
+        "api_ui_visibility_discrepancy": {"const": "disproven-at-observation-time"},
+        "documentation_action": {"const": "remove-stale-2.5.9-rendered-omission-claim"}
+      },
+      "additionalProperties": false
+    },
+    "custody_state": {
+      "type": "object",
+      "required": [
+        "authenticated_redownloads_complete",
+        "authenticated_redownload_state_source",
+        "exact_engine_smokes_complete",
+        "mir3_eol_blocked",
+        "remaining_blockers"
+      ],
+      "properties": {
+        "authenticated_redownloads_complete": {"const": 0},
+        "authenticated_redownload_state_source": {"const": "imported-prior-custody-observation-not-reperformed"},
+        "exact_engine_smokes_complete": {"const": 0},
+        "mir3_eol_blocked": {"const": true},
+        "remaining_blockers": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "prefixItems": [
+            {"const": "authenticated-redownloads-pending"},
+            {"const": "exact-engine-smokes-pending-redownload"}
+          ],
+          "items": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "hard_boundary": {
+      "const": "This read-only recheck records public visibility only. It does not authorize a build, upload, replacement, tag, version allocation, public output, semantic authority change, MIR 3 EOL seal, MIR 4 package, or MIR 4 release."
+    },
+    "record_sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$",
+      "description": "SHA-256 of MIR4BootstrapCanonicalJsonV1 with record_sha256 omitted."
+    }
+  },
+  "$defs": {
+    "sha1": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "fileBinding": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^\\.mir/[A-Za-z0-9._/-]+$"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "sourceObservation": {
+      "type": "object",
+      "required": [
+        "surface",
+        "url",
+        "started_at",
+        "completed_at",
+        "http_status",
+        "media_type",
+        "response_bytes",
+        "response_sha256",
+        "response_body_retained",
+        "parser",
+        "parser_outcome",
+        "matched_rows"
+      ],
+      "properties": {
+        "surface": {"enum": ["official-full-api", "official-rendered-download-table"]},
+        "url": {"type": "string", "format": "uri"},
+        "started_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "http_status": {"const": 200},
+        "media_type": {"enum": ["application/json", "text/html; charset=utf-8"]},
+        "response_bytes": {"type": "integer", "minimum": 1},
+        "response_sha256": {"$ref": "#/$defs/sha256"},
+        "response_body_retained": {"const": false},
+        "parser": {"type": "string", "minLength": 1},
+        "parser_outcome": {"type": "string", "minLength": 1},
+        "matched_rows": {"type": "array"}
+      },
+      "additionalProperties": false
+    },
+    "api329": {
+      "type": "object",
+      "required": ["version", "factorio_version", "portal_sha1", "released_at"],
+      "properties": {
+        "version": {"const": "3.2.9"},
+        "factorio_version": {"const": "2.1"},
+        "portal_sha1": {"const": "602e98292508aa20ed3e1567da396ea5e4c29f7b"},
+        "released_at": {"const": "2026-08-15T08:05:22.426Z"}
+      },
+      "additionalProperties": false
+    },
+    "api259": {
+      "type": "object",
+      "required": ["version", "factorio_version", "portal_sha1", "released_at"],
+      "properties": {
+        "version": {"const": "2.5.9"},
+        "factorio_version": {"const": "2.0"},
+        "portal_sha1": {"const": "e05b0d17f1ce8cf3465347fe85056fca6451506f"},
+        "released_at": {"const": "2026-08-15T13:18:08.140Z"}
+      },
+      "additionalProperties": false
+    },
+    "rendered259": {
+      "type": "object",
+      "required": ["version", "factorio_version"],
+      "properties": {
+        "version": {"const": "2.5.9"},
+        "factorio_version": {"const": "2.0"}
+      },
+      "additionalProperties": false
+    },
+    "rendered329": {
+      "type": "object",
+      "required": ["version", "factorio_version"],
+      "properties": {
+        "version": {"const": "3.2.9"},
+        "factorio_version": {"const": "2.1"}
+      },
+      "additionalProperties": false
+    },
+    "release329": {
+      "allOf": [
+        {"$ref": "#/$defs/releaseObservation"},
+        {
+          "properties": {
+            "version": {"const": "3.2.9"},
+            "factorio_version": {"const": "2.1"},
+            "sealed_archive_sha1": {"const": "602e98292508aa20ed3e1567da396ea5e4c29f7b"},
+            "portal_sha1": {"const": "602e98292508aa20ed3e1567da396ea5e4c29f7b"}
+          }
+        }
+      ]
+    },
+    "release259": {
+      "allOf": [
+        {"$ref": "#/$defs/releaseObservation"},
+        {
+          "properties": {
+            "version": {"const": "2.5.9"},
+            "factorio_version": {"const": "2.0"},
+            "sealed_archive_sha1": {"const": "e05b0d17f1ce8cf3465347fe85056fca6451506f"},
+            "portal_sha1": {"const": "e05b0d17f1ce8cf3465347fe85056fca6451506f"}
+          }
+        }
+      ]
+    },
+    "releaseObservation": {
+      "type": "object",
+      "required": [
+        "version",
+        "factorio_version",
+        "sealed_archive_sha1",
+        "api_visible",
+        "portal_sha1",
+        "sha1_matches_sealed",
+        "rendered_table_visible",
+        "authenticated_redownload",
+        "exact_engine_smoke"
+      ],
+      "properties": {
+        "version": {"enum": ["3.2.9", "2.5.9"]},
+        "factorio_version": {"enum": ["2.1", "2.0"]},
+        "sealed_archive_sha1": {"$ref": "#/$defs/sha1"},
+        "api_visible": {"const": true},
+        "portal_sha1": {"$ref": "#/$defs/sha1"},
+        "sha1_matches_sealed": {"const": true},
+        "rendered_table_visible": {"const": true},
+        "authenticated_redownload": {"const": "pending-not-reperformed"},
+        "exact_engine_smoke": {"const": "pending-redownload"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

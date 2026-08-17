@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json",
+  "title": "MIR4ExactEngineQualificationEvidenceBundleV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "status",
+    "publication_authority",
+    "payload",
+    "signature",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ExactEngineQualificationEvidenceBundleV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "status": {"const": "passed-exact-engine-qualification"},
+    "publication_authority": {"const": false},
+    "payload": {
+      "type": "object",
+      "required": [
+        "schema",
+        "kind",
+        "canonicalization",
+        "evidence_class",
+        "qualification_scope",
+        "publication_authority",
+        "candidate_manifest",
+        "candidate_plan",
+        "candidate",
+        "engine",
+        "observations",
+        "producer",
+        "record_sha256"
+      ],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4ExactEngineQualificationEvidencePayloadV1"},
+        "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+        "evidence_class": {"const": "exact-engine-observation-bundle"},
+        "qualification_scope": {"const": "local-offline-f210-exact-engine"},
+        "publication_authority": {"const": false},
+        "candidate_manifest": {"$ref": "#/$defs/candidateManifestBinding"},
+        "candidate_plan": {"$ref": "#/$defs/candidatePlanBinding"},
+        "candidate": {"$ref": "#/$defs/candidate"},
+        "engine": {
+          "type": "object",
+          "required": ["version", "executable_sha256", "network_denied"],
+          "properties": {
+            "version": {"const": "2.1.14"},
+            "executable_sha256": {"$ref": "#/$defs/sha256"},
+            "network_denied": {"const": true}
+          },
+          "additionalProperties": false
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "allOf": [
+            {"contains": {"type": "object", "properties": {"id": {"const": "clean-install"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "direct-upgrade-from-3.2.10"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "reload-after-upgrade-1"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "reload-after-upgrade-2"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "settings-profile-state-preservation"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1},
+            {"contains": {"type": "object", "properties": {"id": {"const": "target-compatibility"}}, "required": ["id"]}, "minContains": 1, "maxContains": 1}
+          ],
+          "items": {"$ref": "#/$defs/observation"}
+        },
+        "producer": {"$ref": "#/$defs/producer"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "signature": {"$ref": "#/$defs/signature"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "identity": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,127}$"},
+    "recordBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"type": "string"},
+        "kind": {"type": "string"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "candidateManifestBinding": {
+      "allOf": [
+        {"$ref": "#/$defs/recordBinding"},
+        {"properties": {"role": {"const": "candidate-manifest"}, "kind": {"const": "MIR4BootstrapLocalCandidateManifestV1"}}}
+      ]
+    },
+    "candidatePlanBinding": {
+      "allOf": [
+        {"$ref": "#/$defs/recordBinding"},
+        {"properties": {"role": {"const": "candidate-plan"}, "kind": {"const": "MIR4BootstrapLocalCandidatePlanV2"}}}
+      ]
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["candidate_id", "target_id", "distribution_version", "archive_name", "archive_sha256", "bytes"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "target_id": {"const": "factorio-2.1"},
+        "distribution_version": {"const": "4.0.21000"},
+        "archive_name": {"const": "more-infinite-research_4.0.21000.zip"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["relative_path", "sha256", "bytes"],
+      "properties": {
+        "relative_path": {"type": "string", "pattern": "^artifacts/(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9][A-Za-z0-9._/-]{0,511}$"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      },
+      "additionalProperties": false
+    },
+    "observation": {
+      "type": "object",
+      "required": ["id", "status", "result_artifact"],
+      "properties": {
+        "id": {"enum": ["clean-install", "direct-upgrade-from-3.2.10", "reload-after-upgrade-1", "reload-after-upgrade-2", "settings-profile-state-preservation", "target-compatibility"]},
+        "status": {"const": "passed"},
+        "result_artifact": {"$ref": "#/$defs/artifact"}
+      },
+      "additionalProperties": false
+    },
+    "producer": {
+      "type": "object",
+      "required": ["kind", "trust_scope", "identity", "algorithm", "signature_format", "namespace", "public_key", "public_key_fingerprint", "private_key_committed"],
+      "properties": {
+        "kind": {"const": "MIR4ExactEngineEvidenceProducerV1"},
+        "trust_scope": {"const": "explicit-key-local-offline-exact-engine"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "algorithm": {"const": "ssh-ed25519"},
+        "signature_format": {"const": "sshsig"},
+        "namespace": {"const": "mir4-exact-engine-qualification-v1"},
+        "public_key": {"type": "string", "pattern": "^ssh-ed25519 [A-Za-z0-9+/]+={0,3}(?: [^\\r\\n]+)?$"},
+        "public_key_fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+={0,3}$"},
+        "private_key_committed": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "signature": {
+      "type": "object",
+      "required": ["algorithm", "format", "identity", "namespace", "payload_record_sha256", "signature_sha256", "signature_base64"],
+      "properties": {
+        "algorithm": {"const": "ssh-ed25519"},
+        "format": {"const": "sshsig"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "namespace": {"const": "mir4-exact-engine-qualification-v1"},
+        "payload_record_sha256": {"$ref": "#/$defs/sha256"},
+        "signature_sha256": {"$ref": "#/$defs/sha256"},
+        "signature_base64": {"type": "string", "pattern": "^[A-Za-z0-9+/]+={0,3}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

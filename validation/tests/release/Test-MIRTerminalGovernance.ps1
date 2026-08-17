@@ -17,7 +17,10 @@ if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
 $promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
 $promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
 foreach ($snippet in @(
-  'ValidateSet("3.2.10", "3.2.9", "2.5.9")',
+  'ValidateSet("3.2.11", "3.2.10", "3.2.9", "2.5.9")',
+  'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json',
+  'MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json',
+  'MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json',
   'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
@@ -183,6 +186,36 @@ function Get-MIRTerminalCanonicalTextSha256 {
 
   $canonical = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($canonical)))
+}
+function Get-MIRTerminalCommitCanonicalTextSha256 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = "git"
+  $startInfo.WorkingDirectory = $RepoRoot
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  $startInfo.UseShellExecute = $false
+  foreach ($argument in @("cat-file", "blob", "$Commit`:$Path")) { [void]$startInfo.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  [void]$process.Start()
+  $bytes = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $errorText = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Unable to read frozen authority root $Commit`:$Path`: $errorText" }
+    $text = [Text.UTF8Encoding]::new($false, $true).GetString($bytes.ToArray())
+    return Get-MIRTerminalCanonicalTextSha256 -Text $text
+  } finally {
+    $bytes.Dispose()
+    $process.Dispose()
+  }
 }
 $wave = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "docs\releases\archive\MIR-3.5-WAVE-INDEX.json") | ConvertFrom-Json -Depth 100
 foreach ($identity in @($admission.dot5_identity_authority.releases)) {
@@ -964,7 +997,7 @@ foreach ($binding in @($sourceFreeze.fixed_point, $sourceFreeze.repository_prote
   if (-not (Test-Path -LiteralPath $bindingPath -PathType Leaf)) {
     throw "Terminal source-freeze authority root drifted: $($binding.path)"
   }
-  $bindingHash = Get-MIRTerminalCanonicalTextSha256 -Text ([IO.File]::ReadAllText($bindingPath))
+  $bindingHash = Get-MIRTerminalCommitCanonicalTextSha256 -RepoRoot $RepoRoot -Commit ([string]$sourceFreeze.common_source.commit) -Path ([string]$binding.path)
   if ($bindingHash -ne [string]$binding.canonical_text_sha256) { throw "Terminal source-freeze authority root drifted: $($binding.path)" }
 }
 $commonTree = (& git -C $RepoRoot rev-parse "$($sourceFreeze.common_source.commit)^{tree}").Trim()
@@ -1289,13 +1322,26 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
   [string]$current.active_programme.status -in @(
     "c34-package-built-qualification-in-progress",
     "c34-maintainer-accepted-promotion-authorized",
-    "3.2.10-published-publicly-verified-branch-and-mir4-handoff"
+    "3.2.10-published-publicly-verified-branch-and-mir4-handoff",
+    "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff"
   ))
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
     (-not $terminalCurrent -and -not $emergencyCurrent)) {
   throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
+if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.10" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.tagged_factorio_2_0 -ne "2.5.10" -or
+      $current.roles.backport_calibration -ne "2.5.10") {
+    throw "Post-terminal publication roles do not identify the immutable 3.2.10 and 2.5.10 authorities."
+  }
+} elseif ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-published-publicly-verified-branch-and-mir4-handoff") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
       $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
       $current.roles.published_factorio_2_1 -ne "3.2.10" -or

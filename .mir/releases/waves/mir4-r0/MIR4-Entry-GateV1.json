@@ -19,7 +19,7 @@
   "parity_test": ["no-public-4x-before-eol", "local-4x-proof-required-before-eol", "publication-dry-run-idempotent"],
   "sunset_condition": "mir3-eol-sealed-and-first-mir4-publication-authority-admitted",
   "payload": {
-    "before_mir3_eol": ["import-terminal-baseline", "generate-local-behavior-equivalent-factorio-2.1-distribution", "prove-clean-install-and-direct-3.2.9-upgrade", "prove-reload-settings-profile-and-engine-equivalence", "seal-locally-offline", "generate-publication-bundle", "validate-publication-dry-run-idempotence"],
+    "before_mir3_eol": ["import-terminal-baseline", "generate-local-behavior-equivalent-factorio-2.1-distribution", "prove-clean-install-and-direct-3.2.10-upgrade", "close-mir3-term-0033-transactional-owner-rollback", "prove-reload-settings-profile-and-engine-equivalence", "seal-locally-offline", "generate-publication-bundle", "validate-publication-dry-run-idempotence"],
     "mir3_eol_then_requires": ["terminal-public-custody", "terminal-dot9-baselines", "final-index", "museum-and-restore", "local-emergency-lane", "eol-record"],
     "after_mir3_eol": ["allocate-public-distribution-identity", "authorize-source-seal-tag", "authorize-target-release-tags", "replicate-sealed-assets-to-public-channels"],
     "public_version_4_before_eol": false

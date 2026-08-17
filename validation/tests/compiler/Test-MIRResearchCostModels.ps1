@@ -101,6 +101,7 @@ $paths = @{
   Native = "prototypes/mir/planner/native_owner_binding.lua"
   Continuations = "prototypes/mir/planner/base_continuations.lua"
   MaximumLevel = "prototypes/mir/policy/max_level.lua"
+  RuntimeMaximum = "prototypes/mir/runtime/maximum_level_control.lua"
 }
 $source = @{}
 foreach ($entry in $paths.GetEnumerator()) {
@@ -219,9 +220,15 @@ foreach ($route in @("Streams", "Native", "Continuations")) {
   if ($source[$route] -notmatch 'research_cost') { throw "$route does not consume the unified research-cost model." }
 }
 foreach ($route in @("Streams", "Native", "Continuations", "MaximumLevel")) {
-  if ($source[$route] -notmatch 'target_line\.mod_data_supported\(\)') {
-    throw "$route may not make prototypes infinite without the governed runtime maximum-level policy transport."
+  if ($source[$route] -notmatch 'target_line\.feature_enabled\("scripted_techs"\)') {
+    throw "$route may not make prototypes infinite without the governed scripted maximum-level controller."
   }
+}
+if ($source.ModData -notmatch 'target_line\.mod_data_supported\(\)' -or
+    $source.RuntimeMaximum -notmatch 'if next\(managed\) == nil then' -or
+    $source.RuntimeMaximum -notmatch 'add_runtime_settings_policy\(managed\)' -or
+    $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
+  throw "Runtime maximum-level policy must use mod-data where supported and reconstruct the same binding from startup settings otherwise."
 }
 if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
     $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or

@@ -41,6 +41,15 @@ stage_entrypoints:
   data-final-fixes.lua: prototypes/mir/stage/data_final_fixes.lua
   control.lua: prototypes/mir/stage/control.lua
 
+package_excluded_modules:
+  experimental_api_sdk_v0:
+    authority: spec/api/mir4-v0/contracts.json
+    implementation: tools/lib/mir4/ExperimentalApiSdk.ps1
+    command: tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
+    generated_root: sdk/experimental/mir4
+    boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
+    stability: experimental-not-public-api
+
 runtime_boundaries:
   control.lua:
     stage_entrypoint: prototypes/mir/stage/control.lua
@@ -134,6 +143,7 @@ modules:
     - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
     - prototypes/mir/pipeline/mutations/weapon_speed.lua
     - prototypes/mir/pipeline/mutations/max_level.lua
+    - prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/item_prototype_facts.lua
@@ -767,6 +777,73 @@ validation_tooling:
     terminal_shadow_kernel_branch_receipt_schema: spec/schemas/mir3-terminal-shadow-kernel-branch-receipt.schema.json
     terminal_fixed_point_receipt: .mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json
     terminal_fixed_point_receipt_schema: spec/schemas/mir3-terminal-fixed-point-receipt.schema.json
+    mir4_r0_target_registry_historical: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json
+    mir4_r0_version_authority_historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
+    mir4_r0_target_registry_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
+    mir4_r0_target_registry_historical_v2_schema: spec/schemas/mir4-target-registry-v2.schema.json
+    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
+    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v3.schema.json
+    mir4_terminal_predecessor_refresh_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json
+    mir4_terminal_predecessor_refresh: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json
+    mir4_terminal_import_contract_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json
+    mir4_terminal_import_contract: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json
+    mir3_factorio_2_0_post_terminal_continuation_schema: spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json
+    mir4_r0_version_authority: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json
+    mir4_r0_version_authority_schema: spec/schemas/mir4-versioning-distribution-identity-v2.schema.json
+    mir4_r0_codec_vectors: .mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json
+    mir4_r0_codec_vectors_schema: spec/schemas/mir4-distribution-version-codec-vectors-v2.schema.json
+    mir4_distribution_identity: tools/lib/validation/MIR4DistributionIdentity.ps1
+    mir4_distribution_identity_gate: validation/tests/release/Test-MIR4R0Identity.ps1
+    mir4_r0_bootstrap_root_set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
+    mir4_r0_bootstrap_root_set_schema: spec/schemas/mir4-bootstrap-root-set.schema.json
+    mir4_r0_bootstrap_root_set_generator: tools/commands/release/New-MIR4BootstrapRootSet.ps1
+    mir4_r0_bootstrap_gate: tools/commands/release/Test-MIR4R0Bootstrap.ps1
+    mir3_factorio_2_0_post_terminal_continuation_generator: tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1
+    mir4_terminal_baseline_import_generator: tools/commands/release/Import-MIR3TerminalBaselines.ps1
+    mir4_bootstrap_candidate_plan_historical: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
+    mir4_bootstrap_candidate_plan_historical_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
+    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
+    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json
+    mir4_bootstrap_approved_correction_historical: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json
+    mir4_bootstrap_approved_correction_historical_schema: spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json
+    mir4_bootstrap_approved_correction: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json
+    mir4_bootstrap_approved_correction_schema: spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json
+    mir4_local_artifact_lane_authorization_historical: .mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json
+    mir4_local_artifact_lane_authorization_historical_schema: spec/schemas/mir4-local-playtest-shadow-authorization.schema.json
+    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
+    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v2.schema.json
+    mir4_local_playtest_candidate_manifest_schema: spec/schemas/mir4-local-playtest-candidate-manifest.schema.json
+    mir4_local_artifact_lane_gate: validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
+    mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
+    mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
+    mir4_bootstrap_capsule_manifest_schema: spec/schemas/mir4-bootstrap-capsule-manifest.schema.json
+    mir4_bootstrap_toolchain_lock_schema: spec/schemas/mir4-bootstrap-toolchain-lock.schema.json
+    mir4_bootstrap_git_source_proof_schema: spec/schemas/mir4-bootstrap-git-source-proof.schema.json
+    mir4_bootstrap_reconstruction_receipt_schema: spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json
+    mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
+    mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
+    mir4_bootstrap_capsule_runner: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
+    mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
+    mir4_final_programme_reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
+    mir4_final_programme_reconciliation_schema: spec/schemas/mir4-final-programme-reconciliation.schema.json
+    mir4_final_programme_reconciliation_gate: validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1
+    mir4_bootstrap_engine_availability_observation: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
+    mir4_bootstrap_engine_availability_schema: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
+    mir4_bootstrap_target_readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
+    mir4_bootstrap_target_readiness_schema: spec/schemas/mir4-bootstrap-target-readiness.schema.json
+    mir4_bootstrap_target_readiness_gate: validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1
+    mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
+    mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
+    mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
+    mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
+    mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
+    mir4_offline_review_schema: spec/schemas/mir4-offline-review-record.schema.json
+    mir4_publication_dry_run_schema: spec/schemas/mir4-publication-dry-run-bundle.schema.json
+    mir4_offline_seal_schema: spec/schemas/mir4-offline-seal.schema.json
+    mir4_restoration_receipt_schema: spec/schemas/mir4-restoration-receipt.schema.json
+    mir4_emergency_lane_completion_schema: spec/schemas/mir4-emergency-lane-completion-record.schema.json
+    mir4_offline_candidate_custody_gate: validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
     terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
@@ -895,6 +972,16 @@ validation_tooling:
     - the historical maintainer-statement manual-review mode is limited to an already publicly verified immutable package, records an after-publication attestation time, forbids invented checklist observations, and can never satisfy a new candidate's pre-seal review gate
     - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
     - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
+    - MIR 4 distribution target codes are immutable three-digit decimal strings retained unchanged through Target Registry V3; leading zeroes are semantic and the values are never parsed as octal
+    - MIR 4 V1 and V2 target registries are frozen historical evidence; V3 advances only append-only terminal predecessor authority while executable distribution encoding remains governed by the unchanged V2 codec authority
+    - MIR 4 bootstrap records use the BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer; the byte-bound detached capsule pre-verifier reproduces that ABI only until the extracted canonical authority revalidates every record
+    - MIR 4 capsule V2 binds the exact package source Git objects, reconstruction tools, schemas, authorities, complete PowerShell home, deterministic member roles and identities, and canonical package builder; A and B run in distinct fresh processes, their complete workspaces are deleted, and C receives only copied immutable capsule inputs without a checkout argument or inherited checkout working directory
+    - MIR 4 final-programme reconciliation treats supplied prose and JSON as proposal inputs rather than commands, distinguishes the observed 18-entry archive from the unavailable claimed 106-file package, and grants no build allocation signing tag publication or release authority
+    - MIR 4 engine availability and target readiness are package-excluded non-emitting observations; exact lower-engine hashes do not admit f200 f110 or f100 while the live entry gate remains pre-EOL f210-only
+    - MIR 3 Mod Portal public visibility observations never substitute for authenticated redownload byte verification exact-engine smoke archive-rights custody or the MIR 3 EOL seal
+    - MIR 4 offline seals require the exact admitted f210 plan and self-hashed package-equivalent candidate manifest, an exact Factorio 2.1.13 executable, six passed artifact-bound observations in an independently signed exact-engine evidence bundle, passed qualification and human review, and an explicitly trust-anchored proof-only OpenSSH Ed25519 seal signature; synthetic probes never satisfy this gate and private keys and evidence remain under verified ignored local roots
+    - MIR 4 publication dry-run idempotence requires two independently written canonically and byte-identical bundles after sealing; both bind the verified seal and current V2 identity authorities, remain non-mutating, and reject apply tag upload and public modes
+    - MIR 4 offline seals omit publication dry-run and restoration evidence; the final local proof completion record binds the verified seal, both independently written post-seal dry runs, and the clean restoration receipt without granting publication authority
     - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns

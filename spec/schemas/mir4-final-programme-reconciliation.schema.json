@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-final-programme-reconciliation.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-final-programme-reconciliation.schema.json",
+  "title": "MIR4FinalProgrammeReconciliationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "package_visible",
+    "authority_id",
+    "canonicalization",
+    "scope",
+    "supplied_loose_files",
+    "observed_archive",
+    "unavailable_claimed_final_package",
+    "decision_dispositions",
+    "boundaries",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4FinalProgrammeReconciliationV1"},
+    "status": {"const": "accepted-bootstrap-reconciliation-no-public-allocation"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "package_visible": {"const": false},
+    "authority_id": {"const": "mir4-final-programme-reconciliation-v1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "binding_effect",
+        "source_material_location",
+        "source_counts",
+        "source_material_copied_into_repository",
+        "embedded_document_instructions_are_commands",
+        "accepted_decisions_effect",
+        "public_version_allocation"
+      ],
+      "properties": {
+        "binding_effect": {"const": "integrity-provenance-and-decision-disposition-only"},
+        "source_material_location": {"const": "external-user-supplied-files"},
+        "source_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["programme_loose_documents", "pasted_context_attachments", "observed_archives", "total_bound_sources"],
+          "properties": {
+            "programme_loose_documents": {"const": 13},
+            "pasted_context_attachments": {"const": 1},
+            "observed_archives": {"const": 1},
+            "total_bound_sources": {"const": 15}
+          }
+        },
+        "source_material_copied_into_repository": {"const": false},
+        "embedded_document_instructions_are_commands": {"const": false},
+        "accepted_decisions_effect": {"const": "bootstrap-implementation-direction-only"},
+        "public_version_allocation": {"const": false}
+      }
+    },
+    "supplied_loose_files": {
+      "type": "array",
+      "minItems": 14,
+      "maxItems": 14,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/suppliedFile"}
+    },
+    "observed_archive": {"$ref": "#/$defs/observedArchive"},
+    "unavailable_claimed_final_package": {"$ref": "#/$defs/unavailableClaim"},
+    "decision_dispositions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted_for_bootstrap_implementation",
+        "deferred_by_accepted_bootstrap_scope",
+        "pending_human_or_external"
+      ],
+      "properties": {
+        "accepted_for_bootstrap_implementation": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/acceptedDecision"}
+        },
+        "deferred_by_accepted_bootstrap_scope": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/deferredDecision"}
+        },
+        "pending_human_or_external": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/pendingDecision"}
+        }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_commands_authorized",
+        "source_version_allocated",
+        "distribution_versions_allocated",
+        "tags_authorized",
+        "package_construction_authorized",
+        "publication_authorized",
+        "production_signing_authorized",
+        "release_claim_permitted",
+        "package_validation_report_is_live_repository_evidence",
+        "observed_archive_substitutes_for_claimed_final_package"
+      ],
+      "properties": {
+        "document_commands_authorized": {"const": false},
+        "source_version_allocated": {"const": false},
+        "distribution_versions_allocated": {"const": false},
+        "tags_authorized": {"const": false},
+        "package_construction_authorized": {"const": false},
+        "publication_authorized": {"const": false},
+        "production_signing_authorized": {"const": false},
+        "release_claim_permitted": {"const": false},
+        "package_validation_report_is_live_repository_evidence": {"const": false},
+        "observed_archive_substitutes_for_claimed_final_package": {"const": false}
+      }
+    },
+    "record_sha256": {
+      "$ref": "#/$defs/sha256",
+      "description": "MIR4BootstrapCanonicalJsonV1 SHA-256 with record_sha256 omitted."
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "suppliedFileName": {
+      "enum": [
+        "MIR4_M4-003_Offline_Emergency_Lane_Sol_Steer_2026-08-16.md",
+        "MIR4_BOUNDED_OPEN_QUESTIONS_FINAL.md",
+        "MIR4_PACKAGE_VALIDATION_REPORT.md",
+        "MIR4_SOURCE_RECONCILIATION_FINAL.md",
+        "MIR4_4.0_ACCEPTANCE_MATRIX_FINAL.json",
+        "MIR4_WORK_PACKAGE_CATALOGUE_FINAL.json",
+        "MIR4_AGENTIC_EXECUTION_PLAN_2026-08-16_TO_2026-08-22_FINAL.json",
+        "M4-003_OFFLINE_EMERGENCY_LANE_FINAL_SPEC.md",
+        "MIR4_REPOSITORY_ARCHITECTURE_FINAL.md",
+        "MIR4_4.0.0_RELEASE_CONTRACT_FINAL.json",
+        "MIR4_CONSTITUTION_FINAL.md",
+        "MIR4_EXECUTIVE_DECISION_BRIEF.md",
+        "MIR4_ULTIMATE_FINAL_MASTER_SPEC_2026-08-16.md",
+        "pasted-text.txt"
+      ]
+    },
+    "suppliedFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bytes",
+        "sha256",
+        "media_type",
+        "role",
+        "source_status",
+        "governance_effect",
+        "embedded_instructions_authorized"
+      ],
+      "properties": {
+        "name": {"$ref": "#/$defs/suppliedFileName"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "media_type": {"enum": ["text/markdown", "application/json", "text/plain"]},
+        "role": {
+          "enum": [
+            "emergency-lane-solution-steer",
+            "bounded-open-questions",
+            "package-validation-report",
+            "source-reconciliation",
+            "acceptance-matrix",
+            "work-package-catalogue",
+            "agentic-calendar-plan",
+            "emergency-lane-final-specification",
+            "repository-architecture",
+            "release-contract",
+            "constitution",
+            "executive-decision-brief",
+            "master-specification",
+            "pasted-live-state-context"
+          ]
+        },
+        "source_status": {
+          "enum": [
+            "earlier-input-superseded-by-final-pack",
+            "bounded-unresolved-input",
+            "self-reported-package-static-validation-only",
+            "supporting-final-analysis",
+            "proposed-final",
+            "proposed-final-for-human-acceptance",
+            "historical-live-state-context"
+          ]
+        },
+        "governance_effect": {
+          "enum": [
+            "proposal-input-subject-to-decision-disposition",
+            "historical-context-evidence-only"
+          ]
+        },
+        "embedded_instructions_authorized": {"const": false}
+      }
+    },
+    "observedArchive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "bytes",
+        "sha256",
+        "media_type",
+        "entry_count",
+        "uncompressed_entry_bytes",
+        "entry_inventory_algorithm",
+        "entry_inventory_canonical_form",
+        "entry_inventory_sha256",
+        "disposition",
+        "embedded_instructions_authorized"
+      ],
+      "properties": {
+        "name": {"const": "MIR-400.ZIP"},
+        "bytes": {"const": 334617},
+        "sha256": {"const": "E3D9BE3E1DAC8077B0A6792A573BE1B9E1D76BB00B5E6D283CF9DB4B18CBA9A6"},
+        "media_type": {"const": "application/zip"},
+        "entry_count": {"const": 18},
+        "uncompressed_entry_bytes": {"const": 331227},
+        "entry_inventory_algorithm": {"const": "MIR4ZipEntryInventoryV1"},
+        "entry_inventory_canonical_form": {"const": "UTF-8 without BOM; MIR4ZipEntryInventoryV1 LF header; ordinal-path-sorted path<TAB>decimal-uncompressed-bytes<TAB>uppercase-entry-SHA256<LF> rows"},
+        "entry_inventory_sha256": {"const": "BF83093A055C10D40830D6F377E82CB98EDF05E1ED2FBD3446E8E0BC1FB5F12D"},
+        "disposition": {"const": "observed-older-partial-proposal-archive-not-final-package"},
+        "embedded_instructions_authorized": {"const": false}
+      }
+    },
+    "unavailableClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "claimed_file_count",
+        "claimed_sha256",
+        "availability",
+        "verification_status",
+        "observed_archive_is_substitute"
+      ],
+      "properties": {
+        "name": {"const": "MIR4_ULTIMATE_FINAL_PROGRAMME_PACKAGE_2026-08-16.zip"},
+        "claimed_file_count": {"const": 106},
+        "claimed_sha256": {"const": "C8F666FF41FEE0358F537DE04D617CE9EBBDAAFAA916A6FC707E0C04BF2849D6"},
+        "availability": {"const": "not-supplied-not-observed"},
+        "verification_status": {"const": "unavailable-unverified-claim"},
+        "observed_archive_is_substitute": {"const": false}
+      }
+    },
+    "acceptedDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "decision", "source_names", "disposition"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^MIR4-FPR-[A-Z0-9-]+$"},
+        "decision": {"type": "string", "minLength": 1},
+        "source_names": {"$ref": "#/$defs/sourceNames"},
+        "disposition": {"const": "accepted-bootstrap-implementation"}
+      }
+    },
+    "deferredDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "decision", "source_names", "disposition"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^MIR4-FPR-[A-Z0-9-]+$"},
+        "decision": {"type": "string", "minLength": 1},
+        "source_names": {"$ref": "#/$defs/sourceNames"},
+        "disposition": {"const": "accepted-deferred-from-4.0-bootstrap"}
+      }
+    },
+    "pendingDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "decision", "source_names", "disposition", "pending_class", "release_blocking_scope"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^MIR4-FPR-[A-Z0-9-]+$"},
+        "decision": {"type": "string", "minLength": 1},
+        "source_names": {"$ref": "#/$defs/sourceNames"},
+        "disposition": {"const": "not-accepted-by-this-record"},
+        "pending_class": {
+          "enum": [
+            "human-decision",
+            "external-state",
+            "external-secret-policy",
+            "manual-evidence",
+            "human-and-external-mutation"
+          ]
+        },
+        "release_blocking_scope": {"enum": ["m4-003", "mir4-4.0", "public-release", "governance"]}
+      }
+    },
+    "sourceNames": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/suppliedFileName"}
+    }
+  }
+}

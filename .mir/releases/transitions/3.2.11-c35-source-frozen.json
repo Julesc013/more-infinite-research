@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "REL-3.2.11-c35-source-frozen",
+  "release": "3.2.11",
+  "from": "planned",
+  "to": "source-frozen",
+  "admission": "proof",
+  "proofs": [
+    {
+      "kind": "emergency-source-freeze",
+      "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV2.json",
+      "candidate_id": "C35",
+      "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+      "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+      "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+    }
+  ],
+  "recorded_at": "2026-08-17T23:50:00+10:00"
+}

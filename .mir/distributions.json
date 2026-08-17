@@ -2,7 +2,7 @@
   "schema": 1,
   "status": "tracked-root-dist-inventory",
   "generated_at": "2026-08-16",
-  "distribution_count": 67,
+  "distribution_count": 69,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -475,6 +475,14 @@
       "source_ref": "candidate/2.5.9-2.5-P13"
     },
     {
+      "version": "2.5.10",
+      "path": "dist/more-infinite-research_2.5.10.zip",
+      "bytes": 1062874,
+      "sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "kind": "tagged-publicly-verified",
+      "source_ref": "2.5.10"
+    },
+    {
       "version": "3.2.9",
       "path": "dist/more-infinite-research_3.2.9.zip",
       "bytes": 1061572,
@@ -489,6 +497,14 @@
       "sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
       "kind": "tagged-publicly-verified",
       "source_ref": "3.2.10"
+    },
+    {
+      "version": "3.2.11",
+      "path": "dist/more-infinite-research_3.2.11.zip",
+      "bytes": 1067720,
+      "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "kind": "emergency-probe-awaiting-candidate-qualification",
+      "source_ref": "planned/3.2.11-C35-floor"
     }
   ]
 }

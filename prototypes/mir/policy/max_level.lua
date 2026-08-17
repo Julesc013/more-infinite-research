@@ -11,10 +11,10 @@ local function plan_max_level(key, spec)
   if not tech then return end
 
   local max_level = costs.max_level_for(key, spec)
+  local scripted_techs = target_line.feature_enabled("scripted_techs")
   return {
     technology = tech_name,
-    max_level = (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
-      and "infinite" or max_level,
+    max_level = scripted_techs and "infinite" or max_level,
     planned_max_level = max_level
   }
 end
