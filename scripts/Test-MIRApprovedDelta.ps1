@@ -194,7 +194,18 @@ if ($isMIR2511Factorio20Delta) {
     & git -C $repo merge-base --is-ancestor $expectedCurrent.commit $qualificationSourceCommit
     if ($LASTEXITCODE -ne 0) { throw 'Approved-delta P15 package source is not an ancestor of its qualification source.' }
     & git -C $repo merge-base --is-ancestor $qualificationSourceCommit $ExpectedSourceCommit
-    if ($LASTEXITCODE -ne 0) { throw 'Approved-delta P15 qualification source is not an ancestor of ExpectedSourceCommit.' }
+    if ($LASTEXITCODE -ne 0) {
+      # The immutable 2.5.11 promotion is intentionally a new two-parent
+      # commit: immutable 2.5.10 first and frozen 3.2.11 semantic source
+      # second. Its tree carries the qualified P15 evidence without making
+      # the staging branch an additional semantic parent.
+      $releaseParents = @(& git -C $repo rev-list --parents -n 1 $ExpectedSourceCommit)[0].Split(' ')
+      if ($LASTEXITCODE -ne 0 -or $releaseParents.Count -ne 3 -or
+          $releaseParents[1] -ne $expectedBaseline.commit -or
+          $releaseParents[2] -ne '0a32864d1f1d1fdea090369bc1a22fbd511e290a') {
+        throw 'Approved-delta P15 qualification source is neither an ancestor nor carried by the exact immutable release topology.'
+      }
+    }
     [string[]]$packageRoots = @(Get-MIRPackageSourceRoots)
     & git -C $repo diff --quiet $expectedCurrent.commit $ExpectedSourceCommit -- @packageRoots
     if ($LASTEXITCODE -ne 0) { throw 'Package-visible source changed after the 2.5-P15 package authority.' }
