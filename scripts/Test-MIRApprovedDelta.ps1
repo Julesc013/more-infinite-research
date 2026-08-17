@@ -19,6 +19,7 @@ $artifact = Get-Content -Raw -LiteralPath $artifactPath | ConvertFrom-Json
 # invalidate immutable historical evidence.
 $mir250ApprovedDeltaProducerSha256 = 'A59D69F802E4846D65908A857C980F850EAC9582BB7368FF8190A9D298CC8900'
 $mir255ApprovedDeltaProducerSha256 = 'EBE5CD686CE4F2E8B05CAC08563FF7FD4B553C55235057B85D093FB8E135F14A'
+$mir259ApprovedDeltaProducerSha256 = '50CC5B6BA7B1C8E3B2066A10CCBD94ABE41B43CCB21FA77FF4F4E01AC42E0C84'
 
 function Get-MIRDeltaCanonicalJson {
   param($Value)
@@ -184,7 +185,7 @@ if ($isMIR259Factorio20Delta) {
 
   $qualificationSourceCommit = [string]$artifact.exporter.qualification_source_commit
   if ($qualificationSourceCommit -notmatch '^[0-9a-f]{40}$' -or
-      [string]$artifact.exporter.producer_sha256 -ne (Get-MIRDeltaProducerFingerprint) -or
+      [string]$artifact.exporter.producer_sha256 -ne $mir259ApprovedDeltaProducerSha256 -or
       [string]$artifact.exporter.factorio_binary_version -ne '2.0.77.84539') {
     throw 'Approved-delta final producer, qualification source, or Factorio 2.0.77 identity drifted.'
   }

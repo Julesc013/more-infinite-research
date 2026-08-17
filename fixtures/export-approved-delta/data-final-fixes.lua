@@ -168,7 +168,9 @@ if finalized_artifacts then
   end
 elseif mods and (mods["more-infinite-research"] == "2.4.9"
     or mods["more-infinite-research"] == "2.5.5"
-    or mods["more-infinite-research"] == "2.5.9") then
+    or mods["more-infinite-research"] == "2.5.9"
+    or mods["more-infinite-research"] == "2.5.10"
+    or mods["more-infinite-research"] == "2.5.11") then
   -- The frozen 2.4.9 registry and the 2.5.x no-mod-data target adapter have no
   -- finalized public compiler artifact here. Reconstruct the exact comparison
   -- projection from stable technology names instead of reopening compiler state.
