@@ -17,7 +17,10 @@ if (-not (Test-Path -LiteralPath $promotionToolPath -PathType Leaf) -or
 $promotionTool = Get-Content -Raw -LiteralPath $promotionToolPath
 $promotionWorkflow = Get-Content -Raw -LiteralPath $promotionWorkflowPath
 foreach ($snippet in @(
-  'ValidateSet("3.2.10", "3.2.9", "2.5.9")',
+  'ValidateSet("3.2.11", "3.2.10", "3.2.9", "2.5.9")',
+  'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json',
+  'MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json',
+  'MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json',
   'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
