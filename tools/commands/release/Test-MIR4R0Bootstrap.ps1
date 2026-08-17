@@ -169,15 +169,33 @@ if ([string]$bootstrapRootSet.kind -ne "MIR4BootstrapRootSetV1" -or
     @($bootstrapRootSet.targets.roots.qualification.domain | Where-Object { $_ -cne "mir4.bootstrap.qualification.v1" }).Count -ne 0) {
   throw "MIR 4 bootstrap root set is not the exact four-target domain-separated derivation."
 }
-$bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
-Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
+$historicalBootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
+Assert-Schema $historicalBootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
+$bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV2.json"
+Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json"
 $bootstrapCandidatePlan = Read-Json $bootstrapCandidatePlanPath
 $f210Plan = @($bootstrapCandidatePlan.targets | Where-Object target_key -eq "f210")
-if ($f210Plan.Count -ne 1 -or [string]$f210Plan[0].predecessor.release -cne "3.2.10" -or
+$f200Plan = @($bootstrapCandidatePlan.targets | Where-Object target_key -eq "f200")
+if ([string]$bootstrapCandidatePlan.kind -cne 'MIR4BootstrapLocalCandidatePlanV2' -or
+    $f210Plan.Count -ne 1 -or [string]$f210Plan[0].predecessor.release -cne "3.2.10" -or
     [string]$f210Plan[0].engine_lock.version -cne "2.1.14" -or
     [string]$f210Plan[0].engine_lock.executable_sha256 -cne "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F" -or
+    [string]$f210Plan[0].correction_authority.path -cne '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json' -or
+    $f200Plan.Count -ne 1 -or [string]$f200Plan[0].predecessor.release -cne '2.5.10' -or
+    [string]$f200Plan[0].source.candidate_commit -cne '6bb483de9042a7ec4c93674933e7f6c1670d79aa' -or
     -not (Test-MIR4BootstrapRecordHash -Record $bootstrapCandidatePlan)) {
-  throw "The local MIR 4 f210 plan does not bind the 3.2.10 / Steam 2.1.14 predecessor refresh."
+  throw "The local MIR 4 Plan V2 does not bind the current 3.2.10 / 2.5.10 predecessor and correction closure."
+}
+$privateLanePath = "$authorityDirectory/MIR4-Private-Lane-AuthorizationV2.json"
+Assert-Schema $privateLanePath "spec/schemas/mir4-private-lane-authorization-v2.schema.json"
+$privateLane = Read-Json $privateLanePath
+if ([string]$privateLane.kind -cne 'MIR4PrivateLaneAuthorizationV2' -or
+    [bool]$privateLane.public_output_authorized -or [bool]$privateLane.release_admission_authorized -or
+    [bool]$privateLane.signing_or_sealing_authorized -or [bool]$privateLane.publication_authorized -or
+    (@($privateLane.authorized_targets.target_key) -join '|') -cne 'f200|f110|f100' -or
+    [string]$privateLane.authorized_targets[0].predecessor_release -cne '2.5.10' -or
+    -not (Test-MIR4BootstrapRecordHash -Record $privateLane)) {
+  throw 'The private MIR 4 lane V2 widened public authority or retained a stale predecessor.'
 }
 
 $finalProgrammeReconciliationPath = "$authorityDirectory/MIR4-Final-Programme-ReconciliationV1.json"
@@ -254,7 +272,9 @@ $generatedSources += Get-Binding "$authorityDirectory/MIR4-Distribution-Version-
 $generatedSources += Get-Binding $catalogPath
 $generatedSources += Get-Binding $importPath
 $generatedSources += Get-Binding $bootstrapRootSetPath
+$generatedSources += Get-Binding $historicalBootstrapCandidatePlanPath
 $generatedSources += Get-Binding $bootstrapCandidatePlanPath
+$generatedSources += Get-Binding $privateLanePath
 $generatedSources += Get-Binding $finalProgrammeReconciliationPath
 $generatedSources += Get-Binding $targetReadinessPath
 $generatedSources += Get-Binding $engineObservationPath
@@ -279,9 +299,9 @@ $dashboard = Add-RecordSha256 ([ordered]@{
   generated_from = $generatedSources
   payload = [ordered]@{
     mir3 = [ordered]@{ product_development="closed-except-immutable-post-terminal-hotfixes"; github_publication="3.2.10-latest-and-2.5.10-published-verified"; mod_portal_custody="maintainer-upload-not-independently-redownload-verified"; terminal_dot9_baselines="retained-immutable"; terminal_2_1_continuation="3.2.10-captured-and-imported"; terminal_2_0_continuation="2.5.10-public-release-bound-refresh-v2"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v3-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-and-f200-2.5.10-predecessors-bound"; materialization="blocked-until-plan-v2-and-private-lane-import-composite-v2"; public_4x="forbidden-until-mir3-eol"; emergency_lane="plan-v1-historical-plan-v2-required" }
+    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v3-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-and-f200-2.5.10-predecessors-bound"; materialization="authorized-private-plan-v2-f210-emergency-and-f200-shadow"; public_4x="forbidden-until-mir3-eol"; emergency_lane="plan-v2-current-reproof-pending" }
     package_delta = 0
-    next_executable_task = "M4-003-plan-v2-and-private-lane-refresh"
+    next_executable_task = "M4-003-f210-and-f200-materialization-and-reproof"
   }
 })
 $queue = Add-RecordSha256 ([ordered]@{
@@ -293,9 +313,9 @@ $queue = Add-RecordSha256 ([ordered]@{
   payload = [ordered]@{
     tasks = @(
       [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="terminal-continuations-imported-plan-v2-pending";blocked_by=@("mir4-plan-v2")},
+      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="completed-current-predecessors-imported";blocked_by=@()},
       [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
-      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="plan-v2-required-before-f210-or-f200-materialization";blocked_by=@("plan-v2-import-composite-v2", "private-lane-authorization-v2")},
+      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="plan-v2-ready-f210-and-f200-reproof-pending";blocked_by=@("candidate-bound-f210-and-f200-reproof")},
       [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
       [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
       [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
@@ -310,4 +330,4 @@ if (-not $Update) {
 }
 
 Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: create append-only plan V2 and private-lane authorization V2, then resume M4-003"
+Write-Host "[ok] next executable task: materialize and re-prove f210 and f200 under Plan V2"

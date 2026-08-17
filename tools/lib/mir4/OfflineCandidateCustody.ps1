@@ -161,12 +161,12 @@ function Get-MIR4CustodyAdmissionV1 {
 
   $repo = Get-MIR4CustodyRepoRootV1 -RepoRoot $RepoRoot
   $schemas = Get-MIR4CustodySchemaRootV1 -RepoRoot $repo -SchemaRoot $SchemaRoot
-  $expectedPlanPath = (Resolve-Path -LiteralPath (Join-Path $repo ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json")).Path
+  $expectedPlanPath = (Resolve-Path -LiteralPath (Join-Path $repo ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json")).Path
   if ((Resolve-Path -LiteralPath $CandidatePlanPath).Path -cne $expectedPlanPath) {
     throw "Offline custody requires the exact current tracked bootstrap plan path."
   }
   $plan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $CandidatePlanPath `
-    -SchemaPath (Join-Path $schemas "mir4-bootstrap-local-candidate-plan.schema.json")
+    -SchemaPath (Join-Path $schemas "mir4-bootstrap-local-candidate-plan-v2.schema.json")
   $governedRoot = [IO.Path]::GetFullPath((Join-Path $repo ([string]$plan.package_policy.output_root)))
   $expectedManifestPath = [IO.Path]::GetFullPath((Join-Path $governedRoot "manifests/f210.json"))
   $expectedCandidatePath = [IO.Path]::GetFullPath((Join-Path $governedRoot "distributions/more-infinite-research_4.0.21000.zip"))
@@ -203,12 +203,12 @@ function Get-MIR4CustodyAdmissionV1 {
   }
   $correctionPath = Join-Path $repo ([string]$target.correction_authority.path)
   $correction = Assert-MIR4BootstrapRecordFileV1 -Path $correctionPath `
-    -SchemaPath (Join-Path $schemas 'mir4-approved-bootstrap-correction-delta.schema.json')
+    -SchemaPath (Join-Path $schemas 'mir4-approved-bootstrap-correction-delta-v2.schema.json')
   if ([string]$correction.record_sha256 -cne [string]$target.correction_authority.record_sha256 -or
       [string]$manifest.correction_authority.record_sha256 -cne [string]$correction.record_sha256 -or
-      [string]$correction.finding -cne 'MIR3-TERM-0033' -or
+      (@($correction.findings | Sort-Object) -join '+') -cne 'MIR3-TERM-0032+MIR3-TERM-0033' -or
       [string]$correction.target_key -cne 'f210') {
-    throw 'Offline candidate custody requires the exact approved MIR3-TERM-0033 correction binding.'
+    throw 'Offline candidate custody requires the exact approved MIR3-TERM-0032 and MIR3-TERM-0033 composite correction binding.'
   }
   $rootSetPath = Join-Path $repo ".mir/releases/waves/mir4-r0/bootstrap-root-set.json"
   $rootSet = Assert-MIR4CheckedRootSetFileV1 -RepoRoot $repo -Path $rootSetPath `

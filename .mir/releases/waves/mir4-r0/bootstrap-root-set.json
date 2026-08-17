@@ -9,7 +9,7 @@
   "hash_algorithm": "sha256",
   "derived_from": {
     "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-    "record_sha256": "78E931D2CFF576B9FA4717EFF1676A52AE3C23CA7E135511343584F00503E65D"
+    "record_sha256": "85F7102DEBF0DABFE031B151241920174712748EE08554B52CC59B4AC3E9D78F"
   },
   "targets": [
     {
@@ -68,8 +68,8 @@
       },
       "baseline_identity": {
         "path": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
-        "record_sha256": "F5FC00488C1692DD5B1858FE70EF9752E92076720F3CB3E629C46CB5FA867F30",
-        "input_root_sha256": "5A96D672E2E6318BB2BFA6EB25D4287439F693746F14D398E17362E01F3F7912"
+        "record_sha256": "EA502219203357E6DAEA62B54196EBF3F21D62638CF61FD0D950D7EF6913DC05",
+        "input_root_sha256": "D8F7543D496D36AA1DC94A20F4D3D04BA78A834C42A3798684825D06ACC664AB"
       },
       "snapshot_identity": {
         "path": ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
@@ -86,11 +86,11 @@
         },
         "authority": {
           "domain": "mir4.bootstrap.authority.v1",
-          "sha256": "94826F8A37EDFD12ED2DD92F7DB72F7A33A5BFC039D904448F99C914C14BCF85"
+          "sha256": "F5D2EB6516AA92C822BFD7C6C8A9B96F281330FD34DA50CAC1309CF9EF591011"
         },
         "qualification": {
           "domain": "mir4.bootstrap.qualification.v1",
-          "sha256": "1977FECBF84D1A98F43870E17260D4428DCC404222F9B3D2449729F94CADA666"
+          "sha256": "6FA47BC4E429F32E9044B062225673D0BDFA0F808E9E43A61DB21B00E28BBCB2"
         }
       }
     },
@@ -177,5 +177,5 @@
       }
     }
   ],
-  "record_sha256": "68812524B2793F8AC2504BEF6C1D343B640AE200302C6E9A4CC13C0EFBD831E0"
+  "record_sha256": "5E72C16D11BA5F80BE7D1D392BF36C63AE0BED2F972E29F90CB54484585F659A"
 }

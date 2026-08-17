@@ -747,8 +747,8 @@ function Compare-MIR4BootstrapCorrectedCandidate {
     [switch]$ThrowOnDifference
   )
 
-  if ([string]$Correction.kind -cne 'MIR4ApprovedBootstrapCorrectionDeltaV1' -or
-      [string]$Correction.finding -cne 'MIR3-TERM-0033' -or
+  if ([string]$Correction.kind -cne 'MIR4ApprovedBootstrapCorrectionDeltaV2' -or
+      (@($Correction.findings | Sort-Object) -join '+') -cne 'MIR3-TERM-0032+MIR3-TERM-0033' -or
       [string]$Correction.target_key -cne 'f210' -or
       [bool]$Correction.public_output_authorized -ne $false -or
       -not (Test-MIR4BootstrapRecordHash -Record $Correction)) {
@@ -795,12 +795,13 @@ function Compare-MIR4BootstrapCorrectedCandidate {
     $candidateInfoText -ceq $expectedInfo -and
     (Get-MIR4ComparableInfoJson -Json $candidateInfoText) -ceq (Get-MIR4ComparableInfoJson -Json $predecessorInfoText)
   $equivalent = $exactDelta -and $metadataEquivalent
+  $findingIdentity = @($Correction.findings | Sort-Object) -join '+'
   $result = [pscustomobject][ordered]@{
     equivalent = $equivalent
     policy = 'MIR4BootstrapApprovedCorrectionEquivalenceV1'
     correction_kind = [string]$Correction.kind
     correction_record_sha256 = [string]$Correction.record_sha256
-    finding = [string]$Correction.finding
+    finding = $findingIdentity
     added = $added
     removed = $removed
     changed = $changed
@@ -1228,6 +1229,7 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
 
   $paths = @(
     '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json',
     '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json',
@@ -1254,8 +1256,13 @@ function Get-MIR4BootstrapCapsuleAuthorityPaths {
   if ($Lane -ceq 'local-playtest-shadow') {
     $paths += @(
       '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json',
+      '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json',
       '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json',
       '.mir/targets.json',
+      '.mir/releases/terminal/baselines/2.5.10/baseline-manifest.json',
+      '.mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json',
+      '.mir/releases/terminal/baselines/2.5.10/package-composition.json',
+      '.mir/releases/records/2.5.10.json',
       '.mir/releases/terminal/baselines/2.5.9/baseline-manifest.json',
       '.mir/releases/terminal/baselines/2.5.9/normalized-snapshot.json',
       '.mir/releases/terminal/baselines/2.5.9/package-composition.json',
@@ -1278,6 +1285,7 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
 
   $paths = @(
     'spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json',
+    'spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json',
     'spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json',
     'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json',
     'spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json',
@@ -1296,6 +1304,7 @@ function Get-MIR4BootstrapCapsuleSchemaPaths {
   if ($Lane -ceq 'local-playtest-shadow') {
     $paths += @(
       'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json',
+      'spec/schemas/mir4-private-lane-authorization-v2.schema.json',
       'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json',
       'spec/schemas/mir4-bootstrap-target-readiness.schema.json'
     )
@@ -1681,20 +1690,25 @@ function New-MIR4BootstrapSourceCapsule {
         [string]$correction.record_sha256 -cne [string]$Target.correction_authority.record_sha256) {
       throw '[mir4-approved-delta] Capsule construction received a stale correction binding.'
     }
+    $findingIdentity = if ($null -ne $correction.PSObject.Properties['findings']) {
+      @($correction.findings | Sort-Object) -join '+'
+    } else {
+      [string]$correction.finding
+    }
     $correctionBinding = [pscustomobject][ordered]@{
       path = [string]$Target.correction_authority.path
       kind = [string]$correction.kind
-      finding = [string]$correction.finding
+      finding = $findingIdentity
       record_sha256 = [string]$correction.record_sha256
     }
     $targetDescriptor.correction_authority = $correctionBinding
   }
   $laneBinding = $null
   if ($Lane -ceq 'local-playtest-shadow') {
-    $laneRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+    $laneRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
     $lanePath = Join-Path $repo $laneRelativePath
     $laneText = Get-Content -Raw -LiteralPath $lanePath
-    if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'))) {
+    if (-not ($laneText | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-private-lane-authorization-v2.schema.json'))) {
       throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.'
     }
     $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String

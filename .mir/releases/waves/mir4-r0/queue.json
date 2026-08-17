@@ -14,7 +14,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
-      "sha256": "E42E639CB2B995FE5327DB7F9A24B1B3B601D9812E8189EE8F538FBCEB58C7CE"
+      "sha256": "50BB74F4775EFA67B52A2E293A8B3009EB818E1045FB2F376CDF4340E2AE8546"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
@@ -57,16 +57,24 @@
       "sha256": "BCF633E2B9B4174102A601ED6583BA5DE755990D6064EDBC0E9319897F881AB4"
     },
     {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json",
+      "sha256": "87CF66F73C1A06CB5CBC8E349A310045542ABABAEA3613A73CAEAD4F694C8154"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
+      "sha256": "EEA085AB3519E053F62B94497C2F2514EB2D2A171980722649D0980F6E361B55"
+    },
+    {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
       "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "369CAEEB42FEDEC9B45F047A4A1318A4401CC67E174A9607163CC3C0190B149D"
+      "sha256": "0D9B3F9FD6EF4D9E61F34A04EF1818B5733A4205B51C3B26787D9615D24EA6B0"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "3ED34B28A5E3AA1BEF6396571DF3C54BCCAC19C4805F7D48ED549BB3E98A542D"
+      "sha256": "C6D111B6B4792EF10A38CEC828DE3F5E274F382024A232B0CA20927516C71F6F"
     },
     {
       "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
@@ -136,10 +144,8 @@
       {
         "id": "M4-001",
         "scope": "dot9-baseline-capture-plus-post-terminal-continuations",
-        "state": "terminal-continuations-imported-plan-v2-pending",
-        "blocked_by": [
-          "mir4-plan-v2"
-        ]
+        "state": "completed-current-predecessors-imported",
+        "blocked_by": []
       },
       {
         "id": "M4-002",
@@ -150,10 +156,9 @@
       {
         "id": "M4-003",
         "scope": "local-offline-emergency-lane-plus-mir3-term-0033",
-        "state": "plan-v2-required-before-f210-or-f200-materialization",
+        "state": "plan-v2-ready-f210-and-f200-reproof-pending",
         "blocked_by": [
-          "plan-v2-import-composite-v2",
-          "private-lane-authorization-v2"
+          "candidate-bound-f210-and-f200-reproof"
         ]
       },
       {
@@ -184,5 +189,5 @@
       }
     ]
   },
-  "record_sha256": "0C1E6F57B9BED8AEA87835CF381561F60795B7B6DB0BE1249B0E6B36349C94AF"
+  "record_sha256": "141E7EF759A4F48FE74E3B93749D91415B4BFB5EF94D99B95DB257E6AFBABD56"
 }

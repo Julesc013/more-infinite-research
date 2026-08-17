@@ -14,7 +14,7 @@ superseded_by: []
 
 ## Verdict
 
-The repository can construct one admitted deterministic f210 local candidate from the exact public 3.2.10 continuation plus the exact approved `MIR3-TERM-0033` correction. A separate private shadow lane can construct deterministic f200, f110, and f100 local-playtest candidates without changing their release admission. The repository cannot yet seal, allocate, tag, publish, or make public MIR 4 release or beta claims.
+The repository can construct one admitted deterministic f210 local candidate from the exact public 3.2.10 continuation plus the exact approved composite correction for `MIR3-TERM-0032` and `MIR3-TERM-0033`. A separate private shadow lane can construct deterministic f200, f110, and f100 local-playtest candidates without changing their release admission; f200 now begins from exact public 2.5.10. The repository cannot yet allocate, tag, publish, or make public MIR 4 release or beta claims.
 
 The current f210 lock is the maintainer-accepted Steam Factorio `2.1.14.87180` executable with SHA-256 `E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F`. The earlier 2.1.13 availability observation remains historical evidence and no longer controls M4-003. MIR 3 portal custody and EOL remain open, production signing custody is unresolved, and MIR 4 release acceptance remains a later gate.
 
@@ -32,9 +32,9 @@ The loose final authorities still resolve the six architectural contradictions: 
 
 ## Execution boundary
 
-The executable input is `.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json`.
+The executable input is `.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json`. Plan V1 is retained as immutable historical authority and is not executable for current materialization.
 
-The plan binds the live entry gate, emergency-lane and equivalence policies, V2 identity authorities, exact terminal commits, trees, predecessor archives, normalized snapshots, engine locks, capability omissions, distribution versions, and the separately derived semantic, authority, and qualification roots. Candidate authority roots include a digest of that exact imported authority closure.
+The plan binds the live entry gate, emergency-lane and equivalence policies, Target Registry V3 predecessor authority, the unchanged V2 distribution codec, the terminal import contract V2, exact terminal commits, trees, predecessor archives, normalized snapshots, engine locks, capability omissions, distribution versions, and the separately derived semantic, authority, and qualification roots. Candidate authority roots include a digest of that exact imported authority closure.
 
 `LegacyCompilerHostAdapterV1` performs no semantic rewrite: it captures package-visible source from the exact target terminal commit, projects only the distribution version, and delegates deterministic emission to the shared package allowlist.
 
@@ -42,24 +42,24 @@ For each admitted target, the materializer captures byte-identical source capsul
 
 This closes the checkout-independent capsule-only C reconstruction required for local package construction. It does not claim an operating-system ACL/container denial of the original checkout or a network-denied runtime campaign; those stronger environmental observations remain outside the package-construction result.
 
-The f210 candidate and evidence remain beneath ignored `build/mir4/emergency-lane`. The three lower-target playtest candidates remain beneath ignored `build/mir4/local-playtest-shadow`. Neither lane writes `dist`, changes repository package source, creates Git identities, or performs public transfer. The lower lane is governed by `MIR4LocalPlaytestShadowAuthorizationV1`; it authorizes construction and local testing only, and its numeric-version artifacts may move only between maintainer-controlled private machines.
+The f210 candidate and evidence remain beneath ignored `build/mir4/emergency-lane`. The three lower-target playtest candidates remain beneath ignored `build/mir4/local-playtest-shadow`. Neither lane writes `dist`, changes repository package source, creates Git identities, or performs public transfer. The lower lane is governed by `MIR4PrivateLaneAuthorizationV2`; it authorizes construction and local testing only, and its numeric-version artifacts may move only between maintainer-controlled private machines.
 
 ## Target ledger
 
 | Target | Local version | Exact predecessor | Admission | Required exact engine | Dated executable observation |
 | --- | --- | --- | --- | --- | --- |
-| f210 | `4.0.21000` | `3.2.10` | emergency lane; MIR3-TERM-0033 required | Factorio 2.1.14.87180 | Exact maintainer-accepted Steam lock bound |
-| f200 | `4.0.20000` | `2.5.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 2.0.77.84539 | Exact executable lock match |
+| f210 | `4.0.21000` | `3.2.10` | emergency lane; composite MIR3-TERM-0032/0033 proof required | Factorio 2.1.14.87180 | Exact maintainer-accepted Steam lock bound |
+| f200 | `4.0.20000` | `2.5.10` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 2.0.77.84539 | Exact executable lock and public predecessor bound |
 | f110 | `4.0.11000` | `1.9.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 1.1.110.62357 | Exact executable lock match |
 | f100 | `4.0.10000` | `1.8.9` | private local-playtest construction authorized; release admission blocked until EOL | Factorio 1.0.0.54889 only | Exact executable lock match |
 
 ## Dated readiness correction
 
-The `2026-08-16` 2.1.13 engine observation is retained unchanged as historical readiness evidence. `MIR4-Terminal-Predecessor-RefreshV1` supersedes it for current f210 planning by binding 3.2.10 and the Steam 2.1.14 executable identity. Neither record substitutes for candidate-bound M4-003 runtime evidence or admits f200, f110, or f100 construction.
+The `2026-08-16` 2.1.13 engine observation is retained unchanged as historical readiness evidence. `MIR4-Terminal-Predecessor-RefreshV1` binds current f210 planning to 3.2.10 and Steam 2.1.14; `MIR4-Terminal-Predecessor-RefreshV2` advances f200 to 2.5.10 after exact Factorio 2.0.77 qualification. Neither record substitutes for candidate-bound M4-003 runtime evidence or grants public MIR 4 authority.
 
 `MIR4BootstrapTargetReadinessV1` remains package-excluded and does not grant construction or release admission. Its f210 2.1.13 mismatch is superseded by the predecessor refresh. The canonical f200 stream count is reconciled to the exact terminal value `74`; f110 and f100 now carry the exact terminal positive allowlists of zero required mods and twelve supported effect types. Target-local direct-upgrade fixtures are defined, while candidate-bound runtime evidence, MIR 3 custody, and formal admission remain separate blockers.
 
-The historical visibility recheck binds 3.2.9 and 2.5.9. The 3.2.10 continuation is GitHub-published and publicly byte-verified, while its Mod Portal upload is recorded only from the maintainer report until an independent authenticated redownload receipt is captured. That remaining custody work, the final index, archive and rights records, and the EOL seal remain open.
+The historical visibility recheck binds 3.2.9 and 2.5.9. The 3.2.10 and 2.5.10 continuations are GitHub-published and publicly byte-verified, while Mod Portal custody still requires independent authenticated redownload receipts. That remaining custody work, the final index, archive and rights records, and the EOL seal remain open.
 
 ## Commands
 

@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot = "",
-  [string]$PlanPath = ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
+  [string]$PlanPath = ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
   [ValidateSet("all", "f210", "f200", "f110", "f100")]
   [string]$Target = "f210",
   [ValidateSet('emergency', 'local-playtest-shadow')]
@@ -85,17 +85,18 @@ function Assert-MIR4PlanTarget {
     [Parameter(Mandatory)]$PlanTarget,
     [Parameter(Mandatory)]$TerminalImport,
     [Parameter(Mandatory)]$Registry,
+    [Parameter(Mandatory)]$CodecRegistry,
     [Parameter(Mandatory)]$VersionAuthority,
     [Parameter(Mandatory)]$RootSet
   )
 
   $registryRow = @($Registry.payload.targets | Where-Object { $_.id -eq $PlanTarget.target_id })
-  if ($registryRow.Count -ne 1) { throw "V2 target registry does not contain exactly one $($PlanTarget.target_id) row." }
+  if ($registryRow.Count -ne 1) { throw "Current target registry does not contain exactly one $($PlanTarget.target_id) row." }
   Assert-Equal ([string]$registryRow[0].factorio) ([string]$PlanTarget.factorio_line) "$($PlanTarget.target_key) Factorio line"
   Assert-Equal ([string]$registryRow[0].distribution_target_code) ([string]$PlanTarget.distribution_target_code) "$($PlanTarget.target_key) distribution target code"
   Assert-Equal ([string]$registryRow[0].mir3_predecessor) ([string]$PlanTarget.predecessor.release) "$($PlanTarget.target_key) predecessor"
 
-  $projection = Resolve-MIR4DistributionIdentity -TargetRegistry $Registry -VersionAuthority $VersionAuthority -TargetId ([string]$PlanTarget.target_id) -SourceMinor 0 -SourcePatch 0
+  $projection = Resolve-MIR4DistributionIdentity -TargetRegistry $CodecRegistry -VersionAuthority $VersionAuthority -TargetId ([string]$PlanTarget.target_id) -SourceMinor 0 -SourcePatch 0
   Assert-Equal ([string]$projection.distribution_target_code) ([string]$PlanTarget.distribution_target_code) "$($PlanTarget.target_key) projected code"
   Assert-Equal ([string]$projection.distribution_version) ([string]$PlanTarget.distribution_version) "$($PlanTarget.target_key) projected version"
 
@@ -144,10 +145,15 @@ function Get-MIR4PlanCorrection {
   if ($null -eq $PlanTarget.PSObject.Properties['correction_authority']) { return $null }
   $relativePath = [string]$PlanTarget.correction_authority.path
   $path = Join-Path $RepoRoot $relativePath
-  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json'
   $text = Get-Content -Raw -LiteralPath $path
-  if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-approved-delta] The correction authority fails its exact schema.' }
   $correction = $text | ConvertFrom-Json -Depth 100 -DateKind String
+  $schemaName = if ([string]$correction.kind -ceq 'MIR4ApprovedBootstrapCorrectionDeltaV2') {
+    'mir4-approved-bootstrap-correction-delta-v2.schema.json'
+  } else {
+    'mir4-approved-bootstrap-correction-delta.schema.json'
+  }
+  $schema = Join-Path $RepoRoot "spec/schemas/$schemaName"
+  if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-approved-delta] The correction authority fails its exact schema.' }
   if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
       [string]$correction.record_sha256 -cne [string]$PlanTarget.correction_authority.record_sha256) {
     throw '[mir4-approved-delta] The correction authority record binding is stale.'
@@ -159,15 +165,19 @@ function Get-MIR4PlanCorrection {
     @($correction.integration_source.tree, $PlanTarget.source.source_tree, 'integration tree')
   )) { Assert-Equal ([string]$binding[0]) ([string]$binding[1]) "approved correction $($binding[2])" }
   Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.base_source.commit)) ([string]$correction.base_source.tree) 'approved correction base Git tree'
-  Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.correction_source.commit)) ([string]$correction.correction_source.tree) 'approved correction commit Git tree'
+  if ($null -ne $correction.PSObject.Properties['correction_source']) {
+    Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.correction_source.commit)) ([string]$correction.correction_source.tree) 'approved correction commit Git tree'
+  } elseif ($null -ne $correction.PSObject.Properties['correction_commit']) {
+    Assert-Equal ([string]$correction.correction_commit) ([string]$correction.integration_source.commit) 'approved composite correction commit'
+  }
   Assert-Equal (Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$correction.integration_source.commit)) ([string]$correction.integration_source.tree) 'approved correction integration Git tree'
   return $correction
 }
 
 function Get-MIR4LocalPlaytestAuthority {
-  $relativePath = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+  $relativePath = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
   $path = Join-Path $RepoRoot $relativePath
-  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-shadow-authorization.schema.json'
+  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-private-lane-authorization-v2.schema.json'
   $text = Get-Content -Raw -LiteralPath $path
   if (-not ($text | Test-Json -SchemaFile $schema)) { throw '[mir4-local-playtest-shadow] The lane authorization fails its exact schema.' }
   $authority = $text | ConvertFrom-Json -Depth 100 -DateKind String
@@ -246,7 +256,7 @@ function Test-MIR4ExistingCandidate {
     if ($null -eq $correction) { throw '[mir4-approved-delta] The f210 candidate plan does not bind its required correction.' }
     Assert-Equal ([string]$manifest.correction_authority.path) ([string]$PlanTarget.correction_authority.path) 'candidate correction path'
     Assert-Equal ([string]$manifest.correction_authority.kind) ([string]$correction.kind) 'candidate correction kind'
-    Assert-Equal ([string]$manifest.correction_authority.finding) ([string]$correction.finding) 'candidate correction finding'
+    Assert-Equal ([string]$manifest.correction_authority.finding) (@($correction.findings | Sort-Object) -join '+') 'candidate correction finding'
     Assert-Equal ([string]$manifest.correction_authority.record_sha256) ([string]$correction.record_sha256) 'candidate correction record'
   } else {
     if ($null -ne $correction -or $null -ne $manifest.PSObject.Properties['correction_authority']) {
@@ -454,12 +464,12 @@ function Test-MIR4ExistingCandidate {
 }
 
 $plan = Get-Content -Raw -LiteralPath $PlanPath | ConvertFrom-Json -DateKind String
-if ($plan.kind -ne 'MIR4BootstrapLocalCandidatePlanV1' -or $plan.public_output_authorized -ne $false) {
+if ($plan.kind -ne 'MIR4BootstrapLocalCandidatePlanV2' -or $plan.public_output_authorized -ne $false -or $plan.semantic_authority -ne $false) {
   throw "The input is not a publication-forbidden MIR4 bootstrap local candidate plan."
 }
 if (-not (Test-MIR4BootstrapRecordHash -Record $plan)) { throw "MIR4 local candidate plan self-hash mismatch." }
 
-$schemaPath = Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json'
+$schemaPath = Join-Path $RepoRoot 'spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json'
 if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) { throw "Test-Json is required for fail-closed MIR 4 materialization." }
 if (-not ((Get-Content -Raw -LiteralPath $PlanPath) | Test-Json -SchemaFile $schemaPath)) {
   throw "MIR4 local candidate plan does not satisfy its schema."
@@ -467,7 +477,7 @@ if (-not ((Get-Content -Raw -LiteralPath $PlanPath) | Test-Json -SchemaFile $sch
 $laneAuthority = if ($Lane -ceq 'local-playtest-shadow') { Get-MIR4LocalPlaytestAuthority } else { $null }
 $laneBinding = if ($null -ne $laneAuthority) {
   [pscustomobject][ordered]@{
-    path = '.mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json'
+    path = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
     kind = [string]$laneAuthority.kind
     authority_family = [string]$laneAuthority.authority_family
     record_sha256 = [string]$laneAuthority.record_sha256
@@ -483,9 +493,11 @@ $expectedImports = @(
   '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json',
-  '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json',
-  '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json',
   '.mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json',
   '.mir/releases/waves/mir4-r0/terminal-baseline-import.json',
   '.mir/releases/waves/mir4-r0/bootstrap-root-set.json'
 )
@@ -499,7 +511,8 @@ foreach ($import in $expectedImports) {
 }
 $planImportClosureRoot = Get-MIR4DomainSha256 -Domain 'mir4.bootstrap.plan-import-closure.v1' -Fields $planImportBindings
 
-$registryPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json'
+$registryPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json'
+$codecRegistryPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json'
 $versionAuthorityPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json'
 $entryGatePath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json'
 $emergencyLanePath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json'
@@ -507,6 +520,7 @@ $equivalencePolicyPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-E
 $importPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/terminal-baseline-import.json'
 $rootSetPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/bootstrap-root-set.json'
 $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json -DateKind String
+$codecRegistry = Get-Content -Raw -LiteralPath $codecRegistryPath | ConvertFrom-Json -DateKind String
 $versionAuthority = Get-Content -Raw -LiteralPath $versionAuthorityPath | ConvertFrom-Json -DateKind String
 $entryGateText = Get-Content -Raw -LiteralPath $entryGatePath
 if (-not ($entryGateText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-r0-authority.schema.json'))) {
@@ -620,7 +634,7 @@ if (-not (Test-Path -LiteralPath $OutputRoot -PathType Container)) { New-Item -I
 
 $manifests = @()
 foreach ($targetPlan in $targets) {
-  $rootRow = Assert-MIR4PlanTarget -PlanTarget $targetPlan -TerminalImport $terminalImport -Registry $registry -VersionAuthority $versionAuthority -RootSet $rootSet
+  $rootRow = Assert-MIR4PlanTarget -PlanTarget $targetPlan -TerminalImport $terminalImport -Registry $registry -CodecRegistry $codecRegistry -VersionAuthority $versionAuthority -RootSet $rootSet
   $predecessorPath = Join-Path $RepoRoot ([string]$targetPlan.predecessor.archive_path)
   $predecessor = Get-MIR4ArchiveInventory -Path $predecessorPath
   Assert-Equal ([string]$predecessor.archive_sha256) ([string]$targetPlan.predecessor.archive_sha256) "$($targetPlan.target_key) predecessor archive on disk"

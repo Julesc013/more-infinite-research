@@ -24,7 +24,7 @@
     "entries": 302,
     "tag": "2.5.10"
   },
-  "input_root_sha256": "5A96D672E2E6318BB2BFA6EB25D4287439F693746F14D398E17362E01F3F7912",
+  "input_root_sha256": "D8F7543D496D36AA1DC94A20F4D3D04BA78A834C42A3798684825D06ACC664AB",
   "files": [
     {
       "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
@@ -99,8 +99,8 @@
     {
       "logical_path": "authority/docs/releases/notes/release-notes-2.5.10.md",
       "source_path": "docs/releases/notes/release-notes-2.5.10.md",
-      "sha256": "20D2B128D0DBBBF78E18149B5406A8B9101B4F14E1E75AEDFC7162760ACB0714",
-      "bytes": 1499,
+      "sha256": "AAFE0EF13832D31E6CB67D9EE524C2A58D06F3C8D388027B7407C81B6AC6F66A",
+      "bytes": 1440,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -143,5 +143,5 @@
     "open_findings": [],
     "mir4_behavioral_proof_required": true
   },
-  "record_sha256": "F5FC00488C1692DD5B1858FE70EF9752E92076720F3CB3E629C46CB5FA867F30"
+  "record_sha256": "EA502219203357E6DAEA62B54196EBF3F21D62638CF61FD0D950D7EF6913DC05"
 }

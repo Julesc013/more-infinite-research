@@ -14,7 +14,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
-      "sha256": "E42E639CB2B995FE5327DB7F9A24B1B3B601D9812E8189EE8F538FBCEB58C7CE"
+      "sha256": "50BB74F4775EFA67B52A2E293A8B3009EB818E1045FB2F376CDF4340E2AE8546"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
@@ -57,16 +57,24 @@
       "sha256": "BCF633E2B9B4174102A601ED6583BA5DE755990D6064EDBC0E9319897F881AB4"
     },
     {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json",
+      "sha256": "87CF66F73C1A06CB5CBC8E349A310045542ABABAEA3613A73CAEAD4F694C8154"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
+      "sha256": "EEA085AB3519E053F62B94497C2F2514EB2D2A171980722649D0980F6E361B55"
+    },
+    {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
       "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "369CAEEB42FEDEC9B45F047A4A1318A4401CC67E174A9607163CC3C0190B149D"
+      "sha256": "0D9B3F9FD6EF4D9E61F34A04EF1818B5733A4205B51C3B26787D9615D24EA6B0"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "3ED34B28A5E3AA1BEF6396571DF3C54BCCAC19C4805F7D48ED549BB3E98A542D"
+      "sha256": "C6D111B6B4792EF10A38CEC828DE3F5E274F382024A232B0CA20927516C71F6F"
     },
     {
       "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
@@ -144,12 +152,12 @@
       "historical_v1_v2_registries_executable": false,
       "programme_reconciliation": "accepted-no-public-allocation",
       "target_readiness": "f210-3.2.10-and-f200-2.5.10-predecessors-bound",
-      "materialization": "blocked-until-plan-v2-and-private-lane-import-composite-v2",
+      "materialization": "authorized-private-plan-v2-f210-emergency-and-f200-shadow",
       "public_4x": "forbidden-until-mir3-eol",
-      "emergency_lane": "plan-v1-historical-plan-v2-required"
+      "emergency_lane": "plan-v2-current-reproof-pending"
     },
     "package_delta": 0,
-    "next_executable_task": "M4-003-plan-v2-and-private-lane-refresh"
+    "next_executable_task": "M4-003-f210-and-f200-materialization-and-reproof"
   },
-  "record_sha256": "1CC230F3CA69AA37D477413EEA2D432CF6DF6782F30862B6DDB01199E8987DF7"
+  "record_sha256": "282BF3A8DC70D93DA9264125991E1A76C5E33B29670C5223BC52A2BD6C032BD2"
 }

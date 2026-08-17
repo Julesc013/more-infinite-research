@@ -52,7 +52,7 @@
       "required": ["role", "kind", "record_sha256", "file_sha256"],
       "properties": {
         "role": {"const": "candidate-plan"},
-        "kind": {"const": "MIR4BootstrapLocalCandidatePlanV1"},
+        "kind": {"const": "MIR4BootstrapLocalCandidatePlanV2"},
         "record_sha256": {"$ref": "#/$defs/sha256"},
         "file_sha256": {"$ref": "#/$defs/sha256"}
       },
