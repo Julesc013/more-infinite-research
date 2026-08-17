@@ -403,9 +403,18 @@ local function plan_chain(key)
   if max_level_value == "infinite" then
     max_level_value = coerce_max_level_value(spec.max_level)
   end
-  if max_level_value ~= "infinite" and max_level_value < desired_new_level then
+  local retain_for_runtime_cap = target_line.feature_enabled("scripted_techs")
+    and max_level_value ~= "infinite"
+    and max_level_value < desired_new_level
+  if max_level_value ~= "infinite" and max_level_value < desired_new_level
+      and not retain_for_runtime_cap then
     D.extension(D.extension_fields(key, "skipped", "max_level_below_first_extension"))
     return rejected_candidate(key, "max_level_below_first_extension", "progression_safe")
+  end
+  if retain_for_runtime_cap then
+    log("[more-infinite-research] Retaining disabled base continuation for lossless cap migration: "
+      .. new_name .. " selected=" .. tostring(max_level_value)
+      .. " first-level=" .. tostring(desired_new_level) .. ".")
   end
 
   local last_count = base_tech.unit.count
@@ -550,7 +559,8 @@ local function plan_chain(key)
     unit = {},
     max_level = "infinite",
     upgrade = true,
-    level = desired_new_level
+    level = desired_new_level,
+    hidden = retain_for_runtime_cap
   })
 
   local special = SPECIALS[key]
@@ -636,7 +646,14 @@ local function plan_chain(key)
     research_cost_model = cost_model,
     science_phase_policy = science_phase_decision,
     technology_risk = technology_risk.classification(spec.technology_risk),
-    diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status),
+    diagnostics = D.extension_fields(
+      key,
+      "generated",
+      retain_for_runtime_cap and "migration_retention_below_configured_cap" or "base_extension",
+      resolved_ingredients,
+      new.prerequisites,
+      new.effects,
+      lab_status),
     gates = accepted_gate_vector(key, new.name)
   }
   operation.technology_design = technology_design.from_base_extension_operation(operation)
