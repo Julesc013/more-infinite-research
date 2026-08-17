@@ -31,7 +31,7 @@
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
     "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json"
   },
-  "remaining_obligations": ["focused-qualification", "exact-engine-qualification", "deterministic-reconstruction", "tag-and-publication", "mod-portal-maintainer-upload"],
+  "remaining_obligations": ["focused-qualification", "exact-engine-qualification", "governed-upgrades", "tag-and-publication", "mod-portal-maintainer-upload"],
   "source_release": {
     "release": "2.5.10",
     "candidate_id": "2.5-P14",
@@ -41,7 +41,12 @@
     "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
   },
   "semantic_parent": {"release": "3.2.11", "candidate_id": "C35", "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a"},
-  "upgrade": {"from_version": "2.5.10", "to_version": "2.5.11", "fixture": "assert-upgrade-3-2-9-to-3-2-10"},
+  "upgrade": {
+    "from_version": "2.5.10",
+    "additional_from_versions": ["2.5.9", "2.5.5"],
+    "to_version": "2.5.11",
+    "fixture": "assert-upgrade-2-5-10-to-2-5-11"
+  },
   "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
   "release_notes": "docs/releases/notes/release-notes-2.5.11.md",
   "incident_ids": ["MIR3-TERM-0033", "MIR3-TERM-0034"],
