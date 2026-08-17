@@ -1,0 +1,156 @@
+{
+  "schema": 2,
+  "kind": "MIR4ApprovedBootstrapCorrectionDeltaV2",
+  "authority_family": "MIRApprovedDeltaV1",
+  "status": "approved-local-bootstrap-correction-composite-only",
+  "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "approved_by": "explicit-maintainer-bounded-authorization-2026-08-17",
+  "package_visible": false,
+  "public_output_authorized": false,
+  "imports": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json",
+      "text_sha256": "BA594653E301408B9381A864036FF48C1AA81AD029D8D4FD6E4B8994EC13FC66",
+      "record_sha256": "989FB0DB9E07140053BA3188A5A808AA825B4C4D0441F6683D3ED5BA35B087E1"
+    }
+  ],
+  "authority_scope": {
+    "construction_authorized": true,
+    "exact_difference_classification_authorized": true,
+    "release_admission_authorized": false,
+    "signing_or_sealing_authorized": false,
+    "publication_authorized": false,
+    "transitive_target_inheritance_authorized": false
+  },
+  "findings": [
+    "MIR3-TERM-0033",
+    "MIR3-TERM-0032"
+  ],
+  "target_key": "f210",
+  "correction_commit": "9c78a2b6abf281fdcfc0449b2768f0f293a78225",
+  "predecessor": {
+    "release": "3.2.10",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9"
+  },
+  "base_source": {
+    "commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+    "tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a"
+  },
+  "integration_source": {
+    "commit": "9c78a2b6abf281fdcfc0449b2768f0f293a78225",
+    "tree": "b3091843a1ddd4601fd21945ff859c8ff4338276"
+  },
+  "evidence_sources": [
+    {
+      "role": "existing-f210-transactional-owner-correction",
+      "commit": "029d527bc2fb234bc20ae988cc044229450e32f2",
+      "tree": "a30e5b99225807cfc909ec21865faac2eaac37a1"
+    },
+    {
+      "role": "lower-target-profile-closure",
+      "commit": "5a927582a183fef6950bf52697dde0be1f729061",
+      "tree": "714ce9fc69b02644747b91410a5acde894e78d9a"
+    },
+    {
+      "role": "publicly-qualified-factorio-2-0-maximum-level-transport",
+      "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a"
+    }
+  ],
+  "canonical_patch": {
+    "algorithm": "SHA-256",
+    "format": "git-diff-no-ext-diff-no-color-full-index-utf8-lf-v1",
+    "sha256": "9AE5930256BADC9D669BACD36456971978C9637308286DDAD391D5A3E5DFFF8A",
+    "bytes": 7934
+  },
+  "deltas": [
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "before_blob": "010ca0052a8e3292b25b2b245b6f2a68ed765744",
+      "after_blob": "bfd3da244edeef83a4f32ebc39f223a90908197f",
+      "before_sha256": "8648C1D0673BA7389F1EC2B4F0F3E7B91F5B5153343989D8205BE4F9297E6491",
+      "after_sha256": "F0E3BDD20EFCAD0E137732D94EDCDC0380D82DBDD654BC7E32743992CED9F15B",
+      "before_bytes": 1238,
+      "after_bytes": 1808
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations.lua",
+      "before_blob": "2f4ce2dbf3a01ebb1f290d8633640f4d417bddf7",
+      "after_blob": "0f6230c14c5726ecab0139a805b583fa1fad4d0d",
+      "before_sha256": "C1E375043D764D68D2BE1C2DE6B17F7E27459974FE170B1A6A67997CC02B088E",
+      "after_sha256": "96CF734A1C91B0D27902DFC61B5C67797D2F35E1847AFD9F615EFE209DBD2150",
+      "before_bytes": 27312,
+      "after_bytes": 27213
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "before_blob": "836fda2a9944f9c406dc2021e43e64053a28ee66",
+      "after_blob": "9769423cca8c7ce04c9a7b797eee53168bd95096",
+      "before_sha256": "9896BF099CB283CE61AAFFF9EA817C9EB73F35573ED277E01F7AC51412F6483E",
+      "after_sha256": "538FF5A84B35A332CEDC2645C6781627F021915C71931793707A4BB1F35DB124",
+      "before_bytes": 15498,
+      "after_bytes": 16522
+    },
+    {
+      "path": "prototypes/mir/runtime/maximum_level_control.lua",
+      "before_blob": "e6df945a7d5da6e34e07305723638c56cf3baddd",
+      "after_blob": "e01bd8828e0a09d7918cc4966cab55b071b3f928",
+      "before_sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+      "after_sha256": "0B498CF69738E2388101876A882A408399E7935A8CD13D8225C9428CA22179D9",
+      "before_bytes": 5298,
+      "after_bytes": 7637
+    }
+  ],
+  "semantic_effects": [
+    {
+      "paths": [
+        "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+        "prototypes/mir/planner/base_continuations.lua"
+      ],
+      "targets": ["f210"],
+      "effect": "Preserve an external continuation owner and its dependent prerequisites when the configured absolute cap makes the MIR replacement inapplicable."
+    },
+    {
+      "paths": ["prototypes/mir/platform/factorio/target_profiles.lua"],
+      "targets": ["f200", "f110", "f100"],
+      "effect": "Close lower-target effect-profile inventories for private MIR 4 bootstrap planning; the selected f210 profile is unchanged."
+    },
+    {
+      "paths": ["prototypes/mir/runtime/maximum_level_control.lua"],
+      "targets": ["f200"],
+      "effect": "Use direct startup settings or MIRSET1 only when the target lacks mod-data transport; retain mod-data as the first and unchanged f210 transport."
+    }
+  ],
+  "forbidden_side_effects": [
+    "generic-changed-path-allowance",
+    "directory-or-glob-allowance",
+    "unrelated-package-visible-difference",
+    "cross-target-semantic-inheritance",
+    "release-admission",
+    "seal-or-publication"
+  ],
+  "target_dispositions": {
+    "f210": "approved-exact-composite-package-difference-with-target-local-semantics",
+    "f200": "maximum-level-transport-independently-qualified-in-public-2.5.10-but-new-mir4-plan-required",
+    "f110": "profile-inventory-only-private-bootstrap-plan-refresh-required",
+    "f100": "profile-inventory-only-private-bootstrap-plan-refresh-required"
+  },
+  "proof_obligations": [
+    "static-exact-four-path-delta",
+    "exact-engine-2.1-base-competitor-rollback",
+    "exact-engine-2.0.77-direct-setting-cap",
+    "exact-engine-2.0.77-mirset1-cap",
+    "exact-engine-2.0.77-cap-lowering-configuration-change",
+    "append-only-mir4-plan-and-private-lane-refresh-before-materialization"
+  ],
+  "expiry": [
+    "any-package-source-blob-changes",
+    "candidate-abandoned",
+    "formal-admission-supersedes",
+    "public-allocation-attempted"
+  ],
+  "supersession": "A MIR 4 candidate plan V2 must import this exact composite before any refreshed target may be materialized; later package changes require a new append-only exact delta.",
+  "rollback": "Abandon candidates importing this composite; do not mutate the published MIR 3 predecessors, tags, or archives.",
+  "record_sha256": "ECD4C0A3C3207ACA7E121FD83D6F09CC172D4A601BA90FED659559FE1BC0851A"
+}

@@ -1,32 +1,17 @@
 {
   "authority": "mir-generated-backport-queue-v1",
-  "candidate_id": "not-assigned",
+  "candidate_id": "2.5-P14",
   "generated_from": [
     "path:releases.records/2.5.10.json",
     ""
   ],
   "release": "2.5.10",
   "remaining_obligations": [
-    "focused-qualification",
-    "exact-2.5.9-reproduction-on-2.0.77",
-    "shared-fix-package-visibility-decision",
-    "publish-only-if-applicable"
+    "mod-portal-maintainer-upload",
+    "corrected-terminal-baseline-handoff-to-mir4"
   ],
-  "remaining_states": [
-    "source-frozen",
-    "package-built",
-    "focused-qualified",
-    "candidate-qualified",
-    "automated-qualified-awaiting-human-review",
-    "manually-accepted",
-    "protected-qualified",
-    "sealed",
-    "promoted",
-    "tagged",
-    "published",
-    "publicly-verified"
-  ],
+  "remaining_states": [],
   "schema": 1,
-  "state": "planned",
+  "state": "publicly-verified",
   "target": "2.0"
 }

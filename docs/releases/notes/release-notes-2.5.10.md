@@ -23,13 +23,13 @@ If the applicability gate passes, the release will use the same lossless absolut
 
 | Field | Value |
 | --- | --- |
-| State | `planned` |
-| Candidate | `not-assigned` |
-| Package source commit | `pending` |
-| Archive SHA-256 | `pending` |
-| Content SHA-256 | `pending` |
-| Tag | `pending` |
-| Tag commit | `pending` |
+| State | `publicly-verified` |
+| Candidate | `2.5-P14` |
+| Package source commit | `6bb483de9042a7ec4c93674933e7f6c1670d79aa` |
+| Archive SHA-256 | `251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB` |
+| Content SHA-256 | `55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66` |
+| Tag | `2.5.10` |
+| Tag commit | `6bb483de9042a7ec4c93674933e7f6c1670d79aa` |
 | Assurance exceptions | `pending` |
 
 <!-- MIR-CONTROL-PLANE-IDENTITY:END -->

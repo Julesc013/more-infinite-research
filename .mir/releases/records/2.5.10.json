@@ -1,31 +1,47 @@
 {
   "schema": 1,
   "release": "2.5.10",
-  "candidate_id": "not-assigned",
+  "candidate_id": "2.5-P14",
   "candidate_floor": "2.5-P14",
   "candidate_allocation": {
     "namespace": "2.5-P",
     "predecessor_max_ordinal": 13,
     "minimum_next_ordinal": 14,
-    "assigned_id": null,
-    "assignment_condition": "exact-2.0.77-applicability-and-source-freeze"
+    "assigned_id": "2.5-P14",
+    "assigned_at": "2026-08-17T11:30:03+10:00",
+    "candidate_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "assignment_condition": "satisfied-exact-2.0.77-applicability-and-source-freeze"
   },
   "target": "2.0",
-  "branch": "legacy",
+  "branch": "hotfix/mir3-max-level-2.5.10",
   "development_branch": "dev",
-  "state": "planned",
-  "package": {},
+  "state": "publicly-verified",
+  "package": {
+    "source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+    "source_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+    "archive": "dist/more-infinite-research_2.5.10.zip",
+    "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+    "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+    "bytes": 1062874,
+    "entries": 302
+  },
   "proofs": {
     "authorization": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
     "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
-    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json"
+    "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
+    "tag": {
+      "kind": "annotated-tag",
+      "name": "2.5.10",
+      "commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "tag_object": "30a0b8b2c18125d7078739ef9b3d035871af3568"
+    },
+    "github_publication": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json"
   },
   "assurance_exceptions": [],
   "remaining_obligations": [
-    "focused-qualification",
-    "exact-2.5.9-reproduction-on-2.0.77",
-    "shared-fix-package-visibility-decision",
-    "publish-only-if-applicable"
+    "mod-portal-maintainer-upload",
+    "corrected-terminal-baseline-handoff-to-mir4"
   ],
   "source_release": {
     "release": "2.5.9",
@@ -38,5 +54,5 @@
   "programme": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
   "release_notes": "docs/releases/notes/release-notes-2.5.10.md",
   "incident_ids": [],
-  "updated_at": "2026-08-16T00:00:00+10:00"
+  "updated_at": "2026-08-17T11:35:00+10:00"
 }

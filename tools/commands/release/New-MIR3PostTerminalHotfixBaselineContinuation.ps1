@@ -65,11 +65,13 @@ function Write-Or-CheckJson([string]$Path, $Value) {
 function Get-FileBinding([string]$RelativePath, [string]$Role) {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Continuation input is absent: $RelativePath" }
+  $text = [IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n")
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
   return [ordered]@{
     logical_path = "authority/$($RelativePath.Replace('\','/'))"
     source_path = $RelativePath.Replace("\", "/")
-    sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
-    bytes = [long](Get-Item -LiteralPath $path).Length
+    sha256 = Get-Sha256Bytes $bytes
+    bytes = [long]$bytes.Length
     role = $Role
   }
 }

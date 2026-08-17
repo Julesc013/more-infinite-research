@@ -12,6 +12,16 @@
       "target": "2.1"
     },
     {
+      "branch": "hotfix/mir3-max-level-2.5.10",
+      "candidate_floor": "2.5-P14",
+      "candidate_id": "2.5-P14",
+      "effective_status": "publicly-verified",
+      "release": "2.5.10",
+      "source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "state": "publicly-verified",
+      "target": "2.0"
+    },
+    {
       "branch": "legacy",
       "candidate_floor": "",
       "candidate_id": "2.4.9-final",
@@ -29,16 +39,6 @@
       "release": "2.5.0",
       "source_commit": "493e71a6c883c2e191e1e13c7647cf38a8a8b261",
       "state": "publicly-verified",
-      "target": "2.0"
-    },
-    {
-      "branch": "legacy",
-      "candidate_floor": "2.5-P14",
-      "candidate_id": "not-assigned",
-      "effective_status": "planned",
-      "release": "2.5.10",
-      "source_commit": "",
-      "state": "planned",
       "target": "2.0"
     },
     {

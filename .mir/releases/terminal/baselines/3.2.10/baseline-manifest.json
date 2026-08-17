@@ -8,7 +8,7 @@
   "capture_tool": {
     "path": "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
     "version": "1",
-    "sha256": "DD49F7D60EE8368767E4F00DCA5693E5C10A067F50B8C8F97AA9B1902A1FEE6A"
+    "sha256": "CDA5D8C2D3D6EF2E40FFA1636E688B0C0FD1B49C3C7BD07C98747697DCCD1262"
   },
   "foundation": {
     "release": "3.2.9",
@@ -24,104 +24,104 @@
     "entries": 304,
     "tag": "3.2.10"
   },
-  "input_root_sha256": "9EF5E5A17F61969FCD228E35075B5D55FDAFA3C78BE37A6AADC8CEA2C6AB56E0",
+  "input_root_sha256": "6456A368697CEF8FB31B07F0712EB530AA3888CC640740117410E5409D741829",
   "files": [
     {
       "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json",
       "source_path": ".mir/evidence/terminal-publication/2026-08-16/github/3.2.10.json",
-      "sha256": "1D33737221804194BB92FB1A4B53F833CADD7CEBF07717658512F8096399F352",
-      "bytes": 3479,
+      "sha256": "A3230FC3126EFFEDED7E4318CF951C1B91D1D0CE21F054DCBD0700DAE7D3709F",
+      "bytes": 3405,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json",
       "source_path": ".mir/evidence/terminal-publication/2026-08-16/runtime/3.2.10-base-competitor-rollback.json",
-      "sha256": "D0871CE0F5B5881DF97E86A69B8B9F286264A2D6B13210AEE4965C6C0A733515",
-      "bytes": 1480,
+      "sha256": "59B9039F6A7DFE3DAF6A39E0A1BA70FD599C8DECD4F537FCFD448B018405C9CE",
+      "bytes": 1452,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/deltas/3.2.9-to-3.2.10.json",
       "source_path": ".mir/releases/deltas/3.2.9-to-3.2.10.json",
-      "sha256": "C5AAF258C82AC4EFE419ABD2B2D722BAA0FFEF876991E91246CB163B12FB4EF6",
-      "bytes": 2868,
+      "sha256": "9E84E3D7DB5D0C0F0EEA91313D9FEA3A8089A777BF69DC2D1EC23203C6380F13",
+      "bytes": 2802,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/findings/MIR3-TERM-0032.json",
       "source_path": ".mir/releases/emergency/findings/MIR3-TERM-0032.json",
-      "sha256": "2BE944932B43C41E96A4F42F7D8B97B4DC42AFC0743ADD699ABB4FC6A5469332",
-      "bytes": 2466,
+      "sha256": "AEACDEDB63EC0776C938D66FA35C1492048A0FDC3A75E3CF0760F77F38CCB92F",
+      "bytes": 2425,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/findings/MIR3-TERM-0033.json",
       "source_path": ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
-      "sha256": "1985D3FDC609891EA6D4C98EA6E19800BB0B6B1F06E72BF2AB0D9526EBCC4649",
-      "bytes": 2181,
+      "sha256": "70C91B3F5ABE7C5C9B27A26327E780C3400A0D1869923CF500AB6BE85AA6B1AE",
+      "bytes": 2132,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV1.json",
-      "sha256": "A1516A786862003054523947DFB961572BF4BBF0A5E1DF28C2C105C1358BD6E6",
-      "bytes": 1374,
+      "sha256": "14D1E48A9504D358179E6D8A4B32384F35F333403CC87FFDC199F8A3173442B4",
+      "bytes": 1341,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV1.json",
-      "sha256": "7D953453BBD6912B384347C03743A70925A835BA491795453732874496264686",
-      "bytes": 1462,
+      "sha256": "7D450CDE678F479BCC6F1691AAF6FD51907355E6A146258423E53E78CC050B3D",
+      "bytes": 1430,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV1.json",
-      "sha256": "FB93A8BD9D10B79F218FEF89A4B86F61F8D271B65881416CA5ACDA4D09F2210B",
-      "bytes": 920,
+      "sha256": "861BA547CCEC81705E207D8D8A6EEFE839151CC273DC9977B8F518CF3674CFA8",
+      "bytes": 895,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV1.json",
-      "sha256": "17CCC642B50013A3CD82F7E8F8354998A2506C330DD10A52CBD3EB8F02CAA153",
-      "bytes": 5579,
+      "sha256": "D13DE27E1993636D1BABD2E3D27B225B96D0164F2A07D593BDE2C86536B5188C",
+      "bytes": 5482,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json",
-      "sha256": "D15F3AE96454A975C2C6011E53AF0B4F573EEDE807816EB59438718743D34377",
-      "bytes": 2386,
+      "sha256": "4CD6BDC6B5C98C638929BAE92A7A5B40732A0E2611B77345417321DE11DAA5BB",
+      "bytes": 2335,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV1.json",
-      "sha256": "D5920AAC1ACB4694C14A43463815A13E273748F95F49A4A0FB574102971402DC",
-      "bytes": 1622,
+      "sha256": "4BF0EEE416BD5C9E2B02FE03961A215B276C1F68096F4429EE916DE55C5EF024",
+      "bytes": 1587,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV1.json",
-      "sha256": "442F86BBDCF912C21947E6F43EDDB98558E3564D7014DE075507BD9DA0CBF884",
-      "bytes": 830,
+      "sha256": "511EB9A5BF341EA8EA3D18BEAE1D70426E46DE6045D88C228A19A0ED2F2FEFA8",
+      "bytes": 808,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV1.json",
-      "sha256": "B8EE3D22DD8F7BBD5BC9C00C447CF7FE6ACC27B0AFF8B5989B1FBA1327ABB8E9",
-      "bytes": 1199,
+      "sha256": "3B976C05BB6FA8247E2492B5E62742383AD824B6119C8182CB01D676ABE58930",
+      "bytes": 1168,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/records/3.2.10.json",
       "source_path": ".mir/releases/records/3.2.10.json",
-      "sha256": "59BC883887E2141D872AAFD6BBA9482CBCB44F3FDBF53226C42BBE41D22E0985",
-      "bytes": 4126,
+      "sha256": "5942230DE90A76FC2E29000F539BADB4D2DDDF3371382D7178B3D186ECCC9536",
+      "bytes": 4038,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -169,36 +169,36 @@
     {
       "logical_path": "authority/.mir/releases/transitions/3.2.10-c34-manually-accepted.json",
       "source_path": ".mir/releases/transitions/3.2.10-c34-manually-accepted.json",
-      "sha256": "ADB18E2216FB73F9DA7BD5A93F4534BE491309A9E82877B9E10CB3872617051B",
-      "bytes": 1073,
+      "sha256": "7D83E2BFB59A8EE4689D060854E2675808EDB218C310BCA691F81D90AA9175CC",
+      "bytes": 1049,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/transitions/3.2.10-c34-publicly-verified.json",
       "source_path": ".mir/releases/transitions/3.2.10-c34-publicly-verified.json",
-      "sha256": "26C10FAAADF3811CB8140EAEAE763669089E338E4EC9ABB900F576CCCF9FDA83",
-      "bytes": 378,
+      "sha256": "4DE9B93BCB8364F84BEEB2D26BF3F7856EF9C4A21D02D32B12D9DAF41E065612",
+      "bytes": 363,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/transitions/3.2.10-c34-published.json",
       "source_path": ".mir/releases/transitions/3.2.10-c34-published.json",
-      "sha256": "2237FAB00AEFC51F57E6EE0536923C78012AC6B942EB5ACDAD85B95923CB77E2",
-      "bytes": 347,
+      "sha256": "6184954EF0674E4D68BA8BD4192BD0EFD25225A2EAF42C340E426350A5632BD9",
+      "bytes": 332,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/.mir/releases/transitions/3.2.10-c34-tagged.json",
       "source_path": ".mir/releases/transitions/3.2.10-c34-tagged.json",
-      "sha256": "0F10170CD62D7071DAE18BCC2027F4EB1E2EF093CDBD6F95CE75804F9F724040",
-      "bytes": 955,
+      "sha256": "FB1A717D0A669D9F3966CC7DB8084D8D84BD975373A289006DEE6296D6EBFE81",
+      "bytes": 933,
       "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/docs/releases/notes/release-notes-3.2.10.md",
       "source_path": "docs/releases/notes/release-notes-3.2.10.md",
-      "sha256": "69BCBD8E8CDA15E8CE88B3064B1C11257F41359F3F64700729C76D5B447733C6",
-      "bytes": 2047,
+      "sha256": "B5BC1384E8F3B6D60CF06D45CD8C24832230BEA340ADDE50B757C1EF7B648E95",
+      "bytes": 2002,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -211,8 +211,8 @@
     {
       "logical_path": "authority/tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
       "source_path": "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
-      "sha256": "DD49F7D60EE8368767E4F00DCA5693E5C10A067F50B8C8F97AA9B1902A1FEE6A",
-      "bytes": 15097,
+      "sha256": "CDA5D8C2D3D6EF2E40FFA1636E688B0C0FD1B49C3C7BD07C98747697DCCD1262",
+      "bytes": 15163,
       "role": "post-terminal-hotfix-authority"
     }
   ],
@@ -243,5 +243,5 @@
     ],
     "mir4_behavioral_proof_required": true
   },
-  "record_sha256": "88A443E324F99E1F409338EE533FA6AE4584F0EF2EDE78FD7E2A0554F939B779"
+  "record_sha256": "980519BEB17E1B17F61DA2735482A905142551FDF6C4CC14D4832D4EC2ADA2CA"
 }

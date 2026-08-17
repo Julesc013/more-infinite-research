@@ -36,9 +36,11 @@ $readinessRecord = Get-JsonRecord $readinessRelativePath
 $planRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 $entryGateRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json"
 $registryRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json"
+$currentRegistryRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json"
 $targetProfilesRecord = Get-JsonRecord ".mir/targets.json"
 $visibilityRecord = Get-JsonRecord ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
 $refreshRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json"
+$currentRefreshRecord = Get-JsonRecord ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json"
 
 Assert-True ($engineRecord.Value.observed_at -is [string]) "MIR 4 governed timestamps must remain lexical strings during canonical hash validation."
 Assert-True ($engineRecord.Text | Test-Json -SchemaFile $engineSchemaPath) "MIR 4 engine-availability observation schema validation failed."
@@ -68,6 +70,19 @@ Assert-True ([string]$refreshRecord.Value.kind -ceq "MIR4-Terminal-Predecessor-R
 foreach ($path in @($refreshRecord.Value.imports)) {
   Assert-True (Test-Path -LiteralPath (Join-Path $RepoRoot ([string]$path)) -PathType Leaf) "Predecessor refresh import does not exist: $path"
 }
+Assert-True ([string]$currentRefreshRecord.Value.kind -ceq "MIR4-Terminal-Predecessor-RefreshV2" -and
+  [string]$currentRefreshRecord.Value.status -ceq "accepted-current-pre-eol-package-excluded" -and
+  [string]$currentRefreshRecord.Value.payload.factorio_2_1.predecessor_release -ceq "3.2.10" -and
+  [string]$currentRefreshRecord.Value.payload.factorio_2_0.predecessor_release -ceq "2.5.10" -and
+  [string]$currentRefreshRecord.Value.payload.factorio_2_0.historical_baseline_retained -ceq "2.5.9" -and
+  [string]$currentRefreshRecord.Value.payload.factorio_2_0.engine.version -ceq "2.0.77" -and
+  [string]$currentRefreshRecord.Value.payload.factorio_2_0.engine.executable_sha256 -ceq "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B") "Current MIR 4 Factorio 2.0 predecessor refresh authority is incomplete."
+foreach ($path in @($currentRefreshRecord.Value.imports)) {
+  Assert-True (Test-Path -LiteralPath (Join-Path $RepoRoot ([string]$path)) -PathType Leaf) "Current predecessor refresh import does not exist: $path"
+}
+$currentF200RegistryRows = @($currentRegistryRecord.Value.payload.targets | Where-Object { [string]$_.id -ceq "factorio-2.0" })
+Assert-True ($currentF200RegistryRows.Count -eq 1 -and
+  [string]$currentF200RegistryRows[0].mir3_predecessor -ceq "2.5.10") "Target Registry V3 does not advance the current f200 predecessor to 2.5.10."
 
 $engineTargets = @($engineRecord.Value.targets)
 $readinessTargets = @($readinessRecord.Value.targets)

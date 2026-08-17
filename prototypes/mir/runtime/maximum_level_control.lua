@@ -2,6 +2,9 @@ local M = {}
 M.requires_features = {"scripted_techs"}
 
 local runtime_state = require("prototypes.mir.runtime.state")
+local startup_settings = require("prototypes.mir.runtime.startup_settings")
+local stream_registry = require("prototypes.mir.streams.registry")
+local setting_defaults = require("prototypes.mir.settings.defaults")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 1
@@ -21,6 +24,65 @@ local function prototype_is_infinite(value)
     or (type(value) == "number" and value >= INFINITE_RUNTIME_MAX_LEVEL)
 end
 
+local function selected_maximum(setting_name)
+  local selected = tonumber(startup_settings.get(setting_name))
+  if not selected or selected <= 0 then return "infinite" end
+  return math.floor(selected)
+end
+
+local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
+  if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
+  managed[technology_name] = {
+    source = source,
+    operation = operation,
+    setting = setting_name,
+    selected = selected_maximum(setting_name)
+  }
+end
+
+local function add_generated_runtime_bindings(managed)
+  for key, spec in pairs(stream_registry.snapshot()) do
+    local technology_name = spec.technology_name or ("recipe-prod-" .. tostring(key) .. "-1")
+    add_runtime_binding(
+      managed,
+      technology_name,
+      "ips-max-level-" .. tostring(key),
+      "generated-stream",
+      "runtime-settings-transport"
+    )
+  end
+end
+
+local function add_base_continuation_runtime_bindings(managed)
+  for key, spec in pairs(setting_defaults.base_extensions or {}) do
+    local chain_key = spec.chain_key or key
+    local generated_key = spec.generated_key or chain_key
+    local pattern = "^" .. tostring(generated_key):gsub("([^%w])", "%%%1") .. "%-(%d+)$"
+    local selected_name, selected_level = nil, nil
+    for name, prototype in pairs((prototypes and prototypes.technology) or {}) do
+      local level = tonumber(string.match(name, pattern))
+      if level and prototype_is_infinite(prototype.max_level)
+          and (selected_level == nil or level < selected_level) then
+        selected_name, selected_level = name, level
+      end
+    end
+    if selected_name then
+      add_runtime_binding(
+        managed,
+        selected_name,
+        "mir-max-level-" .. tostring(key),
+        "base-continuation",
+        "runtime-settings-transport"
+      )
+    end
+  end
+end
+
+local function add_runtime_settings_policy(managed)
+  add_generated_runtime_bindings(managed)
+  add_base_continuation_runtime_bindings(managed)
+end
+
 local function current_policy()
   local managed = {}
   local caps = {}
@@ -35,6 +97,9 @@ local function current_policy()
       setting = binding.setting,
       selected = binding.selected
     }
+  end
+  if next(managed) == nil then
+    add_runtime_settings_policy(managed)
   end
 
   for name, policy in pairs(managed) do

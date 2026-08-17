@@ -11,6 +11,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
+. (Join-Path $repo "tools\lib\control\Records.ps1")
 
 function Get-MIRCandidateFields {
   param([Parameter(Mandatory)][string]$Text)
@@ -343,8 +344,18 @@ if ($status -eq "maintainer-accepted-emergency") {
   if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after emergency acceptance." }
   $packageRoots = @(Get-MIRPackageSourceRoots)
   $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
-  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+  if ($LASTEXITCODE -ne 0) {
     throw "Package-visible paths changed after emergency acceptance: $($changedPackagePaths -join ', ')"
+  }
+  if ($changedPackagePaths.Count -gt 0) {
+    try {
+      $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo
+    } catch {
+      throw "Package-visible paths changed after emergency acceptance outside the exact MIR 4 composite: $($changedPackagePaths -join ', '): $($_.Exception.Message)"
+    }
+    if ([string]$freeze.lock_id -cne "mir-3.2.10-c34") {
+      throw "The exact MIR 4 composite did not resolve against the immutable 3.2.10/C34 package lock."
+    }
   }
 
   $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"

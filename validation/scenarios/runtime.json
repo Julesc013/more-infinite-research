@@ -4211,9 +4211,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "static"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "static"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "package-build",
@@ -4226,9 +4236,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "package"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "package"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "runtime-state-contract",
@@ -4241,9 +4261,123 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "runtime-state"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "runtime-state"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-five-streams-2-0",
+        "target_profile": "2.0",
+        "kind": "runtime",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-max-level-2-0"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "max-level"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "factorio-2.0",
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "generated-five-stream-absolute-caps-direct-2-0",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-five-streams-mirset1-2-0",
+        "target_profile": "2.0",
+        "kind": "runtime",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-max-level-2-0"
+        ],
+        "settings": {
+          "NativeOwnerSettingsProfile": "max-level-import"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "factorio-2.0",
+          "full",
+          "maximum-level",
+          "mirset1",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "generated-five-stream-absolute-caps-mirset1-2-0",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-maximum-level-lowering-config-change-2-0",
+        "target_profile": "2.0",
+        "kind": "configuration-change",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [
+          "scripted_techs"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-cap-transition-2-0"
+        ],
+        "settings": {
+          "InitialStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 0
+          },
+          "ChangedStartupSettingOverrides": {
+            "ips-max-level-research_processing_unit": 5
+          }
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "factorio-2.0",
+          "full",
+          "maximum-level",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "generated-completed-levels-retained-above-lowered-cap-2-0",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          },
+          {
+            "id": "generated-invalid-research-removed-after-cap-lowering-2-0",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       },
       {
         "name": "package-zip-base",
@@ -4256,9 +4390,20 @@
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "exact-dist", "full", "package", "smoke"],
+        "tags": [
+          "base",
+          "exact-dist",
+          "full",
+          "package",
+          "smoke"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "factorio-load-and-assertion-fixtures-pass", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       }
     ],
     "1.1": [
@@ -4273,9 +4418,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "static"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "static"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "package-build",
@@ -4288,9 +4443,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "package"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "package"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "runtime-state-contract",
@@ -4303,9 +4468,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "runtime-state"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "runtime-state"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "package-zip-base",
@@ -4318,9 +4493,20 @@
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "exact-dist", "full", "package", "smoke"],
+        "tags": [
+          "base",
+          "exact-dist",
+          "full",
+          "package",
+          "smoke"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "factorio-load-and-assertion-fixtures-pass", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       }
     ],
     "1.0": [
@@ -4335,9 +4521,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "static"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "static"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "package-build",
@@ -4350,9 +4546,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "package"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "package"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "runtime-state-contract",
@@ -4365,9 +4571,19 @@
         "settings": {},
         "source_mode": "gate",
         "timeout_seconds": 120,
-        "tags": ["base", "full", "gate", "runtime-state"],
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "runtime-state"
+        ],
         "isolation": "process",
-        "assertions": [{"id": "gate-passes", "type": "gate-passes"}]
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
       },
       {
         "name": "package-zip-base",
@@ -4380,9 +4596,20 @@
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 120,
-        "tags": ["base", "exact-dist", "full", "package", "smoke"],
+        "tags": [
+          "base",
+          "exact-dist",
+          "full",
+          "package",
+          "smoke"
+        ],
         "isolation": "fresh-data-stage",
-        "assertions": [{"id": "factorio-load-and-assertion-fixtures-pass", "type": "factorio-load-and-assertion-fixtures-pass"}]
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
       }
     ]
   }

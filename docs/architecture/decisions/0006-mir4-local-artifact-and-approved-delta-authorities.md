@@ -1,6 +1,6 @@
 ---
 title: "ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities"
-status: accepted
+status: current
 applies_to: "MIR4-R0 and later governed bootstrap work"
 audience: maintainer
 doc_type: adr
@@ -37,6 +37,8 @@ No lower row authorizes a higher row.
 `MIR4LocalPlaytestShadowAuthorizationV1` admits only f200, f110, and f100 beneath ignored `build/mir4/local-playtest-shadow`. It leaves their release admission blocked by MIR 3 custody and EOL. It forbids public identity, tags, `dist/` writes, uploads, publication, production seals, public release or beta claims, broad support claims, wildcard targets, and generic gate waivers. Because the artifacts use intended numeric versions, transfer is restricted to maintainer-controlled private machines.
 
 `MIR4ApprovedBootstrapCorrectionDeltaV1` applies `MIRApprovedDeltaV1` to `MIR3-TERM-0033`. It admits exactly the two recorded Lua byte transitions for f210 and does not amend `MIR4-Equivalence-PolicyV1`. The comparator accepts baseline metadata differences plus those exact deltas, then requires the remaining difference set to be empty. Lower targets do not inherit the correction; each remains governed by its own source identity and target-local proof.
+
+`MIR4ApprovedBootstrapCorrectionDeltaV2` imports that historical delta and binds the complete four-path package difference after the public 2.5.10 predecessor refresh. It adds the lower-target profile closure and the independently qualified Factorio 2.0 maximum-level transport while leaving f210 on its existing mod-data-first path. This composite permits the control plane to recognize the exact committed source, but it does not amend the V1 candidate plan or private lane; both require append-only V2 authorities before materialization resumes.
 
 ## Fail-closed constraints
 
