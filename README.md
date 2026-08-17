@@ -101,7 +101,8 @@ This table is generated from `prototypes/mir/pipeline/commands.lua`; run `./scri
 | 80 | `emit-compiler-reports` | report | `prototypes/mir/planner/compiler.lua` | `emit-compatibility-diagnostics` |
 | 80 | `emit-compatibility-planner` | report | `prototypes/mir/compatibility/planner.lua` | `emit-compiler-reports` |
 | 90 | `assert-plan-output` | assertion | `prototypes/mir/planner/output_validator.lua` | `emit-compatibility-planner` |
-| 95 | `publish-compiler-artifacts` | publication | `prototypes/mir/pipeline/compiler_orchestrator.lua` | `assert-plan-output` |
+| 92 | `apply-maximum-level-presentation` | emission | `prototypes/mir/pipeline/mutations/maximum_level_presentation.lua` | `assert-plan-output` |
+| 95 | `publish-compiler-artifacts` | publication | `prototypes/mir/pipeline/compiler_orchestrator.lua` | `apply-maximum-level-presentation` |
 | 100 | `flush-diagnostics` | report | `prototypes/mir/report/diagnostics_sink.lua` | `publish-compiler-artifacts` |
 <!-- END GENERATED MIR PIPELINE -->
 
