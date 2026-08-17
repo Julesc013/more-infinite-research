@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2",
+  "status": "passed",
+  "release": "3.2.11",
+  "candidate_id": "C35",
+  "source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+  "archive": {
+    "path": "dist/more-infinite-research_3.2.11.zip",
+    "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "bytes": 1067720,
+    "entries": 305
+  },
+  "builds": [
+    {"id": "A", "kind": "clean-build", "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"},
+    {"id": "B", "kind": "clean-build", "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"},
+    {"id": "C", "kind": "detached-clean-worktree-reconstruction", "worktree": "build/worktrees/mir3-c35-reconstruction-c", "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"}
+  ],
+  "recorded_at": "2026-08-17T23:50:00+10:00"
+}

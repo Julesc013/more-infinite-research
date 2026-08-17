@@ -24,6 +24,7 @@ function M.continuation(base_technology, fields)
     upgrade = fields.upgrade ~= false,
     level = fields.level
   }
+  if fields.hidden ~= nil then technology.hidden = fields.hidden == true end
   for _, field in ipairs(PRESENTATION_FIELDS) do
     if base_technology[field] ~= nil then technology[field] = deepcopy(base_technology[field]) end
   end

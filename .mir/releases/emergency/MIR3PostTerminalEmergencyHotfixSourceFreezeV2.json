@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixSourceFreezeV2",
+  "status": "source-frozen",
+  "release": "3.2.11",
+  "candidate_id": "C35",
+  "source": {
+    "commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "tree": "b6102e8ed616955fc335d784a98357b62111322a",
+    "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+  },
+  "baseline": {
+    "release": "3.2.10",
+    "commit": "4ff688c58c07b695be6ae6ebe021c5c7e5e1fa95",
+    "tag": "3.2.10"
+  },
+  "recorded_at": "2026-08-17T23:50:00+10:00"
+}

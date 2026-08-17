@@ -30,6 +30,22 @@ local M = {}
 
 local function maximum_level_policy(plan)
   local bindings = {}
+  local function presentation(selected)
+    if type(selected) == "number" and selected > 0
+        and target_line.feature_enabled("scripted_techs") then
+      return {
+        mode = "finite-runtime-cap",
+        internal_prototype_max_level = "infinite",
+        show_levels_info = false,
+        visible_when_disabled = true
+      }
+    end
+    return {
+      mode = "native-prototype-maximum",
+      internal_prototype_max_level = selected,
+      show_levels_info = true
+    }
+  end
   for _, row in ipairs(plan.stream_plan.rows or {}) do
     if row.action == "emit" then
       table.insert(bindings, {
@@ -37,7 +53,8 @@ local function maximum_level_policy(plan)
         setting = "ips-max-level-" .. tostring(row.stream_key),
         selected = row.planned_max_level,
         source = "generated-stream",
-        operation = "emit"
+        operation = "emit",
+        presentation = presentation(row.planned_max_level)
       })
     elseif row.action == "adopt" and row.adoption then
       table.insert(bindings, {
@@ -45,7 +62,8 @@ local function maximum_level_policy(plan)
         setting = "ips-max-level-" .. tostring(row.stream_key),
         selected = row.adoption.planned_max_level,
         source = "native-owner",
-        operation = row.adoption.operation
+        operation = row.adoption.operation,
+        presentation = presentation(row.adoption.planned_max_level)
       })
     end
   end
@@ -55,13 +73,14 @@ local function maximum_level_policy(plan)
       setting = "mir-max-level-" .. tostring(operation.key),
       selected = operation.planned_max_level,
       source = "base-continuation",
-      operation = operation.operation
+      operation = operation.operation,
+      presentation = presentation(operation.planned_max_level)
     })
   end
   table.sort(bindings, function(left, right) return left.technology < right.technology end)
   return {
-    schema = 1,
-    kind = "MIRMaximumLevelPolicyV1",
+    schema = 2,
+    kind = "MIRMaximumLevelPolicyV2",
     semantics = "absolute-highest-technology-level",
     bindings = bindings
   }

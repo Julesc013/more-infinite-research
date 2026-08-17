@@ -38,48 +38,59 @@
       "tag_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa"
     },
     "factorio-2.1": {
-      "archive": "dist/more-infinite-research_3.2.10.zip",
-      "archive_bytes": 1065178,
-      "archive_class": "immutable-publicly-verified-release",
-      "archive_entries": 304,
-      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
-      "assurance_exception_ids": [
-        "MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1"
-      ],
+      "archive": "dist/more-infinite-research_3.2.11.zip",
+      "archive_bytes": 1067720,
+      "archive_class": "frozen-unreleased-candidate",
+      "archive_entries": 305,
+      "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "assurance_exception_ids": [],
       "branch": "main",
-      "candidate_floor": "C34",
-      "candidate_id": "C34",
+      "candidate_floor": "C35",
+      "candidate_id": "C35",
       "development_branch": "dev",
       "manual_review": "pending",
-      "mir_version": "3.2.10",
-      "package_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
-      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "mir_version": "3.2.11",
+      "package_content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+      "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
       "package_source_material": {
-        "file_count": 304,
+        "file_count": 305,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a"
+        "source_tree": "b6102e8ed616955fc335d784a98357b62111322a"
       },
-      "package_source_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
-      "package_source_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+      "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+      "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
       "protected_qualification": "pending",
-      "publication_status": "publicly-verified",
-      "qualification": "publicly-verified",
+      "publication_status": "package-built",
+      "qualification": "package-built",
       "remaining_obligations": [
-        "legacy-branch-alias-repoint",
-        "corrected-terminal-baseline-handoff-to-mir4"
+        "focused-qualification",
+        "root-cause-regression",
+        "exact-engine-qualification",
+        "protected-promotion",
+        "tag-and-publication"
       ],
-      "remaining_states": [],
-      "source_anchor": "3.2.9",
-      "status": "C34-publicly-verified",
-      "tag": "3.2.10",
-      "tag_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"
+      "remaining_states": [
+        "focused-qualified",
+        "candidate-qualified",
+        "automated-qualified-awaiting-human-review",
+        "manually-accepted",
+        "protected-qualified",
+        "sealed",
+        "promoted",
+        "tagged",
+        "published",
+        "publicly-verified"
+      ],
+      "source_anchor": "3.2.10",
+      "status": "C35-package-built"
     }
   },
   "generated_from": [
     "path:releases.current",
-    "path:releases.records/3.2.10.json",
-    "path:releases.records/2.5.10.json"
+    "path:releases.records/3.2.11.json",
+    "path:releases.records/2.5.10.json",
+    "path:releases.records/3.2.10.json"
   ],
   "published_baselines": {
     "factorio-2.0": {

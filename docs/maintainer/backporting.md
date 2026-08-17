@@ -1,7 +1,7 @@
 ---
 title: "Target-Line Versioning And Backports"
 status: current
-applies_to: "MIR 3.2.5 through 3.2.10 and successor terminal aliases"
+applies_to: "MIR 3.2.5 through the authorized 3.2.11/2.5.11 emergency hotfixes and successor terminal aliases"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
@@ -20,13 +20,13 @@ The permanent remote topology contains `main`, `dev`, and `legacy`.
 
 | Branch | Role |
 | --- | --- |
-| `main` | Published Factorio 2.1 line, promoted to the accepted `3.2.10` emergency hotfix. |
+| `main` | Published Factorio 2.1 line at immutable `3.2.10`; authorized to advance only through the qualified `3.2.11` emergency hotfix. |
 | `dev` | Canonical integration line for the corrected terminal authority and MIR 4 handoff. |
 | `legacy` | Movable previous-major terminal alias. It currently points at MIR 3.2.10 through a two-parent exact-tree commit; when MIR 5 opens, it may advance once to the sealed MIR 4 terminal authority and remain pinned there for the MIR 5 lifecycle. |
 
 Temporary target worktrees or candidate branches are disposable qualification surfaces. Delete their remote branches after publication while retaining immutable tags and evidence. Never use `legacy` or a historical target branch as scratch space.
 
-The `legacy` role changed under `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`. Factorio 2.0 release `2.5.9` remains immutable and downloadable through its annotated tag and release; moving the branch does not replace that history. `2.5.10` was not published and MIR makes no new 2.0 hotfix claim. This exception supersedes the branch-routing text below only where it describes `legacy` as the active 2.0 lane; the historical materialization record remains authoritative for the completed `.9` family.
+The `legacy` role changed under `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`. Factorio 2.0 releases `2.5.9` and `2.5.10` remain immutable and downloadable through their annotated tags and releases; moving the branch does not replace that history. The authorized `2.5.11` source is rooted at the immutable `2.5.10` release commit, not at `legacy`. This exception supersedes the branch-routing text below only where it describes `legacy` as the active 2.0 lane; the historical materialization records remain authoritative.
 
 Advance `legacy` only at a major-generation handoff after the outgoing major's terminal release is sealed. Preserve the old `legacy` head as the first parent, use the new terminal authority as the second semantic parent, require the alias tree to equal that terminal authority exactly, and never force-push. This makes `legacy` usable as the MIR 4 terminal pin throughout MIR 5 without sacrificing the MIR 3 or Factorio 2.0 tags.
 
@@ -34,8 +34,8 @@ Advance `legacy` only at a major-generation handoff after the outgoing major's t
 
 | MIR line | Exact Factorio target for the `.5` / `.9` wave | Frozen predecessor | Terminal release |
 | --- | --- | --- | --- |
-| `3.2.x` | `2.1` | `3.2.5` | `3.2.9` historical terminal; `3.2.10` current emergency continuation |
-| `2.5.x` | `2.0` | `2.5.5` | `2.5.9` |
+| `3.2.x` | `2.1` | `3.2.10` | `3.2.11` authorized emergency continuation |
+| `2.5.x` | `2.0` | `2.5.10` | `2.5.11` authorized emergency continuation |
 | `1.9.x` | `1.1.110` | `1.9.5` | `1.9.9` |
 | `1.8.x` | `1.0.0` only | `1.8.5` | `1.8.9` |
 | `1.7.x` | `0.17.79` | `1.7.5` | `1.7.9` |
@@ -48,7 +48,7 @@ Historical transition exceptions remain historical: MIR `1.9.0` through `1.9.2` 
 
 ## Terminal version rule
 
-The post-terminal `3.2.10` maximum-level exception and the `legacy` alias are governed by the emergency authority above. The rules in this section remain the historical policy for the completed `.5`/`.9` wave.
+The post-terminal `.10` and `.11` maximum-level exceptions and the `legacy` alias are governed by their append-only emergency authorities. The rules in this section remain the historical policy for the completed `.5`/`.9` wave.
 
 - Published `.5` packages and tags never change.
 - Do not create `.6`, `.7`, or `.8` releases.

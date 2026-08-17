@@ -18,6 +18,7 @@ superseded_by: []
 
 | Release | Candidate | Namespace / minimum next ordinal | Target | Branch | Historical state | Effective status | Exceptions |
 | --- | --- | --- | --- | --- | --- | --- | ---: |
+| `3.2.11` | `C35` | `C / 35` | `2.1` | `main` | `package-built` | `package-built` | 0 |
 | `3.2.10` | `C34` | `C / 34` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.9` | `C33` | `C / 33` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 0 |
 | `3.2.5` | `C32` | `C32` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
@@ -25,6 +26,7 @@ superseded_by: []
 | `3.2.3` | `C30` | `pending` | `2.1` | `main` | `publicly-verified` | `publicly-verified` | 1 |
 | `3.2.2` | `C24` | `pending` | `2.1` | `main` | `tagged` | `tagged` | 1 |
 | `3.2.1` | `C21` | `pending` | `2.1` | `main` | `published` | `published` | 1 |
+| `2.5.11` | `not-assigned` | `2.5-P15` | `2.0` | `hotfix/mir3-max-level-2.5.11` | `planned` | `planned` | 0 |
 | `2.5.10` | `2.5-P14` | `2.5-P / 14` | `2.0` | `hotfix/mir3-max-level-2.5.10` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.9` | `2.5-P13` | `2.5-P / 13` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 0 |
 | `2.5.5` | `2.5-P12` | `pending` | `2.0` | `legacy` | `publicly-verified` | `publicly-verified` | 1 |

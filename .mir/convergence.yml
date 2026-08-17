@@ -1,11 +1,11 @@
 schema: 1
 
 release:
-  version: "3.2.10"
+  version: "3.2.11"
   branch: dev
   factorio_version: "2.1"
-  baseline_commit: a60230a0695d2dd8fd1e727744614e746cda0bd8
-  baseline_tag: "3.2.9"
+  baseline_commit: 4ff688c58c07b695be6ae6ebe021c5c7e5e1fa95
+  baseline_tag: "3.2.10"
   objective: bounded-correctness-and-contract-modernization
   public_contract_change: patch-compatible
 
@@ -207,12 +207,12 @@ superseded_candidates:
     status: superseded-runtime-fixture-rejected-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_3.2.10.zip
-  source_commit: 19ddb7db4c960f77aef53d2bb47d23e0f311918f
-  package_source_commit: 19ddb7db4c960f77aef53d2bb47d23e0f311918f
-  automated_gate: passed-local-2.1.14-release-exception
-  manual_gate: accepted-for-publication
-  status: maintainer-accepted-emergency
+  artifact: dist/more-infinite-research_3.2.11.zip
+  source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
+  package_source_commit: 0a32864d1f1d1fdea090369bc1a22fbd511e290a
+  automated_gate: pending-qualification
+  manual_gate: pending-exact-candidate-review
+  status: package-built
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority
