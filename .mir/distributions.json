@@ -501,8 +501,8 @@
     {
       "version": "3.2.11",
       "path": "dist/more-infinite-research_3.2.11.zip",
-      "bytes": 1067547,
-      "sha256": "8850AC99387B987C18C05DA437528B21C979B69471D63AC5BCF1BE6F2DCFA2C3",
+      "bytes": 1067556,
+      "sha256": "024EE5CE2FD52C9F339CA6F62A1AE03C683338A94E4CCE1D852A86F8020E1285",
       "kind": "emergency-probe-awaiting-candidate-qualification",
       "source_ref": "planned/3.2.11-C35-floor"
     }
