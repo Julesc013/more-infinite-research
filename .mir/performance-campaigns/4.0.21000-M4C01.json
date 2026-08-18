@@ -24,6 +24,7 @@
   },
   "manual_scenarios": "validation/scenarios/local-2.1.json",
   "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_policy": "required",
   "artifact_volume_lanes": ["diagnostics-off.factorio-total", "diagnostics-on.factorio-total"],
   "phase_lanes": [
     {"id":"compiler.snapshot","probe_phase":"snapshot"},
