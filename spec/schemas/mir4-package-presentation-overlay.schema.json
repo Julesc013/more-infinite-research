@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://mir.invalid/schemas/mir4-package-presentation-overlay.schema.json",
+  "type":"object",
+  "required":["schema","kind","status","approved_by","package_visible","semantic_authority","gameplay_difference_authorized","public_output_authorized","source_version","candidate_wave","output_root","allowed_changed_files","targets","record_sha256"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4PackagePresentationOverlayV1"},"status":{"const":"authorized-candidate-presentation"},
+    "package_visible":{"const":true},"semantic_authority":{"const":false},"gameplay_difference_authorized":{"const":false},"public_output_authorized":{"const":false},
+    "source_version":{"const":"4.0.0"},"candidate_wave":{"const":"M4C01"},"output_root":{"const":"build/mir4/m4c01-player-candidates"},
+    "allowed_changed_files":{"const":["README.md","changelog.txt"]},
+    "targets":{"type":"array","minItems":10,"maxItems":10},"record_sha256":{"type":"string","pattern":"^[A-F0-9]{64}$"}
+  }
+}

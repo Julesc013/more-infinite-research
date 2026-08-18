@@ -47,6 +47,7 @@
     "local-2-0-base-baseline": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-space-age-baseline-if-installed": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bz-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-bz-suite-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bob-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-angels-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bob-angels": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},

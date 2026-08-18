@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "MIR4HistoricalPrivateCandidateAuthorizationV1",
+  "status": "authorized-private-experimental",
+  "recorded_at": "2026-08-18T12:00:00+10:00",
+  "approved_by": "explicit-maintainer-approval-2026-08-18",
+  "package_visible": false,
+  "semantic_authority": false,
+  "public_output_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "output_root": "build/mir4/historical-private",
+  "imports": [".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json"],
+  "targets": [
+    {"target_key":"f018","factorio_line":"0.18","distribution_version":"4.0.01800","predecessor_release":"1.7.9","predecessor_archive":"dist/more-infinite-research_1.7.9.zip","predecessor_archive_sha256":"B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C","predecessor_snapshot":".mir/releases/terminal/baselines/1.7.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"17C7C1C73D3E6CA22FF116843ABCA475411FD28FCEE7EFCE040E0214F390B6B1","projection":"bridge-factorio-metadata-0.17-to-0.18","engine":{"status":"missing-at-authorization","required_line":"0.18"}},
+    {"target_key":"f017","factorio_line":"0.17","distribution_version":"4.0.01700","predecessor_release":"1.7.9","predecessor_archive":"dist/more-infinite-research_1.7.9.zip","predecessor_archive_sha256":"B6BDCD54C5952F986155ED4D78D92E109E90AD38D2CA9EC609034A848152CA2C","predecessor_snapshot":".mir/releases/terminal/baselines/1.7.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"17C7C1C73D3E6CA22FF116843ABCA475411FD28FCEE7EFCE040E0214F390B6B1","projection":"metadata-only","engine":{"version":"0.17.79","sha256":"E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"}},
+    {"target_key":"f016","factorio_line":"0.16","distribution_version":"4.0.01600","predecessor_release":"1.6.9","predecessor_archive":"dist/more-infinite-research_1.6.9.zip","predecessor_archive_sha256":"928916C96C500AD1441455563F0559EF330A4814DD6C9630ADA9E9B698248B84","predecessor_snapshot":".mir/releases/terminal/baselines/1.6.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"CE6E8F094D932C2E8D848944B6226431AF98D774FD3A85662A6A7C63CCEC9C32","projection":"metadata-only","engine":{"version":"0.16.51","sha256":"ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"}},
+    {"target_key":"f015","factorio_line":"0.15","distribution_version":"4.0.01500","predecessor_release":"1.5.9","predecessor_archive":"dist/more-infinite-research_1.5.9.zip","predecessor_archive_sha256":"85255CB5E8F8B482387454C92A16660276009E0A5D301FBDE38BF8944F72E24E","predecessor_snapshot":".mir/releases/terminal/baselines/1.5.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"6B2A053C3D6923A06A6F882C5398751F8D405C6337E6E9987A3B2788B329183A","projection":"metadata-only","engine":{"version":"0.15.40","sha256":"A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"}},
+    {"target_key":"f014","factorio_line":"0.14","distribution_version":"4.0.01400","predecessor_release":"1.4.9","predecessor_archive":"dist/more-infinite-research_1.4.9.zip","predecessor_archive_sha256":"1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872","predecessor_snapshot":".mir/releases/terminal/baselines/1.4.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"1DD04B872F6A469C3985BFFB320AA237E519927BF0F1FA71B7390159F5EED03B","projection":"metadata-only","engine":{"version":"0.14.23","sha256":"A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"}},
+    {"target_key":"f013","factorio_line":"0.13","distribution_version":"4.0.01300","predecessor_release":"1.3.9","predecessor_archive":"dist/more-infinite-research_1.3.9.zip","predecessor_archive_sha256":"CF540E5ED6902BC0B97F0AC98D17875001B286183647C604CB065A8078B1AD5A","predecessor_snapshot":".mir/releases/terminal/baselines/1.3.9/normalized-snapshot.json","predecessor_snapshot_record_sha256":"3DAC19F059738A45A5FFF326A5009DAFD83F11571EED0E7B174F3E0F906A6620","projection":"metadata-only","engine":{"version":"0.13.20","sha256":"F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856"}}
+  ],
+  "allowed_differences": ["archive-root","info.json#/version","f018-only:info.json#/factorio_version","f018-only:info.json#/dependencies/base"],
+  "required_proof": ["three-byte-identical-builds","package-surface-comparison","exact-engine-load-when-engine-present","direct-predecessor-upgrade","two-reloads","manual-review-before-admission"],
+  "hard_boundary": "These candidates are private experimental test inputs. They are not public releases or support claims and cannot be signed, sealed, tagged, uploaded, or published under this authority.",
+  "record_sha256": "8400581F076D0E43F928B48465A595359EABDB55A267AE58E5FAB202C7B701ED"
+}

@@ -1,17 +1,17 @@
 ---
-title: "MIR 4 Experimental API V0"
+title: "MIR 4 API/SDK V0 Preview"
 status: current
-applies_to: "4.0 bootstrap tooling"
+applies_to: "4.0 developer preview"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-17
+last_reviewed: 2026-08-18
 supersedes: []
 superseded_by: []
 ---
-# MIR 4 Experimental API V0
+# MIR 4 API/SDK V0 Preview
 
-Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read-only experimental tooling, not stable MEP 1.0 or a public support contract.
+Generated from `spec/api/mir4-v0/contracts.json`. This is real, package-excluded, read-only developer-preview tooling. Compatibility may change before 1.0 and it does not establish a player support claim.
 
 ## Quickstart
 
@@ -19,6 +19,8 @@ Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read
 - `.\tools\mir.ps1 mir4 sdk check`
 - `.\tools\mir.ps1 mir4 api check`
 - `.\tools\mir.ps1 mir4 api conformance`
+- `.\tools\mir.ps1 mir4 platform conformance`
+- `.\tools\mir.ps1 mir4 platform package`
 
 | Kind | Purpose |
 | --- | --- |
@@ -31,4 +33,4 @@ Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read
 
 Canonical JSON recursively sorts object keys, preserves array order, uses compact UTF-8, and hashes the record with `digest` omitted. Unknown top-level fields, invalid reverse-DNS namespaces, more than 128 capabilities, more than 32 extensions, and digest mismatch fail closed.
 
-Target transports: f210 may use a proven read-only projection; f200 remains stage-local/package-excluded; f110 and f100 use build-time static manifests. Mutable compiler context, executors, and safety internals are never exposed.
+Target transports are read-only. Mutable compiler context, executors, SafetyKernel internals, and prototype emission are never exposed. MEP V0, the reference extension, Inspector, target-provider projections, shadow compilation runs, Runtime/State inventory, and ProcessIR reports are distributed as separate preview assets.

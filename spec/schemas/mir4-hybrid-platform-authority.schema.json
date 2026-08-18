@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-hybrid-platform-authority.schema.json",
+  "type": "object",
+  "required": ["schema","kind","status","recorded_at","package_visible","record_sha256"],
+  "properties": {
+    "schema": {"type":"integer","minimum":1},
+    "kind": {"enum":["MIR4-Target-RegistryV5","MIR4PlatformMaturityAndPublicationContractV1","MIR4CandidateWaveProgrammeV1"]},
+    "status": {"type":"string","minLength":1},
+    "recorded_at": {"type":"string","minLength":1},
+    "package_visible": {"const":false},
+    "record_sha256": {"type":"string","pattern":"^[A-F0-9]{64}$"}
+  }
+}

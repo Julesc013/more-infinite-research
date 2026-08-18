@@ -46,9 +46,23 @@ package_excluded_modules:
     authority: spec/api/mir4-v0/contracts.json
     implementation: tools/lib/mir4/ExperimentalApiSdk.ps1
     command: tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
-    generated_root: sdk/experimental/mir4
+    generated_root: sdk/preview/mir4/api-v0
+    legacy_generated_root: sdk/experimental/mir4
     boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
-    stability: experimental-not-public-api
+    stability: developer-preview-may-change-before-1.0
+  mir4_platform_preview_v0:
+    authority: spec/platform/mir4-preview-v0/platform.json
+    implementation: tools/lib/mir4/PlatformPreview.ps1
+    safety_kernel: tools/lib/mir4/SafetyKernel.ps1
+    policy_engine: tools/lib/mir4/PolicyEngine.ps1
+    normalized_compiler: tools/lib/mir4/NormalizedCompiler.ps1
+    runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
+    process_ir: tools/lib/mir4/ProcessIR.ps1
+    release_dag: tools/lib/mir4/ReleaseDag.ps1
+    command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
+    generated_root: sdk/preview/mir4
+    boundary: read-only projections and diagnose-only shadow execution; no prototype emission, state mutation, or public support authority
+    stability: developer-preview-and-shadow
 
 runtime_boundaries:
   control.lua:
@@ -828,6 +842,30 @@ validation_tooling:
     mir4_bootstrap_git_source_proof_schema: spec/schemas/mir4-bootstrap-git-source-proof.schema.json
     mir4_bootstrap_reconstruction_receipt_schema: spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json
     mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
+    mir4_platform_preview: tools/lib/mir4/PlatformPreview.ps1
+    mir4_safety_kernel: tools/lib/mir4/SafetyKernel.ps1
+    mir4_policy_engine: tools/lib/mir4/PolicyEngine.ps1
+    mir4_normalized_compiler: tools/lib/mir4/NormalizedCompiler.ps1
+    mir4_runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
+    mir4_process_ir: tools/lib/mir4/ProcessIR.ps1
+    mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1
+    mir4_release_dag_spec: spec/platform/mir4-preview-v0/release-dag.json
+    mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
+    mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1
+    mir4_platform_preview_gate: validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+    mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
+    mir4_candidate_wave_authority: .mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json
+    mir4_m4c01_implementation_authority: .mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json
+    mir4_target_registry_current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
+    mir4_hybrid_platform_authority_schema: spec/schemas/mir4-hybrid-platform-authority.schema.json
+    mir4_m4c01_authority_schema: spec/schemas/mir4-m4c01-implementation-authorization.schema.json
+    mir4_hybrid_platform_authority_gate: validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1
+    mir4_historical_private_candidate_authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json
+    mir4_historical_private_candidate_authority_schema: spec/schemas/mir4-historical-private-candidate-authorization.schema.json
+    mir4_historical_private_candidate_builder: tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1
+    mir4_package_presentation_authority: .mir/releases/waves/mir4-r0/MIR4-Package-Presentation-OverlayV1.json
+    mir4_package_presentation_authority_schema: spec/schemas/mir4-package-presentation-overlay.schema.json
+    mir4_m4c01_player_candidate_builder: tools/commands/release/New-MIR4M4C01PlayerCandidateSet.ps1
     mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
     mir4_bootstrap_capsule_runner: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
     mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
@@ -900,6 +938,8 @@ validation_tooling:
     approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1
     control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
     control_plane_performance_campaigns: .mir/performance-campaigns
+    mir4_m4c01_f210_performance_campaign: .mir/performance-campaigns/4.0.21000-M4C01.json
+    mir4_m4c01_f200_performance_campaign: .mir/performance-campaigns/4.0.20000-M4C01.json
     runtime_performance_gate: validation/tests/release/Test-MIRPerformanceRegression.ps1
     manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
@@ -919,6 +959,7 @@ validation_tooling:
     compiler_authority_generator: tools/commands/compiler/Update-MIRCompilerAuthorities.ps1
     compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
+    mir4_historical_private_runtime: validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1
     verification_domains: validation/domains.yml
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
@@ -980,6 +1021,7 @@ validation_tooling:
     - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
     - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
     - MIR 4 distribution target codes are immutable three-digit decimal strings retained unchanged through Target Registry V3; leading zeroes are semantic and the values are never parsed as octal
+    - MIR 4 historical private archives retain padded distribution identities while historical Factorio engines may normalize the displayed numeric patch component; evidence binds both forms and never changes the archive identity
     - MIR 4 V1 and V2 target registries are frozen historical evidence; V3 advances only append-only terminal predecessor authority while executable distribution encoding remains governed by the unchanged V2 codec authority
     - MIR 4 bootstrap records use the BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer; the byte-bound detached capsule pre-verifier reproduces that ABI only until the extracted canonical authority revalidates every record
     - MIR 4 capsule V2 binds the exact package source Git objects, reconstruction tools, schemas, authorities, complete PowerShell home, deterministic member roles and identities, and canonical package builder; A and B run in distinct fresh processes, their complete workspaces are deleted, and C receives only copied immutable capsule inputs without a checkout argument or inherited checkout working directory

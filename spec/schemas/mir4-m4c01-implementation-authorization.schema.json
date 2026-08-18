@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-m4c01-implementation-authorization.schema.json",
+  "type": "object",
+  "required": ["schema","kind","status","recorded_at","approved_by","approval_phrase","baseline","branch","eol_path","authorized","not_authorized","record_sha256"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4M4C01ImplementationAuthorizationV1"},
+    "status": {"const":"authorized-in-progress"},
+    "approved_by": {"const":"explicit-maintainer-approval-2026-08-18"},
+    "record_sha256": {"type":"string","pattern":"^[A-F0-9]{64}$"}
+  }
+}

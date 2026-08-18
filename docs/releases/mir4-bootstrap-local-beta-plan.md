@@ -1,13 +1,14 @@
 ---
 title: "MIR 4 Bootstrap Local Beta Plan"
-status: current
+status: archived
 applies_to: "MIR4-R0 through MIR4-4.0.0"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
 last_reviewed: 2026-08-17
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/releases/mir4-4.0-candidate-programme.md
 ---
 
 # MIR 4 Bootstrap Local Beta Plan

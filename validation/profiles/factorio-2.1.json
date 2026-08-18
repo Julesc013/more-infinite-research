@@ -7,11 +7,13 @@
   "deterministic_seed": 320021,
   "running_evidence_ttl_minutes": 360,
   "trusted_repository": "self",
+  "release_authority_mode": "candidate-programme",
+  "release_authority": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
   "qualification_factorio_version": "2.1.14",
   "minimum_factorio_version": "2.1.8",
   "upgrade": {
-    "from_version": "3.2.10",
-    "to_version": "3.2.11",
-    "fixture": "assert-upgrade-3-2-9-to-3-2-10"
+    "from_version": "3.2.11",
+    "to_version": "4.0.21000",
+    "fixture": "assert-upgrade-3-2-11-to-4-0-21000"
   }
 }

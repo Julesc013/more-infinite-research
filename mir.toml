@@ -1,0 +1,23 @@
+schema = 1
+source_version = "4.0.0"
+candidate_wave = "M4C01"
+platform_contract = "spec/platform/mir4-preview-v0/platform.json"
+target_registry = ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json"
+compatibility_manifest = ".mir/compatibility.yml"
+stream_manifest = ".mir/streams.yml"
+fixture_manifest = ".mir/fixtures.yml"
+module_manifest = ".mir/modules.yml"
+
+[boundaries]
+player_package = "stable-only"
+developer_assets = "preview"
+compiler_replacement = "shadow"
+autonomous_synthesis = "diagnose-only"
+historical_targets = "private-experimental"
+
+[commands]
+generate = ".\\tools\\mir.ps1 mir4 platform generate"
+check = ".\\tools\\mir.ps1 mir4 platform check"
+conformance = ".\\tools\\mir.ps1 mir4 platform conformance"
+package = ".\\tools\\mir.ps1 mir4 platform package"
+compile = ".\\tools\\mir.ps1 mir4 platform compile --target f210 --extension sdk/preview/mir4/reference-extension/extension.json --output build/results/mir4-shadow/reference-f210.json"

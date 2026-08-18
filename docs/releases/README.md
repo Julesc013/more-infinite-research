@@ -1,11 +1,11 @@
 ---
 title: "Releases"
 status: current
-applies_to: "MIR 3 terminal release train and MIR 4 bootstrap"
+applies_to: "MIR 3 terminal release train and MIR 4.0 candidate programme"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-16
+last_reviewed: 2026-08-18
 supersedes: []
 superseded_by: []
 ---
@@ -40,7 +40,9 @@ The historical `.5` publication exceptions remain release-specific. They do not 
 - [Current Mod Portal page](mod-portal-page.md)
 - [Release-note index](notes/README.md)
 - [MIR 4 offline release authority](../architecture/mir4-offline-release-authority.md)
-- [MIR 4 bootstrap local beta plan](mir4-bootstrap-local-beta-plan.md)
+- [MIR 4.0 candidate programme](mir4-4.0-candidate-programme.md)
+- [MIR 4.0 prepared publication copy and FAQ](mir4-4.0-publication-copy.md)
+- [Superseded MIR 4 bootstrap local beta plan](mir4-bootstrap-local-beta-plan.md)
 
 ## Historical records
 

@@ -1,0 +1,27 @@
+{
+  "schema": 0,
+  "kind": "MIR4ReleaseDagV0",
+  "status": "stable-workflow-contract-production-actions-locked",
+  "nodes": [
+    {"id":"authority","depends_on":[],"mutation":"none","authorization":"candidate-programme","outputs":["exact-target-authority"]},
+    {"id":"build-abc","depends_on":["authority"],"mutation":"private-build","authorization":"candidate-programme","outputs":["byte-identical-candidates","package-surface-lock"]},
+    {"id":"build-developer-preview","depends_on":["authority"],"mutation":"private-build","authorization":"candidate-programme","outputs":["deterministic-preview-assets","embedded-manifests","checksums"]},
+    {"id":"static","depends_on":["build-abc","build-developer-preview"],"mutation":"none","authorization":"candidate-programme","outputs":["static-evidence","package-exclusion-proof"]},
+    {"id":"platform-conformance","depends_on":["build-developer-preview","static"],"mutation":"none","authorization":"candidate-programme","outputs":["api-sdk-mep-conformance","standalone-portability","shadow-non-interference"]},
+    {"id":"runtime","depends_on":["build-abc","static"],"mutation":"private-runtime","authorization":"candidate-programme","outputs":["fresh-load","direct-upgrade","two-reloads"]},
+    {"id":"performance","depends_on":["runtime"],"mutation":"private-runtime","authorization":"candidate-programme","outputs":["performance-evidence"]},
+    {"id":"manual-review","depends_on":["runtime"],"mutation":"human-attestation","authorization":"candidate-programme","outputs":["manual-review-attestation"]},
+    {"id":"target-admission","depends_on":["performance","manual-review"],"mutation":"none","authorization":"candidate-programme","outputs":["mandatory-target-decision","conditional-target-dispositions"]},
+    {"id":"aggregate-qualification","depends_on":["platform-conformance","target-admission"],"mutation":"none","authorization":"candidate-programme","outputs":["verified-evidence-closure"]},
+    {"id":"sign","depends_on":["aggregate-qualification"],"mutation":"sign","authorization":"separate-production-go-no-go","outputs":["signatures"]},
+    {"id":"seal","depends_on":["sign"],"mutation":"seal","authorization":"separate-production-go-no-go","outputs":["production-seals"]},
+    {"id":"publication-dry-run-a","depends_on":["seal"],"mutation":"none","authorization":"separate-production-go-no-go","outputs":["dry-run-a"]},
+    {"id":"publication-dry-run-b","depends_on":["seal"],"mutation":"none","authorization":"separate-production-go-no-go","outputs":["dry-run-b"]},
+    {"id":"restore","depends_on":["publication-dry-run-a","publication-dry-run-b"],"mutation":"none","authorization":"separate-production-go-no-go","outputs":["restore-receipt"]},
+    {"id":"promote-main","depends_on":["restore"],"mutation":"promote","authorization":"separate-production-go-no-go","outputs":["exact-tree-promotion"]},
+    {"id":"tag","depends_on":["promote-main"],"mutation":"tag","authorization":"separate-production-go-no-go","outputs":["source-and-distribution-tags"]},
+    {"id":"publish-github","depends_on":["tag"],"mutation":"publish","authorization":"separate-production-go-no-go","outputs":["github-assets"]},
+    {"id":"publish-mod-portal","depends_on":["tag"],"mutation":"publish","authorization":"separate-production-go-no-go","outputs":["player-packages-only"]},
+    {"id":"public-readback","depends_on":["publish-github","publish-mod-portal"],"mutation":"none","authorization":"separate-production-go-no-go","outputs":["immutable-redownload-receipts"]}
+  ]
+}

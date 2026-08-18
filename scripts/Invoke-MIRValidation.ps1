@@ -665,7 +665,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
+  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "mir4-mep-v0", "mir4-process-ir-v0", "museum", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -694,6 +694,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-2-5-11" = "2.0"
+      "assert-upgrade-2-5-11-to-4-0-20000" = "2.0"
     }
     $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
       $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
@@ -2552,7 +2553,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "mir4-mep-v0", "mir4-process-ir-v0", "museum", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",

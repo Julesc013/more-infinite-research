@@ -81,6 +81,37 @@
       "notes": "Factorio 2.0 BZ resource suite without assuming the Space Age bundle."
     },
     {
+      "name": "local-2-0-bz-suite-space-age",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Locally available BZ resource suite against the official Factorio 2.0 Space Age bundle."
+    },
+    {
       "name": "local-2-0-bob-core-suite",
       "targets": [
         "2.0"

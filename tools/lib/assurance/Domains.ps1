@@ -17,9 +17,30 @@ function Get-MIRAssuranceVerificationProfile {
     throw "Verification profile is invalid for Factorio $Target`: $path"
   }
   $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $candidateProgramme = [string]$profile.release_authority_mode -eq 'candidate-programme'
+  if ($candidateProgramme) {
+    $authorityRelative = [string]$profile.release_authority
+    if ([string]::IsNullOrWhiteSpace($authorityRelative)) {
+      throw "Candidate-programme verification profile has no release authority: $path"
+    }
+    $authorityPath = Join-Path $repo $authorityRelative
+    if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
+      throw "Candidate-programme release authority is missing: $authorityRelative"
+    }
+    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+    if ([string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+        [string]$authority.status -ne 'authorized-in-progress' -or
+        [string]$authority.baseline.commit -ne 'b460edd330dc19524bad97a2374c4c40c3b2ef36') {
+      throw "Candidate-programme release authority is invalid: $authorityRelative"
+    }
+    $fixturePath = Join-Path $repo ("fixtures/" + [string]$profile.upgrade.fixture)
+    if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
+      throw "Candidate-programme upgrade fixture is missing: $fixturePath"
+    }
+  }
   $releaseRoot = Resolve-MIRAssuranceRepoPathId -Id "releases.records"
   $releasePath = Join-Path $repo (Join-Path $releaseRoot "$($info.version).json")
-  if (Test-Path -LiteralPath $releasePath -PathType Leaf) {
+  if (-not $candidateProgramme -and (Test-Path -LiteralPath $releasePath -PathType Leaf)) {
     $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json
     if ([string]$release.release -eq [string]$info.version -and [string]$release.target -eq $Target) {
       foreach ($field in @("from_version", "to_version", "fixture")) {

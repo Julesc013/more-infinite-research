@@ -592,6 +592,68 @@
       ]
     },
     {
+      "id": "static.mir4-platform-preview",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "mir.toml",
+        "mir.lock",
+        "spec/platform/mir4-preview-v0/**",
+        "spec/schemas/preview/**",
+        "sdk/preview/mir4/**",
+        "fixtures/mir4-mep-v0/**",
+        "fixtures/mir4-process-ir-v0/**",
+        "tools/lib/mir4/ExperimentalApiSdk.ps1",
+        "tools/lib/mir4/PlatformPreview.ps1",
+        "tools/lib/mir4/SafetyKernel.ps1",
+        "tools/lib/mir4/PolicyEngine.ps1",
+        "tools/lib/mir4/NormalizedCompiler.ps1",
+        "tools/lib/mir4/RuntimeStateModel.ps1",
+        "tools/lib/mir4/ProcessIR.ps1",
+        "tools/lib/mir4/ReleaseDag.ps1",
+        "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1",
+        "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-hybrid-platform-authority",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Package-Presentation-OverlayV1.json",
+        "spec/schemas/mir4-hybrid-platform-authority.schema.json",
+        "spec/schemas/mir4-m4c01-implementation-authorization.schema.json",
+        "spec/schemas/mir4-historical-private-candidate-authorization.schema.json",
+        "spec/schemas/mir4-package-presentation-overlay.schema.json",
+        "validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "runtime.mir4-historical-private",
+      "kind": "runtime",
+      "layer": "F4",
+      "command": "./tools/mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "prior-release",
+        "factorio",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+        "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
+      ]
+    },
+    {
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",

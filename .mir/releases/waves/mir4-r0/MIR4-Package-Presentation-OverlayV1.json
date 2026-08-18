@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "MIR4PackagePresentationOverlayV1",
+  "status": "authorized-candidate-presentation",
+  "recorded_at": "2026-08-18T12:00:00+10:00",
+  "approved_by": "explicit-maintainer-approval-2026-08-18",
+  "package_visible": true,
+  "semantic_authority": false,
+  "gameplay_difference_authorized": false,
+  "public_output_authorized": false,
+  "source_version": "4.0.0",
+  "candidate_wave": "M4C01",
+  "output_root": "build/mir4/m4c01-player-candidates",
+  "allowed_changed_files": ["README.md","changelog.txt"],
+  "targets": [
+    {"target_key":"f210","factorio_line":"2.1","distribution_version":"4.0.21000","role":"mandatory","input_root":"build/mir4/emergency-lane/candidates/f210","predecessor":"3.2.11"},
+    {"target_key":"f200","factorio_line":"2.0","distribution_version":"4.0.20000","role":"mandatory","input_root":"build/mir4/local-playtest-shadow/candidates/f200","predecessor":"2.5.11"},
+    {"target_key":"f110","factorio_line":"1.1","distribution_version":"4.0.11000","role":"conditional","input_root":"build/mir4/local-playtest-shadow/candidates/f110","predecessor":"1.9.9"},
+    {"target_key":"f100","factorio_line":"1.0","distribution_version":"4.0.10000","role":"conditional","input_root":"build/mir4/local-playtest-shadow/candidates/f100","predecessor":"1.8.9"},
+    {"target_key":"f018","factorio_line":"0.18","distribution_version":"4.0.01800","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f018","predecessor":"1.7.9-bridge"},
+    {"target_key":"f017","factorio_line":"0.17","distribution_version":"4.0.01700","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f017","predecessor":"1.7.9"},
+    {"target_key":"f016","factorio_line":"0.16","distribution_version":"4.0.01600","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f016","predecessor":"1.6.9"},
+    {"target_key":"f015","factorio_line":"0.15","distribution_version":"4.0.01500","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f015","predecessor":"1.5.9"},
+    {"target_key":"f014","factorio_line":"0.14","distribution_version":"4.0.01400","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f014","predecessor":"1.4.9"},
+    {"target_key":"f013","factorio_line":"0.13","distribution_version":"4.0.01300","role":"private-experimental","input_root":"build/mir4/historical-private/candidates/f013","predecessor":"1.3.9"}
+  ],
+  "non_interference": "Every entry except README.md and changelog.txt must remain content-identical to its exact input candidate.",
+  "hard_boundary": "This overlay makes candidate documentation truthful and target-aware. It changes no gameplay, runtime, setting, locale, migration, prototype, dependency, or identity metadata and grants no publication authority.",
+  "record_sha256": "62FD62FAF3D87CFD1A24A2E83C4343D1281C150127B65212D1F68EEC2BED2562"
+}

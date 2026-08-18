@@ -1,0 +1,42 @@
+{
+  "schema": 2,
+  "release": "4.0.20000",
+  "factorio_line": "2.0",
+  "factorio_version": "2.0.77",
+  "authority_scope": "private-m4c01-development-qualification-only",
+  "baseline": {
+    "version": "2.5.11",
+    "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+    "package_content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
+  },
+  "candidate": {
+    "candidate_id": "M4C01",
+    "version": "4.0.20000",
+    "package_source_commit": "b460edd330dc19524bad97a2374c4c40c3b2ef36",
+    "package_source_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+    "archive_sha256": "886E92D34D04A3D9FBC3193B35658E4C0A2DB2F0582F531AAFA5AF53CBE30B3E",
+    "package_content_sha256": "B0FDEF0393972C65A51F2BD6692BB66F8E409CC04940ACE621CD6E4D8569C21E"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "manual_scenarios": "validation/scenarios/local-2.0.json",
+  "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_lanes": ["diagnostics-off.factorio-total", "diagnostics-on.factorio-total"],
+  "phase_lanes": [
+    {"id":"compiler.snapshot","probe_phase":"snapshot"},
+    {"id":"compiler.graph","probe_phase":"graph"},
+    {"id":"compiler.planning","probe_phase":"planning"},
+    {"id":"compiler.postconditions","probe_phase":"postconditions"}
+  ],
+  "lanes": [
+    {"id":"base.factorio-total","runner":"exact-package-load","scenario":"base-default","official_mods":[],"settings":{}},
+    {"id":"space-age.factorio-total","runner":"exact-package-load","scenario":"space-age-default","official_mods":["elevated-rails","quality","space-age"],"settings":{}},
+    {"id":"medium-ecosystem.factorio-total","runner":"compat-audit","scenario":"local-2-0-bz-suite","official_mods":[],"settings":{}},
+    {"id":"large-ecosystem.factorio-total","runner":"compat-audit","scenario":"local-2-0-bz-suite-space-age","official_mods":["elevated-rails","quality","space-age"],"settings":{}},
+    {"id":"diagnostics-off.factorio-total","runner":"exact-package-load","scenario":"base-diagnostics-off","official_mods":[],"settings":{"mir-debug-generation-report":false}},
+    {"id":"diagnostics-on.factorio-total","runner":"exact-package-load","scenario":"base-diagnostics-on","official_mods":[],"settings":{"mir-debug-generation-report":true}}
+  ]
+}
