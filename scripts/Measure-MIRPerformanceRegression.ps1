@@ -139,13 +139,30 @@ function New-MIRCampaignSettingsOverrideMod {
 }
 
 function Copy-MIRCampaignProbe {
-  param([Parameter(Mandatory)][string]$ModsDir)
+  param(
+    [Parameter(Mandatory)][string]$ModsDir,
+    [Parameter(Mandatory)][ValidateSet("2.0", "2.1")][string]$FactorioLine
+  )
   $source = Join-Path $RepoRoot "fixtures\performance-regression-probe"
   if (-not (Test-Path -LiteralPath $source -PathType Container)) {
     throw "Performance probe fixture is absent: $source"
   }
   $destination = Join-Path $ModsDir "mir-fixture-performance-regression-probe_0.1.0"
   Copy-Item -LiteralPath $source -Destination $destination -Recurse
+
+  # The probe implementation is shared, but Factorio validates mod metadata
+  # against the exact engine line before executing any Lua. Materialize only
+  # the target declaration in the disposable run directory so 2.0 and 2.1 use
+  # identical governed probe logic with honest engine-local dependencies.
+  $infoPath = Join-Path $destination "info.json"
+  $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+  if ([string]$info.name -ne "mir-fixture-performance-regression-probe") {
+    throw "Performance probe metadata has an unexpected mod identity."
+  }
+  $minimumBase = if ($FactorioLine -eq "2.1") { "2.1.8" } else { "2.0.0" }
+  $info.factorio_version = $FactorioLine
+  $info.dependencies = @("base >= $minimumBase", "more-infinite-research")
+  $info | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $infoPath -Encoding UTF8
 }
 
 function Get-MIRCampaignProbeFromLog {
@@ -212,7 +229,9 @@ function Invoke-MIRExactPackagePerformanceRun {
   $savesDir = Join-Path $RunRoot "saves"
   New-Item -ItemType Directory -Force -Path $modsDir, $savesDir | Out-Null
   Copy-Item -LiteralPath $PackagePath -Destination (Join-Path $modsDir (Split-Path -Leaf $PackagePath)) -Force
-  if ($RequireProbeTelemetry) { Copy-MIRCampaignProbe -ModsDir $modsDir }
+  if ($RequireProbeTelemetry) {
+    Copy-MIRCampaignProbe -ModsDir $modsDir -FactorioLine ([string]$campaign.factorio_line)
+  }
   $hasOverride = New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine ([string]$campaign.factorio_line)
 
   $knownOfficial = @("elevated-rails", "quality", "recycler", "space-age")
@@ -468,10 +487,7 @@ if ($script:RequiresArtifactVolume -and $script:ArtifactVolumeLaneIds.Count -eq 
   throw "Performance campaign requires artifact-volume telemetry but declares no artifact-volume lanes."
 }
 $budgets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\performance-budgets.json") | ConvertFrom-Json
-$expectedLaneIds = @($budgets.regression_lanes.id | Sort-Object)
-if (($expectedLaneIds -join "`n") -ne (@($lanes.id + $phaseLanes.id | Sort-Object) -join "`n")) {
-  throw "Performance campaign lane set does not match the regression budget manifest."
-}
+$lanePlan = Resolve-MIRPerformanceLanePlan -Campaign $campaign -BudgetManifest $budgets
 if ($WarmupRuns -lt [int]$campaign.run_policy.warmup_runs -or $MeasuredRuns -lt [int]$campaign.run_policy.minimum_measured_runs_per_package) {
   throw "Requested performance run counts are below the governed minimum."
 }
@@ -613,6 +629,7 @@ $raw = [ordered]@{
   warmup_runs = $WarmupRuns
   measured_runs = $MeasuredRuns
   lanes = @()
+  omitted_lanes = @($lanePlan.omitted_lanes)
 }
 $rawPath = Join-Path $script:RunRoot "campaign-result.json"
 $raw | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $rawPath -Encoding UTF8
@@ -802,8 +819,10 @@ $evidence = [ordered]@{
   }
   run_order = $runOrder
   lanes = $laneResults
+  omitted_lanes = @($lanePlan.omitted_lanes)
   artifact_volume = [ordered]@{
     policy = $artifactVolumePolicy
+    omission_reason = if ($script:RequiresArtifactVolume) { "" } else { [string]$campaign.artifact_volume_omission_reason }
     telemetry_schema = if ($script:RequiresArtifactVolume) { 1 } else { 0 }
     aggregation = if ($script:RequiresArtifactVolume) { "maximum-observed" } else { "omitted-by-capability" }
     measurements = $volumeMeasurements

@@ -23,14 +23,15 @@
     "order": "paired-balanced"
   },
   "manual_scenarios": "validation/scenarios/local-2.0.json",
-  "phase_source_lane": "diagnostics-off.factorio-total",
-  "artifact_volume_policy": "required",
-  "artifact_volume_lanes": ["diagnostics-off.factorio-total", "diagnostics-on.factorio-total"],
-  "phase_lanes": [
-    {"id":"compiler.snapshot","probe_phase":"snapshot"},
-    {"id":"compiler.graph","probe_phase":"graph"},
-    {"id":"compiler.planning","probe_phase":"planning"},
-    {"id":"compiler.postconditions","probe_phase":"postconditions"}
+  "artifact_volume_policy": "omitted-by-capability",
+  "artifact_volume_omission_reason": "The f200 materialized package and its 2.5.11 predecessor do not expose the compiler-evidence mod-data telemetry surface.",
+  "artifact_volume_lanes": [],
+  "phase_lanes": [],
+  "omitted_lanes": [
+    {"id":"compiler.snapshot","reason":"The 2.5.11 predecessor does not emit paired MIR performance phase markers."},
+    {"id":"compiler.graph","reason":"The 2.5.11 predecessor does not emit paired MIR performance phase markers."},
+    {"id":"compiler.planning","reason":"The 2.5.11 predecessor does not emit paired MIR performance phase markers."},
+    {"id":"compiler.postconditions","reason":"The 2.5.11 predecessor does not emit paired MIR performance phase markers."}
   ],
   "lanes": [
     {"id":"base.factorio-total","runner":"exact-package-load","scenario":"base-default","official_mods":[],"settings":{}},
