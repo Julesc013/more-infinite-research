@@ -2715,6 +2715,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
     superseded_by: docs/releases/mir4-4.0-candidate-programme.md
+  - path: docs/maintainer/mir4-spark-sol-handoff.md
+    title: "MIR 4 Spark To Sol Handoff And Completion Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-spark-sol-handoff
+      - mir4-m4c01-next-work-plan
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current
