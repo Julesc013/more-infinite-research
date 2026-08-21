@@ -56,7 +56,7 @@
       },
       {
         "path": "prototypes/mir/planner/science.lua",
-        "file_sha256": "DADA03659F5612AD8DFA81CC78120821D7F0FAA92EE812A873934E426DE16CFF"
+        "file_sha256": "92D10B06EB7F83BC29E222A998838005AC44065AB0947ACFCFFFCF7EEEDA97E5"
       },
       {
         "path": "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",

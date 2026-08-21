@@ -84,3 +84,25 @@ sdk/preview/mir4/** text eol=lf
 fixtures/mir4-mep-v0/** text eol=lf
 fixtures/mir4-process-ir-v0/** text eol=lf
 docs/reference/generated/mir4-platform-component-matrix.md text eol=lf
+spec/schemas/preview/mir4-mep-v0.schema.json text eol=lf
+
+# The platform preview lock and generated records raw-hash their complete text
+# input closure. Keep those source bytes invariant across Windows and hosted
+# checkouts so generation and verification bind the same committed content.
+mir.toml text eol=lf
+spec/platform/mir4-preview-v0/*.json text eol=lf
+spec/api/mir4-v0/contracts.json text eol=lf
+.mir/compatibility.yml text eol=lf
+.mir/streams.yml text eol=lf
+.mir/fixtures.yml text eol=lf
+.mir/modules.yml text eol=lf
+tools/lib/mir4/ExperimentalApiSdk.ps1 text eol=lf
+tools/lib/mir4/SafetyKernel.ps1 text eol=lf
+tools/lib/mir4/PolicyEngine.ps1 text eol=lf
+tools/lib/mir4/NormalizedCompiler.ps1 text eol=lf
+tools/lib/mir4/RuntimeStateModel.ps1 text eol=lf
+tools/lib/mir4/ProcessIR.ps1 text eol=lf
+tools/lib/mir4/ReleaseDag.ps1 text eol=lf
+prototypes/mir/runtime/**/*.lua text eol=lf
+migrations/*.json text eol=lf
+migrations/*.lua text eol=lf
