@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'MIR4ReceiptTestSupport.ps1')
+$hostedReceiptOnly = Test-MIR4HostedReceiptOnly
 $receiptPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Affected-Proof-Closure-SOL08V1.json'
 $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
@@ -18,6 +20,7 @@ if ([string]$receipt.source.commit -ne '65796a468a5247c8b31143a82db5fa3c94926d46
   throw 'SOL-08 no longer binds the reconciled M4C01 source.'
 }
 
+if (-not $hostedReceiptOnly) {
 $manifestPath = Join-Path $RepoRoot ([string]$receipt.candidate_manifest.path)
 if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf) -or
     (Get-FileHash -Algorithm SHA256 -LiteralPath $manifestPath).Hash -ne [string]$receipt.candidate_manifest.file_sha256) {
@@ -169,6 +172,90 @@ foreach ($planBinding in @($receipt.verification_plans)) {
     throw "SOL-08 verification plan changed for $($planBinding.target_key)."
   }
 }
+} else {
+  $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$receipt.candidate_manifest.path) -Sha256 ([string]$receipt.candidate_manifest.file_sha256)
+  if ([string]$receipt.candidate_manifest.status -cne 'built-unqualified-local-development-candidates') {
+    throw 'SOL-08 hosted receipt closure lost its private candidate-manifest disposition.'
+  }
+
+  $targets = @($receipt.targets)
+  if ($targets.Count -ne 2 -or (@($targets.target_key | Sort-Object) -join ',') -cne 'f200,f210') {
+    throw 'SOL-08 hosted receipt closure does not bind exactly f200 and f210.'
+  }
+  foreach ($target in $targets) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$target.candidate) -Sha256 ([string]$target.archive_sha256)
+    if ([string]$target.content_sha256 -cnotmatch $shaPattern -or [string]$target.engine_sha256 -cnotmatch $shaPattern -or
+        [string]$target.predecessor_sha256 -cnotmatch $shaPattern -or [long]$target.bytes -le 0 -or
+        [int]$target.entry_count -le 0 -or (@($target.deterministic_repetitions) -join ',') -cne 'A,B') {
+      throw "SOL-08 hosted target identity is incomplete: $($target.target_key)."
+    }
+  }
+
+  $deltas = @($receipt.package_deltas)
+  if ($deltas.Count -ne 2 -or (@($deltas.target_key | Sort-Object) -join ',') -cne 'f200,f210') {
+    throw 'SOL-08 hosted receipt closure does not bind both package deltas.'
+  }
+  foreach ($binding in $deltas) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+    if ([int]$binding.removed -ne 0 -or [int]$binding.unexpected -ne 0 -or @($binding.allowed_paths).Count -eq 0) {
+      throw "SOL-08 hosted package-delta boundary changed: $($binding.target_key)."
+    }
+  }
+
+  $composition = @($receipt.composition)
+  if ($composition.Count -ne 2 -or (@($composition.target_key | Sort-Object) -join ',') -cne 'f200,f210' -or
+      @($composition | Where-Object review_required).Count -ne 0) {
+    throw 'SOL-08 hosted package-composition receipt closure changed.'
+  }
+  foreach ($binding in $composition) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+  }
+
+  $upgradeMatrices = @($receipt.upgrade_matrices)
+  if ($upgradeMatrices.Count -ne 2 -or [int](($upgradeMatrices | Measure-Object -Property passed -Sum).Sum) -ne 6 -or
+      @($upgradeMatrices | Where-Object reloads_per_archetype -ne 2).Count -ne 0) {
+    throw 'SOL-08 hosted two-reload upgrade receipt closure changed.'
+  }
+  foreach ($binding in $upgradeMatrices) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+    if (@($binding.required_archetypes).Count -ne [int]$binding.passed) {
+      throw "SOL-08 hosted upgrade-archetype binding changed: $($binding.target_key)."
+    }
+  }
+
+  $loadEvidence = @($receipt.exact_load_evidence)
+  $scenarioCount = [int](($loadEvidence | ForEach-Object { @($_.accepted_scenarios).Count } | Measure-Object -Sum).Sum)
+  if ($loadEvidence.Count -ne 5 -or $scenarioCount -ne 10) {
+    throw 'SOL-08 hosted exact-load receipt closure changed.'
+  }
+  foreach ($binding in $loadEvidence) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.lock_path) -Sha256 ([string]$binding.lock_sha256)
+    if ([string]$binding.target_key -cnotin @('f210', 'f200') -or @($binding.accepted_scenarios).Count -eq 0) {
+      throw "SOL-08 hosted exact-load binding is incomplete: $($binding.id)."
+    }
+  }
+  $recyclerBinding = @($loadEvidence | Where-Object id -eq 'f200-recycler-characterization')
+  if ($recyclerBinding.Count -ne 1 -or [string]$recyclerBinding[0].disposition -cne 'not-reproduced-on-exact-1.0.0-surface-absent' -or
+      [string]$recyclerBinding[0].assertion -cne 'recycler-1-routes-rejected=true surface-present=false exercised=0') {
+    throw 'SOL-08 hosted f200 Recycler Progression characterization changed.'
+  }
+
+  $plans = @($receipt.verification_plans)
+  if ($plans.Count -ne 2 -or (@($plans.target_key | Sort-Object) -join ',') -cne 'f200,f210') {
+    throw 'SOL-08 hosted verification-plan closure is incomplete.'
+  }
+  foreach ($binding in $plans) {
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+    if ([string]$binding.plan_material_sha256 -cnotmatch $shaPattern -or
+        [string]$binding.required_test_set_sha256 -cnotmatch $shaPattern -or
+        [int]$binding.counts.total -le 0 -or [int]$binding.counts.run -le 0 -or
+        [int]$binding.counts.reuse -ne 0 -or [int]$binding.counts.invalid -ne 2 -or
+        [string]$binding.runtime_upgrade -cne 'RUN') {
+      throw "SOL-08 hosted verification-plan binding changed: $($binding.target_key)."
+    }
+  }
+}
 
 $releaseSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/assurance/Release.ps1')
 foreach ($guard in @(
@@ -200,4 +287,5 @@ if (-not $gate.deterministic_target_candidates_built -or -not $gate.package_delt
   throw 'SOL-08 exit gate is incomplete or grants unsupported authority.'
 }
 
-Write-Host 'MIR 4 SOL-08 deterministic affected-target packages, exact loads, and two-reload upgrade proof passed.'
+if ($hostedReceiptOnly) { Write-Host 'MIR 4 SOL-08 committed receipt closure passed; exact private packages and evidence bytes remain bound to the local integration gate.' }
+else { Write-Host 'MIR 4 SOL-08 deterministic affected-target packages, exact loads, and two-reload upgrade proof passed.' }

@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'MIR4ReceiptTestSupport.ps1')
+$hostedReceiptOnly = Test-MIR4HostedReceiptOnly
 $receiptPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json'
 $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
@@ -13,6 +15,7 @@ if ([int]$receipt.schema -ne 1 -or [string]$receipt.kind -ne 'MIR4M4C01CloseoutS
   throw 'MIR 4 SOL-09 receipt header or source binding is invalid.'
 }
 
+if (-not $hostedReceiptOnly) {
 $outputRoot = Join-Path $RepoRoot ([string]$receipt.output_root)
 $checksumPath = Join-Path $RepoRoot ([string]$receipt.checksums.path)
 if (-not (Test-Path -LiteralPath $checksumPath -PathType Leaf) -or
@@ -105,6 +108,34 @@ if ([string]$completion.status -ne 'M4C01-DEVELOPMENT-CLOSEOUT-COMPLETE' -or -no
     [string]$completion.gates.verification_plans -ne 'materialized-zero-invalid-f210-and-f200') {
   throw 'SOL-09 completion record is incomplete or overclaims release readiness.'
 }
+} else {
+  if ([string]$receipt.output_root -cne 'build/mir4/m4c01-closeout' -or
+      [string]$receipt.checksums.path -cne 'build/mir4/m4c01-closeout/SHA256SUMS.json' -or
+      [int]$receipt.checksums.file_count -ne 9) {
+    throw 'SOL-09 hosted closeout custody root or checksum inventory changed.'
+  }
+  $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$receipt.checksums.path) -Sha256 ([string]$receipt.checksums.sha256)
+  $expectedArtifacts = @(
+    'MIR4_M4C01_BLOCKER_MATRIX.json',
+    'MIR4_M4C01_COMPLETION_RECORD.json',
+    'MIR4_M4C01_EVIDENCE_REVOCATION_MATRIX.json',
+    'MIR4_M4C01_HANDOFF.md',
+    'MIR4_M4C01_MATURITY_MATRIX.json',
+    'MIR4_M4C01_NON_INTERFERENCE_MATRIX.json',
+    'MIR4_M4C01_PACKAGE_MATRIX.json',
+    'MIR4_M4C01_PUBLIC_FEEDBACK_DISPOSITION.json',
+    'MIR4_M4C01_RUNTIME_MIGRATION_MATRIX.json'
+  )
+  $artifacts = @($receipt.artifacts)
+  if ($artifacts.Count -ne 9 -or
+      (@($artifacts.path | Sort-Object) -join ',') -cne (@($expectedArtifacts | Sort-Object) -join ',')) {
+    throw 'SOL-09 hosted closeout artifact inventory changed.'
+  }
+  foreach ($binding in $artifacts) {
+    $relativePath = ([string]$receipt.output_root).TrimEnd('/') + '/' + [string]$binding.path
+    $null = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath $relativePath -Sha256 ([string]$binding.sha256)
+  }
+}
 
 $summary = $receipt.proof_summary
 if ([string]$summary.sol02_through_sol08 -ne 'PASS' -or [int]$summary.mandatory_target_exact_loads -ne 10 -or
@@ -122,4 +153,5 @@ if (-not $boundary.m4c01_development_closeout_complete -or $boundary.release_can
   throw 'SOL-09 completion boundary grants unsupported authority or drops required review.'
 }
 
-Write-Host 'MIR 4 SOL-09 M4C01 development closeout, evidence revocation, and release blocker matrices passed.'
+if ($hostedReceiptOnly) { Write-Host 'MIR 4 SOL-09 committed closeout receipt closure passed; exact private closeout bytes remain bound to the local integration gate.' }
+else { Write-Host 'MIR 4 SOL-09 M4C01 development closeout, evidence revocation, and release blocker matrices passed.' }

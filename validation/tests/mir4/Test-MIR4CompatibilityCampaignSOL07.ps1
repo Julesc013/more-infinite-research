@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'MIR4ReceiptTestSupport.ps1')
+$hostedReceiptOnly = Test-MIR4HostedReceiptOnly
 $receiptPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json'
 $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
@@ -35,24 +37,22 @@ foreach ($binding in $bindings) {
       throw "SOL-07 evidence binding $($binding.id) lacks $field."
     }
   }
-  $evidencePath = Join-Path $RepoRoot ([string]$binding.path)
-  $lockPath = Join-Path $RepoRoot ([string]$binding.lock_path)
-  if (-not (Test-Path -LiteralPath $evidencePath -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $evidencePath -Algorithm SHA256).Hash -ne [string]$binding.file_sha256 -or
-      -not (Test-Path -LiteralPath $lockPath -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $lockPath -Algorithm SHA256).Hash -ne [string]$binding.lock_sha256) {
-    throw "SOL-07 exact evidence or lock differs from binding $($binding.id)."
-  }
-  $evidence = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json -Depth 100
-  if ([string]$evidence.mir_archive.sha256 -ne [string]$binding.candidate_sha256 -or
-      [string]$evidence.factorio_binary.sha256 -ne [string]$binding.engine_sha256) {
-    throw "SOL-07 evidence identity differs from binding $($binding.id)."
-  }
-  foreach ($scenarioId in @($binding.accepted_scenarios)) {
-    $row = @($evidence.scenarios | Where-Object scenario_id -eq $scenarioId)
-    if ($row.Count -ne 1 -or [string]$row[0].result -ne 'passed' -or
-        [int]$row[0].dependency_failure_count -ne 0 -or $row[0].timed_out) {
-      throw "SOL-07 accepted scenario is not an exact pass: $scenarioId"
+  $evidenceMaterialized = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.path) -Sha256 ([string]$binding.file_sha256)
+  $lockMaterialized = Assert-MIR4ExternalEvidenceBinding -RepoRoot $RepoRoot -RelativePath ([string]$binding.lock_path) -Sha256 ([string]$binding.lock_sha256)
+  if ($evidenceMaterialized -ne $lockMaterialized) { throw "SOL-07 evidence and lock custody differ for $($binding.id)." }
+  if ($evidenceMaterialized) {
+    $evidencePath = Join-Path $RepoRoot ([string]$binding.path)
+    $evidence = Get-Content -Raw -LiteralPath $evidencePath | ConvertFrom-Json -Depth 100
+    if ([string]$evidence.mir_archive.sha256 -ne [string]$binding.candidate_sha256 -or
+        [string]$evidence.factorio_binary.sha256 -ne [string]$binding.engine_sha256) {
+      throw "SOL-07 evidence identity differs from binding $($binding.id)."
+    }
+    foreach ($scenarioId in @($binding.accepted_scenarios)) {
+      $row = @($evidence.scenarios | Where-Object scenario_id -eq $scenarioId)
+      if ($row.Count -ne 1 -or [string]$row[0].result -ne 'passed' -or
+          [int]$row[0].dependency_failure_count -ne 0 -or $row[0].timed_out) {
+        throw "SOL-07 accepted scenario is not an exact pass: $scenarioId"
+      }
     }
   }
 }
@@ -148,4 +148,5 @@ if (-not $gate.subject_ledger_complete -or -not $gate.exact_current_candidate_lo
   throw 'SOL-07 exit gate is incomplete or grants unsupported authority.'
 }
 
-Write-Host 'MIR 4 SOL-07 exact compatibility subject ledger and bounded campaign outcomes passed.'
+if ($hostedReceiptOnly) { Write-Host 'MIR 4 SOL-07 committed receipt closure passed; exact private evidence bytes remain bound to the local integration gate.' }
+else { Write-Host 'MIR 4 SOL-07 exact compatibility subject ledger and bounded campaign outcomes passed.' }

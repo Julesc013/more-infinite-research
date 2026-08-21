@@ -71,3 +71,16 @@ spec/schemas/experimental/*.json text eol=lf
 sdk/experimental/mir4/json-schema/*.json text eol=lf
 sdk/experimental/mir4/lua/*.lua text eol=lf
 sdk/experimental/mir4/powershell/*.psm1 text eol=lf
+
+# The M4C01 preview generators and accepted receipts bind these files by raw
+# byte identity. Preserve their canonical LF output in clean Windows checkouts.
+mir.lock text eol=lf
+prototypes/mir/compatibility/policies/k2_science_phase.lua text eol=lf
+prototypes/mir/planner/science.lua text eol=lf
+fixtures/assert-k2-science-phase-policy/data-final-fixes.lua text eol=lf
+tools/lib/mir4/ResearchCostV2.ps1 text eol=lf
+docs/reference/research-cost-v2-preview.md text eol=lf
+sdk/preview/mir4/** text eol=lf
+fixtures/mir4-mep-v0/** text eol=lf
+fixtures/mir4-process-ir-v0/** text eol=lf
+docs/reference/generated/mir4-platform-component-matrix.md text eol=lf
