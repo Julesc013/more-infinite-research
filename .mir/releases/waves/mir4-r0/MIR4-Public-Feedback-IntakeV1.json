@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "kind": "MIR4PublicFeedbackIntakeV1",
+  "status": "accepted-pass-with-findings-sol02",
+  "recorded_at": "2026-08-21T00:20:00+10:00",
+  "package_visible": false,
+  "authority_id": "mir4-public-feedback-intake-v1",
+  "scope": {
+    "work_package": "SOL-02",
+    "result": "PASS_WITH_FINDINGS",
+    "source_pack": {
+      "name": "MIR4_SOL_56_MEGA_SPRINT_HANDOFF_2026-08-20.zip",
+      "sha256": "6A01A866869D803F2D3D40DAD1DD2182117C7347E835B5C3297711F4A4BAE965",
+      "embedded_instructions_authorized": false,
+      "effect": "feedback-and-proposed-acceptance-input-only"
+    },
+    "starting_source": {
+      "branch": "agent/mir4-sol-integration",
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "tree": "33f373e42b74697f08d2b3e0bf36a233fcb9bfcd",
+      "audited_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "verification_plan": {
+      "path": "build/results/mir4-sol/sol02/baseline-f210-verification-plan.json",
+      "file_sha256": "430D23CEB2A85CC2EDD333323FA1EA52CEB4CDFC6BC9D3AB25B9DE8581D5188E",
+      "plan_material_sha256": "AD3A6E39071A233167D88A6360637474F7D9CB173A089A1C739711D948B55666",
+      "candidate_sha256": "FA32F0C9A3FF7CBF9D95AA45F6164CF893C0CBBB4BFFE7AEED9FAC524B5C0117",
+      "test_count": 146,
+      "run": 143,
+      "invalid": 3,
+      "invalid_reasons": [
+        "mir4-bootstrap-governed-output-is-not-materialized-in-this-integration-worktree",
+        "prior-release-was-not-supplied-for-runtime-upgrade"
+      ],
+      "interpretation": "materialized-and-inspected-for-reproduction-planning;not-an-aggregate-pass"
+    },
+    "route_correction_proof": {
+      "status": "passed-generic-runtime-fixture",
+      "candidate_path": "build/results/mir4-sol/sol02/dev-package/more-infinite-research_3.2.11.zip",
+      "candidate_sha256": "067EDA88555C1F5A924293C75ACE839FA85AD30E5F1084C65FE1A6F856357A78",
+      "candidate_content_sha256": "E623EC957BC75C8D22019FB6D972F7C3FC290DCC699F3B0EAB92E9BE2EA81D00",
+      "fixture": "fixtures/assert-generated-prerequisite-safety",
+      "engine_target": "f210",
+      "engine_version": "2.1.14.87180",
+      "result": "PASS",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 4.914776,
+      "log_path": "build/results/mir4-sol/sol02/route-fixture-run/u-13ee37ec8a41/mir4-sol02-route-fixture.log",
+      "log_sha256": "7588E09B5C1C09A7142E679BA49B1DD6A1E607F826E2F641FD956594857C75DA",
+      "claim_boundary": "generic route-policy correction only; exact Cubium and Recycler Progression ecosystem claims remain governed separately"
+    }
+  },
+  "engine_locks": [
+    {
+      "target": "f210",
+      "version": "2.1.14.87180",
+      "binary_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "authority": "AGENTS.md-steam-current-2.1"
+    },
+    {
+      "target": "f200",
+      "version": "2.0.77.84539",
+      "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "authority": "AGENTS.md-preserved-2.0"
+    }
+  ],
+  "families": [
+    {
+      "id": "REPRO-MAXCAP",
+      "feedback_ids": ["PF-2026-08-MAXCAP-001"],
+      "classification": "product-correctness-risk-with-exact-environment-proof-gap",
+      "severity": "B0-if-exactly-reproduced",
+      "minimal_reproducer": {
+        "status": "generic-boundary-reproduced-exact-environment-pending",
+        "fixtures": [
+          "fixtures/assert-generated-max-level",
+          "fixtures/assert-generated-max-level-2-0",
+          "fixtures/assert-native-owner-settings",
+          "fixtures/assert-base-continuation-cap-transition",
+          "fixtures/late-native-owner-max-level"
+        ],
+        "proved_boundary": "Factorio repeated-technology level is the next offered level; after absolute cap N the runtime value is N+1 with researched=false and enabled=false",
+        "missing_observation": "exact PlanetsLib/Corrundum visual completed-state and late-finalizer behavior"
+      },
+      "exact_inputs": [
+        {"name": "PlanetsLib", "version": "1.19.5", "sha256": "21FECA0A902B5B21B92DC17A65B5B3A3E08499E6A59FF9D7FF57ADF530004A93"},
+        {"name": "corrundum", "version": "1.0.47", "sha256": "969A92DE8AE509A9C57C6E94CB1232F9E840E26F340663DDBD1101E1C0932E13"}
+      ],
+      "authority_map": {
+        "planner": "prototypes/mir/policy/max_level.lua",
+        "binding_transport": "prototypes/mir/emit/mod_data.lua",
+        "runtime_owner": "prototypes/mir/runtime/maximum_level_control.lua",
+        "presentation_owner": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+        "fixture_authority": ".mir/fixtures.yml#maximum-level-runtime-control"
+      },
+      "next_work_package": "SOL-03"
+    },
+    {
+      "id": "REPRO-CUBIUM",
+      "feedback_ids": ["PF-2026-08-CUBIUM-001"],
+      "classification": "generic-product-defect-source-confirmed",
+      "severity": "B0",
+      "minimal_reproducer": {
+        "status": "source-confirmed-and-generic-runtime-regression-passed",
+        "source_evidence": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json#MIR3-TERM-0028",
+        "fixture": "fixtures/assert-generated-prerequisite-safety",
+        "witness": "later ordinary alternates and non-authoritative recycling routes must not replace the earliest ordinary acquisition route"
+      },
+      "exact_inputs": [
+        {"name": "cubium", "version": "1.0.30", "sha256": "E7282BF8DF12A5D256934B84B84711703B17A5224FB1D7409202411C9FD54FB4"}
+      ],
+      "authority_map": {
+        "recipe_facts": "prototypes/mir/index/recipe_facts.lua",
+        "reachability": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "selection": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "fixture_authority": ".mir/fixtures.yml#generated-prerequisite-safety"
+      },
+      "next_work_package": "SOL-04"
+    },
+    {
+      "id": "REPRO-RECYCLER-PROGRESSION",
+      "feedback_ids": ["PF-2026-08-ROUTE-001"],
+      "classification": "generic-product-defect-with-exact-f210-closure-acquired",
+      "severity": "B0",
+      "minimal_reproducer": {
+        "status": "generic-runtime-reproduced-and-corrected",
+        "fixture": "fixtures/assert-generated-prerequisite-safety",
+        "witnesses": [
+          "initially-enabled-recycling-alternate-outranks-ordinary-unlock-before-correction",
+          "recycling-only-route-cannot-prove-first-acquisition",
+          "science-pack-self-return-cannot-prove-first-acquisition"
+        ]
+      },
+      "exact_inputs": [
+        {"name": "recycler-progression", "version": "1.0.0", "factorio_line": "2.0", "sha256": "CB3A0C07E630E2DD7E4CD8088E7C211FACEDCCB1A2DB0491BE317C31200E9619", "qualification": "source-locked-awaiting-f200-target-local-proof"},
+        {"name": "recycler-progression", "version": "1.1.1", "factorio_line": "2.1", "sha256": "47CB00BE06606AFA08AF512FC81951CABBAF38D7724FBB0884365C6BEF9A0810", "qualification": "routed-to-sol04-exact-runtime-proof"}
+      ],
+      "acquisition_gap": "Closed on 2026-08-21 for exact local archives 1.0.0 and 1.1.1; target-local proof remains independently governed.",
+      "authority_map": {
+        "recipe_classification": "prototypes/mir/index/recipe_facts.lua",
+        "route_classification": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "progression_law": "prototypes/mir/capabilities/science_integration/production_route_policy.lua"
+      },
+      "next_work_package": "SOL-04"
+    },
+    {
+      "id": "REPRO-COST-V2-REQUEST",
+      "feedback_ids": ["PF-2026-08-COST-001"],
+      "classification": "feature-request-not-regression",
+      "severity": "B2-conditional",
+      "minimal_reproducer": {
+        "status": "canonical-vector-captured",
+        "vector": {
+          "base_source": "direct-prerequisite-sum",
+          "base_multiplier": "2/1",
+          "linear_ratio": "1/2",
+          "growth_factor": "1/1"
+        },
+        "required_witnesses": ["shared-prerequisite-deduplication", "cycle-block", "exact-rounding", "contributor-explanation"]
+      },
+      "authority_map": {
+        "v1_model": "prototypes/mir/domain/research_cost/model.lua",
+        "formula": "prototypes/mir/domain/research_cost/formula.lua",
+        "settings_contract": "prototypes/mir/settings/cost_contract.lua",
+        "migration": "prototypes/mir/domain/research_cost/transition_descriptor.lua"
+      },
+      "admission_rule": "V2 remains experimental unless schema, migration, target projection, explanation, and affected runtime proof all pass.",
+      "next_work_package": "SOL-05"
+    },
+    {
+      "id": "REPRO-K2SO-SCIENCE",
+      "feedback_ids": ["PF-2026-08-K2SO-001"],
+      "classification": "exactly-reproduced-compatibility-defect-plus-feature-request",
+      "severity": "B1-science-phase;B2-new-families",
+      "minimal_reproducer": {
+        "status": "exact-engine-reproduced-and-terminal-correction-imported",
+        "source_evidence": ".mir/releases/waves/MIR3-Terminal-ChangeSet.json#MIR3-TERM-0027",
+        "fixture": "fixtures/assert-k2-science-phase-policy",
+        "witness": "late generated streams retained retired early science cards in exact K2/K2SO"
+      },
+      "exact_inputs": [
+        {"target": "f210", "name": "Krastorio2", "version": "2.1.2", "sha256": "89989E60784EA3E94345289E063C64ABFCE5F35693DB7B9A69D656A163620F43"},
+        {"target": "f210", "name": "Krastorio2-spaced-out", "version": "2.0.13", "sha256": "A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242"},
+        {"target": "f200", "name": "Krastorio2", "version": "2.1.2", "sha256": "89989E60784EA3E94345289E063C64ABFCE5F35693DB7B9A69D656A163620F43"},
+        {"target": "f200", "name": "Krastorio2-spaced-out", "version": "1.6.21", "sha256": "CC5B49B10865A094A86F748115595BCF64588EF3166A7325B4E719EC1E0C7379"}
+      ],
+      "authority_map": {
+        "science_phase": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "compatibility_manifest": ".mir/compatibility.yml#science_phase_policies",
+        "exact_campaign": "validation/scenarios/local-2.1.json#local-2-1-krastorio-spaced-out",
+        "owner_arbitration": "prototypes/mir/planner/effect_ownership.lua"
+      },
+      "next_work_package": "SOL-06"
+    },
+    {
+      "id": "REPRO-OVERHAUL-SUPPORT",
+      "feedback_ids": ["PF-2026-08-OVERHAULS-001"],
+      "classification": "programme-request-not-single-defect",
+      "severity": "not-a-blanket-release-blocker",
+      "minimal_reproducer": {
+        "status": "claim-shape-reproduced",
+        "witness": "a single supported Boolean cannot represent captured, classified, certified, preserved, extension-required, review-required, and omitted subjects"
+      },
+      "authority_map": {
+        "claim_levels": "docs/compatibility/claim-levels.md",
+        "compatibility_authority": ".mir/compatibility.yml",
+        "fixture_authority": ".mir/fixtures.yml",
+        "scenario_authority": "validation/scenarios"
+      },
+      "admission_rule": "Only exact subject-level target/version/settings envelopes may become public claims.",
+      "next_work_package": "SOL-07"
+    }
+  ],
+  "exit_gate": {
+    "minimal_reproducer_count": 6,
+    "authority_map_count": 6,
+    "exact_input_gaps": ["PlanetsLib/Corrundum visual manual observation", "Recycler Progression 1.0.0 f200 target-local runtime proof"],
+    "source_changes_allowed_next": true,
+    "publication_authorized": false
+  }
+}

@@ -573,7 +573,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 **Runtime fixture validation:**
 
 ```powershell
-.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin ".\path\to\factorio.exe"
 ```
 
 **Build the package:**
@@ -590,7 +590,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_2.1
+.\scripts\mir.ps1 local-index build --mods .\testmods\2.1
 ```
 
 `mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/maintainer/developer-tools.md` for the command map and script roles.

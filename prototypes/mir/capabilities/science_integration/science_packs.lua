@@ -33,6 +33,8 @@ function S.ensure_services(context)
   if not context:has_service(SERVICE_PREFIX .. "production_route_for_pack") then
     context:set_service(SERVICE_PREFIX .. "production_route_for_pack",
       pack_production_reachability.production_route_for_pack)
+    context:set_service(SERVICE_PREFIX .. "production_route_decision_for_pack",
+      pack_production_reachability.production_route_decision_for_pack)
   end
   return context
 end
@@ -45,6 +47,7 @@ local function ready(callback)
 end
 
 S.all_lab_inputs = pack_registry.all_lab_inputs
+S.research_pack_prototype = pack_registry.research_pack_prototype
 S.science_pack_exists = pack_registry.science_pack_exists
 S.pack_list_all = pack_registry.pack_list_all
 S.pack_list_official = pack_registry.pack_list_official
@@ -64,6 +67,7 @@ S.pack_production_status = ready(pack_production_reachability.pack_production_st
 S.researchable_unlockers_for_recipe = ready(pack_production_reachability.researchable_unlockers_for_recipe)
 S.prereq_tech_for_science_pack = ready(pack_production_reachability.prereq_tech_for_science_pack)
 S.production_route_for_pack = ready(pack_production_reachability.production_route_for_pack)
+S.production_route_decision_for_pack = ready(pack_production_reachability.production_route_decision_for_pack)
 
 S.technology_researchability_reason = ready(technology_researchability.technology_researchability_reason)
 S.technology_is_researchable = ready(technology_researchability.technology_is_researchable)

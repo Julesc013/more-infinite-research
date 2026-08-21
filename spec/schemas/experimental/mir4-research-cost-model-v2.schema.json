@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/experimental/mir4-research-cost-model-v2.schema.json",
+  "title": "MIR 4 Experimental ResearchCostModel V2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "formula_abi",
+    "maturity",
+    "anchor_level",
+    "base_source",
+    "prerequisite_anchor",
+    "base_multiplier",
+    "linear_ratio",
+    "absolute_linear_increment",
+    "growth_factor",
+    "rounding_law",
+    "contributors",
+    "provenance",
+    "semantic_digest"
+  ],
+  "properties": {
+    "schema": {"const": 2},
+    "formula_abi": {"const": "mir-research-cost-v2-preview"},
+    "maturity": {"const": "experimental-package-excluded"},
+    "anchor_level": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "base_source": {
+      "enum": [
+        "absolute",
+        "previous-series-level",
+        "direct-prerequisite-sum",
+        "transitive-prerequisite-closure",
+        "profile-defined"
+      ]
+    },
+    "prerequisite_anchor": {"$ref": "#/$defs/rational"},
+    "base_multiplier": {"$ref": "#/$defs/rational"},
+    "linear_ratio": {"$ref": "#/$defs/rational"},
+    "absolute_linear_increment": {"$ref": "#/$defs/rational"},
+    "growth_factor": {"$ref": "#/$defs/rational"},
+    "rounding_law": {"const": "round-half-up-positive-final-v1"},
+    "contributors": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "realized_cost"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"},
+          "realized_cost": {"$ref": "#/$defs/rational"}
+        }
+      }
+    },
+    "provenance": {"type": "object"},
+    "semantic_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "rational": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numerator", "denominator"],
+      "properties": {
+        "numerator": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,127})$"},
+        "denominator": {"type": "string", "pattern": "^[1-9][0-9]{0,127}$"}
+      }
+    }
+  }
+}

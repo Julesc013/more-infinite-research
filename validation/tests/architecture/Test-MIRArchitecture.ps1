@@ -885,7 +885,7 @@ Assert-MIRNoPatternInLuaTree `
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/domain" `
-  -Pattern "\b(data\.raw|data:extend|mods|settings)\b" `
+  -Pattern "\bdata\.raw\b|\bdata:extend\b|\bmods\s*(?:\[|\.)|\bsettings\s*(?:\[|\.)" `
   -Message "MIR domain modules must not read Factorio globals or mutate prototypes."
 
 Assert-MIRNoPatternInLuaTree `

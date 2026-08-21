@@ -5,8 +5,20 @@ local k2_science_phase = require("prototypes.mir.compatibility.policies.k2_scien
 
 local M = {}
 
+local function k2_capabilities()
+  local available = {}
+  for _, name in ipairs(k2_science_phase.required_science_packs()) do
+    available[name] = science_packs.research_pack_prototype(name) ~= nil
+  end
+  return {science_packs = available}
+end
+
 function M.normalize_ingredients(ingredients)
-  local normalized, decision = k2_science_phase.normalize(ingredients, factorio_mods.snapshot())
+  local normalized, decision = k2_science_phase.normalize(
+    ingredients,
+    factorio_mods.snapshot(),
+    k2_capabilities()
+  )
   if #normalized == 0 or not science_packs.valid_research_ingredients(normalized) then
     decision.status = "blocked-invalid-result"
     decision.changed = false

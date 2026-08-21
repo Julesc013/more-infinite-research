@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4C01CloseoutSOL09V1",
+  "work_package": "SOL-09",
+  "status": "PASS",
+  "source_commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+  "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a",
+  "output_root": "build/mir4/m4c01-closeout",
+  "checksums": {
+    "path": "build/mir4/m4c01-closeout/SHA256SUMS.json",
+    "sha256": "3304DB79F9D67E95BC5E3AC7EB86BF7CBE4BD54108EA3236686DFD06C09EAAFB",
+    "file_count": 9
+  },
+  "artifacts": [
+    {"path":"MIR4_M4C01_PACKAGE_MATRIX.json","sha256":"6ED647995D89B78222EF579745F9C9D09387FFDB75772DDB4EC829CC8D177BDF"},
+    {"path":"MIR4_M4C01_RUNTIME_MIGRATION_MATRIX.json","sha256":"39B3F742959D3B70FF7CD544FAA02D56E334E9D1326AD562B8297CA519B1E781"},
+    {"path":"MIR4_M4C01_MATURITY_MATRIX.json","sha256":"F9965E3960BBA41267F0241F642FE33A2319982DE01243ADB5CB16378DD90910"},
+    {"path":"MIR4_M4C01_NON_INTERFERENCE_MATRIX.json","sha256":"AECFB43500FE4BC0835382680CFE8D085D5E5226CF396B250E22FF8D7E255753"},
+    {"path":"MIR4_M4C01_EVIDENCE_REVOCATION_MATRIX.json","sha256":"B6DECEC527C70DE7D034D61A0A2583ED75527DD6219BDB2CB9256BBEA7D63315"},
+    {"path":"MIR4_M4C01_PUBLIC_FEEDBACK_DISPOSITION.json","sha256":"952A91E4F34D12BF11D46C466661BD7F1135E546E6F82F826ECA5565B9193477"},
+    {"path":"MIR4_M4C01_BLOCKER_MATRIX.json","sha256":"BAAE8BE43AF8C1BCAE556823A11F36411862D406997A3C646B83616E7C0B9858"},
+    {"path":"MIR4_M4C01_COMPLETION_RECORD.json","sha256":"2F6BEC3891DF231CC3FAEDA8766A8AA8C1B2103DBBD6DC431B9E68E90A2370DC"},
+    {"path":"MIR4_M4C01_HANDOFF.md","sha256":"670540D23244967E32D170806627F61C193E248AA502606E8596307DF06ACACF"}
+  ],
+  "proof_summary": {
+    "sol02_through_sol08": "PASS",
+    "mandatory_target_exact_loads": 10,
+    "mandatory_target_upgrade_archetypes": 6,
+    "reloads_per_upgrade_archetype": 2,
+    "bootstrap_materialization": "PASS",
+    "offline_custody_fail_closed": "PASS",
+    "assurance_regression": "PASS",
+    "f210_plan_invalid": 0,
+    "f200_plan_invalid": 0,
+    "product_blockers": 0
+  },
+  "completion_boundary": {
+    "m4c01_development_closeout_complete": true,
+    "release_candidate_ready": false,
+    "source_freeze_authorized": false,
+    "commit_authorized": false,
+    "signing_or_sealing_authorized": false,
+    "promotion_authorized": false,
+    "publication_authorized": false,
+    "remaining_release_gates": [
+      "maintainer-authorized-source-freeze-and-candidate-allocation",
+      "fresh-corrected-candidate-performance-f210-and-f200",
+      "independent-review",
+      "maintainer-manual-acceptance",
+      "separate-production-go-no-go"
+    ]
+  },
+  "next_work_package": "independent-audit-readiness-review"
+}

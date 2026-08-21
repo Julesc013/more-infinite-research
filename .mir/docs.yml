@@ -79,6 +79,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-mep-v0-preview-contract
+  - path: docs/reference/maximum-level-binding.md
+    title: "Maximum-Level Binding Contract"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - maximum-level-binding-policy-v3
   - path: docs/maintainer/mir4-m4c01-runbook.md
     title: "MIR 4 M4C01 Candidate Runbook"
     status: current
@@ -692,6 +700,7 @@ docs:
     source_of_truth_for:
       - module-boundaries
       - authority-projection-command-boundaries
+      - science-pack-production-route-authority
   - path: docs/releases/3.2.4-unified-research-cost-curves.md
     title: "MIR 3.2.4 Unified Research Cost Curves (Unpublished Candidate)"
     status: historical-checkpoint
@@ -1418,6 +1427,27 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/corrundum.md
+    title: "Corrundum Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/cubium.md
+    title: "Cubium Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/recycler-progression.md
+    title: "Recycler Progression Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/equipment-gantry.md
     title: "Equipment Gantry Compatibility"
     status: current
@@ -1894,6 +1924,17 @@ docs:
       - research-cost-algebraic-qualification
       - research-cost-parser-and-numeric-envelope
       - research-cost-3.2.5-release-contract
+  - path: docs/reference/research-cost-v2-preview.md
+    title: "ResearchCostModel V2 Preview"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - research-cost-v2-experimental-contract
+      - research-cost-v2-exact-rational-and-rounding-law
+      - research-cost-v2-sparse-profile-layering
+      - research-cost-v2-stable-admission-boundary
   - path: docs/reference/schemas/research-cost-compatibility-slice.md
     title: "Research-Cost Compatibility Slice Schema"
     status: current

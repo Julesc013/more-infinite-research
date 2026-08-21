@@ -1,0 +1,291 @@
+{
+  "schema": 1,
+  "kind": "MIR4K2ScienceSOL06V1",
+  "status": "PASS",
+  "work_package": "SOL-06",
+  "recorded_at": "2026-08-21T04:00:00+10:00",
+  "package_visible": false,
+  "publication_authorized": false,
+  "scope": {
+    "starting_source": {
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "feedback_id": "PF-2026-08-K2SO-001",
+    "reproducer_id": "REPRO-K2SO-SCIENCE",
+    "science_classification": "B1-exactly-reproduced-release-critical",
+    "family_breadth_classification": "B2-optional-nonblocking"
+  },
+  "input_reconciliation": {
+    "f210": "Krastorio2 2.1.2 and Krastorio2-spaced-out 2.0.11 through 2.0.13 are a combined closure.",
+    "f200": "Krastorio2-spaced-out 1.6.21 is standalone and explicitly incompatible with Krastorio2; the public-intake f200 Krastorio2 row is not part of the executable closure.",
+    "superseded_assumption": "f200-Krastorio2-plus-K2SO-combined-closure",
+    "authority": "exact archive info.json dependency declarations and exact-engine resolution"
+  },
+  "implementation": {
+    "policy": "K2SciencePhasePolicyV2",
+    "package_visible_semantics_changed": true,
+    "pure_policy": true,
+    "prototype_mutation_owner": "existing planner and emission paths only",
+    "profiles": [
+      {
+        "id": "factorio-2.1-k2so",
+        "target": "f210",
+        "version_ranges": {
+          "base": ">=2.1.0 <2.2.0",
+          "Krastorio2": ">=2.1.2 <2.1.3",
+          "Krastorio2-spaced-out": ">=2.0.11 <2.0.14"
+        },
+        "required_additional_identity": "kr-basic-tech-card"
+      },
+      {
+        "id": "factorio-2.0-k2so-standalone",
+        "target": "f200",
+        "version_ranges": {
+          "base": ">=2.0.73 <2.1.0",
+          "Krastorio2-spaced-out": ">=1.6.21 <1.6.22"
+        },
+        "forbidden_mod": "Krastorio2",
+        "exact_absent_retired_identity": "kr-basic-tech-card"
+      }
+    ],
+    "authorities": [
+      {
+        "path": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "file_sha256": "0103406B1676D5C2BB2CD7065721855D3CB35FEAFB4725C582A81736B8258A0C"
+      },
+      {
+        "path": "prototypes/mir/planner/science.lua",
+        "file_sha256": "DADA03659F5612AD8DFA81CC78120821D7F0FAA92EE812A873934E426DE16CFF"
+      },
+      {
+        "path": "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
+        "file_sha256": "DDD82876964459BE31C3B792D97AC4D67F2C613FFD484F91FBE01969FA20871D"
+      }
+    ]
+  },
+  "generic_runtime_proof": {
+    "scenario": "k2-science-phase-policy",
+    "status": "passed",
+    "path": "build/results/mir4-sol/sol06/k2-policy-runtime-v3-summary.json",
+    "file_sha256": "7ADB01D1A4AB3B8B6268435016FFDB7BFDAD98F5361DA09C0DD091DDFE8D2D7A",
+    "validates": [
+      "target-specific bounded ranges",
+      "profile-specific capability fingerprints",
+      "f200 standalone forbidden-mod rule",
+      "input immutability",
+      "order and shape preservation",
+      "idempotence",
+      "empty-result guard"
+    ]
+  },
+  "candidates": {
+    "f210": {
+      "path": "build/results/mir4-sol/sol06/candidate-v3/more-infinite-research_3.2.11.zip",
+      "archive_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "content_sha256": "1F3D587D9CA51E33A14D597FCC20F1E9EF19709EE2D1F5E75DCE3E56166BD52E",
+      "disposition": "local-development-evidence-only-not-a-release-candidate"
+    },
+    "f200": {
+      "path": "build/results/mir4-sol/sol06/f200-candidate-v2/more-infinite-research_4.0.20000.zip",
+      "archive_sha256": "911FC3CC36A6BEA8444F866E417805101ED51D6691F19B655474A8FC13322441",
+      "content_sha256": "974D533C320F33F189A9379E60B9C9FC4C15B55B02E32D69EA4839A67F0B159E",
+      "base_predecessor": {
+        "release": "2.5.11",
+        "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C"
+      },
+      "construction": "private-target-characterization-from-immutable-predecessor-plus-minimal-policy-overlay",
+      "disposition": "private-local-development-evidence-only-not-formal-target-candidate"
+    }
+  },
+  "f200_reproduction": {
+    "status": "reproduced-on-immutable-predecessor",
+    "candidate": "dist/more-infinite-research_2.5.11.zip",
+    "scenario": "local-2-0-krastorio-spaced-out",
+    "observed_research_belts": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "space-science-pack"
+    ],
+    "unexpected_retained_early_packs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack"
+    ],
+    "campaign_evidence": {
+      "path": "build/results/mir4-sol/sol06/k2so-f200-predecessor-v1/campaign-evidence.json",
+      "file_sha256": "41922D552DEFADE1BD2AAAE10C23BF5B6AB8BF85E20D1575AAFD68B74F7F286C"
+    },
+    "load_results": {
+      "path": "build/results/mir4-sol/sol06/k2so-f200-predecessor-v1/load-results.json",
+      "file_sha256": "5D0B59F4C7B7ED4C0ABA900AD53FEB154730A3998C674C28E3CB688D164D6E0B"
+    },
+    "engine_log": {
+      "path": "build/results/mir4-sol/sol06/k2so-f200-predecessor-v1/runs/u-2ad9284389d3/local-2-0-krastorio-spaced-out.log",
+      "file_sha256": "994D4527C87FF2800708D8939825DAAF99B5AC074442292EAB4B65947A7245B9"
+    }
+  },
+  "exact_runtime_proofs": [
+    {
+      "id": "f210-upper-endpoint",
+      "target": "f210",
+      "scenario": "local-2-1-krastorio-spaced-out",
+      "result": "passed",
+      "factorio": {
+        "version": "2.1.14.87180",
+        "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      },
+      "versions": {
+        "Krastorio2": "2.1.2",
+        "Krastorio2-spaced-out": "2.0.13"
+      },
+      "root_archive_sha256": "A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242",
+      "campaign_evidence_sha256": "ABF0D2569DABADC780FD57BDFD90F7B7D6F77CB05E6B96A6D30A307DB63B503F",
+      "load_results_sha256": "71EAA1F91DA731BA7E1D8F94628C9E7FCB144A8694EA39986EFD8E030D901430",
+      "dependency_lock_sha256": "E8C7CFE3684BCB3D644865CCAD3942EB7E5B2456E0CEC19068B73CD9D03C079E",
+      "engine_log_sha256": "D625BEE128F292AF74E2541E1DB02E85029D77FADA0C886DA00C1EC5D894CA85",
+      "science_contract_passed": true
+    },
+    {
+      "id": "f210-lower-endpoint",
+      "target": "f210",
+      "scenario": "local-2-1-krastorio-spaced-out",
+      "result": "passed",
+      "factorio": {
+        "version": "2.1.14.87180",
+        "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      },
+      "versions": {
+        "Krastorio2": "2.1.2",
+        "Krastorio2-spaced-out": "2.0.11"
+      },
+      "root_archive_sha256": "30EFDD0F1740B4B233FF5E1C767EF8BB35D39684AB7022AFE3A0096F909D64F8",
+      "campaign_evidence_sha256": "100DAA9F5638397A636BCD335B11F064A8B6182104CB5C6F2808A885975AF59A",
+      "load_results_sha256": "89302BBA694F3DE7F4DEF58E6F0A88C9D35C5FB167DBC6758F36230F7AC1FAB1",
+      "dependency_lock_sha256": "B60C80F4D264BE5C14729EA2361FD79CA8E1600A893DC46DDDDFB252C9B1A096",
+      "engine_log_sha256": "3EADB4014CCCEFFD9835608A04A6AE3C027D473371F1E8D525464BAE7EF89D22",
+      "science_contract_passed": true
+    },
+    {
+      "id": "f200-standalone",
+      "target": "f200",
+      "scenario": "local-2-0-krastorio-spaced-out",
+      "result": "passed",
+      "factorio": {
+        "version": "2.0.77.84539",
+        "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "versions": {
+        "Krastorio2": "absent",
+        "Krastorio2-spaced-out": "1.6.21"
+      },
+      "root_archive_sha256": "CC5B49B10865A094A86F748115595BCF64588EF3166A7325B4E719EC1E0C7379",
+      "campaign_evidence_sha256": "5756C357424900884004EBA0A1ADEBA8B00E6834200108962B263CF20F06A71B",
+      "load_results_sha256": "9AB4B6804880AE0C24F0384E64F2379ABDA6443F971753DE5F182BAFDC6E78BB",
+      "dependency_lock_sha256": "D4F766D1492B7298FA4201A4664D6C9DD6529413BF0DCBA4BC6D8954D917AFD7",
+      "engine_log_sha256": "D1946182BCF198876FF9D0E872FC5F76F4FB57E2D536C90E3B0323A1D877F65C",
+      "science_contract_passed": true
+    }
+  ],
+  "science_contract": {
+    "representative_early_stream": {
+      "technology": "research_advanced_circuit",
+      "required": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "electromagnetic-science-pack"
+      ]
+    },
+    "representative_late_stream": {
+      "technology": "research_belts",
+      "required": ["production-science-pack", "space-science-pack"],
+      "forbidden": [
+        "kr-basic-tech-card",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "military-science-pack",
+        "chemical-science-pack"
+      ]
+    }
+  },
+  "optional_productivity_family_dispositions": [
+    {
+      "family": "imersite",
+      "disposition": "preserved-external-owner",
+      "owner": "kr-imersite-productivity",
+      "owned_recipes": [
+        "kr-casting-imersium-beam",
+        "kr-casting-imersium-gear-wheel",
+        "kr-casting-imersium-plate",
+        "kr-easy-imersium-beam",
+        "kr-easy-imersium-gear-wheel",
+        "kr-imersite-crystal",
+        "kr-imersium-plate"
+      ],
+      "mir_duplicate_emitted": false
+    },
+    {
+      "family": "rare-metals",
+      "disposition": "review-required-deferred-processir",
+      "representative_recipes": ["kr-rare-metals", "kr-enriched-rare-metals", "kr-casting-rare-metals"]
+    },
+    {
+      "family": "silicon",
+      "disposition": "review-required-deferred-processir",
+      "representative_recipes": ["kr-silicon"]
+    },
+    {
+      "family": "glass",
+      "disposition": "review-required-deferred-processir",
+      "representative_recipes": ["kr-glass"]
+    },
+    {
+      "family": "black-tile",
+      "disposition": "omitted-hard-safety",
+      "representative_recipes": ["kr-black-reinforced-plate"],
+      "reason": "recipe_productivity_not_allowed"
+    },
+    {
+      "family": "white-tile",
+      "disposition": "omitted-hard-safety",
+      "representative_recipes": ["kr-white-reinforced-plate"],
+      "reason": "recipe_productivity_not_allowed"
+    }
+  ],
+  "verification_plan": {
+    "status": "materialized-preclose",
+    "path": "build/results/mir4-sol/sol06/k2so-verification-plan-v4-preclose-auto.json",
+    "file_sha256": "51661F1EDC5BDFD26011EAF68A71C2BA553A14FA94CABD345A4B146BA534ABED",
+    "plan_material_sha256": "18E908F5086C62FA864534BF4CBF462BFAFE817DF603D6A4A75588BB123E8B11",
+    "required_test_set_sha256": "655BC53B6C5474E883288ED3E78555AADD6538D7DC393F5457A21A2947A21B64",
+    "counts": {
+      "total": 157,
+      "run": 154,
+      "reuse": 0,
+      "invalid": 3
+    },
+    "invalid_future_work": [
+      "runtime.upgrade",
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ]
+  },
+  "exit_gate": {
+    "bounded_policy_implemented": true,
+    "profile_capability_fingerprints_proven": true,
+    "f210_lower_and_upper_endpoints_proven": true,
+    "f200_defect_reproduced": true,
+    "f200_private_target_proof_passed": true,
+    "exact_science_contract_passed": true,
+    "duplicate_imersite_owner_avoided": true,
+    "optional_family_breadth_nonblocking_and_disposed": true,
+    "formal_f200_target_materialization_deferred_to_sol08": true,
+    "public_release_claim_authorized": false,
+    "publication_authorized": false,
+    "next_work_package": "SOL-07"
+  }
+}

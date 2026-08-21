@@ -101,6 +101,7 @@ $paths = @{
   Native = "prototypes/mir/planner/native_owner_binding.lua"
   Continuations = "prototypes/mir/planner/base_continuations.lua"
   MaximumLevel = "prototypes/mir/policy/max_level.lua"
+  MaximumBinding = "prototypes/mir/domain/technology/maximum_level_binding.lua"
   RuntimeMaximum = "prototypes/mir/runtime/maximum_level_control.lua"
 }
 $source = @{}
@@ -229,6 +230,16 @@ if ($source.ModData -notmatch 'target_line\.mod_data_supported\(\)' -or
     $source.RuntimeMaximum -notmatch 'add_runtime_settings_policy\(managed\)' -or
     $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
   throw "Runtime maximum-level policy must use mod-data where supported and reconstruct the same binding from startup settings otherwise."
+}
+if ($source.MaximumBinding -match 'data\.raw|prototypes\.technology|target_line' -or
+    $source.MaximumBinding -notmatch 'MIRMaximumLevelPolicyV3' -or
+    $source.MaximumBinding -notmatch 'absolute-highest-technology-level' -or
+    $source.MaximumBinding -notmatch 'exact-technology' -or
+    $source.MaximumBinding -notmatch 'maximum_level_unknown_finalizer_adapter' -or
+    $source.Orchestrator -notmatch 'maximum_level_binding\.from_plan' -or
+    $source.ModData -notmatch 'maximum-level-policy-v3' -or
+    $source.RuntimeMaximum -notmatch 'record_type == "MaximumLevelBinding"') {
+  throw "Schema-3 MaximumLevelBinding must remain the pure normalized authority consumed by compiler transport and runtime."
 }
 if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
     $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or

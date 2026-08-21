@@ -1,10 +1,13 @@
 ---
 title: "MIR 4 Spark To Sol Handoff And Completion Plan"
 status: current
+applies_to: "MIR 4.0 M4C01"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
 last_reviewed: 2026-08-20
+supersedes: []
+superseded_by: []
 source_of_truth_for:
   - mir4-spark-sol-handoff
   - mir4-m4c01-next-work-plan

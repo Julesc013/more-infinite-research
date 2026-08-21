@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-cubium-production-routes",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Cubium Production Routes",
+  "author": "Julesc013",
+  "description": "Validates exact Cubium alternate science routes without promoting cube-mastery-4 into MIR prerequisites.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "space-age >= 2.1.8",
+    "cubium = 1.0.30",
+    "more-infinite-research"
+  ]
+}

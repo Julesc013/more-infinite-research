@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "kind": "MIR4MaximumLevelBindingSOL03V1",
+  "status": "PASS",
+  "recorded_at": "2026-08-21T00:00:00+10:00",
+  "work_package": "SOL-03",
+  "package_visible": false,
+  "publication_authorized": false,
+  "scope": {
+    "starting_source": {
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "tree": "33f373e42b74697f08d2b3e0bf36a233fcb9bfcd",
+      "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "authority": "normalized-maximum-level-binding-v3-and-exact-corrundum-runtime-contract",
+    "claim_boundary": "The generic MIRMaximumLevelPolicyV3 contract and the exact corrundum_1.0.47 plus PlanetsLib_1.19.5 automated runtime assertions are proven. Manual visual UI review and broad Corrundum support remain unproven."
+  },
+  "candidate": {
+    "path": "build/results/mir4-sol/sol03/candidate-v3/more-infinite-research_3.2.11.zip",
+    "version": "3.2.11",
+    "archive_sha256": "AB30021ED7D17B98EC1639E5303C07FB27630BDE8B8E9B8EC04C2E58D19A91C9",
+    "content_sha256": "4ACA5792CC124E76DD0BBDD683E43B9B42D1FBF9BA15A740FC93827F8B9E71D8",
+    "disposition": "local-development-evidence-only-not-a-release-candidate"
+  },
+  "verification_plan": {
+    "path": "build/results/mir4-sol/sol03/maximum-binding-v3-verification-plan-v2.json",
+    "file_sha256": "0D434BD2C8AAB998373CDF21F3FE14CC66449BE286CF34F92CA8C801D9E6D5B8",
+    "plan_material_sha256": "6A2E136BF0ED91D5335A280F6EAC36BBF3321380C9D46A392876C9AB7EF09790",
+    "required_test_set_sha256": "3E0E60C9E9C89D252067E44FF533138D3D0BEDFDB595B07014CD6B8CD9285787",
+    "counts": {
+      "total": 152,
+      "reuse": 0,
+      "wait": 0,
+      "run": 150,
+      "invalid": 2
+    },
+    "invalid_future_work": [
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ],
+    "invalid_reason": "Both future-work entries require the governed MIR 4 bootstrap output produced in SOL-09; neither invalidates SOL-03."
+  },
+  "generic_runtime_proofs": [
+    {
+      "scenario": "compiler-contracts",
+      "path": "build/results/mir4-sol/sol03/compiler-contracts-v3-summary.json",
+      "file_sha256": "BB8BB3AD197E270DBAEE12795CC02AB5D3643E501F4770209D2909F9B0DF3D01",
+      "status": "passed"
+    },
+    {
+      "scenario": "generated-maximum-level-absolute",
+      "path": "build/results/mir4-sol/sol03/generated-maximum-v3-summary.json",
+      "file_sha256": "57F55D92EE04219934594B81135EF50D6D575CCA1C6C5CEDFF4AF9E76D326342",
+      "status": "passed"
+    },
+    {
+      "scenario": "space-age-native-owner-settings-max-level",
+      "path": "build/results/mir4-sol/sol03/native-owner-maximum-v3-summary.json",
+      "file_sha256": "7FC5A935FD03C7697F77BA8C8A0119D52E59CC8EDB2D999B82ABEDDFBE4899D8",
+      "status": "passed"
+    },
+    {
+      "scenario": "space-age-native-owner-settings-max-level-late-conflict",
+      "path": "build/results/mir4-sol/sol03/native-owner-maximum-conflict-v3-summary.json",
+      "file_sha256": "55797ADFFC03467B8DDC1E6DA91C53F6CD5DD8B20224BDBAD649332FF45BAB7F",
+      "status": "passed"
+    }
+  ],
+  "exact_runtime_proof": {
+    "scenario": "local-2-1-corrundum-maxcap-13",
+    "result": "passed",
+    "claim_level": "diagnostic-only",
+    "campaign_evidence": {
+      "path": "build/results/mir4-sol/sol03/corrundum-maxcap-v3-run6/campaign-evidence.json",
+      "file_sha256": "A37E7FEB7EB9F1A60ACF5F87D0ED9210C263B74FBE9DAB3D193BBB6DF7C2049F"
+    },
+    "load_results": {
+      "path": "build/results/mir4-sol/sol03/corrundum-maxcap-v3-run6/load-results.json",
+      "file_sha256": "D3A082F97EF20CC51C4AB17FFCA2455DF250139F0662BC8E7D006E37727B45EA"
+    },
+    "engine_log": {
+      "path": "build/results/mir4-sol/sol03/corrundum-maxcap-v3-run6/runs/u-c5d98370cc10/local-2-1-corrundum-maxcap-13.log",
+      "file_sha256": "D3D236B8F7C8EB17A6C9E0726ABBD818C4ACE270602DEE38E74BD6FD02073752"
+    },
+    "factorio": {
+      "version": "2.1.14.87180",
+      "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+    },
+    "dependency_lock_sha256": "2422B1B4AE786B137A27BE0F7896AF77FBE88500BC294A75CB358787341369BA",
+    "roots": [
+      {
+        "name": "corrundum",
+        "version": "1.0.47",
+        "archive_sha256": "969A92DE8AE509A9C57C6E94CB1232F9E840E26F340663DDBD1101E1C0932E13"
+      },
+      {
+        "name": "PlanetsLib",
+        "version": "1.19.5",
+        "archive_sha256": "21FECA0A902B5B21B92DC17A65B5B3A3E08499E6A59FF9D7FF57ADF530004A93"
+      }
+    ],
+    "assertions": {
+      "required_audit_rows": 1,
+      "required_audit_rows_passed": 1,
+      "required_log_fragments": 9,
+      "required_log_fragments_passed": 9,
+      "forbidden_log_fragments": 1,
+      "forbidden_log_fragments_passed": 1,
+      "total": 11,
+      "passed": 11
+    }
+  },
+  "implementation_authorities": [
+    "prototypes/mir/domain/technology/maximum_level_binding.lua",
+    "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+    "prototypes/mir/emit/mod_data.lua",
+    "prototypes/mir/runtime/maximum_level_control.lua",
+    "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua"
+  ],
+  "findings": [
+    "The aggregate static wrapper correctly rejects development package content that differs from the immutable terminal 3.2.11 package lock.",
+    "The two verification-plan invalid entries are future SOL-09 bootstrap custody artifacts, not SOL-03 product failures.",
+    "Exact automated maximum-level behavior is proven for the locked Corrundum closure; visual UI inspection remains a separate manual evidence class."
+  ],
+  "exit_gate": {
+    "normalized_binding_v3": true,
+    "three_ownership_routes_proven": true,
+    "order_independence_proven": true,
+    "known_finalizer_acceptance_proven": true,
+    "unknown_or_conflicting_finalizer_rejection_proven": true,
+    "exact_corrundum_runtime_contract_proven": true,
+    "publication_authorized": false,
+    "next_work_package": "SOL-04"
+  }
+}

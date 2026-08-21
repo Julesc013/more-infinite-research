@@ -326,20 +326,22 @@ foreach ($target in @("2.0", "2.1")) {
 }
 $publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
 $terminalRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
-$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.10.json") | ConvertFrom-Json
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.11.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
+$mir4Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-M4C01-Implementation-AuthorizationV1.json") | ConvertFrom-Json
+$mir4Targets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Target-RegistryV5.json") | ConvertFrom-Json
+$mir4F210 = @($mir4Targets.payload.targets | Where-Object id -eq 'factorio-2.1')
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
-if ($currentReleaseBoundary -notin @(
-      "planned|not-assigned", "source-frozen|C34", "package-built|C34",
-      "focused-qualified|C34", "candidate-qualified|C34", "manually-accepted|C34",
-      "automated-qualified-awaiting-human-review|C34",
-      "protected-qualified|C34", "sealed|C34", "promoted|C34", "tagged|C34",
-      "published|C34", "publicly-verified|C34"
-    ) -or [string]$currentRelease.candidate_floor -ne "C34" -or
-    [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
-    [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
-    [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current 3.2.10 hotfix upgrade authority."
+if ($currentReleaseBoundary -ne 'publicly-verified|C35' -or [string]$currentRelease.candidate_floor -ne 'C35' -or
+    [string]$currentProfile.release_authority_mode -ne 'candidate-programme' -or
+    [string]$currentProfile.release_authority -ne '.mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json' -or
+    [string]$mir4Authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+    [string]$mir4Authority.status -ne 'authorized-in-progress' -or $mir4F210.Count -ne 1 -or
+    [string]$mir4F210[0].mir3_predecessor -ne [string]$currentProfile.upgrade.from_version -or
+    [string]$currentProfile.upgrade.from_version -ne '3.2.11' -or
+    [string]$currentProfile.upgrade.to_version -ne '4.0.21000' -or
+    [string]$currentProfile.upgrade.fixture -ne 'assert-upgrade-3-2-11-to-4-0-21000') {
+  throw "Factorio 2.1 assurance profile must bind the exact 3.2.11 to MIR 4 M4C01 candidate-programme authority."
 }
 if ([string]$terminalRelease.state -ne "publicly-verified" -or
     [string]$terminalRelease.candidate_id -ne "C33" -or
@@ -705,7 +707,7 @@ if ($validateWorkflow -match "github\.(ref|head_ref|base_ref)\s*==\s*'[^']*legac
   throw "Hosted validation must treat legacy as the Factorio 2.1 terminal alias and reserve the Factorio 2.0 lane for tmp/2.0."
 }
 if ($validateWorkflow.Contains('$candidate = Join-Path $PWD ([string]$plan.candidate)') -or
-    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 4 -or
+    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 6 -or
     @([regex]::Matches($validateWorkflow, '\[IO\.Path\]::IsPathRooted\(\$candidateRelative\)')).Count -ne 2) {
   throw "Hosted workers and aggregate verification must reconstruct the candidate from the governed repo-relative descriptor path, never the planner checkout's absolute path."
 }
