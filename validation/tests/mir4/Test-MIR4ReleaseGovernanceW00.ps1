@@ -1,0 +1,48 @@
+param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
+
+$ErrorActionPreference='Stop'
+. (Join-Path $RepoRoot 'tools/lib/mir4/ReleaseGovernance.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+
+$authority = Test-MIR4ReleaseGovernanceAuthority -RepoRoot $RepoRoot
+if ([string]$authority.state -cne 'BLOCKED-HUMAN-SECRET-INPUT' -or [string]$authority.acceptance -cne 'BLOCKED') {
+  throw '[mir4-w00-blocker] The current secret-input blocker was not represented honestly.'
+}
+if (@($authority.blocked_subtasks).Count -ne 3) { throw '[mir4-w00-blocker-set] Expected three key-dependent blockers.' }
+
+$ledgerSchema = Join-Path $RepoRoot 'spec/schemas/mir4-release-ledger-event.schema.json'
+$revocationSchema = Join-Path $RepoRoot 'spec/schemas/mir4-key-revocation.schema.json'
+foreach ($schema in @($ledgerSchema, $revocationSchema)) {
+  Get-Content -Raw -LiteralPath $schema | ConvertFrom-Json | Out-Null
+}
+$event = [ordered]@{
+  schema=1;kind='MIR4ReleaseLedgerEventV1';event_id='MIR4-LEDGER-20260822T000000Z-INTENT';event_kind='ReleaseIntent';occurred_at='2026-08-22T00:00:00Z';subject='M4C02-09-24H';predecessor_event_sha256=$null;payload_sha256=('a'*64);signing_namespace='mir4-ledger';signer_fingerprint='SHA256:example-public-fixture'
+}
+if (-not (($event | ConvertTo-Json -Depth 10) | Test-Json -SchemaFile $ledgerSchema)) { throw '[mir4-w00-ledger-schema]' }
+
+$publisherFixture = Join-Path ([IO.Path]::GetTempPath()) ('mir4-w00-publisher-' + [guid]::NewGuid().ToString('N'))
+try {
+  New-Item -ItemType Directory -Force -Path (Join-Path $publisherFixture 'public-release-records') | Out-Null
+  $clean = Test-MIR4PublisherInventory -PublisherHome $publisherFixture
+  if (@($clean.forbidden).Count -ne 0) { throw '[mir4-w00-publisher-clean-fixture]' }
+  New-Item -ItemType Directory -Force -Path (Join-Path $publisherFixture '.git') | Out-Null
+  $dirty = Test-MIR4PublisherInventory -PublisherHome $publisherFixture
+  if ('.git' -notin @($dirty.forbidden)) { throw '[mir4-w00-publisher-forbidden-fixture]' }
+} finally {
+  if (Test-Path -LiteralPath $publisherFixture) { Remove-Item -LiteralPath $publisherFixture -Recurse -Force }
+}
+
+$packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
+foreach ($path in @(
+  '.mir/releases/governance/mir4/release-governance.json',
+  '.mir/releases/governance/mir4/allowed-signers.json',
+  'spec/schemas/mir4-release-ledger-event.schema.json',
+  'spec/schemas/mir4-key-revocation.schema.json',
+  'tools/lib/mir4/ReleaseGovernance.ps1',
+  'tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1',
+  'docs/maintainer/mir4-release-governance.md'
+)) {
+  if ($path -in $packageFiles) { throw "[mir4-w00-package-visible] $path" }
+}
+
+Write-Host '[ok] MIR 4 W00 release-governance contracts passed; protected signing remains BLOCKED-HUMAN-SECRET-INPUT.'
