@@ -10,13 +10,15 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/streams.yml',
   '.mir/fixtures.yml',
   '.mir/modules.yml',
+  '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/SafetyKernel.ps1',
   'tools/lib/mir4/PolicyEngine.ps1',
   'tools/lib/mir4/NormalizedCompiler.ps1',
   'tools/lib/mir4/RuntimeStateModel.ps1',
   'tools/lib/mir4/ProcessIR.ps1',
-  'tools/lib/mir4/ReleaseDag.ps1'
+  'tools/lib/mir4/ReleaseDag.ps1',
+  'tools/lib/mir4/RepositoryFixedPoint.ps1'
 )
 
 function Get-MIR4PlatformRepoRoot {

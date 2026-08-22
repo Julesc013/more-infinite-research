@@ -223,6 +223,10 @@ Invoke-RepoCheck "MIR 4 W00 release governance is separated and honestly classif
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4ReleaseGovernanceW00.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "MIR 4 W01 repository shadow fixed point has one writer and no unknown path" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4RepositoryFixedPointW01.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "MIR 4 public feedback has one governed reproducer and authority map per family" {
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4PublicFeedbackIntake.ps1") -RepoRoot $repo
 }

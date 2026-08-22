@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR4VisibleRootProjectionV1",
+  "id": "governance",
+  "path": "governance",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    ".mir/control",
+    ".mir/control-plane",
+    ".mir/*.yml"
+  ],
+  "writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

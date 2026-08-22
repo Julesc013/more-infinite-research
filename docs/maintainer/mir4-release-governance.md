@@ -1,3 +1,14 @@
+---
+title: "MIR 4 Release Governance"
+status: current
+applies_to: "M4C02-09-24H private programme"
+audience: release-manager
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-08-23
+supersedes: []
+superseded_by: []
+---
 # MIR 4 release governance
 
 This authority defines the release-custody boundary for the private `M4C02-09-24H` programme. It does not authorize source freeze, candidate allocation, production signatures, seals, tags, promotion, or publication.
