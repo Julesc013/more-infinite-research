@@ -1,0 +1,1 @@
+{"schema":1,"kind":"MIR4CompatibilityFactoryRequestV1","target":"f210","subjects":[{"subject_id":"aai","safe_choice":"target-capability-or-provider"},{"subject_id":"bz","safe_choice":"generic-compiler-correction"},{"subject_id":"industrial-revolution-4","safe_choice":"preserve-review-or-omit"}],"expected":{"package_visible":false,"public_claim":false,"executable_entries":0}}

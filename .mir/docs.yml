@@ -148,6 +148,18 @@ docs:
       - mir4-effect-channel-registry-v1
       - mir4-synthesis-maturity-matrix-v1
       - mir4-exact-target-processir-snapshot-blocker
+  - path: docs/architecture/mir4-inspector-compatibility.md
+    title: "MIR 4 Inspector and Compatibility Workbench"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-inspector-v1-preview
+      - mir4-compatibility-subject-ledger-v1
+      - mir4-compatibility-factory-data-bundle-v1
+      - mir4-compatibility-evidence-transfer-boundary
+      - mir4-independent-production-consumer-blocker-w07
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

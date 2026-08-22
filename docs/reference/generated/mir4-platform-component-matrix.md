@@ -42,6 +42,9 @@ Generated from `spec/platform/mir4-preview-v0/platform.json`.
 | `process-ir-v1` | preview | synthetic-parity-exact-target-snapshot-blocked |
 | `effect-channel-registry-v1` | preview | owner-references-and-opaque-preservation |
 | `autonomous-synthesis-v1` | preview | diagnose-conservative-experimental-no-player-mutation |
+| `compatibility-subject-ledger-v1` | preview | multidimensional-private-evidence-nontransferable |
+| `compatibility-factory-v1` | preview | data-only-allowlisted-zip-no-code-generation |
+| `inspector-v1` | preview | offline-bounded-accessible-package-excluded |
 | `historical-target-providers-v0` | experimental | private-build-only |
 
 The conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.

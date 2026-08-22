@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/mir4-inspector-workbench-result-v1.schema.json",
+  "title": "MIR 4 Inspector Workbench Result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "source_identity", "maturity", "authority", "input_digests", "workbench", "offline", "accessibility", "localization", "compatibility_factory", "blockers", "passed", "package_visible", "public_release_proof", "player_mutation_authorized", "public_support_authorized", "publication_authorized", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4InspectorWorkbenchResultV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "source_identity": {"type": ["object", "null"]},
+    "maturity": {"const": "developer-preview"},
+    "authority": {"const": "W07-read-only-inspector-and-data-bundle-factory"},
+    "input_digests": {"type": "object", "required": ["inspection_bundle", "subject_ledger", "factory_plan"]},
+    "workbench": {"type": "object", "required": ["root", "html_sha256", "section_count", "sections", "bounded_lists", "page_limit", "raw_mutable_compiler_objects"]},
+    "offline": {"type": "object", "required": ["local_file_api_only", "network_calls", "upload_paths", "external_assets", "idle_runtime_work"]},
+    "accessibility": {"type": "object", "required": ["keyboard_paging", "keyboard_filter", "focus_visible", "screen_reader_labels", "table_captions_and_headers", "live_status_and_error_regions"]},
+    "localization": {"type": "object", "required": ["catalogue", "ui_text_separated_from_render_logic", "default_locale"]},
+    "compatibility_factory": {"type": "object", "required": ["pipeline", "subject_count", "plan_digest", "package", "arbitrary_code", "executable_content", "validation"]},
+    "blockers": {"type": "object", "required": ["subjects", "ir4", "process_ir"]},
+    "passed": {"const": true},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "public_support_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,1 @@
+{"schema":1,"kind":"MIR4CompatibilityFactoryRequestV1","target":"f210","subjects":[{"subject_id":"bob","safe_choice":"generic-effect-channel-or-operator"},{"subject_id":"bz","safe_choice":"generic-compiler-correction"},{"subject_id":"aai","safe_choice":"target-capability-or-provider"}]}
