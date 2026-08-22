@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-luna-audit-input-v1.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-luna-audit-input-v1.schema.json",
+  "title": "MIR4LunaAuditInputV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "auditor_model", "audit_scope", "decision", "b0_findings", "b1_findings", "merge_recommendation", "evidence_refs"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4LunaAuditInputV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "auditor_model": {"const": "gpt-5.6-luna"},
+    "audit_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "tree": {"type": "string", "pattern": "^[a-f0-9]{40}$"}
+      }
+    },
+    "decision": {"enum": ["ACCEPT", "REJECT"]},
+    "b0_findings": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "b1_findings": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "merge_recommendation": {"enum": ["APPROVE", "DO-NOT-MERGE"]},
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "role"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+          "role": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "ACCEPT"}}},
+      "then": {"properties": {"b0_findings": {"maxItems": 0}, "merge_recommendation": {"const": "APPROVE"}}}
+    }
+  ]
+}

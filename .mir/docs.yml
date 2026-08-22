@@ -192,6 +192,16 @@ docs:
     source_of_truth_for:
       - mir4-w09-manual-playtest-checklist
       - mir4-historical-and-museum-playtest-boundaries
+  - path: docs/maintainer/mir4-full-platform-closeout.md
+    title: "MIR 4 Full-Platform Private Closeout"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-full-platform-39-record-closeout
+      - mir4-independent-luna-audit-input-binding
+      - mir4-dev-and-source-freeze-stop-boundary
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

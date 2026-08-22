@@ -150,6 +150,14 @@ package_excluded_modules:
     playtest_handoff: docs/maintainer/mir4-w09-manual-playtest.md
     boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
     stability: developer-preview-shadow-partial-with-bounded-blockers
+  mir4_full_platform_closeout_v1:
+    implementation: tools/lib/mir4/FullPlatformCloseout.ps1
+    exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
+    output_schema: spec/schemas/mir4-full-platform-record-v1.schema.json
+    independent_audit_input_schema: spec/schemas/mir4-luna-audit-input-v1.schema.json
+    documentation: docs/maintainer/mir4-full-platform-closeout.md
+    boundary: evidence-only aggregation of the existing W00-W09 authorities, exact generated records, governed verification evidence, and independent audit result; no product, policy, compiler, prototype, runtime, migration, release, secret, ledger, source-freeze, signing, sealing, promotion, tag, upload, publication, or Dev-mutation authority
+    stability: stable-evidence-adapter-partial-with-bounded-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
