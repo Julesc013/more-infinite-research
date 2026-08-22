@@ -24,6 +24,15 @@ if(Test-MIR4FullPlatformAuditInput -Audit $audit -SourceIdentity $source){throw 
 $audit.audit_scope.tree=$source.tree;$audit.b0_findings=@('B0 defect')
 if(Test-MIR4FullPlatformAuditInput -Audit $audit -SourceIdentity $source){throw '[mir4-full-platform-b0-acceptance-admitted]'}
 
+$plan=[pscustomobject][ordered]@{source_commit=$source.commit;source_tree=$source.tree;package_source_sha256=$source.package_source_sha256;plan_material_sha256=('E'*64);tests=@([ordered]@{id='one'},[ordered]@{id='two'})}
+$summary=[pscustomobject][ordered]@{status='passed';plan=$plan;counts=[ordered]@{expected=2;total=2;failed=0;incomplete=0;unexpected=0}}
+$bundle=[pscustomobject][ordered]@{status='passed';plan_material_sha256=$plan.plan_material_sha256;required_test_set_sha256=('F'*64);capsule_set_sha256=('A'*64);bundle_sha256=('B'*64);checks=@([ordered]@{test_id='one';status='passed'},[ordered]@{test_id='two';status='passed'})}
+if(-not(Test-MIR4FullPlatformGateBinding -Plan $plan -Summary $summary -Bundle $bundle -SourceIdentity $source)){throw '[mir4-full-platform-gate-binding]'}
+$bundle.checks[1].status='failed'
+if(Test-MIR4FullPlatformGateBinding -Plan $plan -Summary $summary -Bundle $bundle -SourceIdentity $source){throw '[mir4-full-platform-failed-gate-admitted]'}
+$bundle.checks[1].status='passed';$plan.source_tree='c'*40
+if(Test-MIR4FullPlatformGateBinding -Plan $plan -Summary $summary -Bundle $bundle -SourceIdentity $source){throw '[mir4-full-platform-stale-gate-admitted]'}
+
 $blockers=@(Get-MIR4FullPlatformBlockers)
 $requiredBlockers=@('BLOCKED-HUMAN-SECRET-INPUT','BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER','BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT','BLOCKED-MISSING-EXACT-ENGINE-f018','BLOCKED-MISSING-TRUSTED-TIMING-CAPACITY-EVIDENCE','BLOCKED-MUSEUM-RIGHTS-CUSTODY-RESTORE-CLOSURE','BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST')
 if($blockers.Count-ne$requiredBlockers.Count-or@($requiredBlockers|Where-Object{$_-notin@($blockers.id)}).Count){throw '[mir4-full-platform-blocker-loss]'}

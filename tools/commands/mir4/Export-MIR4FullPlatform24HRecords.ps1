@@ -121,6 +121,14 @@ $definitions = @(
 foreach ($definition in $definitions) { Add-Record $definition.name (New-WrappedWaveRecord $definition) }
 
 $gateRefs = @()
+$gatePaths = @($VerificationPlanPath,$VerificationSummaryPath,$EvidenceBundlePath)
+if (@($gatePaths | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }).Count -notin @(0,3)) { throw '[mir4-full-platform-gate-input-set-incomplete]' }
+if (-not [string]::IsNullOrWhiteSpace($VerificationPlanPath)) {
+  $verificationPlan = Read-RepoJson $VerificationPlanPath
+  $verificationSummary = Read-RepoJson $VerificationSummaryPath
+  $evidenceBundle = Read-RepoJson $EvidenceBundlePath
+  if (-not (Test-MIR4FullPlatformGateBinding -Plan $verificationPlan -Summary $verificationSummary -Bundle $evidenceBundle -SourceIdentity $source)) { throw '[mir4-full-platform-gate-evidence-invalid-or-stale]' }
+}
 foreach ($gate in @(
   @{path=$VerificationPlanPath;role='verification-plan'},
   @{path=$VerificationSummaryPath;role='verification-summary'},

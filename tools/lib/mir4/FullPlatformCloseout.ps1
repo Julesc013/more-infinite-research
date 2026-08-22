@@ -66,6 +66,35 @@ function Test-MIR4FullPlatformAuditInput {
   return $true
 }
 
+function Test-MIR4FullPlatformGateBinding {
+  param(
+    [Parameter(Mandatory)]$Plan,
+    [Parameter(Mandatory)]$Summary,
+    [Parameter(Mandatory)]$Bundle,
+    [Parameter(Mandatory)]$SourceIdentity
+  )
+  if ([string]$Plan.source_commit -cne [string]$SourceIdentity.commit -or
+      [string]$Plan.source_tree -cne [string]$SourceIdentity.tree -or
+      [string]$Plan.package_source_sha256 -cne [string]$SourceIdentity.package_source_sha256 -or
+      [string]$Plan.plan_material_sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+  if ([string]$Summary.status -cne 'passed' -or
+      [string]$Summary.plan.source_commit -cne [string]$SourceIdentity.commit -or
+      [string]$Summary.plan.source_tree -cne [string]$SourceIdentity.tree -or
+      [string]$Summary.plan.plan_material_sha256 -cne [string]$Plan.plan_material_sha256 -or
+      [int]$Summary.counts.expected -ne @($Plan.tests).Count -or
+      [int]$Summary.counts.total -ne @($Plan.tests).Count -or
+      [int]$Summary.counts.failed -ne 0 -or [int]$Summary.counts.incomplete -ne 0 -or [int]$Summary.counts.unexpected -ne 0) { return $false }
+  if ([string]$Bundle.status -cne 'passed' -or
+      [string]$Bundle.plan_material_sha256 -cne [string]$Plan.plan_material_sha256 -or
+      [string]$Bundle.required_test_set_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$Bundle.capsule_set_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$Bundle.bundle_sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+  $plannedIds = @($Plan.tests.id | Sort-Object -Unique)
+  $checkIds = @($Bundle.checks | Where-Object { [string]$_.status -ceq 'passed' } | ForEach-Object { [string]$_.test_id } | Sort-Object -Unique)
+  if ($plannedIds.Count -ne @($Plan.tests).Count -or $checkIds.Count -ne $plannedIds.Count -or @($plannedIds | Where-Object { $_ -notin $checkIds }).Count -ne 0) { return $false }
+  return $true
+}
+
 function Get-MIR4FullPlatformBlockers {
   return @(
     [pscustomobject][ordered]@{id='BLOCKED-HUMAN-SECRET-INPUT';scope=@('release-governance','source-freeze','production-signing','release-ledger');owner='maintainer-protected-secret-authority';required_input='Protected signing-key passphrase or an approved existing protected signing authority.';workaround_permitted=$false},
