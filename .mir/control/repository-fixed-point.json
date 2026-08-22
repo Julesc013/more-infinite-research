@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIR4RepositoryFixedPointV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "REPOSITORY-SHADOW-FIXED-POINT-ACCEPTED",
+  "unknown_policy": "block-deletion-and-cutover",
+  "physical_cutover": false,
+  "current_package_source_remains_authoritative": true,
+  "root_markers": ".mir-root.json",
+  "classification_order": [
+    "normative-authority",
+    "generated-projection",
+    "executable-source",
+    "test-fixture",
+    "reusable-cache",
+    "durable-evidence",
+    "process-scratch",
+    "archive",
+    "obsolete",
+    "unknown"
+  ],
+  "visible_roots": [
+    {"id":"governance","path":"governance","mode":"shadow-reader","current_authorities":[".mir/control",".mir/control-plane",".mir/*.yml"]},
+    {"id":"contracts","path":"contracts","mode":"shadow-reader","current_authorities":["spec/api","spec/schemas"]},
+    {"id":"spec","path":"spec","mode":"canonical","current_authorities":["spec"]},
+    {"id":"src","path":"src","mode":"shadow-reader","current_authorities":["prototypes","data.lua","data-updates.lua","data-final-fixes.lua","control.lua","settings.lua","migrations"]},
+    {"id":"targets","path":"targets","mode":"shadow-reader","current_authorities":[".mir/targets.json",".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json","tools/commands/targets"]},
+    {"id":"modules","path":"modules","mode":"shadow-reader","current_authorities":[".mir/modules.yml","prototypes/mir/capabilities","prototypes/mir/domain"]},
+    {"id":"sdk","path":"sdk","mode":"canonical-package-excluded","current_authorities":["sdk"]},
+    {"id":"tools-mir","path":"tools/mir","mode":"shadow-command-index","current_authorities":["tools/mir.ps1","tools/commands","tools/lib"]},
+    {"id":"tests","path":"tests","mode":"shadow-reader","current_authorities":["validation/tests","validation/tests.yml"]},
+    {"id":"assurance","path":"assurance","mode":"shadow-reader","current_authorities":["tools/lib/assurance","validation",".mir/control-plane"]},
+    {"id":"changes","path":"changes","mode":"shadow-reader","current_authorities":[".mir/lifecycle/changes",".mir/lifecycle/incidents",".mir/lifecycle/tasks"]},
+    {"id":"releases","path":"releases","mode":"shadow-reader","current_authorities":[".mir/releases",".mir/releases.json",".mir/distributions.json"]},
+    {"id":"docs","path":"docs","mode":"canonical","current_authorities":["docs",".mir/docs.yml"]},
+    {"id":"examples","path":"examples","mode":"shadow-reader","current_authorities":["fixtures","sdk/preview/mir4/reference","sdk/preview/mir4/reference-extension"]}
+  ],
+  "external_roots": [
+    {"environment":"MIR_CACHE_HOME","path":"C:\\Projects\\Factorio\\cache\\mir4","class":"reusable-cache"},
+    {"environment":"MIR_STATE_HOME","path":"C:\\Projects\\Factorio\\state\\mir4","class":"process-scratch"},
+    {"environment":"MIR_TEMP_HOME","path":"C:\\Projects\\Factorio\\tmp\\mir4","class":"process-scratch"},
+    {"environment":"MIR_WORKTREE_HOME","path":"C:\\Projects\\Factorio\\more-infinite-research\\.worktrees","class":"process-scratch"},
+    {"environment":"MIR_ARCHIVE_HOME","path":"C:\\Projects\\Factorio\\archive","class":"archive"},
+    {"environment":"MIR_EVIDENCE_HOME","path":"C:\\Projects\\Factorio\\evidence\\mir4","class":"durable-evidence"}
+  ],
+  "move_gate": [
+    "old-new-readers-agree",
+    "old-new-package-trees-agree",
+    "semantic-roots-agree",
+    "target-package-roots-agree",
+    "tests-agree",
+    "rollback-recorded"
+  ],
+  "remaining_move": {
+    "classification": "bounded-shadow-debt",
+    "reason": "A physical source move is not justified until complete reader and package parity is independently proven.",
+    "rollback": "Remove shadow root projections and retain every current writer at its existing canonical path."
+  }
+}

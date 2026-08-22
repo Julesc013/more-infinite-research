@@ -1,6 +1,7 @@
 schema = 1
 source_version = "4.0.0"
 candidate_wave = "M4C01"
+programme_id = "M4C02-09-24H"
 platform_contract = "spec/platform/mir4-preview-v0/platform.json"
 target_registry = ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json"
 compatibility_manifest = ".mir/compatibility.yml"
@@ -14,6 +15,30 @@ developer_assets = "preview"
 compiler_replacement = "shadow"
 autonomous_synthesis = "diagnose-only"
 historical_targets = "private-experimental"
+
+[logical_paths]
+governance = "governance"
+contracts = "contracts"
+spec = "spec"
+source = "src"
+targets = "targets"
+modules = "modules"
+sdk = "sdk"
+tools = "tools/mir"
+tests = "tests"
+assurance = "assurance"
+changes = "changes"
+releases = "releases"
+docs = "docs"
+examples = "examples"
+
+[external_roots]
+cache = "MIR_CACHE_HOME"
+state = "MIR_STATE_HOME"
+temp = "MIR_TEMP_HOME"
+worktrees = "MIR_WORKTREE_HOME"
+archive = "MIR_ARCHIVE_HOME"
+evidence = "MIR_EVIDENCE_HOME"
 
 [commands]
 generate = ".\\tools\\mir.ps1 mir4 platform generate"

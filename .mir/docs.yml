@@ -62,6 +62,17 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-qualification-and-promotion-workflow
+  - path: docs/maintainer/mir4-release-governance.md
+    title: "MIR 4 Release Governance"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-signing-authority-separation
+      - mir4-key-recovery-and-revocation
+      - mir4-release-ledger-policy
+      - mir4-archive-and-publisher-confinement
   - path: docs/architecture/mir4-platform-preview.md
     title: "MIR 4 Platform Preview Architecture"
     status: current
@@ -71,6 +82,16 @@ docs:
     source_of_truth_for:
       - mir4-hybrid-platform-boundary
       - shadow-non-interference
+  - path: docs/architecture/mir4-repository-fixed-point.md
+    title: "MIR 4 Repository Fixed Point"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-visible-root-shadow-layout
+      - mir4-path-classification-and-external-roots
+      - mir4-physical-move-gate
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

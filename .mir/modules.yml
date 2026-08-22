@@ -42,6 +42,25 @@ stage_entrypoints:
   control.lua: prototypes/mir/stage/control.lua
 
 package_excluded_modules:
+  mir4_repository_fixed_point_v1:
+    authority: .mir/control/repository-fixed-point.json
+    path_authority: .mir/control/paths.yml
+    ownership_authority: .mir/control-plane/ownership.json
+    implementation: tools/lib/mir4/RepositoryFixedPoint.ps1
+    command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+    documentation: docs/architecture/mir4-repository-fixed-point.md
+    boundary: read-only shadow roots, complete inventory, and external non-secret state initialization; no physical source move, writer cutover, package mutation, or deletion authority
+    stability: stable-shadow-fixed-point
+  mir4_release_governance_v1:
+    authority: .mir/releases/governance/mir4/release-governance.json
+    allowed_signers: .mir/releases/governance/mir4/allowed-signers.json
+    implementation: tools/lib/mir4/ReleaseGovernance.ps1
+    command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    ledger_schema: spec/schemas/mir4-release-ledger-event.schema.json
+    revocation_schema: spec/schemas/mir4-key-revocation.schema.json
+    documentation: docs/maintainer/mir4-release-governance.md
+    boundary: release-custody policy and external-layout validation only; no source freeze, key generation without protected human secret input, signing, sealing, promotion, tagging, or publication
+    stability: stable-governance-contract-blocked-human-secret-input
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
     profile_authority: spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json
@@ -859,6 +878,15 @@ validation_tooling:
     mir4_runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
     mir4_process_ir: tools/lib/mir4/ProcessIR.ps1
     mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1
+    mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
+    mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
+    mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
+    mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
+    mir4_repository_fixed_point: tools/lib/mir4/RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_authority: .mir/control/repository-fixed-point.json
+    mir4_repository_fixed_point_command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_gate: validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
     mir4_release_dag_spec: spec/platform/mir4-preview-v0/release-dag.json
     mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1

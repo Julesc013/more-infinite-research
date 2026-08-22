@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "MIR4VisibleRootProjectionV1",
+  "id": "contracts",
+  "path": "contracts",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    "spec/api",
+    "spec/schemas"
+  ],
+  "writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseGovernanceV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "BLOCKED-HUMAN-SECRET-INPUT",
+  "acceptance": "BLOCKED",
+  "blocked_subtasks": [
+    {
+      "id": "dedicated-ed25519-authority",
+      "reason": "A maintainer-approved passphrase or protected encryption authority is not available to this session.",
+      "required_human_input": "Provide a secure signing-key passphrase through an approved secret channel or identify an existing protected secret authority."
+    },
+    {
+      "id": "encrypted-recovery-and-restore",
+      "reason": "Recovery copies and a clean restore test require the protected private-key authority."
+    },
+    {
+      "id": "signed-append-only-ledger",
+      "reason": "The ledger branch must not be created unsigned or with a substitute key."
+    }
+  ],
+  "signing_authority": {
+    "algorithm": "ssh-ed25519",
+    "dedicated": true,
+    "reused": false,
+    "private_key_location_class": "external-protected-signing-authority",
+    "private_key_forbidden_roots": [
+      "repository",
+      "builder-worktrees",
+      "publisher"
+    ],
+    "namespaces": [
+      "mir4-source",
+      "mir4-target",
+      "mir4-ledger"
+    ],
+    "public_key": null,
+    "fingerprint": null,
+    "secret_material_recorded": false
+  },
+  "allowed_signers": {
+    "authority_path": ".mir/releases/governance/mir4/allowed-signers.json",
+    "status": "awaiting-protected-key",
+    "required_fields": [
+      "principal",
+      "public_key",
+      "fingerprint",
+      "namespace",
+      "effective_at",
+      "status",
+      "rotation_predecessor",
+      "rotation_successor",
+      "revocation_reference"
+    ]
+  },
+  "recovery": {
+    "required_copies": 2,
+    "encryption_required": true,
+    "separate_control_required": true,
+    "clean_restore_test_required": true,
+    "private_key_disclosure_forbidden": true
+  },
+  "ledger": {
+    "branch": "release-ledger/mir4",
+    "status": "not-created-until-signing-authority-exists",
+    "append_only": true,
+    "signed_commits_required": true,
+    "product_source_forbidden": true,
+    "event_kinds": [
+      "ReleaseIntent",
+      "SourceFreeze",
+      "TargetBuild",
+      "FocusedQualification",
+      "CandidateQualification",
+      "ManualAcceptance",
+      "IndependentAcceptance",
+      "Seal",
+      "Promotion",
+      "Tag",
+      "Publication",
+      "PublicByteVerification",
+      "Revocation"
+    ]
+  },
+  "archive": {
+    "environment_variable": "MIR_ARCHIVE_HOME",
+    "required_home": "C:\\Projects\\Factorio\\archive",
+    "subroots": [
+      "source-bundles",
+      "target-packages",
+      "release-capsules",
+      "proof-objects",
+      "publication-receipts",
+      "recovery-material",
+      "predecessor-custody",
+      "rights-custody-metadata"
+    ]
+  },
+  "publisher": {
+    "required_home": "C:\\Projects\\Factorio\\publisher\\mir4",
+    "allowed_classes": [
+      "sealed-package-bytes",
+      "public-release-records",
+      "public-signing-material",
+      "seal-verifier",
+      "publication-clients",
+      "upload-credential-authority"
+    ],
+    "forbidden_classes": [
+      "source-checkout",
+      "compiler",
+      "package-materializer",
+      "package-builder",
+      "mutable-package-staging",
+      "private-signing-key"
+    ]
+  },
+  "credential_authorities": [
+    {
+      "service": "github",
+      "value_recorded": false,
+      "authority": "external-user-or-machine-credential-store"
+    },
+    {
+      "service": "factorio-mod-portal",
+      "value_recorded": false,
+      "authority": "external-user-or-machine-credential-store"
+    }
+  ],
+  "procedures": {
+    "key_rotation": "docs/maintainer/mir4-release-governance.md#key-rotation",
+    "revocation": "docs/maintainer/mir4-release-governance.md#revocation",
+    "compromise_response": "docs/maintainer/mir4-release-governance.md#compromise-response",
+    "emergency_suspension": "docs/maintainer/mir4-release-governance.md#emergency-release-suspension",
+    "restore": "docs/maintainer/mir4-release-governance.md#recovery-and-restore"
+  },
+  "prohibited_transitions": {
+    "source_freeze": true,
+    "candidate_allocation": true,
+    "production_signing": true,
+    "production_seal": true,
+    "promotion_to_main": true,
+    "tagging": true,
+    "publication": true
+  },
+  "secret_values_present": false,
+  "generated_at": "2026-08-22T00:00:00+10:00"
+}

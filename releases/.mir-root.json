@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR4VisibleRootProjectionV1",
+  "id": "releases",
+  "path": "releases",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    ".mir/releases",
+    ".mir/releases.json",
+    ".mir/distributions.json"
+  ],
+  "writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}
