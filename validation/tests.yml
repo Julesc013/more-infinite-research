@@ -754,6 +754,7 @@
         "tools/lib/mir4/PolicyEngine.ps1",
         "tools/lib/mir4/NormalizedCompiler.ps1",
         "tools/lib/mir4/TargetCompiler.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/RuntimeStateModel.ps1",
         "tools/lib/mir4/ProcessIR.ps1",
         "tools/lib/mir4/ReleaseDag.ps1",

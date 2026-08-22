@@ -17,4 +17,12 @@ if(@($contracts.targets.provider_spec.provenance|Where-Object{[string]::IsNullOr
 
 $packageFiles=@(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
 foreach($path in @('.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json','tools/lib/mir4/TargetCompiler.ps1','tools/commands/mir4/New-MIR4TargetProductSet.ps1')){if($path-in$packageFiles){throw "[mir4-w02-package-visible] $path"}}
+$packageSourceBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
+$productOutput='build/results/mir4-w02-target-products-f012'
+& (Join-Path $RepoRoot 'tools/commands/mir4/New-MIR4TargetProductSet.ps1') -RepoRoot $RepoRoot -Target f012 -OutputRoot $productOutput|Out-Null
+& (Join-Path $RepoRoot 'tools/commands/mir4/New-MIR4TargetProductSet.ps1') -RepoRoot $RepoRoot -Target f012 -OutputRoot $productOutput -Check|Out-Null
+foreach($recordName in @('MIR4_TARGET_PROVIDER_MATRIX.json','MIR4_TARGET_DISPOSITION_MATRIX.json','MIR4_PRIVATE_PACKAGE_MATRIX.json')){if(-not(Test-Path -LiteralPath (Join-Path $RepoRoot "$productOutput/$recordName") -PathType Leaf)){throw "[mir4-w02-product-record] $recordName"}}
+$privateMatrix=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$productOutput/MIR4_PRIVATE_PACKAGE_MATRIX.json")|ConvertFrom-Json
+if([string]$privateMatrix.targets[0].state-ne'BLOCKED_WITH_EVIDENCE'-or$privateMatrix.targets[0].package){throw '[mir4-w02-museum-product-boundary]'}
+if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageSourceBefore){throw '[mir4-w02-product-package-mutation]'}
 Write-Host '[ok] MIR 4 W02 target contracts and all nine provider laws passed for f006-f210.'
