@@ -160,6 +160,18 @@ docs:
       - mir4-compatibility-factory-data-bundle-v1
       - mir4-compatibility-evidence-transfer-boundary
       - mir4-independent-production-consumer-blocker-w07
+  - path: docs/architecture/mir4-assurance-scale.md
+    title: "MIR 4 Assurance Scale and Offline Drill"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-four-stage-proof-identities
+      - mir4-eleven-observation-slice-roots
+      - mir4-proof-cover-proposal
+      - mir4-24-6-1-release-budget-design
+      - mir4-non-production-offline-publisher-drill
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

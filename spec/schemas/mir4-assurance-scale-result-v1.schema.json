@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-assurance-scale-result-v1.schema.json",
+  "title": "MIR 4 Assurance Scale Result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema", "programme_id", "wave", "maturity", "authority", "source_identity", "identities", "observation_slices", "impact", "freshness_revocation", "mutation_calibration", "partial_recovery", "nondeterminism_incident", "counterexample", "proof_cover", "blockers", "status", "package_visible", "public_release_proof", "evidence_ledger_authority", "verification_plan_authority", "source_freeze_authorized", "production_signing_or_sealing_authorized", "publication_authorized", "record_sha256"],
+  "properties": {
+    "kind": {"const": "MIR4AssuranceScaleResultV1"},
+    "schema": {"const": 1},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "wave": {"const": "W08"},
+    "maturity": {"const": "developer-preview"},
+    "authority": {"const": "read-only-control-plane-and-assurance-crosswalk"},
+    "source_identity": {"$ref": "#/$defs/sourceIdentity"},
+    "identities": {"$ref": "#/$defs/identitySet"},
+    "observation_slices": {"$ref": "#/$defs/sliceSet"},
+    "impact": {"type": "object"},
+    "freshness_revocation": {"type": "object"},
+    "mutation_calibration": {"type": "object"},
+    "partial_recovery": {"type": "object"},
+    "nondeterminism_incident": {"type": "object"},
+    "counterexample": {"type": "object"},
+    "proof_cover": {"type": "object"},
+    "blockers": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "status": {"enum": ["passed-projection-only", "partial-with-bounded-blockers"]},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "evidence_ledger_authority": {"const": false},
+    "verification_plan_authority": {"const": false},
+    "source_freeze_authorized": {"const": false},
+    "production_signing_or_sealing_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "sourceIdentity": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "programme_id"], "properties": {"commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "programme_id": {"const": "M4C02-09-24H"}}},
+    "identitySet": {"type": "object", "additionalProperties": false, "required": ["kind", "schema", "CaptureKey", "CompilationKey", "RealizationKey", "EvaluationKey", "bindings"], "properties": {"kind": {"const": "MIR4AssuranceIdentitySetV1"}, "schema": {"const": 1}, "CaptureKey": {"$ref": "#/$defs/sha256"}, "CompilationKey": {"$ref": "#/$defs/sha256"}, "RealizationKey": {"$ref": "#/$defs/sha256"}, "EvaluationKey": {"$ref": "#/$defs/sha256"}, "bindings": {"type": "object"}}},
+    "sliceSet": {"type": "object", "additionalProperties": false, "required": ["kind", "schema", "slices", "available_count", "unavailable_count", "aggregate_root_sha256", "complete"], "properties": {"kind": {"const": "MIR4ObservationSliceSetV1"}, "schema": {"const": 1}, "slices": {"type": "array", "minItems": 11, "maxItems": 11, "items": {"$ref": "#/$defs/slice"}}, "available_count": {"type": "integer", "minimum": 0, "maximum": 11}, "unavailable_count": {"type": "integer", "minimum": 0, "maximum": 11}, "aggregate_root_sha256": {"$ref": "#/$defs/sha256"}, "complete": {"type": "boolean"}}},
+    "slice": {"type": "object", "additionalProperties": false, "required": ["id", "status", "authority_ref", "leaf_count", "leaves", "root_sha256", "reason", "proof_eligible"], "properties": {"id": {"enum": ["recipe-facts", "process-ir", "technology-graph", "science-lab-graph", "ownership", "settings", "runtime-state", "diagnostics", "presentation", "locale", "package-identity"]}, "status": {"enum": ["available", "unavailable"]}, "authority_ref": {"type": "string", "minLength": 1}, "leaf_count": {"type": "integer", "minimum": 0}, "leaves": {"type": "array", "items": {"type": "object"}}, "root_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]}, "reason": {"type": "string"}, "proof_eligible": {"type": "boolean"}}}
+  }
+}
