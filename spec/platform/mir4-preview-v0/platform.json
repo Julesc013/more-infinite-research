@@ -49,6 +49,9 @@
     {"id":"process-ir-v1","maturity":"preview","mode":"synthetic-parity-exact-target-snapshot-blocked"},
     {"id":"effect-channel-registry-v1","maturity":"preview","mode":"owner-references-and-opaque-preservation"},
     {"id":"autonomous-synthesis-v1","maturity":"preview","mode":"diagnose-conservative-experimental-no-player-mutation"},
+    {"id":"compatibility-subject-ledger-v1","maturity":"preview","mode":"multidimensional-private-evidence-nontransferable"},
+    {"id":"compatibility-factory-v1","maturity":"preview","mode":"data-only-allowlisted-zip-no-code-generation"},
+    {"id":"inspector-v1","maturity":"preview","mode":"offline-bounded-accessible-package-excluded"},
     {"id":"historical-target-providers-v0","maturity":"experimental","mode":"private-build-only"}
   ],
   "mep_fragments": [
@@ -96,8 +99,9 @@
     "mir4-sdk-v0-preview.zip",
     "mir4-platform-preview-v0.zip",
     "mir4-reference-extension-v0.zip",
-    "mir4-inspector-preview-v0.zip"
-    ,"mir4-sdk-v1-preview.zip"
-    ,"mir4-reference-extension-v1-preview.zip"
+    "mir4-inspector-preview-v0.zip",
+    "mir4-sdk-v1-preview.zip",
+    "mir4-reference-extension-v1-preview.zip",
+    "mir4-inspector-preview-v1.zip"
   ]
 }

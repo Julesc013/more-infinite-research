@@ -1,0 +1,1 @@
+{"schema":1,"kind":"MIR4SupportBundleV1","bundle_id":"org.example.bad","target":"f210","subjects":[],"modpack_supported":true,"expected_diagnostic":"mir4-w07-forbidden-field"}

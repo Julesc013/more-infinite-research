@@ -11,6 +11,9 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json',
+  'spec/compatibility/claims.json',
   'spec/schemas/mir4-runtime-state-matrix-v1.schema.json',
   'spec/schemas/mir4-migration-graph-matrix-v1.schema.json',
   'spec/schemas/mir4-continuity-bundle-v1.schema.json',
@@ -18,6 +21,10 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-process-ir-v1.schema.json',
   'spec/schemas/mir4-effect-channel-registry-v1.schema.json',
   'spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json',
+  'spec/schemas/mir4-inspection-bundle-v1.schema.json',
+  'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json',
+  'spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
+  'spec/schemas/mir4-inspector-workbench-result-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json',
   '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json',
   '.mir/compatibility.yml',
@@ -35,6 +42,10 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/RuntimeStateModel.ps1',
   'tools/lib/mir4/ModuleEcosystem.ps1',
   'tools/lib/mir4/ProcessIR.ps1',
+  'tools/lib/mir4/SupportAssessment.ps1',
+  'tools/lib/mir4/CompatibilityIndex.ps1',
+  'tools/lib/mir4/CompatibilityFactory.ps1',
+  'tools/lib/mir4/Inspector.ps1',
   'tools/lib/mir4/ReleaseDag.ps1',
   'tools/lib/mir4/RepositoryFixedPoint.ps1'
 )
@@ -133,6 +144,8 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
 . (Join-Path $PSScriptRoot 'ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
+. (Join-Path $PSScriptRoot 'Inspector.ps1')
+. (Join-Path $PSScriptRoot 'CompatibilityFactory.ps1')
 . (Join-Path $PSScriptRoot 'ReleaseDag.ps1')
 . (Join-Path $PSScriptRoot 'CompilationRun.ps1')
 
@@ -265,6 +278,11 @@ function Get-MIR4PlatformGeneratedFiles {
   $process = $w06.parity
   $effects = $w06.effects
   $opportunities = $w06.synthesis
+  $compatibilityLedgerV1 = New-MIR4CompatibilitySubjectLedger -RepoRoot $repo -SourceIdentity $null
+  $supportBundleV1 = New-MIR4ReferenceSupportBundleV1 -Ledger $compatibilityLedgerV1 -RepoRoot $repo -Target f210
+  $compatibilityFactoryPlanV1 = New-MIR4CompatibilityFactoryPlanV1 -SupportBundle $supportBundleV1 -Ledger $compatibilityLedgerV1 -RepoRoot $repo -SourceIdentity $null
+  $previewFactoryPackage = [pscustomobject][ordered]@{path='build/mir4/m4c02-inspector-compatibility/factory/mir4-compatibility-reference-v1.zip';bytes=0;sha256=$null;entry_count=0;status='not-built-platform-generation-is-nonpackaging'}
+  $inspectorV1 = New-MIR4InspectorWorkbenchResultV1 -RepoRoot $repo -Ledger $compatibilityLedgerV1 -FactoryPlan $compatibilityFactoryPlanV1 -FactoryPackage $previewFactoryPackage -SourceIdentity $null
   $mepSchema = Get-MIR4MepSchema $platform
   $extension = New-MIR4ReferenceExtension
   $shadowExtensionRun = New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId 'f210' -Envelope $extension
@@ -367,6 +385,11 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'sdk/preview/mir4/reference/process-ir-parity-result.json' = (ConvertTo-MIR4PlatformCanonicalJson $process) + "`n"
     'sdk/preview/mir4/reference/effect-channel-registry-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $effects) + "`n"
     'sdk/preview/mir4/reference/synthesis-maturity-matrix-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $opportunities) + "`n"
+    'sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $compatibilityLedgerV1) + "`n"
+    'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $compatibilityFactoryPlanV1) + "`n"
+    'sdk/preview/mir4/reference/inspection-bundle-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $inspectorV1.inspection_bundle) + "`n"
+    'sdk/preview/mir4/reference/inspector-workbench-result-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $inspectorV1.result) + "`n"
+    'sdk/preview/mir4/reference/support-bundle-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $supportBundleV1) + "`n"
     'sdk/preview/mir4/reference/release-dag.json' = (ConvertTo-MIR4PlatformCanonicalJson $releaseDag) + "`n"
     'sdk/preview/mir4/reference/query-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $query) + "`n"
     'sdk/preview/mir4/reference/support-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $support) + "`n"
@@ -377,6 +400,9 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'sdk/preview/mir4/inspector/index.html' = (Get-MIR4InspectorHtml).Replace("`r`n","`n")
     'sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1' = $inspectorPs.Replace("`r`n","`n")
     'sdk/preview/mir4/inspector/README.md' = "# MIR 4 Inspector V0`n`nOpen ``index.html`` locally and select a generated JSON snapshot. The browser-only viewer performs no upload and no mutation.`n"
+    'sdk/preview/mir4/inspector-v1/index.html' = $inspectorV1.html.Replace("`r`n","`n")
+    'sdk/preview/mir4/inspector-v1/Export-MIR4InspectionBundle.ps1' = $inspectorV1.exporter.Replace("`r`n","`n")
+    'sdk/preview/mir4/inspector-v1/README.md' = $inspectorV1.readme.Replace("`r`n","`n")
     'sdk/preview/mir4/conformance/Invoke-MIR4SdkConformance.ps1' = $conformancePs.Replace("`r`n","`n")
     'sdk/preview/mir4/README.md' = "# MIR 4 SDK V0 preview`n`nRun ``.\conformance\Invoke-MIR4SdkConformance.ps1`` with PowerShell 7. API bindings are under ``api-v0``; MEP bindings are under ``powershell`` and ``lua``; deterministic examples and shadow reports are under ``reference``. This preview is read-only, package-excluded, and may change before 1.0.`n"
     'fixtures/mir4-mep-v0/positive/reference-extension.json' = (ConvertTo-MIR4PlatformCanonicalJson $extension) + "`n"
@@ -453,6 +479,15 @@ function Test-MIR4PlatformConformance {
   $w06 = New-MIR4W06Records -RepoRoot $repo -SourceIdentity $null
   if(-not$w06.parity.passed-or-not$w06.parity.bilateral_gate.passed-or-not$w06.effects.opaque_preserved-or$w06.synthesis.automatic_player_mutation){throw '[mir4-platform-w06-conformance]'}
   if([string]$w06.parity.exact_target_status-cne'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'){throw '[mir4-platform-w06-exact-target-truth]'}
+  $w07Ledger=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json')|ConvertFrom-Json -Depth 100
+  Test-MIR4CompatibilitySubjectLedger -Ledger $w07Ledger -RepoRoot $repo|Out-Null
+  $w07Bundle=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/inspection-bundle-v1.json')|ConvertFrom-Json -Depth 100
+  Test-MIR4InspectionBundleV1 -Bundle $w07Bundle -RepoRoot $repo|Out-Null
+  $w07Plan=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json')|ConvertFrom-Json -Depth 100
+  Test-MIR4CompatibilityFactoryPlanV1 -Plan $w07Plan -RepoRoot $repo|Out-Null
+  $w07Html=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/inspector-v1/index.html')
+  Test-MIR4InspectorHtmlV1 -Html $w07Html|Out-Null
+  if([string](Test-MIR4CompatibilityProvenance -Ledger $w07Ledger -RepoRoot $repo).status-cne'current'){throw '[mir4-platform-w07-provenance]'}
   return $true
 }
 
@@ -494,7 +529,7 @@ function New-MIR4PlatformPreviewPackages {
   $allowedOutput = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\') + '\'
   if (-not ($output + '\').StartsWith($allowedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-preview-output-boundary] $output" }
   $allSdk = @(Get-ChildItem -LiteralPath (Join-Path $repo 'sdk/preview/mir4') -Recurse -File) | ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') }
-  $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1)/' -and $_ -notmatch '/reference/(?:process-ir-parity-result|effect-channel-registry-v1|synthesis-maturity-matrix-v1)\.json$' })
+  $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1|inspector-v1)/' -and $_ -notmatch '/reference/(?:process-ir-parity-result|effect-channel-registry-v1|synthesis-maturity-matrix-v1|compatibility-subject-ledger-v1|compatibility-factory-plan-v1|inspection-bundle-v1|inspector-workbench-result-v1|support-bundle-v1)\.json$' })
   $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
   $sets = [ordered]@{
     'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
@@ -504,6 +539,32 @@ function New-MIR4PlatformPreviewPackages {
     'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
     'mir4-inspector-preview-v0.zip' = @('sdk/preview/mir4/inspector/index.html','sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1','sdk/preview/mir4/inspector/README.md','sdk/preview/mir4/reference/query-snapshot-f210.json','sdk/preview/mir4/reference/support-snapshot-f210.json','LICENSE')
   }
+  $sets['mir4-platform-preview-v0.zip'] += @(
+    '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json',
+    'spec/schemas/mir4-inspection-bundle-v1.schema.json','spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json',
+    'spec/schemas/mir4-compatibility-factory-plan-v1.schema.json','spec/schemas/mir4-inspector-workbench-result-v1.schema.json',
+    'docs/architecture/mir4-inspector-compatibility.md','sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json',
+    'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json','sdk/preview/mir4/reference/inspection-bundle-v1.json',
+    'sdk/preview/mir4/reference/inspector-workbench-result-v1.json','sdk/preview/mir4/reference/support-bundle-v1.json',
+    'fixtures/mir4-inspector-compatibility-v1/positive/bounded-reference-request.json',
+    'fixtures/mir4-inspector-compatibility-v1/negative/blanket-support-boolean.json',
+    'fixtures/mir4-inspector-compatibility-v1/negative/forbidden-callback.json',
+    'fixtures/mir4-inspector-compatibility-v1/negative/unbounded-page.json',
+    'fixtures/mir4-inspector-compatibility-v1/permutation/subject-order-a.json',
+    'fixtures/mir4-inspector-compatibility-v1/permutation/subject-order-b.json',
+    'fixtures/mir4-inspector-compatibility-v1/evidence/ir4-no-exact-closure.json',
+    'fixtures/mir4-inspector-compatibility-v1/evidence/aai-historical-exact-nontransferable.json',
+    'fixtures/mir4-inspector-compatibility-v1/evidence/synthetic-claim-attempt.json',
+    'tools/lib/mir4/SupportAssessment.ps1','tools/lib/mir4/CompatibilityIndex.ps1','tools/lib/mir4/CompatibilityFactory.ps1','tools/lib/mir4/Inspector.ps1'
+  )
+  $sets['mir4-inspector-preview-v1.zip'] = @(
+    'sdk/preview/mir4/inspector-v1/index.html','sdk/preview/mir4/inspector-v1/Export-MIR4InspectionBundle.ps1','sdk/preview/mir4/inspector-v1/README.md',
+    'sdk/preview/mir4/reference/inspection-bundle-v1.json','sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json',
+    'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json','sdk/preview/mir4/reference/inspector-workbench-result-v1.json',
+    'sdk/preview/mir4/reference/support-bundle-v1.json','spec/schemas/mir4-inspection-bundle-v1.schema.json',
+    'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json','spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
+    'spec/schemas/mir4-inspector-workbench-result-v1.schema.json','LICENSE'
+  )
   $hashes = @()
   foreach ($set in $sets.GetEnumerator()) {
     $path = Join-Path $output $set.Key

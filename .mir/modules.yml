@@ -103,6 +103,24 @@ package_excluded_modules:
     documentation: docs/architecture/mir4-processir-synthesis.md
     boundary: package-excluded copied-fact ProcessIR certificates, effect owner references, and descriptive proposal classification only; no data.raw scan, risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
     stability: developer-preview-blocked-exact-target-processir-snapshot
+  mir4_inspector_compatibility_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
+    implementations:
+      - tools/lib/mir4/CompatibilityIndex.ps1
+      - tools/lib/mir4/SupportAssessment.ps1
+      - tools/lib/mir4/Inspector.ps1
+      - tools/lib/mir4/CompatibilityFactory.ps1
+    exporter: tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1
+    output_schemas:
+      - spec/schemas/mir4-inspection-bundle-v1.schema.json
+      - spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json
+      - spec/schemas/mir4-compatibility-factory-plan-v1.schema.json
+      - spec/schemas/mir4-inspector-workbench-result-v1.schema.json
+    fixtures: fixtures/mir4-inspector-compatibility-v1
+    generated_root: sdk/preview/mir4/inspector-v1
+    documentation: docs/architecture/mir4-inspector-compatibility.md
+    boundary: bounded copied read-only DTO inspection, normalized private subject assessments, and deterministic data-only compatibility bundles; no raw mutable compiler objects, callbacks, executable adapters, blanket modpack support booleans, claim transfer, player mutation, signing, sealing, or publication
+    stability: developer-preview-blocked-independent-production-consumer-and-exact-profile-claim-transfer
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
@@ -112,6 +130,11 @@ package_excluded_modules:
     runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
     process_ir: tools/lib/mir4/ProcessIR.ps1
     process_ir_authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
+    compatibility_index: tools/lib/mir4/CompatibilityIndex.ps1
+    support_assessment: tools/lib/mir4/SupportAssessment.ps1
+    inspector: tools/lib/mir4/Inspector.ps1
+    compatibility_factory: tools/lib/mir4/CompatibilityFactory.ps1
+    inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     generated_root: sdk/preview/mir4
