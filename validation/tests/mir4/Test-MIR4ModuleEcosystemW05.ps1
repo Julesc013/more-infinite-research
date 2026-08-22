@@ -51,6 +51,22 @@ if(@($responses.surface|Sort-Object -Unique).Count-ne 9-or@($responses|Where-Obj
 
 Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot -Check
 foreach($path in @('spec/schemas/preview/mir4-mep-v1.schema.json','sdk/preview/mir4/mep-v1/lua/mir4_mep_v1.lua','sdk/preview/mir4/mep-v1/lua/mir4_mep_v1.luals.lua','sdk/preview/mir4/api-v1/typescript/index.ts','sdk/preview/mir4/api-v1/python/mir4_api_v1.py','sdk/preview/mir4/api-v1/powershell/MIR4.Api.V1.psm1','sdk/preview/mir4/mep-v1/migration/Convert-MIR4MepV0ToV1.ps1','sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/mep-v1/conformance.ps1')){if(-not(Test-Path -LiteralPath (Join-Path $RepoRoot $path) -PathType Leaf)){throw "[mir4-w05-sdk-file] $path"}}
+$builderRoot='build/mir4/test-w05-extension-builder'
+$initRoot="$builderRoot/init";$packageRoot="$builderRoot/package";$migrationRoot="$builderRoot/migration"
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command init -RepoRoot $RepoRoot -OutputRoot $initRoot -ExtensionId org.example.builder|Out-Null
+$builderExtension="$initRoot/extension.json"
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command validate -RepoRoot $RepoRoot -ExtensionPath $builderExtension|Out-Null
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command explain -RepoRoot $RepoRoot -ExtensionPath $builderExtension|Out-Null
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command test -RepoRoot $RepoRoot -ExtensionPath $builderExtension|Out-Null
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command package -RepoRoot $RepoRoot -ExtensionPath $builderExtension -OutputRoot $packageRoot|Out-Null
+$builderZip=Get-ChildItem -LiteralPath (Join-Path $RepoRoot $packageRoot) -Filter *.zip -File
+if(@($builderZip).Count-ne 1){throw '[mir4-w05-builder-package]'}
+$builderZipHash=(Get-FileHash -LiteralPath $builderZip.FullName -Algorithm SHA256).Hash
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command package -RepoRoot $RepoRoot -ExtensionPath $builderExtension -OutputRoot $packageRoot|Out-Null
+if((Get-FileHash -LiteralPath $builderZip.FullName -Algorithm SHA256).Hash-cne$builderZipHash){throw '[mir4-w05-builder-package-determinism]'}
+& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command migrate -RepoRoot $RepoRoot -ExtensionPath 'sdk/preview/mir4/reference-extension/extension.json' -OutputRoot $migrationRoot|Out-Null
+$migratedBuilder=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$migrationRoot/extension-v1.json")|ConvertFrom-Json
+Test-MIR4MepV1Envelope -Envelope $migratedBuilder -RepoRoot $RepoRoot|Out-Null
 $shadow=New-MIR4ShadowExtensionCompilationV1 -RepoRoot $RepoRoot -TargetId f210 -Envelope $reference
 if($shadow.result-cne'shadow-complete'-or$shadow.authoritative_output-or$shadow.mutation_capability-or$shadow.public_support_claim-or@($shadow.contributions).Count-ne 12){throw '[mir4-w05-shadow-boundary]'}
 
