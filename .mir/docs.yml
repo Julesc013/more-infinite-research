@@ -137,6 +137,17 @@ docs:
       - mir4-api-sdk-v1-preview
       - mir4-extension-builder
       - mir4-independent-production-consumer-blocker
+  - path: docs/architecture/mir4-processir-synthesis.md
+    title: "MIR 4 ProcessIR, Effect Channels, and Synthesis"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-process-ir-v1-preview
+      - mir4-effect-channel-registry-v1
+      - mir4-synthesis-maturity-matrix-v1
+      - mir4-exact-target-processir-snapshot-blocker
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

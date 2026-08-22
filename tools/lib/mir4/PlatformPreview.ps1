@@ -10,9 +10,14 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-compilation-run-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',
   'spec/schemas/mir4-runtime-state-matrix-v1.schema.json',
   'spec/schemas/mir4-migration-graph-matrix-v1.schema.json',
   'spec/schemas/mir4-continuity-bundle-v1.schema.json',
+  'spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json',
+  'spec/schemas/mir4-process-ir-v1.schema.json',
+  'spec/schemas/mir4-effect-channel-registry-v1.schema.json',
+  'spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json',
   '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json',
   '.mir/compatibility.yml',
@@ -256,8 +261,10 @@ function Get-MIR4PlatformGeneratedFiles {
   $extensionClosureV1 = Resolve-MIR4ExtensionClosureV1 -RepoRoot $repo -Extensions @($extensionV1) -Target f210
   $continuity.module_extension_closure.external_extensions = [ordered]@{status='complete-preview';opaque_reference=$false;closure_digest=[string]$extensionClosureV1.digest;authority='.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json'}
   Add-MIR4PlatformDigest $continuity | Out-Null
-  $process = Get-MIR4ProcessIRInventory -RepoRoot $repo -PlatformSpec $platform
-  $opportunities = Get-MIR4OpportunityCatalogue -PlatformSpec $platform -ProcessIR $process
+  $w06 = New-MIR4W06Records -RepoRoot $repo -SourceIdentity $null
+  $process = $w06.parity
+  $effects = $w06.effects
+  $opportunities = $w06.synthesis
   $mepSchema = Get-MIR4MepSchema $platform
   $extension = New-MIR4ReferenceExtension
   $shadowExtensionRun = New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId 'f210' -Envelope $extension
@@ -267,7 +274,7 @@ function Get-MIR4PlatformGeneratedFiles {
   $primary = $providers | Where-Object { $_.id -eq 'f210' }
   $primaryRun = $runs | Where-Object { $_.target.id -eq 'f210' }
   $query = New-MIR4ApiRecord -Kind MIR4QuerySnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('query.read','support.snapshot','streams.read','diagnostics.read','settings.read') -Payload ([ordered]@{ provider=$primary; compilation=$primaryRun; streams=[ordered]@{ authority='.mir/streams.yml'; mode='read-only' }; diagnostics=@(); profile=[ordered]@{ maturity='preview'; mutation_allowed=$false } })
-  $support = New-MIR4ApiRecord -Kind MIR4SupportSnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('support.snapshot') -Payload ([ordered]@{ target=$primary; maturity='candidate-programme-only'; public_claim=$false; evidence=@('target-provider','compilation-run','runtime-state-inventory','process-ir-inventory') })
+  $support = New-MIR4ApiRecord -Kind MIR4SupportSnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('support.snapshot') -Payload ([ordered]@{ target=$primary; maturity='candidate-programme-only'; public_claim=$false; evidence=@('target-provider','compilation-run','runtime-state-inventory','process-ir-parity-result') })
   $components = @($platform.components | ForEach-Object { "| ``$($_.id)`` | $($_.maturity) | $($_.mode) |" }) -join "`n"
   $generatedDoc = "---`ntitle: `"MIR 4 Platform Component Matrix`"`nstatus: current`napplies_to: `"4.0.0 M4C02-09-24H`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-23`nsupersedes: []`nsuperseded_by: []`n---`n# MIR 4 Platform Component Matrix`n`nGenerated from ``spec/platform/mir4-preview-v0/platform.json``.`n`n| Component | Maturity | Mode |`n| --- | --- | --- |`n$components`n`nThe conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.`n"
   $psBinding = @'
@@ -357,6 +364,9 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'sdk/preview/mir4/reference/continuity-bundle-template.json' = (ConvertTo-MIR4PlatformCanonicalJson $continuity) + "`n"
     'sdk/preview/mir4/reference/process-ir-inventory.json' = (ConvertTo-MIR4PlatformCanonicalJson $process) + "`n"
     'sdk/preview/mir4/reference/opportunity-catalogue.json' = (ConvertTo-MIR4PlatformCanonicalJson $opportunities) + "`n"
+    'sdk/preview/mir4/reference/process-ir-parity-result.json' = (ConvertTo-MIR4PlatformCanonicalJson $process) + "`n"
+    'sdk/preview/mir4/reference/effect-channel-registry-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $effects) + "`n"
+    'sdk/preview/mir4/reference/synthesis-maturity-matrix-v1.json' = (ConvertTo-MIR4PlatformCanonicalJson $opportunities) + "`n"
     'sdk/preview/mir4/reference/release-dag.json' = (ConvertTo-MIR4PlatformCanonicalJson $releaseDag) + "`n"
     'sdk/preview/mir4/reference/query-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $query) + "`n"
     'sdk/preview/mir4/reference/support-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $support) + "`n"
@@ -440,6 +450,9 @@ function Test-MIR4PlatformConformance {
     if ([string]$decision.safety.status -cne [string]$fixture.expected_status) { throw "[mir4-process-ir-fixture-status] $fixturePath" }
     if ($fixture.expected_violation -and [string]$fixture.expected_violation -notin @($decision.safety.violations)) { throw "[mir4-process-ir-fixture-violation] $fixturePath" }
   }
+  $w06 = New-MIR4W06Records -RepoRoot $repo -SourceIdentity $null
+  if(-not$w06.parity.passed-or-not$w06.parity.bilateral_gate.passed-or-not$w06.effects.opaque_preserved-or$w06.synthesis.automatic_player_mutation){throw '[mir4-platform-w06-conformance]'}
+  if([string]$w06.parity.exact_target_status-cne'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'){throw '[mir4-platform-w06-exact-target-truth]'}
   return $true
 }
 
@@ -481,12 +494,12 @@ function New-MIR4PlatformPreviewPackages {
   $allowedOutput = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\') + '\'
   if (-not ($output + '\').StartsWith($allowedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-preview-output-boundary] $output" }
   $allSdk = @(Get-ChildItem -LiteralPath (Join-Path $repo 'sdk/preview/mir4') -Recurse -File) | ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') }
-  $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1)/' })
+  $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1)/' -and $_ -notmatch '/reference/(?:process-ir-parity-result|effect-channel-registry-v1|synthesis-maturity-matrix-v1)\.json$' })
   $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
   $sets = [ordered]@{
     'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
     'mir4-sdk-v1-preview.zip' = @($sdkV1 + @('spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-api-v1-response.schema.json','docs/architecture/mir4-module-ecosystem.md','docs/reference/generated/mir4-api-sdk-v1.md','tools/lib/mir4/ModuleEcosystem.ps1','tools/commands/mir4/Invoke-MIR4Extension.ps1','LICENSE'))
-    'mir4-platform-preview-v0.zip' = @('mir.toml','mir.lock','spec/platform/mir4-preview-v0/platform.json','spec/platform/mir4-preview-v0/release-dag.json','spec/schemas/mir4-compilation-run-v1.schema.json','spec/schemas/mir4-runtime-state-matrix-v1.schema.json','spec/schemas/mir4-migration-graph-matrix-v1.schema.json','spec/schemas/mir4-continuity-bundle-v1.schema.json','docs/architecture/mir4-platform-preview.md','docs/architecture/mir4-target-compiler.md','docs/architecture/mir4-semantic-compiler.md','docs/architecture/mir4-runtime-continuity.md','docs/reference/generated/mir4-platform-component-matrix.md','sdk/preview/mir4/reference/target-providers.json','sdk/preview/mir4/reference/target-contracts.json','sdk/preview/mir4/reference/target-provider-law-results.json','sdk/preview/mir4/reference/affected-target-plan.json','sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/feature-setting-cutover-matrix.json','sdk/preview/mir4/reference/provider-micro-protocol-matrix.json','sdk/preview/mir4/reference/merge-law-catalogue.json','sdk/preview/mir4/reference/runtime-state-inventory.json','sdk/preview/mir4/reference/migration-graph-matrix.json','sdk/preview/mir4/reference/continuity-bundle-template.json','sdk/preview/mir4/reference/process-ir-inventory.json','sdk/preview/mir4/reference/opportunity-catalogue.json','sdk/preview/mir4/reference/release-dag.json','sdk/preview/mir4/reference/shadow-extension-run-f210.json','fixtures/mir4-process-ir-v0/positive/bounded-loop.json','fixtures/mir4-process-ir-v0/negative/unbounded-loop.json','tools/lib/mir4/SafetyKernel.ps1','tools/lib/mir4/PolicyEngine.ps1','tools/lib/mir4/NormalizedCompiler.ps1','tools/lib/mir4/TargetCompiler.ps1','tools/lib/mir4/CompilationRun.ps1','tools/lib/mir4/RuntimeStateModel.ps1','tools/lib/mir4/ProcessIR.ps1','tools/lib/mir4/ReleaseDag.ps1','LICENSE')
+    'mir4-platform-preview-v0.zip' = @('mir.toml','mir.lock','spec/platform/mir4-preview-v0/platform.json','spec/platform/mir4-preview-v0/release-dag.json','spec/schemas/mir4-compilation-run-v1.schema.json','spec/schemas/mir4-runtime-state-matrix-v1.schema.json','spec/schemas/mir4-migration-graph-matrix-v1.schema.json','spec/schemas/mir4-continuity-bundle-v1.schema.json','spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json','spec/schemas/mir4-process-ir-v1.schema.json','spec/schemas/mir4-effect-channel-registry-v1.schema.json','spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json','.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json','docs/architecture/mir4-platform-preview.md','docs/architecture/mir4-target-compiler.md','docs/architecture/mir4-semantic-compiler.md','docs/architecture/mir4-runtime-continuity.md','docs/architecture/mir4-processir-synthesis.md','docs/reference/generated/mir4-platform-component-matrix.md','sdk/preview/mir4/reference/target-providers.json','sdk/preview/mir4/reference/target-contracts.json','sdk/preview/mir4/reference/target-provider-law-results.json','sdk/preview/mir4/reference/affected-target-plan.json','sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/feature-setting-cutover-matrix.json','sdk/preview/mir4/reference/provider-micro-protocol-matrix.json','sdk/preview/mir4/reference/merge-law-catalogue.json','sdk/preview/mir4/reference/runtime-state-inventory.json','sdk/preview/mir4/reference/migration-graph-matrix.json','sdk/preview/mir4/reference/continuity-bundle-template.json','sdk/preview/mir4/reference/process-ir-parity-result.json','sdk/preview/mir4/reference/effect-channel-registry-v1.json','sdk/preview/mir4/reference/synthesis-maturity-matrix-v1.json','sdk/preview/mir4/reference/release-dag.json','sdk/preview/mir4/reference/shadow-extension-run-f210.json','fixtures/mir4-process-ir-v0/positive/bounded-loop.json','fixtures/mir4-process-ir-v0/negative/unbounded-loop.json','fixtures/mir4-process-ir-v1/positive/ordinary-safe.json','fixtures/mir4-process-ir-v1/positive/catalyst-container-bounded-cycle.json','fixtures/mir4-process-ir-v1/positive/recycling-recovery.json','fixtures/mir4-process-ir-v1/negative/unbounded-positive-cycle.json','fixtures/mir4-process-ir-v1/negative/unsupported-unknown.json','fixtures/mir4-process-ir-v1/permutation/scc-order-a.json','fixtures/mir4-process-ir-v1/permutation/scc-order-b.json','tools/lib/mir4/SafetyKernel.ps1','tools/lib/mir4/PolicyEngine.ps1','tools/lib/mir4/NormalizedCompiler.ps1','tools/lib/mir4/TargetCompiler.ps1','tools/lib/mir4/CompilationRun.ps1','tools/lib/mir4/RuntimeStateModel.ps1','tools/lib/mir4/ProcessIR.ps1','tools/lib/mir4/ReleaseDag.ps1','LICENSE')
     'mir4-reference-extension-v0.zip' = @('sdk/preview/mir4/reference-extension/extension.json','sdk/preview/mir4/reference-extension/README.md','spec/schemas/preview/mir4-mep-v0.schema.json','LICENSE')
     'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
     'mir4-inspector-preview-v0.zip' = @('sdk/preview/mir4/inspector/index.html','sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1','sdk/preview/mir4/inspector/README.md','sdk/preview/mir4/reference/query-snapshot-f210.json','sdk/preview/mir4/reference/support-snapshot-f210.json','LICENSE')

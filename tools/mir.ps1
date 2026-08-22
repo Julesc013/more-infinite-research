@@ -46,6 +46,7 @@ Usage:
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 processir-synthesis <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate> [--extension <path>] [--output <path>] [--id <reverse.dns.id>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
@@ -660,6 +661,15 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($output)) { $moduleArguments.OutputRoot = $output }
         if (-not [string]::IsNullOrWhiteSpace($candidate)) { $moduleArguments.CandidateZip = $candidate }
         & (Join-Path $repo "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1") @moduleArguments
+      }
+      "processir-synthesis" {
+        if ($Args.Count -lt 3) { throw "mir4 processir-synthesis requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 processir-synthesis command: $subcommand" }
+        $processArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $processArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1") @processArguments
       }
       "extension" {
         if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, or migrate." }

@@ -37,8 +37,12 @@ $written=Invoke-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -E
 if($written.digest -cne $shadowA.digest){throw '[mir4-platform-shadow-write-determinism]'}
 try{Invoke-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -ExtensionPath 'sdk/preview/mir4/reference-extension/extension.json' -OutputPath 'docs/forbidden-shadow-output.json'|Out-Null;throw '[mir4-platform-shadow-output-escape-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-shadow-output-boundary]')){throw}}
 $opportunities=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/opportunity-catalogue.json')|ConvertFrom-Json
-if(@($opportunities.grammar).Count -ne 6 -or @($opportunities.candidates).Count -ne @($platform.effect_channels).Count){throw '[mir4-platform-opportunity-catalogue]'}
-if(@($opportunities.candidates|Where-Object{$_.mutation_allowed -or $_.authoritative -or $_.execution -ne 'diagnose-only'}).Count){throw '[mir4-platform-opportunity-authority]'}
+if([string]$opportunities.kind-cne'MIR4SynthesisMaturityMatrixV1'-or@($opportunities.constructors).Count-ne 10-or@($opportunities.terminal_dispositions).Count-ne 5-or@($opportunities.candidates).Count-lt 12){throw '[mir4-platform-opportunity-catalogue]'}
+if(@($opportunities.candidates|Where-Object{$_.mutation_authorized-or$_.planner_admission-or$_.operation_object}).Count-or$opportunities.automatic_player_mutation){throw '[mir4-platform-opportunity-authority]'}
+$processParity=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/process-ir-parity-result.json')|ConvertFrom-Json
+$effectRegistry=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/effect-channel-registry-v1.json')|ConvertFrom-Json
+if(-not$processParity.passed-or-not$processParity.bilateral_gate.passed-or[string]$processParity.exact_target_status-cne'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'){throw '[mir4-platform-processir-parity]'}
+if(@($effectRegistry.channels).Count-ne 6-or-not$effectRegistry.opaque_preserved-or$effectRegistry.player_mutation_authorized){throw '[mir4-platform-effect-registry]'}
 $runtimeInventory=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/runtime-state-inventory.json')|ConvertFrom-Json
 if([string]$runtimeInventory.kind-cne'MIR4RuntimeStateMatrixV1'-or@($runtimeInventory.runtime_feature_specs).Count-ne 7-or@($runtimeInventory.state_specs).Count-ne 5-or@($runtimeInventory.registration_plan.groups).Count-ne 9-or@($runtimeInventory.targets).Count-ne 17-or-not$runtimeInventory.registration_plan.law_results.all_passed){throw '[mir4-platform-runtime-state-inventory]'}
 $runtimeF210=@($runtimeInventory.targets|Where-Object { $_.target -eq 'f210' })[0]
