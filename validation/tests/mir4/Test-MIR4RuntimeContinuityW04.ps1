@@ -14,16 +14,16 @@ $runtimeB=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers @($providers
 if($runtimeA.digest-cne$runtimeB.digest){throw '[mir4-w04-runtime-determinism]'}
 if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 9-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
 if(-not$runtimeA.registration_plan.law_results.all_passed-or$runtimeA.registration_plan.on_load.registered-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch){throw '[mir4-w04-dispatcher-laws]'}
-$f210=@($runtimeA.targets|Where-Object target -eq'f210')[0]
-$f110=@($runtimeA.targets|Where-Object target -eq'f110')[0]
-$f014=@($runtimeA.targets|Where-Object target -eq'f014')[0]
-$f012=@($runtimeA.targets|Where-Object target -eq'f012')[0]
-if($f210.backend-cne'storage'-or@($f210.feature_dispositions|Where-Object disposition -eq'active-player-authority').Count-lt 6){throw '[mir4-w04-f210-runtime-profile]'}
-if($f110.backend-cne'global'-or@($f110.feature_dispositions|Where-Object disposition -ne'compiled-out').Count-ne 0){throw '[mir4-w04-f110-runtime-profile]'}
-if(@($f014.feature_dispositions|Where-Object disposition -ne'opaque-terminal-derived').Count-ne 0-or@($f012.feature_dispositions|Where-Object disposition -ne'blocked-with-evidence').Count-ne 0){throw '[mir4-w04-historical-runtime-disposition]'}
-$spoilage=@($runtimeA.state_specs|Where-Object id -eq'state.spoilage-preservation')[0]
-$maximum=@($runtimeA.state_specs|Where-Object id -eq'state.maximum-level-control')[0]
-if(@($spoilage.fields|Where-Object classification -eq'authoritative').Count-ne 2-or@($maximum.fields|Where-Object classification -eq'authoritative').Count-ne 2-or@($maximum.fields|Where-Object classification -eq'disposable-cache').Count-ne 1){throw '[mir4-w04-field-aware-state]'}
+$f210=@($runtimeA.targets|Where-Object { $_.target -eq 'f210' })[0]
+$f110=@($runtimeA.targets|Where-Object { $_.target -eq 'f110' })[0]
+$f014=@($runtimeA.targets|Where-Object { $_.target -eq 'f014' })[0]
+$f012=@($runtimeA.targets|Where-Object { $_.target -eq 'f012' })[0]
+if($f210.backend-cne'storage'-or@($f210.feature_dispositions|Where-Object { $_.disposition -eq 'active-player-authority' }).Count-lt 6){throw '[mir4-w04-f210-runtime-profile]'}
+if($f110.backend-cne'global'-or@($f110.feature_dispositions|Where-Object { $_.disposition -ne 'compiled-out' }).Count-ne 0){throw '[mir4-w04-f110-runtime-profile]'}
+if(@($f014.feature_dispositions|Where-Object { $_.disposition -ne 'opaque-terminal-derived' }).Count-ne 0-or@($f012.feature_dispositions|Where-Object { $_.disposition -ne 'blocked-with-evidence' }).Count-ne 0){throw '[mir4-w04-historical-runtime-disposition]'}
+$spoilage=@($runtimeA.state_specs|Where-Object { $_.id -eq 'state.spoilage-preservation' })[0]
+$maximum=@($runtimeA.state_specs|Where-Object { $_.id -eq 'state.maximum-level-control' })[0]
+if(@($spoilage.fields|Where-Object { $_.classification -eq 'authoritative' }).Count-ne 2-or@($maximum.fields|Where-Object { $_.classification -eq 'authoritative' }).Count-ne 2-or@($maximum.fields|Where-Object { $_.classification -eq 'disposable-cache' }).Count-ne 1){throw '[mir4-w04-field-aware-state]'}
 $tampered=$runtimeA.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $tampered.groups=@($tampered.groups)+@($tampered.groups[0])
 try{Assert-MIR4RuntimeRegistrationPlan -Plan $tampered|Out-Null;throw '[mir4-w04-duplicate-registration-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-runtime-duplicate-registration-group]')){throw}}
@@ -41,7 +41,7 @@ $runtime=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -S
 $migration=New-MIR4MigrationGraphMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $source
 $continuity=New-MIR4ContinuityBundle -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $source -CandidateZip $candidatePath -RuntimeStateMatrix $runtime -MigrationGraphMatrix $migration
 if($continuity.target_count-ne 17-or-not$continuity.redaction_manifest.complete-or$continuity.package_visible-or$continuity.public_release_proof){throw '[mir4-w04-continuity-boundary]'}
-$f210Package=@($continuity.package_roots|Where-Object target -eq'f210')[0].descriptor
+$f210Package=@($continuity.package_roots|Where-Object { $_.target -eq 'f210' })[0].descriptor
 if($candidatePath){if($f210Package.status-cne'present-private-unqualified'-or[string]$f210Package.sha256-cne(Get-MIR4PlatformFileSha256 $candidatePath)){throw '[mir4-w04-continuity-package-root]'}}elseif($f210Package.status-cne'not-materialized-for-this-bundle'){throw '[mir4-w04-continuity-template-package-root]'}
 $laws=Test-MIR4SemanticMergeLaws -RepoRoot $RepoRoot
 if(-not$laws.complete-or-not$laws.implemented_passed-or@($laws.deferred_owners).Count-ne 0-or@($laws.laws|Where-Object passed).Count-ne 12){throw '[mir4-w04-W03-law-cutover]'}
