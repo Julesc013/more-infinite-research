@@ -92,6 +92,16 @@ docs:
       - mir4-visible-root-shadow-layout
       - mir4-path-classification-and-external-roots
       - mir4-physical-move-gate
+  - path: docs/architecture/mir4-target-compiler.md
+    title: "MIR 4 Target Compiler"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-target-registry-v6
+      - mir4-target-provider-abi
+      - mir4-private-target-product-set
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

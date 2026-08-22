@@ -4,6 +4,9 @@ authority: mir-repository-paths-v1
 paths:
   package.root: .
   mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
+  mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
+  mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
+  mir4.target-registry.historical-v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
   final.governance: governance
   final.contracts: contracts
   final.spec: spec
@@ -24,6 +27,7 @@ paths:
   spec.compatibility.claims: spec/compatibility/claims.json
   spec.compatibility.lanes: spec/compatibility/support-lanes.json
   spec.schemas: spec/schemas
+  spec.schemas.mir4-target-registry-v6: spec/schemas/mir4-target-registry-v6.schema.json
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json
@@ -104,8 +108,10 @@ paths:
   tools.commands.release.mir4-bootstrap-local-candidate: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
   tools.commands.release.mir4-bootstrap-capsule: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
   tools.commands.release.mir4-r0-check: tools/commands/release/Test-MIR4R0Bootstrap.ps1
+  tools.commands.mir4.target-products: tools/commands/mir4/New-MIR4TargetProductSet.ps1
   tools.lib.mir4: tools/lib/mir4
   tools.lib.mir4.bootstrap-materialization: tools/lib/mir4/BootstrapMaterialization.ps1
+  tools.lib.mir4.target-compiler: tools/lib/mir4/TargetCompiler.ps1
   tools.lib.mir4.offline-candidate-custody: tools/lib/mir4/OfflineCandidateCustody.ps1
   tools.lib.validation.mir4-distribution-identity: tools/lib/validation/MIR4DistributionIdentity.ps1
   tools.lib: tools/lib

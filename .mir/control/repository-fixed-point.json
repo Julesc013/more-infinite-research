@@ -24,7 +24,7 @@
     {"id":"contracts","path":"contracts","mode":"shadow-reader","current_authorities":["spec/api","spec/schemas"]},
     {"id":"spec","path":"spec","mode":"canonical","current_authorities":["spec"]},
     {"id":"src","path":"src","mode":"shadow-reader","current_authorities":["prototypes","data.lua","data-updates.lua","data-final-fixes.lua","control.lua","settings.lua","migrations"]},
-    {"id":"targets","path":"targets","mode":"shadow-reader","current_authorities":[".mir/targets.json",".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json","tools/commands/targets"]},
+    {"id":"targets","path":"targets","mode":"shadow-reader","current_authorities":[".mir/targets.json",".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json","tools/commands/targets","tools/lib/mir4/TargetCompiler.ps1"]},
     {"id":"modules","path":"modules","mode":"shadow-reader","current_authorities":[".mir/modules.yml","prototypes/mir/capabilities","prototypes/mir/domain"]},
     {"id":"sdk","path":"sdk","mode":"canonical-package-excluded","current_authorities":["sdk"]},
     {"id":"tools-mir","path":"tools/mir","mode":"shadow-command-index","current_authorities":["tools/mir.ps1","tools/commands","tools/lib"]},

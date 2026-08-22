@@ -78,7 +78,7 @@ function Get-MIR4GitBlobSha1File {
 }
 
 function ConvertTo-MIR4BootstrapCanonicalValue {
-  param([Parameter(Mandatory)]$Value)
+  param([Parameter(Mandatory)][AllowNull()]$Value)
 
   if ($Value -is [string]) {
     if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?Z$') {

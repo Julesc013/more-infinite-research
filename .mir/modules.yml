@@ -875,6 +875,11 @@ validation_tooling:
     mir4_safety_kernel: tools/lib/mir4/SafetyKernel.ps1
     mir4_policy_engine: tools/lib/mir4/PolicyEngine.ps1
     mir4_normalized_compiler: tools/lib/mir4/NormalizedCompiler.ps1
+    mir4_target_compiler: tools/lib/mir4/TargetCompiler.ps1
+    mir4_target_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
+    mir4_target_registry_v6_schema: spec/schemas/mir4-target-registry-v6.schema.json
+    mir4_target_product_builder: tools/commands/mir4/New-MIR4TargetProductSet.ps1
+    mir4_target_compiler_gate: validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
     mir4_runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
     mir4_process_ir: tools/lib/mir4/ProcessIR.ps1
     mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1
@@ -894,7 +899,8 @@ validation_tooling:
     mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
     mir4_candidate_wave_authority: .mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json
     mir4_m4c01_implementation_authority: .mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json
-    mir4_target_registry_current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
+    mir4_target_registry_historical_v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
+    mir4_target_registry_current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
     mir4_hybrid_platform_authority_schema: spec/schemas/mir4-hybrid-platform-authority.schema.json
     mir4_m4c01_authority_schema: spec/schemas/mir4-m4c01-implementation-authorization.schema.json
     mir4_hybrid_platform_authority_gate: validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1

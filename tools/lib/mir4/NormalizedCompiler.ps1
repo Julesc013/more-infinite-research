@@ -1,7 +1,10 @@
 function New-MIR4NormalizedTargetProviders {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $registry = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json') | ConvertFrom-Json
+  $registry = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json') | ConvertFrom-Json
+  $supportByTarget = @{}
+  foreach ($row in $registry.support_policy) { $supportByTarget[[string]$row.target] = $row }
+  $profiles = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/targets.json') | ConvertFrom-Json
   $plan = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json') | ConvertFrom-Json
   $planById = @{}
   foreach ($target in $plan.targets) { $planById[[string]$target.target_id] = $target }
@@ -10,22 +13,38 @@ function New-MIR4NormalizedTargetProviders {
   foreach ($target in $historical.targets) { $historicalByKey[[string]$target.target_key] = $target }
 
   return @(
-    foreach ($target in $registry.payload.targets) {
-      $id = [string]$target.id
+    foreach ($target in $registry.identities) {
+      $id = [string]$target.target_id
       $code = [string]$target.distribution_target_code
+      $targetKey = [string]$target.target
+      $support = $supportByTarget[$targetKey]
+      if ($null -eq $support) { throw "[mir4-target-support-policy] $targetKey" }
       $planned = $planById[$id]
-      $historicalTarget = $historicalByKey[(Get-MIR4PlatformTargetKey $code)]
+      $historicalTarget = $historicalByKey[$targetKey]
       $predecessor = [string]$target.mir3_predecessor
       $snapshot = Get-MIR4PlatformPredecessorPath $predecessor
       $maturity = if ($id -in @('factorio-2.1','factorio-2.0','factorio-1.1','factorio-1.0')) { 'preview' } else { 'experimental' }
+      if ([string]$support.support_tier -eq 'museum') { $maturity = 'omitted-by-target' }
+      $profileProperty = $profiles.profiles.PSObject.Properties[[string]$target.factorio_line]
+      $profileStatus = [string]$support.profile
+      $profileDigest = if ($null -ne $profileProperty) {
+        Get-MIR4PlatformDigest ([pscustomobject][ordered]@{factorio_line=[string]$target.factorio_line;profile=$profileProperty.Value})
+      } elseif ($snapshot -and (Test-Path -LiteralPath (Join-Path $repo $snapshot) -PathType Leaf)) {
+        'sha256:' + (Get-MIR4PlatformFileSha256 (Join-Path $repo $snapshot))
+      } else { $null }
       $provider = [pscustomobject][ordered]@{
-        kind = 'MIR4TargetProviderV0'; schema = 0; id = Get-MIR4PlatformTargetKey $code; target_id = $id
-        factorio_line = [string]$target.factorio; distribution_target_code = $code; source_version = '4.0.0'
-        distribution_version = Get-MIR4PlatformDistributionVersion $code; support_tier = [string]$target.support_tier
-        disposition = [string]$target.disposition; release_blocking = [bool]$target.release_blocking; maturity = $maturity
+        kind = 'MIR4TargetProviderV0'; schema = 0; id = $targetKey; target_id = $id
+        factorio_line = [string]$target.factorio_line; distribution_target_code = $code; source_version = '4.0.0'
+        distribution_version = [string]$target.distribution_version; support_tier = [string]$support.support_tier
+        disposition = [string]$support.disposition; release_blocking = [bool]$support.release_blocking; maturity = $maturity
         authority = if ($maturity -eq 'preview') { 'candidate-programme-only' } else { 'private-experimental-only' }
         predecessor = if ($predecessor) { [ordered]@{ release=$predecessor; snapshot=$snapshot } } else { $null }
         engine_lock = if ($planned) { [ordered]@{ version=[string]$planned.engine_lock.version; sha256=[string]$planned.engine_lock.executable_sha256; authority='MIR4-Bootstrap-Local-Candidate-PlanV3' } } elseif ($historicalTarget -and -not [string]::IsNullOrWhiteSpace([string]$historicalTarget.engine.version)) { [ordered]@{ version=[string]$historicalTarget.engine.version; sha256=[string]$historicalTarget.engine.sha256; authority='MIR4-Historical-Private-Candidate-AuthorizationV1' } } else { $null }
+        profile = [ordered]@{ status=$profileStatus; authority=[string]$registry.profile_authority.path; authority_sha256=[string]$registry.profile_authority.sha256; digest=$profileDigest }
+        provenance = @(
+          [ordered]@{role='identity-and-support';path='.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json';sha256=(Get-MIR4PlatformFileSha256 (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json'))},
+          [ordered]@{role='target-profile';path=[string]$registry.profile_authority.path;sha256=[string]$registry.profile_authority.sha256}
+        )
         operations = @('identify','normalize-capabilities','explain-omissions','plan-private-candidate')
         forbidden_operations = @('mutate-prototypes','emit-authoritative-output','claim-public-support','weaken-safety')
         digest = ''
