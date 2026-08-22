@@ -1,8 +1,111 @@
 schema: 1
 
 docs:
+  - path: docs/releases/mir4-4.0-candidate-programme.md
+    title: "MIR 4.0 Candidate Programme"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0-product-contract
+      - mir4-target-admission-model
+      - mir4-candidate-wave-programme
+      - mir4-4.0-definition-of-done
+  - path: docs/user/mir3-to-mir4.md
+    title: "Upgrading from MIR 3 to MIR 4"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir3-to-mir4-player-upgrade-guide
+  - path: docs/reference/mir4-sdk-v0-quickstart.md
+    title: "MIR 4 SDK V0 Preview Quickstart"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-sdk-v0-preview-quickstart
+  - path: docs/reference/mir4-api-sdk-v0-stability.md
+    title: "MIR 4 API and SDK V0 Stability Policy"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-api-sdk-v0-stability-and-migration-policy
+  - path: docs/releases/notes/release-notes-4.0.0-candidate.md
+    title: "More Infinite Research 4.0.0 Candidate Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0.0-candidate-release-notes
+  - path: docs/releases/mir4-4.0-publication-copy.md
+    title: "MIR 4.0 Publication Copy"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0-github-release-copy
+      - mir4-4.0-mod-portal-copy
+      - mir4-4.0-player-faq
+  - path: docs/maintainer/mir4-qualification-and-promotion.md
+    title: "MIR 4 Qualification and Promotion"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-qualification-and-promotion-workflow
+  - path: docs/architecture/mir4-platform-preview.md
+    title: "MIR 4 Platform Preview Architecture"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-hybrid-platform-boundary
+      - shadow-non-interference
+  - path: docs/reference/mir4-mep-v0.md
+    title: "MIR Extension Protocol V0 Preview"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-mep-v0-preview-contract
+  - path: docs/reference/maximum-level-binding.md
+    title: "Maximum-Level Binding Contract"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - maximum-level-binding-policy-v3
+  - path: docs/maintainer/mir4-m4c01-runbook.md
+    title: "MIR 4 M4C01 Candidate Runbook"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-m4c01-execution-order
+      - mir4-production-authorization-boundary
+  - path: docs/reference/generated/mir4-platform-component-matrix.md
+    title: "MIR 4 Platform Component Matrix"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-mir4-component-maturity
   - path: docs/reference/generated/mir4-experimental-api-v0.md
-    title: "MIR 4 Experimental API V0"
+    title: "MIR 4 API/SDK V0 Preview"
     status: current
     audience: developer
     doc_type: reference
@@ -597,6 +700,7 @@ docs:
     source_of_truth_for:
       - module-boundaries
       - authority-projection-command-boundaries
+      - science-pack-production-route-authority
   - path: docs/releases/3.2.4-unified-research-cost-curves.md
     title: "MIR 3.2.4 Unified Research Cost Curves (Unpublished Candidate)"
     status: historical-checkpoint
@@ -1323,6 +1427,27 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/corrundum.md
+    title: "Corrundum Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/cubium.md
+    title: "Cubium Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/recycler-progression.md
+    title: "Recycler Progression Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/equipment-gantry.md
     title: "Equipment Gantry Compatibility"
     status: current
@@ -1799,6 +1924,17 @@ docs:
       - research-cost-algebraic-qualification
       - research-cost-parser-and-numeric-envelope
       - research-cost-3.2.5-release-contract
+  - path: docs/reference/research-cost-v2-preview.md
+    title: "ResearchCostModel V2 Preview"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - research-cost-v2-experimental-contract
+      - research-cost-v2-exact-rational-and-rounding-law
+      - research-cost-v2-sparse-profile-layering
+      - research-cost-v2-stable-admission-boundary
   - path: docs/reference/schemas/research-cost-compatibility-slice.md
     title: "Research-Cost Compatibility Slice Schema"
     status: current
@@ -2614,17 +2750,21 @@ docs:
       - mir-3-mod-portal-discussion-reconciliation
   - path: docs/releases/mir4-bootstrap-local-beta-plan.md
     title: "MIR 4 Bootstrap Local Beta Plan"
+    status: archived
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+    superseded_by: docs/releases/mir4-4.0-candidate-programme.md
+  - path: docs/maintainer/mir4-spark-sol-handoff.md
+    title: "MIR 4 Spark To Sol Handoff And Completion Plan"
     status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
-      - mir4-bootstrap-local-candidate-execution-plan
-      - mir4-bootstrap-local-candidate-status
-      - mir4-final-programme-reconciliation-status
-      - mir4-terminal-predecessor-refresh
-      - mir4-m4-003-required-follow-up
-      - mir4-private-local-playtest-shadow-operations
+      - mir4-spark-sol-handoff
+      - mir4-m4c01-next-work-plan
   - path: docs/releases/notes/release-notes-3.2.9.md
     title: "MIR 3.2.9 Release Notes"
     status: current

@@ -57,14 +57,17 @@ function Assert-MIRReleaseTag {
 }
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $null = Update-MIRCPViews -RepoRoot $repo -Check
-$null = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks
+$info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
+$verificationProfilePath = Join-Path $repo "validation\profiles\factorio-$([string]$info.factorio_version).json"
+$verificationProfile = Get-Content -Raw -LiteralPath $verificationProfilePath | ConvertFrom-Json
+$candidateProgramme = [string]$verificationProfile.release_authority_mode -eq 'candidate-programme'
+$null = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks -AllowCandidateProgrammeWorkingTree:$candidateProgramme
 $canonical = Get-MIRCPCurrentRelease -Role canonical -RepoRoot $repo
 $currentRoles = Read-MIRCPJson -Path "path:releases.current" -RepoRoot $repo
 $taggedModern = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.tagged_factorio_2_1) -RepoRoot $repo
 $publishedModern = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.published_factorio_2_1) -RepoRoot $repo
 $publishedBackport = Get-MIRCPReleaseByVersion -Release ([string]$currentRoles.roles.published_factorio_2_0) -RepoRoot $repo
 $backport = Get-MIRCPCurrentRelease -Role backport_calibration -RepoRoot $repo
-$info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
 
 if ([string]$canonical.release -ne [string]$info.version -or [string]$canonical.target -ne [string]$info.factorio_version) {
   throw "Canonical release authority must bind the package version and Factorio target in info.json."
@@ -124,7 +127,7 @@ if ($canonicalHasPackage) {
   if ($LASTEXITCODE -ne 0 -or $sourceTree -ne [string]$canonical.package.source_tree) { throw "Canonical package source tree differs from ReleaseRecord." }
   & git -C $repo merge-base --is-ancestor ([string]$canonical.package.source_commit) HEAD
   if ($LASTEXITCODE -ne 0) { throw "Canonical package source is not an ancestor of release-engineering HEAD." }
-  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty." }
+  if (-not $candidateProgramme -and (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) { throw "Package-visible source is dirty." }
 }
 
 $ledger = Read-MIRCPJson -Path ".mir/releases.json" -RepoRoot $repo

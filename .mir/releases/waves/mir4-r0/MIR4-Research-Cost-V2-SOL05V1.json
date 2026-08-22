@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "kind": "MIR4ResearchCostV2SOL05V1",
+  "status": "PASS_WITH_DEFERRED_STABLE_ADMISSION",
+  "recorded_at": "2026-08-21T00:00:00+10:00",
+  "work_package": "SOL-05",
+  "package_visible": false,
+  "publication_authorized": false,
+  "scope": {
+    "starting_source": {
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "feedback_id": "PF-2026-08-COST-001",
+    "reproducer_id": "REPRO-COST-V2-REQUEST",
+    "classification": "B2-conditional-feature-request-not-regression",
+    "claim_boundary": "The package-excluded V2 exact arithmetic, graph, sparse profile, explanation, and analytical transition contracts are frozen and tested. Stable V1 remains the sole player-package authority. V2 runtime projection, migration, manual acceptance, public identity, and publication are not admitted."
+  },
+  "candidate_non_interference": {
+    "before_path": "build/results/mir4-sol/sol04/candidate-v6/more-infinite-research_3.2.11.zip",
+    "after_path": "build/results/mir4-sol/sol05/candidate-v1/more-infinite-research_3.2.11.zip",
+    "before_archive_sha256": "689E7C5D9364FAF6AE7C06AC2032E5DCBCB95E05833672A87CA036BFC094603F",
+    "after_archive_sha256": "689E7C5D9364FAF6AE7C06AC2032E5DCBCB95E05833672A87CA036BFC094603F",
+    "content_sha256": "80A0C50EE03B3FBA999DDB4F520B9BAB55EEA4588E22D8A291E84125D7DFF563",
+    "byte_identical": true,
+    "disposition": "local-development-evidence-only-not-a-release-candidate"
+  },
+  "verification_plan": {
+    "path": "build/results/mir4-sol/sol05/research-cost-v2-verification-plan-v2-preclose.json",
+    "file_sha256": "5AE5158DBEDF59727594F5EE27E3A817530E7B3548BBE130167014D071910CC0",
+    "plan_material_sha256": "49F5903F9E7DAE67CB203C0D15151078A6FD9FE55A3C83C25F2A323C0C56FD11",
+    "required_test_set_sha256": "40D343950F3283DEF7FE2A2ED908A7C9A4FDFE5EBBE0BFC1BD6E2CA507925ADA",
+    "counts": {
+      "total": 156,
+      "reuse": 0,
+      "wait": 0,
+      "run": 154,
+      "invalid": 2
+    },
+    "invalid_future_work": [
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ]
+  },
+  "stable_authority": {
+    "schema": 1,
+    "formula_abi": "mir-research-cost-v1",
+    "authority": "prototypes/mir/domain/research_cost/model.lua",
+    "compiler_schema_record": ".mir/compiler-schema-authority.json#records/ResearchCostModel",
+    "writable_versions": [1],
+    "regression_tests": [
+      {
+        "command": "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+        "result": "passed",
+        "coverage": "identities-algebra-parser-defaults-target-dispositions-sixteen-transitions"
+      },
+      {
+        "command": "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+        "result": "passed",
+        "coverage": "five-f210-native-owner-contracts-and-engine-normalized-work-preservation"
+      }
+    ]
+  },
+  "preview_contract": {
+    "schema": 2,
+    "formula_abi": "mir-research-cost-v2-preview",
+    "maturity": "experimental-package-excluded",
+    "rounding_law": "round-half-up-positive-final-v1",
+    "base_sources": [
+      "absolute",
+      "previous-series-level",
+      "direct-prerequisite-sum",
+      "transitive-prerequisite-closure",
+      "profile-defined"
+    ],
+    "profile_layers": [
+      "safe-default",
+      "target",
+      "ecosystem",
+      "modpack",
+      "user",
+      "explicit",
+      "hard-safety"
+    ],
+    "selectors": [
+      "all",
+      "target",
+      "owner",
+      "source-mod",
+      "effect-channel",
+      "family",
+      "stream",
+      "technology"
+    ],
+    "artifacts": [
+      {
+        "path": "tools/lib/mir4/ResearchCostV2.ps1",
+        "file_sha256": "650A770B66196EB7C32F600836B4635D9E87F4CD156CB29C6DBF9DC68354C78D"
+      },
+      {
+        "path": "spec/schemas/experimental/mir4-research-cost-model-v2.schema.json",
+        "file_sha256": "4BF835DAE7B68425C14B7C227C80BD9CFC99250418784A41BBF7E73A81DA775C"
+      },
+      {
+        "path": "spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json",
+        "file_sha256": "9409E37D9DAC5194CC800271F861C3259A93D051AA75254840ACAAA48AA71CB3"
+      },
+      {
+        "path": "docs/reference/research-cost-v2-preview.md",
+        "file_sha256": "CA5EAD86CA11526CFA9A8E8730BD932D95C6354D76F0C6AE04579A057658F3E4"
+      }
+    ]
+  },
+  "proof_vectors": {
+    "public_vector": {
+      "base_source": "direct-prerequisite-sum",
+      "prerequisite_anchor": "300/1",
+      "base_multiplier": "2/1",
+      "linear_ratio": "1/2",
+      "growth_factor": "1/1",
+      "levels_1_to_3": ["600", "750", "900"],
+      "result": "passed"
+    },
+    "shared_prerequisite_deduplication": {
+      "direct_anchor": "300/1",
+      "transitive_anchor": "350/1",
+      "shared_contributor_count": 1,
+      "reorder_equivalent": true,
+      "result": "passed"
+    },
+    "cycle_block": {
+      "witness": ["a", "b", "a"],
+      "reason": "research_cost_v2_graph_cycle:a>b>a",
+      "result": "passed"
+    },
+    "profile_layering": {
+      "deterministic_under_reorder": true,
+      "hard_safety_final": true,
+      "field_source_explained": true,
+      "result": "passed"
+    },
+    "analytical_transition": {
+      "previous_cost": "600",
+      "current_cost": "1200",
+      "previous_fraction": "1/2",
+      "converted_fraction": "1/4",
+      "application": "diagnostic-once-only-runtime-not-admitted",
+      "result": "passed"
+    }
+  },
+  "target_dispositions": {
+    "f210": "preview-only-runtime-projection-not-admitted",
+    "f200": "preview-only-target-local-runtime-proof-required",
+    "f110": "schema-preserved-no-runtime-projection",
+    "f100": "schema-preserved-no-runtime-projection",
+    "f018_to_f013": "private-target-omitted"
+  },
+  "stable_admission_decision": {
+    "decision": "DEFER_TO_EXPERIMENTAL_PREVIEW",
+    "reason": "The optional feature contract is complete enough for review, but product admission would be unsafe without exact Factorio formula lowering, runtime migration/reload proof, target-local f210/f200 evidence, Inspector transport, manual acceptance, and rollback proof.",
+    "blocking_obligations": [
+      "exact-factorio-formula-lowering",
+      "active-and-queued-research-transition-proof",
+      "direct-predecessor-upgrade-and-two-reloads",
+      "f210-target-local-runtime-proof",
+      "f200-target-local-runtime-proof",
+      "profile-transport-and-inspector-explanation",
+      "manual-review",
+      "v2-to-v1-rollback-proof"
+    ],
+    "v1_regression": false,
+    "player_package_changed": false,
+    "public_claim": "none"
+  },
+  "exit_gate": {
+    "schema_frozen": true,
+    "exact_arithmetic_and_rounding_proven": true,
+    "graph_deduplication_and_cycle_witness_proven": true,
+    "sparse_profile_layering_proven": true,
+    "explanation_proven": true,
+    "analytical_transition_proven": true,
+    "target_dispositions_complete": true,
+    "package_non_interference_proven": true,
+    "stable_v2_admitted": false,
+    "stable_v1_retained": true,
+    "publication_authorized": false,
+    "next_work_package": "SOL-06"
+  }
+}

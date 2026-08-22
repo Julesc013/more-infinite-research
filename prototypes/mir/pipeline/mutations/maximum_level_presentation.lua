@@ -1,5 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local compiler_orchestrator = require("prototypes.mir.pipeline.compiler_orchestrator")
+local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
 
 local M = {}
 
@@ -29,58 +30,48 @@ local function append_cap_description(technology, source, maximum)
   return prefix
 end
 
-local function bindings(plan)
-  local out = {}
-  for _, row in ipairs(plan.stream_plan.rows or {}) do
-    if row.action == "emit" then
-      table.insert(out, {
-        technology = row.technology_name,
-        selected = row.planned_max_level,
-        source = "generated-stream"
-      })
-    elseif row.action == "adopt" and row.adoption then
-      table.insert(out, {
-        technology = row.adoption.owner,
-        selected = row.adoption.planned_max_level,
-        source = "native-owner"
-      })
-    end
-  end
-  for _, operation in ipairs(plan.base_extension_operations or {}) do
-    table.insert(out, {
-      technology = operation.technology_name,
-      selected = operation.planned_max_level,
-      source = "base-continuation"
-    })
-  end
-  table.sort(out, function(left, right) return left.technology < right.technology end)
-  return out
-end
-
 function M.apply(context)
-  local plan = compiler_orchestrator.compile(context)
-  local applied = {}
-  for _, binding in ipairs(bindings(plan)) do
-    local maximum = finite_maximum(binding.selected)
-    local technology = data_raw.technology(binding.technology)
-    if maximum and technology then
-      if technology.max_level == "infinite" then
-        technology.show_levels_info = false
-        technology.visible_when_disabled = true
+  local policy = compiler_orchestrator.maximum_level_policy(context)
+  local applied, blocked, observations = {}, {}, {}
+  for _, binding in ipairs(policy.bindings or {}) do
+    local technology = data_raw.technology(binding.technology_id)
+    local observed = technology and technology.max_level or "missing"
+    local maximum = finite_maximum(binding.cap and binding.cap.effective)
+    if maximum and technology and binding.diagnostics.status ~= "blocking-conflict" then
+      if observed == "infinite" then
+        technology.show_levels_info = binding.presentation_strategy.show_levels_info
+        technology.visible_when_disabled = binding.presentation_strategy.visible_when_disabled
         technology.localised_description = append_cap_description(
-          technology, binding.source, maximum)
-        table.insert(applied, binding.technology .. "=" .. tostring(maximum))
+          technology, binding.binding.source, maximum)
+        table.insert(applied, binding.technology_id .. "=" .. tostring(maximum))
       else
+        table.insert(blocked, binding.technology_id)
         log("[more-infinite-research] Maximum-level presentation refused"
-          .. " technology=" .. tostring(binding.technology)
+          .. " technology=" .. tostring(binding.technology_id)
           .. " selected=" .. tostring(maximum)
-          .. " final-observed=" .. tostring(technology.max_level)
+          .. " final-observed=" .. tostring(observed)
           .. " reason=late_prototype_maximum_conflict.")
       end
+    elseif maximum and (not technology or binding.diagnostics.status == "blocking-conflict") then
+      table.insert(blocked, binding.technology_id)
+      log("[more-infinite-research] Maximum-level presentation refused"
+        .. " technology=" .. tostring(binding.technology_id)
+        .. " selected=" .. tostring(maximum)
+        .. " final-observed=" .. tostring(observed)
+        .. " reason=" .. tostring(binding.diagnostics.active_code
+          or "maximum_level_finalizer_observation_missing") .. ".")
     end
+    observations[binding.technology_id] = {
+      adapter = policy.finalizer_adapter,
+      observed_prototype_max_level = observed
+    }
   end
+  local observed_policy = maximum_level_binding.observe_finalizers(policy, observations)
+  context:replace_epoch(
+    "maximum_level_policy", observed_policy, context:state_epoch("maximum_level_policy"))
   log("[more-infinite-research] Applied truthful finite-cap presentation"
     .. " count=" .. tostring(#applied)
+    .. " blocked=" .. tostring(#blocked)
     .. " technologies=" .. table.concat(applied, ",") .. ".")
 end
 

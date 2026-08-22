@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kind": "MIR4PlatformMaturityAndPublicationContractV1",
+  "status": "accepted-for-m4c01-implementation",
+  "recorded_at": "2026-08-18T12:00:00+10:00",
+  "package_visible": false,
+  "source_version": "4.0.0",
+  "candidate_wave": "M4C01",
+  "authority_source": "explicit-maintainer-approval-2026-08-18",
+  "imports": ["spec/platform/mir4-preview-v0/platform.json",".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json"],
+  "maturity_classes": ["stable","shadow","preview","experimental","omitted-by-target"],
+  "stable_player_targets": ["f210","f200"],
+  "conditional_player_targets": ["f110","f100"],
+  "private_experimental_targets": ["f018","f017","f016","f015","f014","f013"],
+  "developer_preview_assets": ["mir4-sdk-v0-preview.zip","mir4-platform-preview-v0.zip","mir4-reference-extension-v0.zip","mir4-inspector-preview-v0.zip"],
+  "non_stable_forbidden": ["prototype-mutation","setting-or-default-change","persistent-state-mutation","migration-change","public-support-claim","player-package-load-dependency","hard-safety-weakening","undeclared-package-content"],
+  "publication": {"player_packages":"not-authorized","developer_previews":"local-private-until-release-go-no-go","mod_portal":"not-authorized"},
+  "record_sha256": "497AC48C17E1C89104CE9909AD9A0EBD00AC089884DF56E7CF886638C8947BE0"
+}

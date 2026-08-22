@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "kind": "MIR4PlatformPreviewV0",
+  "source_version": "4.0.0",
+  "candidate_wave": "M4C01",
+  "canonicalization": "mir-canonical-json-v0",
+  "maturity_classes": {
+    "stable": "May affect authoritative player behavior and is release-blocking where admitted.",
+    "shadow": "Executes and compares but cannot alter authoritative output or state.",
+    "preview": "Real and distributable; compatibility may change before 1.0.",
+    "experimental": "Disabled by default and carries no compatibility promise.",
+    "omitted-by-target": "Not emitted; a target-local reason and evidence reference are required."
+  },
+  "non_interference": [
+    "no-authoritative-prototype-mutation",
+    "no-authoritative-setting-or-default-change",
+    "no-authoritative-persistent-state-mutation",
+    "no-admitted-migration-change",
+    "no-public-support-claim",
+    "no-player-package-load-dependency",
+    "no-hard-safety-weakening",
+    "no-undeclared-package-visible-content"
+  ],
+  "components": [
+    {"id":"source-distribution-codec","maturity":"stable","mode":"authoritative"},
+    {"id":"target-identity-predecessor-contracts","maturity":"stable","mode":"authoritative"},
+    {"id":"legacy-compiler-host-adapter-v1","maturity":"stable","mode":"bootstrap"},
+    {"id":"target-materializer","maturity":"stable","mode":"authoritative-for-admitted-targets"},
+    {"id":"package-surface-lock","maturity":"stable","mode":"authoritative"},
+    {"id":"release-dag","maturity":"stable","mode":"authoritative"},
+    {"id":"api-sdk-v0","maturity":"preview","mode":"read-only-package-excluded"},
+    {"id":"mep-v0","maturity":"preview","mode":"data-only-package-excluded"},
+    {"id":"query-profile-observation-v0","maturity":"preview","mode":"read-only-package-excluded"},
+    {"id":"inspector-v0","maturity":"preview","mode":"query-consumer-package-excluded"},
+    {"id":"target-provider-abi-v0","maturity":"preview","mode":"build-time-package-excluded"},
+    {"id":"normalized-compiler-v0","maturity":"shadow","mode":"compare-only"},
+    {"id":"safety-kernel-policy-engine-boundary-v0","maturity":"shadow","mode":"dependency-audit"},
+    {"id":"runtime-state-model-v0","maturity":"shadow","mode":"inventory-only"},
+    {"id":"process-ir-v0","maturity":"shadow","mode":"parity-and-loop-diagnostics"},
+    {"id":"autonomous-synthesis-v0","maturity":"shadow","mode":"diagnose-only"},
+    {"id":"historical-target-providers-v0","maturity":"experimental","mode":"private-build-only"}
+  ],
+  "mep_fragments": [
+    "CompatibilityFragment",
+    "ProfileFragment",
+    "ProofFragment",
+    "PresentationFragment",
+    "CapabilityRequirement",
+    "ExtensionDependency",
+    "ExtensionConflict",
+    "FinalizationRequirement"
+  ],
+  "mep_forbidden_fields": [
+    "callback",
+    "callbacks",
+    "compiler_context",
+    "data_raw",
+    "executor",
+    "prototype",
+    "prototype_write",
+    "safety_kernel"
+  ],
+  "effect_channels": [
+    "recipe-productivity",
+    "laboratory-speed",
+    "worker-robot-speed",
+    "worker-robot-storage",
+    "character-inventory",
+    "character-trash-slots",
+    "weapon-shooting-speed",
+    "ammo-damage",
+    "follower-robot-lifetime",
+    "mining-drill-productivity",
+    "agricultural-growth-speed",
+    "spoilage-preservation"
+  ],
+  "synthesis_dispositions": [
+    "handle-certified",
+    "preserve-opaque",
+    "request-extension",
+    "request-review",
+    "omit-with-evidence",
+    "fail-hard-safety-with-witness"
+  ],
+  "preview_assets": [
+    "mir4-sdk-v0-preview.zip",
+    "mir4-platform-preview-v0.zip",
+    "mir4-reference-extension-v0.zip",
+    "mir4-inspector-preview-v0.zip"
+  ]
+}

@@ -101,6 +101,65 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
     }
   }
 
+  # MIR 4 candidate-programme profiles intentionally exist before a typed
+  # release record or approved-delta artifact. Bind the pending fingerprint to
+  # the exact implementation authorization and target registry instead of
+  # fabricating release authority or treating the absent future artifact as an
+  # assurance-tooling failure.
+  if ([string]$Context.verification_profile.release_authority_mode -eq 'candidate-programme') {
+    $authorityRelative = ([string]$Context.verification_profile.release_authority).Replace('\', '/')
+    if ($authorityRelative -notmatch '^\.mir/releases/waves/mir4-r0/[A-Za-z0-9._-]+\.json$') {
+      throw "Candidate-programme approved-delta authority path is unsafe: $authorityRelative"
+    }
+    $authorityPath = Join-Path $repo $authorityRelative
+    $registryRelative = '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json'
+    $registryPath = Join-Path $repo $registryRelative
+    if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
+      throw 'Candidate-programme approved-delta authority or target registry is absent.'
+    }
+    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+    $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
+    $targetRows = @($registry.payload.targets | Where-Object {
+      [string]$_.factorio -eq [string]$Context.target
+    })
+    if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+        -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
+        [string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+        [string]$authority.status -ne 'authorized-in-progress' -or
+        @($authority.authorized) -notcontains 'exact-engine-development-proof' -or
+        @($authority.not_authorized) -notcontains 'production-seal' -or
+        @($authority.not_authorized) -notcontains 'github-release-publication' -or
+        @($authority.not_authorized) -notcontains 'mod-portal-mir4-upload' -or
+        [string]$registry.kind -ne 'MIR4-Target-RegistryV5' -or
+        [string]$registry.status -ne 'accepted-candidate-programme-current' -or
+        $registry.package_visible -or $targetRows.Count -ne 1) {
+      throw 'Candidate-programme approved-delta authority boundary is invalid.'
+    }
+    $targetRow = $targetRows[0]
+    $expectedVersion = "4.0.$([string]$targetRow.distribution_target_code)00"
+    if ([string]$targetRow.mir3_predecessor -ne $fromVersion -or
+        $expectedVersion -ne $toVersion -or
+        [string]$targetRow.disposition -notin @('candidate-mandatory', 'candidate-conditional')) {
+      throw 'Candidate-programme approved-delta profile does not match the exact target registry row.'
+    }
+    $material = [ordered]@{
+      kind='approved-delta-transition'
+      state='pending'
+      from_version=$fromVersion
+      to_version=$toVersion
+      path=$relativePath
+      release_record=$authorityRelative
+      release_state=[string]$authority.status
+      release_record_sha256=(Get-MIRAssuranceSha256 -Path $authorityPath)
+      target_registry=$registryRelative
+      target_registry_sha256=(Get-MIRAssuranceSha256 -Path $registryPath)
+      authority_class='candidate-programme-development-only'
+    }
+    $material['sha256'] = Get-MIRAssuranceJsonHash -Value $material
+    return $material
+  }
+
   $path = Join-Path $repo $relativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Approved-delta transition artifact is absent: $relativePath"

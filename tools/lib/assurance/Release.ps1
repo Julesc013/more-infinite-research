@@ -37,6 +37,82 @@ function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
   $binding = $targetMap[[string]$Context.target]
   if ($null -eq $binding) { return $null }
 
+  # Confirmed package-visible corrections are qualified before source freeze in
+  # a separate, private affected-proof lane. This lane does not replace the
+  # fixed-point M4C01 materializer or broaden its authority; it only lets the
+  # exact f200 correction candidate participate in candidate-bound planning.
+  $affectedManifestPath = Join-Path $repo "build\results\mir4-sol\sol08\target-candidates\MIR4_AFFECTED_TARGET_CANDIDATES.json"
+  if ([string]$binding.target_key -eq 'f200' -and (Test-Path -LiteralPath $affectedManifestPath -PathType Leaf)) {
+    $affectedManifest = Get-Content -Raw -LiteralPath $affectedManifestPath | ConvertFrom-Json
+    $affectedRows = @($affectedManifest.targets | Where-Object {
+      [string]$_.target_key -eq [string]$binding.target_key -and
+      [string]$_.factorio_line -eq [string]$Context.target -and
+      [string]$_.version -eq [string]$binding.distribution_version
+    })
+    if ($affectedRows.Count -eq 1) {
+      $affectedRow = $affectedRows[0]
+      $affectedCandidate = Join-Path $repo ([string]$affectedRow.archive)
+      $requestedAffectedCandidate = -not [string]::IsNullOrWhiteSpace([string]$Context.candidate) -and
+        [IO.Path]::GetFullPath($affectedCandidate).Equals(
+          [IO.Path]::GetFullPath([string]$Context.candidate),
+          [StringComparison]::OrdinalIgnoreCase
+        )
+      if ($requestedAffectedCandidate) {
+        $authorityPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Private-Lane-AuthorizationV3.json"
+        if ([int]$affectedManifest.schema -ne 1 -or
+            [string]$affectedManifest.kind -ne 'MIR4AffectedTargetCandidateSetSOL08V1' -or
+            [string]$affectedManifest.status -ne 'built-unqualified-local-development-candidates' -or
+            [bool]$affectedManifest.public_output_authorized -or
+            [bool]$affectedManifest.publication_authorized -or
+            -not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
+          throw 'MIR 4 affected-correction planning manifest violates its private authority boundary.'
+        }
+        $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+        if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+            [string]$authority.kind -ne 'MIR4PrivateLaneAuthorizationV3' -or
+            [bool]$authority.release_admission_authorized -or [bool]$authority.public_output_authorized -or
+            [bool]$authority.signing_or_sealing_authorized -or [bool]$authority.publication_authorized) {
+          throw 'MIR 4 affected-correction planning lacks exact private-lane authority.'
+        }
+        $authorityRows = @($authority.authorized_targets | Where-Object {
+          [string]$_.target_key -eq [string]$binding.target_key -and
+          [string]$_.factorio_line -eq [string]$Context.target -and
+          [string]$_.distribution_version -eq [string]$binding.distribution_version
+        })
+        if ($authorityRows.Count -ne 1) { throw 'MIR 4 affected-correction target is absent from private-lane authority.' }
+        $authorityRow = $authorityRows[0]
+        if (-not (Test-Path -LiteralPath $affectedCandidate -PathType Leaf)) {
+          throw 'MIR 4 affected-correction candidate is missing.'
+        }
+        $candidateIdentity = Get-MIRAssuranceCandidateArchiveIdentity -Path $affectedCandidate
+        if ([string]$candidateIdentity.sha256 -ne [string]$affectedRow.archive_sha256 -or
+            [string]$candidateIdentity.content_sha256 -ne [string]$affectedRow.content_sha256 -or
+            [long]$candidateIdentity.bytes -ne [long]$affectedRow.bytes -or
+            [int]$candidateIdentity.entries -ne [int]$affectedRow.entry_count) {
+          throw 'MIR 4 affected-correction candidate bytes differ from the exact manifest.'
+        }
+        if ([string]::IsNullOrWhiteSpace([string]$Context.factorio) -or
+            -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf) -or
+            (Get-FileHash -Algorithm SHA256 -LiteralPath $Context.factorio).Hash -ne [string]$authorityRow.engine_sha256) {
+          throw 'MIR 4 affected-correction plan requires the exact target-bound Factorio engine.'
+        }
+        if ([string]::IsNullOrWhiteSpace([string]$Context.prior_release) -or
+            -not (Test-Path -LiteralPath $Context.prior_release -PathType Leaf) -or
+            (Get-FileHash -Algorithm SHA256 -LiteralPath $Context.prior_release).Hash -ne [string]$authorityRow.predecessor_archive_sha256) {
+          throw 'MIR 4 affected-correction plan requires the exact target-bound predecessor archive.'
+        }
+        return [pscustomobject][ordered]@{
+          release = [string]$binding.distribution_version
+          target = [string]$Context.target
+          state = [string]$affectedManifest.status
+          authority_class = 'private-affected-correction-testing-only'
+          candidate_id = [string]$binding.target_key
+          package_source_commit = [string]$affectedManifest.source_commit
+        }
+      }
+    }
+  }
+
   $laneRoot = Join-Path $repo "build\mir4\local-playtest-shadow"
   $manifestPath = Join-Path $laneRoot "manifests\$($binding.target_key).json"
   $authorityPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Private-Lane-AuthorizationV2.json"
@@ -808,7 +884,7 @@ function Invoke-MIRAssuranceSelfTest {
     throw "Active approved-delta transition fingerprint is invalid: $activeApprovedDeltaPath"
   }
   if ([string]$activeApprovedDeltaFingerprint.state -eq "pending" -and
-      ([string]$activeApprovedDeltaFingerprint.release_state -notin @("planned", "source-frozen", "package-built") -or
+      ([string]$activeApprovedDeltaFingerprint.release_state -notin @("planned", "source-frozen", "package-built", "authorized-in-progress") -or
        [string]$activeApprovedDeltaFingerprint.release_record_sha256 -notmatch '^[A-F0-9]{64}$')) {
     throw "Pending approved-delta transition does not bind exact pre-qualification release authority."
   }

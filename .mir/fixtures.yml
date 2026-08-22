@@ -166,10 +166,31 @@ fixtures:
     requires_features: []
     path: fixtures/mir4-api-v0
     validates:
-      - six-experimental-v0-contracts
+      - six-developer-preview-v0-contracts
       - canonical-digest-vectors
       - stable-negative-diagnostics
       - extension-profile-round-trip
+
+  mir4-mep-v0-conformance:
+    requires_features: []
+    path: fixtures/mir4-mep-v0
+    shipped: false
+    validates:
+      - eight-data-only-fragment-kinds
+      - reference-extension-round-trip
+      - recursive-forbidden-field-rejection
+      - stable-negative-diagnostics
+      - package-surface-non-interference
+
+  mir4-process-ir-v0-safety:
+    requires_features: []
+    path: fixtures/mir4-process-ir-v0
+    shipped: false
+    validates:
+      - bounded-positive-loop-accepted-for-policy-evaluation
+      - unbounded-positive-loop-rejected-by-safety-kernel
+      - stable-safety-violation-diagnostics
+      - policy-cannot-override-hard-safety
 
   museum-synthetic-installation:
     requires_features: []
@@ -243,6 +264,15 @@ fixtures:
       - deterministic-multiple-unlocker-selection
       - later-alternate-route-cannot-delay-existing-science-production
       - deterministic-earliest-safe-route-selection
+      - reachable-canonical-primary-outranks-later-ordinary-alternate
+      - immediately-available-ordinary-alternate-remains-first-acquisition
+      - ordinary-route-precedence-over-initially-enabled-recycling-route
+      - recycling-route-default-progression-demotion
+      - recycling-only-first-acquisition-fails-closed
+      - science-pack-self-return-never-proves-first-acquisition
+      - factorio-generated-recycling-suffix-classification
+      - exact-profile-recycling-first-requires-process-ir-and-target-proof
+      - rejected-route-explanation-witness
       - direct-science-self-lock-exclusion
       - two-pack-science-cycle-exclusion
       - missing-research-mechanism-exclusion
@@ -255,18 +285,69 @@ fixtures:
       - isolated-context-science-facade-validation
       - closed-compiler-context-assertion-safety
 
+  cubium-production-routes:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-cubium-production-routes
+    external_mod_identity: cubium
+    exact_real_campaign: local-2-1-cubium-production-routes
+    exact_version_envelope:
+      cubium: "1.0.30"
+    validates:
+      - exact-cubium-cubic-route-corpus-present
+      - eleven-science-packs-retain-ordinary-primary-routes
+      - cube-mastery-4-does-not-delay-first-acquisition
+      - multi-route-selection-witnesses-are-deterministic
+      - generated-technologies-do-not-retain-cube-mastery-4
+
+  recycler-progression-routes:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-recycler-progression-routes
+    external_mod_identity: recycler-progression
+    exact_real_campaign: local-2-1-recycler-progression-routes
+    exact_version_envelope:
+      recycler-progression: "1.1.1"
+    validates:
+      - exact-recycler-1-hidden-science-recycling-unlock-surface
+      - recycling-and-self-return-routes-never-prove-first-acquisition-by-default
+      - recycler-1-does-not-enter-generated-prerequisites
+      - rejected-recycling-route-witnesses-remain-explainable
+
+  recycler-progression-routes-f200:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-recycler-progression-routes-f200
+    external_mod_identity: recycler-progression
+    exact_real_campaign: local-2-0-recycler-progression-routes
+    exact_version_envelope:
+      recycler-progression: "1.0.0"
+    validates:
+      - exact-f200-recycler-1-science-recycling-unlock-surface-characterization
+      - present-recycling-and-self-return-routes-never-prove-first-acquisition-by-default
+      - recycler-1-does-not-enter-generated-prerequisites
+      - rejected-recycling-route-witnesses-remain-explainable
+
   k2-science-phase-policy:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy
     external_mod_identity: Krastorio2-spaced-out
-    exact_real_campaign: local-2-1-krastorio-spaced-out
-    exact_version_envelope:
-      Krastorio2: "2.1.2"
-      Krastorio2-spaced-out: "2.0.13"
+    exact_real_campaigns:
+      - local-2-1-krastorio-spaced-out
+      - local-2-0-krastorio-spaced-out
+    exact_endpoint_evidence:
+      lower: build/results/mir4-sol/sol06/k2so-f210-lower-v3
+      upper: build/results/mir4-sol/sol06/k2so-f210-upper-v3
+    bounded_version_envelopes:
+      f210:
+        Krastorio2: ">=2.1.2 <2.1.3"
+        Krastorio2-spaced-out: ">=2.0.11 <2.0.14"
+      f200:
+        Krastorio2: absent
+        Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
     validates:
-      - exact-version-envelope
+      - target-specific-bounded-version-envelopes
+      - required-science-identity-capability-fingerprint
       - no-behavior-when-k2-is-absent
-      - no-behavior-outside-the-exact-version-envelope
+      - no-behavior-outside-the-bounded-version-envelopes
+      - factorio-2-0-standalone-profile-forbids-krastorio2
       - idempotent-mir-owned-technology-normalization
       - ingredient-order-shape-and-amount-preservation
       - nonempty-normalized-ingredient-lists
@@ -422,6 +503,47 @@ fixtures:
       - removed-recipe-target-sanitation
       - fixture-storage-retention
       - upgraded-save-reload
+
+  upgrade-3-2-11-to-4-0-21000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-3-2-11-to-4-0-21000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "3.2.11"
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-3-2-11-source-archive
+      - startup-profile-retention
+      - stable-generated-technology-identities
+      - technology-level-and-current-research-retention
+      - completed-research-work-and-science-retention
+      - native-owner-cap-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-mod-removal-and-dangling-effect-sanitation
+      - fixture-storage-retention
+      - upgraded-save-two-reload-proof
+
+  upgrade-2-5-11-to-4-0-20000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-2-5-11-to-4-0-20000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.11"
+    archetypes:
+      - base-default
+    validates:
+      - exact-2-5-11-source-archive
+      - startup-profile-retention
+      - stable-base-technology-level-retention
+      - current-research-retention
+      - fractional-research-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-0-20000-candidate-normal-mod-directory-load
 
   upgrade-2-5-10-to-4-0-20000:
     requires_features: []
@@ -1075,6 +1197,10 @@ fixtures:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts
     validates:
+      - normalized-maximum-level-binding-policy-v3
+      - maximum-level-binding-precedence-and-order-independence
+      - known-finalizer-observation-acceptance
+      - unknown-finalizer-stable-blocking-diagnostic
       - invalid-family-rule-rejection
       - unknown-family-operator-rejection
       - data-only-family-operator-composition

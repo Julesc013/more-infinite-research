@@ -7,6 +7,12 @@ local cycle_pack_b_name = "mir-fixture-cycle-science-pack-b"
 local alternate_route_pack_name = "mir-fixture-alternate-route-science-pack"
 local alternate_route_early_recipe_name = "mir-fixture-alternate-route-early"
 local alternate_route_late_recipe_name = "mir-fixture-alternate-route-late"
+local recycling_alternate_pack_name = "mir-fixture-recycling-alternate-science-pack"
+local recycling_alternate_recipe_name = "mir-fixture-recycling-alternate"
+local self_return_pack_name = "mir-fixture-self-return-science-pack"
+local self_return_recipe_name = "mir-fixture-self-return-recycling"
+local recycling_only_pack_name = "mir-fixture-recycling-only-science-pack"
+local recycling_only_recipe_name = "mir-fixture-recycling-only"
 
 local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
 
@@ -67,6 +73,24 @@ alternate_route_early_recipe.name = alternate_route_early_recipe_name
 local alternate_route_late_recipe = table.deepcopy(alternate_route_early_recipe)
 alternate_route_late_recipe.name = alternate_route_late_recipe_name
 
+local recycling_alternate_pack, recycling_alternate_primary_recipe =
+  pack_and_recipe(recycling_alternate_pack_name)
+local recycling_alternate_recipe = table.deepcopy(recycling_alternate_primary_recipe)
+recycling_alternate_recipe.name = recycling_alternate_recipe_name
+recycling_alternate_recipe.enabled = true
+recycling_alternate_recipe.categories = {"recycling"}
+
+local self_return_pack, self_return_recipe = pack_and_recipe(self_return_pack_name)
+self_return_recipe.name = self_return_recipe_name
+self_return_recipe.enabled = true
+self_return_recipe.categories = {"recycling"}
+self_return_recipe.ingredients = {{type = "item", name = self_return_pack_name, amount = 1}}
+
+local recycling_only_pack, recycling_only_recipe = pack_and_recipe(recycling_only_pack_name)
+recycling_only_recipe.name = recycling_only_recipe_name
+recycling_only_recipe.enabled = true
+recycling_only_recipe.categories = {"recycling"}
+
 local function unlocker(name, enabled, unlocked_recipe, ingredients)
   return {
     type = "technology",
@@ -85,7 +109,7 @@ local function unlocker(name, enabled, unlocked_recipe, ingredients)
   }
 end
 
-data:extend({
+local fixture_prototypes = {
   pack,
   recipe,
   initial_pack,
@@ -108,8 +132,22 @@ data:extend({
   alternate_route_late_recipe,
   unlocker("mir-fixture-z-early-route-unlocker", true, alternate_route_early_recipe_name),
   unlocker("mir-fixture-00-late-route-unlocker", true, alternate_route_late_recipe_name),
+  recycling_alternate_pack,
+  recycling_alternate_primary_recipe,
+  recycling_alternate_recipe,
+  unlocker("mir-fixture-recycling-alternate-primary-unlocker", true, recycling_alternate_pack_name),
+  self_return_pack,
+  self_return_recipe,
+  recycling_only_pack,
+  recycling_only_recipe,
   unlocker("mir-fixture-no-research-mechanism-unlocker", true, recipe_name)
-})
+}
+
+if not (data.raw["recipe-category"] and data.raw["recipe-category"].recycling) then
+  table.insert(fixture_prototypes, 1, {type = "recipe-category", name = "recycling"})
+end
+
+data:extend(fixture_prototypes)
 
 data.raw.technology["mir-fixture-00-late-route-unlocker"].prerequisites = {
   "mir-fixture-z-early-route-unlocker"
@@ -123,4 +161,7 @@ for _, lab in pairs(data.raw.lab or {}) do
   table.insert(lab.inputs, cycle_pack_a_name)
   table.insert(lab.inputs, cycle_pack_b_name)
   table.insert(lab.inputs, alternate_route_pack_name)
+  table.insert(lab.inputs, recycling_alternate_pack_name)
+  table.insert(lab.inputs, self_return_pack_name)
+  table.insert(lab.inputs, recycling_only_pack_name)
 end

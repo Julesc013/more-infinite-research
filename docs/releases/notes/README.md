@@ -14,7 +14,11 @@ superseded_by: []
 
 Player-facing summaries are grouped here by MIR version. The root `changelog.txt` remains the detailed history; ReleaseRecords under `.mir/releases/records/` hold exact release identities.
 
-## Current published `.5` wave
+## MIR 4 candidate
+
+- [4.0.0 candidate release notes](release-notes-4.0.0-candidate.md) — implementation and qualification candidate only; not a publication claim.
+
+## Historical published waves
 
 - [3.2.5 — Factorio 2.1](release-notes-3.2.5.md)
 - [2.5.5 — Factorio 2.0](release-notes-2.5.5.md)
@@ -25,12 +29,6 @@ Player-facing summaries are grouped here by MIR version. The root `changelog.txt
 - [1.5.5 — Factorio 0.15.40](release-notes-1.5.5.md)
 - [1.4.5 — Factorio 0.14.23](release-notes-1.4.5.md)
 - [1.3.5 — Factorio 0.13.20](release-notes-1.3.5.md)
-
-## Next planned release
-
-- [3.2.9 planning notes](release-notes-3.2.9.md) — planning only; no candidate, source freeze, or package exists yet.
-
-The matching lower terminal releases are `2.5.9`, `1.9.9`, `1.8.9`, `1.7.9`, `1.6.9`, `1.5.9`, `1.4.9`, and `1.3.9`. Their exact scope will be written after the unified finding inventory is frozen. There will be no `.6`, `.7`, or `.8` releases.
 
 ## Earlier releases
 

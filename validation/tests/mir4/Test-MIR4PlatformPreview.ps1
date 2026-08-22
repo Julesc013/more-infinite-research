@@ -1,0 +1,74 @@
+$ErrorActionPreference='Stop'
+$repo=(Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+. (Join-Path $repo 'tools\lib\mir4\PlatformPreview.ps1')
+Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
+Test-MIR4PlatformConformance -RepoRoot $repo|Out-Null
+if((ConvertTo-MIR4PlatformCanonicalJson ([ordered]@{empty=@()})) -cne '{"empty":[]}'){throw '[mir4-platform-canonical-empty-array]'}
+
+$platform=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec\platform\mir4-preview-v0\platform.json')|ConvertFrom-Json
+if(@($platform.components).Count -lt 16){throw '[mir4-platform-components] Expected the complete hybrid component inventory.'}
+if(@($platform.mep_fragments).Count -ne 8){throw '[mir4-platform-mep] Expected exactly eight bounded V0 fragment kinds.'}
+if(@($platform.non_interference).Count -ne 8){throw '[mir4-platform-non-interference] Expected all eight non-interference rules.'}
+
+$providers=(Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk\preview\mir4\reference\target-providers.json')|ConvertFrom-Json).providers
+if(@($providers).Count -ne 17){throw '[mir4-platform-targets] Expected all 17 governed target providers.'}
+foreach($target in @('f210','f200','f110','f100','f018','f017','f016','f015','f014','f013')){if($target -notin @($providers.id)){throw "[mir4-platform-target] Missing $target"}}
+$affected=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/affected-target-plan.json')|ConvertFrom-Json
+if(@($affected.targets).Count -ne 17 -or @($affected.targets|Where-Object authoritative).Count){throw '[mir4-platform-affected-target-plan]'}
+$affectedF210=$affected.targets|Where-Object target -eq 'f210'
+$affectedF018=$affected.targets|Where-Object target -eq 'f018'
+if([string]$affectedF210.plan -cne 'build-and-qualify-mandatory'){throw '[mir4-platform-affected-target-f210]'}
+if([string]$affectedF018.plan -cne 'blocked-missing-exact-engine'){throw '[mir4-platform-affected-target-f018]'}
+if(@($affected.targets|Where-Object{$_.target -in @('f012','f011','f010','f009','f008','f007','f006') -and $_.plan -ne 'omitted-by-target'}).Count){throw '[mir4-platform-affected-target-museum]'}
+
+$extension=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference-extension/extension.json')|ConvertFrom-Json
+$shadowA=New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -Envelope $extension
+$shadowB=New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -Envelope $extension
+if($shadowA.digest-cne$shadowB.digest-or$shadowA.authoritative_output-or$shadowA.mutation_capability-or$shadowA.public_support_claim){throw '[mir4-platform-shadow-compile-noninterference]'}
+if(@($shadowA.contributions).Count -ne @($extension.fragments).Count -or @($shadowA.contributions|Where-Object{$_.policy.safety.status -ne 'accepted-for-policy-evaluation'}).Count){throw '[mir4-platform-shadow-compile-incomplete]'}
+$missing=$extension|ConvertTo-Json -Depth 100|ConvertFrom-Json
+($missing.fragments|Where-Object kind -eq 'CapabilityRequirement').data.all_of=@('query.read','unavailable.capability')
+$missing.digest=Get-MIR4PlatformDigest $missing
+$missingRun=New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -Envelope $missing
+if($missingRun.result -cne 'review-required' -or -not @($missingRun.diagnostics|Where-Object code -eq 'mir4-shadow-capability-unavailable')){throw '[mir4-platform-shadow-capability-diagnostic]'}
+try{New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f013 -Envelope $extension|Out-Null;throw '[mir4-platform-shadow-undeclared-target-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-shadow-target-not-declared]')){throw}}
+$shadowOutput='build/results/mir4-shadow/reference-f210.json'
+$written=Invoke-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -ExtensionPath 'sdk/preview/mir4/reference-extension/extension.json' -OutputPath $shadowOutput
+if($written.digest -cne $shadowA.digest){throw '[mir4-platform-shadow-write-determinism]'}
+try{Invoke-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId f210 -ExtensionPath 'sdk/preview/mir4/reference-extension/extension.json' -OutputPath 'docs/forbidden-shadow-output.json'|Out-Null;throw '[mir4-platform-shadow-output-escape-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-shadow-output-boundary]')){throw}}
+$opportunities=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/opportunity-catalogue.json')|ConvertFrom-Json
+if(@($opportunities.grammar).Count -ne 6 -or @($opportunities.candidates).Count -ne @($platform.effect_channels).Count){throw '[mir4-platform-opportunity-catalogue]'}
+if(@($opportunities.candidates|Where-Object{$_.mutation_allowed -or $_.authoritative -or $_.execution -ne 'diagnose-only'}).Count){throw '[mir4-platform-opportunity-authority]'}
+$runtimeInventory=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/runtime-state-inventory.json')|ConvertFrom-Json
+if(@($runtimeInventory.runtime_feature_specs).Count -lt 10 -or @($runtimeInventory.state_specs).Count -lt 3 -or @($runtimeInventory.migrations).Count -ne 2 -or @($runtimeInventory.event_registry.events).Count -lt 7){throw '[mir4-platform-runtime-state-inventory]'}
+if([string]$runtimeInventory.predecessor_map.f210 -cne '3.2.11' -or [string]$runtimeInventory.predecessor_map.f200 -cne '2.5.11'){throw '[mir4-platform-runtime-predecessor-map]'}
+$inspector=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/inspector/index.html')
+if($inspector.Contains('innerHTML') -or -not $inspector.Contains('textContent') -or -not $inspector.Contains('mir4-inspector-invalid-json')){throw '[mir4-platform-inspector-safe-rendering]'}
+
+$dag=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec\platform\mir4-preview-v0\release-dag.json')|ConvertFrom-Json
+Test-MIR4ReleaseDag -Dag $dag|Out-Null
+$cycle=$dag|ConvertTo-Json -Depth 20|ConvertFrom-Json
+($cycle.nodes|Where-Object id -eq 'authority').depends_on=@('public-readback')
+try{Test-MIR4ReleaseDag -Dag $cycle|Out-Null;throw '[mir4-release-dag-cycle-accepted]'}catch{if(-not $_.Exception.Message.StartsWith('[mir4-release-dag-cycle]')){throw}}
+$boundary=$dag|ConvertTo-Json -Depth 20|ConvertFrom-Json
+($boundary.nodes|Where-Object id -eq 'publish-github').authorization='candidate-programme'
+try{Test-MIR4ReleaseDag -Dag $boundary|Out-Null;throw '[mir4-release-dag-boundary-accepted]'}catch{if(-not $_.Exception.Message.StartsWith('[mir4-release-dag-production-boundary]')){throw}}
+
+$query=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk\preview\mir4\reference\query-snapshot-f210.json')|ConvertFrom-Json
+. (Join-Path $repo 'tools\lib\mir4\ExperimentalApiSdk.ps1')
+Test-MIR4ApiRecord -Record $query -RepoRoot $repo|Out-Null
+
+$previewA=New-MIR4PlatformPreviewPackages -RepoRoot $repo -OutputRoot 'build/results/mir4-preview-determinism/A'
+$previewB=New-MIR4PlatformPreviewPackages -RepoRoot $repo -OutputRoot 'build/results/mir4-preview-determinism/B'
+if($previewA.digest -cne $previewB.digest -or (ConvertTo-MIR4PlatformCanonicalJson $previewA.assets) -cne (ConvertTo-MIR4PlatformCanonicalJson $previewB.assets)){throw '[mir4-platform-preview-nondeterministic]'}
+$sdkAsset=$previewA.assets|Where-Object name -eq 'mir4-sdk-v0-preview.zip'
+if(-not$sdkAsset){throw '[mir4-platform-sdk-asset-missing]'}
+$portableRoot=Join-Path $repo ('build/results/mir4-sdk-portability/'+[Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $portableRoot|Out-Null
+Expand-Archive -LiteralPath (Join-Path $repo 'build/results/mir4-preview-determinism/A/mir4-sdk-v0-preview.zip') -DestinationPath $portableRoot
+$runner=Join-Path $portableRoot 'mir4-sdk-v0-preview/sdk/preview/mir4/conformance/Invoke-MIR4SdkConformance.ps1'
+if(-not(Test-Path -LiteralPath $runner -PathType Leaf)){throw '[mir4-platform-sdk-portable-runner-missing]'}
+& pwsh -NoLogo -NoProfile -NonInteractive -File $runner
+if($LASTEXITCODE -ne 0){throw '[mir4-platform-sdk-portable-conformance]'}
+
+Write-Host 'MIR 4 platform preview validation passed.'

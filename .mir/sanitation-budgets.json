@@ -25,6 +25,10 @@
     "ultracube": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-crucible-rigor-exact-dist": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-space-age-planet-cluster": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+      "local-2-1-corrundum-maxcap-13": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+      "local-2-1-cubium-production-routes": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+      "local-2-1-recycler-progression-routes": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+      "local-2-0-recycler-progression-routes": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-muluna-secretas-astroponics-cycle": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-aai-loaders": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-1-aai-industry": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
@@ -47,10 +51,12 @@
     "local-2-0-base-baseline": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-space-age-baseline-if-installed": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bz-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-bz-suite-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bob-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-angels-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-bob-angels": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-krastorio2": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-krastorio-spaced-out": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-space-exploration": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
     "local-2-0-pymodpack": {
       "expected_external_prunes": [

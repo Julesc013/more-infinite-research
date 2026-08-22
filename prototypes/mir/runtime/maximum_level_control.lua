@@ -7,7 +7,7 @@ local stream_registry = require("prototypes.mir.streams.registry")
 local setting_defaults = require("prototypes.mir.settings.defaults")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
-local POLICY_VERSION = 1
+local POLICY_VERSION = 3
 local INFINITE_RUNTIME_MAX_LEVEL = 4294967295
 
 local function ensure_state()
@@ -33,6 +33,33 @@ local function selected_maximum(setting_name)
   local selected = tonumber(startup_settings.get(setting_name))
   if not selected or selected <= 0 then return "infinite" end
   return math.floor(selected)
+end
+
+local function normalized_policy_binding(binding)
+  if type(binding) ~= "table" then return nil end
+  if binding.schema == 3 and binding.record_type == "MaximumLevelBinding" then
+    local diagnostics = binding.diagnostics or {}
+    local finalizer = binding.finalizer_observation or {}
+    return {
+      technology = tostring(binding.technology_id),
+      source = binding.binding and binding.binding.source or binding.source,
+      operation = binding.binding and binding.binding.operation or binding.operation,
+      setting = binding.setting and binding.setting.name or binding.setting_name,
+      selected = binding.cap and binding.cap.effective or binding.selected,
+      binding_fingerprint = binding.binding_fingerprint,
+      blocked_reason = diagnostics.status == "blocking-conflict"
+        and (diagnostics.active_code or "maximum_level_binding_conflict")
+        or finalizer.status == "blocking-conflict"
+          and (diagnostics.active_code or "maximum_level_finalizer_conflict") or nil
+    }
+  end
+  return {
+    technology = tostring(binding.technology),
+    source = binding.source,
+    operation = binding.operation,
+    setting = binding.setting,
+    selected = binding.selected
+  }
 end
 
 local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
@@ -95,13 +122,18 @@ local function current_policy()
     and prototypes.mod_data[POLICY_DATA_NAME]
   local policy_data = policy_prototype and policy_prototype.data or nil
   for _, binding in ipairs((policy_data and policy_data.bindings) or {}) do
-    local name = tostring(binding.technology)
-    managed[name] = {
-      source = binding.source,
-      operation = binding.operation,
-      setting = binding.setting,
-      selected = binding.selected
-    }
+    local normalized = normalized_policy_binding(binding)
+    if normalized and normalized.technology ~= "nil" then
+      local name = normalized.technology
+      managed[name] = {
+        source = normalized.source,
+        operation = normalized.operation,
+        setting = normalized.setting,
+        selected = normalized.selected,
+        binding_fingerprint = normalized.binding_fingerprint,
+        blocked_reason = normalized.blocked_reason
+      }
+    end
   end
   if next(managed) == nil then
     add_runtime_settings_policy(managed)
@@ -109,7 +141,17 @@ local function current_policy()
 
   for name, policy in pairs(managed) do
     local selected = policy.selected
-    if type(selected) == "number" and selected > 0 then
+    if policy.blocked_reason then
+      log("[more-infinite-research] Maximum-level conflict technology=" .. name
+        .. " selected=" .. tostring(selected)
+        .. " planned=" .. tostring(selected)
+        .. " final-observed=" .. tostring(observed_max_level(name))
+        .. " binding-operation=" .. tostring(policy.operation)
+        .. " source=" .. tostring(policy.source)
+        .. " reason=" .. tostring(policy.blocked_reason)
+        .. " setting=" .. tostring(policy.setting)
+        .. "; runtime queue normalization was refused.")
+    elseif type(selected) == "number" and selected > 0 then
       local observed = observed_max_level(name)
       if prototype_matches_selected(observed, selected) then
         caps[name] = math.floor(selected)

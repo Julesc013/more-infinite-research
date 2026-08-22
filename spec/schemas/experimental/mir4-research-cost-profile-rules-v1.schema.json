@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json",
+  "title": "MIR 4 Experimental Research-Cost Profile Rules V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "policy_id", "maturity", "layers"],
+  "properties": {
+    "schema": {"const": 1},
+    "policy_id": {"const": "mir-research-cost-profile-rules-v1-preview"},
+    "maturity": {"const": "experimental-package-excluded"},
+    "layers": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"$ref": "#/$defs/layer"}
+    }
+  },
+  "$defs": {
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "rules"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"},
+        "kind": {"enum": ["safe-default", "target", "ecosystem", "modpack", "user", "explicit", "hard-safety"]},
+        "rules": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": {"$ref": "#/$defs/rule"}
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "selector", "values"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"},
+        "priority": {"type": "integer", "minimum": -1000000, "maximum": 1000000},
+        "selector": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": {"enum": ["all", "target", "owner", "source-mod", "effect-channel", "family", "stream", "technology"]},
+            "value": {"type": "string", "maxLength": 256}
+          }
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "base_source": {"enum": ["absolute", "previous-series-level", "direct-prerequisite-sum", "transitive-prerequisite-closure", "profile-defined"]},
+            "base_multiplier": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,127})/[1-9][0-9]{0,127}$"},
+            "linear_ratio": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,127})/[1-9][0-9]{0,127}$"},
+            "absolute_linear_increment": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,127})/[1-9][0-9]{0,127}$"},
+            "growth_factor": {"type": "string", "pattern": "^(0|[1-9][0-9]{0,127})/[1-9][0-9]{0,127}$"},
+            "previous_series_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"}
+          }
+        }
+      }
+    }
+  }
+}

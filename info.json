@@ -10,6 +10,8 @@
     "(?) elevated-rails",
     "? recycler >= 2.1.8",
     "(?) quality",
+    "(?) cubium",
+    "(?) recycler-progression",
     "(?) Krastorio2",
     "(?) Krastorio2-spaced-out",
     "(?) pypostprocessing",

@@ -282,6 +282,149 @@
       ]
     },
     {
+      "id": "static.mir4-public-feedback-intake",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PublicFeedbackIntake.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Public-Feedback-IntakeV1.json",
+        ".mir/compatibility.yml",
+        ".mir/fixtures.yml",
+        "validation/tests/mir4/Test-MIR4PublicFeedbackIntake.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-maximum-level-sol03",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4MaximumLevelSOL03.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Maximum-Level-Binding-SOL03V1.json",
+        ".mir/compatibility.yml",
+        "docs/compatibility/targets/corrundum.md",
+        "prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "prototypes/mir/pipeline/compiler_orchestrator.lua",
+        "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+        "prototypes/mir/emit/mod_data.lua",
+        "prototypes/mir/runtime/maximum_level_control.lua",
+        "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
+        "validation/tests/mir4/Test-MIR4MaximumLevelSOL03.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-production-route-sol04",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ProductionRouteSOL04.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Production-Route-SOL04V1.json",
+        ".mir/compatibility.yml",
+        ".mir/fixtures.yml",
+        "docs/compatibility/targets/cubium.md",
+        "docs/compatibility/targets/recycler-progression.md",
+        "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
+        "fixtures/assert-generated-prerequisite-safety/data-final-fixes.lua",
+        "fixtures/assert-cubium-production-routes/data-final-fixes.lua",
+        "fixtures/assert-recycler-progression-routes/data-final-fixes.lua",
+        "validation/tests/mir4/Test-MIR4ProductionRouteSOL04.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-research-cost-v2-sol05",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ResearchCostV2SOL05.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Research-Cost-V2-SOL05V1.json",
+        "spec/schemas/experimental/mir4-research-cost-model-v2.schema.json",
+        "spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json",
+        "tools/lib/mir4/ResearchCostV2.ps1",
+        "docs/reference/research-cost-v2-preview.md",
+        ".mir/compiler-schema-authority.json",
+        ".mir/modules.yml",
+        "validation/tests/mir4/Test-MIR4ResearchCostV2SOL05.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-k2-science-sol06",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4K2ScienceSOL06.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-K2-Science-SOL06V1.json",
+        ".mir/compatibility.yml",
+        ".mir/fixtures.yml",
+        ".mir/sanitation-budgets.json",
+        "validation/scenarios/local-2.1.json",
+        "validation/scenarios/local-2.0.json",
+        "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "prototypes/mir/planner/science.lua",
+        "prototypes/mir/capabilities/science_integration/science_packs.lua",
+        "prototypes/mir/planner/base_continuations.lua",
+        "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
+        "fixtures/assert-k2-science-phase-policy/info.json",
+        "docs/architecture/module-boundaries.md",
+        "validation/tests/mir4/Test-MIR4K2ScienceSOL06.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-compatibility-campaign-sol07",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4CompatibilityCampaignSOL07.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json",
+        ".mir/compatibility.yml",
+        ".mir/evidence/3.1.0-rc4-missing-overhaul-closures.json",
+        ".mir/evidence/3.1.0-rc5-ecosystem-campaign.json",
+        ".mir/evidence/3.2.0-ecosystem-qualification/pymodpack/campaign-evidence.json",
+        "validation/scenarios/manual.json",
+        "validation/scenarios/local-2.1.json",
+        "validation/scenarios/local-2.0.json",
+        "validation/tests/mir4/Test-MIR4CompatibilityCampaignSOL07.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-affected-proof-sol08",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4AffectedProofSOL08.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Affected-Proof-Closure-SOL08V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json",
+        ".mir/fixtures.yml",
+        ".mir/sanitation-budgets.json",
+        "fixtures/assert-recycler-progression-routes-f200/**",
+        "tools/commands/mir4/New-MIR4AffectedTargetCandidateSet.ps1",
+        "tools/lib/assurance/Release.ps1",
+        "validation/scenarios/local-2.0.json",
+        "validation/tests/mir4/Test-MIR4AffectedProofSOL08.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-m4c01-closeout-sol09",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4M4C01CloseoutSOL09.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Affected-Proof-Closure-SOL08V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json",
+        "tools/commands/mir4/Export-MIR4M4C01Closeout.ps1",
+        "validation/tests/mir4/Test-MIR4M4C01CloseoutSOL09.ps1"
+      ]
+    },
+    {
       "id": "static.mir4-final-programme-reconciliation",
       "kind": "static",
       "layer": "F0",
@@ -589,6 +732,68 @@
         "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1",
         "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
         "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-platform-preview",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "mir.toml",
+        "mir.lock",
+        "spec/platform/mir4-preview-v0/**",
+        "spec/schemas/preview/**",
+        "sdk/preview/mir4/**",
+        "fixtures/mir4-mep-v0/**",
+        "fixtures/mir4-process-ir-v0/**",
+        "tools/lib/mir4/ExperimentalApiSdk.ps1",
+        "tools/lib/mir4/PlatformPreview.ps1",
+        "tools/lib/mir4/SafetyKernel.ps1",
+        "tools/lib/mir4/PolicyEngine.ps1",
+        "tools/lib/mir4/NormalizedCompiler.ps1",
+        "tools/lib/mir4/RuntimeStateModel.ps1",
+        "tools/lib/mir4/ProcessIR.ps1",
+        "tools/lib/mir4/ReleaseDag.ps1",
+        "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1",
+        "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-hybrid-platform-authority",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Package-Presentation-OverlayV1.json",
+        "spec/schemas/mir4-hybrid-platform-authority.schema.json",
+        "spec/schemas/mir4-m4c01-implementation-authorization.schema.json",
+        "spec/schemas/mir4-historical-private-candidate-authorization.schema.json",
+        "spec/schemas/mir4-package-presentation-overlay.schema.json",
+        "validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "runtime.mir4-historical-private",
+      "kind": "runtime",
+      "layer": "F4",
+      "command": "./tools/mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "prior-release",
+        "factorio",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+        "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
       ]
     },
     {

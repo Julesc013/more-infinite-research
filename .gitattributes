@@ -71,3 +71,38 @@ spec/schemas/experimental/*.json text eol=lf
 sdk/experimental/mir4/json-schema/*.json text eol=lf
 sdk/experimental/mir4/lua/*.lua text eol=lf
 sdk/experimental/mir4/powershell/*.psm1 text eol=lf
+
+# The M4C01 preview generators and accepted receipts bind these files by raw
+# byte identity. Preserve their canonical LF output in clean Windows checkouts.
+mir.lock text eol=lf
+prototypes/mir/compatibility/policies/k2_science_phase.lua text eol=lf
+prototypes/mir/planner/science.lua text eol=lf
+fixtures/assert-k2-science-phase-policy/data-final-fixes.lua text eol=lf
+tools/lib/mir4/ResearchCostV2.ps1 text eol=lf
+docs/reference/research-cost-v2-preview.md text eol=lf
+sdk/preview/mir4/** text eol=lf
+fixtures/mir4-mep-v0/** text eol=lf
+fixtures/mir4-process-ir-v0/** text eol=lf
+docs/reference/generated/mir4-platform-component-matrix.md text eol=lf
+spec/schemas/preview/mir4-mep-v0.schema.json text eol=lf
+
+# The platform preview lock and generated records raw-hash their complete text
+# input closure. Keep those source bytes invariant across Windows and hosted
+# checkouts so generation and verification bind the same committed content.
+mir.toml text eol=lf
+spec/platform/mir4-preview-v0/*.json text eol=lf
+spec/api/mir4-v0/contracts.json text eol=lf
+.mir/compatibility.yml text eol=lf
+.mir/streams.yml text eol=lf
+.mir/fixtures.yml text eol=lf
+.mir/modules.yml text eol=lf
+tools/lib/mir4/ExperimentalApiSdk.ps1 text eol=lf
+tools/lib/mir4/SafetyKernel.ps1 text eol=lf
+tools/lib/mir4/PolicyEngine.ps1 text eol=lf
+tools/lib/mir4/NormalizedCompiler.ps1 text eol=lf
+tools/lib/mir4/RuntimeStateModel.ps1 text eol=lf
+tools/lib/mir4/ProcessIR.ps1 text eol=lf
+tools/lib/mir4/ReleaseDag.ps1 text eol=lf
+prototypes/mir/runtime/**/*.lua text eol=lf
+migrations/*.json text eol=lf
+migrations/*.lua text eol=lf

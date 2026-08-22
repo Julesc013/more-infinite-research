@@ -10,6 +10,9 @@ permissions:
 
 env:
   MIR_VALIDATION_TARGET: ${{ (github.ref == 'refs/heads/tmp/2.0' || github.head_ref == 'tmp/2.0' || github.base_ref == 'tmp/2.0') && '2.0' || '2.1' }}
+  # Clean hosted runners validate the committed receipt closure. Exact private
+  # development evidence remains mandatory in the local integration gate.
+  MIR4_EXTERNAL_EVIDENCE_MODE: hosted-receipt
 
 jobs:
   plan:

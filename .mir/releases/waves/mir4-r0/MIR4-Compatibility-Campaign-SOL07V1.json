@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "kind": "MIR4CompatibilityCampaignSOL07V1",
+  "work_package": "SOL-07",
+  "status": "PASS",
+  "package_visible": false,
+  "publication_authorized": false,
+  "public_release_claim_authorized": false,
+  "scope": {
+    "starting_source": {
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "candidate": {
+      "path": "build/results/mir4-sol/sol06/candidate-v3/more-infinite-research_3.2.11.zip",
+      "archive_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "content_sha256": "1F3D587D9CA51E33A14D597FCC20F1E9EF19709EE2D1F5E75DCE3E56166BD52E",
+      "disposition": "local-development-evidence-only-unbound-to-release-commit"
+    },
+    "factorio_2_1": {
+      "version": "2.1.14.87180",
+      "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+    },
+    "result_model": [
+      "LOAD",
+      "INTEGRITY",
+      "extension-required",
+      "review-required",
+      "omitted",
+      "failed-hard-safety"
+    ],
+    "claim_boundary": "subject-level exact development evidence only; no blanket compatibility, release qualification, or publication authority"
+  },
+  "verification_plan": {
+    "status": "materialized-preclose",
+    "path": "build/results/mir4-sol/sol07/compatibility-verification-plan-v1-preclose-auto.json",
+    "file_sha256": "3EE4164F337588F46D74685ED9E8CFAF629B497C8F8DF93F7911031656CDFF9A",
+    "plan_material_sha256": "21450CD73DA0455DFD5C4FBCBBE63B0E29DD0C17A135AD50B4E4FE53C8E58483",
+    "required_test_set_sha256": "A9662E3BA99FD6FC708C2436F919AB6798519D5ED8E68AB14505DFD9C4F954E7",
+    "counts": {
+      "total": 158,
+      "run": 155,
+      "reuse": 0,
+      "invalid": 3
+    },
+    "invalid_future_work": [
+      "runtime.upgrade",
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ]
+  },
+  "evidence_bindings": [
+    {
+      "id": "f210-base-official",
+      "path": "build/results/mir4-sol/sol07/f210-representative-v1/campaign-evidence.json",
+      "file_sha256": "42B8E87525D8D07EB529A005D0016923F770A99A7A0F7C3D60093615336F24E9",
+      "lock_path": "build/results/mir4-sol/sol07/f210-representative-v1/compat-candidates.lock.json",
+      "lock_sha256": "35025D335B785194F87A9E0704462BCBD8F2A8A8F2A32613EBC3352535A000ED",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": ["base-baseline", "space-age-baseline"]
+    },
+    {
+      "id": "f210-representative-subjects",
+      "path": "build/results/mir4-sol/sol07/f210-representative-v2/campaign-evidence.json",
+      "file_sha256": "AB3A9388C1AA27D4FC5E8DADDDC4622D757E4AF03C27E554AA4A400ECD97DB02",
+      "lock_path": "build/results/mir4-sol/sol07/f210-representative-v2/compat-candidates.lock.json",
+      "lock_sha256": "9FB2DEC9F617E50C3EB4DB6DFA6E2C5193BEBD447EEB2EF2FB5D385C90FF8D41",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": [
+        "local-2-1-corrundum-maxcap-13",
+        "local-2-1-cubium-production-routes",
+        "local-2-1-aai-representative-extensions",
+        "local-2-1-bz-suite-space-age"
+      ]
+    },
+    {
+      "id": "f210-recycler-progression",
+      "path": "build/results/mir4-sol/sol07/f210-recycler-v2/campaign-evidence.json",
+      "file_sha256": "612236BB95950F16520EC2B0AC9246F1D9106FB44A4D87F2E66AFF954B219220",
+      "lock_path": "build/results/mir4-sol/sol07/f210-recycler-v2/compat-candidates.lock.json",
+      "lock_sha256": "3DD2B5107A1C25BD1970FA7EC466C348D1E4CBA48908A2654CD5D537198AD8F6",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": ["local-2-1-recycler-progression-routes"]
+    },
+    {
+      "id": "f210-bob-suite",
+      "path": "build/results/mir4-sol/sol07/f210-bob-v1/campaign-evidence.json",
+      "file_sha256": "3CE8BB3843E5B0CC06AF1A7FB47CF469688C4420D59C9962F530ED5D785C96C6",
+      "lock_path": "build/results/mir4-sol/sol07/f210-bob-v1/compat-candidates.lock.json",
+      "lock_sha256": "FA3E93408F9B4C0B5AA10C54C5840AF97ED08A23829E1AA941292EAD5B620ABA",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": ["local-2-1-bob-suite"]
+    },
+    {
+      "id": "f210-k2so-lower",
+      "path": "build/results/mir4-sol/sol06/k2so-f210-lower-v3/campaign-evidence.json",
+      "file_sha256": "100DAA9F5638397A636BCD335B11F064A8B6182104CB5C6F2808A885975AF59A",
+      "lock_path": "build/results/mir4-sol/sol06/k2so-f210-lower-v3/compat-candidates.lock.json",
+      "lock_sha256": "B60C80F4D264BE5C14729EA2361FD79CA8E1600A893DC46DDDDFB252C9B1A096",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": ["local-2-1-krastorio-spaced-out"]
+    },
+    {
+      "id": "f210-k2so-upper",
+      "path": "build/results/mir4-sol/sol06/k2so-f210-upper-v3/campaign-evidence.json",
+      "file_sha256": "ABF0D2569DABADC780FD57BDFD90F7B7D6F77CB05E6B96A6D30A307DB63B503F",
+      "lock_path": "build/results/mir4-sol/sol06/k2so-f210-upper-v3/compat-candidates.lock.json",
+      "lock_sha256": "E8C7CFE3684BCB3D644865CCAD3942EB7E5B2456E0CEC19068B73CD9D03C079E",
+      "candidate_sha256": "27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "accepted_scenarios": ["local-2-1-krastorio-spaced-out"]
+    },
+    {
+      "id": "f200-k2so-private-development",
+      "path": "build/results/mir4-sol/sol06/k2so-f200-candidate-v2/campaign-evidence.json",
+      "file_sha256": "5756C357424900884004EBA0A1ADEBA8B00E6834200108962B263CF20F06A71B",
+      "lock_path": "build/results/mir4-sol/sol06/k2so-f200-candidate-v2/compat-candidates.lock.json",
+      "lock_sha256": "D4F766D1492B7298FA4201A4664D6C9DD6529413BF0DCBA4BC6D8954D917AFD7",
+      "candidate_sha256": "911FC3CC36A6BEA8444F866E417805101ED51D6691F19B655474A8FC13322441",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "accepted_scenarios": ["local-2-0-krastorio-spaced-out"],
+      "disposition": "private-target-characterization-not-formal-target-package"
+    }
+  ],
+  "superseded_campaign_findings": [
+    {
+      "id": "SOL07-HARNESS-001",
+      "path": "build/results/mir4-sol/sol07/f210-representative-v2/campaign-evidence.json",
+      "scenario": "local-2-1-recycler-progression-routes",
+      "result": "skipped",
+      "dependency_failure_count": 2,
+      "classification": "harness-input-ambiguity-not-product-failure",
+      "superseded_by": "f210-recycler-progression",
+      "minimized_cause": "combined local library selected an obsolete MIR archive and omitted the exact Recycler Progression root archive"
+    }
+  ],
+  "historical_context": [
+    {
+      "path": ".mir/evidence/3.1.0-rc4-missing-overhaul-closures.json",
+      "file_sha256": "A17544B77FAFFCF85D016E631063C666CD0C54DE5A9C33EF2F23F7ABC365CCD9",
+      "disposition": "nontransferable missing-closure context for Angel, Space Exploration, and Pyanodons"
+    },
+    {
+      "path": ".mir/evidence/3.1.0-rc5-ecosystem-campaign.json",
+      "file_sha256": "306AD04B8D68F6502AFA9E44D966B3BED5552682AFE89EFA999C40BF88D590E2",
+      "disposition": "nontransferable predecessor load characterization for AAI, BZ, Bob, and K2"
+    },
+    {
+      "path": ".mir/evidence/3.2.0-ecosystem-qualification/pymodpack/campaign-evidence.json",
+      "file_sha256": "1670386E6092B0589824F285ABC3478444EB623C43A76C0FCEABBAEA049763B6",
+      "disposition": "failed zero-root Py evidence; no compatibility claim"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "base-and-official",
+      "outcome": "LOAD",
+      "claim_level": "loads",
+      "evidence_ids": ["f210-base-official"],
+      "exact_scenarios": ["base-baseline", "space-age-baseline"],
+      "qualified_surface": "exact current candidate startup with Base-only and the official Space Age bundle",
+      "excluded_surface": ["migration", "interactive-gameplay", "balance", "release-qualification"]
+    },
+    {
+      "id": "planetslib-corrundum",
+      "outcome": "INTEGRITY",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": ["f210-representative-subjects"],
+      "exact_scenarios": ["local-2-1-corrundum-maxcap-13"],
+      "qualified_surface": "Corrundum 1.0.47 plus PlanetsLib 1.19.5 loader-schema and automated maximum-level-13 contract",
+      "excluded_surface": ["manual-visual-completed-state-review", "broad-Corrundum-support"]
+    },
+    {
+      "id": "cubium",
+      "outcome": "INTEGRITY",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": ["f210-representative-subjects"],
+      "exact_scenarios": ["local-2-1-cubium-production-routes"],
+      "qualified_surface": "Cubium 1.0.30 science production-route selection and loader-schema interoperability",
+      "excluded_surface": ["broad-Cubium-support", "full-progression"]
+    },
+    {
+      "id": "recycler-progression",
+      "outcome": "INTEGRITY",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": ["f210-recycler-progression"],
+      "exact_scenarios": ["local-2-1-recycler-progression-routes"],
+      "qualified_surface": "Recycler Progression 1.1.1 recycling-route rejection and prerequisite integrity",
+      "excluded_surface": ["broad-Recycler-Progression-support", "f200-version-1.0.0-until-SOL08"]
+    },
+    {
+      "id": "k2-k2so",
+      "outcome": "INTEGRITY",
+      "claim_level": "partial-support",
+      "evidence_ids": ["f210-k2so-lower", "f210-k2so-upper", "f200-k2so-private-development"],
+      "exact_scenarios": ["local-2-1-krastorio-spaced-out", "local-2-0-krastorio-spaced-out"],
+      "qualified_surface": "bounded K2SO science-phase behavior at both admitted f210 endpoints and private f200 standalone characterization",
+      "excluded_surface": ["full-pack-support", "classic-K2", "K2-plus-Space-Exploration", "formal-f200-target-until-SOL08"]
+    },
+    {
+      "id": "aai",
+      "outcome": "LOAD",
+      "claim_level": "loads",
+      "evidence_ids": ["f210-representative-subjects"],
+      "exact_scenarios": ["local-2-1-aai-representative-extensions"],
+      "qualified_surface": "representative aai-containers, aai-industry, and aai-loaders coexistence",
+      "excluded_surface": ["broad-AAI-suite-support", "arbitrary-AAI-combinations"]
+    },
+    {
+      "id": "bz",
+      "outcome": "LOAD",
+      "claim_level": "loads",
+      "evidence_ids": ["f210-representative-subjects"],
+      "exact_scenarios": ["local-2-1-bz-suite-space-age"],
+      "qualified_surface": "six-root BZ resource suite with the official Space Age bundle",
+      "excluded_surface": ["full-family-semantics", "arbitrary-BZ-combinations"]
+    },
+    {
+      "id": "industrial-revolution-3",
+      "outcome": "review-required",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": [],
+      "exact_scenarios": [],
+      "qualified_surface": "none",
+      "blocker": "no governed exact IR3 archive closure or scenario is present",
+      "excluded_surface": ["all-compatibility-claims"]
+    },
+    {
+      "id": "industrial-revolution-4",
+      "outcome": "review-required",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": [],
+      "exact_scenarios": [],
+      "qualified_surface": "none",
+      "blocker": "no governed exact IR4 archive closure or scenario is present",
+      "excluded_surface": ["all-compatibility-claims"]
+    },
+    {
+      "id": "space-exploration",
+      "outcome": "extension-required",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": [],
+      "exact_scenarios": [],
+      "qualified_surface": "existing finalized-recipe startup repair only",
+      "blocker": "current-candidate complete dependency closure was not executed",
+      "excluded_surface": ["broad-Space-Exploration-support", "K2-plus-Space-Exploration"]
+    },
+    {
+      "id": "bob",
+      "outcome": "LOAD",
+      "claim_level": "loads",
+      "evidence_ids": ["f210-bob-suite"],
+      "exact_scenarios": ["local-2-1-bob-suite"],
+      "qualified_surface": "named 14-mod Bob 3.0 suite startup",
+      "excluded_surface": ["full-Bob-family-support", "Angel-Bob-combinations", "semantic-progression"]
+    },
+    {
+      "id": "angel",
+      "outcome": "review-required",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": [],
+      "exact_scenarios": [],
+      "qualified_surface": "none",
+      "blocker": "complete Angel dependency closure is unavailable and unexecuted",
+      "excluded_surface": ["all-compatibility-claims"]
+    },
+    {
+      "id": "pyanodons",
+      "outcome": "review-required",
+      "claim_level": "diagnostic-only",
+      "evidence_ids": [],
+      "exact_scenarios": [],
+      "qualified_surface": "existing finalized-technology-tree repair policy only",
+      "blocker": "the retained Py attempt is a failed zero-root non-claim and no current-candidate closure was executed",
+      "excluded_surface": ["broad-Pyanodons-support", "all-load-claims"]
+    }
+  ],
+  "summary": {
+    "subject_count": 13,
+    "load_outcomes": 4,
+    "integrity_outcomes": 4,
+    "extension_required": 1,
+    "review_required": 4,
+    "omitted": 0,
+    "failed_hard_safety": 0,
+    "current_candidate_passed_scenario_count": 10,
+    "private_f200_development_passed_scenario_count": 1,
+    "blanket_claims_emitted": 0,
+    "product_failures": 0
+  },
+  "exit_gate": {
+    "subject_ledger_complete": true,
+    "exact_current_candidate_locks_bound": true,
+    "representative_affected_campaign_passed": true,
+    "superseded_harness_failure_minimized": true,
+    "unexecuted_overhauls_have_no_claim": true,
+    "blanket_claims_emitted": false,
+    "publication_authorized": false,
+    "next_work_package": "SOL-08"
+  }
+}

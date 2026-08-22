@@ -319,6 +319,30 @@
       "tags": ["maximum-level"]
     },
     {
+      "pattern": "prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "groups": ["runtime-state", "space-age"],
+      "scenarios": ["compiler-contracts", "generated-maximum-level-absolute", "generated-maximum-level-lowering-config-change", "base-continuation-maximum-level-lowering-config-change", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-max-level-1", "space-age-native-owner-settings-max-level-2", "space-age-native-owner-settings-max-level-7", "space-age-native-owner-settings-max-level-profile-import", "space-age-native-owner-settings-max-level-late-conflict", "space-age-native-owner-cap-lowering-config-change", "space-age-native-owner-cap-raising-config-change", "space-age-native-owner-cap-removal-config-change"],
+      "tags": ["maximum-level"]
+    },
+    {
+      "pattern": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+      "groups": ["runtime-state", "space-age"],
+      "scenarios": ["compiler-contracts", "generated-maximum-level-absolute", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-max-level-late-conflict"],
+      "tags": ["maximum-level"]
+    },
+    {
+      "pattern": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "groups": ["automatic-compiler", "base-load", "space-age"],
+      "scenarios": ["compiler-contracts", "generated-maximum-level-absolute", "space-age-native-owner-settings-max-level"],
+      "tags": ["maximum-level"]
+    },
+    {
+      "pattern": "prototypes/mir/emit/mod_data.lua",
+      "groups": ["base-load", "runtime-state", "space-age"],
+      "scenarios": ["compiler-contracts", "generated-maximum-level-absolute", "space-age-native-owner-settings-max-level"],
+      "tags": ["maximum-level"]
+    },
+    {
       "pattern": "prototypes/mir/domain/native_owner/**",
       "groups": ["space-age"],
       "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]
@@ -352,9 +376,42 @@
       "scenarios": ["compiler-contracts", "semantic-family-attach", "semantic-family-exact-pack"]
     },
     {
+      "pattern": "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
+      "groups": ["local-mod-library"],
+      "scenarios": ["local-2-1-corrundum-maxcap-13", "local-2-1-cubium-production-routes"]
+    },
+    {
+      "pattern": "fixtures/assert-cubium-production-routes/**",
+      "groups": ["local-mod-library"],
+      "scenarios": ["local-2-1-cubium-production-routes"]
+    },
+    {
+      "pattern": "fixtures/assert-recycler-progression-routes/**",
+      "groups": ["local-mod-library"],
+      "scenarios": ["local-2-1-recycler-progression-routes"]
+    },
+    {
+      "pattern": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "groups": ["science-prerequisites", "local-mod-library"],
+      "scenarios": ["k2-science-phase-policy"]
+    },
+    {
       "pattern": "prototypes/mir/planner/**",
       "groups": ["automatic-compiler", "base-load", "science-prerequisites"],
       "scenarios": ["space-age-galore-effect-ownership"]
+    },
+    {
+      "pattern": "prototypes/mir/capabilities/science_integration/**",
+      "groups": ["science-prerequisites"],
+      "scenarios": ["generated-prerequisite-safety", "k2-science-phase-policy"]
+    },
+    {
+      "pattern": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
+      "groups": ["local-mod-library"]
+    },
+    {
+      "pattern": "tools/lib/compatibility/**",
+      "groups": ["local-mod-library"]
     },
     {
       "pattern": "prototypes/mir/emit/base_extensions.lua",
@@ -379,6 +436,14 @@
     },
     {
       "pattern": "sdk/experimental/mir4/**",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "spec/schemas/experimental/mir4-research-cost-*.schema.json",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "tools/lib/mir4/ResearchCostV2.ps1",
       "tags": ["smoke"]
     },
     {

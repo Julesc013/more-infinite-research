@@ -13,7 +13,7 @@ if (-not $RepoRoot) {
 
 if ($Command -eq 'sdk-generate') {
   Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot
-  Write-Host 'MIR4 experimental SDK generated.'
+  Write-Host 'MIR4 developer-preview SDK generated.'
   exit
 }
 Invoke-MIR4SdkGenerate -RepoRoot $RepoRoot -Check
@@ -30,5 +30,6 @@ if($Command-eq'api-conformance'){
  if((ConvertTo-MIR4ApiCanonicalJson $source)-cne(ConvertTo-MIR4ApiCanonicalJson $roundTrip)){throw '[mir4-api-round-trip] Reference example changed.'}
  $reverse=[ordered]@{};foreach($property in @($source.PSObject.Properties|Sort-Object Name -Descending)){$reverse[$property.Name]=$property.Value}
  if((ConvertTo-MIR4ApiCanonicalJson $source)-cne(ConvertTo-MIR4ApiCanonicalJson $reverse)){throw '[mir4-api-canonicalization] Object property order changed canonical bytes.'}
+ if((ConvertTo-MIR4ApiCanonicalJson ([ordered]@{empty=@()}))-cne'{"empty":[]}'){throw '[mir4-api-canonical-empty-array] Empty arrays must not collapse to null.'}
 }
-Write-Host "MIR4 experimental $Command passed."
+Write-Host "MIR4 developer-preview $Command passed."

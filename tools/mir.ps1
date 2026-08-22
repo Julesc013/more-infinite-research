@@ -31,8 +31,16 @@ Usage:
   .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 build-local-playtest [--target <all|f200|f110|f100>] [--repetitions <n>]
   .\tools\mir.ps1 mir4 check-local-playtest [--target <all|f200|f110|f100>]
+  .\tools\mir.ps1 mir4 build-historical-private [--target <all|f018|f017|f016|f015|f014|f013>]
+  .\tools\mir.ps1 mir4 check-historical-private [--target <all|f018|f017|f016|f015|f014|f013>]
+  .\tools\mir.ps1 mir4 build-m4c01-player-set
+  .\tools\mir.ps1 mir4 check-m4c01-player-set
+  .\tools\mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
+  .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
+  .\tools\mir.ps1 mir4 platform compile --target <fNNN> --extension <path> --output <path>
+  .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
@@ -522,12 +530,56 @@ switch ($area) {
           -Repetitions $repetitions `
           -Check:($verb -eq "check-local-playtest")
       }
+      { $_ -in @("build-historical-private", "check-historical-private") } {
+        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        if ($target -notin @('all','f018','f017','f016','f015','f014','f013')) {
+          throw "--target must be one of all, f018, f017, f016, f015, f014, or f013."
+        }
+        & (Join-Path $repo "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1") `
+          -RepoRoot $repo.Path -Target $target -Repetitions 3 -Check:($verb -eq "check-historical-private")
+      }
+      { $_ -in @("build-m4c01-player-set", "check-m4c01-player-set") } {
+        & (Join-Path $repo "tools/commands/release/New-MIR4M4C01PlayerCandidateSet.ps1") `
+          -RepoRoot $repo.Path -Check:($verb -eq "check-m4c01-player-set")
+      }
+      "runtime-historical-private" {
+        $target = Get-MIRArgValue -Items $Args -Name "--target"
+        if ($target -notin @('f017','f016','f015','f014','f013')) {
+          throw "--target must be one of f017, f016, f015, f014, or f013. f018 requires an explicitly admitted exact engine."
+        }
+        $runtimeArguments = @{ RepoRoot = $repo.Path; Target = $target }
+        $factorioBin = Get-MIRArgValue -Items $Args -Name "--factorio-bin"
+        $candidate = Get-MIRArgValue -Items $Args -Name "--candidate"
+        $evidence = Get-MIRArgValue -Items $Args -Name "--evidence"
+        if (-not [string]::IsNullOrWhiteSpace($factorioBin)) { $runtimeArguments.FactorioBin = $factorioBin }
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
+        if (-not [string]::IsNullOrWhiteSpace($evidence)) { $runtimeArguments.EvidenceRoot = $evidence }
+        & (Join-Path $repo "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
+      }
       { $_ -in @("api", "sdk") } {
         if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }
         $subcommand = [string]$Args[2]
         $allowed = if ($verb -eq "api") { @("check", "conformance") } else { @("generate", "check") }
         if ($subcommand -notin $allowed) { throw "Unknown mir4 $verb command: $subcommand" }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
+      }
+      "platform" {
+        if ($Args.Count -lt 3) { throw "mir4 platform requires a subcommand." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','conformance','package','compile')) {
+          throw "Unknown mir4 platform command: $subcommand"
+        }
+        $platformArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        if ($subcommand -eq 'compile') {
+          $platformArguments.Target = Get-MIRArgValue -Items $Args -Name '--target'
+          $platformArguments.ExtensionPath = Get-MIRArgValue -Items $Args -Name '--extension'
+          $platformArguments.OutputPath = Get-MIRArgValue -Items $Args -Name '--output'
+        }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1") @platformArguments
+      }
+      "handoff-m4c01" {
+        $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4M4C01Handoff.ps1") -RepoRoot $repo.Path -OutputRoot $output
       }
       default { throw "Unknown mir4 command: $verb" }
     }

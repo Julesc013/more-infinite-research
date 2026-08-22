@@ -64,6 +64,141 @@
       "notes": "Locally available Factorio 2.1 Space Age planet cluster. Missing asset/library dependencies are reported as dependency-resolution failures until the local library is filled."
     },
     {
+      "name": "local-2-1-corrundum-maxcap-13",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "PlanetsLib",
+        "corrundum"
+      ],
+      "settings": {
+        "ips-max-level-research_processing_unit": 13,
+        "ips-max-level-research_rocket_fuel": 13,
+        "ips-max-level-research_plastic": 13,
+        "ips-max-level-research_steel": 13,
+        "ips-max-level-research_low_density_structure": 13,
+        "ips-max-level-research_lubricant_productivity": 13,
+        "ips-max-level-research_sulfur": 13,
+        "ips-max-level-research_modules": 13,
+        "mir-max-level-braking-force": 13
+      },
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_audit_rows": [
+          {
+            "kind": "rule_mutation",
+            "key": "factorio_2_1_ambient_sound_schema",
+            "status": "repaired",
+            "mod": "corrundum",
+            "observed_value": "1.0.47"
+          }
+        ],
+        "required_log_fragments": [
+          "Maximum-level state force=player technology=braking-force-8 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=low-density-structure-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=plastic-bar-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=processing-unit-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=recipe-prod-research_lubricant_productivity-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=recipe-prod-research_modules-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=recipe-prod-research_sulfur-1 selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=rocket-fuel-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
+          "Maximum-level state force=player technology=steel-plate-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295"
+        ],
+        "forbidden_log_fragments": [
+          "Maximum-level conflict"
+        ]
+      },
+      "timeout_seconds": 900,
+      "claim_level": "diagnostic-only",
+      "notes": "Exact Corrundum 1.0.47 and PlanetsLib 1.19.5 loader-schema and maximum-cap-13 reproduction envelope on Factorio 2.1.14."
+    },
+    {
+      "name": "local-2-1-cubium-production-routes",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "cubium",
+        "mir-fixture-assert-cubium-production-routes"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_audit_rows": [
+          {
+            "kind": "rule_mutation",
+            "key": "factorio_2_1_ambient_sound_schema",
+            "status": "repaired",
+            "mod": "cubium",
+            "observed_value": "1.0.30"
+          }
+        ],
+        "required_log_fragments": [
+          "[mir-fixture-assert-cubium-production-routes] PASS packs=11 selected=ordinary-primary late-route=cube-mastery-4"
+        ],
+        "forbidden_log_fragments": [
+          "MIR Cubium route assertion failed"
+        ]
+      },
+      "timeout_seconds": 900,
+      "claim_level": "diagnostic-only",
+      "notes": "Exact Cubium 1.0.30 route-selection assertion harness on Factorio 2.1.14. The harness proves that all eleven Cubium cubic alternates remain later routes rather than first-acquisition prerequisites."
+    },
+    {
+      "name": "local-2-1-recycler-progression-routes",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "recycler-progression",
+        "mir-fixture-assert-recycler-progression-routes"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_log_fragments": [
+          "[mir-fixture-assert-recycler-progression-routes] PASS recycler-1-routes-rejected=true"
+        ],
+        "forbidden_log_fragments": [
+          "MIR Recycler Progression route assertion failed"
+        ]
+      },
+      "timeout_seconds": 900,
+      "claim_level": "diagnostic-only",
+      "notes": "Exact Recycler Progression 1.1.1 assertion harness on Factorio 2.1.14. It proves that recycler-1 hidden recycling unlocks remain rejected, explainable routes rather than general science-pack prerequisites."
+    },
+    {
       "name": "local-2-1-muluna-secretas-astroponics-cycle",
       "targets": [
         "2.1"
