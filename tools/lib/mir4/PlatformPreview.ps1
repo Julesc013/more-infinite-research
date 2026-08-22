@@ -21,6 +21,7 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/modules.yml',
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
+  'tools/lib/mir4/PlatformPreview.ps1',
   'tools/lib/mir4/SafetyKernel.ps1',
   'tools/lib/mir4/PolicyEngine.ps1',
   'tools/lib/mir4/NormalizedCompiler.ps1',
@@ -125,6 +126,7 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot 'TargetCompiler.ps1')
 . (Join-Path $PSScriptRoot 'RuntimeStateModel.ps1')
 . (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
+. (Join-Path $PSScriptRoot 'ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 . (Join-Path $PSScriptRoot 'ReleaseDag.ps1')
 . (Join-Path $PSScriptRoot 'CompilationRun.ps1')
