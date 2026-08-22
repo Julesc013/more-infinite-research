@@ -922,6 +922,36 @@
       ]
     },
     {
+      "id": "static.mir4-assurance-scale-w08",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json",
+        ".mir/control-plane/control-plane.json",
+        ".mir/control-plane/domains.json",
+        ".mir/control-plane/ownership.json",
+        ".mir/control-plane/freshness.json",
+        ".mir/control-plane/evidence-revocations.json",
+        ".mir/control-plane/mutation-calibration.json",
+        ".mir/assurance.json",
+        "validation/tests.yml",
+        "validation/trust.json",
+        "spec/schemas/mir4-assurance-scale-result-v1.schema.json",
+        "spec/schemas/mir4-release-budget-plan-v1.schema.json",
+        "spec/schemas/mir4-offline-drill-result-v1.schema.json",
+        "fixtures/mir4-assurance-scale-v1/**",
+        "tools/lib/control/**",
+        "tools/lib/mir4/AssuranceScale.ps1",
+        "tools/lib/mir4/ReleaseBudget.ps1",
+        "tools/lib/mir4/OfflineDrill.ps1",
+        "tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1",
+        "validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",

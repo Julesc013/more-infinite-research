@@ -243,6 +243,24 @@ fixtures:
       - forbidden-callback-and-blanket-support-rejection
       - player-package-non-interference
 
+  mir4-assurance-scale-v1:
+    requires_features: []
+    path: fixtures/mir4-assurance-scale-v1
+    shipped: false
+    validates:
+      - four-stage-identity-locality-and-downstream-invalidation
+      - eleven-slice-merkle-roots-and-explicit-unavailability
+      - control-plane-semantic-impact-and-zero-false-negative-calibration
+      - exact-unrevoked-partial-run-recovery
+      - nondeterminism-incident-and-counterexample-minimization
+      - exact-target-environment-trust-proof-cover
+      - 24-6-1-deadline-arithmetic-and-missing-evidence-blockers
+      - dummy-repository-restoration-and-package-rehearsal
+      - non-production-proof-verifier-and-seal-rehearsal
+      - verify-before-transfer-and-idempotent-uncertain-reconciliation
+      - publisher-build-mutation-network-and-production-authority-denial
+      - player-package-non-interference
+
   museum-synthetic-installation:
     requires_features: []
     path: fixtures/museum/synthetic-installation

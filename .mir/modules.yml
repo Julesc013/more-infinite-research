@@ -121,6 +121,21 @@ package_excluded_modules:
     documentation: docs/architecture/mir4-inspector-compatibility.md
     boundary: bounded copied read-only DTO inspection, normalized private subject assessments, and deterministic data-only compatibility bundles; no raw mutable compiler objects, callbacks, executable adapters, blanket modpack support booleans, claim transfer, player mutation, signing, sealing, or publication
     stability: developer-preview-blocked-independent-production-consumer-and-exact-profile-claim-transfer
+  mir4_assurance_scale_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
+    implementations:
+      - tools/lib/mir4/AssuranceScale.ps1
+      - tools/lib/mir4/ReleaseBudget.ps1
+      - tools/lib/mir4/OfflineDrill.ps1
+    exporter: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
+    output_schemas:
+      - spec/schemas/mir4-assurance-scale-result-v1.schema.json
+      - spec/schemas/mir4-release-budget-plan-v1.schema.json
+      - spec/schemas/mir4-offline-drill-result-v1.schema.json
+    fixtures: fixtures/mir4-assurance-scale-v1
+    documentation: docs/architecture/mir4-assurance-scale.md
+    boundary: read-only Control Plane v5 and Assurance v4 crosswalk, four proof identities, Merkle authority slices, proposal-only proof cover and deadline arithmetic, and dummy-fixture offline drills; no third evidence ledger, active selector ownership, real source/candidate/publisher access, player mutation, source freeze, production signing/sealing, promotion, tag, upload, or publication
+    stability: developer-preview-and-shadow-blocked-exact-processir-and-trusted-timing-capacity-evidence
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1

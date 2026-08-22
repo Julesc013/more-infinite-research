@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-offline-drill-result-v1.schema.json",
+  "title": "MIR 4 Offline Drill Result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema", "programme_id", "wave", "maturity", "source_identity", "confinement", "repository_restoration", "package_construction", "qualification_planning", "signing_verifier", "seal_rehearsal", "release_capsule", "distribution", "publisher", "operations", "status", "package_visible", "public_release_proof", "source_freeze_authorized", "production_signing_or_sealing_authorized", "promotion_or_tag_authorized", "publication_authorized", "record_sha256"],
+  "properties": {
+    "kind": {"const": "MIR4OfflineDrillResultV1"}, "schema": {"const": 1}, "programme_id": {"const": "M4C02-09-24H"}, "wave": {"const": "W08"}, "maturity": {"const": "developer-preview"},
+    "source_identity": {"$ref": "#/$defs/sourceIdentity"},
+    "confinement": {"type": "object"}, "repository_restoration": {"type": "object"}, "package_construction": {"type": "object"}, "qualification_planning": {"type": "object"}, "signing_verifier": {"type": "object"}, "seal_rehearsal": {"type": "object"}, "release_capsule": {"type": "object"},
+    "distribution": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "object"}}, "publisher": {"type": "object"},
+    "operations": {"type": "array", "minItems": 8, "maxItems": 8, "items": {"type": "object"}},
+    "status": {"const": "passed-non-production-offline-drill"},
+    "package_visible": {"const": false}, "public_release_proof": {"const": false}, "source_freeze_authorized": {"const": false}, "production_signing_or_sealing_authorized": {"const": false}, "promotion_or_tag_authorized": {"const": false}, "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "sourceIdentity": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "programme_id"], "properties": {"commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "programme_id": {"const": "M4C02-09-24H"}}}
+  }
+}
