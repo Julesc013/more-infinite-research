@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-runtime-state-matrix-v1.schema.json",
+  "title": "MIR 4 Runtime State Matrix V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","programme_id","source_identity","authority","maturity","runtime_feature_specs","state_specs","registration_plan","targets","invariants","package_visible","runtime_mutation_authorized","public_release_proof","digest"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4RuntimeStateMatrixV1"},
+    "programme_id": {"const":"M4C02-09-24H"},
+    "source_identity": {"type":["object","null"]},
+    "authority": {"const":".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
+    "maturity": {"const":"shadow"},
+    "runtime_feature_specs": {"type":"array","minItems":7,"maxItems":7,"items":{"$ref":"#/$defs/runtimeFeatureSpec"}},
+    "state_specs": {"type":"array","minItems":5,"maxItems":5,"items":{"$ref":"#/$defs/stateSpec"}},
+    "registration_plan": {"type":"object"},
+    "targets": {"type":"array","minItems":17,"maxItems":17},
+    "invariants": {"type":"array","minItems":8,"uniqueItems":true},
+    "package_visible": {"const":false},
+    "runtime_mutation_authorized": {"const":false},
+    "public_release_proof": {"const":false},
+    "digest": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "runtimeFeatureSpec": {
+      "type":"object",
+      "required":["id","version","source","source_sha256","handlers","target_requirements","state_ids","determinism","complexity_budget","migration_refs","disable_or_removal","target_dispositions"],
+      "properties":{"id":{"type":"string"},"version":{"const":1},"source":{"type":"string"},"source_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},"handlers":{"type":"array","minItems":1},"target_requirements":{"type":"array"},"state_ids":{"type":"array"},"determinism":{"type":"string"},"complexity_budget":{"type":"object"},"migration_refs":{"type":"array"},"disable_or_removal":{"type":"string"},"target_dispositions":{"type":"array","minItems":17,"maxItems":17}}
+    },
+    "stateSpec": {
+      "type":"object",
+      "required":["id","schema","owner","bucket","namespace_template","fields","aliases","tombstones","ownership_transfer","target_namespaces"],
+      "properties":{"id":{"type":"string"},"schema":{"const":1},"owner":{"type":"string"},"bucket":{"type":"string"},"namespace_template":{"type":"string"},"fields":{"type":"array","minItems":1},"aliases":{"type":"array"},"tombstones":{"type":"array"},"ownership_transfer":{"type":"string"},"target_namespaces":{"type":"array","minItems":17,"maxItems":17}}
+    }
+  }
+}

@@ -6,7 +6,7 @@ Test-MIR4PlatformConformance -RepoRoot $repo|Out-Null
 if((ConvertTo-MIR4PlatformCanonicalJson ([ordered]@{empty=@()})) -cne '{"empty":[]}'){throw '[mir4-platform-canonical-empty-array]'}
 
 $platform=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec\platform\mir4-preview-v0\platform.json')|ConvertFrom-Json
-if(@($platform.components).Count -lt 16){throw '[mir4-platform-components] Expected the complete hybrid component inventory.'}
+if(@($platform.components).Count -lt 23){throw '[mir4-platform-components] Expected the complete hybrid component inventory.'}
 if(@($platform.mep_fragments).Count -ne 8){throw '[mir4-platform-mep] Expected exactly eight bounded V0 fragment kinds.'}
 if(@($platform.non_interference).Count -ne 8){throw '[mir4-platform-non-interference] Expected all eight non-interference rules.'}
 
@@ -40,8 +40,14 @@ $opportunities=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/
 if(@($opportunities.grammar).Count -ne 6 -or @($opportunities.candidates).Count -ne @($platform.effect_channels).Count){throw '[mir4-platform-opportunity-catalogue]'}
 if(@($opportunities.candidates|Where-Object{$_.mutation_allowed -or $_.authoritative -or $_.execution -ne 'diagnose-only'}).Count){throw '[mir4-platform-opportunity-authority]'}
 $runtimeInventory=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/runtime-state-inventory.json')|ConvertFrom-Json
-if(@($runtimeInventory.runtime_feature_specs).Count -lt 10 -or @($runtimeInventory.state_specs).Count -lt 3 -or @($runtimeInventory.migrations).Count -ne 2 -or @($runtimeInventory.event_registry.events).Count -lt 7){throw '[mir4-platform-runtime-state-inventory]'}
-if([string]$runtimeInventory.predecessor_map.f210 -cne '3.2.11' -or [string]$runtimeInventory.predecessor_map.f200 -cne '2.5.11'){throw '[mir4-platform-runtime-predecessor-map]'}
+if([string]$runtimeInventory.kind-cne'MIR4RuntimeStateMatrixV1'-or@($runtimeInventory.runtime_feature_specs).Count-ne 7-or@($runtimeInventory.state_specs).Count-ne 5-or@($runtimeInventory.registration_plan.groups).Count-ne 9-or@($runtimeInventory.targets).Count-ne 17-or-not$runtimeInventory.registration_plan.law_results.all_passed){throw '[mir4-platform-runtime-state-inventory]'}
+$runtimeF210=@($runtimeInventory.targets|Where-Object { $_.target -eq 'f210' })[0]
+$runtimeF110=@($runtimeInventory.targets|Where-Object { $_.target -eq 'f110' })[0]
+if($runtimeF210.backend-cne'storage'-or$runtimeF110.backend-cne'global'-or@($runtimeF110.feature_dispositions|Where-Object { $_.disposition -ne 'compiled-out' }).Count-ne 0){throw '[mir4-platform-runtime-target-backends]'}
+$migration=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/migration-graph-matrix.json')|ConvertFrom-Json
+if([string]$migration.kind-cne'MIR4MigrationGraphMatrixV1'-or@($migration.edges).Count-ne 10-or@($migration.edge_kinds).Count-ne 8-or-not$migration.law_results.all_passed-or$migration.complete_for_public_release){throw '[mir4-platform-migration-graph]'}
+$continuity=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/continuity-bundle-template.json')|ConvertFrom-Json
+if([string]$continuity.kind-cne'MIR4ContinuityBundleV1'-or$continuity.target_count-ne 17-or-not$continuity.redaction_manifest.complete-or$continuity.package_visible-or$continuity.public_release_proof){throw '[mir4-platform-continuity-bundle]'}
 $inspector=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/inspector/index.html')
 if($inspector.Contains('innerHTML') -or -not $inspector.Contains('textContent') -or -not $inspector.Contains('mir4-inspector-invalid-json')){throw '[mir4-platform-inspector-safe-rendering]'}
 

@@ -44,6 +44,7 @@ Usage:
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|fNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
+  .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
@@ -627,6 +628,24 @@ switch ($area) {
           $output = Get-MIRArgValue -Items $Args -Name '--output'
           if (-not [string]::IsNullOrWhiteSpace($output)) { $semanticArguments.OutputRoot = $output }
           & (Join-Path $repo "tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1") @semanticArguments
+        }
+      }
+      "runtime-continuity" {
+        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity requires export, check, or laws." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check','laws')) { throw "Unknown mir4 runtime-continuity command: $subcommand" }
+        if ($subcommand -eq 'laws') {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          $runtime = New-MIR4RuntimeStateMatrix -RepoRoot $repo.Path -Providers $null -SourceIdentity $null
+          $migration = New-MIR4MigrationGraphMatrix -RepoRoot $repo.Path -Providers $null -SourceIdentity $null
+          [ordered]@{runtime=$runtime.registration_plan.law_results;migration=$migration.law_results;passed=([bool]$runtime.registration_plan.law_results.all_passed -and [bool]$migration.law_results.all_passed)} | ConvertTo-Json -Depth 20
+        } else {
+          $runtimeArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $runtimeArguments.OutputRoot = $output }
+          if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
+          & (Join-Path $repo "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1") @runtimeArguments
         }
       }
       "handoff-m4c01" {

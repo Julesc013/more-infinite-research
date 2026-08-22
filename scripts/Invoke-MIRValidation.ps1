@@ -231,9 +231,13 @@ Invoke-RepoCheck "MIR 4 W02 target compiler separates identity, support, profile
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4TargetCompilerW02.ps1") -RepoRoot $repo
 }
 
-Invoke-RepoCheck "MIR 4 W03 semantic compiler is a complete non-mutating reference aggregate" {
-  & (Join-Path $repo "validation\tests\mir4\Test-MIR4SemanticCompilationW03.ps1") -RepoRoot $repo
-}
+  Invoke-RepoCheck "MIR 4 W03 semantic compiler is a complete non-mutating reference aggregate" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4SemanticCompilationW03.ps1") -RepoRoot $repo
+  }
+
+  Invoke-RepoCheck "MIR 4 W04 runtime, state, migration, and continuity contracts are package-excluded" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4RuntimeContinuityW04.ps1") -RepoRoot $repo -CandidateZip $CandidateZip
+  }
 
 Invoke-RepoCheck "MIR 4 public feedback has one governed reproducer and authority map per family" {
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4PublicFeedbackIntake.ps1") -RepoRoot $repo

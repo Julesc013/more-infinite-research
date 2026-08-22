@@ -16,7 +16,7 @@ if(@($runs|Where-Object{-not$_.contract_set.digest-or-not$_.environment_lock.dig
 if(@($runs.plans|Where-Object{$_.executor_authorized}).Count-ne 0){throw '[mir4-w03-executor-authority]'}
 if(@($protocols.protocols).Count-ne 13-or@($protocols.protocols|Where-Object{$_.rewrite_required-or'mutate-prototype'-notin@($_.forbidden_operations)}).Count-ne 0){throw '[mir4-w03-protocol-adapter]'}
 if(@($cutover.targets).Count-ne 17-or@($cutover.targets|Where-Object{-not$_.feature_manifest.aggregate_only-or-not$_.setting_spec.aggregate_only-or$_.duplicated_fact_or_policy_authority-or$_.package_visible}).Count-ne 0){throw '[mir4-w03-feature-setting-cutover]'}
-if(-not$laws.implemented_passed-or@($laws.laws|Where-Object{$_.status-eq'passed'}).Count-ne 10-or((@($laws.deferred_owners|Sort-Object)-join'|')-cne'migrations|subscriptions')-or$laws.complete){throw '[mir4-w03-merge-laws]'}
+if(-not$laws.implemented_passed-or@($laws.laws|Where-Object{$_.passed}).Count-ne 12-or@($laws.deferred_owners).Count-ne 0-or-not$laws.complete){throw '[mir4-w03-merge-laws]'}
 if(@($authority.terminal_player_authority|Where-Object{-not(Test-Path -LiteralPath (Join-Path $RepoRoot ([string]$_)) -PathType Leaf)}).Count-ne 0){throw '[mir4-w03-terminal-authority]'}
 $output='build/mir4/test-w03-semantic-compiler'
 & (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output|Out-Null
