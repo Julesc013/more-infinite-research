@@ -6,8 +6,9 @@
   "mode": "shadow-reader",
   "current_authorities": [
     ".mir/targets.json",
-    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",
-    "tools/commands/targets"
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+    "tools/commands/targets",
+    "tools/lib/mir4/TargetCompiler.ps1"
   ],
   "writable_authority": false,
   "package_visible": false,

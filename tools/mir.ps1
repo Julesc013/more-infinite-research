@@ -42,6 +42,7 @@ Usage:
   .\tools\mir.ps1 mir4 platform compile --target <fNNN> --extension <path> --output <path>
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|fNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
@@ -596,6 +597,22 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
+      }
+      "targets" {
+        if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('contracts','laws','build','check')) { throw "Unknown mir4 targets command: $subcommand" }
+        if ($subcommand -in @('contracts','laws')) {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          $record = if ($subcommand -eq 'contracts') { New-MIR4TargetContractSet -RepoRoot $repo.Path } else { Test-MIR4TargetProviderLaws -RepoRoot $repo.Path }
+          $record | ConvertTo-Json -Depth 100
+        } else {
+          $target = Get-MIRArgValue -Items $Args -Name '--target' -Default 'all'
+          $targetArguments = @{RepoRoot=$repo.Path;Target=$target;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $targetArguments.OutputRoot = $output }
+          & (Join-Path $repo "tools/commands/mir4/New-MIR4TargetProductSet.ps1") @targetArguments
+        }
       }
       "handoff-m4c01" {
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"

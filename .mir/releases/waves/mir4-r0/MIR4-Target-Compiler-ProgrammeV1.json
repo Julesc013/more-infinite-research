@@ -56,7 +56,7 @@
     "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1"
   ],
   "generalized_dispatcher": "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
-  "output_root": "build/mir4/full-platform-private",
+  "output_root": "build/mir4/m4c02-target-products",
   "semantic_authority": false,
   "player_package_mutation_authorized": false,
   "public_support_authorized": false,

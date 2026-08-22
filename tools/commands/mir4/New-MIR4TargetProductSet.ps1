@@ -1,7 +1,7 @@
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('all','f210','f200','f110','f100','f018','f017','f016','f015','f014','f013','f012','f011','f010','f009','f008','f007','f006')][string]$Target='all',
-  [string]$OutputRoot='build/mir4/full-platform-private',
+  [string]$OutputRoot='build/mir4/m4c02-target-products',
   [switch]$Check
 )
 
@@ -19,12 +19,10 @@ foreach($key in $modern){
   $lane=if($key-eq'f210'){'emergency'}else{'local-playtest-shadow'}
   $sourceOutput=if($lane-eq'emergency'){'build/mir4/emergency-lane'}else{'build/mir4/local-playtest-shadow'}
   & (Join-Path $repo 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') -RepoRoot $repo -Target $key -Lane $lane -OutputRoot $sourceOutput -Repetitions 3 -Check:$Check
-  if($LASTEXITCODE-ne 0){throw "[mir4-target-product-builder] $key"}
 }
 $historical=@($selected|Where-Object{$_-in@('f018','f017','f016','f015','f014','f013')})
 foreach($key in $historical){
   & (Join-Path $repo 'tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1') -RepoRoot $repo -Target $key -Repetitions 3 -Check:$Check
-  if($LASTEXITCODE-ne 0){throw "[mir4-target-product-builder] $key"}
 }
 
 $contracts=New-MIR4TargetContractSet -RepoRoot $repo
@@ -48,6 +46,20 @@ foreach($contract in @($contracts.targets|Where-Object{$Target-eq'all'-or$_.targ
 }
 $manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4PrivateTargetProductSetV1';programme_id=[string]$authority.programme_id;state=$(if(@($rows|Where-Object{$_.state-eq'BLOCKED_WITH_EVIDENCE'}).Count){'partial-with-bounded-blockers'}else{'built-private-unqualified'});targets=$rows;semantic_authority=$false;public_support_authorized=$false;signing_or_sealing_authorized=$false;publication_authorized=$false;record_sha256=''}
 $manifest.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $manifest
-$manifestPath=Join-Path $output 'MIR4_PRIVATE_PACKAGE_MATRIX.json'
-if($Check){$existing=Get-Content -Raw -LiteralPath $manifestPath|ConvertFrom-Json -Depth 50;if(-not(Test-MIR4BootstrapRecordHash -Record $existing)-or(ConvertTo-MIR4BootstrapCanonicalJson $existing)-cne(ConvertTo-MIR4BootstrapCanonicalJson $manifest)){throw '[mir4-target-product-manifest-stale]'}}else{Write-MIR4BootstrapRecord -Path $manifestPath -Record $manifest}
+$providerMatrix=[pscustomobject][ordered]@{schema=1;kind='MIR4TargetProviderMatrixV1';programme_id=[string]$authority.programme_id;targets=@($contracts.targets|ForEach-Object{[ordered]@{target=[string]$_.target;identity=$_.identity;profile=$_.profile;provider_spec=$_.provider_spec}});semantic_authority=$false;publication_authorized=$false;record_sha256=''}
+$providerMatrix.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $providerMatrix
+$dispositionMatrix=[pscustomobject][ordered]@{schema=1;kind='MIR4TargetDispositionMatrixV1';programme_id=[string]$authority.programme_id;targets=@($contracts.targets|ForEach-Object{[ordered]@{target=[string]$_.target;maturity=[string]$_.maturity;mode=[string]$_.mode;support_policy=$_.support_policy;inputs=$_.inputs;facilities=$_.facilities}});public_support_authorized=$false;publication_authorized=$false;record_sha256=''}
+$dispositionMatrix.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $dispositionMatrix
+$records=[ordered]@{
+  'MIR4_TARGET_PROVIDER_MATRIX.json'=$providerMatrix
+  'MIR4_TARGET_DISPOSITION_MATRIX.json'=$dispositionMatrix
+  'MIR4_PRIVATE_PACKAGE_MATRIX.json'=$manifest
+}
+foreach($entry in $records.GetEnumerator()){
+  $path=Join-Path $output $entry.Key
+  if($Check){
+    $existing=Get-Content -Raw -LiteralPath $path|ConvertFrom-Json -Depth 50
+    if(-not(Test-MIR4BootstrapRecordHash -Record $existing)-or(ConvertTo-MIR4BootstrapCanonicalJson $existing)-cne(ConvertTo-MIR4BootstrapCanonicalJson $entry.Value)){throw "[mir4-target-product-record-stale] $($entry.Key)"}
+  }else{Write-MIR4BootstrapRecord -Path $path -Record $entry.Value}
+}
 $manifest|ConvertTo-Json -Depth 30

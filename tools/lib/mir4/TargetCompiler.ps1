@@ -14,6 +14,8 @@ function Get-MIR4TargetCompilerAuthority {
   $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
   if (@($registry.identities.target | Sort-Object -Unique).Count -ne 17 -or @($registry.support_policy.target | Sort-Object -Unique).Count -ne 17) { throw '[mir4-target-registry-v6-count]' }
   if ((@($registry.identities.target | Sort-Object) -join '|') -cne (@($registry.support_policy.target | Sort-Object) -join '|')) { throw '[mir4-target-registry-v6-join]' }
+  $profilePath = Join-Path $repo ([string]$registry.profile_authority.path)
+  if ((Get-MIR4PlatformFileSha256 $profilePath) -cne [string]$registry.profile_authority.sha256) { throw '[mir4-target-registry-v6-profile-binding]' }
   return $authority
 }
 
@@ -48,7 +50,7 @@ function New-MIR4TargetContractSet {
       $profileValue = if ($null -ne $profile) { $profile.Value } else { $null }
       $inputStatus = Get-MIR4TargetInputStatus -Provider $provider
       $facilities = @(
-        [ordered]@{id='distribution-identity';disposition='native';evidence='MIR4-Target-RegistryV5'},
+        [ordered]@{id='distribution-identity';disposition='native';evidence='MIR4-Target-RegistryV6'},
         [ordered]@{id='package-materialization';disposition=$(if ($provider.support_tier -eq 'museum') {'unsupported-with-evidence'} elseif ($provider.support_tier -eq 'historical') {'finite-substitute'} else {'adapted'});evidence=$(if ($provider.support_tier -eq 'historical') {'MIR4-Historical-Private-Candidate-AuthorizationV1'} else {'MIR4-Bootstrap-Local-Candidate-PlanV3'})},
         [ordered]@{id='exact-engine-runtime';disposition=$(if ($provider.engine_lock) {'native'} else {'unsupported-with-evidence'});evidence=$(if ($provider.engine_lock) {$provider.engine_lock.authority} else {'missing-exact-engine-lock'})},
         [ordered]@{id='space-age';disposition=$(if ($profileValue -and [bool]$profileValue.supports_space_age) {'native'} else {'compiled-out'});evidence='.mir/targets.json'},
@@ -57,10 +59,10 @@ function New-MIR4TargetContractSet {
       )
       $record = [pscustomobject][ordered]@{
         kind='MIR4TargetContractV1';schema=1;target=[string]$provider.id;maturity=[string]$group.maturity;mode=[string]$group.mode
-        identity=[ordered]@{target_id=[string]$provider.target_id;factorio_line=[string]$provider.factorio_line;distribution_target_code=[string]$provider.distribution_target_code;distribution_version=[string]$provider.distribution_version;authority='MIR4-Target-RegistryV5'}
-        support_policy=[ordered]@{tier=[string]$provider.support_tier;disposition=[string]$provider.disposition;release_blocking=[bool]$provider.release_blocking;public_support=$false;authority='MIR4-Target-RegistryV5'}
+        identity=[ordered]@{target_id=[string]$provider.target_id;factorio_line=[string]$provider.factorio_line;distribution_target_code=[string]$provider.distribution_target_code;distribution_version=[string]$provider.distribution_version;authority='MIR4-Target-RegistryV6'}
+        support_policy=[ordered]@{tier=[string]$provider.support_tier;disposition=[string]$provider.disposition;release_blocking=[bool]$provider.release_blocking;public_support=$false;authority='MIR4-Target-RegistryV6'}
         profile=[ordered]@{authority='.mir/targets.json';status=$(if ($profileValue) {'explicit'} else {'terminal-derived-or-unavailable'});runtime_state_backend=$(if ($profileValue) {[string]$profileValue.runtime_state_backend} else {$null});features=$(if ($profileValue) {$profileValue.features} else {$null})}
-        provider_spec=[ordered]@{kind='MIR4TargetProviderSpecV1';maturity='preview';provider_digest=[string]$provider.digest;owned_fields=@($authority.provider_abi.owned_fields);laws=@($authority.provider_abi.laws);operations=@($provider.operations);forbidden_operations=@($provider.forbidden_operations)}
+        provider_spec=[ordered]@{kind='MIR4TargetProviderSpecV1';maturity='preview';provider_digest=[string]$provider.digest;owned_fields=@($authority.provider_abi.owned_fields);laws=@($authority.provider_abi.laws);operations=@($provider.operations);forbidden_operations=@($provider.forbidden_operations);provenance=@($provider.provenance)}
         distribution=[ordered]@{kind='MIR4TargetDistributionRecordV1';version=[string]$provider.distribution_version;state=$(if ($provider.support_tier -eq 'museum') {'omitted-by-target'} else {'private-build-planned'});publication_authorized=$false}
         facilities=$facilities
         inputs=$inputStatus
@@ -104,10 +106,22 @@ function Test-MIR4TargetProviderLaws {
     if ((ConvertTo-MIR4PlatformCanonicalJson $once) -cne (ConvertTo-MIR4PlatformCanonicalJson $twice)) { throw "[mir4-target-law-idempotence] $($provider.target)" }
     if ((ConvertTo-MIR4PlatformCanonicalJson $fixture.unowned) -cne (ConvertTo-MIR4PlatformCanonicalJson $once.unowned)) { throw "[mir4-target-law-unowned-preservation] $($provider.target)" }
     if ([string]$once.owned.distribution_version -cne [string]$provider.identity.distribution_version -or [string]$once.owned.factorio_version -cne [string]$provider.identity.factorio_line) { throw "[mir4-target-law-round-trip] $($provider.target)" }
+    try {
+      Invoke-MIR4TargetProviderProjection -Provider $provider -InputRecord $fixture -OwnedChanges ([pscustomobject]@{unowned_sentinel='forbidden'}) | Out-Null
+      throw "[mir4-target-law-locality-accepted] $($provider.target)"
+    } catch {
+      if (-not $_.Exception.Message.StartsWith('[mir4-target-provider-unowned-write]')) { throw }
+    }
     $serialized = ConvertTo-MIR4PlatformCanonicalJson $provider
     foreach ($field in @($authority.provider_abi.forbidden_policy_fields)) { if ($null -ne $provider.provider_spec.PSObject.Properties[[string]$field]) { throw "[mir4-target-law-hidden-policy] $($provider.target):$field" } }
     if ([Text.Encoding]::UTF8.GetByteCount($serialized) -gt [int]$authority.provider_abi.maximum_provider_bytes -or @($provider.provider_spec.operations).Count -gt [int]$authority.provider_abi.maximum_operations) { throw "[mir4-target-law-budget] $($provider.target)" }
     if (@($provider.facilities | Where-Object { [string]$_.disposition -notin @($authority.facility_dispositions) }).Count -ne 0) { throw "[mir4-target-law-explicit-loss] $($provider.target)" }
+    if (@($provider.facilities | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.evidence) }).Count -ne 0) { throw "[mir4-target-law-explicit-loss-evidence] $($provider.target)" }
+    foreach ($provenance in @($provider.provider_spec.provenance)) {
+      $path = Join-Path $repo ([string]$provenance.path)
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or (Get-MIR4PlatformFileSha256 $path) -cne [string]$provenance.sha256) { throw "[mir4-target-law-provenance] $($provider.target):$([string]$provenance.path)" }
+    }
+    if (@($provider.provider_spec.provenance).Count -lt 2) { throw "[mir4-target-law-provenance-incomplete] $($provider.target)" }
     $results += [ordered]@{target=[string]$provider.target;status='passed';laws=@($authority.provider_abi.laws);provider_digest=[string]$provider.provider_spec.provider_digest}
   }
   $record = [pscustomobject][ordered]@{schema=1;kind='MIR4TargetProviderLawResultV1';programme_id=[string]$authority.programme_id;maturity='preview';targets=$results;passed=$true;authoritative_output=$false;mutation_capability=$false;digest=''}

@@ -13,6 +13,7 @@ if(@($contracts.targets|Where-Object{$_.target-in@('f012','f011','f010','f009','
 if(@($contracts.targets|Where-Object{$_.target-in@('f210','f200')-and$_.maturity-ne'stable'}).Count-ne 0){throw '[mir4-w02-modern-maturity]'}
 if(@($contracts.targets|Where-Object{$_.authoritative_output-or$_.mutation_capability-or$_.public_support_claim}).Count-ne 0){throw '[mir4-w02-shadow-authority]'}
 if(@($contracts.targets.facilities|Where-Object{[string]$_.disposition-notin@($authority.facility_dispositions)}).Count-ne 0){throw '[mir4-w02-facility-disposition]'}
+if(@($contracts.targets.provider_spec.provenance|Where-Object{[string]::IsNullOrWhiteSpace([string]$_.sha256)}).Count-ne 0){throw '[mir4-w02-provider-provenance]'}
 
 $packageFiles=@(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
 foreach($path in @('.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json','tools/lib/mir4/TargetCompiler.ps1','tools/commands/mir4/New-MIR4TargetProductSet.ps1')){if($path-in$packageFiles){throw "[mir4-w02-package-visible] $path"}}
