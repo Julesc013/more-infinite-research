@@ -14,6 +14,7 @@
     "maturity": {"const": "developer-preview"},
     "scope": {"const": "synthetic-fixture-parity-only"},
     "exact_target_status": {"const": "BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT"},
+    "exact_target_reason": {"type": "string", "minLength": 1},
     "fixture_results": {"type": "array", "minItems": 4, "items": {"type": "object"}},
     "bilateral_gate": {"type": "object", "required": ["known_safe_admissible", "known_unsafe_rejected", "reject_everything", "passed"]},
     "risk_parity": {"type": "object", "required": ["copied_not_reclassified", "all_fixture_fingerprints_preserved", "passed"]},
