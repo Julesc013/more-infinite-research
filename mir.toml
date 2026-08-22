@@ -1,6 +1,7 @@
 schema = 1
 source_version = "4.0.0"
 candidate_wave = "M4C01"
+programme_id = "M4C02-09-24H"
 platform_contract = "spec/platform/mir4-preview-v0/platform.json"
 target_registry = ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json"
 compatibility_manifest = ".mir/compatibility.yml"
