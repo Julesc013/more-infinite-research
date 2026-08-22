@@ -10,6 +10,7 @@ paths:
   mir4.semantic-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
   mir4.runtime-continuity.programme: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
   mir4.module-ecosystem.programme: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
+  mir4.processir-synthesis.programme: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
   final.governance: governance
   final.contracts: contracts
   final.spec: spec
@@ -35,6 +36,10 @@ paths:
   spec.schemas.mir4-runtime-state-matrix-v1: spec/schemas/mir4-runtime-state-matrix-v1.schema.json
   spec.schemas.mir4-migration-graph-matrix-v1: spec/schemas/mir4-migration-graph-matrix-v1.schema.json
   spec.schemas.mir4-continuity-bundle-v1: spec/schemas/mir4-continuity-bundle-v1.schema.json
+  spec.schemas.mir4-canonical-recipe-fact-input-v1: spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json
+  spec.schemas.mir4-process-ir-v1: spec/schemas/mir4-process-ir-v1.schema.json
+  spec.schemas.mir4-effect-channel-registry-v1: spec/schemas/mir4-effect-channel-registry-v1.schema.json
+  spec.schemas.mir4-synthesis-maturity-matrix-v1: spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json

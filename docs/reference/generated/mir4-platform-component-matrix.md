@@ -39,8 +39,9 @@ Generated from `spec/platform/mir4-preview-v0/platform.json`.
 | `extension-closure-v1` | preview | deterministic-resolver-package-excluded |
 | `api-sdk-v1` | preview | bounded-copied-data-only-package-excluded |
 | `synthetic-reference-consumer-v1` | preview | blocked-independent-production-consumer |
-| `process-ir-v0` | shadow | parity-and-loop-diagnostics |
-| `autonomous-synthesis-v0` | shadow | diagnose-only |
+| `process-ir-v1` | preview | synthetic-parity-exact-target-snapshot-blocked |
+| `effect-channel-registry-v1` | preview | owner-references-and-opaque-preservation |
+| `autonomous-synthesis-v1` | preview | diagnose-conservative-experimental-no-player-mutation |
 | `historical-target-providers-v0` | experimental | private-build-only |
 
 The conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.

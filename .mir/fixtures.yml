@@ -207,6 +207,24 @@ fixtures:
       - stable-safety-violation-diagnostics
       - policy-cannot-override-hard-safety
 
+  mir4-process-ir-v1-synthesis:
+    requires_features: []
+    path: fixtures/mir4-process-ir-v1
+    shipped: false
+    validates:
+      - canonical-recipe-and-risk-fact-transport
+      - exact-and-bounded-quantity-preservation
+      - catalyst-returned-container-and-self-intersection-preservation
+      - basic-recycling-and-recovery-classification
+      - deterministic-simple-scc-and-minimal-witness
+      - terminal-risk-fingerprint-parity
+      - conservative-unknown-and-uncertainty-monotonicity
+      - bilateral-known-safe-and-known-unsafe-gate
+      - opaque-effect-channel-preservation
+      - no-automatic-candidate-without-complete-independent-certificates
+      - exact-target-snapshot-blocker-retained
+      - player-package-non-interference
+
   museum-synthetic-installation:
     requires_features: []
     path: fixtures/museum/synthetic-installation

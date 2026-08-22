@@ -90,6 +90,19 @@ package_excluded_modules:
     documentation: docs/architecture/mir4-module-ecosystem.md
     boundary: typed data-only fragments, deterministic extension closure, copied bounded APIs, and package-excluded SDK tooling; no callbacks, mutable compiler context, prototype writes, migration execution, W06 semantic ownership, or public support authority
     stability: developer-preview-blocked-independent-production-consumer
+  mir4_processir_synthesis_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
+    implementation: tools/lib/mir4/ProcessIR.ps1
+    exporter: tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1
+    input_schema: spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json
+    output_schemas:
+      - spec/schemas/mir4-process-ir-v1.schema.json
+      - spec/schemas/mir4-effect-channel-registry-v1.schema.json
+      - spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json
+    fixtures: fixtures/mir4-process-ir-v1
+    documentation: docs/architecture/mir4-processir-synthesis.md
+    boundary: package-excluded copied-fact ProcessIR certificates, effect owner references, and descriptive proposal classification only; no data.raw scan, risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
+    stability: developer-preview-blocked-exact-target-processir-snapshot
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
@@ -98,6 +111,7 @@ package_excluded_modules:
     normalized_compiler: tools/lib/mir4/NormalizedCompiler.ps1
     runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
     process_ir: tools/lib/mir4/ProcessIR.ps1
+    process_ir_authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     generated_root: sdk/preview/mir4
