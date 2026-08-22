@@ -43,6 +43,7 @@ Usage:
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|fNNN>] [--output <path>]
+  .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
@@ -612,6 +613,20 @@ switch ($area) {
           $output = Get-MIRArgValue -Items $Args -Name '--output'
           if (-not [string]::IsNullOrWhiteSpace($output)) { $targetArguments.OutputRoot = $output }
           & (Join-Path $repo "tools/commands/mir4/New-MIR4TargetProductSet.ps1") @targetArguments
+        }
+      }
+      "semantic" {
+        if ($Args.Count -lt 3) { throw "mir4 semantic requires export, check, or laws." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check','laws')) { throw "Unknown mir4 semantic command: $subcommand" }
+        if ($subcommand -eq 'laws') {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          Test-MIR4SemanticMergeLaws -RepoRoot $repo.Path | ConvertTo-Json -Depth 100
+        } else {
+          $semanticArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $semanticArguments.OutputRoot = $output }
+          & (Join-Path $repo "tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1") @semanticArguments
         }
       }
       "handoff-m4c01" {

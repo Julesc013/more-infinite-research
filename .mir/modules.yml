@@ -880,6 +880,11 @@ validation_tooling:
     mir4_target_registry_v6_schema: spec/schemas/mir4-target-registry-v6.schema.json
     mir4_target_product_builder: tools/commands/mir4/New-MIR4TargetProductSet.ps1
     mir4_target_compiler_gate: validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
+    mir4_semantic_compiler: tools/lib/mir4/CompilationRun.ps1
+    mir4_semantic_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
+    mir4_compilation_run_v1_schema: spec/schemas/mir4-compilation-run-v1.schema.json
+    mir4_semantic_compiler_exporter: tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1
+    mir4_semantic_compiler_gate: validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     mir4_runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
     mir4_process_ir: tools/lib/mir4/ProcessIR.ps1
     mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1

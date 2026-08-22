@@ -54,7 +54,7 @@ function New-MIR4NormalizedTargetProviders {
   )
 }
 
-function New-MIR4NormalizedCompilationRuns {
+function New-MIR4LegacyNormalizedCompilationRuns {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)]$Providers)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   $inputs = Get-MIR4PlatformInputs $repo
@@ -80,6 +80,11 @@ function New-MIR4NormalizedCompilationRuns {
       Add-MIR4PlatformDigest $run
     }
   )
+}
+
+function New-MIR4NormalizedCompilationRuns {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Providers)
+  return @(New-MIR4SemanticCompilationRuns -RepoRoot $RepoRoot -Providers $Providers)
 }
 
 function New-MIR4AffectedTargetPlan {
