@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-key-revocation.schema.json",
+  "title": "MIR 4 signing-key revocation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "revocation_id",
+    "fingerprint",
+    "effective_at",
+    "reason",
+    "affected_namespaces",
+    "successor_fingerprint",
+    "ledger_event"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4SigningKeyRevocationV1" },
+    "revocation_id": { "type": "string", "pattern": "^MIR4-REVOKE-[0-9]{8}-[A-Z0-9-]+$" },
+    "fingerprint": { "type": "string", "minLength": 1 },
+    "effective_at": { "type": "string", "format": "date-time" },
+    "reason": { "type": "string", "minLength": 1 },
+    "affected_namespaces": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["mir4-source", "mir4-target", "mir4-ledger"] }
+    },
+    "successor_fingerprint": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "minLength": 1 }
+      ]
+    },
+    "ledger_event": { "type": "string", "minLength": 1 }
+  }
+}
