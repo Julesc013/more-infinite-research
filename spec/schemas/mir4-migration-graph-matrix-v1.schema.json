@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-migration-graph-matrix-v1.schema.json",
+  "title": "MIR 4 Migration Graph Matrix V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","programme_id","source_identity","authority","maturity","edge_kinds","edges","target_dispositions","law_results","complete_for_public_release","package_visible","migration_execution_authorized","public_release_proof","digest"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4MigrationGraphMatrixV1"},
+    "programme_id": {"const":"M4C02-09-24H"},
+    "source_identity": {"type":["object","null"]},
+    "authority": {"const":".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
+    "maturity": {"const":"shadow"},
+    "edge_kinds": {"type":"array","minItems":8,"maxItems":8,"uniqueItems":true},
+    "edges": {"type":"array","minItems":10},
+    "target_dispositions": {"type":"array","minItems":17,"maxItems":17},
+    "law_results": {"type":"object","required":["deterministic_path_selection","input_order_invariant","duplicate_edge_rejection","explicit_downgrade","all_passed"]},
+    "complete_for_public_release": {"const":false},
+    "package_visible": {"const":false},
+    "migration_execution_authorized": {"const":false},
+    "public_release_proof": {"const":false},
+    "digest": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  }
+}

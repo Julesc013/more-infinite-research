@@ -8,6 +8,7 @@ paths:
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
   mir4.target-registry.historical-v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
   mir4.semantic-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
+  mir4.runtime-continuity.programme: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
   final.governance: governance
   final.contracts: contracts
   final.spec: spec
@@ -30,6 +31,9 @@ paths:
   spec.schemas: spec/schemas
   spec.schemas.mir4-target-registry-v6: spec/schemas/mir4-target-registry-v6.schema.json
   spec.schemas.mir4-compilation-run-v1: spec/schemas/mir4-compilation-run-v1.schema.json
+  spec.schemas.mir4-runtime-state-matrix-v1: spec/schemas/mir4-runtime-state-matrix-v1.schema.json
+  spec.schemas.mir4-migration-graph-matrix-v1: spec/schemas/mir4-migration-graph-matrix-v1.schema.json
+  spec.schemas.mir4-continuity-bundle-v1: spec/schemas/mir4-continuity-bundle-v1.schema.json
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json
@@ -112,10 +116,12 @@ paths:
   tools.commands.release.mir4-r0-check: tools/commands/release/Test-MIR4R0Bootstrap.ps1
   tools.commands.mir4.target-products: tools/commands/mir4/New-MIR4TargetProductSet.ps1
   tools.commands.mir4.semantic-compiler-records: tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1
+  tools.commands.mir4.runtime-continuity-records: tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1
   tools.lib.mir4: tools/lib/mir4
   tools.lib.mir4.bootstrap-materialization: tools/lib/mir4/BootstrapMaterialization.ps1
   tools.lib.mir4.target-compiler: tools/lib/mir4/TargetCompiler.ps1
   tools.lib.mir4.compilation-run: tools/lib/mir4/CompilationRun.ps1
+  tools.lib.mir4.runtime-state-model: tools/lib/mir4/RuntimeStateModel.ps1
   tools.lib.mir4.offline-candidate-custody: tools/lib/mir4/OfflineCandidateCustody.ps1
   tools.lib.validation.mir4-distribution-identity: tools/lib/validation/MIR4DistributionIdentity.ps1
   tools.lib: tools/lib

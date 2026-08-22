@@ -886,6 +886,12 @@ validation_tooling:
     mir4_semantic_compiler_exporter: tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1
     mir4_semantic_compiler_gate: validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     mir4_runtime_state_model: tools/lib/mir4/RuntimeStateModel.ps1
+    mir4_runtime_continuity_authority: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+    mir4_runtime_state_matrix_schema: spec/schemas/mir4-runtime-state-matrix-v1.schema.json
+    mir4_migration_graph_matrix_schema: spec/schemas/mir4-migration-graph-matrix-v1.schema.json
+    mir4_continuity_bundle_schema: spec/schemas/mir4-continuity-bundle-v1.schema.json
+    mir4_runtime_continuity_exporter: tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1
+    mir4_runtime_continuity_gate: validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1
     mir4_process_ir: tools/lib/mir4/ProcessIR.ps1
     mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1

@@ -107,7 +107,15 @@ function Test-MIR4SemanticMergeLaws {
     $id = [string]$law.id
     $owner = [string]$law.owner
     if ([string]$law.status -eq 'deferred-runtime-owner') {
-      $rows += [ordered]@{law=$id;operator=[string]$law.operator;owner=$owner;status='deferred-runtime-owner';declared_properties=@($law.properties);passed=$null;evidence=@('owner:W04')}
+      if ($id -eq 'subscriptions') {
+        $runtimeLaw = New-MIR4RuntimeStateMatrix -RepoRoot $repo -Providers $null -SourceIdentity $null
+        if (-not [bool]$runtimeLaw.registration_plan.law_results.all_passed) { throw '[mir4-semantic-subscription-law-W04]' }
+        $rows += [ordered]@{law=$id;operator=[string]$law.operator;owner='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';status='passed-W04-shadow';declared_properties=@('deterministic','duplicate-rejecting','filter-before-dispatch','bounded');passed=$true;evidence=@("runtime-matrix:$($runtimeLaw.digest)")}
+      } elseif ($id -eq 'migrations') {
+        $migrationLaw = New-MIR4MigrationGraphMatrix -RepoRoot $repo -Providers $null -SourceIdentity $null
+        if (-not [bool]$migrationLaw.law_results.all_passed) { throw '[mir4-semantic-migration-law-W04]' }
+        $rows += [ordered]@{law=$id;operator=[string]$law.operator;owner='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';status='passed-W04-shadow';declared_properties=@('deterministic','input-order-invariant','ambiguity-rejecting','explicit-downgrade');passed=$true;evidence=@("migration-matrix:$($migrationLaw.digest)")}
+      } else { throw "[mir4-semantic-deferred-law-owner] $id" }
       continue
     }
     $ownerRef = New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role "merge-law:$id" -Path $owner -Status 'current-domain-owner' -Maturity 'stable'
@@ -126,9 +134,9 @@ function Test-MIR4SemanticMergeLaws {
   }
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4MergeLawCatalogueV1';programme_id=[string]$authority.programme_id;maturity='shadow';laws=$rows
-    implemented_passed=(@($rows | Where-Object { $_.status -eq 'passed' }).Count -eq 10)
-    deferred_owners=@($rows | Where-Object { $_.status -eq 'deferred-runtime-owner' } | ForEach-Object { [string]$_.law })
-    complete=$false;mutation_capability=$false;publication_authorized=$false;digest=''
+    implemented_passed=(@($rows | Where-Object { $_.passed }).Count -eq 12)
+    deferred_owners=@($rows | Where-Object { -not $_.passed } | ForEach-Object { [string]$_.law })
+    complete=(@($rows | Where-Object { $_.passed }).Count -eq 12);mutation_capability=$false;publication_authorized=$false;digest=''
   }
   return Add-MIR4PlatformDigest $record
 }
@@ -187,14 +195,14 @@ function New-MIR4SemanticCompilationRuns {
       $planRows = @(
         foreach($plan in @($authority.plans)){
           $owner=[string]$plan.owner
-          $ownerValue=if($owner -eq 'W04'){[ordered]@{role=[string]$plan.id;authority='W04';sha256=$null;status=[string]$plan.status;maturity='deferred'}}else{New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path $owner -Status ([string]$plan.status) -Maturity $(if([string]$plan.status -match 'blocked'){'blocked'}else{'stable'})}
+          $ownerValue=if($owner -eq 'W04'){New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json' -Status 'implemented-W04-shadow' -Maturity 'shadow'}else{New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path $owner -Status ([string]$plan.status) -Maturity $(if([string]$plan.status -match 'blocked'){'blocked'}else{'stable'})}
           [ordered]@{id=[string]$plan.id;owner=$ownerValue;executor_authorized=$false}
         }
       )
       $proofs = @(
         [ordered]@{id='old-new-semantic-parity';status=$(if($hasSnapshot){'shadow-reference-ready'}else{'blocked-missing-predecessor-snapshot'});evidence=$snapshotRef},
         [ordered]@{id='target-parity';status='passed-provider-contract-laws';evidence=[ordered]@{contract_digest=[string]$contract.digest;provider_digest=[string]$provider.digest}},
-        [ordered]@{id='migration-parity';status='deferred-W04';evidence=$null},
+        [ordered]@{id='migration-parity';status='W04-static-contract-passed-runtime-qualification-required';evidence=[ordered]@{runtime_inventory_digest=[string]$runtimeInventory.digest;merge_law_digest=[string]$mergeLaws.digest}},
         [ordered]@{id='package-parity';status='no-W03-package-delta';evidence='package-source-fingerprint-gate'},
         [ordered]@{id='rollback';status='recorded';evidence=[string]$authority.rollback},
         [ordered]@{id='luna-acceptance';status='pending-independent-audit';evidence=$null}
@@ -219,7 +227,7 @@ function New-MIR4SemanticCompilationRuns {
         resolutions=[ordered]@{owner=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'owner-arbitration' -Path 'prototypes/mir/providers/pipeline/owner_arbitration.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');decision=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'provider-decision' -Path 'prototypes/mir/providers/pipeline/decision.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable')}
         plans=$planRows
         operations=[ordered]@{plan=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'transformation-plan' -Path 'prototypes/mir/domain/compiler/transformation_plan.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');executor=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'technology-operation-executor' -Path 'prototypes/mir/emit/technology_operation_executor.lua' -Status 'existing-authoritative-not-invoked' -Maturity 'stable');execution_authorized=$false}
-        runtime_state=[ordered]@{inventory_kind=[string]$runtimeInventory.kind;inventory_digest=[string]$runtimeInventory.digest;authority='tools/lib/mir4/RuntimeStateModel.ps1';status='opaque-reference-deferred-W04';mutation_authorized=$false}
+        runtime_state=[ordered]@{inventory_kind=[string]$runtimeInventory.kind;inventory_digest=[string]$runtimeInventory.digest;authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';status='W04-shadow-contract-complete-runtime-proof-required';mutation_authorized=$false}
         proof_obligations=$proofs
         bounded_public_projections=[ordered]@{authority=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'public-compiler-artifacts' -Path 'prototypes/mir/report/public_compiler_artifacts.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');mode='reference-only';new_projection_authorized=$false;budget='existing-public-artifact-bounds'}
         merge_law_catalogue=[ordered]@{kind=[string]$mergeLaws.kind;digest=[string]$mergeLaws.digest;implemented_passed=[bool]$mergeLaws.implemented_passed;deferred_owners=@($mergeLaws.deferred_owners)}

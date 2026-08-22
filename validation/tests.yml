@@ -745,6 +745,9 @@
         "mir.lock",
         "spec/platform/mir4-preview-v0/**",
         "spec/schemas/preview/**",
+        "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
+        "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",
+        "spec/schemas/mir4-continuity-bundle-v1.schema.json",
         "sdk/preview/mir4/**",
         "fixtures/mir4-mep-v0/**",
         "fixtures/mir4-process-ir-v0/**",
@@ -796,6 +799,30 @@
         "tools/lib/mir4/CompilationRun.ps1",
         "tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1",
         "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-runtime-continuity-w04",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+        ".mir/targets.json",
+        "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
+        "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",
+        "spec/schemas/mir4-continuity-bundle-v1.schema.json",
+        "control.lua",
+        "prototypes/mir/stage/control.lua",
+        "prototypes/mir/platform/factorio/runtime_state.lua",
+        "prototypes/mir/runtime/**",
+        "migrations/**",
+        "tools/lib/mir4/RuntimeStateModel.ps1",
+        "tools/lib/mir4/CompilationRun.ps1",
+        "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1",
+        "validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
         "repository"
       ]
     },
