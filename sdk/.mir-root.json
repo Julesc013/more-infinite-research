@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "kind": "MIR4VisibleRootProjectionV1",
+  "id": "sdk",
+  "path": "sdk",
+  "mode": "canonical-package-excluded",
+  "current_authorities": [
+    "sdk"
+  ],
+  "writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

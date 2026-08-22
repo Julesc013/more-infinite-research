@@ -3,6 +3,21 @@ authority: mir-repository-paths-v1
 
 paths:
   package.root: .
+  mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
+  final.governance: governance
+  final.contracts: contracts
+  final.spec: spec
+  final.src: src
+  final.targets: targets
+  final.modules: modules
+  final.sdk: sdk
+  final.tools-mir: tools/mir
+  final.tests: tests
+  final.assurance: assurance
+  final.changes: changes
+  final.releases: releases
+  final.docs: docs
+  final.examples: examples
   spec.root: spec
   spec.architecture: spec/architecture
   spec.compatibility: spec/compatibility

@@ -15,6 +15,30 @@ compiler_replacement = "shadow"
 autonomous_synthesis = "diagnose-only"
 historical_targets = "private-experimental"
 
+[logical_paths]
+governance = "governance"
+contracts = "contracts"
+spec = "spec"
+source = "src"
+targets = "targets"
+modules = "modules"
+sdk = "sdk"
+tools = "tools/mir"
+tests = "tests"
+assurance = "assurance"
+changes = "changes"
+releases = "releases"
+docs = "docs"
+examples = "examples"
+
+[external_roots]
+cache = "MIR_CACHE_HOME"
+state = "MIR_STATE_HOME"
+temp = "MIR_TEMP_HOME"
+worktrees = "MIR_WORKTREE_HOME"
+archive = "MIR_ARCHIVE_HOME"
+evidence = "MIR_EVIDENCE_HOME"
+
 [commands]
 generate = ".\\tools\\mir.ps1 mir4 platform generate"
 check = ".\\tools\\mir.ps1 mir4 platform check"
