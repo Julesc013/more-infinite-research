@@ -1,3 +1,15 @@
+---
+title: "MIR 4 Historical, Museum, and Successor-Host Closure"
+status: current
+applies_to: "4.0.0 M4C02-09-24H"
+audience: developer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-08-23
+supersedes: []
+superseded_by: []
+---
+
 # MIR 4 Historical, Museum, and Successor-Host Closure
 
 Status: developer-preview shadow evidence for W09 (`M4C02-09-24H`). This module is package-excluded and is not release authority.

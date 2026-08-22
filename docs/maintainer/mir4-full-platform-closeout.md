@@ -1,3 +1,15 @@
+---
+title: "MIR 4 Full-Platform Private Closeout"
+status: current
+applies_to: "4.0.0 M4C02-09-24H"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-08-23
+supersedes: []
+superseded_by: []
+---
+
 # MIR 4 full-platform private closeout
 
 `Export-MIR4FullPlatform24HRecords.ps1` is an evidence-only adapter for the M4C02 W00–W09 programme. It gathers the exact named records required by the full-platform steer into `build/mir4/m4c02-full-platform-24h`. It does not become a product, policy, compiler, release, or publication authority.

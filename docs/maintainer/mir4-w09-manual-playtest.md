@@ -1,3 +1,15 @@
+---
+title: "MIR 4 W09 Manual Playtest Handoff"
+status: current
+applies_to: "4.0.0 M4C02-09-24H"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-08-23
+supersedes: []
+superseded_by: []
+---
+
 # MIR 4 W09 Manual Playtest Handoff
 
 Use this after the automated campaign is green and before any source freeze or release decision. The current W09 result is private and unqualified; this checklist does not authorize publishing.
