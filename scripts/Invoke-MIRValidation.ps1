@@ -219,6 +219,10 @@ Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
   & (Join-Path $repo "validation\tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "MIR 4 W00 release governance is separated and honestly classified" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4ReleaseGovernanceW00.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "MIR 4 public feedback has one governed reproducer and authority map per family" {
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4PublicFeedbackIntake.ps1") -RepoRoot $repo
 }

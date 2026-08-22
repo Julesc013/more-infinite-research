@@ -40,6 +40,7 @@ Usage:
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
   .\tools\mir.ps1 mir4 platform compile --target <fNNN> --extension <path> --output <path>
+  .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
@@ -576,6 +577,15 @@ switch ($area) {
           $platformArguments.OutputPath = Get-MIRArgValue -Items $Args -Name '--output'
         }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1") @platformArguments
+      }
+      "release-governance" {
+        if ($Args.Count -lt 3) { throw "mir4 release-governance requires check or initialize." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','initialize')) { throw "Unknown mir4 release-governance command: $subcommand" }
+        $governanceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $governanceArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1") @governanceArguments
       }
       "handoff-m4c01" {
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"
