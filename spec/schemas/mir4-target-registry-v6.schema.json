@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-target-registry-v6.schema.json",
+  "title": "MIR 4 Target Registry V6",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","status","programme_id","package_visible","supersedes","profile_authority","identities","support_policy","profile_binding_policy","semantic_authority","public_support_authorized","signing_or_sealing_authorized","publication_authorized","rollback"],
+  "properties": {
+    "schema": {"const": 6},
+    "kind": {"const": "MIR4TargetRegistryV6"},
+    "status": {"const": "accepted-private-platform-current"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "package_visible": {"const": false},
+    "supersedes": {"type":"object","required":["path","sha256","disposition"]},
+    "profile_authority": {"type":"object","required":["path","sha256"]},
+    "identities": {
+      "type":"array","minItems":17,"maxItems":17,
+      "items":{"type":"object","additionalProperties":false,"required":["target","target_id","factorio_line","distribution_target_code","distribution_version","mir3_predecessor"],"properties":{"target":{"type":"string","pattern":"^f[0-9]{3}$"},"target_id":{"type":"string","pattern":"^factorio-[0-9]+\\.[0-9]+$"},"factorio_line":{"type":"string"},"distribution_target_code":{"type":"string","pattern":"^[0-9]{3}$"},"distribution_version":{"type":"string","pattern":"^4\\.0\\.[0-9]{5}$"},"mir3_predecessor":{"oneOf":[{"type":"string"},{"type":"null"}]}}}
+    },
+    "support_policy": {
+      "type":"array","minItems":17,"maxItems":17,
+      "items":{"type":"object","additionalProperties":false,"required":["target","support_tier","disposition","release_blocking","profile"],"properties":{"target":{"type":"string","pattern":"^f[0-9]{3}$"},"support_tier":{"enum":["current","maintained","lts","historical","museum"]},"disposition":{"enum":["candidate-mandatory","candidate-conditional","private-experimental-bridge","private-experimental","deferred-museum"]},"release_blocking":{"type":"boolean"},"profile":{"enum":["explicit","terminal-derived","blocked-with-evidence"]}}}
+    },
+    "profile_binding_policy": {"type":"string","minLength":1},
+    "semantic_authority": {"const":false},
+    "public_support_authorized": {"const":false},
+    "signing_or_sealing_authorized": {"const":false},
+    "publication_authorized": {"const":false},
+    "rollback": {"type":"string","minLength":1}
+  }
+}
