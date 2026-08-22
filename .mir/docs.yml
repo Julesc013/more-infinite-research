@@ -172,6 +172,26 @@ docs:
       - mir4-proof-cover-proposal
       - mir4-24-6-1-release-budget-design
       - mir4-non-production-offline-publisher-drill
+  - path: docs/architecture/mir4-historical-succession.md
+    title: "MIR 4 Historical, Museum, and Successor-Host Closure"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-w09-historical-museum-matrix
+      - mir4-offline-module-index-and-external-provider-conformance
+      - mir4-synthetic-successor-host-proof
+      - mir4-append-only-package-succession-witness
+  - path: docs/maintainer/mir4-w09-manual-playtest.md
+    title: "MIR 4 W09 Manual Playtest Handoff"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-w09-manual-playtest-checklist
+      - mir4-historical-and-museum-playtest-boundaries
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current

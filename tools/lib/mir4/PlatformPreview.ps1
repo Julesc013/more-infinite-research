@@ -12,6 +12,7 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json',
   'spec/compatibility/claims.json',
   'spec/schemas/mir4-runtime-state-matrix-v1.schema.json',
@@ -25,6 +26,8 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json',
   'spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
   'spec/schemas/mir4-inspector-workbench-result-v1.schema.json',
+  'spec/schemas/mir4-historical-museum-matrix-v1.schema.json',
+  'spec/schemas/mir4-successor-host-result-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json',
   '.mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json',
   '.mir/compatibility.yml',
@@ -46,6 +49,8 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/CompatibilityIndex.ps1',
   'tools/lib/mir4/CompatibilityFactory.ps1',
   'tools/lib/mir4/Inspector.ps1',
+  'tools/lib/mir4/HistoricalSuccession.ps1',
+  'tools/lib/mir4/SuccessorHost.ps1',
   'tools/lib/mir4/ReleaseDag.ps1',
   'tools/lib/mir4/RepositoryFixedPoint.ps1'
 )

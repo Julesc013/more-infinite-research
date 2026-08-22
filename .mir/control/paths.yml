@@ -13,6 +13,7 @@ paths:
   mir4.processir-synthesis.programme: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
   mir4.inspector-compatibility.programme: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
   mir4.assurance-scale.programme: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
+  mir4.historical-succession.programme: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
   final.governance: governance
   final.contracts: contracts
   final.spec: spec
@@ -49,6 +50,8 @@ paths:
   spec.schemas.mir4-assurance-scale-result-v1: spec/schemas/mir4-assurance-scale-result-v1.schema.json
   spec.schemas.mir4-release-budget-plan-v1: spec/schemas/mir4-release-budget-plan-v1.schema.json
   spec.schemas.mir4-offline-drill-result-v1: spec/schemas/mir4-offline-drill-result-v1.schema.json
+  spec.schemas.mir4-historical-museum-matrix-v1: spec/schemas/mir4-historical-museum-matrix-v1.schema.json
+  spec.schemas.mir4-successor-host-result-v1: spec/schemas/mir4-successor-host-result-v1.schema.json
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json

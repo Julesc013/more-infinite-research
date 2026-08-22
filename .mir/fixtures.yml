@@ -261,6 +261,25 @@ fixtures:
       - publisher-build-mutation-network-and-production-authority-denial
       - player-package-non-interference
 
+  mir4-historical-succession-v1:
+    requires_features: []
+    path: fixtures/mir4-historical-succession-v1
+    shipped: false
+    validates:
+      - historical-and-museum-target-count-and-disposition-preservation
+      - portable-exact-engine-and-archive-observations
+      - f018-missing-exact-engine-blocker
+      - museum-rights-custody-restore-closure-blocker
+      - reviewed-budgeted-offline-module-index
+      - deterministic-w05-extension-closure-reuse
+      - synthetic-external-f300-provider-laws
+      - copied-redacted-w04-continuity-import
+      - data-only-extension-transport
+      - deterministic-proof-replay-and-tamper-rejection
+      - byte-identical-synthetic-package-reconstruction
+      - append-only-nontransferable-c35-succession-witness
+      - player-package-non-interference
+
   museum-synthetic-installation:
     requires_features: []
     path: fixtures/museum/synthetic-installation

@@ -13,6 +13,9 @@ $authority=Get-MIR4TargetCompilerAuthority -RepoRoot $repo
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 $output=Assert-MIR4DescendantPath -Root (Join-Path $repo 'build/mir4') -Path $output
 $selected=@($authority.target_groups.targets|ForEach-Object{$_}|Where-Object{$Target-eq'all'-or$_-eq$Target})
+$sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
+$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+$packageSourceSha256=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 
 $modern=@($selected|Where-Object{$_-in@('f210','f200','f110','f100')})
 foreach($key in $modern){
@@ -31,7 +34,7 @@ foreach($contract in @($contracts.targets|Where-Object{$Target-eq'all'-or$_.targ
   $key=[string]$contract.target;$version=[string]$contract.identity.distribution_version
   $sourceRoot=if($key-eq'f210'){'build/mir4/emergency-lane'}elseif($key-in@('f200','f110','f100')){'build/mir4/local-playtest-shadow'}elseif($key-in@('f018','f017','f016','f015','f014','f013')){'build/mir4/historical-private'}else{''}
   if(-not$sourceRoot){
-    $rows+=[ordered]@{target=$key;version=$version;state='BLOCKED_WITH_EVIDENCE';facility='unsupported-with-evidence';missing=@($contract.inputs.missing);package=$null;publication_authorized=$false}
+    $rows+=[ordered]@{target=$key;version=$version;state='BLOCKED_WITH_EVIDENCE';maturity=[string]$contract.maturity;target_disposition=[string]$contract.support_policy.disposition;facility='unsupported-with-evidence';missing=@($contract.inputs.missing);package=$null;source_version='4.0.0';candidate_id='M4C02-09-24H';source_commit=$sourceCommit;source_tree=$sourceTree;publication_authorized=$false}
     continue
   }
   $source=Join-Path $repo "$sourceRoot/distributions/more-infinite-research_$version.zip"
@@ -42,9 +45,9 @@ foreach($contract in @($contracts.targets|Where-Object{$Target-eq'all'-or$_.targ
   $sourceHash=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
   $destinationHash=(Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
   if($sourceHash-cne$destinationHash){throw "[mir4-target-product-copy] $key"}
-  $rows+=[ordered]@{target=$key;version=$version;state='built-private-unqualified';facility=$(if($key-in@('f018','f017','f016','f015','f014','f013')){'finite-substitute'}else{'adapted'});package=[ordered]@{path=[IO.Path]::GetRelativePath($repo,$destination).Replace('\','/');sha256=$destinationHash;bytes=(Get-Item -LiteralPath $destination).Length};publication_authorized=$false}
+  $rows+=[ordered]@{target=$key;version=$version;state='built-private-unqualified';maturity=[string]$contract.maturity;target_disposition=[string]$contract.support_policy.disposition;facility=$(if($key-in@('f018','f017','f016','f015','f014','f013')){'finite-substitute'}else{'adapted'});package=[ordered]@{path=[IO.Path]::GetRelativePath($repo,$destination).Replace('\','/');sha256=$destinationHash;bytes=(Get-Item -LiteralPath $destination).Length;package_root="more-infinite-research_$version"};source_version='4.0.0';candidate_id='M4C02-09-24H';source_commit=$sourceCommit;source_tree=$sourceTree;publication_authorized=$false}
 }
-$manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4PrivateTargetProductSetV1';programme_id=[string]$authority.programme_id;state=$(if(@($rows|Where-Object{$_.state-eq'BLOCKED_WITH_EVIDENCE'}).Count){'partial-with-bounded-blockers'}else{'built-private-unqualified'});targets=$rows;semantic_authority=$false;public_support_authorized=$false;signing_or_sealing_authorized=$false;publication_authorized=$false;record_sha256=''}
+$manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4PrivateTargetProductSetV1';programme_id=[string]$authority.programme_id;candidate_id='M4C02-09-24H';source_version='4.0.0';source_commit=$sourceCommit;source_tree=$sourceTree;package_source_sha256=$packageSourceSha256;state=$(if(@($rows|Where-Object{$_.state-eq'BLOCKED_WITH_EVIDENCE'}).Count){'partial-with-bounded-blockers'}else{'built-private-unqualified'});targets=$rows;semantic_authority=$false;public_support_authorized=$false;signing_or_sealing_authorized=$false;source_frozen=$false;publication_authorized=$false;record_sha256=''}
 $manifest.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $manifest
 $providerMatrix=[pscustomobject][ordered]@{schema=1;kind='MIR4TargetProviderMatrixV1';programme_id=[string]$authority.programme_id;targets=@($contracts.targets|ForEach-Object{[ordered]@{target=[string]$_.target;identity=$_.identity;profile=$_.profile;provider_spec=$_.provider_spec}});semantic_authority=$false;publication_authorized=$false;record_sha256=''}
 $providerMatrix.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $providerMatrix

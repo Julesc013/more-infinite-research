@@ -136,6 +136,20 @@ package_excluded_modules:
     documentation: docs/architecture/mir4-assurance-scale.md
     boundary: read-only Control Plane v5 and Assurance v4 crosswalk, four proof identities, Merkle authority slices, proposal-only proof cover and deadline arithmetic, and dummy-fixture offline drills; no third evidence ledger, active selector ownership, real source/candidate/publisher access, player mutation, source freeze, production signing/sealing, promotion, tag, upload, or publication
     stability: developer-preview-and-shadow-blocked-exact-processir-and-trusted-timing-capacity-evidence
+  mir4_historical_succession_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
+    implementations:
+      - tools/lib/mir4/HistoricalSuccession.ps1
+      - tools/lib/mir4/SuccessorHost.ps1
+    exporter: tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1
+    output_schemas:
+      - spec/schemas/mir4-historical-museum-matrix-v1.schema.json
+      - spec/schemas/mir4-successor-host-result-v1.schema.json
+    fixtures: fixtures/mir4-historical-succession-v1
+    documentation: docs/architecture/mir4-historical-succession.md
+    playtest_handoff: docs/maintainer/mir4-w09-manual-playtest.md
+    boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
+    stability: developer-preview-shadow-partial-with-bounded-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1

@@ -952,6 +952,38 @@
       ]
     },
     {
+      "id": "static.mir4-historical-succession-w09",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json",
+        ".mir/releases/records/3.2.11.json",
+        ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+        ".mir/releases/terminal/MIR-3-MUSEUM-INDEX.json",
+        ".mir/museum-targets.json",
+        ".mir/modules.yml",
+        ".mir/fixtures.yml",
+        ".mir/docs.yml",
+        "spec/schemas/mir4-historical-museum-matrix-v1.schema.json",
+        "spec/schemas/mir4-successor-host-result-v1.schema.json",
+        "fixtures/mir4-historical-succession-v1/**",
+        "tools/lib/mir4/HistoricalSuccession.ps1",
+        "tools/lib/mir4/SuccessorHost.ps1",
+        "tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1",
+        "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1",
+        "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
+        "validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",
