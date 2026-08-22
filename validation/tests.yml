@@ -827,6 +827,35 @@
       ]
     },
     {
+      "id": "static.mir4-module-ecosystem-w05",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+        "spec/api/mir4-v1/**",
+        "spec/schemas/preview/mir4-mep-v1.schema.json",
+        "spec/schemas/preview/mir4-api-v1-response.schema.json",
+        "sdk/preview/mir4/mep-v1/**",
+        "sdk/preview/mir4/api-v1/**",
+        "sdk/preview/mir4/reference-extension-v1/**",
+        "fixtures/mir4-mep-v1/**",
+        "tools/lib/mir4/ModuleEcosystem.ps1",
+        "tools/lib/mir4/ExperimentalApiSdk.ps1",
+        "tools/lib/mir4/NormalizedCompiler.ps1",
+        "tools/lib/mir4/CompilationRun.ps1",
+        "tools/lib/mir4/PlatformPreview.ps1",
+        "tools/commands/mir4/Invoke-MIR4Extension.ps1",
+        "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1",
+        "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",

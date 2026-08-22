@@ -42,6 +42,10 @@
     {"id":"runtime-registration-plan-v1","maturity":"shadow","mode":"existing-dispatcher-law-verifier"},
     {"id":"migration-graph-v1","maturity":"shadow","mode":"explicit-private-transition-contract"},
     {"id":"continuity-bundle-v1","maturity":"preview","mode":"private-redacted-package-excluded"},
+    {"id":"mep-v1","maturity":"preview","mode":"typed-data-only-package-excluded"},
+    {"id":"extension-closure-v1","maturity":"preview","mode":"deterministic-resolver-package-excluded"},
+    {"id":"api-sdk-v1","maturity":"preview","mode":"bounded-copied-data-only-package-excluded"},
+    {"id":"synthetic-reference-consumer-v1","maturity":"preview","mode":"blocked-independent-production-consumer"},
     {"id":"process-ir-v0","maturity":"shadow","mode":"parity-and-loop-diagnostics"},
     {"id":"autonomous-synthesis-v0","maturity":"shadow","mode":"diagnose-only"},
     {"id":"historical-target-providers-v0","maturity":"experimental","mode":"private-build-only"}
@@ -93,5 +97,7 @@
     "mir4-platform-preview-v0.zip",
     "mir4-reference-extension-v0.zip",
     "mir4-inspector-preview-v0.zip"
+    ,"mir4-sdk-v1-preview.zip"
+    ,"mir4-reference-extension-v1-preview.zip"
   ]
 }

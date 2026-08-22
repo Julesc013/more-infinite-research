@@ -76,6 +76,20 @@ package_excluded_modules:
     legacy_generated_root: sdk/experimental/mir4
     boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
     stability: developer-preview-may-change-before-1.0
+  mir4_module_ecosystem_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
+    api_contracts: spec/api/mir4-v1/contracts.json
+    implementation: tools/lib/mir4/ModuleEcosystem.ps1
+    generator: tools/lib/mir4/ExperimentalApiSdk.ps1
+    builder: tools/commands/mir4/Invoke-MIR4Extension.ps1
+    exporter: tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1
+    generated_roots:
+      - sdk/preview/mir4/mep-v1
+      - sdk/preview/mir4/api-v1
+      - sdk/preview/mir4/reference-extension-v1
+    documentation: docs/architecture/mir4-module-ecosystem.md
+    boundary: typed data-only fragments, deterministic extension closure, copied bounded APIs, and package-excluded SDK tooling; no callbacks, mutable compiler context, prototype writes, migration execution, W06 semantic ownership, or public support authority
+    stability: developer-preview-blocked-independent-production-consumer
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1

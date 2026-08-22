@@ -209,11 +209,42 @@ function Invoke-MIR4ShadowExtensionCompilation {
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   $resolvedExtension = if ([IO.Path]::IsPathRooted($ExtensionPath)) { [IO.Path]::GetFullPath($ExtensionPath) } else { [IO.Path]::GetFullPath((Join-Path $repo $ExtensionPath)) }
   $extension = Get-Content -Raw -LiteralPath $resolvedExtension | ConvertFrom-Json
-  $record = New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId $TargetId -Envelope $extension
+  $record = if ([int]$extension.schema -eq 1 -and [string]$extension.kind -eq 'MIR4ExtensionEnvelopeV1') {
+    New-MIR4ShadowExtensionCompilationV1 -RepoRoot $repo -TargetId $TargetId -Envelope $extension
+  } else {
+    New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId $TargetId -Envelope $extension
+  }
   $resolvedOutput = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputPath)) }
   $allowedOutput = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\') + '\'
   if (-not ($resolvedOutput + '\').StartsWith($allowedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-shadow-output-boundary] $resolvedOutput" }
   New-Item -ItemType Directory -Force -Path (Split-Path $resolvedOutput -Parent) | Out-Null
   [IO.File]::WriteAllText($resolvedOutput,(ConvertTo-MIR4PlatformCanonicalJson $record)+"`n",[Text.UTF8Encoding]::new($false))
   return $record
+}
+
+function New-MIR4ShadowExtensionCompilationV1 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^f[0-9]{3}$')][string]$TargetId,
+    [Parameter(Mandatory)]$Envelope
+  )
+  $closure = Resolve-MIR4ExtensionClosureV1 -RepoRoot $RepoRoot -Extensions @($Envelope) -Target $TargetId
+  $transport = @((Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot).transports | Where-Object target -eq $TargetId)
+  $contributions = @(
+    foreach ($fragment in @($Envelope.fragments | Sort-Object id)) {
+      $availability = if ([string]$fragment.kind -in @('ProcessClassificationFragment','ExternalEffectChannelDeclaration') -and [string]$fragment.data.status -eq 'unavailable') { 'unavailable' } else { 'available' }
+      [ordered]@{
+        fragment_id=[string]$fragment.id;fragment_kind=[string]$fragment.kind;normalized_operation='data-only-fragment';availability=$availability
+        owner=$(switch ([string]$fragment.kind){'MigrationFragment'{'W04'};'ProcessClassificationFragment'{'W06'};'ExternalEffectChannelDeclaration'{'W06'};default{'W05'}})
+        authoritative=$false;mutation_authorized=$false
+      }
+    }
+  )
+  $record = [pscustomobject][ordered]@{
+    kind='MIR4ShadowExtensionCompilationV1';schema=1;maturity='shadow';target=[ordered]@{id=$TargetId;transport=[string]$transport.transport;admission=[string]$transport.admission}
+    extension=[ordered]@{id=[string]$Envelope.extension_id;version=[string]$Envelope.extension_version;digest=[string]$Envelope.digest};closure_digest=[string]$closure.digest
+    contributions=$contributions;diagnostics=@($contributions | Where-Object availability -eq 'unavailable' | ForEach-Object {[ordered]@{code='mir4-shadow-authority-not-yet-available';severity='info';subject=[string]$_.fragment_id;owner=[string]$_.owner}})
+    result=$(if($closure.complete){'shadow-complete'}else{'review-required'});authoritative_output=$false;mutation_capability=$false;public_support_claim=$false;digest=''
+  }
+  return Add-MIR4PlatformDigest $record
 }

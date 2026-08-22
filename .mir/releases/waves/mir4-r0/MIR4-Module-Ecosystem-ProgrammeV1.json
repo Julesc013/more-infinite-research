@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "kind": "MIR4ModuleEcosystemProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "wave": "W05",
+  "maturity": "developer-preview",
+  "semantic_authority": false,
+  "player_package_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "runtime_state_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "safety_kernel_override_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "inputs": [
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+    ".mir/targets.json",
+    ".mir/module-dependencies.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+    "spec/api/mir4-v1/contracts.json"
+  ],
+  "fragment_kinds": [
+    "CompatibilityFragment",
+    "ProfileFragment",
+    "ProofFragment",
+    "PresentationFragment",
+    "CapabilityRequirement",
+    "ExtensionDependency",
+    "ExtensionConflict",
+    "FinalizationRequirement",
+    "ProcessClassificationFragment",
+    "MigrationFragment",
+    "TargetDispositionFragment",
+    "ExternalEffectChannelDeclaration"
+  ],
+  "forbidden_fields": [
+    "callback",
+    "callbacks",
+    "compiler_context",
+    "data_raw",
+    "executor",
+    "prototype",
+    "prototype_write",
+    "safety_kernel",
+    "safety_kernel_override"
+  ],
+  "host_extensions": [
+    {
+      "id": "org.more-infinite-research.platform",
+      "version": "0.5.0-preview",
+      "capabilities": [
+        "continuity.read",
+        "diagnostics.read",
+        "host.read",
+        "observation.read",
+        "profile.read",
+        "proof.read",
+        "query.read",
+        "release.read",
+        "support.snapshot",
+        "target-provider.read",
+        "tooling.read"
+      ]
+    }
+  ],
+  "transports": [
+    {"target":"f210","transport":"extension-owned-mod-data-record","admission":"blocked-by-terminal-emitter","maturity":"stable-private-mechanism"},
+    {"target":"f200","transport":"versioned-namespaced-stage-local-bus","admission":"build-materializer-local-preview","maturity":"stable-private-mechanism"},
+    {"target":"f110","transport":"deterministic-static-manifest","admission":"preview","maturity":"preview"},
+    {"target":"f100","transport":"deterministic-static-manifest","admission":"preview","maturity":"preview"},
+    {"target":"f018","transport":"deterministic-static-manifest","admission":"private-experimental","maturity":"experimental"},
+    {"target":"f017","transport":"deterministic-static-manifest","admission":"private-experimental","maturity":"experimental"},
+    {"target":"f016","transport":"deterministic-static-manifest","admission":"private-experimental","maturity":"experimental"},
+    {"target":"f015","transport":"deterministic-static-manifest","admission":"private-experimental","maturity":"experimental"},
+    {"target":"f014","transport":"opaque-static-manifest","admission":"terminal-derived-opaque","maturity":"experimental"},
+    {"target":"f013","transport":"opaque-static-manifest","admission":"terminal-derived-opaque","maturity":"experimental"},
+    {"target":"f012","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f011","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f010","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f009","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f008","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f007","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"},
+    {"target":"f006","transport":"unavailable","admission":"BLOCKED_WITH_EVIDENCE","maturity":"blocked"}
+  ],
+  "api_surfaces": [
+    "host-manifest",
+    "query",
+    "profile",
+    "observation",
+    "tooling",
+    "target-provider-abi",
+    "proof",
+    "release",
+    "continuity-bundle"
+  ],
+  "response_bounds": {
+    "max_page_items": 128,
+    "max_capabilities": 128,
+    "max_extensions": 32,
+    "max_context_properties": 128,
+    "max_cursor_bytes": 256,
+    "copy_mode": "canonical-json-deep-copy",
+    "unavailable_representation": "explicit-status-reason-evidence-never-zero"
+  },
+  "builder_commands": ["init", "validate", "explain", "test", "package", "migrate"],
+  "independent_consumer": {
+    "preferred": "industrial-revolution-4",
+    "status": "BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER",
+    "reason": "No governed exact IR4 repository, archive closure, target, and accepted scope are locally available.",
+    "fallback": "synthetic-external-reference-extension"
+  },
+  "outputs": [
+    "MIR4_MEP_CONFORMANCE.json",
+    "MIR4_API_SDK_GRADUATION_MATRIX.json",
+    "MIR4_REFERENCE_CONSUMER_RESULT.json"
+  ],
+  "rollback": "Remove the W05 authority, package-excluded tooling, generated SDK assets, fixtures, and projections. Preserve W02-W04 and every player-package source unchanged."
+}

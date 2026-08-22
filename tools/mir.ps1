@@ -45,6 +45,8 @@ Usage:
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|fNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate> [--extension <path>] [--output <path>] [--id <reverse.dns.id>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
@@ -647,6 +649,30 @@ switch ($area) {
           if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
           & (Join-Path $repo "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1") @runtimeArguments
         }
+      }
+      "module-ecosystem" {
+        if ($Args.Count -lt 3) { throw "mir4 module-ecosystem requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 module-ecosystem command: $subcommand" }
+        $moduleArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $moduleArguments.OutputRoot = $output }
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) { $moduleArguments.CandidateZip = $candidate }
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1") @moduleArguments
+      }
+      "extension" {
+        if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, or migrate." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('init','validate','explain','test','package','migrate')) { throw "Unknown mir4 extension command: $subcommand" }
+        $builderArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
+        $extension = Get-MIRArgValue -Items $Args -Name '--extension'
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $id = Get-MIRArgValue -Items $Args -Name '--id'
+        if (-not [string]::IsNullOrWhiteSpace($extension)) { $builderArguments.ExtensionPath = $extension }
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $builderArguments.OutputRoot = $output }
+        if (-not [string]::IsNullOrWhiteSpace($id)) { $builderArguments.ExtensionId = $id }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4Extension.ps1") @builderArguments
       }
       "handoff-m4c01" {
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"
