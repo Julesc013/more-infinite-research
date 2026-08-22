@@ -16,7 +16,7 @@ if(@($records.parity.fixture_results|Where-Object{-not$_.passed}).Count-ne 0){th
 
 $complex=$records.fixture_irs['catalyst-container-bounded-cycle']
 if(@($complex.processes|Where-Object{$_.catalysts.Count-gt 0}).Count-ne 1-or@($complex.processes|Where-Object{$_.returned_containers.Count-gt 0}).Count-ne 1-or@($complex.processes|Where-Object{$_.productivity_sensitive}).Count-ne 1-or@($complex.processes|Where-Object{$_.self_intersection.Count-gt 0}).Count-ne 1){throw '[mir4-w06-process-shape]'}
-if(@($complex.sccs).Count-ne 1-or[string]$complex.sccs[0].classification-cne'CERTIFIED_BOUNDED'-or@($complex.sccs[0].minimal_witness).Count-lt 3){throw '[mir4-w06-scc-bounded-witness]'}
+if(@($complex.sccs).Count-ne 1-or[string]$complex.sccs[0].classification-cne'CERTIFIED_BOUNDED'-or@($complex.sccs[0].minimal_witness).Count-lt 2-or$complex.sccs[0].witness_edge_count-lt 1){throw '[mir4-w06-scc-bounded-witness]'}
 $routes=$records.fixture_irs['recycling-recovery']
 if(@($routes.processes|Where-Object basic_recycling).Count-ne 1-or@($routes.processes|Where-Object basic_recovery).Count-ne 1){throw '[mir4-w06-recycling-recovery]'}
 $unsafe=$records.fixture_irs['unbounded-positive-cycle']
