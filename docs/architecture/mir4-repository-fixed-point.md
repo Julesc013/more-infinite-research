@@ -1,3 +1,14 @@
+---
+title: "MIR 4 Repository Fixed Point"
+status: current
+applies_to: "M4C02-09-24H private programme"
+audience: developer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-08-23
+supersedes: []
+superseded_by: []
+---
 # MIR 4 repository fixed point
 
 MIR 4 uses a shadow repository fixed point before any physical source move. The sole machine-readable authority is `.mir/control/repository-fixed-point.json`; `.mir/control/paths.yml` continues to own logical path resolution and `.mir/control-plane/ownership.json` continues to own writer selection.
