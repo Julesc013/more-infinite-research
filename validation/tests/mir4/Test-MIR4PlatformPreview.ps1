@@ -41,9 +41,9 @@ if(@($opportunities.grammar).Count -ne 6 -or @($opportunities.candidates).Count 
 if(@($opportunities.candidates|Where-Object{$_.mutation_allowed -or $_.authoritative -or $_.execution -ne 'diagnose-only'}).Count){throw '[mir4-platform-opportunity-authority]'}
 $runtimeInventory=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/runtime-state-inventory.json')|ConvertFrom-Json
 if([string]$runtimeInventory.kind-cne'MIR4RuntimeStateMatrixV1'-or@($runtimeInventory.runtime_feature_specs).Count-ne 7-or@($runtimeInventory.state_specs).Count-ne 5-or@($runtimeInventory.registration_plan.groups).Count-ne 9-or@($runtimeInventory.targets).Count-ne 17-or-not$runtimeInventory.registration_plan.law_results.all_passed){throw '[mir4-platform-runtime-state-inventory]'}
-$runtimeF210=@($runtimeInventory.targets|Where-Object target -eq'f210')[0]
-$runtimeF110=@($runtimeInventory.targets|Where-Object target -eq'f110')[0]
-if($runtimeF210.backend-cne'storage'-or$runtimeF110.backend-cne'global'-or@($runtimeF110.feature_dispositions|Where-Object disposition -ne'compiled-out').Count-ne 0){throw '[mir4-platform-runtime-target-backends]'}
+$runtimeF210=@($runtimeInventory.targets|Where-Object { $_.target -eq 'f210' })[0]
+$runtimeF110=@($runtimeInventory.targets|Where-Object { $_.target -eq 'f110' })[0]
+if($runtimeF210.backend-cne'storage'-or$runtimeF110.backend-cne'global'-or@($runtimeF110.feature_dispositions|Where-Object { $_.disposition -ne 'compiled-out' }).Count-ne 0){throw '[mir4-platform-runtime-target-backends]'}
 $migration=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/migration-graph-matrix.json')|ConvertFrom-Json
 if([string]$migration.kind-cne'MIR4MigrationGraphMatrixV1'-or@($migration.edges).Count-ne 10-or@($migration.edge_kinds).Count-ne 8-or-not$migration.law_results.all_passed-or$migration.complete_for_public_release){throw '[mir4-platform-migration-graph]'}
 $continuity=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/continuity-bundle-template.json')|ConvertFrom-Json
