@@ -184,7 +184,12 @@ function ConvertFrom-MIR4MepV0ToV1 {
         'CompatibilityFragment' { [ordered]@{subject_refs=@($fragment.data.subjects);disposition=[string]$fragment.data.disposition} }
         'ProfileFragment' { [ordered]@{profile_id=[string]$fragment.data.profile;setting_refs=@($fragment.data.settings.PSObject.Properties.Name | Sort-Object)} }
         'ProofFragment' { [ordered]@{evidence_refs=@($fragment.data.fixtures | ForEach-Object { "fixture:$_" });claim_level=[string]$fragment.data.claim_level} }
-        default { ConvertTo-MIR4ModuleCanonicalValue $fragment.data }
+        'PresentationFragment' { [ordered]@{title=[string]$fragment.data.title;summary=[string]$fragment.data.summary} }
+        'CapabilityRequirement' { [ordered]@{all_of=@($fragment.data.all_of | ForEach-Object { [string]$_ })} }
+        'ExtensionDependency' { [ordered]@{extension_id=[string]$fragment.data.extension_id;constraint=[string]$fragment.data.constraint} }
+        'ExtensionConflict' { [ordered]@{extension_ids=@($fragment.data.extension_ids | ForEach-Object { [string]$_ })} }
+        'FinalizationRequirement' { [ordered]@{phase=[string]$fragment.data.phase;writes_allowed=[bool]$fragment.data.writes_allowed} }
+        default { throw "[mir4-mep-migrate-fragment] $([string]$fragment.kind)" }
       }
       [ordered]@{id=[string]$fragment.id;kind=[string]$fragment.kind;data=$data}
     }

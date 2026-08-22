@@ -33,6 +33,7 @@ if($Command-eq'init'){
 $envelope=Get-BuilderEnvelope
 if($Command-eq'migrate'){
   $result=ConvertFrom-MIR4MepV0ToV1 -Envelope $envelope
+  Test-MIR4MepV1Envelope -Envelope $result -RepoRoot $repo|Out-Null
   New-Item -ItemType Directory -Force -Path $output|Out-Null
   [IO.File]::WriteAllText((Join-Path $output 'extension-v1.json'),(ConvertTo-MIR4ModuleCanonicalJson $result)+"`n",[Text.UTF8Encoding]::new($false))
   [pscustomobject]@{status='migrated';path=(Join-Path $output 'extension-v1.json');execution_authorized=$false}|ConvertTo-Json

@@ -295,6 +295,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/ModuleEcosystem.ps1')
 $value=Get-Content -Raw -LiteralPath $InputPath|ConvertFrom-Json
 $result=ConvertFrom-MIR4MepV0ToV1 -Envelope $value
+Test-MIR4MepV1Envelope -Envelope $result -RepoRoot $RepoRoot|Out-Null
 [IO.File]::WriteAllText($OutputPath,(ConvertTo-MIR4ModuleCanonicalJson $result)+"`n",[Text.UTF8Encoding]::new($false))
 '@
   $files['sdk/preview/mir4/mep-v1/migration/migrate_v0_to_v1.lua'] = @'
