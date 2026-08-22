@@ -184,6 +184,11 @@ function New-MIR4SemanticCompilationRuns {
   $inputs = Get-MIR4PlatformInputs $repo
   $inputLock = [pscustomobject][ordered]@{kind='MIR4PlatformInputLockV1';inputs=$inputs;digest=''}; Add-MIR4PlatformDigest $inputLock|Out-Null
   $schemaPath = Join-Path $repo ([string]$authority.compilation_run_schema)
+  $externalExtensionClosure = $null
+  if (Get-Command Resolve-MIR4ExtensionClosureV1 -ErrorAction SilentlyContinue) {
+    $referenceExtension = New-MIR4ReferenceExtensionV1 -RepoRoot $repo
+    $externalExtensionClosure = Resolve-MIR4ExtensionClosureV1 -RepoRoot $repo -Extensions @($referenceExtension) -Target f210
+  }
   $runs = @(
     foreach ($provider in @($Providers)) {
       $target = [string]$provider.id
@@ -216,7 +221,7 @@ function New-MIR4SemanticCompilationRuns {
         platform_profile=[ordered]@{authority=[string]$provider.profile.authority;authority_sha256=[string]$provider.profile.authority_sha256;profile_digest=[string]$provider.profile.digest;status=[string]$provider.profile.status}
         environment_lock=[ordered]@{kind=[string]$inputLock.kind;digest=[string]$inputLock.digest;engine_lock=$provider.engine_lock;immutable_inputs=$true}
         target_provider=[ordered]@{kind=[string]$contract.provider_spec.kind;digest=[string]$provider.digest;maturity=[string]$contract.provider_spec.maturity;authority='MIR4-Target-RegistryV6'}
-        module_extension_closure=[ordered]@{module_graph=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'module-dependency-graph' -Path '.mir/module-dependencies.json' -Status 'reference-available' -Maturity 'stable');provider_protocol_digest=[string]$protocols.digest;external_extension_closure='deferred-W05';mutation_authorized=$false}
+        module_extension_closure=[ordered]@{module_graph=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'module-dependency-graph' -Path '.mir/module-dependencies.json' -Status 'reference-available' -Maturity 'stable');provider_protocol_digest=[string]$protocols.digest;external_extension_closure=$(if($externalExtensionClosure){[ordered]@{authority='.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json';reference_target='f210';closure_digest=[string]$externalExtensionClosure.digest;target_status=$(if($target -in @('f210','f200','f110','f100')){'reference-available'}else{'target-transport-static-or-unavailable'})}}else{'deferred-W05'});mutation_authorized=$false}
         feature_manifest=$featureSetting.feature_manifest
         setting_spec=$featureSetting.setting_spec
         normalized_facts=[ordered]@{snapshot=$snapshotRef;adapter=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compilation-snapshot-adapter' -Path 'prototypes/mir/pipeline/compilation_snapshot_adapter.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');duplicated_facts=$false}

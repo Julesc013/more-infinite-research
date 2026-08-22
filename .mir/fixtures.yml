@@ -182,6 +182,21 @@ fixtures:
       - stable-negative-diagnostics
       - package-surface-non-interference
 
+  mir4-mep-v1-conformance:
+    requires_features: []
+    path: fixtures/mir4-mep-v1
+    shipped: false
+    validates:
+      - twelve-typed-data-only-fragment-kinds
+      - deterministic-dependency-closure
+      - missing-dependency-cycle-conflict-and-forbidden-field-rejection
+      - target-specific-transport-truth
+      - bounded-copied-paginated-capability-aware-api-responses
+      - explicit-unavailability-never-zero
+      - synthetic-external-reference-consumer
+      - blocked-independent-production-consumer-retained
+      - player-package-non-interference
+
   mir4-process-ir-v0-safety:
     requires_features: []
     path: fixtures/mir4-process-ir-v0

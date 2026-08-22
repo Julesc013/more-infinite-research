@@ -125,6 +125,18 @@ docs:
       - mir4-runtime-registration-plan-v1
       - mir4-migration-graph-v1
       - mir4-continuity-bundle-v1
+  - path: docs/architecture/mir4-module-ecosystem.md
+    title: "MIR 4 Module Ecosystem"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-mep-v1-preview-contract
+      - mir4-extension-closure-v1
+      - mir4-api-sdk-v1-preview
+      - mir4-extension-builder
+      - mir4-independent-production-consumer-blocker
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current
@@ -166,6 +178,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - generated-experimental-api-v0-reference
+  - path: docs/reference/generated/mir4-api-sdk-v1.md
+    title: "MIR 4 API and SDK V1 Preview"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-mir4-api-sdk-v1-reference
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

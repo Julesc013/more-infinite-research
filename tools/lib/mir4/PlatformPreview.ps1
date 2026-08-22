@@ -3,11 +3,13 @@ $script:MIR4PlatformInputPaths = @(
   'spec/platform/mir4-preview-v0/platform.json',
   'spec/platform/mir4-preview-v0/release-dag.json',
   'spec/api/mir4-v0/contracts.json',
+  'spec/api/mir4-v1/contracts.json',
   '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json',
   '.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json',
   'spec/schemas/mir4-compilation-run-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
   'spec/schemas/mir4-runtime-state-matrix-v1.schema.json',
   'spec/schemas/mir4-migration-graph-matrix-v1.schema.json',
   'spec/schemas/mir4-continuity-bundle-v1.schema.json',
@@ -19,12 +21,14 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/modules.yml',
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
+  'tools/lib/mir4/PlatformPreview.ps1',
   'tools/lib/mir4/SafetyKernel.ps1',
   'tools/lib/mir4/PolicyEngine.ps1',
   'tools/lib/mir4/NormalizedCompiler.ps1',
   'tools/lib/mir4/TargetCompiler.ps1',
   'tools/lib/mir4/CompilationRun.ps1',
   'tools/lib/mir4/RuntimeStateModel.ps1',
+  'tools/lib/mir4/ModuleEcosystem.ps1',
   'tools/lib/mir4/ProcessIR.ps1',
   'tools/lib/mir4/ReleaseDag.ps1',
   'tools/lib/mir4/RepositoryFixedPoint.ps1'
@@ -121,6 +125,8 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot 'NormalizedCompiler.ps1')
 . (Join-Path $PSScriptRoot 'TargetCompiler.ps1')
 . (Join-Path $PSScriptRoot 'RuntimeStateModel.ps1')
+. (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
+. (Join-Path $PSScriptRoot 'ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 . (Join-Path $PSScriptRoot 'ReleaseDag.ps1')
 . (Join-Path $PSScriptRoot 'CompilationRun.ps1')
@@ -246,11 +252,16 @@ function Get-MIR4PlatformGeneratedFiles {
   $runtime = Get-MIR4RuntimeStateInventory $repo
   $migration = New-MIR4MigrationGraphMatrix -RepoRoot $repo -Providers $providers -SourceIdentity $null
   $continuity = New-MIR4ContinuityBundle -RepoRoot $repo -Providers $providers -SourceIdentity $null -CandidateZip $null -RuntimeStateMatrix $runtime -MigrationGraphMatrix $migration
+  $extensionV1 = New-MIR4ReferenceExtensionV1 -RepoRoot $repo
+  $extensionClosureV1 = Resolve-MIR4ExtensionClosureV1 -RepoRoot $repo -Extensions @($extensionV1) -Target f210
+  $continuity.module_extension_closure.external_extensions = [ordered]@{status='complete-preview';opaque_reference=$false;closure_digest=[string]$extensionClosureV1.digest;authority='.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json'}
+  Add-MIR4PlatformDigest $continuity | Out-Null
   $process = Get-MIR4ProcessIRInventory -RepoRoot $repo -PlatformSpec $platform
   $opportunities = Get-MIR4OpportunityCatalogue -PlatformSpec $platform -ProcessIR $process
   $mepSchema = Get-MIR4MepSchema $platform
   $extension = New-MIR4ReferenceExtension
   $shadowExtensionRun = New-MIR4ShadowExtensionCompilation -RepoRoot $repo -TargetId 'f210' -Envelope $extension
+  $shadowExtensionRunV1 = New-MIR4ShadowExtensionCompilationV1 -RepoRoot $repo -TargetId 'f210' -Envelope $extensionV1
   $processSafeFixture = [ordered]@{schema=0;kind='MIR4ProcessIRSafetyFixtureV0';id='bounded-reference-loop';expected_status='accepted-for-policy-evaluation';contribution=[ordered]@{subject='process.reference.bounded';operations=@('data-only-fragment');evidence=@('fixture:bounded-reference-loop');positive_cycle=$true;proven_bounded=$true;owner_opaque=$false;owner_rewrite=$false;requested_disposition='preserve'}}
   $processUnsafeFixture = [ordered]@{schema=0;kind='MIR4ProcessIRSafetyFixtureV0';id='unbounded-reference-loop';expected_status='rejected';expected_violation='unbounded-positive-cycle';contribution=[ordered]@{subject='process.reference.unbounded';operations=@('data-only-fragment');evidence=@('fixture:unbounded-reference-loop');positive_cycle=$true;proven_bounded=$false;owner_opaque=$false;owner_rewrite=$false;requested_disposition='handle'}}
   $primary = $providers | Where-Object { $_.id -eq 'f210' }
@@ -350,6 +361,7 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'sdk/preview/mir4/reference/query-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $query) + "`n"
     'sdk/preview/mir4/reference/support-snapshot-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $support) + "`n"
     'sdk/preview/mir4/reference/shadow-extension-run-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $shadowExtensionRun) + "`n"
+    'sdk/preview/mir4/reference/shadow-extension-run-v1-f210.json' = (ConvertTo-MIR4PlatformCanonicalJson $shadowExtensionRunV1) + "`n"
     'sdk/preview/mir4/reference-extension/extension.json' = (ConvertTo-MIR4PlatformCanonicalJson $extension) + "`n"
     'sdk/preview/mir4/reference-extension/README.md' = "# MIR 4 reference extension V0`n`nThis data-only extension exercises all eight MEP V0 fragment kinds and carries no prototype-write capability.`n"
     'sdk/preview/mir4/inspector/index.html' = (Get-MIR4InspectorHtml).Replace("`r`n","`n")
@@ -362,6 +374,9 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'fixtures/mir4-process-ir-v0/positive/bounded-loop.json' = (ConvertTo-MIR4PlatformCanonicalJson $processSafeFixture) + "`n"
     'fixtures/mir4-process-ir-v0/negative/unbounded-loop.json' = (ConvertTo-MIR4PlatformCanonicalJson $processUnsafeFixture) + "`n"
     'docs/reference/generated/mir4-platform-component-matrix.md' = $generatedDoc
+  }
+  foreach ($entry in (Get-MIR4ModuleEcosystemSdkFiles -RepoRoot $repo).GetEnumerator()) {
+    $files[$entry.Key] = $entry.Value
   }
   return $files
 }
@@ -466,10 +481,14 @@ function New-MIR4PlatformPreviewPackages {
   $allowedOutput = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\') + '\'
   if (-not ($output + '\').StartsWith($allowedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-preview-output-boundary] $output" }
   $allSdk = @(Get-ChildItem -LiteralPath (Join-Path $repo 'sdk/preview/mir4') -Recurse -File) | ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') }
+  $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1)/' })
+  $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
   $sets = [ordered]@{
-    'mir4-sdk-v0-preview.zip' = @($allSdk + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
+    'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
+    'mir4-sdk-v1-preview.zip' = @($sdkV1 + @('spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-api-v1-response.schema.json','docs/architecture/mir4-module-ecosystem.md','docs/reference/generated/mir4-api-sdk-v1.md','tools/lib/mir4/ModuleEcosystem.ps1','tools/commands/mir4/Invoke-MIR4Extension.ps1','LICENSE'))
     'mir4-platform-preview-v0.zip' = @('mir.toml','mir.lock','spec/platform/mir4-preview-v0/platform.json','spec/platform/mir4-preview-v0/release-dag.json','spec/schemas/mir4-compilation-run-v1.schema.json','spec/schemas/mir4-runtime-state-matrix-v1.schema.json','spec/schemas/mir4-migration-graph-matrix-v1.schema.json','spec/schemas/mir4-continuity-bundle-v1.schema.json','docs/architecture/mir4-platform-preview.md','docs/architecture/mir4-target-compiler.md','docs/architecture/mir4-semantic-compiler.md','docs/architecture/mir4-runtime-continuity.md','docs/reference/generated/mir4-platform-component-matrix.md','sdk/preview/mir4/reference/target-providers.json','sdk/preview/mir4/reference/target-contracts.json','sdk/preview/mir4/reference/target-provider-law-results.json','sdk/preview/mir4/reference/affected-target-plan.json','sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/feature-setting-cutover-matrix.json','sdk/preview/mir4/reference/provider-micro-protocol-matrix.json','sdk/preview/mir4/reference/merge-law-catalogue.json','sdk/preview/mir4/reference/runtime-state-inventory.json','sdk/preview/mir4/reference/migration-graph-matrix.json','sdk/preview/mir4/reference/continuity-bundle-template.json','sdk/preview/mir4/reference/process-ir-inventory.json','sdk/preview/mir4/reference/opportunity-catalogue.json','sdk/preview/mir4/reference/release-dag.json','sdk/preview/mir4/reference/shadow-extension-run-f210.json','fixtures/mir4-process-ir-v0/positive/bounded-loop.json','fixtures/mir4-process-ir-v0/negative/unbounded-loop.json','tools/lib/mir4/SafetyKernel.ps1','tools/lib/mir4/PolicyEngine.ps1','tools/lib/mir4/NormalizedCompiler.ps1','tools/lib/mir4/TargetCompiler.ps1','tools/lib/mir4/CompilationRun.ps1','tools/lib/mir4/RuntimeStateModel.ps1','tools/lib/mir4/ProcessIR.ps1','tools/lib/mir4/ReleaseDag.ps1','LICENSE')
     'mir4-reference-extension-v0.zip' = @('sdk/preview/mir4/reference-extension/extension.json','sdk/preview/mir4/reference-extension/README.md','spec/schemas/preview/mir4-mep-v0.schema.json','LICENSE')
+    'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
     'mir4-inspector-preview-v0.zip' = @('sdk/preview/mir4/inspector/index.html','sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1','sdk/preview/mir4/inspector/README.md','sdk/preview/mir4/reference/query-snapshot-f210.json','sdk/preview/mir4/reference/support-snapshot-f210.json','LICENSE')
   }
   $hashes = @()
