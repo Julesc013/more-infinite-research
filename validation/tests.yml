@@ -754,6 +754,7 @@
         "tools/lib/mir4/PolicyEngine.ps1",
         "tools/lib/mir4/NormalizedCompiler.ps1",
         "tools/lib/mir4/TargetCompiler.ps1",
+        "tools/lib/mir4/CompilationRun.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/RuntimeStateModel.ps1",
         "tools/lib/mir4/ProcessIR.ps1",
@@ -778,6 +779,23 @@
         "tools/lib/mir4/TargetCompiler.ps1",
         "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
         "validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1",
+        "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-semantic-compiler-w03",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json",
+        "spec/schemas/mir4-compilation-run-v1.schema.json",
+        "tools/lib/mir4/NormalizedCompiler.ps1",
+        "tools/lib/mir4/TargetCompiler.ps1",
+        "tools/lib/mir4/CompilationRun.ps1",
+        "tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1",
+        "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
         "repository"
       ]
     },
