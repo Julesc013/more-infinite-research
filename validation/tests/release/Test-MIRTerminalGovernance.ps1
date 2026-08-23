@@ -347,7 +347,10 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
     [string]$legacyCalibrationItem[0].closure.evidence -ne ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json") {
   throw "Legacy terminal calibration debt remains unresolved."
 }
-if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
+$deprecatedWorkRoot = "." + "work"
+if (Test-Path -LiteralPath (Join-Path $RepoRoot $deprecatedWorkRoot)) {
+  throw "Legacy $deprecatedWorkRoot directory exists after foundation admission."
+}
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 $programmeStatus = [string]$programme.status

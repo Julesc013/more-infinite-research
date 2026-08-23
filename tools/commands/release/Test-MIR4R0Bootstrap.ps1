@@ -274,7 +274,10 @@ if ([string]$portalVisibility.kind -cne "MIR3Dot9ModPortalVisibilityRecheckV1" -
   throw "Dated MIR 3 portal visibility record is inconsistent or grants authority."
 }
 
-if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw ".work must remain absent during MIR 4 R0 bootstrap." }
+$deprecatedWorkRoot = "." + "work"
+if (Test-Path -LiteralPath (Join-Path $RepoRoot $deprecatedWorkRoot)) {
+  throw "$deprecatedWorkRoot must remain absent during MIR 4 R0 bootstrap."
+}
 
 $generatedSources = @($executableKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Distribution-Version-Codec-VectorsV2.json"

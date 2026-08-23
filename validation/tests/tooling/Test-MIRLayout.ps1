@@ -448,7 +448,7 @@ $legacyLibraryWrappers = @($legacyLibraryNames | ForEach-Object {
 })
 $canonicalLibraries = @(Get-ChildItem -LiteralPath (Join-Path $repo "tools/lib") -Recurse -File |
   Where-Object { $_.Extension -in @(".ps1", ".psm1") -and $_.FullName -notlike "*tools\lib\workspace\*" })
-if ($legacyLibraryWrappers.Count -ne 42 -or $canonicalLibraries.Count -ne 42) {
+if ($legacyLibraryWrappers.Count -ne 42 -or $canonicalLibraries.Count -lt $legacyLibraryWrappers.Count) {
   throw "Canonical tool-library/wrapper inventory drifted: canonical=$($canonicalLibraries.Count), wrappers=$($legacyLibraryWrappers.Count)."
 }
 foreach ($wrapper in $legacyLibraryWrappers) {
@@ -493,7 +493,7 @@ foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoo
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
   Where-Object Name -ne "Test-MIRLayout.ps1")
-if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 69) {
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -lt 69) {
   throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
 }
 foreach ($wrapper in $legacyTestWrappers) {

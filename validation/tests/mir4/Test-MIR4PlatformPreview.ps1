@@ -4,6 +4,13 @@ $repo=(Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
 Test-MIR4PlatformConformance -RepoRoot $repo|Out-Null
 if((ConvertTo-MIR4PlatformCanonicalJson ([ordered]@{empty=@()})) -cne '{"empty":[]}'){throw '[mir4-platform-canonical-empty-array]'}
+$lineEndingProbeRoot=Join-Path $repo 'build/results/mir4-platform-line-ending-probe'
+New-Item -ItemType Directory -Force -Path $lineEndingProbeRoot|Out-Null
+$lfProbe=Join-Path $lineEndingProbeRoot 'lf.txt'
+$crlfProbe=Join-Path $lineEndingProbeRoot 'crlf.txt'
+[IO.File]::WriteAllBytes($lfProbe,[Text.UTF8Encoding]::new($false).GetBytes("alpha`nbeta`n"))
+[IO.File]::WriteAllBytes($crlfProbe,[Text.UTF8Encoding]::new($false).GetBytes("alpha`r`nbeta`r`n"))
+if((Get-MIR4PlatformInputSha256 $lfProbe)-cne(Get-MIR4PlatformInputSha256 $crlfProbe)){throw '[mir4-platform-input-line-ending-invariance]'}
 
 $platform=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec\platform\mir4-preview-v0\platform.json')|ConvertFrom-Json
 if(@($platform.components).Count -lt 23){throw '[mir4-platform-components] Expected the complete hybrid component inventory.'}

@@ -74,7 +74,7 @@ function Get-MIR4RepositoryPathClass {
   if ($path -match '^(fixtures/|validation/|tests/|examples/)') { return 'test-fixture' }
   if ($path -match '^(docs/|governance/|contracts/|targets/|modules/|assurance/|changes/|releases/)') { return 'generated-projection' }
   if ($path -match '^(\.github/|tools/|scripts/|prototypes/|migrations/|locale/|src/)' -or $path -match '^(data|settings)(-updates|-final-fixes)?\.lua$' -or $path -eq 'control.lua') { return 'executable-source' }
-  if ($path -match '^(dist/|approved-delta/)' -or $path.EndsWith('.zip')) { return 'archive' }
+  if ($path -match '^dist/' -or $path.EndsWith('.zip')) { return 'archive' }
   if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','README.md','LICENSE','changelog.txt','info.json','thumbnail.png','todo.md')) { return 'normative-authority' }
   return 'unknown'
 }

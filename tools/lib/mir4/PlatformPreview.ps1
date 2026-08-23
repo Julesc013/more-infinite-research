@@ -73,6 +73,17 @@ function Get-MIR4PlatformFileSha256 {
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Get-MIR4PlatformInputSha256 {
+  param([Parameter(Mandatory)][string]$Path)
+  $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+  try { $text = $strictUtf8.GetString([IO.File]::ReadAllBytes($Path)) }
+  catch { throw "[mir4-platform-input-encoding] $Path" }
+  $canonical = $text.Replace("`r`n", "`n").Replace("`r", "`n")
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try { return ([BitConverter]::ToString($sha.ComputeHash($strictUtf8.GetBytes($canonical))).Replace('-', '').ToLowerInvariant()) }
+  finally { $sha.Dispose() }
+}
+
 function ConvertTo-MIR4PlatformCanonicalValue {
   param($Value)
   if ($null -eq $Value) { return $null }
@@ -128,7 +139,7 @@ function Get-MIR4PlatformInputs {
     foreach ($relative in $script:MIR4PlatformInputPaths) {
       $path = Join-Path $repo $relative
       if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-platform-input-missing] $relative" }
-      [ordered]@{ path=$relative; sha256=(Get-MIR4PlatformFileSha256 $path) }
+      [ordered]@{ path=$relative; sha256=(Get-MIR4PlatformInputSha256 $path) }
     }
   )
 }

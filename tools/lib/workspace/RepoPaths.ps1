@@ -416,10 +416,14 @@ function New-MIRLayoutManifest {
 
   $caseCollisions = @($rows | Group-Object { $_.path.ToLowerInvariant() } | Where-Object Count -gt 1)
   $gitLinks = @($rows | Where-Object git_mode -eq "120000")
+  $localJunctionRoots = @('.git', '.worktrees', 'build') | ForEach-Object {
+    (Join-Path $repo $_).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  }
   $junctions = @(
     Get-ChildItem -LiteralPath $repo -Directory -Force -Recurse -ErrorAction SilentlyContinue |
       Where-Object {
-        $_.FullName -notlike "$(Join-Path $repo '.git')*" -and
+        $candidatePath = $_.FullName
+        @($localJunctionRoots | Where-Object { $candidatePath.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }).Count -eq 0 -and
         ($_.Attributes -band [IO.FileAttributes]::ReparsePoint)
       }
   )

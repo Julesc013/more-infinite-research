@@ -567,7 +567,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-2-5-10-to-2-5-11
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.10"
     additional_source_versions: ["2.5.9", "2.5.5"]
     target_candidate: "2.5.11"

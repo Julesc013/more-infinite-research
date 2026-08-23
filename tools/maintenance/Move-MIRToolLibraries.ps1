@@ -44,6 +44,10 @@ function Get-MIRActiveToolFiles {
     $relative -notlike ".mir/performance-campaigns/*" -and
     $relative -notlike "docs/archive/*" -and
     $relative -notlike "docs/releases/*" -and
+    $relative -notin @(
+      "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+      "validation/tests/release/Test-MIRTerminalShadowProjection.ps1"
+    ) -and
     $relative -ne "README.md" -and
     $relative -ne "tools/maintenance/Move-MIRToolLibraries.ps1" -and
     $relative -ne ".mir/control/aliases.yml"
