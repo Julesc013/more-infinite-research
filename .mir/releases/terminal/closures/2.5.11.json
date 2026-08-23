@@ -6,7 +6,7 @@
   "package_visible": false,
   "frozen_manifest": {
     "path": ".mir/releases/records/2.5.11.json",
-    "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1"
+    "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145"
   },
   "review": {
     "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
@@ -15,7 +15,7 @@
   },
   "seal": {
     "path": ".mir/releases/records/2.5.11.json",
-    "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1",
+    "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145",
     "status": "deterministically-reconstructed-and-publicly-verified"
   },
   "tag": {
@@ -35,5 +35,5 @@
     "authenticated_redownload": "pending"
   },
   "final_channel_state": "github-published-and-verified-mod-portal-custody-pending",
-  "record_sha256": "C9BBC1145CB7F4DA7119E4B7E8E37CA7EF379040BF6327156A3723EE53771FFA"
+  "record_sha256": "059D15DA9A8408405B631F23592693F6E48B1995A7D9E91DCD2BA137E32E40F8"
 }

@@ -8,7 +8,7 @@
   "capture_tool": {
     "path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
     "version": "2",
-    "sha256": "11DA1BE6281210B54C9E2522EF015DF5B02D1B3F784E6660B13F45AB02B2C072"
+    "sha256": "1EDC6192E52ED41A67C106D1A54C22DB6F1EC032924FE30A5085E4A9A98A21E4"
   },
   "foundation": {
     "release": "2.5.10",
@@ -24,13 +24,20 @@
     "entries": 303,
     "tag": "2.5.11"
   },
-  "input_root_sha256": "6A0DE8F852CBCA15C8B6320F0D1ED3B9FA7AD2FB668CF59CAC2A8FCC5DCCD786",
+  "input_root_sha256": "66E331CE620FBE5CF1395EDE2486FC667EDC209959B856B63C4B8A1E9CD1DAB1",
   "files": [
     {
       "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
       "source_path": ".mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
       "sha256": "9FE6CAE3D01263C4235232F37BAA02C17CFF0136E0C4D939F6957B0E236726F5",
       "bytes": 2383,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/deltas/2.5.10-to-2.5.11.json",
+      "source_path": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
+      "sha256": "4531BBF9BFA60BAAF0F1EA6CE64FF7DF1DE292214250E532656AA0FEF31A5563",
+      "bytes": 44174,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -64,8 +71,8 @@
     {
       "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
       "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
-      "sha256": "3600FB92ED0E636EC40C56BC7CDA0F88CC166B776727306F8CB9BF3D16BC37EF",
-      "bytes": 2087,
+      "sha256": "8C0271EAFE06412037583771ED2384D1C6BC57EC3848F7246469D06ED39B907F",
+      "bytes": 2093,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -85,8 +92,8 @@
     {
       "logical_path": "authority/.mir/releases/records/2.5.11.json",
       "source_path": ".mir/releases/records/2.5.11.json",
-      "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1",
-      "bytes": 3147,
+      "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145",
+      "bytes": 3153,
       "role": "post-terminal-hotfix-authority"
     },
     {
@@ -106,8 +113,8 @@
     {
       "logical_path": "authority/.mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
       "source_path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
-      "sha256": "2AF971474C83186D902627AF2D4CC029AE619A6841FD536917F5FCB198A5EFDC",
-      "bytes": 4885,
+      "sha256": "A80B9935288B1D79BDAB630B3D14CDFE3B36BC0D1605C4B26316FB0720A48E3F",
+      "bytes": 4891,
       "role": "normalized-import-snapshot"
     },
     {
@@ -120,16 +127,9 @@
     {
       "logical_path": "authority/.mir/releases/terminal/closures/2.5.11.json",
       "source_path": ".mir/releases/terminal/closures/2.5.11.json",
-      "sha256": "87E87E3A067E0F2E71774F61BB1B795273C4CE2374C42B326B15002D8FA68B13",
+      "sha256": "127505377BA255C2F1F888A185DABC1D5739CA25D38A483CF146F4D76296BEB8",
       "bytes": 1606,
       "role": "release-closure"
-    },
-    {
-      "logical_path": "authority/approved-delta/2.5.10-to-2.5.11.json",
-      "source_path": "approved-delta/2.5.10-to-2.5.11.json",
-      "sha256": "4531BBF9BFA60BAAF0F1EA6CE64FF7DF1DE292214250E532656AA0FEF31A5563",
-      "bytes": 44174,
-      "role": "post-terminal-hotfix-authority"
     },
     {
       "logical_path": "authority/docs/releases/notes/release-notes-2.5.11.md",
@@ -148,16 +148,16 @@
     {
       "logical_path": "authority/tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
       "source_path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
-      "sha256": "11DA1BE6281210B54C9E2522EF015DF5B02D1B3F784E6660B13F45AB02B2C072",
-      "bytes": 14197,
+      "sha256": "1EDC6192E52ED41A67C106D1A54C22DB6F1EC032924FE30A5085E4A9A98A21E4",
+      "bytes": 14203,
       "role": "post-terminal-hotfix-authority"
     }
   ],
   "normalized_snapshot": {
     "logical_path": "authority/.mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
     "source_path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
-    "sha256": "2AF971474C83186D902627AF2D4CC029AE619A6841FD536917F5FCB198A5EFDC",
-    "bytes": 4885,
+    "sha256": "A80B9935288B1D79BDAB630B3D14CDFE3B36BC0D1605C4B26316FB0720A48E3F",
+    "bytes": 4891,
     "role": "normalized-import-snapshot"
   },
   "public_custody": {
@@ -181,5 +181,5 @@
     "open_findings": [],
     "mir4_behavioral_proof_required": true
   },
-  "record_sha256": "A98CE10D2A09B86A1C5D898C1D7C24EA1CEABB2F7F73EB909A71D6090610B535"
+  "record_sha256": "15323DD05DC3AEDC75C499EB3EC39218B80C90368254C049269B29F31C664D0C"
 }
