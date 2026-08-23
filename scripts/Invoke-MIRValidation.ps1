@@ -717,7 +717,20 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "mir4-mep-v0", "mir4-process-ir-v0", "museum", "run-profiles")
+  $nonModFixtureDirs = @(
+    "compat-matrix",
+    "golden-plans",
+    "mir4-api-v0",
+    "mir4-assurance-scale-v1",
+    "mir4-historical-succession-v1",
+    "mir4-inspector-compatibility-v1",
+    "mir4-mep-v0",
+    "mir4-mep-v1",
+    "mir4-process-ir-v0",
+    "mir4-process-ir-v1",
+    "museum",
+    "run-profiles"
+  )
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
