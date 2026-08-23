@@ -317,7 +317,7 @@ function New-MIR4EffectChannelRegistryV1 {
         id=[string]$source.id;class=[string]$source.class;subject=[string]$source.subject
         value_domain=$source.value_domain;composition_law=$source.composition_law;neutral_value=$source.neutral_value;repeatability=$source.repeatability;saturation=$source.saturation;bounds=$source.bounds
         target_representation=[string]$source.target_representation;runtime_owner=$source.runtime_owner;migration=[string]$source.migration;presentation=[string]$source.presentation;proof=[string]$source.proof
-        owner_ref=[ordered]@{path=[string]$source.owner_path;sha256=((Get-FileHash -LiteralPath $ownerPath -Algorithm SHA256).Hash.ToLowerInvariant())}
+        owner_ref=[ordered]@{path=[string]$source.owner_path;sha256=(Get-MIR4PlatformInputSha256 $ownerPath)}
         disposition=[string]$source.disposition;maturity='developer-preview';package_visible=$false;semantic_owner_preserved=$true;digest=''
       }
       Add-MIR4ProcessIRDigest $row | Out-Null
@@ -393,7 +393,7 @@ function New-MIR4W06Records {
   foreach($relative in Get-MIR4W06FixturePaths){
     $input=Read-MIR4CanonicalRecipeFactInputV1 -RepoRoot $repo -Path $relative;$ir=New-MIR4ProcessIRV1 -InputRecord $input -RepoRoot $repo;$irs[[string]$input.fixture_id]=$ir
     $actual=[string]$ir.overall_classification;$actualDisposition=[string]$ir.terminal_disposition
-    $fixtureRows += [ordered]@{fixture_id=[string]$input.fixture_id;path=$relative;sha256=((Get-FileHash -LiteralPath (Join-Path $repo $relative) -Algorithm SHA256).Hash.ToLowerInvariant());expected_classification=[string]$input.expected.classification;actual_classification=$actual;expected_disposition=[string]$input.expected.disposition;actual_disposition=$actualDisposition;graph_digest=[string]$ir.graph_digest;risk_fingerprints=@($ir.processes.risk.fingerprint);passed=($actual-ceq[string]$input.expected.classification-and$actualDisposition-ceq[string]$input.expected.disposition)}
+    $fixtureRows += [ordered]@{fixture_id=[string]$input.fixture_id;path=$relative;sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo $relative));expected_classification=[string]$input.expected.classification;actual_classification=$actual;expected_disposition=[string]$input.expected.disposition;actual_disposition=$actualDisposition;graph_digest=[string]$ir.graph_digest;risk_fingerprints=@($ir.processes.risk.fingerprint);passed=($actual-ceq[string]$input.expected.classification-and$actualDisposition-ceq[string]$input.expected.disposition)}
   }
   $safe=$irs['ordinary-safe'];$unsafe=$irs['unbounded-positive-cycle'];$unknown=$irs['unsupported-unknown']
   $safeAssessment=Test-MIR4SynthesisCandidateV1 -ProcessIR $safe -Constructor ContinueSeries -Mode Diagnose -ProcessId ([string]$safe.processes[0].identity.id) -Authority $authority

@@ -13,6 +13,7 @@ if(-not$records.parity.passed-or-not$records.parity.bilateral_gate.passed-or$rec
 if([string]$records.parity.scope-cne'synthetic-fixture-parity-only'-or[string]$records.parity.exact_target_status-cne'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'){throw '[mir4-w06-parity-scope]'}
 if(-not$records.parity.risk_parity.passed-or-not$records.parity.risk_parity.copied_not_reclassified){throw '[mir4-w06-risk-parity]'}
 if(@($records.parity.fixture_results|Where-Object{-not$_.passed}).Count-ne 0){throw '[mir4-w06-fixture-result]'}
+foreach($evidence in @($records.parity.evidence_refs)){if([string]$evidence.sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$evidence.path)))){throw "[mir4-w06-fixture-canonical-hash] $($evidence.path)"}}
 
 $complex=$records.fixture_irs['catalyst-container-bounded-cycle']
 if(@($complex.processes|Where-Object{$_.catalysts.Count-gt 0}).Count-ne 1-or@($complex.processes|Where-Object{$_.returned_containers.Count-gt 0}).Count-ne 1-or@($complex.processes|Where-Object{$_.productivity_sensitive}).Count-ne 1-or@($complex.processes|Where-Object{$_.self_intersection.Count-gt 0}).Count-ne 1){throw '[mir4-w06-process-shape]'}
@@ -34,6 +35,7 @@ $classes=@($records.effects.channels.class|Sort-Object -Unique)
 $expectedClasses=@('MEP-declared scripted channel','MIR runtime operator','compile-time policy','native modifier','opaque','recipe productivity')|Sort-Object
 if(($classes-join'|')-cne($expectedClasses-join'|')-or-not$records.effects.opaque_preserved){throw '[mir4-w06-effect-classes]'}
 foreach($channel in @($records.effects.channels)){foreach($field in @('subject','value_domain','composition_law','neutral_value','repeatability','saturation','bounds','target_representation','runtime_owner','migration','presentation','proof')){if($null-eq$channel.PSObject.Properties[$field]){throw "[mir4-w06-effect-field] $($channel.id):$field"}};if($channel.package_visible-or-not$channel.semantic_owner_preserved){throw "[mir4-w06-effect-boundary] $($channel.id)"}}
+foreach($channel in @($records.effects.channels)){if([string]$channel.owner_ref.sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$channel.owner_ref.path)))){throw "[mir4-w06-owner-canonical-hash] $($channel.id)"}}
 $opaque=@($records.effects.channels|Where-Object class -eq opaque)[0]
 if($null-ne$opaque.value_domain-or$null-ne$opaque.composition_law-or$null-ne$opaque.bounds-or[string]$opaque.disposition-cne'Preserve'){throw '[mir4-w06-opaque-preservation]'}
 

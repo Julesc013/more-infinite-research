@@ -30,7 +30,7 @@ function New-MIR4NormalizedTargetProviders {
       $profileDigest = if ($null -ne $profileProperty) {
         Get-MIR4PlatformDigest ([pscustomobject][ordered]@{factorio_line=[string]$target.factorio_line;profile=$profileProperty.Value})
       } elseif ($snapshot -and (Test-Path -LiteralPath (Join-Path $repo $snapshot) -PathType Leaf)) {
-        'sha256:' + (Get-MIR4PlatformFileSha256 (Join-Path $repo $snapshot))
+        'sha256:' + (Get-MIR4PlatformInputSha256 (Join-Path $repo $snapshot))
       } else { $null }
       $provider = [pscustomobject][ordered]@{
         kind = 'MIR4TargetProviderV0'; schema = 0; id = $targetKey; target_id = $id
@@ -42,7 +42,7 @@ function New-MIR4NormalizedTargetProviders {
         engine_lock = if ($planned) { [ordered]@{ version=[string]$planned.engine_lock.version; sha256=[string]$planned.engine_lock.executable_sha256; authority='MIR4-Bootstrap-Local-Candidate-PlanV3' } } elseif ($historicalTarget -and -not [string]::IsNullOrWhiteSpace([string]$historicalTarget.engine.version)) { [ordered]@{ version=[string]$historicalTarget.engine.version; sha256=[string]$historicalTarget.engine.sha256; authority='MIR4-Historical-Private-Candidate-AuthorizationV1' } } else { $null }
         profile = [ordered]@{ status=$profileStatus; authority=[string]$registry.profile_authority.path; authority_sha256=[string]$registry.profile_authority.sha256; digest=$profileDigest }
         provenance = @(
-          [ordered]@{role='identity-and-support';path='.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json';sha256=(Get-MIR4PlatformFileSha256 (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json'))},
+          [ordered]@{role='identity-and-support';path='.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json';sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json'))},
           [ordered]@{role='target-profile';path=[string]$registry.profile_authority.path;sha256=[string]$registry.profile_authority.sha256}
         )
         operations = @('identify','normalize-capabilities','explain-omissions','plan-private-candidate')
@@ -69,7 +69,7 @@ function New-MIR4LegacyNormalizedCompilationRuns {
         adapter = 'LegacyCompilerHostAdapterV1'; maturity = 'shadow'; input_digests = $inputs
         feature_manifest = if ($snapshot) { [ordered]@{ adapter='terminal-normalized-snapshot'; mode='read-only'; target=$provider.id; features=$snapshot.inventories.features; technologies=$snapshot.inventories.technologies; capability_omissions=@($snapshot.capability_omissions) } } else { [ordered]@{ adapter='terminal-normalized-snapshot'; mode='read-only'; target=$provider.id; status='unavailable' } }
         setting_spec = if ($snapshot) { [ordered]@{ adapter='terminal-settings-inventory'; mode='read-only'; target=$provider.id; settings=$snapshot.inventories.settings } } else { [ordered]@{ adapter='terminal-settings-inventory'; mode='read-only'; target=$provider.id; status='unavailable' } }
-        legacy_snapshot = if ($snapshot) { [ordered]@{ path=$snapshotPath; sha256=(Get-MIR4PlatformFileSha256 (Join-Path $repo $snapshotPath)); top_level_sections=@($snapshot.PSObject.Properties.Name | Sort-Object) } } else { $null }
+        legacy_snapshot = if ($snapshot) { [ordered]@{ path=$snapshotPath; sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo $snapshotPath)); top_level_sections=@($snapshot.PSObject.Properties.Name | Sort-Object) } } else { $null }
         parity_baseline = if ($snapshot) { [ordered]@{ release=[string]$snapshot.release; archive_sha256=[string]$snapshot.distribution.archive_sha256; content_sha256=[string]$snapshot.distribution.content_sha256; entries=[int]$snapshot.distribution.entries; expectation='semantic-identity-except-governed-presentation-overlay' } } else { $null }
         stages = @('target-provider','feature-manifest-adapter','setting-spec-adapter','normalized-contribution-model','safety-kernel','policy-engine','public-artifact-projection')
         result = if ($snapshot) { 'deterministic-predecessor-projection-ready' } else { 'blocked-missing-predecessor-snapshot' }
