@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-release-ledger-event.schema.json",
+  "title": "MIR 4 append-only release ledger event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "event_id",
+    "event_kind",
+    "occurred_at",
+    "subject",
+    "predecessor_event_sha256",
+    "payload_sha256",
+    "signing_namespace",
+    "signer_fingerprint"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4ReleaseLedgerEventV1" },
+    "event_id": { "type": "string", "pattern": "^MIR4-LEDGER-[0-9]{8}T[0-9]{6}Z-[A-Z0-9-]+$" },
+    "event_kind": {
+      "enum": [
+        "ReleaseIntent",
+        "SourceFreeze",
+        "TargetBuild",
+        "FocusedQualification",
+        "CandidateQualification",
+        "ManualAcceptance",
+        "IndependentAcceptance",
+        "Seal",
+        "Promotion",
+        "Tag",
+        "Publication",
+        "PublicByteVerification",
+        "Revocation"
+      ]
+    },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "subject": { "type": "string", "minLength": 1 },
+    "predecessor_event_sha256": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      ]
+    },
+    "payload_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "signing_namespace": { "const": "mir4-ledger" },
+    "signer_fingerprint": { "type": "string", "minLength": 1 }
+  }
+}

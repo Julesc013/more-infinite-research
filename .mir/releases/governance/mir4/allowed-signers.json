@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "kind": "MIR4AllowedSignersV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "awaiting-protected-key",
+  "rows": [],
+  "required_namespaces": [
+    "mir4-source",
+    "mir4-target",
+    "mir4-ledger"
+  ],
+  "secret_values_present": false
+}

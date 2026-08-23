@@ -34,7 +34,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json",
-      "sha256": "2613B8D6A76366CC94102E0108AEB3F03D89985A2760072226CC4C173DCA8B31"
+      "sha256": "E672118A8DEC241EA657C1B49EDA33B727AEFC296685FD47A9B784CBA5092786"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json",
@@ -74,7 +74,7 @@
     },
     {
       "path": ".mir/releases/records/2.5.11.json",
-      "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1"
+      "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145"
     },
     {
       "path": ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
@@ -90,7 +90,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json",
-      "sha256": "444EA96DF78A5965324B28C190BC9234FE3E9BB41898B98C20F8329902BFEE6B"
+      "sha256": "F1ACD005D0AAF409288800BC51A4C0E37B2D0BD99932CBDE95C1D0D9097BCC10"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
@@ -142,11 +142,11 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "2122558CA288BDD272C3FA2B4CE48883E439682F76BF56D2F16F19417743CC59"
+      "sha256": "09FD046F1BDF162B15ED2A935A8A74FCF17A97DAD5D40946D9A29F9F7FD88F55"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "6193E73D0E528DBC089A46D40CC5B12E72A8CC1D005490AA316C1CF9B43673C3"
+      "sha256": "66429810F0F19A38CDA0A81BB54FA97FC79271B5B14AFEBB33AC3990795259A4"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
@@ -158,7 +158,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
-      "sha256": "1B4B0D9442B853A01E20D066C3E404912D1C41A2D11B3D9AA9971AE91BA26592"
+      "sha256": "2B477D6792C91C2069763DC6CAA0C78370AE87268E9A06E3FCBBAC7EDCDF63A6"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json",
@@ -166,7 +166,7 @@
     },
     {
       "path": ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json",
-      "sha256": "FE2E02D6D649D57B4AF05BA3295342337E2A7BD60379C4DD26CAA82416396334"
+      "sha256": "32347ABD85A75079ECAF54D13357018C40EAECBB9906119C00ED0B2B8508F404"
     }
   ],
   "payload": {
@@ -195,5 +195,5 @@
     "package_delta": 0,
     "next_executable_task": "M4-003-f210-and-f200-materialization-and-reproof"
   },
-  "record_sha256": "3807FDB40753E9CD4DC9E0D44BF8A1FA3445A096CD955E7F985B22D716BDE436"
+  "record_sha256": "B32868ABD57D35C09C6AB79DC747F4268B407C4C05AD9E496645C290A2FE62CB"
 }

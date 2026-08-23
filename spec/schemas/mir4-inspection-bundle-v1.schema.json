@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/mir4-inspection-bundle-v1.schema.json",
+  "title": "MIR 4 Inspection Bundle V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "source_identity", "maturity", "authority", "input_digests", "bounds", "sections", "section_count", "local_file_api_only", "network_or_upload_authorized", "raw_mutable_compiler_objects", "idle_runtime_work", "package_visible", "public_release_proof", "player_mutation_authorized", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4InspectionBundleV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "source_identity": {"type": ["object", "null"]},
+    "maturity": {"const": "developer-preview"},
+    "authority": {"const": "W07-copied-bounded-read-only-DTOs"},
+    "input_digests": {"type": "object", "minProperties": 8, "maxProperties": 8, "additionalProperties": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
+    "bounds": {"type": "object", "required": ["default_page_items", "max_page_items", "max_sections", "max_items_per_section", "max_string_bytes", "max_object_depth", "cursor_format", "copy_mode"]},
+    "sections": {
+      "type": "array", "minItems": 11, "maxItems": 11,
+      "items": {"type": "object", "additionalProperties": false, "required": ["id", "label", "item_count", "returned", "truncated", "items"], "properties": {"id": {"type": "string", "pattern": "^[a-z][a-z0-9-]+$"}, "label": {"type": "string", "minLength": 1}, "item_count": {"type": "integer", "minimum": 0}, "returned": {"type": "integer", "minimum": 0, "maximum": 100}, "truncated": {"type": "boolean"}, "items": {"type": "array", "maxItems": 100}}}
+    },
+    "section_count": {"const": 11},
+    "local_file_api_only": {"const": true},
+    "network_or_upload_authorized": {"const": false},
+    "raw_mutable_compiler_objects": {"const": false},
+    "idle_runtime_work": {"const": false},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

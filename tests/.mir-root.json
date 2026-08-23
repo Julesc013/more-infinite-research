@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "MIR4VisibleRootProjectionV1",
+  "id": "tests",
+  "path": "tests",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    "validation/tests",
+    "validation/tests.yml"
+  ],
+  "writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

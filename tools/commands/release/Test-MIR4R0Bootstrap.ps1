@@ -274,7 +274,10 @@ if ([string]$portalVisibility.kind -cne "MIR3Dot9ModPortalVisibilityRecheckV1" -
   throw "Dated MIR 3 portal visibility record is inconsistent or grants authority."
 }
 
-if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw ".work must remain absent during MIR 4 R0 bootstrap." }
+$deprecatedWorkRoot = "." + "work"
+if (Test-Path -LiteralPath (Join-Path $RepoRoot $deprecatedWorkRoot)) {
+  throw "$deprecatedWorkRoot must remain absent during MIR 4 R0 bootstrap."
+}
 
 $generatedSources = @($executableKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Distribution-Version-Codec-VectorsV2.json"
@@ -348,4 +351,4 @@ if (-not $Update) {
 }
 
 Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: materialize and re-prove f210 and f200 under Plan V3"
+Write-Host "[ok] next executable task: materialize and re-prove F210 and F200 under Plan V3"

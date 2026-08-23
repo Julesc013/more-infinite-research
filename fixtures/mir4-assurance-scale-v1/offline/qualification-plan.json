@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "kind": "MIR4W08DummyQualificationPlanV1",
+  "non_production": true,
+  "tasks": [
+    {"id": "dummy.static", "depends_on": []},
+    {"id": "dummy.package", "depends_on": ["dummy.static"]},
+    {"id": "dummy.verify", "depends_on": ["dummy.package"]}
+  ]
+}

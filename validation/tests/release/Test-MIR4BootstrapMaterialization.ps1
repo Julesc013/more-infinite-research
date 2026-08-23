@@ -252,7 +252,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
     Assert-Throws {
       & (Join-Path $RepoRoot 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') -RepoRoot $RepoRoot -Target f210 -OutputRoot $governedRoot -Check
     } 'The superseded pre-3.2.11 f210 candidate was still accepted.'
-    Write-Host 'Superseded pre-3.2.11 f210 candidate correctly rejected; capsule tamper probes deferred until rebuild.'
+    Write-Host 'Superseded pre-3.2.11 F210 candidate correctly rejected; capsule tamper probes deferred until rebuild.'
   } else {
   $null = & (Join-Path $RepoRoot 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') `
     -RepoRoot $RepoRoot -Target f210 -OutputRoot $governedRoot -Check

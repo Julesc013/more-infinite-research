@@ -306,14 +306,24 @@ function Get-MIRLayoutClass {
   param([Parameter(Mandatory)][string]$Path)
   if (Test-MIRPackagePath -Path $Path) { return "product-package" }
   foreach ($row in @(
+    @("governance/", "repository-shadow-projection"),
+    @("contracts/", "repository-shadow-projection"),
     @("spec/", "product-specification"),
+    @("src/", "repository-shadow-projection"),
+    @("targets/", "repository-shadow-projection"),
+    @("modules/", "repository-shadow-projection"),
+    @("sdk/", "developer-sdk-projection"),
+    @("tests/", "repository-shadow-projection"),
+    @("assurance/", "repository-shadow-projection"),
+    @("changes/", "repository-shadow-projection"),
+    @("releases/", "repository-shadow-projection"),
+    @("examples/", "repository-shadow-projection"),
     @("validation/", "validation"),
     @("verification/", "legacy-validation"),
     @("tools/", "tooling"),
     @("scripts/", "legacy-tooling"),
     @("fixtures/", "fixtures"),
     @("docs/", "documentation"),
-    @("approved-delta/", "legacy-release-delta"),
     @(".mir/", "control-plane"),
     @("dist/", "distribution"),
     @(".github/", "automation"),
@@ -322,7 +332,7 @@ function Get-MIRLayoutClass {
   )) {
     if ($Path.StartsWith($row[0], [StringComparison]::Ordinal)) { return $row[1] }
   }
-  if ($Path -in @(".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "todo.md")) { return "repository-policy" }
+  if ($Path -in @(".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "todo.md", "mir.toml", "mir.lock")) { return "repository-policy" }
   return "unclassified"
 }
 
@@ -389,7 +399,7 @@ function New-MIRLayoutManifest {
     } else {
       "canonical"
     }
-    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/)" -or $path -eq "todo.md"
+    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("todo.md", "mir.lock")
     $rows.Add([pscustomobject][ordered]@{
       path=$path
       class=$class
@@ -406,10 +416,14 @@ function New-MIRLayoutManifest {
 
   $caseCollisions = @($rows | Group-Object { $_.path.ToLowerInvariant() } | Where-Object Count -gt 1)
   $gitLinks = @($rows | Where-Object git_mode -eq "120000")
+  $localJunctionRoots = @('.git', '.worktrees', 'build') | ForEach-Object {
+    (Join-Path $repo $_).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  }
   $junctions = @(
     Get-ChildItem -LiteralPath $repo -Directory -Force -Recurse -ErrorAction SilentlyContinue |
       Where-Object {
-        $_.FullName -notlike "$(Join-Path $repo '.git')*" -and
+        $candidatePath = $_.FullName
+        @($localJunctionRoots | Where-Object { $candidatePath.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }).Count -eq 0 -and
         ($_.Attributes -band [IO.FileAttributes]::ReparsePoint)
       }
   )

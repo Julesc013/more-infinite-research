@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "kind": "MIR4AssuranceScaleProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "wave": "W08",
+  "maturity": "developer-preview",
+  "authority": "read-only-control-plane-and-assurance-crosswalk",
+  "semantic_authority": false,
+  "evidence_ledger_authority": false,
+  "verification_plan_authority": false,
+  "player_package_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "runtime_state_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "source_freeze_authorized": false,
+  "production_signing_or_sealing_authorized": false,
+  "promotion_or_tag_authorized": false,
+  "network_or_upload_authorized": false,
+  "publication_authorized": false,
+  "identity_kinds": [
+    "CaptureKey",
+    "CompilationKey",
+    "RealizationKey",
+    "EvaluationKey"
+  ],
+  "observation_slices": [
+    "recipe-facts",
+    "process-ir",
+    "technology-graph",
+    "science-lab-graph",
+    "ownership",
+    "settings",
+    "runtime-state",
+    "diagnostics",
+    "presentation",
+    "locale",
+    "package-identity"
+  ],
+  "control_plane_authorities": {
+    "policy": ".mir/control-plane/control-plane.json",
+    "domains": ".mir/control-plane/domains.json",
+    "ownership": ".mir/control-plane/ownership.json",
+    "freshness": ".mir/control-plane/freshness.json",
+    "revocation": ".mir/control-plane/evidence-revocations.json",
+    "mutation_calibration": ".mir/control-plane/mutation-calibration.json"
+  },
+  "legacy_assurance_authorities": {
+    "policy": ".mir/assurance.json",
+    "test_catalog": "validation/tests.yml",
+    "trust": "validation/trust.json"
+  },
+  "rules": {
+    "impact_false_negative_budget": 0,
+    "unknown_impact_policy": "select-all-and-fail-governance",
+    "slice_absence_policy": "explicit-unavailable-never-infer",
+    "partial_recovery_policy": "exact-identity-target-candidate-abi-trust-unrevoked-only",
+    "nondeterminism_policy": "same-identity-conflict-blocks",
+    "proof_cover_policy": "cover-all-mandatory-obligations-without-trust-or-environment-collapse",
+    "publisher_policy": "verify-before-copy-and-idempotently-reconcile-exact-bytes"
+  },
+  "deadline_classes": [
+    {"id": "minor", "hard_seconds": 86400, "design_p95_seconds": 64800, "design_headroom_seconds": 21600},
+    {"id": "patch", "hard_seconds": 21600, "design_p95_seconds": 16200, "design_headroom_seconds": 5400},
+    {"id": "hotfix", "hard_seconds": 3600, "design_p95_seconds": 2700, "design_headroom_seconds": 900}
+  ],
+  "manual_requirements": [
+    "maintainer-interactive-review",
+    "protected-signing-authority",
+    "independent-release-acceptance"
+  ],
+  "offline_drill_operations": [
+    "repository-restoration",
+    "package-construction-rehearsal",
+    "qualification-planning",
+    "signing-verifier-path",
+    "non-production-seal-rehearsal",
+    "release-capsule-export",
+    "local-file-distribution",
+    "lan-file-distribution"
+  ],
+  "dummy_publisher_roots": [
+    "inbox",
+    "verified",
+    "outbox",
+    "receipt"
+  ],
+  "dummy_publisher_forbidden_capabilities": [
+    "build",
+    "mutate",
+    "source-access",
+    "real-candidate-access",
+    "factorio-execution",
+    "git-execution",
+    "credential-access",
+    "production-key-access",
+    "network",
+    "production-seal",
+    "promotion",
+    "tag",
+    "upload",
+    "publication"
+  ],
+  "fixtures": "fixtures/mir4-assurance-scale-v1",
+  "outputs": [
+    "MIR4_ASSURANCE_SCALE_RESULT.json",
+    "MIR4_RELEASE_BUDGET_PLAN.json",
+    "MIR4_OFFLINE_DRILL_RESULT.json"
+  ],
+  "initial_blockers": [
+    "BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT",
+    "BLOCKED-MISSING-TIMING-EVIDENCE",
+    "BLOCKED-MISSING-WORKER-CAPACITY-EVIDENCE",
+    "BLOCKED-HUMAN-SECRET-INPUT"
+  ],
+  "rollback": "Remove only W08 programme, package-excluded tooling, schemas, fixtures, documentation, validation, and build/mir4/m4c02-assurance-scale output. Preserve Control Plane v5, Assurance v4, evidence indexes, candidates, release state, packages, source identity, and governance unchanged."
+}

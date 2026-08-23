@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/mir4-compatibility-subject-ledger-v1.schema.json",
+  "title": "MIR 4 Compatibility Subject Ledger V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "source_identity", "maturity", "authority", "input_digests", "evidence_policy", "subject_count", "subjects", "target_dispositions", "blanket_support_boolean_present", "package_visible", "public_release_proof", "player_mutation_authorized", "public_support_authorized", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CompatibilitySubjectLedgerV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "source_identity": {"type": ["object", "null"]},
+    "maturity": {"const": "developer-preview"},
+    "authority": {"const": "W07-normalized-private-assessment-only"},
+    "input_digests": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "evidence_policy": {"type": "object", "required": ["inherited_sol07", "synthetic", "missing_closure", "public_claim_transfer_authorized"]},
+    "subject_count": {"const": 10},
+    "subjects": {
+      "type": "array", "minItems": 10, "maxItems": 10,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["ecosystem", "subject_id", "subject_kind", "target_bindings", "capabilities_or_streams", "availability", "hard_safety", "implementation", "target_portability", "migration", "proof", "claim", "evidence", "revocation", "blockers"],
+        "properties": {
+          "ecosystem": {"type": "string", "minLength": 1},
+          "subject_id": {"enum": ["base-and-official", "aai", "bz", "industrial-revolution-3", "industrial-revolution-4", "k2-k2so", "space-exploration", "bob", "angel", "pyanodons"]},
+          "subject_kind": {"const": "ecosystem-profile"},
+          "target_bindings": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"type": "object", "required": ["target", "factorio_line", "distribution_version", "provider_authority", "provider_authority_sha256", "provider_identity_digest"]}},
+          "capabilities_or_streams": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "string"}},
+          "availability": {"type": "object", "required": ["state", "qualified_surface", "excluded_surface"]},
+          "hard_safety": {"type": "object", "required": ["state", "override_authorized"]},
+          "implementation": {"type": "object", "required": ["preferred_safe_choice", "automatic_mutation", "exact_fragment_admitted"]},
+          "target_portability": {"type": "object", "required": ["state", "cross_target_transfer_authorized"]},
+          "migration": {"type": "object", "required": ["state", "execution_authorized"]},
+          "proof": {"type": "object", "required": ["state", "evidence", "synthetic_can_satisfy_exact", "public_release_proof"]},
+          "claim": {"type": "object", "required": ["source_level", "state", "eligible", "public_authorized", "blanket"]},
+          "evidence": {"type": "object", "required": ["authority_path", "authority_sha256", "status", "scenario_ids"]},
+          "revocation": {"type": "object", "required": ["state", "actual_claim_revocation_authority", "invalid_if"]},
+          "blockers": {"type": "array", "maxItems": 8, "items": {"type": "string"}}
+        }
+      }
+    },
+    "target_dispositions": {"type": "array", "minItems": 17, "maxItems": 17, "items": {"type": "object", "required": ["target", "factorio_line", "distribution_version", "provider_identity_digest", "disposition", "cross_target_transfer_authorized"]}},
+    "blanket_support_boolean_present": {"const": false},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "public_support_authorized": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

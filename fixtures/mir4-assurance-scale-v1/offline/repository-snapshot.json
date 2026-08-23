@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "kind": "MIR4W08DummyRepositorySnapshotV1",
+  "non_production": true,
+  "files": [
+    {"path": "README.md", "content": "# Dummy MIR W08 restored repository\n"},
+    {"path": "governance/authority.json", "content": "{\"authority\":\"dummy-w08-only\",\"production\":false}\n"},
+    {"path": "src/placeholder.txt", "content": "offline restoration fixture\n"}
+  ]
+}

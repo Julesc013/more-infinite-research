@@ -1,0 +1,161 @@
+{
+  "schema": 1,
+  "kind": "MIR4InspectorCompatibilityProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "wave": "W07",
+  "maturity": "developer-preview",
+  "authority": "private-package-excluded-inspection-and-assessment-only",
+  "semantic_authority": false,
+  "terminal_compatibility_policy_authority": false,
+  "terminal_claim_authority": false,
+  "player_package_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "runtime_state_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "planner_or_emitter_admission_authorized": false,
+  "safety_kernel_override_authorized": false,
+  "arbitrary_code_generation_authorized": false,
+  "network_or_upload_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "inputs": [
+    ".mir/compatibility.yml",
+    "spec/compatibility/claims.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json"
+  ],
+  "inspector_sections": [
+    "Overview",
+    "Capabilities",
+    "Research streams",
+    "Recipe/productivity coverage",
+    "Compatibility",
+    "Diagnostics",
+    "Settings/profile",
+    "Target dispositions",
+    "Migration status",
+    "Proof status",
+    "Export"
+  ],
+  "inspection_bounds": {
+    "default_page_items": 25,
+    "max_page_items": 50,
+    "max_sections": 11,
+    "max_items_per_section": 100,
+    "max_string_bytes": 4096,
+    "max_object_depth": 8,
+    "cursor_format": "decimal-offset",
+    "copy_mode": "canonical-json-deep-copy"
+  },
+  "forbidden_import_fields": [
+    "callback",
+    "callbacks",
+    "compiler_context",
+    "CompilerContext",
+    "data_raw",
+    "executor",
+    "executors",
+    "function",
+    "functions",
+    "operation",
+    "operations",
+    "prototype",
+    "prototypes",
+    "prototype_write",
+    "safety_kernel",
+    "secret",
+    "secrets"
+  ],
+  "support_dimensions": [
+    "availability",
+    "hard_safety",
+    "implementation",
+    "target_portability",
+    "migration",
+    "proof",
+    "claim",
+    "evidence",
+    "revocation"
+  ],
+  "named_ecosystems": [
+    "base-and-official",
+    "aai",
+    "bz",
+    "industrial-revolution-3",
+    "industrial-revolution-4",
+    "k2-k2so",
+    "space-exploration",
+    "bob",
+    "angel",
+    "pyanodons"
+  ],
+  "safe_choice_priority": [
+    "generic-compiler-correction",
+    "generic-effect-channel-or-operator",
+    "target-capability-or-provider",
+    "ecosystem-profile",
+    "exact-version-fragment",
+    "preserve-review-or-omit",
+    "experimental-trusted-adapter"
+  ],
+  "factory_pipeline": [
+    "support-bundle",
+    "subject-inventory",
+    "safe-bounded-choices",
+    "target-portability-preview",
+    "plan-and-explanation",
+    "standalone-compatibility-zip",
+    "validation"
+  ],
+  "factory_zip_allowlist": [
+    "manifest.json",
+    "support-bundle.json",
+    "subject-ledger.json",
+    "portability-preview.json",
+    "plan.json",
+    "explanation.json",
+    "provenance.json",
+    "schemas/mir4-compatibility-subject-ledger-v1.schema.json",
+    "schemas/mir4-compatibility-factory-plan-v1.schema.json"
+  ],
+  "factory_zip_forbidden_extensions": [
+    ".lua",
+    ".ps1",
+    ".psm1",
+    ".dll",
+    ".exe",
+    ".bat",
+    ".cmd",
+    ".js",
+    ".mjs",
+    ".cjs"
+  ],
+  "evidence_statuses": {
+    "synthetic": "synthetic-fixture/nonclaim-preview",
+    "missing_closure": "review-required/no-governed-exact-archive-closure",
+    "exact_private": "private-exact-evidence",
+    "inherited_sol07": "historical-development-evidence-nontransferable"
+  },
+  "blockers": [
+    {
+      "id": "BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER",
+      "subject": "industrial-revolution-4",
+      "reason": "No governed exact IR4 repository, archive closure, target, accepted scope, and independent production consumer are locally available."
+    },
+    {
+      "id": "BLOCKED-EXACT-PROFILE-CLAIM-TRANSFER",
+      "subject": "all-named-ecosystems",
+      "reason": "SOL07 is historical private development evidence and cannot transfer public claim or release authority to the W07 source or candidate."
+    }
+  ],
+  "outputs": [
+    "MIR4_INSPECTOR_WORKBENCH_RESULT.json",
+    "MIR4_COMPATIBILITY_SUBJECT_LEDGER.json"
+  ],
+  "rollback": "Remove W07 authority, package-excluded libraries, schemas, fixtures, V1 Inspector assets, tests, records, and data-only factory bundles. Preserve V0, terminal compatibility policy and claims, player prototypes, runtime, migrations, W02-W06, and all package-visible source unchanged."
+}

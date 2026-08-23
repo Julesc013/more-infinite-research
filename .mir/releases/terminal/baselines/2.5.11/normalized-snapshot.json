@@ -57,7 +57,7 @@
     "technologies": {
       "foundation_snapshot": ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
       "emergency_delta": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
-      "approved_delta": "approved-delta/2.5.10-to-2.5.11.json",
+      "approved_delta": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
       "closed_findings": [
         ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
         ".mir/releases/emergency/findings/MIR3-TERM-0034.json"
@@ -131,5 +131,5 @@
     "promoted_claims": 0,
     "rule": "preserve-2.5.10-claim-envelope-and-add-no-hotfix-claims"
   },
-  "record_sha256": "D61C0EC9B3F43ADDA743B89DEC883424F7768221DC2783A244B64C19DBB2FF44"
+  "record_sha256": "1EFA0686034369DDEA79C54EAD7B91C05698357AEBC6AA4672EDE0E782C4B4F8"
 }

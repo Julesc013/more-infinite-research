@@ -1,0 +1,60 @@
+{
+  "schema": 6,
+  "kind": "MIR4TargetRegistryV6",
+  "status": "accepted-private-platform-current",
+  "programme_id": "M4C02-09-24H",
+  "package_visible": false,
+  "supersedes": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",
+    "sha256": "b461b244a72664f53c9a0444f7d22ba56014e253fed687897b74ee652f608d1a",
+    "disposition": "immutable-historical-composite-registry"
+  },
+  "profile_authority": {
+    "path": ".mir/targets.json",
+    "sha256": "ba8bca730845d4479b672c6cc71300320c3281959b5c94e5827d0a4b6cfc58be"
+  },
+  "identities": [
+    {"target":"f210","target_id":"factorio-2.1","factorio_line":"2.1","distribution_target_code":"210","distribution_version":"4.0.21000","mir3_predecessor":"3.2.11"},
+    {"target":"f200","target_id":"factorio-2.0","factorio_line":"2.0","distribution_target_code":"200","distribution_version":"4.0.20000","mir3_predecessor":"2.5.11"},
+    {"target":"f110","target_id":"factorio-1.1","factorio_line":"1.1","distribution_target_code":"110","distribution_version":"4.0.11000","mir3_predecessor":"1.9.9"},
+    {"target":"f100","target_id":"factorio-1.0","factorio_line":"1.0","distribution_target_code":"100","distribution_version":"4.0.10000","mir3_predecessor":"1.8.9"},
+    {"target":"f018","target_id":"factorio-0.18","factorio_line":"0.18","distribution_target_code":"018","distribution_version":"4.0.01800","mir3_predecessor":"1.7.9"},
+    {"target":"f017","target_id":"factorio-0.17","factorio_line":"0.17","distribution_target_code":"017","distribution_version":"4.0.01700","mir3_predecessor":"1.7.9"},
+    {"target":"f016","target_id":"factorio-0.16","factorio_line":"0.16","distribution_target_code":"016","distribution_version":"4.0.01600","mir3_predecessor":"1.6.9"},
+    {"target":"f015","target_id":"factorio-0.15","factorio_line":"0.15","distribution_target_code":"015","distribution_version":"4.0.01500","mir3_predecessor":"1.5.9"},
+    {"target":"f014","target_id":"factorio-0.14","factorio_line":"0.14","distribution_target_code":"014","distribution_version":"4.0.01400","mir3_predecessor":"1.4.9"},
+    {"target":"f013","target_id":"factorio-0.13","factorio_line":"0.13","distribution_target_code":"013","distribution_version":"4.0.01300","mir3_predecessor":"1.3.9"},
+    {"target":"f012","target_id":"factorio-0.12","factorio_line":"0.12","distribution_target_code":"012","distribution_version":"4.0.01200","mir3_predecessor":null},
+    {"target":"f011","target_id":"factorio-0.11","factorio_line":"0.11","distribution_target_code":"011","distribution_version":"4.0.01100","mir3_predecessor":null},
+    {"target":"f010","target_id":"factorio-0.10","factorio_line":"0.10","distribution_target_code":"010","distribution_version":"4.0.01000","mir3_predecessor":null},
+    {"target":"f009","target_id":"factorio-0.9","factorio_line":"0.9","distribution_target_code":"009","distribution_version":"4.0.00900","mir3_predecessor":null},
+    {"target":"f008","target_id":"factorio-0.8","factorio_line":"0.8","distribution_target_code":"008","distribution_version":"4.0.00800","mir3_predecessor":null},
+    {"target":"f007","target_id":"factorio-0.7","factorio_line":"0.7","distribution_target_code":"007","distribution_version":"4.0.00700","mir3_predecessor":null},
+    {"target":"f006","target_id":"factorio-0.6","factorio_line":"0.6","distribution_target_code":"006","distribution_version":"4.0.00600","mir3_predecessor":null}
+  ],
+  "support_policy": [
+    {"target":"f210","support_tier":"current","disposition":"candidate-mandatory","release_blocking":true,"profile":"explicit"},
+    {"target":"f200","support_tier":"maintained","disposition":"candidate-mandatory","release_blocking":true,"profile":"explicit"},
+    {"target":"f110","support_tier":"lts","disposition":"candidate-conditional","release_blocking":false,"profile":"explicit"},
+    {"target":"f100","support_tier":"lts","disposition":"candidate-conditional","release_blocking":false,"profile":"explicit"},
+    {"target":"f018","support_tier":"historical","disposition":"private-experimental-bridge","release_blocking":false,"profile":"explicit"},
+    {"target":"f017","support_tier":"historical","disposition":"private-experimental","release_blocking":false,"profile":"explicit"},
+    {"target":"f016","support_tier":"historical","disposition":"private-experimental","release_blocking":false,"profile":"explicit"},
+    {"target":"f015","support_tier":"historical","disposition":"private-experimental","release_blocking":false,"profile":"explicit"},
+    {"target":"f014","support_tier":"historical","disposition":"private-experimental","release_blocking":false,"profile":"terminal-derived"},
+    {"target":"f013","support_tier":"historical","disposition":"private-experimental","release_blocking":false,"profile":"terminal-derived"},
+    {"target":"f012","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f011","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f010","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f009","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f008","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f007","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"},
+    {"target":"f006","support_tier":"museum","disposition":"deferred-museum","release_blocking":false,"profile":"blocked-with-evidence"}
+  ],
+  "profile_binding_policy": "Explicit profiles hash-bind .mir/targets.json; terminal-derived profiles bind the named normalized predecessor snapshot; museum profiles remain blocked.",
+  "semantic_authority": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "rollback": "Restore V5 as current and remove only V6 provider projections and private M4C02 target output."
+}

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "MIR4DeveloperPreviewContractSetV1",
+  "stability": "preview-package-excluded-may-change-before-1.0",
+  "canonicalization": "mir-canonical-json-v0",
+  "record_kind": "MIR4ApiResponseV1",
+  "availability": ["available", "unavailable"],
+  "surfaces": [
+    {"id":"host-manifest","capability":"host.read","description":"Host identity and advertised data-only capabilities."},
+    {"id":"query","capability":"query.read","description":"Immutable query projection over bounded public compiler artifacts."},
+    {"id":"profile","capability":"profile.read","description":"Declarative effective-profile projection with no setting mutation."},
+    {"id":"observation","capability":"observation.read","description":"Copied bounded observations with explicit unavailable values."},
+    {"id":"tooling","capability":"tooling.read","description":"Tool and builder capability manifest."},
+    {"id":"target-provider-abi","capability":"target-provider.read","description":"Read-only Target Provider ABI projection owned by W02."},
+    {"id":"proof","capability":"proof.read","description":"Evidence references without claim-grant authority."},
+    {"id":"release","capability":"release.read","description":"Release readiness projection without promotion or publication authority."},
+    {"id":"continuity-bundle","capability":"continuity.read","description":"Redacted W04 continuity-bundle projection."}
+  ],
+  "response_rules": [
+    "bounded",
+    "canonical-deep-copy",
+    "data-only",
+    "paginated",
+    "capability-aware",
+    "unavailable-never-zero"
+  ]
+}

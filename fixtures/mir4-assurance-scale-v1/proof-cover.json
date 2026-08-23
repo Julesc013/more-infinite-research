@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "obligations": [
+    {"id": "static", "target": "f210", "environment": "portable", "trust": "self-test"},
+    {"id": "package", "target": "f210", "environment": "portable", "trust": "self-test"},
+    {"id": "runtime", "target": "f210", "environment": "factorio-2.1", "trust": "self-test"}
+  ],
+  "candidates": [
+    {"id": "portable-combined", "covers": ["static", "package"], "target": "f210", "environment": "portable", "trust": "self-test", "action": "REUSE", "evidence_digest": "1111111111111111111111111111111111111111111111111111111111111111"},
+    {"id": "runtime-fresh", "covers": ["runtime"], "target": "f210", "environment": "factorio-2.1", "trust": "self-test", "action": "RUN", "evidence_digest": null},
+    {"id": "wrong-trust", "covers": ["static", "package"], "target": "f210", "environment": "portable", "trust": "untrusted", "action": "REUSE", "evidence_digest": "2222222222222222222222222222222222222222222222222222222222222222"}
+  ]
+}

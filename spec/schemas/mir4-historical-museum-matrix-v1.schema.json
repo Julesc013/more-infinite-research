@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-historical-museum-matrix-v1.schema.json",
+  "title": "MIR 4 Historical and Museum Matrix V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema", "programme_id", "wave", "maturity", "source_identity", "input_authorities", "historical_targets", "museum_targets", "summary", "blockers", "status", "package_visible", "public_release_proof", "target_policy_authority", "museum_admission_authority", "rights_or_custody_authority", "source_freeze_authorized", "production_signing_or_sealing_authorized", "publication_authorized", "record_sha256"],
+  "properties": {
+    "kind": {"const": "MIR4HistoricalMuseumMatrixV1"},
+    "schema": {"const": 1},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "wave": {"const": "W09"},
+    "maturity": {"const": "developer-preview-shadow"},
+    "source_identity": {"$ref": "#/$defs/sourceIdentity"},
+    "input_authorities": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"$ref": "#/$defs/input"}},
+    "historical_targets": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"$ref": "#/$defs/target"}},
+    "museum_targets": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"$ref": "#/$defs/target"}},
+    "summary": {"type": "object"},
+    "blockers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "status": {"const": "partial-with-bounded-blockers"},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "target_policy_authority": {"const": false},
+    "museum_admission_authority": {"const": false},
+    "rights_or_custody_authority": {"const": false},
+    "source_freeze_authorized": {"const": false},
+    "production_signing_or_sealing_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "sourceIdentity": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "programme_id", "source_version", "package_source_sha256"], "properties": {"commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "programme_id": {"const": "M4C02-09-24H"}, "source_version": {"const": "4.0.0"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}}},
+    "input": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "target": {"type": "object", "required": ["target", "factorio_line", "distribution_version", "maturity", "registry_disposition", "candidate", "engine", "runtime", "rights_custody", "blockers"], "properties": {"target": {"type": "string", "pattern": "^f[0-9]{3}$"}, "factorio_line": {"type": "string"}, "distribution_version": {"type": "string"}, "maturity": {"enum": ["private-experimental", "blocked-museum-inventory"]}, "registry_disposition": {"type": "string"}, "candidate": {"type": "object"}, "engine": {"type": "object"}, "runtime": {"type": "object"}, "rights_custody": {"type": "object"}, "blockers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}}}
+  }
+}

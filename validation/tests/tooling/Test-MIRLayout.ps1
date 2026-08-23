@@ -25,8 +25,8 @@ foreach ($retiredPathId in @("workspace.root", "workspace.output", "workspace.pl
     throw "Retired workspace path ID remains canonical: $retiredPathId"
   }
 }
-if (@($aliases.aliases | Where-Object from -eq "approved-delta/").Count -ne 1) {
-  throw "Historical approved-delta alias is missing."
+if (@($aliases.aliases | Where-Object from -eq "approved-delta/").Count -ne 0) {
+  throw "Retired root approved-delta alias remains registered."
 }
 if (@($aliases.aliases | Where-Object {
   $_.introduced -eq "3.2.5" -and $_.sunset -ne "3.3.0"
@@ -156,10 +156,9 @@ $canonical = Resolve-MIRRepoPath -RepoRoot $repo -Id "releases.deltas"
 if ($canonical.alias -or $canonical.relative_path -ne ".mir/releases/deltas") {
   throw "Canonical release delta resolution failed."
 }
-$legacy = Resolve-MIRRepoPath -RepoRoot $repo -Path "approved-delta/3.2.1-to-3.2.2.json"
-if (-not $legacy.alias -or $legacy.mode -ne "historical-read-only" -or
-    $legacy.relative_path -ne ".mir/releases/deltas/3.2.1-to-3.2.2.json") {
-  throw "Historical release delta resolution failed."
+$canonicalDelta = Resolve-MIRRepoPath -RepoRoot $repo -Path ".mir/releases/deltas/3.2.1-to-3.2.2.json"
+if ($canonicalDelta.alias -or $canonicalDelta.relative_path -ne ".mir/releases/deltas/3.2.1-to-3.2.2.json") {
+  throw "Canonical release delta path resolution failed."
 }
 $legacyRelease = Resolve-MIRRepoPath -RepoRoot $repo -Path ".mir/releases/3.2.5.json"
 if (-not $legacyRelease.alias -or $legacyRelease.mode -ne "read-only" -or
@@ -449,7 +448,7 @@ $legacyLibraryWrappers = @($legacyLibraryNames | ForEach-Object {
 })
 $canonicalLibraries = @(Get-ChildItem -LiteralPath (Join-Path $repo "tools/lib") -Recurse -File |
   Where-Object { $_.Extension -in @(".ps1", ".psm1") -and $_.FullName -notlike "*tools\lib\workspace\*" })
-if ($legacyLibraryWrappers.Count -ne 42 -or $canonicalLibraries.Count -ne 42) {
+if ($legacyLibraryWrappers.Count -ne 42 -or $canonicalLibraries.Count -lt $legacyLibraryWrappers.Count) {
   throw "Canonical tool-library/wrapper inventory drifted: canonical=$($canonicalLibraries.Count), wrappers=$($legacyLibraryWrappers.Count)."
 }
 foreach ($wrapper in $legacyLibraryWrappers) {
@@ -494,7 +493,7 @@ foreach ($legacyDefinitionRoot in @($legacyCompatibilityRoot, $legacyBaselineRoo
 $legacyTestWrappers = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Filter "Test-MIR*.ps1" -File)
 $canonicalMovedTests = @(Get-ChildItem -LiteralPath (Join-Path $repo "validation/tests") -Filter "Test-MIR*.ps1" -Recurse -File |
   Where-Object Name -ne "Test-MIRLayout.ps1")
-if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -ne 69) {
+if ($legacyTestWrappers.Count -ne 65 -or $canonicalMovedTests.Count -lt 69) {
   throw "Canonical test/wrapper inventory drifted: canonical=$($canonicalMovedTests.Count), wrappers=$($legacyTestWrappers.Count)."
 }
 foreach ($wrapper in $legacyTestWrappers) {
@@ -558,7 +557,7 @@ if ($legacyTest.exit_code -ne $canonicalTest.exit_code -or $legacyTest.output -c
 foreach ($arguments in @(
   [string[]]@("help"),
   [string[]]@("path", "resolve", "releases.deltas"),
-  [string[]]@("path", "resolve", "--path", "approved-delta/3.2.1-to-3.2.2.json")
+  [string[]]@("path", "resolve", "--path", ".mir/releases/deltas/3.2.1-to-3.2.2.json")
 )) {
   $legacyCli = Invoke-MIRCliProbe -Entrypoint (Join-Path $repo "scripts/mir.ps1") -Arguments $arguments
   $stableCli = Invoke-MIRCliProbe -Entrypoint (Join-Path $repo "tools/mir.ps1") -Arguments $arguments

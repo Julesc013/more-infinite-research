@@ -30,4 +30,4 @@ MIR 4.0 preserves the proven MIR 3 player behavior while establishing a portable
 
 ## Candidate status
 
-These notes describe the candidate programme, not a published release. f210 and f200 remain the mandatory public targets; f110 and f100 require independent admission; f018 through f013 are private experimental candidates. Production signatures, seals, tags, promotion and publication require a separate go/no-go.
+These notes describe the candidate programme, not a published release. F210 and F200 remain the mandatory public targets; F110 and F100 require independent admission; F018 through F013 are private experimental candidates. Production signatures, seals, tags, promotion and publication require a separate go/no-go.

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-technology-acceptance-queue-v1.schema.json",
+  "title": "MIR 4 Technology Acceptance Queue V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "source_version", "target", "legacy_target", "ecosystem", "catalog_fingerprint", "selection_fingerprint", "candidate_count", "entries", "rules", "mutation_authorized", "compatibility_claim_authorized", "publication_authorized", "queue_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4TechnologyAcceptanceQueueV1"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "source_version": {"const": "4.0.0"},
+    "target": {"type": "string", "pattern": "^F[0-9]{3}$"},
+    "legacy_target": {"type": "string", "pattern": "^f[0-9]{3}$"},
+    "ecosystem": {"type": "string", "pattern": "^[a-z][a-z0-9-]+$"},
+    "catalog_fingerprint": {"type": "string", "minLength": 1},
+    "selection_fingerprint": {"type": "string", "minLength": 1},
+    "candidate_count": {"type": "integer", "minimum": 0},
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ordinal", "candidate_id", "technology_id", "alternative_id", "action", "disposition", "design_fingerprint", "qualification_fingerprint", "qualification_decision", "acceptance_state", "maintainer_decision", "required_records", "review_checklist"],
+        "properties": {
+          "ordinal": {"type": "integer", "minimum": 1},
+          "candidate_id": {"type": "string", "minLength": 1},
+          "technology_id": {"type": ["string", "null"]},
+          "alternative_id": {"type": "string", "minLength": 1},
+          "action": {"type": "string", "minLength": 1},
+          "disposition": {"type": "string", "minLength": 1},
+          "design_fingerprint": {"type": "string", "minLength": 1},
+          "qualification_fingerprint": {"type": "string", "minLength": 1},
+          "qualification_decision": {"type": "string", "minLength": 1},
+          "acceptance_state": {"enum": ["awaiting-quality-and-review", "diagnostic-or-nonmaterializing", "blocked-qualification"]},
+          "maintainer_decision": {"const": "pending"},
+          "required_records": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "review_checklist": {"type": "array", "minItems": 6, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "rules": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "mutation_authorized": {"const": false},
+    "compatibility_claim_authorized": {"const": false},
+    "publication_authorized": {"const": false},
+    "queue_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+  }
+}

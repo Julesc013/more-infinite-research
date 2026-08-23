@@ -206,6 +206,10 @@ function Get-MIRActiveTextFiles {
     $relative -notlike ".mir/release-transitions/*" -and
     $relative -notlike "docs/archive/*" -and
     $relative -notlike "docs/releases/*" -and
+    $relative -notin @(
+      "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+      "validation/tests/release/Test-MIRTerminalShadowProjection.ps1"
+    ) -and
     $relative -ne "tools/maintenance/Move-MIRTestRoot.ps1"
   } | Sort-Object FullName -Unique)
 }
