@@ -7,7 +7,7 @@
   "source_generation": "MIR4-R0-pre-release",
   "distribution_generation": null,
   "mir3_eol_status": "pending",
-  "input_root_sha256": "3F97831150360253DDE760CC46DE65958E6773AEB346E2F8A2619FC2114F2891",
+  "input_root_sha256": "ED2D61B5A9D133CCEEBAD49070F8D59AC067992781712CF7A48FECB1402DC512",
   "inputs": [
     {
       "path": ".mir/evidence/terminal-publication/2026-08-15/github/1.3.9.json",
@@ -1703,7 +1703,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json",
-      "sha256": "2613B8D6A76366CC94102E0108AEB3F03D89985A2760072226CC4C173DCA8B31"
+      "sha256": "E672118A8DEC241EA657C1B49EDA33B727AEFC296685FD47A9B784CBA5092786"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json",
@@ -3427,5 +3427,5 @@
     "no-version-4-package-tag-or-publication-created"
   ],
   "next_executable_task": "M4-003-local-offline-emergency-lane",
-  "record_sha256": "E5D9C60C881D1BF4DB85E164102701D28FF727029AB2A193A2D9B358B30E7B97"
+  "record_sha256": "9E32D57535047CC0637B00025E799D886E7C2DA5925EB1FAE0001331C3531ECE"
 }

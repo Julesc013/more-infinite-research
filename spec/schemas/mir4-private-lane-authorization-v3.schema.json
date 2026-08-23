@@ -39,8 +39,8 @@
         "target_profiles": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/targets.json" } } }] },
         "terminal_predecessor_refresh": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json" } } }] },
         "terminal_import_contract": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json" } } }] },
-        "terminal_import": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json" }, "record_sha256": { "const": "E5D9C60C881D1BF4DB85E164102701D28FF727029AB2A193A2D9B358B30E7B97" } } }] },
-        "bootstrap_root_set": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json" }, "record_sha256": { "const": "CF39E494A2A888DB5E014F29ABB0F308BE054E60FB0079C2EEF271AEA8136F6E" } } }] },
+        "terminal_import": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json" }, "record_sha256": { "const": "9E32D57535047CC0637B00025E799D886E7C2DA5925EB1FAE0001331C3531ECE" } } }] },
+        "bootstrap_root_set": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json" }, "record_sha256": { "const": "F71B9FA4E88BE0BE3DD23A770493B08448EEAEAD719D19BC755E2A22A0030C6D" } } }] },
         "terminal_import_composite": { "$ref": "#/$defs/fileImport" }
       }
     },
