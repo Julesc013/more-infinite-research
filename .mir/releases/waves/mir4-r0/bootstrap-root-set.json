@@ -9,7 +9,7 @@
   "hash_algorithm": "sha256",
   "derived_from": {
     "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-    "record_sha256": "0EC45588F021ED7ED08424D01A98ABE29FABEEBCF717BE0908F8B66C8D4BA9C7"
+    "record_sha256": "E5D9C60C881D1BF4DB85E164102701D28FF727029AB2A193A2D9B358B30E7B97"
   },
   "targets": [
     {
@@ -68,12 +68,12 @@
       },
       "baseline_identity": {
         "path": ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json",
-        "record_sha256": "A98CE10D2A09B86A1C5D898C1D7C24EA1CEABB2F7F73EB909A71D6090610B535",
-        "input_root_sha256": "6A0DE8F852CBCA15C8B6320F0D1ED3B9FA7AD2FB668CF59CAC2A8FCC5DCCD786"
+        "record_sha256": "15323DD05DC3AEDC75C499EB3EC39218B80C90368254C049269B29F31C664D0C",
+        "input_root_sha256": "66E331CE620FBE5CF1395EDE2486FC667EDC209959B856B63C4B8A1E9CD1DAB1"
       },
       "snapshot_identity": {
         "path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
-        "record_sha256": "D61C0EC9B3F43ADDA743B89DEC883424F7768221DC2783A244B64C19DBB2FF44"
+        "record_sha256": "1EFA0686034369DDEA79C54EAD7B91C05698357AEBC6AA4672EDE0E782C4B4F8"
       },
       "exact_engine": {
         "version": "2.0.77",
@@ -86,11 +86,11 @@
         },
         "authority": {
           "domain": "mir4.bootstrap.authority.v1",
-          "sha256": "5E8BB733442529AD6E61F376903BF10C803E0078446EAD8A036737018B955263"
+          "sha256": "FF7A34AA6321916173642B070FFFDD2DB60ACB40E071CECE66F19367FADF7109"
         },
         "qualification": {
           "domain": "mir4.bootstrap.qualification.v1",
-          "sha256": "EB7578183869D4F3E93E396CA57C3B353D5758016DD16295FC169164FED39002"
+          "sha256": "19E4A6E429C652B8F4CF4BB8E87B14A01115F1A7A0CAA0735B042E854B9EB2ED"
         }
       }
     },
@@ -177,5 +177,5 @@
       }
     }
   ],
-  "record_sha256": "CA9B4A96EE7A83F36FF96CD5D28253159951390F0F2A80DA50C0D4F0B57D8317"
+  "record_sha256": "CF39E494A2A888DB5E014F29ABB0F308BE054E60FB0079C2EEF271AEA8136F6E"
 }

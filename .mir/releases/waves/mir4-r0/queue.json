@@ -74,7 +74,7 @@
     },
     {
       "path": ".mir/releases/records/2.5.11.json",
-      "sha256": "714E43231253497C7FD6A96AD5A148A035D10285EB530A764EEB56527B390FB1"
+      "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145"
     },
     {
       "path": ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
@@ -142,11 +142,11 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "2122558CA288BDD272C3FA2B4CE48883E439682F76BF56D2F16F19417743CC59"
+      "sha256": "D7867B64C8C80351B3ABD4D28086F1CD223659A709FF8ECD92095E7B1F26D243"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "6193E73D0E528DBC089A46D40CC5B12E72A8CC1D005490AA316C1CF9B43673C3"
+      "sha256": "75F2C138E3F8D209E39019A24D18DC10E9411A1DC0ACA32BF6C1A380496C36DC"
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
@@ -166,7 +166,7 @@
     },
     {
       "path": ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json",
-      "sha256": "FE2E02D6D649D57B4AF05BA3295342337E2A7BD60379C4DD26CAA82416396334"
+      "sha256": "32347ABD85A75079ECAF54D13357018C40EAECBB9906119C00ED0B2B8508F404"
     }
   ],
   "payload": {
@@ -225,5 +225,5 @@
       }
     ]
   },
-  "record_sha256": "C0B33CB8BD117AB625C976AB3460419863DD8C4104D600DBFB64D02327E3C962"
+  "record_sha256": "4D8FA5DA80C71AA929E6A1AC38C8EC1FCB31B667E9FC377CFA76E570DDC5CE26"
 }
