@@ -168,4 +168,4 @@ if (-not $gate.bounded_policy_implemented -or -not $gate.profile_capability_fing
   throw 'SOL-06 exit gate is incomplete or grants release/publication authority.'
 }
 
-Write-Host 'MIR 4 SOL-06 bounded K2 science policy, exact f210/f200 proof, and family dispositions passed.'
+Write-Host 'MIR 4 SOL-06 bounded K2 science policy, exact F210/F200 proof, and family dispositions passed.'

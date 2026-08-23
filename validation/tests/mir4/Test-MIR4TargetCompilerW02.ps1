@@ -25,4 +25,4 @@ foreach($recordName in @('MIR4_TARGET_PROVIDER_MATRIX.json','MIR4_TARGET_DISPOSI
 $privateMatrix=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$productOutput/MIR4_PRIVATE_PACKAGE_MATRIX.json")|ConvertFrom-Json
 if([string]$privateMatrix.targets[0].state-ne'BLOCKED_WITH_EVIDENCE'-or$privateMatrix.targets[0].package){throw '[mir4-w02-museum-product-boundary]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageSourceBefore){throw '[mir4-w02-product-package-mutation]'}
-Write-Host '[ok] MIR 4 W02 target contracts and all nine provider laws passed for f006-f210.'
+Write-Host '[ok] MIR 4 W02 target contracts and all nine provider laws passed for F006-F210.'
