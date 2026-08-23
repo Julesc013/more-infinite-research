@@ -6,6 +6,8 @@ param(
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+. (Join-Path $PSScriptRoot 'MIR4ReceiptTestSupport.ps1')
+$hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4RuntimeContinuityAuthority -RepoRoot $RepoRoot
 $providers=@(New-MIR4NormalizedTargetProviders -RepoRoot $RepoRoot)
@@ -33,8 +35,9 @@ if($migrationA.digest-cne$migrationB.digest-or@($migrationA.edges).Count-ne 10-o
 if(@($migrationA.edges|Where-Object{$_.kind-eq'downgrade'-and$_.status-eq'unsupported-with-evidence'}).Count-ne 1){throw '[mir4-w04-downgrade]'}
 $candidatePath=$null
 if(-not[string]::IsNullOrWhiteSpace($CandidateZip)){
-  $candidatePath=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $RepoRoot $CandidateZip}
-  if(-not(Test-Path -LiteralPath $candidatePath -PathType Leaf)){throw '[mir4-w04-private-candidate-required]'}
+  $candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $RepoRoot $CandidateZip}
+  if(Test-Path -LiteralPath $candidateInput -PathType Leaf){$candidatePath=$candidateInput}
+  elseif(-not$hostedReceiptOnly){throw '[mir4-w04-private-candidate-required]'}
 }
 $head=(& git -C $RepoRoot rev-parse HEAD).Trim();$tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim();$source=[ordered]@{commit=$head;tree=$tree;programme_id='M4C02-09-24H'}
 $runtime=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $source

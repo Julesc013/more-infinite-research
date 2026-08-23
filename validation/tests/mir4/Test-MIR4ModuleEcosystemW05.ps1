@@ -5,6 +5,8 @@ param(
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+. (Join-Path $PSScriptRoot 'MIR4ReceiptTestSupport.ps1')
+$hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot
 if(@($authority.fragment_kinds).Count-ne 12-or@($authority.api_surfaces).Count-ne 9-or@($authority.transports).Count-ne 17-or@($authority.builder_commands).Count-ne 6){throw '[mir4-w05-authority-counts]'}
@@ -70,8 +72,12 @@ Test-MIR4MepV1Envelope -Envelope $migratedBuilder -RepoRoot $RepoRoot|Out-Null
 $shadow=New-MIR4ShadowExtensionCompilationV1 -RepoRoot $RepoRoot -TargetId f210 -Envelope $reference
 if($shadow.result-cne'shadow-complete'-or$shadow.authoritative_output-or$shadow.mutation_capability-or$shadow.public_support_claim-or@($shadow.contributions).Count-ne 12){throw '[mir4-w05-shadow-boundary]'}
 
-$candidatePath=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $RepoRoot $CandidateZip}
-if(-not(Test-Path -LiteralPath $candidatePath -PathType Leaf)){throw '[mir4-w05-private-candidate-required]'}
+$candidatePath=$null
+if(-not[string]::IsNullOrWhiteSpace($CandidateZip)){
+  $candidateInput=if([IO.Path]::IsPathRooted($CandidateZip)){$CandidateZip}else{Join-Path $RepoRoot $CandidateZip}
+  if(Test-Path -LiteralPath $candidateInput -PathType Leaf){$candidatePath=$candidateInput}
+  elseif(-not$hostedReceiptOnly){throw '[mir4-w05-private-candidate-required]'}
+}
 $output='build/mir4/test-w05-module-ecosystem'
 & (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath|Out-Null
 & (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath -Check|Out-Null
@@ -79,5 +85,7 @@ $head=(& git -C $RepoRoot rev-parse HEAD).Trim();$tree=(& git -C $RepoRoot rev-p
 foreach($name in @('MIR4_MEP_CONFORMANCE.json','MIR4_API_SDK_GRADUATION_MATRIX.json','MIR4_REFERENCE_CONSUMER_RESULT.json')){$record=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$output/$name")|ConvertFrom-Json;if([string]$record.source_identity.commit-cne$head-or[string]$record.source_identity.tree-cne$tree-or$record.package_visible-or$record.public_support_claim){throw "[mir4-w05-export-identity] $name"}}
 $consumer=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$output/MIR4_REFERENCE_CONSUMER_RESULT.json")|ConvertFrom-Json
 if($consumer.production_consumer_status-cne'BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER'-or$consumer.fallback.result-cne'passed'-or$consumer.graduated){throw '[mir4-w05-consumer-truth]'}
+$mep=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$output/MIR4_MEP_CONFORMANCE.json")|ConvertFrom-Json
+if($hostedReceiptOnly-and$null-ne$mep.candidate){throw '[mir4-w05-hosted-absent-candidate-boundary]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore){throw '[mir4-w05-package-mutation]'}
 Write-Host '[ok] MIR 4 W05 MEP V1, deterministic closure, API/SDK, builder, and synthetic consumer preview passed.'
