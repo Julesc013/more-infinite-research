@@ -15,6 +15,8 @@ $runtimeA=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -
 $runtimeB=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null
 if($runtimeA.digest-cne$runtimeB.digest){throw '[mir4-w04-runtime-determinism]'}
 if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 9-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
+foreach($feature in @($runtimeA.runtime_feature_specs)){if([string]$feature.source_sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$feature.source)))){throw "[mir4-w04-runtime-source-canonical-hash] $($feature.id)"}}
+if([string]$runtimeA.registration_plan.owner_sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$runtimeA.registration_plan.owner)))){throw '[mir4-w04-runtime-owner-canonical-hash]'}
 if(-not$runtimeA.registration_plan.law_results.all_passed-or$runtimeA.registration_plan.on_load.registered-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch){throw '[mir4-w04-dispatcher-laws]'}
 $f210=@($runtimeA.targets|Where-Object { $_.target -eq 'f210' })[0]
 $f110=@($runtimeA.targets|Where-Object { $_.target -eq 'f110' })[0]
@@ -32,6 +34,7 @@ try{Assert-MIR4RuntimeRegistrationPlan -Plan $tampered|Out-Null;throw '[mir4-w04
 $migrationA=New-MIR4MigrationGraphMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $null
 $migrationB=New-MIR4MigrationGraphMatrix -RepoRoot $RepoRoot -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null
 if($migrationA.digest-cne$migrationB.digest-or@($migrationA.edges).Count-ne 10-or@($migrationA.edge_kinds).Count-ne 8-or-not$migrationA.law_results.all_passed-or$migrationA.complete_for_public_release){throw '[mir4-w04-migration-graph]'}
+foreach($edge in @($migrationA.edges)){foreach($evidence in @($edge.evidence)){if([string]$evidence.sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$evidence.path)))){throw "[mir4-w04-migration-evidence-canonical-hash] $($edge.id):$($evidence.path)"}}}
 if(@($migrationA.edges|Where-Object{$_.kind-eq'downgrade'-and$_.status-eq'unsupported-with-evidence'}).Count-ne 1){throw '[mir4-w04-downgrade]'}
 $candidatePath=$null
 if(-not[string]::IsNullOrWhiteSpace($CandidateZip)){

@@ -80,7 +80,7 @@ function New-MIR4RuntimeFeatureSpecs {
         }
       )
       [ordered]@{
-        id=[string]$feature.id;version=[int]$feature.version;source=$source;source_sha256=(Get-MIR4PlatformFileSha256 $path)
+        id=[string]$feature.id;version=[int]$feature.version;source=$source;source_sha256=(Get-MIR4PlatformInputSha256 $path)
         handlers=@($feature.handlers);target_requirements=@($feature.target_requirements);state_ids=@($feature.state_ids)
         determinism=[string]$feature.determinism;complexity_budget=$feature.complexity_budget;migration_refs=@($feature.migration_refs)
         disable_or_removal=[string]$feature.disable_or_removal;target_dispositions=$targetDispositions
@@ -159,7 +159,7 @@ function New-MIR4RuntimeRegistrationPlan {
   )
   $combined = $dispatcherText + "`n" + $stageText
   $plan = [pscustomobject][ordered]@{
-    kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformFileSha256 $dispatcherPath);groups=$groups
+    kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
     on_load=[ordered]@{registered=($combined -match 'script\.on_load');persistent_mutation=$false};on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64
@@ -230,7 +230,7 @@ function New-MIR4MigrationGraphMatrix {
         foreach ($relative in @($edge.evidence)) {
           $path = Join-Path $repo ([string]$relative)
           if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-migration-evidence-missing] $relative" }
-          [ordered]@{path=[string]$relative;sha256=(Get-MIR4PlatformFileSha256 $path)}
+          [ordered]@{path=[string]$relative;sha256=(Get-MIR4PlatformInputSha256 $path)}
         }
       )
       [ordered]@{id=[string]$edge.id;kind=[string]$edge.kind;from=[string]$edge.from;to=[string]$edge.to;status=[string]$edge.status;precedence=[int]$edge.precedence;evidence=$evidence;execution_authorized=$false}
@@ -276,7 +276,7 @@ function New-MIR4ContinuityBundle {
     foreach ($context in $contexts) {
       $provider = $context.provider
       $snapshotPath = if ($provider.predecessor) { [string]$provider.predecessor.snapshot } else { $null }
-      $snapshot = if ($snapshotPath -and (Test-Path -LiteralPath (Join-Path $repo $snapshotPath) -PathType Leaf)) { [ordered]@{path=$snapshotPath;sha256=(Get-MIR4PlatformFileSha256 (Join-Path $repo $snapshotPath));status='reference-available'} } else { [ordered]@{path=$null;sha256=$null;status='blocked-missing-predecessor-snapshot'} }
+      $snapshot = if ($snapshotPath -and (Test-Path -LiteralPath (Join-Path $repo $snapshotPath) -PathType Leaf)) { [ordered]@{path=$snapshotPath;sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo $snapshotPath));status='reference-available'} } else { [ordered]@{path=$null;sha256=$null;status='blocked-missing-predecessor-snapshot'} }
       $featureRows = @($RuntimeStateMatrix.targets | Where-Object target -eq $context.target)[0].feature_dispositions
       $activeStateIds = @(
         foreach ($state in @($RuntimeStateMatrix.state_specs)) {
@@ -304,7 +304,7 @@ function New-MIR4ContinuityBundle {
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4ContinuityBundleV1';programme_id=[string]$authority.programme_id;source_identity=(New-MIR4RuntimeSourceIdentity $SourceIdentity)
     authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';maturity='private-preview';target_count=17;targets=$targets
-    module_extension_closure=[ordered]@{module_graph=[ordered]@{path='.mir/module-dependencies.json';sha256=(Get-MIR4PlatformFileSha256 (Join-Path $repo '.mir/module-dependencies.json'))};external_extensions=[ordered]@{status='deferred-W05';opaque_reference=$true}}
+    module_extension_closure=[ordered]@{module_graph=[ordered]@{path='.mir/module-dependencies.json';sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo '.mir/module-dependencies.json'))};external_extensions=[ordered]@{status='deferred-W05';opaque_reference=$true}}
     feature_inventory=[ordered]@{kind=[string]$RuntimeStateMatrix.kind;digest=[string]$RuntimeStateMatrix.digest;feature_count=@($RuntimeStateMatrix.runtime_feature_specs).Count}
     runtime_state_schemas=[ordered]@{kind='MIR4StateSpecSetV1';matrix_digest=[string]$RuntimeStateMatrix.digest;state_count=@($RuntimeStateMatrix.state_specs).Count}
     aliases_tombstones=[ordered]@{state_aliases=@($RuntimeStateMatrix.state_specs | ForEach-Object { @($_.aliases) });state_tombstones=@($RuntimeStateMatrix.state_specs | ForEach-Object { @($_.tombstones) });migration_graph_digest=[string]$MigrationGraphMatrix.digest}
