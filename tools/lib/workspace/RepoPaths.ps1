@@ -313,7 +313,6 @@ function Get-MIRLayoutClass {
     @("scripts/", "legacy-tooling"),
     @("fixtures/", "fixtures"),
     @("docs/", "documentation"),
-    @("approved-delta/", "legacy-release-delta"),
     @(".mir/", "control-plane"),
     @("dist/", "distribution"),
     @(".github/", "automation"),

@@ -2,11 +2,6 @@ schema: 1
 authority: mir-repository-path-aliases-v1
 
 aliases:
-  - from: approved-delta/
-    to: releases.deltas
-    mode: historical-read-only
-    introduced: 3.2.5
-    sunset: 3.3.0
   - from: .mir/candidate-closures/
     to: releases.closures
     mode: read-only

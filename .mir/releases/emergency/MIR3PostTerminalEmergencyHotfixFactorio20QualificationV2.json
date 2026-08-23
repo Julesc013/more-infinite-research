@@ -35,7 +35,7 @@
     "required": 15
   },
   "approved_delta": {
-    "path": "approved-delta/2.5.10-to-2.5.11.json",
+    "path": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
     "artifact_sha256": "0B9E01643A199D2AF18BA52B1AAA5469BBAE62D94C973BAC46AC2914E2C22232",
     "reviewed_differences": 53,
     "intentional_differences": 53,

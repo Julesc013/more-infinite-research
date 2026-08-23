@@ -34,7 +34,7 @@
     "change_set": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
     "target_matrix": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json",
     "factorio_2_0_qualification": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
-    "approved_delta": "approved-delta/2.5.10-to-2.5.11.json",
+    "approved_delta": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
     "tag": {
       "kind": "annotated-tag",
       "name": "2.5.11",
