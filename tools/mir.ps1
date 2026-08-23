@@ -11,6 +11,7 @@ $scriptRoot = Join-Path $repo "scripts"
 . (Join-Path $repo "tools\lib\cli\PathResolver.ps1")
 . (Join-Path $repo "tools\lib\cli\LocalModIndex.ps1")
 . (Join-Path $repo "tools\lib\cli\Reports.ps1")
+. (Join-Path $repo "tools\lib\mir4\TargetKey.ps1")
 
 function Show-MIRHelp {
   Write-Host @"
@@ -27,27 +28,29 @@ Usage:
   .\tools\mir.ps1 mir4 capture-terminal-baselines [--check] [--build-bundles]
   .\tools\mir.ps1 mir4 import-terminal-baselines [--output <path>] [--check]
   .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
-  .\tools\mir.ps1 mir4 build-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>] [--repetitions <n>]
-  .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
-  .\tools\mir.ps1 mir4 build-local-playtest [--target <all|f200|f110|f100>] [--repetitions <n>]
-  .\tools\mir.ps1 mir4 check-local-playtest [--target <all|f200|f110|f100>]
-  .\tools\mir.ps1 mir4 build-historical-private [--target <all|f018|f017|f016|f015|f014|f013>]
-  .\tools\mir.ps1 mir4 check-historical-private [--target <all|f018|f017|f016|f015|f014|f013>]
+  .\tools\mir.ps1 mir4 build-local-beta [--target <all|F210|F200|F110|F100>] [--output <path>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-beta [--target <all|F210|F200|F110|F100>] [--output <path>]
+  .\tools\mir.ps1 mir4 build-local-playtest [--target <all|F200|F110|F100>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-playtest [--target <all|F200|F110|F100>]
+  .\tools\mir.ps1 mir4 build-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
+  .\tools\mir.ps1 mir4 check-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
   .\tools\mir.ps1 mir4 build-m4c01-player-set
   .\tools\mir.ps1 mir4 check-m4c01-player-set
-  .\tools\mir.ps1 mir4 runtime-historical-private --target <f017|f016|f015|f014|f013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
+  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
-  .\tools\mir.ps1 mir4 platform compile --target <fNNN> --extension <path> --output <path>
+  .\tools\mir.ps1 mir4 platform compile --target <FNNN> --extension <path> --output <path>
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
-  .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|fNNN>] [--output <path>]
+  .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 processir-synthesis <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 whole-platform <check|matrix|target-key> [--target <FNNN>]
+  .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
   .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate> [--extension <path>] [--output <path>] [--id <reverse.dns.id>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
@@ -501,7 +504,8 @@ switch ($area) {
           -BuildBundles:(Test-MIRArgSwitch -Items $Args -Name "--build-bundles")
       }
       { $_ -in @("build-local-beta", "check-local-beta") } {
-        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "f210"
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "F210"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/emergency-lane"
         $repetitionsText = Get-MIRArgValue -Items $Args -Name "--repetitions" -Default "3"
         $repetitions = 0
@@ -517,9 +521,10 @@ switch ($area) {
           -Check:($verb -eq "check-local-beta")
       }
       { $_ -in @("build-local-playtest", "check-local-playtest") } {
-        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
         if ($target -notin @('all', 'f200', 'f110', 'f100')) {
-          throw "--target must be one of all, f200, f110, or f100 for the private local-playtest lane."
+          throw "--target must be one of all, F200, F110, or F100 for the private local-playtest lane."
         }
         $explicitOutput = Get-MIRArgValue -Items $Args -Name "--output"
         if (-not [string]::IsNullOrWhiteSpace($explicitOutput) -and
@@ -540,9 +545,10 @@ switch ($area) {
           -Check:($verb -eq "check-local-playtest")
       }
       { $_ -in @("build-historical-private", "check-historical-private") } {
-        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
         if ($target -notin @('all','f018','f017','f016','f015','f014','f013')) {
-          throw "--target must be one of all, f018, f017, f016, f015, f014, or f013."
+          throw "--target must be one of all, F018, F017, F016, F015, F014, or F013."
         }
         & (Join-Path $repo "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1") `
           -RepoRoot $repo.Path -Target $target -Repetitions 3 -Check:($verb -eq "check-historical-private")
@@ -552,9 +558,9 @@ switch ($area) {
           -RepoRoot $repo.Path -Check:($verb -eq "check-m4c01-player-set")
       }
       "runtime-historical-private" {
-        $target = Get-MIRArgValue -Items $Args -Name "--target"
+        $target = ConvertTo-MIR4LegacyTargetKey -Target (Get-MIRArgValue -Items $Args -Name "--target")
         if ($target -notin @('f017','f016','f015','f014','f013')) {
-          throw "--target must be one of f017, f016, f015, f014, or f013. f018 requires an explicitly admitted exact engine."
+          throw "--target must be one of F017, F016, F015, F014, or F013. F018 requires an explicitly admitted exact engine."
         }
         $runtimeArguments = @{ RepoRoot = $repo.Path; Target = $target }
         $factorioBin = Get-MIRArgValue -Items $Args -Name "--factorio-bin"
@@ -580,7 +586,7 @@ switch ($area) {
         }
         $platformArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         if ($subcommand -eq 'compile') {
-          $platformArguments.Target = Get-MIRArgValue -Items $Args -Name '--target'
+          $platformArguments.Target = ConvertTo-MIR4LegacyTargetKey -Target (Get-MIRArgValue -Items $Args -Name '--target')
           $platformArguments.ExtensionPath = Get-MIRArgValue -Items $Args -Name '--extension'
           $platformArguments.OutputPath = Get-MIRArgValue -Items $Args -Name '--output'
         }
@@ -613,7 +619,8 @@ switch ($area) {
           $record = if ($subcommand -eq 'contracts') { New-MIR4TargetContractSet -RepoRoot $repo.Path } else { Test-MIR4TargetProviderLaws -RepoRoot $repo.Path }
           $record | ConvertTo-Json -Depth 100
         } else {
-          $target = Get-MIRArgValue -Items $Args -Name '--target' -Default 'all'
+          $targetInput = Get-MIRArgValue -Items $Args -Name '--target' -Default 'all'
+          $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
           $targetArguments = @{RepoRoot=$repo.Path;Target=$target;Check=($subcommand -eq 'check')}
           $output = Get-MIRArgValue -Items $Args -Name '--output'
           if (-not [string]::IsNullOrWhiteSpace($output)) { $targetArguments.OutputRoot = $output }
@@ -680,6 +687,27 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $inspectorArguments.OutputRoot = $output }
         & (Join-Path $repo "tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1") @inspectorArguments
+      }
+      "whole-platform" {
+        if ($Args.Count -lt 3) { throw "mir4 whole-platform requires check, matrix, or target-key." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','matrix','target-key')) { throw "Unknown mir4 whole-platform command: $subcommand" }
+        $wholeArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
+        if ($subcommand -eq 'target-key') {
+          $wholeArguments.Target = Get-MIRArgValue -Items $Args -Name '--target'
+        }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4WholePlatform.ps1") @wholeArguments
+      }
+      "acceptance" {
+        if ($Args.Count -lt 3 -or [string]$Args[2] -cne 'queue') { throw "mir4 acceptance requires queue." }
+        $catalog = Get-MIRArgValue -Items $Args -Name '--catalog'
+        $target = Get-MIRArgValue -Items $Args -Name '--target'
+        $ecosystem = Get-MIRArgValue -Items $Args -Name '--ecosystem'
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        foreach ($required in @(@{name='--catalog';value=$catalog},@{name='--target';value=$target},@{name='--ecosystem';value=$ecosystem},@{name='--output';value=$output})) {
+          if ([string]::IsNullOrWhiteSpace([string]$required.value)) { throw "mir4 acceptance queue requires $($required.name)." }
+        }
+        & (Join-Path $repo "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1") -RepoRoot $repo.Path -CatalogPath $catalog -Target $target -Ecosystem $ecosystem -OutputPath $output
       }
       "extension" {
         if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, or migrate." }

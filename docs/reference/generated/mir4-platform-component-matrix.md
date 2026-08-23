@@ -1,7 +1,7 @@
 ---
 title: "MIR 4 Platform Component Matrix"
 status: current
-applies_to: "4.0.0 M4C02-09-24H"
+applies_to: "4.0.0 M4C10-WHOLE-4X-IN-4.0"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
@@ -21,6 +21,9 @@ Generated from `spec/platform/mir4-preview-v0/platform.json`.
 | `target-materializer` | stable | authoritative-for-admitted-targets |
 | `package-surface-lock` | stable | authoritative |
 | `release-dag` | stable | authoritative |
+| `whole-platform-programme-v1` | stable | package-excluded-4.0-consolidation-authority |
+| `uppercase-f-target-presentation-v1` | stable | canonical-display-with-legacy-input-normalization |
+| `technology-acceptance-queue-v1` | preview | one-technology-at-a-time-non-mutating-review-queue |
 | `api-sdk-v0` | preview | read-only-package-excluded |
 | `mep-v0` | preview | data-only-package-excluded |
 | `query-profile-observation-v0` | preview | read-only-package-excluded |

@@ -1,6 +1,24 @@
 schema: 1
 
 docs:
+  - path: docs/releases/mir4-4.0-whole-platform-programme.md
+    title: "MIR 4.0 Whole Platform Programme"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0-whole-platform-consolidation
+      - mir4-uppercase-f-target-presentation
+      - mir4-technology-by-technology-acceptance
+  - path: docs/reference/generated/mir4-whole-platform-matrix.md
+    title: "MIR 4 Whole Platform Matrix"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-mir4-whole-platform-maturity
   - path: docs/releases/mir4-4.0-candidate-programme.md
     title: "MIR 4.0 Candidate Programme"
     status: current

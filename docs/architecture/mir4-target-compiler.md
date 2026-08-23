@@ -17,6 +17,6 @@ W02 makes target variation an explicit compiler boundary without creating a seco
 
 The generalized product command delegates bytes to the existing bootstrap and historical materializers. It then copies their deterministic private packages into `build/mir4/m4c02-target-products` and records exact hashes. It does not sign, seal, publish, or mutate package sources.
 
-Targets f210 and f200 have stable private-candidate mechanisms; f110 and f100 are preview conditional mechanisms; f018-f013 are experimental historical mechanisms. Targets f012-f006 are omitted-by-target and remain `BLOCKED_WITH_EVIDENCE` until governed predecessor packages and snapshots, exact engine locks, and rights-custody records exist.
+Targets F210 and F200 have stable private-candidate mechanisms; F110 and F100 are preview conditional mechanisms; F018-F013 are experimental historical mechanisms. Targets F012-F006 are omitted-by-target and remain `BLOCKED_WITH_EVIDENCE` until governed predecessor packages and snapshots, exact engine locks, and rights-custody records exist.
 
 Rollback restores Target Registry V5 as the current platform reader, deletes only generated V6 projections and private W02 output, and leaves every legacy materializer and player-package source unchanged.

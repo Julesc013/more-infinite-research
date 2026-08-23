@@ -7,7 +7,10 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json',
   '.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
   'spec/schemas/mir4-compilation-run-v1.schema.json',
+  'spec/schemas/mir4-whole-platform-programme-v1.schema.json',
+  'spec/schemas/mir4-technology-acceptance-queue-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',
@@ -34,6 +37,8 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/streams.yml',
   '.mir/fixtures.yml',
   '.mir/modules.yml',
+  '.mir/technology-lifecycle.json',
+  '.mir/technology-governance.json',
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/PlatformPreview.ps1',
@@ -52,7 +57,10 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/HistoricalSuccession.ps1',
   'tools/lib/mir4/SuccessorHost.ps1',
   'tools/lib/mir4/ReleaseDag.ps1',
-  'tools/lib/mir4/RepositoryFixedPoint.ps1'
+  'tools/lib/mir4/RepositoryFixedPoint.ps1',
+  'tools/lib/mir4/TargetKey.ps1',
+  'tools/lib/mir4/WholePlatform.ps1',
+  'tools/lib/mir4/TechnologyAcceptance.ps1'
 )
 
 function Get-MIR4PlatformRepoRoot {
@@ -262,6 +270,7 @@ function Get-MIR4PlatformGeneratedFiles {
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   . (Join-Path $repo 'tools/lib/mir4/ExperimentalApiSdk.ps1')
   $platform = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/platform/mir4-preview-v0/platform.json') | ConvertFrom-Json
+  $wholePlatform = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json') | ConvertFrom-Json
   $releaseDag = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/platform/mir4-preview-v0/release-dag.json') | ConvertFrom-Json
   Test-MIR4ReleaseDag -Dag $releaseDag | Out-Null
   $providers = @(Get-MIR4TargetProviderRecords $repo)
@@ -299,7 +308,7 @@ function Get-MIR4PlatformGeneratedFiles {
   $query = New-MIR4ApiRecord -Kind MIR4QuerySnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('query.read','support.snapshot','streams.read','diagnostics.read','settings.read') -Payload ([ordered]@{ provider=$primary; compilation=$primaryRun; streams=[ordered]@{ authority='.mir/streams.yml'; mode='read-only' }; diagnostics=@(); profile=[ordered]@{ maturity='preview'; mutation_allowed=$false } })
   $support = New-MIR4ApiRecord -Kind MIR4SupportSnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('support.snapshot') -Payload ([ordered]@{ target=$primary; maturity='candidate-programme-only'; public_claim=$false; evidence=@('target-provider','compilation-run','runtime-state-inventory','process-ir-parity-result') })
   $components = @($platform.components | ForEach-Object { "| ``$($_.id)`` | $($_.maturity) | $($_.mode) |" }) -join "`n"
-  $generatedDoc = "---`ntitle: `"MIR 4 Platform Component Matrix`"`nstatus: current`napplies_to: `"4.0.0 M4C02-09-24H`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-23`nsupersedes: []`nsuperseded_by: []`n---`n# MIR 4 Platform Component Matrix`n`nGenerated from ``spec/platform/mir4-preview-v0/platform.json``.`n`n| Component | Maturity | Mode |`n| --- | --- | --- |`n$components`n`nThe conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.`n"
+  $generatedDoc = "---`ntitle: `"MIR 4 Platform Component Matrix`"`nstatus: current`napplies_to: `"4.0.0 $($wholePlatform.programme_id)`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-23`nsupersedes: []`nsuperseded_by: []`n---`n# MIR 4 Platform Component Matrix`n`nGenerated from ``spec/platform/mir4-preview-v0/platform.json``.`n`n| Component | Maturity | Mode |`n| --- | --- | --- |`n$components`n`nThe conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.`n"
   $psBinding = @'
 # Generated standalone MIR Extension Protocol V0 preview binding.
 function ConvertTo-MIR4MepCanonicalValue($Value){
@@ -365,7 +374,7 @@ $badMep=$extension|ConvertTo-Json -Depth 100|ConvertFrom-Json;$badMep.fragments[
 try{Test-MIR4MepEnvelope $badMep|Out-Null;throw '[mir4-sdk-negative-mep-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-mep-forbidden-field]')){throw}}
 Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
 '@
-  $lock = [ordered]@{ schema=1; kind='MIR4PlatformLockV0'; source_version='4.0.0'; candidate_wave='M4C01'; programme_id='M4C02-09-24H'; canonicalization='mir-canonical-json-v0'; inputs=(Get-MIR4PlatformInputs $repo); generated_by='tools/lib/mir4/PlatformPreview.ps1'; digest='' }
+  $lock = [ordered]@{ schema=1; kind='MIR4PlatformLockV0'; source_version='4.0.0'; candidate_wave='M4C01'; programme_id=[string]$wholePlatform.programme_id; canonicalization='mir-canonical-json-v0'; inputs=(Get-MIR4PlatformInputs $repo); generated_by='tools/lib/mir4/PlatformPreview.ps1'; digest='' }
   $lockObject = [pscustomobject]$lock
   Add-MIR4PlatformDigest $lockObject | Out-Null
   $files = [ordered]@{
@@ -544,6 +553,14 @@ function New-MIR4PlatformPreviewPackages {
     'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
     'mir4-inspector-preview-v0.zip' = @('sdk/preview/mir4/inspector/index.html','sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1','sdk/preview/mir4/inspector/README.md','sdk/preview/mir4/reference/query-snapshot-f210.json','sdk/preview/mir4/reference/support-snapshot-f210.json','LICENSE')
   }
+  $sets['mir4-platform-preview-v0.zip'] += @(
+    '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
+    '.mir/technology-lifecycle.json','.mir/technology-governance.json',
+    'spec/schemas/mir4-whole-platform-programme-v1.schema.json','spec/schemas/mir4-technology-acceptance-queue-v1.schema.json',
+    'docs/releases/mir4-4.0-whole-platform-programme.md','docs/reference/generated/mir4-whole-platform-matrix.md',
+    'tools/lib/mir4/TargetKey.ps1','tools/lib/mir4/WholePlatform.ps1','tools/lib/mir4/TechnologyAcceptance.ps1',
+    'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1','tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1'
+  )
   $sets['mir4-platform-preview-v0.zip'] += @(
     '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json',
     'spec/schemas/mir4-inspection-bundle-v1.schema.json','spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json',

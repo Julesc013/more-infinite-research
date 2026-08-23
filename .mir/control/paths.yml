@@ -4,6 +4,7 @@ authority: mir-repository-paths-v1
 paths:
   package.root: .
   mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
+  mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
   mir4.target-registry.historical-v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
@@ -35,6 +36,8 @@ paths:
   spec.compatibility.claims: spec/compatibility/claims.json
   spec.compatibility.lanes: spec/compatibility/support-lanes.json
   spec.schemas: spec/schemas
+  spec.schemas.mir4-whole-platform-programme-v1: spec/schemas/mir4-whole-platform-programme-v1.schema.json
+  spec.schemas.mir4-technology-acceptance-queue-v1: spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
   spec.schemas.mir4-target-registry-v6: spec/schemas/mir4-target-registry-v6.schema.json
   spec.schemas.mir4-compilation-run-v1: spec/schemas/mir4-compilation-run-v1.schema.json
   spec.schemas.mir4-runtime-state-matrix-v1: spec/schemas/mir4-runtime-state-matrix-v1.schema.json

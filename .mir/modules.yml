@@ -42,6 +42,21 @@ stage_entrypoints:
   control.lua: prototypes/mir/stage/control.lua
 
 package_excluded_modules:
+  mir4_whole_platform_programme_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
+    implementation: tools/lib/mir4/WholePlatform.ps1
+    target_key_contract: tools/lib/mir4/TargetKey.ps1
+    technology_acceptance: tools/lib/mir4/TechnologyAcceptance.ps1
+    commands:
+      - tools/commands/mir4/Invoke-MIR4WholePlatform.ps1
+      - tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1
+    schemas:
+      - spec/schemas/mir4-whole-platform-programme-v1.schema.json
+      - spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
+    documentation: docs/releases/mir4-4.0-whole-platform-programme.md
+    generated_reference: docs/reference/generated/mir4-whole-platform-matrix.md
+    boundary: executable inventory and per-technology review queue only; no prototype or runtime mutation, automatic acceptance, compatibility-claim transfer, source freeze, signing, sealing, promotion, tag, publication, main mutation, or legacy mutation
+    stability: stable-private-programme-with-preview-acceptance-workflow
   mir4_repository_fixed_point_v1:
     authority: .mir/control/repository-fixed-point.json
     path_authority: .mir/control/paths.yml
