@@ -182,6 +182,21 @@ fixtures:
       - stable-negative-diagnostics
       - package-surface-non-interference
 
+  mir4-mep-v1-conformance:
+    requires_features: []
+    path: fixtures/mir4-mep-v1
+    shipped: false
+    validates:
+      - twelve-typed-data-only-fragment-kinds
+      - deterministic-dependency-closure
+      - missing-dependency-cycle-conflict-and-forbidden-field-rejection
+      - target-specific-transport-truth
+      - bounded-copied-paginated-capability-aware-api-responses
+      - explicit-unavailability-never-zero
+      - synthetic-external-reference-consumer
+      - blocked-independent-production-consumer-retained
+      - player-package-non-interference
+
   mir4-process-ir-v0-safety:
     requires_features: []
     path: fixtures/mir4-process-ir-v0
@@ -191,6 +206,79 @@ fixtures:
       - unbounded-positive-loop-rejected-by-safety-kernel
       - stable-safety-violation-diagnostics
       - policy-cannot-override-hard-safety
+
+  mir4-process-ir-v1-synthesis:
+    requires_features: []
+    path: fixtures/mir4-process-ir-v1
+    shipped: false
+    validates:
+      - canonical-recipe-and-risk-fact-transport
+      - exact-and-bounded-quantity-preservation
+      - catalyst-returned-container-and-self-intersection-preservation
+      - basic-recycling-and-recovery-classification
+      - deterministic-simple-scc-and-minimal-witness
+      - terminal-risk-fingerprint-parity
+      - conservative-unknown-and-uncertainty-monotonicity
+      - bilateral-known-safe-and-known-unsafe-gate
+      - opaque-effect-channel-preservation
+      - no-automatic-candidate-without-complete-independent-certificates
+      - exact-target-snapshot-blocker-retained
+      - player-package-non-interference
+
+  mir4-inspector-compatibility-v1:
+    requires_features: []
+    path: fixtures/mir4-inspector-compatibility-v1
+    shipped: false
+    validates:
+      - bounded-copied-read-only-inspection-dtos
+      - deterministic-pagination-filtering-and-local-file-export
+      - accessibility-localization-and-zero-idle-runtime-work
+      - normalized-ten-subject-evidence-ledger
+      - historical-evidence-nontransferability
+      - synthetic-evidence-nonclaim-boundary
+      - missing-exact-closure-review-required
+      - ir4-independent-production-consumer-blocker-retained
+      - deterministic-safe-choice-priority-with-rejection-reasons
+      - data-only-factory-zip-exact-allowlist
+      - forbidden-callback-and-blanket-support-rejection
+      - player-package-non-interference
+
+  mir4-assurance-scale-v1:
+    requires_features: []
+    path: fixtures/mir4-assurance-scale-v1
+    shipped: false
+    validates:
+      - four-stage-identity-locality-and-downstream-invalidation
+      - eleven-slice-merkle-roots-and-explicit-unavailability
+      - control-plane-semantic-impact-and-zero-false-negative-calibration
+      - exact-unrevoked-partial-run-recovery
+      - nondeterminism-incident-and-counterexample-minimization
+      - exact-target-environment-trust-proof-cover
+      - 24-6-1-deadline-arithmetic-and-missing-evidence-blockers
+      - dummy-repository-restoration-and-package-rehearsal
+      - non-production-proof-verifier-and-seal-rehearsal
+      - verify-before-transfer-and-idempotent-uncertain-reconciliation
+      - publisher-build-mutation-network-and-production-authority-denial
+      - player-package-non-interference
+
+  mir4-historical-succession-v1:
+    requires_features: []
+    path: fixtures/mir4-historical-succession-v1
+    shipped: false
+    validates:
+      - historical-and-museum-target-count-and-disposition-preservation
+      - portable-exact-engine-and-archive-observations
+      - f018-missing-exact-engine-blocker
+      - museum-rights-custody-restore-closure-blocker
+      - reviewed-budgeted-offline-module-index
+      - deterministic-w05-extension-closure-reuse
+      - synthetic-external-f300-provider-laws
+      - copied-redacted-w04-continuity-import
+      - data-only-extension-transport
+      - deterministic-proof-replay-and-tamper-rejection
+      - byte-identical-synthetic-package-reconstruction
+      - append-only-nontransferable-c35-succession-witness
+      - player-package-non-interference
 
   museum-synthetic-installation:
     requires_features: []

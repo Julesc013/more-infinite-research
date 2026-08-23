@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/mir4-effect-channel-registry-v1.schema.json",
+  "title": "MIR 4 effect channel registry V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "source_identity", "authority", "maturity", "channels", "opaque_preserved", "package_visible", "public_release_proof", "player_mutation_authorized", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4EffectChannelRegistryV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "source_identity": {"type": "object", "required": ["commit", "tree", "programme_id"]},
+    "authority": {"type": "string"},
+    "maturity": {"const": "developer-preview"},
+    "channels": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "subject", "value_domain", "composition_law", "neutral_value", "repeatability", "saturation", "bounds", "target_representation", "runtime_owner", "migration", "presentation", "proof", "owner_ref", "disposition", "maturity", "package_visible"]
+      }
+    },
+    "opaque_preserved": {"const": true},
+    "package_visible": {"const": false},
+    "public_release_proof": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

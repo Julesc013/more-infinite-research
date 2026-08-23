@@ -219,6 +219,26 @@ Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
   & (Join-Path $repo "validation\tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "MIR 4 W00 release governance is separated and honestly classified" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4ReleaseGovernanceW00.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 W01 repository shadow fixed point has one writer and no unknown path" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4RepositoryFixedPointW01.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 W02 target compiler separates identity, support, profiles, and product policy" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4TargetCompilerW02.ps1") -RepoRoot $repo
+}
+
+  Invoke-RepoCheck "MIR 4 W03 semantic compiler is a complete non-mutating reference aggregate" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4SemanticCompilationW03.ps1") -RepoRoot $repo
+  }
+
+  Invoke-RepoCheck "MIR 4 W04 runtime, state, migration, and continuity contracts are package-excluded" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4RuntimeContinuityW04.ps1") -RepoRoot $repo -CandidateZip $CandidateZip
+  }
+
 Invoke-RepoCheck "MIR 4 public feedback has one governed reproducer and authority map per family" {
   & (Join-Path $repo "validation\tests\mir4\Test-MIR4PublicFeedbackIntake.ps1") -RepoRoot $repo
 }

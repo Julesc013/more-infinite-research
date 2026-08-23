@@ -29,16 +29,16 @@ The five governed maturity classes are Stable, Shadow, Preview, Experimental and
 
 | Target | Distribution | Predecessor | Candidate role | 4.0 admission rule |
 | --- | --- | --- | --- | --- |
-| f210 | `4.0.21000` | `3.2.11` | Mandatory | Must be fully qualified on exact Factorio 2.1.14 |
-| f200 | `4.0.20000` | `2.5.11` | Mandatory | Must be fully qualified on exact Factorio 2.0.77 with maximum representable parity |
-| f110 | `4.0.11000` | `1.9.9` | Conditional | Independent qualification or explicit deferral |
-| f100 | `4.0.10000` | `1.8.9` | Conditional | Independent qualification or explicit deferral |
-| f018 | `4.0.01800` | private 0.17 bridge | Experimental/private | No admission without an exact preserved 0.18 engine and full target-local proof |
-| f017 | `4.0.01700` | `1.7.9` | Experimental/private | Private evidence only until all admission gates pass |
-| f016 | `4.0.01600` | `1.6.9` | Experimental/private | Private evidence only until all admission gates pass |
-| f015 | `4.0.01500` | `1.5.9` | Experimental/private | Private evidence only until all admission gates pass |
-| f014 | `4.0.01400` | `1.4.9` | Experimental/private | Private evidence only until all admission gates pass |
-| f013 | `4.0.01300` | `1.3.9` | Experimental/private | Private evidence only until all admission gates pass |
+| F210 | `4.0.21000` | `3.2.11` | Mandatory | Must be fully qualified on exact Factorio 2.1.14 |
+| F200 | `4.0.20000` | `2.5.11` | Mandatory | Must be fully qualified on exact Factorio 2.0.77 with maximum representable parity |
+| F110 | `4.0.11000` | `1.9.9` | Conditional | Independent qualification or explicit deferral |
+| F100 | `4.0.10000` | `1.8.9` | Conditional | Independent qualification or explicit deferral |
+| F018 | `4.0.01800` | private 0.17 bridge | Experimental/private | No admission without an exact preserved 0.18 engine and full target-local proof |
+| F017 | `4.0.01700` | `1.7.9` | Experimental/private | Private evidence only until all admission gates pass |
+| F016 | `4.0.01600` | `1.6.9` | Experimental/private | Private evidence only until all admission gates pass |
+| F015 | `4.0.01500` | `1.5.9` | Experimental/private | Private evidence only until all admission gates pass |
+| F014 | `4.0.01400` | `1.4.9` | Experimental/private | Private evidence only until all admission gates pass |
+| F013 | `4.0.01300` | `1.3.9` | Experimental/private | Private evidence only until all admission gates pass |
 
 Padded historical distribution identities are canonical archive identities. Factorio 0.x may normalize the numeric patch component when displaying it in logs; evidence records both forms.
 

@@ -1,0 +1,1 @@
+{"schema":1,"kind":"MIR4SuccessorProofReplayFixtureV1","facts":[{"id":"continuity-import","value":"accepted-copy"},{"id":"extension-transport","value":"data-only"},{"id":"provider-locality","value":"preserved"}],"tamper":{"id":"provider-locality","value":"mutated"},"expected_fact_count":3}

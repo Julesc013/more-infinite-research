@@ -1,6 +1,24 @@
 schema: 1
 
 docs:
+  - path: docs/releases/mir4-4.0-whole-platform-programme.md
+    title: "MIR 4.0 Whole Platform Programme"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0-whole-platform-consolidation
+      - mir4-uppercase-f-target-presentation
+      - mir4-technology-by-technology-acceptance
+  - path: docs/reference/generated/mir4-whole-platform-matrix.md
+    title: "MIR 4 Whole Platform Matrix"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-mir4-whole-platform-maturity
   - path: docs/releases/mir4-4.0-candidate-programme.md
     title: "MIR 4.0 Candidate Programme"
     status: current
@@ -62,6 +80,17 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-qualification-and-promotion-workflow
+  - path: docs/maintainer/mir4-release-governance.md
+    title: "MIR 4 Release Governance"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-signing-authority-separation
+      - mir4-key-recovery-and-revocation
+      - mir4-release-ledger-policy
+      - mir4-archive-and-publisher-confinement
   - path: docs/architecture/mir4-platform-preview.md
     title: "MIR 4 Platform Preview Architecture"
     status: current
@@ -71,6 +100,126 @@ docs:
     source_of_truth_for:
       - mir4-hybrid-platform-boundary
       - shadow-non-interference
+  - path: docs/architecture/mir4-repository-fixed-point.md
+    title: "MIR 4 Repository Fixed Point"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-visible-root-shadow-layout
+      - mir4-path-classification-and-external-roots
+      - mir4-physical-move-gate
+  - path: docs/architecture/mir4-target-compiler.md
+    title: "MIR 4 Target Compiler"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-target-registry-v6
+      - mir4-target-provider-abi
+      - mir4-private-target-product-set
+  - path: docs/architecture/mir4-semantic-compiler.md
+    title: "MIR 4 Semantic Compiler Shadow"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-compilation-run-v1
+      - mir4-provider-micro-protocol-adapter
+      - mir4-merge-law-catalogue
+      - mir4-feature-setting-cutover
+  - path: docs/architecture/mir4-runtime-continuity.md
+    title: "MIR 4 Runtime, State, Migration, and Continuity"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-runtime-feature-spec-v1
+      - mir4-state-spec-v1
+      - mir4-runtime-registration-plan-v1
+      - mir4-migration-graph-v1
+      - mir4-continuity-bundle-v1
+  - path: docs/architecture/mir4-module-ecosystem.md
+    title: "MIR 4 Module Ecosystem"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-mep-v1-preview-contract
+      - mir4-extension-closure-v1
+      - mir4-api-sdk-v1-preview
+      - mir4-extension-builder
+      - mir4-independent-production-consumer-blocker
+  - path: docs/architecture/mir4-processir-synthesis.md
+    title: "MIR 4 ProcessIR, Effect Channels, and Synthesis"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-process-ir-v1-preview
+      - mir4-effect-channel-registry-v1
+      - mir4-synthesis-maturity-matrix-v1
+      - mir4-exact-target-processir-snapshot-blocker
+  - path: docs/architecture/mir4-inspector-compatibility.md
+    title: "MIR 4 Inspector and Compatibility Workbench"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-inspector-v1-preview
+      - mir4-compatibility-subject-ledger-v1
+      - mir4-compatibility-factory-data-bundle-v1
+      - mir4-compatibility-evidence-transfer-boundary
+      - mir4-independent-production-consumer-blocker-w07
+  - path: docs/architecture/mir4-assurance-scale.md
+    title: "MIR 4 Assurance Scale and Offline Drill"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-four-stage-proof-identities
+      - mir4-eleven-observation-slice-roots
+      - mir4-proof-cover-proposal
+      - mir4-24-6-1-release-budget-design
+      - mir4-non-production-offline-publisher-drill
+  - path: docs/architecture/mir4-historical-succession.md
+    title: "MIR 4 Historical, Museum, and Successor-Host Closure"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-w09-historical-museum-matrix
+      - mir4-offline-module-index-and-external-provider-conformance
+      - mir4-synthetic-successor-host-proof
+      - mir4-append-only-package-succession-witness
+  - path: docs/maintainer/mir4-w09-manual-playtest.md
+    title: "MIR 4 W09 Manual Playtest Handoff"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-w09-manual-playtest-checklist
+      - mir4-historical-and-museum-playtest-boundaries
+  - path: docs/maintainer/mir4-full-platform-closeout.md
+    title: "MIR 4 Full-Platform Private Closeout"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-full-platform-39-record-closeout
+      - mir4-independent-luna-audit-input-binding
+      - mir4-dev-and-source-freeze-stop-boundary
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: current
@@ -112,6 +261,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - generated-experimental-api-v0-reference
+  - path: docs/reference/generated/mir4-api-sdk-v1.md
+    title: "MIR 4 API and SDK V1 Preview"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-mir4-api-sdk-v1-reference
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

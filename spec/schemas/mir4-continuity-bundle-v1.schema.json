@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-continuity-bundle-v1.schema.json",
+  "title": "MIR 4 Private Continuity Bundle V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","programme_id","source_identity","authority","maturity","target_count","targets","module_extension_closure","feature_inventory","runtime_state_schemas","aliases_tombstones","migration_watermark","package_roots","proof_roots","redaction_manifest","package_visible","runtime_mutation_authorized","public_release_proof","digest"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4ContinuityBundleV1"},
+    "programme_id": {"const":"M4C02-09-24H"},
+    "source_identity": {"type":["object","null"]},
+    "authority": {"const":".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"},
+    "maturity": {"const":"private-preview"},
+    "target_count": {"const":17},
+    "targets": {"type":"array","minItems":17,"maxItems":17},
+    "module_extension_closure": {"type":"object"},
+    "feature_inventory": {"type":"object"},
+    "runtime_state_schemas": {"type":"object"},
+    "aliases_tombstones": {"type":"object"},
+    "migration_watermark": {"type":"object"},
+    "package_roots": {"type":"array","minItems":17,"maxItems":17},
+    "proof_roots": {"type":"object"},
+    "redaction_manifest": {"type":"object"},
+    "package_visible": {"const":false},
+    "runtime_mutation_authorized": {"const":false},
+    "public_release_proof": {"const":false},
+    "digest": {"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  }
+}

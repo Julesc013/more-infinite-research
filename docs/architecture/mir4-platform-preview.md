@@ -5,7 +5,7 @@ applies_to: "4.0.0 candidate programme"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
 ---
@@ -23,7 +23,7 @@ Anything below Stable is forbidden from mutating prototypes, settings, persisten
 
 `LegacyCompilerHostAdapterV1` reads the existing target snapshots, stream manifest, compatibility manifest, fixture manifest, module boundaries, and package surface. It emits an immutable `CompilationRunV0` shadow record. The normalized compiler is therefore a comparison model over the current compiler, not a second prototype emitter.
 
-The preview is physically split under `tools/lib/mir4`: `NormalizedCompiler.ps1` owns target providers, FeatureManifest/SettingSpec adapters and compilation runs; `SafetyKernel.ps1` owns non-overridable rejection; `PolicyEngine.ps1` owns review dispositions but cannot authorize mutation or override safety; `RuntimeStateModel.ps1` owns runtime and state inventory; `ProcessIR.ps1` owns effect-channel and opportunity models; and `ReleaseDag.ps1` validates the acyclic release workflow. `PlatformPreview.ps1` is the composition and deterministic packaging facade.
+The preview is physically split under `tools/lib/mir4`: `NormalizedCompiler.ps1` owns target providers, FeatureManifest/SettingSpec adapters and compilation runs; `SafetyKernel.ps1` owns non-overridable rejection; `PolicyEngine.ps1` owns review dispositions but cannot authorize mutation or override safety; `RuntimeStateModel.ps1` owns runtime and state inventory; `ProcessIR.ps1` owns package-excluded ProcessIR certificates, effect-channel owner references, and proposal classification; and `ReleaseDag.ps1` validates the acyclic release workflow. `PlatformPreview.ps1` is the composition and deterministic packaging facade.
 
 `mir4 platform compile` supplies an executable extension-to-shadow loop. It validates MEP V0, binds a target provider, normalizes each fragment, evaluates the hard-safety kernel before policy, and serializes stable diagnostics and a digest without acquiring mutation authority.
 
@@ -33,9 +33,9 @@ The preview is physically split under `tools/lib/mir4`: `NormalizedCompiler.ps1`
 
 API/SDK V0 carries six read-only envelope types. MEP V0 adds eight bounded data fragments. The reference extension is a declarative consumer and the Inspector is a second independent consumer of Query API snapshots. Both are packaged separately from the Factorio mod.
 
-ProcessIR V0 records effect channels, inputs, outputs, invariants, and loop diagnostics. Autonomous synthesis can only propose one of six dispositions: handle a certified subject, preserve opaque behavior, request an extension, request review, omit with evidence, or fail hard safety with a witness. It cannot emit new gameplay families in 4.0.
+ProcessIR V1 derives deterministic process identities, exact/bounded flows, catalysts, returned containers, recycling/recovery classifications, self-intersections, SCCs, and minimal witnesses from copied canonical fact transports. It preserves terminal risk fingerprints and treats incomplete evidence as `UNKNOWN`. The repository currently has only a synthetic fixture corpus, so exact-target parity is explicitly blocked.
 
-The opportunity catalogue scans every declared effect channel and emits evidence-linked `request-review` or `request-extension` candidates. This is immediately usable for compiler tuning, while the absence of mutation authority prevents a confidence score or heuristic from becoming gameplay.
+Autonomous synthesis V1 exposes ten descriptive constructors across Diagnose, Conservative, and Experimental modes. Known unsafe candidates fail hard safety, known safe candidates remain preview-admissible or explicitly quarantined, and no candidate becomes a player operation. Effect channels retain their existing semantic owners; opaque channels remain opaque.
 
 The stable release-DAG contract orders authority, deterministic construction, static proof, runtime proof, performance, manual review, aggregate qualification, signing, sealing, dry runs, restore, exact-tree promotion, tags, publication and public readback. Its executable validator rejects cycles, missing dependencies and any sign, seal, promote, tag or publish node that lacks the separate production go/no-go boundary.
 

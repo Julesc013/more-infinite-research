@@ -32,10 +32,10 @@ Developer SDKs, schemas, fixtures, evidence, governance records, and Inspector a
 
 Append exactly one qualified target statement:
 
-- f210: `For Factorio 2.1. Direct upgrade predecessor: MIR 3.2.11.`
-- f200: `For Factorio 2.0. Direct upgrade predecessor: MIR 2.5.11.`
-- f110: `For Factorio 1.1. Direct upgrade predecessor: MIR 1.9.9.`
-- f100: `For Factorio 1.0. Direct upgrade predecessor: MIR 1.8.9.`
+- F210: `For Factorio 2.1. Direct upgrade predecessor: MIR 3.2.11.`
+- F200: `For Factorio 2.0. Direct upgrade predecessor: MIR 2.5.11.`
+- F110: `For Factorio 1.1. Direct upgrade predecessor: MIR 1.9.9.`
+- F100: `For Factorio 1.0. Direct upgrade predecessor: MIR 1.8.9.`
 
 Do not prepare a public historical suffix unless that target has its own admission, qualification, seal, and publication decision.
 

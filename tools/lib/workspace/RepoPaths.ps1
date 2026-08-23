@@ -306,7 +306,18 @@ function Get-MIRLayoutClass {
   param([Parameter(Mandatory)][string]$Path)
   if (Test-MIRPackagePath -Path $Path) { return "product-package" }
   foreach ($row in @(
+    @("governance/", "repository-shadow-projection"),
+    @("contracts/", "repository-shadow-projection"),
     @("spec/", "product-specification"),
+    @("src/", "repository-shadow-projection"),
+    @("targets/", "repository-shadow-projection"),
+    @("modules/", "repository-shadow-projection"),
+    @("sdk/", "developer-sdk-projection"),
+    @("tests/", "repository-shadow-projection"),
+    @("assurance/", "repository-shadow-projection"),
+    @("changes/", "repository-shadow-projection"),
+    @("releases/", "repository-shadow-projection"),
+    @("examples/", "repository-shadow-projection"),
     @("validation/", "validation"),
     @("verification/", "legacy-validation"),
     @("tools/", "tooling"),
@@ -321,7 +332,7 @@ function Get-MIRLayoutClass {
   )) {
     if ($Path.StartsWith($row[0], [StringComparison]::Ordinal)) { return $row[1] }
   }
-  if ($Path -in @(".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "todo.md")) { return "repository-policy" }
+  if ($Path -in @(".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "todo.md", "mir.toml", "mir.lock")) { return "repository-policy" }
   return "unclassified"
 }
 
@@ -388,7 +399,7 @@ function New-MIRLayoutManifest {
     } else {
       "canonical"
     }
-    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/)" -or $path -eq "todo.md"
+    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("todo.md", "mir.lock")
     $rows.Add([pscustomobject][ordered]@{
       path=$path
       class=$class

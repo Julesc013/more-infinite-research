@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/schemas/mir4-release-budget-plan-v1.schema.json",
+  "title": "MIR 4 Release Budget Plan V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind", "schema", "programme_id", "wave", "maturity", "source_identity", "affected_targets", "fresh_proof", "reused_proof", "deadlines", "manual_requirements", "worker_capacity", "timing_evidence", "status", "package_visible", "public_release_proof", "deadline_certification", "source_freeze_authorized", "production_signing_or_sealing_authorized", "publication_authorized", "record_sha256"],
+  "properties": {
+    "kind": {"const": "MIR4ReleaseBudgetPlanV1"}, "schema": {"const": 1}, "programme_id": {"const": "M4C02-09-24H"}, "wave": {"const": "W08"}, "maturity": {"const": "shadow-design-model"},
+    "source_identity": {"$ref": "#/$defs/sourceIdentity"},
+    "affected_targets": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^f[0-9]{3}$"}},
+    "fresh_proof": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}, "reused_proof": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "deadlines": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/deadline"}},
+    "manual_requirements": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "worker_capacity": {"type": "object"}, "timing_evidence": {"type": "object"},
+    "status": {"enum": ["partial-with-bounded-blockers", "passed-design-model-only"]},
+    "package_visible": {"const": false}, "public_release_proof": {"const": false}, "deadline_certification": {"const": false}, "source_freeze_authorized": {"const": false}, "production_signing_or_sealing_authorized": {"const": false}, "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "sourceIdentity": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "programme_id"], "properties": {"commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "programme_id": {"const": "M4C02-09-24H"}}},
+    "deadline": {"type": "object", "additionalProperties": false, "required": ["change_class", "hard_seconds", "design_p95_seconds", "design_headroom_seconds", "estimated_p95_seconds", "estimated_headroom_seconds", "critical_path", "status", "blockers"], "properties": {"change_class": {"enum": ["minor", "patch", "hotfix"]}, "hard_seconds": {"type": "integer", "minimum": 1}, "design_p95_seconds": {"type": "integer", "minimum": 1}, "design_headroom_seconds": {"type": "integer", "minimum": 0}, "estimated_p95_seconds": {"type": ["integer", "null"], "minimum": 0}, "estimated_headroom_seconds": {"type": ["integer", "null"]}, "critical_path": {"type": "object"}, "status": {"type": "string", "minLength": 1}, "blockers": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}}}
+  }
+}
