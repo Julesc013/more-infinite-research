@@ -27,7 +27,7 @@ function New-MIR4SemanticAuthorityRef {
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   $file = Join-Path $repo $Path
   if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "[mir4-semantic-reference-missing] ${Role}:$Path" }
-  return [ordered]@{role=$Role;authority=$Path;sha256=(Get-MIR4PlatformFileSha256 $file);status=$Status;maturity=$Maturity}
+  return [ordered]@{role=$Role;authority=$Path;sha256=(Get-MIR4PlatformInputSha256 $file);status=$Status;maturity=$Maturity}
 }
 
 function New-MIR4ProviderMicroProtocolMatrix {

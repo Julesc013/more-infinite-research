@@ -11,6 +11,9 @@ $crlfProbe=Join-Path $lineEndingProbeRoot 'crlf.txt'
 [IO.File]::WriteAllBytes($lfProbe,[Text.UTF8Encoding]::new($false).GetBytes("alpha`nbeta`n"))
 [IO.File]::WriteAllBytes($crlfProbe,[Text.UTF8Encoding]::new($false).GetBytes("alpha`r`nbeta`r`n"))
 if((Get-MIR4PlatformInputSha256 $lfProbe)-cne(Get-MIR4PlatformInputSha256 $crlfProbe)){throw '[mir4-platform-input-line-ending-invariance]'}
+$lfAuthority=New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'line-ending-probe' -Path 'build/results/mir4-platform-line-ending-probe/lf.txt' -Status 'probe' -Maturity 'test'
+$crlfAuthority=New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'line-ending-probe' -Path 'build/results/mir4-platform-line-ending-probe/crlf.txt' -Status 'probe' -Maturity 'test'
+if([string]$lfAuthority.sha256-cne[string]$crlfAuthority.sha256){throw '[mir4-semantic-authority-line-ending-invariance]'}
 
 $platform=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec\platform\mir4-preview-v0\platform.json')|ConvertFrom-Json
 if(@($platform.components).Count -lt 23){throw '[mir4-platform-components] Expected the complete hybrid component inventory.'}
