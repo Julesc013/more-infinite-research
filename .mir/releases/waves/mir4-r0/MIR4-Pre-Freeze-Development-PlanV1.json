@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "kind": "MIR4PreFreezeDevelopmentPlanV1",
+  "recorded_at": "2026-08-24T13:00:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "source_baseline": {
+    "branch": "dev",
+    "commit": "01d17672acd74d229652b87e3919f30c9a70166e",
+    "tree": "52bef9bca7edc0b612c4c766f934bf5b1d43f4c5",
+    "package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"
+  },
+  "candidate_state": "pre-freeze-unallocated",
+  "next_candidate": "M4RC1",
+  "targets": [
+    {
+      "target": "F210",
+      "release_role": "mandatory",
+      "distribution_version": "4.0.21000",
+      "development_package": {
+        "sha256": "5058499D4A2802B0F1D9FDC50C1887C36A76AA2C9A4BD9B5F8DFFB58D1ACBD7D",
+        "content_sha256": "E898C21075452B045C62879535E6639C424276223063E4170FF05D4F72070B6B",
+        "bytes": 1076523,
+        "entry_count": 307,
+        "release_identity": false
+      },
+      "engine": {
+        "version": "2.1.14",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      },
+      "predecessor": {
+        "release": "3.2.11",
+        "path": "dist/more-infinite-research_3.2.11.zip",
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+      }
+    },
+    {
+      "target": "F200",
+      "release_role": "mandatory",
+      "distribution_version": "4.0.20000",
+      "development_package": {
+        "sha256": "0078768BDDAEB4E8AE243D406919C38C55AC6C2CB96A492E890175EDEB0860C4",
+        "content_sha256": "ECFA00DAB282F266C98754749523791C485D73F7D019E04362DD58134C486FD3",
+        "bytes": 1071065,
+        "entry_count": 304,
+        "release_identity": false
+      },
+      "engine": {
+        "version": "2.0.77",
+        "path": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "predecessor": {
+        "release": "2.5.11",
+        "path": "dist/more-infinite-research_2.5.11.zip",
+        "sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
+      }
+    }
+  ],
+  "verification_plan": {
+    "profile": "mir4-bootstrap",
+    "plan_sha256": "124EE29574BB9ABC3797793532A56F34D2B2F14C7309C1209083E0CEE72CED0D",
+    "plan_material_sha256": "A1164A5FA48E12630E49FC9972AA8287B1DB6EDD318583EB59C851AB0711CED4",
+    "required_test_set_sha256": "9DF329853A48F248F94B6FE59B120E03894AEF64FA0C07CCC35F603E8C47068E",
+    "bundle_sha256": "9E261769751BDE23F7E563C95419C83857F6F4D2F8B9BC21D333A5877A087604",
+    "total": 30,
+    "passed": 30,
+    "failed": 0,
+    "invalid": 0
+  },
+  "qualification_boundary": {
+    "development_predecessors_bound": true,
+    "frozen_candidate_predecessor_binding_required": true,
+    "development_packages_are_release_identities": false,
+    "source_freeze_authorized": false,
+    "candidate_allocation_authorized": false,
+    "production_release_authorized": false
+  },
+  "status": "ZERO-INVALID-DEVELOPMENT-PLAN-RELEASE-QUALIFICATION-PENDING"
+}

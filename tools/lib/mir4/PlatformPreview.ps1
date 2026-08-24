@@ -73,6 +73,13 @@ function Get-MIR4PlatformFileSha256 {
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToLowerInvariant()
 }
 
+function Get-MIR4PlatformBytesSha256 {
+  param([Parameter(Mandatory)][byte[]]$Bytes)
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try { return ([BitConverter]::ToString($sha.ComputeHash($Bytes)).Replace('-', '').ToLowerInvariant()) }
+  finally { $sha.Dispose() }
+}
+
 function Get-MIR4PlatformInputSha256 {
   param([Parameter(Mandatory)][string]$Path)
   $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
@@ -553,7 +560,57 @@ function Write-MIR4DeterministicPreviewArchive {
         $entry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
         $entryStream = $entry.Open(); try { $entryStream.Write($bytes,0,$bytes.Length) } finally { $entryStream.Dispose() }
       }
-      $manifestObject = [pscustomobject][ordered]@{schema=1;kind='MIR4PreviewAssetManifestV1';root=$RootName;source_version='4.0.0';programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated';files=$rows;digest=''}
+      $sourceCommit = (& git -C $repo rev-parse HEAD).Trim()
+      $sourceTree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+      $sourceClean = @(& git -C $repo status --porcelain --untracked-files=no).Count -eq 0
+      $contractRows = @($rows | Where-Object { $_.path -match '^spec/(?:api/|schemas/)' })
+      $contractSet = [pscustomobject][ordered]@{kind='MIR4PreviewContractSetV1';files=$contractRows;digest=''}
+      Add-MIR4PlatformDigest $contractSet | Out-Null
+      $generatedMap = @($rows | Where-Object { $_.path -match '^sdk/preview/mir4/' } | ForEach-Object {
+        [ordered]@{generated_path=$_.path;generator='tools/lib/mir4/PlatformPreview.ps1';checked_in=$true}
+      })
+      $sbom = [pscustomobject][ordered]@{
+        spdxVersion='SPDX-2.3';dataLicense='CC0-1.0';SPDXID='SPDXRef-DOCUMENT';name=$RootName
+        documentNamespace=("https://more-infinite-research.invalid/spdx/{0}/{1}" -f $RootName,$contractSet.digest.Replace('sha256:',''))
+        creationInfo=[ordered]@{creators=@('Tool: MIR4 PlatformPreview.ps1');licenseListVersion='3.25'}
+        packages=@([ordered]@{SPDXID='SPDXRef-Package';name=$RootName;versionInfo='4.0.0';downloadLocation='NOASSERTION';filesAnalyzed=$true;licenseConcluded='MPL-2.0';licenseDeclared='MPL-2.0';copyrightText='NOASSERTION'})
+        files=@($rows | ForEach-Object -Begin {$index=0} -Process {$index++;[ordered]@{SPDXID=('SPDXRef-File-{0:d4}' -f $index);fileName=$_.path;checksums=@([ordered]@{algorithm='SHA256';checksumValue=$_.sha256});licenseConcluded='MPL-2.0';copyrightText='NOASSERTION'}})
+      }
+      $provenance = [pscustomobject][ordered]@{
+        schema=1;kind='MIR4PreviewProvenanceV1';build_type='mir4-deterministic-preview-archive-v1'
+        source=[ordered]@{repository='Julesc013/more-infinite-research';commit=$sourceCommit;tree=$sourceTree;clean=$sourceClean}
+        builder=[ordered]@{id='tools/lib/mir4/PlatformPreview.ps1';network_required=$false}
+        invocation=[ordered]@{asset_root=$RootName;candidate_state='pre-freeze-unallocated';production_candidate=$false}
+        materials=$rows;subject_scope='archive-payload-before-containerization';contract_set_digest=$contractSet.digest
+        source_freeze_authorized=$false;publication_authorized=$false
+      }
+      $sbomBytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4PlatformCanonicalJson $sbom)+[Environment]::NewLine)
+      $provenanceBytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4PlatformCanonicalJson $provenance)+[Environment]::NewLine)
+      foreach ($metadata in @(
+        @{name='sbom.spdx.json';bytes=$sbomBytes},
+        @{name='provenance.json';bytes=$provenanceBytes}
+      )) {
+        $metadataEntry = $zip.CreateEntry(($RootName + '/' + $metadata.name),[IO.Compression.CompressionLevel]::Optimal)
+        $metadataEntry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
+        $metadataStream = $metadataEntry.Open(); try { $metadataStream.Write($metadata.bytes,0,$metadata.bytes.Length) } finally { $metadataStream.Dispose() }
+      }
+      $manifestObject = [pscustomobject][ordered]@{
+        schema=1;kind='MIR4PreviewAssetManifestV1';root=$RootName;source_version='4.0.0'
+        programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated'
+        production_candidate=$false;publication_authorized=$false
+        source=[ordered]@{repository='Julesc013/more-infinite-research';commit=$sourceCommit;tree=$sourceTree;clean=$sourceClean}
+        contract_set=$contractSet;files=$rows
+        license_inventory=@([ordered]@{path='LICENSE';spdx_id='MPL-2.0'})
+        generated_source_map=$generatedMap
+        conformance=[ordered]@{status='passed-before-packaging';commands=@('mir4 platform check','mir4 platform conformance')}
+        v0_migration_policy='V0 is superseded migration-only compatibility input and is not a public preview asset.'
+        compatibility_notice='Developer preview: read-only, package-excluded, not API/SDK 1.0 stable, and not a Mod Portal payload.'
+        embedded_metadata=@(
+          [ordered]@{path='sbom.spdx.json';bytes=$sbomBytes.Length;sha256=(Get-MIR4PlatformBytesSha256 $sbomBytes)},
+          [ordered]@{path='provenance.json';bytes=$provenanceBytes.Length;sha256=(Get-MIR4PlatformBytesSha256 $provenanceBytes)}
+        )
+        digest=''
+      }
       Add-MIR4PlatformDigest $manifestObject | Out-Null
       $manifestBytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4PlatformCanonicalJson $manifestObject)+"`n")
       $manifestEntry = $zip.CreateEntry(($RootName + '/manifest.json'),[IO.Compression.CompressionLevel]::Optimal)
@@ -571,12 +628,21 @@ function New-MIR4PlatformPreviewPackages {
   $output = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
   $allowedOutput = [IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\') + '\'
   if (-not ($output + '\').StartsWith($allowedOutput,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-preview-output-boundary] $output" }
+  $assetContract = @('mir4-api-sdk-v1-preview.zip','mir4-mep-v1-preview.zip','mir4-reference-extension-v1-preview.zip','mir4-inspector-v1-preview.zip')
+  New-Item -ItemType Directory -Path $output -Force | Out-Null
+  $unexpectedDirectories = @(Get-ChildItem -LiteralPath $output -Directory -Force)
+  if ($unexpectedDirectories.Count -ne 0) { throw "[mir4-preview-output-directory] $($unexpectedDirectories[0].FullName)" }
+  foreach ($staleFile in @(Get-ChildItem -LiteralPath $output -File -Force)) {
+    Remove-Item -LiteralPath $staleFile.FullName -Force
+  }
   $allSdk = @(Get-ChildItem -LiteralPath (Join-Path $repo 'sdk/preview/mir4') -Recurse -File) | ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') }
   $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1|inspector-v1)/' -and $_ -notmatch '/reference/(?:process-ir-parity-result|effect-channel-registry-v1|synthesis-maturity-matrix-v1|compatibility-subject-ledger-v1|compatibility-factory-plan-v1|inspection-bundle-v1|inspector-workbench-result-v1|support-bundle-v1)\.json$' })
   $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
+  $apiV1 = @($allSdk | Where-Object { $_ -match '/api-v1/' })
+  $mepV1 = @($allSdk | Where-Object { $_ -match '/mep-v1/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
   $sets = [ordered]@{
     'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
-    'mir4-sdk-v1-preview.zip' = @($sdkV1 + @('spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-api-v1-response.schema.json','docs/architecture/mir4-module-ecosystem.md','docs/reference/generated/mir4-api-sdk-v1.md','tools/lib/mir4/ModuleEcosystem.ps1','tools/commands/mir4/Invoke-MIR4Extension.ps1','LICENSE'))
+    'mir4-api-sdk-v1-preview.zip' = @($apiV1 + @('spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-api-v1-response.schema.json','docs/reference/generated/mir4-api-sdk-v1.md','docs/reference/mir4-sdk-v1-quickstart.md','LICENSE'))
     'mir4-platform-preview-v0.zip' = @('mir.toml','mir.lock','spec/platform/mir4-preview-v0/platform.json','spec/platform/mir4-preview-v0/release-dag.json','spec/schemas/mir4-compilation-run-v1.schema.json','spec/schemas/mir4-runtime-state-matrix-v1.schema.json','spec/schemas/mir4-migration-graph-matrix-v1.schema.json','spec/schemas/mir4-continuity-bundle-v1.schema.json','spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json','spec/schemas/mir4-process-ir-v1.schema.json','spec/schemas/mir4-effect-channel-registry-v1.schema.json','spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json','.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json','docs/architecture/mir4-platform-preview.md','docs/architecture/mir4-target-compiler.md','docs/architecture/mir4-semantic-compiler.md','docs/architecture/mir4-runtime-continuity.md','docs/architecture/mir4-processir-synthesis.md','docs/reference/generated/mir4-platform-component-matrix.md','sdk/preview/mir4/reference/target-providers.json','sdk/preview/mir4/reference/target-contracts.json','sdk/preview/mir4/reference/target-provider-law-results.json','sdk/preview/mir4/reference/affected-target-plan.json','sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/feature-setting-cutover-matrix.json','sdk/preview/mir4/reference/provider-micro-protocol-matrix.json','sdk/preview/mir4/reference/merge-law-catalogue.json','sdk/preview/mir4/reference/runtime-state-inventory.json','sdk/preview/mir4/reference/migration-graph-matrix.json','sdk/preview/mir4/reference/continuity-bundle-template.json','sdk/preview/mir4/reference/process-ir-parity-result.json','sdk/preview/mir4/reference/effect-channel-registry-v1.json','sdk/preview/mir4/reference/synthesis-maturity-matrix-v1.json','sdk/preview/mir4/reference/release-dag.json','sdk/preview/mir4/reference/shadow-extension-run-f210.json','fixtures/mir4-process-ir-v0/positive/bounded-loop.json','fixtures/mir4-process-ir-v0/negative/unbounded-loop.json','fixtures/mir4-process-ir-v1/positive/ordinary-safe.json','fixtures/mir4-process-ir-v1/positive/catalyst-container-bounded-cycle.json','fixtures/mir4-process-ir-v1/positive/recycling-recovery.json','fixtures/mir4-process-ir-v1/negative/unbounded-positive-cycle.json','fixtures/mir4-process-ir-v1/negative/unsupported-unknown.json','fixtures/mir4-process-ir-v1/permutation/scc-order-a.json','fixtures/mir4-process-ir-v1/permutation/scc-order-b.json','tools/lib/mir4/SafetyKernel.ps1','tools/lib/mir4/PolicyEngine.ps1','tools/lib/mir4/NormalizedCompiler.ps1','tools/lib/mir4/TargetCompiler.ps1','tools/lib/mir4/CompilationRun.ps1','tools/lib/mir4/RuntimeStateModel.ps1','tools/lib/mir4/ProcessIR.ps1','tools/lib/mir4/ReleaseDag.ps1','LICENSE')
     'mir4-reference-extension-v0.zip' = @('sdk/preview/mir4/reference-extension/extension.json','sdk/preview/mir4/reference-extension/README.md','spec/schemas/preview/mir4-mep-v0.schema.json','LICENSE')
     'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
@@ -608,7 +674,7 @@ function New-MIR4PlatformPreviewPackages {
     'fixtures/mir4-inspector-compatibility-v1/evidence/synthetic-claim-attempt.json',
     'tools/lib/mir4/SupportAssessment.ps1','tools/lib/mir4/CompatibilityIndex.ps1','tools/lib/mir4/CompatibilityFactory.ps1','tools/lib/mir4/Inspector.ps1'
   )
-  $sets['mir4-inspector-preview-v1.zip'] = @(
+  $sets['mir4-inspector-v1-preview.zip'] = @(
     'sdk/preview/mir4/inspector-v1/index.html','sdk/preview/mir4/inspector-v1/Export-MIR4InspectionBundle.ps1','sdk/preview/mir4/inspector-v1/README.md',
     'sdk/preview/mir4/reference/inspection-bundle-v1.json','sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json',
     'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json','sdk/preview/mir4/reference/inspector-workbench-result-v1.json',
@@ -616,12 +682,9 @@ function New-MIR4PlatformPreviewPackages {
     'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json','spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
     'spec/schemas/mir4-inspector-workbench-result-v1.schema.json','LICENSE'
   )
-  $sets['mir4-sdk-v1-preview.zip'] += @('sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1','sdk/preview/mir4/README.md')
-  $sets['mir4-developer-preview-v1.zip'] = @($sets['mir4-platform-preview-v0.zip'] + $sdkV1 + @(
-    'sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1','sdk/preview/mir4/README.md',
-    'docs/reference/generated/mir4-api-sdk-v1.md','docs/reference/mir4-sdk-v1-quickstart.md',
-    'spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-mep-v1.schema.json',
-    'spec/schemas/preview/mir4-api-v1-response.schema.json'
+  $sets['mir4-mep-v1-preview.zip'] = @($mepV1 + @(
+    'spec/schemas/preview/mir4-mep-v1.schema.json','docs/architecture/mir4-module-ecosystem.md',
+    'tools/lib/mir4/ModuleEcosystem.ps1','tools/commands/mir4/Invoke-MIR4Extension.ps1','LICENSE'
   ))
   foreach ($legacyAsset in @('mir4-sdk-v0-preview.zip','mir4-platform-preview-v0.zip','mir4-reference-extension-v0.zip','mir4-inspector-preview-v0.zip')) {
     [void]$sets.Remove($legacyAsset)
@@ -632,8 +695,23 @@ function New-MIR4PlatformPreviewPackages {
     Write-MIR4DeterministicPreviewArchive -RepoRoot $repo -OutputPath $path -RootName ([IO.Path]::GetFileNameWithoutExtension($set.Key)) -RelativePaths @($set.Value)
     $hashes += [ordered]@{name=$set.Key;bytes=(Get-Item -LiteralPath $path).Length;sha256=(Get-MIR4PlatformFileSha256 $path)}
   }
-  $manifest = [pscustomobject][ordered]@{schema=1;kind='MIR4PreviewAssetSetV1';source_version='4.0.0';programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated';assets=$hashes;publication='github-preview-only-not-mod-portal';digest=''}
+  $manifest = [pscustomobject][ordered]@{
+    schema=1;kind='MIR4PreviewAssetSetV1';source_version='4.0.0'
+    programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated'
+    source=[ordered]@{
+      repository='Julesc013/more-infinite-research'
+      commit=(& git -C $repo rev-parse HEAD).Trim()
+      tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+      clean=(@(& git -C $repo status --porcelain --untracked-files=no).Count -eq 0)
+    }
+    asset_contract=$assetContract
+    assets=$hashes;embedded_manifest_required=$true;embedded_spdx_required=$true;embedded_provenance_required=$true
+    v0_policy='migration-only-no-public-v0-assets';publication='github-preview-only-not-mod-portal';digest=''
+  }
   Add-MIR4PlatformDigest $manifest | Out-Null
-  [IO.File]::WriteAllText((Join-Path $output 'preview-assets.json'),(ConvertTo-MIR4PlatformCanonicalJson $manifest)+"`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $output 'preview-assets.json'),(ConvertTo-MIR4PlatformCanonicalJson $manifest)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+  $actualOutput = @(Get-ChildItem -LiteralPath $output -File | ForEach-Object Name | Sort-Object)
+  $expectedOutput = @($assetContract + 'preview-assets.json' | Sort-Object)
+  if (($actualOutput -join '|') -cne ($expectedOutput -join '|')) { throw '[mir4-preview-output-exact-set]' }
   return $manifest
 }

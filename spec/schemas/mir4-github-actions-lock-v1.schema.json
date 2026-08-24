@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-github-actions-lock-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "scope", "package_visible", "actions", "production_workflows", "policy"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4GitHubActionsLockV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "production-and-release-controller-workflows"},
+    "package_visible": {"const": false},
+    "actions": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "requested_tag", "commit_sha", "source"],
+        "properties": {
+          "action": {"pattern": "^actions/[a-z-]+$"},
+          "requested_tag": {"pattern": "^v[0-9]+$"},
+          "commit_sha": {"pattern": "^[0-9a-f]{40}$"},
+          "source": {"pattern": "^https://api\\.github\\.com/repos/actions/"}
+        }
+      }
+    },
+    "production_workflows": {
+      "type": "array",
+      "minItems": 12,
+      "items": {"pattern": "^\\.github/workflows/[a-z0-9-]+\\.yml$"}
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_commit_sha_required", "floating_tag_forbidden", "lock_mismatch_fails_closed", "release_candidate_has_no_third_party_action", "publisher_has_no_source_checkout_or_package_builder"],
+      "properties": {
+        "full_commit_sha_required": {"const": true},
+        "floating_tag_forbidden": {"const": true},
+        "lock_mismatch_fails_closed": {"const": true},
+        "release_candidate_has_no_third_party_action": {"const": true},
+        "publisher_has_no_source_checkout_or_package_builder": {"const": true}
+      }
+    }
+  }
+}

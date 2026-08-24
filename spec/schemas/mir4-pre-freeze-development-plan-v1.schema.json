@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-pre-freeze-development-plan-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "kind", "source_baseline", "candidate_state", "next_candidate", "targets", "verification_plan", "qualification_boundary", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PreFreezeDevelopmentPlanV1"},
+    "source_baseline": {
+      "type": "object",
+      "required": ["branch", "commit", "tree", "package_source_sha256"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[0-9a-f]{40}$"},
+        "tree": {"pattern": "^[0-9a-f]{40}$"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "candidate_state": {"const": "pre-freeze-unallocated"},
+    "next_candidate": {"const": "M4RC1"},
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["target", "release_role", "distribution_version", "development_package", "engine", "predecessor"],
+        "properties": {
+          "target": {"enum": ["F210", "F200"]},
+          "release_role": {"const": "mandatory"},
+          "development_package": {
+            "type": "object",
+            "required": ["sha256", "content_sha256", "release_identity"],
+            "properties": {
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "content_sha256": {"$ref": "#/$defs/sha256"},
+              "release_identity": {"const": false}
+            }
+          },
+          "engine": {
+            "type": "object",
+            "required": ["version", "path", "sha256"],
+            "properties": {
+              "version": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"$ref": "#/$defs/sha256"}
+            }
+          },
+          "predecessor": {
+            "type": "object",
+            "required": ["release", "path", "sha256", "content_sha256"],
+            "properties": {
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "content_sha256": {"$ref": "#/$defs/sha256"}
+            }
+          }
+        }
+      }
+    },
+    "verification_plan": {
+      "type": "object",
+      "required": ["plan_sha256", "plan_material_sha256", "required_test_set_sha256", "bundle_sha256", "total", "passed", "failed", "invalid"],
+      "properties": {
+        "plan_sha256": {"$ref": "#/$defs/sha256"},
+        "plan_material_sha256": {"$ref": "#/$defs/sha256"},
+        "required_test_set_sha256": {"$ref": "#/$defs/sha256"},
+        "bundle_sha256": {"$ref": "#/$defs/sha256"},
+        "total": {"const": 30},
+        "passed": {"const": 30},
+        "failed": {"const": 0},
+        "invalid": {"const": 0}
+      }
+    },
+    "qualification_boundary": {
+      "type": "object",
+      "required": ["development_predecessors_bound", "frozen_candidate_predecessor_binding_required", "development_packages_are_release_identities", "source_freeze_authorized", "candidate_allocation_authorized", "production_release_authorized"],
+      "properties": {
+        "development_predecessors_bound": {"const": true},
+        "frozen_candidate_predecessor_binding_required": {"const": true},
+        "development_packages_are_release_identities": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocation_authorized": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    },
+    "status": {"const": "ZERO-INVALID-DEVELOPMENT-PLAN-RELEASE-QUALIFICATION-PENDING"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseWorkflowContractV1",
+  "recorded_at": "2026-08-24T13:00:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "package_visible": false,
+  "primary_inputs": [
+    "source_release_record",
+    "candidate_id",
+    "source_commit",
+    "source_tree",
+    "target_distribution_record_set",
+    "release_plan_digest",
+    "proof_root",
+    "seal_root"
+  ],
+  "ad_hoc_archive_hash_input_forbidden": true,
+  "target_matrix": {
+    "mandatory": ["F210", "F200"],
+    "conditional": ["F110", "F100"],
+    "target_receipt_required": true,
+    "family_readiness_is_target_receipt_fold": true
+  },
+  "phases": [
+    {"id": "source-freeze", "workflow": ".github/workflows/mir4-source-freeze.yml", "production_transition": true},
+    {"id": "target-build", "workflow": ".github/workflows/mir4-target-build.yml", "production_transition": false},
+    {"id": "target-qualification", "workflow": ".github/workflows/mir4-target-qualification.yml", "production_transition": false},
+    {"id": "preview-assets", "workflow": ".github/workflows/mir4-preview-assets.yml", "production_transition": false},
+    {"id": "independent-verification", "workflow": ".github/workflows/mir4-independent-verification.yml", "production_transition": false},
+    {"id": "release-seal", "workflow": ".github/workflows/mir4-release-seal.yml", "production_transition": true},
+    {"id": "promotion", "workflow": ".github/workflows/mir4-promotion.yml", "production_transition": true},
+    {"id": "target-publication", "workflow": ".github/workflows/mir4-target-publication.yml", "production_transition": true},
+    {"id": "public-readback", "workflow": ".github/workflows/mir4-public-readback.yml", "production_transition": true},
+    {"id": "restore-drill", "workflow": ".github/workflows/mir4-restore-drill.yml", "production_transition": false}
+  ],
+  "current_gate": {
+    "state": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED",
+    "source_freeze_authorized": false,
+    "candidate_allocation_authorized": false,
+    "production_signing_authorized": false,
+    "promotion_authorized": false,
+    "publication_authorized": false,
+    "fail_closed": true
+  }
+}

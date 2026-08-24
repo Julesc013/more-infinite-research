@@ -5,6 +5,7 @@ $root='.mir/releases/waves/mir4-r0'
 $records=@(
   @{path="$root/MIR4-Target-RegistryV5.json";schema='spec/schemas/mir4-hybrid-platform-authority.schema.json'},
   @{path="$root/MIR4-Platform-Maturity-and-Publication-ContractV1.json";schema='spec/schemas/mir4-hybrid-platform-authority.schema.json'},
+  @{path="$root/MIR4-Platform-Maturity-and-Publication-ContractV2.json";schema='spec/schemas/mir4-hybrid-platform-authority.schema.json'},
   @{path="$root/MIR4-Candidate-Wave-ProgrammeV1.json";schema='spec/schemas/mir4-hybrid-platform-authority.schema.json'},
   @{path="$root/MIR4-M4C01-Implementation-AuthorizationV1.json";schema='spec/schemas/mir4-m4c01-implementation-authorization.schema.json'}
 )
@@ -13,6 +14,14 @@ foreach($item in $records){
   if(-not($text|Test-Json -SchemaFile (Join-Path $repo $item.schema))){throw "[mir4-hybrid-schema] $($item.path)"}
   $record=$text|ConvertFrom-Json -Depth 100 -DateKind String
   if(-not(Test-MIR4BootstrapRecordHash -Record $record)){throw "[mir4-hybrid-self-hash] $($item.path)"}
+}
+$previewAuthority=Get-Content -Raw -LiteralPath (Join-Path $repo "$root/MIR4-Platform-Maturity-and-Publication-ContractV2.json")|ConvertFrom-Json -Depth 100 -DateKind String
+$expectedPreviewAssets=@('mir4-api-sdk-v1-preview.zip','mir4-mep-v1-preview.zip','mir4-reference-extension-v1-preview.zip','mir4-inspector-v1-preview.zip')
+if((@($previewAuthority.developer_preview_assets|Sort-Object)-join'|')-cne(@($expectedPreviewAssets|Sort-Object)-join'|')-or
+   [string]$previewAuthority.v0_policy-cne'migration-only-no-public-v0-assets'-or
+   $previewAuthority.source_freeze_authorized-or$previewAuthority.candidate_allocation_authorized-or
+   $previewAuthority.production_signing_authorized-or$previewAuthority.promotion_authorized-or$previewAuthority.publication_authorized){
+  throw '[mir4-hybrid-v2-preview-authority]'
 }
 $authority=Get-Content -Raw -LiteralPath (Join-Path $repo "$root/MIR4-M4C01-Implementation-AuthorizationV1.json")|ConvertFrom-Json -DateKind String
 foreach($forbidden in @('production-key-create-or-use','main-promotion','legacy-promotion','v4-tags','github-release-publication','mod-portal-mir4-upload','production-seal','cleanup-or-deletion')){if($forbidden -notin @($authority.not_authorized)){throw "[mir4-hybrid-boundary] Missing $forbidden"}}

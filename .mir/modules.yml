@@ -180,6 +180,41 @@ package_excluded_modules:
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records, merged Dev baseline, typed blocker scopes, and branch readiness only; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
     stability: stable-release-readiness-authority-release-blocked
+  mir4_pre_freeze_hardening_v1:
+    authorities:
+      - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
+      - .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
+      - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
+      - .mir/releases/governance/mir4/github-actions-lock.json
+      - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
+    implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    commands:
+      - tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
+      - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
+    workflows:
+      - .github/workflows/mir4-source-freeze.yml
+      - .github/workflows/mir4-target-build.yml
+      - .github/workflows/mir4-target-qualification.yml
+      - .github/workflows/mir4-preview-assets.yml
+      - .github/workflows/mir4-independent-verification.yml
+      - .github/workflows/mir4-release-seal.yml
+      - .github/workflows/mir4-promotion.yml
+      - .github/workflows/mir4-target-publication.yml
+      - .github/workflows/mir4-public-readback.yml
+      - .github/workflows/mir4-restore-drill.yml
+    schemas:
+      - spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json
+      - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
+      - spec/schemas/mir4-release-workflow-contract-v1.schema.json
+      - spec/schemas/mir4-github-actions-lock-v1.schema.json
+      - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
+    validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+    documentation: docs/maintainer/mir4-pre-freeze-hardening.md
+    boundary: package-excluded release preparation, exact-input validation, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    stability: stable-pre-freeze-control-plane-with-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
@@ -1019,7 +1054,8 @@ validation_tooling:
     mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1
     mir4_platform_preview_gate: validation/tests/mir4/Test-MIR4PlatformPreview.ps1
-    mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
+    mir4_platform_preview_authority_historical_v1: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
+    mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
     mir4_candidate_wave_authority: .mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json
     mir4_m4c01_implementation_authority: .mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json
     mir4_target_registry_historical_v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json

@@ -1053,6 +1053,30 @@
       ]
     },
     {
+      "id": "static.mir4-pre-freeze-hardening",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".github/workflows/mir4-*.yml",
+        ".mir/releases/governance/mir4/**",
+        ".mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+        "spec/schemas/mir4-*.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+        "docs/maintainer/mir4-pre-freeze-hardening.md",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",
@@ -1061,6 +1085,7 @@
       "inputs": [
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json",
         ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json",
         ".mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",

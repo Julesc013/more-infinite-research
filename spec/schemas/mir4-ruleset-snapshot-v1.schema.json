@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-ruleset-snapshot-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "captured_at", "repository", "observed_from_commit", "package_visible", "authoritative_for_remote_current_state", "rulesets", "negative_assertions"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4RulesetSnapshotV1"},
+    "captured_at": {"type": "string", "format": "date-time"},
+    "repository": {"const": "Julesc013/more-infinite-research"},
+    "observed_from_commit": {"pattern": "^[0-9a-f]{40}$"},
+    "package_visible": {"const": false},
+    "authoritative_for_remote_current_state": {"const": false},
+    "rulesets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "target", "enforcement", "includes", "rule_types", "required_status_checks", "allowed_merge_methods", "bypass_actors", "current_user_can_bypass", "updated_at"],
+        "properties": {
+          "id": {"type": "integer", "minimum": 1},
+          "name": {"type": "string", "minLength": 1},
+          "target": {"enum": ["branch", "tag"]},
+          "enforcement": {"const": "active"},
+          "includes": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "rule_types": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+          "required_status_checks": {"type": "array", "items": {"type": "string"}},
+          "allowed_merge_methods": {"type": "array", "items": {"type": "string"}},
+          "bypass_actors": {"type": "array"},
+          "current_user_can_bypass": {"enum": ["never", "pull_requests_only"]},
+          "updated_at": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "negative_assertions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_branch_deletion_forbidden", "release_branch_non_fast_forward_forbidden", "release_branch_direct_push_forbidden", "source_and_distribution_tag_update_forbidden", "source_and_distribution_tag_deletion_forbidden", "tag_bypass_actor_count"],
+      "properties": {
+        "release_branch_deletion_forbidden": {"const": true},
+        "release_branch_non_fast_forward_forbidden": {"const": true},
+        "release_branch_direct_push_forbidden": {"const": true},
+        "source_and_distribution_tag_update_forbidden": {"const": true},
+        "source_and_distribution_tag_deletion_forbidden": {"const": true},
+        "tag_bypass_actor_count": {"const": 0}
+      }
+    }
+  }
+}

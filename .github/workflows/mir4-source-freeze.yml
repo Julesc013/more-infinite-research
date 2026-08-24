@@ -1,0 +1,25 @@
+name: MIR4 Source Freeze
+on:
+  workflow_dispatch:
+    inputs:
+      source_release_record: {description: Governed source release record path, required: true, type: string}
+      candidate_id: {description: Governed candidate ID, required: true, type: string}
+      source_commit: {description: Exact source commit, required: true, type: string}
+      source_tree: {description: Exact source tree, required: true, type: string}
+      target_distribution_record_set: {description: Governed target record set path, required: true, type: string}
+      release_plan_digest: {description: Governed release plan SHA-256, required: true, type: string}
+      proof_root: {description: Governed proof root, required: true, type: string}
+      seal_root: {description: Governed seal root, required: true, type: string}
+permissions: {contents: read}
+jobs:
+  freeze-gate:
+    runs-on: [self-hosted, Windows]
+    environment: mir4-source-freeze
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, ref: "${{ inputs.source_commit }}"}
+      - name: Validate signed source-freeze gate
+        shell: pwsh
+        run: |
+          $p=@{Phase='source-freeze';SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}';OutputPath='build/results/mir4-source-freeze/request.json'}
+          ./tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1 @p
