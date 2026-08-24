@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "MIR4RulesetSnapshotV1",
+  "captured_at": "2026-08-24T13:00:00+10:00",
+  "repository": "Julesc013/more-infinite-research",
+  "observed_from_commit": "01d17672acd74d229652b87e3919f30c9a70166e",
+  "package_visible": false,
+  "authoritative_for_remote_current_state": false,
+  "rulesets": [
+    {
+      "id": 21258880,
+      "name": "MIR4 4.0 release branch integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "includes": ["refs/heads/release/mir4-4.0.0"],
+      "rule_types": ["deletion", "non_fast_forward", "required_status_checks"],
+      "required_status_checks": ["branch-policy", "verification-gate"],
+      "allowed_merge_methods": [],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-08-24T11:21:24.612+10:00"
+    },
+    {
+      "id": 21258882,
+      "name": "MIR4 4.0 release branch pull request workflow",
+      "target": "branch",
+      "enforcement": "active",
+      "includes": ["refs/heads/release/mir4-4.0.0"],
+      "rule_types": ["pull_request"],
+      "required_status_checks": [],
+      "allowed_merge_methods": ["merge"],
+      "bypass_actors": [
+        {"actor_id": 30209022, "actor_type": "User", "bypass_mode": "pull_request"}
+      ],
+      "current_user_can_bypass": "pull_requests_only",
+      "updated_at": "2026-08-24T11:21:25.321+10:00"
+    },
+    {
+      "id": 21258883,
+      "name": "MIR4 immutable source and distribution tags",
+      "target": "tag",
+      "enforcement": "active",
+      "includes": ["refs/tags/v4.*", "refs/tags/dist/f*/v4.*"],
+      "rule_types": ["update", "deletion"],
+      "required_status_checks": [],
+      "allowed_merge_methods": [],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-08-24T11:21:26.003+10:00"
+    }
+  ],
+  "negative_assertions": {
+    "release_branch_deletion_forbidden": true,
+    "release_branch_non_fast_forward_forbidden": true,
+    "release_branch_direct_push_forbidden": true,
+    "source_and_distribution_tag_update_forbidden": true,
+    "source_and_distribution_tag_deletion_forbidden": true,
+    "tag_bypass_actor_count": 0
+  }
+}

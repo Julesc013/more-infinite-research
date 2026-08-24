@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "MIR4IndependentReadinessAcceptanceLunaV1",
+  "reviewed_at": "2026-08-24T13:00:00+10:00",
+  "reviewer_class": "independent-gpt-5.6-luna-read-only",
+  "scope": "pr152-package-excluded-release-readiness-layer",
+  "review_input": {
+    "pull_request": 152,
+    "base_commit": "3a58d3753bedcaf1107b76655117e0ff84dac960",
+    "head_commit": "fa98de5018fa9bdf10fbda90658ff4ef6b040e57",
+    "merge_commit": "01d17672acd74d229652b87e3919f30c9a70166e",
+    "merge_tree": "52bef9bca7edc0b612c4c766f934bf5b1d43f4c5",
+    "changed_path_count": 44
+  },
+  "reviewed_dimensions": [
+    "blocker-separation",
+    "v0-v1-transition",
+    "branch-and-tag-policy",
+    "release-root-portability",
+    "source-freeze-prohibition",
+    "candidate-non-allocation",
+    "final-merge-identity",
+    "player-package-path-exclusion"
+  ],
+  "findings": [],
+  "informational_follow_up": [
+    {
+      "id": "v1-default-reference-extension-path",
+      "state": "addressed-by-pre-freeze-hardening",
+      "path": "mir.toml"
+    }
+  ],
+  "verdict": "ACCEPTED-RELEASE-READINESS",
+  "package_visible": false,
+  "maintainer_acceptance": false,
+  "source_freeze_authorized": false,
+  "candidate_allocation_authorized": false,
+  "production_release_authorized": false
+}

@@ -83,14 +83,60 @@ $previewB=New-MIR4PlatformPreviewPackages -RepoRoot $repo -OutputRoot 'build/res
 if($previewA.digest -cne $previewB.digest -or (ConvertTo-MIR4PlatformCanonicalJson $previewA.assets) -cne (ConvertTo-MIR4PlatformCanonicalJson $previewB.assets)){throw '[mir4-platform-preview-nondeterministic]'}
 if([string]$previewA.kind-cne'MIR4PreviewAssetSetV1'-or[string]$previewA.candidate_state-cne'pre-freeze-unallocated'){throw '[mir4-platform-preview-v1-authority]'}
 if(@($previewA.assets|Where-Object name -match 'v0').Count){throw '[mir4-platform-preview-v0-asset]'}
-$sdkAsset=$previewA.assets|Where-Object name -eq 'mir4-sdk-v1-preview.zip'
-if(-not$sdkAsset){throw '[mir4-platform-sdk-asset-missing]'}
+$expectedAssets=@('mir4-api-sdk-v1-preview.zip','mir4-mep-v1-preview.zip','mir4-reference-extension-v1-preview.zip','mir4-inspector-v1-preview.zip')
+if((@($previewA.assets.name|Sort-Object)-join'|')-cne(@($expectedAssets|Sort-Object)-join'|')){throw '[mir4-platform-preview-asset-contract]'}
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+foreach($asset in @($previewA.assets)){
+  $assetPath=Join-Path $repo ('build/results/mir4-preview-determinism/A/'+[string]$asset.name)
+  $zip=[IO.Compression.ZipFile]::OpenRead($assetPath)
+  try{
+    $root=[IO.Path]::GetFileNameWithoutExtension([string]$asset.name)
+    $manifestEntry=$zip.GetEntry("$root/manifest.json")
+    $sbomEntry=$zip.GetEntry("$root/sbom.spdx.json")
+    $provenanceEntry=$zip.GetEntry("$root/provenance.json")
+    if(-not$manifestEntry-or-not$sbomEntry-or-not$provenanceEntry){throw "[mir4-platform-preview-metadata] $($asset.name)"}
+    $reader=[IO.StreamReader]::new($manifestEntry.Open())
+    try{$manifest=$reader.ReadToEnd()|ConvertFrom-Json -Depth 100}finally{$reader.Dispose()}
+    if([string]$manifest.kind-cne'MIR4PreviewAssetManifestV1'-or
+       [string]$manifest.source.commit-cnotmatch'^[0-9a-f]{40}$'-or
+       [string]$manifest.source.tree-cnotmatch'^[0-9a-f]{40}$'-or
+       [string]$manifest.contract_set.digest-cnotmatch'^sha256:[0-9a-f]{64}$'-or
+       @($manifest.contract_set.files).Count-lt1-or
+       [string]$manifest.conformance.status-cne'passed-before-packaging'-or
+       @($manifest.license_inventory|Where-Object spdx_id -eq 'MPL-2.0').Count-ne1-or
+       @($manifest.generated_source_map).Count-lt1-or
+       @($manifest.embedded_metadata).Count-ne2-or
+       [bool]$manifest.production_candidate-or[bool]$manifest.publication_authorized){
+      throw "[mir4-platform-preview-manifest-completeness] $($asset.name)"
+    }
+    $sbomReader=[IO.StreamReader]::new($sbomEntry.Open())
+    try{$sbom=$sbomReader.ReadToEnd()|ConvertFrom-Json -Depth 100}finally{$sbomReader.Dispose()}
+    if([string]$sbom.spdxVersion-cne'SPDX-2.3'-or[string]$sbom.packages[0].licenseDeclared-cne'MPL-2.0'-or
+       @($sbom.files).Count-ne@($manifest.files).Count){throw "[mir4-platform-preview-sbom] $($asset.name)"}
+    $provenanceReader=[IO.StreamReader]::new($provenanceEntry.Open())
+    try{$provenance=$provenanceReader.ReadToEnd()|ConvertFrom-Json -Depth 100}finally{$provenanceReader.Dispose()}
+    if([string]$provenance.kind-cne'MIR4PreviewProvenanceV1'-or[bool]$provenance.publication_authorized-or
+       @($provenance.materials).Count-ne@($manifest.files).Count-or
+       [string]$provenance.contract_set_digest-cne[string]$manifest.contract_set.digest){throw "[mir4-platform-preview-provenance] $($asset.name)"}
+    foreach($file in @($manifest.files)){
+      $payload=$zip.GetEntry("$root/$([string]$file.path)")
+      if(-not$payload){throw "[mir4-platform-preview-manifest-path] $($asset.name):$($file.path)"}
+      $payloadStream=$payload.Open()
+      try{
+        $memory=[IO.MemoryStream]::new()
+        try{$payloadStream.CopyTo($memory);$payloadHash=Get-MIR4PlatformBytesSha256 $memory.ToArray()}finally{$memory.Dispose()}
+      }finally{$payloadStream.Dispose()}
+      if($payloadHash-cne[string]$file.sha256){throw "[mir4-platform-preview-manifest-hash] $($asset.name):$($file.path)"}
+    }
+  }finally{$zip.Dispose()}
+}
 $portableRoot=Join-Path $repo ('build/results/mir4-sdk-portability/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $portableRoot|Out-Null
-Expand-Archive -LiteralPath (Join-Path $repo 'build/results/mir4-preview-determinism/A/mir4-sdk-v1-preview.zip') -DestinationPath $portableRoot
-$runner=Join-Path $portableRoot 'mir4-sdk-v1-preview/sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1'
-if(-not(Test-Path -LiteralPath $runner -PathType Leaf)){throw '[mir4-platform-sdk-portable-runner-missing]'}
-& pwsh -NoLogo -NoProfile -NonInteractive -File $runner
-if($LASTEXITCODE -ne 0){throw '[mir4-platform-sdk-portable-conformance]'}
+Expand-Archive -LiteralPath (Join-Path $repo 'build/results/mir4-preview-determinism/A/mir4-api-sdk-v1-preview.zip') -DestinationPath $portableRoot
+$apiRoot=Join-Path $portableRoot 'mir4-api-sdk-v1-preview/sdk/preview/mir4/api-v1'
+foreach($relative in @('powershell/MIR4.Api.V1.psm1','python/mir4_api_v1.py','typescript/index.ts','json-schema/mir4-api-v1-response.schema.json')){
+  if(-not(Test-Path -LiteralPath (Join-Path $apiRoot $relative)-PathType Leaf)){throw "[mir4-platform-sdk-portable-binding] $relative"}
+}
+Import-Module (Join-Path $apiRoot 'powershell/MIR4.Api.V1.psm1') -Force
 
 Write-Host 'MIR 4 platform preview validation passed.'

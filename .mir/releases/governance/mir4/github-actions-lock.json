@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "kind": "MIR4GitHubActionsLockV1",
+  "recorded_at": "2026-08-24T13:00:00+10:00",
+  "scope": "production-and-release-controller-workflows",
+  "package_visible": false,
+  "actions": [
+    {"action": "actions/checkout", "requested_tag": "v4", "commit_sha": "11d5960a326750d5838078e36cf38b85af677262", "source": "https://api.github.com/repos/actions/checkout/git/ref/tags/v4"},
+    {"action": "actions/download-artifact", "requested_tag": "v4", "commit_sha": "d3f86a106a0bac45b974a628896c90dbdf5c8093", "source": "https://api.github.com/repos/actions/download-artifact/git/ref/tags/v4"},
+    {"action": "actions/github-script", "requested_tag": "v7", "commit_sha": "f28e40c7f34bde8b3046d885e986cb6290c5673b", "source": "https://api.github.com/repos/actions/github-script/git/ref/tags/v7"},
+    {"action": "actions/upload-artifact", "requested_tag": "v4", "commit_sha": "ea165f8d65b6e75b540449e92b4886f43607fa02", "source": "https://api.github.com/repos/actions/upload-artifact/git/ref/tags/v4"}
+  ],
+  "production_workflows": [
+    ".github/workflows/branch-policy.yml",
+    ".github/workflows/mir4-source-freeze.yml",
+    ".github/workflows/mir4-target-build.yml",
+    ".github/workflows/mir4-target-qualification.yml",
+    ".github/workflows/mir4-preview-assets.yml",
+    ".github/workflows/mir4-independent-verification.yml",
+    ".github/workflows/mir4-release-seal.yml",
+    ".github/workflows/mir4-promotion.yml",
+    ".github/workflows/mir4-target-publication.yml",
+    ".github/workflows/mir4-public-readback.yml",
+    ".github/workflows/mir4-restore-drill.yml",
+    ".github/workflows/release-candidate.yml"
+  ],
+  "policy": {
+    "full_commit_sha_required": true,
+    "floating_tag_forbidden": true,
+    "lock_mismatch_fails_closed": true,
+    "release_candidate_has_no_third_party_action": true,
+    "publisher_has_no_source_checkout_or_package_builder": true
+  }
+}

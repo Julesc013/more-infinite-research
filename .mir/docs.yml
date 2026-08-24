@@ -231,6 +231,18 @@ docs:
       - mir4-dev-and-source-freeze-stop-boundary
       - mir4-release-readiness-reconciliation
       - mir4-blocker-scope-matrix
+  - path: docs/maintainer/mir4-pre-freeze-hardening.md
+    title: "MIR 4 Pre-Freeze Hardening"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-pre-freeze-release-doctor
+      - mir4-governed-release-workflow-inputs
+      - mir4-manual-playtest-evidence-lifecycle
+      - mir4-public-preview-asset-contract
+      - mir4-publisher-confinement-and-restore-drill
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
     status: deprecated

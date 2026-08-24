@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-workflow-contract-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "kind", "primary_inputs", "ad_hoc_archive_hash_input_forbidden", "target_matrix", "phases", "current_gate"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseWorkflowContractV1"},
+    "primary_inputs": {
+      "type": "array",
+      "minItems": 8,
+      "allOf": [
+        {"contains": {"const": "source_release_record"}},
+        {"contains": {"const": "candidate_id"}},
+        {"contains": {"const": "source_commit"}},
+        {"contains": {"const": "source_tree"}},
+        {"contains": {"const": "target_distribution_record_set"}},
+        {"contains": {"const": "release_plan_digest"}},
+        {"contains": {"const": "proof_root"}},
+        {"contains": {"const": "seal_root"}}
+      ]
+    },
+    "ad_hoc_archive_hash_input_forbidden": {"const": true},
+    "target_matrix": {
+      "type": "object",
+      "required": ["mandatory", "conditional", "target_receipt_required", "family_readiness_is_target_receipt_fold"],
+      "properties": {
+        "mandatory": {"const": ["F210", "F200"]},
+        "conditional": {"const": ["F110", "F100"]},
+        "target_receipt_required": {"const": true},
+        "family_readiness_is_target_receipt_fold": {"const": true}
+      }
+    },
+    "phases": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["id", "workflow", "production_transition"],
+        "properties": {
+          "id": {"enum": ["source-freeze", "target-build", "target-qualification", "preview-assets", "independent-verification", "release-seal", "promotion", "target-publication", "public-readback", "restore-drill"]},
+          "workflow": {"pattern": "^\\.github/workflows/mir4-[a-z-]+\\.yml$"},
+          "production_transition": {"type": "boolean"}
+        }
+      }
+    },
+    "current_gate": {
+      "type": "object",
+      "required": ["state", "source_freeze_authorized", "candidate_allocation_authorized", "production_signing_authorized", "promotion_authorized", "publication_authorized", "fail_closed"],
+      "properties": {
+        "state": {"const": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED"},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocation_authorized": {"const": false},
+        "production_signing_authorized": {"const": false},
+        "promotion_authorized": {"const": false},
+        "publication_authorized": {"const": false},
+        "fail_closed": {"const": true}
+      }
+    }
+  }
+}

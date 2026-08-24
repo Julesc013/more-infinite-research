@@ -1,0 +1,91 @@
+param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path)
+$ErrorActionPreference='Stop'
+$repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/mir4/PreFreezeRelease.ps1')
+. (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+
+$receipt=Test-MIR4PreFreezeAuthorities -RepoRoot $repo
+$rulesets=Test-MIR4RulesetSnapshot -RepoRoot $repo
+$actions=Test-MIR4ProductionActionLock -RepoRoot $repo
+if([string]$receipt.status-cne'DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED'){throw '[mir4-prefreeze-receipt-status]'}
+if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
+
+$planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+$plan=Get-Content -Raw -LiteralPath (Join-Path $repo $planPath)|ConvertFrom-Json -Depth 100
+if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne[string]$plan.source_baseline.package_source_sha256){throw '[mir4-prefreeze-package-diff]'}
+if([int]$plan.verification_plan.invalid-ne0-or[int]$plan.verification_plan.passed-ne30-or
+   @($plan.targets|Where-Object{$_.release_role-cne'mandatory'-or$_.development_package.release_identity-or[string]::IsNullOrWhiteSpace([string]$_.engine.sha256)}).Count-ne0){
+  throw '[mir4-prefreeze-zero-invalid-plan]'
+}
+$luna=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json')|ConvertFrom-Json -Depth 100
+if([string]$luna.verdict-cne'ACCEPTED'-or@($luna.findings).Count-ne0-or
+   [bool]$luna.package_visible-or[bool]$luna.source_freeze_authorized-or[bool]$luna.candidate_allocation_authorized-or
+   [bool]$luna.production_release_authorized-or[bool]$luna.publication_authorized-or
+   [string]$luna.review_input.player_package_source_sha256-cne[string]$plan.source_baseline.package_source_sha256){
+  throw '[mir4-prefreeze-independent-acceptance]'
+}
+
+$expectedInputs=@('source_release_record','candidate_id','source_commit','source_tree','target_distribution_record_set','release_plan_digest','proof_root','seal_root')
+$contract=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json')|ConvertFrom-Json -Depth 100
+if(@($contract.phases).Count-ne10){throw '[mir4-prefreeze-workflow-count]'}
+foreach($phase in @($contract.phases)){
+  $workflow=Join-Path $repo ([string]$phase.workflow)
+  $text=Get-Content -Raw -LiteralPath $workflow
+  foreach($input in $expectedInputs){if($text-notmatch("(?m)^\s{6}"+[regex]::Escape($input)+":")){throw "[mir4-prefreeze-workflow-input] $($phase.id):$input"}}
+  if($text-match'(?m)^\s{6}archive_sha256:'){throw "[mir4-prefreeze-ad-hoc-hash-input] $($phase.id)"}
+}
+$publisher=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-publication.yml')
+if($publisher-match'actions/checkout|Build-MIRPackage|mir4\s+platform\s+package'-or
+   $publisher-notmatch'permissions:\s*\{contents:\s*read\}'-or
+   $publisher-notmatch'seal-verifier/Test-MIR4PublicationAdmission\.ps1'-or
+   $publisher-notmatch'publication_authorized'){throw '[mir4-prefreeze-publisher-capability]'}
+Test-MIR4PublisherAdmissionBindings -WorkflowText $publisher|Out-Null
+foreach($field in $expectedInputs){
+  $pattern='\[string\]\$admission\.'+[regex]::Escape($field)+'\s*-cne\s*''\$\{\{\s*inputs\.'+[regex]::Escape($field)+'\s*\}\}'''
+  $negative=([regex]::new($pattern)).Replace($publisher,'',1)
+  try{
+    Test-MIR4PublisherAdmissionBindings -WorkflowText $negative|Out-Null
+    throw "[mir4-prefreeze-publisher-negative-not-detected] $field"
+  }catch{
+    if($_.Exception.Message-notmatch'^\[mir4-publisher-admission-binding-missing\]'){throw}
+  }
+}
+$previewWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-preview-assets.yml')
+if($previewWorkflow-match'build/mir4/platform-preview/\*'-or
+   @('mir4-api-sdk-v1-preview.zip','mir4-mep-v1-preview.zip','mir4-reference-extension-v1-preview.zip','mir4-inspector-v1-preview.zip','preview-assets.json'|Where-Object{$previewWorkflow-notmatch[regex]::Escape($_)}).Count-ne0){
+  throw '[mir4-prefreeze-preview-upload-set]'
+}
+
+$head=(& git -C $repo rev-parse HEAD).Trim()
+$tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+$invocation=@{
+  RepoRoot=$repo;SourceReleaseRecord='.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
+  CandidateId='DEV-PREFREEZE-UNALLOCATED';SourceCommit=$head;SourceTree=$tree
+  TargetDistributionRecordSet=$planPath;ReleasePlanDigest=[string]$plan.verification_plan.plan_sha256
+  ProofRoot='development-proof-root';SealRoot='not-allocated'
+}
+$nonProduction=Test-MIR4ReleaseWorkflowInvocation @invocation -Phase independent-verification
+if([string]$nonProduction.status-cne'validated'-or$nonProduction.mutation_performed){throw '[mir4-prefreeze-nonproduction-controller]'}
+$blocked=$false
+try{
+  $invocation.CandidateId='M4RC1'
+  Test-MIR4ReleaseWorkflowInvocation @invocation -Phase source-freeze|Out-Null
+}catch{if($_.Exception.Message.StartsWith('[mir4-release-transition-blocked]')){$blocked=$true}else{throw}}
+if(-not$blocked){throw '[mir4-prefreeze-source-freeze-accepted]'}
+
+$toml=Get-Content -Raw -LiteralPath (Join-Path $repo 'mir.toml')
+if($toml-notmatch'reference-extension-v1/extension\.json'-or$toml-match'--extension sdk/preview/mir4/reference-extension/extension\.json'){throw '[mir4-prefreeze-v1-default]'}
+
+$cli=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir.ps1')
+foreach($command in @('release doctor','playtest prepare','playtest capture','playtest finalize','rulesets audit')){
+  if($cli-notmatch[regex]::Escape($command)){throw "[mir4-prefreeze-cli] $command"}
+}
+$decisionRejected=$false
+try{& (Join-Path $repo 'tools/mir.ps1') playtest finalize --session missing --reviewer test 2>$null|Out-Null}catch{if($_.Exception.Message-match'explicit --decision'){$decisionRejected=$true}else{throw}}
+if(-not$decisionRejected){throw '[mir4-prefreeze-playtest-inferred-decision]'}
+
+foreach($source in @('tools/lib/mir4/PreFreezeRelease.ps1','tools/commands/mir4/Invoke-MIR4PreFreeze.ps1','tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1')){
+  $text=Get-Content -Raw -LiteralPath (Join-Path $repo $source)
+  if($text-match'(?i)source_freeze_authorized\s*=\s*\$true|production_release_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-prefreeze-forbidden-authority] $source"}
+}
+Write-Host '[ok] MIR 4 pre-freeze receipts, rulesets, action pins, workflows, CLI, predecessor plan, and fail-closed boundaries passed.'

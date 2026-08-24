@@ -118,9 +118,9 @@
     "FailHardSafety"
   ],
   "preview_assets": [
-    "mir4-developer-preview-v1.zip",
-    "mir4-sdk-v1-preview.zip",
+    "mir4-api-sdk-v1-preview.zip",
+    "mir4-mep-v1-preview.zip",
     "mir4-reference-extension-v1-preview.zip",
-    "mir4-inspector-preview-v1.zip"
+    "mir4-inspector-v1-preview.zip"
   ]
 }

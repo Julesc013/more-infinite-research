@@ -1,0 +1,44 @@
+{
+  "schema": 2,
+  "kind": "MIR4PlatformMaturityAndPublicationContractV2",
+  "status": "pre-freeze-v1-preview-contract-release-blocked",
+  "recorded_at": "2026-08-24T19:20:00+10:00",
+  "package_visible": false,
+  "source_version": "4.0.0",
+  "candidate_wave": "pre-freeze-unallocated",
+  "authority_source": "explicit-maintainer-pre-freeze-hardening-2026-08-24",
+  "supersedes": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json",
+    "record_sha256": "497AC48C17E1C89104CE9909AD9A0EBD00AC089884DF56E7CF886638C8947BE0",
+    "disposition": "historical-m4c01-v0-preview-contract"
+  },
+  "imports": [
+    "spec/platform/mir4-preview-v0/platform.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"
+  ],
+  "maturity_classes": ["stable", "shadow", "preview", "experimental", "omitted-by-target"],
+  "stable_player_targets": ["f210", "f200"],
+  "conditional_player_targets": ["f110", "f100"],
+  "private_experimental_targets": ["f018", "f017", "f016", "f015", "f014", "f013"],
+  "developer_preview_assets": [
+    "mir4-api-sdk-v1-preview.zip",
+    "mir4-mep-v1-preview.zip",
+    "mir4-reference-extension-v1-preview.zip",
+    "mir4-inspector-v1-preview.zip"
+  ],
+  "embedded_metadata_required": ["manifest.json", "sbom.spdx.json", "provenance.json"],
+  "v0_policy": "migration-only-no-public-v0-assets",
+  "non_stable_forbidden": ["prototype-mutation", "setting-or-default-change", "persistent-state-mutation", "migration-change", "public-support-claim", "player-package-load-dependency", "hard-safety-weakening", "undeclared-package-content"],
+  "publication": {
+    "player_packages": "not-authorized",
+    "developer_previews": "github-preview-only-after-release-go-no-go",
+    "mod_portal": "not-authorized"
+  },
+  "source_freeze_authorized": false,
+  "candidate_allocation_authorized": false,
+  "production_signing_authorized": false,
+  "promotion_authorized": false,
+  "publication_authorized": false,
+  "record_sha256": "6FF76FEE9205EF67C39A82CAAF6EC2FB26C7D91F3907AE13F6747E40BEEFBA61"
+}
