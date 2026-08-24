@@ -17,7 +17,11 @@ This control plane prepares dev for a future MIR 4.0.0 freeze without authorizin
 
 The post-readiness receipt binds PR 152, its merge commit and tree, the 30-of-30 evidence gate, F210 and F200 development packages, and the package-source fingerprint. The development plan keeps those packages as rehearsal inputs only. A future release run must supply a clean frozen commit/tree and exact candidate identities; development package hashes never become release identities by implication.
 
-Every production workflow accepts the same eight inputs: source release record, candidate ID, source commit, source tree, target distribution record set, release-plan digest, proof root, and seal root. The dispatcher validates the exact inputs and the checked-out repository identity before any phase-specific command can run. While the source-freeze prohibition is present, all release transition phases stop before mutation.
+Every production workflow accepts the same eight inputs: source release record, candidate ID, source commit, source tree, target distribution record set, release-plan digest, proof root, and seal root. The dispatcher validates the exact inputs and the checked-out repository identity. At the current fixed point it does not invoke a phase adapter: every phase is registered and fail-closed, while phase-specific executor implementation, dry-run, production rehearsal, and production authorization are all separately false.
+
+The shared T02 kernel is implemented under `tools/lib/mir4/ReleasePhaseEngine.ps1`. It gives non-production attempts a deterministic fingerprint, an append-only hash-chained event log, operation-level idempotency keys, replay-based resume, verification and compensation transitions, and an immutable receipt. Its Git port is read-only, build and engine ports are attempt-root sandboxes, and signing and publication ports are denied. The kernel rejects production-capable adapters and does not make any of the ten phase rows executor-mature by itself.
+
+The workflow contract and release doctor use six ordered maturity fields: `workflow_registered`, `workflow_fail_closed`, `workflow_executor_implemented`, `workflow_dry_run_passed`, `workflow_production_rehearsal_passed`, and `workflow_production_authorized`. Registration and fail-closed behavior are safety properties, not evidence that a named release operation can run. Source freeze remains blocked until the ten phase executors have truthful dry-run and rehearsal evidence.
 
 ## Pre-freeze checks
 
@@ -25,7 +29,7 @@ Run:
 
     .\tools\mir.ps1 release doctor --json --explain
 
-The doctor checks the authority schemas and bindings, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, and release workflow contract. Human signing input and explicit playtest acceptance remain blockers and are reported as such.
+The doctor checks the authority schemas and bindings, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Until all phase adapters are implemented and rehearsed, `workflow-executor-maturity` is an automated blocker. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
 
 Audit the recorded branch and tag policy with:
 

@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleasePhaseEngineContractV1",
+  "recorded_at": "2026-08-25T09:00:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "maturity": "non-production-kernel",
+  "operations": ["Plan", "DryRun", "Execute", "Resume", "Verify", "Compensate", "Receipt"],
+  "phases": ["source-freeze", "target-build", "target-qualification", "preview-assets", "independent-verification", "release-seal", "promotion", "target-publication", "public-readback", "restore-drill"],
+  "event_model": {
+    "storage": "attempt-local-append-only-hash-chain",
+    "attempt_identity": "sha256-of-phase-input-adapter-contract-and-port-closure",
+    "idempotency": "attempt-and-operation-domain-key",
+    "resume": "replay-last-valid-event-and-retry-last-failed-or-next-operation",
+    "divergence_policy": "hard-fail-same-fingerprint-different-plan",
+    "receipt": "immutable-final-state-projection"
+  },
+  "ports": [
+    {"id": "git", "mode": "read-only", "allowed": ["resolve-commit", "resolve-tree", "compare-ancestry"], "denied": ["commit", "tag", "push", "ref-update"]},
+    {"id": "build", "mode": "sandbox-only", "allowed": ["plan", "materialize-under-attempt-root", "hash", "compare"], "denied": ["dist-write", "archive-write", "source-write"]},
+    {"id": "engine", "mode": "sandbox-only", "allowed": ["plan", "run-isolated", "capture"], "denied": ["shared-profile-write", "external-state-write"]},
+    {"id": "sign", "mode": "denied", "allowed": [], "denied": ["key-create", "key-read", "sign", "seal"]},
+    {"id": "publish", "mode": "denied", "allowed": [], "denied": ["upload", "release-create", "tag", "branch-update", "public-write"]}
+  ],
+  "adapter_laws": [
+    "adapter-declares-exact-implementation-digest",
+    "adapter-is-non-production-capable",
+    "adapter-echoes-engine-idempotency-key",
+    "adapter-result-denies-production-mutation",
+    "adapter-artifacts-remain-under-attempt-root"
+  ],
+  "package_visible": false,
+  "production_capable": false,
+  "production_authorized": false,
+  "release_transition_authorized": false
+}

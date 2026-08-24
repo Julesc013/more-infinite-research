@@ -117,6 +117,7 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' = 'spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' = 'spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' = 'spec/schemas/mir4-release-workflow-contract-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json' = 'spec/schemas/mir4-release-phase-engine-contract-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -140,6 +141,35 @@ function Test-MIR4PreFreezeAuthorities {
 function New-MIR4DoctorCheck {
   param([string]$Id,[string]$Stage,[string]$Status,[string]$Detail)
   return [pscustomobject][ordered]@{id=$Id;stage=$Stage;status=$Status;detail=$Detail}
+}
+
+function Get-MIR4ReleaseWorkflowMaturity {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  $contract = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' -Kind 'MIR4ReleaseWorkflowContractV1'
+  $rows = @($contract.phases | ForEach-Object {
+    $maturity = $_.maturity
+    if ([bool]$maturity.workflow_dry_run_passed -and -not [bool]$maturity.workflow_executor_implemented) {
+      throw "[mir4-workflow-maturity-order] $($_.id):dry-run-without-executor"
+    }
+    if ([bool]$maturity.workflow_production_rehearsal_passed -and -not [bool]$maturity.workflow_dry_run_passed) {
+      throw "[mir4-workflow-maturity-order] $($_.id):rehearsal-without-dry-run"
+    }
+    if ([bool]$maturity.workflow_production_authorized -and -not [bool]$maturity.workflow_production_rehearsal_passed) {
+      throw "[mir4-workflow-maturity-order] $($_.id):authorization-without-rehearsal"
+    }
+    [pscustomobject][ordered]@{
+      phase = [string]$_.id
+      workflow_registered = [bool]$maturity.workflow_registered
+      workflow_fail_closed = [bool]$maturity.workflow_fail_closed
+      workflow_executor_implemented = [bool]$maturity.workflow_executor_implemented
+      workflow_dry_run_passed = [bool]$maturity.workflow_dry_run_passed
+      workflow_production_rehearsal_passed = [bool]$maturity.workflow_production_rehearsal_passed
+      workflow_production_authorized = [bool]$maturity.workflow_production_authorized
+    }
+  })
+  if ($rows.Count -ne 10) { throw '[mir4-workflow-maturity-count]' }
+  return $rows
 }
 
 function Get-MIR4ReleaseDoctor {
@@ -176,6 +206,19 @@ function Get-MIR4ReleaseDoctor {
   Add-AutomatedCheck 'release-governance' {
     Test-MIR4ReleaseGovernanceAuthority -RepoRoot $repo | Out-Null
   } 'Tracked release governance is internally consistent and every production transition remains prohibited.'
+  Add-AutomatedCheck 'release-phase-engine-kernel' {
+    . (Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1')
+    $engine = Get-MIR4ReleasePhaseContract -RepoRoot $repo
+    $workflow = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' -Kind 'MIR4ReleaseWorkflowContractV1'
+    if ([string]$engine.record.maturity -cne 'non-production-kernel' -or [bool]$engine.record.production_capable -or
+        [bool]$engine.record.production_authorized -or [bool]$engine.record.release_transition_authorized -or
+        -not [bool]$workflow.phase_engine.kernel_implemented -or -not [bool]$workflow.phase_engine.event_sourcing_implemented -or
+        -not [bool]$workflow.phase_engine.idempotency_and_resume_tested -or [bool]$workflow.phase_engine.production_capable -or
+        [bool]$workflow.phase_engine.production_authorized -or
+        @($workflow.phases | Where-Object { [bool]$_.maturity.workflow_executor_implemented }).Count -ne 0) {
+      throw '[mir4-doctor-release-phase-engine-kernel]'
+    }
+  } 'The event-sourced phase kernel is implemented and tested while every phase adapter and production port remains disabled.'
   Add-AutomatedCheck 'external-custody-layout' {
     $readiness = Get-MIR4ReleaseGovernanceReadiness -RepoRoot $repo
     if ([string]$readiness.classification -ceq 'CHANGES-REQUESTED' -or @($readiness.publisher.inventory.forbidden).Count -ne 0) {
@@ -238,10 +281,24 @@ function Get-MIR4ReleaseDoctor {
         [string]$drill.publisher.uncertain_transfer_disposition -cne 'reconciled-idempotent' -or
         [bool]$drill.publication_authorized) { throw '[mir4-doctor-offline-drill]' }
   } 'The non-production offline restore, deterministic package, seal-verifier, and idempotent publisher rehearsal passes.'
-  Add-AutomatedCheck 'workflow-gate' {
+  $workflowMaturity = @(Get-MIR4ReleaseWorkflowMaturity -RepoRoot $repo)
+  Add-AutomatedCheck 'workflow-registration' {
     $contract = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' -Kind 'MIR4ReleaseWorkflowContractV1'
-    if (@($contract.phases).Count -ne 10 -or -not [bool]$contract.current_gate.fail_closed) { throw '[mir4-doctor-workflow-contract]' }
+    if (@($contract.phases).Count -ne 10 -or -not [bool]$contract.current_gate.fail_closed -or
+        @($workflowMaturity | Where-Object { -not $_.workflow_registered -or -not $_.workflow_fail_closed }).Count -ne 0) {
+      throw '[mir4-doctor-workflow-contract]'
+    }
   } 'All ten MIR4 workflow phases are registered and fail closed.'
+  Add-AutomatedCheck 'workflow-executor-maturity' {
+    $pending = @($workflowMaturity | Where-Object {
+      -not $_.workflow_executor_implemented -or
+      -not $_.workflow_dry_run_passed -or
+      -not $_.workflow_production_rehearsal_passed
+    })
+    if ($pending.Count -ne 0) {
+      throw ("[mir4-doctor-workflow-executor-maturity] {0}" -f (@($pending.phase) -join ','))
+    }
+  } 'All ten phase executors are implemented, dry-run passed, and production rehearsed.'
 
   $governance = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/governance/mir4/release-governance.json' -Kind 'MIR4ReleaseGovernanceV1'
   $checks.Add((New-MIR4DoctorCheck 'protected-signing-secret' 'human' 'blocked' ([string]$governance.state)))
@@ -285,6 +342,7 @@ function Get-MIR4ReleaseDoctor {
     prefreeze_status=$(if($automatedFailed -eq 0){'ready'}else{'not-ready'})
     release_status=$(if($automatedFailed -eq 0 -and $humanBlocked -eq 0){'ready-for-source-freeze-authorization'}else{'blocked'})
     checks=@($checks)
+    workflow_maturity=$workflowMaturity
     counts=[ordered]@{automated_total=$automatedIds.Count;automated_failed=$automatedFailed;human_blocked=$humanBlocked}
     explanation=$(if($Explain){'Automated pre-freeze controls can become ready while protected signing input and maintainer playtest remain separate human gates.'}else{$null})
     source_freeze_authorized=$false

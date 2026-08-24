@@ -50,6 +50,8 @@ The executable shadow contains target-provider records, normalized compilation r
 
 ## Candidate waves
 
+The current machine-readable pre-freeze cut, blockers, workflow maturity vocabulary, MIR 3 residual disposition, and dependency-ordered execution queue are owned by `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json`. Uploaded audits and handoff packages are hash-bound planning evidence only; repository authority and explicit human gates control execution.
+
 | Wave | Purpose | Exit |
 | --- | --- | --- |
 | M4C01 | Historical bootstrap identifier, retained in immutable records only | Superseded by the unified whole-platform programme |

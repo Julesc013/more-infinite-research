@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://more-infinite-research.invalid/schemas/mir4-release-workflow-contract-v1.schema.json",
   "type": "object",
-  "required": ["schema", "kind", "primary_inputs", "ad_hoc_archive_hash_input_forbidden", "target_matrix", "phases", "current_gate"],
+  "required": ["schema", "kind", "primary_inputs", "ad_hoc_archive_hash_input_forbidden", "target_matrix", "phase_engine", "phases", "current_gate"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4ReleaseWorkflowContractV1"},
@@ -31,17 +31,51 @@
         "family_readiness_is_target_receipt_fold": {"const": true}
       }
     },
+    "phase_engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "implementation", "kernel_implemented", "event_sourcing_implemented", "idempotency_and_resume_tested", "production_capable", "production_authorized"],
+      "properties": {
+        "contract": {"const": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json"},
+        "implementation": {"const": "tools/lib/mir4/ReleasePhaseEngine.ps1"},
+        "kernel_implemented": {"const": true},
+        "event_sourcing_implemented": {"const": true},
+        "idempotency_and_resume_tested": {"const": true},
+        "production_capable": {"const": false},
+        "production_authorized": {"const": false}
+      }
+    },
     "phases": {
       "type": "array",
       "minItems": 10,
       "maxItems": 10,
       "items": {
         "type": "object",
-        "required": ["id", "workflow", "production_transition"],
+        "required": ["id", "workflow", "production_transition", "maturity"],
         "properties": {
           "id": {"enum": ["source-freeze", "target-build", "target-qualification", "preview-assets", "independent-verification", "release-seal", "promotion", "target-publication", "public-readback", "restore-drill"]},
           "workflow": {"pattern": "^\\.github/workflows/mir4-[a-z-]+\\.yml$"},
-          "production_transition": {"type": "boolean"}
+          "production_transition": {"type": "boolean"},
+          "maturity": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "workflow_registered",
+              "workflow_fail_closed",
+              "workflow_executor_implemented",
+              "workflow_dry_run_passed",
+              "workflow_production_rehearsal_passed",
+              "workflow_production_authorized"
+            ],
+            "properties": {
+              "workflow_registered": {"const": true},
+              "workflow_fail_closed": {"const": true},
+              "workflow_executor_implemented": {"type": "boolean"},
+              "workflow_dry_run_passed": {"type": "boolean"},
+              "workflow_production_rehearsal_passed": {"type": "boolean"},
+              "workflow_production_authorized": {"const": false}
+            }
+          }
         }
       }
     },

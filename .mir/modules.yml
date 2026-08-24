@@ -174,23 +174,31 @@ package_excluded_modules:
     boundary: evidence-only aggregation of the existing W00-W09 authorities, exact generated records, governed verification evidence, and independent audit result; no product, policy, compiler, prototype, runtime, migration, release, secret, ledger, source-freeze, signing, sealing, promotion, tag, upload, publication, or Dev-mutation authority
     stability: stable-evidence-adapter-partial-with-bounded-blockers
   mir4_release_readiness_reconciliation_v1:
-    authority: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
-    schema: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
+    historical_authority: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
+    historical_schema: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
+    current_authority: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
+    current_schema: spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json
+    generated_views:
+      - .mir/releases/waves/mir4-r0/dashboard.json
+      - .mir/releases/waves/mir4-r0/queue.json
+      - todo.md
     validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
-    boundary: append-only reconciliation of historical queue and closeout records, merged Dev baseline, typed blocker scopes, and branch readiness only; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
-    stability: stable-release-readiness-authority-release-blocked
+    boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
+    stability: stable-current-pre-freeze-execution-authority-release-blocked
   mir4_pre_freeze_hardening_v1:
     authorities:
       - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
       - .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     commands:
       - tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
       - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
@@ -209,12 +217,13 @@ package_excluded_modules:
       - spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json
       - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json
+      - spec/schemas/mir4-release-phase-engine-contract-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
-    boundary: package-excluded release preparation, exact-input validation, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
-    stability: stable-pre-freeze-control-plane-with-human-and-freeze-blockers
+    boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no phase adapter executor maturity, source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    stability: stable-pre-freeze-control-plane-with-non-production-phase-kernel-and-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
