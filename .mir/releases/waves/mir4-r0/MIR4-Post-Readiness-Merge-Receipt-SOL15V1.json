@@ -84,7 +84,7 @@
     },
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json",
-      "sha256": "C8BD877F8C8419A77C3492A9912A81A709F2F0250967E75969A913752E7FE51A",
+      "sha256": "6183FB1B2C98F56688ACBB0DE29CB49439DA0A4A41E16CE8E3BA0A849637C1FC",
       "role": "independent-package-excluded-pre-freeze-hardening-acceptance"
     }
   ],

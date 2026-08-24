@@ -8,7 +8,8 @@
     "branch": "agent/mir4-pre-freeze-hardening",
     "base_commit": "01d17672acd74d229652b87e3919f30c9a70166e",
     "reviewed_tree": "3b53cdbf3631bcc5110832b63afeb7e6348053df",
-    "changed_path_count": 45,
+    "supplemental_reviewed_tree": "594762d75d3c34f70ae11c2d092cf64599559ee6",
+    "changed_path_count": 47,
     "player_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"
   },
   "reviewed_dimensions": [
@@ -21,13 +22,15 @@
     "release-doctor-coverage",
     "external-custody-layout",
     "manual-playtest-explicit-acceptance",
+    "governance-authority-checkout-byte-invariance",
     "player-package-path-exclusion"
   ],
   "remediated_findings": [
     "supersede-stale-v0-preview-asset-authority",
     "exclude-stale-preview-output-and-wildcard-upload",
     "require-confined-publisher-seal-admission",
-    "compare-all-eight-governed-publication-identities"
+    "compare-all-eight-governed-publication-identities",
+    "pin-governance-authority-json-to-canonical-lf"
   ],
   "findings": [],
   "non_blocking_notes": [

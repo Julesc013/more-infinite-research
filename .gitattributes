@@ -25,6 +25,7 @@
 .mir/evidence/mir4-r0/**/*.json text eol=lf
 .mir/targets.json text eol=lf
 .mir/releases/waves/mir4-r0/**/*.json text eol=lf
+.mir/releases/governance/mir4/*.json text eol=lf
 spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json text eol=lf
 spec/schemas/mir4-terminal-normalized-snapshot.schema.json text eol=lf
 spec/schemas/mir4-terminal-baseline-import.schema.json text eol=lf
