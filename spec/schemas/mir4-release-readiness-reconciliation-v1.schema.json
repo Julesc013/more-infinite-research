@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-readiness-reconciliation-v1.schema.json",
+  "title": "MIR 4 release-readiness reconciliation V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "programme_execution_id", "source_baseline", "historical_authorities", "planning_inputs", "queue_reconciliation", "blockers", "branch_readiness", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseReadinessReconciliationV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "programme_execution_id": {"const": "M4C02-09-24H"},
+    "source_baseline": {"type": "object", "required": ["branch", "commit", "tree", "integration_pr"], "properties": {"branch": {"const": "dev"}, "commit": {"pattern": "^[0-9a-f]{40}$"}, "tree": {"pattern": "^[0-9a-f]{40}$"}, "integration_pr": {"const": 151}}, "additionalProperties": false},
+    "historical_authorities": {"type": "array", "minItems": 2, "items": {"type": "object", "required": ["path", "sha256", "disposition"], "properties": {"path": {"type": "string"}, "sha256": {"pattern": "^[0-9a-f]{64}$"}, "disposition": {"const": "retained-immutable-superseded-by-this-reconciliation"}}, "additionalProperties": false}},
+    "planning_inputs": {"type": "array", "minItems": 2, "items": {"type": "object", "required": ["name", "sha256", "authority"], "properties": {"name": {"type": "string"}, "sha256": {"pattern": "^[0-9a-f]{64}$"}, "authority": {"const": "planning-input-user-request-is-execution-authority"}}, "additionalProperties": false}},
+    "queue_reconciliation": {"type": "array", "minItems": 6, "items": {"type": "object", "required": ["task", "historical_state", "current_state"], "properties": {"task": {"pattern": "^M4-00[0-5](A|B)?$"}, "historical_state": {"type": "string"}, "current_state": {"type": "string"}}, "additionalProperties": false}},
+    "blockers": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "state", "scope", "blocks"], "properties": {"id": {"type": "string"}, "state": {"enum": ["OPEN", "SATISFIED", "NOT-APPLICABLE"]}, "scope": {"enum": ["stable-player-release", "component-graduation", "target-publication", "slo-claim", "technology-or-compatibility-claim"]}, "blocks": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}},
+    "branch_readiness": {"type": "object", "required": ["dev", "release_branch", "main"], "properties": {"dev": {"type": "string"}, "release_branch": {"type": "string"}, "main": {"type": "string"}}, "additionalProperties": false},
+    "transition_gate": {"type": "object", "required": ["source_freeze", "candidate_allocation", "promotion_to_main", "tagging", "publication"], "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}, "additionalProperties": false},
+    "status": {"const": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED"}
+  }
+}

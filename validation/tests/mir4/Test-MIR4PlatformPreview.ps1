@@ -81,12 +81,14 @@ Test-MIR4ApiRecord -Record $query -RepoRoot $repo|Out-Null
 $previewA=New-MIR4PlatformPreviewPackages -RepoRoot $repo -OutputRoot 'build/results/mir4-preview-determinism/A'
 $previewB=New-MIR4PlatformPreviewPackages -RepoRoot $repo -OutputRoot 'build/results/mir4-preview-determinism/B'
 if($previewA.digest -cne $previewB.digest -or (ConvertTo-MIR4PlatformCanonicalJson $previewA.assets) -cne (ConvertTo-MIR4PlatformCanonicalJson $previewB.assets)){throw '[mir4-platform-preview-nondeterministic]'}
-$sdkAsset=$previewA.assets|Where-Object name -eq 'mir4-sdk-v0-preview.zip'
+if([string]$previewA.kind-cne'MIR4PreviewAssetSetV1'-or[string]$previewA.candidate_state-cne'pre-freeze-unallocated'){throw '[mir4-platform-preview-v1-authority]'}
+if(@($previewA.assets|Where-Object name -match 'v0').Count){throw '[mir4-platform-preview-v0-asset]'}
+$sdkAsset=$previewA.assets|Where-Object name -eq 'mir4-sdk-v1-preview.zip'
 if(-not$sdkAsset){throw '[mir4-platform-sdk-asset-missing]'}
 $portableRoot=Join-Path $repo ('build/results/mir4-sdk-portability/'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $portableRoot|Out-Null
-Expand-Archive -LiteralPath (Join-Path $repo 'build/results/mir4-preview-determinism/A/mir4-sdk-v0-preview.zip') -DestinationPath $portableRoot
-$runner=Join-Path $portableRoot 'mir4-sdk-v0-preview/sdk/preview/mir4/conformance/Invoke-MIR4SdkConformance.ps1'
+Expand-Archive -LiteralPath (Join-Path $repo 'build/results/mir4-preview-determinism/A/mir4-sdk-v1-preview.zip') -DestinationPath $portableRoot
+$runner=Join-Path $portableRoot 'mir4-sdk-v1-preview/sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1'
 if(-not(Test-Path -LiteralPath $runner -PathType Leaf)){throw '[mir4-platform-sdk-portable-runner-missing]'}
 & pwsh -NoLogo -NoProfile -NonInteractive -File $runner
 if($LASTEXITCODE -ne 0){throw '[mir4-platform-sdk-portable-conformance]'}

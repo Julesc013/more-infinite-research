@@ -9,6 +9,24 @@ if ([string]$authority.state -cne 'BLOCKED-HUMAN-SECRET-INPUT' -or [string]$auth
   throw '[mir4-w00-blocker] The current secret-input blocker was not represented honestly.'
 }
 if (@($authority.blocked_subtasks).Count -ne 3) { throw '[mir4-w00-blocker-set] Expected three key-dependent blockers.' }
+if ([string]$authority.archive.environment_variable -cne 'MIR_ARCHIVE_HOME' -or
+    [string]$authority.publisher.environment_variable -cne 'MIR_PUBLISHER_HOME') {
+  throw '[mir4-w00-logical-roots] Release custody must use logical environment roots.'
+}
+
+$rootFixture = Join-Path ([IO.Path]::GetTempPath()) ('mir4-w00-roots-' + [guid]::NewGuid().ToString('N'))
+$archiveFixture = Join-Path $rootFixture 'archive'
+$publisherRootFixture = Join-Path $rootFixture 'publisher'
+try {
+  foreach ($path in @($archiveFixture, $publisherRootFixture)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
+  $resolved = Get-MIR4ReleaseGovernanceReadiness -RepoRoot $RepoRoot -ArchiveHome $archiveFixture -PublisherHome $publisherRootFixture
+  if ([string]$resolved.archive.resolution_source -cne 'explicit-parameter' -or
+      [string]$resolved.publisher.resolution_source -cne 'explicit-parameter') {
+    throw '[mir4-w00-explicit-root-resolution]'
+  }
+} finally {
+  if (Test-Path -LiteralPath $rootFixture) { Remove-Item -LiteralPath $rootFixture -Recurse -Force }
+}
 
 $ledgerSchema = Join-Path $RepoRoot 'spec/schemas/mir4-release-ledger-event.schema.json'
 $revocationSchema = Join-Path $RepoRoot 'spec/schemas/mir4-key-revocation.schema.json'

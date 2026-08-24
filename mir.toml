@@ -1,7 +1,9 @@
 schema = 1
 source_version = "4.0.0"
-candidate_wave = "M4C01"
 programme_id = "M4C10-WHOLE-4X-IN-4.0"
+programme_execution_id = "M4C02-09-24H"
+candidate_state = "pre-freeze-unallocated"
+next_candidate = "M4RC1"
 platform_contract = "spec/platform/mir4-preview-v0/platform.json"
 target_registry = ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"
 whole_platform_programme = ".mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json"
@@ -41,6 +43,7 @@ state = "MIR_STATE_HOME"
 temp = "MIR_TEMP_HOME"
 worktrees = "MIR_WORKTREE_HOME"
 archive = "MIR_ARCHIVE_HOME"
+publisher = "MIR_PUBLISHER_HOME"
 evidence = "MIR_EVIDENCE_HOME"
 
 [commands]

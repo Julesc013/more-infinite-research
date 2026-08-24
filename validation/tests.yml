@@ -1035,6 +1035,24 @@
       ]
     },
     {
+      "id": "static.mir4-release-readiness-reconciliation",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json",
+        ".mir/releases/waves/mir4-r0/queue.json",
+        ".mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json",
+        ".mir/modules.yml",
+        ".mir/branches.yml",
+        "spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json",
+        "validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1",
+        "docs/maintainer/mir4-full-platform-closeout.md",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",

@@ -16,6 +16,8 @@ paths:
   mir4.assurance-scale.programme: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
   mir4.historical-succession.programme: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
   mir4.full-platform-closeout.command: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
+  mir4.release-readiness.reconciliation: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
+  spec.schemas.mir4-release-readiness-reconciliation-v1: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
   final.governance: governance
   final.contracts: contracts
   final.spec: spec

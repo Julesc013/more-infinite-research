@@ -525,6 +525,7 @@ fixtures:
       - complete-factorio-2-1-product-normalization
       - target-declared-product-probability-fields
       - governed-pipeline-command-catalog
+      - governed-23-command-catalog-including-publication
       - pipeline-command-positive-target-requirements
       - large-synthetic-recipe-index
       - repeated-full-recipe-scan-rejection

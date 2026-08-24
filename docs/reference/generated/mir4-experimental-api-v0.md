@@ -1,26 +1,27 @@
 ---
 title: "MIR 4 API/SDK V0 Preview"
-status: current
-applies_to: "4.0 developer preview"
+status: deprecated
+applies_to: "4.0 developer preview migration input"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/reference/generated/mir4-api-sdk-v1.md
 ---
 # MIR 4 API/SDK V0 Preview
 
-Generated from `spec/api/mir4-v0/contracts.json`. This is real, package-excluded, read-only developer-preview tooling. Compatibility may change before 1.0 and it does not establish a player support claim.
+> Deprecated compatibility input. Use API/SDK V1 for new consumers; retain V0 only for deterministic V0-to-V1 migration.
 
-## Quickstart
+Generated from `spec/api/mir4-v0/contracts.json`. This package-excluded, read-only tooling does not establish a player support claim.
+
+## Migration checks
 
 - `.\tools\mir.ps1 mir4 sdk generate`
 - `.\tools\mir.ps1 mir4 sdk check`
 - `.\tools\mir.ps1 mir4 api check`
 - `.\tools\mir.ps1 mir4 api conformance`
-- `.\tools\mir.ps1 mir4 platform conformance`
-- `.\tools\mir.ps1 mir4 platform package`
 
 | Kind | Purpose |
 | --- | --- |
@@ -33,4 +34,4 @@ Generated from `spec/api/mir4-v0/contracts.json`. This is real, package-excluded
 
 Canonical JSON recursively sorts object keys, preserves array order, uses compact UTF-8, and hashes the record with `digest` omitted. Unknown top-level fields, invalid reverse-DNS namespaces, more than 128 capabilities, more than 32 extensions, and digest mismatch fail closed.
 
-Target transports are read-only. Mutable compiler context, executors, SafetyKernel internals, and prototype emission are never exposed. MEP V0, the reference extension, Inspector, target-provider projections, shadow compilation runs, Runtime/State inventory, and ProcessIR reports are distributed as separate preview assets.
+Target transports are read-only. Mutable compiler context, executors, SafetyKernel internals, and prototype emission are never exposed. V0 source artifacts remain package-excluded migration inputs and are not emitted as release-facing preview archives.

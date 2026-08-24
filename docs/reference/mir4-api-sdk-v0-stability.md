@@ -1,16 +1,19 @@
 ---
 title: "MIR 4 API and SDK V0 Stability Policy"
-status: current
+status: deprecated
 applies_to: "MIR 4 API/SDK V0 preview"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/reference/generated/mir4-api-sdk-v1.md
 ---
 
 # MIR 4 API and SDK V0 Stability Policy
+
+> Deprecated compatibility policy. V1 is the current release-facing developer preview.
 
 V0 is a supported developer preview, not a frozen 1.0 compatibility contract. Every preview archive is immutable once attached to a release, but a later V0 build may change a schema, field, diagnostic or binding when the change is documented and conformance remains deterministic.
 

@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes:
   - docs/releases/mir4-bootstrap-local-beta-plan.md
 superseded_by: []
@@ -20,7 +20,7 @@ MIR 4.0 is one source release with target-specific distribution versions. It com
 | Layer | Public effect | 4.0 requirement |
 | --- | --- | --- |
 | Stable player product | May affect authoritative player behavior | Deterministic package, exact target engine, direct predecessor upgrade, two reloads, state/settings/research proof, manual acceptance, independent qualification and seal |
-| Developer preview | Separate GitHub assets; no player ZIP content | Deterministic archive, schema validation, examples, conformance, checksums, licensing and explicit V0 migration policy |
+| Developer preview | Separate GitHub assets; no player ZIP content | Deterministic V1 archives, schema validation, examples, conformance, checksums, licensing and explicit V0-to-V1 migration policy |
 | Shadow architecture | Reports and comparisons only | Deterministic execution and hard non-interference with prototypes, settings, migrations, persistent state and support claims |
 
 The five governed maturity classes are Stable, Shadow, Preview, Experimental and Omitted by target. Anything below Stable cannot mutate authoritative player behavior or become required for loading a player package.
@@ -44,7 +44,7 @@ Padded historical distribution identities are canonical archive identities. Fact
 
 ## 4.0 platform contents
 
-The V0 developer preview includes the six read-only API contracts, JSON Schemas, Lua and PowerShell bindings, canonicalization vectors, fixtures, generated reference, MEP V0, a reference extension, Query and Support snapshots, Inspector, conformance runners, manifests, checksums, licensing and quickstarts. Player ZIPs exclude every developer and governance asset.
+The V1 developer preview includes nine copied, bounded APIs, JSON Schemas, Lua/LuaLS, TypeScript, Python and PowerShell bindings, canonicalization vectors, fixtures, generated reference, 12-kind MEP V1, V0-to-V1 migration helpers, a synthetic reference extension, Inspector, conformance runners, manifests, checksums, licensing and quickstarts. V0 remains a superseded compatibility input only. Player ZIPs exclude every developer and governance asset.
 
 The executable shadow contains target-provider records, normalized compilation runs, FeatureManifest and SettingSpec projections, runtime/state inventories, ProcessIR facts, effect-channel inventory and diagnose-only synthesis opportunities. It serializes and compares the future architecture without becoming the emitter of record.
 
@@ -52,7 +52,7 @@ The executable shadow contains target-provider records, normalized compilation r
 
 | Wave | Purpose | Exit |
 | --- | --- | --- |
-| M4C01 | Integrate the full preview/shadow platform and all private target candidates | Deterministic builds, static gates and bounded target evidence |
+| M4C01 | Historical bootstrap identifier, retained in immutable records only | Superseded by the unified whole-platform programme |
 | M4C02 | Fix repository, authority and evidence closure | No authority drift or package-surface ambiguity |
 | M4C03 | Harden target/normalized compiler and runtime cutover candidates | Parity reports complete; no authoritative cutover |
 | M4C04 | Harden MEP, API, SDK and Inspector | Preview distribution and conformance complete |
@@ -67,7 +67,7 @@ Every row below is present in 4.0 as stable infrastructure, a usable preview, or
 
 | Milestone | Graduation decision |
 | --- | --- |
-| 4.0.x | Stabilize released player targets and V0 developer feedback without broadening authority |
+| 4.0.x | Stabilize released player targets and V1 developer feedback without broadening authority |
 | 4.1 | Graduate the repository and release-engine fixed point |
 | 4.2 | Graduate the target-provider ABI and affected-target planning |
 | 4.3 | Graduate normalized contributions and merge-law proofs |

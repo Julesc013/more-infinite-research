@@ -319,7 +319,7 @@ function Get-MIR4PlatformGeneratedFiles {
   $query = New-MIR4ApiRecord -Kind MIR4QuerySnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('query.read','support.snapshot','streams.read','diagnostics.read','settings.read') -Payload ([ordered]@{ provider=$primary; compilation=$primaryRun; streams=[ordered]@{ authority='.mir/streams.yml'; mode='read-only' }; diagnostics=@(); profile=[ordered]@{ maturity='preview'; mutation_allowed=$false } })
   $support = New-MIR4ApiRecord -Kind MIR4SupportSnapshotV0 -TargetId f210 -FactorioLine '2.1' -SourceVersion '4.0.0' -DistributionVersion '4.0.21000' -Capabilities @('support.snapshot') -Payload ([ordered]@{ target=$primary; maturity='candidate-programme-only'; public_claim=$false; evidence=@('target-provider','compilation-run','runtime-state-inventory','process-ir-parity-result') })
   $components = @($platform.components | ForEach-Object { "| ``$($_.id)`` | $($_.maturity) | $($_.mode) |" }) -join "`n"
-  $generatedDoc = "---`ntitle: `"MIR 4 Platform Component Matrix`"`nstatus: current`napplies_to: `"4.0.0 $($wholePlatform.programme_id)`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-23`nsupersedes: []`nsuperseded_by: []`n---`n# MIR 4 Platform Component Matrix`n`nGenerated from ``spec/platform/mir4-preview-v0/platform.json``.`n`n| Component | Maturity | Mode |`n| --- | --- | --- |`n$components`n`nThe conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.`n"
+  $generatedDoc = "---`ntitle: `"MIR 4 Platform Component Matrix`"`nstatus: current`napplies_to: `"4.0.0 $($wholePlatform.programme_id)`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-24`nsupersedes: []`nsuperseded_by: []`n---`n# MIR 4 Platform Component Matrix`n`nGenerated from ``spec/platform/mir4-preview-v0/platform.json``. V1 is the current release-facing developer preview; V0 remains a superseded compatibility input for migration testing only.`n`n| Component | Maturity | Mode |`n| --- | --- | --- |`n$components`n`nThe conformance gate enforces the eight non-interference rules and keeps every non-stable surface outside player packages.`n"
   $psBinding = @'
 # Generated standalone MIR Extension Protocol V0 preview binding.
 function ConvertTo-MIR4MepCanonicalValue($Value){
@@ -385,7 +385,24 @@ $badMep=$extension|ConvertTo-Json -Depth 100|ConvertFrom-Json;$badMep.fragments[
 try{Test-MIR4MepEnvelope $badMep|Out-Null;throw '[mir4-sdk-negative-mep-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-mep-forbidden-field]')){throw}}
 Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
 '@
-  $lock = [ordered]@{ schema=1; kind='MIR4PlatformLockV0'; source_version='4.0.0'; candidate_wave='M4C01'; programme_id=[string]$wholePlatform.programme_id; canonicalization='mir-canonical-json-v0'; inputs=(Get-MIR4PlatformInputs $repo); generated_by='tools/lib/mir4/PlatformPreview.ps1'; digest='' }
+  $conformanceV1Ps = @'
+param([string]$SdkRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path)
+$ErrorActionPreference='Stop'
+Import-Module (Join-Path $SdkRoot 'api-v1/powershell/MIR4.Api.V1.psm1') -Force
+$available=Get-Content -Raw -LiteralPath (Join-Path $SdkRoot 'api-v1/vectors/available-page-1.json')|ConvertFrom-Json
+$unavailable=Get-Content -Raw -LiteralPath (Join-Path $SdkRoot 'api-v1/vectors/unavailable-observation-f012.json')|ConvertFrom-Json
+Test-MIR4ApiV1Availability $available|Out-Null
+Test-MIR4ApiV1Availability $unavailable|Out-Null
+$copy=Copy-MIR4ApiV1Data $available
+$copy.items=@()
+if(@($available.items).Count-eq 0){throw '[mir4-sdk-v1-copy-isolation]'}
+$extension=Get-Content -Raw -LiteralPath (Join-Path $SdkRoot 'reference-extension-v1/extension.json')|ConvertFrom-Json
+$schema=Join-Path $SdkRoot 'mep-v1/json-schema/mir4-mep-v1.schema.json'
+if(-not(($extension|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile $schema)){throw '[mir4-sdk-v1-mep-schema]'}
+if(@($extension.fragments).Count-ne 12){throw '[mir4-sdk-v1-fragment-count]'}
+Write-Host '[ok] standalone MIR 4 SDK V1 conformance passed.'
+'@
+  $lock = [ordered]@{ schema=1; kind='MIR4PlatformLockV1'; source_version='4.0.0'; programme_id=[string]$wholePlatform.programme_id; programme_execution_id='M4C02-09-24H'; candidate_state='pre-freeze-unallocated'; next_candidate='M4RC1'; canonicalization='mir-canonical-json-v0'; inputs=(Get-MIR4PlatformInputs $repo); generated_by='tools/lib/mir4/PlatformPreview.ps1'; digest='' }
   $lockObject = [pscustomobject]$lock
   Add-MIR4PlatformDigest $lockObject | Out-Null
   $files = [ordered]@{
@@ -429,7 +446,8 @@ Write-Host '[ok] standalone MIR 4 SDK V0 conformance passed.'
     'sdk/preview/mir4/inspector-v1/Export-MIR4InspectionBundle.ps1' = $inspectorV1.exporter.Replace("`r`n","`n")
     'sdk/preview/mir4/inspector-v1/README.md' = $inspectorV1.readme.Replace("`r`n","`n")
     'sdk/preview/mir4/conformance/Invoke-MIR4SdkConformance.ps1' = $conformancePs.Replace("`r`n","`n")
-    'sdk/preview/mir4/README.md' = "# MIR 4 SDK V0 preview`n`nRun ``.\conformance\Invoke-MIR4SdkConformance.ps1`` with PowerShell 7. API bindings are under ``api-v0``; MEP bindings are under ``powershell`` and ``lua``; deterministic examples and shadow reports are under ``reference``. This preview is read-only, package-excluded, and may change before 1.0.`n"
+    'sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1' = $conformanceV1Ps.Replace("`r`n","`n")
+    'sdk/preview/mir4/README.md' = "# MIR 4 SDK V1 developer preview`n`nRun ``.\conformance-v1\Invoke-MIR4SdkV1Conformance.ps1`` with PowerShell 7. Current API bindings are under ``api-v1``, current MEP bindings and V0-to-V1 migration helpers are under ``mep-v1``, and bounded examples are under ``reference``. V0 remains a superseded compatibility input only. This preview is read-only, package-excluded, and may change before 1.0.`n"
     'fixtures/mir4-mep-v0/positive/reference-extension.json' = (ConvertTo-MIR4PlatformCanonicalJson $extension) + "`n"
     'fixtures/mir4-mep-v0/negative/forbidden-callback.json' = "{`"expected_diagnostic`":`"mir4-mep-forbidden-field`",`"kind`":`"MIR4ExtensionEnvelopeV0`",`"schema`":0,`"extension_id`":`"org.example.bad`",`"targets`":[`"f210`"],`"fragments`":[{`"id`":`"org.example.bad.fragment`",`"kind`":`"CompatibilityFragment`",`"data`":{`"callback`":`"run`"}}],`"canonicalization`":`"mir-canonical-json-v0`",`"digest`":`"sha256:0000000000000000000000000000000000000000000000000000000000000000`"}`n"
     'fixtures/mir4-process-ir-v0/positive/bounded-loop.json' = (ConvertTo-MIR4PlatformCanonicalJson $processSafeFixture) + "`n"
@@ -535,7 +553,7 @@ function Write-MIR4DeterministicPreviewArchive {
         $entry.LastWriteTime = [DateTimeOffset]::new(1980,1,1,0,0,0,[TimeSpan]::Zero)
         $entryStream = $entry.Open(); try { $entryStream.Write($bytes,0,$bytes.Length) } finally { $entryStream.Dispose() }
       }
-      $manifestObject = [pscustomobject][ordered]@{schema=0;kind='MIR4PreviewAssetManifestV0';root=$RootName;source_version='4.0.0';candidate_wave='M4C01';files=$rows;digest=''}
+      $manifestObject = [pscustomobject][ordered]@{schema=1;kind='MIR4PreviewAssetManifestV1';root=$RootName;source_version='4.0.0';programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated';files=$rows;digest=''}
       Add-MIR4PlatformDigest $manifestObject | Out-Null
       $manifestBytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4PlatformCanonicalJson $manifestObject)+"`n")
       $manifestEntry = $zip.CreateEntry(($RootName + '/manifest.json'),[IO.Compression.CompressionLevel]::Optimal)
@@ -598,13 +616,23 @@ function New-MIR4PlatformPreviewPackages {
     'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json','spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
     'spec/schemas/mir4-inspector-workbench-result-v1.schema.json','LICENSE'
   )
+  $sets['mir4-sdk-v1-preview.zip'] += @('sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1','sdk/preview/mir4/README.md')
+  $sets['mir4-developer-preview-v1.zip'] = @($sets['mir4-platform-preview-v0.zip'] + $sdkV1 + @(
+    'sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1','sdk/preview/mir4/README.md',
+    'docs/reference/generated/mir4-api-sdk-v1.md','docs/reference/mir4-sdk-v1-quickstart.md',
+    'spec/api/mir4-v1/contracts.json','spec/schemas/preview/mir4-mep-v1.schema.json',
+    'spec/schemas/preview/mir4-api-v1-response.schema.json'
+  ))
+  foreach ($legacyAsset in @('mir4-sdk-v0-preview.zip','mir4-platform-preview-v0.zip','mir4-reference-extension-v0.zip','mir4-inspector-preview-v0.zip')) {
+    [void]$sets.Remove($legacyAsset)
+  }
   $hashes = @()
   foreach ($set in $sets.GetEnumerator()) {
     $path = Join-Path $output $set.Key
     Write-MIR4DeterministicPreviewArchive -RepoRoot $repo -OutputPath $path -RootName ([IO.Path]::GetFileNameWithoutExtension($set.Key)) -RelativePaths @($set.Value)
     $hashes += [ordered]@{name=$set.Key;bytes=(Get-Item -LiteralPath $path).Length;sha256=(Get-MIR4PlatformFileSha256 $path)}
   }
-  $manifest = [pscustomobject][ordered]@{schema=0;kind='MIR4PreviewAssetSetV0';source_version='4.0.0';candidate_wave='M4C01';assets=$hashes;publication='github-preview-only-not-mod-portal';digest=''}
+  $manifest = [pscustomobject][ordered]@{schema=1;kind='MIR4PreviewAssetSetV1';source_version='4.0.0';programme_id='M4C10-WHOLE-4X-IN-4.0';programme_execution_id='M4C02-09-24H';candidate_state='pre-freeze-unallocated';assets=$hashes;publication='github-preview-only-not-mod-portal';digest=''}
   Add-MIR4PlatformDigest $manifest | Out-Null
   [IO.File]::WriteAllText((Join-Path $output 'preview-assets.json'),(ConvertTo-MIR4PlatformCanonicalJson $manifest)+"`n",[Text.UTF8Encoding]::new($false))
   return $manifest

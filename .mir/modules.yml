@@ -173,6 +173,13 @@ package_excluded_modules:
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: evidence-only aggregation of the existing W00-W09 authorities, exact generated records, governed verification evidence, and independent audit result; no product, policy, compiler, prototype, runtime, migration, release, secret, ledger, source-freeze, signing, sealing, promotion, tag, upload, publication, or Dev-mutation authority
     stability: stable-evidence-adapter-partial-with-bounded-blockers
+  mir4_release_readiness_reconciliation_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
+    schema: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
+    validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
+    documentation: docs/maintainer/mir4-full-platform-closeout.md
+    boundary: append-only reconciliation of historical queue and closeout records, merged Dev baseline, typed blocker scopes, and branch readiness only; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
+    stability: stable-release-readiness-authority-release-blocked
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
@@ -190,8 +197,10 @@ package_excluded_modules:
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     generated_root: sdk/preview/mir4
+    current_release_asset_generation: v1
+    legacy_input_generation: v0-migration-only
     boundary: read-only projections and diagnose-only shadow execution; no prototype emission, state mutation, or public support authority
-    stability: developer-preview-and-shadow
+    stability: v1-developer-preview-and-shadow-with-v0-migration-input
 
 runtime_boundaries:
   control.lua:
