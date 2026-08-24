@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 candidate programme"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
 ---
@@ -23,9 +23,9 @@ MIR 4.0 preserves the proven MIR 3 player behavior while establishing a portable
 
 ## Modders and developers
 
-- API/SDK V0 provides six read-only contracts, schemas, Lua and PowerShell bindings, fixtures, canonicalization vectors and stable diagnostics.
-- MEP V0 provides a bounded data-only extension envelope.
-- The reference extension and Inspector are independent first-party API consumers.
+- API/SDK V1 provides nine copied, bounded, capability-labelled contracts with JSON Schema, Lua/LuaLS, TypeScript, Python and PowerShell bindings.
+- MEP V1 provides 12 typed data-only fragment kinds plus deterministic V0-to-V1 migration helpers.
+- The synthetic reference extension and Inspector are first-party conformance consumers; independent production-consumer acceptance remains a component-graduation blocker, not a player-release blocker.
 - Target-provider, normalized compiler, runtime/state, ProcessIR and opportunity catalogues run as deterministic non-authoritative previews or shadows.
 
 ## Candidate status

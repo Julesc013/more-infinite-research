@@ -5,7 +5,7 @@ applies_to: "4.0.0 candidate programme"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
 ---
@@ -25,13 +25,13 @@ Anything below Stable is forbidden from mutating prototypes, settings, persisten
 
 The preview is physically split under `tools/lib/mir4`: `NormalizedCompiler.ps1` owns target providers, FeatureManifest/SettingSpec adapters and compilation runs; `SafetyKernel.ps1` owns non-overridable rejection; `PolicyEngine.ps1` owns review dispositions but cannot authorize mutation or override safety; `RuntimeStateModel.ps1` owns runtime and state inventory; `ProcessIR.ps1` owns package-excluded ProcessIR certificates, effect-channel owner references, and proposal classification; and `ReleaseDag.ps1` validates the acyclic release workflow. `PlatformPreview.ps1` is the composition and deterministic packaging facade.
 
-`mir4 platform compile` supplies an executable extension-to-shadow loop. It validates MEP V0, binds a target provider, normalizes each fragment, evaluates the hard-safety kernel before policy, and serializes stable diagnostics and a digest without acquiring mutation authority.
+`mir4 platform compile` supplies an executable extension-to-shadow loop. The V1 developer surface validates typed MEP V1 data; the original V0 loop remains a migration-compatibility input. Both bind a target provider, normalize each fragment, evaluate the hard-safety kernel before policy, and serialize stable diagnostics and a digest without acquiring mutation authority.
 
 `TargetProviderV0` supplies identity, engine, predecessor, capability, and omission facts. It has no callback or emission surface. Historical providers remain private and experimental until separately admitted.
 
 ## Developer surfaces
 
-API/SDK V0 carries six read-only envelope types. MEP V0 adds eight bounded data fragments. The reference extension is a declarative consumer and the Inspector is a second independent consumer of Query API snapshots. Both are packaged separately from the Factorio mod.
+API/SDK V1 carries nine copied, bounded, capability-labelled surfaces. MEP V1 adds 12 typed data fragments. The reference extension and Inspector are synthetic first-party conformance consumers, packaged separately from the Factorio mod. Independent production-consumer acceptance remains open for component graduation. V0 is retained only for V0-to-V1 migration testing.
 
 ProcessIR V1 derives deterministic process identities, exact/bounded flows, catalysts, returned containers, recycling/recovery classifications, self-intersections, SCCs, and minimal witnesses from copied canonical fact transports. It preserves terminal risk fingerprints and treats incomplete evidence as `UNKNOWN`. The repository currently has only a synthetic fixture corpus, so exact-target parity is explicitly blocked.
 

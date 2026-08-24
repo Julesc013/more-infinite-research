@@ -40,20 +40,29 @@ docs:
       - mir3-to-mir4-player-upgrade-guide
   - path: docs/reference/mir4-sdk-v0-quickstart.md
     title: "MIR 4 SDK V0 Preview Quickstart"
+    status: deprecated
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-sdk-v0-migration-quickstart
+  - path: docs/reference/mir4-sdk-v1-quickstart.md
+    title: "MIR 4 SDK V1 Developer Preview Quickstart"
     status: current
     audience: developer
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
-      - mir4-sdk-v0-preview-quickstart
+      - mir4-sdk-current-preview-quickstart
+      - mir4-v1-preview-asset-portability
   - path: docs/reference/mir4-api-sdk-v0-stability.md
     title: "MIR 4 API and SDK V0 Stability Policy"
-    status: current
+    status: deprecated
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir4-api-sdk-v0-stability-and-migration-policy
+      - mir4-api-sdk-v0-migration-policy
   - path: docs/releases/notes/release-notes-4.0.0-candidate.md
     title: "More Infinite Research 4.0.0 Candidate Release Notes"
     status: current
@@ -220,14 +229,16 @@ docs:
       - mir4-full-platform-39-record-closeout
       - mir4-independent-luna-audit-input-binding
       - mir4-dev-and-source-freeze-stop-boundary
+      - mir4-release-readiness-reconciliation
+      - mir4-blocker-scope-matrix
   - path: docs/reference/mir4-mep-v0.md
     title: "MIR Extension Protocol V0 Preview"
-    status: current
+    status: deprecated
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir4-mep-v0-preview-contract
+      - mir4-mep-v0-migration-input
   - path: docs/reference/maximum-level-binding.md
     title: "Maximum-Level Binding Contract"
     status: current
@@ -255,12 +266,12 @@ docs:
       - generated-mir4-component-maturity
   - path: docs/reference/generated/mir4-experimental-api-v0.md
     title: "MIR 4 API/SDK V0 Preview"
-    status: current
+    status: deprecated
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - generated-experimental-api-v0-reference
+      - generated-api-v0-migration-reference
   - path: docs/reference/generated/mir4-api-sdk-v1.md
     title: "MIR 4 API and SDK V1 Preview"
     status: current

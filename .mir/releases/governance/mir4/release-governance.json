@@ -84,7 +84,7 @@
   },
   "archive": {
     "environment_variable": "MIR_ARCHIVE_HOME",
-    "required_home": "C:\\Projects\\Factorio\\archive",
+    "local_profile_default": "C:\\Projects\\Factorio\\archive",
     "subroots": [
       "source-bundles",
       "target-packages",
@@ -97,7 +97,8 @@
     ]
   },
   "publisher": {
-    "required_home": "C:\\Projects\\Factorio\\publisher\\mir4",
+    "environment_variable": "MIR_PUBLISHER_HOME",
+    "local_profile_default": "C:\\Projects\\Factorio\\publisher\\mir4",
     "allowed_classes": [
       "sealed-package-bytes",
       "public-release-records",

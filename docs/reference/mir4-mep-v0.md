@@ -1,15 +1,18 @@
 ---
 title: "MIR Extension Protocol V0 Preview"
-status: current
+status: deprecated
 applies_to: "MIR 4.0.0 developer preview"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/architecture/mir4-module-ecosystem.md
 ---
 # MIR Extension Protocol V0 Preview
+
+> Deprecated compatibility input. New extensions use MEP V1; V0 remains only for deterministic migration testing.
 
 MEP V0 is a package-excluded, data-only declaration format. It lets a mod describe compatibility, profiles, proof references, presentation, capabilities, dependencies, conflicts, and finalization requirements without receiving compiler internals or write access.
 

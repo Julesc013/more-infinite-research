@@ -1,5 +1,5 @@
-$script:MIR4RequiredArchiveHome = 'C:\Projects\Factorio\archive'
-$script:MIR4RequiredPublisherHome = 'C:\Projects\Factorio\publisher\mir4'
+$script:MIR4ArchiveEnvironmentVariable = 'MIR_ARCHIVE_HOME'
+$script:MIR4PublisherEnvironmentVariable = 'MIR_PUBLISHER_HOME'
 $script:MIR4ArchiveSubroots = @(
   'source-bundles',
   'target-packages',
@@ -30,18 +30,36 @@ $script:MIR4PublisherForbiddenNames = @(
   'id_ed25519'
 )
 
-function Resolve-MIR4GovernanceExactPath {
+function Resolve-MIR4GovernanceRoot {
   param(
-    [Parameter(Mandatory)][string]$Path,
-    [Parameter(Mandatory)][string]$Expected,
+    [AllowEmptyString()][string]$Path,
+    [Parameter(Mandatory)][string]$EnvironmentVariable,
+    [Parameter(Mandatory)][string]$LocalProfileDefault,
+    [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$Code
   )
-  $actual = [IO.Path]::GetFullPath($Path).TrimEnd('\')
-  $required = [IO.Path]::GetFullPath($Expected).TrimEnd('\')
-  if (-not $actual.Equals($required, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "[$Code] Expected $required, got $actual"
+  $environmentValue = [Environment]::GetEnvironmentVariable($EnvironmentVariable)
+  $source = 'explicit-parameter'
+  $candidate = $Path
+  if ([string]::IsNullOrWhiteSpace($candidate)) {
+    if (-not [string]::IsNullOrWhiteSpace($environmentValue)) {
+      $candidate = $environmentValue
+      $source = "environment:$EnvironmentVariable"
+    } else {
+      $candidate = $LocalProfileDefault
+      $source = 'local-profile-default'
+    }
   }
-  return $actual
+  if ([string]::IsNullOrWhiteSpace($candidate) -or -not [IO.Path]::IsPathRooted($candidate)) {
+    throw "[$Code] A resolved absolute external root is required."
+  }
+  $actual = [IO.Path]::GetFullPath($candidate).TrimEnd('\')
+  $repo = [IO.Path]::GetFullPath($RepoRoot).TrimEnd('\')
+  if ($actual.Equals($repo, [StringComparison]::OrdinalIgnoreCase) -or
+      $actual.StartsWith($repo + '\', [StringComparison]::OrdinalIgnoreCase)) {
+    throw "[$Code] External release custody must remain outside the repository: $actual"
+  }
+  return [pscustomobject][ordered]@{ path=$actual; source=$source; environment_variable=$EnvironmentVariable }
 }
 
 function Test-MIR4ReleaseGovernanceAuthority {
@@ -77,9 +95,14 @@ function Test-MIR4ReleaseGovernanceAuthority {
   if ((@($authority.archive.subroots | Sort-Object) -join '|') -cne (@($script:MIR4ArchiveSubroots | Sort-Object) -join '|')) {
     throw '[mir4-governance-archive-roots] Governed archive roots changed.'
   }
-  if ([string]$authority.archive.required_home -cne $script:MIR4RequiredArchiveHome -or
-      [string]$authority.publisher.required_home -cne $script:MIR4RequiredPublisherHome) {
-    throw '[mir4-governance-fixed-path] Archive or publisher authority changed.'
+  if ([string]$authority.archive.environment_variable -cne $script:MIR4ArchiveEnvironmentVariable -or
+      [string]$authority.publisher.environment_variable -cne $script:MIR4PublisherEnvironmentVariable) {
+    throw '[mir4-governance-logical-root] Archive or publisher logical root changed.'
+  }
+  foreach ($row in @($authority.archive, $authority.publisher)) {
+    if (-not [IO.Path]::IsPathRooted([string]$row.local_profile_default)) {
+      throw '[mir4-governance-local-profile-default] Local profile defaults must be absolute.'
+    }
   }
   foreach ($transition in @('source_freeze','candidate_allocation','production_signing','production_seal','promotion_to_main','tagging','publication')) {
     if (-not [bool]$authority.prohibited_transitions.$transition) {
@@ -126,12 +149,15 @@ function Test-MIR4PublisherInventory {
 function Initialize-MIR4ReleaseGovernanceLayout {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [string]$ArchiveHome=$script:MIR4RequiredArchiveHome,
-    [string]$PublisherHome=$script:MIR4RequiredPublisherHome
+    [AllowEmptyString()][string]$ArchiveHome='',
+    [AllowEmptyString()][string]$PublisherHome=''
   )
   $authority = Test-MIR4ReleaseGovernanceAuthority -RepoRoot $RepoRoot
-  $archive = Resolve-MIR4GovernanceExactPath -Path $ArchiveHome -Expected $script:MIR4RequiredArchiveHome -Code 'mir4-governance-archive-path'
-  $publisher = Resolve-MIR4GovernanceExactPath -Path $PublisherHome -Expected $script:MIR4RequiredPublisherHome -Code 'mir4-governance-publisher-path'
+  $archiveResolution = Resolve-MIR4GovernanceRoot -Path $ArchiveHome -EnvironmentVariable ([string]$authority.archive.environment_variable) -LocalProfileDefault ([string]$authority.archive.local_profile_default) -RepoRoot $RepoRoot -Code 'mir4-governance-archive-path'
+  $publisherResolution = Resolve-MIR4GovernanceRoot -Path $PublisherHome -EnvironmentVariable ([string]$authority.publisher.environment_variable) -LocalProfileDefault ([string]$authority.publisher.local_profile_default) -RepoRoot $RepoRoot -Code 'mir4-governance-publisher-path'
+  $archive = $archiveResolution.path
+  $publisher = $publisherResolution.path
+  if ($archive.Equals($publisher, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-governance-root-separation]' }
   foreach ($path in @($archive, $publisher)) { New-Item -ItemType Directory -Force -Path $path | Out-Null }
   foreach ($name in $script:MIR4ArchiveSubroots) { New-Item -ItemType Directory -Force -Path (Join-Path $archive $name) | Out-Null }
   foreach ($name in $script:MIR4PublisherSubroots) { New-Item -ItemType Directory -Force -Path (Join-Path $publisher $name) | Out-Null }
@@ -154,12 +180,15 @@ function Initialize-MIR4ReleaseGovernanceLayout {
 function Get-MIR4ReleaseGovernanceReadiness {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [string]$ArchiveHome=$script:MIR4RequiredArchiveHome,
-    [string]$PublisherHome=$script:MIR4RequiredPublisherHome
+    [AllowEmptyString()][string]$ArchiveHome='',
+    [AllowEmptyString()][string]$PublisherHome=''
   )
   $authority = Test-MIR4ReleaseGovernanceAuthority -RepoRoot $RepoRoot
-  $archive = Resolve-MIR4GovernanceExactPath -Path $ArchiveHome -Expected $script:MIR4RequiredArchiveHome -Code 'mir4-governance-archive-path'
-  $publisher = Resolve-MIR4GovernanceExactPath -Path $PublisherHome -Expected $script:MIR4RequiredPublisherHome -Code 'mir4-governance-publisher-path'
+  $archiveResolution = Resolve-MIR4GovernanceRoot -Path $ArchiveHome -EnvironmentVariable ([string]$authority.archive.environment_variable) -LocalProfileDefault ([string]$authority.archive.local_profile_default) -RepoRoot $RepoRoot -Code 'mir4-governance-archive-path'
+  $publisherResolution = Resolve-MIR4GovernanceRoot -Path $PublisherHome -EnvironmentVariable ([string]$authority.publisher.environment_variable) -LocalProfileDefault ([string]$authority.publisher.local_profile_default) -RepoRoot $RepoRoot -Code 'mir4-governance-publisher-path'
+  $archive = $archiveResolution.path
+  $publisher = $publisherResolution.path
+  if ($archive.Equals($publisher, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-governance-root-separation]' }
   $archiveRows = @(
     foreach ($name in $script:MIR4ArchiveSubroots) {
       [ordered]@{ name=$name; exists=(Test-Path -LiteralPath (Join-Path $archive $name) -PathType Container) }
@@ -181,8 +210,8 @@ function Get-MIR4ReleaseGovernanceReadiness {
     programme_id=[string]$authority.programme_id
     classification=$classification
     authority_state=[string]$authority.state
-    archive=[ordered]@{home=$archive;roots=$archiveRows}
-    publisher=[ordered]@{home=$publisher;roots=$publisherRows;inventory=$inventory}
+    archive=[ordered]@{home=$archive;resolution_source=$archiveResolution.source;environment_variable=$archiveResolution.environment_variable;roots=$archiveRows}
+    publisher=[ordered]@{home=$publisher;resolution_source=$publisherResolution.source;environment_variable=$publisherResolution.environment_variable;roots=$publisherRows;inventory=$inventory}
     ledger=[ordered]@{branch=[string]$authority.ledger.branch;state=[string]$authority.ledger.status}
     protected_secret_input_available=([string]$authority.state -ne 'BLOCKED-HUMAN-SECRET-INPUT')
     source_freeze_authorized=$false

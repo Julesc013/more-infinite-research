@@ -2,7 +2,12 @@
   "schema": 1,
   "kind": "MIR4PlatformPreviewV0",
   "source_version": "4.0.0",
-  "candidate_wave": "M4C01",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "programme_execution_id": "M4C02-09-24H",
+  "candidate_state": "pre-freeze-unallocated",
+  "next_candidate": "M4RC1",
+  "release_preview_generation": "v1",
+  "v0_disposition": "superseded-compatibility-input-for-v1-migration-only",
   "canonicalization": "mir-canonical-json-v0",
   "maturity_classes": {
     "stable": "May affect authoritative player behavior and is release-blocking where admitted.",
@@ -31,8 +36,8 @@
     {"id":"whole-platform-programme-v1","maturity":"stable","mode":"package-excluded-4.0-consolidation-authority"},
     {"id":"uppercase-f-target-presentation-v1","maturity":"stable","mode":"canonical-display-with-legacy-input-normalization"},
     {"id":"technology-acceptance-queue-v1","maturity":"preview","mode":"one-technology-at-a-time-non-mutating-review-queue"},
-    {"id":"api-sdk-v0","maturity":"preview","mode":"read-only-package-excluded"},
-    {"id":"mep-v0","maturity":"preview","mode":"data-only-package-excluded"},
+    {"id":"api-sdk-v0","maturity":"preview","mode":"superseded-compatibility-input-package-excluded"},
+    {"id":"mep-v0","maturity":"preview","mode":"superseded-migration-input-package-excluded"},
     {"id":"query-profile-observation-v0","maturity":"preview","mode":"read-only-package-excluded"},
     {"id":"inspector-v0","maturity":"preview","mode":"query-consumer-package-excluded"},
     {"id":"target-provider-abi-v1","maturity":"preview","mode":"build-time-package-excluded"},
@@ -67,6 +72,20 @@
     "ExtensionConflict",
     "FinalizationRequirement"
   ],
+  "mep_fragments_v1": [
+    "CompatibilityFragment",
+    "ProfileFragment",
+    "ProofFragment",
+    "PresentationFragment",
+    "CapabilityRequirement",
+    "ExtensionDependency",
+    "ExtensionConflict",
+    "FinalizationRequirement",
+    "ProcessClassificationFragment",
+    "MigrationFragment",
+    "TargetDispositionFragment",
+    "ExternalEffectChannelDeclaration"
+  ],
   "mep_forbidden_fields": [
     "callback",
     "callbacks",
@@ -99,10 +118,7 @@
     "FailHardSafety"
   ],
   "preview_assets": [
-    "mir4-sdk-v0-preview.zip",
-    "mir4-platform-preview-v0.zip",
-    "mir4-reference-extension-v0.zip",
-    "mir4-inspector-preview-v0.zip",
+    "mir4-developer-preview-v1.zip",
     "mir4-sdk-v1-preview.zip",
     "mir4-reference-extension-v1-preview.zip",
     "mir4-inspector-preview-v1.zip"

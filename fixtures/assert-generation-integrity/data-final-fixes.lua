@@ -381,7 +381,7 @@ local function assert_pipeline_command_contracts()
       fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
-  if count ~= 22 then fail("expected 22 governed pipeline commands, got " .. tostring(count)) end
+  if count ~= 23 then fail("expected 23 governed pipeline commands, got " .. tostring(count)) end
 end
 
 assert_pipeline_command_contracts()

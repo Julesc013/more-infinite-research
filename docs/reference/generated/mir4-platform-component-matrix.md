@@ -5,13 +5,13 @@ applies_to: "4.0.0 M4C10-WHOLE-4X-IN-4.0"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
 ---
 # MIR 4 Platform Component Matrix
 
-Generated from `spec/platform/mir4-preview-v0/platform.json`.
+Generated from `spec/platform/mir4-preview-v0/platform.json`. V1 is the current release-facing developer preview; V0 remains a superseded compatibility input for migration testing only.
 
 | Component | Maturity | Mode |
 | --- | --- | --- |
@@ -24,8 +24,8 @@ Generated from `spec/platform/mir4-preview-v0/platform.json`.
 | `whole-platform-programme-v1` | stable | package-excluded-4.0-consolidation-authority |
 | `uppercase-f-target-presentation-v1` | stable | canonical-display-with-legacy-input-normalization |
 | `technology-acceptance-queue-v1` | preview | one-technology-at-a-time-non-mutating-review-queue |
-| `api-sdk-v0` | preview | read-only-package-excluded |
-| `mep-v0` | preview | data-only-package-excluded |
+| `api-sdk-v0` | preview | superseded-compatibility-input-package-excluded |
+| `mep-v0` | preview | superseded-migration-input-package-excluded |
 | `query-profile-observation-v0` | preview | read-only-package-excluded |
 | `inspector-v0` | preview | query-consumer-package-excluded |
 | `target-provider-abi-v1` | preview | build-time-package-excluded |

@@ -1,9 +1,9 @@
 param(
   [ValidateSet('check','initialize')][string]$Command='check',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
-  [string]$ArchiveHome='C:\Projects\Factorio\archive',
-  [string]$PublisherHome='C:\Projects\Factorio\publisher\mir4',
-  [string]$OutputPath=''
+  [AllowEmptyString()][string]$ArchiveHome='',
+  [AllowEmptyString()][string]$PublisherHome='',
+  [string]$OutputPath='.mir/local/mir4-release-governance-readiness.json'
 )
 
 $ErrorActionPreference='Stop'

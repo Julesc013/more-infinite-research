@@ -1,16 +1,19 @@
 ---
 title: "MIR 4 SDK V0 Preview Quickstart"
-status: current
+status: deprecated
 applies_to: "MIR 4 API/SDK V0 preview"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/reference/mir4-sdk-v1-quickstart.md
 ---
 
 # MIR 4 SDK V0 Preview Quickstart
+
+> Deprecated compatibility input. Use the V1 developer preview; retain this page only for V0-to-V1 migration.
 
 SDK V0 is a real, distributable developer preview. Its schemas and diagnostics are deterministic, but compatibility may change before API/SDK 1.0. It cannot mutate Factorio prototypes, settings, migrations or persistent authoritative state.
 

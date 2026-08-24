@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 candidate programme"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
 ---
@@ -16,7 +16,7 @@ This is prepared copy, not publication authority. Replace candidate status and t
 
 ## GitHub release summary
 
-More Infinite Research 4.0 preserves the proven MIR 3 player behavior while introducing target-specific distributions and a separate developer-preview platform. Download only the player ZIP matching your Factorio line. Modders can separately download API/SDK V0, MEP V0, the reference extension, and Inspector previews; these assets are read-only, package-excluded, and may change before 1.0.
+More Infinite Research 4.0 preserves the proven MIR 3 player behavior while introducing target-specific distributions and a separate V1 developer-preview platform. Download only the player ZIP matching your Factorio line. Modders can separately download API/SDK V1, MEP V1, the reference extension, and Inspector previews; these assets are read-only, package-excluded, and may change before 1.0. V0 remains available only as a migration input.
 
 The final release table must list each admitted target's Factorio line, direct predecessor, archive name, SHA-256, qualification status, and support tier. Private or deferred targets must not appear as downloadable public player products.
 
