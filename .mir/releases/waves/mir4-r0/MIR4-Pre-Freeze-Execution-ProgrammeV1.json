@@ -106,8 +106,8 @@
     {"id": "T02", "name": "Release phase engine kernel", "state": "completed", "depends_on": ["T01"], "human_required": false, "release_transition": false},
     {"id": "T03", "name": "Source-freeze and target-build executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
     {"id": "T04", "name": "Qualification, preview and independent-verification executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
-    {"id": "T05", "name": "Seal, promotion, publication, readback and restore executors", "state": "ready", "depends_on": ["T03", "T04"], "human_required": false, "release_transition": false},
-    {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "blocked-dependency", "depends_on": ["T05"], "human_required": false, "release_transition": false},
+    {"id": "T05", "name": "Seal, promotion, publication, readback and restore executors", "state": "completed", "depends_on": ["T03", "T04"], "human_required": false, "release_transition": false},
+    {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "ready", "depends_on": ["T05"], "human_required": false, "release_transition": false},
     {"id": "T07", "name": "Canonicalization, schema namespace and diagnostic authority", "state": "ready", "depends_on": ["T01"], "human_required": false, "release_transition": false},
     {"id": "T08", "name": "SDK V1 preview completion", "state": "blocked-dependency", "depends_on": ["T07"], "human_required": false, "release_transition": false},
     {"id": "T09", "name": "Extension developer experience", "state": "blocked-dependency", "depends_on": ["T07"], "human_required": false, "release_transition": false},
@@ -117,14 +117,14 @@
     {"id": "T13", "name": "Release compatibility canary cut", "state": "blocked-dependency", "depends_on": ["T10", "T12"], "human_required": false, "release_transition": false},
     {"id": "T14", "name": "MIR4 public, contributor, maintainer and continuity documentation", "state": "blocked-dependency", "depends_on": ["T01", "T07", "T09", "T10"], "human_required": false, "release_transition": false},
     {"id": "T15", "name": "Supply-chain and preservation hardening", "state": "blocked-dependency", "depends_on": ["T05", "T07"], "human_required": false, "release_transition": false},
-    {"id": "T16", "name": "Protected signing and recovery ceremony", "state": "blocked-dependency", "depends_on": ["T05"], "human_required": true, "release_transition": false},
+    {"id": "T16", "name": "Protected signing and recovery ceremony", "state": "blocked-human", "depends_on": ["T05"], "human_required": true, "release_transition": false},
     {"id": "T17", "name": "Pre-freeze F210/F200 maintainer playtests", "state": "blocked-human", "depends_on": ["T01"], "human_required": true, "release_transition": false},
     {"id": "T18", "name": "Pre-freeze defect closure and independent audit", "state": "blocked-dependency", "depends_on": ["T06", "T08", "T11", "T13", "T14", "T15", "T16", "T17"], "human_required": false, "release_transition": false},
     {"id": "T19", "name": "Source-freeze authorization and M4RC1 allocation", "state": "blocked-human", "depends_on": ["T18"], "human_required": true, "release_transition": true},
     {"id": "T20", "name": "Frozen candidate qualification and final acceptance", "state": "blocked-dependency", "depends_on": ["T19"], "human_required": true, "release_transition": true},
     {"id": "T21", "name": "Production seal, promotion, tags, publication and public readback", "state": "blocked-dependency", "depends_on": ["T20"], "human_required": true, "release_transition": true}
   ],
-  "next_dependency_ready_turn": "T05",
+  "next_dependency_ready_turn": "T06",
   "transition_gate": {
     "source_freeze": false,
     "candidate_allocation": false,
@@ -133,5 +133,5 @@
     "tagging": false,
     "publication": false
   },
-  "status": "T04-COMPLETE-T05-READY-RELEASE-BLOCKED"
+  "status": "T05-COMPLETE-T06-READY-RELEASE-BLOCKED"
 }

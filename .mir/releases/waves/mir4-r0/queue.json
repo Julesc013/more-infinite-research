@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "E689F34294D3824DB5C0A2782B67837F1C17B7889E29F7101B23759E0C5BEE95"
+      "sha256": "00A4EC23076A726D6683D3355A9197B26E15D11FFA8A4C4CA5377498D27C3CEB"
     }
   ],
   "payload": {
@@ -62,7 +62,7 @@
       {
         "id": "T05",
         "scope": "Seal, promotion, publication, readback and restore executors",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T03",
           "T04"
@@ -73,7 +73,7 @@
       {
         "id": "T06",
         "scope": "Release doctor maturity and fault-injection closure",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T05"
         ],
@@ -178,7 +178,7 @@
       {
         "id": "T16",
         "scope": "Protected signing and recovery ceremony",
-        "state": "blocked-dependency",
+        "state": "blocked-human",
         "blocked_by": [
           "T05"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "0FD21E0AF332AAAD7AB8D4360AD8F0A39785830495EBF553AC550D91A092E40E"
+  "record_sha256": "DECE0D326BDB9F26D3047EB23929C46FC3D1205A086121F9252DF8777A82B9E2"
 }
