@@ -2,6 +2,14 @@ name: MIR
 
 on:
   push:
+    branches:
+      - main
+      - dev
+      - legacy
+      - tmp/2.0
+      - factorio-2.0-lane
+      - 'release/**'
+      - 'port/**'
   pull_request:
   workflow_dispatch:
 

@@ -61,6 +61,17 @@ $promotion=Complete-T05 promotion (Join-Path $testRoot 'promotion') $promotionAd
 if(-not[bool]$promotion.execute.result.detail.fast_forward_proven-or[bool]$promotion.execute.result.detail.ref_update_performed-or
    [bool]$promotion.execute.result.detail.tag_created){throw '[mir4-t05-promotion-plan]'}
 
+$promotionTamperInputs=$inputs.PSObject.Copy();$promotionTamperInputs.candidate_id='DEV-T05-PROMOTION-TAMPER'
+$promotionTamperRoot=Join-Path $testRoot 'promotion-tamper';$promotionTamperPlan=Invoke-T05 Plan promotion $promotionTamperRoot $promotionAdapter $promotionTamperInputs
+$null=Invoke-T05 DryRun promotion $promotionTamperRoot $promotionAdapter $promotionTamperInputs;$null=Invoke-T05 Execute promotion $promotionTamperRoot $promotionAdapter $promotionTamperInputs
+$promotionTamperPath=Join-Path ([string]$promotionTamperPlan.attempt_root) 'artifacts/execute/fast-forward-promotion-plan.json'
+$promotionTampered=Get-Content -Raw -LiteralPath $promotionTamperPath|ConvertFrom-Json -Depth 100;$promotionTampered.from_commit='0'*40
+$promotionTampered.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $promotionTampered -HashProperty record_sha256
+[IO.File]::WriteAllText($promotionTamperPath,(ConvertTo-MIR4ReleasePhaseCanonicalJson $promotionTampered)+"`n",[Text.UTF8Encoding]::new($false))
+$promotionTamperRejected=$false
+try{$null=Invoke-T05 Verify promotion $promotionTamperRoot $promotionAdapter $promotionTamperInputs}catch{if($_.Exception.Message-ceq'[mir4-promotion-plan-stale]'){$promotionTamperRejected=$true}else{throw}}
+if(-not$promotionTamperRejected){throw '[mir4-t05-promotion-tamper-accepted]'}
+
 $transferCalls=[Collections.Generic.List[object]]::new()
 $transferProvider={
   param([string]$FixtureRepo,$Request,[string]$Mode,$Context)
@@ -74,6 +85,17 @@ $transferGroups=@($transferCalls|Group-Object transfer_id)
 if($transferGroups.Count-ne4-or@($transferGroups|Where-Object{$_.Count-ne2-or(@($_.Group.mode)-join'|')-cne'Transfer|Reconcile'}).Count-ne0-or
    [int]$publication.execute.result.detail.reconciled_count-ne4-or[bool]$publication.execute.result.detail.builder_available-or
    [bool]$publication.execute.result.detail.source_checkout_required){throw '[mir4-t05-publication-reconciliation]'}
+
+$wrongTransferProvider={
+  param([string]$FixtureRepo,$Request,[string]$Mode,$Context)
+  [pscustomobject][ordered]@{state='transferred-exact';transfer_id=[string]$Request.transfer_id;observed_sha256=('D'*64);network_calls=0;production_mutation_performed=$false}
+}
+$wrongPublicationAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-publication -PublicationTransferProvider $wrongTransferProvider -PublicationTransferProviderIdentity ('C'*64)
+$wrongPublicationInputs=$inputs.PSObject.Copy();$wrongPublicationInputs.candidate_id='DEV-T05-WRONG-PUBLICATION';$wrongPublicationRoot=Join-Path $testRoot 'publication-wrong'
+$null=Invoke-T05 Plan target-publication $wrongPublicationRoot $wrongPublicationAdapter $wrongPublicationInputs;$null=Invoke-T05 DryRun target-publication $wrongPublicationRoot $wrongPublicationAdapter $wrongPublicationInputs
+$wrongPublicationRejected=$false
+try{$null=Invoke-T05 Execute target-publication $wrongPublicationRoot $wrongPublicationAdapter $wrongPublicationInputs}catch{if($_.Exception.Message.StartsWith('[mir4-publication-transfer-hash]')){$wrongPublicationRejected=$true}else{throw}}
+if(-not$wrongPublicationRejected){throw '[mir4-t05-publication-mismatch-accepted]'}
 
 $readbackAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase public-readback
 $readback=Complete-T05 public-readback (Join-Path $testRoot 'readback') $readbackAdapter
@@ -95,6 +117,14 @@ $restore=Complete-T05 restore-drill (Join-Path $testRoot 'restore') $restoreAdap
 if(-not[bool]$restore.execute.result.detail.clean_destination-or-not[bool]$restore.execute.result.detail.all_bytes_equal-or
    @($restore.execute.result.detail.files).Count-ne2-or[bool]$restore.execute.result.detail.source_repository_access-or
    [bool]$restore.execute.result.detail.credential_access){throw '[mir4-t05-clean-restore]'}
+
+$restoreExtraInputs=$inputs.PSObject.Copy();$restoreExtraInputs.candidate_id='DEV-T05-RESTORE-EXTRA';$restoreExtraRoot=Join-Path $testRoot 'restore-extra'
+$restoreExtraPlan=Invoke-T05 Plan restore-drill $restoreExtraRoot $restoreAdapter $restoreExtraInputs
+$null=Invoke-T05 DryRun restore-drill $restoreExtraRoot $restoreAdapter $restoreExtraInputs;$null=Invoke-T05 Execute restore-drill $restoreExtraRoot $restoreAdapter $restoreExtraInputs
+[IO.File]::WriteAllText((Join-Path ([string]$restoreExtraPlan.attempt_root) 'artifacts/execute/restored/extra.json'),'{}',[Text.UTF8Encoding]::new($false))
+$restoreExtraRejected=$false
+try{$null=Invoke-T05 Verify restore-drill $restoreExtraRoot $restoreAdapter $restoreExtraInputs}catch{if($_.Exception.Message-ceq'[mir4-restore-drill-verification]'){$restoreExtraRejected=$true}else{throw}}
+if(-not$restoreExtraRejected){throw '[mir4-t05-restore-extra-accepted]'}
 
 $compensateInputs=$inputs.PSObject.Copy();$compensateInputs.candidate_id='DEV-T05-COMPENSATE';$compensateRoot=Join-Path $testRoot 'promotion-compensate'
 $compensatePlan=Invoke-T05 Plan promotion $compensateRoot $promotionAdapter $compensateInputs;$null=Invoke-T05 DryRun promotion $compensateRoot $promotionAdapter $compensateInputs;$null=Invoke-T05 Execute promotion $compensateRoot $promotionAdapter $compensateInputs

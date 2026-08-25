@@ -136,6 +136,18 @@ foreach($suffix in @('A','B')){
 }
 if((@($previewHashes[0])-join'|')-cne(@($previewHashes[1])-join'|')){throw '[mir4-t04-preview-nondeterministic]'}
 
+$previewTamperInputs=$inputs.PSObject.Copy();$previewTamperInputs.candidate_id='DEV-T04-PREVIEW-TAMPER'
+$previewTamperRoot=Join-Path $testRunRoot 'preview-tamper'
+$previewTamperPlan=Invoke-T04Phase Plan preview-assets $previewTamperRoot $previewAdapter $previewTamperInputs
+$null=Invoke-T04Phase DryRun preview-assets $previewTamperRoot $previewAdapter $previewTamperInputs
+$null=Invoke-T04Phase Execute preview-assets $previewTamperRoot $previewAdapter $previewTamperInputs
+$previewTamperManifest=Get-Content -Raw -LiteralPath (Join-Path ([string]$previewTamperPlan.attempt_root) 'artifacts/execute/preview/preview-assets.json')|ConvertFrom-Json -Depth 100
+$previewTamperPath=Join-Path ([string]$previewTamperPlan.attempt_root) ('artifacts/execute/preview/'+[string]$previewTamperManifest.assets[0].name)
+[IO.File]::AppendAllText($previewTamperPath,'TAMPER',[Text.UTF8Encoding]::new($false))
+$previewTamperRejected=$false
+try{$null=Invoke-T04Phase Verify preview-assets $previewTamperRoot $previewAdapter $previewTamperInputs}catch{if($_.Exception.Message.StartsWith('[mir4-preview-assets-byte-binding]')){$previewTamperRejected=$true}else{throw}}
+if(-not$previewTamperRejected){throw '[mir4-t04-preview-tamper-accepted]'}
+
 $independentCalls=@{}
 $independentProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
