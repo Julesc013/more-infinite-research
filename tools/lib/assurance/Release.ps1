@@ -1239,6 +1239,24 @@ function Invoke-MIRAssuranceSelfTest {
       throw "Worker fan-in required a mutable worker pointer instead of deriving it from immutable receipt objects."
     }
 
+    $adoptedRoot = Join-Path $fanInRoot "adopted-exact-evidence"
+    & $copyFanInArtifact $adoptedRoot @("expected")
+    $adoptedReceiptPath = Join-Path (Join-Path $adoptedRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    $adoptedReceipt = Get-Content -Raw -LiteralPath $adoptedReceiptPath | ConvertFrom-Json
+    $adoptedReceipt.producer.run_id = "trusted-continuation-run"
+    $adoptedReceipt.producer.job = "trusted-continuation-worker"
+    $adoptedReceipt.evidence_disposition = "adopted-exact-trusted-capsule"
+    Write-MIRAssuranceAtomicJson -Value $adoptedReceipt -Path $adoptedReceiptPath
+    & $resetFanInDestination
+    $adoptedDestinationReceipt = Join-Path $paths.root "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
+    if (Test-Path -LiteralPath $adoptedDestinationReceipt -PathType Leaf) {
+      Remove-Item -LiteralPath $adoptedDestinationReceipt -Force
+    }
+    $adoptedImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $adoptedRoot -ArtifactPrefix $fanInPrefix
+    if ([string]$adoptedImport.status -ne "passed" -or @($adoptedImport.imported).Count -ne 1) {
+      throw "Worker fan-in rejected exact trusted evidence adopted by a later trusted worker."
+    }
+
     $receiptMismatchRoot = Join-Path $fanInRoot "receipt-mismatch"
     & $copyFanInArtifact $receiptMismatchRoot @("expected")
     $receiptMismatchPath = Join-Path (Join-Path $receiptMismatchRoot "$fanInPrefix$selfTestId") "worker-receipts\$([string]$fanInPlan.plan_material_sha256).json"
@@ -1258,7 +1276,7 @@ function Invoke-MIRAssuranceSelfTest {
     Write-MIRAssuranceAtomicJson -Value $producerMismatch -Path $producerMismatchPath
     $producerMismatchImport = Import-MIRAssuranceWorkerEvidence -Plan $fanInPlan -Context $Context -WorkerRoot $producerMismatchRoot -ArtifactPrefix $fanInPrefix
     if ([string]$producerMismatchImport.status -ne "failed" -or @($producerMismatchImport.rejected).Count -ne 1) {
-      throw "Worker fan-in accepted a receipt whose worker job identity differed from its evidence producer."
+      throw "Worker fan-in accepted a receipt whose declared evidence disposition contradicted its producer lineage."
     }
 
     $duplicateRoot = Join-Path $fanInRoot "duplicate"

@@ -766,7 +766,9 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
 
 $assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredIngestionGuard in @(
-  'mir-assurance-worker-receipt-v2',
+  'mir-assurance-worker-receipt-v3',
+  'adopted-exact-trusted-capsule',
+  'evidence-disposition',
   'Test-MIRAssuranceFreshCampaignEvidence',
   'Get-MIRAssuranceCampaignCheckpoint',
   'stale-ignored',
