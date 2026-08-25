@@ -1,8 +1,3 @@
-$script:MIR4CanonicalJsonV1Name = 'mir-canonical-json/1'
-$script:MIR4CanonicalJsonV1MaxDepth = 64
-$script:MIR4CanonicalJsonV1MaxSafeInteger = [System.Numerics.BigInteger]::Parse('9007199254740991')
-$script:MIR4CanonicalJsonV1MinSafeInteger = [System.Numerics.BigInteger]::Parse('-9007199254740991')
-
 function New-MIR4CanonicalJsonV1Error {
   param([Parameter(Mandatory)][string]$Code,[string]$Detail='')
   $suffix = if ([string]::IsNullOrWhiteSpace($Detail)) { '' } else { " $Detail" }
@@ -51,7 +46,7 @@ function Write-MIR4CanonicalJsonV1Element {
     [Parameter(Mandatory)][Text.StringBuilder]$Builder,
     [int]$Depth = 0
   )
-  if ($Depth -gt $script:MIR4CanonicalJsonV1MaxDepth) {
+  if ($Depth -gt 64) {
     throw (New-MIR4CanonicalJsonV1Error -Code 'mir4-canon-depth')
   }
   switch ($Element.ValueKind) {
@@ -104,7 +99,7 @@ function Write-MIR4CanonicalJsonV1Element {
       }
       if ($raw -ceq '-0') { throw (New-MIR4CanonicalJsonV1Error -Code 'mir4-canon-negative-zero') }
       $integer = [System.Numerics.BigInteger]::Parse($raw, [Globalization.CultureInfo]::InvariantCulture)
-      if ($integer -lt $script:MIR4CanonicalJsonV1MinSafeInteger -or $integer -gt $script:MIR4CanonicalJsonV1MaxSafeInteger) {
+      if ($integer -lt [System.Numerics.BigInteger]::Parse('-9007199254740991') -or $integer -gt [System.Numerics.BigInteger]::Parse('9007199254740991')) {
         throw (New-MIR4CanonicalJsonV1Error -Code 'mir4-canon-unsafe-integer' -Detail $raw)
       }
       [void]$Builder.Append($raw)
@@ -125,7 +120,7 @@ function ConvertFrom-MIR4CanonicalJsonTextV1 {
   $options = [System.Text.Json.JsonDocumentOptions]::new()
   $options.AllowTrailingCommas = $false
   $options.CommentHandling = [System.Text.Json.JsonCommentHandling]::Disallow
-  $options.MaxDepth = $script:MIR4CanonicalJsonV1MaxDepth + 1
+  $options.MaxDepth = 65
   try { $document = [System.Text.Json.JsonDocument]::Parse($Json, $options) }
   catch [System.Text.Json.JsonException] {
     if ($_.Exception.Message -match 'maximum configured depth') { throw (New-MIR4CanonicalJsonV1Error -Code 'mir4-canon-depth') }
@@ -164,7 +159,7 @@ function Get-MIR4CanonicalDigestV1 {
   }
   $canonical = ConvertTo-MIR4CanonicalJsonV1 -Value $material
   $encoding = [Text.UTF8Encoding]::new($false, $true)
-  $prefix = $encoding.GetBytes("$($script:MIR4CanonicalJsonV1Name)$([char]0)$Domain$([char]0)")
+  $prefix = $encoding.GetBytes("mir-canonical-json/1$([char]0)$Domain$([char]0)")
   $payload = $encoding.GetBytes($canonical)
   $bytes = [byte[]]::new($prefix.Length + $payload.Length)
   [Array]::Copy($prefix, 0, $bytes, 0, $prefix.Length)

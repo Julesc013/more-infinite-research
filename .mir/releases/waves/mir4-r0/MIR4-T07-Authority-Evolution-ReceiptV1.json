@@ -55,7 +55,7 @@
     {"path":"spec/api/mir4-v1/compatibility.json","sha256":"2EE28E6F258BEF31F40EA7C9FE737844CF95446AF709BAC757A483C935D16F0A","hash_mode":"raw-bytes","role":"v0-to-v1-preview-compatibility-policy"},
     {"path":"spec/canonicalization/mir-canonical-json-v1.json","sha256":"4570175C876584B26529B2BA450798DF8FBCB807DA7F99904B622A80025F88A3","hash_mode":"raw-bytes","role":"mir-canonical-json-v1-authority"},
     {"path":"fixtures/mir4-canonical-json-v1/vectors.json","sha256":"0D7100B6BFDBBED805B4D16E3ACCAB6A9BC751494A7CA785C1AB83FB575AB531","hash_mode":"raw-bytes","role":"twelve-positive-sixteen-negative-vector-corpus"},
-    {"path":"tools/lib/mir4/CanonicalJsonV1.ps1","sha256":"74F5D816635AC8520A008128A423DF1B882E94FA9B4363E3BCC0A67BF9D4D4BD","hash_mode":"canonical-text-v1","role":"powershell-canonical-json-v1-reference"},
+    {"path":"tools/lib/mir4/CanonicalJsonV1.ps1","sha256":"1BB192ED81D94996FE1E4C5200AAFAF3E09D2BED9C5F49D8E6AC884A3E9201C4","hash_mode":"canonical-text-v1","role":"powershell-canonical-json-v1-reference"},
     {"path":"tools/lib/mir4/DiagnosticsV1.ps1","sha256":"B50FADF570E941A5420EE5D58104D47759A52A097B480BE66BFBBEF6B1D9BD0A","hash_mode":"canonical-text-v1","role":"stable-diagnostic-construction-order-renderer"},
     {"path":"spec/canonicalization/reference/mir4_canonical_json_v1.py","sha256":"AB9E11467E775036A15F8A995CC1297B5508C94EC8167F37B4D9EA08D0E8CA5D","hash_mode":"canonical-text-v1","role":"independent-python-canonical-json-v1-reference"},
     {"path":"tools/lib/mir4/ModuleEcosystem.ps1","sha256":"E9156B7524C0EC5716D6FE97495AA867A7FE3C7BFAD792F447DB9955C8DC364F","hash_mode":"canonical-text-v1","role":"v1-api-mep-domain-digest-integration"},
