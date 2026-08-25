@@ -6,7 +6,7 @@ Generated: 2026-08-25
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T06-COMPLETE-T07-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T07`.
+Status: `T07-COMPLETE-T08-T09-T10-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T08`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -17,10 +17,10 @@ Status: `T06-COMPLETE-T07-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 | `T04` | Qualification, preview and independent-verification executors | `completed` | T02 | `false` |
 | `T05` | Seal, promotion, publication, readback and restore executors | `completed` | T03, T04 | `false` |
 | `T06` | Release doctor maturity and fault-injection closure | `completed` | T05 | `false` |
-| `T07` | Canonicalization, schema namespace and diagnostic authority | `ready` | T01 | `false` |
-| `T08` | SDK V1 preview completion | `blocked-dependency` | T07 | `false` |
-| `T09` | Extension developer experience | `blocked-dependency` | T07 | `false` |
-| `T10` | Environment lock, diff, support bundle and minimizer | `blocked-dependency` | T07 | `false` |
+| `T07` | Canonicalization, schema namespace and diagnostic authority | `completed` | T01 | `false` |
+| `T08` | SDK V1 preview completion | `ready` | T07 | `false` |
+| `T09` | Extension developer experience | `ready` | T07 | `false` |
+| `T10` | Environment lock, diff, support bundle and minimizer | `ready` | T07 | `false` |
 | `T11` | Read-only F210 MEP discovery | `blocked-dependency` | T09 | `false` |
 | `T12` | Exact target ProcessIR preview and Inspector compare | `blocked-dependency` | T10 | `false` |
 | `T13` | Release compatibility canary cut | `blocked-dependency` | T10, T12 | `false` |

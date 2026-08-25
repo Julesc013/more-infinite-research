@@ -1,3 +1,6 @@
+. (Join-Path $PSScriptRoot 'CanonicalJsonV1.ps1')
+. (Join-Path $PSScriptRoot 'DiagnosticsV1.ps1')
+
 function Get-MIR4ModuleEcosystemRepoRoot {
   param([Parameter(Mandatory)][string]$RepoRoot)
   return (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -30,19 +33,12 @@ function ConvertTo-MIR4ModuleCanonicalValue {
 
 function ConvertTo-MIR4ModuleCanonicalJson {
   param([Parameter(Mandatory)]$Value)
-  return ((ConvertTo-MIR4ModuleCanonicalValue $Value) | ConvertTo-Json -Depth 100 -Compress)
+  return ConvertTo-MIR4CanonicalJsonV1 -Value $Value
 }
 
 function Get-MIR4ModuleDigest {
   param([Parameter(Mandatory)]$Value)
-  $material = [ordered]@{}
-  foreach ($property in $Value.PSObject.Properties) {
-    if ($property.Name -ne 'digest') { $material[$property.Name] = $property.Value }
-  }
-  $bytes = [Text.UTF8Encoding]::new($false).GetBytes((ConvertTo-MIR4ModuleCanonicalJson $material))
-  $sha = [Security.Cryptography.SHA256]::Create()
-  try { return 'sha256:' + ([BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-', '').ToLowerInvariant()) }
-  finally { $sha.Dispose() }
+  return Get-MIR4CanonicalDigestV1 -Value $Value -Domain (Get-MIR4RecordDigestDomainV1 -Value $Value) -OmitTopLevelDigest
 }
 
 function Add-MIR4ModuleDigest {
@@ -101,7 +97,7 @@ function Get-MIR4MepV1Schema {
     }
   )
   return [ordered]@{
-    '$schema'='https://json-schema.org/draft/2020-12/schema';'$id'='https://mir.invalid/preview/mir4-mep-v1.schema.json';title='MIR Extension Protocol V1 Preview';type='object';additionalProperties=$false
+    '$schema'='https://json-schema.org/draft/2020-12/schema';'$id'='https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/extension-envelope.schema.json';title='MIR Extension Protocol V1 Preview';type='object';additionalProperties=$false
     required=@('kind','schema','extension_id','extension_version','namespace','targets','fragments','canonicalization','digest')
     properties=[ordered]@{
       kind=@{const='MIR4ExtensionEnvelopeV1'};schema=@{const=1}
@@ -110,7 +106,7 @@ function Get-MIR4MepV1Schema {
       namespace=@{type='string';pattern='^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$'}
       targets=@{type='array';minItems=1;maxItems=17;uniqueItems=$true;items=@{type='string';pattern='^f[0-9]{3}$'}}
       fragments=@{type='array';minItems=1;maxItems=64;items=@{oneOf=$variants}}
-      canonicalization=@{const='mir-canonical-json-v0'};digest=@{type='string';pattern='^sha256:[0-9a-f]{64}$'}
+      canonicalization=@{const='mir-canonical-json/1'};digest=@{type='string';pattern='^sha256:[0-9a-f]{64}$'}
     }
   }
 }
@@ -118,7 +114,7 @@ function Get-MIR4MepV1Schema {
 function Get-MIR4ApiV1Schema {
   param([Parameter(Mandatory)]$Authority)
   return [ordered]@{
-    '$schema'='https://json-schema.org/draft/2020-12/schema';'$id'='https://mir.invalid/preview/mir4-api-v1-response.schema.json';title='MIR 4 API Response V1 Preview';type='object';additionalProperties=$false
+    '$schema'='https://json-schema.org/draft/2020-12/schema';'$id'='https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/api-response.schema.json';title='MIR 4 API Response V1 Preview';type='object';additionalProperties=$false
     required=@('kind','schema','surface','target','versions','capabilities','availability','page','items','canonicalization','extensions','source_identity','package_visible','mutation_authorized','public_support_claim','digest')
     properties=[ordered]@{
       kind=@{const='MIR4ApiResponseV1'};schema=@{const=1};surface=@{enum=@($Authority.api_surfaces)}
@@ -127,8 +123,8 @@ function Get-MIR4ApiV1Schema {
       capabilities=@{type='array';maxItems=[int]$Authority.response_bounds.max_capabilities;uniqueItems=$true;items=@{type='string';pattern='^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$'}}
       availability=@{type='object';additionalProperties=$false;required=@('status','reason','evidence');properties=[ordered]@{status=@{enum=@('available','unavailable')};reason=@{type='string';minLength=1;maxLength=512};evidence=@{type='array';maxItems=64;uniqueItems=$true;items=@{type='string';minLength=1;maxLength=256}}}}
       page=@{type='object';additionalProperties=$false;required=@('offset','limit','returned','total','next_cursor');properties=[ordered]@{offset=@{type='integer';minimum=0};limit=@{type='integer';minimum=1;maximum=[int]$Authority.response_bounds.max_page_items};returned=@{type='integer';minimum=0;maximum=[int]$Authority.response_bounds.max_page_items};total=@{type=@('integer','null');minimum=0};next_cursor=@{type=@('string','null');maxLength=[int]$Authority.response_bounds.max_cursor_bytes}}}
-      items=@{type='array';maxItems=[int]$Authority.response_bounds.max_page_items;items=@{type=@('object','string','number','boolean','array','null')}}
-      canonicalization=@{const='mir-canonical-json-v0'}
+      items=@{type='array';maxItems=[int]$Authority.response_bounds.max_page_items;items=@{type=@('object','string','integer','boolean','array','null');minimum=-9007199254740991;maximum=9007199254740991}}
+      canonicalization=@{const='mir-canonical-json/1'}
       extensions=@{type='object';maxProperties=[int]$Authority.response_bounds.max_extensions;propertyNames=@{pattern='^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$'};additionalProperties=$true}
       source_identity=@{type=@('object','null')};package_visible=@{const=$false};mutation_authorized=@{const=$false};public_support_claim=@{const=$false};digest=@{type='string';pattern='^sha256:[0-9a-f]{64}$'}
     }
@@ -167,6 +163,7 @@ function Test-MIR4MepV1Envelope {
   if (-not $valid) { throw '[mir4-mep-v1-schema] Envelope schema validation failed.' }
   $fragmentIds = @($Envelope.fragments | ForEach-Object { [string]$_.id })
   if (@($fragmentIds | Sort-Object -Unique).Count -ne $fragmentIds.Count) { throw '[mir4-mep-v1-duplicate-fragment]' }
+  Test-MIR4OrdinalSortedUniqueV1 -Values @($Envelope.targets | ForEach-Object { [string]$_ }) -Diagnostic 'mir4-mep-v1-target-order' | Out-Null
   $registry = Get-Content -Raw -LiteralPath (Join-Path (Get-MIR4ModuleEcosystemRepoRoot $RepoRoot) '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json') | ConvertFrom-Json
   foreach ($target in @($Envelope.targets)) {
     if ([string]$target -notin @($registry.identities.target)) { throw "[mir4-mep-v1-target] $target" }
@@ -196,7 +193,7 @@ function ConvertFrom-MIR4MepV0ToV1 {
   )
   $record = [pscustomobject][ordered]@{
     kind='MIR4ExtensionEnvelopeV1';schema=1;extension_id=[string]$Envelope.extension_id;extension_version='0.0.0-migrated';namespace=[string]$Envelope.extension_id
-    targets=@($Envelope.targets | ForEach-Object { [string]$_ } | Sort-Object -Unique);fragments=$fragments;canonicalization='mir-canonical-json-v0';digest=''
+    targets=@(Get-MIR4OrdinalSortedUniqueV1 -Values @($Envelope.targets | ForEach-Object { [string]$_ }));fragments=$fragments;canonicalization='mir-canonical-json/1';digest=''
   }
   return Add-MIR4ModuleDigest $record
 }
@@ -223,7 +220,7 @@ function New-MIR4ReferenceExtensionV1 {
       [ordered]@{id='org.more-infinite-research.reference.target';kind='TargetDispositionFragment';data=[ordered]@{target='f210';disposition='blocked-by-terminal-emitter';provider_ref='sdk/preview/mir4/reference/target-providers.json#f210'}},
       [ordered]@{id='org.more-infinite-research.reference.effect';kind='ExternalEffectChannelDeclaration';data=[ordered]@{channel_ref=$null;status='unavailable';evidence_refs=@('authority:W06-external-effect-channel')}}
     )
-    canonicalization='mir-canonical-json-v0';digest=''
+    canonicalization='mir-canonical-json/1';digest=''
   }
   return Add-MIR4ModuleDigest $record
 }
@@ -330,9 +327,10 @@ function New-MIR4ApiV1Response {
     capabilities=@([string]$contract[0].capability)
     availability=[ordered]@{status=$Availability;reason=$Reason;evidence=@($Evidence | Sort-Object -Unique)}
     page=[ordered]@{offset=$offset;limit=$Limit;returned=$pageItems.Count;total=$(if($Availability -eq 'available'){$all.Count}else{$null});next_cursor=$next}
-    items=$pageItems;canonicalization='mir-canonical-json-v0';extensions=$extensionCopy;source_identity=$SourceIdentity
+    items=$pageItems;canonicalization='mir-canonical-json/1';extensions=$extensionCopy;source_identity=$SourceIdentity
     package_visible=$false;mutation_authorized=$false;public_support_claim=$false;digest=''
   }
+  Test-MIR4ExplicitAvailabilityV1 -Availability $record.availability -Page $record.page | Out-Null
   Add-MIR4ModuleDigest $record | Out-Null
   $schema = Get-MIR4ApiV1Schema -Authority $authority | ConvertTo-Json -Depth 100 -Compress
   if (-not (($record | ConvertTo-Json -Depth 100) | Test-Json -Schema $schema)) { throw '[mir4-api-v1-schema]' }

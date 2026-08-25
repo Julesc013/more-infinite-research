@@ -2,7 +2,12 @@
   "schema": 1,
   "kind": "MIR4DeveloperPreviewContractSetV1",
   "stability": "preview-package-excluded-may-change-before-1.0",
-  "canonicalization": "mir-canonical-json-v0",
+  "canonicalization": "mir-canonical-json/1",
+  "schema_namespace": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/",
+  "canonicalization_contract": "spec/canonicalization/mir-canonical-json-v1.json",
+  "schema_namespace_registry": "spec/api/mir4-v1/schema-namespace.json",
+  "diagnostic_registry": "spec/api/mir4-v1/diagnostics.json",
+  "compatibility_policy": "spec/api/mir4-v1/compatibility.json",
   "record_kind": "MIR4ApiResponseV1",
   "availability": ["available", "unavailable"],
   "surfaces": [

@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "52E1399173938C69BBC76A7C0F6EB01372B10E7A3017E95FD96800C783035A15"
+      "sha256": "253BD40A36D9F6A1B0B0BAED9F939053FD617DB9ABAA609FE7E2E18239E30B48"
     }
   ],
   "payload": {
@@ -83,7 +83,7 @@
       {
         "id": "T07",
         "scope": "Canonicalization, schema namespace and diagnostic authority",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T01"
         ],
@@ -93,7 +93,7 @@
       {
         "id": "T08",
         "scope": "SDK V1 preview completion",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T07"
         ],
@@ -103,7 +103,7 @@
       {
         "id": "T09",
         "scope": "Extension developer experience",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T07"
         ],
@@ -113,7 +113,7 @@
       {
         "id": "T10",
         "scope": "Environment lock, diff, support bundle and minimizer",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T07"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "90578E1003D20BC1CF37DE7AF09F2A3B7EE60CAA8D4F1A6E791651E08A29FABC"
+  "record_sha256": "F1C7A7DEDED850A96E19609ED24F7EA800AF039A6F392D5014F5A3E06A64277A"
 }

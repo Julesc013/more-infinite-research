@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/canonical-json-vectors.schema.json",
+  "title": "MIR canonical JSON V1 conformance vectors",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","canonicalization","positive","negative"],
+  "properties": {
+    "schema":{"const":1},
+    "kind":{"const":"MIR4CanonicalJsonVectorsV1"},
+    "canonicalization":{"const":"mir-canonical-json/1"},
+    "positive":{"type":"array","minItems":12,"items":{"type":"object","additionalProperties":false,"required":["id","input_json","canonical_json"],"properties":{"id":{"type":"string","pattern":"^positive-[a-z0-9-]+$"},"input_json":{"type":"string"},"canonical_json":{"type":"string"}}}},
+    "negative":{"type":"array","minItems":16,"items":{"type":"object","additionalProperties":false,"required":["id","input_json","diagnostic"],"properties":{"id":{"type":"string","pattern":"^negative-[a-z0-9-]+$"},"input_json":{"type":"string"},"diagnostic":{"type":"string","pattern":"^mir4-canon-[a-z0-9-]+$"}}}}
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "MIR4PreviewCompatibilityPolicyV1",
+  "current_generation": 1,
+  "current_canonicalization": "mir-canonical-json/1",
+  "v0": {
+    "status": "deprecated-migration-input-only",
+    "read": "explicit-v0-reader-only",
+    "write": "forbidden",
+    "digest_reuse_in_v1": "forbidden",
+    "schema_id_reuse_in_v1": "forbidden",
+    "migration": "parse-v0-validate-v0-map-to-v1-canonicalize-v1-domain-digest",
+    "removal_gate": "accepted-independent-consumer-migration-and-explicit-later-release-decision"
+  },
+  "v1": {
+    "stability": "developer-preview-may-change-before-1.0",
+    "schema_ids": "permanent-and-never-reassigned",
+    "unknown_required_version": "reject",
+    "unknown_optional_extension": "preserve-only-when-bounded-and-data-only",
+    "canonicalization_mismatch": "reject",
+    "digest_mismatch": "reject",
+    "target_mismatch": "reject",
+    "mutation_authority": false,
+    "public_support_authority": false
+  },
+  "legacy_schema_ids": {
+    "recognition": "diagnostic-and-migration-routing-only",
+    "emission": "forbidden"
+  }
+}

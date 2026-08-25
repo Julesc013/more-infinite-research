@@ -42,6 +42,13 @@ if(@($t06.evolved_bindings).Count-ne2-or@($t06.current_authorities).Count-ne10-o
    @($t06.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t06-authority-evolution]'
 }
+$t07=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t07.evolved_bindings).Count-ne3-or@($t07.current_authorities).Count-ne32-or
+   (@($t07.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|tools/lib/mir4/PlatformPreview.ps1|tools/lib/mir4/PreFreezeRelease.ps1'-or
+   [string]$t07.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   @($t07.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t07-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

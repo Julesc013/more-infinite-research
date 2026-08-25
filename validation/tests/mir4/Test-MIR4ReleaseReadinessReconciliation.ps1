@@ -20,8 +20,8 @@ if(-not($currentJson|Test-Json -SchemaFile $currentSchema)){throw '[mir4-current
 $current=$currentJson|ConvertFrom-Json -Depth 100
 if([string]$current.source_baseline.commit-cne'8e269b6379ef3958f92fb747cef389f0f098feb6'-or
    [string]$current.source_baseline.tree-cne'dc3c7415c725bf10c0908d35ed93e530a49a77b1'-or
-   [string]$current.status-cne'T06-COMPLETE-T07-READY-RELEASE-BLOCKED'-or
-   [string]$current.next_dependency_ready_turn-cne'T07'){
+   [string]$current.status-cne'T07-COMPLETE-T08-T09-T10-READY-RELEASE-BLOCKED'-or
+   [string]$current.next_dependency_ready_turn-cne'T08'){
   throw '[mir4-current-execution-baseline]'
 }
 if(@($current.planning_inputs|Where-Object classification -ne 'planning-evidence-only-not-execution-authority').Count-ne0){
@@ -35,8 +35,8 @@ if(@($current.blockers|Where-Object{$_.id-eq'release-workflow-executor-maturity'
   throw '[mir4-current-execution-release-blockers]'
 }
 if(@($current.turns).Count-ne22-or
-   @($current.turns|Where-Object{$_.id-in@('T00','T01','T02','T03','T04','T05','T06')-and$_.state-eq'completed'}).Count-ne7-or
-   @($current.turns|Where-Object{$_.id-eq'T07'-and$_.state-eq'ready'}).Count-ne1-or
+   @($current.turns|Where-Object{$_.id-in@('T00','T01','T02','T03','T04','T05','T06','T07')-and$_.state-eq'completed'}).Count-ne8-or
+   @($current.turns|Where-Object{$_.id-in@('T08','T09','T10')-and$_.state-eq'ready'}).Count-ne3-or
    @($current.mir3_residuals|Where-Object{$_.id-in@('github-pr-149','github-pr-146')-and$_.release_blocking}).Count-ne2){
   throw '[mir4-current-execution-queue]'
 }

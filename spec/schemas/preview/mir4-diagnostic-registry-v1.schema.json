@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/diagnostic-registry.schema.json",
+  "title": "MIR 4 stable diagnostic registry V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","stability","ordering","severities","diagnostics"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4DiagnosticRegistryV1"},
+    "stability": {"const":"stable-codes-never-reused"},
+    "ordering": {"const":"severity-then-order-then-code-then-path"},
+    "severities": {"const":["error","warning","info"]},
+    "diagnostics": {
+      "type":"array","minItems":32,
+      "items":{"type":"object","additionalProperties":false,"required":["code","order","severity","message","legacy_id"],"properties":{
+        "code":{"type":"string","pattern":"^MIR4-(?:API|CANON|DIAG|MEP)-[0-9]{3}$"},
+        "order":{"type":"integer","minimum":1000,"maximum":9999},
+        "severity":{"enum":["error","warning","info"]},
+        "message":{"type":"string","minLength":1,"maxLength":256},
+        "legacy_id":{"type":"string","pattern":"^mir4-[a-z0-9-]+$"}
+      }}
+    }
+  }
+}
