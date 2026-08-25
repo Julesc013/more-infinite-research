@@ -6,7 +6,7 @@ Generated: 2026-08-25
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T05-COMPLETE-T06-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T06`.
+Status: `T06-COMPLETE-T07-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T07`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -16,7 +16,7 @@ Status: `T05-COMPLETE-T06-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 | `T03` | Source-freeze and target-build executors | `completed` | T02 | `false` |
 | `T04` | Qualification, preview and independent-verification executors | `completed` | T02 | `false` |
 | `T05` | Seal, promotion, publication, readback and restore executors | `completed` | T03, T04 | `false` |
-| `T06` | Release doctor maturity and fault-injection closure | `ready` | T05 | `false` |
+| `T06` | Release doctor maturity and fault-injection closure | `completed` | T05 | `false` |
 | `T07` | Canonicalization, schema namespace and diagnostic authority | `ready` | T01 | `false` |
 | `T08` | SDK V1 preview completion | `blocked-dependency` | T07 | `false` |
 | `T09` | Extension developer experience | `blocked-dependency` | T07 | `false` |
@@ -37,7 +37,7 @@ Status: `T05-COMPLETE-T06-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 
 | Blocker | Scope | State | Blocks |
 | --- | --- | --- | --- |
-| `release-workflow-executor-maturity` | `stable-player-release` | `OPEN` | source-freeze, candidate-allocation, release-qualification, release-seal, promotion, publication |
+| `release-workflow-executor-maturity` | `stable-player-release` | `SATISFIED` | source-freeze, candidate-allocation, release-qualification, release-seal, promotion, publication |
 | `protected-signing-and-recovery` | `stable-player-release` | `OPEN` | source-freeze, candidate-allocation, production-signing, release-seal, promotion, tagging, publication |
 | `maintainer-playtest-f210` | `stable-player-release` | `OPEN` | production-go-no-go |
 | `maintainer-playtest-f200` | `stable-player-release` | `OPEN` | production-go-no-go |

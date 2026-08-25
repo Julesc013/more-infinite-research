@@ -1156,6 +1156,29 @@
       ]
     },
     {
+      "id": "static.mir4-release-doctor-t06",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".github/workflows/validate.yml",
+        ".mir/assurance.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json",
+        "spec/schemas/mir4-release-fault-corpus-v1.schema.json",
+        "spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1",
+        "validation/tests.yml",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-pre-freeze-hardening",
       "kind": "static",
       "layer": "F0",
@@ -1169,6 +1192,8 @@
         ".mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",

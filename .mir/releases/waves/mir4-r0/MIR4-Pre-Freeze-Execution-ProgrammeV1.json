@@ -45,7 +45,7 @@
   "blockers": [
     {
       "id": "release-workflow-executor-maturity",
-      "state": "OPEN",
+      "state": "SATISFIED",
       "scope": "stable-player-release",
       "blocks": ["source-freeze", "candidate-allocation", "release-qualification", "release-seal", "promotion", "publication"],
       "authority": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json"
@@ -107,7 +107,7 @@
     {"id": "T03", "name": "Source-freeze and target-build executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
     {"id": "T04", "name": "Qualification, preview and independent-verification executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
     {"id": "T05", "name": "Seal, promotion, publication, readback and restore executors", "state": "completed", "depends_on": ["T03", "T04"], "human_required": false, "release_transition": false},
-    {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "ready", "depends_on": ["T05"], "human_required": false, "release_transition": false},
+    {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "completed", "depends_on": ["T05"], "human_required": false, "release_transition": false},
     {"id": "T07", "name": "Canonicalization, schema namespace and diagnostic authority", "state": "ready", "depends_on": ["T01"], "human_required": false, "release_transition": false},
     {"id": "T08", "name": "SDK V1 preview completion", "state": "blocked-dependency", "depends_on": ["T07"], "human_required": false, "release_transition": false},
     {"id": "T09", "name": "Extension developer experience", "state": "blocked-dependency", "depends_on": ["T07"], "human_required": false, "release_transition": false},
@@ -124,7 +124,7 @@
     {"id": "T20", "name": "Frozen candidate qualification and final acceptance", "state": "blocked-dependency", "depends_on": ["T19"], "human_required": true, "release_transition": true},
     {"id": "T21", "name": "Production seal, promotion, tags, publication and public readback", "state": "blocked-dependency", "depends_on": ["T20"], "human_required": true, "release_transition": true}
   ],
-  "next_dependency_ready_turn": "T06",
+  "next_dependency_ready_turn": "T07",
   "transition_gate": {
     "source_freeze": false,
     "candidate_allocation": false,
@@ -133,5 +133,5 @@
     "tagging": false,
     "publication": false
   },
-  "status": "T05-COMPLETE-T06-READY-RELEASE-BLOCKED"
+  "status": "T06-COMPLETE-T07-READY-RELEASE-BLOCKED"
 }

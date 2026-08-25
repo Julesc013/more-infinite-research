@@ -6,8 +6,18 @@ function Get-MIR4PreFreezeRepoRoot {
 }
 
 function Get-MIR4PreFreezeFileSha256 {
-  param([Parameter(Mandatory)][string]$Path)
-  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [ValidateSet('raw-bytes','canonical-text-v1')][string]$Mode='raw-bytes'
+  )
+  if ($Mode -ceq 'raw-bytes') {
+    return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+  }
+  $utf8 = [Text.UTF8Encoding]::new($false,$true)
+  $text = $utf8.GetString([IO.File]::ReadAllBytes($Path))
+  if ($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF) { $text = $text.Substring(1) }
+  $canonical = $text.Replace("`r`n","`n").Replace("`r","`n").Normalize([Text.NormalizationForm]::FormC)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($utf8.GetBytes($canonical)))
 }
 
 function Read-MIR4PreFreezeJson {
@@ -122,6 +132,8 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t04-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t05-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json' = 'spec/schemas/mir4-release-fault-corpus-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -138,7 +150,8 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json';kind='MIR4T02AuthorityEvolutionReceiptV1'},
     @{path='.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json';kind='MIR4T03AuthorityEvolutionReceiptV1'},
     @{path='.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json';kind='MIR4T04AuthorityEvolutionReceiptV1'},
-    @{path='.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json';kind='MIR4T05AuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json';kind='MIR4T05AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json';kind='MIR4T06AuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -171,8 +184,10 @@ function Test-MIR4PreFreezeAuthorities {
   }
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)
+    $currentBinding = @($evolution.current_authorities | Where-Object { [string]$_.path -ceq [string]$binding.Key })
+    $hashMode = if ($currentBinding.Count -eq 1 -and $currentBinding[0].PSObject.Properties.Name -contains 'hash_mode') { [string]$currentBinding[0].hash_mode } else { 'raw-bytes' }
     if (-not (Test-Path -LiteralPath $full -PathType Leaf) -or
-        (Get-MIR4PreFreezeFileSha256 $full) -cne [string]$binding.Value) {
+        (Get-MIR4PreFreezeFileSha256 -Path $full -Mode $hashMode) -cne [string]$binding.Value) {
       throw "[mir4-prefreeze-current-authority-binding] $($binding.Key)"
     }
   }

@@ -315,10 +315,10 @@ $generatedSources = @($generatedSources | Sort-Object path)
 $currentExecutionPath = "$authorityDirectory/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
 Assert-Schema $currentExecutionPath "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json"
 $currentExecution = Read-Json $currentExecutionPath
-if ([string]$currentExecution.status -cne "T05-COMPLETE-T06-READY-RELEASE-BLOCKED" -or
-    [string]$currentExecution.next_dependency_ready_turn -cne "T06" -or
+if ([string]$currentExecution.status -cne "T06-COMPLETE-T07-READY-RELEASE-BLOCKED" -or
+    [string]$currentExecution.next_dependency_ready_turn -cne "T07" -or
     @($currentExecution.turns).Count -ne 22 -or
-    @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 4 -or
+    @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 3 -or
     @($currentExecution.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
   throw "Current MIR 4 pre-freeze execution authority is inconsistent or grants a release transition."
 }

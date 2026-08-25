@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR4T06AuthorityEvolutionReceiptV1",
+  "recorded_at": "2026-08-26T00:45:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "turn": "T06",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json",
+    "sha256": "739F20083C6D0651EB916366AF2567EF092CECE629FE93E1802BC05E42BA989F"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+      "previous_sha256": "C390E36D730259ABA0E7AAB0ED966964FEE48F3EE1E31C1B4B8AFC3A607548B2",
+      "current_sha256": "5A3FCBAD2E7FE425B9C1AEC86C4B95E96F394EDC44FCBB5FD91E7AFFC6B631EA",
+      "reason": "T06 records complete non-production production-shaped rehearsal for all ten implemented release phases while leaving every production authorization false.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
+      "previous_sha256": "00A4EC23076A726D6683D3355A9197B26E15D11FFA8A4C4CA5377498D27C3CEB",
+      "current_sha256": "52E1399173938C69BBC76A7C0F6EB01372B10E7A3017E95FD96800C783035A15",
+      "reason": "T06 is complete, the executor-maturity blocker is satisfied, T07 is next, and protected signing, maintainer playtests, freeze, promotion, and publication remain blocked.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json", "sha256": "5A3FCBAD2E7FE425B9C1AEC86C4B95E96F394EDC44FCBB5FD91E7AFFC6B631EA", "hash_mode": "raw-bytes", "role": "ten-phase-workflow-maturity-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json", "sha256": "52E1399173938C69BBC76A7C0F6EB01372B10E7A3017E95FD96800C783035A15", "hash_mode": "raw-bytes", "role": "current-pre-freeze-execution-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json", "sha256": "1A2CA80A50CC39069A7711536CD3A007B097B59523997206F0AAAB5E0E22CB5C", "hash_mode": "raw-bytes", "role": "ten-phase-rehearsal-and-fault-authority"},
+    {"path": "tools/lib/mir4/PreFreezeRelease.ps1", "sha256": "F25506ADE31A53DCD006282E307E87C0DAA4A8E86FAF4AC1A1F0810A47D36F90", "hash_mode": "raw-bytes", "role": "truthful-release-doctor-implementation"},
+    {"path": ".github/workflows/validate.yml", "sha256": "FB713AB609777681674A1C8EC3347A5662734FEDDC3F7D678907FFAB199938E6", "hash_mode": "canonical-text-v1", "role": "single-matrix-topic-ci-routing"},
+    {"path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1", "sha256": "096F0B1866D2D3135885FE5C24306219651176D2EC625F847D053BB546FE6B82", "hash_mode": "canonical-text-v1", "role": "qualification-preview-independent-happy-and-fault-proof"},
+    {"path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1", "sha256": "BDCBB512DD4DE7A1256AC009D2B461DBC60AF72B6EB1154B5FB5642DD609F68B", "hash_mode": "canonical-text-v1", "role": "lifecycle-happy-and-fault-proof"},
+    {"path": "validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1", "sha256": "0F1F7504B49DF460456354C15AF1FA2C822E3685E101AEC21BE61D3E3EA9A126", "hash_mode": "canonical-text-v1", "role": "t06-aggregate-doctor-and-ci-regression-proof"},
+    {"path": "spec/schemas/mir4-release-fault-corpus-v1.schema.json", "sha256": "E870EA50D047E2547461434605B2D6AB6343F8D8CE0EFFE16330CC8022C52E2F", "hash_mode": "raw-bytes", "role": "fault-corpus-contract"},
+    {"path": "spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json", "sha256": "C6E8D11EB89C16CE9385C950D98EC2C2E18F06423C03EA522CC9AB978FAFF7F3", "hash_mode": "raw-bytes", "role": "t06-authority-evolution-contract"}
+  ],
+  "player_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C",
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "T06-REHEARSAL-AND-FAULT-CLOSURE-PASSED-PRODUCTION-UNAUTHORIZED"
+}

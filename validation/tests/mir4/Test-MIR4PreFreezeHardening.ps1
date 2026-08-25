@@ -35,6 +35,13 @@ if(@($t05.evolved_bindings).Count-ne3-or@($t05.current_authorities).Count-ne21-o
    @($t05.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t05-authority-evolution]'
 }
+$t06=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t06.evolved_bindings).Count-ne2-or@($t06.current_authorities).Count-ne10-or
+   (@($t06.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
+   [string]$t06.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   @($t06.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t06-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
@@ -60,8 +67,8 @@ if(-not[bool]$contract.phase_engine.kernel_implemented-or-not[bool]$contract.pha
    [bool]$contract.phase_engine.production_authorized){throw '[mir4-prefreeze-phase-engine-boundary]'}
 $maturity=@(Get-MIR4ReleaseWorkflowMaturity -RepoRoot $repo)
 if(@($maturity|Where-Object{-not$_.workflow_registered-or-not$_.workflow_fail_closed}).Count-ne0-or
-   @($maturity|Where-Object{-not$_.workflow_executor_implemented-or-not$_.workflow_dry_run_passed}).Count-ne0-or
-   @($maturity|Where-Object{$_.workflow_production_rehearsal_passed-or$_.workflow_production_authorized}).Count-ne0){
+   @($maturity|Where-Object{-not$_.workflow_executor_implemented-or-not$_.workflow_dry_run_passed-or-not$_.workflow_production_rehearsal_passed}).Count-ne0-or
+   @($maturity|Where-Object{$_.workflow_production_authorized}).Count-ne0){
   throw '[mir4-prefreeze-workflow-maturity]'
 }
 foreach($phase in @($contract.phases)){
