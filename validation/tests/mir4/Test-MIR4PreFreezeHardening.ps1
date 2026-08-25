@@ -8,6 +8,12 @@ $receipt=Test-MIR4PreFreezeAuthorities -RepoRoot $repo
 $rulesets=Test-MIR4RulesetSnapshot -RepoRoot $repo
 $actions=Test-MIR4ProductionActionLock -RepoRoot $repo
 if([string]$receipt.status-cne'DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED'){throw '[mir4-prefreeze-receipt-status]'}
+$evolution=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($evolution.evolved_bindings).Count-ne1-or[string]$evolution.evolved_bindings[0].path-cne'.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
+   [bool]$evolution.evolved_bindings[0].package_visible-or[bool]$evolution.evolved_bindings[0].release_authority-or
+   [string]$evolution.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)){
+  throw '[mir4-prefreeze-explicit-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
@@ -28,6 +34,14 @@ if([string]$luna.verdict-cne'ACCEPTED'-or@($luna.findings).Count-ne0-or
 $expectedInputs=@('source_release_record','candidate_id','source_commit','source_tree','target_distribution_record_set','release_plan_digest','proof_root','seal_root')
 $contract=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json')|ConvertFrom-Json -Depth 100
 if(@($contract.phases).Count-ne10){throw '[mir4-prefreeze-workflow-count]'}
+if(-not[bool]$contract.phase_engine.kernel_implemented-or-not[bool]$contract.phase_engine.event_sourcing_implemented-or
+   -not[bool]$contract.phase_engine.idempotency_and_resume_tested-or[bool]$contract.phase_engine.production_capable-or
+   [bool]$contract.phase_engine.production_authorized){throw '[mir4-prefreeze-phase-engine-boundary]'}
+$maturity=@(Get-MIR4ReleaseWorkflowMaturity -RepoRoot $repo)
+if(@($maturity|Where-Object{-not$_.workflow_registered-or-not$_.workflow_fail_closed}).Count-ne0-or
+   @($maturity|Where-Object{$_.workflow_executor_implemented-or$_.workflow_dry_run_passed-or$_.workflow_production_rehearsal_passed-or$_.workflow_production_authorized}).Count-ne0){
+  throw '[mir4-prefreeze-workflow-maturity]'
+}
 foreach($phase in @($contract.phases)){
   $workflow=Join-Path $repo ([string]$phase.workflow)
   $text=Get-Content -Raw -LiteralPath $workflow
@@ -84,7 +98,7 @@ $decisionRejected=$false
 try{& (Join-Path $repo 'tools/mir.ps1') playtest finalize --session missing --reviewer test 2>$null|Out-Null}catch{if($_.Exception.Message-match'explicit --decision'){$decisionRejected=$true}else{throw}}
 if(-not$decisionRejected){throw '[mir4-prefreeze-playtest-inferred-decision]'}
 
-foreach($source in @('tools/lib/mir4/PreFreezeRelease.ps1','tools/commands/mir4/Invoke-MIR4PreFreeze.ps1','tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1')){
+foreach($source in @('tools/lib/mir4/PreFreezeRelease.ps1','tools/lib/mir4/ReleasePhaseEngine.ps1','tools/commands/mir4/Invoke-MIR4PreFreeze.ps1','tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1')){
   $text=Get-Content -Raw -LiteralPath (Join-Path $repo $source)
   if($text-match'(?i)source_freeze_authorized\s*=\s*\$true|production_release_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-prefreeze-forbidden-authority] $source"}
 }

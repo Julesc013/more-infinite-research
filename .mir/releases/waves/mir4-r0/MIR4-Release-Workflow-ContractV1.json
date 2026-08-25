@@ -21,17 +21,26 @@
     "target_receipt_required": true,
     "family_readiness_is_target_receipt_fold": true
   },
+  "phase_engine": {
+    "contract": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json",
+    "implementation": "tools/lib/mir4/ReleasePhaseEngine.ps1",
+    "kernel_implemented": true,
+    "event_sourcing_implemented": true,
+    "idempotency_and_resume_tested": true,
+    "production_capable": false,
+    "production_authorized": false
+  },
   "phases": [
-    {"id": "source-freeze", "workflow": ".github/workflows/mir4-source-freeze.yml", "production_transition": true},
-    {"id": "target-build", "workflow": ".github/workflows/mir4-target-build.yml", "production_transition": false},
-    {"id": "target-qualification", "workflow": ".github/workflows/mir4-target-qualification.yml", "production_transition": false},
-    {"id": "preview-assets", "workflow": ".github/workflows/mir4-preview-assets.yml", "production_transition": false},
-    {"id": "independent-verification", "workflow": ".github/workflows/mir4-independent-verification.yml", "production_transition": false},
-    {"id": "release-seal", "workflow": ".github/workflows/mir4-release-seal.yml", "production_transition": true},
-    {"id": "promotion", "workflow": ".github/workflows/mir4-promotion.yml", "production_transition": true},
-    {"id": "target-publication", "workflow": ".github/workflows/mir4-target-publication.yml", "production_transition": true},
-    {"id": "public-readback", "workflow": ".github/workflows/mir4-public-readback.yml", "production_transition": true},
-    {"id": "restore-drill", "workflow": ".github/workflows/mir4-restore-drill.yml", "production_transition": false}
+    {"id": "source-freeze", "workflow": ".github/workflows/mir4-source-freeze.yml", "production_transition": true, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "target-build", "workflow": ".github/workflows/mir4-target-build.yml", "production_transition": false, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "target-qualification", "workflow": ".github/workflows/mir4-target-qualification.yml", "production_transition": false, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "preview-assets", "workflow": ".github/workflows/mir4-preview-assets.yml", "production_transition": false, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "independent-verification", "workflow": ".github/workflows/mir4-independent-verification.yml", "production_transition": false, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "release-seal", "workflow": ".github/workflows/mir4-release-seal.yml", "production_transition": true, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "promotion", "workflow": ".github/workflows/mir4-promotion.yml", "production_transition": true, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "target-publication", "workflow": ".github/workflows/mir4-target-publication.yml", "production_transition": true, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "public-readback", "workflow": ".github/workflows/mir4-public-readback.yml", "production_transition": true, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}},
+    {"id": "restore-drill", "workflow": ".github/workflows/mir4-restore-drill.yml", "production_transition": false, "maturity": {"workflow_registered": true, "workflow_fail_closed": true, "workflow_executor_implemented": false, "workflow_dry_run_passed": false, "workflow_production_rehearsal_passed": false, "workflow_production_authorized": false}}
   ],
   "current_gate": {
     "state": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED",

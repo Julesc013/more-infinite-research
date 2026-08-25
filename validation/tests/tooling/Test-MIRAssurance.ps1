@@ -787,6 +787,19 @@ foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "che
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+foreach ($bootstrapAuthorityBinding in @(
+  '[string]$verificationProfile.release_authority_mode -eq "candidate-programme"',
+  '[string]$info.version -eq [string]$verificationProfile.upgrade.from_version'
+)) {
+  if (-not $assuranceCore.Contains($bootstrapAuthorityBinding)) {
+    throw "MIR 4 assurance bootstrap selection is not bound to the current candidate-programme predecessor: $bootstrapAuthorityBinding"
+  }
+}
+$bootstrapBuilder = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapLocalCandidate.ps1")
+if (-not $bootstrapBuilder.Contains("foreach (`$targetPlan in `$targets) {`r`n  `$correction = Get-MIR4PlanCorrection -PlanTarget `$targetPlan") -and
+    -not $bootstrapBuilder.Contains("foreach (`$targetPlan in `$targets) {`n  `$correction = Get-MIR4PlanCorrection -PlanTarget `$targetPlan")) {
+  throw "MIR 4 bootstrap materialization does not bind the optional correction per target and can inherit caller scope."
+}
 foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/results/*')) {
   if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
     throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"

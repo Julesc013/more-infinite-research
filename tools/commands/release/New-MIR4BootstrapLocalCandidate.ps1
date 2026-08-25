@@ -645,7 +645,11 @@ if ($Lane -ceq 'local-playtest-shadow') {
 if (-not (Test-Path -LiteralPath $OutputRoot -PathType Container)) { New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null }
 
 $manifests = @()
+# Bind this in the script scope for every target. PowerShell child scripts can
+# otherwise inherit a caller's variable with the same name, which previously
+# let a superseded correction overlay leak into a fixed-point V3 manifest.
 foreach ($targetPlan in $targets) {
+  $correction = Get-MIR4PlanCorrection -PlanTarget $targetPlan
   $rootRow = Assert-MIR4PlanTarget -PlanTarget $targetPlan -TerminalImport $terminalImport -Registry $registry -CodecRegistry $codecRegistry -VersionAuthority $versionAuthority -RootSet $rootSet
   $predecessorPath = Join-Path $RepoRoot ([string]$targetPlan.predecessor.archive_path)
   $predecessor = Get-MIR4ArchiveInventory -Path $predecessorPath

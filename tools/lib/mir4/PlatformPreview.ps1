@@ -470,18 +470,42 @@ Write-Host '[ok] standalone MIR 4 SDK V1 conformance passed.'
 function Invoke-MIR4PlatformGenerate {
   param([Parameter(Mandatory)][string]$RepoRoot, [switch]$Check)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $files = Get-MIR4PlatformGeneratedFiles $repo
-  foreach ($entry in $files.GetEnumerator()) {
-    $path = Join-Path $repo $entry.Key
-    $bytes = [Text.UTF8Encoding]::new($false).GetBytes(([string]$entry.Value).Replace("`r`n","`n"))
-    if ($Check) {
-      if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or -not [Linq.Enumerable]::SequenceEqual([byte[]][IO.File]::ReadAllBytes($path),[byte[]]$bytes)) {
-        throw "[mir4-platform-stale] $($entry.Key)"
+  $getStalePaths = {
+    param([Parameter(Mandatory)]$Files)
+    $stale = [Collections.Generic.List[string]]::new()
+    foreach ($entry in $Files.GetEnumerator()) {
+      $path = Join-Path $repo $entry.Key
+      $bytes = [Text.UTF8Encoding]::new($false).GetBytes(([string]$entry.Value).Replace("`r`n","`n"))
+      if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
+          -not [Linq.Enumerable]::SequenceEqual([byte[]][IO.File]::ReadAllBytes($path),[byte[]]$bytes)) {
+        $stale.Add([string]$entry.Key)
       }
-    } else {
+    }
+    return $stale.ToArray()
+  }
+
+  $files = Get-MIR4PlatformGeneratedFiles $repo
+  $stalePaths = @(& $getStalePaths $files)
+  if ($Check) {
+    if ($stalePaths.Count) { throw "[mir4-platform-stale] $($stalePaths[0])" }
+    return $files.Keys
+  }
+
+  # Several projections consume other generated projections. Converge the on-disk
+  # set so one successful generate invocation always leaves a checkable fixed point.
+  $maximumPasses = 8
+  for ($pass = 1; $pass -le $maximumPasses -and $stalePaths.Count; $pass++) {
+    foreach ($relative in $stalePaths) {
+      $path = Join-Path $repo $relative
+      $bytes = [Text.UTF8Encoding]::new($false).GetBytes(([string]$files[$relative]).Replace("`r`n","`n"))
       New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent) | Out-Null
       [IO.File]::WriteAllBytes($path,$bytes)
     }
+    $files = Get-MIR4PlatformGeneratedFiles $repo
+    $stalePaths = @(& $getStalePaths $files)
+  }
+  if ($stalePaths.Count) {
+    throw "[mir4-platform-generation-nonconvergent] passes=$maximumPasses stale=$($stalePaths -join ',')"
   }
   return $files.Keys
 }

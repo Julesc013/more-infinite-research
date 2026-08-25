@@ -312,17 +312,32 @@ $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-18/
 $generatedSources += Get-Binding ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json"
 $generatedSources = @($generatedSources | Sort-Object path)
 
+$currentExecutionPath = "$authorityDirectory/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
+Assert-Schema $currentExecutionPath "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json"
+$currentExecution = Read-Json $currentExecutionPath
+if ([string]$currentExecution.status -cne "T02-COMPLETE-T03-T04-READY-RELEASE-BLOCKED" -or
+    [string]$currentExecution.next_dependency_ready_turn -cne "T03" -or
+    @($currentExecution.turns).Count -ne 22 -or
+    @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 4 -or
+    @($currentExecution.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+  throw "Current MIR 4 pre-freeze execution authority is inconsistent or grants a release transition."
+}
+$currentGeneratedSources = @(Get-Binding $currentExecutionPath)
+
 $dashboard = Add-RecordSha256 ([ordered]@{
   schema = 1
   kind = "MIR4R0DashboardV1"
-  status = "READY_FOR_MIR4_R0_IMPLEMENTATION"
+  status = [string]$currentExecution.status
   package_visible = $false
-  generated_from = $generatedSources
+  generated_from = $currentGeneratedSources
   payload = [ordered]@{
-    mir3 = [ordered]@{ product_development="closed-except-immutable-post-terminal-hotfixes"; github_publication="3.2.11-latest-and-2.5.11-published-verified"; mod_portal_custody="maintainer-upload-not-independently-redownload-verified"; terminal_dot9_baselines="retained-immutable"; terminal_2_1_continuation="3.2.11-captured-and-imported"; terminal_2_0_continuation="2.5.11-public-release-bound-refresh-v3"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v4-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_v3_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.11-and-f200-2.5.11-predecessors-bound"; materialization="authorized-private-plan-v3-f210-emergency-and-f200-shadow"; public_4x="forbidden-until-mir3-eol"; emergency_lane="plan-v3-current-reproof-pending" }
+    source_baseline = $currentExecution.source_baseline
+    release_cut = $currentExecution.release_cut
+    workflow_maturity_vocabulary = @($currentExecution.workflow_maturity_vocabulary)
+    blockers = @($currentExecution.blockers)
+    mir3_residuals = @($currentExecution.mir3_residuals)
     package_delta = 0
-    next_executable_task = "M4-003-f210-and-f200-materialization-and-reproof"
+    next_executable_task = [string]$currentExecution.next_dependency_ready_turn
   }
 })
 $queue = Add-RecordSha256 ([ordered]@{
@@ -330,17 +345,18 @@ $queue = Add-RecordSha256 ([ordered]@{
   kind = "MIR4R0ExecutableQueueV1"
   status = "next-task-ready"
   package_visible = $false
-  generated_from = $generatedSources
+  generated_from = $currentGeneratedSources
   payload = [ordered]@{
-    tasks = @(
-      [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="completed-current-predecessors-imported";blocked_by=@()},
-      [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
-      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-from-corrected-dot11-predecessors";state="plan-v3-ready-f210-and-f200-reproof-pending";blocked_by=@("candidate-bound-f210-and-f200-reproof")},
-      [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
-      [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
-      [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
-    )
+    tasks = @($currentExecution.turns | ForEach-Object {
+      [ordered]@{
+        id = [string]$_.id
+        scope = [string]$_.name
+        state = [string]$_.state
+        blocked_by = @($_.depends_on)
+        human_required = [bool]$_.human_required
+        release_transition = [bool]$_.release_transition
+      }
+    })
   }
 })
 Write-Or-Check "$authorityDirectory/dashboard.json" $dashboard
@@ -350,5 +366,5 @@ if (-not $Update) {
   Assert-Schema "$authorityDirectory/queue.json" "spec/schemas/mir4-r0-status.schema.json"
 }
 
-Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: materialize and re-prove F210 and F200 under Plan V3"
+Write-Host "[ok] MIR 4 pre-freeze status: $($currentExecution.status)"
+Write-Host "[ok] next dependency-ready turn: $($currentExecution.next_dependency_ready_turn)"

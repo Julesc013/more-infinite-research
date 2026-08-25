@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-phase-engine-contract-v1.schema.json",
+  "title": "MIR 4 release phase engine contract V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "maturity", "operations", "phases", "event_model", "ports", "adapter_laws", "package_visible", "production_capable", "production_authorized", "release_transition_authorized"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleasePhaseEngineContractV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "maturity": {"const": "non-production-kernel"},
+    "operations": {"const": ["Plan", "DryRun", "Execute", "Resume", "Verify", "Compensate", "Receipt"]},
+    "phases": {"const": ["source-freeze", "target-build", "target-qualification", "preview-assets", "independent-verification", "release-seal", "promotion", "target-publication", "public-readback", "restore-drill"]},
+    "event_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["storage", "attempt_identity", "idempotency", "resume", "divergence_policy", "receipt"],
+      "properties": {
+        "storage": {"const": "attempt-local-append-only-hash-chain"},
+        "attempt_identity": {"const": "sha256-of-phase-input-adapter-contract-and-port-closure"},
+        "idempotency": {"const": "attempt-and-operation-domain-key"},
+        "resume": {"const": "replay-last-valid-event-and-retry-last-failed-or-next-operation"},
+        "divergence_policy": {"const": "hard-fail-same-fingerprint-different-plan"},
+        "receipt": {"const": "immutable-final-state-projection"}
+      }
+    },
+    "ports": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "mode", "allowed", "denied"],
+        "properties": {
+          "id": {"enum": ["git", "build", "engine", "sign", "publish"]},
+          "mode": {"enum": ["read-only", "sandbox-only", "denied"]},
+          "allowed": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "denied": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "adapter_laws": {"type": "array", "minItems": 5, "items": {"type": "string"}, "uniqueItems": true},
+    "package_visible": {"const": false},
+    "production_capable": {"const": false},
+    "production_authorized": {"const": false},
+    "release_transition_authorized": {"const": false}
+  }
+}

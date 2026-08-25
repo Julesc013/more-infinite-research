@@ -1,199 +1,138 @@
 {
   "schema": 1,
   "kind": "MIR4R0DashboardV1",
-  "status": "READY_FOR_MIR4_R0_IMPLEMENTATION",
+  "status": "T02-COMPLETE-T03-T04-READY-RELEASE-BLOCKED",
   "package_visible": false,
   "generated_from": [
     {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-ProgrammeV1.json",
-      "sha256": "8B1C761D8DAC4E482CEE8434869166AE5CAFBABBFF2B9ADF7E1B918A6923AA9A"
-    },
-    {
-      "path": ".mir/releases/terminal/MIR3-Terminal-ProgrammeV1.json",
-      "sha256": "FDF734AF28667BC4605DB42709C6DEE167DFF27A51E1D528D7AE2F33C98D267D"
-    },
-    {
-      "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
-      "sha256": "13FC741342124F0EE93EAC8ADB27DECC3828C1D6028187131BB3CF8A555528AF"
-    },
-    {
-      "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
-      "sha256": "AE47F7D195AE1D940F388D3CFDCDDC057B2E26A493C7E7B456408C57EE8100A3"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json",
-      "sha256": "AB537D42345AB83578E52C21F67B452F38976CF3290EF66A4191B1B7441660AC"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json",
-      "sha256": "2A7BDA93D66F5A9EC674C5AAC82840570F10BC676EDC5C7E9D2C5E55E1D2B313"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json",
-      "sha256": "36367EC16059ECBB57479BDDE68BF8A6A316082790637C718E182D0628C699FF"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json",
-      "sha256": "E672118A8DEC241EA657C1B49EDA33B727AEFC296685FD47A9B784CBA5092786"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json",
-      "sha256": "6119292EB80D3727EAB7308D0A786D8D1E3482702941B7C0C3700062A8C6FE6A"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json",
-      "sha256": "02AFC3E964CF454F414489446FC5B9EC3B3519E4A04D178811AA55ADDC843F71"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json",
-      "sha256": "50BB74F4775EFA67B52A2E293A8B3009EB818E1045FB2F376CDF4340E2AE8546"
-    },
-    {
-      "path": ".mir/releases/records/2.5.10.json",
-      "sha256": "E0306AF363CADA74293A0C40FC834AB7BF7C4361732E2EC0A59796699D55B71C"
-    },
-    {
-      "path": ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
-      "sha256": "9F6F062BAB178789314B4484F88F9DD413F3D7C19F50D12DF403379566F9F2FE"
-    },
-    {
-      "path": ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
-      "sha256": "B02B046EC781428AB8362D9E3E2CAC12A572B10CEB402741E96F67F56C223E82"
-    },
-    {
-      "path": ".mir/releases/records/3.2.11.json",
-      "sha256": "D01204BC008BB80C0D8A3E87947C90A97BF0AFAD5A1306053699A8AE9067DE69"
-    },
-    {
-      "path": ".mir/evidence/terminal-publication/2026-08-18/github/3.2.11.json",
-      "sha256": "CE3E34E2303135D146ED8B0F23C43DB4F6443F4965333479DA41DBDA684C86DE"
-    },
-    {
-      "path": ".mir/releases/terminal/baselines/3.2.11/baseline-manifest.json",
-      "sha256": "80A1B35732012221A2C47D8C6BB2BA4E417A2037338F8373909028ECEA5EC446"
-    },
-    {
-      "path": ".mir/releases/records/2.5.11.json",
-      "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145"
-    },
-    {
-      "path": ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
-      "sha256": "D2C0B73345FC972A676F8624F4212C54366634F9A34534DB9DF35B5F2A3A95FA"
-    },
-    {
-      "path": ".mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
-      "sha256": "9FE6CAE3D01263C4235232F37BAA02C17CFF0136E0C4D939F6957B0E236726F5"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json",
-      "sha256": "46AE9D0A4F5C433B3B38BB9ED15C050D1D6E1CF40668D4EC37995493D4BAAC8D"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json",
-      "sha256": "F1ACD005D0AAF409288800BC51A4C0E37B2D0BD99932CBDE95C1D0D9097BCC10"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Entry-GateV1.json",
-      "sha256": "96662013142D5CEADF24381DFD7A87F119E5C8708111CB0CD35485EB76C1F703"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
-      "sha256": "6D77470A74595442782742E0CB86B1F6CE8715D642DB6AFE68703B25AFBB37A5"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Repository-Layout-TransitionV1.json",
-      "sha256": "A9DC6B0E779F43DAD146B2919F55378A2C01A741E4A5158503E575C75FDDEDF7"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json",
-      "sha256": "79547555A5A5ACAF45F9DFD533C020F1A60241CB88B3395D022C6BCA521DDB8D"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json",
-      "sha256": "D1B221925A458EA0276D6FB1C16D9F6C06C89E9590144D0D73225CB4B52052A9"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Equivalence-PolicyV1.json",
-      "sha256": "34EFFACBE0F7B56C48D72484D5511D86B057E602FBBF52E835761A1C337EC708"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Emergency-LaneV1.json",
-      "sha256": "57F231EAC6DC1F745723AB43EAE7892543FAC14889A18C89912A3F1607E3A0BE"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Offline-Release-AuthorityV1.json",
-      "sha256": "2F9D33CFEDEBA3C20A6F5199F76DD9714186320E8EBEE88AD7BB802167D95816"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR3-to-MIR4-Governance-ReconciliationV1.json",
-      "sha256": "4E9185C0C8992C01F830AE6E9FF8950713E04EC1ED94C62135D2FC47980B91FC"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json",
-      "sha256": "AB537D42345AB83578E52C21F67B452F38976CF3290EF66A4191B1B7441660AC"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json",
-      "sha256": "507AEF1D544858E3FFF9F399A73693462D6F04B07379CCBD59EF0B39321B5DD5"
-    },
-    {
-      "path": ".mir/releases/terminal/baselines/dot9-family-catalog.json",
-      "sha256": "CF2142297FF4971378780C747523905B546A84FDA4191FDFDA6108E456551F56"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-      "sha256": "09FD046F1BDF162B15ED2A935A8A74FCF17A97DAD5D40946D9A29F9F7FD88F55"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json",
-      "sha256": "66429810F0F19A38CDA0A81BB54FA97FC79271B5B14AFEBB33AC3990795259A4"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json",
-      "sha256": "3D38A53CA9CE206A4268AD43922B399A36EFA45B058A4F97CCF4BEDADAF12FD2"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json",
-      "sha256": "EEA085AB3519E053F62B94497C2F2514EB2D2A171980722649D0980F6E361B55"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
-      "sha256": "2B477D6792C91C2069763DC6CAA0C78370AE87268E9A06E3FCBBAC7EDCDF63A6"
-    },
-    {
-      "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json",
-      "sha256": "BCF633E2B9B4174102A601ED6583BA5DE755990D6064EDBC0E9319897F881AB4"
-    },
-    {
-      "path": ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json",
-      "sha256": "32347ABD85A75079ECAF54D13357018C40EAECBB9906119C00ED0B2B8508F404"
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
+      "sha256": "3ABFE03DB2E4B1893C6F757B4D248FB83B72D01BCD822CE7DB421A619C48A195"
     }
   ],
   "payload": {
-    "mir3": {
-      "product_development": "closed-except-immutable-post-terminal-hotfixes",
-      "github_publication": "3.2.11-latest-and-2.5.11-published-verified",
-      "mod_portal_custody": "maintainer-upload-not-independently-redownload-verified",
-      "terminal_dot9_baselines": "retained-immutable",
-      "terminal_2_1_continuation": "3.2.11-captured-and-imported",
-      "terminal_2_0_continuation": "2.5.11-public-release-bound-refresh-v3",
-      "final_index": "pending",
-      "museum_and_restore": "pending",
-      "eol": "pending"
+    "source_baseline": {
+      "repository": "Julesc013/more-infinite-research",
+      "branch": "dev",
+      "commit": "8e269b6379ef3958f92fb747cef389f0f098feb6",
+      "tree": "dc3c7415c725bf10c0908d35ed93e530a49a77b1",
+      "main_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+      "legacy_commit": "20210a90d97c52426ea6abc7c94a89bb8ec7671b",
+      "package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"
     },
-    "mir4": {
-      "r0": "active-package-excluded",
-      "semantic_authority": false,
-      "identity_authority": "v4-predecessors-with-unchanged-v2-distribution-codec",
-      "historical_v1_v2_v3_registries_executable": false,
-      "programme_reconciliation": "accepted-no-public-allocation",
-      "target_readiness": "f210-3.2.11-and-f200-2.5.11-predecessors-bound",
-      "materialization": "authorized-private-plan-v3-f210-emergency-and-f200-shadow",
-      "public_4x": "forbidden-until-mir3-eol",
-      "emergency_lane": "plan-v3-current-reproof-pending"
+    "release_cut": {
+      "source_version": "4.0.0",
+      "candidate_state": "pre-freeze-unallocated",
+      "next_candidate": "M4RC1",
+      "stable_targets": [
+        "F210",
+        "F200"
+      ],
+      "conditional_targets": [
+        "F110",
+        "F100"
+      ],
+      "private_experimental_targets": [
+        "F018",
+        "F017",
+        "F016",
+        "F015",
+        "F014",
+        "F013"
+      ],
+      "developer_preview_asset_count": 4,
+      "player_authority": "terminal-compiler-emitter-runtime-and-materializers"
     },
+    "workflow_maturity_vocabulary": [
+      "workflow_registered",
+      "workflow_fail_closed",
+      "workflow_executor_implemented",
+      "workflow_dry_run_passed",
+      "workflow_production_rehearsal_passed",
+      "workflow_production_authorized"
+    ],
+    "blockers": [
+      {
+        "id": "release-workflow-executor-maturity",
+        "state": "OPEN",
+        "scope": "stable-player-release",
+        "blocks": [
+          "source-freeze",
+          "candidate-allocation",
+          "release-qualification",
+          "release-seal",
+          "promotion",
+          "publication"
+        ],
+        "authority": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json"
+      },
+      {
+        "id": "protected-signing-and-recovery",
+        "state": "OPEN",
+        "scope": "stable-player-release",
+        "blocks": [
+          "source-freeze",
+          "candidate-allocation",
+          "production-signing",
+          "release-seal",
+          "promotion",
+          "tagging",
+          "publication"
+        ],
+        "authority": ".mir/releases/governance/mir4/release-governance.json"
+      },
+      {
+        "id": "maintainer-playtest-f210",
+        "state": "OPEN",
+        "scope": "stable-player-release",
+        "blocks": [
+          "production-go-no-go"
+        ],
+        "authority": "build/mir4/playtests/f210/**/manual-decision.json"
+      },
+      {
+        "id": "maintainer-playtest-f200",
+        "state": "OPEN",
+        "scope": "stable-player-release",
+        "blocks": [
+          "production-go-no-go"
+        ],
+        "authority": "build/mir4/playtests/f200/**/manual-decision.json"
+      },
+      {
+        "id": "independent-mep-production-consumer",
+        "state": "OPEN",
+        "scope": "component-graduation",
+        "blocks": [
+          "mep-api-sdk-stability-graduation"
+        ],
+        "authority": ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json"
+      },
+      {
+        "id": "exact-target-processir-snapshot",
+        "state": "OPEN",
+        "scope": "component-graduation",
+        "blocks": [
+          "processir-and-synthesis-graduation"
+        ],
+        "authority": ".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json"
+      }
+    ],
+    "mir3_residuals": [
+      {
+        "id": "github-pr-149",
+        "observed_state": "open-main-to-legacy-alias-advance-to-3.2.11",
+        "required_disposition": "merge-close-or-explicitly-supersede-before-source-freeze",
+        "release_blocking": true
+      },
+      {
+        "id": "github-pr-146",
+        "observed_state": "open-draft-2.5.11-hotfix-already-published-through-separate-authority",
+        "required_disposition": "close-or-explicitly-supersede-before-source-freeze",
+        "release_blocking": true
+      }
+    ],
     "package_delta": 0,
-    "next_executable_task": "M4-003-f210-and-f200-materialization-and-reproof"
+    "next_executable_task": "T03"
   },
-  "record_sha256": "B32868ABD57D35C09C6AB79DC747F4268B407C4C05AD9E496645C290A2FE62CB"
+  "record_sha256": "4A15A35CCF3E5A8F374599EA07008CA88488988FF5A193C9AA4F2CCA85897D95"
 }
