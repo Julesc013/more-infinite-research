@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 pre-freeze development"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
 ---
@@ -15,19 +15,26 @@ This control plane prepares dev for a future MIR 4.0.0 freeze without authorizin
 
 ## Immutable inputs
 
-The post-readiness receipt binds PR 152, its merge commit and tree, the 30-of-30 evidence gate, F210 and F200 development packages, and the package-source fingerprint. Later changes may not silently reinterpret those bindings. The typed T02 authority-evolution receipt names the one changed workflow-contract hash, its before and after values, the current package-excluded authorities, and false release-transition flags; any unrecorded mismatch still fails closed. The development plan keeps those packages as rehearsal inputs only. A future release run must supply a clean frozen commit/tree and exact candidate identities; development package hashes never become release identities by implication.
+The post-readiness receipt binds PR 152, its merge commit and tree, the 30-of-30 evidence gate, F210 and F200 development packages, and the package-source fingerprint. Later changes may not silently reinterpret those bindings. Typed T02 and T03 authority-evolution receipts form an append-only chain: each records the exact previous and current hashes of evolved authorities, binds the current package-excluded implementation and schemas, and keeps every release-transition flag false. Any missing predecessor, duplicate evolution, or unrecorded live-authority mismatch fails closed. The development plan keeps the packages as rehearsal inputs only. A future release run must supply a clean frozen commit/tree and exact candidate identities; development package hashes never become release identities by implication.
 
-Every production workflow accepts the same eight inputs: source release record, candidate ID, source commit, source tree, target distribution record set, release-plan digest, proof root, and seal root. The dispatcher validates the exact inputs and the checked-out repository identity. At the current fixed point it does not invoke a phase adapter: every phase is registered and fail-closed, while phase-specific executor implementation, dry-run, production rehearsal, and production authorization are all separately false.
+Every production workflow accepts the same eight inputs: source release record, candidate ID, source commit, source tree, target distribution record set, release-plan digest, proof root, and seal root. The dispatcher validates the exact inputs and the checked-out repository identity. T03 adds executable non-production adapters for source freeze and target build. Source-freeze rehearsal records the exact clean commit and tree in an attempt-local manifest without creating a ref, allocating a candidate, or changing tracked content. Target-build rehearsal delegates package construction to the established F210 and F200 materializers, writes only below the attempt artifact root, and verifies the resulting bytes. The remaining eight phases remain registered and fail-closed without adapters.
 
-The shared T02 kernel is implemented under `tools/lib/mir4/ReleasePhaseEngine.ps1`. It gives non-production attempts a deterministic fingerprint, an append-only hash-chained event log, operation-level idempotency keys, replay-based resume, verification and compensation transitions, and an immutable receipt. Its Git port is read-only, build and engine ports are attempt-root sandboxes, and signing and publication ports are denied. The kernel rejects production-capable adapters and does not make any of the ten phase rows executor-mature by itself.
+The shared T02 kernel is implemented under `tools/lib/mir4/ReleasePhaseEngine.ps1`, with T03 adapters under `tools/lib/mir4/ReleaseAdapters.ps1`. It gives non-production attempts a deterministic fingerprint, an append-only hash-chained event log, operation-level idempotency keys, replay-based resume, verification and compensation transitions, and an immutable receipt. Its Git port is read-only, build and engine ports are attempt-root sandboxes, and signing and publication ports are denied. The kernel rejects production-capable adapters. Adapter maturity is recorded phase by phase and never inferred from kernel availability.
 
-The workflow contract and release doctor use six ordered maturity fields: `workflow_registered`, `workflow_fail_closed`, `workflow_executor_implemented`, `workflow_dry_run_passed`, `workflow_production_rehearsal_passed`, and `workflow_production_authorized`. Registration and fail-closed behavior are safety properties, not evidence that a named release operation can run. Source freeze remains blocked until the ten phase executors have truthful dry-run and rehearsal evidence.
+The workflow contract and release doctor use six ordered maturity fields: `workflow_registered`, `workflow_fail_closed`, `workflow_executor_implemented`, `workflow_dry_run_passed`, `workflow_production_rehearsal_passed`, and `workflow_production_authorized`. Registration and fail-closed behavior are safety properties, not evidence that a named release operation can run. Source freeze and target build now truthfully report executor and dry-run maturity; production rehearsal and authorization remain false. Source freeze remains blocked until all ten phase executors have truthful dry-run and rehearsal evidence and the separate human gates are satisfied.
 
 ## Pre-freeze checks
 
 Run:
 
     .\tools\mir.ps1 release doctor --json --explain
+
+Run the two T03 rehearsals against exact source identities with:
+
+    .\tools\commands\mir4\Invoke-MIR4ReleaseWorkflow.ps1 -Phase source-freeze -Operation DryRun -SourceReleaseRecord <path> -CandidateId <development-id> -SourceCommit <commit> -SourceTree <tree> -TargetDistributionRecordSet <path> -ReleasePlanDigest <sha256> -ProofRoot <path> -SealRoot <path>
+    .\tools\commands\mir4\Invoke-MIR4ReleaseWorkflow.ps1 -Phase target-build -Operation DryRun -SourceReleaseRecord <path> -CandidateId <development-id> -SourceCommit <commit> -SourceTree <tree> -TargetDistributionRecordSet <path> -ReleasePlanDigest <sha256> -ProofRoot <path> -SealRoot <path>
+
+Use only repository-descendant package-excluded paths. `M4RC1` is rejected while allocation is unauthorized. Execute, resume, verify, compensate, and receipt operations are available only inside the same non-production attempt boundary.
 
 The doctor checks the authority schemas and bindings, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Until all phase adapters are implemented and rehearsed, `workflow-executor-maturity` is an automated blocker. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
 

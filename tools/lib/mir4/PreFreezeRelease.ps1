@@ -119,41 +119,58 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' = 'spec/schemas/mir4-release-workflow-contract-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json' = 'spec/schemas/mir4-release-phase-engine-contract-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
     if (-not ($json | Test-Json -SchemaFile (Join-Path $repo $entry.Value))) { throw "[mir4-prefreeze-schema] $($entry.Key)" }
   }
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
-  $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T02AuthorityEvolutionReceiptV1'
-  $predecessorPath = Join-Path $repo ([string]$evolution.predecessor_receipt.path)
-  if ((Get-MIR4PreFreezeFileSha256 $predecessorPath) -cne [string]$evolution.predecessor_receipt.sha256) {
-    throw '[mir4-prefreeze-evolution-predecessor]'
-  }
-  $evolvedCount = 0
+  $authorityHashes = @{}
   foreach ($binding in @($receipt.authority_bindings)) {
-    $full = Join-Path $repo ([string]$binding.path)
-    if (-not (Test-Path -LiteralPath $full -PathType Leaf)) { throw "[mir4-prefreeze-binding] $($binding.path)" }
-    $actual = Get-MIR4PreFreezeFileSha256 $full
-    if ($actual -cne [string]$binding.sha256) {
-      $rows = @($evolution.evolved_bindings | Where-Object { [string]$_.path -ceq [string]$binding.path })
-      if ($rows.Count -ne 1 -or [string]$rows[0].previous_sha256 -cne [string]$binding.sha256 -or
-          [string]$rows[0].current_sha256 -cne $actual -or [bool]$rows[0].package_visible -or [bool]$rows[0].release_authority) {
-        throw "[mir4-prefreeze-binding] $($binding.path)"
+    $authorityHashes[[string]$binding.path] = [string]$binding.sha256
+  }
+  $priorReceiptPath = '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
+  $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  foreach ($link in @(
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json';kind='MIR4T02AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json';kind='MIR4T03AuthorityEvolutionReceiptV1'}
+  )) {
+    $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
+    if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
+        [string]$evolution.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
+      throw "[mir4-prefreeze-evolution-predecessor] $($link.path)"
+    }
+    $evolvedPaths = @{}
+    foreach ($binding in @($evolution.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-evolution-binding] $path"
       }
-      $evolvedCount++
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $evolvedPaths[$path] = $true
     }
+    foreach ($binding in @($evolution.current_authorities)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.sha256 -and
+          -not $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-current-authority-evolution-missing] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+    }
+    foreach ($property in $evolution.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-evolution-transition] $($link.path):$($property.Name)" }
+    }
+    $priorReceiptPath = [string]$link.path
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
-  if ($evolvedCount -ne @($evolution.evolved_bindings).Count) { throw '[mir4-prefreeze-evolution-unused-binding]' }
-  foreach ($binding in @($evolution.current_authorities)) {
-    $full = Join-Path $repo ([string]$binding.path)
+  foreach ($binding in $authorityHashes.GetEnumerator()) {
+    $full = Join-Path $repo ([string]$binding.Key)
     if (-not (Test-Path -LiteralPath $full -PathType Leaf) -or
-        (Get-MIR4PreFreezeFileSha256 $full) -cne [string]$binding.sha256) {
-      throw "[mir4-prefreeze-current-authority-binding] $($binding.path)"
+        (Get-MIR4PreFreezeFileSha256 $full) -cne [string]$binding.Value) {
+      throw "[mir4-prefreeze-current-authority-binding] $($binding.Key)"
     }
-  }
-  foreach ($property in $evolution.transition_gate.PSObject.Properties) {
-    if ([bool]$property.Value) { throw "[mir4-prefreeze-evolution-transition] $($property.Name)" }
   }
   $review = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json' -Kind 'MIR4IndependentReadinessAcceptanceLunaV1'
   if ([string]$review.verdict -cne 'ACCEPTED-RELEASE-READINESS' -or [bool]$review.maintainer_acceptance) {
@@ -232,17 +249,27 @@ function Get-MIR4ReleaseDoctor {
   } 'Tracked release governance is internally consistent and every production transition remains prohibited.'
   Add-AutomatedCheck 'release-phase-engine-kernel' {
     . (Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1')
+    . (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
     $engine = Get-MIR4ReleasePhaseContract -RepoRoot $repo
     $workflow = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' -Kind 'MIR4ReleaseWorkflowContractV1'
+    $implemented = @($workflow.phases | Where-Object { [bool]$_.maturity.workflow_executor_implemented })
+    $dryRunPassed = @($workflow.phases | Where-Object { [bool]$_.maturity.workflow_dry_run_passed })
     if ([string]$engine.record.maturity -cne 'non-production-kernel' -or [bool]$engine.record.production_capable -or
         [bool]$engine.record.production_authorized -or [bool]$engine.record.release_transition_authorized -or
         -not [bool]$workflow.phase_engine.kernel_implemented -or -not [bool]$workflow.phase_engine.event_sourcing_implemented -or
         -not [bool]$workflow.phase_engine.idempotency_and_resume_tested -or [bool]$workflow.phase_engine.production_capable -or
         [bool]$workflow.phase_engine.production_authorized -or
-        @($workflow.phases | Where-Object { [bool]$_.maturity.workflow_executor_implemented }).Count -ne 0) {
+        (@($implemented.id | Sort-Object) -join '|') -cne 'source-freeze|target-build' -or
+        (@($dryRunPassed.id | Sort-Object) -join '|') -cne 'source-freeze|target-build') {
       throw '[mir4-doctor-release-phase-engine-kernel]'
     }
-  } 'The event-sourced phase kernel is implemented and tested while every phase adapter and production port remains disabled.'
+    foreach ($phase in @('source-freeze','target-build')) {
+      $adapter = Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase $phase
+      if ([bool]$adapter.descriptor.production_capable -or @($adapter.descriptor.required_ports | Where-Object { $_ -in @('sign','publish') }).Count -ne 0) {
+        throw "[mir4-doctor-release-adapter-boundary] $phase"
+      }
+    }
+  } 'The event-sourced phase kernel and T03 source-freeze/target-build rehearsal adapters are implemented and dry-run tested while production ports remain disabled.'
   Add-AutomatedCheck 'external-custody-layout' {
     $readiness = Get-MIR4ReleaseGovernanceReadiness -RepoRoot $repo
     if ([string]$readiness.classification -ceq 'CHANGES-REQUESTED' -or @($readiness.publisher.inventory.forbidden).Count -ne 0) {
@@ -386,7 +413,8 @@ function Test-MIR4ReleaseWorkflowInvocation {
     [Parameter(Mandatory)][string]$TargetDistributionRecordSet,
     [Parameter(Mandatory)][string]$ReleasePlanDigest,
     [Parameter(Mandatory)][string]$ProofRoot,
-    [Parameter(Mandatory)][string]$SealRoot
+    [Parameter(Mandatory)][string]$SealRoot,
+    [switch]$NonProductionRehearsal
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   if ($SourceCommit -cnotmatch '^[0-9a-f]{40}$' -or $SourceTree -cnotmatch '^[0-9a-f]{40}$' -or $ReleasePlanDigest -cnotmatch '^[A-F0-9]{64}$') {
@@ -407,13 +435,15 @@ function Test-MIR4ReleaseWorkflowInvocation {
   if ($phaseRecord.Count -ne 1) { throw '[mir4-release-workflow-phase]' }
   $governance = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/governance/mir4/release-governance.json' -Kind 'MIR4ReleaseGovernanceV1'
   $requiresFreeze = $Phase -in @('source-freeze','target-build','target-qualification','release-seal','promotion','target-publication','public-readback')
-  if ($requiresFreeze -and ([bool]$governance.prohibited_transitions.source_freeze -or [string]$CandidateId -ceq 'M4RC1')) {
+  if ($requiresFreeze -and (-not $NonProductionRehearsal -or [string]$CandidateId -ceq 'M4RC1')) {
     throw "[mir4-release-transition-blocked] $Phase"
   }
   return [pscustomobject][ordered]@{
     schema=1;kind='MIR4ReleaseWorkflowInvocationV1';phase=$Phase;candidate_id=$CandidateId
     source_commit=$SourceCommit;source_tree=$SourceTree;release_plan_digest=$ReleasePlanDigest
-    proof_root=$ProofRoot;seal_root=$SealRoot;status='validated';mutation_performed=$false
+    proof_root=$ProofRoot;seal_root=$SealRoot
+    status=$(if($NonProductionRehearsal){'validated-non-production-rehearsal'}else{'validated'})
+    mutation_performed=$false;production_authorized=$false
   }
 }
 
