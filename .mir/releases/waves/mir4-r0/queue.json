@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "3ABFE03DB2E4B1893C6F757B4D248FB83B72D01BCD822CE7DB421A619C48A195"
+      "sha256": "425C5E6B69AF500A0B7C904417703F25A89B5C34B3924C939E1F43D5D040AE90"
     }
   ],
   "payload": {
@@ -42,7 +42,7 @@
       {
         "id": "T03",
         "scope": "Source-freeze and target-build executors",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T02"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "046C7EEBEE53DFAC84FFE72065C42117F0C4EE784494E8C951B227E79FDF055C"
+  "record_sha256": "2A1DF143EACF3362D9EA7128947B4BACB3A45E99018EC9E35F65AC186D624CB2"
 }

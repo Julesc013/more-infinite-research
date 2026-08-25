@@ -17,8 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {fetch-depth: 0, ref: "${{ inputs.source_commit }}"}
-      - name: Validate frozen target-build request
+      - name: Run non-production target-build rehearsal dry-run
         shell: pwsh
         run: |
-          $p=@{Phase='target-build';SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}';OutputPath='build/results/mir4-target-build/request.json'}
+          $p=@{Phase='target-build';Operation='DryRun';SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}';OutputPath='build/results/mir4-target-build/request.json'}
           ./tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1 @p

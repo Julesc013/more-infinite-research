@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "kind": "MIR4R0DashboardV1",
-  "status": "T02-COMPLETE-T03-T04-READY-RELEASE-BLOCKED",
+  "status": "T03-COMPLETE-T04-READY-RELEASE-BLOCKED",
   "package_visible": false,
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "3ABFE03DB2E4B1893C6F757B4D248FB83B72D01BCD822CE7DB421A619C48A195"
+      "sha256": "425C5E6B69AF500A0B7C904417703F25A89B5C34B3924C939E1F43D5D040AE90"
     }
   ],
   "payload": {
@@ -132,7 +132,7 @@
       }
     ],
     "package_delta": 0,
-    "next_executable_task": "T03"
+    "next_executable_task": "T04"
   },
-  "record_sha256": "4A15A35CCF3E5A8F374599EA07008CA88488988FF5A193C9AA4F2CCA85897D95"
+  "record_sha256": "F9120386A6AC45144DAC0B72FD4F5B102E2A067B2E0F17AABBBE40BA8F130C02"
 }

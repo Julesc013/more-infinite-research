@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T03 authority evolution receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "turn", "predecessor_receipt", "evolved_bindings", "current_authorities", "player_package_source_sha256", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T03AuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T03"},
+    "predecessor_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "evolved_bindings": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "contains": {"type": "object", "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json"}}, "required": ["path"]},
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+        "properties": {
+          "path": {"enum": [".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json", ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"]},
+          "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"},
+          "reason": {"type": "string", "minLength": 1}, "scope": {"const": "package-excluded-control-plane"},
+          "package_visible": {"const": false}, "release_authority": {"const": false}
+        }
+      }
+    },
+    "current_authorities": {
+      "type": "array", "minItems": 6, "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["path", "sha256", "role"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "role": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "player_package_source_sha256": {"$ref": "#/$defs/sha256"},
+    "transition_gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "promotion_to_main", "tagging", "publication"],
+      "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}
+    },
+    "status": {"const": "T03-ADAPTERS-IMPLEMENTED-DRY-RUN-PASSED-RELEASE-BLOCKED"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

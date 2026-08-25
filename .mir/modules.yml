@@ -194,12 +194,14 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
+    release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
     commands:
       - tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
       - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
@@ -220,12 +222,15 @@ package_excluded_modules:
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json
       - spec/schemas/mir4-release-phase-engine-contract-v1.schema.json
       - spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
+      - spec/schemas/mir4-release-target-build-result-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
-    boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no phase adapter executor maturity, source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
-    stability: stable-pre-freeze-control-plane-with-non-production-phase-kernel-and-human-and-freeze-blockers
+    boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, attempt-local source-freeze and target-build rehearsal adapters, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    stability: stable-pre-freeze-control-plane-with-t03-non-production-source-freeze-and-target-build-adapters-and-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
