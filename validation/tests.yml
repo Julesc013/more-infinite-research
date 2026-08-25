@@ -1117,6 +1117,9 @@
         "tools/lib/mir4/ReleasePhaseEngine.ps1",
         "tools/lib/mir4/ReleaseAdapters.ps1",
         "tools/lib/mir4/PlatformPreview.ps1",
+        "tools/lib/mir4/NormalizedCompiler.ps1",
+        "tools/lib/mir4/SupportAssessment.ps1",
+        "tools/lib/mir4/SafetyKernel.ps1",
         "tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1",
         "validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1",
         "repository"

@@ -34,7 +34,7 @@
       }
     },
     "current_authorities": {
-      "type": "array", "minItems": 11, "maxItems": 11,
+      "type": "array", "minItems": 15, "maxItems": 15,
       "items": {
         "type": "object", "additionalProperties": false, "required": ["path", "sha256", "role"],
         "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "role": {"type": "string", "minLength": 1}}

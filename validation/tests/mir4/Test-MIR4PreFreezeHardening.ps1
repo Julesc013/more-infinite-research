@@ -22,7 +22,7 @@ if(@($t03.evolved_bindings).Count-ne2-or@($t03.current_authorities).Count-ne6-or
   throw '[mir4-prefreeze-t03-authority-evolution]'
 }
 $t04=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
-if(@($t04.evolved_bindings).Count-ne3-or@($t04.current_authorities).Count-ne11-or
+if(@($t04.evolved_bindings).Count-ne3-or@($t04.current_authorities).Count-ne15-or
    (@($t04.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json|tools/lib/mir4/ReleaseAdapters.ps1'-or
    [string]$t04.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
    @($t04.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){

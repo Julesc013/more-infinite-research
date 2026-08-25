@@ -21,6 +21,8 @@ function New-MIR4NormalizedTargetProviders {
       if ($null -eq $support) { throw "[mir4-target-support-policy] $targetKey" }
       $planned = $planById[$id]
       $historicalTarget = $historicalByKey[$targetKey]
+      $historicalEngineVersion = if ($historicalTarget -and $historicalTarget.engine -and
+          $null -ne $historicalTarget.engine.PSObject.Properties['version']) { [string]$historicalTarget.engine.version } else { '' }
       $predecessor = [string]$target.mir3_predecessor
       $snapshot = Get-MIR4PlatformPredecessorPath $predecessor
       $maturity = if ($id -in @('factorio-2.1','factorio-2.0','factorio-1.1','factorio-1.0')) { 'preview' } else { 'experimental' }
@@ -39,7 +41,7 @@ function New-MIR4NormalizedTargetProviders {
         disposition = [string]$support.disposition; release_blocking = [bool]$support.release_blocking; maturity = $maturity
         authority = if ($maturity -eq 'preview') { 'candidate-programme-only' } else { 'private-experimental-only' }
         predecessor = if ($predecessor) { [ordered]@{ release=$predecessor; snapshot=$snapshot } } else { $null }
-        engine_lock = if ($planned) { [ordered]@{ version=[string]$planned.engine_lock.version; sha256=[string]$planned.engine_lock.executable_sha256; authority='MIR4-Bootstrap-Local-Candidate-PlanV3' } } elseif ($historicalTarget -and -not [string]::IsNullOrWhiteSpace([string]$historicalTarget.engine.version)) { [ordered]@{ version=[string]$historicalTarget.engine.version; sha256=[string]$historicalTarget.engine.sha256; authority='MIR4-Historical-Private-Candidate-AuthorizationV1' } } else { $null }
+        engine_lock = if ($planned) { [ordered]@{ version=[string]$planned.engine_lock.version; sha256=[string]$planned.engine_lock.executable_sha256; authority='MIR4-Bootstrap-Local-Candidate-PlanV3' } } elseif (-not [string]::IsNullOrWhiteSpace($historicalEngineVersion)) { [ordered]@{ version=$historicalEngineVersion; sha256=[string]$historicalTarget.engine.sha256; authority='MIR4-Historical-Private-Candidate-AuthorizationV1' } } else { $null }
         profile = [ordered]@{ status=$profileStatus; authority=[string]$registry.profile_authority.path; authority_sha256=[string]$registry.profile_authority.sha256; digest=$profileDigest }
         provenance = @(
           [ordered]@{role='identity-and-support';path='.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json';sha256=(Get-MIR4PlatformInputSha256 (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json'))},
