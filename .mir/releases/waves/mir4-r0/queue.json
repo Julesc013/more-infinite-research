@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "00A4EC23076A726D6683D3355A9197B26E15D11FFA8A4C4CA5377498D27C3CEB"
+      "sha256": "52E1399173938C69BBC76A7C0F6EB01372B10E7A3017E95FD96800C783035A15"
     }
   ],
   "payload": {
@@ -73,7 +73,7 @@
       {
         "id": "T06",
         "scope": "Release doctor maturity and fault-injection closure",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T05"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "DECE0D326BDB9F26D3047EB23929C46FC3D1205A086121F9252DF8777A82B9E2"
+  "record_sha256": "90578E1003D20BC1CF37DE7AF09F2A3B7EE60CAA8D4F1A6E791651E08A29FABC"
 }
