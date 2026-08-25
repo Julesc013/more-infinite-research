@@ -49,9 +49,9 @@ if(-not($dashboardJson|Test-Json -SchemaFile $statusSchema)-or-not($queueJson|Te
 $dashboard=$dashboardJson|ConvertFrom-Json -Depth 100
 $queue=$queueJson|ConvertFrom-Json -Depth 100
 if(@($dashboard.generated_from).Count-ne1-or[string]$dashboard.generated_from[0].path-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json'-or
-   [string]$dashboard.payload.next_executable_task-cne'T07'-or@($queue.payload.tasks).Count-ne22-or
-   @($queue.payload.tasks|Where-Object{$_.id-eq'T07'-and$_.state-eq'ready'}).Count-ne1-or
-   @($queue.payload.tasks|Where-Object{$_.id-eq'T06'-and$_.state-eq'completed'}).Count-ne1){
+   [string]$dashboard.payload.next_executable_task-cne'T08'-or@($queue.payload.tasks).Count-ne22-or
+   @($queue.payload.tasks|Where-Object{$_.id-eq'T08'-and$_.state-eq'ready'}).Count-ne1-or
+   @($queue.payload.tasks|Where-Object{$_.id-eq'T07'-and$_.state-eq'completed'}).Count-ne1){
   throw '[mir4-current-execution-generated-view]'
 }
 
