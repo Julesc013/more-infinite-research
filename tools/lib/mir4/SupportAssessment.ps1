@@ -149,7 +149,8 @@ function New-MIR4CompatibilitySubjectLedger {
         default { 'review-required' }
       }
       $blockers = @()
-      if (-not [string]::IsNullOrWhiteSpace([string]$source.blocker)) { $blockers += [string]$source.blocker }
+      $sourceBlocker = if ($null -ne $source.PSObject.Properties['blocker']) { [string]$source.blocker } else { '' }
+      if (-not [string]::IsNullOrWhiteSpace($sourceBlocker)) { $blockers += $sourceBlocker }
       if ($id -eq 'industrial-revolution-4') { $blockers += 'BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER' }
       $row = [pscustomobject][ordered]@{
         ecosystem=[string]$metadata[$id].title

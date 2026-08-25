@@ -14,7 +14,7 @@ superseded_by: []
 
 MIR 3 product development is closed. The post-terminal 3.2.11 and 2.5.11 releases and all historical `.9` releases remain immutable; unresolved alias/hotfix PR residue and remaining custody work are tracked separately. MIR 4 R0 is active only on the package-excluded successor plane.
 
-The current executable authority is `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json`. It binds the exact Dev baseline, current release cut, workflow maturity vocabulary, blocker authorities, MIR 3 residual disposition, and 22-turn dependency queue. The generated dashboard reports `T02-COMPLETE-T03-T04-READY-RELEASE-BLOCKED`; source-freeze/target-build adapters and qualification/preview/independent-verification adapters are now the dependency-ready work packages.
+The current executable authority is `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json`. It binds the exact Dev baseline, current release cut, workflow maturity vocabulary, blocker authorities, MIR 3 residual disposition, and 22-turn dependency queue. The generated dashboard reports `T04-COMPLETE-T05-READY-RELEASE-BLOCKED`; source freeze, target build, exact target qualification, deterministic preview assets, and independent receipt import now have non-production adapters. Seal, promotion, publication, readback, and restore are the next dependency-ready executor package.
 
 ## Current boundary
 
@@ -51,4 +51,4 @@ The eventual layout separates `src/`, `platforms/factorio/`, and `targets/`. Cur
 
 ## Next slice
 
-The former M4-003 bootstrap queue is retained as historical evidence. T02 now provides the package-excluded, event-sourced release phase kernel with an explicit phase interface, idempotency, resume, compensation, receipts, and bounded Git, build, engine, signing, and publication ports. It authorizes no production mutation. T03 and T04 add the first phase adapters without changing that production boundary.
+The former M4-003 bootstrap queue is retained as historical evidence. T02 provides the package-excluded, event-sourced release phase kernel with an explicit phase interface, idempotency, resume, compensation, receipts, and bounded Git, build, engine, signing, and publication ports. It authorizes no production mutation. T03 and T04 implement the first five phase adapters without changing that production boundary; T05 must close the remaining five.

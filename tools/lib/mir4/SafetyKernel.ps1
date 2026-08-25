@@ -10,8 +10,12 @@ function Test-MIR4SafetyContribution {
   foreach ($operation in $operations) {
     if ($operation -in $forbidden) { $violations += "forbidden-operation:$operation" }
   }
-  if ([bool]$Contribution.positive_cycle -and -not [bool]$Contribution.proven_bounded) { $violations += 'unbounded-positive-cycle' }
-  if ([bool]$Contribution.owner_opaque -and [bool]$Contribution.owner_rewrite) { $violations += 'opaque-owner-rewrite' }
+  $positiveCycle = $null -ne $Contribution.PSObject.Properties['positive_cycle'] -and [bool]$Contribution.positive_cycle
+  $provenBounded = $null -ne $Contribution.PSObject.Properties['proven_bounded'] -and [bool]$Contribution.proven_bounded
+  $ownerOpaque = $null -ne $Contribution.PSObject.Properties['owner_opaque'] -and [bool]$Contribution.owner_opaque
+  $ownerRewrite = $null -ne $Contribution.PSObject.Properties['owner_rewrite'] -and [bool]$Contribution.owner_rewrite
+  if ($positiveCycle -and -not $provenBounded) { $violations += 'unbounded-positive-cycle' }
+  if ($ownerOpaque -and $ownerRewrite) { $violations += 'opaque-owner-rewrite' }
   if ($evidence.Count -eq 0) { $violations += 'missing-safety-evidence' }
   $violations = @($violations | Sort-Object -Unique)
 

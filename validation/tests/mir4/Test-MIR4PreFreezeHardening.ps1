@@ -21,6 +21,13 @@ if(@($t03.evolved_bindings).Count-ne2-or@($t03.current_authorities).Count-ne6-or
    @($t03.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t03-authority-evolution]'
 }
+$t04=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t04.evolved_bindings).Count-ne3-or@($t04.current_authorities).Count-ne15-or
+   (@($t04.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json|tools/lib/mir4/ReleaseAdapters.ps1'-or
+   [string]$t04.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   @($t04.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t04-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
@@ -46,8 +53,8 @@ if(-not[bool]$contract.phase_engine.kernel_implemented-or-not[bool]$contract.pha
    [bool]$contract.phase_engine.production_authorized){throw '[mir4-prefreeze-phase-engine-boundary]'}
 $maturity=@(Get-MIR4ReleaseWorkflowMaturity -RepoRoot $repo)
 if(@($maturity|Where-Object{-not$_.workflow_registered-or-not$_.workflow_fail_closed}).Count-ne0-or
-   (@($maturity|Where-Object{$_.workflow_executor_implemented}|Select-Object -ExpandProperty phase|Sort-Object)-join'|')-cne'source-freeze|target-build'-or
-   (@($maturity|Where-Object{$_.workflow_dry_run_passed}|Select-Object -ExpandProperty phase|Sort-Object)-join'|')-cne'source-freeze|target-build'-or
+   (@($maturity|Where-Object{$_.workflow_executor_implemented}|Select-Object -ExpandProperty phase|Sort-Object)-join'|')-cne'independent-verification|preview-assets|source-freeze|target-build|target-qualification'-or
+   (@($maturity|Where-Object{$_.workflow_dry_run_passed}|Select-Object -ExpandProperty phase|Sort-Object)-join'|')-cne'independent-verification|preview-assets|source-freeze|target-build|target-qualification'-or
    @($maturity|Where-Object{$_.workflow_production_rehearsal_passed-or$_.workflow_production_authorized}).Count-ne0){
   throw '[mir4-prefreeze-workflow-maturity]'
 }

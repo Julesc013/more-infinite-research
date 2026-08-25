@@ -548,7 +548,8 @@ function Test-MIR4PlatformConformance {
     $fixture = Get-Content -Raw -LiteralPath (Join-Path $repo $fixturePath) | ConvertFrom-Json
     $decision = Resolve-MIR4PolicyDisposition -Contribution $fixture.contribution
     if ([string]$decision.safety.status -cne [string]$fixture.expected_status) { throw "[mir4-process-ir-fixture-status] $fixturePath" }
-    if ($fixture.expected_violation -and [string]$fixture.expected_violation -notin @($decision.safety.violations)) { throw "[mir4-process-ir-fixture-violation] $fixturePath" }
+    $expectedViolation = if ($null -ne $fixture.PSObject.Properties['expected_violation']) { [string]$fixture.expected_violation } else { '' }
+    if ($expectedViolation -and $expectedViolation -notin @($decision.safety.violations)) { throw "[mir4-process-ir-fixture-violation] $fixturePath" }
   }
   $w06 = New-MIR4W06Records -RepoRoot $repo -SourceIdentity $null
   if(-not$w06.parity.passed-or-not$w06.parity.bilateral_gate.passed-or-not$w06.effects.opaque_preserved-or$w06.synthesis.automatic_player_mutation){throw '[mir4-platform-w06-conformance]'}

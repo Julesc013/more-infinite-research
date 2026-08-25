@@ -6,7 +6,7 @@ Generated: 2026-08-25
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T03-COMPLETE-T04-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T04`.
+Status: `T04-COMPLETE-T05-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T05`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -14,8 +14,8 @@ Status: `T03-COMPLETE-T04-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 | `T01` | Authority and backlog reconciliation | `completed` | T00 | `false` |
 | `T02` | Release phase engine kernel | `completed` | T01 | `false` |
 | `T03` | Source-freeze and target-build executors | `completed` | T02 | `false` |
-| `T04` | Qualification, preview and independent-verification executors | `ready` | T02 | `false` |
-| `T05` | Seal, promotion, publication, readback and restore executors | `blocked-dependency` | T03, T04 | `false` |
+| `T04` | Qualification, preview and independent-verification executors | `completed` | T02 | `false` |
+| `T05` | Seal, promotion, publication, readback and restore executors | `ready` | T03, T04 | `false` |
 | `T06` | Release doctor maturity and fault-injection closure | `blocked-dependency` | T05 | `false` |
 | `T07` | Canonicalization, schema namespace and diagnostic authority | `ready` | T01 | `false` |
 | `T08` | SDK V1 preview completion | `blocked-dependency` | T07 | `false` |
