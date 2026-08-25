@@ -38,8 +38,8 @@
     "current_authorities": {
       "type": "array", "minItems": 10, "maxItems": 10,
       "items": {
-        "type": "object", "additionalProperties": false, "required": ["path", "sha256", "role"],
-        "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "role": {"type": "string", "minLength": 1}}
+        "type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "role"],
+        "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"enum": ["raw-bytes", "canonical-text-v1"]}, "role": {"type": "string", "minLength": 1}}
       }
     },
     "player_package_source_sha256": {"$ref": "#/$defs/sha256"},

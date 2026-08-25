@@ -5,6 +5,13 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/PreFreezeRelease.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$canonicalProbeRoot=Join-Path $repo ('build/mir4/release-phase-engine/tests/t06-canonical-'+[guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $canonicalProbeRoot -Force|Out-Null
+$lfProbe=Join-Path $canonicalProbeRoot 'lf.txt';$crlfProbe=Join-Path $canonicalProbeRoot 'crlf.txt'
+[IO.File]::WriteAllText($lfProbe,"alpha`nbeta`n",[Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText($crlfProbe,"alpha`r`nbeta`r`n",[Text.UTF8Encoding]::new($false))
+if((Get-MIR4PreFreezeFileSha256 -Path $lfProbe -Mode canonical-text-v1)-cne(Get-MIR4PreFreezeFileSha256 -Path $crlfProbe -Mode canonical-text-v1)-or
+   (Get-MIR4PreFreezeFileSha256 -Path $lfProbe -Mode raw-bytes)-ceq(Get-MIR4PreFreezeFileSha256 -Path $crlfProbe -Mode raw-bytes)){throw '[mir4-t06-canonical-text-hash]'}
 $corpusPath=Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json'
 $corpusJson=Get-Content -Raw -LiteralPath $corpusPath
 if(-not($corpusJson|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-release-fault-corpus-v1.schema.json'))){throw '[mir4-t06-fault-corpus-schema]'}
@@ -30,6 +37,9 @@ foreach($testId in @($corpus.aggregate.required_test_ids)){
 
 $maturity=@(Get-MIR4ReleaseWorkflowMaturity -RepoRoot $repo)
 if($maturity.Count-ne10-or@($maturity|Where-Object{-not$_.workflow_registered-or-not$_.workflow_fail_closed-or-not$_.workflow_executor_implemented-or-not$_.workflow_dry_run_passed-or-not$_.workflow_production_rehearsal_passed-or$_.workflow_production_authorized}).Count-ne0){throw '[mir4-t06-workflow-maturity]'}
+$t06Receipt=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t06Receipt.current_authorities|Where-Object hash_mode -eq 'canonical-text-v1').Count-ne4-or
+   @($t06Receipt.current_authorities|Where-Object hash_mode -eq 'raw-bytes').Count-ne6){throw '[mir4-t06-authority-hash-modes]'}
 $doctor=Get-MIR4ReleaseDoctor -RepoRoot $repo -Explain
 $executorCheck=@($doctor.checks|Where-Object id -eq 'workflow-executor-maturity')
 $signingCheck=@($doctor.checks|Where-Object id -eq 'protected-signing-secret')

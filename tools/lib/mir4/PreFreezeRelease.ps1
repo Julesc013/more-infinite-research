@@ -6,8 +6,18 @@ function Get-MIR4PreFreezeRepoRoot {
 }
 
 function Get-MIR4PreFreezeFileSha256 {
-  param([Parameter(Mandatory)][string]$Path)
-  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [ValidateSet('raw-bytes','canonical-text-v1')][string]$Mode='raw-bytes'
+  )
+  if ($Mode -ceq 'raw-bytes') {
+    return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+  }
+  $utf8 = [Text.UTF8Encoding]::new($false,$true)
+  $text = $utf8.GetString([IO.File]::ReadAllBytes($Path))
+  if ($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF) { $text = $text.Substring(1) }
+  $canonical = $text.Replace("`r`n","`n").Replace("`r","`n").Normalize([Text.NormalizationForm]::FormC)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($utf8.GetBytes($canonical)))
 }
 
 function Read-MIR4PreFreezeJson {
@@ -174,8 +184,10 @@ function Test-MIR4PreFreezeAuthorities {
   }
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)
+    $currentBinding = @($evolution.current_authorities | Where-Object { [string]$_.path -ceq [string]$binding.Key })
+    $hashMode = if ($currentBinding.Count -eq 1 -and $currentBinding[0].PSObject.Properties.Name -contains 'hash_mode') { [string]$currentBinding[0].hash_mode } else { 'raw-bytes' }
     if (-not (Test-Path -LiteralPath $full -PathType Leaf) -or
-        (Get-MIR4PreFreezeFileSha256 $full) -cne [string]$binding.Value) {
+        (Get-MIR4PreFreezeFileSha256 -Path $full -Mode $hashMode) -cne [string]$binding.Value) {
       throw "[mir4-prefreeze-current-authority-binding] $($binding.Key)"
     }
   }
