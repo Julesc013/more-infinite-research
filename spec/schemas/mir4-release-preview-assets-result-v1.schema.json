@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-preview-assets-result-v1.schema.json",
+  "title": "MIR 4 preview-assets phase result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "phase", "phase_result_kind", "operation", "status", "idempotency_key", "artifact_root", "production_mutation_performed", "release_transition_performed", "assets", "artifacts", "checks"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleasePhaseAdapterResultV1"},
+    "phase": {"const": "preview-assets"},
+    "phase_result_kind": {"const": "MIR4PreviewAssetsPhaseResultV1"},
+    "operation": {"enum": ["DryRun", "Execute", "Verify", "Compensate"]},
+    "status": {"const": "passed"},
+    "idempotency_key": {"$ref": "#/$defs/sha256"},
+    "artifact_root": {"type": "string", "pattern": "^build/mir4/release-phase-engine/"},
+    "production_mutation_performed": {"const": false},
+    "release_transition_performed": {"const": false},
+    "assets": {
+      "type": "array", "maxItems": 4,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "sha256", "bytes"],
+        "properties": {
+          "name": {"enum": ["mir4-api-sdk-v1-preview.zip", "mir4-mep-v1-preview.zip", "mir4-reference-extension-v1-preview.zip", "mir4-inspector-v1-preview.zip"]},
+          "sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "artifacts": {"type": "array", "maxItems": 1, "items": {"$ref": "#/$defs/artifact"}},
+    "checks": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "bytes"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer", "minimum": 1}}
+    }
+  }
+}

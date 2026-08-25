@@ -223,14 +223,20 @@ package_excluded_modules:
       - spec/schemas/mir4-release-phase-engine-contract-v1.schema.json
       - spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t04-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
       - spec/schemas/mir4-release-target-build-result-v1.schema.json
+      - spec/schemas/mir4-release-target-qualification-result-v1.schema.json
+      - spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json
+      - spec/schemas/mir4-release-preview-assets-result-v1.schema.json
+      - spec/schemas/mir4-release-independent-verification-result-v1.schema.json
+      - spec/schemas/mir4-independent-verification-receipt-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
-    boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, attempt-local source-freeze and target-build rehearsal adapters, preview packaging, independent evidence capture, playtest handoff, ruleset audit, and fail-closed workflow control only; no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
-    stability: stable-pre-freeze-control-plane-with-t03-non-production-source-freeze-and-target-build-adapters-and-human-and-freeze-blockers
+    boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, attempt-local source-freeze, target-build, exact target-qualification, deterministic preview-asset, and independent-receipt rehearsal adapters, playtest handoff, ruleset audit, and fail-closed workflow control only; no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    stability: stable-pre-freeze-control-plane-with-t03-t04-non-production-adapters-and-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json
     implementation: tools/lib/mir4/PlatformPreview.ps1
