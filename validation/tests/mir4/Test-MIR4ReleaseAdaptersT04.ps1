@@ -42,8 +42,28 @@ function New-T04IndependentReceipt($Expected,$Context,[string]$Target,[string]$E
   $record.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $record -HashProperty record_sha256
   return $record
 }
-$qualificationReceiptFactory=${function:New-T04QualificationReceipt}
-$independentReceiptFactory=${function:New-T04IndependentReceipt}
+$fixtureContext=[pscustomobject][ordered]@{plan=[pscustomobject][ordered]@{identity=[pscustomobject][ordered]@{
+  source_commit=[string]$inputs.source_commit;source_tree=[string]$inputs.source_tree;release_plan_digest=[string]$inputs.release_plan_digest
+}}}
+$qualificationReceipts=@{};$independentReceipts=@{};$wrongQualificationReceipts=@{};$wrongIndependentReceipts=@{}
+foreach($row in @($developmentPlan.targets)){
+  $target=([string]$row.target).ToUpperInvariant()
+  $expected=[pscustomobject][ordered]@{
+    target=$target;distribution_version=[string]$row.distribution_version
+    package=[pscustomobject][ordered]@{sha256=([string]$row.development_package.sha256).ToUpperInvariant();content_sha256=([string]$row.development_package.content_sha256).ToUpperInvariant();bytes=[long]$row.development_package.bytes;entry_count=[int]$row.development_package.entry_count}
+    engine=[pscustomobject][ordered]@{version=[string]$row.engine.version;path=[string]$row.engine.path;sha256=([string]$row.engine.sha256).ToUpperInvariant()}
+  }
+  $qualificationReceipts[$target]=New-T04QualificationReceipt -Expected $expected -Context $fixtureContext -Target $target -Evidence $(if($target-ceq'F210'){'1'*64}else{'2'*64})
+  $independentReceipts[$target]=New-T04IndependentReceipt -Expected $expected -Context $fixtureContext -Target $target -Evidence $(if($target-ceq'F210'){'6'*64}else{'7'*64})
+  $wrongQualification=($qualificationReceipts[$target]|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100)
+  $wrongQualification.package.sha256='F'*64
+  $wrongQualification.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $wrongQualification -HashProperty record_sha256
+  $wrongQualificationReceipts[$target]=$wrongQualification
+  $wrongIndependent=($independentReceipts[$target]|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100)
+  $wrongIndependent.engine_sha256='A'*64
+  $wrongIndependent.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $wrongIndependent -HashProperty record_sha256
+  $wrongIndependentReceipts[$target]=$wrongIndependent
+}
 
 $schemas=@(
   'spec/schemas/mir4-release-target-qualification-result-v1.schema.json',
@@ -61,7 +81,7 @@ $qualificationProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
   $qualificationCalls[$Target]=1+[int]$qualificationCalls[$Target]
   if($Target-ceq'F210'-and[int]$qualificationCalls[$Target]-eq1){throw '[mir4-t04-fixture-worker-interruption] F210'}
-  &$qualificationReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'1'*64}else{'2'*64})
+  return $qualificationReceipts[$Target]
 }.GetNewClosure()
 $qualificationAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-qualification -QualificationWorkerProvider $qualificationProvider -QualificationWorkerProviderIdentity ('3'*64)
 if([bool]$qualificationAdapter.descriptor.production_capable-or[string]$qualificationAdapter.descriptor.result_schema-cne$schemas[0]){throw '[mir4-t04-qualification-descriptor]'}
@@ -86,10 +106,7 @@ if([string]$qualificationDry.state-cne'dry-run-passed'-or[string]$qualificationR
 
 $wrongProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
-  $receipt=&$qualificationReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence ('4'*64)
-  $receipt.package.sha256='F'*64
-  $receipt.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $receipt -HashProperty record_sha256
-  return $receipt
+  return $wrongQualificationReceipts[$Target]
 }.GetNewClosure()
 $wrongAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-qualification -QualificationWorkerProvider $wrongProvider -QualificationWorkerProviderIdentity ('5'*64)
 $wrongInputs=$inputs.PSObject.Copy();$wrongInputs.candidate_id='DEV-T04-WRONG-PACKAGE'
@@ -124,7 +141,7 @@ $independentProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
   $independentCalls[$Target]=1+[int]$independentCalls[$Target]
   if($Target-ceq'F210'-and[int]$independentCalls[$Target]-eq1){throw '[mir4-t04-fixture-independent-interruption] F210'}
-  &$independentReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'6'*64}else{'7'*64})
+  return $independentReceipts[$Target]
 }.GetNewClosure()
 $independentAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase independent-verification -IndependentReceiptProvider $independentProvider -IndependentReceiptProviderIdentity ('8'*64)
 if([bool]$independentAdapter.descriptor.production_capable-or[string]$independentAdapter.descriptor.result_schema-cne$schemas[3]){throw '[mir4-t04-independent-descriptor]'}
@@ -149,10 +166,7 @@ if([string]$independentResume.state-cne'executed'-or[string]$independentVerify.s
 
 $wrongIndependentProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
-  $receipt=&$independentReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence ('9'*64)
-  $receipt.engine_sha256='A'*64
-  $receipt.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $receipt -HashProperty record_sha256
-  return $receipt
+  return $wrongIndependentReceipts[$Target]
 }.GetNewClosure()
 $wrongIndependentAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase independent-verification -IndependentReceiptProvider $wrongIndependentProvider -IndependentReceiptProviderIdentity ('B'*64)
 $wrongIndependentInputs=$inputs.PSObject.Copy();$wrongIndependentInputs.candidate_id='DEV-T04-WRONG-ENGINE'
