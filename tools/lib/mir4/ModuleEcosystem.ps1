@@ -64,7 +64,7 @@ function Get-MIR4ModuleEcosystemAuthority {
   if (@($authority.fragment_kinds | Sort-Object -Unique).Count -ne 12) { throw '[mir4-module-fragment-count]' }
   if (@($authority.api_surfaces | Sort-Object -Unique).Count -ne 9) { throw '[mir4-module-api-surface-count]' }
   if (@($authority.transports.target | Sort-Object -Unique).Count -ne 17) { throw '[mir4-module-transport-count]' }
-  if (@($authority.builder_commands | Sort-Object -Unique).Count -ne 6) { throw '[mir4-module-builder-command-count]' }
+  if (@($authority.builder_commands | Sort-Object -Unique).Count -ne 10) { throw '[mir4-module-builder-command-count]' }
   foreach ($input in @($authority.inputs)) {
     if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$input)) -PathType Leaf)) { throw "[mir4-module-input] $input" }
   }
@@ -179,7 +179,7 @@ function ConvertFrom-MIR4MepV0ToV1 {
     foreach ($fragment in @($Envelope.fragments)) {
       $data = switch ([string]$fragment.kind) {
         'CompatibilityFragment' { [ordered]@{subject_refs=@($fragment.data.subjects);disposition=[string]$fragment.data.disposition} }
-        'ProfileFragment' { [ordered]@{profile_id=[string]$fragment.data.profile;setting_refs=@($fragment.data.settings.PSObject.Properties.Name | Sort-Object)} }
+        'ProfileFragment' { [ordered]@{profile_id=[string]$fragment.data.profile;setting_refs=@($fragment.data.settings.PSObject.Properties | ForEach-Object Name | Sort-Object)} }
         'ProofFragment' { [ordered]@{evidence_refs=@($fragment.data.fixtures | ForEach-Object { "fixture:$_" });claim_level=[string]$fragment.data.claim_level} }
         'PresentationFragment' { [ordered]@{title=[string]$fragment.data.title;summary=[string]$fragment.data.summary} }
         'CapabilityRequirement' { [ordered]@{all_of=@($fragment.data.all_of | ForEach-Object { [string]$_ })} }

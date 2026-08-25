@@ -110,9 +110,9 @@
     {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "completed", "depends_on": ["T05"], "human_required": false, "release_transition": false},
     {"id": "T07", "name": "Canonicalization, schema namespace and diagnostic authority", "state": "completed", "depends_on": ["T01"], "human_required": false, "release_transition": false},
     {"id": "T08", "name": "SDK V1 preview completion", "state": "completed", "depends_on": ["T07"], "human_required": false, "release_transition": false},
-    {"id": "T09", "name": "Extension developer experience", "state": "ready", "depends_on": ["T07"], "human_required": false, "release_transition": false},
+    {"id": "T09", "name": "Extension developer experience", "state": "completed", "depends_on": ["T07"], "human_required": false, "release_transition": false},
     {"id": "T10", "name": "Environment lock, diff, support bundle and minimizer", "state": "ready", "depends_on": ["T07"], "human_required": false, "release_transition": false},
-    {"id": "T11", "name": "Read-only F210 MEP discovery", "state": "blocked-dependency", "depends_on": ["T09"], "human_required": false, "release_transition": false},
+    {"id": "T11", "name": "Read-only F210 MEP discovery", "state": "ready", "depends_on": ["T09"], "human_required": false, "release_transition": false},
     {"id": "T12", "name": "Exact target ProcessIR preview and Inspector compare", "state": "blocked-dependency", "depends_on": ["T10"], "human_required": false, "release_transition": false},
     {"id": "T13", "name": "Release compatibility canary cut", "state": "blocked-dependency", "depends_on": ["T10", "T12"], "human_required": false, "release_transition": false},
     {"id": "T14", "name": "MIR4 public, contributor, maintainer and continuity documentation", "state": "blocked-dependency", "depends_on": ["T01", "T07", "T09", "T10"], "human_required": false, "release_transition": false},
@@ -124,7 +124,7 @@
     {"id": "T20", "name": "Frozen candidate qualification and final acceptance", "state": "blocked-dependency", "depends_on": ["T19"], "human_required": true, "release_transition": true},
     {"id": "T21", "name": "Production seal, promotion, tags, publication and public readback", "state": "blocked-dependency", "depends_on": ["T20"], "human_required": true, "release_transition": true}
   ],
-  "next_dependency_ready_turn": "T09",
+  "next_dependency_ready_turn": "T10",
   "transition_gate": {
     "source_freeze": false,
     "candidate_allocation": false,
@@ -133,5 +133,5 @@
     "tagging": false,
     "publication": false
   },
-  "status": "T08-COMPLETE-T09-T10-READY-RELEASE-BLOCKED"
+  "status": "T09-COMPLETE-T10-T11-READY-RELEASE-BLOCKED"
 }

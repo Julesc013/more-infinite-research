@@ -49,6 +49,8 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/technology-governance.json',
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
+  'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
+  'tools/commands/mir4/Invoke-MIR4Extension.ps1',
   'tools/lib/mir4/SdkV1.ps1',
   'tools/templates/mir4/sdk-v1/powershell/MIR4.Api.V1.psm1',
   'tools/templates/mir4/sdk-v1/python/mir4_api_v1.py',
@@ -62,6 +64,9 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/CanonicalJsonV1.ps1',
   'tools/lib/mir4/DiagnosticsV1.ps1',
   'tools/lib/mir4/PlatformPreview.ps1',
+  'spec/schemas/preview/mir4-extension-lock-v1.schema.json',
+  'spec/schemas/preview/mir4-extension-diff-v1.schema.json',
+  'docs/reference/mir4-first-extension.md',
   'tools/lib/mir4/SafetyKernel.ps1',
   'tools/lib/mir4/PolicyEngine.ps1',
   'tools/lib/mir4/NormalizedCompiler.ps1',
@@ -685,6 +690,7 @@ function New-MIR4PlatformPreviewPackages {
   $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
   $apiV1 = @($allSdk | Where-Object { $_ -match '/api-v1/' })
   $mepV1 = @($allSdk | Where-Object { $_ -match '/mep-v1/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
+  $mepAuthority = Get-MIR4ModuleEcosystemAuthority -RepoRoot $repo
   $sets = [ordered]@{
     'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
     'mir4-api-sdk-v1-preview.zip' = @($apiV1 + @('sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1','sdk/preview/mir4/canonical-json-v1/python/mir4_canonical_json_v1.py','spec/api/mir4-v1/contracts.json','spec/api/mir4-v1/schema-namespace.json','spec/api/mir4-v1/diagnostics.json','spec/api/mir4-v1/compatibility.json','spec/canonicalization/mir-canonical-json-v1.json','fixtures/mir4-canonical-json-v1/vectors.json','spec/schemas/preview/mir4-api-v1-response.schema.json','spec/schemas/preview/mir4-canonical-json-v1.schema.json','spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json','spec/schemas/preview/mir4-schema-namespace-v1.schema.json','spec/schemas/preview/mir4-diagnostic-registry-v1.schema.json','spec/schemas/preview/mir4-preview-compatibility-policy-v1.schema.json','docs/reference/generated/mir4-api-sdk-v1.md','docs/reference/mir4-sdk-v1-quickstart.md','docs/reference/mir4-canonical-json-v1.md','LICENSE'))
@@ -738,11 +744,17 @@ function New-MIR4PlatformPreviewPackages {
   $sets['mir4-mep-v1-preview.zip'] = @($mepV1 + @(
     'spec/api/mir4-v1/diagnostics.json','spec/api/mir4-v1/compatibility.json',
     'spec/canonicalization/mir-canonical-json-v1.json','fixtures/mir4-canonical-json-v1/vectors.json',
-    'spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-canonical-json-v1.schema.json',
+    'spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-extension-lock-v1.schema.json',
+    'spec/schemas/preview/mir4-extension-diff-v1.schema.json','spec/schemas/preview/mir4-canonical-json-v1.schema.json',
     'spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json','docs/architecture/mir4-module-ecosystem.md',
-    'docs/reference/mir4-canonical-json-v1.md','tools/lib/mir4/CanonicalJsonV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
-    'tools/lib/mir4/ModuleEcosystem.ps1','tools/commands/mir4/Invoke-MIR4Extension.ps1','LICENSE'
-  ))
+    'docs/reference/mir4-canonical-json-v1.md','docs/reference/mir4-first-extension.md',
+    'tools/lib/mir4/CanonicalJsonV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
+    'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1',
+    'tools/commands/mir4/Invoke-MIR4Extension.ps1',
+    '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
+    '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json',
+    '.mir/targets.json','.mir/module-dependencies.json','LICENSE'
+  ) + @($mepAuthority.inputs) | Sort-Object -Unique)
   foreach ($legacyAsset in @('mir4-sdk-v0-preview.zip','mir4-platform-preview-v0.zip','mir4-reference-extension-v0.zip','mir4-inspector-preview-v0.zip')) {
     [void]$sets.Remove($legacyAsset)
   }

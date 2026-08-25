@@ -182,6 +182,7 @@ return M
 function Get-MIR4ModuleEcosystemSdkFiles {
   param([Parameter(Mandatory)][string]$RepoRoot)
   . (Join-Path $RepoRoot 'tools/lib/mir4/ModuleEcosystem.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
   . (Join-Path $RepoRoot 'tools/lib/mir4/SdkV1.ps1')
   $authority = Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot
   $mepSchema = Get-MIR4MepV1Schema -Authority $authority
@@ -198,6 +199,16 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   $missing.extension_id='org.example.missing';$missing.namespace='org.example.missing';$missing.fragments[5].data.extension_id='org.example.not-installed';$missing.digest='';$missing.digest=Get-MIR4ModuleDigest $missing
   $cycleA = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json);$cycleA.extension_id='org.example.cycle-a';$cycleA.namespace='org.example.cycle-a';$cycleA.fragments[5].data.extension_id='org.example.cycle-b';$cycleA.digest='';$cycleA.digest=Get-MIR4ModuleDigest $cycleA
   $cycleB = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json);$cycleB.extension_id='org.example.cycle-b';$cycleB.namespace='org.example.cycle-b';$cycleB.fragments[5].data.extension_id='org.example.cycle-a';$cycleB.digest='';$cycleB.digest=Get-MIR4ModuleDigest $cycleB
+  $minimal = New-MIR4ExtensionTemplateV1 -RepoRoot $RepoRoot -ExtensionId 'org.example.minimal' -Template minimal
+  $unavailable = New-MIR4ExtensionTemplateV1 -RepoRoot $RepoRoot -ExtensionId 'org.example.unavailable' -Template unavailable
+  $conflictA = New-MIR4ExtensionTemplateV1 -RepoRoot $RepoRoot -ExtensionId 'org.example.conflict-a' -Template minimal
+  $conflictA.fragments += [pscustomobject][ordered]@{id='org.example.conflict-a.conflict';kind='ExtensionConflict';data=[ordered]@{extension_ids=@('org.example.conflict-b')}}
+  $conflictA.digest='';$conflictA.digest=Get-MIR4ModuleDigest $conflictA
+  $conflictB = New-MIR4ExtensionTemplateV1 -RepoRoot $RepoRoot -ExtensionId 'org.example.conflict-b' -Template minimal
+  $conflictB.fragments += [pscustomobject][ordered]@{id='org.example.conflict-b.conflict';kind='ExtensionConflict';data=[ordered]@{extension_ids=@('org.example.conflict-a')}}
+  $conflictB.digest='';$conflictB.digest=Get-MIR4ModuleDigest $conflictB
+  $migrationV0 = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/reference-extension/extension.json')|ConvertFrom-Json -Depth 100
+  $migrationV1 = ConvertFrom-MIR4MepV0ToV1 -Envelope $migrationV0
   $files = [ordered]@{}
   $files['sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/mir4/CanonicalJsonV1.ps1')
   $files['sdk/preview/mir4/canonical-json-v1/python/mir4_canonical_json_v1.py'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/canonicalization/reference/mir4_canonical_json_v1.py')
@@ -363,6 +374,35 @@ end
   $files['fixtures/mir4-mep-v1/negative/cycle-a.json']=(ConvertTo-MIR4ModuleCanonicalJson $cycleA)+"`n"
   $files['fixtures/mir4-mep-v1/negative/cycle-b.json']=(ConvertTo-MIR4ModuleCanonicalJson $cycleB)+"`n"
   $files['sdk/preview/mir4/mep-v1/README.md'] = "# MIR Extension Protocol V1 preview`n`nData-only envelopes contribute 12 typed fragment kinds. They cannot carry callbacks, prototype writes, raw compiler context, executors, or SafetyKernel overrides. Resolve dependencies before inspection and treat capability gaps as review-required.`n"
+  foreach($generatedExtension in @(
+    @{path='sdk/preview/mir4/mep-v1/templates/minimal/extension.json';value=$minimal},
+    @{path='sdk/preview/mir4/mep-v1/templates/all-fragments/extension.json';value=$reference},
+    @{path='sdk/preview/mir4/mep-v1/templates/unavailable/extension.json';value=$unavailable},
+    @{path='sdk/preview/mir4/mep-v1/examples/positive/extension.json';value=$minimal},
+    @{path='sdk/preview/mir4/mep-v1/examples/conflict/extension-a.json';value=$conflictA},
+    @{path='sdk/preview/mir4/mep-v1/examples/conflict/extension-b.json';value=$conflictB},
+    @{path='sdk/preview/mir4/mep-v1/examples/unavailable/extension.json';value=$unavailable},
+    @{path='sdk/preview/mir4/mep-v1/examples/migration/extension-v0.json';value=$migrationV0},
+    @{path='sdk/preview/mir4/mep-v1/examples/migration/extension-v1.json';value=$migrationV1}
+  )) {
+    $files[$generatedExtension.path]=(ConvertTo-MIR4ModuleCanonicalJson $generatedExtension.value)+[char]10
+  }
+  $files['sdk/preview/mir4/mep-v1/package-metadata.json']=(ConvertTo-MIR4ModuleCanonicalJson ([ordered]@{
+    schema=1;kind='MIR4MepV1PackageMetadata';name='mir4-mep-v1-preview';version='4.0.0-preview'
+    maturity='developer-preview';license='MPL-2.0';canonicalization='mir-canonical-json/1'
+    commands=@('ci-init','diff','doctor','explain','init','lock','migrate','package','test','validate')
+    templates=@('all-fragments','minimal','unavailable')
+    examples=@('conflict','migration','positive','unavailable')
+    package_visible=$false;player_mutation_authorized=$false;prototype_write_authorized=$false
+    release_authority=$false;publication_authorized=$false
+  }))+[char]10
+  $files['sdk/preview/mir4/mep-v1/README.md'] = @'
+# MIR Extension Protocol V1 preview
+
+This self-contained, offline developer preview supplies minimal, all-fragment, and unavailable templates; positive, conflict, unavailable, and migration examples; and ten commands: init, doctor, validate, lock, diff, explain, test, package, migrate, and ci-init.
+
+Start with docs/reference/mir4-first-extension.md. The protocol is data-only. It grants no callbacks, compiler context, prototype writes, player mutation, signing, sealing, publication, or public support authority. F210 remains review-required while its extension-owned mod-data transport is blocked by the terminal emitter.
+'@
   $files['docs/reference/generated/mir4-api-sdk-v1.md'] = @'
 ---
 title: "MIR 4 API and SDK V1 Preview"
@@ -395,6 +435,24 @@ $value=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/refe
 Test-MIR4MepV1Envelope -Envelope $value -RepoRoot $RepoRoot|Out-Null
 Resolve-MIR4ExtensionClosureV1 -RepoRoot $RepoRoot -Extensions @($value) -Target f210|Out-Null
 [pscustomobject]@{status='passed';maturity='developer-preview';production_consumer='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER'}|ConvertTo-Json
+'@
+  $files['sdk/preview/mir4/mep-v1/conformance.ps1'] = @'
+param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path)
+$ErrorActionPreference='Stop'
+. (Join-Path $RepoRoot 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+$value=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/mep-v1/examples/positive/extension.json')|ConvertFrom-Json -Depth 100
+Test-MIR4MepV1Envelope -Envelope $value -RepoRoot $RepoRoot|Out-Null
+$closure=Resolve-MIR4ExtensionClosureV1 -RepoRoot $RepoRoot -Extensions @($value) -Target f210
+$doctor=Get-MIR4ExtensionDoctorV1 -RepoRoot $RepoRoot -Envelope $value
+$lock=New-MIR4ExtensionLockV1 -RepoRoot $RepoRoot -Envelope $value -Target f210
+$diff=New-MIR4ExtensionDiffV1 -RepoRoot $RepoRoot -Base $value -Candidate $value
+$plan=New-MIR4ExtensionShadowPlanV1 -RepoRoot $RepoRoot -Envelope $value -Target f210
+if([string]$doctor.status-cne'passed'-or-not[bool]$closure.complete-or[string]$diff.status-cne'identical'-or[string]$plan.result-cne'shadow-complete'){throw '[mir4-mep-v1-conformance]'}
+[pscustomobject]@{
+  status='passed';maturity='developer-preview';commands=10;offline=$true
+  lock_status=[string]$lock.status;player_mutation_authorized=$false;prototype_write_authorized=$false
+  production_consumer='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER'
+}|ConvertTo-Json
 '@
   return $files
 }

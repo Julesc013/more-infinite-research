@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/extension-diff.schema.json",
+  "title": "MIR 4 extension diff V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind","schema","base","candidate","status","change_count","changes","package_visible","player_mutation_authorized","release_authority","digest"],
+  "properties": {
+    "kind": {"const": "MIR4ExtensionDiffV1"},
+    "schema": {"const": 1},
+    "base": {"$ref": "#/$defs/identity"},
+    "candidate": {"$ref": "#/$defs/identity"},
+    "status": {"enum": ["identical","changed"]},
+    "change_count": {"type": "integer","minimum": 0,"maximum": 4096},
+    "changes": {"type": "array","maxItems": 4096,"items": {"type": "object","additionalProperties": false,"required": ["path","change","before","after"],"properties": {"path": {"type": "string","pattern": "^\\$"},"change": {"enum": ["added","changed","removed"]},"before": {},"after": {}}}},
+    "package_visible": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "release_authority": {"const": false},
+    "digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "digest": {"type": "string","pattern": "^sha256:[0-9a-f]{64}$"},
+    "identity": {"type": "object","additionalProperties": false,"required": ["id","version","digest"],"properties": {"id": {"type": "string","minLength": 1},"version": {"type": "string","minLength": 1},"digest": {"$ref": "#/$defs/digest"}}}
+  }
+}

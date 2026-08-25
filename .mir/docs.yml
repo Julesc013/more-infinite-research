@@ -303,6 +303,15 @@ docs:
       - mir4-permanent-schema-namespace
       - mir4-stable-diagnostic-registry
       - mir4-v0-v1-compatibility-policy
+  - path: docs/reference/mir4-first-extension.md
+    title: "Your First MIR 4 Extension"
+    status: current
+    audience: developer
+    doc_type: tutorial
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-first-extension-tutorial
+      - mir4-extension-developer-workflow
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

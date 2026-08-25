@@ -113,7 +113,7 @@
     "copy_mode": "canonical-json-deep-copy",
     "unavailable_representation": "explicit-status-reason-evidence-never-zero"
   },
-  "builder_commands": ["init", "validate", "explain", "test", "package", "migrate"],
+  "builder_commands": ["init", "validate", "explain", "test", "package", "migrate", "doctor", "lock", "diff", "ci-init"],
   "independent_consumer": {
     "preferred": "industrial-revolution-4",
     "status": "BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER",

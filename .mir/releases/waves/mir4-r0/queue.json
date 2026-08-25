@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "9D022EFF4EB1CD3642391E82F6DCE15752FD29E40C2FE349376B71CEA22FE88C"
+      "sha256": "835728300CA3742BC12C2044DAA77FA666D407558D377140284A0D7B66FC16AD"
     }
   ],
   "payload": {
@@ -103,7 +103,7 @@
       {
         "id": "T09",
         "scope": "Extension developer experience",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T07"
         ],
@@ -123,7 +123,7 @@
       {
         "id": "T11",
         "scope": "Read-only F210 MEP discovery",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T09"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "44DEA2FC0BE72477790CB1A1A59041DFB3F06A2956CAB5B98D217CEE7DD0325E"
+  "record_sha256": "5FBE94E81EF1D1CE1991369DA5FED717E1C1A10B67AC5B0D52C7E3A7524BF8CB"
 }
