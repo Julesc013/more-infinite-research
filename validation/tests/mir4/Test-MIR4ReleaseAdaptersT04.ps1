@@ -42,6 +42,8 @@ function New-T04IndependentReceipt($Expected,$Context,[string]$Target,[string]$E
   $record.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $record -HashProperty record_sha256
   return $record
 }
+$qualificationReceiptFactory=${function:New-T04QualificationReceipt}
+$independentReceiptFactory=${function:New-T04IndependentReceipt}
 
 $schemas=@(
   'spec/schemas/mir4-release-target-qualification-result-v1.schema.json',
@@ -59,7 +61,7 @@ $qualificationProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
   $qualificationCalls[$Target]=1+[int]$qualificationCalls[$Target]
   if($Target-ceq'F210'-and[int]$qualificationCalls[$Target]-eq1){throw '[mir4-t04-fixture-worker-interruption] F210'}
-  New-T04QualificationReceipt -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'1'*64}else{'2'*64})
+  &$qualificationReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'1'*64}else{'2'*64})
 }.GetNewClosure()
 $qualificationAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase target-qualification -QualificationWorkerProvider $qualificationProvider -QualificationWorkerProviderIdentity ('3'*64)
 if([bool]$qualificationAdapter.descriptor.production_capable-or[string]$qualificationAdapter.descriptor.result_schema-cne$schemas[0]){throw '[mir4-t04-qualification-descriptor]'}
@@ -84,7 +86,7 @@ if([string]$qualificationDry.state-cne'dry-run-passed'-or[string]$qualificationR
 
 $wrongProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
-  $receipt=New-T04QualificationReceipt -Expected $Expected -Context $Context -Target $Target -Evidence ('4'*64)
+  $receipt=&$qualificationReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence ('4'*64)
   $receipt.package.sha256='F'*64
   $receipt.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $receipt -HashProperty record_sha256
   return $receipt
@@ -122,7 +124,7 @@ $independentProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
   $independentCalls[$Target]=1+[int]$independentCalls[$Target]
   if($Target-ceq'F210'-and[int]$independentCalls[$Target]-eq1){throw '[mir4-t04-fixture-independent-interruption] F210'}
-  New-T04IndependentReceipt -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'6'*64}else{'7'*64})
+  &$independentReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence $(if($Target-ceq'F210'){'6'*64}else{'7'*64})
 }.GetNewClosure()
 $independentAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase independent-verification -IndependentReceiptProvider $independentProvider -IndependentReceiptProviderIdentity ('8'*64)
 if([bool]$independentAdapter.descriptor.production_capable-or[string]$independentAdapter.descriptor.result_schema-cne$schemas[3]){throw '[mir4-t04-independent-descriptor]'}
@@ -147,7 +149,7 @@ if([string]$independentResume.state-cne'executed'-or[string]$independentVerify.s
 
 $wrongIndependentProvider={
   param([string]$FixtureRepo,[string]$Target,$Expected,$Context)
-  $receipt=New-T04IndependentReceipt -Expected $Expected -Context $Context -Target $Target -Evidence ('9'*64)
+  $receipt=&$independentReceiptFactory -Expected $Expected -Context $Context -Target $Target -Evidence ('9'*64)
   $receipt.engine_sha256='A'*64
   $receipt.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $receipt -HashProperty record_sha256
   return $receipt
