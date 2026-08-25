@@ -53,7 +53,7 @@ $tampered=Get-Content -Raw -LiteralPath $tamperPath|ConvertFrom-Json -Depth 100;
 $tampered.record_sha256=Get-MIR4ReleasePhaseSelfHash -Record $tampered -HashProperty record_sha256
 [IO.File]::WriteAllText($tamperPath,(ConvertTo-MIR4ReleasePhaseCanonicalJson $tampered)+"`n",[Text.UTF8Encoding]::new($false))
 $tamperRejected=$false
-try{$null=Invoke-T05 Verify release-seal $tamperRoot $sealAdapter $tamperInputs}catch{if($_.Exception.Message-match'^\\[mir4-release-(lifecycle-record|seal-post-assembly-mutation)\\]'){$tamperRejected=$true}else{throw}}
+try{$null=Invoke-T05 Verify release-seal $tamperRoot $sealAdapter $tamperInputs}catch{if($_.Exception.Message.StartsWith('[mir4-release-lifecycle-record]')-or$_.Exception.Message.StartsWith('[mir4-release-seal-post-assembly-mutation]')){$tamperRejected=$true}else{throw}}
 if(-not$tamperRejected){throw '[mir4-t05-post-seal-mutation-accepted]'}
 
 $promotionAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase promotion
@@ -87,7 +87,7 @@ $wrongAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase public-readback
 $wrongInputs=$inputs.PSObject.Copy();$wrongInputs.candidate_id='DEV-T05-WRONG-READBACK';$wrongRoot=Join-Path $testRoot 'readback-wrong'
 $null=Invoke-T05 Plan public-readback $wrongRoot $wrongAdapter $wrongInputs;$null=Invoke-T05 DryRun public-readback $wrongRoot $wrongAdapter $wrongInputs
 $wrongRejected=$false
-try{$null=Invoke-T05 Execute public-readback $wrongRoot $wrongAdapter $wrongInputs}catch{if($_.Exception.Message-match'^\\[mir4-public-readback-mismatch\\]'){$wrongRejected=$true}else{throw}}
+try{$null=Invoke-T05 Execute public-readback $wrongRoot $wrongAdapter $wrongInputs}catch{if($_.Exception.Message.StartsWith('[mir4-public-readback-mismatch]')){$wrongRejected=$true}else{throw}}
 if(-not$wrongRejected){throw '[mir4-t05-readback-mismatch-accepted]'}
 
 $restoreAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase restore-drill
