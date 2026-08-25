@@ -193,6 +193,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
@@ -218,6 +219,7 @@ package_excluded_modules:
       - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json
       - spec/schemas/mir4-release-phase-engine-contract-v1.schema.json
+      - spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1

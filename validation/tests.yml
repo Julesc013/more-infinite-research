@@ -1084,6 +1084,7 @@
         ".github/workflows/mir4-*.yml",
         ".mir/releases/governance/mir4/**",
         ".mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",

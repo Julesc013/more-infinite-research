@@ -8,6 +8,12 @@ $receipt=Test-MIR4PreFreezeAuthorities -RepoRoot $repo
 $rulesets=Test-MIR4RulesetSnapshot -RepoRoot $repo
 $actions=Test-MIR4ProductionActionLock -RepoRoot $repo
 if([string]$receipt.status-cne'DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED'){throw '[mir4-prefreeze-receipt-status]'}
+$evolution=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($evolution.evolved_bindings).Count-ne1-or[string]$evolution.evolved_bindings[0].path-cne'.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
+   [bool]$evolution.evolved_bindings[0].package_visible-or[bool]$evolution.evolved_bindings[0].release_authority-or
+   [string]$evolution.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)){
+  throw '[mir4-prefreeze-explicit-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

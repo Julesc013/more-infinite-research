@@ -227,6 +227,7 @@ paths:
   releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
   releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
   releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
+  releases.waves.mir4-r0-t02-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-platform-maturity-publication-contract-v2: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json

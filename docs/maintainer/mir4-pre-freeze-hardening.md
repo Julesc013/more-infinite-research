@@ -15,7 +15,7 @@ This control plane prepares dev for a future MIR 4.0.0 freeze without authorizin
 
 ## Immutable inputs
 
-The post-readiness receipt binds PR 152, its merge commit and tree, the 30-of-30 evidence gate, F210 and F200 development packages, and the package-source fingerprint. The development plan keeps those packages as rehearsal inputs only. A future release run must supply a clean frozen commit/tree and exact candidate identities; development package hashes never become release identities by implication.
+The post-readiness receipt binds PR 152, its merge commit and tree, the 30-of-30 evidence gate, F210 and F200 development packages, and the package-source fingerprint. Later changes may not silently reinterpret those bindings. The typed T02 authority-evolution receipt names the one changed workflow-contract hash, its before and after values, the current package-excluded authorities, and false release-transition flags; any unrecorded mismatch still fails closed. The development plan keeps those packages as rehearsal inputs only. A future release run must supply a clean frozen commit/tree and exact candidate identities; development package hashes never become release identities by implication.
 
 Every production workflow accepts the same eight inputs: source release record, candidate ID, source commit, source tree, target distribution record set, release-plan digest, proof root, and seal root. The dispatcher validates the exact inputs and the checked-out repository identity. At the current fixed point it does not invoke a phase adapter: every phase is registered and fail-closed, while phase-specific executor implementation, dry-run, production rehearsal, and production authorization are all separately false.
 
