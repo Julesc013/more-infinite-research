@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "835728300CA3742BC12C2044DAA77FA666D407558D377140284A0D7B66FC16AD"
+      "sha256": "47D617F34C8FA54227C3436E3806BD5E68458D09229FC7D35E941FAB23DE21C4"
     }
   ],
   "payload": {
@@ -113,7 +113,7 @@
       {
         "id": "T10",
         "scope": "Environment lock, diff, support bundle and minimizer",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T07"
         ],
@@ -133,7 +133,7 @@
       {
         "id": "T12",
         "scope": "Exact target ProcessIR preview and Inspector compare",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T10"
         ],
@@ -154,7 +154,7 @@
       {
         "id": "T14",
         "scope": "MIR4 public, contributor, maintainer and continuity documentation",
-        "state": "blocked-dependency",
+        "state": "ready",
         "blocked_by": [
           "T01",
           "T07",
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "5FBE94E81EF1D1CE1991369DA5FED717E1C1A10B67AC5B0D52C7E3A7524BF8CB"
+  "record_sha256": "24E39B329595AA3BE257CA6AE93410E5DEC89E850A9FA707D94B0169848539D9"
 }

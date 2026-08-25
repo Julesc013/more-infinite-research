@@ -243,6 +243,21 @@ fixtures:
       - forbidden-callback-and-blanket-support-rejection
       - player-package-non-interference
 
+  mir4-environment-evidence-v1:
+    requires_features: []
+    path: fixtures/mir4-environment-evidence-v1
+    shipped: false
+    validates:
+      - portable-exact-environment-digest
+      - order-independent-lock-normalization
+      - deterministic-environment-diff
+      - private-field-rejection
+      - private-value-path-rejection
+      - diagnostic-value-redaction
+      - transitive-witness-closure-minimization
+      - reproducer-signature-preservation
+      - player-package-non-interference
+
   mir4-assurance-scale-v1:
     requires_features: []
     path: fixtures/mir4-assurance-scale-v1
