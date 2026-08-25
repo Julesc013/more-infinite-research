@@ -55,7 +55,7 @@
     {"path":"spec/api/mir4-v1/compatibility.json","sha256":"2EE28E6F258BEF31F40EA7C9FE737844CF95446AF709BAC757A483C935D16F0A","hash_mode":"raw-bytes","role":"v0-to-v1-preview-compatibility-policy"},
     {"path":"spec/canonicalization/mir-canonical-json-v1.json","sha256":"4570175C876584B26529B2BA450798DF8FBCB807DA7F99904B622A80025F88A3","hash_mode":"raw-bytes","role":"mir-canonical-json-v1-authority"},
     {"path":"fixtures/mir4-canonical-json-v1/vectors.json","sha256":"0D7100B6BFDBBED805B4D16E3ACCAB6A9BC751494A7CA785C1AB83FB575AB531","hash_mode":"raw-bytes","role":"twelve-positive-sixteen-negative-vector-corpus"},
-    {"path":"tools/lib/mir4/CanonicalJsonV1.ps1","sha256":"1BB192ED81D94996FE1E4C5200AAFAF3E09D2BED9C5F49D8E6AC884A3E9201C4","hash_mode":"canonical-text-v1","role":"powershell-canonical-json-v1-reference"},
+    {"path":"tools/lib/mir4/CanonicalJsonV1.ps1","sha256":"C2B7DAA282C7B77D686B7E7E99B6B46C1930070AC3408F92FDE33198DA0F2BC4","hash_mode":"canonical-text-v1","role":"powershell-canonical-json-v1-reference"},
     {"path":"tools/lib/mir4/DiagnosticsV1.ps1","sha256":"B50FADF570E941A5420EE5D58104D47759A52A097B480BE66BFBBEF6B1D9BD0A","hash_mode":"canonical-text-v1","role":"stable-diagnostic-construction-order-renderer"},
     {"path":"spec/canonicalization/reference/mir4_canonical_json_v1.py","sha256":"AB9E11467E775036A15F8A995CC1297B5508C94EC8167F37B4D9EA08D0E8CA5D","hash_mode":"canonical-text-v1","role":"independent-python-canonical-json-v1-reference"},
     {"path":"tools/lib/mir4/ModuleEcosystem.ps1","sha256":"E9156B7524C0EC5716D6FE97495AA867A7FE3C7BFAD792F447DB9955C8DC364F","hash_mode":"canonical-text-v1","role":"v1-api-mep-domain-digest-integration"},
@@ -68,7 +68,7 @@
     {"path":"spec/schemas/preview/mir4-schema-namespace-v1.schema.json","sha256":"321E4D1C335CBC5DE91839DDDFBE332332C2B0AD9D5B9EE81A8463054405665B","hash_mode":"raw-bytes","role":"schema-namespace-registry-schema"},
     {"path":"spec/schemas/preview/mir4-diagnostic-registry-v1.schema.json","sha256":"BA6B7850511C53E0BE8D43C3B7EF3956171DB6961130DCA7F5C6A1D18C9B96C1","hash_mode":"raw-bytes","role":"stable-diagnostic-registry-schema"},
     {"path":"spec/schemas/preview/mir4-preview-compatibility-policy-v1.schema.json","sha256":"0962B312C3DD3372BAEDD05ADB2F33A292B9D6A1819B70E0B49D85B4E1366FCA","hash_mode":"raw-bytes","role":"preview-compatibility-policy-schema"},
-    {"path":"validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1","sha256":"13A3E0B8A2B46BCC8868366BEFCEC189587D1B53072D225B376D96A15D96EB6D","hash_mode":"canonical-text-v1","role":"t07-cross-runtime-contract-and-boundary-proof"},
+    {"path":"validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1","sha256":"0F5BAECEB115DD8FB0AEBE43174A7AEFE589E5F80D981AB5597FAF405DE8D02A","hash_mode":"canonical-text-v1","role":"t07-cross-runtime-contract-and-boundary-proof"},
     {"path":"spec/schemas/mir4-t07-authority-evolution-receipt-v1.schema.json","sha256":"D8964A2122DCD91577118CB43B017ED36D696FB144EB614B6EA9B51104ADEE69","hash_mode":"raw-bytes","role":"t07-authority-evolution-contract"}
   ],
   "player_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C",

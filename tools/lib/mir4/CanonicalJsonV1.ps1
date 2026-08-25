@@ -171,7 +171,12 @@ function Get-MIR4CanonicalDigestV1 {
 
 function Get-MIR4RecordDigestDomainV1 {
   param([Parameter(Mandatory)]$Value)
-  $kind = if ($Value -is [Collections.IDictionary]) { [string]$Value['kind'] } else { [string]$Value.kind }
+  $kind = ''
+  if ($Value -is [Collections.IDictionary]) {
+    if ($Value.Contains('kind')) { $kind = [string]$Value['kind'] }
+  } elseif ($null -ne $Value.PSObject.Properties['kind']) {
+    $kind = [string]$Value.kind
+  }
   switch ($kind) {
     'MIR4ApiResponseV1' { return 'mir4:api-response-v1' }
     'MIR4ExtensionEnvelopeV1' { return 'mir4:extension-envelope-v1' }

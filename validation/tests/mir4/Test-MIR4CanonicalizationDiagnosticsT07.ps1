@@ -64,6 +64,8 @@ $digestValue=[pscustomobject][ordered]@{kind='MIR4ApiResponseV1';schema=1;value=
 $apiDigest=Get-MIR4CanonicalDigestV1 -Value $digestValue -Domain 'mir4:api-response-v1' -OmitTopLevelDigest
 $mepDigest=Get-MIR4CanonicalDigestV1 -Value $digestValue -Domain 'mir4:extension-envelope-v1' -OmitTopLevelDigest
 if($apiDigest-ceq$mepDigest-or$apiDigest-notmatch'^sha256:[0-9a-f]{64}$'){throw '[mir4-t07-domain-separation]'}
+$untypedDomain=& { Set-StrictMode -Version Latest; Get-MIR4RecordDigestDomainV1 -Value ([pscustomobject][ordered]@{schema=1;value='untyped'}) }
+if($untypedDomain-cne'mir4:module-value-v1'){throw '[mir4-t07-untyped-record-domain]'}
 Test-MIR4CanonicalTimestampV1 '2026-08-26T00:00:00Z'|Out-Null
 Test-MIR4CanonicalTargetIdV1 'f210'|Out-Null
 foreach($bad in @('2026-08-26T00:00:00+10:00','2026-08-26T00:00:00.000Z')){
