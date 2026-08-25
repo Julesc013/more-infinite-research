@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MIR4CanonicalJsonContractV1",
+  "identifier": "mir-canonical-json/1",
+  "schema_namespace": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/",
+  "encoding": {
+    "name": "UTF-8",
+    "bom_allowed": false,
+    "invalid_sequences": "reject"
+  },
+  "unicode": {
+    "normalization": "NFC",
+    "applies_to": ["property-names", "string-values"],
+    "unpaired_surrogates": "reject",
+    "normalized_property_collision": "reject"
+  },
+  "objects": {
+    "property_order": "ascending-UTF-16-code-unit-order",
+    "duplicate_properties": "reject"
+  },
+  "arrays": {
+    "generic_order": "preserve",
+    "set_like_fields": "producer-must-sort-ordinal-and-deduplicate-before-canonicalization",
+    "extension_closure_order": "dependency-topological-then-extension-id-ordinal",
+    "diagnostic_order": "severity-then-registry-order-then-code-then-path"
+  },
+  "numbers": {
+    "grammar": "-?(0|[1-9][0-9]*)",
+    "minimum": -9007199254740991,
+    "maximum": 9007199254740991,
+    "negative_zero": "reject",
+    "fractional_and_exponent_forms": "reject",
+    "non_finite": "reject"
+  },
+  "strings": {
+    "escaping": "JSON-short-escapes-where-defined-otherwise-lowercase-u00xx-for-controls",
+    "solidus_escaped": false,
+    "non_ascii": "literal-UTF-8"
+  },
+  "timestamps": {
+    "grammar": "yyyy-MM-ddTHH:mm:ssZ",
+    "timezone": "UTC",
+    "fractional_seconds": "reject"
+  },
+  "target_ids": {
+    "grammar": "^f[0-9]{3}$",
+    "case": "lowercase"
+  },
+  "unavailable_values": {
+    "representation": "explicit-status-reason-evidence",
+    "null_or_zero_substitution": "forbidden",
+    "page_total": null,
+    "page_returned": 0
+  },
+  "digests": {
+    "algorithm": "SHA-256",
+    "format": "sha256:<64-lowercase-hex>",
+    "input": "UTF8('mir-canonical-json/1' + NUL + domain + NUL + canonical-json)",
+    "top_level_digest_field": "omitted",
+    "domain_grammar": "^mir4:[a-z0-9][a-z0-9.:-]{0,95}$",
+    "domains": {
+      "MIR4ApiResponseV1": "mir4:api-response-v1",
+      "MIR4ExtensionEnvelopeV1": "mir4:extension-envelope-v1",
+      "MIR4PlatformLockV1": "mir4:platform-lock-v1",
+      "untyped_module_values": "mir4:module-value-v1",
+      "other_records": "mir4:record:<lowercase-kind>"
+    }
+  },
+  "limits": {
+    "maximum_depth": 64,
+    "maximum_safe_integer": 9007199254740991
+  }
+}

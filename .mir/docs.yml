@@ -292,6 +292,17 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - generated-mir4-api-sdk-v1-reference
+  - path: docs/reference/mir4-canonical-json-v1.md
+    title: "MIR Canonical JSON V1"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-canonical-json-v1-contract
+      - mir4-permanent-schema-namespace
+      - mir4-stable-diagnostic-registry
+      - mir4-v0-v1-compatibility-policy
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

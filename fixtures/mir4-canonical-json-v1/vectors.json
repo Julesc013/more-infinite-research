@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "MIR4CanonicalJsonVectorsV1",
+  "canonicalization": "mir-canonical-json/1",
+  "positive": [
+    {"id":"positive-object-order","input_json":"{\"b\":2,\"a\":1}","canonical_json":"{\"a\":1,\"b\":2}"},
+    {"id":"positive-nested-order","input_json":"{\"z\":{\"b\":false,\"a\":true},\"a\":null}","canonical_json":"{\"a\":null,\"z\":{\"a\":true,\"b\":false}}"},
+    {"id":"positive-array-order","input_json":"{\"items\":[3,1,2]}","canonical_json":"{\"items\":[3,1,2]}"},
+    {"id":"positive-unicode-value-nfc","input_json":"{\"text\":\"e\\u0301\"}","canonical_json":"{\"text\":\"é\"}"},
+    {"id":"positive-unicode-key-nfc","input_json":"{\"e\\u0301\":1}","canonical_json":"{\"é\":1}"},
+    {"id":"positive-short-escapes","input_json":"{\"x\":\"\\b\\t\\n\\f\\r\\\"\\\\\"}","canonical_json":"{\"x\":\"\\b\\t\\n\\f\\r\\\"\\\\\"}"},
+    {"id":"positive-zero","input_json":"0","canonical_json":"0"},
+    {"id":"positive-negative-integer","input_json":"-42","canonical_json":"-42"},
+    {"id":"positive-maximum-safe-integer","input_json":"9007199254740991","canonical_json":"9007199254740991"},
+    {"id":"positive-minimum-safe-integer","input_json":"-9007199254740991","canonical_json":"-9007199254740991"},
+    {"id":"positive-primitives","input_json":"[true,false,null,\"text\"]","canonical_json":"[true,false,null,\"text\"]"},
+    {"id":"positive-ordinal-case","input_json":"{\"z\":0,\"Z\":1,\"a\":2,\"A\":3}","canonical_json":"{\"A\":3,\"Z\":1,\"a\":2,\"z\":0}"}
+  ],
+  "negative": [
+    {"id":"negative-fraction","input_json":"{\"x\":1.5}","diagnostic":"mir4-canon-unsupported-number"},
+    {"id":"negative-exponent","input_json":"{\"x\":1e3}","diagnostic":"mir4-canon-unsupported-number"},
+    {"id":"negative-zero","input_json":"{\"x\":-0}","diagnostic":"mir4-canon-negative-zero"},
+    {"id":"negative-too-large","input_json":"9007199254740992","diagnostic":"mir4-canon-unsafe-integer"},
+    {"id":"negative-too-small","input_json":"-9007199254740992","diagnostic":"mir4-canon-unsafe-integer"},
+    {"id":"negative-leading-zero","input_json":"{\"x\":01}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-nan","input_json":"{\"x\":NaN}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-infinity","input_json":"{\"x\":Infinity}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-duplicate-key","input_json":"{\"x\":1,\"x\":2}","diagnostic":"mir4-canon-duplicate-key"},
+    {"id":"negative-normalized-key-collision","input_json":"{\"é\":1,\"e\\u0301\":2}","diagnostic":"mir4-canon-unicode-key-collision"},
+    {"id":"negative-bom","input_json":"\ufeff{}","diagnostic":"mir4-canon-utf8-bom"},
+    {"id":"negative-trailing-data","input_json":"{}{}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-comment","input_json":"{/*x*/}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-trailing-comma","input_json":"{\"x\":1,}","diagnostic":"mir4-canon-invalid-json"},
+    {"id":"negative-unpaired-surrogate","input_json":"{\"x\":\"\\ud800\"}","diagnostic":"mir4-canon-invalid-unicode"},
+    {"id":"negative-depth","input_json":"[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]","diagnostic":"mir4-canon-depth"}
+  ]
+}

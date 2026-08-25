@@ -10,5 +10,5 @@
 ---@field namespace string
 ---@field targets string[]
 ---@field fragments MIR4FragmentV1[]
----@field canonicalization 'mir-canonical-json-v0'
+---@field canonicalization 'mir-canonical-json/1'
 ---@field digest string

@@ -4,6 +4,10 @@
   "programme_id": "M4C02-09-24H",
   "wave": "W05",
   "maturity": "developer-preview",
+  "canonicalization": "mir-canonical-json/1",
+  "schema_namespace": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/",
+  "diagnostic_registry": "spec/api/mir4-v1/diagnostics.json",
+  "compatibility_policy": "spec/api/mir4-v1/compatibility.json",
   "semantic_authority": false,
   "player_package_mutation_authorized": false,
   "prototype_write_authorized": false,
@@ -19,7 +23,12 @@
     ".mir/module-dependencies.json",
     ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json",
     ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
-    "spec/api/mir4-v1/contracts.json"
+    "spec/api/mir4-v1/contracts.json",
+    "spec/api/mir4-v1/schema-namespace.json",
+    "spec/api/mir4-v1/diagnostics.json",
+    "spec/api/mir4-v1/compatibility.json",
+    "spec/canonicalization/mir-canonical-json-v1.json",
+    "fixtures/mir4-canonical-json-v1/vectors.json"
   ],
   "fragment_kinds": [
     "CompatibilityFragment",

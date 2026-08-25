@@ -235,6 +235,7 @@ paths:
   releases.waves.mir4-r0-t05-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-release-fault-corpus: .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
   releases.waves.mir4-r0-t06-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t07-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-platform-maturity-publication-contract-v2: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json

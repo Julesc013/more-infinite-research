@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import Any, Generic, Optional, TypeVar
 T = TypeVar("T")
+CANONICALIZATION = "mir-canonical-json/1"
 @dataclass(frozen=True)
 class Availability:
     status: str

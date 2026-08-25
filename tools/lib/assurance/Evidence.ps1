@@ -980,8 +980,15 @@ function Write-MIRAssuranceWorkerReceipt {
     throw "Cannot write a worker receipt without the plan's coordination producer for '$([string]$Test.id)'."
   }
   $receiptProducer = Get-MIRAssuranceProducer
+  $receiptProducerSha256 = Get-MIRAssuranceJsonHash -Value $receiptProducer
+  $evidenceProducerSha256 = Get-MIRAssuranceJsonHash -Value $Capsule.producer
+  $evidenceDisposition = if ($receiptProducerSha256 -eq $evidenceProducerSha256) {
+    "produced-by-worker"
+  } else {
+    "adopted-exact-trusted-capsule"
+  }
   $receipt = [ordered]@{
-    schema="mir-assurance-worker-receipt-v2"
+    schema="mir-assurance-worker-receipt-v3"
     plan=[ordered]@{
       material_sha256=$planMaterialSha256
       required_test_set_sha256=[string]$Plan.required_test_set_sha256
@@ -1008,6 +1015,7 @@ function Write-MIRAssuranceWorkerReceipt {
     }
     producer=$receiptProducer
     evidence_producer=$Capsule.producer
+    evidence_disposition=$evidenceDisposition
     completed_at=(ConvertTo-MIRAssuranceTimestampText -Value $Capsule.completed_at)
   }
   $receiptPath = Join-Path $paths.root "worker-receipts\$planMaterialSha256.json"
@@ -1037,7 +1045,7 @@ function Read-MIRAssuranceWorkerObject {
   catch { throw "Worker artifact for '$([string]$Test.id)' has an invalid worker receipt." }
   $expectedSafeId = ([string]$Test.id) -replace '[^A-Za-z0-9._-]', '_'
   $receiptMismatches = [Collections.Generic.List[string]]::new()
-  if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v2") { $receiptMismatches.Add("schema") }
+  if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v3") { $receiptMismatches.Add("schema") }
   if ([string]$receipt.plan.material_sha256 -ne [string]$Plan.plan_material_sha256) { $receiptMismatches.Add("plan-material") }
   if ([string]$receipt.plan.required_test_set_sha256 -ne [string]$Plan.required_test_set_sha256) { $receiptMismatches.Add("required-test-set") }
   $receiptGeneratedAt = ConvertTo-MIRAssuranceDateTimeOffset -Value $receipt.plan.generated_at
@@ -1060,7 +1068,14 @@ function Read-MIRAssuranceWorkerObject {
   if ([string]$receipt.result.capsule_sha256 -notmatch '^[A-Fa-f0-9]{64}$') { $receiptMismatches.Add("capsule-digest") }
   if (-not (Test-MIRAssuranceTrustedProducer -Producer $receipt.producer -Context $Context)) { $receiptMismatches.Add("receipt-trust-context") }
   if (-not (Test-MIRAssuranceTrustedProducer -Producer $receipt.evidence_producer -Context $Context)) { $receiptMismatches.Add("evidence-trust-context") }
-  if ((Get-MIRAssuranceJsonHash -Value $receipt.producer) -ne (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)) { $receiptMismatches.Add("worker-producer-binding") }
+  $receiptProducerSha256 = Get-MIRAssuranceJsonHash -Value $receipt.producer
+  $evidenceProducerSha256 = Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer
+  $expectedEvidenceDisposition = if ($receiptProducerSha256 -eq $evidenceProducerSha256) {
+    "produced-by-worker"
+  } else {
+    "adopted-exact-trusted-capsule"
+  }
+  if ([string]$receipt.evidence_disposition -ne $expectedEvidenceDisposition) { $receiptMismatches.Add("evidence-disposition") }
   foreach ($field in @("repository", "workflow", "run_id", "run_attempt", "job", "commit", "ref", "event", "trust_class")) {
     if ([string]::IsNullOrWhiteSpace([string]$receipt.producer.$field)) { $receiptMismatches.Add("receipt-producer-$field") }
   }
@@ -1304,7 +1319,7 @@ function Import-MIRAssuranceWorkerEvidence {
       continue
     }
     $receiptTestId = [string]$receipt.work.test_id
-    if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v2" -or
+    if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v3" -or
         [string]$receipt.plan.material_sha256 -ne [string]$Plan.plan_material_sha256 -or
         -not $expectedRows.ContainsKey($receiptTestId)) {
       $matchedExpected = @($work | Where-Object { $directory.Name -eq "$ArtifactPrefix$([string]$_.safe_test_id)" })

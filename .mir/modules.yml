@@ -91,9 +91,32 @@ package_excluded_modules:
     legacy_generated_root: sdk/experimental/mir4
     boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
     stability: developer-preview-may-change-before-1.0
+  mir4_canonical_json_v1:
+    authority: spec/canonicalization/mir-canonical-json-v1.json
+    schema_namespace: spec/api/mir4-v1/schema-namespace.json
+    diagnostic_registry: spec/api/mir4-v1/diagnostics.json
+    compatibility_policy: spec/api/mir4-v1/compatibility.json
+    implementations:
+      - tools/lib/mir4/CanonicalJsonV1.ps1
+      - tools/lib/mir4/DiagnosticsV1.ps1
+      - spec/canonicalization/reference/mir4_canonical_json_v1.py
+    schemas:
+      - spec/schemas/preview/mir4-canonical-json-v1.schema.json
+      - spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json
+      - spec/schemas/preview/mir4-schema-namespace-v1.schema.json
+      - spec/schemas/preview/mir4-diagnostic-registry-v1.schema.json
+      - spec/schemas/preview/mir4-preview-compatibility-policy-v1.schema.json
+    fixtures: fixtures/mir4-canonical-json-v1
+    documentation: docs/reference/mir4-canonical-json-v1.md
+    boundary: package-excluded deterministic data representation, permanent schema identity, stable diagnostic lookup, and explicit preview migration only; no player-package mutation, compiler or emitter authority, release transition, signing, publication, or public support claim
+    stability: stable-v1-canonicalization-and-diagnostic-authority-with-preview-consumer-contracts
   mir4_module_ecosystem_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
     api_contracts: spec/api/mir4-v1/contracts.json
+    canonicalization: spec/canonicalization/mir-canonical-json-v1.json
+    schema_namespace: spec/api/mir4-v1/schema-namespace.json
+    diagnostic_registry: spec/api/mir4-v1/diagnostics.json
+    compatibility_policy: spec/api/mir4-v1/compatibility.json
     implementation: tools/lib/mir4/ModuleEcosystem.ps1
     generator: tools/lib/mir4/ExperimentalApiSdk.ps1
     builder: tools/commands/mir4/Invoke-MIR4Extension.ps1
@@ -199,6 +222,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
@@ -232,6 +256,7 @@ package_excluded_modules:
       - spec/schemas/mir4-t05-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-fault-corpus-v1.schema.json
       - spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t07-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
       - spec/schemas/mir4-release-target-build-result-v1.schema.json
       - spec/schemas/mir4-release-target-qualification-result-v1.schema.json
@@ -251,6 +276,7 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
       - validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
+      - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority

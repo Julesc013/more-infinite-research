@@ -197,6 +197,11 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   $cycleA = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json);$cycleA.extension_id='org.example.cycle-a';$cycleA.namespace='org.example.cycle-a';$cycleA.fragments[5].data.extension_id='org.example.cycle-b';$cycleA.digest='';$cycleA.digest=Get-MIR4ModuleDigest $cycleA
   $cycleB = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json);$cycleB.extension_id='org.example.cycle-b';$cycleB.namespace='org.example.cycle-b';$cycleB.fragments[5].data.extension_id='org.example.cycle-a';$cycleB.digest='';$cycleB.digest=Get-MIR4ModuleDigest $cycleB
   $files = [ordered]@{}
+  $files['sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/mir4/CanonicalJsonV1.ps1')
+  $files['sdk/preview/mir4/canonical-json-v1/python/mir4_canonical_json_v1.py'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/canonicalization/reference/mir4_canonical_json_v1.py')
+  $files['sdk/preview/mir4/api-v1/diagnostics.json'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/api/mir4-v1/diagnostics.json')
+  $files['sdk/preview/mir4/api-v1/compatibility.json'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/api/mir4-v1/compatibility.json')
+  $files['sdk/preview/mir4/api-v1/schema-namespace.json'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/api/mir4-v1/schema-namespace.json')
   $files['spec/schemas/preview/mir4-mep-v1.schema.json'] = (ConvertTo-MIR4ModuleCanonicalJson $mepSchema)+"`n"
   $files['spec/schemas/preview/mir4-api-v1-response.schema.json'] = (ConvertTo-MIR4ModuleCanonicalJson $apiSchema)+"`n"
   $files['sdk/preview/mir4/mep-v1/json-schema/mir4-mep-v1.schema.json'] = $files['spec/schemas/preview/mir4-mep-v1.schema.json']
@@ -245,13 +250,13 @@ return M
 ---@field namespace string
 ---@field targets string[]
 ---@field fragments MIR4FragmentV1[]
----@field canonicalization 'mir-canonical-json-v0'
+---@field canonicalization 'mir-canonical-json/1'
 ---@field digest string
 '@
   $files['sdk/preview/mir4/api-v1/typescript/index.ts'] = @'
 export type Availability = {status: "available" | "unavailable"; reason: string; evidence: string[]};
 export type ApiSurface = "host-manifest"|"query"|"profile"|"observation"|"tooling"|"target-provider-abi"|"proof"|"release"|"continuity-bundle";
-export interface Mir4ApiResponse<T=unknown>{kind:"MIR4ApiResponseV1";schema:1;surface:ApiSurface;target:{id:string;factorio_line:string;transport:string};versions:{source:string;distribution:string};capabilities:string[];availability:Availability;page:{offset:number;limit:number;returned:number;total:number|null;next_cursor:string|null};items:T[];canonicalization:"mir-canonical-json-v0";extensions:Record<string,unknown>;source_identity:unknown;package_visible:false;mutation_authorized:false;public_support_claim:false;digest:string}
+export interface Mir4ApiResponse<T=unknown>{kind:"MIR4ApiResponseV1";schema:1;surface:ApiSurface;target:{id:string;factorio_line:string;transport:string};versions:{source:string;distribution:string};capabilities:string[];availability:Availability;page:{offset:number;limit:number;returned:number;total:number|null;next_cursor:string|null};items:T[];canonicalization:"mir-canonical-json/1";extensions:Record<string,unknown>;source_identity:unknown;package_visible:false;mutation_authorized:false;public_support_claim:false;digest:string}
 export function unavailable(response:Mir4ApiResponse):boolean{return response.availability.status === "unavailable"}
 '@
   $files['sdk/preview/mir4/api-v1/python/mir4_api_v1.py'] = @'
@@ -259,6 +264,7 @@ export function unavailable(response:Mir4ApiResponse):boolean{return response.av
 from dataclasses import dataclass
 from typing import Any, Generic, Optional, TypeVar
 T = TypeVar("T")
+CANONICALIZATION = "mir-canonical-json/1"
 @dataclass(frozen=True)
 class Availability:
     status: str
@@ -302,7 +308,7 @@ Test-MIR4MepV1Envelope -Envelope $result -RepoRoot $RepoRoot|Out-Null
 -- V0 to V1 migration is intentionally structural and data-only.
 return function(v0)
   assert(v0.kind == 'MIR4ExtensionEnvelopeV0' and v0.schema == 0, 'mir4-mep-migrate-source')
-  return {kind='MIR4ExtensionEnvelopeV1',schema=1,extension_id=v0.extension_id,extension_version='0.0.0-migrated',namespace=v0.extension_id,targets=v0.targets,fragments=v0.fragments,canonicalization='mir-canonical-json-v0',digest='RECOMPUTE-WITH-CANONICAL-JSON'}
+  return {kind='MIR4ExtensionEnvelopeV1',schema=1,extension_id=v0.extension_id,extension_version='0.0.0-migrated',namespace=v0.extension_id,targets=v0.targets,fragments=v0.fragments,canonicalization='mir-canonical-json/1',digest='RECOMPUTE-WITH-MIR-CANONICAL-JSON-1'}
 end
 '@
   $files['sdk/preview/mir4/reference-extension-v1/extension.json']=(ConvertTo-MIR4ModuleCanonicalJson $reference)+"`n"
@@ -332,6 +338,8 @@ superseded_by: []
 # MIR 4 API and SDK V1 Preview
 
 Generated from `spec/api/mir4-v1/contracts.json` and the W05 module-ecosystem authority. The nine APIs return copied, bounded, paginated, capability-labelled data. Unavailability is an explicit status with a reason and evidence; it is never reported as a numeric zero.
+
+V1 records use the permanent `https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/` namespace and `mir-canonical-json/1`: NFC UTF-8 without a BOM, ordinal object keys, preserved generic array order, signed safe integers only, canonical target and timestamp forms, and domain-separated SHA-256 digests. V0 is accepted only by explicit migration readers and is never emitted as V1.
 
 Bindings are provided for JSON Schema, Lua with LuaLS annotations, TypeScript, Python, and PowerShell. The reference extension and fixtures exercise all 12 fragment kinds. Use `tools/mir.ps1 mir4 extension` for init, validate, explain, test, package, and migrate commands.
 
