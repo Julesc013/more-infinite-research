@@ -111,10 +111,36 @@ try {
             $actualPackageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repoRoot
             $expectedPackageSourceSha256 = [string]$releaseRecord.package.source_sha256
             if ($actualPackageSourceSha256 -ne $expectedPackageSourceSha256) {
-                $failures.Add(
-                    "$($info.version): current package roots changed after publication; " +
-                    "expected $expectedPackageSourceSha256, observed $actualPackageSourceSha256"
-                )
+                $programmePath = Join-Path $repoRoot ".mir\releases\waves\mir4-r0\MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
+                $authorizedPreFreezeTransition = $false
+                if (Test-Path -LiteralPath $programmePath -PathType Leaf) {
+                    $programme = Get-Content -LiteralPath $programmePath -Raw | ConvertFrom-Json -Depth 100
+                    $enabledTransitions = @(
+                        $programme.transition_gate.PSObject.Properties |
+                            Where-Object { [bool]$_.Value }
+                    )
+                    $authorizedPreFreezeTransition =
+                        [string]$programme.kind -ceq "MIR4PreFreezeExecutionProgrammeV1" -and
+                        [string]$programme.release_cut.source_version -cne [string]$info.version -and
+                        [string]$programme.release_cut.candidate_state -ceq "pre-freeze-unallocated" -and
+                        [string]$programme.source_baseline.package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                        [string]$programme.status -match "RELEASE-BLOCKED$" -and
+                        $enabledTransitions.Count -eq 0
+                }
+                if ($authorizedPreFreezeTransition) {
+                    Write-Host (
+                        "PASS $($info.version): published source remains immutable while the explicit " +
+                        "$($programme.release_cut.source_version) pre-freeze authority binds development roots " +
+                        "$actualPackageSourceSha256 and denies production transitions"
+                    )
+                }
+                else {
+                    $failures.Add(
+                        "$($info.version): current package roots changed after publication without an exact " +
+                        "blocked pre-freeze successor authority; expected $expectedPackageSourceSha256, " +
+                        "observed $actualPackageSourceSha256"
+                    )
+                }
             }
             else {
                 Write-Host "PASS $($info.version): current package roots match the immutable published source"

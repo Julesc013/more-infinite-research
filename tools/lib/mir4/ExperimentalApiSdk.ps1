@@ -182,6 +182,7 @@ return M
 function Get-MIR4ModuleEcosystemSdkFiles {
   param([Parameter(Mandatory)][string]$RepoRoot)
   . (Join-Path $RepoRoot 'tools/lib/mir4/ModuleEcosystem.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/mir4/SdkV1.ps1')
   $authority = Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot
   $mepSchema = Get-MIR4MepV1Schema -Authority $authority
   $apiSchema = Get-MIR4ApiV1Schema -Authority $authority
@@ -190,6 +191,7 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   $transport = New-MIR4TargetTransportPlanV1 -RepoRoot $RepoRoot
   $apiAvailable = New-MIR4ApiV1Response -RepoRoot $RepoRoot -Surface query -Target f210 -Items @([ordered]@{id='alpha';status='known'},[ordered]@{id='beta';status='known'}) -Limit 1 -Evidence @('vector:available')
   $apiUnavailable = New-MIR4ApiV1Response -RepoRoot $RepoRoot -Surface observation -Target f012 -Availability unavailable -Reason 'The museum target has no admitted observation transport.' -Evidence @('target:f012','admission:BLOCKED_WITH_EVIDENCE')
+  $sdkV1Corpus = New-MIR4SdkV1ConformanceCorpus -RepoRoot $RepoRoot
   $forbidden = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json)
   $forbidden.fragments[0].data | Add-Member -NotePropertyName callback -NotePropertyValue 'forbidden'
   $missing = (($reference | ConvertTo-Json -Depth 100) | ConvertFrom-Json)
@@ -295,6 +297,44 @@ function Test-MIR4ApiV1Availability {
 function Copy-MIR4ApiV1Data { param([AllowNull()]$Value) if($null-eq$Value){return $null};return (($Value|ConvertTo-Json -Depth 100 -Compress)|ConvertFrom-Json) }
 Export-ModuleMember -Function Test-MIR4ApiV1Availability,Copy-MIR4ApiV1Data
 '@
+  foreach($binding in @(
+    @{path='sdk/preview/mir4/api-v1/typescript/index.mjs';template='tools/templates/mir4/sdk-v1/typescript/index.mjs'},
+    @{path='sdk/preview/mir4/api-v1/typescript/index.ts';template='tools/templates/mir4/sdk-v1/typescript/index.ts'},
+    @{path='sdk/preview/mir4/api-v1/typescript/package.json';template='tools/templates/mir4/sdk-v1/typescript/package.json'},
+    @{path='sdk/preview/mir4/api-v1/python/mir4_api_v1.py';template='tools/templates/mir4/sdk-v1/python/mir4_api_v1.py'},
+    @{path='sdk/preview/mir4/api-v1/powershell/MIR4.Api.V1.psm1';template='tools/templates/mir4/sdk-v1/powershell/MIR4.Api.V1.psm1'},
+    @{path='sdk/preview/mir4/api-v1/lua/mir4_api_v1.lua';template='tools/templates/mir4/sdk-v1/lua/mir4_api_v1.lua'},
+    @{path='sdk/preview/mir4/api-v1/lua/mir4_api_v1.luals.lua';template='tools/templates/mir4/sdk-v1/lua/mir4_api_v1.luals.lua'},
+    @{path='sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1';template='tools/templates/mir4/sdk-v1/conformance/Invoke-MIR4SdkV1Conformance.ps1'}
+  )){$files[$binding.path]=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $binding.template)}
+  $files['sdk/preview/mir4/api-v1/conformance/corpus.json']=(ConvertTo-MIR4ModuleCanonicalJson $sdkV1Corpus)+"`n"
+  $files['sdk/preview/mir4/api-v1/package-metadata.json']=(ConvertTo-MIR4ModuleCanonicalJson ([ordered]@{
+    schema=1;kind='MIR4ApiSdkV1PackageMetadata';name='mir4-api-sdk-v1-preview';version='4.0.0-preview'
+    maturity='developer-preview';license='MPL-2.0';canonicalization='mir-canonical-json/1'
+    bindings=@('lua','powershell','python','typescript')
+    operations=@('parse','validate','canonicalize','digest','capability-negotiation','availability-decoding','bounded-pagination','snapshot-comparison','diagnostic-rendering','extension-validation','manifest-verification','archive-verification')
+    conformance=[ordered]@{positive=12;negative=18;accept_reject_identity=$true;canonical_byte_identity=$true;digest_identity=$true}
+    package_visible=$false;publication_authorized=$false
+  }))+"`n"
+  $files['sdk/preview/mir4/api-v1/examples/read-response.ps1']=@'
+param([Parameter(Mandatory)][string]$Path)
+Import-Module (Join-Path $PSScriptRoot '../powershell/MIR4.Api.V1.psm1') -Force
+$response=ConvertFrom-MIR4ApiV1Json -Json (Get-Content -Raw -LiteralPath $Path)
+Test-MIR4ApiV1Response $response|Out-Null
+$availability=Get-MIR4ApiV1Availability $response
+[pscustomobject]@{target=$response.target.id;surface=$response.surface;available=$availability.available;items=@($response.items).Count;digest=$response.digest}
+'@
+  $files['sdk/preview/mir4/api-v1/examples/read_response.py']=@'
+import argparse
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "python"))
+import mir4_api_v1 as mir4
+parser=argparse.ArgumentParser();parser.add_argument("path",type=Path);args=parser.parse_args()
+response=mir4.validate(mir4.parse(args.path.read_text(encoding="utf-8")))
+print({"target":response["target"]["id"],"surface":response["surface"],"available":mir4.decode_availability(response)["available"],"items":len(response["items"]),"digest":response["digest"]})
+'@
+  $files['sdk/preview/mir4/api-v1/examples/README.md']="# MIR 4 API V1 examples`n`nThe PowerShell and Python readers parse, validate, decode availability, and report the immutable response digest. Run them against files in ../vectors. Neither example mutates the player package or grants release authority.`n"
   $files['sdk/preview/mir4/mep-v1/migration/Convert-MIR4MepV0ToV1.ps1'] = @'
 param([Parameter(Mandatory)][string]$InputPath,[Parameter(Mandatory)][string]$OutputPath,[Parameter(Mandatory)][string]$RepoRoot)
 $ErrorActionPreference='Stop'
@@ -331,7 +371,7 @@ applies_to: "4.0 developer preview"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
 ---
@@ -341,7 +381,9 @@ Generated from `spec/api/mir4-v1/contracts.json` and the W05 module-ecosystem au
 
 V1 records use the permanent `https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/` namespace and `mir-canonical-json/1`: NFC UTF-8 without a BOM, ordinal object keys, preserved generic array order, signed safe integers only, canonical target and timestamp forms, and domain-separated SHA-256 digests. V0 is accepted only by explicit migration readers and is never emitted as V1.
 
-Bindings are provided for JSON Schema, Lua with LuaLS annotations, TypeScript, Python, and PowerShell. The reference extension and fixtures exercise all 12 fragment kinds. Use `tools/mir.ps1 mir4 extension` for init, validate, explain, test, package, and migrate commands.
+Bindings are provided for JSON Schema, Lua with LuaLS annotations, TypeScript/Node, Python, and PowerShell. Every language binding exposes parse, validate, canonicalize, digest, capability negotiation, availability decoding, bounded pagination, snapshot comparison, diagnostic rendering, extension validation, and manifest/archive verification. Lua uses explicit host ports for canonical JSON, SHA-256, and archive entry I/O because the Factorio sandbox has no general filesystem or ZIP authority.
+
+The generated conformance corpus contains 12 positive and 18 negative cases. PowerShell, Python, and Node must produce identical canonical bytes, digests, and accept/reject sets. The same conformance runner operates from a clean extracted archive. The reference extension and fixtures exercise all 12 fragment kinds. Use `tools/mir.ps1 mir4 extension` for init, validate, explain, test, package, and migrate commands.
 
 This is package-excluded developer-preview tooling. `BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER` remains open because no governed exact IR4 consumer closure is local.
 '@

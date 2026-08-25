@@ -251,14 +251,30 @@ function Get-MIRAssuranceInputFingerprint {
         throw "Unable to resolve the staged compact source-lock authority for release-history fingerprinting."
       }
       $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
+      $successorAuthority = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
+      )
+      if ([int]$successorAuthority.file_count -ne 1) {
+        throw "Unable to resolve the staged pre-freeze successor authority for release-history fingerprinting."
+      }
+      $packageFiles = @(Get-MIRAssurancePackageFiles)
+      $packageSource = [ordered]@{
+        kind="package-source"
+        file_count=$packageFiles.Count
+        sha256=(Get-MIRAssuranceTreeHash -Paths $packageFiles)
+      }
       $material = [ordered]@{
         source_lock=$sourceLock
         inventory=$inventory
+        successor_authority=$successorAuthority
+        package_source=$packageSource
       }
       return [ordered]@{
         kind="release-history"
         source_lock=$sourceLock
         inventory=$inventory
+        successor_authority=$successorAuthority
+        package_source=$packageSource
         sha256=(Get-MIRAssuranceJsonHash -Value $material)
       }
     }

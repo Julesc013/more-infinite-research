@@ -722,6 +722,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     "golden-plans",
     "mir4-api-v0",
     "mir4-assurance-scale-v1",
+    "mir4-canonical-json-v1",
     "mir4-historical-succession-v1",
     "mir4-inspector-compatibility-v1",
     "mir4-mep-v0",

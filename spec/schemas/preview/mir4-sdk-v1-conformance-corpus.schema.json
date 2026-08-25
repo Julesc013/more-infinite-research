@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/sdk-conformance-corpus.schema.json",
+  "title": "MIR 4 SDK V1 conformance corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","canonicalization","positive","negative","requirements"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SdkV1ConformanceCorpus"},
+    "canonicalization": {"const": "mir-canonical-json/1"},
+    "positive": {
+      "type": "array", "minItems": 12,
+      "items": {"type":"object","additionalProperties":false,"required":["id","input_json","canonical_json","digest"],"properties":{"id":{"type":"string"},"input_json":{"type":"string"},"canonical_json":{"type":"string"},"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}}}
+    },
+    "negative": {
+      "type": "array", "minItems": 16,
+      "items": {"type":"object","additionalProperties":false,"required":["id","input_json","diagnostic"],"properties":{"id":{"type":"string"},"input_json":{"type":"string"},"diagnostic":{"type":"string"}}}
+    },
+    "requirements": {"type":"object"}
+  }
+}

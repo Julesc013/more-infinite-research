@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/control/t08-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T08 authority evolution receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","recorded_at","programme_id","turn","predecessor_receipt","evolved_bindings","current_authorities","conformance","player_package_source_sha256","transition_gate","status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T08AuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type":"string","format":"date-time"},
+    "programme_id": {"const":"M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const":"T08"},
+    "predecessor_receipt": {
+      "type":"object","additionalProperties":false,"required":["path","sha256"],
+      "properties":{"path":{"const":".mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json"},"sha256":{"$ref":"#/$defs/sha256"}}
+    },
+    "evolved_bindings": {
+      "type":"array","minItems":4,"maxItems":4,
+      "allOf":[
+        {"contains":{"type":"object","properties":{"path":{"const":".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"}},"required":["path"]}},
+        {"contains":{"type":"object","properties":{"path":{"const":"tools/lib/mir4/PreFreezeRelease.ps1"}},"required":["path"]}},
+        {"contains":{"type":"object","properties":{"path":{"const":"tools/lib/mir4/ExperimentalApiSdk.ps1"}},"required":["path"]}},
+        {"contains":{"type":"object","properties":{"path":{"const":"tools/lib/mir4/PlatformPreview.ps1"}},"required":["path"]}}
+      ],
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["path","previous_sha256","current_sha256","reason","scope","package_visible","release_authority"],
+        "properties":{
+          "path":{"enum":[".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json","tools/lib/mir4/PreFreezeRelease.ps1","tools/lib/mir4/ExperimentalApiSdk.ps1","tools/lib/mir4/PlatformPreview.ps1"]},
+          "previous_sha256":{"$ref":"#/$defs/sha256"},"current_sha256":{"$ref":"#/$defs/sha256"},"reason":{"type":"string","minLength":1},
+          "scope":{"const":"package-excluded-control-plane"},"package_visible":{"const":false},"release_authority":{"const":false}
+        }
+      }
+    },
+    "current_authorities": {
+      "type":"array","minItems":40,
+      "items":{"type":"object","additionalProperties":false,"required":["path","sha256","hash_mode","role"],"properties":{"path":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/sha256"},"hash_mode":{"enum":["raw-bytes","canonical-text-v1"]},"role":{"type":"string","minLength":1}}}
+    },
+    "conformance": {
+      "type":"object","additionalProperties":false,
+      "required":["positive","negative","powershell","python","node_policy","identical_canonical_bytes","identical_digests","identical_accept_reject","clean_extracted_archive","deterministic_archive"],
+      "properties":{
+        "positive":{"type":"integer","minimum":12},"negative":{"type":"integer","minimum":16},
+        "powershell":{"const":"passed"},"python":{"const":"passed"},"node_policy":{"enum":["passed","required-when-runtime-present"]},
+        "identical_canonical_bytes":{"const":true},"identical_digests":{"const":true},"identical_accept_reject":{"const":true},
+        "clean_extracted_archive":{"const":true},"deterministic_archive":{"const":true}
+      }
+    },
+    "player_package_source_sha256":{"const":"9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"},
+    "transition_gate":{"type":"object","additionalProperties":false,"required":["source_freeze","candidate_allocation","production_signing","promotion_to_main","tagging","publication"],"properties":{"source_freeze":{"const":false},"candidate_allocation":{"const":false},"production_signing":{"const":false},"promotion_to_main":{"const":false},"tagging":{"const":false},"publication":{"const":false}}},
+    "status":{"const":"T08-SDK-V1-PREVIEW-CONFORMANCE-PASSED-PRODUCTION-UNAUTHORIZED"}
+  },
+  "$defs":{"sha256":{"type":"string","pattern":"^[A-F0-9]{64}$"}}
+}

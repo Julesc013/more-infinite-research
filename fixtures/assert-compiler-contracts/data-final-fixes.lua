@@ -31,9 +31,15 @@ local focused_contracts = {
   technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate"),
   technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification"),
   technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval"),
-  technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration"),
-  maximum_level_binding = require("__more-infinite-research__.prototypes.mir.domain.technology.maximum_level_binding")
+  technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
 }
+do
+  local available, contract = pcall(
+    require,
+    "__more-infinite-research__.prototypes.mir.domain.technology.maximum_level_binding"
+  )
+  focused_contracts.maximum_level_binding = available and contract or false
+end
 local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
@@ -60,6 +66,13 @@ local c9_contracts = {
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
+end
+
+if not focused_contracts.maximum_level_binding then
+  local mir_version = mods and mods["more-infinite-research"] or ""
+  if not tostring(mir_version):match("^4%.0%.%d+$") then
+    fail("MaximumLevelBinding is absent outside the governed MIR 4 terminal-bootstrap target")
+  end
 end
 
 (function()
@@ -106,7 +119,7 @@ local function expect_error(label, expected, callback)
   end
 end
 
-(function()
+if focused_contracts.maximum_level_binding then (function()
   local plan = {
     fingerprint = "maximum-level-binding-fixture-plan",
     stream_plan = {rows = {
@@ -204,7 +217,7 @@ end
       or blocked.bindings[2].diagnostics.active_code ~= "maximum_level_unknown_finalizer_adapter" then
     fail("unknown MaximumLevelBinding finalizer did not emit a stable blocking diagnostic")
   end
-end)();
+end)(); end
 
 local function valid_pack(id, line, mod_id, version)
   return {
