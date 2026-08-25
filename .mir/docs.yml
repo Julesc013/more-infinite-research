@@ -312,6 +312,17 @@ docs:
     source_of_truth_for:
       - mir4-first-extension-tutorial
       - mir4-extension-developer-workflow
+  - path: docs/reference/mir4-environment-evidence.md
+    title: "MIR 4 Environment Evidence V1"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-portable-exact-environment-lock
+      - mir4-environment-diff
+      - mir4-support-bundle-redaction
+      - mir4-reproducer-preserving-minimization
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

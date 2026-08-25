@@ -41,6 +41,7 @@ Usage:
   .\tools\mir.ps1 mir4 sdk <generate|check>
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
   .\tools\mir.ps1 mir4 platform compile --target <FNNN> --extension <path> --output <path>
+  .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
@@ -605,6 +606,19 @@ switch ($area) {
           $platformArguments.OutputPath = Get-MIRArgValue -Items $Args -Name '--output'
         }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1") @platformArguments
+      }
+      "environment-evidence" {
+        if ($Args.Count -lt 3) { throw "mir4 environment-evidence requires lock, diff, bundle, minimize, verify, or reference." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('lock','diff','bundle','minimize','verify','reference')) { throw "Unknown mir4 environment-evidence command: $subcommand" }
+        $environmentArguments = @{Mode=$subcommand;RepoRoot=$repo.Path}
+        $inputValue = Get-MIRArgValue -Items $Args -Name '--input'
+        $otherValue = Get-MIRArgValue -Items $Args -Name '--other'
+        $outputValue = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($inputValue)) { $environmentArguments.InputPath = $inputValue }
+        if (-not [string]::IsNullOrWhiteSpace($otherValue)) { $environmentArguments.OtherPath = $otherValue }
+        if (-not [string]::IsNullOrWhiteSpace($outputValue)) { $environmentArguments.OutputPath = $outputValue }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1") @environmentArguments
       }
       "release-governance" {
         if ($Args.Count -lt 3) { throw "mir4 release-governance requires check or initialize." }

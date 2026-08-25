@@ -159,6 +159,22 @@ package_excluded_modules:
     documentation: docs/architecture/mir4-inspector-compatibility.md
     boundary: bounded copied read-only DTO inspection, normalized private subject assessments, and deterministic data-only compatibility bundles; no raw mutable compiler objects, callbacks, executable adapters, blanket modpack support booleans, claim transfer, player mutation, signing, sealing, or publication
     stability: developer-preview-blocked-independent-production-consumer-and-exact-profile-claim-transfer
+  mir4_environment_evidence_v1:
+    implementation: tools/lib/mir4/EnvironmentEvidence.ps1
+    command: tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1
+    schemas:
+      - spec/schemas/preview/mir4-environment-lock-v1.schema.json
+      - spec/schemas/preview/mir4-environment-diff-v1.schema.json
+      - spec/schemas/preview/mir4-support-bundle-v1.schema.json
+    fixtures: fixtures/mir4-environment-evidence-v1
+    generated_references:
+      - sdk/preview/mir4/reference/environment-lock-f210-v1.json
+      - sdk/preview/mir4/reference/environment-lock-f200-v1.json
+      - sdk/preview/mir4/reference/environment-diff-f210-f200-v1.json
+      - sdk/preview/mir4/reference/support-bundle-minimized-v1.json
+    documentation: docs/reference/mir4-environment-evidence.md
+    boundary: portable exact read-only environment identity, bounded redacted diagnostics, and reproducer-preserving evidence minimization only; no private host state, executable content, network access, player mutation, prototype writes, public support claim, release transition, signing, sealing, or publication
+    stability: developer-preview-package-excluded
   mir4_assurance_scale_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
     implementations:
@@ -294,6 +310,7 @@ package_excluded_modules:
     support_assessment: tools/lib/mir4/SupportAssessment.ps1
     inspector: tools/lib/mir4/Inspector.ps1
     compatibility_factory: tools/lib/mir4/CompatibilityFactory.ps1
+    environment_evidence: tools/lib/mir4/EnvironmentEvidence.ps1
     inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1

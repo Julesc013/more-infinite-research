@@ -604,6 +604,22 @@ targets:
       diagnostic_only:
         - broad-aai-suite-support
 
+mir4_environment_evidence:
+  maturity: developer-preview
+  claim_level: none
+  public_claim: false
+  package_visible: false
+  authority: tools/lib/mir4/EnvironmentEvidence.ps1
+  contracts:
+    - MIR4EnvironmentLockV1
+    - MIR4EnvironmentDiffV1
+    - MIR4SupportBundleV1
+  privacy:
+    private_host_fields: rejected
+    diagnostic_values: redacted
+  minimization: required-witness-transitive-closure
+  release_authority: false
+
 rules:
   - every target declares compatibility maturity behavior and scope independently
   - every public compatibility claim has a compatibility page

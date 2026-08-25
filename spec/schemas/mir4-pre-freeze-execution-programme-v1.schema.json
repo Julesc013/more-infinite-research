@@ -127,7 +127,7 @@
         }
       }
     },
-    "next_dependency_ready_turn": {"const": "T10"},
+    "next_dependency_ready_turn": {"const": "T11"},
     "transition_gate": {
       "type": "object",
       "additionalProperties": false,
@@ -141,6 +141,6 @@
         "publication": {"const": false}
       }
     },
-    "status": {"const": "T09-COMPLETE-T10-T11-READY-RELEASE-BLOCKED"}
+    "status": {"const": "T10-COMPLETE-T11-T12-T14-READY-RELEASE-BLOCKED"}
   }
 }

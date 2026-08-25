@@ -1,6 +1,9 @@
 if (-not (Get-Command Get-MIR4CompatibilityPage -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot 'CompatibilityIndex.ps1')
 }
+if (-not (Get-Command New-MIR4EnvironmentSupportBundleV1 -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot 'EnvironmentEvidence.ps1')
+}
 
 function New-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Request,[Parameter(Mandatory)]$Ledger,[Parameter(Mandatory)][string]$RepoRoot)
@@ -23,14 +26,18 @@ function New-MIR4SupportBundleV1 {
       [ordered]@{subject_id=$id;safe_choice=[string]$selection.safe_choice}
     }
   )
-  $record = [pscustomobject][ordered]@{
-    schema=1;kind='MIR4SupportBundleV1';bundle_id='org.more-infinite-research.w07.reference';target=[string]$Request.target;subjects=$subjects
-    source_ledger_digest=[string]$Ledger.digest;maturity='developer-preview';synthetic=$true;claim_eligible=$false
-    arbitrary_code=$false;package_visible=$false;digest=''
+  $references = New-MIR4ReferenceEnvironmentEvidenceV1 -RepoRoot $RepoRoot
+  $lock = if ([string]$Request.target -ceq 'f200') { $references.f200 } elseif ([string]$Request.target -ceq 'f210') { $references.f210 } else {
+    throw "[mir4-w07-support-environment-unavailable] $($Request.target)"
   }
+  $evidence = @(
+    [pscustomobject][ordered]@{
+      id='compatibility.subject-ledger';kind='authority';summary='The bounded compatibility subject ledger selected by this bundle.'
+      dependencies=@();required_by_reproducer=$true
+    }
+  )
+  $record = New-MIR4EnvironmentSupportBundleV1 -EnvironmentLock $lock -BundleId 'org.more-infinite-research.w07.reference' -Subjects $subjects -SourceLedgerDigest ([string]$Ledger.digest) -EvidenceItems $evidence
   Test-MIR4W07ForbiddenValue -Value $record -Forbidden @($authority.forbidden_import_fields)
-  Import-MIR4W07CanonicalSupport -RepoRoot $RepoRoot
-  Add-MIR4ModuleDigest $record | Out-Null
   return $record
 }
 

@@ -1,0 +1,17 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/support-bundle-v1.schema.json",
+  "title":"MIR 4 SupportBundleV1 developer preview",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","bundle_id","target","subjects","source_ledger_digest","environment_lock","environment_lock_digest","evidence_items","diagnostics","redaction","reproducer","minimized","source_bundle_digest","minimization","maturity","synthetic","claim_eligible","arbitrary_code","executable_content","network_access_authorized","package_visible","player_mutation_authorized","prototype_write_authorized","public_support_authorized","release_authority","canonicalization","digest"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4SupportBundleV1"},"bundle_id":{"type":"string","minLength":1},"target":{"pattern":"^f[0-9]{3}$"},
+    "subjects":{"type":"array","maxItems":64},"source_ledger_digest":{"anyOf":[{"$ref":"#/$defs/digest"},{"type":"null"}]},"environment_lock":{"type":"object","required":["kind","target","digest"],"properties":{"kind":{"const":"MIR4EnvironmentLockV1"},"target":{"pattern":"^f[0-9]{3}$"},"digest":{"$ref":"#/$defs/digest"}}},"environment_lock_digest":{"$ref":"#/$defs/digest"},
+    "evidence_items":{"type":"array","maxItems":1024,"items":{"type":"object"}},"diagnostics":{"type":"array","maxItems":1024,"items":{"type":"object"}},"redaction":{"type":"object"},"reproducer":{"type":"object"},
+    "minimized":{"type":"boolean"},"source_bundle_digest":{"type":["string","null"]},"minimization":{"type":"object"},"maturity":{"const":"developer-preview"},"synthetic":{"type":"boolean"},
+    "claim_eligible":{"const":false},"arbitrary_code":{"const":false},"executable_content":{"const":false},"network_access_authorized":{"const":false},
+    "package_visible":{"const":false},"player_mutation_authorized":{"const":false},"prototype_write_authorized":{"const":false},"public_support_authorized":{"const":false},"release_authority":{"const":false},
+    "canonicalization":{"const":"mir-canonical-json/1"},"digest":{"$ref":"#/$defs/digest"}
+  },
+  "$defs":{"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}}
+}
