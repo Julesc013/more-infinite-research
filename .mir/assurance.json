@@ -39,6 +39,11 @@
       "tests": ["static.mir4-r0-identity", "static.mir4-r0-bootstrap", "static.mir4-public-feedback-intake", "static.mir4-maximum-level-sol03", "static.mir4-production-route-sol04", "static.mir4-research-cost-v2-sol05", "static.mir4-k2-science-sol06", "static.mir4-compatibility-campaign-sol07", "static.mir4-affected-proof-sol08", "static.mir4-m4c01-closeout-sol09", "static.mir4-final-programme-reconciliation", "static.mir3-dot9-portal-visibility", "static.mir4-bootstrap-target-readiness", "static.mir4-local-playtest-shadow", "static.mir4-bootstrap-materialization", "static.mir4-offline-custody", "static.mir4-experimental-api-sdk", "static.mir4-target-compiler-w02", "static.mir4-semantic-compiler-w03", "static.mir4-runtime-continuity-w04", "static.mir4-module-ecosystem-w05", "static.mir4-processir-synthesis-w06", "static.mir4-inspector-compatibility-w07", "static.mir4-assurance-scale-w08", "static.mir4-historical-succession-w09", "static.mir4-whole-platform", "static.mir4-full-platform-closeout", "static.mir4-release-readiness-reconciliation", "static.mir4-release-phase-engine", "static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05", "static.mir4-release-doctor-t06", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-pre-freeze-hardening", "static.mir4-platform-preview", "static.mir4-hybrid-platform-authority"]
     },
     {
+      "id": "mir4-sdk-templates",
+      "patterns": ["^tools/templates/mir4/"],
+      "tests": ["static.mir4-sdk-v1-t08", "static.mir4-platform-preview", "static.mir4-pre-freeze-hardening"]
+    },
+    {
       "id": "runtime-or-migration",
       "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^validation/tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
       "tests": ["static.full", "runtime.full", "runtime.upgrade"]
@@ -80,7 +85,7 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!Invoke-MIRAssurance\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)(?!tests/mir4/)(?!tests/release/Test-MIRPublishedSnapshotIntegrity\\.ps1$)(?!tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.mir/(combination-campaigns|compatibility-capsules|interaction-delta-policies|mod-interaction-(?:graph|policy))\\.json$", "^\\.github/workflows/(?!validate\\.yml$)(?!assurance-(?:targeted|scheduled)\\.yml$)", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
@@ -105,7 +110,7 @@
     },
     {
       "id": "release-evidence",
-      "patterns": ["^\\.mir/(evidence|target-lines|releases/(deltas|sources))/", "^dist/"],
+      "patterns": ["^\\.mir/(evidence|target-lines|releases/(deltas|sources))/", "^dist/", "^validation/tests/release/Test-MIRPublishedSnapshotIntegrity\\.ps1$"],
       "tests": ["tooling.self-test", "static.release-history", "static.full", "static.package"]
     }
   ],

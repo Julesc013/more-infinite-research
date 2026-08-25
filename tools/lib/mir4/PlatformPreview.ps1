@@ -49,6 +49,16 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/technology-governance.json',
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
+  'tools/lib/mir4/SdkV1.ps1',
+  'tools/templates/mir4/sdk-v1/powershell/MIR4.Api.V1.psm1',
+  'tools/templates/mir4/sdk-v1/python/mir4_api_v1.py',
+  'tools/templates/mir4/sdk-v1/typescript/index.mjs',
+  'tools/templates/mir4/sdk-v1/typescript/index.ts',
+  'tools/templates/mir4/sdk-v1/typescript/package.json',
+  'tools/templates/mir4/sdk-v1/lua/mir4_api_v1.lua',
+  'tools/templates/mir4/sdk-v1/lua/mir4_api_v1.luals.lua',
+  'tools/templates/mir4/sdk-v1/conformance/Invoke-MIR4SdkV1Conformance.ps1',
+  'spec/schemas/preview/mir4-sdk-v1-conformance-corpus.schema.json',
   'tools/lib/mir4/CanonicalJsonV1.ps1',
   'tools/lib/mir4/DiagnosticsV1.ps1',
   'tools/lib/mir4/PlatformPreview.ps1',
@@ -464,7 +474,7 @@ Write-Host '[ok] standalone MIR 4 SDK V1 conformance passed.'
     'sdk/preview/mir4/inspector-v1/README.md' = $inspectorV1.readme.Replace("`r`n","`n")
     'sdk/preview/mir4/conformance/Invoke-MIR4SdkConformance.ps1' = $conformancePs.Replace("`r`n","`n")
     'sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1' = $conformanceV1Ps.Replace("`r`n","`n")
-    'sdk/preview/mir4/README.md' = "# MIR 4 SDK V1 developer preview`n`nRun ``.\conformance-v1\Invoke-MIR4SdkV1Conformance.ps1`` with PowerShell 7. Current API bindings are under ``api-v1``, current MEP bindings and V0-to-V1 migration helpers are under ``mep-v1``, and bounded examples are under ``reference``. V0 remains a superseded compatibility input only. This preview is read-only, package-excluded, and may change before 1.0.`n"
+    'sdk/preview/mir4/README.md' = "# MIR 4 SDK V1 developer preview`n`nRun ``.\conformance-v1\Invoke-MIR4SdkV1Conformance.ps1`` with PowerShell 7; use ``-RequireNode`` in CI. The 12-positive/18-negative corpus proves identical accepted/rejected cases and digests across available executable ports, both in-tree and from the clean extracted API archive. Current Lua, TypeScript/Node, Python, and PowerShell API bindings are under ``api-v1``; MEP bindings and V0-to-V1 migration helpers are under ``mep-v1``; bounded examples are under ``reference``. V0 remains a superseded compatibility input only. This preview is read-only, package-excluded, and may change before 1.0.`n"
     'fixtures/mir4-mep-v0/positive/reference-extension.json' = (ConvertTo-MIR4PlatformCanonicalJson $extension) + "`n"
     'fixtures/mir4-mep-v0/negative/forbidden-callback.json' = "{`"expected_diagnostic`":`"mir4-mep-forbidden-field`",`"kind`":`"MIR4ExtensionEnvelopeV0`",`"schema`":0,`"extension_id`":`"org.example.bad`",`"targets`":[`"f210`"],`"fragments`":[{`"id`":`"org.example.bad.fragment`",`"kind`":`"CompatibilityFragment`",`"data`":{`"callback`":`"run`"}}],`"canonicalization`":`"mir-canonical-json-v0`",`"digest`":`"sha256:0000000000000000000000000000000000000000000000000000000000000000`"}`n"
     'fixtures/mir4-process-ir-v0/positive/bounded-loop.json' = (ConvertTo-MIR4PlatformCanonicalJson $processSafeFixture) + "`n"
@@ -683,6 +693,14 @@ function New-MIR4PlatformPreviewPackages {
     'mir4-reference-extension-v1-preview.zip' = @('sdk/preview/mir4/reference-extension-v1/extension.json','sdk/preview/mir4/reference-extension-v1/README.md','sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1','sdk/preview/mir4/canonical-json-v1/python/mir4_canonical_json_v1.py','spec/canonicalization/mir-canonical-json-v1.json','spec/schemas/preview/mir4-canonical-json-v1.schema.json','spec/schemas/preview/mir4-mep-v1.schema.json','LICENSE')
     'mir4-inspector-preview-v0.zip' = @('sdk/preview/mir4/inspector/index.html','sdk/preview/mir4/inspector/Export-MIR4SupportSnapshot.ps1','sdk/preview/mir4/inspector/README.md','sdk/preview/mir4/reference/query-snapshot-f210.json','sdk/preview/mir4/reference/support-snapshot-f210.json','LICENSE')
   }
+  $sets['mir4-api-sdk-v1-preview.zip'] += @(
+    'sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1',
+    'sdk/preview/mir4/reference-extension-v1/extension.json',
+    'sdk/preview/mir4/reference-extension-v1/README.md',
+    'sdk/preview/mir4/mep-v1/json-schema/mir4-mep-v1.schema.json',
+    'spec/schemas/preview/mir4-mep-v1.schema.json',
+    'spec/schemas/preview/mir4-sdk-v1-conformance-corpus.schema.json'
+  )
   $sets['mir4-platform-preview-v0.zip'] += @(
     '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
     '.mir/technology-lifecycle.json','.mir/technology-governance.json',

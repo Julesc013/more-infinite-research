@@ -1,0 +1,10 @@
+{
+  "name": "@mir4/api-v1-preview",
+  "version": "4.0.0-preview",
+  "private": true,
+  "type": "module",
+  "main": "./index.mjs",
+  "types": "./index.ts",
+  "engines": {"node": ">=20"},
+  "license": "MPL-2.0"
+}

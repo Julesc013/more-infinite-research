@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "253BD40A36D9F6A1B0B0BAED9F939053FD617DB9ABAA609FE7E2E18239E30B48"
+      "sha256": "9D022EFF4EB1CD3642391E82F6DCE15752FD29E40C2FE349376B71CEA22FE88C"
     }
   ],
   "payload": {
@@ -93,7 +93,7 @@
       {
         "id": "T08",
         "scope": "SDK V1 preview completion",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T07"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "F1C7A7DEDED850A96E19609ED24F7EA800AF039A6F392D5014F5A3E06A64277A"
+  "record_sha256": "44DEA2FC0BE72477790CB1A1A59041DFB3F06A2956CAB5B98D217CEE7DD0325E"
 }

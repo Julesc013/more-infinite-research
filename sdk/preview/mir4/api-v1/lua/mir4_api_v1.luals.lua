@@ -1,0 +1,23 @@
+---@class MIR4ApiV1Availability
+---@field status 'available'|'unavailable'
+---@field reason string
+---@field evidence string[]
+---@class MIR4ApiV1Page
+---@field offset integer
+---@field limit integer
+---@field returned integer
+---@field total integer|nil
+---@field next_cursor string|nil
+---@class MIR4ApiResponseV1
+---@field kind 'MIR4ApiResponseV1'
+---@field schema 1
+---@field surface string
+---@field target table
+---@field versions table
+---@field capabilities string[]
+---@field availability MIR4ApiV1Availability
+---@field page MIR4ApiV1Page
+---@field items table[]
+---@field canonicalization 'mir-canonical-json/1'
+---@field extensions table
+---@field digest string

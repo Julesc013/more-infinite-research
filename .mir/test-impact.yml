@@ -169,6 +169,18 @@
       "tags": []
     },
     {
+      "pattern": "tools/templates/mir4/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/mir4/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/lib/validation/MIR4DistributionIdentity.ps1",
       "groups": [],
       "scenarios": [],
@@ -242,6 +254,18 @@
     },
     {
       "pattern": "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/assurance/Evidence.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
