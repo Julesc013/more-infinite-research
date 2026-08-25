@@ -166,6 +166,7 @@ paths:
   tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
   tools.lib.mir4.release-phase-engine: tools/lib/mir4/ReleasePhaseEngine.ps1
   tools.lib.mir4.release-adapters: tools/lib/mir4/ReleaseAdapters.ps1
+  tools.lib.mir4.release-lifecycle-adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
   tools.lib.validation.mir4-distribution-identity: tools/lib/validation/MIR4DistributionIdentity.ps1
   tools.lib: tools/lib
   tools.lib.assurance: tools/lib/assurance

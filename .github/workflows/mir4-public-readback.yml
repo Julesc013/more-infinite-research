@@ -17,10 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {fetch-depth: 0, ref: "${{ inputs.source_commit }}"}
-      - name: Validate public readback identities
+      - name: Run non-production exact-byte readback rehearsal
         shell: pwsh
         run: |
-          $p=@{Phase='public-readback';SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}';OutputPath='build/results/mir4-public-readback/request.json'}
+          $p=@{Phase='public-readback';Operation='DryRun';SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}';OutputPath='build/results/mir4-public-readback/request.json'}
           ./tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1 @p
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

@@ -596,12 +596,16 @@ function Get-MIR4ReleasePhaseAdapter {
     [scriptblock]$TargetConstructor,[string]$TargetConstructorIdentity='',
     [scriptblock]$QualificationWorkerProvider,[string]$QualificationWorkerProviderIdentity='',
     [scriptblock]$PreviewBuilder,[string]$PreviewBuilderIdentity='',
-    [scriptblock]$IndependentReceiptProvider,[string]$IndependentReceiptProviderIdentity=''
+    [scriptblock]$IndependentReceiptProvider,[string]$IndependentReceiptProviderIdentity='',
+    [scriptblock]$PublicationTransferProvider,[string]$PublicationTransferProviderIdentity='',
+    [scriptblock]$PublicReadbackProvider,[string]$PublicReadbackProviderIdentity=''
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $phaseEngineLibraryPath = Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1'
   $adapterLibraryPath = Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1'
+  $lifecycleAdapterLibraryPath = Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1'
   $implementation = (Get-FileHash -LiteralPath $adapterLibraryPath -Algorithm SHA256).Hash.ToUpperInvariant()
+  $lifecycleImplementation = (Get-FileHash -LiteralPath $lifecycleAdapterLibraryPath -Algorithm SHA256).Hash.ToUpperInvariant()
   switch ($Phase) {
     'source-freeze' {
       $invoke = { param($Context) . $phaseEngineLibraryPath; . $adapterLibraryPath; Invoke-MIR4SourceFreezeAdapter -RepoRoot $repo -Context $Context }.GetNewClosure()
@@ -675,6 +679,59 @@ function Get-MIR4ReleasePhaseAdapter {
       }.GetNewClosure()
       return [pscustomobject][ordered]@{
         descriptor=[pscustomobject][ordered]@{id='mir4.independent-verification.rehearsal.v1';version=1;implementation_sha256=$implementation;delegate_sha256=$IndependentReceiptProviderIdentity;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@('git','build');result_schema='spec/schemas/mir4-release-independent-verification-result-v1.schema.json'}
+        invoke=$invoke
+      }
+    }
+    'release-seal' {
+      $invoke={param($Context). $phaseEngineLibraryPath;. $adapterLibraryPath;. $lifecycleAdapterLibraryPath;Invoke-MIR4ReleaseSealAdapter -RepoRoot $repo -Context $Context}.GetNewClosure()
+      return [pscustomobject][ordered]@{
+        descriptor=[pscustomobject][ordered]@{id='mir4.release-seal.rehearsal.v1';version=1;implementation_sha256=$lifecycleImplementation;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@('git','build');result_schema='spec/schemas/mir4-release-seal-result-v1.schema.json'}
+        invoke=$invoke
+      }
+    }
+    'promotion' {
+      $invoke={param($Context). $phaseEngineLibraryPath;. $adapterLibraryPath;. $lifecycleAdapterLibraryPath;Invoke-MIR4PromotionAdapter -RepoRoot $repo -Context $Context}.GetNewClosure()
+      return [pscustomobject][ordered]@{
+        descriptor=[pscustomobject][ordered]@{id='mir4.promotion.rehearsal.v1';version=1;implementation_sha256=$lifecycleImplementation;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@('git','build');result_schema='spec/schemas/mir4-release-promotion-result-v1.schema.json'}
+        invoke=$invoke
+      }
+    }
+    'target-publication' {
+      $useDefaultProvider=$null-eq$PublicationTransferProvider
+      if($useDefaultProvider){$PublicationTransferProvider=${function:Invoke-MIR4DefaultPublicationTransferProvider}}
+      if([string]::IsNullOrWhiteSpace($PublicationTransferProviderIdentity)){$PublicationTransferProviderIdentity=Get-MIR4ReleasePhaseSha256 ([string]$PublicationTransferProvider)}
+      $provider=$PublicationTransferProvider
+      $invoke={
+        param($Context)
+        . $phaseEngineLibraryPath;. $adapterLibraryPath;. $lifecycleAdapterLibraryPath
+        $effectiveProvider=if($useDefaultProvider){${function:Invoke-MIR4DefaultPublicationTransferProvider}}else{$provider}
+        Invoke-MIR4TargetPublicationAdapter -RepoRoot $repo -Context $Context -TransferProvider $effectiveProvider
+      }.GetNewClosure()
+      return [pscustomobject][ordered]@{
+        descriptor=[pscustomobject][ordered]@{id='mir4.target-publication.rehearsal.v1';version=1;implementation_sha256=$lifecycleImplementation;delegate_sha256=$PublicationTransferProviderIdentity;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@();result_schema='spec/schemas/mir4-release-target-publication-result-v1.schema.json'}
+        invoke=$invoke
+      }
+    }
+    'public-readback' {
+      $useDefaultProvider=$null-eq$PublicReadbackProvider
+      if($useDefaultProvider){$PublicReadbackProvider=${function:Invoke-MIR4DefaultPublicReadbackProvider}}
+      if([string]::IsNullOrWhiteSpace($PublicReadbackProviderIdentity)){$PublicReadbackProviderIdentity=Get-MIR4ReleasePhaseSha256 ([string]$PublicReadbackProvider)}
+      $provider=$PublicReadbackProvider
+      $invoke={
+        param($Context)
+        . $phaseEngineLibraryPath;. $adapterLibraryPath;. $lifecycleAdapterLibraryPath
+        $effectiveProvider=if($useDefaultProvider){${function:Invoke-MIR4DefaultPublicReadbackProvider}}else{$provider}
+        Invoke-MIR4PublicReadbackAdapter -RepoRoot $repo -Context $Context -ReadbackProvider $effectiveProvider
+      }.GetNewClosure()
+      return [pscustomobject][ordered]@{
+        descriptor=[pscustomobject][ordered]@{id='mir4.public-readback.rehearsal.v1';version=1;implementation_sha256=$lifecycleImplementation;delegate_sha256=$PublicReadbackProviderIdentity;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@();result_schema='spec/schemas/mir4-release-public-readback-result-v1.schema.json'}
+        invoke=$invoke
+      }
+    }
+    'restore-drill' {
+      $invoke={param($Context). $phaseEngineLibraryPath;. $adapterLibraryPath;. $lifecycleAdapterLibraryPath;Invoke-MIR4RestoreDrillAdapter -RepoRoot $repo -Context $Context}.GetNewClosure()
+      return [pscustomobject][ordered]@{
+        descriptor=[pscustomobject][ordered]@{id='mir4.restore-drill.rehearsal.v1';version=1;implementation_sha256=$lifecycleImplementation;production_capable=$false;supported_operations=@('DryRun','Execute','Verify','Compensate');required_ports=@('build');result_schema='spec/schemas/mir4-release-restore-drill-result-v1.schema.json'}
         invoke=$invoke
       }
     }

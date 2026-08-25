@@ -6,7 +6,7 @@ Generated: 2026-08-25
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T04-COMPLETE-T05-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T05`.
+Status: `T05-COMPLETE-T06-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T06`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -15,8 +15,8 @@ Status: `T04-COMPLETE-T05-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 | `T02` | Release phase engine kernel | `completed` | T01 | `false` |
 | `T03` | Source-freeze and target-build executors | `completed` | T02 | `false` |
 | `T04` | Qualification, preview and independent-verification executors | `completed` | T02 | `false` |
-| `T05` | Seal, promotion, publication, readback and restore executors | `ready` | T03, T04 | `false` |
-| `T06` | Release doctor maturity and fault-injection closure | `blocked-dependency` | T05 | `false` |
+| `T05` | Seal, promotion, publication, readback and restore executors | `completed` | T03, T04 | `false` |
+| `T06` | Release doctor maturity and fault-injection closure | `ready` | T05 | `false` |
 | `T07` | Canonicalization, schema namespace and diagnostic authority | `ready` | T01 | `false` |
 | `T08` | SDK V1 preview completion | `blocked-dependency` | T07 | `false` |
 | `T09` | Extension developer experience | `blocked-dependency` | T07 | `false` |
@@ -26,7 +26,7 @@ Status: `T04-COMPLETE-T05-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-u
 | `T13` | Release compatibility canary cut | `blocked-dependency` | T10, T12 | `false` |
 | `T14` | MIR4 public, contributor, maintainer and continuity documentation | `blocked-dependency` | T01, T07, T09, T10 | `false` |
 | `T15` | Supply-chain and preservation hardening | `blocked-dependency` | T05, T07 | `false` |
-| `T16` | Protected signing and recovery ceremony | `blocked-dependency` | T05 | `true` |
+| `T16` | Protected signing and recovery ceremony | `blocked-human` | T05 | `true` |
 | `T17` | Pre-freeze F210/F200 maintainer playtests | `blocked-human` | T01 | `true` |
 | `T18` | Pre-freeze defect closure and independent audit | `blocked-dependency` | T06, T08, T11, T13, T14, T15, T16, T17 | `false` |
 | `T19` | Source-freeze authorization and M4RC1 allocation | `blocked-human` | T18 | `true` |

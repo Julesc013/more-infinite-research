@@ -121,6 +121,7 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t04-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t05-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -136,7 +137,8 @@ function Test-MIR4PreFreezeAuthorities {
   foreach ($link in @(
     @{path='.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json';kind='MIR4T02AuthorityEvolutionReceiptV1'},
     @{path='.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json';kind='MIR4T03AuthorityEvolutionReceiptV1'},
-    @{path='.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json';kind='MIR4T04AuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json';kind='MIR4T04AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json';kind='MIR4T05AuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -252,6 +254,7 @@ function Get-MIR4ReleaseDoctor {
   Add-AutomatedCheck 'release-phase-engine-kernel' {
     . (Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1')
     . (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
+    . (Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1')
     $engine = Get-MIR4ReleasePhaseContract -RepoRoot $repo
     $workflow = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json' -Kind 'MIR4ReleaseWorkflowContractV1'
     $implemented = @($workflow.phases | Where-Object { [bool]$_.maturity.workflow_executor_implemented })
@@ -261,17 +264,17 @@ function Get-MIR4ReleaseDoctor {
         -not [bool]$workflow.phase_engine.kernel_implemented -or -not [bool]$workflow.phase_engine.event_sourcing_implemented -or
         -not [bool]$workflow.phase_engine.idempotency_and_resume_tested -or [bool]$workflow.phase_engine.production_capable -or
         [bool]$workflow.phase_engine.production_authorized -or
-        (@($implemented.id | Sort-Object) -join '|') -cne 'independent-verification|preview-assets|source-freeze|target-build|target-qualification' -or
-        (@($dryRunPassed.id | Sort-Object) -join '|') -cne 'independent-verification|preview-assets|source-freeze|target-build|target-qualification') {
+        (@($implemented.id | Sort-Object) -join '|') -cne 'independent-verification|preview-assets|promotion|public-readback|release-seal|restore-drill|source-freeze|target-build|target-publication|target-qualification' -or
+        (@($dryRunPassed.id | Sort-Object) -join '|') -cne 'independent-verification|preview-assets|promotion|public-readback|release-seal|restore-drill|source-freeze|target-build|target-publication|target-qualification') {
       throw '[mir4-doctor-release-phase-engine-kernel]'
     }
-    foreach ($phase in @('source-freeze','target-build','target-qualification','preview-assets','independent-verification')) {
+    foreach ($phase in @('source-freeze','target-build','target-qualification','preview-assets','independent-verification','release-seal','promotion','target-publication','public-readback','restore-drill')) {
       $adapter = Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase $phase
       if ([bool]$adapter.descriptor.production_capable -or @($adapter.descriptor.required_ports | Where-Object { $_ -in @('sign','publish') }).Count -ne 0) {
         throw "[mir4-doctor-release-adapter-boundary] $phase"
       }
     }
-  } 'The event-sourced phase kernel and T03-T04 source, build, qualification, preview, and independent-verification rehearsal adapters are implemented and dry-run tested while production ports remain disabled.'
+  } 'The event-sourced phase kernel and all ten T03-T05 release lifecycle rehearsal adapters are implemented and dry-run tested while production signing and publication ports remain disabled.'
   Add-AutomatedCheck 'external-custody-layout' {
     $readiness = Get-MIR4ReleaseGovernanceReadiness -RepoRoot $repo
     if ([string]$readiness.classification -ceq 'CHANGES-REQUESTED' -or @($readiness.publisher.inventory.forbidden).Count -ne 0) {
