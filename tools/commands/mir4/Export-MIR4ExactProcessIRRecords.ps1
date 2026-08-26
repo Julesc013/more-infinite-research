@@ -15,6 +15,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ExactProcessIR.ps1')
 
 function Resolve-T12Output([string]$Relative,[string]$AllowedRoot){
