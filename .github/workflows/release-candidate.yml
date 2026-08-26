@@ -29,17 +29,23 @@ jobs:
   exact-candidate:
     runs-on: [self-hosted, Windows]
     environment: release-candidate
+    env:
+      MIR_RC_ARCHIVE_SHA256: ${{ inputs.archive_sha256 }}
+      MIR_RC_CANDIDATE_SHA: ${{ inputs.candidate_sha }}
+      MIR_RC_LOCAL_AUTHORITY_REPO: ${{ inputs.local_authority_repo }}
+      MIR_RC_RELEASE_PROFILE: ${{ inputs.release_profile }}
+      MIR_RC_RESUME_EXACT_DIST_RUN: ${{ inputs.resume_exact_dist_evidence_run }}
     steps:
       - name: Materialize clean roots from local Git authority
         id: roots
         shell: pwsh
         run: |
-          $authority = (Resolve-Path -LiteralPath '${{ inputs.local_authority_repo }}').Path
+          $authority = (Resolve-Path -LiteralPath $env:MIR_RC_LOCAL_AUTHORITY_REPO).Path
           $remote = (git -C $authority remote get-url origin).Trim()
           if ($LASTEXITCODE -ne 0 -or $remote -notmatch 'Julesc013/more-infinite-research(?:\.git)?$') {
             throw "Local authority is not the governed repository: $remote"
           }
-          foreach ($commit in @('${{ github.sha }}', '${{ inputs.candidate_sha }}')) {
+          foreach ($commit in @('${{ github.sha }}', $env:MIR_RC_CANDIDATE_SHA)) {
             git -C $authority cat-file -e "$commit^{commit}"
             if ($LASTEXITCODE -ne 0) { throw "Local Git authority is missing commit $commit." }
           }
@@ -50,7 +56,7 @@ jobs:
           New-Item -ItemType Directory -Path $workRoot | Out-Null
           foreach ($row in @(
             @{ path = $controller; commit = '${{ github.sha }}' },
-            @{ path = $candidate; commit = '${{ inputs.candidate_sha }}' }
+            @{ path = $candidate; commit = $env:MIR_RC_CANDIDATE_SHA }
           )) {
             git clone --quiet --shared --no-checkout -- $authority $row.path
             if ($LASTEXITCODE -ne 0) { throw "Unable to clone local authority into $($row.path)." }
@@ -66,7 +72,7 @@ jobs:
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
           $candidate = '${{ steps.roots.outputs.candidate }}'
-          if ((git -C $candidate rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
+          if ((git -C $candidate rev-parse HEAD).Trim() -ne $env:MIR_RC_CANDIDATE_SHA) {
             throw 'Checked-out source does not match candidate_sha.'
           }
           if ((git -C $controller rev-parse HEAD).Trim() -ne '${{ github.sha }}') {
@@ -98,8 +104,8 @@ jobs:
               throw "Required exact candidate archive is absent: $archive"
             }
             $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
-            if ($actual -ne '${{ inputs.archive_sha256 }}') {
-              throw "Archive SHA mismatch for ${archive}: expected ${{ inputs.archive_sha256 }}, got $actual"
+            if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
+              throw "Archive SHA mismatch for ${archive}: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
             }
           }
 
@@ -113,8 +119,8 @@ jobs:
           $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
           $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
-          if ($actual -ne '${{ inputs.archive_sha256 }}') {
-            throw "Exact validation archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
+            throw "Exact validation archive drifted before execution: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
           }
           Push-Location $controller
           try {
@@ -130,7 +136,7 @@ jobs:
           $authority = '${{ steps.roots.outputs.authority }}'
           $controller = '${{ steps.roots.outputs.controller }}'
           $candidate = '${{ steps.roots.outputs.candidate }}'
-          $priorRun = '${{ inputs.resume_exact_dist_evidence_run }}'
+          $priorRun = $env:MIR_RC_RESUME_EXACT_DIST_RUN
           if ($priorRun -notmatch '^\d+-\d+$') {
             throw "Prior protected run-attempt must use the run_id-run_attempt form, got: $priorRun"
           }
@@ -144,13 +150,13 @@ jobs:
           }
           $priorReceipt = Get-Content -Raw -LiteralPath $priorReceiptPath | ConvertFrom-Json
           if ([string]$priorReceipt.kind -ne 'MIRProtectedReleaseCandidateRunV1' -or
-              [string]$priorReceipt.candidate_commit -ne '${{ inputs.candidate_sha }}' -or
-              [string]$priorReceipt.expected_archive_sha256 -ne '${{ inputs.archive_sha256 }}') {
+              [string]$priorReceipt.candidate_commit -ne $env:MIR_RC_CANDIDATE_SHA -or
+              [string]$priorReceipt.expected_archive_sha256 -ne $env:MIR_RC_ARCHIVE_SHA256) {
             throw 'Prior protected receipt does not bind the requested candidate commit and archive.'
           }
           $priorArchives = @($priorReceipt.archives)
           if ($priorArchives.Count -ne 2 -or
-              @($priorArchives | Where-Object { [string]$_.sha256 -ne '${{ inputs.archive_sha256 }}' }).Count -ne 0) {
+              @($priorArchives | Where-Object { [string]$_.sha256 -ne $env:MIR_RC_ARCHIVE_SHA256 }).Count -ne 0) {
             throw 'Prior protected receipt does not contain both exact candidate archives.'
           }
           $priorController = [string]$priorReceipt.controller_commit
@@ -201,15 +207,15 @@ jobs:
           $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
           $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
-          if ($actual -ne '${{ inputs.archive_sha256 }}') {
-            throw "Targeted-gate archive drifted before execution: expected ${{ inputs.archive_sha256 }}, got $actual"
+          if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
+            throw "Targeted-gate archive drifted before execution: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
           }
           Push-Location $controller
           try {
             ./tools/mir.ps1 release gate `
-              --profile '${{ inputs.release_profile }}' `
+              --profile $env:MIR_RC_RELEASE_PROFILE `
               --candidate $candidateArchive `
-              --candidate-source '${{ inputs.candidate_sha }}' `
+              --candidate-source $env:MIR_RC_CANDIDATE_SHA `
               --output 'build/results/release-gate' `
               --no-git-pull
           } finally {
@@ -294,9 +300,9 @@ jobs:
             run_id = '${{ github.run_id }}'
             run_attempt = '${{ github.run_attempt }}'
             controller_commit = '${{ github.sha }}'
-            candidate_commit = '${{ inputs.candidate_sha }}'
-            expected_archive_sha256 = '${{ inputs.archive_sha256 }}'
-            resumed_exact_dist_evidence_run = '${{ inputs.resume_exact_dist_evidence_run }}'
+            candidate_commit = $env:MIR_RC_CANDIDATE_SHA
+            expected_archive_sha256 = $env:MIR_RC_ARCHIVE_SHA256
+            resumed_exact_dist_evidence_run = $env:MIR_RC_RESUME_EXACT_DIST_RUN
             archives = $archiveRows
             runtime_evidence = $runtimeEvidenceRows
             retained_at = [DateTime]::UtcNow.ToString('o')

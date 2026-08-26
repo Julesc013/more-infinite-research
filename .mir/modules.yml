@@ -81,8 +81,10 @@ package_excluded_modules:
     implementation: tools/lib/mir4/SupplyChain.ps1
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
+    runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
     command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
     capsule_command: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
+    runner_confinement_command: tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1
     schemas:
       - spec/schemas/mir4-supply-chain-authority-v1.schema.json
       - spec/schemas/mir4-component-inventory-v1.schema.json
@@ -94,12 +96,14 @@ package_excluded_modules:
       - spec/schemas/mir4-release-capsule-manifest-v1.schema.json
       - spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
       - spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
+      - spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
     tests:
       - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
       - validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
+      - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
-    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, and offline restoration only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
+    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
     stability: stable-pre-freeze-supply-chain-preparation
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json

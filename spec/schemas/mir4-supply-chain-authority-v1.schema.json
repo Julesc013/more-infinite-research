@@ -3,7 +3,7 @@
   "$id": "https://more-infinite-research.invalid/schemas/mir4-supply-chain-authority-v1.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "programme_id", "turn", "state", "source_version", "candidate_state", "package_visible", "standards", "construction", "identity_sets", "components", "attestation", "capsule", "transition_gate"],
+  "required": ["schema", "kind", "programme_id", "turn", "state", "source_version", "candidate_state", "package_visible", "standards", "construction", "identity_sets", "components", "attestation", "capsule", "runner_action_security", "transition_gate"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4SupplyChainAuthorityV1"},
@@ -47,6 +47,29 @@
     },
     "attestation": {"type": "object"},
     "capsule": {"type": "object"},
+    "runner_action_security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workflow_lock", "receipt_schema", "public_pull_request_runner", "public_pull_request_secrets_forbidden", "protected_runtime_environment", "protected_runtime_runner", "immutable_source_ref_required", "full_action_commit_required", "direct_dispatch_input_shell_interpolation_forbidden", "maximum_heavy_parallelism", "maximum_lightweight_parallelism", "builder_signing_or_upload_credentials_forbidden", "qualifier_package_mutation_forbidden", "external_mod_release_credentials_forbidden", "publisher_checkout_or_builder_forbidden", "publisher_admission_required"],
+      "properties": {
+        "workflow_lock": {"const": ".mir/releases/governance/mir4/github-actions-lock-v2.json"},
+        "receipt_schema": {"const": "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json"},
+        "public_pull_request_runner": {"const": "windows-latest"},
+        "public_pull_request_secrets_forbidden": {"const": true},
+        "protected_runtime_environment": {"const": "release-candidate"},
+        "protected_runtime_runner": {"const": "self-hosted-windows"},
+        "immutable_source_ref_required": {"const": true},
+        "full_action_commit_required": {"const": true},
+        "direct_dispatch_input_shell_interpolation_forbidden": {"const": true},
+        "maximum_heavy_parallelism": {"const": 1},
+        "maximum_lightweight_parallelism": {"const": 2},
+        "builder_signing_or_upload_credentials_forbidden": {"const": true},
+        "qualifier_package_mutation_forbidden": {"const": true},
+        "external_mod_release_credentials_forbidden": {"const": true},
+        "publisher_checkout_or_builder_forbidden": {"const": true},
+        "publisher_admission_required": {"const": true}
+      }
+    },
     "transition_gate": {
       "type": "object",
       "additionalProperties": false,

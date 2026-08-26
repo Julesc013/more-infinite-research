@@ -18,6 +18,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         target: ["2.1", "2.0"]
     steps:
@@ -27,7 +28,10 @@ jobs:
           fetch-depth: 0
       - name: Materialize target plan
         shell: pwsh
-        run: ./tools/mir.ps1 assurance backport --target '${{ matrix.target }}' --baseline '${{ inputs.baseline_sha }}' --output build/results/assurance/backport-${{ matrix.target }}.json
+        env:
+          MIR_BACKPORT_BASELINE_SHA: ${{ inputs.baseline_sha }}
+          MIR_BACKPORT_TARGET: ${{ matrix.target }}
+        run: ./tools/mir.ps1 assurance backport --target $env:MIR_BACKPORT_TARGET --baseline $env:MIR_BACKPORT_BASELINE_SHA --output "build/results/assurance/backport-$($env:MIR_BACKPORT_TARGET).json"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true

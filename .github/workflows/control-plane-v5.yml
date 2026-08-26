@@ -243,6 +243,7 @@ jobs:
     environment: release-candidate
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.context.outputs.environments) }}
     concurrency:
       group: mir-v5-${{ matrix.environment_signature }}
@@ -290,7 +291,7 @@ jobs:
   transitions:
     name: upgrade-and-approved-delta
     if: always()
-    needs: [context, package]
+    needs: [context, package, environments]
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     concurrency:
@@ -346,7 +347,7 @@ jobs:
   ecosystem:
     name: ecosystem-closure
     if: always()
-    needs: [context, package]
+    needs: [context, package, transitions]
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     concurrency:

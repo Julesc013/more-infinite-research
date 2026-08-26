@@ -180,14 +180,17 @@
           "tools/lib/mir4/SupplyChain.ps1",
           "tools/lib/mir4/SupplyChainAttestation.ps1",
           "tools/lib/mir4/ReleaseCapsule.ps1",
+          "tools/lib/mir4/RunnerPublisherConfinement.ps1",
           "tools/commands/mir4/Invoke-MIR4SupplyChain.ps1",
           "tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1",
+          "tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1",
           "spec/schemas/mir4-supply-chain-authority-v1.schema.json",
           "spec/schemas/mir4-supply-chain-attestation-v1.schema.json",
           "spec/schemas/mir4-private-custody-inventory-v1.schema.json",
           "spec/schemas/mir4-release-capsule-manifest-v1.schema.json",
           "spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json",
-          "spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json"
+          "spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json",
+          "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json"
         ]
       },
       "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
@@ -259,6 +262,24 @@
     "private_payloads_embedded": false,
     "mutable_github_state_required": false,
     "dummy_publisher_only": true
+  },
+  "runner_action_security": {
+    "workflow_lock": ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+    "receipt_schema": "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json",
+    "public_pull_request_runner": "windows-latest",
+    "public_pull_request_secrets_forbidden": true,
+    "protected_runtime_environment": "release-candidate",
+    "protected_runtime_runner": "self-hosted-windows",
+    "immutable_source_ref_required": true,
+    "full_action_commit_required": true,
+    "direct_dispatch_input_shell_interpolation_forbidden": true,
+    "maximum_heavy_parallelism": 1,
+    "maximum_lightweight_parallelism": 2,
+    "builder_signing_or_upload_credentials_forbidden": true,
+    "qualifier_package_mutation_forbidden": true,
+    "external_mod_release_credentials_forbidden": true,
+    "publisher_checkout_or_builder_forbidden": true,
+    "publisher_admission_required": true
   },
   "transition_gate": {
     "source_freeze": false,

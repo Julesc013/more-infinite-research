@@ -15,6 +15,15 @@ jobs:
   confined-publisher:
     runs-on: [self-hosted, Windows, mir4-publisher]
     environment: mir4-production-publication
+    env:
+      MIR4_CANDIDATE_ID: ${{ inputs.candidate_id }}
+      MIR4_PROOF_ROOT: ${{ inputs.proof_root }}
+      MIR4_RELEASE_PLAN_DIGEST: ${{ inputs.release_plan_digest }}
+      MIR4_SEAL_ROOT: ${{ inputs.seal_root }}
+      MIR4_SOURCE_COMMIT: ${{ inputs.source_commit }}
+      MIR4_SOURCE_RELEASE_RECORD: ${{ inputs.source_release_record }}
+      MIR4_SOURCE_TREE: ${{ inputs.source_tree }}
+      MIR4_TARGET_RECORD_SET: ${{ inputs.target_distribution_record_set }}
     steps:
       - name: Publish only pre-sealed bytes from the confined publisher
         shell: pwsh
@@ -26,18 +35,18 @@ jobs:
           $client=Join-Path $root 'publication-clients/Invoke-MIR4TargetPublication.ps1'
           if(-not(Test-Path -LiteralPath $gate -PathType Leaf)){throw '[mir4-publisher-admission-gate-absent]'}
           if(-not(Test-Path -LiteralPath $client -PathType Leaf)){throw '[mir4-publisher-client-absent]'}
-          $p=@{SourceReleaseRecord='${{ inputs.source_release_record }}';CandidateId='${{ inputs.candidate_id }}';SourceCommit='${{ inputs.source_commit }}';SourceTree='${{ inputs.source_tree }}';TargetDistributionRecordSet='${{ inputs.target_distribution_record_set }}';ReleasePlanDigest='${{ inputs.release_plan_digest }}';ProofRoot='${{ inputs.proof_root }}';SealRoot='${{ inputs.seal_root }}'}
+          $p=@{SourceReleaseRecord=$env:MIR4_SOURCE_RELEASE_RECORD;CandidateId=$env:MIR4_CANDIDATE_ID;SourceCommit=$env:MIR4_SOURCE_COMMIT;SourceTree=$env:MIR4_SOURCE_TREE;TargetDistributionRecordSet=$env:MIR4_TARGET_RECORD_SET;ReleasePlanDigest=$env:MIR4_RELEASE_PLAN_DIGEST;ProofRoot=$env:MIR4_PROOF_ROOT;SealRoot=$env:MIR4_SEAL_ROOT}
           $admission=& $gate @p
           if($admission-is[string]){$admission=$admission|ConvertFrom-Json -Depth 30}
           if($null-eq$admission-or-not[bool]$admission.publication_authorized-or
-             [string]$admission.source_release_record-cne'${{ inputs.source_release_record }}'-or
-             [string]$admission.candidate_id-cne'${{ inputs.candidate_id }}'-or
-             [string]$admission.source_commit-cne'${{ inputs.source_commit }}'-or
-             [string]$admission.source_tree-cne'${{ inputs.source_tree }}'-or
-             [string]$admission.target_distribution_record_set-cne'${{ inputs.target_distribution_record_set }}'-or
-             [string]$admission.release_plan_digest-cne'${{ inputs.release_plan_digest }}'-or
-             [string]$admission.proof_root-cne'${{ inputs.proof_root }}'-or
-             [string]$admission.seal_root-cne'${{ inputs.seal_root }}'){
+             [string]$admission.source_release_record -cne $env:MIR4_SOURCE_RELEASE_RECORD -or
+             [string]$admission.candidate_id -cne $env:MIR4_CANDIDATE_ID -or
+             [string]$admission.source_commit -cne $env:MIR4_SOURCE_COMMIT -or
+             [string]$admission.source_tree -cne $env:MIR4_SOURCE_TREE -or
+             [string]$admission.target_distribution_record_set -cne $env:MIR4_TARGET_RECORD_SET -or
+             [string]$admission.release_plan_digest -cne $env:MIR4_RELEASE_PLAN_DIGEST -or
+             [string]$admission.proof_root -cne $env:MIR4_PROOF_ROOT -or
+             [string]$admission.seal_root -cne $env:MIR4_SEAL_ROOT){
              throw '[mir4-publisher-admission-denied]'
            }
           & $client @p

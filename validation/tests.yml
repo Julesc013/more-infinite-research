@@ -1595,6 +1595,31 @@
       ]
     },
     {
+      "id": "static.mir4-runner-publisher-confinement",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".github/workflows/*.yml",
+        ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+        ".mir/releases/governance/mir4/supply-chain.json",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "spec/schemas/mir4-github-actions-lock-v2.schema.json",
+        "spec/schemas/mir4-supply-chain-authority-v1.schema.json",
+        "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json",
+        "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+        "tools/lib/mir4/ExtensionDeveloperExperience.ps1",
+        "tools/lib/mir4/RunnerPublisherConfinement.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1",
+        "validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+        "docs/maintainer/mir4-supply-chain-preservation.md",
+        "package-source"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",

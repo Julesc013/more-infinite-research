@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json",
+  "title": "MIR 4 runner and publisher confinement receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "canonicalization", "programme_id", "turn", "source", "workflow_closure", "action_lock", "checks", "confinement", "package_source_sha256", "transition_authority", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4RunnerPublisherConfinementReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "working_tree_clean"],
+      "properties": {
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "working_tree_clean": {"type": "boolean"}
+      }
+    },
+    "workflow_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["count", "root_sha256", "rows"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 1},
+        "root_sha256": {"$ref": "#/$defs/sha256"},
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256", "external_actions", "public_pull_request", "secret_references"],
+            "properties": {
+              "path": {"type": "string", "pattern": "^\\.github/workflows/[A-Za-z0-9._-]+\\.yml$"},
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "external_actions": {"type": "array", "items": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*@[0-9a-f]{40}$"}, "uniqueItems": true},
+              "public_pull_request": {"type": "boolean"},
+              "secret_references": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "action_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "file_sha256", "actions", "generated_sources"],
+      "properties": {
+        "path": {"const": ".mir/releases/governance/mir4/github-actions-lock-v2.json"},
+        "file_sha256": {"$ref": "#/$defs/sha256"},
+        "actions": {"type": "integer", "minimum": 1},
+        "generated_sources": {"type": "integer", "minimum": 1}
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"const": "passed"}
+        }
+      }
+    },
+    "confinement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_pr_secrets", "builder_signing_credentials", "builder_upload_credentials", "qualifier_package_mutation", "external_mod_release_credentials", "publisher_source_checkout", "publisher_package_builder", "publisher_private_signing_key", "publisher_admission_required"],
+      "properties": {
+        "public_pr_secrets": {"const": false},
+        "builder_signing_credentials": {"const": false},
+        "builder_upload_credentials": {"const": false},
+        "qualifier_package_mutation": {"const": false},
+        "external_mod_release_credentials": {"const": false},
+        "publisher_source_checkout": {"const": false},
+        "publisher_package_builder": {"const": false},
+        "publisher_private_signing_key": {"const": false},
+        "publisher_admission_required": {"const": true}
+      }
+    },
+    "package_source_sha256": {"$ref": "#/$defs/sha256"},
+    "transition_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "sealing", "promotion", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "sealing": {"const": false},
+        "promotion": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  }
+}

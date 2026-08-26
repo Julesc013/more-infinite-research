@@ -80,6 +80,14 @@ The receipt is independent of its absolute restore path, so two clean roots prod
 
 The repository declares MPL-2.0 through LICENSE; the authority conservatively records concluded license and copyright as NOASSERTION. It does not invent ownership or a separate redistribution grant for binary artwork. Private engines, third-party archives, unredacted evidence, acquisition data, recovery material, credentials, and private keys remain outside ordinary repository and public-capsule history.
 
+## Runner and publisher confinement
+
+Run `./tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1 -RequireClean` to write the commit-bound T15 confinement receipt. The verifier closes over every tracked and generated workflow source, requires every third-party action to match the full-SHA action lock, checks least-privilege permissions, and rejects direct workflow-dispatch input interpolation inside shell commands.
+
+Public pull requests run on secret-free hosted workers. Factorio-capable protected jobs use the `release-candidate` environment and are serialized to one heavy worker; public static work is capped at two lanes. Builders receive neither signing nor upload credentials, qualifiers cannot modify packages, and external mod closures receive acquisition-only Factorio credentials rather than release credentials. The publisher workflow has no action, checkout, source tree, builder, or private-key capability and must obtain an exact admission decision from its external seal verifier before its external client can run.
+
+The confinement receipt is evidence, not publication authority. Its transition flags remain false even when every check passes.
+
 ## Resource interruption
 
 If a validator approaches the memory reserve, stop scheduling work, terminate the isolated child process, hash all completed immutable outputs, and write a resource-interruption receipt. A resource-context failure is not a semantic acceptance or rejection.

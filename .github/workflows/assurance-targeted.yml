@@ -37,12 +37,16 @@ jobs:
             mir-ledger-${{ runner.os }}-${{ inputs.target }}-
       - name: Build exact candidate once
         shell: pwsh
-        run: ./tools/mir.ps1 assurance build --target '${{ inputs.target }}'
+        env:
+          MIR_ASSURANCE_TARGET: ${{ inputs.target }}
+        run: ./tools/mir.ps1 assurance build --target $env:MIR_ASSURANCE_TARGET
       - name: Create impact-selected plan
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./tools/mir.ps1 verify plan --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --factorio $env:FACTORIO_BIN --output build/results/assurance/verification-plan.json
+          MIR_ASSURANCE_BASELINE_SHA: ${{ inputs.baseline_sha }}
+          MIR_ASSURANCE_TARGET: ${{ inputs.target }}
+        run: ./tools/mir.ps1 verify plan --target $env:MIR_ASSURANCE_TARGET --baseline $env:MIR_ASSURANCE_BASELINE_SHA --profile targeted --factorio $env:FACTORIO_BIN --output build/results/assurance/verification-plan.json
       - id: matrix
         shell: pwsh
         run: |
@@ -64,6 +68,7 @@ jobs:
     environment: release-candidate
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     concurrency:
       group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
@@ -87,7 +92,10 @@ jobs:
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./tools/mir.ps1 verify run-one --target '${{ inputs.target }}' --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN
+          MIR_ASSURANCE_FINGERPRINT: ${{ matrix.fingerprint }}
+          MIR_ASSURANCE_TARGET: ${{ inputs.target }}
+          MIR_ASSURANCE_TEST_ID: ${{ matrix.test_id }}
+        run: ./tools/mir.ps1 verify run-one --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --test $env:MIR_ASSURANCE_TEST_ID --fingerprint $env:MIR_ASSURANCE_FINGERPRINT --factorio $env:FACTORIO_BIN
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -129,12 +137,14 @@ jobs:
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./tools/mir.ps1 verify import-workers --target '${{ inputs.target }}' --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --workers build/results/assurance/worker-evidence --artifact-prefix mir-targeted-evidence-
+          MIR_ASSURANCE_TARGET: ${{ inputs.target }}
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --workers build/results/assurance/worker-evidence --artifact-prefix mir-targeted-evidence-
       - name: Aggregate targeted gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./tools/mir.ps1 verify gate --target '${{ inputs.target }}' --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --output build/results/assurance/targeted-summary.json
+          MIR_ASSURANCE_TARGET: ${{ inputs.target }}
+        run: ./tools/mir.ps1 verify gate --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --output build/results/assurance/targeted-summary.json
       - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         if: always()
         with:

@@ -79,6 +79,7 @@ paths:
   spec.schemas.mir4-release-capsule-manifest-v1: spec/schemas/mir4-release-capsule-manifest-v1.schema.json
   spec.schemas.mir4-release-capsule-construction-receipt-v1: spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
   spec.schemas.mir4-release-capsule-restoration-receipt-v1: spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
+  spec.schemas.mir4-runner-publisher-confinement-receipt-v1: spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
   validation.adapters: validation/adapters
@@ -94,6 +95,7 @@ paths:
   validation.tests.mir4.supply-chain-foundation: validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
   validation.tests.mir4.supply-chain-attestation: validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
   validation.tests.mir4.release-capsule: validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
+  validation.tests.mir4.runner-publisher-confinement: validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control

@@ -114,6 +114,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     concurrency:
       group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}

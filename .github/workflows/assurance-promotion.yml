@@ -24,4 +24,6 @@ jobs:
           fetch-depth: 0
       - name: Verify sealed bytes and evidence only
         shell: pwsh
-        run: ./tools/mir.ps1 assurance check-seal --seal '${{ inputs.seal_path }}' --json
+        env:
+          MIR_SEAL_PATH: ${{ inputs.seal_path }}
+        run: ./tools/mir.ps1 assurance check-seal --seal $env:MIR_SEAL_PATH --json

@@ -28,6 +28,12 @@ Assert-MIR4SupplyChainTest (
   -not [bool]$authority.attestation.production_key_generation_authorized
 ) 'mir4-supply-chain-production-key-firewall'
 Assert-MIR4SupplyChainTest (
+  [int]$authority.runner_action_security.maximum_heavy_parallelism -eq 1 -and
+  [int]$authority.runner_action_security.maximum_lightweight_parallelism -eq 2 -and
+  [bool]$authority.runner_action_security.direct_dispatch_input_shell_interpolation_forbidden -and
+  [bool]$authority.runner_action_security.publisher_admission_required
+) 'mir4-supply-chain-runner-publisher-policy'
+Assert-MIR4SupplyChainTest (
   @($authority.components | Where-Object {
     [string]$_.license.declared -cne 'MPL-2.0' -or
     [string]$_.license.concluded -cne 'NOASSERTION' -or
