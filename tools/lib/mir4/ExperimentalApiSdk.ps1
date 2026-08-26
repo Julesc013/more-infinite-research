@@ -183,6 +183,7 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   param([Parameter(Mandatory)][string]$RepoRoot)
   . (Join-Path $RepoRoot 'tools/lib/mir4/ModuleEcosystem.ps1')
   . (Join-Path $RepoRoot 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+  . (Join-Path $RepoRoot 'tools/lib/mir4/MepDiscovery.ps1')
   . (Join-Path $RepoRoot 'tools/lib/mir4/SdkV1.ps1')
   $authority = Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot
   $mepSchema = Get-MIR4MepV1Schema -Authority $authority
@@ -207,6 +208,21 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   $conflictB = New-MIR4ExtensionTemplateV1 -RepoRoot $RepoRoot -ExtensionId 'org.example.conflict-b' -Template minimal
   $conflictB.fragments += [pscustomobject][ordered]@{id='org.example.conflict-b.conflict';kind='ExtensionConflict';data=[ordered]@{extension_ids=@('org.example.conflict-a')}}
   $conflictB.digest='';$conflictB.digest=Get-MIR4ModuleDigest $conflictB
+  $discoveryAddon = (($minimal | ConvertTo-Json -Depth 100) | ConvertFrom-Json -Depth 100)
+  $discoveryAddon.extension_id='org.example.discovery-addon';$discoveryAddon.namespace='org.example.discovery-addon';$discoveryAddon.extension_version='1.0.0-preview'
+  foreach($fragment in @($discoveryAddon.fragments)){$fragment.id=$fragment.id.Replace('org.example.minimal','org.example.discovery-addon')}
+  @($discoveryAddon.fragments|Where-Object kind -eq 'ExtensionDependency')[0].data.extension_id='org.more-infinite-research.reference'
+  $discoveryAddon.digest='';$discoveryAddon.digest=Get-MIR4ModuleDigest $discoveryAddon
+  $environmentLock=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/reference/environment-lock-f210-v1.json')|ConvertFrom-Json -Depth 100
+  $discoveryRecordReference=[pscustomobject][ordered]@{name='mir-reference--mep-v1';data_type='more-infinite-research.extension.v1';data=$reference}
+  $discoveryRecordAddon=[pscustomobject][ordered]@{name='example-addon--mep-v1';data_type='more-infinite-research.extension.v1';data=$discoveryAddon}
+  $discoveryRecordIgnored=[pscustomobject][ordered]@{name='example-unrelated';data_type='example.unrelated';data=[pscustomobject]@{note='ignored-by-exact-data-type'}}
+  $discoverySnapshotA=[pscustomobject][ordered]@{schema=1;kind='MIR4F210ModDataSnapshotV1';target='f210';factorio_line='2.1';environment_lock_digest=[string]$environmentLock.digest;host=[pscustomobject][ordered]@{present=$true;id='org.more-infinite-research.platform';version='0.5.0-preview'};records=@($discoveryRecordReference,$discoveryRecordIgnored,$discoveryRecordAddon)}
+  $discoverySnapshotB=[pscustomobject][ordered]@{schema=1;kind='MIR4F210ModDataSnapshotV1';target='f210';factorio_line='2.1';environment_lock_digest=[string]$environmentLock.digest;host=[pscustomobject][ordered]@{present=$true;id='org.more-infinite-research.platform';version='0.5.0-preview'};records=@($discoveryRecordAddon,$discoveryRecordReference,$discoveryRecordIgnored)}
+  $discoveryHostAbsent=Copy-MIR4F210MepDiscoveryValueV1 $discoverySnapshotA;$discoveryHostAbsent.host=[pscustomobject][ordered]@{present=$false;id=$null;version=$null}
+  $discoveryConflict=[pscustomobject][ordered]@{schema=1;kind='MIR4F210ModDataSnapshotV1';target='f210';factorio_line='2.1';environment_lock_digest=[string]$environmentLock.digest;host=[pscustomobject][ordered]@{present=$true;id='org.more-infinite-research.platform';version='0.5.0-preview'};records=@([pscustomobject][ordered]@{name='conflict-a--mep-v1';data_type='more-infinite-research.extension.v1';data=$conflictA},[pscustomobject][ordered]@{name='conflict-b--mep-v1';data_type='more-infinite-research.extension.v1';data=$conflictB})}
+  $discoveryInvalid=[pscustomobject][ordered]@{schema=1;kind='MIR4F210ModDataSnapshotV1';target='f210';factorio_line='2.1';environment_lock_digest=[string]$environmentLock.digest;host=[pscustomobject][ordered]@{present=$true;id='org.more-infinite-research.platform';version='0.5.0-preview'};records=@([pscustomobject][ordered]@{name='invalid--mep-v1';data_type='more-infinite-research.extension.v1';data=$forbidden})}
+  $discoveryResult=New-MIR4F210MepDiscoveryV1 -RepoRoot $RepoRoot -Snapshot $discoverySnapshotA
   $migrationV0 = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/reference-extension/extension.json')|ConvertFrom-Json -Depth 100
   $migrationV1 = ConvertFrom-MIR4MepV0ToV1 -Envelope $migrationV0
   $files = [ordered]@{}
@@ -248,6 +264,53 @@ function M.validate(value)
   return scan(value)
 end
 function M.build(value) local ok, err=M.validate(value);if not ok then return nil,err end;return value end
+local function sorted_keys(value)
+  local out = {}; for key, _ in pairs(value or {}) do out[#out + 1] = key end
+  table.sort(out); return out
+end
+function M.discover_mod_data(mod_data, host_present)
+  local result = {status=host_present and 'discovered' or 'host-absent-inert',records={},diagnostics={},mutation_authorized=false,prototype_write_authorized=false}
+  if not host_present then return result end
+  local by_id, namespaces, edges = {}, {}, {}
+  for _, name in ipairs(sorted_keys(mod_data)) do
+    local prototype = mod_data[name]
+    if type(prototype) == 'table' and prototype.data_type == 'more-infinite-research.extension.v1' then
+      local envelope = prototype.data
+      local ok, err = M.validate(envelope)
+      if not ok then result.status='quarantined';result.diagnostics[#result.diagnostics+1]=err
+      elseif by_id[envelope.extension_id] or namespaces[envelope.namespace] then result.status='quarantined';result.diagnostics[#result.diagnostics+1]='mir4-mep-v1-duplicate-extension'
+      else
+        by_id[envelope.extension_id]=envelope;namespaces[envelope.namespace]=envelope.extension_id;edges[envelope.extension_id]={}
+        result.records[#result.records+1]={prototype_name=name,extension_id=envelope.extension_id,status='validated'}
+      end
+    end
+  end
+  if result.status == 'quarantined' then return result end
+  for id, envelope in pairs(by_id) do
+    for _, fragment in ipairs(envelope.fragments) do
+      if fragment.kind == 'ExtensionDependency' and fragment.data.extension_id ~= 'org.more-infinite-research.platform' then
+        local dependency=fragment.data.extension_id
+        if not by_id[dependency] then result.status='quarantined';result.diagnostics[#result.diagnostics+1]='mir4-mep-v1-missing-dependency';return result end
+        edges[id][#edges[id]+1]=dependency
+      elseif fragment.kind == 'ExtensionConflict' then
+        for _, conflict in ipairs(fragment.data.extension_ids or {}) do
+          if by_id[conflict] then result.status='quarantined';result.diagnostics[#result.diagnostics+1]='mir4-mep-v1-conflict';return result end
+        end
+      end
+    end
+  end
+  local remaining, order = {}, {}
+  for id, dependencies in pairs(edges) do remaining[id]=dependencies end
+  while next(remaining) do
+    local ready={};for id, dependencies in pairs(remaining) do if #dependencies==0 then ready[#ready+1]=id end end;table.sort(ready)
+    if #ready==0 then result.status='quarantined';result.diagnostics[#result.diagnostics+1]='mir4-mep-v1-dependency-cycle';return result end
+    for _, id in ipairs(ready) do
+      order[#order+1]=id;remaining[id]=nil
+      for _, dependencies in pairs(remaining) do for index=#dependencies,1,-1 do if dependencies[index]==id then table.remove(dependencies,index) end end end
+    end
+  end
+  result.order=order;return result
+end
 return M
 '@
   $files['sdk/preview/mir4/mep-v1/lua/mir4_mep_v1.luals.lua'] = @'
@@ -366,6 +429,7 @@ end
   $files['sdk/preview/mir4/reference-extension-v1/README.md']="# MIR 4 synthetic external reference extension V1`n`nThis package-excluded extension exercises all 12 data-only fragment kinds. It is a conformance fallback, not an independent production consumer or public compatibility claim.`n"
   $files['sdk/preview/mir4/reference/extension-closure-v1.json']=(ConvertTo-MIR4ModuleCanonicalJson $closure)+"`n"
   $files['sdk/preview/mir4/reference/extension-transport-plan-v1.json']=(ConvertTo-MIR4ModuleCanonicalJson $transport)+"`n"
+  $files['sdk/preview/mir4/reference/f210-mep-discovery-v1.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoveryResult)+"`n"
   $files['sdk/preview/mir4/api-v1/vectors/available-page-1.json']=(ConvertTo-MIR4ModuleCanonicalJson $apiAvailable)+"`n"
   $files['sdk/preview/mir4/api-v1/vectors/unavailable-observation-f012.json']=(ConvertTo-MIR4ModuleCanonicalJson $apiUnavailable)+"`n"
   $files['fixtures/mir4-mep-v1/positive/reference-extension.json']=(ConvertTo-MIR4ModuleCanonicalJson $reference)+"`n"
@@ -373,6 +437,11 @@ end
   $files['fixtures/mir4-mep-v1/negative/missing-dependency.json']=(ConvertTo-MIR4ModuleCanonicalJson $missing)+"`n"
   $files['fixtures/mir4-mep-v1/negative/cycle-a.json']=(ConvertTo-MIR4ModuleCanonicalJson $cycleA)+"`n"
   $files['fixtures/mir4-mep-v1/negative/cycle-b.json']=(ConvertTo-MIR4ModuleCanonicalJson $cycleB)+"`n"
+  $files['fixtures/mir4-mep-discovery-v1/positive/order-a.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoverySnapshotA)+"`n"
+  $files['fixtures/mir4-mep-discovery-v1/positive/order-b.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoverySnapshotB)+"`n"
+  $files['fixtures/mir4-mep-discovery-v1/positive/host-absent.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoveryHostAbsent)+"`n"
+  $files['fixtures/mir4-mep-discovery-v1/negative/conflict.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoveryConflict)+"`n"
+  $files['fixtures/mir4-mep-discovery-v1/negative/invalid-envelope.json']=(ConvertTo-MIR4ModuleCanonicalJson $discoveryInvalid)+"`n"
   $files['sdk/preview/mir4/mep-v1/README.md'] = "# MIR Extension Protocol V1 preview`n`nData-only envelopes contribute 12 typed fragment kinds. They cannot carry callbacks, prototype writes, raw compiler context, executors, or SafetyKernel overrides. Resolve dependencies before inspection and treat capability gaps as review-required.`n"
   foreach($generatedExtension in @(
     @{path='sdk/preview/mir4/mep-v1/templates/minimal/extension.json';value=$minimal},
@@ -390,7 +459,7 @@ end
   $files['sdk/preview/mir4/mep-v1/package-metadata.json']=(ConvertTo-MIR4ModuleCanonicalJson ([ordered]@{
     schema=1;kind='MIR4MepV1PackageMetadata';name='mir4-mep-v1-preview';version='4.0.0-preview'
     maturity='developer-preview';license='MPL-2.0';canonicalization='mir-canonical-json/1'
-    commands=@('ci-init','diff','doctor','explain','init','lock','migrate','package','test','validate')
+    commands=@('ci-init','diff','discover','doctor','explain','init','lock','migrate','package','test','validate')
     templates=@('all-fragments','minimal','unavailable')
     examples=@('conflict','migration','positive','unavailable')
     package_visible=$false;player_mutation_authorized=$false;prototype_write_authorized=$false
@@ -399,9 +468,9 @@ end
   $files['sdk/preview/mir4/mep-v1/README.md'] = @'
 # MIR Extension Protocol V1 preview
 
-This self-contained, offline developer preview supplies minimal, all-fragment, and unavailable templates; positive, conflict, unavailable, and migration examples; and ten commands: init, doctor, validate, lock, diff, explain, test, package, migrate, and ci-init.
+This self-contained, offline developer preview supplies minimal, all-fragment, and unavailable templates; positive, conflict, unavailable, migration, and F210 discovery examples; and eleven commands: init, doctor, validate, lock, diff, discover, explain, test, package, migrate, and ci-init.
 
-Start with docs/reference/mir4-first-extension.md. The protocol is data-only. It grants no callbacks, compiler context, prototype writes, player mutation, signing, sealing, publication, or public support authority. F210 remains review-required while its extension-owned mod-data transport is blocked by the terminal emitter.
+Start with docs/reference/mir4-first-extension.md. The F210 collector now discovers extension-owned mod-data snapshots, validates envelopes, resolves dependency/conflict closure, and explains shadow plans. It remains package-excluded and read-only; F210 emission/admission is still blocked behind the unchanged terminal emitter.
 '@
   $files['docs/reference/generated/mir4-api-sdk-v1.md'] = @'
 ---
@@ -449,7 +518,7 @@ $diff=New-MIR4ExtensionDiffV1 -RepoRoot $RepoRoot -Base $value -Candidate $value
 $plan=New-MIR4ExtensionShadowPlanV1 -RepoRoot $RepoRoot -Envelope $value -Target f210
 if([string]$doctor.status-cne'passed'-or-not[bool]$closure.complete-or[string]$diff.status-cne'identical'-or[string]$plan.result-cne'shadow-complete'){throw '[mir4-mep-v1-conformance]'}
 [pscustomobject]@{
-  status='passed';maturity='developer-preview';commands=10;offline=$true
+  status='passed';maturity='developer-preview';commands=11;offline=$true
   lock_status=[string]$lock.status;player_mutation_authorized=$false;prototype_write_authorized=$false
   production_consumer='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER'
 }|ConvertTo-Json

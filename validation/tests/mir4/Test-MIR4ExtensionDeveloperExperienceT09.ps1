@@ -19,7 +19,7 @@ New-Item -ItemType Directory -Force -Path $resultRoot|Out-Null
 $command=Join-Path $repo 'tools/commands/mir4/Invoke-MIR4Extension.ps1'
 
 $doctor=& $command -Command doctor -RepoRoot $repo|ConvertFrom-Json -Depth 100
-if([string]$doctor.status-cne'passed'-or@($doctor.commands).Count-ne10-or[bool]$doctor.player_mutation_authorized){throw '[mir4-t09-doctor]'}
+if([string]$doctor.status-cne'passed'-or@($doctor.commands).Count-ne11-or[bool]$doctor.player_mutation_authorized){throw '[mir4-t09-doctor]'}
 $init=Join-Path $resultRoot 'init'
 & $command -Command init -RepoRoot $repo -ExtensionId org.example.t09 -Template minimal -OutputRoot $init|Out-Null
 $extension=Join-Path $init 'extension.json'

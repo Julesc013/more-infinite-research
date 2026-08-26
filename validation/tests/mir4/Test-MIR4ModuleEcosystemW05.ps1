@@ -9,7 +9,7 @@ $ErrorActionPreference='Stop'
 $hostedReceiptOnly=Test-MIR4HostedReceiptOnly
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4ModuleEcosystemAuthority -RepoRoot $RepoRoot
-if(@($authority.fragment_kinds).Count-ne 12-or@($authority.api_surfaces).Count-ne 9-or@($authority.transports).Count-ne 17-or@($authority.builder_commands).Count-ne 10){throw '[mir4-w05-authority-counts]'}
+if(@($authority.fragment_kinds).Count-ne 12-or@($authority.api_surfaces).Count-ne 9-or@($authority.transports).Count-ne 17-or@($authority.builder_commands).Count-ne 11){throw '[mir4-w05-authority-counts]'}
 if($authority.semantic_authority-or$authority.prototype_write_authorized-or$authority.runtime_state_mutation_authorized-or$authority.migration_execution_authorized-or$authority.safety_kernel_override_authorized-or$authority.public_support_authorized-or$authority.signing_or_sealing_authorized-or$authority.publication_authorized){throw '[mir4-w05-authority-boundary]'}
 
 $reference=New-MIR4ReferenceExtensionV1 -RepoRoot $RepoRoot

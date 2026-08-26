@@ -82,9 +82,17 @@ function Get-MIR4ExtensionDoctorV1 {
     [bool]$authority.publication_authorized
   )
   $checks += [ordered]@{id='authority-firewall';status=$(if($safe){'passed'}else{'failed'});observed='all-player-and-release-authority-denied'}
-  $expectedCommands = @('ci-init','diff','doctor','explain','init','lock','migrate','package','test','validate')
+  $expectedCommands = @('ci-init','diff','discover','doctor','explain','init','lock','migrate','package','test','validate')
   $actualCommands = @($authority.builder_commands | ForEach-Object {[string]$_} | Sort-Object)
   $checks += [ordered]@{id='command-surface';status=$(if(($actualCommands-join'|')-ceq($expectedCommands-join'|')){'passed'}else{'failed'});observed=$actualCommands}
+  $discoveryFiles = @(
+    '.mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json',
+    'spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json',
+    'spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json',
+    'tools/lib/mir4/MepDiscovery.ps1'
+  )
+  $discoveryReady = @($discoveryFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $repo $_) -PathType Leaf) }).Count -eq 0
+  $checks += [ordered]@{id='f210-read-only-discovery';status=$(if($discoveryReady){'passed'}else{'failed'});observed='extension-owned-mod-data-read-only'}
   if ($null -ne $Envelope) {
     try {
       Test-MIR4MepV1Envelope -Envelope $Envelope -RepoRoot $repo | Out-Null
@@ -210,6 +218,33 @@ function New-MIR4ExtensionShadowPlanV1 {
   $record=[pscustomobject][ordered]@{
     kind='MIR4ExtensionShadowPlanV1';schema=1;maturity='developer-preview';extension_lock_digest=[string]$lock.digest
     target=$Target;contributions=$contributions;result=$(if([string]$lock.status-eq'unavailable'){'unavailable'}else{'shadow-complete'})
+    authoritative_output=$false;player_mutation_authorized=$false;prototype_write_authorized=$false;public_support_claim=$false;digest=''
+  }
+  $record.digest=Get-MIR4ModuleDigest $record
+  return $record
+}
+
+function New-MIR4ExtensionClosureShadowPlanV1 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Envelope,
+    [Parameter(Mandatory)]$Closure
+  )
+  $repo=Get-MIR4ExtensionDeveloperRepoRoot $RepoRoot
+  Test-MIR4MepV1Envelope -Envelope $Envelope -RepoRoot $repo|Out-Null
+  if([string]$Closure.kind-cne'MIR4ExtensionClosureV1'-or-not[bool]$Closure.complete){throw '[mir4-extension-shadow-closure]'}
+  $row=@($Closure.extensions|Where-Object extension_id -eq ([string]$Envelope.extension_id))
+  if($row.Count-ne1-or[string]$row[0].digest-cne[string]$Envelope.digest){throw '[mir4-extension-shadow-closure-member]'}
+  $contributions=@(
+    foreach($fragment in @($Envelope.fragments|Sort-Object id)){
+      $availability=if([string]$fragment.kind-in@('ProcessClassificationFragment','ExternalEffectChannelDeclaration')-and[string]$fragment.data.status-eq'unavailable'){'unavailable'}else{'available'}
+      [ordered]@{fragment_id=[string]$fragment.id;fragment_kind=[string]$fragment.kind;operation='data-only-shadow';availability=$availability;authoritative=$false;mutation_authorized=$false}
+    }
+  )
+  $record=[pscustomobject][ordered]@{
+    kind='MIR4ExtensionClosureShadowPlanV1';schema=1;maturity='developer-preview'
+    extension=[ordered]@{id=[string]$Envelope.extension_id;version=[string]$Envelope.extension_version;digest=[string]$Envelope.digest}
+    target=[string]$Closure.target;extension_closure_digest=[string]$Closure.digest;contributions=$contributions;result='shadow-complete'
     authoritative_output=$false;player_mutation_authorized=$false;prototype_write_authorized=$false;public_support_claim=$false;digest=''
   }
   $record.digest=Get-MIR4ModuleDigest $record

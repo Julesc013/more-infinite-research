@@ -197,6 +197,22 @@ fixtures:
       - blocked-independent-production-consumer-retained
       - player-package-non-interference
 
+  mir4-mep-discovery-v1:
+    requires_features: []
+    path: fixtures/mir4-mep-discovery-v1
+    shipped: false
+    validates:
+      - exact-f210-extension-mod-data-type-selection
+      - canonical-prototype-order-invariance
+      - shared-mep-v1-envelope-validation
+      - deterministic-dependency-before-dependent-closure
+      - explicit-conflict-quarantine
+      - invalid-envelope-quarantine
+      - host-absence-inertness
+      - shadow-plan-only-output
+      - terminal-emitter-unchanged
+      - player-package-non-interference
+
   mir4-process-ir-v0-safety:
     requires_features: []
     path: fixtures/mir4-process-ir-v0

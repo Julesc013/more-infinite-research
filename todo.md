@@ -6,7 +6,7 @@ Generated: 2026-08-25
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T10-COMPLETE-T11-T12-T14-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T11`.
+Status: `T11-COMPLETE-T12-T14-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T12`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -21,7 +21,7 @@ Status: `T10-COMPLETE-T11-T12-T14-READY-RELEASE-BLOCKED`. Candidate state: `pre-
 | `T08` | SDK V1 preview completion | `completed` | T07 | `false` |
 | `T09` | Extension developer experience | `completed` | T07 | `false` |
 | `T10` | Environment lock, diff, support bundle and minimizer | `completed` | T07 | `false` |
-| `T11` | Read-only F210 MEP discovery | `ready` | T09 | `false` |
+| `T11` | Read-only F210 MEP discovery | `completed` | T09 | `false` |
 | `T12` | Exact target ProcessIR preview and Inspector compare | `ready` | T10 | `false` |
 | `T13` | Release compatibility canary cut | `blocked-dependency` | T10, T12 | `false` |
 | `T14` | MIR4 public, contributor, maintainer and continuity documentation | `ready` | T01, T07, T09, T10 | `false` |

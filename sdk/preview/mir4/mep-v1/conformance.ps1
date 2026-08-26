@@ -10,7 +10,7 @@ $diff=New-MIR4ExtensionDiffV1 -RepoRoot $RepoRoot -Base $value -Candidate $value
 $plan=New-MIR4ExtensionShadowPlanV1 -RepoRoot $RepoRoot -Envelope $value -Target f210
 if([string]$doctor.status-cne'passed'-or-not[bool]$closure.complete-or[string]$diff.status-cne'identical'-or[string]$plan.result-cne'shadow-complete'){throw '[mir4-mep-v1-conformance]'}
 [pscustomobject]@{
-  status='passed';maturity='developer-preview';commands=10;offline=$true
+  status='passed';maturity='developer-preview';commands=11;offline=$true
   lock_status=[string]$lock.status;player_mutation_authorized=$false;prototype_write_authorized=$false
   production_consumer='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER'
 }|ConvertTo-Json

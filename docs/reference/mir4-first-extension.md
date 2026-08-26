@@ -25,6 +25,12 @@ Replace the placeholder subject_refs value with a stable subject identifier befo
 
 Use the all-fragments template to inspect every fragment kind or the unavailable template to exercise an explicit unavailable result. The archive also includes positive, reciprocal-conflict, unavailable, and V0-to-V1 migration examples under sdk/preview/mir4/mep-v1/examples.
 
+To test F210 automatic discovery without changing a player package, use a captured mod-data snapshot:
+
+    .\tools\mir.ps1 mir4 extension discover --discovery fixtures\mir4-mep-discovery-v1\positive\order-a.json --output build\first-extension\discovery
+
+The read-only collector selects only `more-infinite-research.extension.v1`, validates the same envelopes used by `validate`, resolves dependencies and conflicts, and returns shadow plans. A snapshot with no host returns `host-absent-inert` with no accepted records or plans.
+
 Compare two valid envelopes and create an offline CI scaffold:
 
     .\tools\commands\mir4\Invoke-MIR4Extension.ps1 -Command diff -BasePath old.json -CandidatePath new.json -OutputRoot build\first-extension

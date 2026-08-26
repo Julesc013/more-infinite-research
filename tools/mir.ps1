@@ -52,7 +52,7 @@ Usage:
   .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 whole-platform <check|matrix|target-key> [--target <FNNN>]
   .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
-  .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate|doctor|lock|diff|ci-init> [--extension <path>] [--output <path>] [--id <reverse.dns.id>] [--template <minimal|all-fragments|unavailable>] [--target <FNNN>] [--base <path>] [--candidate <path>]
+  .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate|doctor|lock|diff|ci-init|discover> [--extension <path>] [--discovery <snapshot.json>] [--output <path>] [--id <reverse.dns.id>] [--template <minimal|all-fragments|unavailable>] [--target <FNNN>] [--base <path>] [--candidate <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
   .\tools\mir.ps1 release doctor [--json] [--dry-run] [--explain] [--output <path>]
   .\tools\mir.ps1 playtest prepare --target <F210|F200> [--candidate <path>] [--predecessor <path>] [--factorio <path>] [--settings <path>] [--save <path>] [--output <path>] [--dry-run] [--json]
@@ -738,9 +738,9 @@ switch ($area) {
         & (Join-Path $repo "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1") -RepoRoot $repo.Path -CatalogPath $catalog -Target $target -Ecosystem $ecosystem -OutputPath $output
       }
       "extension" {
-        if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, migrate, doctor, lock, diff, or ci-init." }
+        if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, migrate, doctor, lock, diff, ci-init, or discover." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('init','validate','explain','test','package','migrate','doctor','lock','diff','ci-init')) { throw "Unknown mir4 extension command: $subcommand" }
+        if ($subcommand -notin @('init','validate','explain','test','package','migrate','doctor','lock','diff','ci-init','discover')) { throw "Unknown mir4 extension command: $subcommand" }
         $builderArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
         $extension = Get-MIRArgValue -Items $Args -Name '--extension'
         $output = Get-MIRArgValue -Items $Args -Name '--output'
@@ -749,6 +749,7 @@ switch ($area) {
         $target = Get-MIRArgValue -Items $Args -Name '--target'
         $base = Get-MIRArgValue -Items $Args -Name '--base'
         $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+        $discovery = Get-MIRArgValue -Items $Args -Name '--discovery'
         if (-not [string]::IsNullOrWhiteSpace($extension)) { $builderArguments.ExtensionPath = $extension }
         if (-not [string]::IsNullOrWhiteSpace($output)) { $builderArguments.OutputRoot = $output }
         if (-not [string]::IsNullOrWhiteSpace($id)) { $builderArguments.ExtensionId = $id }
@@ -756,6 +757,7 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($target)) { $builderArguments.Target = $target.ToLowerInvariant() }
         if (-not [string]::IsNullOrWhiteSpace($base)) { $builderArguments.BasePath = $base }
         if (-not [string]::IsNullOrWhiteSpace($candidate)) { $builderArguments.CandidatePath = $candidate }
+        if (-not [string]::IsNullOrWhiteSpace($discovery)) { $builderArguments.DiscoveryPath = $discovery }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4Extension.ps1") @builderArguments
       }
       "handoff-m4c01" {

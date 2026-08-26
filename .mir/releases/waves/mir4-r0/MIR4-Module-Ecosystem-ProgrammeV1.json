@@ -28,7 +28,8 @@
     "spec/api/mir4-v1/diagnostics.json",
     "spec/api/mir4-v1/compatibility.json",
     "spec/canonicalization/mir-canonical-json-v1.json",
-    "fixtures/mir4-canonical-json-v1/vectors.json"
+    "fixtures/mir4-canonical-json-v1/vectors.json",
+    ".mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json"
   ],
   "fragment_kinds": [
     "CompatibilityFragment",
@@ -113,7 +114,7 @@
     "copy_mode": "canonical-json-deep-copy",
     "unavailable_representation": "explicit-status-reason-evidence-never-zero"
   },
-  "builder_commands": ["init", "validate", "explain", "test", "package", "migrate", "doctor", "lock", "diff", "ci-init"],
+  "builder_commands": ["init", "validate", "explain", "test", "package", "migrate", "doctor", "lock", "diff", "ci-init", "discover"],
   "independent_consumer": {
     "preferred": "industrial-revolution-4",
     "status": "BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER",
