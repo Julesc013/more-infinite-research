@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.moreinfiniteresearch.net/mir4/process-ir-comparison/1/schema.json",
+  "title": "MIR 4 bounded ProcessIR A/B comparison V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "work_package", "a", "b", "process_changes", "process_change_count", "truncated", "classification_before", "classification_after", "safe_unsafe_unknown_explicit", "offline", "network_or_upload_authorized", "mutation_authorized", "public_support_claim", "package_visible", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ProcessIRComparisonV1"},
+    "work_package": {"const": "T12"},
+    "a": {"type": "object"},
+    "b": {"type": "object"},
+    "process_changes": {"type": "array", "maxItems": 100},
+    "process_change_count": {"type": "integer", "minimum": 0},
+    "truncated": {"type": "boolean"},
+    "classification_before": {"type": "object"},
+    "classification_after": {"type": "object"},
+    "safe_unsafe_unknown_explicit": {"const": true},
+    "offline": {"const": true},
+    "network_or_upload_authorized": {"const": false},
+    "mutation_authorized": {"const": false},
+    "public_support_claim": {"const": false},
+    "package_visible": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

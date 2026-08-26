@@ -87,7 +87,7 @@ function New-MIR4EnvironmentLockV1 {
   if ($mir.source_commit -cnotmatch '^[0-9a-f]{40}$' -or $mir.source_tree -cnotmatch '^[0-9a-f]{40}$') { throw '[mir4-environment-source-identity]' }
   $mods = @(ConvertTo-MIR4EnvironmentRows -Rows @($Manifest.mods) -IdField 'name' -Diagnostic 'mir4-environment-mod-id')
   foreach ($mod in $mods) {
-    if ([string]$mod.name -cnotmatch '^[a-z0-9][a-z0-9_-]{0,99}$' -or [string]$mod.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,3}(?:-[a-z0-9.-]+)?$') { throw "[mir4-environment-mod] $($mod.name)" }
+    if ([string]$mod.name -cnotmatch '^[A-Za-z0-9][A-Za-z0-9_-]{0,99}$' -or [string]$mod.version -cnotmatch '^[0-9]+(?:\.[0-9]+){1,3}(?:-[a-z0-9.-]+)?$') { throw "[mir4-environment-mod] $($mod.name)" }
     $mod.sha256 = ConvertTo-MIR4PortableSha256 -Value ([string]$mod.sha256) -Diagnostic 'mir4-environment-mod-digest'
   }
   $settings = @(ConvertTo-MIR4EnvironmentRows -Rows @($Manifest.startup_settings) -IdField 'name' -Diagnostic 'mir4-environment-setting-id')

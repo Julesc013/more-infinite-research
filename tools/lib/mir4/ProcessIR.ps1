@@ -114,6 +114,10 @@ function ConvertTo-MIR4ProcessIRFlow {
     amount=(ConvertTo-MIR4ProcessIRQuantity $Flow.amount)
     probability=(ConvertTo-MIR4ProcessIRQuantity $Flow.probability)
     productivity_sensitive=[bool]$Flow.productivity_sensitive
+    catalyst_amount=$(if($null-ne$Flow.catalyst_amount){[decimal]$Flow.catalyst_amount}else{[decimal]0})
+    ignored_by_productivity=$(if($null-ne$Flow.ignored_by_productivity){[decimal]$Flow.ignored_by_productivity}else{[decimal]0})
+    temperature=$(if($null-ne$Flow.temperature){Copy-MIR4ProcessIRValue $Flow.temperature}else{[ordered]@{status='unavailable'}})
+    quality=$(if($null-ne$Flow.quality){Copy-MIR4ProcessIRValue $Flow.quality}else{[ordered]@{status='unavailable'}})
   }
 }
 
@@ -218,7 +222,14 @@ function New-MIR4ProcessIRV1 {
       self_intersection=$intersection
       shape_supported=[bool]$sourceProcess.shape_supported
       cycle_bound=[string]$sourceProcess.cycle_bound
-      risk=[ordered]@{fingerprint=[string]$sourceProcess.risk.fingerprint;confidence=[string]$sourceProcess.risk.confidence;hard_flags=$hardFlags;review_flags=$reviewFlags;copied_not_reclassified=$true}
+      categories=@($sourceProcess.categories|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      machines=@($sourceProcess.machines|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      surface_conditions=(Copy-MIR4ProcessIRValue $sourceProcess.surface_conditions)
+      unlocks=@($sourceProcess.unlocks|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      owners=@($sourceProcess.owners|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      source_mod=(Copy-MIR4ProcessIRValue $sourceProcess.source_mod)
+      energy_required=$sourceProcess.energy_required
+      risk=[ordered]@{fingerprint=[string]$sourceProcess.risk.fingerprint;terminal_fingerprint=$(if($sourceProcess.risk.terminal_fingerprint){[string]$sourceProcess.risk.terminal_fingerprint}else{$null});confidence=[string]$sourceProcess.risk.confidence;hard_flags=$hardFlags;review_flags=$reviewFlags;evidence=@($sourceProcess.risk.evidence|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive);copied_not_reclassified=$true}
       certainty=$certainty
       disposition=$(if($certainty -eq 'UNSAFE'){'FailHardSafety'}elseif($certainty -eq 'UNKNOWN'){'RequestReview'}elseif($certainty -eq 'REVIEW_REQUIRED'){'RequestReview'}else{'Preserve'})
       safety_status='pending-graph-evaluation'
@@ -269,7 +280,7 @@ function New-MIR4ProcessIRV1 {
   $graphMaterial = [ordered]@{processes=$processes;sccs=$sccs}
   $record = [ordered]@{
     schema=1;kind='MIR4ProcessIRV1';fixture_id=[string]$InputRecord.fixture_id
-    source=[ordered]@{authority=[string]$InputRecord.source.authority;target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;exact_target=[bool]$InputRecord.source.exact_target;recipe_facts_sha256=[string]$InputRecord.source.recipe_facts_sha256;risk_facts_sha256=[string]$InputRecord.source.risk_facts_sha256}
+    source=[ordered]@{authority=[string]$InputRecord.source.authority;target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;exact_target=[bool]$InputRecord.source.exact_target;recipe_facts_sha256=[string]$InputRecord.source.recipe_facts_sha256;risk_facts_sha256=[string]$InputRecord.source.risk_facts_sha256;environment_lock_digest=$(if($InputRecord.source.environment_lock_digest){[string]$InputRecord.source.environment_lock_digest}else{$null})}
     processes=$processes;sccs=$sccs;overall_classification=[string]$overall;terminal_disposition=$disposition
     graph_digest=(Get-MIR4ProcessIRDigest $graphMaterial);mutation_authorized=$false;authoritative=$false;digest=''
   }

@@ -116,6 +116,7 @@ tools/commands/mir4/*.ps1 text eol=lf
 fixtures/mir4-mep-v1/** text eol=lf
 fixtures/mir4-mep-discovery-v1/** text eol=lf
 fixtures/mir4-process-ir-v1/** text eol=lf
+fixtures/mir4-processir-exact-observer/** text eol=lf
 fixtures/mir4-inspector-compatibility-v1/** text eol=lf
 fixtures/mir4-assurance-scale-v1/** text eol=lf
 fixtures/mir4-historical-succession-v1/** text eol=lf
