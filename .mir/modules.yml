@@ -79,6 +79,7 @@ package_excluded_modules:
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     implementation: tools/lib/mir4/SupplyChain.ps1
+    attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
     schemas:
       - spec/schemas/mir4-supply-chain-authority-v1.schema.json
@@ -86,8 +87,10 @@ package_excluded_modules:
       - spec/schemas/mir4-spdx-3.0.1-profile.schema.json
       - spec/schemas/mir4-spdx-2.3-compatibility.schema.json
       - spec/schemas/mir4-slsa-provenance-v1.schema.json
+      - spec/schemas/mir4-supply-chain-attestation-v1.schema.json
     tests:
       - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
     boundary: package-excluded component inventory, SBOM, provenance, attestation, capsule, and restoration preparation only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
     stability: stable-pre-freeze-supply-chain-preparation

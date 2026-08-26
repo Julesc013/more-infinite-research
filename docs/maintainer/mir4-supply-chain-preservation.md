@@ -5,7 +5,7 @@ applies_to: "M4C02-09-24H T15 pre-freeze preparation"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -37,6 +37,14 @@ SPDX 2.3 is a compatibility projection from the same component inventory. It is 
 ## Provenance boundary
 
 SLSA v1 provenance binds the source commit and tree, contract/platform/toolchain roots, SOURCE_DATE_EPOCH, network-disabled policy, builder identity, component subjects, and output digests. Gameplay proof remains separate. Source-closure subjects are explicitly pre-freeze and must not be presented as released archive bytes.
+
+## Proof-only attestation
+
+Use the supply-chain command with -Attest, an explicit OpenSSH ssh-keygen path, an explicit workflow ref, and proof-only key paths below ignored build/ or .mir/local/. The optional -CreateProofKey switch creates only a disposable local Ed25519 proof key. It is not production signing authority and the command refuses to expose private key bytes or paths in the attestation.
+
+The verifier binds the signed payload to the source commit and tree, canonical inventory root, SLSA digest, all nine component subjects, the exact F210 and F200 subject rows, workflow ref, trusted public-key fingerprint, local OpenSSH executable, and revocation snapshot. Verification rejects a wrong source, tree, inventory, provenance, subject, target, workflow, trusted root, revoked key, self-hash, or signature.
+
+Never use proof-only key creation for T16. Production key generation, passphrase custody, recovery approval, production signing, and publication remain explicit maintainer gates.
 
 ## Rights and custody
 

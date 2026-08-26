@@ -146,6 +146,7 @@ Change-record IDs are identities, not execution order. Follow the terminal progr
 | Record | Type | State | Title |
 | --- | --- | --- | --- |
 | `CHG-2026-0020` | `change/release` | `planned` | Deliver the unified MIR 3 terminal .9 stabilization wave |
+| `INC-2026-0061` | `incident` | `pending` | Recover the interrupted T15 attempt after host memory exhaustion |
 
 ## Explicit release obligations
 

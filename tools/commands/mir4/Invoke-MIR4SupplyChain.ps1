@@ -3,12 +3,23 @@ param(
   [string]$OutputRoot = 'build/results/mir4-t15/supply-chain',
   [string]$ArtifactMapPath,
   [switch]$RequireClean,
-  [string]$OfficialSpdxSchemaPath
+  [string]$OfficialSpdxSchemaPath,
+  [switch]$Attest,
+  [switch]$CreateProofKey,
+  [string]$SshKeygenPath,
+  [string]$PrivateKeyPath,
+  [string]$PublicKeyPath,
+  [string]$AttestationIdentity = 'mir4-t15-proof',
+  [string]$WorkflowRef,
+  [string]$AttestationScratchRoot
 )
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SupplyChain.ps1')
+if ($Attest) {
+  . (Join-Path $repo 'tools/lib/mir4/SupplyChainAttestation.ps1')
+}
 
 $output = if ([IO.Path]::IsPathRooted($OutputRoot)) {
   [IO.Path]::GetFullPath($OutputRoot)
@@ -55,6 +66,42 @@ Write-MIR4SupplyChainRecord -Record $inventory -Path $paths.inventory
 Write-MIR4SupplyChainRecord -Record $spdx301 -Path $paths.spdx301
 Write-MIR4SupplyChainRecord -Record $spdx23 -Path $paths.spdx23
 Write-MIR4SupplyChainRecord -Record $provenance -Path $paths.provenance
+
+if ($CreateProofKey -and -not $Attest) {
+  throw '[mir4-supply-chain-proof-key-requires-attestation]'
+}
+if ($Attest) {
+  if ([string]::IsNullOrWhiteSpace($SshKeygenPath) -or
+      [string]::IsNullOrWhiteSpace($WorkflowRef)) {
+    throw '[mir4-supply-chain-attestation-required-parameters]'
+  }
+  $private = if ([string]::IsNullOrWhiteSpace($PrivateKeyPath)) {
+    Join-Path $output '.private/mir4-t15-proof'
+  } elseif ([IO.Path]::IsPathRooted($PrivateKeyPath)) {
+    [IO.Path]::GetFullPath($PrivateKeyPath)
+  } else {
+    Assert-MIR4DescendantPath -Root $repo -Path (Join-Path $repo $PrivateKeyPath)
+  }
+  $public = if ([string]::IsNullOrWhiteSpace($PublicKeyPath)) {
+    $private + '.pub'
+  } elseif ([IO.Path]::IsPathRooted($PublicKeyPath)) {
+    [IO.Path]::GetFullPath($PublicKeyPath)
+  } else {
+    Assert-MIR4DescendantPath -Root $repo -Path (Join-Path $repo $PublicKeyPath)
+  }
+  $scratch = if ([string]::IsNullOrWhiteSpace($AttestationScratchRoot)) {
+    Join-Path $output '.private/scratch'
+  } elseif ([IO.Path]::IsPathRooted($AttestationScratchRoot)) {
+    [IO.Path]::GetFullPath($AttestationScratchRoot)
+  } else {
+    Assert-MIR4DescendantPath -Root $repo -Path (Join-Path $repo $AttestationScratchRoot)
+  }
+  if ($CreateProofKey) {
+    $null = New-MIR4ProofOnlyEd25519KeyPairV1 -RepoRoot $repo -SshKeygenPath $SshKeygenPath -PrivateKeyPath $private -PublicKeyPath $public -Identity $AttestationIdentity
+  }
+  $paths.attestation = Join-Path $output 'supply-chain-attestation.json'
+  $null = New-MIR4SupplyChainAttestationV1 -RepoRoot $repo -Inventory $inventory -SlsaProvenance $provenance -SshKeygenPath $SshKeygenPath -PrivateKeyPath $private -PublicKeyPath $public -Identity $AttestationIdentity -ScratchRoot $scratch -OutputPath $paths.attestation -WorkflowRef $WorkflowRef
+}
 
 $outputs = @(
   foreach ($entry in $paths.GetEnumerator()) {

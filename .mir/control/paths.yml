@@ -74,6 +74,7 @@ paths:
   spec.schemas.mir4-spdx-3.0.1-profile: spec/schemas/mir4-spdx-3.0.1-profile.schema.json
   spec.schemas.mir4-spdx-2.3-compatibility: spec/schemas/mir4-spdx-2.3-compatibility.schema.json
   spec.schemas.mir4-slsa-provenance-v1: spec/schemas/mir4-slsa-provenance-v1.schema.json
+  spec.schemas.mir4-supply-chain-attestation-v1: spec/schemas/mir4-supply-chain-attestation-v1.schema.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
   validation.adapters: validation/adapters
@@ -87,6 +88,7 @@ paths:
   validation.scenarios.local-2.1: validation/scenarios/local-2.1.json
   validation.tests: validation/tests
   validation.tests.mir4.supply-chain-foundation: validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+  validation.tests.mir4.supply-chain-attestation: validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
@@ -182,6 +184,7 @@ paths:
   tools.lib.mir4.package-presentation: tools/lib/mir4/PackagePresentation.ps1
   tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
   tools.lib.mir4.supply-chain: tools/lib/mir4/SupplyChain.ps1
+  tools.lib.mir4.supply-chain-attestation: tools/lib/mir4/SupplyChainAttestation.ps1
   tools.lib.mir4.release-phase-engine: tools/lib/mir4/ReleasePhaseEngine.ps1
   tools.lib.mir4.release-adapters: tools/lib/mir4/ReleaseAdapters.ps1
   tools.lib.mir4.release-lifecycle-adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1

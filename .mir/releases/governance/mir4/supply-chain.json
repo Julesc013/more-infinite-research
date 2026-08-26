@@ -173,7 +173,7 @@
       "version": "4.0.0",
       "artifact_class": "verifier-tool",
       "target": null,
-      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/lib/mir4/SupplyChain.ps1", "tools/commands/mir4/Invoke-MIR4SupplyChain.ps1", "spec/schemas/mir4-supply-chain-authority-v1.schema.json"]},
+      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/lib/mir4/SupplyChain.ps1", "tools/lib/mir4/SupplyChainAttestation.ps1", "tools/commands/mir4/Invoke-MIR4SupplyChain.ps1", "spec/schemas/mir4-supply-chain-authority-v1.schema.json", "spec/schemas/mir4-supply-chain-attestation-v1.schema.json"]},
       "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
       "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
       "digest": {"algorithm": "SHA-256", "mode": "ordinal-path-byte-root"},
