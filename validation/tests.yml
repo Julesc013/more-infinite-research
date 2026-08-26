@@ -1502,6 +1502,31 @@
       ]
     },
     {
+      "id": "static.mir4-playtest-handoff-t17",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/modules.yml",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json",
+        "spec/schemas/mir4-playtest-evidence-v1.schema.json",
+        "spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tools/commands/mir4/Update-MIR4PlaytestHandoffT17.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
+        "docs/maintainer/mir4-pre-freeze-hardening.md",
+        "docs/maintainer/mir4-w09-manual-playtest.md",
+        "RELEASE-RUNBOOK.md",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-supply-chain-foundation",
       "kind": "static",
       "layer": "F0",

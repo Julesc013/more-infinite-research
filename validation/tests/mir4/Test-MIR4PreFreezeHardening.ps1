@@ -114,6 +114,20 @@ if(@($t15.evolved_bindings).Count-lt20-or@($t15.current_authorities).Count-lt20-
    @($t15.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t15-authority-evolution]'
 }
+$t17=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if([string]$t17.turn-cne'T17'-or
+   [string]$t17.execution_state.programme_status-cne'T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED'-or
+   $null-ne$t17.execution_state.completed_turn-or[string]$t17.execution_state.t17_status-cne'blocked-human'-or
+   $null-ne$t17.execution_state.next_dependency_ready_turn-or
+   [bool]$t17.human_gate.f210_decision_recorded-or[bool]$t17.human_gate.f200_decision_recorded-or
+   [bool]$t17.human_gate.acceptance_inferred-or[bool]$t17.human_gate.decision_template_is_evidence-or
+   -not[bool](@($t17.target_handoff|Where-Object target -ceq 'F200')[0].exact_engine_custody_ready)-or
+   [bool](@($t17.target_handoff|Where-Object target -ceq 'F210')[0].exact_engine_custody_ready)-or
+   [string]$t17.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   @($t17.package_visible_delta).Count-ne0-or
+   @($t17.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t17-machine-preparation-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
@@ -211,4 +225,4 @@ foreach($source in @('tools/lib/mir4/PreFreezeRelease.ps1','tools/lib/mir4/Relea
   $text=Get-Content -Raw -LiteralPath (Join-Path $repo $source)
   if($text-match'(?i)source_freeze_authorized\s*=\s*\$true|production_release_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-prefreeze-forbidden-authority] $source"}
 }
-Write-Host '[ok] MIR 4 T02-T15 pre-freeze receipts, rulesets, action pins, workflows, CLI, predecessor plan, and fail-closed boundaries passed; T16/T17 remain human-blocked.'
+Write-Host '[ok] MIR 4 T02-T15 completion and the T17 machine-preparation authority evolution passed; T16/T17 human decisions and every release transition remain blocked.'

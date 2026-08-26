@@ -181,13 +181,13 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
-| docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-25 |
+| docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
 | docs/maintainer/mir4-qualification-and-promotion.md | MIR 4 Qualification and Promotion | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-release-governance.md | MIR 4 Release Governance | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
 | docs/maintainer/mir4-release-operations.md | MIR 4 Release Operations | current | release-manager | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-spark-sol-handoff.md | MIR 4 Spark To Sol Handoff And Completion Plan | current | release-manager | release-plan | mir-maintainers | 2026-08-20 |
 | docs/maintainer/mir4-supply-chain-preservation.md | MIR 4 Supply-Chain and Preservation | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
-| docs/maintainer/mir4-w09-manual-playtest.md | MIR 4 W09 Manual Playtest Handoff | current | maintainer | how-to | mir-maintainers | 2026-08-23 |
+| docs/maintainer/mir4-w09-manual-playtest.md | MIR 4 W09 Manual Playtest Handoff | current | maintainer | how-to | mir-maintainers | 2026-08-27 |
 | docs/maintainer/modpack-campaigns.md | Modpack Campaigns | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | MIR 2.5.0 Offline Continuity And Final Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/playtest-intake.md | Playtest Intake | current | maintainer | how-to | mir-maintainers | 2026-07-21 |

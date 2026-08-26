@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -24,6 +24,12 @@ Use this after the automated campaign is green and before any source freeze or r
 3. Confirm Factorio reports the exact governed engine patch. Use Steam only for current Factorio 2.1; use `D:\Programs\Factorio\<version>` for 2.0 and every older engine.
 4. Keep a fresh isolated user-data directory and retain the complete log and save artifacts.
 
+## Prepare the exact sessions
+
+Use `tools/mir.ps1 playtest prepare --target F210 --candidate <exact-f210-development-package> --predecessor dist/more-infinite-research_3.2.11.zip --factorio <exact-factorio-2.1.14-executable> --json` and the corresponding F200 command with `dist/more-infinite-research_2.5.11.zip` and `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`. The command fails closed if the current package source, development plan, package, predecessor, or engine no longer matches the governed hashes. If Steam has advanced past the governed F210 patch, stop and obtain the exact engine through maintainer-approved custody; do not replace or retarget the Steam depot.
+
+Each prepared root contains `session.json`, `review-checklist.md`, `Invoke-MIR4PlaytestEngine.ps1`, isolated `profile/` and `packages/` trees, `observations.json`, `capture-queue/`, and `manual-decision.template.json`. The template is explicitly non-evidence. Run the launcher with `-Package Predecessor` for the direct-upgrade source and with `-Package Candidate` for the fresh candidate, upgrade, and reload observations. Add `-SavePath <path>` when the engine should open a specific save.
+
 ## Modern targets
 
 For f210 and f200, start a new game with default settings, inspect the technology graph, research representative mining/productivity/weapon/lab continuations, save, reload twice, and directly upgrade one representative MIR3 save. Repeat any target-specific affected scenario named by the final verification plan. Record UI presentation, costs, prerequisites, effects, disabled/hidden state, mod-data diagnostics, and any unexpected warnings.
@@ -40,4 +46,4 @@ Treat f012 through f006 as restoration experiments, not MIR4 support. Do not mov
 
 ## Failure capture and decision
 
-On any mismatch, stop promotion, preserve the exact candidate and environment identity, save logs/screenshots/saves, and record the smallest reproducer. Do not repair evidence in place. After review, the maintainer may accept a new bounded candidate, request a fix and full affected revalidation, or retain `PARTIAL-WITH-BOUNDED-BLOCKERS`. Source freeze, signing, sealing, tagging, merge to main, and publication remain separate human-authorized actions.
+On any mismatch, stop promotion, preserve the exact candidate and environment identity, save logs/screenshots/saves, and record the smallest reproducer. Do not repair evidence in place. Place the retained artifacts in `capture-queue/`, complete the exact scenario statuses in `observations.json`, and run `tools/mir.ps1 playtest capture --session <path> --json`. After review, the maintainer may run `tools/mir.ps1 playtest finalize --session <path> --decision <ACCEPTED|CHANGES-REQUESTED|REJECTED> --reviewer <identity> --json`. An accepted decision is impossible while any scenario or required capture is incomplete. Source freeze, signing, sealing, tagging, merge to main, and publication remain separate human-authorized actions.
