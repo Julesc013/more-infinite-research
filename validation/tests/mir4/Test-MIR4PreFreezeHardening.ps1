@@ -75,6 +75,18 @@ if(@($t12.evolved_bindings).Count-lt1-or@($t12.current_authorities).Count-lt15-o
    @($t12.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t12-authority-evolution]'
 }
+$t13=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t13.evolved_bindings).Count-lt10-or@($t13.current_authorities).Count-lt25-or
+   [string]$t13.turn-cne'T13'-or[string]$t13.status-cne'T13-EXACT-RELEASE-CANARIES-PASSED-T14-NEXT-PRODUCTION-UNAUTHORIZED'-or
+   [string]$t13.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [int]$t13.conformance.canary_count-ne8-or[int]$t13.conformance.capture_count-ne11-or[int]$t13.conformance.reload_count-ne22-or
+   -not[bool]$t13.conformance.all_clean_loads_passed-or-not[bool]$t13.conformance.all_first_reloads_passed-or-not[bool]$t13.conformance.all_second_reloads_passed-or
+   -not[bool]$t13.conformance.all_target_upgrades_passed-or-not[bool]$t13.conformance.all_claims_exact_and_expiring-or
+   -not[bool]$t13.conformance.f200_k2so_archive_custody_complete-or-not[bool]$t13.conformance.t12_historical_blocker_superseded-or
+   [bool]$t13.conformance.public_support_claim_authorized-or[bool]$t13.conformance.release_transition_authority-or
+   @($t13.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t13-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

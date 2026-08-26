@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "kind": "MIR4R0DashboardV1",
-  "status": "T12-COMPLETE-T13-T14-T15-READY-RELEASE-BLOCKED",
+  "status": "T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED",
   "package_visible": false,
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "99FC6CA3EE9E614F605FEC15E48AC9E2A06EDB4D123709C2F73BB2DCCD9639FA"
+      "sha256": "3060DEC9530C0DE585E912929295C48AC053E2D1659786CC100B0744B0B677E9"
     }
   ],
   "payload": {
@@ -118,12 +118,12 @@
       },
       {
         "id": "exact-archive-custody-f200-k2so",
-        "state": "OPEN",
+        "state": "SATISFIED",
         "scope": "technology-or-compatibility-claim",
         "blocks": [
           "f200-k2so-exact-processir-claim"
         ],
-        "authority": "sdk/preview/mir4/reference/t12/blockers/f200-k2so.json"
+        "authority": "sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json"
       }
     ],
     "mir3_residuals": [
@@ -141,7 +141,7 @@
       }
     ],
     "package_delta": 0,
-    "next_executable_task": "T13"
+    "next_executable_task": "T14"
   },
-  "record_sha256": "64090803822172D6C637C1D5F11F88D7812CB4E2E235A5A64168875A1D76F62B"
+  "record_sha256": "EF2E6842EB2B760E96D3AA4B67D41C8F3BEC55AF67C3C27A106BD919D9392DCE"
 }

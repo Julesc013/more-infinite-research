@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/preview/t13-exact-capture-canary-v1.schema.json",
+  "title": "MIR 4 T13 exact capture canary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "capture_id", "target", "scenario_id", "environment_lock", "exact_fact_capture", "lifecycle", "performance", "support_assessment", "diagnostics", "diagnostic_registry", "diagnostic_order", "raw_logs_published", "private_paths_published", "package_visible", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T13ExactCaptureCanaryV1"},
+    "capture_id": {"type": "string", "pattern": "^f(?:200|210)-[a-z0-9-]+$"},
+    "target": {"enum": ["f210", "f200"]},
+    "scenario_id": {"type": "string", "minLength": 1},
+    "environment_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "engine", "mir", "mods", "startup_settings"],
+      "properties": {
+        "digest": {"$ref": "#/$defs/digest"},
+        "engine": {"type": "object"},
+        "mir": {"type": "object"},
+        "mods": {"type": "array"},
+        "startup_settings": {"type": "array"}
+      }
+    },
+    "exact_fact_capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot_digest", "processir_digest", "process_count", "recipe_count", "technology_unlock_count", "productivity_owner_count", "classification_counts", "terminal_disposition", "terminal_fact_authority_preserved"],
+      "properties": {
+        "snapshot_digest": {"$ref": "#/$defs/digest"},
+        "processir_digest": {"$ref": "#/$defs/digest"},
+        "process_count": {"type": "integer", "minimum": 1, "maximum": 128},
+        "recipe_count": {"type": "integer", "minimum": 1},
+        "technology_unlock_count": {"type": "integer", "minimum": 0},
+        "productivity_owner_count": {"type": "integer", "minimum": 0},
+        "classification_counts": {"type": "object"},
+        "terminal_disposition": {"enum": ["Apply", "Adopt", "Preserve", "ExtensionRequired", "ReviewRequired", "Omit", "FailHardSafety"]},
+        "terminal_fact_authority_preserved": {"const": true}
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clean_load", "reloads", "first_reload_passed", "second_reload_passed", "save_byte_identical"],
+      "properties": {
+        "clean_load": {"type": "object", "required": ["status", "authority", "save_sha256", "snapshot_digest"], "properties": {"status": {"const": "passed"}, "authority": {"const": "T12 exact engine create-save capture"}, "save_sha256": {"$ref": "#/$defs/digest"}, "snapshot_digest": {"$ref": "#/$defs/digest"}}},
+        "reloads": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "object", "required": ["ordinal", "status", "exit_code", "duration_seconds", "maximum_seconds", "save_sha256", "save_byte_identical", "portable_log_sha256", "portable_stderr_sha256", "raw_log_published", "private_paths_published"], "properties": {"ordinal": {"enum": [1, 2]}, "status": {"const": "passed"}, "exit_code": {"const": 0}, "duration_seconds": {"type": "number", "minimum": 0, "maximum": 300}, "maximum_seconds": {"const": 300}, "save_sha256": {"$ref": "#/$defs/digest"}, "save_byte_identical": {"const": true}, "portable_log_sha256": {"$ref": "#/$defs/digest"}, "portable_stderr_sha256": {"$ref": "#/$defs/digest"}, "raw_log_published": {"const": false}, "private_paths_published": {"const": false}}}},
+        "first_reload_passed": {"const": true},
+        "second_reload_passed": {"const": true},
+        "save_byte_identical": {"const": true}
+      }
+    },
+    "performance": {"type": "object", "required": ["scope", "reload_seconds", "maximum_observed_reload_seconds", "budget_seconds", "within_budget"], "properties": {"scope": {"type": "string", "minLength": 1}, "reload_seconds": {"type": "array", "minItems": 2, "maxItems": 2}, "maximum_observed_reload_seconds": {"type": "number", "minimum": 0, "maximum": 300}, "budget_seconds": {"const": 300}, "within_budget": {"const": true}}},
+    "support_assessment": {"type": "object", "required": ["status", "scope", "processir_terminal_disposition", "automatic_synthesis_authorized", "public_claim_authorized"], "properties": {"status": {"const": "qualified-exact-release-canary-input"}, "scope": {"const": "exact locked environment only"}, "processir_terminal_disposition": {"type": "string"}, "automatic_synthesis_authorized": {"const": false}, "public_claim_authorized": {"const": false}}},
+    "diagnostics": {"type": "array"},
+    "diagnostic_registry": {"const": "spec/api/mir4-v1/diagnostics.json"},
+    "diagnostic_order": {"const": "severity-code-path"},
+    "raw_logs_published": {"const": false},
+    "private_paths_published": {"const": false},
+    "package_visible": {"const": false},
+    "digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {"digest": {"type": "string", "pattern": "^sha256:[A-Fa-f0-9]{64}$"}}
+}
