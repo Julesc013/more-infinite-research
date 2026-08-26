@@ -85,6 +85,25 @@ function Resolve-MIR4T12Archive {
 function Get-MIR4T12ClosureRows {
   param([Parameter(Mandatory)]$Scenario,[Parameter(Mandatory)]$Lock)
   $rows=@($Scenario.dependency_closure)
+  if($rows.Count){
+    $joined=@()
+    foreach($row in $rows){
+      $entry=@($Lock.mods|Where-Object{[string]$_.name-ceq[string]$row.name})
+      if($entry.Count-ne 1){throw "[mir4-t12-lock-entry] $($row.name)"}
+      if([string]$entry[0].version-cne[string]$row.version-or
+         ([string]$entry[0].sha256).ToLowerInvariant()-cne([string]$row.sha256).ToLowerInvariant()){
+        throw "[mir4-t12-lock-closure-mismatch] $($row.name)"
+      }
+      $copy=[ordered]@{}
+      foreach($property in $row.PSObject.Properties){$copy[$property.Name]=$property.Value}
+      foreach($propertyName in @('file_name','source_path')){
+        $property=$entry[0].PSObject.Properties[$propertyName]
+        if($null-ne$property-and-not[string]::IsNullOrWhiteSpace([string]$property.Value)){$copy[$propertyName]=$property.Value}
+      }
+      $joined+=[pscustomobject]$copy
+    }
+    $rows=$joined
+  }
   if($rows.Count-eq 0-and@($Scenario.resolved_mods).Count){
     foreach($name in @($Scenario.resolved_mods|Where-Object{$_-ne'more-infinite-research'-and$_-notlike'mir-fixture-*'})){
       $entry=@($Lock.mods|Where-Object{[string]$_.name-ceq[string]$name})
