@@ -30,7 +30,7 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       mir4_bootstrap: ${{ steps.mode.outputs.mir4_bootstrap }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
       - id: mode
@@ -40,7 +40,7 @@ jobs:
           $mir4 = Test-Path -LiteralPath .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json -PathType Leaf
           "mir4_bootstrap=$($mir4.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
@@ -94,13 +94,13 @@ jobs:
           }
           $matrix = @{ include = $work } | ConvertTo-Json -Depth 10 -Compress
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance/verification-plan.json
           if-no-files-found: error
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         with:
           include-hidden-files: true
@@ -119,16 +119,16 @@ jobs:
       group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: ${{ matrix.no_op != true }}
         with:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
@@ -165,7 +165,7 @@ jobs:
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
@@ -180,7 +180,7 @@ jobs:
         if: ${{ matrix.no_op == true }}
         shell: pwsh
         run: Write-Host "All required fingerprints were adopted from trusted reusable evidence."
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: ${{ always() && matrix.no_op != true }}
         with:
           include-hidden-files: true
@@ -211,7 +211,7 @@ jobs:
             (($status | ConvertTo-Json -Depth 10) + "`n"),
             [Text.UTF8Encoding]::new($false)
           )
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mir-verification-status-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance/workflow-status.json
@@ -228,14 +228,14 @@ jobs:
       - tests
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
@@ -271,7 +271,7 @@ jobs:
           $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
@@ -281,7 +281,7 @@ jobs:
       - name: Download isolated worker evidence
         id: download-workers
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*
           path: build/results/assurance/worker-evidence
@@ -309,11 +309,11 @@ jobs:
         run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --output build/results/assurance/evidence-bundle.json
       - name: Save updated persistent evidence ledger
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true

@@ -291,6 +291,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
+      - .mir/releases/governance/mir4/github-actions-lock-v2.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
@@ -342,6 +343,7 @@ package_excluded_modules:
       - spec/schemas/mir4-release-public-readback-result-v1.schema.json
       - spec/schemas/mir4-release-restore-drill-result-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
+      - spec/schemas/mir4-github-actions-lock-v2.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     supporting_validators:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
@@ -1188,6 +1190,7 @@ validation_tooling:
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
     mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
     mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
+    mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
     mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
     mir4_repository_fixed_point: tools/lib/mir4/RepositoryFixedPoint.ps1

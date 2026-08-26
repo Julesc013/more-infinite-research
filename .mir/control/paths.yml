@@ -256,6 +256,7 @@ paths:
   releases.waves.mir4-r0-platform-maturity-publication-contract-v2: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json
+  releases.governance.mir4.github-actions-lock-v2: .mir/releases/governance/mir4/github-actions-lock-v2.json
   releases.governance.mir4.ruleset-snapshot-2026-08-24: .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json
   releases.waves.mir4-r0-queue: .mir/releases/waves/mir4-r0/queue.json

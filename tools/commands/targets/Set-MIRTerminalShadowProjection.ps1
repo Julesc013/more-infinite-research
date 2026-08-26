@@ -203,7 +203,7 @@ jobs:
   verify:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
       - name: Build deterministic terminal shadow archive
@@ -223,7 +223,7 @@ jobs:
         run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
       - name: Upload verification plan
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mir-terminal-shadow-verification-plan
           path: artifacts/assurance/plan.json
@@ -252,7 +252,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $text = $text.Replace("--target $([string]$Target.factorio_line) --plan", "--target $([string]$Target.factorio_line) --candidate '$archive' --plan")
 
   $checkout = @'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
 '@.TrimEnd()
@@ -267,7 +267,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   if (-not $text.Contains("Build deterministic terminal shadow archive")) {
     $text = $text.Replace($checkout, $checkoutWithBuild.TrimEnd())
     $conditionalCheckout = @'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
@@ -319,7 +319,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $mergeWorkerEvidence = @'
       - name: Merge worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/evidence
@@ -329,7 +329,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $importWorkerEvidence = @'
       - name: Download isolated worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/worker-evidence

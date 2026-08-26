@@ -145,25 +145,53 @@ function Test-MIR4PublisherAdmissionBindings {
 function Test-MIR4ProductionActionLock {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
-  $relative = '.mir/releases/governance/mir4/github-actions-lock.json'
+  $relative = '.mir/releases/governance/mir4/github-actions-lock-v2.json'
   $path = Join-Path $repo $relative
-  $schema = Join-Path $repo 'spec/schemas/mir4-github-actions-lock-v1.schema.json'
+  $schema = Join-Path $repo 'spec/schemas/mir4-github-actions-lock-v2.schema.json'
   $json = Get-Content -Raw -LiteralPath $path
   if (-not ($json | Test-Json -SchemaFile $schema)) { throw '[mir4-actions-lock-schema]' }
   $lock = $json | ConvertFrom-Json -Depth 100
   $pins = @{}
   foreach ($action in @($lock.actions)) { $pins[[string]$action.action] = [string]$action.commit_sha }
-  foreach ($relativeWorkflow in @($lock.production_workflows)) {
+  $actualWorkflows = @(Get-ChildItem -LiteralPath (Join-Path $repo '.github/workflows') -File |
+    Where-Object { $_.Extension -in @('.yml','.yaml') } |
+    ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') } |
+    Sort-Object -CaseSensitive)
+  $governedWorkflows = @($lock.repository_workflows | ForEach-Object { [string]$_ } | Sort-Object -CaseSensitive)
+  if (($actualWorkflows -join '|') -cne ($governedWorkflows -join '|')) {
+    throw '[mir4-actions-workflow-closure]'
+  }
+  $scanPaths = @($governedWorkflows + @($lock.generated_workflow_sources | ForEach-Object { [string]$_ }))
+  foreach ($relativeWorkflow in $scanPaths) {
     $workflow = Join-Path $repo ([string]$relativeWorkflow)
     if (-not (Test-Path -LiteralPath $workflow -PathType Leaf)) { throw "[mir4-actions-workflow-missing] $relativeWorkflow" }
     $text = Get-Content -Raw -LiteralPath $workflow
-    foreach ($match in [regex]::Matches($text, 'uses:\s*(actions/[A-Za-z0-9_-]+)@([A-Za-z0-9._-]+)')) {
+    foreach ($match in [regex]::Matches($text, 'uses:\s*(actions/[A-Za-z0-9_/-]+)@([A-Za-z0-9._-]+)')) {
       $actionName = [string]$match.Groups[1].Value
       $reference = [string]$match.Groups[2].Value
       if (-not $pins.ContainsKey($actionName) -or $reference -cne $pins[$actionName]) {
         throw "[mir4-actions-unpinned] $relativeWorkflow -> $actionName@$reference"
       }
     }
+    if ($relativeWorkflow -in $governedWorkflows) {
+      if ($text -notmatch '(?m)^permissions:\s*(?:\{|$)') { throw "[mir4-actions-permissions-implicit] $relativeWorkflow" }
+      if ($text -match '(?m)^\s{2}pull_request:' -and $text -match 'secrets\.[A-Za-z0-9_]+') {
+        throw "[mir4-actions-public-pr-secret] $relativeWorkflow"
+      }
+      foreach ($write in [regex]::Matches($text,'(?m)(?<permission>[a-z-]+):\s*write\b')) {
+        $permission = [string]$write.Groups['permission'].Value
+        if ($relativeWorkflow -cne '.github/workflows/branch-policy.yml' -or $permission -notin @('checks','statuses')) {
+          throw "[mir4-actions-excess-write-permission] $relativeWorkflow -> $permission"
+        }
+      }
+    }
+  }
+  $builder = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-build.yml')
+  if ($builder -match '(?i)ssh-keygen|private[_-]?key|sign(?:ing)?|upload-artifact|gh\s+release|mod[_ -]?portal' -or
+      $builder -notmatch "Operation='DryRun'") { throw '[mir4-builder-capability-confinement]' }
+  $qualifier = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-qualification.yml')
+  if ($qualifier -match 'Operation=''Execute''|production_mutation_performed\s*=\s*\$true|upload-artifact|gh\s+release|mod[_ -]?portal') {
+    throw '[mir4-qualifier-capability-confinement]'
   }
   $publisher = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-publication.yml')
   if ($publisher -match 'actions/checkout|Build-MIRPackage|mir4\s+platform\s+package' -or

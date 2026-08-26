@@ -22,6 +22,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: read
+
 jobs:
   exact-candidate:
     runs-on: [self-hosted, Windows]
