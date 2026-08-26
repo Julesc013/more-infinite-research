@@ -91,3 +91,11 @@ The confinement receipt is evidence, not publication authority. Its transition f
 ## Resource interruption
 
 If a validator approaches the memory reserve, stop scheduling work, terminate the isolated child process, hash all completed immutable outputs, and write a resource-interruption receipt. A resource-context failure is not a semantic acceptance or rejection.
+
+## T15 acceptance and programme transition
+
+`.mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json` is the immutable machine-scope receipt for the clean `c4a68809` construction. It binds the canonical inventory and SPDX projections, verified proof-only attestation, non-production release capsule, two byte-identical offline restoration receipts, workflow-byte confinement root, five registered workers, public-safe external rescue export, and signing-ceremony machine preparation. The two verification-plan rows that depend on a historical planning candidate are recorded as invalid and are not misrepresented as T15 evidence.
+
+`.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json` records the separate-clean-worktree audit. Its acceptance is limited to the T15 machine scope: it claims no human reviewer, no playtest decision, no protected signing ceremony, and no release transition. The append-only T15 authority-evolution receipt moves T15 to `completed`, leaves T16 and T17 `blocked-human`, leaves T18 dependency-blocked, and sets no next dependency-ready turn.
+
+Run `./validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1` for the typed T15 acceptance, then run `./tools/commands/release/Test-MIR4R0Bootstrap.ps1 -Update` and the Control Plane v5 view writer after changing the programme authority. Generated dashboard, queue, and `todo.md` content must never be edited by hand.

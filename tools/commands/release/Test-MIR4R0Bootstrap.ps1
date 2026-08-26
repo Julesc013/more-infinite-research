@@ -315,13 +315,15 @@ $generatedSources = @($generatedSources | Sort-Object path)
 $currentExecutionPath = "$authorityDirectory/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
 Assert-Schema $currentExecutionPath "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json"
 $currentExecution = Read-Json $currentExecutionPath
-if ([string]$currentExecution.status -cne "T14-COMPLETE-T15-READY-RELEASE-BLOCKED" -or
-    [string]$currentExecution.next_dependency_ready_turn -cne "T15" -or
+if ([string]$currentExecution.status -cne "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED" -or
+    $null -ne $currentExecution.next_dependency_ready_turn -or
     @($currentExecution.turns).Count -ne 22 -or
     @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 3 -or
     @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-target-processir-snapshot" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
     @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-archive-custody-f200-k2so" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
-    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T13","T14") -and [string]$_.state -ceq "completed" }).Count -ne 2 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T13","T14","T15") -and [string]$_.state -ceq "completed" }).Count -ne 3 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T16","T17") -and [string]$_.state -ceq "blocked-human" }).Count -ne 2 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -ceq "T18" -and [string]$_.state -ceq "blocked-dependency" }).Count -ne 1 -or
     @($currentExecution.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
   throw "Current MIR 4 pre-freeze execution authority is inconsistent or grants a release transition."
 }
@@ -340,13 +342,13 @@ $dashboard = Add-RecordSha256 ([ordered]@{
     blockers = @($currentExecution.blockers)
     mir3_residuals = @($currentExecution.mir3_residuals)
     package_delta = 0
-    next_executable_task = [string]$currentExecution.next_dependency_ready_turn
+    next_executable_task = $currentExecution.next_dependency_ready_turn
   }
 })
 $queue = Add-RecordSha256 ([ordered]@{
   schema = 1
   kind = "MIR4R0ExecutableQueueV1"
-  status = "next-task-ready"
+  status = $(if ($null -eq $currentExecution.next_dependency_ready_turn) { "human-gates-required" } else { "next-task-ready" })
   package_visible = $false
   generated_from = $currentGeneratedSources
   payload = [ordered]@{
@@ -370,4 +372,5 @@ if (-not $Update) {
 }
 
 Write-Host "[ok] MIR 4 pre-freeze status: $($currentExecution.status)"
-Write-Host "[ok] next dependency-ready turn: $($currentExecution.next_dependency_ready_turn)"
+$nextDependencyReadyTurn = if ($null -eq $currentExecution.next_dependency_ready_turn) { "none; T16/T17 human gates required" } else { [string]$currentExecution.next_dependency_ready_turn }
+Write-Host "[ok] next dependency-ready turn: $nextDependencyReadyTurn"

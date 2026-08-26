@@ -85,6 +85,9 @@ package_excluded_modules:
     stability: stable-governance-contract-blocked-human-secret-input
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
+    completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
+    independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
+    authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
     implementation: tools/lib/mir4/SupplyChain.ps1
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
@@ -104,14 +107,18 @@ package_excluded_modules:
       - spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
       - spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
       - spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
+      - spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
+      - spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
+      - spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
     tests:
       - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
       - validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
       - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
     boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
-    stability: stable-pre-freeze-supply-chain-preparation
+    stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
     profile_authority: spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json
@@ -303,7 +310,7 @@ package_excluded_modules:
     validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
-    stability: stable-current-pre-freeze-execution-authority-release-blocked
+    stability: stable-t15-complete-t16-t17-human-blocked-release-blocked
   mir4_pre_freeze_hardening_v1:
     authorities:
       - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json

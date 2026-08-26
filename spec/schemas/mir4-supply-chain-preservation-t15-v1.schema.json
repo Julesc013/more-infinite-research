@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-supply-chain-preservation-t15-v1.schema.json",
+  "title": "MIR 4 T15 supply-chain and preservation machine receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "execution_programme_id", "turn", "source", "evidence_class", "verification_plan", "supply_chain", "release_capsule", "offline_restoration", "runner_publisher_confinement", "signing_preparation", "preview_assets", "workers", "external_custody", "independent_machine_audit", "machine_conclusion", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SupplyChainPreservationT15V1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "execution_programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T15"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["repository", "branch", "commit", "tree", "working_tree_clean", "package_source_sha256"],
+      "properties": {
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "branch": {"const": "codex/mir4-t15-supply-chain-preservation"},
+        "commit": {"const": "c4a68809a54a81ae0a1959d257c2e4a97ef0e490"},
+        "tree": {"const": "c76a5fb46bc950264652b7033c6ce72b7f9b1991"},
+        "working_tree_clean": {"const": true},
+        "package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"}
+      }
+    },
+    "evidence_class": {"const": "public-safe-non-production"},
+    "verification_plan": {"$ref": "#/$defs/verificationPlan"},
+    "supply_chain": {"$ref": "#/$defs/supplyChain"},
+    "release_capsule": {"$ref": "#/$defs/releaseCapsule"},
+    "offline_restoration": {"$ref": "#/$defs/offlineRestoration"},
+    "runner_publisher_confinement": {"$ref": "#/$defs/confinement"},
+    "signing_preparation": {"$ref": "#/$defs/signingPreparation"},
+    "preview_assets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/artifact"}},
+    "workers": {"type": "array", "minItems": 5, "maxItems": 5, "items": {"$ref": "#/$defs/worker"}},
+    "external_custody": {"$ref": "#/$defs/externalCustody"},
+    "independent_machine_audit": {"$ref": "#/$defs/audit"},
+    "machine_conclusion": {"$ref": "#/$defs/conclusion"},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "status": {"const": "T15-MACHINE-WORK-COMPLETE-INDEPENDENT-AUDIT-PASSED-HUMAN-GATES-REMAIN"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "verificationPlan": {
+      "type": "object", "additionalProperties": false,
+      "required": ["plan_material_sha256", "total", "run", "invalid", "unknown_paths", "invalid_tests", "invalid_scope"],
+      "properties": {
+        "plan_material_sha256": {"const": "827BC56F9C6B0DC5F68E48432242037EDF165D8167E1B908385D8A29D74F2613"},
+        "total": {"const": 48}, "run": {"const": 46}, "invalid": {"const": 2}, "unknown_paths": {"const": 0},
+        "invalid_tests": {"const": ["static.mir4-bootstrap-materialization", "static.mir4-offline-custody"]},
+        "invalid_scope": {"const": "historical-planning-candidate-dependent-not-t15-machine-acceptance-input"}
+      }
+    },
+    "supplyChain": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_inventory_record_sha256", "component_inventory_file_sha256", "spdx_3_0_1_file_sha256", "spdx_2_3_file_sha256", "provenance_file_sha256", "attestation_file_sha256", "projection_record_sha256", "attestation_identity", "attestation_verified"],
+      "properties": {
+        "component_inventory_record_sha256": {"$ref": "#/$defs/sha256"}, "component_inventory_file_sha256": {"$ref": "#/$defs/sha256"},
+        "spdx_3_0_1_file_sha256": {"$ref": "#/$defs/sha256"}, "spdx_2_3_file_sha256": {"$ref": "#/$defs/sha256"},
+        "provenance_file_sha256": {"$ref": "#/$defs/sha256"}, "attestation_file_sha256": {"$ref": "#/$defs/sha256"},
+        "projection_record_sha256": {"$ref": "#/$defs/sha256"}, "attestation_identity": {"const": "mir4-t15-non-production-capsule-c4a68809"}, "attestation_verified": {"const": true}
+      }
+    },
+    "releaseCapsule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["archive_sha256", "content_root_sha256", "bytes", "manifest_record_sha256", "construction_record_sha256", "descriptor_count", "unique_public_object_count", "direct_verification", "candidate_state"],
+      "properties": {
+        "archive_sha256": {"const": "E63F93915430F44C9DDAD780E4EE81E85ACA6EC948367C36AC24A1426D017E22"},
+        "content_root_sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"const": 47407823},
+        "manifest_record_sha256": {"$ref": "#/$defs/sha256"}, "construction_record_sha256": {"$ref": "#/$defs/sha256"},
+        "descriptor_count": {"const": 17}, "unique_public_object_count": {"const": 17}, "direct_verification": {"const": "passed"}, "candidate_state": {"const": "pre-freeze-unallocated"}
+      }
+    },
+    "offlineRestoration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["independent_restore_count", "record_sha256", "receipt_file_sha256", "receipts_byte_identical", "network_calls", "all_checks_passed"],
+      "properties": {"independent_restore_count": {"const": 2}, "record_sha256": {"$ref": "#/$defs/sha256"}, "receipt_file_sha256": {"$ref": "#/$defs/sha256"}, "receipts_byte_identical": {"const": true}, "network_calls": {"const": 0}, "all_checks_passed": {"const": true}}
+    },
+    "confinement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["workflow_count", "workflow_root_sha256", "record_sha256", "cross_worktree_bytes_identical", "publisher_confined"],
+      "properties": {"workflow_count": {"const": 21}, "workflow_root_sha256": {"const": "3A4B3CCC6AEA0C7D0DE1A5699FA3FF77D3C11C9F26C5A88C88A9C68CB972D022"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "cross_worktree_bytes_identical": {"const": true}, "publisher_confined": {"const": true}}
+    },
+    "signingPreparation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "record_sha256", "human_blocker_count", "proof_private_key_retained", "production_authority"],
+      "properties": {"status": {"const": "machine-preparation-passed-human-ceremony-required"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "human_blocker_count": {"const": 4}, "proof_private_key_retained": {"const": false}, "production_authority": {"const": false}}
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false, "required": ["id", "bytes", "sha256"],
+      "properties": {"id": {"enum": ["mir4-api-sdk-v1-preview", "mir4-inspector-v1-preview", "mir4-mep-v1-preview", "mir4-reference-extension-v1-preview"]}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "worker": {
+      "type": "object", "additionalProperties": false, "required": ["test_id", "fingerprint", "file_sha256"],
+      "properties": {"test_id": {"enum": ["static.mir4-supply-chain-foundation", "static.mir4-supply-chain-attestation", "static.mir4-release-capsule", "static.mir4-runner-publisher-confinement", "static.mir4-signing-ceremony-preparation"]}, "fingerprint": {"$ref": "#/$defs/sha256"}, "file_sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "externalCustody": {
+      "type": "object", "additionalProperties": false,
+      "required": ["manifest_record_sha256", "manifest_file_sha256", "file_count", "private_proof_key_exported", "production_authority"],
+      "properties": {"manifest_record_sha256": {"const": "C0AA4781AA197F9C3438C135FCB9700B2A5AC8129F090DA0007C08309D867C72"}, "manifest_file_sha256": {"const": "8B4C36506D3A0682994EAAB33E7D4C36B6F7321EA5641FEC055F3EF004D1ACCC"}, "file_count": {"const": 29}, "private_proof_key_exported": {"const": false}, "production_authority": {"const": false}}
+    },
+    "audit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewer_class", "diagnostic_record_sha256", "diagnostic_file_sha256", "status", "human_acceptance_inferred"],
+      "properties": {"reviewer_class": {"const": "separate-clean-worktree-machine-audit"}, "diagnostic_record_sha256": {"const": "72FA27A0172448F35D09F2161743DA50C576DB6991A90BB720432C0F5B9DDB6E"}, "diagnostic_file_sha256": {"const": "B1EF351537376E278DC39A6F938ACA8E289B50CFA2DF8D4A34BF35A54A2771DC"}, "status": {"const": "passed-ready-for-typed-acceptance"}, "human_acceptance_inferred": {"const": false}}
+    },
+    "conclusion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["t15_prerequisites_satisfied", "canonical_inventory_single_writer", "attestation_generation_and_verification_passed", "network_disabled_reproducible_construction_passed", "offline_restoration_passed", "runner_isolation_passed", "publisher_confinement_passed", "t16_machine_preparation_complete", "remaining_human_turns"],
+      "properties": {"t15_prerequisites_satisfied": {"const": true}, "canonical_inventory_single_writer": {"const": true}, "attestation_generation_and_verification_passed": {"const": true}, "network_disabled_reproducible_construction_passed": {"const": true}, "offline_restoration_passed": {"const": true}, "runner_isolation_passed": {"const": true}, "publisher_confinement_passed": {"const": true}, "t16_machine_preparation_complete": {"const": true}, "remaining_human_turns": {"const": ["T16", "T17"]}}
+    },
+    "transitionGate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "production_seal": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}
+    }
+  }
+}

@@ -1648,6 +1648,35 @@
       ]
     },
     {
+      "id": "static.mir4-supply-chain-preservation-t15",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/governance/mir4/supply-chain.json",
+        ".mir/releases/governance/mir4/signing-ceremony-preparation.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/dashboard.json",
+        ".mir/releases/waves/mir4-r0/queue.json",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json",
+        "spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json",
+        "spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json",
+        "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
+        "validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1",
+        "docs/maintainer/mir4-supply-chain-preservation.md",
+        "package-source"
+      ]
+    },
+    {
       "id": "static.mir4-hybrid-platform-authority",
       "kind": "static",
       "layer": "F0",

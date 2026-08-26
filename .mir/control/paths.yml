@@ -83,6 +83,9 @@ paths:
   spec.schemas.mir4-signing-ceremony-preparation-authority-v1: spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json
   spec.schemas.mir4-signing-ceremony-preparation-receipt-v1: spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json
   spec.schemas.mir4-protected-signing-ceremony-receipt-v1: spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json
+  spec.schemas.mir4-supply-chain-preservation-t15-v1: spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
+  spec.schemas.mir4-t15-independent-machine-acceptance-v1: spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
+  spec.schemas.mir4-t15-authority-evolution-receipt-v1: spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
   spec.templates.mir4-protected-signing-ceremony-receipt-v1: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
@@ -101,6 +104,7 @@ paths:
   validation.tests.mir4.release-capsule: validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
   validation.tests.mir4.runner-publisher-confinement: validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
   validation.tests.mir4.signing-ceremony-preparation: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+  validation.tests.mir4.supply-chain-preservation-t15: validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
@@ -266,6 +270,9 @@ paths:
   releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
   releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
   releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
+  releases.waves.mir4-r0-supply-chain-preservation-t15: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
+  releases.waves.mir4-r0-t15-independent-machine-acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
+  releases.waves.mir4-r0-t15-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-t02-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-t03-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-t04-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json
