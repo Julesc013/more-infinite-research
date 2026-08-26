@@ -99,7 +99,8 @@
     {"path": "tools/lib/mir4/WholePlatform.ps1", "sha256": "6AF6D7F6BC98AFB48A0920340313DBD993F772DBFE6ADE6A086661F9ED89163E", "hash_mode": "canonical-text-v1", "role": "t14-frontmatter-preserving-whole-platform-writer"},
     {"path": "docs/reference/generated/mir4-whole-platform-matrix.md", "sha256": "6AA900C93352701A7E0CE98CF56072DFE1FE05E1187AE67CDBE6C3BBEB243B89", "hash_mode": "canonical-text-v1", "role": "generated-whole-platform-maturity-projection"},
     {"path": "validation/tests/mir4/Test-MIR4ReleasePhaseEngine.ps1", "sha256": "4EC37B710A1A185F89FC45F66A6E65315416829A35F6C65F3711EF0FE266B120", "hash_mode": "canonical-text-v1", "role": "build-scoped-repeatable-release-phase-engine-conformance"},
-    {"path": "tools/lib/mir4/RepositoryFixedPoint.ps1", "sha256": "1347F1E7837777CB7657517CFAF04063960D1E195E4BAF1282129092BBB41DAA", "hash_mode": "canonical-text-v1", "role": "t14-root-document-repository-classification"}
+    {"path": "tools/lib/mir4/RepositoryFixedPoint.ps1", "sha256": "1347F1E7837777CB7657517CFAF04063960D1E195E4BAF1282129092BBB41DAA", "hash_mode": "canonical-text-v1", "role": "t14-root-document-repository-classification"},
+    {"path": "tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1", "sha256": "7218645392FF2F4FF6852FE712130D9520B745E3E6AA4EDDD3F307F4E0A03ECB", "hash_mode": "canonical-text-v1", "role": "t14-frontmatter-preserving-generated-authority-doc-writer"}
   ],
   "conformance": {
     "document_count": 425,
