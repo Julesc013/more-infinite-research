@@ -948,6 +948,34 @@
       ]
     },
     {
+      "id": "static.mir4-release-compatibility-canaries-t13",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/compatibility.yml",
+        ".mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json",
+        "spec/api/mir4-v1/diagnostics.json",
+        "spec/schemas/mir4-release-compatibility-canaries-t13-v1.schema.json",
+        "spec/schemas/preview/mir4-t13-exact-capture-canary-v1.schema.json",
+        "spec/schemas/preview/mir4-release-compatibility-canary-v1.schema.json",
+        "spec/schemas/preview/mir4-t13-receipt-v1.schema.json",
+        "sdk/preview/mir4/reference/t13/**",
+        "tools/lib/mir4/EnvironmentEvidence.ps1",
+        "tools/lib/mir4/ExactProcessIR.ps1",
+        "tools/lib/mir4/CompatibilityCanary.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1",
+        "validation/tests/runtime/Test-MIRUpgrade.ps1",
+        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1",
+        "docs/compatibility/mir4-release-canaries.md",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-assurance-scale-w08",
       "kind": "static",
       "layer": "F0",

@@ -29,13 +29,15 @@ The ten constructors are descriptive proposals, never compiler operation objects
 
 The governing prompt names five terminal dispositions: `Preserve`, `RequireExtension`, `RequestReview`, `Omit`, and `FailHardSafety`. W06 does not invent an unnamed sixth value; `admissible-preview` is an assessment state.
 
-## Exact T12 evidence
+## Exact T12 and T13 evidence
 
-The governed T12 matrix contains 11 target/environment requests: F210 and F200 base and official closures; F210 Corrundum, Cubium, Recycler, K2SO, AAI, and BZ; and F200 K2SO. Ten exact captures pass two-repetition determinism. The retained F200 K2SO lock cannot be completed because four exact historical dependency archives are absent from local custody, so that one row remains `blocked-exact-archive-custody`. No substitute archive is downloaded, guessed, or fabricated.
+The governed T12 matrix contains 11 target/environment requests: F210 and F200 base and official closures; F210 Corrundum, Cubium, Recycler, K2SO, AAI, and BZ; and F200 K2SO. The immutable T12 reference records ten deterministic captures plus the historical F200 K2SO custody blocker that existed at that turn.
+
+T13 closes that narrow blocker without rewriting T12 history. Scenario dependency rows are now joined to their authoritative lock entries, including exact archive source paths, versions, and SHA-256 identities. All 11 captures reproduce twice. The tracked T13 supplement carries the exact F200 K2SO lock and ProcessIR snapshot, and its canary record binds clean load, two byte-preserving reloads, the F200 direct-predecessor matrix, performance, limitations, and expiry. No substitute archive was guessed or fabricated.
 
 Every captured snapshot retains bounded recipe inputs and outputs, exact/bounded quantities, independent probabilities, catalysts, productivity exclusions, temperature and quality facts, categories, machines, surface conditions, unlocks, owners, recycling/recovery classification, terminal risk fingerprints, SCCs, and safety outcomes. Source-mod ownership remains explicitly unavailable because Factorio's finalized recipe surface does not expose a trustworthy last-writer identity.
 
-The reference set under `sdk/preview/mir4/reference/t12` contains snapshots, environment locks, bounded A/B comparisons, Inspector bundles, the explicit custody blocker, a manifest, and the T12 receipt. These records satisfy the former general exact-target snapshot blocker while retaining developer-preview maturity, the F200 K2SO custody gap, and every non-authority flag. They are not public support evidence and do not authorize synthesis, mutation, release admission, signing, sealing, or publication.
+The reference set under `sdk/preview/mir4/reference/t12` contains the immutable T12 snapshots, locks, bounded A/B comparisons, Inspector bundles, blocker, manifest, and receipt. The T13 reference under `sdk/preview/mir4/reference/t13` supersedes only the current custody assessment and adds exact lifecycle canaries; it does not mutate T12 evidence. Neither reference authorizes synthesis, player mutation, public support claims, source freeze, signing, sealing, promotion, or publication.
 
 ```powershell
 .\tools\mir.ps1 mir4 processir-synthesis export

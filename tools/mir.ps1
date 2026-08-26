@@ -50,6 +50,7 @@ Usage:
   .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 processir-synthesis <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 exact-processir <export|check> [--capture <id>]... [--repetitions <1-4>] [--output <path>] [--reference <path>] [--publish-reference]
+  .\tools\mir.ps1 mir4 release-canaries <export|check> [--capture-root <path>] [--upgrade-root <path>] [--output <path>] [--reference <path>] [--publish-reference]
   .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 whole-platform <check|matrix|target-key> [--target <FNNN>]
   .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
@@ -730,6 +731,26 @@ switch ($area) {
           $exactArguments.PublishReference = $true
         }
         & (Join-Path $repo "tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1") @exactArguments
+      }
+      "release-canaries" {
+        if ($Args.Count -lt 3) { throw "mir4 release-canaries requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 release-canaries command: $subcommand" }
+        $canaryArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        foreach($binding in @(
+          @{arg='--capture-root';parameter='CaptureRoot'},
+          @{arg='--upgrade-root';parameter='UpgradeRoot'},
+          @{arg='--output';parameter=$(if($subcommand -eq 'check'){'ReferenceRoot'}else{'OutputRoot'})},
+          @{arg='--reference';parameter='ReferenceRoot'}
+        )){
+          $value=Get-MIRArgValue -Items $Args -Name $binding.arg
+          if(-not[string]::IsNullOrWhiteSpace($value)){$canaryArguments[$binding.parameter]=$value}
+        }
+        if(Test-MIRArgSwitch -Items $Args -Name '--publish-reference'){
+          if($subcommand -eq 'check'){throw "--publish-reference is valid only for release-canaries export."}
+          $canaryArguments.PublishReference=$true
+        }
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1") @canaryArguments
       }
       "inspector-compatibility" {
         if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility requires export or check." }

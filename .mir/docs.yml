@@ -176,6 +176,18 @@ docs:
       - mir4-synthesis-maturity-matrix-v1
       - mir4-exact-target-processir-t12-capture
       - mir4-exact-target-processir-custody-boundary
+  - path: docs/compatibility/mir4-release-canaries.md
+    title: "MIR 4 Exact Release Compatibility Canaries"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-t13-exact-release-canary-contract
+      - mir4-t13-lifecycle-reload-proof
+      - mir4-t13-target-upgrade-binding
+      - mir4-t13-claim-limitations-and-expiry
+      - mir4-f200-k2so-custody-closure
   - path: docs/architecture/mir4-inspector-compatibility.md
     title: "MIR 4 Inspector and Compatibility Workbench"
     status: current

@@ -620,6 +620,41 @@ mir4_environment_evidence:
   minimization: required-witness-transitive-closure
   release_authority: false
 
+mir4_release_canaries_t13:
+  authority: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+  machine_receipt: sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json
+  reference_root: sdk/preview/mir4/reference/t13
+  maturity: pre-freeze-release-canary
+  claim_level: exact-locked-release-canary-input
+  target_disposition: qualified-exact-release-canary
+  exact_capture_count: 11
+  canary_count: 8
+  subjects:
+    - base-and-official-closure
+    - cubium
+    - corrundum
+    - recycler-progression
+    - k2-k2so-f210
+    - k2-k2so-f200
+    - aai-selected
+    - bz-selected
+  lifecycle:
+    - exact-engine-clean-load
+    - first-byte-preserving-reload
+    - second-byte-preserving-reload
+    - target-direct-predecessor-upgrade-matrix
+    - affected-closure-performance-budget
+  expiry:
+    - exact-engine-identity-change
+    - mir-candidate-package-identity-change
+    - exact-archive-closure-change
+    - startup-settings-change
+    - governed-policy-or-fixture-change
+  f200_k2so_archive_custody: complete-t13-supersedes-historical-t12-blocker
+  public_claim: false
+  package_visible: false
+  release_transition_authority: false
+
 rules:
   - every target declares compatibility maturity behavior and scope independently
   - every public compatibility claim has a compatibility page

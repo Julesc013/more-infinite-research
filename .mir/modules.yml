@@ -158,7 +158,21 @@ package_excluded_modules:
     exact_reference_root: sdk/preview/mir4/reference/t12
     documentation: docs/architecture/mir4-processir-synthesis.md
     boundary: package-excluded exact post-finalizer observation, copied-fact ProcessIR certificates, effect owner references, bounded offline comparisons, and descriptive proposal classification only; the observer cannot write prototypes and the preview has no risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
-    stability: developer-preview-exact-f210-f200-captured-with-declared-f200-k2so-custody-blocker
+    stability: developer-preview-exact-f210-f200-captured-t13-custody-complete
+  mir4_release_compatibility_canaries_t13:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+    implementation: tools/lib/mir4/CompatibilityCanary.ps1
+    exporter: tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1
+    schemas:
+      - spec/schemas/mir4-release-compatibility-canaries-t13-v1.schema.json
+      - spec/schemas/preview/mir4-t13-exact-capture-canary-v1.schema.json
+      - spec/schemas/preview/mir4-release-compatibility-canary-v1.schema.json
+      - spec/schemas/preview/mir4-t13-receipt-v1.schema.json
+    reference_root: sdk/preview/mir4/reference/t13
+    documentation: docs/compatibility/mir4-release-canaries.md
+    validator: validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+    boundary: exact locked F210 and F200 release-canary input with clean load, two byte-preserving reloads, target-shared direct-predecessor upgrade proof, bounded performance, claim limitations, and expiry; no blanket ecosystem claim, automatic synthesis, player or prototype mutation, source freeze, signing, sealing, promotion, or publication authority
+    stability: pre-freeze-release-canary-exact-eleven-captures-eight-bounded-subjects
   mir4_inspector_compatibility_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     implementations:
@@ -325,6 +339,7 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4SdkV1T08.ps1
       - validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1
       - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
