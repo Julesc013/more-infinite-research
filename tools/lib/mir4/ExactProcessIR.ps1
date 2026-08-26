@@ -138,6 +138,19 @@ function ConvertTo-MIR4T12Probability {
   [ordered]@{kind='exact';value=$(if($null-ne$Entry.independent_probability){[decimal]$Entry.independent_probability}elseif($null-ne$Entry.probability){[decimal]$Entry.probability}else{[decimal]1})}
 }
 
+function ConvertTo-MIR4T12Array {
+  param($Value,[switch]$Strings)
+  foreach($item in @($Value)){
+    if($null-eq$item){continue}
+    if($item-is[pscustomobject]-and$item.PSObject.Properties.Count-eq 0){continue}
+    if($item-is[Collections.IDictionary]-and$item.Count-eq 0){continue}
+    if($Strings){
+      $text=[string]$item
+      if(-not[string]::IsNullOrWhiteSpace($text)){$text}
+    }else{$item}
+  }
+}
+
 function ConvertTo-MIR4T12Flow {
   param([Parameter(Mandatory)]$Entry,[Parameter(Mandatory)][bool]$ProductivitySensitive)
   [ordered]@{
@@ -152,13 +165,20 @@ function ConvertTo-MIR4T12Flow {
 
 function ConvertTo-MIR4T12CanonicalInput {
   param([Parameter(Mandatory)]$Observed,[Parameter(Mandatory)]$EnvironmentLock,[Parameter(Mandatory)]$Capture)
-  $processes=@();$observationRows=@()
+  $processes=@();$observationRows=@();$transportOmissions=@()
   foreach($row in @($Observed.rows|Sort-Object recipe -CaseSensitive)){
     $variantOrdinal=0
     foreach($variant in @($row.fact.variants|Sort-Object name -CaseSensitive)){
       $variantOrdinal++
-      $inputs=@($variant.ingredients|ForEach-Object{ConvertTo-MIR4T12Flow -Entry $_ -ProductivitySensitive $false})
-      $outputs=@($variant.results|ForEach-Object{
+      $rawInputs=@(ConvertTo-MIR4T12Array $variant.ingredients)
+      $rawOutputs=@(ConvertTo-MIR4T12Array $variant.results)
+      $invalidFlows=@(@($rawInputs)+@($rawOutputs)|Where-Object{[string]::IsNullOrWhiteSpace([string]$_.name)-or([string]$_.type-notin@('item','fluid'))})
+      if($rawOutputs.Count-eq 0-or$invalidFlows.Count-ne 0){
+        $transportOmissions+=[ordered]@{recipe=[string]$row.recipe;variant=[string]$variant.name;status='unavailable';reason=$(if([bool]$row.fact.parameter){'parameterized recipe flow identities are not concrete in the finalized prototype surface'}else{'one or more finalized recipe flows do not expose a concrete supported type and name'})}
+        continue
+      }
+      $inputs=@($rawInputs|ForEach-Object{ConvertTo-MIR4T12Flow -Entry $_ -ProductivitySensitive $false})
+      $outputs=@($rawOutputs|ForEach-Object{
         $amount=if($null-ne$_.amount_max){[decimal]$_.amount_max}elseif($null-ne$_.amount){[decimal]$_.amount}else{[decimal]1}
         $ignored=if($null-ne$_.ignored_by_productivity){[decimal]$_.ignored_by_productivity}else{[decimal]0}
         ConvertTo-MIR4T12Flow -Entry $_ -ProductivitySensitive ([bool]$variant.effective_allow_productivity-and$amount-gt$ignored)
@@ -168,19 +188,19 @@ function ConvertTo-MIR4T12CanonicalInput {
       $catalysts=@($outputs|Where-Object{[decimal]$_.catalyst_amount-gt 0}|ForEach-Object name|Sort-Object -Unique -CaseSensitive)
       $returned=@($intersection|Where-Object{$_-match'(?i)barrel|canister|container|capsule|empty'}|Sort-Object -Unique -CaseSensitive)
       $unsupported=@($variant.results|Where-Object{$null-ne$_.shared_probability-or($null-ne$_.extra_count_fraction-and[decimal]$_.extra_count_fraction-ne 0)})
-      $riskMaterial=[ordered]@{recipe=[string]$row.recipe;terminal_fingerprint=[string]$row.risk.risk_fingerprint;hard_flags=@($row.risk.hard_flags);review_flags=@($row.risk.review_flags);evidence=@($row.risk.evidence);shared_input_output=@($row.risk.shared_input_output)}
+      $riskMaterial=[ordered]@{recipe=[string]$row.recipe;terminal_fingerprint=[string]$row.risk.risk_fingerprint;hard_flags=@(ConvertTo-MIR4T12Array $row.risk.hard_flags -Strings);review_flags=@(ConvertTo-MIR4T12Array $row.risk.review_flags -Strings);evidence=@(ConvertTo-MIR4T12Array $row.risk.evidence -Strings);shared_input_output=@(ConvertTo-MIR4T12Array $row.risk.shared_input_output)}
       $idMaterial=[ordered]@{capture=[string]$Capture.id;recipe=[string]$row.recipe;variant=[string]$variant.name;ordinal=$variantOrdinal}
       $idDigest=(Get-MIR4T12RecordDigest -Value $idMaterial -Domain 'mir4:process-id:1').Substring(7,24)
       $classification=if([string]$row.fact.source_class-eq'recycling'){'recycling'}elseif([string]$row.recipe-match'(?i)recover|recovery'){'recovery'}elseif($unsupported.Count){'opaque'}else{'ordinary'}
       $processes+=[ordered]@{
         id="process-$idDigest";recipe=[string]$row.recipe;variant=[string]$variant.name;classification=$classification;shape_supported=($unsupported.Count-eq 0)
         inputs=$inputs;outputs=$outputs;catalysts=$catalysts;returned_containers=$returned;cycle_bound=$(if(@($row.risk.hard_flags).Count){'unknown'}else{'not-applicable'})
-        categories=@($variant.categories);machines=@($row.machines);surface_conditions=@($variant.surface_conditions);unlocks=@($row.unlocks);owners=@($row.productivity_owners);source_mod=$row.source_mod
+        categories=@(ConvertTo-MIR4T12Array $variant.categories -Strings);machines=@(ConvertTo-MIR4T12Array $row.machines -Strings);surface_conditions=@(ConvertTo-MIR4T12Array $variant.surface_conditions);unlocks=@(ConvertTo-MIR4T12Array $row.unlocks -Strings);owners=@(ConvertTo-MIR4T12Array $row.productivity_owners -Strings);source_mod=$row.source_mod
         energy_required=$(if($null-ne$variant.energy_required){$variant.energy_required}else{$null})
-        risk=[ordered]@{fingerprint=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'mir4:terminal-risk-fact:1');terminal_fingerprint=[string]$row.risk.risk_fingerprint;confidence=$(if($unsupported.Count){'partial'}else{'complete'});hard_flags=@($row.risk.hard_flags|Sort-Object -Unique -CaseSensitive);review_flags=@($row.risk.review_flags|Sort-Object -Unique -CaseSensitive);evidence=@($row.risk.evidence|Sort-Object -Unique -CaseSensitive)}
+        risk=[ordered]@{fingerprint=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'mir4:terminal-risk-fact:1');terminal_fingerprint=[string]$row.risk.risk_fingerprint;confidence=$(if($unsupported.Count){'partial'}else{'complete'});hard_flags=@(ConvertTo-MIR4T12Array $row.risk.hard_flags -Strings|Sort-Object -Unique -CaseSensitive);review_flags=@(ConvertTo-MIR4T12Array $row.risk.review_flags -Strings|Sort-Object -Unique -CaseSensitive);evidence=@(ConvertTo-MIR4T12Array $row.risk.evidence -Strings|Sort-Object -Unique -CaseSensitive)}
       }
     }
-    $observationRows+=[ordered]@{recipe=[string]$row.recipe;fact=$row.fact;risk=$row.risk;unlocks=@($row.unlocks);productivity_owners=@($row.productivity_owners);machines=@($row.machines);source_mod=$row.source_mod}
+    $observationRows+=[ordered]@{recipe=[string]$row.recipe;fact=$row.fact;risk=$row.risk;unlocks=@(ConvertTo-MIR4T12Array $row.unlocks -Strings);productivity_owners=@(ConvertTo-MIR4T12Array $row.productivity_owners -Strings);machines=@(ConvertTo-MIR4T12Array $row.machines -Strings);source_mod=$row.source_mod}
   }
   $factMaterial=@($observationRows|ForEach-Object{[ordered]@{recipe=$_.recipe;fact=$_.fact}})
   $riskMaterial=@($observationRows|ForEach-Object{[ordered]@{recipe=$_.recipe;risk=$_.risk}})
@@ -189,7 +209,7 @@ function ConvertTo-MIR4T12CanonicalInput {
     source=[ordered]@{authority='terminal-exact-target';target=[string]$Capture.target;profile=[string]$Capture.scenario_id;exact_target=$true;recipe_facts_sha256=(Get-MIR4T12RecordDigest -Value $factMaterial -Domain 'mir4:recipe-facts:1');risk_facts_sha256=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'mir4:risk-facts:1');environment_lock_digest=[string]$EnvironmentLock.digest}
     processes=@($processes|Sort-Object id -CaseSensitive)
   }
-  [pscustomobject][ordered]@{input=$input;observations=$observationRows}
+  [pscustomobject][ordered]@{input=$input;observations=$observationRows;transport_omissions=@($transportOmissions|Sort-Object recipe,variant -CaseSensitive)}
 }
 
 function New-MIR4T12ExactSnapshot {
@@ -202,7 +222,7 @@ function New-MIR4T12ExactSnapshot {
     schema=1;kind='MIR4ExactProcessIRSnapshotV1';work_package='T12';capture_id=[string]$Capture.id;target=[string]$Capture.target;scenario_id=[string]$Capture.scenario_id
     source_identity=$SourceIdentity;environment_lock=$EnvironmentLock;environment_lock_digest=[string]$EnvironmentLock.digest
     evidence_refs=@($Evidence.evidence_ref,$Evidence.lock_ref);observer=[ordered]@{digest=[string]$Observed.digest;header=$Observed.header;footer=$Observed.footer;repetitions=$Repetitions;deterministic=$Deterministic;bounded=$true;truncated=([int]$Observed.header.total_recipes-gt[int]$Observed.header.selected_processes)}
-    transport=$transportSet.input;process_ir=$ir;observations=@($transportSet.observations);classification_counts=$counts
+    transport=$transportSet.input;transport_omissions=@($transportSet.transport_omissions);process_ir=$ir;observations=@($transportSet.observations);classification_counts=$counts
     explicit_unavailable_not_zero=$true;terminal_fact_authority_preserved=$true;authoritative=$false;maturity='developer-preview';package_visible=$false;public_release_proof=$false;player_mutation_authorized=$false;prototype_write_authorized=$false;planner_or_emitter_admission_authorized=$false;public_support_authorized=$false;digest=''
   }
   Add-MIR4T12RecordDigest $record|Out-Null
