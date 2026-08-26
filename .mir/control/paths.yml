@@ -172,6 +172,7 @@ paths:
   tools.lib.mir4.release-budget: tools/lib/mir4/ReleaseBudget.ps1
   tools.lib.mir4.offline-drill: tools/lib/mir4/OfflineDrill.ps1
   tools.lib.mir4.offline-candidate-custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+  tools.lib.mir4.package-presentation: tools/lib/mir4/PackagePresentation.ps1
   tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
   tools.lib.mir4.release-phase-engine: tools/lib/mir4/ReleasePhaseEngine.ps1
   tools.lib.mir4.release-adapters: tools/lib/mir4/ReleaseAdapters.ps1

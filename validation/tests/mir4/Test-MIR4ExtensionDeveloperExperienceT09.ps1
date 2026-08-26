@@ -4,10 +4,10 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
-$expectedPackage='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-if($packageBefore-cne$expectedPackage){throw '[mir4-t09-player-package-baseline]'}
+Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 $clock=[Diagnostics.Stopwatch]::StartNew()
 Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
 
@@ -94,5 +94,5 @@ $portableExample=Join-Path $portableRoot 'sdk/preview/mir4/mep-v1/examples/posit
 
 $clock.Stop()
 if($clock.Elapsed.TotalSeconds-ge300){throw "[mir4-t09-five-minute-path] $($clock.Elapsed.TotalSeconds)"}
-if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$expectedPackage){throw '[mir4-t09-player-package-drift]'}
+if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-t09-player-package-drift]'}
 Write-Host "[ok] MIR 4 T09 extension DX passed in $([Math]::Round($clock.Elapsed.TotalSeconds,2)) seconds: templates, doctor/lock/diff/CI, examples, migration, deterministic archives, clean extraction, and no player authority."

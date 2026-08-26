@@ -3,11 +3,11 @@ $ErrorActionPreference='Stop'
 
 . (Join-Path $RepoRoot 'tools/lib/mir4/MepDiscovery.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
-$expectedPackage='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'
 $before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-if($before-cne$expectedPackage){throw "[mir4-t11-package-before] $before"}
+Assert-MIR4PackagePresentationV1 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
 $emitterPath=Join-Path $RepoRoot 'prototypes/mir/emit/mod_data.lua'
 $emitterBefore=(Get-FileHash -LiteralPath $emitterPath -Algorithm SHA256).Hash
 

@@ -293,6 +293,7 @@ package_excluded_modules:
       - .mir/releases/governance/mir4/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
     release_lifecycle_adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
@@ -370,6 +371,7 @@ package_excluded_modules:
     inspector: tools/lib/mir4/Inspector.ps1
     compatibility_factory: tools/lib/mir4/CompatibilityFactory.ps1
     environment_evidence: tools/lib/mir4/EnvironmentEvidence.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
     inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
@@ -1226,6 +1228,7 @@ validation_tooling:
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
     mir4_offline_review_schema: spec/schemas/mir4-offline-review-record.schema.json

@@ -2,11 +2,11 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $ErrorActionPreference='Stop'
 
 . (Join-Path $RepoRoot 'tools/lib/mir4/EnvironmentEvidence.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
-$expectedPackage='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'
 $before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-if($before-cne$expectedPackage){throw "[mir4-t10-package-before] $before"}
+Assert-MIR4PackagePresentationV1 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
 
 $a=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-environment-evidence-v1/positive/environment-f210-a.json')|ConvertFrom-Json -Depth 100
 $b=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-environment-evidence-v1/positive/environment-f210-b.json')|ConvertFrom-Json -Depth 100

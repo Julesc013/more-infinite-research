@@ -3,7 +3,10 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
+$packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
 $corpusPath=Join-Path $repo 'sdk/preview/mir4/api-v1/conformance/corpus.json'
 $corpusJson=Get-Content -Raw -LiteralPath $corpusPath
@@ -51,6 +54,6 @@ foreach($path in @(
   'api-v1/conformance/corpus.json','api-v1/package-metadata.json',
   'conformance-v1/Invoke-MIR4SdkV1Conformance.ps1'
 )){if(-not(Test-Path -LiteralPath (Join-Path $sdkRoot $path)-PathType Leaf)){throw "[mir4-t08-archive-file] $path"}}
-if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'){throw '[mir4-t08-player-package-drift]'}
+if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-t08-player-package-drift]'}
 
 Write-Host '[ok] MIR 4 T08 SDK V1 bindings, 12+/16+ corpus, cross-runtime identity, deterministic archives, extracted conformance, and package exclusion passed.'
