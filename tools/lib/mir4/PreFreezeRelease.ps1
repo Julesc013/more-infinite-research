@@ -216,6 +216,79 @@ function Test-MIR4ProductionActionLock {
   return $lock
 }
 
+function Get-MIR4PreFreezeAuthorityState {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [switch]$IncludeT17MachinePreparation
+  )
+  $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
+  $authorityHashes = @{}
+  $authorityHashModes = @{}
+  foreach ($binding in @($receipt.authority_bindings)) {
+    $authorityHashes[[string]$binding.path] = [string]$binding.sha256
+    $authorityHashModes[[string]$binding.path] = $(if($binding.PSObject.Properties.Name-contains'hash_mode'){[string]$binding.hash_mode}else{'raw-bytes'})
+  }
+  $priorReceiptPath = '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
+  $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  $links = @(
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json';kind='MIR4T02AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json';kind='MIR4T03AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json';kind='MIR4T04AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json';kind='MIR4T05AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json';kind='MIR4T06AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json';kind='MIR4T07AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json';kind='MIR4T08AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T09-Authority-Evolution-ReceiptV1.json';kind='MIR4T09AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json';kind='MIR4T10AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json';kind='MIR4T11AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json';kind='MIR4T12AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json';kind='MIR4T13AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json';kind='MIR4T14AuthorityEvolutionReceiptV1'},
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json';kind='MIR4T15AuthorityEvolutionReceiptV1'}
+  )
+  if ($IncludeT17MachinePreparation) {
+    $links += @{path='.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json';kind='MIR4T17MachinePreparationAuthorityEvolutionReceiptV1'}
+  }
+  foreach ($link in $links) {
+    $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
+    if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
+        [string]$evolution.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
+      throw "[mir4-prefreeze-evolution-predecessor] $($link.path)"
+    }
+    $evolvedPaths = @{}
+    foreach ($binding in @($evolution.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-evolution-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $evolvedPaths[$path] = $true
+    }
+    foreach ($binding in @($evolution.current_authorities)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.sha256 -and
+          -not $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-current-authority-evolution-missing] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $authorityHashModes[$path] = $(if($binding.PSObject.Properties.Name-contains'hash_mode'){[string]$binding.hash_mode}else{'raw-bytes'})
+    }
+    foreach ($property in $evolution.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-evolution-transition] $($link.path):$($property.Name)" }
+    }
+    $priorReceiptPath = [string]$link.path
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  return [pscustomobject][ordered]@{
+    authority_hashes = $authorityHashes
+    authority_hash_modes = $authorityHashModes
+    prior_receipt_path = $priorReceiptPath
+    prior_receipt_sha256 = $priorReceiptSha256
+  }
+}
+
 function Test-MIR4PreFreezeAuthorities {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
@@ -244,6 +317,7 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json' = 'spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json' = 'spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -273,6 +347,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json';kind='MIR4T13AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json';kind='MIR4T14AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json';kind='MIR4T15AuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json';kind='MIR4T17MachinePreparationAuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -363,7 +438,9 @@ function Get-MIR4ReleaseWorkflowMaturity {
 function Get-MIR4ReleaseDoctor {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Explain)
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
-  . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  }
   . (Join-Path $repo 'tools/lib/mir4/ReleaseGovernance.ps1')
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   . (Join-Path $repo 'tools/lib/mir4/AssuranceScale.ps1')
@@ -430,8 +507,13 @@ function Get-MIR4ReleaseDoctor {
   } 'The default compile example is V1-native.'
   Add-AutomatedCheck 'package-source' {
     $plan = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' -Kind 'MIR4PreFreezeDevelopmentPlanV1'
+    $t13 = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T13AuthorityEvolutionReceiptV1'
+    $t15 = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T15AuthorityEvolutionReceiptV1'
     $actual = Get-MIRPackageSourceFingerprint -RepoRoot $repo
-    if ($actual -cne [string]$plan.source_baseline.package_source_sha256) { throw "[mir4-doctor-package-diff] expected $($plan.source_baseline.package_source_sha256), got $actual" }
+    if ([string]$plan.source_baseline.package_source_sha256 -cne [string]$t13.player_package_source_sha256 -or
+        $actual -cne [string]$t15.player_package_source_sha256) {
+      throw "[mir4-doctor-package-diff] expected current $($t15.player_package_source_sha256), got $actual"
+    }
     if ([int]$plan.verification_plan.invalid -ne 0 -or [int]$plan.verification_plan.passed -ne 30) { throw '[mir4-doctor-development-plan]' }
   } 'Player-package fingerprint is unchanged and the development plan is 30/30 with zero invalid rows.'
   Add-AutomatedCheck 'target-custody' {
@@ -509,16 +591,26 @@ function Get-MIR4ReleaseDoctor {
       $decision = Get-Content -Raw -LiteralPath $decisionFile.FullName | ConvertFrom-Json -Depth 100
       $sessionPath = Join-Path $root 'session.json'
       $capturePath = Join-Path $root 'capture.json'
+      $summaryPath = Join-Path $root 'result-summary.json'
       $session = Get-Content -Raw -LiteralPath $sessionPath | ConvertFrom-Json -Depth 100
       $capture = Get-Content -Raw -LiteralPath $capturePath | ConvertFrom-Json -Depth 100
+      $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json -Depth 100
       $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq [string]$session.target })
-      if ($targetRow.Count -ne 1 -or [string]$decision.decision -cne 'ACCEPTED' -or [bool]$decision.decision_inferred -or
+      if ($targetRow.Count -ne 1 -or [string]$session.kind -cne 'MIR4PlaytestSessionV1' -or
+          [string]$capture.kind -cne 'MIR4PlaytestCaptureV1' -or [string]$summary.kind -cne 'MIR4PlaytestResultSummaryV1' -or
+          [string]$decision.kind -cne 'MIR4ManualPlaytestDecisionV1' -or [string]$decision.decision -cne 'ACCEPTED' -or [bool]$decision.decision_inferred -or
           [bool]$decision.production_release_authorized -or [string]$decision.target -cne [string]$session.target -or
           [string]$decision.candidate_sha256 -cne [string]$targetRow[0].development_package.sha256 -or
           [string]$decision.engine_sha256 -cne [string]$targetRow[0].engine.sha256 -or
+          [string]$session.predecessor.sha256 -cne [string]$targetRow[0].predecessor.sha256 -or
           [string]$capture.candidate_sha256 -cne [string]$decision.candidate_sha256 -or
           [string]$capture.engine_sha256 -cne [string]$decision.engine_sha256 -or
-          (Get-MIR4PreFreezeFileSha256 $capturePath) -cne [string]$decision.capture_sha256) { continue }
+          [string]$capture.status -cne 'ready-for-maintainer-decision' -or [string]$capture.comparison.status -cne 'MATCHED' -or
+          @($capture.missing_capture_requirements).Count -ne 0 -or [string]$summary.status -cne 'ready-for-maintainer-decision' -or
+          (Get-MIR4PreFreezeFileSha256 $sessionPath) -cne [string]$decision.session_sha256 -or
+          (Get-MIR4PreFreezeFileSha256 $capturePath) -cne [string]$decision.capture_sha256 -or
+          (Get-MIR4PreFreezeFileSha256 $summaryPath) -cne [string]$decision.result_summary_sha256 -or
+          (Get-MIR4PreFreezeFileSha256 ([string]$session.authority.development_plan.path)) -cne [string]$session.authority.development_plan.sha256) { continue }
       $evidenceCurrent = $true
       foreach ($evidence in @($capture.files)) {
         if (-not (Test-Path -LiteralPath ([string]$evidence.path) -PathType Leaf) -or
@@ -601,6 +693,144 @@ function Get-MIR4PlaytestFileDescriptor {
   return [ordered]@{path=$item.FullName;bytes=$item.Length;sha256=(Get-MIR4PreFreezeFileSha256 $item.FullName)}
 }
 
+function Write-MIR4PlaytestJson {
+  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)]$Value)
+  [IO.File]::WriteAllText($Path,($Value|ConvertTo-Json -Depth 100)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+}
+
+function Assert-MIR4PlaytestEvidenceV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Record)
+  $schema = Join-Path (Get-MIR4PreFreezeRepoRoot $RepoRoot) 'spec/schemas/mir4-playtest-evidence-v1.schema.json'
+  if (-not (Test-Path -LiteralPath $schema -PathType Leaf)) { throw '[mir4-playtest-evidence-schema-missing]' }
+  $json = $Record | ConvertTo-Json -Depth 100
+  if (-not ($json | Test-Json -SchemaFile $schema -ErrorAction SilentlyContinue)) {
+    throw "[mir4-playtest-evidence-schema] $($Record.kind)"
+  }
+  return $true
+}
+
+function Get-MIR4PlaytestScenarioContract {
+  param([Parameter(Mandatory)][ValidateSet('F210','F200')][string]$Target)
+  $rows = if ($Target -ceq 'F210') {
+    @(
+      @{id='fresh-load';expected='A new default-settings game loads with the exact F210 development package.'},
+      @{id='direct-upgrade-3.2.11';expected='A representative 3.2.11 save upgrades directly to the exact F210 development package.'},
+      @{id='reload-1';expected='The upgraded F210 save reloads once without identity, state, or graph drift.'},
+      @{id='reload-2';expected='The same F210 save reloads a second time without identity, state, or graph drift.'},
+      @{id='maximum-level-states';expected='Maximum-level and continuation states match the F210 target contract.'},
+      @{id='research-progress-and-queue';expected='Current research, fractional progress, and queued research survive upgrade and reload.'},
+      @{id='production-route-policy';expected='Production-route selection matches the admitted F210 policy.'},
+      @{id='cubium-canary';expected='The bounded Cubium compatibility canary matches its exact expected state.'},
+      @{id='corrundum-canary';expected='The bounded Corrundum compatibility canary matches its exact expected state.'},
+      @{id='recycler-canary';expected='The bounded Recycler compatibility canary matches its exact expected state.'},
+      @{id='bounded-k2';expected='The exact bounded F210 Krastorio 2 scenario matches its target-bound claim.'},
+      @{id='bounded-k2so';expected='The exact bounded F210 K2SO scenario matches its target-bound claim.'},
+      @{id='settings-runtime-presentation-diagnostics';expected='Settings, runtime behavior, UI presentation, locales, and diagnostics match the F210 handoff.'}
+    )
+  } else {
+    @(
+      @{id='fresh-load';expected='A new default-settings game loads with the exact F200 development package.'},
+      @{id='direct-upgrade-2.5.11';expected='A representative 2.5.11 save upgrades directly to the exact F200 development package.'},
+      @{id='reload-1';expected='The upgraded F200 save reloads once without identity, state, or graph drift.'},
+      @{id='reload-2';expected='The same F200 save reloads a second time without identity, state, or graph drift.'},
+      @{id='target-appropriate-maximum-level';expected='Maximum-level behavior matches the F200 target contract and its finite omissions.'},
+      @{id='research-progress-and-queue';expected='Current research, fractional progress, and queued research survive upgrade and reload.'},
+      @{id='route-policy';expected='Production-route selection matches the admitted F200 policy.'},
+      @{id='bounded-f200-k2';expected='The exact bounded F200 Krastorio 2 scenario matches its target-bound claim.'},
+      @{id='bounded-f200-k2so';expected='The exact bounded F200 K2SO scenario matches its target-bound claim.'},
+      @{id='explicit-target-omissions';expected='F210-only capabilities remain absent exactly where the F200 profile requires omission.'},
+      @{id='settings-runtime-presentation-diagnostics';expected='Settings, runtime behavior, UI presentation, locales, and diagnostics match the F200 handoff.'}
+    )
+  }
+  return @($rows | ForEach-Object { [pscustomobject][ordered]@{id=[string]$_.id;expected=[string]$_.expected} })
+}
+
+function Get-MIR4PlaytestLauncherText {
+  return @'
+param(
+  [ValidateSet('Candidate','Predecessor')][string]$Package = 'Candidate',
+  [string]$SavePath = '',
+  [string]$CaptureLabel = ''
+)
+
+$ErrorActionPreference = 'Stop'
+$sessionPath = Join-Path $PSScriptRoot 'session.json'
+$session = Get-Content -Raw -LiteralPath $sessionPath | ConvertFrom-Json -Depth 100
+function Get-LauncherSha256([string]$Path) {
+  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+$enginePath = [string]$session.engine.path
+if (-not (Test-Path -LiteralPath $enginePath -PathType Leaf) -or (Get-LauncherSha256 $enginePath) -cne [string]$session.engine.sha256) {
+  throw '[mir4-playtest-launcher-engine-hash]'
+}
+$selected = if ($Package -ceq 'Candidate') { $session.candidate } else { $session.predecessor }
+if (-not (Test-Path -LiteralPath ([string]$selected.path) -PathType Leaf) -or (Get-LauncherSha256 ([string]$selected.path)) -cne [string]$selected.sha256) {
+  throw '[mir4-playtest-launcher-package-hash]'
+}
+$mods = [string]$session.profile.mods
+$stagedName = [IO.Path]::GetFileName([string]$selected.path)
+foreach ($item in @(Get-ChildItem -LiteralPath $mods -Filter 'more-infinite-research_*.zip' -File -ErrorAction SilentlyContinue)) {
+  Remove-Item -LiteralPath $item.FullName -Force
+}
+Copy-Item -LiteralPath ([string]$selected.path) -Destination (Join-Path $mods $stagedName)
+$arguments = @('--config',[string]$session.profile.config,'--no-log-rotation','--mod-directory',$mods)
+if (-not [string]::IsNullOrWhiteSpace($SavePath)) {
+  $resolvedSave = (Resolve-Path -LiteralPath $SavePath -ErrorAction Stop).Path
+  $arguments += @('--load-game',$resolvedSave)
+}
+& $enginePath @arguments
+$exitCode = $LASTEXITCODE
+$logPath = Join-Path ([string]$session.profile.userdata) 'factorio-current.log'
+if (Test-Path -LiteralPath $logPath -PathType Leaf) {
+  if ([string]::IsNullOrWhiteSpace($CaptureLabel)) { $CaptureLabel = [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ') }
+  if ($CaptureLabel -notmatch '^[A-Za-z0-9._-]+$') { throw '[mir4-playtest-launcher-capture-label]' }
+  $captureLog = Join-Path ([string]$session.profile.capture_queue) ('logs/' + $CaptureLabel + '-factorio-current.log')
+  New-Item -ItemType Directory -Path (Split-Path -Parent $captureLog) -Force | Out-Null
+  if (Test-Path -LiteralPath $captureLog) { throw '[mir4-playtest-launcher-capture-exists]' }
+  Copy-Item -LiteralPath $logPath -Destination $captureLog
+}
+if ($exitCode -ne 0) { throw "[mir4-playtest-launcher-exit] $exitCode" }
+'@
+}
+
+function Get-MIR4PlaytestCaptureKind {
+  param([Parameter(Mandatory)][string]$Path,[string]$ObservationsPath='')
+  $full = [IO.Path]::GetFullPath($Path)
+  if (-not [string]::IsNullOrWhiteSpace($ObservationsPath) -and $full -ceq [IO.Path]::GetFullPath($ObservationsPath)) { return 'observations' }
+  $extension = [IO.Path]::GetExtension($full).ToLowerInvariant()
+  if ($extension -eq '.log') { return 'factorio-log' }
+  if ($extension -eq '.zip') { return 'save' }
+  if ($extension -in @('.png','.jpg','.jpeg','.webp')) { return 'screenshot' }
+  if ($extension -in @('.md','.txt')) { return 'note' }
+  return 'attachment'
+}
+
+function Compare-MIR4PlaytestObservations {
+  param([Parameter(Mandatory)]$Session,[Parameter(Mandatory)]$Observations)
+  if ([string]$Observations.kind -cne 'MIR4PlaytestObservationsV1' -or
+      [string]$Observations.target -cne [string]$Session.target -or
+      [string]$Observations.candidate_sha256 -cne [string]$Session.candidate.sha256 -or
+      [string]$Observations.engine_sha256 -cne [string]$Session.engine.sha256) {
+    throw '[mir4-playtest-observations-binding]'
+  }
+  $expectedIds = @($Session.expected_scenarios | ForEach-Object { [string]$_.id })
+  $actualIds = @($Observations.scenarios | ForEach-Object { [string]$_.id })
+  if (@($actualIds | Sort-Object -Unique).Count -ne $actualIds.Count -or
+      (($expectedIds | Sort-Object) -join '|') -cne (($actualIds | Sort-Object) -join '|')) {
+    throw '[mir4-playtest-observations-scenario-set]'
+  }
+  $allowed = @('PASSED','FAILED','BLOCKED','PENDING')
+  foreach ($row in @($Observations.scenarios)) {
+    if ([string]$row.status -notin $allowed) { throw "[mir4-playtest-observations-status] $($row.id)" }
+  }
+  $passed = @($Observations.scenarios | Where-Object { [string]$_.status -ceq 'PASSED' }).Count
+  $failed = @($Observations.scenarios | Where-Object { [string]$_.status -ceq 'FAILED' }).Count
+  $blocked = @($Observations.scenarios | Where-Object { [string]$_.status -ceq 'BLOCKED' }).Count
+  $pending = @($Observations.scenarios | Where-Object { [string]$_.status -ceq 'PENDING' }).Count
+  $status = if ($failed -gt 0) { 'MISMATCH' } elseif ($blocked -gt 0 -or $pending -gt 0) { 'INCOMPLETE' } else { 'MATCHED' }
+  return [pscustomobject][ordered]@{status=$status;total=$actualIds.Count;passed=$passed;failed=$failed;blocked=$blocked;pending=$pending}
+}
+
 function New-MIR4PlaytestSession {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -614,21 +844,22 @@ function New-MIR4PlaytestSession {
     [switch]$DryRun
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  }
   $plan = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' -Kind 'MIR4PreFreezeDevelopmentPlanV1'
+  $t15Path = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json'
+  $t15 = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T15AuthorityEvolutionReceiptV1'
   $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq $Target })
   if ($targetRow.Count -ne 1) { throw "[mir4-playtest-target] $Target" }
   $row = $targetRow[0]
+  $packageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  if ($packageSourceSha256 -cne [string]$t15.player_package_source_sha256) { throw '[mir4-playtest-package-source-superseded]' }
   if ([string]::IsNullOrWhiteSpace($CandidatePath)) {
-    $CandidatePath = Join-Path $repo ("build/mir4/release-readiness/target-candidates/distributions/more-infinite-research_{0}.zip" -f [string]$row.distribution_version)
+    $CandidatePath = Join-Path $repo ("build/results/mir4-sol/sol08/target-candidates/distributions/more-infinite-research_{0}.zip" -f [string]$row.distribution_version)
   }
   if ([string]::IsNullOrWhiteSpace($PredecessorPath)) { $PredecessorPath = Join-Path $repo ([string]$row.predecessor.path) }
-  if ([string]::IsNullOrWhiteSpace($FactorioBin)) {
-    $FactorioBin = if ($Target -ceq 'F210') {
-      'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
-    } else {
-      'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
-    }
-  }
+  if ([string]::IsNullOrWhiteSpace($FactorioBin)) { $FactorioBin = [string]$row.engine.path }
   foreach ($required in @($CandidatePath,$PredecessorPath,$FactorioBin)) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "[mir4-playtest-input] $required" }
   }
@@ -649,22 +880,49 @@ function New-MIR4PlaytestSession {
   $output = [IO.Path]::GetFullPath($(if([IO.Path]::IsPathRooted($OutputRoot)){$OutputRoot}else{Join-Path $repo $OutputRoot}))
   $allowed = [IO.Path]::GetFullPath((Join-Path $repo 'build/mir4/playtests')).TrimEnd('\') + '\'
   if (-not ($output + '\').StartsWith($allowed,[StringComparison]::OrdinalIgnoreCase)) { throw "[mir4-playtest-output-boundary] $output" }
+  $profile = Join-Path $output 'profile'
+  $mods = Join-Path $profile 'mods'
+  $userdata = Join-Path $profile 'userdata'
+  $packages = Join-Path $output 'packages'
+  $captureQueue = Join-Path $output 'capture-queue'
+  $config = Join-Path $profile 'config.ini'
+  $launcher = Join-Path $output 'Invoke-MIR4PlaytestEngine.ps1'
+  $observationsPath = Join-Path $output 'observations.json'
+  $decisionTemplatePath = Join-Path $output 'manual-decision.template.json'
+  $planPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+  $handoffPath = Join-Path $repo 'docs/maintainer/mir4-w09-manual-playtest.md'
+  $scenarioContract = @(Get-MIR4PlaytestScenarioContract -Target $Target)
   $record = [pscustomobject][ordered]@{
     schema=1;kind='MIR4PlaytestSessionV1';status=$(if($DryRun){'planned'}else{'prepared'})
     target=$Target;distribution_version=[string]$row.distribution_version;candidate_state='development-pre-freeze-not-release-identity'
     created_at=[DateTime]::UtcNow.ToString('o');session_root=$output
     engine=$engine;candidate=$candidate;predecessor=$predecessor
+    authority=[ordered]@{
+      development_plan=(Get-MIR4PlaytestFileDescriptor $planPath)
+      current_package_authority=(Get-MIR4PlaytestFileDescriptor $t15Path)
+      manual_handoff=(Get-MIR4PlaytestFileDescriptor $handoffPath)
+      source_baseline=$plan.source_baseline
+      verification_plan=$plan.verification_plan
+      package_source_sha256=$packageSourceSha256
+    }
     settings=$(if([string]::IsNullOrWhiteSpace($SettingsPath)){$null}else{Get-MIR4PlaytestFileDescriptor $SettingsPath})
     save_fixture=$(if([string]::IsNullOrWhiteSpace($SavePath)){$null}else{Get-MIR4PlaytestFileDescriptor $SavePath})
-    checklist=@('fresh-load','upgrade-from-predecessor','second-reload','research-queue-and-fractional-progress','state-and-settings-preservation','technology-and-research-state','performance-observations','maintainer-notes')
+    profile=[ordered]@{root=$profile;config=$config;mods=$mods;userdata=$userdata;capture_queue=$captureQueue;default_package='Candidate'}
+    engine_command=[ordered]@{launcher=$launcher;base_arguments=@('--config',$config,'--no-log-rotation','--mod-directory',$mods);save_argument='--load-game'}
+    expected_scenarios=$scenarioContract
+    capture_requirements=@('factorio-log','save','observations','screenshot-or-note')
+    observations_template=$observationsPath
+    decision_template=$decisionTemplatePath
     decision=$null;decision_inferred=$false;package_visible=$false;production_release_authorized=$false
   }
-  if ($DryRun) { return $record }
+  if ($DryRun) { Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $record | Out-Null; return $record }
   if (Test-Path -LiteralPath $output) { throw "[mir4-playtest-session-exists] $output" }
-  $mods = Join-Path $output 'profile/mods'
-  New-Item -ItemType Directory -Path $mods -Force | Out-Null
-  Copy-Item -LiteralPath $CandidatePath -Destination (Join-Path $mods ([IO.Path]::GetFileName($CandidatePath)))
-  Copy-Item -LiteralPath $PredecessorPath -Destination (Join-Path $mods ([IO.Path]::GetFileName($PredecessorPath)))
+  New-Item -ItemType Directory -Path $mods,$userdata,$packages,$captureQueue,(Join-Path $captureQueue 'logs'),(Join-Path $captureQueue 'saves'),(Join-Path $captureQueue 'screenshots'),(Join-Path $captureQueue 'notes') -Force | Out-Null
+  $candidateStored = Join-Path $packages ([IO.Path]::GetFileName($CandidatePath))
+  $predecessorStored = Join-Path $packages ([IO.Path]::GetFileName($PredecessorPath))
+  Copy-Item -LiteralPath $CandidatePath -Destination $candidateStored
+  Copy-Item -LiteralPath $PredecessorPath -Destination $predecessorStored
+  Copy-Item -LiteralPath $candidateStored -Destination (Join-Path $mods ([IO.Path]::GetFileName($candidateStored)))
   if (-not [string]::IsNullOrWhiteSpace($SettingsPath)) {
     Copy-Item -LiteralPath $SettingsPath -Destination (Join-Path $output ('profile/' + [IO.Path]::GetFileName($SettingsPath)))
   }
@@ -672,13 +930,45 @@ function New-MIR4PlaytestSession {
     New-Item -ItemType Directory -Path (Join-Path $output 'profile/saves') -Force | Out-Null
     Copy-Item -LiteralPath $SavePath -Destination (Join-Path $output ('profile/saves/' + [IO.Path]::GetFileName($SavePath)))
   }
-  $record.candidate.path = Join-Path $mods ([IO.Path]::GetFileName($CandidatePath))
-  $record.predecessor.path = Join-Path $mods ([IO.Path]::GetFileName($PredecessorPath))
+  $record.candidate.path = $candidateStored
+  $record.predecessor.path = $predecessorStored
   $newline = [Environment]::NewLine
-  [IO.File]::WriteAllText((Join-Path $output 'session.json'),($record|ConvertTo-Json -Depth 30)+$newline,[Text.UTF8Encoding]::new($false))
+  $configText = @(
+    '; Generated by MIR 4 T17 playtest preparation.',$newline,
+    '[path]',
+    'read-data=__PATH__executable__/../../data',
+    ('write-data=' + $userdata.Replace('\','/')),
+    '[other]',
+    'check-updates=false'
+  ) -join $newline
+  [IO.File]::WriteAllText($config,$configText+$newline,[Text.UTF8Encoding]::new($false))
+  $modList = [ordered]@{mods=@([ordered]@{name='base';enabled=$true},[ordered]@{name='more-infinite-research';enabled=$true})}
+  Write-MIR4PlaytestJson -Path (Join-Path $mods 'mod-list.json') -Value $modList
+  [IO.File]::WriteAllText($launcher,(Get-MIR4PlaytestLauncherText)+$newline,[Text.UTF8Encoding]::new($false))
+  $record.engine_command.launcher_sha256 = Get-MIR4PreFreezeFileSha256 $launcher
+  $observations = [ordered]@{
+    schema=1;kind='MIR4PlaytestObservationsV1';status='in-progress';target=$Target
+    candidate_sha256=[string]$record.candidate.sha256;engine_sha256=[string]$record.engine.sha256
+    scenarios=@($scenarioContract | ForEach-Object { [ordered]@{id=[string]$_.id;status='PENDING';notes=''} })
+    decision=$null;decision_inferred=$false;production_release_authorized=$false
+  }
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $observations | Out-Null
+  Write-MIR4PlaytestJson -Path $observationsPath -Value $observations
+  $decisionTemplate = [ordered]@{
+    schema=1;kind='MIR4ManualPlaytestDecisionTemplateV1';valid_evidence=$false;target=$Target
+    candidate_sha256=[string]$record.candidate.sha256;engine_sha256=[string]$record.engine.sha256
+    allowed_decisions=@('ACCEPTED','CHANGES-REQUESTED','REJECTED')
+    instruction='Do not edit this template into evidence. After capture, the maintainer runs tools/mir.ps1 playtest finalize with an explicit decision and reviewer.'
+    decision=$null;reviewer=$null;source_freeze_authorized=$false;production_release_authorized=$false
+  }
+  Write-MIR4PlaytestJson -Path $decisionTemplatePath -Value $decisionTemplate
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $record | Out-Null
+  Write-MIR4PlaytestJson -Path (Join-Path $output 'session.json') -Value $record
   $checklist = "# MIR 4 $Target manual playtest" + $newline + $newline +
-    "Candidate and predecessor identities are locked in session.json. Record observations; do not infer acceptance." + $newline + $newline +
-    ((@($record.checklist) | ForEach-Object { "- [ ] $_" }) -join $newline) + $newline
+    "Candidate, predecessor, engine, plan, package-source, and handoff identities are locked in session.json. Record observations; do not infer acceptance." + $newline + $newline +
+    "Launch the isolated engine with .\Invoke-MIR4PlaytestEngine.ps1 -Package Candidate. Use -Package Predecessor to create or inspect the direct-upgrade source save, then switch back to Candidate and pass -SavePath <save>." + $newline + $newline +
+    ((@($scenarioContract) | ForEach-Object { "- [ ] $($_.id): $($_.expected)" }) -join $newline) + $newline + $newline +
+    "Place logs, saves, screenshots, and notes below capture-queue, set every observations.json scenario to PASSED, FAILED, or BLOCKED, then run playtest capture. Only the maintainer may run playtest finalize." + $newline
   [IO.File]::WriteAllText((Join-Path $output 'review-checklist.md'),$checklist,[Text.UTF8Encoding]::new($false))
   return $record
 }
@@ -696,41 +986,83 @@ function Capture-MIR4PlaytestSession {
   $sessionPath = Join-Path $sessionRootFull 'session.json'
   $session = Get-Content -Raw -LiteralPath $sessionPath | ConvertFrom-Json -Depth 100
   if ([string]$session.kind -cne 'MIR4PlaytestSessionV1') { throw '[mir4-playtest-session-kind]' }
-  foreach ($locked in @($session.candidate,$session.predecessor)) {
+  foreach ($locked in @($session.candidate,$session.predecessor,$session.engine,$session.authority.development_plan,$session.authority.current_package_authority,$session.authority.manual_handoff)) {
     if (-not (Test-Path -LiteralPath ([string]$locked.path) -PathType Leaf) -or
         (Get-MIR4PreFreezeFileSha256 ([string]$locked.path)) -cne [string]$locked.sha256) {
       throw "[mir4-playtest-locked-input] $($locked.path)"
     }
   }
-  if (-not [string]::IsNullOrWhiteSpace($ObservationsPath)) { $CapturePath += $ObservationsPath }
-  $paths = @($CapturePath | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
-  if ($paths.Count -eq 0) {
-    $defaultLog = Join-Path $sessionRootFull 'profile/factorio-current.log'
-    if (Test-Path -LiteralPath $defaultLog -PathType Leaf) { $paths = @($defaultLog) }
+  if (-not (Test-Path -LiteralPath ([string]$session.engine_command.launcher) -PathType Leaf) -or
+      (Get-MIR4PreFreezeFileSha256 ([string]$session.engine_command.launcher)) -cne [string]$session.engine_command.launcher_sha256) {
+    throw '[mir4-playtest-launcher-current]'
   }
-  if ($paths.Count -eq 0) { throw '[mir4-playtest-capture-empty] Supply --capture paths or place factorio-current.log in the isolated profile.' }
+  if ([string]::IsNullOrWhiteSpace($ObservationsPath)) { $ObservationsPath = [string]$session.observations_template }
+  if (-not (Test-Path -LiteralPath $ObservationsPath -PathType Leaf)) { throw '[mir4-playtest-observations-required]' }
+  $observations = Get-Content -Raw -LiteralPath $ObservationsPath | ConvertFrom-Json -Depth 100
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $observations | Out-Null
+  $comparison = Compare-MIR4PlaytestObservations -Session $session -Observations $observations
+  $paths = [Collections.Generic.List[string]]::new()
+  foreach ($path in @($CapturePath | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
+    $paths.Add([IO.Path]::GetFullPath($path))
+  }
+  $queueRoot = [string]$session.profile.capture_queue
+  if (Test-Path -LiteralPath $queueRoot -PathType Container) {
+    foreach ($item in @(Get-ChildItem -LiteralPath $queueRoot -Recurse -File -ErrorAction Stop | Sort-Object FullName)) { $paths.Add($item.FullName) }
+  }
+  $paths.Add([IO.Path]::GetFullPath($ObservationsPath))
+  $paths = @($paths | Sort-Object -Unique)
   foreach ($path in $paths) { if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-playtest-capture-input] $path" } }
+  $sourceRows = @($paths | ForEach-Object {
+    $descriptor = Get-MIR4PlaytestFileDescriptor $_
+    $descriptor['kind'] = Get-MIR4PlaytestCaptureKind -Path $_ -ObservationsPath $ObservationsPath
+    [pscustomobject]$descriptor
+  })
+  $kinds = @($sourceRows | ForEach-Object { [string]$_.kind })
+  $missingRequirements = [Collections.Generic.List[string]]::new()
+  foreach ($required in @('factorio-log','save','observations')) { if ($required -notin $kinds) { $missingRequirements.Add($required) } }
+  if ('screenshot' -notin $kinds -and 'note' -notin $kinds) { $missingRequirements.Add('screenshot-or-note') }
+  $ready = $comparison.status -ceq 'MATCHED' -and $missingRequirements.Count -eq 0
   $receipt = [pscustomobject][ordered]@{
-    schema=1;kind='MIR4PlaytestCaptureV1';status=$(if($DryRun){'planned'}else{'captured'})
+    schema=1;kind='MIR4PlaytestCaptureV1';status=$(if($DryRun){'planned'}elseif($ready){'ready-for-maintainer-decision'}else{'captured-incomplete'})
     target=[string]$session.target;captured_at=[DateTime]::UtcNow.ToString('o')
     candidate_sha256=[string]$session.candidate.sha256;engine_sha256=[string]$session.engine.sha256
-    files=@($paths | ForEach-Object { Get-MIR4PlaytestFileDescriptor $_ })
-    observations_supplied=(-not [string]::IsNullOrWhiteSpace($ObservationsPath))
-    decision=$null;decision_inferred=$false;package_visible=$false
+    session_sha256=(Get-MIR4PreFreezeFileSha256 $sessionPath)
+    files=$sourceRows;observations_supplied=$true;comparison=$comparison
+    missing_capture_requirements=@($missingRequirements);result_summary=$null
+    decision=$null;decision_inferred=$false;package_visible=$false;production_release_authorized=$false
   }
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $receipt | Out-Null
   if ($DryRun) { return $receipt }
   $captureRoot = Join-Path $sessionRootFull 'capture'
   if (Test-Path -LiteralPath (Join-Path $sessionRootFull 'capture.json')) { throw '[mir4-playtest-capture-exists]' }
   New-Item -ItemType Directory -Path $captureRoot -Force | Out-Null
   $usedNames = @{}
-  foreach ($path in $paths) {
-    $name = [IO.Path]::GetFileName($path)
+  $capturedRows = [Collections.Generic.List[object]]::new()
+  foreach ($source in $sourceRows) {
+    $name = [IO.Path]::GetFileName([string]$source.path)
     if ($usedNames.ContainsKey($name)) { throw "[mir4-playtest-capture-name-collision] $name" }
     $usedNames[$name] = $true
-    Copy-Item -LiteralPath $path -Destination (Join-Path $captureRoot $name)
+    $destination = Join-Path $captureRoot $name
+    Copy-Item -LiteralPath ([string]$source.path) -Destination $destination
+    $descriptor = Get-MIR4PlaytestFileDescriptor $destination
+    $descriptor['kind'] = [string]$source.kind
+    $capturedRows.Add([pscustomobject]$descriptor)
   }
-  $receipt.files = @($paths | ForEach-Object { Get-MIR4PlaytestFileDescriptor (Join-Path $captureRoot ([IO.Path]::GetFileName($_))) })
-  [IO.File]::WriteAllText((Join-Path $sessionRootFull 'capture.json'),($receipt|ConvertTo-Json -Depth 30)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+  $receipt.files = @($capturedRows)
+  $summary = [ordered]@{
+    schema=1;kind='MIR4PlaytestResultSummaryV1';status=$(if($ready){'ready-for-maintainer-decision'}else{'changes-required-or-incomplete'})
+    target=[string]$session.target;candidate_sha256=[string]$session.candidate.sha256;engine_sha256=[string]$session.engine.sha256
+    comparison=$comparison;capture_file_count=$capturedRows.Count;capture_kinds=@($capturedRows.kind | Sort-Object -Unique)
+    missing_capture_requirements=@($missingRequirements)
+    next_action=$(if($ready){'Maintainer reviews the retained evidence and supplies an explicit decision.'}else{'Complete or correct the named scenarios and capture requirements; do not infer acceptance.'})
+    decision=$null;decision_inferred=$false;source_freeze_authorized=$false;production_release_authorized=$false
+  }
+  $summaryPath = Join-Path $sessionRootFull 'result-summary.json'
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $summary | Out-Null
+  Write-MIR4PlaytestJson -Path $summaryPath -Value $summary
+  $receipt.result_summary = Get-MIR4PlaytestFileDescriptor $summaryPath
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $receipt | Out-Null
+  Write-MIR4PlaytestJson -Path (Join-Path $sessionRootFull 'capture.json') -Value $receipt
   return $receipt
 }
 
@@ -745,29 +1077,67 @@ function Complete-MIR4PlaytestSession {
   )
   if ([string]::IsNullOrWhiteSpace($Reviewer)) { throw '[mir4-playtest-reviewer-required]' }
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  }
   $root = [IO.Path]::GetFullPath($(if([IO.Path]::IsPathRooted($SessionRoot)){$SessionRoot}else{Join-Path $repo $SessionRoot}))
-  $session = Get-Content -Raw -LiteralPath (Join-Path $root 'session.json') | ConvertFrom-Json -Depth 100
+  $sessionPath = Join-Path $root 'session.json'
+  $session = Get-Content -Raw -LiteralPath $sessionPath | ConvertFrom-Json -Depth 100
+  if ([string]$session.kind -cne 'MIR4PlaytestSessionV1' -or [bool]$session.decision_inferred -or [bool]$session.production_release_authorized) {
+    throw '[mir4-playtest-finalize-session]'
+  }
+  $planPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+  if ((Get-MIR4PreFreezeFileSha256 $planPath) -cne [string]$session.authority.development_plan.sha256) { throw '[mir4-playtest-finalize-plan-superseded]' }
+  if (-not (Test-Path -LiteralPath ([string]$session.authority.current_package_authority.path) -PathType Leaf) -or
+      (Get-MIR4PreFreezeFileSha256 ([string]$session.authority.current_package_authority.path)) -cne [string]$session.authority.current_package_authority.sha256 -or
+      (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne [string]$session.authority.package_source_sha256) {
+    throw '[mir4-playtest-finalize-package-source-superseded]'
+  }
+  $plan = Get-Content -Raw -LiteralPath $planPath | ConvertFrom-Json -Depth 100
+  $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq [string]$session.target })
+  if ($targetRow.Count -ne 1 -or [string]$targetRow[0].development_package.sha256 -cne [string]$session.candidate.sha256 -or
+      [string]$targetRow[0].predecessor.sha256 -cne [string]$session.predecessor.sha256 -or
+      [string]$targetRow[0].engine.sha256 -cne [string]$session.engine.sha256) {
+    throw '[mir4-playtest-finalize-current-bindings]'
+  }
   $capturePath = Join-Path $root 'capture.json'
   if (-not (Test-Path -LiteralPath $capturePath -PathType Leaf)) { throw '[mir4-playtest-finalize-without-capture]' }
   $capture = Get-Content -Raw -LiteralPath $capturePath | ConvertFrom-Json -Depth 100
-  if ([string]$capture.candidate_sha256 -cne [string]$session.candidate.sha256) { throw '[mir4-playtest-finalize-candidate]' }
-  if ([string]$capture.engine_sha256 -cne [string]$session.engine.sha256) { throw '[mir4-playtest-finalize-engine]' }
+  if ([string]$capture.candidate_sha256 -cne [string]$session.candidate.sha256 -or
+      [string]$capture.engine_sha256 -cne [string]$session.engine.sha256 -or
+      [string]$capture.session_sha256 -cne (Get-MIR4PreFreezeFileSha256 $sessionPath) -or
+      [bool]$capture.decision_inferred -or [bool]$capture.production_release_authorized) {
+    throw '[mir4-playtest-finalize-capture-binding]'
+  }
   foreach ($evidence in @($capture.files)) {
     if (-not (Test-Path -LiteralPath ([string]$evidence.path) -PathType Leaf) -or
         (Get-MIR4PreFreezeFileSha256 ([string]$evidence.path)) -cne [string]$evidence.sha256) {
       throw "[mir4-playtest-finalize-evidence] $($evidence.path)"
     }
   }
+  $summaryPath = Join-Path $root 'result-summary.json'
+  if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf) -or
+      (Get-MIR4PreFreezeFileSha256 $summaryPath) -cne [string]$capture.result_summary.sha256) {
+    throw '[mir4-playtest-finalize-summary-binding]'
+  }
+  $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json -Depth 100
+  if ($Decision -ceq 'ACCEPTED' -and ([string]$capture.status -cne 'ready-for-maintainer-decision' -or
+      [string]$capture.comparison.status -cne 'MATCHED' -or @($capture.missing_capture_requirements).Count -ne 0 -or
+      [string]$summary.status -cne 'ready-for-maintainer-decision')) {
+    throw '[mir4-playtest-acceptance-evidence-incomplete]'
+  }
   $receipt = [pscustomobject][ordered]@{
     schema=1;kind='MIR4ManualPlaytestDecisionV1';status=$(if($DryRun){'planned'}else{'final'})
     target=[string]$session.target;candidate_sha256=[string]$session.candidate.sha256
     engine_sha256=[string]$session.engine.sha256;capture_sha256=(Get-MIR4PreFreezeFileSha256 $capturePath)
+    session_sha256=(Get-MIR4PreFreezeFileSha256 $sessionPath);result_summary_sha256=(Get-MIR4PreFreezeFileSha256 $summaryPath)
     reviewer=$Reviewer;decision=$Decision;notes=$Notes;decided_at=[DateTime]::UtcNow.ToString('o')
     decision_inferred=$false;source_freeze_authorized=$false;production_release_authorized=$false
   }
+  Assert-MIR4PlaytestEvidenceV1 -RepoRoot $repo -Record $receipt | Out-Null
   if ($DryRun) { return $receipt }
   $output = Join-Path $root 'manual-decision.json'
   if (Test-Path -LiteralPath $output) { throw '[mir4-playtest-decision-exists]' }
-  [IO.File]::WriteAllText($output,($receipt|ConvertTo-Json -Depth 30)+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))
+  Write-MIR4PlaytestJson -Path $output -Value $receipt
   return $receipt
 }

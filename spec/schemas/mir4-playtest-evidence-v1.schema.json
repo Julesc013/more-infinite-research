@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-playtest-evidence-v1.schema.json",
+  "title": "MIR 4 pre-freeze playtest evidence V1",
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "descriptor": {
+      "type": "object",
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "kind": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "scenarioContract": {
+      "type": "object",
+      "required": ["id", "expected"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$"},
+        "expected": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "scenarioObservation": {
+      "type": "object",
+      "required": ["id", "status", "notes"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$"},
+        "status": {"enum": ["PASSED", "FAILED", "BLOCKED", "PENDING"]},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "comparison": {
+      "type": "object",
+      "required": ["status", "total", "passed", "failed", "blocked", "pending"],
+      "properties": {
+        "status": {"enum": ["MATCHED", "MISMATCH", "INCOMPLETE"]},
+        "total": {"type": "integer", "minimum": 1},
+        "passed": {"type": "integer", "minimum": 0},
+        "failed": {"type": "integer", "minimum": 0},
+        "blocked": {"type": "integer", "minimum": 0},
+        "pending": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "distribution_version", "candidate_state", "created_at", "session_root", "engine", "candidate", "predecessor", "authority", "profile", "engine_command", "expected_scenarios", "capture_requirements", "observations_template", "decision_template", "decision", "decision_inferred", "package_visible", "production_release_authorized"],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4PlaytestSessionV1"},
+        "status": {"enum": ["planned", "prepared"]},
+        "target": {"enum": ["F210", "F200"]},
+        "distribution_version": {"type": "string", "pattern": "^4\\.0\\.(21000|20000)$"},
+        "candidate_state": {"const": "development-pre-freeze-not-release-identity"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "session_root": {"type": "string", "minLength": 1},
+        "engine": {"$ref": "#/$defs/descriptor"},
+        "candidate": {"$ref": "#/$defs/descriptor"},
+        "predecessor": {"$ref": "#/$defs/descriptor"},
+        "authority": {"type": "object"},
+        "profile": {"type": "object"},
+        "engine_command": {"type": "object"},
+        "expected_scenarios": {"type": "array", "minItems": 11, "items": {"$ref": "#/$defs/scenarioContract"}},
+        "capture_requirements": {"const": ["factorio-log", "save", "observations", "screenshot-or-note"]},
+        "observations_template": {"type": "string", "minLength": 1},
+        "decision_template": {"type": "string", "minLength": 1},
+        "decision": {"type": "null"},
+        "decision_inferred": {"const": false},
+        "package_visible": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "candidate_sha256", "engine_sha256", "scenarios", "decision", "decision_inferred", "production_release_authorized"],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4PlaytestObservationsV1"},
+        "status": {"enum": ["in-progress", "review-complete"]},
+        "target": {"enum": ["F210", "F200"]},
+        "candidate_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_sha256": {"$ref": "#/$defs/sha256"},
+        "scenarios": {"type": "array", "minItems": 11, "items": {"$ref": "#/$defs/scenarioObservation"}},
+        "decision": {"type": "null"},
+        "decision_inferred": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "captured_at", "candidate_sha256", "engine_sha256", "session_sha256", "files", "observations_supplied", "comparison", "missing_capture_requirements", "result_summary", "decision", "decision_inferred", "package_visible", "production_release_authorized"],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4PlaytestCaptureV1"},
+        "status": {"enum": ["planned", "captured-incomplete", "ready-for-maintainer-decision"]},
+        "target": {"enum": ["F210", "F200"]},
+        "captured_at": {"type": "string", "format": "date-time"},
+        "candidate_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_sha256": {"$ref": "#/$defs/sha256"},
+        "session_sha256": {"$ref": "#/$defs/sha256"},
+        "files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/descriptor"}},
+        "observations_supplied": {"const": true},
+        "comparison": {"$ref": "#/$defs/comparison"},
+        "missing_capture_requirements": {"type": "array", "items": {"enum": ["factorio-log", "save", "observations", "screenshot-or-note"]}, "uniqueItems": true},
+        "result_summary": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/descriptor"}]},
+        "decision": {"type": "null"},
+        "decision_inferred": {"const": false},
+        "package_visible": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "candidate_sha256", "engine_sha256", "comparison", "capture_file_count", "capture_kinds", "missing_capture_requirements", "next_action", "decision", "decision_inferred", "source_freeze_authorized", "production_release_authorized"],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4PlaytestResultSummaryV1"},
+        "status": {"enum": ["ready-for-maintainer-decision", "changes-required-or-incomplete"]},
+        "target": {"enum": ["F210", "F200"]},
+        "candidate_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_sha256": {"$ref": "#/$defs/sha256"},
+        "comparison": {"$ref": "#/$defs/comparison"},
+        "capture_file_count": {"type": "integer", "minimum": 1},
+        "capture_kinds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "missing_capture_requirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "next_action": {"type": "string", "minLength": 1},
+        "decision": {"type": "null"},
+        "decision_inferred": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    },
+    {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "candidate_sha256", "engine_sha256", "capture_sha256", "session_sha256", "result_summary_sha256", "reviewer", "decision", "notes", "decided_at", "decision_inferred", "source_freeze_authorized", "production_release_authorized"],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4ManualPlaytestDecisionV1"},
+        "status": {"enum": ["planned", "final"]},
+        "target": {"enum": ["F210", "F200"]},
+        "candidate_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_sha256": {"$ref": "#/$defs/sha256"},
+        "capture_sha256": {"$ref": "#/$defs/sha256"},
+        "session_sha256": {"$ref": "#/$defs/sha256"},
+        "result_summary_sha256": {"$ref": "#/$defs/sha256"},
+        "reviewer": {"type": "string", "minLength": 1},
+        "decision": {"enum": ["ACCEPTED", "CHANGES-REQUESTED", "REJECTED"]},
+        "notes": {"type": "string"},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "decision_inferred": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "production_release_authorized": {"const": false}
+      }
+    }
+  ]
+}

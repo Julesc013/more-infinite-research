@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 pre-freeze development"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-25
+last_reviewed: 2026-08-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -61,9 +61,15 @@ The snapshot is evidence of the observed GitHub configuration, not permission to
 
 ## Manual playtest evidence
 
-Prepare isolated F210 or F200 sessions with release playtest-prepare. The command verifies the candidate, predecessor, and engine hashes before copying inputs into the session. Use release playtest-capture to retain only the named log, save, screenshot, and note files. Finish with release playtest-finalize --decision <ACCEPTED|CHANGES-REQUESTED|REJECTED> --reviewer <identity>.
+Prepare isolated F210 or F200 sessions with `tools/mir.ps1 playtest prepare`. The command rejects a changed package-source authority or any candidate, predecessor, or engine hash mismatch before writing below `build/mir4/playtests/<target>/`. A prepared session contains separate immutable candidate and predecessor copies, a candidate-selected mods directory, isolated Factorio config and user-data roots, a hash-locked launcher, the complete target-specific scenario checklist, an observations template, typed capture directories, a deliberately invalid decision template, and no inferred result.
 
-Automation never invents a playtest result. Finalization requires an explicit human decision and records release_authority=false. Steam Factorio is used only for the current 2.1 engine; the preserved D:\Programs\Factorio\2.0 installation is used for 2.0.
+Run the prepared launcher from its session root. Use `-Package Predecessor` to create or inspect the direct-upgrade source save, then use `-Package Candidate -SavePath <save>` for the upgrade and each reload. The launcher re-verifies the engine and selected package, stages exactly one MIR archive, passes the governed `--config`, `--no-log-rotation`, `--mod-directory`, and optional `--load-game` arguments, and retains the resulting log under `capture-queue/logs/`. It does not create a decision.
+
+Place the retained saves, screenshots, and notes under the matching `capture-queue` directories and set every row in `observations.json` to `PASSED`, `FAILED`, or `BLOCKED`. Run `tools/mir.ps1 playtest capture --session <path> --json`. Capture verifies the locked launcher and authorities, validates the exact scenario set, copies the named evidence, and writes `capture.json` plus `result-summary.json`. An `ACCEPTED` decision is rejected unless every expected scenario is `PASSED` and the capture contains a Factorio log, save, observations, and at least one screenshot or note.
+
+After reviewing those immutable files, the maintainer alone runs `tools/mir.ps1 playtest finalize --session <path> --decision <ACCEPTED|CHANGES-REQUESTED|REJECTED> --reviewer <identity> --json`. Finalization revalidates the current development plan, current package-source authority, exact package and engine identities, captured bytes, and summary before writing `manual-decision.json`. `spec/schemas/mir4-playtest-evidence-v1.schema.json` covers the session, observations, capture, summary, and decision records. The generated `manual-decision.template.json` is not valid evidence and must not be renamed or edited into a decision.
+
+Automation never invents a playtest result. Finalization requires an explicit human decision and records `source_freeze_authorized=false` and `production_release_authorized=false`. Steam Factorio is used only for the current 2.1 engine; the preserved `D:\Programs\Factorio\2.0` installation is used for 2.0.
 
 ## Public preview assets
 

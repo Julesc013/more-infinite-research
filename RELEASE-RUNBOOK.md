@@ -19,6 +19,8 @@ Its ten phase adapters are source freeze, target build, target qualification, pr
 7. Independently verify, seal, promote, publish, and read back the public bytes.
 8. Run the offline restore drill and close the release ledger.
 
+For T17, prepare each exact session with `tools/mir.ps1 playtest prepare --target <F210|F200> ... --json`, run the generated isolated launcher, retain logs/saves/screenshots/notes in its capture queue, and record the exact scenario outcomes in `observations.json`. Then run `tools/mir.ps1 playtest capture --session <path> --json`. Only the maintainer may run `tools/mir.ps1 playtest finalize --session <path> --decision <ACCEPTED|CHANGES-REQUESTED|REJECTED> --reviewer <identity> --json`; the non-evidence template cannot satisfy the gate, and even an explicit `ACCEPTED` is rejected unless all expected scenarios and capture requirements match.
+
 ## Non-negotiable behavior
 
 - Never infer a human receipt or invent credentials.

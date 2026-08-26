@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T17 machine-preparation authority evolution receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "turn", "predecessor_receipt", "source_baseline", "execution_state", "target_handoff", "evolved_bindings", "current_authorities", "player_package_source_sha256", "package_visible_delta", "human_gate", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T17MachinePreparationAuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T17"},
+    "predecessor_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json"},
+        "sha256": {"const": "294A1E2001F3BA8E6813329E3C8BC609B0D07413AC365A0AFEF525A1188D76F0"}
+      }
+    },
+    "source_baseline": {
+      "type": "object", "additionalProperties": false, "required": ["branch", "commit", "tree", "working_tree_clean"],
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "commit": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "tree": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "working_tree_clean": {"const": false}
+      }
+    },
+    "execution_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["programme_status", "completed_turn", "t16_status", "t17_status", "t18_status", "next_dependency_ready_turn"],
+      "properties": {
+        "programme_status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"},
+        "completed_turn": {"type": "null"},
+        "t16_status": {"const": "blocked-human"},
+        "t17_status": {"const": "blocked-human"},
+        "t18_status": {"const": "blocked-dependency"},
+        "next_dependency_ready_turn": {"type": "null"}
+      }
+    },
+    "target_handoff": {
+      "type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/targetHandoff"}
+    },
+    "evolved_bindings": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 4, "items": {"$ref": "#/$defs/current"}},
+    "player_package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "package_visible_delta": {"const": []},
+    "human_gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["f210_decision_recorded", "f200_decision_recorded", "acceptance_inferred", "decision_template_is_evidence", "remaining_actions"],
+      "properties": {
+        "f210_decision_recorded": {"const": false},
+        "f200_decision_recorded": {"const": false},
+        "acceptance_inferred": {"const": false},
+        "decision_template_is_evidence": {"const": false},
+        "remaining_actions": {"const": ["obtain-exact-f210-engine-custody", "execute-exact-f210-maintainer-playtest", "execute-exact-f200-maintainer-playtest", "record-explicit-decisions"]}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "status": {"const": "T17-MACHINE-PREPARATION-HARDENED-F200-READY-F210-EXACT-ENGINE-CUSTODY-BLOCKED-HUMAN-DECISIONS-REQUIRED"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "targetHandoff": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "package_sha256", "engine_version", "engine_sha256", "package_custody_ready", "exact_engine_custody_ready", "isolated_session_automation_ready", "scenario_comparison_ready", "human_decision_recorded"],
+      "properties": {
+        "target": {"enum": ["F210", "F200"]},
+        "package_sha256": {"$ref": "#/$defs/sha256"},
+        "engine_version": {"enum": ["2.1.14", "2.0.77"]},
+        "engine_sha256": {"$ref": "#/$defs/sha256"},
+        "package_custody_ready": {"const": true},
+        "exact_engine_custody_ready": {"type": "boolean"},
+        "isolated_session_automation_ready": {"const": true},
+        "scenario_comparison_ready": {"const": true},
+        "human_decision_recorded": {"const": false}
+      }
+    },
+    "evolved": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 1},
+        "scope": {"const": "package-excluded-control-plane"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"enum": ["raw-bytes", "canonical-text-v1"]},
+        "role": {"type": "string", "minLength": 1}
+      }
+    },
+    "transitionGate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

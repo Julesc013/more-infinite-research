@@ -181,13 +181,13 @@ Ages are measured against the newest governed review date, 2026-08-27, so checko
 | docs/maintainer/mir4-continuity.md | current | 2026-08-26 | 1 | current-window |
 | docs/maintainer/mir4-full-platform-closeout.md | current | 2026-08-24 | 3 | current-window |
 | docs/maintainer/mir4-m4c01-runbook.md | current | 2026-08-18 | 9 | current-window |
-| docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-08-25 | 2 | current-window |
+| docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-08-27 | 0 | current-window |
 | docs/maintainer/mir4-qualification-and-promotion.md | current | 2026-08-18 | 9 | current-window |
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-27 | 0 | current-window |
 | docs/maintainer/mir4-release-operations.md | current | 2026-08-26 | 1 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 7 | current-window |
 | docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-27 | 0 | current-window |
-| docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-23 | 4 | current-window |
+| docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-27 | 0 | current-window |
 | docs/maintainer/modpack-campaigns.md | current | 2026-08-03 | 24 | current-window |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | current | 2026-08-03 | 24 | current-window |
 | docs/maintainer/playtest-intake.md | current | 2026-07-21 | 37 | current-window |
