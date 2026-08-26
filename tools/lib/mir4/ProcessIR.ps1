@@ -133,19 +133,23 @@ function Get-MIR4MinimalCycleWitness {
   foreach ($start in @($Nodes | Sort-Object -CaseSensitive)) {
     $queue = [Collections.Generic.Queue[object]]::new()
     $queue.Enqueue([object]@($start))
-    while ($queue.Count -gt 0) {
+    $seen = @{$start=$true}
+    $found = $null
+    :cycleSearch while ($queue.Count -gt 0) {
       $path = @($queue.Dequeue())
       $last = [string]$path[-1]
       foreach ($next in @($Adjacency[$last] | Where-Object { $allowed.ContainsKey([string]$_) } | Sort-Object -CaseSensitive)) {
         $nextValue = [string]$next
         if ($nextValue -ceq $start) {
-          $cycle = @($path + $start)
-          $candidates += [pscustomobject]@{edge_count=$cycle.Count-1;key=($cycle -join '>');nodes=$cycle}
-        } elseif ($nextValue -notin $path -and $path.Count -lt $Nodes.Count) {
+          $found = @($path + $start)
+          break cycleSearch
+        } elseif (-not $seen.ContainsKey($nextValue)) {
+          $seen[$nextValue] = $true
           $queue.Enqueue([object]@($path + $nextValue))
         }
       }
     }
+    if ($null -ne $found) { $candidates += [pscustomobject]@{edge_count=$found.Count-1;key=($found -join '>');nodes=$found} }
   }
   if ($candidates.Count -eq 0) { return @($Nodes | Sort-Object -CaseSensitive) }
   return @(($candidates | Sort-Object edge_count,key | Select-Object -First 1).nodes)
