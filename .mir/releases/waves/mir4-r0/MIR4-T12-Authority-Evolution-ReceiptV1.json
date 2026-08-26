@@ -14,7 +14,7 @@
     "next_dependency_ready_turn":"T13"
   },
   "evolved_bindings":[
-    {"path":".gitattributes","previous_sha256":"6DFCAB62A11CADB816576215EC8B2B5CE484B682C666DD9B9D8E250AF5112588","current_sha256":"CD8E1BFF4B79DC19ECEA78EFF7517C5019604F4D147574EF7AA64B6D504B0620","reason":"T12 exact observer and reference bytes are pinned across checkouts.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false},
+    {"path":".gitattributes","previous_sha256":"6DFCAB62A11CADB816576215EC8B2B5CE484B682C666DD9B9D8E250AF5112588","current_sha256":"FC4C9C77530D3882CE68DB6967118B4D39EDB301E1A5FDA3D91EE7A4F28B6C99","reason":"T12 exact observer sources use canonical LF while raw Factorio runtime custody bytes are preserved without checkout normalization.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false},
     {"path":".mir/assurance.json","previous_sha256":"611AE3D75D6D33BB5A90D988063F6A053F22175A0D88079CE053E588A3922F2F","current_sha256":"5C596DCCD341A490464250C1929D6E614B7E7595A5137D847D7DF7D39D309B75","reason":"The exact ProcessIR test is routed through the MIR4 assurance profile.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false},
     {"path":".mir/docs.yml","previous_sha256":"85C7A16C369EF43BFAE1FB2A31EB186DAE4C86768B029832F4FD7DFFC8B67A9A","current_sha256":"47857046BEF65F970EBD6B1EC8F4587A3997230E16E91EDDF84384A0217D7E27","reason":"The documentation registry owns the exact ProcessIR and Inspector references.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false},
     {"path":".mir/fixtures.yml","previous_sha256":"34EF47BBFCE341FD11E29DE6C2AE8A7A1096598568BBAEAA6EE0CCABF7CA0815","current_sha256":"3B4249362F276F2389A7F30DC50F2FF2DF61E25DE5EC19A178B9CABB6DF6EDAE","reason":"The fixture registry binds the exact read-only observer.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false},
@@ -38,7 +38,7 @@
     {"path":"validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1","previous_sha256":"EE71EA75A4A2554FD62193AA3B6C3865B88CBB06F16D8D089FA26413C150D6CB","current_sha256":"38D30632BA70243F0B97881C98F64BC4FFA147EE654252E4F3564FC77C3F58DE","reason":"Release readiness proves T12 complete, T13 next, T15 ready and every release transition denied.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false}
   ],
   "current_authorities":[
-    {"path":".gitattributes","sha256":"CD8E1BFF4B79DC19ECEA78EFF7517C5019604F4D147574EF7AA64B6D504B0620","hash_mode":"canonical-text-v1","role":"cross-checkout-t12-byte-policy"},
+    {"path":".gitattributes","sha256":"FC4C9C77530D3882CE68DB6967118B4D39EDB301E1A5FDA3D91EE7A4F28B6C99","hash_mode":"canonical-text-v1","role":"cross-checkout-t12-byte-policy"},
     {"path":".mir/assurance.json","sha256":"5C596DCCD341A490464250C1929D6E614B7E7595A5137D847D7DF7D39D309B75","hash_mode":"canonical-text-v1","role":"t12-assurance-routing"},
     {"path":".mir/control/paths.yml","sha256":"20404575E7DA9E874F68B689DB1AAD8984C94CCA6A47A918BB9B5A4C73731990","hash_mode":"canonical-text-v1","role":"t12-path-registry"},
     {"path":".mir/docs.yml","sha256":"47857046BEF65F970EBD6B1EC8F4587A3997230E16E91EDDF84384A0217D7E27","hash_mode":"canonical-text-v1","role":"t12-documentation-registry"},

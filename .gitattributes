@@ -82,6 +82,9 @@ fixtures/assert-k2-science-phase-policy/data-final-fixes.lua text eol=lf
 tools/lib/mir4/ResearchCostV2.ps1 text eol=lf
 docs/reference/research-cost-v2-preview.md text eol=lf
 sdk/preview/mir4/** text eol=lf
+# T12 runtime custody preserves the exact engine-emitted bytes that its
+# manifest raw-hashes. Do not normalize mixed line endings in this subtree.
+sdk/preview/mir4/reference/t12/runtime/** -text -eol
 fixtures/mir4-mep-v0/** text eol=lf
 fixtures/mir4-process-ir-v0/** text eol=lf
 docs/reference/generated/mir4-platform-component-matrix.md text eol=lf
