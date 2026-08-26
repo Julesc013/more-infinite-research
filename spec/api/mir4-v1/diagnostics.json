@@ -43,6 +43,10 @@
     {"code":"MIR4-MEP-009","order":4009,"severity":"error","message":"A required extension dependency is absent.","legacy_id":"mir4-mep-v1-missing-dependency"},
     {"code":"MIR4-MEP-010","order":4010,"severity":"error","message":"The extension closure contains an active conflict.","legacy_id":"mir4-mep-v1-conflict"},
     {"code":"MIR4-MEP-011","order":4011,"severity":"error","message":"The extension dependency graph contains a cycle.","legacy_id":"mir4-mep-v1-dependency-cycle"},
-    {"code":"MIR4-MEP-012","order":4012,"severity":"error","message":"The extension target array is not in canonical ordinal unique order.","legacy_id":"mir4-mep-v1-target-order"}
+    {"code":"MIR4-MEP-012","order":4012,"severity":"error","message":"The extension target array is not in canonical ordinal unique order.","legacy_id":"mir4-mep-v1-target-order"},
+    {"code":"MIR4-MEP-013","order":4013,"severity":"error","message":"The F210 mod-data discovery snapshot is malformed or inconsistent.","legacy_id":"mir4-mep-discovery-snapshot"},
+    {"code":"MIR4-MEP-014","order":4014,"severity":"error","message":"The F210 extension discovery record bound was exceeded.","legacy_id":"mir4-mep-discovery-cardinality"},
+    {"code":"MIR4-MEP-015","order":4015,"severity":"error","message":"The F210 discovery snapshot contains a duplicate prototype name.","legacy_id":"mir4-mep-discovery-duplicate-prototype"},
+    {"code":"MIR4-MEP-016","order":4016,"severity":"info","message":"No compatible MIR host is present; extension declarations remain inert.","legacy_id":"mir4-mep-discovery-host-absent"}
   ]
 }

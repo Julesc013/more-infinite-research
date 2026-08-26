@@ -323,6 +323,16 @@ docs:
       - mir4-environment-diff
       - mir4-support-bundle-redaction
       - mir4-reproducer-preserving-minimization
+  - path: docs/reference/mir4-f210-mep-discovery.md
+    title: "MIR 4 F210 Read-Only MEP Discovery"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-f210-extension-owned-mod-data-discovery
+      - mir4-mep-host-absence-inertness
+      - mir4-mep-read-only-shadow-planning
   - path: docs/maintainer/mir3-terminal-repository-protections.md
     title: "MIR 3 Terminal Repository Protections"
     status: current

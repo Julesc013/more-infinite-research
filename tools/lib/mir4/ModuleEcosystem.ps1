@@ -64,7 +64,7 @@ function Get-MIR4ModuleEcosystemAuthority {
   if (@($authority.fragment_kinds | Sort-Object -Unique).Count -ne 12) { throw '[mir4-module-fragment-count]' }
   if (@($authority.api_surfaces | Sort-Object -Unique).Count -ne 9) { throw '[mir4-module-api-surface-count]' }
   if (@($authority.transports.target | Sort-Object -Unique).Count -ne 17) { throw '[mir4-module-transport-count]' }
-  if (@($authority.builder_commands | Sort-Object -Unique).Count -ne 10) { throw '[mir4-module-builder-command-count]' }
+  if (@($authority.builder_commands | Sort-Object -Unique).Count -ne 11) { throw '[mir4-module-builder-command-count]' }
   foreach ($input in @($authority.inputs)) {
     if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$input)) -PathType Leaf)) { throw "[mir4-module-input] $input" }
   }

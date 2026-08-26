@@ -21,6 +21,7 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-technology-acceptance-queue-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
+  '.mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json',
@@ -50,6 +51,7 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/control/repository-fixed-point.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
+  'tools/lib/mir4/MepDiscovery.ps1',
   'tools/commands/mir4/Invoke-MIR4Extension.ps1',
   'tools/lib/mir4/SdkV1.ps1',
   'tools/templates/mir4/sdk-v1/powershell/MIR4.Api.V1.psm1',
@@ -66,7 +68,10 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/PlatformPreview.ps1',
   'spec/schemas/preview/mir4-extension-lock-v1.schema.json',
   'spec/schemas/preview/mir4-extension-diff-v1.schema.json',
+  'spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json',
+  'spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json',
   'docs/reference/mir4-first-extension.md',
+  'docs/reference/mir4-f210-mep-discovery.md',
   'tools/lib/mir4/SafetyKernel.ps1',
   'tools/lib/mir4/PolicyEngine.ps1',
   'tools/lib/mir4/NormalizedCompiler.ps1',
@@ -204,6 +209,7 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot 'TargetCompiler.ps1')
 . (Join-Path $PSScriptRoot 'RuntimeStateModel.ps1')
 . (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
+. (Join-Path $PSScriptRoot 'MepDiscovery.ps1')
 . (Join-Path $PSScriptRoot 'ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 . (Join-Path $PSScriptRoot 'Inspector.ps1')
@@ -602,9 +608,12 @@ function Test-MIR4PlatformConformance {
   $environmentLock=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/environment-lock-f210-v1.json')|ConvertFrom-Json -Depth 100
   $environmentDiff=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/environment-diff-f210-f200-v1.json')|ConvertFrom-Json -Depth 100
   $supportBundle=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/support-bundle-minimized-v1.json')|ConvertFrom-Json -Depth 100
+  $mepDiscovery=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/f210-mep-discovery-v1.json')|ConvertFrom-Json -Depth 100
   Test-MIR4EnvironmentLockV1 $environmentLock|Out-Null
   Test-MIR4EnvironmentDiffV1 $environmentDiff|Out-Null
   Test-MIR4SupportBundleV1 $supportBundle|Out-Null
+  Test-MIR4F210MepDiscoveryResultV1 -RepoRoot $repo -Result $mepDiscovery|Out-Null
+  if([string]$mepDiscovery.result-cne'shadow-complete'-or[int]$mepDiscovery.counts.accepted_records-ne2-or@($mepDiscovery.shadow_plans).Count-ne2){throw '[mir4-platform-t11-discovery]'}
   foreach($pair in @(
     @($environmentLock,'spec/schemas/preview/mir4-environment-lock-v1.schema.json'),
     @($environmentDiff,'spec/schemas/preview/mir4-environment-diff-v1.schema.json'),
@@ -711,10 +720,10 @@ function New-MIR4PlatformPreviewPackages {
   }
   $allSdk = @(Get-ChildItem -LiteralPath (Join-Path $repo 'sdk/preview/mir4') -Recurse -File) | ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') }
   $sdkV0 = @($allSdk | Where-Object { $_ -notmatch '/(?:mep-v1|api-v1|reference-extension-v1|inspector-v1)/' -and $_ -notmatch '/reference/(?:process-ir-parity-result|effect-channel-registry-v1|synthesis-maturity-matrix-v1|compatibility-subject-ledger-v1|compatibility-factory-plan-v1|inspection-bundle-v1|inspector-workbench-result-v1|support-bundle-v1)\.json$' })
-  $sdkV0 = @($sdkV0 | Where-Object { $_ -notmatch '/reference/(?:environment-lock-f210-v1|environment-lock-f200-v1|environment-diff-f210-f200-v1|support-bundle-minimized-v1)\.json$' })
-  $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
+  $sdkV0 = @($sdkV0 | Where-Object { $_ -notmatch '/reference/(?:environment-lock-f210-v1|environment-lock-f200-v1|environment-diff-f210-f200-v1|support-bundle-minimized-v1|f210-mep-discovery-v1)\.json$' })
+  $sdkV1 = @($allSdk | Where-Object { $_ -match '/(?:mep-v1|api-v1|reference-extension-v1)/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1|f210-mep-discovery-v1)' })
   $apiV1 = @($allSdk | Where-Object { $_ -match '/api-v1/' })
-  $mepV1 = @($allSdk | Where-Object { $_ -match '/mep-v1/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1)' })
+  $mepV1 = @($allSdk | Where-Object { $_ -match '/mep-v1/' -or $_ -match '/reference/(?:extension-closure-v1|extension-transport-plan-v1|shadow-extension-run-v1|f210-mep-discovery-v1)' })
   $mepAuthority = Get-MIR4ModuleEcosystemAuthority -RepoRoot $repo
   $sets = [ordered]@{
     'mir4-sdk-v0-preview.zip' = @($sdkV0 + @('spec/api/mir4-v0/contracts.json','spec/schemas/preview/mir4-mep-v0.schema.json','docs/reference/generated/mir4-experimental-api-v0.md','docs/reference/mir4-mep-v0.md','docs/reference/mir4-sdk-v0-quickstart.md','docs/reference/mir4-api-sdk-v0-stability.md','LICENSE'))
@@ -775,12 +784,14 @@ function New-MIR4PlatformPreviewPackages {
     'spec/canonicalization/mir-canonical-json-v1.json','fixtures/mir4-canonical-json-v1/vectors.json',
     'spec/schemas/preview/mir4-mep-v1.schema.json','spec/schemas/preview/mir4-extension-lock-v1.schema.json',
     'spec/schemas/preview/mir4-extension-diff-v1.schema.json','spec/schemas/preview/mir4-canonical-json-v1.schema.json',
+    'spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json','spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json',
     'spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json','docs/architecture/mir4-module-ecosystem.md',
-    'docs/reference/mir4-canonical-json-v1.md','docs/reference/mir4-first-extension.md',
+    'docs/reference/mir4-canonical-json-v1.md','docs/reference/mir4-first-extension.md','docs/reference/mir4-f210-mep-discovery.md',
     'tools/lib/mir4/CanonicalJsonV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
-    'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1',
+    'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1','tools/lib/mir4/MepDiscovery.ps1',
     'tools/commands/mir4/Invoke-MIR4Extension.ps1',
     '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
+    '.mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json',
     '.mir/targets.json','.mir/module-dependencies.json','LICENSE'
   ) + @($mepAuthority.inputs) | Sort-Object -Unique)

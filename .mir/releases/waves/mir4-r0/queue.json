@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "47D617F34C8FA54227C3436E3806BD5E68458D09229FC7D35E941FAB23DE21C4"
+      "sha256": "F0CCB23BAA90804BD420ADE0558450CC7674081FA3FC866AE0DB29407EBD0F55"
     }
   ],
   "payload": {
@@ -123,7 +123,7 @@
       {
         "id": "T11",
         "scope": "Read-only F210 MEP discovery",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T09"
         ],
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "24E39B329595AA3BE257CA6AE93410E5DEC89E850A9FA707D94B0169848539D9"
+  "record_sha256": "AC74D5D71B199B300B7EB28058D5D543AFD0E4DC8AD4E8523F59A6FA2471DA46"
 }

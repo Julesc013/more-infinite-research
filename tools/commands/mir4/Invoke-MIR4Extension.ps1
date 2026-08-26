@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('init','validate','explain','test','package','migrate','doctor','lock','diff','ci-init')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('init','validate','explain','test','package','migrate','doctor','lock','diff','ci-init','discover')][string]$Command,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$ExtensionPath='',
   [string]$OutputRoot='build/mir4/extension-builder',
@@ -7,11 +7,12 @@ param(
   [ValidateSet('minimal','all-fragments','unavailable')][string]$Template='minimal',
   [string]$BasePath='',
   [string]$CandidatePath='',
+  [string]$DiscoveryPath='',
   [ValidatePattern('^f[0-9]{3}$')][string]$Target=''
 )
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+. (Join-Path $repo 'tools/lib/mir4/MepDiscovery.ps1')
 $output=if([IO.Path]::IsPathRooted($OutputRoot)){[IO.Path]::GetFullPath($OutputRoot)}else{[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))}
 if($null-eq[IO.Directory]::GetParent($output)){throw "[mir4-extension-output-root] $output"}
 if($ExtensionId-notmatch'^[a-z][a-z0-9-]*(\.[a-z][a-z0-9-]*)+$'){throw '[mir4-extension-id]'}
@@ -61,6 +62,20 @@ if($Command-eq'diff'){
 if($Command-eq'ci-init'){
   $result=Write-MIR4ExtensionCiScaffoldV1 -OutputRoot $output -ExtensionPath $(if([string]::IsNullOrWhiteSpace($ExtensionPath)){'extension.json'}else{$ExtensionPath})
   $result|ConvertTo-Json -Depth 100
+  return
+}
+
+if($Command-eq'discover'){
+  $snapshot=Read-BuilderEnvelope -Path $DiscoveryPath -Role 'discover-snapshot'
+  $result=New-MIR4F210MepDiscoveryV1 -RepoRoot $repo -Snapshot $snapshot
+  New-Item -ItemType Directory -Force -Path $output|Out-Null
+  $path=Join-Path $output 'f210-mep-discovery.json'
+  Write-BuilderJson -Path $path -Value $result
+  [pscustomobject]@{
+    status=[string]$result.result;path=$path;matching_records=[int]$result.counts.matching_records
+    accepted_records=[int]$result.counts.accepted_records;quarantined_records=[int]$result.counts.quarantined_records
+    digest=[string]$result.digest;player_mutation_authorized=$false;prototype_write_authorized=$false
+  }|ConvertTo-Json
   return
 }
 

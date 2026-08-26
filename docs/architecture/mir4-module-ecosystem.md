@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
 ---
@@ -22,13 +22,13 @@ An extension contains 12 typed fragment kinds. It is canonical data, never a cal
 
 ## Target transports
 
-f210 uses an extension-owned mod-data record shape, but admission is blocked behind the existing terminal emitter. W05 does not write `data.raw` or create a prototype. f200 has a versioned namespaced stage-local bus confined to build/materializer scope. f110 through f015 use deterministic static manifests; f014 and f013 are opaque terminal-derived manifests. f012 through f006 are unavailable with evidence.
+f210 uses an extension-owned mod-data record shape. T11 implements the read-only side: exact data-type selection, bounded copied-envelope validation, deterministic dependency/conflict closure, inert host absence, and shadow-plan explanation. Admission remains blocked behind the existing terminal emitter. Neither W05 nor T11 writes `data.raw` or creates a prototype. f200 has a versioned namespaced stage-local bus confined to build/materializer scope. f110 through f015 use deterministic static manifests; f014 and f013 are opaque terminal-derived manifests. f012 through f006 are unavailable with evidence.
 
 ## API and SDK
 
 Host Manifest, Query, Profile, Observation, Tooling, Target Provider ABI, Proof, Release, and Continuity Bundle responses are data-only, capability-labelled, deep-copied, paginated, and bounded to 128 items per page. An unavailable result carries status, reason, and evidence with a null total; it is not represented as zero.
 
-Generated assets include JSON Schema, Lua builders and validators, LuaLS annotations, TypeScript, Python, PowerShell, Markdown, canonical vectors, migration helpers, positive and negative fixtures, and the synthetic external reference extension. The local builder supports `init`, `validate`, `explain`, `test`, `package`, and `migrate`, with all writes confined to `build/mir4`.
+Generated assets include JSON Schema, Lua builders, validators and the pure read-only mod-data collector, LuaLS annotations, TypeScript, Python, PowerShell, Markdown, canonical vectors, migration helpers, positive and negative fixtures, and the synthetic external reference extension. The local builder also provides `doctor`, `lock`, `diff`, `ci-init`, and `discover`; all writes are confined to `build/mir4`.
 
 ## Graduation boundary
 
