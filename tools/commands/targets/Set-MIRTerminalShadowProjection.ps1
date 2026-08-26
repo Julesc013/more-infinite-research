@@ -19,6 +19,40 @@ function ConvertTo-MIRCanonicalText {
   return $Text.Replace("`r`n", "`n").Replace("`r", "`n")
 }
 
+$script:MIRTerminalActionPinsV2 = [ordered]@{
+  'actions/cache/restore' = [pscustomobject]@{ tag = 'v4'; sha = '0057852bfaa89a56745cba8c7296529d2fc39830' }
+  'actions/cache/save' = [pscustomobject]@{ tag = 'v4'; sha = '0057852bfaa89a56745cba8c7296529d2fc39830' }
+  'actions/checkout' = [pscustomobject]@{ tag = 'v4'; sha = '11d5960a326750d5838078e36cf38b85af677262' }
+  'actions/download-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'd3f86a106a0bac45b974a628896c90dbdf5c8093' }
+  'actions/github-script' = [pscustomobject]@{ tag = 'v7'; sha = 'f28e40c7f34bde8b3046d885e986cb6290c5673b' }
+  'actions/upload-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'ea165f8d65b6e75b540449e92b4886f43607fa02' }
+}
+
+function ConvertTo-MIRTerminalPinnedActionRefsV2 {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $result = ConvertTo-MIRCanonicalText -Text $Text
+  foreach ($entry in $script:MIRTerminalActionPinsV2.GetEnumerator()) {
+    $result = $result.Replace(
+      "$([string]$entry.Key)@$([string]$entry.Value.tag)",
+      "$([string]$entry.Key)@$([string]$entry.Value.sha)"
+    )
+  }
+  $references = [regex]::Matches(
+    $result,
+    '(?m)uses:\s+(?<action>actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*)@(?<ref>[^\s#]+)'
+  )
+  foreach ($reference in $references) {
+    $action = [string]$reference.Groups['action'].Value
+    $ref = [string]$reference.Groups['ref'].Value
+    if (-not $script:MIRTerminalActionPinsV2.Contains($action) -or
+        $ref -cne [string]$script:MIRTerminalActionPinsV2[$action].sha) {
+      throw "Terminal workflow action is not admitted by the MIR4 V2 action lock: $action@$ref"
+    }
+  }
+  return $result
+}
+
 function Write-MIRUtf8NoBom {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Text)
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Path))
@@ -246,6 +280,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
     }
     $text = ConvertTo-MIRCanonicalText -Text (Get-MIRGitText -Commit ([string]$targetHead[0]) -Path ".github/workflows/validate.yml")
   }
+  $text = ConvertTo-MIRTerminalPinnedActionRefsV2 -Text $text
   $archive = ".\dist\more-infinite-research_$([string]$Target.release).zip"
   $text = $text.Replace("--target 2.1", "--target $([string]$Target.factorio_line)")
   $text = $text.Replace("--profile fast --output", "--profile fast --candidate '$archive' --output")
