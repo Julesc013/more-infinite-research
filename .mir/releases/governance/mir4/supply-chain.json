@@ -32,7 +32,7 @@
     "archive_timestamp": "1980-01-01T00:00:00Z",
     "archive_permissions": 0,
     "path_policy": "portable-relative-no-traversal",
-    "text_policy": "canonical-records-utf8-lf-no-bom-source-payload-preserved",
+    "text_policy": "canonical-records-utf8-lf-no-bom-config-pinned-git-archive-payload-preserved",
     "clean_roots_required": 2,
     "byte_identical_repetitions_required": 2
   },

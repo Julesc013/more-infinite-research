@@ -254,6 +254,7 @@ function New-MIR4DeterministicGitSourceArchiveV1 {
   $info.RedirectStandardOutput = $true
   $info.RedirectStandardError = $true
   foreach ($argument in @(
+    '-c', 'core.autocrlf=false', '-c', 'core.eol=lf',
     '-C', $repo, 'archive', '--format=zip', '--prefix=mir4-source/',
     "--output=$temporary", $SourceCommit
   )) {
@@ -1158,7 +1159,7 @@ function Restore-MIR4ReleaseCapsuleV1 {
 
   $sourceArchivePath = & $getObjectPath 'source-archive'
   $sourceDestination = Join-Path $root 'source'
-  Expand-MIR4SafeArchive -ArchivePath $sourceArchivePath -Destination $sourceDestination -OutputRoot $root | Out-Null
+  Expand-MIR4SafeArchive -ArchivePath $sourceArchivePath -Destination $sourceDestination -OutputRoot $root -MaxEntries 100000 -MaxEntryBytes 268435456 -MaxExpandedBytes 1073741824 | Out-Null
   $restoredSource = Join-Path $sourceDestination 'mir4-source'
   if (-not (Test-Path -LiteralPath $restoredSource -PathType Container)) {
     throw '[mir4-release-capsule-restored-source]'

@@ -50,7 +50,7 @@ Never use proof-only key creation for T16. Production key generation, passphrase
 
 Run .\tools\commands\mir4\Invoke-MIR4ReleaseCapsule.ps1 -Mode Build only after the supply-chain projection and four V1 developer-preview archives exist for the same clean source commit and tree. Pass the proof-only public key explicitly when the default ignored build location is not used.
 
-The command verifies the component inventory, both SBOM projections, SLSA provenance, proof-only signature, trusted public key, revocation snapshot, and preview manifests before constructing anything. It creates a deterministic Git-produced source snapshot, then writes one ZIP rooted at mir4-release-capsule. Public objects live at objects/sha256/<first-two-uppercase-hex>/<uppercase-sha256>; the manifest records logical roles separately from content identity, so duplicate bytes cannot create ambiguous custody.
+The command verifies the component inventory, both SBOM projections, SLSA provenance, proof-only signature, trusted public key, revocation snapshot, and preview manifests before constructing anything. Repository, package-source, identity-set, and verifier component rows are hashed from one canonical Git archive of the exact source commit rather than mutable checkout bytes. Git runs with core.autocrlf=false and core.eol=lf while committed eol attributes remain authoritative, so the inventory and restored archive agree on both ordinary text and deliberately CRLF-bound authorities. It then writes one ZIP rooted at mir4-release-capsule. Public objects live at objects/sha256/<first-two-uppercase-hex>/<uppercase-sha256>; the manifest records logical roles separately from content identity, so duplicate bytes cannot create ambiguous custody.
 
 The non-production capsule carries:
 

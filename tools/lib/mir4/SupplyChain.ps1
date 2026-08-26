@@ -191,28 +191,104 @@ function Get-MIR4SupplyChainRowsRoot {
   }
 }
 
-function Get-MIR4SupplyChainRepositoryRows {
+function Get-MIR4SupplyChainCanonicalArchiveRows {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
-  $paths = @(& git -C $RepoRoot ls-files --cached 2>$null)
-  if ($LASTEXITCODE -ne 0 -or $paths.Count -eq 0) {
-    throw '[mir4-supply-chain-git-files]'
+  $repo = Resolve-MIR4SupplyChainRepoRoot -RepoRoot $RepoRoot
+  $scratchRoot = Assert-MIR4DescendantPath -Root $repo -Path (Join-Path $repo 'build/results/mir4-t15/supply-chain-source-scratch')
+  if (-not (Test-Path -LiteralPath $scratchRoot -PathType Container)) {
+    New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null
   }
-  $rows = [Collections.Generic.List[object]]::new($paths.Count)
-  foreach ($path in @($paths | Sort-Object -CaseSensitive)) {
-    $rows.Add((Get-MIR4SupplyChainFileRow -Root $RepoRoot -RelativePath ([string]$path) -Origin repository))
+  $archivePath = Assert-MIR4DescendantPath -Root $scratchRoot -Path (Join-Path $scratchRoot ("source-" + [guid]::NewGuid().ToString('N') + '.zip'))
+  $git = @(Get-Command git -CommandType Application -ErrorAction Stop | Where-Object {
+    -not [string]::IsNullOrWhiteSpace([string]$_.Source) -and
+    (Test-Path -LiteralPath $_.Source -PathType Leaf)
+  } | Select-Object -First 1)
+  if ($git.Count -ne 1) { throw '[mir4-supply-chain-git-executable]' }
+  try {
+    $info = [Diagnostics.ProcessStartInfo]::new()
+    $info.FileName = [string]$git[0].Source
+    $info.UseShellExecute = $false
+    $info.CreateNoWindow = $true
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    foreach ($argument in @(
+      '-c', 'core.autocrlf=false',
+      '-c', 'core.eol=lf',
+      '-C', $repo,
+      'archive', '--format=zip', '--prefix=mir4-source/',
+      "--output=$archivePath", 'HEAD'
+    )) {
+      $null = $info.ArgumentList.Add($argument)
+    }
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $info
+    if (-not $process.Start()) { throw '[mir4-supply-chain-git-archive-start]' }
+    $standardOutput = $process.StandardOutput.ReadToEnd()
+    $standardError = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    $exitCode = $process.ExitCode
+    $process.Dispose()
+    if ($exitCode -ne 0 -or -not (Test-Path -LiteralPath $archivePath -PathType Leaf)) {
+      throw "[mir4-supply-chain-git-archive] $standardError $standardOutput"
+    }
+    $archiveRows = @(Get-MIR4SupplyChainArchiveRows -Path $archivePath -MaximumEntries 100000 -MaximumExpandedBytes 1073741824)
+    return @(
+      foreach ($entry in $archiveRows) {
+        $archivePathValue = [string]$entry.path
+        if (-not $archivePathValue.StartsWith('mir4-source/', [StringComparison]::Ordinal)) {
+          throw "[mir4-supply-chain-git-archive-root] $archivePathValue"
+        }
+        $relative = $archivePathValue.Substring('mir4-source/'.Length)
+        Assert-MIR4SupplyChainRelativePath -Path $relative
+        [pscustomobject][ordered]@{
+          path = $relative
+          bytes = [long]$entry.bytes
+          sha256 = [string]$entry.sha256
+          source_class = Get-MIR4SupplyChainFileClass -Path $relative
+          origin = 'repository'
+        }
+      }
+    )
+  } finally {
+    if (Test-Path -LiteralPath $archivePath -PathType Leaf) {
+      Remove-Item -LiteralPath $archivePath -Force
+    }
   }
-  return $rows.ToArray()
+}
+
+function Select-MIR4SupplyChainRows {
+  param(
+    [Parameter(Mandatory)][object[]]$Rows,
+    [Parameter(Mandatory)][string[]]$Paths
+  )
+
+  $map = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($row in $Rows) { $map.Add([string]$row.path, $row) }
+  $selectedPaths = @(
+    $Paths |
+      ForEach-Object { ([string]$_).Replace('\', '/') } |
+      Sort-Object -Unique -CaseSensitive
+  )
+  if ($selectedPaths.Count -eq 0) { throw '[mir4-supply-chain-row-selection-empty]' }
+  return @(
+    foreach ($path in $selectedPaths) {
+      Assert-MIR4SupplyChainRelativePath -Path $path
+      if (-not $map.ContainsKey($path)) { throw "[mir4-supply-chain-row-path-absent] $path" }
+      $map[$path]
+    }
+  )
+}
+
+function Get-MIR4SupplyChainRepositoryRows {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  return @(Get-MIR4SupplyChainCanonicalArchiveRows -RepoRoot $RepoRoot)
 }
 
 function Get-MIR4SupplyChainPackageRows {
   param([Parameter(Mandatory)][string]$RepoRoot)
-
-  $rows = [Collections.Generic.List[object]]::new()
-  foreach ($path in @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot | Sort-Object -CaseSensitive)) {
-    $rows.Add((Get-MIR4SupplyChainFileRow -Root $RepoRoot -RelativePath ([string]$path) -Origin repository))
-  }
-  return $rows.ToArray()
+  $rows = @(Get-MIR4SupplyChainCanonicalArchiveRows -RepoRoot $RepoRoot)
+  return @(Select-MIR4SupplyChainRows -Rows $rows -Paths @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot))
 }
 
 function Get-MIR4SupplyChainExplicitRows {
@@ -220,12 +296,8 @@ function Get-MIR4SupplyChainExplicitRows {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string[]]$Paths
   )
-
-  $rows = [Collections.Generic.List[object]]::new()
-  foreach ($path in @($Paths | Sort-Object -CaseSensitive)) {
-    $rows.Add((Get-MIR4SupplyChainFileRow -Root $RepoRoot -RelativePath $path -Origin repository))
-  }
-  return $rows.ToArray()
+  $rows = @(Get-MIR4SupplyChainCanonicalArchiveRows -RepoRoot $RepoRoot)
+  return @(Select-MIR4SupplyChainRows -Rows $rows -Paths $Paths)
 }
 
 function Get-MIR4SupplyChainArchiveRows {
@@ -324,13 +396,21 @@ function New-MIR4ComponentInventoryV1 {
     throw '[mir4-supply-chain-clean-root-required]'
   }
 
+  $cachedRepositoryRows = @(Get-MIR4SupplyChainRepositoryRows -RepoRoot $repo)
   $identitySets = [Collections.Generic.List[object]]::new()
   foreach ($property in $authority.identity_sets.PSObject.Properties) {
     $identityPaths = [string[]]@($property.Value | ForEach-Object { [string]$_ })
-    $identitySets.Add((Get-MIR4SupplyChainIdentitySet -RepoRoot $repo -Name $property.Name -Paths $identityPaths))
+    $identityRows = @(Select-MIR4SupplyChainRows -Rows $cachedRepositoryRows -Paths $identityPaths)
+    $identityRoot = Get-MIR4SupplyChainRowsRoot -Rows $identityRows
+    $identitySets.Add([pscustomobject][ordered]@{
+      name = $property.Name
+      root_sha256 = $identityRoot.sha256
+      file_count = $identityRoot.file_count
+      total_bytes = $identityRoot.total_bytes
+      files = $identityRows
+    })
   }
 
-  $cachedRepositoryRows = $null
   $cachedPackageRows = $null
   $components = [Collections.Generic.List[object]]::new()
   foreach ($component in $authority.components) {
@@ -356,25 +436,24 @@ function New-MIR4ComponentInventoryV1 {
     } else {
       switch ([string]$component.source.selector) {
         'repository-tracked-source' {
-          if ($null -eq $cachedRepositoryRows) {
-            $cachedRepositoryRows = @(Get-MIR4SupplyChainRepositoryRows -RepoRoot $repo)
-          }
           $rows = @($cachedRepositoryRows)
         }
         'player-package-source' {
           if ($null -eq $cachedPackageRows) {
-            $cachedPackageRows = @(Get-MIR4SupplyChainPackageRows -RepoRoot $repo)
+            $cachedPackageRows = @(Select-MIR4SupplyChainRows -Rows $cachedRepositoryRows -Paths @(
+              Get-MIRPackageSourceFiles -RepoRoot $repo
+            ))
           }
           $rows = @($cachedPackageRows)
         }
         'explicit-files' {
           $explicitPaths = [string[]]@($component.source.paths | ForEach-Object { [string]$_ })
-          $rows = @(Get-MIR4SupplyChainExplicitRows -RepoRoot $repo -Paths $explicitPaths)
+          $rows = @(Select-MIR4SupplyChainRows -Rows $cachedRepositoryRows -Paths $explicitPaths)
         }
         'preview-payload' {
           $previewPaths = @([string]$component.source_map.generator, $script:MIR4SupplyChainAuthorityPath, 'LICENSE') |
             Sort-Object -Unique -CaseSensitive
-          $rows = @(Get-MIR4SupplyChainExplicitRows -RepoRoot $repo -Paths $previewPaths)
+          $rows = @(Select-MIR4SupplyChainRows -Rows $cachedRepositoryRows -Paths $previewPaths)
         }
         default {
           throw "Unknown MIR 4 supply-chain selector: $($component.source.selector)"
