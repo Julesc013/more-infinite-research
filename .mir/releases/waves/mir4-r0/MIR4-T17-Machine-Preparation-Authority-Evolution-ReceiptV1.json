@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4T17MachinePreparationAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-27T08:00:02.3665001+10:00",
+  "recorded_at": "2026-08-27T08:41:07.3924977+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "turn": "T17",
   "predecessor_receipt": {
@@ -10,8 +10,8 @@
   },
   "source_baseline": {
     "branch": "codex/mir4-t17-machine-preparation",
-    "commit": "2ab7266b1918880c02bc72b6ad66cf9b05251453",
-    "tree": "85fddbd53671fb04530c3fec7523dce4a50e33c8",
+    "commit": "682b4d665f86ac4cdb8ff7c214dbfe6a86cd7bc0",
+    "tree": "5ddff9f5edad71fc1f3b0a74b57d2d6aeb510f2b",
     "working_tree_clean": false
   },
   "execution_state": {
@@ -93,6 +93,51 @@
       "release_authority": false
     },
     {
+      "path": "mir.lock",
+      "previous_sha256": "8BF292246146F3A29B573AE0EA76379B2546EABC8705D9405423D2DA0669E463",
+      "current_sha256": "81BA8317D6149A8F7B72BA72244ED1D1323A598E61FD2C0C5D1C1FD5EA1CCF03",
+      "reason": "T17 hardens exact isolated playtest preparation and evidence comparison while preserving the human decision gate.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "8D5CC9EBB69C902DBC754C3BD0056B04BF1B4781E8BDE936C7D0974D0A19D264",
+      "current_sha256": "0A14D7422749D94F73553467499BCF93E1DCC47D830A74FC95FCC0149291CA39",
+      "reason": "T17 hardens exact isolated playtest preparation and evidence comparison while preserving the human decision gate.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "A543DA4FD18B287F0A899E428D6F2FB09EEF1D8ABC2842A1BC1F67B30FD1D106",
+      "current_sha256": "1E37E14ED1EDC0FEBADB03C09ACEEFFC0619274530DAF71C86377850121370EC",
+      "reason": "T17 hardens exact isolated playtest preparation and evidence comparison while preserving the human decision gate.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "399C1D95AE23F21121D6D80E93962217678E6A08C2D97A8174787B981FE3BBEF",
+      "current_sha256": "A3BDB8E7A720577B398C368DE3E7B7FB0A1B8B7AE1F1BAA0F759AC9C85DE0AFA",
+      "reason": "T17 hardens exact isolated playtest preparation and evidence comparison while preserving the human decision gate.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "0D4C700DAD88D626D7892ECE2C6C01F3F1F65F0115BB94706D090C6B9959B4FA",
+      "current_sha256": "97E38EEDC666E0CCE1267494BFD73FDF45E6730BB6805DCA5D2280CEE69A0AF5",
+      "reason": "T17 hardens exact isolated playtest preparation and evidence comparison while preserving the human decision gate.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "95CE133DDA7CEB67CFE4C95B1762FFF732E4BFFB870289B5601AD14BB4F5B7C6",
       "current_sha256": "7C51B01293876DB53C51AEA92B14CA782BEE3FA5CFE856241297F8EF69BC4BF4",
@@ -147,7 +192,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4PlaytestHandoffT17.ps1",
-      "sha256": "97835B0E7D5B1889CC70157B20CD598D9CC49EF0A3059B7A5A23F99497B8A0D3",
+      "sha256": "D1D969D65E0EBE03380DD3B6CCB77EF805ADA69C4150D923888972248E1ACD14",
       "hash_mode": "canonical-text-v1",
       "role": "t17-authority-evolution-writer"
     },
