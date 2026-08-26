@@ -277,6 +277,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
@@ -316,6 +317,7 @@ package_excluded_modules:
       - spec/schemas/mir4-t10-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-t11-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-t12-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t13-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
       - spec/schemas/mir4-release-target-build-result-v1.schema.json
       - spec/schemas/mir4-release-target-qualification-result-v1.schema.json

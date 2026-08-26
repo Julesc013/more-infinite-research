@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "99FC6CA3EE9E614F605FEC15E48AC9E2A06EDB4D123709C2F73BB2DCCD9639FA"
+      "sha256": "3060DEC9530C0DE585E912929295C48AC053E2D1659786CC100B0744B0B677E9"
     }
   ],
   "payload": {
@@ -143,7 +143,7 @@
       {
         "id": "T13",
         "scope": "Release compatibility canary cut",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T10",
           "T12"
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "DFA7A2A13CBE38AAFB0C9FAC48398A1E0458980C663E1A3ED37DD456A2495D35"
+  "record_sha256": "3C4487EB8877D1879661FE5115A4FA9BBBE40597E71077DE2247FEA648FCDAB5"
 }

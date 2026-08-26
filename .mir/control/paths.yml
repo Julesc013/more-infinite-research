@@ -248,12 +248,15 @@ paths:
   releases.waves.mir4-r0-t10-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-t11-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-t12-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-release-compatibility-canaries-t13: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+  releases.waves.mir4-r0-t13-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-platform-maturity-publication-contract-v2: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json
   releases.governance.mir4.ruleset-snapshot-2026-08-24: .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json
   releases.waves.mir4-r0-queue: .mir/releases/waves/mir4-r0/queue.json
+  sdk.preview.mir4.reference.t13-receipt: sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json
   evidence.root: .mir/evidence
   evidence.mir4-r0-engine-availability: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
   evidence.mir3-dot9-mod-portal-visibility-recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/control/t13-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T13 authority evolution receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "turn", "predecessor_receipt", "machine_receipt", "execution_transition", "evolved_bindings", "current_authorities", "conformance", "player_package_source_sha256", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T13AuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T13"},
+    "predecessor_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json"}, "sha256": {"const": "E3769770488BB6924CF7A5ADA619E426CFD16079B0F18F0E3B0BF878081BD608"}}},
+    "machine_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "digest"], "properties": {"path": {"const": "sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json"}, "sha256": {"const": "D8AD00B861F0C31A7CE4A7DA239AF250EEED4F586F78921F80A10CF9E771FF9F"}, "digest": {"const": "sha256:fb8175ec9b87d13fd255782f78d26aab7a44caeef6c340a52d56a97420e1df50"}}},
+    "execution_transition": {"type": "object", "additionalProperties": false, "required": ["previous_status", "current_status", "completed_turn", "newly_ready_turns", "next_dependency_ready_turn"], "properties": {"previous_status": {"const": "T12-COMPLETE-T13-T14-T15-READY-RELEASE-BLOCKED"}, "current_status": {"const": "T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED"}, "completed_turn": {"const": "T13"}, "newly_ready_turns": {"const": []}, "next_dependency_ready_turn": {"const": "T14"}}},
+    "evolved_bindings": {"type": "array", "minItems": 10, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 25, "items": {"$ref": "#/$defs/current"}},
+    "conformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canary_count", "capture_count", "reload_count", "target_count", "upgrade_archetype_count", "all_clean_loads_passed", "all_first_reloads_passed", "all_second_reloads_passed", "all_target_upgrades_passed", "all_performance_within_budget", "all_claims_exact_and_expiring", "f200_k2so_archive_custody_complete", "t12_historical_blocker_superseded", "package_source_unchanged", "package_visible", "automatic_synthesis_authorized", "public_support_claim_authorized", "release_transition_authority"],
+      "properties": {
+        "canary_count": {"const": 8},
+        "capture_count": {"const": 11},
+        "reload_count": {"const": 22},
+        "target_count": {"const": 2},
+        "upgrade_archetype_count": {"const": 6},
+        "all_clean_loads_passed": {"const": true},
+        "all_first_reloads_passed": {"const": true},
+        "all_second_reloads_passed": {"const": true},
+        "all_target_upgrades_passed": {"const": true},
+        "all_performance_within_budget": {"const": true},
+        "all_claims_exact_and_expiring": {"const": true},
+        "f200_k2so_archive_custody_complete": {"const": true},
+        "t12_historical_blocker_superseded": {"const": true},
+        "package_source_unchanged": {"const": true},
+        "package_visible": {"const": false},
+        "automatic_synthesis_authorized": {"const": false},
+        "public_support_claim_authorized": {"const": false},
+        "release_transition_authority": {"const": false}
+      }
+    },
+    "player_package_source_sha256": {"const": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"},
+    "transition_gate": {"type": "object", "additionalProperties": false, "required": ["source_freeze", "candidate_allocation", "production_signing", "promotion_to_main", "tagging", "publication"], "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}},
+    "status": {"const": "T13-EXACT-RELEASE-CANARIES-PASSED-T14-NEXT-PRODUCTION-UNAUTHORIZED"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "reason": {"type": "string", "minLength": 1}, "scope": {"const": "package-excluded-control-plane"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "current": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "role"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "role": {"type": "string", "minLength": 1}}}
+  }
+}
