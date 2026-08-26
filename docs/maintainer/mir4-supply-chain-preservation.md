@@ -22,7 +22,7 @@ The machine authority is .mir/releases/governance/mir4/supply-chain.json. It def
 
 Run .\tools\commands\mir4\Invoke-MIR4SupplyChain.ps1 from the repository root.
 
-The command streams file and ZIP-entry hashes, writes canonical UTF-8/LF JSON, and produces one canonical component inventory plus SPDX 3.0.1, SPDX 2.3, and SLSA provenance projections. Supply an artifact-map JSON only when exact archives exist; otherwise the inventory records the governed source closure and does not imply that a candidate was allocated.
+The command streams file and ZIP-entry hashes, writes canonical UTF-8/LF JSON, and produces one canonical component inventory plus SPDX 3.0.1, SPDX 2.3, and SLSA provenance projections. Supply an artifact-map JSON only when exact archives exist; otherwise the inventory records the governed source closure and does not imply that a candidate was allocated. A relative artifact-map path and every relative path inside that map resolve from the explicit repository root, never from the caller's process directory.
 
 Use -RequireClean for accepted construction evidence. A dirty pre-freeze development run is diagnostic only.
 

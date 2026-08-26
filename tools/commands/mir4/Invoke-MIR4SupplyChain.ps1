@@ -32,7 +32,8 @@ if (-not (Test-Path -LiteralPath $output -PathType Container)) {
 
 $artifacts = @{}
 if (-not [string]::IsNullOrWhiteSpace($ArtifactMapPath)) {
-  $artifactMap = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $ArtifactMapPath).Path) | ConvertFrom-Json -Depth 20
+  $artifactMapPathResolved = Resolve-MIR4SupplyChainInputPath -RepoRoot $repo -Path $ArtifactMapPath
+  $artifactMap = [IO.File]::ReadAllText($artifactMapPathResolved) | ConvertFrom-Json -Depth 20
   foreach ($property in $artifactMap.PSObject.Properties) {
     $artifacts[[string]$property.Name] = [string]$property.Value
   }

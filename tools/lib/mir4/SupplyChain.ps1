@@ -19,6 +19,21 @@ function Resolve-MIR4SupplyChainRepoRoot {
   return $resolved
 }
 
+function Resolve-MIR4SupplyChainInputPath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $repo = Resolve-MIR4SupplyChainRepoRoot -RepoRoot $RepoRoot
+  $candidate = if ([IO.Path]::IsPathRooted($Path)) {
+    [IO.Path]::GetFullPath($Path)
+  } else {
+    [IO.Path]::GetFullPath((Join-Path $repo $Path))
+  }
+  return (Resolve-Path -LiteralPath $candidate).Path
+}
+
 function Assert-MIR4SupplyChainRelativePath {
   param([Parameter(Mandatory)][string]$Path)
 
@@ -424,7 +439,7 @@ function New-MIR4ComponentInventoryV1 {
       )
       $materialization = 'provided-payload'
     } elseif (Test-MIR4SupplyChainMapKey -Map $ArtifactPaths -Key $componentId) {
-      $artifactPath = (Resolve-Path -LiteralPath ([string]$ArtifactPaths[$componentId])).Path
+      $artifactPath = Resolve-MIR4SupplyChainInputPath -RepoRoot $repo -Path ([string]$ArtifactPaths[$componentId])
       $rows = @(Get-MIR4SupplyChainArchiveRows -Path $artifactPath)
       $artifactItem = Get-Item -LiteralPath $artifactPath
       $artifact = [pscustomobject][ordered]@{

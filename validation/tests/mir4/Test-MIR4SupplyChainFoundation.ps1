@@ -58,6 +58,17 @@ Assert-MIR4SupplyChainThrows {
   }) | Out-Null
 } 'mir4-supply-chain-path-traversal'
 
+$startingLocation = Get-Location
+try {
+  Set-Location -LiteralPath (Split-Path -Parent $repo)
+  $relativeInput = Resolve-MIR4SupplyChainInputPath -RepoRoot $repo -Path 'LICENSE'
+} finally {
+  Set-Location -LiteralPath $startingLocation.Path
+}
+Assert-MIR4SupplyChainTest (
+  $relativeInput -ceq (Resolve-Path -LiteralPath (Join-Path $repo 'LICENSE')).Path
+) 'mir4-supply-chain-repo-relative-input'
+
 $inventoryA = New-MIR4ComponentInventoryV1 -RepoRoot $repo
 $inventoryB = New-MIR4ComponentInventoryV1 -RepoRoot $repo
 Assert-MIR4SupplyChainTest (
