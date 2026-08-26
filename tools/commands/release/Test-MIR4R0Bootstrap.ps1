@@ -315,13 +315,13 @@ $generatedSources = @($generatedSources | Sort-Object path)
 $currentExecutionPath = "$authorityDirectory/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
 Assert-Schema $currentExecutionPath "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json"
 $currentExecution = Read-Json $currentExecutionPath
-if ([string]$currentExecution.status -cne "T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED" -or
-    [string]$currentExecution.next_dependency_ready_turn -cne "T14" -or
+if ([string]$currentExecution.status -cne "T14-COMPLETE-T15-READY-RELEASE-BLOCKED" -or
+    [string]$currentExecution.next_dependency_ready_turn -cne "T15" -or
     @($currentExecution.turns).Count -ne 22 -or
     @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 3 -or
     @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-target-processir-snapshot" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
     @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-archive-custody-f200-k2so" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
-    @($currentExecution.turns | Where-Object { [string]$_.id -ceq "T13" -and [string]$_.state -ceq "completed" }).Count -ne 1 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T13","T14") -and [string]$_.state -ceq "completed" }).Count -ne 2 -or
     @($currentExecution.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
   throw "Current MIR 4 pre-freeze execution authority is inconsistent or grants a release transition."
 }

@@ -1,0 +1,248 @@
+{
+  "schema": 1,
+  "kind": "MIRImmutableDocumentationSourceTruthV1",
+  "policy": "versioned-release-notes-are-byte-immutable",
+  "records": [
+    {
+      "path": "docs/releases/notes/release-notes-0.10.0.md",
+      "source_of_truth_for": [
+        "mir-0.10.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.11.0.md",
+      "source_of_truth_for": [
+        "mir-0.11.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.12.0.md",
+      "source_of_truth_for": [
+        "mir-0.12.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.6.0.md",
+      "source_of_truth_for": [
+        "mir-0.6.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.7.0.md",
+      "source_of_truth_for": [
+        "mir-0.7.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.8.0.md",
+      "source_of_truth_for": [
+        "mir-0.8.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-0.9.0.md",
+      "source_of_truth_for": [
+        "mir-0.9.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.3.5.md",
+      "source_of_truth_for": [
+        "mir-1.3.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.3.9.md",
+      "source_of_truth_for": [
+        "mir-1.3.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.4.5.md",
+      "source_of_truth_for": [
+        "mir-1.4.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.4.9.md",
+      "source_of_truth_for": [
+        "mir-1.4.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.5.5.md",
+      "source_of_truth_for": [
+        "mir-1.5.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.5.9.md",
+      "source_of_truth_for": [
+        "mir-1.5.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.6.5.md",
+      "source_of_truth_for": [
+        "mir-1.6.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.6.9.md",
+      "source_of_truth_for": [
+        "mir-1.6.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.7.5.md",
+      "source_of_truth_for": [
+        "mir-1.7.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.7.9.md",
+      "source_of_truth_for": [
+        "mir-1.7.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.8.5.md",
+      "source_of_truth_for": [
+        "mir-1.8.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.8.9.md",
+      "source_of_truth_for": [
+        "mir-1.8.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.9.5.md",
+      "source_of_truth_for": [
+        "mir-1.9.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-1.9.9.md",
+      "source_of_truth_for": [
+        "mir-1.9.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-2.4.9.md",
+      "source_of_truth_for": [
+        "mir-2.4.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-2.5.10.md",
+      "source_of_truth_for": [
+        "release-notes-2.5.10"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-2.5.11.md",
+      "source_of_truth_for": [
+        "release-notes-2.5.11"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-2.5.5.md",
+      "source_of_truth_for": [
+        "mir-2.5.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-2.5.9.md",
+      "source_of_truth_for": [
+        "mir-2.5.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.0.5.md",
+      "source_of_truth_for": [
+        "mir-3.0.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.1.0.md",
+      "source_of_truth_for": [
+        "mir-3.1.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.1.1.md",
+      "source_of_truth_for": [
+        "mir-3.1.1-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.1.2.md",
+      "source_of_truth_for": [
+        "mir-3.1.2-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.1.5.md",
+      "source_of_truth_for": [
+        "mir-3.1.5-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.1.9.md",
+      "source_of_truth_for": [
+        "mir-3.1.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.0.md",
+      "source_of_truth_for": [
+        "mir-3.2.0-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.10.md",
+      "source_of_truth_for": [
+        "release-notes-3.2.10"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.11.md",
+      "source_of_truth_for": [
+        "release-notes-3.2.11"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.2.md",
+      "source_of_truth_for": [
+        "mir-3.2.2-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.3.md",
+      "source_of_truth_for": [
+        "mir-3.2.3-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.5.md",
+      "source_of_truth_for": [
+        "mir-3.2.5-release-notes",
+        "mir-3.2.5-player-visible-progress-preservation"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-3.2.9.md",
+      "source_of_truth_for": [
+        "mir-3.2.9-release-notes"
+      ]
+    },
+    {
+      "path": "docs/releases/notes/release-notes-4.0.0-candidate.md",
+      "source_of_truth_for": [
+        "mir4-4.0.0-candidate-release-notes"
+      ]
+    }
+  ]
+}

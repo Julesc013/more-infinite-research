@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4PreFreezeExecutionProgrammeV1",
-  "recorded_at": "2026-08-26T20:30:00+10:00",
+  "recorded_at": "2026-08-26T22:30:00+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "source_baseline": {
     "repository": "Julesc013/more-infinite-research",
@@ -122,7 +122,7 @@
     {"id": "T11", "name": "Read-only F210 MEP discovery", "state": "completed", "depends_on": ["T09"], "human_required": false, "release_transition": false},
     {"id": "T12", "name": "Exact target ProcessIR preview and Inspector compare", "state": "completed", "depends_on": ["T10"], "human_required": false, "release_transition": false},
     {"id": "T13", "name": "Release compatibility canary cut", "state": "completed", "depends_on": ["T10", "T12"], "human_required": false, "release_transition": false},
-    {"id": "T14", "name": "MIR4 public, contributor, maintainer and continuity documentation", "state": "ready", "depends_on": ["T01", "T07", "T09", "T10"], "human_required": false, "release_transition": false},
+    {"id": "T14", "name": "MIR4 public, contributor, maintainer and continuity documentation", "state": "completed", "depends_on": ["T01", "T07", "T09", "T10"], "human_required": false, "release_transition": false},
     {"id": "T15", "name": "Supply-chain and preservation hardening", "state": "ready", "depends_on": ["T05", "T07"], "human_required": false, "release_transition": false},
     {"id": "T16", "name": "Protected signing and recovery ceremony", "state": "blocked-human", "depends_on": ["T05"], "human_required": true, "release_transition": false},
     {"id": "T17", "name": "Pre-freeze F210/F200 maintainer playtests", "state": "blocked-human", "depends_on": ["T01"], "human_required": true, "release_transition": false},
@@ -131,7 +131,7 @@
     {"id": "T20", "name": "Frozen candidate qualification and final acceptance", "state": "blocked-dependency", "depends_on": ["T19"], "human_required": true, "release_transition": true},
     {"id": "T21", "name": "Production seal, promotion, tags, publication and public readback", "state": "blocked-dependency", "depends_on": ["T20"], "human_required": true, "release_transition": true}
   ],
-  "next_dependency_ready_turn": "T14",
+  "next_dependency_ready_turn": "T15",
   "transition_gate": {
     "source_freeze": false,
     "candidate_allocation": false,
@@ -140,5 +140,5 @@
     "tagging": false,
     "publication": false
   },
-  "status": "T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED"
+  "status": "T14-COMPLETE-T15-READY-RELEASE-BLOCKED"
 }

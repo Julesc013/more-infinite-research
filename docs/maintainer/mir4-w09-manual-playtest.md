@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-w09-manual-playtest-checklist
+  - mir4-historical-and-museum-playtest-boundaries
 ---
 
 # MIR 4 W09 Manual Playtest Handoff

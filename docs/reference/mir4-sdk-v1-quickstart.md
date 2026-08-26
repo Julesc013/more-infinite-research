@@ -9,6 +9,9 @@ last_reviewed: 2026-08-26
 supersedes:
   - docs/reference/mir4-sdk-v0-quickstart.md
 superseded_by: []
+source_of_truth_for:
+  - mir4-sdk-current-preview-quickstart
+  - mir4-v1-preview-asset-portability
 ---
 
 # MIR 4 SDK V1 developer preview quickstart

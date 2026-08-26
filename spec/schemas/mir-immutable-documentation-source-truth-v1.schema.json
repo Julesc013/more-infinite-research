@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir/control/immutable-documentation-source-truth-v1.schema.json",
+  "title": "MIR immutable documentation source-truth authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "policy", "records"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIRImmutableDocumentationSourceTruthV1"},
+    "policy": {"const": "versioned-release-notes-are-byte-immutable"},
+    "records": {
+      "type": "array",
+      "minItems": 40,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "source_of_truth_for"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^docs/releases/notes/release-notes-[0-9].*\\.md$"},
+          "source_of_truth_for": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"}
+          }
+        }
+      }
+    }
+  }
+}

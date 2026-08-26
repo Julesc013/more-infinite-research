@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-07
 supersedes: ["schemas/stream-manifest.md"]
 superseded_by: []
+source_of_truth_for:
+  - generated-ids
 ---
 
 # Generated ID Reference

@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-3-terminal-wave-dashboard
 ---
 
 # MIR 3 Terminal Wave Dashboard

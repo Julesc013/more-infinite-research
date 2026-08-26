@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-bootstrap-local-candidate-boundary
+  - mir4-bootstrap-canonical-json-v1
+  - mir4-bootstrap-seal-restoration-order
+  - mir4-bootstrap-capsule-reconstruction-boundary
 ---
 
 # ADR 0005: MIR 4 Local Beta Candidate Boundary

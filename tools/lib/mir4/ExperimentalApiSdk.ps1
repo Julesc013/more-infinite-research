@@ -176,6 +176,7 @@ return M
  $out['sdk/preview/mir4/api-v0/powershell/MIR4.Api.V0.psm1']=$out['sdk/experimental/mir4/powershell/MIR4.Api.V0.psm1']
  $out['sdk/preview/mir4/api-v0/lua/mir4_api_v0.lua']=$out['sdk/experimental/mir4/lua/mir4_api_v0.lua']
  $rows=@($a.contracts|%{"| ``$($_.kind)`` | $($_.description) |"});$out['docs/reference/generated/mir4-experimental-api-v0.md']="---`ntitle: `"MIR 4 API/SDK V0 Preview`"`nstatus: deprecated`napplies_to: `"4.0 developer preview migration input`"`naudience: developer`ndoc_type: reference`nowner: mir-maintainers`nlast_reviewed: 2026-08-24`nsupersedes: []`nsuperseded_by:`n  - docs/reference/generated/mir4-api-sdk-v1.md`n---`n# MIR 4 API/SDK V0 Preview`n`n> Deprecated compatibility input. Use API/SDK V1 for new consumers; retain V0 only for deterministic V0-to-V1 migration.`n`nGenerated from ``spec/api/mir4-v0/contracts.json``. This package-excluded, read-only tooling does not establish a player support claim.`n`n## Migration checks`n`n- ``.\tools\mir.ps1 mir4 sdk generate```n- ``.\tools\mir.ps1 mir4 sdk check```n- ``.\tools\mir.ps1 mir4 api check```n- ``.\tools\mir.ps1 mir4 api conformance```n`n| Kind | Purpose |`n| --- | --- |`n$($rows-join"`n")`n`nCanonical JSON recursively sorts object keys, preserves array order, uses compact UTF-8, and hashes the record with ``digest`` omitted. Unknown top-level fields, invalid reverse-DNS namespaces, more than 128 capabilities, more than 32 extensions, and digest mismatch fail closed.`n`nTarget transports are read-only. Mutable compiler context, executors, SafetyKernel internals, and prototype emission are never exposed. V0 source artifacts remain package-excluded migration inputs and are not emitted as release-facing preview archives.`n"
+ $out['docs/reference/generated/mir4-experimental-api-v0.md']=$out['docs/reference/generated/mir4-experimental-api-v0.md'].Replace("superseded_by:`n  - docs/reference/generated/mir4-api-sdk-v1.md`n---","superseded_by:`n  - docs/reference/generated/mir4-api-sdk-v1.md`nsource_of_truth_for:`n  - generated-api-v0-migration-reference`n---")
  foreach($e in $out.GetEnumerator()){$p=Join-Path $RepoRoot $e.Key;$b=[Text.UTF8Encoding]::new($false).GetBytes(([string]$e.Value).Replace("`r`n","`n"));if($Check){if(-not(Test-Path $p)-or-not[Linq.Enumerable]::SequenceEqual([byte[]][IO.File]::ReadAllBytes($p),[byte[]]$b)){throw "[mir4-sdk-stale] $($e.Key)"}}else{New-Item -ItemType Directory -Force(Split-Path $p -Parent)|Out-Null;[IO.File]::WriteAllBytes($p,$b)}}
 }
 
@@ -483,6 +484,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - generated-mir4-api-sdk-v1-reference
 ---
 # MIR 4 API and SDK V1 Preview
 

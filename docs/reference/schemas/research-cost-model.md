@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - research-cost-model-schema
+  - legacy-coefficient-anchor-projection
+  - research-cost-algebraic-qualification
+  - research-cost-parser-and-numeric-envelope
+  - research-cost-3.2.5-release-contract
 ---
 
 # ResearchCostModel Schema

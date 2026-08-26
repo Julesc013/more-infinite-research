@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-12
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-dual-plane-repository
+  - mir-logical-repository-paths
 ---
 
 # ADR 0029: Dual-plane repository

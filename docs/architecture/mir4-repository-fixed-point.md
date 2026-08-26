@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-visible-root-shadow-layout
+  - mir4-path-classification-and-external-roots
+  - mir4-physical-move-gate
 ---
 # MIR 4 repository fixed point
 

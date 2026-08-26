@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-17
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - backporting-policy
+  - backport-target-profile-projection
 ---
 
 # Target-Line Versioning And Backports

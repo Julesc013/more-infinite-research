@@ -9,6 +9,11 @@ last_reviewed: 2026-08-24
 supersedes:
   - docs/releases/mir4-bootstrap-local-beta-plan.md
 superseded_by: []
+source_of_truth_for:
+  - mir4-4.0-product-contract
+  - mir4-target-admission-model
+  - mir4-candidate-wave-programme
+  - mir4-4.0-definition-of-done
 ---
 
 # MIR 4.0 Candidate Programme

@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot 'PackagePresentation.ps1')
+
 function Get-MIR4W09RepoRoot {
   param([Parameter(Mandatory)][string]$RepoRoot)
   return (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -110,7 +112,8 @@ function New-MIR4PackageSuccessionWitnessV1 {
   $release = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/records/3.2.11.json') | ConvertFrom-Json -Depth 100
   $witness = $authority.succession_witness
   if ([string]$release.release -cne [string]$witness.published_predecessor_release -or [string]$release.package.source_commit -cne [string]$witness.published_predecessor_commit -or [string]$release.package.source_tree -cne [string]$witness.published_predecessor_tree -or [string]$release.package.source_sha256 -cne [string]$witness.published_predecessor_package_source_sha256) { throw '[mir4-w09-predecessor-identity-drift]' }
-  if ([string]$SourceIdentity.package_source_sha256 -cne [string]$witness.current_mir4_package_source_sha256) { throw '[mir4-w09-current-package-source-drift]' }
+  $presentation=Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 ([string]$SourceIdentity.package_source_sha256)
+  if ([string]$SourceIdentity.package_source_sha256 -cne [string]$witness.current_mir4_package_source_sha256 -and [string]$presentation.maturity -cne 't14-readme-presentation') { throw '[mir4-w09-current-package-source-drift]' }
   if (@($witness.changed_package_roots | Sort-Object -Unique).Count -ne 14) { throw '[mir4-w09-succession-root-count]' }
   & git -C $repo cat-file -e "$([string]$witness.introducing_commit)^{commit}" 2>$null
   if ($LASTEXITCODE -ne 0) { throw '[mir4-w09-introducing-commit-missing]' }

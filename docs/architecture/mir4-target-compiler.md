@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-target-registry-v6
+  - mir4-target-provider-abi
+  - mir4-private-target-product-set
 ---
 # MIR 4 Target Compiler
 

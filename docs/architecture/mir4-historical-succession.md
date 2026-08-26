@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-w09-historical-museum-matrix
+  - mir4-offline-module-index-and-external-provider-conformance
+  - mir4-synthetic-successor-host-proof
+  - mir4-append-only-package-succession-witness
 ---
 
 # MIR 4 Historical, Museum, and Successor-Host Closure

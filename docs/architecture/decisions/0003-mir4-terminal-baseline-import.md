@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-terminal-baseline-import
 ---
 
 # ADR 0003: MIR 4 Terminal Baseline Import

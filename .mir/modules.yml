@@ -173,6 +173,16 @@ package_excluded_modules:
     validator: validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     boundary: exact locked F210 and F200 release-canary input with clean load, two byte-preserving reloads, target-shared direct-predecessor upgrade proof, bounded performance, claim limitations, and expiry; no blanket ecosystem claim, automatic synthesis, player or prototype mutation, source freeze, signing, sealing, promotion, or publication authority
     stability: pre-freeze-release-canary-exact-eleven-captures-eight-bounded-subjects
+  mir4_documentation_continuity_t14:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json
+    immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    immutable_source_truth_schema: spec/schemas/mir-immutable-documentation-source-truth-v1.schema.json
+    schema: spec/schemas/mir4-documentation-continuity-t14-v1.schema.json
+    writer: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    validator: validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1
+    documentation: docs/developer/README.md
+    boundary: MIR4-first root, developer, maintainer, generated metadata, and continuity documentation with one declared README-only package-visible delta; no player executable, emitter, source-freeze, signing, sealing, promotion, or publication authority
+    stability: stable-documentation-and-package-excluded-developer-preview
   mir4_inspector_compatibility_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     implementations:
@@ -283,6 +293,7 @@ package_excluded_modules:
       - .mir/releases/governance/mir4/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
     release_lifecycle_adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
@@ -360,6 +371,7 @@ package_excluded_modules:
     inspector: tools/lib/mir4/Inspector.ps1
     compatibility_factory: tools/lib/mir4/CompatibilityFactory.ps1
     environment_evidence: tools/lib/mir4/EnvironmentEvidence.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
     inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
@@ -1216,6 +1228,7 @@ validation_tooling:
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
     mir4_offline_review_schema: spec/schemas/mir4-offline-review-record.schema.json
@@ -1287,6 +1300,10 @@ validation_tooling:
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
     documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
+    documentation_index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    documentation_metadata_authority: markdown-frontmatter
+    documentation_immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    documentation_compatibility_projection: .mir/docs.yml
     generated_authority_documentation: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
     pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
     readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1

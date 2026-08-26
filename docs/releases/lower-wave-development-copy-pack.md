@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-12
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-published-lines-development-copy-pack
 ---
 
 # MIR Published Lines Development Copy Pack

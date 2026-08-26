@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-15
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - terminal-repository-protection-handoff
+  - github-administration-preflight
 ---
 
 # MIR 3 Terminal Repository Protections

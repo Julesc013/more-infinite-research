@@ -4,6 +4,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/ResearchCostV2.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PreFreezeRelease.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
 $receiptPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Research-Cost-V2-SOL05V1.json'
@@ -202,10 +203,15 @@ foreach ($artifact in @($preview.artifacts)) {
     throw "SOL-05 preview artifact lacks a SHA-256 binding: $($artifact.path)"
   }
   $artifactPath = Join-Path $RepoRoot ([string]$artifact.path)
-  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
-      (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash -ne [string]$artifact.file_sha256) {
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
     throw "SOL-05 preview artifact differs from its receipt: $($artifact.path)"
   }
+  $artifactMatches = (Get-FileHash -Algorithm SHA256 -LiteralPath $artifactPath).Hash -ceq [string]$artifact.file_sha256
+  if (-not $artifactMatches -and [string]$artifact.path -like 'docs/*.md') {
+    $artifactMatches = Test-MIR4T14HistoricalDocumentationSha256 -RepoRoot $RepoRoot `
+      -RelativePath ([string]$artifact.path) -ExpectedSha256 ([string]$artifact.file_sha256)
+  }
+  if (-not $artifactMatches) { throw "SOL-05 preview artifact differs from its receipt: $($artifact.path)" }
 }
 $vectors = $receipt.proof_vectors
 if (($vectors.public_vector.levels_1_to_3 -join ',') -ne '600,750,900' -or

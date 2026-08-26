@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-4.0-whole-platform-consolidation
+  - mir4-uppercase-f-target-presentation
+  - mir4-technology-by-technology-acceptance
 ---
 # MIR 4.0 whole platform programme
 

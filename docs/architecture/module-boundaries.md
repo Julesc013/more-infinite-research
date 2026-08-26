@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-21
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - module-boundaries
+  - authority-projection-command-boundaries
+  - science-pack-production-route-authority
 ---
 # MIR 3.0.0 Repository Structure
 

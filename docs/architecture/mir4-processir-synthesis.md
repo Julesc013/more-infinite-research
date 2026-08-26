@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-process-ir-v1-preview
+  - mir4-effect-channel-registry-v1
+  - mir4-synthesis-maturity-matrix-v1
+  - mir4-exact-target-processir-t12-capture
+  - mir4-exact-target-processir-custody-boundary
 ---
 # MIR 4 ProcessIR, Effect Channels, and Synthesis
 

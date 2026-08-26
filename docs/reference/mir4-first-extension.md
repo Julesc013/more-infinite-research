@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-first-extension-tutorial
+  - mir4-extension-developer-workflow
 ---
 
 # Your first MIR 4 extension

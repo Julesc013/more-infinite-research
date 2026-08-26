@@ -62,5 +62,21 @@ $badLock=($lock|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100);$badLock.
 $failedClosed=$false
 try{New-MIR4T13CaptureRecord -Authority $authority -Snapshot $snapshot -Lock $badLock -RunRoot 'does-not-matter' -EnginePath 'does-not-matter'|Out-Null}catch{$failedClosed=$_.Exception.Message.StartsWith('[mir4-t13-capture-binding]')}
 if(-not$failedClosed){throw '[mir4-t13-mismatched-lock-fail-closed]'}
-if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore-or$packageBefore-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'){throw '[mir4-t13-package-source-mutation]'}
+$packageAfter=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
+if($packageAfter-cne$packageBefore){throw '[mir4-t13-package-source-mutation]'}
+$preT14Package='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'
+$t14Package='F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
+if($packageBefore-cne$preT14Package){
+  if($packageBefore-cne$t14Package){throw '[mir4-t13-package-source-unknown-evolution]'}
+  & (Join-Path $RepoRoot 'validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
+  $t14Text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json')
+  if(-not($t14Text|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'))){throw '[mir4-t13-t14-presentation-authority-schema]'}
+  $t14=$t14Text|ConvertFrom-Json -Depth 100
+  $deltaMatches=(@($t14.package_visible_delta)-join'|')-ceq'README.md'
+  $presentationValid=$deltaMatches-and
+    ([bool]$t14.player_executable_sources_unchanged)-and([bool]$t14.one_emitter_preserved)-and
+    (-not[bool]$t14.source_freeze_authorized)-and(-not[bool]$t14.signing_or_sealing_authorized)-and
+    (-not[bool]$t14.promotion_authorized)-and(-not[bool]$t14.publication_authorized)
+  if(-not$presentationValid){throw '[mir4-t13-t14-presentation-evolution]'}
+}
 Write-Host '[ok] MIR 4 T13 exact release canaries, lifecycle reloads, target upgrades, expiry, F200 K2SO custody closure, and authority firewall passed.'

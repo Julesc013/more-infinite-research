@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-signing-authority-separation
+  - mir4-key-recovery-and-revocation
+  - mir4-release-ledger-policy
+  - mir4-archive-and-publisher-confinement
 ---
 # MIR 4 release governance
 

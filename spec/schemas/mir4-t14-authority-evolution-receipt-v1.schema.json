@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/control/t14-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T14 authority evolution receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "turn", "predecessor_receipt", "machine_receipt", "execution_transition", "evolved_bindings", "current_authorities", "conformance", "player_package_source_sha256", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T14AuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T14"},
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json"},
+        "sha256": {"const": "6780C9FB490D8481281A8565EAFD379920776E4FEC35734FC6EE88287B3EAC4A"}
+      }
+    },
+    "machine_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json"},
+        "sha256": {"const": "FEC947588A2DEE04506539C8E9BE709BD06DCA395D326E9D9D98957BCFC495F0"}
+      }
+    },
+    "execution_transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["previous_status", "current_status", "completed_turn", "newly_ready_turns", "next_dependency_ready_turn"],
+      "properties": {
+        "previous_status": {"const": "T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED"},
+        "current_status": {"const": "T14-COMPLETE-T15-READY-RELEASE-BLOCKED"},
+        "completed_turn": {"const": "T14"},
+        "newly_ready_turns": {"const": []},
+        "next_dependency_ready_turn": {"const": "T15"}
+      }
+    },
+    "evolved_bindings": {"type": "array", "minItems": 15, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 25, "items": {"$ref": "#/$defs/current"}},
+    "conformance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_count", "source_of_truth_count", "generated_projection_count", "root_document_count", "developer_document_count", "clean_extracted_preview_tutorial_passed", "metadata_authority", "package_visible_delta", "player_executable_sources_unchanged", "one_emitter_preserved", "release_transition_authority"],
+      "properties": {
+        "document_count": {"minimum": 425, "type": "integer"},
+        "source_of_truth_count": {"minimum": 341, "type": "integer"},
+        "generated_projection_count": {"const": 6},
+        "root_document_count": {"const": 11},
+        "developer_document_count": {"const": 13},
+        "clean_extracted_preview_tutorial_passed": {"const": true},
+        "metadata_authority": {"const": "markdown-frontmatter"},
+        "package_visible_delta": {"const": ["README.md"]},
+        "player_executable_sources_unchanged": {"const": true},
+        "one_emitter_preserved": {"const": true},
+        "release_transition_authority": {"const": false}
+      }
+    },
+    "player_package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "status": {"const": "T14-DOCUMENTATION-CONTINUITY-PASSED-T15-NEXT-PRODUCTION-UNAUTHORIZED"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 1},
+        "scope": {"const": "package-excluded-control-plane"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "role": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

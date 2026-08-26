@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-05
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-3.2.5-convergence-decision
+  - mir-c31-obligation-cancellation
+  - mir-3.2.5-scope-cut-decision
 ---
 
 # ADR 0028: MIR 3.2.5 convergence release

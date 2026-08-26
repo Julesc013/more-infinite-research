@@ -6,7 +6,7 @@ Generated: 2026-08-26
 
 ## Active MIR 4.0 pre-freeze programme
 
-Status: `T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T14`.
+Status: `T14-COMPLETE-T15-READY-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `T15`.
 
 | Turn | Work package | State | Dependencies | Human gate |
 | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Status: `T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED`. Candidate state: `pre-free
 | `T11` | Read-only F210 MEP discovery | `completed` | T09 | `false` |
 | `T12` | Exact target ProcessIR preview and Inspector compare | `completed` | T10 | `false` |
 | `T13` | Release compatibility canary cut | `completed` | T10, T12 | `false` |
-| `T14` | MIR4 public, contributor, maintainer and continuity documentation | `ready` | T01, T07, T09, T10 | `false` |
+| `T14` | MIR4 public, contributor, maintainer and continuity documentation | `completed` | T01, T07, T09, T10 | `false` |
 | `T15` | Supply-chain and preservation hardening | `ready` | T05, T07 | `false` |
 | `T16` | Protected signing and recovery ceremony | `blocked-human` | T05 | `true` |
 | `T17` | Pre-freeze F210/F200 maintainer playtests | `blocked-human` | T01 | `true` |

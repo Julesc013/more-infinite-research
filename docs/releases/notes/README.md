@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - release-notes-index
 ---
 
 # Release Notes

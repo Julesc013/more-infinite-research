@@ -42,6 +42,10 @@ function Invoke-T02([string]$Operation,[string]$Root,[string]$Phase='independent
   Invoke-MIR4ReleasePhaseEngine -RepoRoot $repo -Operation $Operation -Phase $Phase -Inputs $inputs -Adapter $UseAdapter -OutputRoot $Root
 }
 
+$phaseTestRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build/mir4/release-phase-engine/tests'))
+$buildBoundary=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\')+'\'
+if(-not($phaseTestRoot+'\').StartsWith($buildBoundary,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-phase-engine-test-root-boundary]'}
+if(Test-Path -LiteralPath $phaseTestRoot){Remove-Item -LiteralPath $phaseTestRoot -Recurse -Force}
 $happyRoot='build/mir4/release-phase-engine/tests/t02-happy'
 $planA=Invoke-T02 Plan $happyRoot
 $planB=Invoke-T02 Plan $happyRoot

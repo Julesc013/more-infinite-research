@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-pre-freeze-release-doctor
+  - mir4-governed-release-workflow-inputs
+  - mir4-manual-playtest-evidence-lifecycle
+  - mir4-public-preview-asset-contract
+  - mir4-publisher-confinement-and-restore-drill
 ---
 # MIR 4 pre-freeze hardening
 

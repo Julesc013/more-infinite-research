@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-11
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-3.0.5-backport-ledger
 ---
 
 # 3.0.5 Backport Behavior Ledger

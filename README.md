@@ -4,75 +4,59 @@
 
 *Trickle down economics bring productivity gains to all industries.*
 
-More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
+More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
+## MIR 4.0 Whole-Platform Genesis
 
-**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+MIR 4.0.0 has one source version and target-coded distribution versions:
 
-**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
+| Product | Factorio line | Distribution version | Upgrade baseline | Release requirement |
+| --- | --- | --- | --- | --- |
+| F210 | 2.1 | `4.0.21000` | MIR `3.2.11` | mandatory |
+| F200 | 2.0 | `4.0.20000` | MIR `2.5.11` | mandatory |
 
-The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
+`4.0.0` identifies the shared source programme. The five-digit distribution suffix identifies the exact target line; it is not a claim that every Factorio generation has identical capabilities. F110 and F100 remain independently conditional. F018 through F013 are private experimental products unless separately admitted.
 
-## Quick Summary
+The 4.0 source tree contains five maturity classes:
 
-- **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
-- **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
-- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
-- **Fluid and prototype tuning:** includes opt-in startup-only pipeline extent, recipe productivity, energy-use, pollution, speed, and quality limit controls.
-- **Settings profiles:** exports full MIR startup profiles by default, with optional compact export that omits unchanged defaults.
-- **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
-- **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
-- **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
-- **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
-- **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
-- **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
-- **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are enabled by default. Spoilage preservation remains explicitly classified as factory-disruptive, stays at the top of the settings list, and warns that existing spoilable stacks may retain their current deadlines; broader existing-save claims still require the named manual save matrix.
-- **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
-- **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
-- **Verified defaults:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
+- **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
+- **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
+- **shadow** — executable comparison machinery that cannot write player output;
+- **experimental** — bounded private work with no public support authority;
+- **omitted** — intentionally absent from a target or release artifact.
 
-Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
+Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling are distributed as separate package-excluded preview assets. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
 
-## New Design
+## Player behavior
 
-**MIR 3** is the compatibility compiler architecture release. It keeps the player-facing generated technology IDs stable while moving active implementation under the MIR compiler namespace, replacing old compatibility helper paths with bounded discovery, policy, report, and emission layers.
+- Recipe and fluid-output productivity research for admitted intermediate, logistics, combat, infrastructure, science, and Space Age chains.
+- Direct-effect research for cargo logistics, weapon speed, character bonuses, inventory/trash slots, and worker robot battery.
+- Manifest-backed stable prototype IDs, governed migrations, lab-aware science selection, bounded limits, and deterministic diagnostics.
+- Graceful terminal outcomes: applied, adopted, preserved, extension-required, review-required, omitted, or failed-hard-safety.
+- No blanket “supports every modpack” promise. Every public compatibility claim names an exact target, environment, proposition, and evidence in [the compatibility claims](docs/compatibility/README.md).
 
-It is the release that makes the generation architecture durable:
+## Install and upgrade
 
-- active shipped implementation lives under `prototypes/mir/`;
-- required Factorio root lifecycle files remain thin wrappers;
-- `prototypes/streams/` stays as declarative stream data;
-- generated IDs are manifest-backed and stable;
-- compatibility behavior is described through narrow claim records and policy overlays;
-- only emission/platform code creates or mutates generated technologies;
-- diagnostic rows explain skipped, rejected, observed, and emitted behavior;
-- package hygiene excludes docs, fixtures, scripts, tests, task ledgers, build outputs, and distribution outputs from the release zip.
+Install the target-matching player ZIP from the Factorio Mod Portal or the sealed GitHub release assets. Do not install a developer-preview archive as a mod.
 
-## Installation
+- F210 upgrades directly from MIR 3.2.11 and retains its admitted technology IDs, settings, migrations, and runtime state.
+- F200 upgrades directly from MIR 2.5.11 under its target-local evidence.
+- Back up the save, select the package for the running Factorio line, and keep startup settings unchanged for the first load.
+- A support request should include an exact [SupportBundleV1](SUPPORT.md), not only a mod list or screenshot.
 
-Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
+Detailed steps are in [Upgrading from MIR 3 to MIR 4](docs/user/mir3-to-mir4.md). MIR 3 and earlier remain immutable historical baselines; their architecture and release records are retained under `docs/releases/` and `.mir/releases/terminal/`.
 
-Packaged release archives are in `dist/` named:
+## Repository and branches
 
-```text
-more-infinite-research_<version>.zip
-```
+`dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line and advances only by the governed promotion phase from an exact sealed candidate. Historical target branches are custody references, not alternative MIR 4 authoring roots.
 
-## Branch Policy
+The root `info.json` remains a proven player-package baseline until target materialization; it does not define the MIR 4 source version. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](PROJECT-CONTINUITY.md) before changing authorities or release state.
 
-The repository has **three permanent branches** on `origin`:
+## Stable player plane reference
 
-- **`main`**: latest stable release line for **Factorio `2.1`**.
-- **`dev`**: experimental and development branch for the **Factorio `2.1` main line**.
-- **`legacy`**: backport branch for **Factorio `2.0`** players.
+The following generated pipeline, settings, and research catalog describe the terminal player compiler inherited by the stable MIR 4 target packages. Shadow and preview implementations do not replace this authority until a separately proven cutover.
 
-Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**. Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**. Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
-
-See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
-
-## How it Works
+### How it works
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 

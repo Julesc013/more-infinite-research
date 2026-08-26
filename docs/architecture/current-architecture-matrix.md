@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir3-terminal-compiler-boundaries
+  - mir3-terminal-mutation-authorities
+  - mir4-bootstrap-parity-baseline
 ---
 
 # Frozen MIR 3 Compiler Architecture Matrix

@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - generated-mir4-component-maturity
 ---
 # MIR 4 Platform Component Matrix
 

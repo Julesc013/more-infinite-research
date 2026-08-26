@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-09
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - terminal-dot5-semantic-baseline-capture-status
 ---
 
 # MIR 3 Terminal `.5` Baseline Capture

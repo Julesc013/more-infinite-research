@@ -20,8 +20,8 @@ if(-not($currentJson|Test-Json -SchemaFile $currentSchema)){throw '[mir4-current
 $current=$currentJson|ConvertFrom-Json -Depth 100
 if([string]$current.source_baseline.commit-cne'8e269b6379ef3958f92fb747cef389f0f098feb6'-or
    [string]$current.source_baseline.tree-cne'dc3c7415c725bf10c0908d35ed93e530a49a77b1'-or
-   [string]$current.status-cne'T13-COMPLETE-T14-T15-READY-RELEASE-BLOCKED'-or
-   [string]$current.next_dependency_ready_turn-cne'T14'){
+   [string]$current.status-cne'T14-COMPLETE-T15-READY-RELEASE-BLOCKED'-or
+   [string]$current.next_dependency_ready_turn-cne'T15'){
   throw '[mir4-current-execution-baseline]'
 }
 if(@($current.planning_inputs|Where-Object classification -ne 'planning-evidence-only-not-execution-authority').Count-ne0){
@@ -37,8 +37,8 @@ if(@($current.blockers|Where-Object{$_.id-eq'release-workflow-executor-maturity'
   throw '[mir4-current-execution-release-blockers]'
 }
 if(@($current.turns).Count-ne22-or
-   @($current.turns|Where-Object{$_.id-in@('T00','T01','T02','T03','T04','T05','T06','T07','T08','T09','T10','T11','T12','T13')-and$_.state-eq'completed'}).Count-ne14-or
-   @($current.turns|Where-Object{$_.id-in@('T14','T15')-and$_.state-eq'ready'}).Count-ne2-or
+   @($current.turns|Where-Object{$_.id-in@('T00','T01','T02','T03','T04','T05','T06','T07','T08','T09','T10','T11','T12','T13','T14')-and$_.state-eq'completed'}).Count-ne15-or
+   @($current.turns|Where-Object{$_.id-eq'T15'-and$_.state-eq'ready'}).Count-ne1-or
    @($current.mir3_residuals|Where-Object{$_.id-in@('github-pr-149','github-pr-146')-and$_.release_blocking}).Count-ne2){
   throw '[mir4-current-execution-queue]'
 }
@@ -51,9 +51,9 @@ if(-not($dashboardJson|Test-Json -SchemaFile $statusSchema)-or-not($queueJson|Te
 $dashboard=$dashboardJson|ConvertFrom-Json -Depth 100
 $queue=$queueJson|ConvertFrom-Json -Depth 100
 if(@($dashboard.generated_from).Count-ne1-or[string]$dashboard.generated_from[0].path-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json'-or
-   [string]$dashboard.payload.next_executable_task-cne'T14'-or@($queue.payload.tasks).Count-ne22-or
-   @($queue.payload.tasks|Where-Object{$_.id-in@('T14','T15')-and$_.state-eq'ready'}).Count-ne2-or
-   @($queue.payload.tasks|Where-Object{$_.id-in@('T12','T13')-and$_.state-eq'completed'}).Count-ne2){
+   [string]$dashboard.payload.next_executable_task-cne'T15'-or@($queue.payload.tasks).Count-ne22-or
+   @($queue.payload.tasks|Where-Object{$_.id-eq'T15'-and$_.state-eq'ready'}).Count-ne1-or
+   @($queue.payload.tasks|Where-Object{$_.id-in@('T12','T13','T14')-and$_.state-eq'completed'}).Count-ne3){
   throw '[mir4-current-execution-generated-view]'
 }
 

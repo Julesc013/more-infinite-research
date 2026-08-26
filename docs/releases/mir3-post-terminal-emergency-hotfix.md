@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir3-post-terminal-emergency-hotfix-policy
+  - maximum-level-contract
 ---
 
 # MIR 3 Post-Terminal Emergency Hotfix
