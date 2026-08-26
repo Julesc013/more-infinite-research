@@ -49,5 +49,7 @@ if(($witness-join'|')-cne'dense-00|dense-00'-or$elapsed.TotalSeconds-gt 5){throw
 
 $observerText=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-processir-exact-observer/data-final-fixes.lua')
 if($observerText-match'(?m)\bdata\.raw\b'-or$observerText-match'prototypes/mir/(?:planner|emit|runtime)'){throw '[mir4-t12-observer-write-surface]'}
+$observerInfo=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-processir-exact-observer/info.json')|ConvertFrom-Json
+if([string]$observerInfo.name-cne'mir4-processir-exact-observer'-or[string]$observerInfo.version-cne'0.1.0'-or[string]$observerInfo.factorio_version-cne'2.1'-or@($observerInfo.dependencies).Count-ne 2){throw '[mir4-t12-observer-fixture-metadata]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore-or$packageBefore-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'){throw '[mir4-t12-package-source-mutation]'}
 Write-Host '[ok] MIR 4 T12 exact F210/F200 ProcessIR, deterministic captures, custody blocker, bounded comparisons, and offline Inspector passed.'
