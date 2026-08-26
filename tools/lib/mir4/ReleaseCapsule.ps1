@@ -462,7 +462,7 @@ function Get-MIR4ReleaseCapsuleArchiveInventoryV1 {
         path = $name.Substring($script:MIR4ReleaseCapsuleRootV1.Length + 1)
         bytes = [long]$entry.Length
         sha256 = $sha256
-        timestamp = $entry.LastWriteTime.UtcDateTime.ToString('yyyy-MM-ddTHH:mm:ssZ')
+        zip_dos_timestamp = $entry.LastWriteTime.DateTime.ToString('yyyy-MM-ddTHH:mm:ss')
         external_attributes = [int]$entry.ExternalAttributes
       })
     }
@@ -856,6 +856,8 @@ function New-MIR4ReleaseCapsuleV1 {
       network = 'disabled'
       path_order = 'ordinal'
       timestamp = '1980-01-01T00:00:00Z'
+      zip_dos_timestamp = '1980-01-01T00:00:00'
+      timestamp_projection = 'normalized-utc-policy-instant-to-timezone-free-zip-dos-clock'
       permissions = 0
       append_only_receipt = $true
     }
@@ -936,7 +938,7 @@ function Test-MIR4ReleaseCapsuleV1 {
       $entry = $byPath[[string]$object.path]
       if ([string]$entry.sha256 -cne [string]$object.sha256 -or
           [long]$entry.bytes -ne [long]$object.bytes -or
-          [string]$entry.timestamp -cne '1980-01-01T00:00:00Z' -or
+          [string]$entry.zip_dos_timestamp -cne '1980-01-01T00:00:00' -or
           [int]$entry.external_attributes -ne 0) {
         return $false
       }

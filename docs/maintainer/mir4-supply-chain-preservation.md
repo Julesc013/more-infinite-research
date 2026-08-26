@@ -60,7 +60,7 @@ The non-production capsule carries:
 - all four developer-preview archives and their embedded manifests;
 - a proof-closure summary, deterministic restore instructions, and the public-safe private-custody index.
 
-The manifest deliberately contains only a tag plan for v4.0.0. It records allocation and authorization as false. Construction is append-only: an existing archive or receipt may be reused only when its bytes are identical; a conflicting rewrite fails closed.
+The manifest deliberately contains only a tag plan for v4.0.0. It records allocation and authorization as false. Construction is append-only: an existing archive or receipt may be reused only when its bytes are identical; a conflicting rewrite fails closed. The construction receipt distinguishes the normalized 1980-01-01T00:00:00Z policy instant from ZIP's timezone-free 1980-01-01T00:00:00 DOS clock, so verification never converts the stored clock through the host timezone.
 
 ## Public-safe and private custody partitions
 

@@ -47,11 +47,13 @@
     "construction": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["network", "path_order", "timestamp", "permissions", "append_only_receipt"],
+      "required": ["network", "path_order", "timestamp", "zip_dos_timestamp", "timestamp_projection", "permissions", "append_only_receipt"],
       "properties": {
         "network": {"const": "disabled"},
         "path_order": {"const": "ordinal"},
         "timestamp": {"const": "1980-01-01T00:00:00Z"},
+        "zip_dos_timestamp": {"const": "1980-01-01T00:00:00"},
+        "timestamp_projection": {"const": "normalized-utc-policy-instant-to-timezone-free-zip-dos-clock"},
         "permissions": {"const": 0},
         "append_only_receipt": {"const": true}
       }
