@@ -1601,6 +1601,7 @@
       "command": "./validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".gitattributes",
         ".github/workflows/*.yml",
         ".mir/releases/governance/mir4/github-actions-lock-v2.json",
         ".mir/releases/governance/mir4/supply-chain.json",

@@ -11,6 +11,32 @@ function Assert-MIR4RunnerPublisherCondition {
   if (-not $Condition) { throw "[$Code] $Detail".TrimEnd() }
 }
 
+function Assert-MIR4CanonicalLfByteSequenceV1 {
+  param(
+    [Parameter(Mandatory)][byte[]]$Bytes,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  Assert-MIR4RunnerPublisherCondition (-not ($Bytes -contains [byte]13)) 'mir4-runner-workflow-checkout-eol' $Path
+}
+
+function Assert-MIR4WorkflowCheckoutContractV1 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$FullPath
+  )
+
+  $attributeRows = @(& git -C $RepoRoot check-attr text eol -- $RelativePath)
+  Assert-MIR4RunnerPublisherCondition ($LASTEXITCODE -eq 0) 'mir4-runner-workflow-git-attributes-command' $RelativePath
+  $expectedRows = @(
+    "$RelativePath`: text: set"
+    "$RelativePath`: eol: lf"
+  )
+  Assert-MIR4RunnerPublisherCondition (($attributeRows -join "`n") -ceq ($expectedRows -join "`n")) 'mir4-runner-workflow-git-attributes' $RelativePath
+  Assert-MIR4CanonicalLfByteSequenceV1 -Bytes ([IO.File]::ReadAllBytes($FullPath)) -Path $RelativePath
+}
+
 function Get-MIR4WorkflowUsesFromText {
   param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
 
@@ -179,6 +205,7 @@ function New-MIR4RunnerPublisherConfinementReceiptV1 {
   $allExternalUses = [Collections.Generic.List[string]]::new()
   foreach ($relative in $workflowPaths) {
     $path = Join-Path $repo $relative
+    Assert-MIR4WorkflowCheckoutContractV1 -RepoRoot $repo -RelativePath $relative -FullPath $path
     $text = [IO.File]::ReadAllText($path)
     Assert-MIR4WorkflowTopPermissionsV1 -Path $relative -Text $text
     Assert-MIR4RunnerPublisherCondition ($text -notmatch '(?m)^\s*pull_request_target:') 'mir4-runner-pull-request-target' $relative

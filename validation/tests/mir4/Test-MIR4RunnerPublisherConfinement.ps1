@@ -22,6 +22,13 @@ Assert-MIR4RunnerTest (Test-MIR4RunnerPublisherConfinementReceiptV1 -Receipt $re
 Assert-MIR4RunnerTest ([string]$receiptA.record_sha256 -ceq [string]$receiptB.record_sha256) 'mir4-runner-determinism'
 Assert-MIR4RunnerTest (@($receiptA.workflow_closure.rows).Count -eq 21) 'mir4-runner-workflow-count'
 Assert-MIR4RunnerTest (@($receiptA.checks).Count -eq 10) 'mir4-runner-check-count'
+foreach ($workflow in @($receiptA.workflow_closure.rows)) {
+  $relative = [string]$workflow.path
+  Assert-MIR4WorkflowCheckoutContractV1 -RepoRoot $repo -RelativePath $relative -FullPath (Join-Path $repo $relative)
+}
+Assert-MIR4RunnerThrows {
+  Assert-MIR4CanonicalLfByteSequenceV1 -Bytes ([Text.Encoding]::UTF8.GetBytes("name: test`r`n")) -Path '<crlf-fixture>'
+} 'mir4-runner-workflow-crlf-negative'
 
 $lock = Get-Content -LiteralPath (Join-Path $repo '.mir/releases/governance/mir4/github-actions-lock-v2.json') -Raw | ConvertFrom-Json -Depth 30
 Assert-MIR4RunnerThrows { Assert-MIR4ExternalActionReferenceV1 -Reference 'actions/checkout@v4' -Lock $lock } 'mir4-runner-floating-action-negative'
@@ -42,7 +49,7 @@ Assert-MIR4RunnerTest ([string]$receiptA.package_source_sha256 -ceq 'F9E3F19201B
   action_lock_sha256 = [string]$receiptA.action_lock.file_sha256
   workflow_root_sha256 = [string]$receiptA.workflow_closure.root_sha256
   receipt_sha256 = [string]$receiptA.record_sha256
-  negative_cases = @('floating-action','public-pr-secret','publisher-checkout','builder-release-secret','qualifier-mutation','shell-input-interpolation')
+  negative_cases = @('workflow-crlf','floating-action','public-pr-secret','publisher-checkout','builder-release-secret','qualifier-mutation','shell-input-interpolation')
   package_source_sha256 = [string]$receiptA.package_source_sha256
   production_authority = $false
   release_transition_performed = $false

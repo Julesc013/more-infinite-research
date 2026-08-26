@@ -21,5 +21,5 @@ $receipt = New-MIR4RunnerPublisherConfinementReceiptV1 -RepoRoot $repo -RequireC
 if (-not (Test-MIR4RunnerPublisherConfinementReceiptV1 -Receipt $receipt -RepoRoot $repo)) {
   throw '[mir4-runner-receipt-verification]'
 }
-Write-MIR4BootstrapRecord -Record $receipt -Path $output
+$null = Write-MIR4BootstrapRecord -Record $receipt -Path $output
 $receipt
