@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseCompatibilityCanariesT13V1",
+  "work_package": "T13",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "maturity": "pre-freeze-release-canary",
+  "canonicalization": "mir-canonical-json/1",
+  "exact_processir_authority": ".mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json",
+  "diagnostic_registry": "spec/api/mir4-v1/diagnostics.json",
+  "required_capture_count": 11,
+  "required_canary_count": 8,
+  "lifecycle": {
+    "clean_load_authority": "exact T12 engine create-save capture",
+    "required_reload_runs": 2,
+    "benchmark_ticks": 1,
+    "benchmark_runs": 1,
+    "timeout_seconds": 600,
+    "maximum_reload_seconds": 300,
+    "save_must_remain_byte_identical": true
+  },
+  "target_upgrades": {
+    "f210": {
+      "engine_version": "2.1.14",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "baseline_version": "3.2.11",
+      "baseline_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "candidate_version": "4.0.21000",
+      "candidate_sha256": "5058499D4A2802B0F1D9FDC50C1887C36A76AA2C9A4BD9B5F8DFFB58D1ACBD7D",
+      "required_archetypes": ["base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change"]
+    },
+    "f200": {
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "baseline_version": "2.5.11",
+      "baseline_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "candidate_version": "4.0.20000",
+      "candidate_sha256": "0078768BDDAEB4E8AE243D406919C38C55AC6C2CB96A492E890175EDEB0860C4",
+      "required_archetypes": ["base-default"]
+    }
+  },
+  "common_expiry_triggers": [
+    "engine-executable-sha256-changes",
+    "mir-candidate-package-sha256-changes",
+    "exact-mod-archive-closure-changes",
+    "startup-settings-digest-changes",
+    "governed-compatibility-policy-or-fixture-changes"
+  ],
+  "canaries": [
+    {
+      "id": "base-and-official-closure",
+      "name": "Base and official closure",
+      "capture_ids": ["f200-base", "f200-official", "f210-base", "f210-official"],
+      "subjects": ["base", "elevated-rails", "quality", "recycler", "space-age"],
+      "compatibility_authorities": ["campaigns", "claims"],
+      "support_statement": "The exact F210 and F200 base and installed official closures clean-load and reload with their locked candidate; MIR-owned direct-predecessor state transitions pass the target matrices.",
+      "limitations": ["Only the exact locked closures are covered.", "Optional official products absent from a target lock are not inferred.", "No third-party ecosystem claim follows from this canary."]
+    },
+    {
+      "id": "cubium",
+      "name": "Cubium",
+      "capture_ids": ["f210-cubium"],
+      "subjects": ["cubium"],
+      "compatibility_authorities": ["targets.records.cubium", "science_pack_production_route_policy"],
+      "support_statement": "The exact locked Cubium closure clean-loads and reloads; the canary preserves the existing exact loader-schema and science production-route claim boundary.",
+      "limitations": ["No broad Cubium support claim.", "Progression beyond science production-route selection is not claimed."]
+    },
+    {
+      "id": "corrundum",
+      "name": "Corrundum",
+      "capture_ids": ["f210-corrundum"],
+      "subjects": ["corrundum", "PlanetsLib"],
+      "compatibility_authorities": ["targets.records.corrundum", "maximum_level_binding_policy"],
+      "support_statement": "The exact locked Corrundum and PlanetsLib closure clean-loads and reloads while retaining the existing exact loader-schema boundary.",
+      "limitations": ["Manual visual maximum-level review remains outside this automated canary.", "Science-pack prerequisite selection is not promoted beyond existing proof."]
+    },
+    {
+      "id": "recycler-progression",
+      "name": "Recycler Progression",
+      "capture_ids": ["f210-recycler"],
+      "subjects": ["recycler-progression"],
+      "compatibility_authorities": ["targets.records.recycler-progression", "science_pack_production_route_policy"],
+      "support_statement": "The exact locked Recycler Progression closure clean-loads and reloads while retaining the named science production-route interoperability boundary.",
+      "limitations": ["No broad Recycler Progression support claim.", "Recycler entity-tier progression is not claimed.", "Factorio 2.0 Recycler Progression remains unclaimed."]
+    },
+    {
+      "id": "k2-k2so-f210",
+      "name": "K2 and K2SO F210",
+      "capture_ids": ["f210-k2so"],
+      "subjects": ["Krastorio2", "Krastorio2-spaced-out"],
+      "compatibility_authorities": ["science_phase_policies.K2SciencePhasePolicyV2", "campaigns.mir4_sol07_development_campaign"],
+      "support_statement": "The exact bounded F210 K2/K2SO closure clean-loads and reloads; only MIR-owned generated stream and base-continuation science normalization inside the locked version envelope is assessed.",
+      "limitations": ["No full-pack or blanket K2/K2SO support claim.", "ProcessIR hard-safety dispositions remain authoritative and do not authorize synthesis."]
+    },
+    {
+      "id": "k2-k2so-f200",
+      "name": "K2SO F200",
+      "capture_ids": ["f200-k2so"],
+      "subjects": ["Krastorio2-spaced-out"],
+      "compatibility_authorities": ["science_phase_policies.K2SciencePhasePolicyV2", "campaigns.mir4_sol07_development_campaign"],
+      "support_statement": "The exact bounded F200 standalone K2SO closure is archive-complete, clean-loads, and reloads; its target-local MIR state transition is bound to the F200 upgrade matrix.",
+      "limitations": ["Private exact-environment evidence only until a stable F200 claim is separately admitted.", "Co-loaded Krastorio2 is forbidden by the target profile.", "No full-pack claim."]
+    },
+    {
+      "id": "aai-selected",
+      "name": "Selected AAI",
+      "capture_ids": ["f210-aai"],
+      "subjects": ["aai-loaders", "aai-industry"],
+      "compatibility_authorities": ["targets.records.aai-loaders", "targets.records.aai-industry"],
+      "support_statement": "The exact selected AAI Loaders and AAI Industry closure clean-loads and reloads; existing named loader-productivity and diagnostic boundaries remain unchanged.",
+      "limitations": ["No broad AAI suite support claim.", "Runtime loader modes, throughput, and unrelated AAI products are not claimed."]
+    },
+    {
+      "id": "bz-selected",
+      "name": "Selected BZ",
+      "capture_ids": ["f210-bz"],
+      "subjects": ["bz-suite-selected-closure"],
+      "compatibility_authorities": ["campaigns.mir4_sol07_development_campaign"],
+      "support_statement": "The exact selected BZ Space Age closure clean-loads and reloads as a bounded release canary.",
+      "limitations": ["Only the archives present in the exact lock are covered.", "No full BZ family, pack, or blanket ecosystem claim."]
+    }
+  ],
+  "release_qualification_input": true,
+  "semantic_authority": false,
+  "player_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "automatic_synthesis_authorized": false,
+  "public_support_claim_authorized": false,
+  "source_freeze_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "promotion_authorized": false,
+  "publication_authorized": false,
+  "package_visible": false
+}
