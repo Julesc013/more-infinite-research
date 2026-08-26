@@ -114,6 +114,7 @@ tools/lib/mir4/ReleaseDag.ps1 text eol=lf
 tools/lib/mir4/*.ps1 text eol=lf
 tools/commands/mir4/*.ps1 text eol=lf
 fixtures/mir4-mep-v1/** text eol=lf
+fixtures/mir4-mep-discovery-v1/** text eol=lf
 fixtures/mir4-process-ir-v1/** text eol=lf
 fixtures/mir4-inspector-compatibility-v1/** text eol=lf
 fixtures/mir4-assurance-scale-v1/** text eol=lf

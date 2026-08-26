@@ -39,6 +39,7 @@
     {"path":"validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1","previous_sha256":"C703FA3692A81A99D1E8B66FE585FF535F3C8A6DAC96D2B27DC8A9F7C0E1F344","current_sha256":"EE71EA75A4A2554FD62193AA3B6C3865B88CBB06F16D8D089FA26413C150D6CB","reason":"Release readiness proves T11 complete, T12 next, and every transition denied.","scope":"package-excluded-control-plane","package_visible":false,"release_authority":false}
   ],
   "current_authorities":[
+    {"path":".gitattributes","sha256":"6DFCAB62A11CADB816576215EC8B2B5CE484B682C666DD9B9D8E250AF5112588","hash_mode":"canonical-text-v1","role":"cross-checkout-discovery-fixture-byte-policy"},
     {"path":".mir/assurance.json","sha256":"611AE3D75D6D33BB5A90D988063F6A053F22175A0D88079CE053E588A3922F2F","hash_mode":"canonical-text-v1","role":"t11-assurance-routing"},
     {"path":".mir/docs.yml","sha256":"85C7A16C369EF43BFAE1FB2A31EB186DAE4C86768B029832F4FD7DFFC8B67A9A","hash_mode":"canonical-text-v1","role":"t11-documentation-registry"},
     {"path":".mir/fixtures.yml","sha256":"34EF47BBFCE341FD11E29DE6C2AE8A7A1096598568BBAEAA6EE0CCABF7CA0815","hash_mode":"canonical-text-v1","role":"t11-fixture-registry"},
