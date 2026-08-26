@@ -82,7 +82,7 @@ function Test-MIR4T13UpgradeMatrix {
 
 function New-MIR4T13CaptureRecord {
   param([Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Snapshot,[Parameter(Mandatory)]$Lock,[Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][string]$EnginePath)
-  if([string]$Snapshot.capture_id-cne[string]$Lock.capture-or[string]$Snapshot.environment_lock_digest-cne[string]$Lock.digest-or[string]$Snapshot.digest-cne(Get-MIR4T12RecordDigest $Snapshot)){throw "[mir4-t13-capture-binding] $($Snapshot.capture_id)"}
+  if([string]$Snapshot.environment_lock_digest-cne[string]$Lock.digest-or[string]$Snapshot.target-cne[string]$Lock.target-or[string]$Snapshot.digest-cne(Get-MIR4T12RecordDigest $Snapshot)){throw "[mir4-t13-capture-binding] $($Snapshot.capture_id)"}
   Test-MIR4EnvironmentLockV1 -Lock $Lock|Out-Null
   $target=[string]$Snapshot.target;$expected=$Authority.target_upgrades.$target
   if(([string]$Lock.engine.executable_sha256).ToLowerInvariant()-cne('sha256:'+([string]$expected.engine_sha256).ToLowerInvariant())-or([string]$Lock.mir.package_sha256).ToLowerInvariant()-cne('sha256:'+([string]$expected.candidate_sha256).ToLowerInvariant())){throw "[mir4-t13-lock-target-identity] $($Snapshot.capture_id)"}
