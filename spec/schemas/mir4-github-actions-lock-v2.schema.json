@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-github-actions-lock-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "scope", "package_visible", "supersedes", "actions", "repository_workflows", "generated_workflow_sources", "policy"],
+  "properties": {
+    "schema": {"const": 2},
+    "kind": {"const": "MIR4GitHubActionsLockV2"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "scope": {"const": "all-repository-and-generated-workflows"},
+    "package_visible": {"const": false},
+    "supersedes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "disposition"],
+      "properties": {
+        "path": {"const": ".mir/releases/governance/mir4/github-actions-lock.json"},
+        "disposition": {"const": "immutable-production-scope-predecessor"}
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "requested_tag", "commit_sha", "source"],
+        "properties": {
+          "action": {"pattern": "^actions/[a-z-]+(?:/[a-z-]+)?$"},
+          "requested_tag": {"pattern": "^v[0-9]+$"},
+          "commit_sha": {"pattern": "^[0-9a-f]{40}$"},
+          "source": {"pattern": "^https://api\\.github\\.com/repos/actions/"}
+        }
+      }
+    },
+    "repository_workflows": {
+      "type": "array",
+      "minItems": 21,
+      "maxItems": 21,
+      "uniqueItems": true,
+      "items": {"pattern": "^\\.github/workflows/[a-z0-9-]+\\.yml$"}
+    },
+    "generated_workflow_sources": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"pattern": "^tools/(?:commands|lib)/[A-Za-z0-9_./-]+\\.ps1$"}
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_commit_sha_required", "floating_tag_forbidden", "exact_workflow_closure_required", "explicit_permissions_required", "public_pull_request_secrets_forbidden", "builder_signing_and_upload_forbidden", "qualifier_mutation_forbidden", "release_candidate_has_no_third_party_action", "publisher_has_no_source_checkout_or_package_builder"],
+      "properties": {
+        "full_commit_sha_required": {"const": true},
+        "floating_tag_forbidden": {"const": true},
+        "exact_workflow_closure_required": {"const": true},
+        "explicit_permissions_required": {"const": true},
+        "public_pull_request_secrets_forbidden": {"const": true},
+        "builder_signing_and_upload_forbidden": {"const": true},
+        "qualifier_mutation_forbidden": {"const": true},
+        "release_candidate_has_no_third_party_action": {"const": true},
+        "publisher_has_no_source_checkout_or_package_builder": {"const": true}
+      }
+    }
+  }
+}

@@ -16,10 +16,10 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
@@ -39,7 +39,7 @@ jobs:
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true
           name: mir-scheduled-plan-and-candidate
@@ -55,20 +55,20 @@ jobs:
     environment: release-candidate
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     concurrency:
       group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-scheduled-plan-and-candidate
           path: .
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
@@ -80,7 +80,7 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
         run: ./tools/mir.ps1 verify run-one --target 2.1 --plan build/results/assurance/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -97,14 +97,14 @@ jobs:
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-scheduled-plan-and-candidate
           path: .
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
@@ -112,7 +112,7 @@ jobs:
             mir-ledger-${{ runner.os }}-2.1-
       - name: Download isolated worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: mir-scheduled-evidence-*
           path: build/results/assurance/worker-evidence
@@ -128,12 +128,12 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_3_1_9 }}
         run: ./tools/mir.ps1 verify gate --target 2.1 --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --output build/results/assurance/scheduled-summary.json
-      - uses: actions/cache/save@v4
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830
         if: always()
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true

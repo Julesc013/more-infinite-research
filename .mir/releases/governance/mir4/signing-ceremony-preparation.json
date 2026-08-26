@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "MIR4SigningCeremonyPreparationAuthorityV1",
+  "programme_id": "M4C02-09-24H",
+  "turn": "T15",
+  "state": "MACHINE-PREPARATION-COMPLETE-HUMAN-CEREMONY-REQUIRED",
+  "production_signing_authorized": false,
+  "machine_scope": {
+    "authority_validation": true,
+    "external_root_separation_validation": true,
+    "acl_policy_validation": true,
+    "non_production_key_rehearsal": true,
+    "two_copy_encryption_rehearsal": true,
+    "clean_restore_rehearsal": true,
+    "namespace_sign_and_verify_rehearsal": true,
+    "public_receipt_verification": true
+  },
+  "logical_roots": [
+    {
+      "role": "protected-signing-home",
+      "environment_variable": "MIR_SIGNING_HOME",
+      "required": true,
+      "absolute": true,
+      "external_to_repository": true,
+      "separate_control": "maintainer-signing-custodian"
+    },
+    {
+      "role": "encrypted-recovery-copy-a",
+      "environment_variable": "MIR_RECOVERY_COPY_A_HOME",
+      "required": true,
+      "absolute": true,
+      "external_to_repository": true,
+      "separate_control": "recovery-custodian-a"
+    },
+    {
+      "role": "encrypted-recovery-copy-b",
+      "environment_variable": "MIR_RECOVERY_COPY_B_HOME",
+      "required": true,
+      "absolute": true,
+      "external_to_repository": true,
+      "separate_control": "recovery-custodian-b"
+    }
+  ],
+  "signing": {
+    "algorithm": "ssh-ed25519",
+    "signature_format": "sshsig",
+    "dedicated_key_required": true,
+    "interactive_protected_passphrase_required": true,
+    "empty_passphrase_forbidden": true,
+    "reused_key_forbidden": true,
+    "command_line_secret_forbidden": true,
+    "principal": "mir4-release-signing",
+    "namespaces": [
+      "mir4-source",
+      "mir4-target",
+      "mir4-ledger"
+    ],
+    "forbidden_roots": [
+      "repository",
+      "builder-worktrees",
+      "publisher"
+    ]
+  },
+  "recovery": {
+    "required_copies": 2,
+    "encryption_required": true,
+    "separate_control_required": true,
+    "clean_restore_required": true,
+    "restored_fingerprint_match_required": true,
+    "restored_challenge_namespace": "mir4-ledger",
+    "ephemeral_plaintext_destruction_required": true,
+    "production_encryption_authority": null
+  },
+  "acl_policy": {
+    "inheritance_protected_required": true,
+    "explicit_allowed_sids_required": true,
+    "approved_owner_required": true,
+    "broad_principals_forbidden": [
+      "S-1-1-0",
+      "S-1-5-11",
+      "S-1-5-32-545",
+      "S-1-5-32-546"
+    ],
+    "maintainer_approved_sids": []
+  },
+  "tracked_outputs": {
+    "allowed_signers": ".mir/releases/governance/mir4/allowed-signers.json",
+    "production_receipt_schema": "spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json",
+    "production_receipt_template": "spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json",
+    "preparation_receipt_schema": "spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json"
+  },
+  "ceremony_sequence": [
+    "approve-three-external-roots-and-custodian-sids",
+    "configure-logical-root-environment-variables",
+    "verify-root-separation-and-protected-acls",
+    "invoke-openssh-key-generation-in-an-interactive-protected-console",
+    "record-public-key-and-fingerprint-only",
+    "create-exactly-two-encrypted-recovery-copies",
+    "restore-one-copy-into-a-clean-ephemeral-root",
+    "verify-fingerprint-and-mir4-ledger-challenge-signature",
+    "destroy-restored-plaintext",
+    "obtain-maintainer-acceptance-of-the-bound-ceremony-receipt"
+  ],
+  "human_gates": [
+    {
+      "id": "protected-root-and-custodian-approval",
+      "required_input": "Maintainer-approved absolute root paths and explicit custodian SIDs."
+    },
+    {
+      "id": "protected-secret-authority",
+      "required_input": "A passphrase or protected encryption authority supplied through an approved secret channel."
+    },
+    {
+      "id": "interactive-key-ceremony",
+      "required_input": "Maintainer execution of interactive OpenSSH key creation and recovery-copy encryption."
+    },
+    {
+      "id": "ceremony-acceptance",
+      "required_input": "An exact ACCEPTED decision bound to the completed public ceremony receipt."
+    }
+  ],
+  "prohibited_transitions": {
+    "source_freeze": true,
+    "candidate_allocation": true,
+    "production_signing": true,
+    "production_seal": true,
+    "promotion_to_main": true,
+    "tagging": true,
+    "publication": true
+  },
+  "secret_values_present": false
+}

@@ -370,6 +370,17 @@ try {
     $hostedValidation = if ([string]$row.support_tier -ne "current") {
       Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".github/workflows/validate.yml")
     } else { "" }
+    $hostedActionRefs = @(
+      [regex]::Matches(
+        $hostedValidation,
+        '(?m)uses:\s+actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*@(?<ref>[^\s#]+)'
+      ) |
+        ForEach-Object { [string]$_.Groups['ref'].Value }
+    )
+    if ([string]$row.support_tier -ne "current" -and
+        @($hostedActionRefs | Where-Object { $_ -cnotmatch '^[0-9a-f]{40}$' }).Count -ne 0) {
+      throw "Terminal projection retained a floating or unrecognized action ref for $($row.release)."
+    }
     $hostedTargetPattern = '--target\s+[''"]?' + [regex]::Escape([string]$row.factorio_line) + '[''"]?(?:\s|$)'
     $shadowProfile = @($assurance.profiles.'terminal-shadow-convergence' | ForEach-Object { [string]$_ })
     $releaseGovernance = @($assurance.classes | Where-Object { [string]$_.id -eq "release-governance" })
@@ -467,6 +478,7 @@ try {
           $assuranceEntryPoint.Contains('branch=([string](& git -C $repo branch --show-current)).Trim()') -or
           -not $assuranceFastWorkflow.Contains('workflow_dispatch:') -or
           $assuranceFastWorkflow.Contains("`n  push:") -or
+          $assuranceFastWorkflow -match '(?m)uses:\s+actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*@(?![0-9a-f]{40}(?:\s|$))' -or
           -not $assuranceFastWorkflow.Contains("--target '$([string]$row.factorio_line)'") -or
           @($transition.generated_authorities | Where-Object { [string]$_ -eq ".github/workflows/assurance-fast.yml" }).Count -ne 1 -or
           -not $assuranceReleaseLibrary.Contains('$branch = (@(& git -C $repo branch --show-current) -join "").Trim()') -or

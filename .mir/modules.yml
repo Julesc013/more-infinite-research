@@ -69,13 +69,56 @@ package_excluded_modules:
   mir4_release_governance_v1:
     authority: .mir/releases/governance/mir4/release-governance.json
     allowed_signers: .mir/releases/governance/mir4/allowed-signers.json
+    signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
     implementation: tools/lib/mir4/ReleaseGovernance.ps1
+    signing_ceremony_preparation_implementation: tools/lib/mir4/SigningCeremonyPreparation.ps1
     command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
     ledger_schema: spec/schemas/mir4-release-ledger-event.schema.json
     revocation_schema: spec/schemas/mir4-key-revocation.schema.json
+    signing_ceremony_preparation_authority_schema: spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json
+    signing_ceremony_preparation_receipt_schema: spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_schema: spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_template: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
     documentation: docs/maintainer/mir4-release-governance.md
-    boundary: release-custody policy and external-layout validation only; no source freeze, key generation without protected human secret input, signing, sealing, promotion, tagging, or publication
+    boundary: release-custody policy, external-layout validation, and disposable proof-only signing/recovery rehearsal only; no production key generation without protected human secret input, source freeze, production signing, sealing, promotion, tagging, or publication
     stability: stable-governance-contract-blocked-human-secret-input
+  mir4_supply_chain_v1:
+    authority: .mir/releases/governance/mir4/supply-chain.json
+    completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
+    independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
+    authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
+    implementation: tools/lib/mir4/SupplyChain.ps1
+    attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
+    capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
+    runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
+    command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
+    capsule_command: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
+    runner_confinement_command: tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1
+    schemas:
+      - spec/schemas/mir4-supply-chain-authority-v1.schema.json
+      - spec/schemas/mir4-component-inventory-v1.schema.json
+      - spec/schemas/mir4-spdx-3.0.1-profile.schema.json
+      - spec/schemas/mir4-spdx-2.3-compatibility.schema.json
+      - spec/schemas/mir4-slsa-provenance-v1.schema.json
+      - spec/schemas/mir4-supply-chain-attestation-v1.schema.json
+      - spec/schemas/mir4-private-custody-inventory-v1.schema.json
+      - spec/schemas/mir4-release-capsule-manifest-v1.schema.json
+      - spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
+      - spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
+      - spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
+      - spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
+      - spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
+      - spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
+    tests:
+      - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
+      - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
+    documentation: docs/maintainer/mir4-supply-chain-preservation.md
+    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
+    stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
     profile_authority: spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json
@@ -267,7 +310,7 @@ package_excluded_modules:
     validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
-    stability: stable-current-pre-freeze-execution-authority-release-blocked
+    stability: stable-t15-complete-t16-t17-human-blocked-release-blocked
   mir4_pre_freeze_hardening_v1:
     authorities:
       - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
@@ -291,6 +334,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
+      - .mir/releases/governance/mir4/github-actions-lock-v2.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
@@ -342,6 +386,7 @@ package_excluded_modules:
       - spec/schemas/mir4-release-public-readback-result-v1.schema.json
       - spec/schemas/mir4-release-restore-drill-result-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
+      - spec/schemas/mir4-github-actions-lock-v2.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     supporting_validators:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
@@ -1188,6 +1233,11 @@ validation_tooling:
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
     mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
     mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
+    mir4_signing_ceremony_preparation: tools/lib/mir4/SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
+    mir4_signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_gate: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+    mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
     mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
     mir4_repository_fixed_point: tools/lib/mir4/RepositoryFixedPoint.ps1
@@ -1317,6 +1367,7 @@ validation_tooling:
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
     - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
+    - root governance and continuity guides are canonical repository-policy documents owned by documentation governance and remain package-excluded unless separately admitted by the package whitelist
     - source-of-truth projections are owned by domain command families under tools commands while scripts retains parameter-compatible read-only wrappers and immutable historical worktrees may invoke their contemporary legacy paths
     - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
     - typed change incident task release and transition records are authoritative and human-readable status files are generated views

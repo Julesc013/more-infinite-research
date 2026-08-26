@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "kind": "MIR4R0ExecutableQueueV1",
-  "status": "next-task-ready",
+  "status": "human-gates-required",
   "package_visible": false,
   "generated_from": [
     {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
-      "sha256": "1B075BC4EDA3097E79A1B12071656886B1BD51F9092626A17BCC929AA23F73B9"
+      "sha256": "BD4CB9DA3727C66D9D01DD7BA46DBDCD56194801AABE056D94C9C9803CD3C051"
     }
   ],
   "payload": {
@@ -167,7 +167,7 @@
       {
         "id": "T15",
         "scope": "Supply-chain and preservation hardening",
-        "state": "ready",
+        "state": "completed",
         "blocked_by": [
           "T05",
           "T07"
@@ -244,5 +244,5 @@
       }
     ]
   },
-  "record_sha256": "D65166399AE916BC917496AC7239F4AC925F8A747919BC34A484876BE7FB9125"
+  "record_sha256": "9AE03C6511DFDB528340FB712A2373DE895874C913593597316B8328C6DC4B5D"
 }

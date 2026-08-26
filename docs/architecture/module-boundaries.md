@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-21
+last_reviewed: 2026-08-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -741,7 +741,7 @@ The W03 semantic compiler is a package-excluded shadow reference aggregate owned
 
 The W04 runtime-continuity programme is a package-excluded verifier and private projection owned by `MIR4-Runtime-Continuity-ProgrammeV1.json`. It may declare stable feature/state identities, hash current handlers and migration evidence, verify dispatcher and migration laws, and build redacted continuity bundles. It cannot register events, execute migrations, write runtime state, mutate prototypes, or claim public continuity. `control.lua`, `prototypes/mir/stage/control.lua`, `prototypes/mir/runtime/**`, the Factorio runtime-state adapter, and `migrations/**` remain the only player-authoritative runtime and migration implementation. W05 owns extension closure and transport; W06 owns ProcessIR and effect semantics.
 
-MIR 4 release governance is package-excluded and owned by `.mir/releases/governance/mir4/release-governance.json`. `tools/lib/mir4/ReleaseGovernance.ps1` may validate or initialize only the fixed external archive and publisher layouts; it cannot create a signing key without protected human secret input, authorize source freeze or candidate allocation, sign or seal release objects, promote `main`, tag, or publish. The persistent allowed-signers authority contains public material only. The signed append-only ledger is deliberately absent while signing authority is blocked because an unsigned placeholder would misrepresent custody.
+MIR 4 release governance is package-excluded and owned by `.mir/releases/governance/mir4/release-governance.json`. `tools/lib/mir4/ReleaseGovernance.ps1` may validate or initialize only the fixed external archive and publisher layouts. `tools/lib/mir4/SigningCeremonyPreparation.ps1` may validate logical-root and ACL contracts and perform a disposable proof-only encryption, recovery, and signature rehearsal; it records no configured production path or secret and grants no production authority. Neither library can create a production signing key without protected human secret input, authorize source freeze or candidate allocation, sign or seal release objects, promote `main`, tag, or publish. The persistent allowed-signers authority contains public material only. The signed append-only ledger is deliberately absent while signing authority is blocked because an unsigned placeholder would misrepresent custody.
 
 The package-excluded MIR 4 experimental API/SDK V0 is owned by `spec/api/mir4-v0/contracts.json` and generated through `tools/lib/mir4/ExperimentalApiSdk.ps1`. It may project immutable public compiler artifacts into query and support snapshots, but it cannot import mutable `CompilerContext`, executor, SafetyKernel, emission, or Factorio prototype adapters. Its Lua output is an offline binding under `sdk/experimental/`; it is not shipped prototype-stage code and does not create a second semantic authority.
 

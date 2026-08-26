@@ -332,7 +332,11 @@ function Get-MIRLayoutClass {
   )) {
     if ($Path.StartsWith($row[0], [StringComparison]::Ordinal)) { return $row[1] }
   }
-  if ($Path -in @(".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "todo.md", "mir.toml", "mir.lock")) { return "repository-policy" }
+  if ($Path -in @(
+    ".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "EXTENSION-PROTOCOL.md",
+    "FORKING.md", "GOVERNANCE.md", "MAINTAINER-HANDOFF.md", "PROJECT-CONTINUITY.md",
+    "RELEASE-RUNBOOK.md", "SECURITY.md", "SUPPORT.md", "todo.md", "mir.toml", "mir.lock"
+  )) { return "repository-policy" }
   return "unclassified"
 }
 

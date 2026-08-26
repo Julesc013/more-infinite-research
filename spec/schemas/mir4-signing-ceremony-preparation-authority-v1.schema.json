@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json",
+  "title": "MIR 4 signing ceremony preparation authority V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "turn", "state", "production_signing_authorized", "machine_scope", "logical_roots", "signing", "recovery", "acl_policy", "tracked_outputs", "ceremony_sequence", "human_gates", "prohibited_transitions", "secret_values_present"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SigningCeremonyPreparationAuthorityV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "state": {"const": "MACHINE-PREPARATION-COMPLETE-HUMAN-CEREMONY-REQUIRED"},
+    "production_signing_authorized": {"const": false},
+    "machine_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_validation", "external_root_separation_validation", "acl_policy_validation", "non_production_key_rehearsal", "two_copy_encryption_rehearsal", "clean_restore_rehearsal", "namespace_sign_and_verify_rehearsal", "public_receipt_verification"],
+      "properties": {
+        "authority_validation": {"const": true},
+        "external_root_separation_validation": {"const": true},
+        "acl_policy_validation": {"const": true},
+        "non_production_key_rehearsal": {"const": true},
+        "two_copy_encryption_rehearsal": {"const": true},
+        "clean_restore_rehearsal": {"const": true},
+        "namespace_sign_and_verify_rehearsal": {"const": true},
+        "public_receipt_verification": {"const": true}
+      }
+    },
+    "logical_roots": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "environment_variable", "required", "absolute", "external_to_repository", "separate_control"],
+        "properties": {
+          "role": {"enum": ["protected-signing-home", "encrypted-recovery-copy-a", "encrypted-recovery-copy-b"]},
+          "environment_variable": {"enum": ["MIR_SIGNING_HOME", "MIR_RECOVERY_COPY_A_HOME", "MIR_RECOVERY_COPY_B_HOME"]},
+          "required": {"const": true},
+          "absolute": {"const": true},
+          "external_to_repository": {"const": true},
+          "separate_control": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "signing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "signature_format", "dedicated_key_required", "interactive_protected_passphrase_required", "empty_passphrase_forbidden", "reused_key_forbidden", "command_line_secret_forbidden", "principal", "namespaces", "forbidden_roots"],
+      "properties": {
+        "algorithm": {"const": "ssh-ed25519"},
+        "signature_format": {"const": "sshsig"},
+        "dedicated_key_required": {"const": true},
+        "interactive_protected_passphrase_required": {"const": true},
+        "empty_passphrase_forbidden": {"const": true},
+        "reused_key_forbidden": {"const": true},
+        "command_line_secret_forbidden": {"const": true},
+        "principal": {"const": "mir4-release-signing"},
+        "namespaces": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["mir4-source", "mir4-target", "mir4-ledger"]}},
+        "forbidden_roots": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"enum": ["repository", "builder-worktrees", "publisher"]}}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_copies", "encryption_required", "separate_control_required", "clean_restore_required", "restored_fingerprint_match_required", "restored_challenge_namespace", "ephemeral_plaintext_destruction_required", "production_encryption_authority"],
+      "properties": {
+        "required_copies": {"const": 2},
+        "encryption_required": {"const": true},
+        "separate_control_required": {"const": true},
+        "clean_restore_required": {"const": true},
+        "restored_fingerprint_match_required": {"const": true},
+        "restored_challenge_namespace": {"const": "mir4-ledger"},
+        "ephemeral_plaintext_destruction_required": {"const": true},
+        "production_encryption_authority": {"type": "null"}
+      }
+    },
+    "acl_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inheritance_protected_required", "explicit_allowed_sids_required", "approved_owner_required", "broad_principals_forbidden", "maintainer_approved_sids"],
+      "properties": {
+        "inheritance_protected_required": {"const": true},
+        "explicit_allowed_sids_required": {"const": true},
+        "approved_owner_required": {"const": true},
+        "broad_principals_forbidden": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string", "pattern": "^S-1-"}},
+        "maintainer_approved_sids": {"type": "array", "maxItems": 0}
+      }
+    },
+    "tracked_outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed_signers", "production_receipt_schema", "production_receipt_template", "preparation_receipt_schema"],
+      "properties": {
+        "allowed_signers": {"const": ".mir/releases/governance/mir4/allowed-signers.json"},
+        "production_receipt_schema": {"const": "spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json"},
+        "production_receipt_template": {"const": "spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json"},
+        "preparation_receipt_schema": {"const": "spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json"}
+      }
+    },
+    "ceremony_sequence": {"type": "array", "minItems": 10, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "human_gates": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "required_input"],
+        "properties": {"id": {"type": "string", "minLength": 1}, "required_input": {"type": "string", "minLength": 1}}
+      }
+    },
+    "prohibited_transitions": {"$ref": "#/$defs/prohibitedTransitions"},
+    "secret_values_present": {"const": false}
+  },
+  "$defs": {
+    "prohibitedTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": true},
+        "candidate_allocation": {"const": true},
+        "production_signing": {"const": true},
+        "production_seal": {"const": true},
+        "promotion_to_main": {"const": true},
+        "tagging": {"const": true},
+        "publication": {"const": true}
+      }
+    }
+  }
+}

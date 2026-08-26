@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-component-inventory-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "programme_id",
+    "turn",
+    "state",
+    "source",
+    "standards",
+    "construction",
+    "identity_sets",
+    "components",
+    "transition_authority",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ComponentInventoryV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "state": {"const": "pre-freeze-supply-chain-preparation"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "commit_time", "source_date_epoch", "working_tree_clean"],
+      "properties": {
+        "repository": {"const": "https://github.com/Julesc013/more-infinite-research"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "tree": {"pattern": "^[a-f0-9]{40}$"},
+        "commit_time": {"format": "date-time"},
+        "source_date_epoch": {"type": "integer", "minimum": 1},
+        "working_tree_clean": {"type": "boolean"}
+      }
+    },
+    "standards": {"type": "object"},
+    "construction": {
+      "type": "object",
+      "required": ["network_policy", "source_date_epoch", "archive_order", "archive_timestamp", "archive_permissions", "path_policy", "text_policy", "clean_roots_required", "byte_identical_repetitions_required"],
+      "properties": {
+        "network_policy": {"const": "disabled"},
+        "source_date_epoch": {"const": "git-commit-time"},
+        "archive_order": {"const": "ordinal-path"},
+        "archive_timestamp": {"const": "1980-01-01T00:00:00Z"},
+        "archive_permissions": {"const": 0},
+        "path_policy": {"const": "portable-relative-no-traversal"},
+        "clean_roots_required": {"const": 2},
+        "byte_identical_repetitions_required": {"const": 2}
+      }
+    },
+    "identity_sets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/identitySet"}
+    },
+    "components": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "transition_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  },
+  "$defs": {
+    "fileRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256", "source_class", "origin"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9._/-]+$"
+        },
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "source_class": {
+          "enum": ["manual-source", "generated-projection", "binary-asset", "archive-metadata"]
+        },
+        "origin": {"enum": ["repository", "artifact", "provided"]}
+      }
+    },
+    "root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "mode", "sha256", "file_count", "total_bytes"],
+      "properties": {
+        "algorithm": {"const": "SHA-256"},
+        "mode": {"const": "ordinal-path-byte-root-v1"},
+        "sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "file_count": {"type": "integer", "minimum": 1},
+        "total_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "identitySet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "root_sha256", "file_count", "total_bytes", "files"],
+      "properties": {
+        "name": {"enum": ["contract_set", "platform_profile", "toolchain_locks"]},
+        "root_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "file_count": {"type": "integer", "minimum": 1},
+        "total_bytes": {"type": "integer", "minimum": 0},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/fileRow"}
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "bytes", "sha256"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"pattern": "^[A-F0-9]{64}$"}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component_id",
+        "name",
+        "version",
+        "artifact_class",
+        "target",
+        "materialization",
+        "source_selector",
+        "source_map",
+        "license",
+        "copyright",
+        "redistribution_custody",
+        "capsule_partition",
+        "artifact",
+        "content_root",
+        "files"
+      ],
+      "properties": {
+        "component_id": {"pattern": "^mir4-[a-z0-9-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "artifact_class": {"enum": ["source-release", "player-distribution", "developer-preview", "verifier-tool"]},
+        "target": {"type": ["string", "null"]},
+        "materialization": {"enum": ["source-closure", "provided-payload", "artifact"]},
+        "source_selector": {"enum": ["repository-tracked-source", "player-package-source", "preview-payload", "explicit-files"]},
+        "source_map": {"type": "object"},
+        "license": {
+          "type": "object",
+          "required": ["declared", "concluded", "evidence"],
+          "properties": {
+            "declared": {"const": "MPL-2.0"},
+            "concluded": {"const": "NOASSERTION"},
+            "evidence": {"const": "LICENSE"}
+          }
+        },
+        "copyright": {
+          "type": "object",
+          "required": ["text", "classification"],
+          "properties": {
+            "text": {"const": "NOASSERTION"},
+            "classification": {"type": "string", "minLength": 1}
+          }
+        },
+        "redistribution_custody": {
+          "type": "object",
+          "required": ["classification", "evidence", "separate-rights-grant_asserted"],
+          "properties": {
+            "classification": {"const": "repository-declared-mpl-2.0-license-preservation-required"},
+            "evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+            "separate-rights-grant_asserted": {"const": false}
+          }
+        },
+        "capsule_partition": {"const": "public"},
+        "artifact": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/artifact"}
+          ]
+        },
+        "content_root": {"$ref": "#/$defs/root"},
+        "files": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/fileRow"}
+        }
+      }
+    }
+  }
+}

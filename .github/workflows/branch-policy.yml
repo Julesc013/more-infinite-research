@@ -71,6 +71,12 @@ jobs:
     name: promotion-verification
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.terminal_release != 'none' }}
     runs-on: windows-latest
+    env:
+      MIR_TERMINAL_CANDIDATE_REF: ${{ inputs.terminal_candidate_ref }}
+      MIR_TERMINAL_CANDIDATE_SHA: ${{ inputs.terminal_candidate_sha }}
+      MIR_TERMINAL_OPERATION: ${{ inputs.terminal_operation }}
+      MIR_TERMINAL_PROMOTION_BRANCH: ${{ inputs.terminal_promotion_branch }}
+      MIR_TERMINAL_RELEASE: ${{ inputs.terminal_release }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -81,12 +87,12 @@ jobs:
         shell: pwsh
         run: |
           ./tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1 `
-            -Release '${{ inputs.terminal_release }}' `
-            -CandidateSha '${{ inputs.terminal_candidate_sha }}' `
-            -Operation '${{ inputs.terminal_operation }}' `
-            -CandidateRef '${{ inputs.terminal_candidate_ref }}' `
-            -PromotionBranch '${{ inputs.terminal_promotion_branch }}' `
-            -OutputPath 'build/results/terminal-promotion/${{ inputs.terminal_release }}.json'
+            -Release $env:MIR_TERMINAL_RELEASE `
+            -CandidateSha $env:MIR_TERMINAL_CANDIDATE_SHA `
+            -Operation $env:MIR_TERMINAL_OPERATION `
+            -CandidateRef $env:MIR_TERMINAL_CANDIDATE_REF `
+            -PromotionBranch $env:MIR_TERMINAL_PROMOTION_BRANCH `
+            -OutputPath "build/results/terminal-promotion/$($env:MIR_TERMINAL_RELEASE).json"
       - name: Preserve exact promotion verification
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

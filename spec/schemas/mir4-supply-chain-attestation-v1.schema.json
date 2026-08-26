@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-supply-chain-attestation-v1.schema.json",
+  "title": "MIR4SupplyChainAttestationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "status",
+    "publication_authority",
+    "payload",
+    "signature",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SupplyChainAttestationV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "status": {"const": "attested-local-proof-only"},
+    "publication_authority": {"const": false},
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "kind",
+        "canonicalization",
+        "predicate_type",
+        "scope",
+        "publication_authority",
+        "source",
+        "inventory",
+        "provenance",
+        "subjects",
+        "github_subjects",
+        "targets",
+        "workflow",
+        "trusted_root",
+        "revocation_snapshot",
+        "signing_provider",
+        "record_sha256"
+      ],
+      "properties": {
+        "schema": {"const": 1},
+        "kind": {"const": "MIR4SupplyChainAttestationPayloadV1"},
+        "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+        "predicate_type": {"const": "https://more-infinite-research.invalid/attestations/supply-chain/v1"},
+        "scope": {"const": "local-offline-proof-only"},
+        "publication_authority": {"const": false},
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commit", "tree"],
+          "properties": {
+            "commit": {"$ref": "#/$defs/gitObject"},
+            "tree": {"$ref": "#/$defs/gitObject"}
+          }
+        },
+        "inventory": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "record_sha256"],
+          "properties": {
+            "kind": {"const": "MIR4ComponentInventoryV1"},
+            "record_sha256": {"$ref": "#/$defs/sha256Upper"}
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["predicate_type", "sha256"],
+          "properties": {
+            "predicate_type": {"const": "https://slsa.dev/provenance/v1"},
+            "sha256": {"$ref": "#/$defs/sha256Upper"}
+          }
+        },
+        "subjects": {"$ref": "#/$defs/subjects"},
+        "github_subjects": {"$ref": "#/$defs/subjects"},
+        "targets": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["component_id", "target", "version", "sha256"],
+                "properties": {
+                  "component_id": {"const": "mir4-player-f210"},
+                  "target": {"const": "f210"},
+                  "version": {"const": "4.0.21000"},
+                  "sha256": {"$ref": "#/$defs/sha256Lower"}
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["component_id", "target", "version", "sha256"],
+                "properties": {
+                  "component_id": {"const": "mir4-player-f200"},
+                  "target": {"const": "f200"},
+                  "version": {"const": "4.0.20000"},
+                  "sha256": {"$ref": "#/$defs/sha256Lower"}
+                }
+              }
+            ]
+          },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "required": ["target"],
+                "properties": {"target": {"const": "f210"}}
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["target"],
+                "properties": {"target": {"const": "f200"}}
+              },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          ]
+        },
+        "workflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["repository", "ref", "workflow"],
+          "properties": {
+            "repository": {"const": "Julesc013/more-infinite-research"},
+            "ref": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/@:+-]{0,255}$"},
+            "workflow": {"const": "tools/commands/mir4/Invoke-MIR4SupplyChain.ps1"}
+          }
+        },
+        "trusted_root": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["root_id", "public_key_fingerprint", "status"],
+          "properties": {
+            "root_id": {"const": "mir4-t15-proof-root"},
+            "public_key_fingerprint": {"$ref": "#/$defs/fingerprint"},
+            "status": {"const": "proof-only-active"}
+          }
+        },
+        "revocation_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_commit", "revoked_fingerprints"],
+          "properties": {
+            "source_commit": {"$ref": "#/$defs/gitObject"},
+            "revoked_fingerprints": {
+              "type": "array",
+              "maxItems": 0,
+              "items": {"$ref": "#/$defs/fingerprint"}
+            }
+          }
+        },
+        "signing_provider": {"$ref": "#/$defs/signingProvider"},
+        "record_sha256": {"$ref": "#/$defs/sha256Upper"}
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "format",
+        "identity",
+        "namespace",
+        "payload_record_sha256",
+        "signature_sha256",
+        "signature_base64"
+      ],
+      "properties": {
+        "algorithm": {"const": "ssh-ed25519"},
+        "format": {"const": "sshsig"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "namespace": {"const": "mir4-supply-chain-attestation-v1"},
+        "payload_record_sha256": {"$ref": "#/$defs/sha256Upper"},
+        "signature_sha256": {"$ref": "#/$defs/sha256Upper"},
+        "signature_base64": {"type": "string", "pattern": "^[A-Za-z0-9+/]+={0,3}$"}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256Upper"}
+  },
+  "$defs": {
+    "sha256Upper": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "sha256Lower": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "identity": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._@+-]{0,127}$"},
+    "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+={0,3}$"},
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "digest"],
+      "properties": {
+        "name": {
+          "enum": [
+            "mir4-source-release",
+            "mir4-player-f210",
+            "mir4-player-f200",
+            "mir4-preview-api-sdk-v1",
+            "mir4-preview-mep-v1",
+            "mir4-preview-reference-extension-v1",
+            "mir4-preview-inspector-v1",
+            "mir4-offline-seal-verifier",
+            "mir4-supply-chain-verifier"
+          ]
+        },
+        "digest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sha256"],
+          "properties": {"sha256": {"$ref": "#/$defs/sha256Lower"}}
+        }
+      }
+    },
+    "subjects": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/subject"},
+      "allOf": [
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-source-release"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-player-f210"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-player-f200"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-preview-api-sdk-v1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-preview-mep-v1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-preview-reference-extension-v1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-preview-inspector-v1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-offline-seal-verifier"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "mir4-supply-chain-verifier"}}}, "minContains": 1, "maxContains": 1}
+      ]
+    },
+    "signingProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "algorithm",
+        "signature_format",
+        "implementation",
+        "executable_sha256",
+        "public_key",
+        "public_key_fingerprint",
+        "identity",
+        "namespace",
+        "scope",
+        "private_key_committed"
+      ],
+      "properties": {
+        "kind": {"const": "MIR4SigningProviderV1"},
+        "algorithm": {"const": "ssh-ed25519"},
+        "signature_format": {"const": "sshsig"},
+        "implementation": {"const": "OpenSSH-ssh-keygen"},
+        "executable_sha256": {"$ref": "#/$defs/sha256Upper"},
+        "public_key": {"type": "string", "pattern": "^ssh-ed25519 [A-Za-z0-9+/]+={0,3}(?: [^\\r\\n]+)?$"},
+        "public_key_fingerprint": {"$ref": "#/$defs/fingerprint"},
+        "identity": {"$ref": "#/$defs/identity"},
+        "namespace": {"const": "mir4-supply-chain-attestation-v1"},
+        "scope": {"const": "proof-only-local-t15"},
+        "private_key_committed": {"const": false}
+      }
+    }
+  }
+}

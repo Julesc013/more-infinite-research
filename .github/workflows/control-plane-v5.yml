@@ -80,10 +80,10 @@ jobs:
       context_id: ${{ steps.export.outputs.context_id }}
       environments: ${{ steps.export.outputs.environments }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -144,7 +144,7 @@ jobs:
           $context = "build/results/verification-context/${{ steps.export.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation record-context -ContextPath $context `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true
           name: mir-v5-context
@@ -159,10 +159,10 @@ jobs:
     needs: context
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -170,7 +170,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -186,7 +186,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind static,evaluation -ExcludeTask shadow.equivalence -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true
           name: mir-v5-evidence-static
@@ -200,10 +200,10 @@ jobs:
     needs: context
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -211,7 +211,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -227,7 +227,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind package -ExcludeTask verification.context -SourceRepoRoot source `
             -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           include-hidden-files: true
           name: mir-v5-evidence-package
@@ -243,15 +243,16 @@ jobs:
     environment: release-candidate
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix: ${{ fromJSON(needs.context.outputs.environments) }}
     concurrency:
       group: mir-v5-${{ matrix.environment_signature }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -259,7 +260,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -277,7 +278,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation environment -ContextPath $context `
             -BatchId '${{ matrix.batch_id }}' -FactorioBin $env:FACTORIO_BIN `
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -290,17 +291,17 @@ jobs:
   transitions:
     name: upgrade-and-approved-delta
     if: always()
-    needs: [context, package]
+    needs: [context, package, environments]
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     concurrency:
       group: mir-v5-transition-${{ inputs.target }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -308,7 +309,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -330,7 +331,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation approved-delta -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -346,17 +347,17 @@ jobs:
   ecosystem:
     name: ecosystem-closure
     if: always()
-    needs: [context, package]
+    needs: [context, package, transitions]
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     concurrency:
       group: mir-v5-ecosystem-${{ inputs.target }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -364,7 +365,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -383,7 +384,7 @@ jobs:
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation ecosystem -ContextPath $context `
             -FactorioBin $env:FACTORIO_BIN -LocalModDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -404,10 +405,10 @@ jobs:
       group: mir-v5-performance-${{ inputs.target }}
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -415,7 +416,7 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -436,7 +437,7 @@ jobs:
             -FactorioBin $env:FACTORIO_BIN -PriorRelease $env:MIR_PRIOR_RELEASE `
             -LocalModZipDir $env:MIR_LOCAL_MOD_ZIPS -SourceRepoRoot source `
             -TrustClass protected-release -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -453,10 +454,10 @@ jobs:
     needs: [context, transitions, ecosystem, performance]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
@@ -471,7 +472,7 @@ jobs:
           $context = "build/results/verification-context/${{ needs.context.outputs.context_id }}"
           ./tools/commands/control/Invoke-MIRControlPlaneWork.ps1 -Operation run-set -ContextPath $context `
             -Kind manual -TrustClass $env:MIR_CP_TRUST_CLASS -EvidenceRoot build/results/evidence
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true
@@ -488,10 +489,10 @@ jobs:
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ inputs.source_ref }}
           fetch-depth: 0
@@ -499,12 +500,12 @@ jobs:
       - name: Isolate nested source checkout from controller status
         shell: pwsh
         run: Add-Content -LiteralPath (git rev-parse --git-path info/exclude) -Value "/source/"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: mir-v5-context
           path: build/results
       - name: Download isolated immutable worker objects
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           pattern: mir-v5-evidence-*
           path: build/results/control-plane-worker-evidence
@@ -537,7 +538,7 @@ jobs:
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence | Out-Host
           ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot build/results/evidence |
             Tee-Object -FilePath build/results/control-plane-v5/promotion-result.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
           include-hidden-files: true

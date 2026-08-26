@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 T15 authority evolution receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "turn", "predecessor_receipt", "machine_receipt", "independent_machine_acceptance", "execution_transition", "evolved_bindings", "current_authorities", "player_package_source_sha256", "package_visible_delta", "conformance", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T15AuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T15"},
+    "predecessor_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json"}, "sha256": {"const": "AD83B044BF955D136FF68484D5913F1B857238D73229ED03F8B278AB5CB6EED0"}}
+    },
+    "machine_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json"}, "sha256": {"const": "84B6C8FB0215F198972C27D28995A3324A46B6D6ED0D7E1C6A330B3FAA9A0C90"}}
+    },
+    "independent_machine_acceptance": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json"}, "sha256": {"const": "5CE4D1504FBD03D96B23948E591832CAA0C2B9C48DFBDA6002C13761560EC8BE"}}
+    },
+    "execution_transition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["previous_status", "current_status", "completed_turn", "newly_ready_turns", "human_blocked_turns", "next_dependency_ready_turn"],
+      "properties": {
+        "previous_status": {"const": "T14-COMPLETE-T15-READY-RELEASE-BLOCKED"},
+        "current_status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"},
+        "completed_turn": {"const": "T15"},
+        "newly_ready_turns": {"const": []},
+        "human_blocked_turns": {"const": ["T16", "T17"]},
+        "next_dependency_ready_turn": {"type": "null"}
+      }
+    },
+    "evolved_bindings": {"type": "array", "minItems": 20, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 20, "items": {"$ref": "#/$defs/current"}},
+    "player_package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "package_visible_delta": {"const": []},
+    "conformance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_inventory_single_writer", "spdx_3_0_1_and_2_3_passed", "provenance_and_attestation_verification_passed", "network_disabled_construction_passed", "dual_offline_restoration_passed", "runner_isolation_passed", "publisher_confinement_passed", "signing_machine_preparation_passed", "independent_machine_acceptance_passed", "player_package_source_unchanged", "release_transition_authority"],
+      "properties": {"component_inventory_single_writer": {"const": true}, "spdx_3_0_1_and_2_3_passed": {"const": true}, "provenance_and_attestation_verification_passed": {"const": true}, "network_disabled_construction_passed": {"const": true}, "dual_offline_restoration_passed": {"const": true}, "runner_isolation_passed": {"const": true}, "publisher_confinement_passed": {"const": true}, "signing_machine_preparation_passed": {"const": true}, "independent_machine_acceptance_passed": {"const": true}, "player_package_source_unchanged": {"const": true}, "release_transition_authority": {"const": false}}
+    },
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "status": {"const": "T15-SUPPLY-CHAIN-PRESERVATION-PASSED-T16-T17-HUMAN-GATES-NEXT-PRODUCTION-UNAUTHORIZED"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "reason": {"type": "string", "minLength": 1}, "scope": {"const": "package-excluded-control-plane"}, "package_visible": {"const": false}, "release_authority": {"const": false}}
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"enum": ["raw-bytes", "canonical-text-v1"]}, "role": {"type": "string", "minLength": 1}}
+    },
+    "transitionGate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {"source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "production_seal": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}
+    }
+  }
+}

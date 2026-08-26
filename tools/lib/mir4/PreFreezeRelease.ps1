@@ -132,10 +132,22 @@ function Test-MIR4RulesetSnapshot {
 
 function Test-MIR4PublisherAdmissionBindings {
   param([Parameter(Mandatory)][string]$WorkflowText)
-  $fields = @('source_release_record','candidate_id','source_commit','source_tree','target_distribution_record_set','release_plan_digest','proof_root','seal_root')
-  foreach ($field in $fields) {
-    $pattern = '\[string\]\$admission\.' + [regex]::Escape($field) + '\s*-cne\s*''\$\{\{\s*inputs\.' + [regex]::Escape($field) + '\s*\}\}'''
-    if ($WorkflowText -notmatch $pattern) {
+  $bindings = [ordered]@{
+    source_release_record = 'MIR4_SOURCE_RELEASE_RECORD'
+    candidate_id = 'MIR4_CANDIDATE_ID'
+    source_commit = 'MIR4_SOURCE_COMMIT'
+    source_tree = 'MIR4_SOURCE_TREE'
+    target_distribution_record_set = 'MIR4_TARGET_RECORD_SET'
+    release_plan_digest = 'MIR4_RELEASE_PLAN_DIGEST'
+    proof_root = 'MIR4_PROOF_ROOT'
+    seal_root = 'MIR4_SEAL_ROOT'
+  }
+  foreach ($binding in $bindings.GetEnumerator()) {
+    $field = [string]$binding.Key
+    $environmentVariable = [string]$binding.Value
+    $environmentPattern = '(?m)^\s+' + [regex]::Escape($environmentVariable) + ':\s*\$\{\{\s*inputs\.' + [regex]::Escape($field) + '\s*\}\}\s*$'
+    $comparisonPattern = '\[string\]\$admission\.' + [regex]::Escape($field) + '\s*-cne\s*\$env:' + [regex]::Escape($environmentVariable)
+    if ($WorkflowText -notmatch $environmentPattern -or $WorkflowText -notmatch $comparisonPattern) {
       throw "[mir4-publisher-admission-binding-missing] $field"
     }
   }
@@ -145,25 +157,53 @@ function Test-MIR4PublisherAdmissionBindings {
 function Test-MIR4ProductionActionLock {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
-  $relative = '.mir/releases/governance/mir4/github-actions-lock.json'
+  $relative = '.mir/releases/governance/mir4/github-actions-lock-v2.json'
   $path = Join-Path $repo $relative
-  $schema = Join-Path $repo 'spec/schemas/mir4-github-actions-lock-v1.schema.json'
+  $schema = Join-Path $repo 'spec/schemas/mir4-github-actions-lock-v2.schema.json'
   $json = Get-Content -Raw -LiteralPath $path
   if (-not ($json | Test-Json -SchemaFile $schema)) { throw '[mir4-actions-lock-schema]' }
   $lock = $json | ConvertFrom-Json -Depth 100
   $pins = @{}
   foreach ($action in @($lock.actions)) { $pins[[string]$action.action] = [string]$action.commit_sha }
-  foreach ($relativeWorkflow in @($lock.production_workflows)) {
+  $actualWorkflows = @(Get-ChildItem -LiteralPath (Join-Path $repo '.github/workflows') -File |
+    Where-Object { $_.Extension -in @('.yml','.yaml') } |
+    ForEach-Object { [IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/') } |
+    Sort-Object -CaseSensitive)
+  $governedWorkflows = @($lock.repository_workflows | ForEach-Object { [string]$_ } | Sort-Object -CaseSensitive)
+  if (($actualWorkflows -join '|') -cne ($governedWorkflows -join '|')) {
+    throw '[mir4-actions-workflow-closure]'
+  }
+  $scanPaths = @($governedWorkflows + @($lock.generated_workflow_sources | ForEach-Object { [string]$_ }))
+  foreach ($relativeWorkflow in $scanPaths) {
     $workflow = Join-Path $repo ([string]$relativeWorkflow)
     if (-not (Test-Path -LiteralPath $workflow -PathType Leaf)) { throw "[mir4-actions-workflow-missing] $relativeWorkflow" }
     $text = Get-Content -Raw -LiteralPath $workflow
-    foreach ($match in [regex]::Matches($text, 'uses:\s*(actions/[A-Za-z0-9_-]+)@([A-Za-z0-9._-]+)')) {
+    foreach ($match in [regex]::Matches($text, 'uses:\s*(actions/[A-Za-z0-9_/-]+)@([A-Za-z0-9._-]+)')) {
       $actionName = [string]$match.Groups[1].Value
       $reference = [string]$match.Groups[2].Value
       if (-not $pins.ContainsKey($actionName) -or $reference -cne $pins[$actionName]) {
         throw "[mir4-actions-unpinned] $relativeWorkflow -> $actionName@$reference"
       }
     }
+    if ($relativeWorkflow -in $governedWorkflows) {
+      if ($text -notmatch '(?m)^permissions:\s*(?:\{|$)') { throw "[mir4-actions-permissions-implicit] $relativeWorkflow" }
+      if ($text -match '(?m)^\s{2}pull_request:' -and $text -match 'secrets\.[A-Za-z0-9_]+') {
+        throw "[mir4-actions-public-pr-secret] $relativeWorkflow"
+      }
+      foreach ($write in [regex]::Matches($text,'(?m)(?<permission>[a-z-]+):\s*write\b')) {
+        $permission = [string]$write.Groups['permission'].Value
+        if ($relativeWorkflow -cne '.github/workflows/branch-policy.yml' -or $permission -notin @('checks','statuses')) {
+          throw "[mir4-actions-excess-write-permission] $relativeWorkflow -> $permission"
+        }
+      }
+    }
+  }
+  $builder = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-build.yml')
+  if ($builder -match '(?i)ssh-keygen|private[_-]?key|sign(?:ing)?|upload-artifact|gh\s+release|mod[_ -]?portal' -or
+      $builder -notmatch "Operation='DryRun'") { throw '[mir4-builder-capability-confinement]' }
+  $qualifier = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-qualification.yml')
+  if ($qualifier -match 'Operation=''Execute''|production_mutation_performed\s*=\s*\$true|upload-artifact|gh\s+release|mod[_ -]?portal') {
+    throw '[mir4-qualifier-capability-confinement]'
   }
   $publisher = Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-target-publication.yml')
   if ($publisher -match 'actions/checkout|Build-MIRPackage|mir4\s+platform\s+package' -or
@@ -201,6 +241,9 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t13-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json' = 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t14-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json' = 'spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json' = 'spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -229,6 +272,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json';kind='MIR4T12AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json';kind='MIR4T13AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json';kind='MIR4T14AuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json';kind='MIR4T15AuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -271,6 +315,13 @@ function Test-MIR4PreFreezeAuthorities {
   $review = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json' -Kind 'MIR4IndependentReadinessAcceptanceLunaV1'
   if ([string]$review.verdict -cne 'ACCEPTED-RELEASE-READINESS' -or [bool]$review.maintainer_acceptance) {
     throw '[mir4-prefreeze-independent-review]'
+  }
+  $t15Review = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json' -Kind 'MIR4T15IndependentMachineAcceptanceV1'
+  if ([string]$t15Review.verdict -cne 'ACCEPTED-T15-MACHINE-SCOPE' -or
+      [bool]$t15Review.reviewer.human_reviewer_claimed -or
+      [bool]$t15Review.reviewer.human_acceptance_inferred -or
+      [bool]$t15Review.release_authority) {
+    throw '[mir4-prefreeze-t15-independent-machine-review]'
   }
   return $receipt
 }

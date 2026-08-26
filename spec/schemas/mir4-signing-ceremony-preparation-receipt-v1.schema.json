@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json",
+  "title": "MIR 4 signing ceremony preparation receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "canonicalization", "programme_id", "turn", "status", "source", "authority", "toolchain", "logical_roots", "acl_policy", "rehearsal", "human_blockers", "package_source_sha256", "production_transition_authority", "secret_values_present", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SigningCeremonyPreparationReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "status": {"const": "machine-preparation-passed-human-ceremony-required"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "working_tree_clean"],
+      "properties": {
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "working_tree_clean": {"type": "boolean"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "production_receipt_schema_path", "production_receipt_schema_sha256", "template_path", "template_sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/governance/mir4/signing-ceremony-preparation.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "production_receipt_schema_path": {"const": "spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json"},
+        "production_receipt_schema_sha256": {"$ref": "#/$defs/sha256"},
+        "template_path": {"const": "spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json"},
+        "template_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ssh_keygen_sha256", "algorithm", "signature_format", "rehearsal_encryption"],
+      "properties": {
+        "ssh_keygen_sha256": {"$ref": "#/$defs/sha256"},
+        "algorithm": {"const": "ssh-ed25519"},
+        "signature_format": {"const": "sshsig"},
+        "rehearsal_encryption": {"const": "AES-256-GCM-IN-MEMORY-NON-PRODUCTION"}
+      }
+    },
+    "logical_roots": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_variables", "absolute_external_required", "pairwise_disjoint_required", "publisher_separation_required", "configured_values_recorded"],
+      "properties": {
+        "environment_variables": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["MIR_SIGNING_HOME", "MIR_RECOVERY_COPY_A_HOME", "MIR_RECOVERY_COPY_B_HOME"]}},
+        "absolute_external_required": {"const": true},
+        "pairwise_disjoint_required": {"const": true},
+        "publisher_separation_required": {"const": true},
+        "configured_values_recorded": {"const": false}
+      }
+    },
+    "acl_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inheritance_protected_required", "explicit_approved_sids_required", "approved_owner_required", "broad_principals_forbidden", "synthetic_positive_case", "synthetic_broad_principal_rejection", "synthetic_unapproved_owner_rejection"],
+      "properties": {
+        "inheritance_protected_required": {"const": true},
+        "explicit_approved_sids_required": {"const": true},
+        "approved_owner_required": {"const": true},
+        "broad_principals_forbidden": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"type": "string", "pattern": "^S-1-"}},
+        "synthetic_positive_case": {"const": "passed"},
+        "synthetic_broad_principal_rejection": {"const": "passed"},
+        "synthetic_unapproved_owner_rejection": {"const": "passed"}
+      }
+    },
+    "rehearsal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "production_authority", "identity", "namespace", "public_key_fingerprint", "public_key_sha256", "challenge_sha256", "copies", "copy_ciphertexts_distinct", "both_copies_decrypted", "original_plaintext_deleted_before_restore", "original_acl_policy_passed", "restored_acl_policy_passed", "restored_acl_matched", "restored_fingerprint_matched", "restored_challenge_signature_verified", "ephemeral_plaintext_destroyed", "encryption_keys_retained", "recovery_artifacts_retained"],
+      "properties": {
+        "scope": {"const": "local-non-production-proof-only"},
+        "production_authority": {"const": false},
+        "identity": {"const": "mir4-t15-signing-recovery-rehearsal"},
+        "namespace": {"const": "mir4-ledger"},
+        "public_key_fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+$"},
+        "public_key_sha256": {"$ref": "#/$defs/sha256"},
+        "challenge_sha256": {"$ref": "#/$defs/sha256"},
+        "copies": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["copy_id", "encryption", "ciphertext_sha256", "bytes", "separate_control_fixture", "decryption_verified"],
+            "properties": {
+              "copy_id": {"enum": ["rehearsal-copy-a", "rehearsal-copy-b"]},
+              "encryption": {"const": "AES-256-GCM-IN-MEMORY-NON-PRODUCTION"},
+              "ciphertext_sha256": {"$ref": "#/$defs/sha256"},
+              "bytes": {"type": "integer", "minimum": 1},
+              "separate_control_fixture": {"const": true},
+              "decryption_verified": {"const": true}
+            }
+          }
+        },
+        "copy_ciphertexts_distinct": {"const": true},
+        "both_copies_decrypted": {"const": true},
+        "original_plaintext_deleted_before_restore": {"const": true},
+        "original_acl_policy_passed": {"const": true},
+        "restored_acl_policy_passed": {"const": true},
+        "restored_acl_matched": {"const": true},
+        "restored_fingerprint_matched": {"const": true},
+        "restored_challenge_signature_verified": {"const": true},
+        "ephemeral_plaintext_destroyed": {"const": true},
+        "encryption_keys_retained": {"const": false},
+        "recovery_artifacts_retained": {"const": false}
+      }
+    },
+    "human_blockers": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "state", "next_action"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "state": {"const": "requires-maintainer"},
+          "next_action": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "package_source_sha256": {"$ref": "#/$defs/sha256"},
+    "production_transition_authority": {"$ref": "#/$defs/falseTransitions"},
+    "secret_values_present": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signature", "seal", "promotion", "tag", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signature": {"const": false},
+        "seal": {"const": false},
+        "promotion": {"const": false},
+        "tag": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

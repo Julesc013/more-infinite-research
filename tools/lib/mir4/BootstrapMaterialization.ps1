@@ -820,10 +820,13 @@ function Expand-MIR4SafeArchive {
   param(
     [Parameter(Mandatory)][string]$ArchivePath,
     [Parameter(Mandatory)][string]$Destination,
-    [Parameter(Mandatory)][string]$OutputRoot
+    [Parameter(Mandatory)][string]$OutputRoot,
+    [ValidateRange(1, 100000)][int]$MaxEntries = 4096,
+    [ValidateRange(1, 2147483647)][long]$MaxEntryBytes = 268435456,
+    [ValidateRange(1, 9223372036854775807)][long]$MaxExpandedBytes = 1073741824
   )
 
-  $inventory = Get-MIR4ArchiveInventory -Path $ArchivePath
+  $inventory = Get-MIR4ArchiveInventory -Path $ArchivePath -MaxEntries $MaxEntries -MaxEntryBytes $MaxEntryBytes -MaxExpandedBytes $MaxExpandedBytes
   $safeDestination = Assert-MIR4DescendantPath -Root $OutputRoot -Path $Destination
   if (Test-Path -LiteralPath $safeDestination) {
     Remove-MIR4BuildTree -OutputRoot $OutputRoot -Path $safeDestination

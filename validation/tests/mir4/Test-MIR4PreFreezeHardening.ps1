@@ -99,7 +99,22 @@ if(@($t14.evolved_bindings).Count-lt15-or@($t14.current_authorities).Count-lt25-
    @($t14.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t14-authority-evolution]'
 }
-if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
+$t15=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+$t15Machine=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json')|ConvertFrom-Json -Depth 100
+$t15Acceptance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json')|ConvertFrom-Json -Depth 100
+if(@($t15.evolved_bindings).Count-lt20-or@($t15.current_authorities).Count-lt20-or
+   [string]$t15.turn-cne'T15'-or[string]$t15.status-cne'T15-SUPPLY-CHAIN-PRESERVATION-PASSED-T16-T17-HUMAN-GATES-NEXT-PRODUCTION-UNAUTHORIZED'-or
+   [string]$t15.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t15Machine.status-cne'T15-MACHINE-WORK-COMPLETE-INDEPENDENT-AUDIT-PASSED-HUMAN-GATES-REMAIN'-or
+   [string]$t15Acceptance.verdict-cne'ACCEPTED-T15-MACHINE-SCOPE'-or
+   [bool]$t15Acceptance.reviewer.human_reviewer_claimed-or[bool]$t15Acceptance.reviewer.human_acceptance_inferred-or
+   [bool]$t15Acceptance.release_authority-or
+   $null-ne$t15.execution_transition.next_dependency_ready_turn-or
+   (@($t15.execution_transition.human_blocked_turns)-join'|')-cne'T16|T17'-or
+   @($t15.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t15-authority-evolution]'
+}
+if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $plan=Get-Content -Raw -LiteralPath (Join-Path $repo $planPath)|ConvertFrom-Json -Depth 100
@@ -141,14 +156,21 @@ if($publisher-match'actions/checkout|Build-MIRPackage|mir4\s+platform\s+package'
    $publisher-notmatch'seal-verifier/Test-MIR4PublicationAdmission\.ps1'-or
    $publisher-notmatch'publication_authorized'){throw '[mir4-prefreeze-publisher-capability]'}
 Test-MIR4PublisherAdmissionBindings -WorkflowText $publisher|Out-Null
-foreach($field in $expectedInputs){
-  $pattern='\[string\]\$admission\.'+[regex]::Escape($field)+'\s*-cne\s*''\$\{\{\s*inputs\.'+[regex]::Escape($field)+'\s*\}\}'''
-  $negative=([regex]::new($pattern)).Replace($publisher,'',1)
-  try{
-    Test-MIR4PublisherAdmissionBindings -WorkflowText $negative|Out-Null
-    throw "[mir4-prefreeze-publisher-negative-not-detected] $field"
-  }catch{
-    if($_.Exception.Message-notmatch'^\[mir4-publisher-admission-binding-missing\]'){throw}
+$publisherBindings=[ordered]@{source_release_record='MIR4_SOURCE_RELEASE_RECORD';candidate_id='MIR4_CANDIDATE_ID';source_commit='MIR4_SOURCE_COMMIT';source_tree='MIR4_SOURCE_TREE';target_distribution_record_set='MIR4_TARGET_RECORD_SET';release_plan_digest='MIR4_RELEASE_PLAN_DIGEST';proof_root='MIR4_PROOF_ROOT';seal_root='MIR4_SEAL_ROOT'}
+foreach($binding in $publisherBindings.GetEnumerator()){
+  $field=[string]$binding.Key
+  $environmentVariable=[string]$binding.Value
+  foreach($pattern in @(
+    ('(?m)^\s+'+[regex]::Escape($environmentVariable)+':\s*\$\{\{\s*inputs\.'+[regex]::Escape($field)+'\s*\}\}\s*$')
+    ('\[string\]\$admission\.'+[regex]::Escape($field)+'\s*-cne\s*\$env:'+[regex]::Escape($environmentVariable))
+  )){
+    $negative=([regex]::new($pattern)).Replace($publisher,'',1)
+    try{
+      Test-MIR4PublisherAdmissionBindings -WorkflowText $negative|Out-Null
+      throw "[mir4-prefreeze-publisher-negative-not-detected] $field"
+    }catch{
+      if($_.Exception.Message-notmatch'^\[mir4-publisher-admission-binding-missing\]'){throw}
+    }
   }
 }
 $previewWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/mir4-preview-assets.yml')
@@ -189,4 +211,4 @@ foreach($source in @('tools/lib/mir4/PreFreezeRelease.ps1','tools/lib/mir4/Relea
   $text=Get-Content -Raw -LiteralPath (Join-Path $repo $source)
   if($text-match'(?i)source_freeze_authorized\s*=\s*\$true|production_release_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-prefreeze-forbidden-authority] $source"}
 }
-Write-Host '[ok] MIR 4 pre-freeze receipts, rulesets, action pins, workflows, CLI, predecessor plan, and fail-closed boundaries passed.'
+Write-Host '[ok] MIR 4 T02-T15 pre-freeze receipts, rulesets, action pins, workflows, CLI, predecessor plan, and fail-closed boundaries passed; T16/T17 remain human-blocked.'

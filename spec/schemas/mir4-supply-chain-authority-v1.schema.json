@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-supply-chain-authority-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "programme_id", "turn", "state", "source_version", "candidate_state", "package_visible", "standards", "construction", "identity_sets", "components", "attestation", "capsule", "runner_action_security", "transition_gate"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4SupplyChainAuthorityV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "state": {"const": "pre-freeze-supply-chain-preparation"},
+    "source_version": {"const": "4.0.0"},
+    "candidate_state": {"const": "pre-freeze-unallocated"},
+    "package_visible": {"const": false},
+    "standards": {"type": "object"},
+    "construction": {
+      "type": "object",
+      "required": ["network_policy", "source_date_epoch", "archive_order", "archive_timestamp", "archive_permissions", "path_policy", "text_policy", "clean_roots_required", "byte_identical_repetitions_required"],
+      "properties": {
+        "network_policy": {"const": "disabled"},
+        "source_date_epoch": {"const": "git-commit-time"},
+        "archive_order": {"const": "ordinal-path"},
+        "archive_timestamp": {"const": "1980-01-01T00:00:00Z"},
+        "archive_permissions": {"const": 0},
+        "path_policy": {"const": "portable-relative-no-traversal"},
+        "text_policy": {"type": "string"},
+        "clean_roots_required": {"const": 2},
+        "byte_identical_repetitions_required": {"const": 2}
+      }
+    },
+    "identity_sets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract_set", "platform_profile", "toolchain_locks"],
+      "properties": {
+        "contract_set": {"type": "array", "minItems": 5, "items": {"type": "string"}, "uniqueItems": true},
+        "platform_profile": {"type": "array", "minItems": 3, "items": {"type": "string"}, "uniqueItems": true},
+        "toolchain_locks": {"type": "array", "minItems": 2, "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "components": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": {"$ref": "#/$defs/component"}
+    },
+    "attestation": {"type": "object"},
+    "capsule": {"type": "object"},
+    "runner_action_security": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workflow_lock", "receipt_schema", "public_pull_request_runner", "public_pull_request_secrets_forbidden", "protected_runtime_environment", "protected_runtime_runner", "immutable_source_ref_required", "full_action_commit_required", "direct_dispatch_input_shell_interpolation_forbidden", "maximum_heavy_parallelism", "maximum_lightweight_parallelism", "builder_signing_or_upload_credentials_forbidden", "qualifier_package_mutation_forbidden", "external_mod_release_credentials_forbidden", "publisher_checkout_or_builder_forbidden", "publisher_admission_required"],
+      "properties": {
+        "workflow_lock": {"const": ".mir/releases/governance/mir4/github-actions-lock-v2.json"},
+        "receipt_schema": {"const": "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json"},
+        "public_pull_request_runner": {"const": "windows-latest"},
+        "public_pull_request_secrets_forbidden": {"const": true},
+        "protected_runtime_environment": {"const": "release-candidate"},
+        "protected_runtime_runner": {"const": "self-hosted-windows"},
+        "immutable_source_ref_required": {"const": true},
+        "full_action_commit_required": {"const": true},
+        "direct_dispatch_input_shell_interpolation_forbidden": {"const": true},
+        "maximum_heavy_parallelism": {"const": 1},
+        "maximum_lightweight_parallelism": {"const": 2},
+        "builder_signing_or_upload_credentials_forbidden": {"const": true},
+        "qualifier_package_mutation_forbidden": {"const": true},
+        "external_mod_release_credentials_forbidden": {"const": true},
+        "publisher_checkout_or_builder_forbidden": {"const": true},
+        "publisher_admission_required": {"const": true}
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["component_id", "name", "version", "artifact_class", "target", "source", "license", "copyright", "digest", "inclusion", "source_map", "redistribution_custody"],
+      "properties": {
+        "component_id": {"pattern": "^mir4-[a-z0-9-]+$"},
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "artifact_class": {"enum": ["source-release", "player-distribution", "developer-preview", "verifier-tool"]},
+        "target": {"type": ["string", "null"]},
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["selector", "repository", "paths"],
+          "properties": {
+            "selector": {"enum": ["repository-tracked-source", "player-package-source", "preview-payload", "explicit-files"]},
+            "repository": {"const": "Julesc013/more-infinite-research"},
+            "paths": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+          }
+        },
+        "license": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["declared", "concluded", "evidence"],
+          "properties": {"declared": {"const": "MPL-2.0"}, "concluded": {"const": "NOASSERTION"}, "evidence": {"const": "LICENSE"}}
+        },
+        "copyright": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "classification"],
+          "properties": {"text": {"const": "NOASSERTION"}, "classification": {"type": "string", "minLength": 1}}
+        },
+        "digest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "mode"],
+          "properties": {"algorithm": {"const": "SHA-256"}, "mode": {"type": "string", "minLength": 1}}
+        },
+        "inclusion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "release_capsule_partition", "artifact_name"],
+          "properties": {"required": {"const": true}, "release_capsule_partition": {"const": "public"}, "artifact_name": {"type": "string", "minLength": 1}}
+        },
+        "source_map": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "generator"],
+          "properties": {"mode": {"type": "string", "minLength": 1}, "generator": {"type": ["string", "null"]}}
+        },
+        "redistribution_custody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "evidence", "separate-rights-grant_asserted"],
+          "properties": {
+            "classification": {"const": "repository-declared-mpl-2.0-license-preservation-required"},
+            "evidence": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true},
+            "separate-rights-grant_asserted": {"const": false}
+          }
+        }
+      }
+    }
+  }
+}

@@ -191,6 +191,17 @@ $manifest = New-MIRLayoutManifest -RepoRoot $repo
 if ($manifest.summary.unclassified -ne 0 -or $manifest.summary.case_collisions -ne 0 -or $manifest.summary.links -ne 0) {
   throw "Layout manifest contains unsafe or unclassified paths: $($manifest.summary | ConvertTo-Json -Compress)"
 }
+foreach ($guide in @(
+  'EXTENSION-PROTOCOL.md','FORKING.md','GOVERNANCE.md','MAINTAINER-HANDOFF.md',
+  'PROJECT-CONTINUITY.md','RELEASE-RUNBOOK.md','SECURITY.md','SUPPORT.md'
+)) {
+  $row = @($manifest.entries | Where-Object path -ceq $guide)
+  if ($row.Count -ne 1 -or [string]$row[0].class -cne 'repository-policy' -or
+      [string]$row[0].owner -cne 'documentation-governance' -or
+      [string]$row[0].status -cne 'canonical' -or [bool]$row[0].package_included) {
+    throw "Root governance guide is not canonically package-excluded: $guide"
+  }
+}
 if ($manifest.summary.legacy -eq 0) { throw "Migration baseline unexpectedly contains no legacy paths." }
 
 $migrationPreview = & pwsh -NoProfile -File (Join-Path $repo "tools/maintenance/Remove-MIRDeprecatedWorkRoot.ps1") -RepoRoot $repo | ConvertFrom-Json
