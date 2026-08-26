@@ -79,8 +79,24 @@ function New-MIR4InspectionSection {
   }
 }
 
+function Resolve-MIR4W07ProcessIRComparison {
+  param([Parameter(Mandatory)][string]$RepoRoot,[AllowNull()]$Comparison=$null)
+  $value=$Comparison;$path='embedded:T12/process-ir-comparison'
+  if($null-eq$value){
+    $relative='sdk/preview/mir4/reference/t12/comparisons/f210-base--f210-official.json'
+    $candidate=Join-Path $RepoRoot $relative
+    if(-not(Test-Path -LiteralPath $candidate -PathType Leaf)){return $null}
+    $value=Get-Content -Raw -LiteralPath $candidate|ConvertFrom-Json -Depth 100;$path=$relative
+  }
+  if([int]$value.schema-ne 1-or[string]$value.kind-cne'MIR4ProcessIRComparisonV1'-or[string]$value.work_package-cne'T12'-or
+     -not[bool]$value.offline-or[bool]$value.network_or_upload_authorized-or[bool]$value.mutation_authorized-or
+     [bool]$value.public_support_claim-or[bool]$value.package_visible-or@($value.process_changes).Count-gt 100-or
+     [string]$value.digest-cnotmatch'^sha256:[0-9a-f]{64}$') { throw '[mir4-w07-processir-comparison]' }
+  [pscustomobject][ordered]@{value=$value;path=$path}
+}
+
 function New-MIR4InspectionBundleV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Ledger,[AllowNull()]$SourceIdentity=$null)
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Ledger,[AllowNull()]$SourceIdentity=$null,[AllowNull()]$ProcessIRComparison=$null)
   $repo = Get-MIR4W07RepoRoot $RepoRoot
   Import-MIR4W07CanonicalSupport -RepoRoot $repo
   $authority = Get-MIR4InspectorCompatibilityAuthority -RepoRoot $repo
@@ -102,6 +118,8 @@ function New-MIR4InspectionBundleV1 {
     $inputDigests[$key] = [ordered]@{path=$files[$key];sha256=(Get-MIR4W07FileSha256 $path)}
     $imported[$key] = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
   }
+  $exactComparison=Resolve-MIR4W07ProcessIRComparison -RepoRoot $repo -Comparison $ProcessIRComparison
+  if($null-ne$exactComparison){$inputDigests.process_ir=[ordered]@{path=[string]$exactComparison.path;sha256=([string]$exactComparison.value.digest).Substring(7)}}
   $capabilities = @(
     foreach ($subject in @($Ledger.subjects | Sort-Object subject_id)) {
       foreach ($capability in @($subject.capabilities_or_streams | Sort-Object)) {
@@ -114,22 +132,32 @@ function New-MIR4InspectionBundleV1 {
       [ordered]@{subject_id=[string]$subject.subject_id;qualified_surface=[string]$subject.availability.qualified_surface;excluded_surface=@($subject.availability.excluded_surface);automatic_mutation=$false}
     }
   )
+  $comparisonRows=@()
+  if($null-ne$exactComparison){
+    $comparisonRows=@($exactComparison.value.process_changes|Select-Object -First ([Math]::Max(0,$max-$coverage.Count))|ForEach-Object{
+      [ordered]@{subject_id='process-ir';process=[string]$_.process;change=[string]$_.status;before=$(if($null-ne$_.before){[ordered]@{certainty=[string]$_.before.certainty;disposition=[string]$_.before.disposition;digest=[string]$_.before.digest}}else{$null});after=$(if($null-ne$_.after){[ordered]@{certainty=[string]$_.after.certainty;disposition=[string]$_.after.disposition;digest=[string]$_.after.digest}}else{$null});automatic_mutation=$false}
+    })
+  }
   $diagnostics = @(
     foreach ($subject in @($Ledger.subjects | Sort-Object subject_id)) {
       foreach ($blocker in @($subject.blockers)) { [ordered]@{subject_id=[string]$subject.subject_id;severity='review';code='mir4-w07-bounded-blocker';message=[string]$blocker} }
     }
-    [ordered]@{subject_id='process-ir';severity='review';code=[string]$imported.process_ir.exact_target_status;message=[string]$imported.process_ir.exact_target_reason}
+    if($null-eq$exactComparison){[ordered]@{subject_id='process-ir';severity='review';code=[string]$imported.process_ir.exact_target_status;message=[string]$imported.process_ir.exact_target_reason}}
+    else{[ordered]@{subject_id='process-ir';severity='information';code='mir4-t12-exact-comparison-captured';message="Exact bounded comparison $($exactComparison.value.a.capture_id) to $($exactComparison.value.b.capture_id); changes=$($exactComparison.value.process_change_count); truncated=$($exactComparison.value.truncated)."}}
   )
   $proof = @(
     foreach ($subject in @($Ledger.subjects | Sort-Object subject_id)) {
       [ordered]@{subject_id=[string]$subject.subject_id;state=[string]$subject.proof.state;evidence_count=@($subject.proof.evidence).Count;claim_eligible=$false}
     }
   )
+  if($null-ne$exactComparison){$proof+= [ordered]@{subject_id='process-ir';state='exact-target-preview-captured';evidence_count=2;claim_eligible=$false;comparison_digest=[string]$exactComparison.value.digest}}
+  $overview=[ordered]@{programme_id=[string]$authority.programme_id;maturity='developer-preview';subject_count=[int]$Ledger.subject_count;target_count=@($Ledger.target_dispositions).Count;read_only=$true}
+  if($null-ne$exactComparison){$overview['exact_processir']=[ordered]@{status='captured-bounded-preview';a=$exactComparison.value.a;b=$exactComparison.value.b;change_count=[int]$exactComparison.value.process_change_count;truncated=[bool]$exactComparison.value.truncated;digest=[string]$exactComparison.value.digest}}
   $sections = @(
-    New-MIR4InspectionSection -Id overview -Label 'Overview' -MaxItems $max -Items @([ordered]@{programme_id=[string]$authority.programme_id;maturity='developer-preview';subject_count=[int]$Ledger.subject_count;target_count=@($Ledger.target_dispositions).Count;read_only=$true})
+    New-MIR4InspectionSection -Id overview -Label 'Overview' -MaxItems $max -Items @($overview)
     New-MIR4InspectionSection -Id capabilities -Label 'Capabilities' -MaxItems $max -Items $capabilities
     New-MIR4InspectionSection -Id research-streams -Label 'Research streams' -MaxItems $max -Items @([ordered]@{authority='.mir/streams.yml';mode='digest-bound-reference-only';sha256=(Get-MIR4W07FileSha256 (Join-Path $repo '.mir/streams.yml'))})
-    New-MIR4InspectionSection -Id recipe-productivity-coverage -Label 'Recipe/productivity coverage' -MaxItems $max -Items $coverage
+    New-MIR4InspectionSection -Id recipe-productivity-coverage -Label 'Recipe/productivity coverage' -MaxItems $max -Items @($coverage+$comparisonRows)
     New-MIR4InspectionSection -Id compatibility -Label 'Compatibility' -MaxItems $max -Items @($Ledger.subjects | Sort-Object subject_id)
     New-MIR4InspectionSection -Id diagnostics -Label 'Diagnostics' -MaxItems $max -Items $diagnostics
     New-MIR4InspectionSection -Id settings-profile -Label 'Settings/profile' -MaxItems $max -Items @([ordered]@{maturity='developer-preview';network='denied';upload='denied';mutation='denied';factory='data-only'})

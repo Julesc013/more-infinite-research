@@ -49,6 +49,7 @@ Usage:
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
   .\tools\mir.ps1 mir4 processir-synthesis <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 exact-processir <export|check> [--capture <id>]... [--repetitions <1-4>] [--output <path>] [--reference <path>] [--publish-reference]
   .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 whole-platform <check|matrix|target-key> [--target <FNNN>]
   .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
@@ -706,6 +707,29 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $processArguments.OutputRoot = $output }
         & (Join-Path $repo "tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1") @processArguments
+      }
+      "exact-processir" {
+        if ($Args.Count -lt 3) { throw "mir4 exact-processir requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 exact-processir command: $subcommand" }
+        $exactArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $captures = @(Get-MIRArgValues -Items $Args -Name '--capture')
+        if ($captures.Count) { $exactArguments.CaptureId = $captures }
+        $repetitionsText = Get-MIRArgValue -Items $Args -Name '--repetitions' -Default '2'
+        $repetitions = 0
+        if (-not [int]::TryParse($repetitionsText,[ref]$repetitions) -or $repetitions -lt 1 -or $repetitions -gt 4) { throw "--repetitions must be an integer from 1 through 4." }
+        $exactArguments.Repetitions = $repetitions
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $reference = Get-MIRArgValue -Items $Args -Name '--reference'
+        if (-not [string]::IsNullOrWhiteSpace($output)) {
+          if ($subcommand -eq 'check') { $exactArguments.ReferenceRoot = $output } else { $exactArguments.OutputRoot = $output }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($reference)) { $exactArguments.ReferenceRoot = $reference }
+        if (Test-MIRArgSwitch -Items $Args -Name '--publish-reference') {
+          if ($subcommand -eq 'check') { throw "--publish-reference is valid only for exact-processir export." }
+          $exactArguments.PublishReference = $true
+        }
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1") @exactArguments
       }
       "inspector-compatibility" {
         if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility requires export or check." }

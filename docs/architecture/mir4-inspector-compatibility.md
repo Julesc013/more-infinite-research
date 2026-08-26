@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
 ---
@@ -19,6 +19,8 @@ The one-way data flow is:
 terminal claims and compatibility policy + W02–W06 records + SOL07 receipt
   -> CompatibilityIndex copied DTOs
   -> multidimensional SupportAssessment ledger
+T12 exact ProcessIR snapshots -> bounded A/B comparison DTO
+  -> the same fixed Inspector bundle contract
   -> offline Inspector V1 and data-only Compatibility Factory bundle
 ```
 
@@ -28,6 +30,8 @@ terminal claims and compatibility policy + W02–W06 records + SOL07 receipt
 
 Inspector V0 remains unchanged under `sdk/preview/mir4/inspector`. Inspector V1 lives separately under `sdk/preview/mir4/inspector-v1`. V1 accepts only `MIR4InspectionBundleV1`, renders eleven fixed bounded sections, uses native keyboard controls and accessible tables/live regions, keeps strings in a localization catalogue, and has a network-denying content security policy. It performs no upload, remote fetch, runtime polling, or mutation.
 
+T12 supplies Inspector V1 with exact target/environment A/B comparisons without adding a twelfth section or importing mutable compiler objects. The overview carries both capture identities, environment-lock and snapshot digests, the total change count, and truncation state. Recipe/productivity coverage receives copied bounded change rows; diagnostics replace the former exact-snapshot blocker with `mir4-t12-exact-comparison-captured`; proof status remains non-claim-eligible. At most 100 rows enter any section, while the comparison record preserves the untruncated count. The default workbench uses the tracked F210 base-to-official comparison when the T12 reference exists.
+
 The named ecosystem ledger preserves the current evidence boundary:
 
 - Base/official, AAI, BZ, and Bob have narrow f210 load observations only.
@@ -36,4 +40,4 @@ The named ecosystem ledger preserves the current evidence boundary:
 - Space Exploration remains `extension-required` with no complete current exact dependency closure.
 - IR4 additionally retains `BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER`.
 
-The exact W07 records are `MIR4_INSPECTOR_WORKBENCH_RESULT.json` and `MIR4_COMPATIBILITY_SUBJECT_LEDGER.json`. Both bind their source commit/tree when exported, record content-addressed inputs, remain developer preview, and set package, player-mutation, public-proof, support-publication, signing, and publication authority to false.
+The exact W07 records are `MIR4_INSPECTOR_WORKBENCH_RESULT.json` and `MIR4_COMPATIBILITY_SUBJECT_LEDGER.json`. T12 comparison bundles are under `sdk/preview/mir4/reference/t12/inspector`. All bind content-addressed inputs, remain developer preview, and set package, player-mutation, public-proof, support-publication, signing, and publication authority to false. Exact ProcessIR observation closes an evidence-availability blocker; it does not transfer a compatibility claim between environments or satisfy `BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER`.

@@ -17,6 +17,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ExactProcessIR.ps1')
+. (Join-Path $repo 'tools/lib/mir4/Inspector.ps1')
 
 function Resolve-T12Output([string]$Relative,[string]$AllowedRoot){
   $full=[IO.Path]::GetFullPath((Join-Path $repo $Relative));$allowed=[IO.Path]::GetFullPath((Join-Path $repo $AllowedRoot)).TrimEnd('\')+'\'
@@ -38,6 +39,7 @@ function Test-T12Reference([string]$Root){
   }
   foreach($lockFile in Get-ChildItem -LiteralPath (Join-Path $Root 'locks') -File -Filter '*.json'){$lock=Get-Content -Raw -LiteralPath $lockFile.FullName|ConvertFrom-Json -Depth 100;Test-MIR4EnvironmentLockV1 $lock|Out-Null}
   foreach($snapshotFile in Get-ChildItem -LiteralPath (Join-Path $Root 'snapshots') -File -Filter '*.json'){$snapshot=Get-Content -Raw -LiteralPath $snapshotFile.FullName|ConvertFrom-Json -Depth 100;if([string]$snapshot.digest-cne(Get-MIR4T12RecordDigest $snapshot)-or-not$snapshot.observer.deterministic-or$snapshot.package_visible-or$snapshot.authoritative){throw "[mir4-t12-reference-snapshot] $($snapshot.capture_id)"}}
+  foreach($bundleFile in Get-ChildItem -LiteralPath (Join-Path $Root 'inspector') -File -Filter '*.json'){$bundle=Get-Content -Raw -LiteralPath $bundleFile.FullName|ConvertFrom-Json -Depth 100;Test-MIR4InspectionBundleV1 -Bundle $bundle -RepoRoot $repo|Out-Null}
   $receipt=Get-Content -Raw -LiteralPath (Join-Path $Root 'MIR4_T12_RECEIPT.json')|ConvertFrom-Json -Depth 100
   if([string]$receipt.digest-cne(Get-MIR4T12RecordDigest -Value $receipt -Domain 'mir4:t12-receipt:1')-or[string]$receipt.status-notin@('completed-machine-work','completed-machine-work-with-custody-blocker')-or-not$receipt.package_source_unchanged){throw '[mir4-t12-reference-receipt]'}
   [pscustomobject][ordered]@{status='passed';capture_count=[int]$receipt.capture_count;reference_root=$Root;package_visible=$false}
@@ -84,6 +86,14 @@ foreach($snapshot in $snapshots){
     Write-T12Json -Path (Join-Path $output "comparisons/$baseId--$($snapshot.capture_id).json") -Value $comparison
   }
 }
+$ledger=New-MIR4CompatibilitySubjectLedger -RepoRoot $repo -SourceIdentity $source
+$inspectorBundles=@()
+foreach($comparison in $comparisons){
+  $bundle=New-MIR4InspectionBundleV1 -RepoRoot $repo -Ledger $ledger -SourceIdentity $source -ProcessIRComparison $comparison
+  Test-MIR4InspectionBundleV1 -Bundle $bundle -RepoRoot $repo|Out-Null
+  $inspectorBundles+=$bundle
+  Write-T12Json -Path (Join-Path $output "inspector/$($comparison.a.capture_id)--$($comparison.b.capture_id).json") -Value $bundle
+}
 $w06=New-MIR4W06Records -RepoRoot $repo -SourceIdentity $source
 $effects=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactEffectObservationV1';source_identity=$source;effect_channel_registry_digest=[string]$w06.effects.digest;captures=@($snapshots|Sort-Object capture_id|ForEach-Object{[ordered]@{capture_id=$_.capture_id;environment_lock_digest=$_.environment_lock_digest;snapshot_digest=$_.digest;classification_counts=$_.classification_counts}});copied_not_reclassified=$true;automatic_mutation=$false;package_visible=$false;digest=''}
 Add-MIR4T12RecordDigest -Value $effects -Domain 'mir4:t12-effects:1'|Out-Null
@@ -96,7 +106,7 @@ $receipt=[pscustomobject][ordered]@{
   schema=1;kind='MIR4T12ReceiptV1';work_package='T12';status=$(if($blockers.Count){'completed-machine-work-with-custody-blocker'}else{'completed-machine-work'});source_identity=$source
   capture_count=$snapshots.Count;required_capture_count=$authority.captures.Count;targets=@($snapshots.target|Sort-Object -Unique -CaseSensitive);capture_ids=@($snapshots.capture_id|Sort-Object -CaseSensitive)
   blocker_count=$blockers.Count;blockers=@($blockers|ForEach-Object{[ordered]@{capture_id=$_.capture_id;status=$_.status;digest=$_.digest}})
-  repetitions=$Repetitions;all_deterministic=(@($sets|Where-Object{-not$_.deterministic}).Count-eq 0);comparison_count=$comparisons.Count
+  repetitions=$Repetitions;all_deterministic=(@($sets|Where-Object{-not$_.deterministic}).Count-eq 0);comparison_count=$comparisons.Count;inspector_bundle_count=$inspectorBundles.Count
   exact_target_processir_status=$(if(($snapshots.Count+$blockers.Count)-eq$authority.captures.Count-and$Repetitions-ge[int]$authority.required_repetitions){$(if($blockers.Count){'CAPTURED-EXACT-F210-F200-PROCESSIR-PREVIEW-WITH-DECLARED-CUSTODY-BLOCKER'}else{'CAPTURED-EXACT-F210-F200-PROCESSIR-PREVIEW'})}else{'PARTIAL-LOCAL-T12-CAPTURE'})
   bilateral_synthetic_gate_preserved=[bool]$w06.parity.bilateral_gate.passed;terminal_fact_authority_preserved=$true;explicit_unavailable_not_zero=$true
   package_source_before=$packageBefore;package_source_after=$packageAfter;package_source_unchanged=($packageBefore-ceq$packageAfter)
@@ -107,7 +117,7 @@ if(-not$receipt.package_source_unchanged-or-not$receipt.all_deterministic){throw
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_RECEIPT.json') -Value $receipt
 
 $files=@(Get-ChildItem -LiteralPath $output -Recurse -File -Filter '*.json'|Where-Object{$_.Name-cne'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'}|Sort-Object FullName|ForEach-Object{[ordered]@{path=[IO.Path]::GetRelativePath($output,$_.FullName).Replace('\','/');bytes=$_.Length;sha256='sha256:'+(Get-MIR4T12FileSha256 $_.FullName)}})
-$manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactProcessIRManifestV1';source_identity=$source;capture_count=$snapshots.Count;blocker_count=$blockers.Count;comparison_count=$comparisons.Count;files=$files;complete=(($snapshots.Count+$blockers.Count)-eq$authority.captures.Count);package_visible=$false;digest=''}
+$manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactProcessIRManifestV1';source_identity=$source;capture_count=$snapshots.Count;blocker_count=$blockers.Count;comparison_count=$comparisons.Count;inspector_bundle_count=$inspectorBundles.Count;files=$files;complete=(($snapshots.Count+$blockers.Count)-eq$authority.captures.Count);package_visible=$false;digest=''}
 Add-MIR4T12RecordDigest -Value $manifest -Domain 'mir4:t12-manifest:1'|Out-Null
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json') -Value $manifest
 
