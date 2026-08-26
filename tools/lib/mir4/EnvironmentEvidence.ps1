@@ -55,11 +55,17 @@ function ConvertTo-MIR4PortableSha256 {
 
 function ConvertTo-MIR4EnvironmentRows {
   param([AllowEmptyCollection()]$Rows,[Parameter(Mandatory)][string]$IdField,[Parameter(Mandatory)][string]$Diagnostic)
-  $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $byId = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
+  foreach ($row in @($Rows)) {
+    $id = [string]$row.$IdField
+    if ([string]::IsNullOrWhiteSpace($id) -or $byId.ContainsKey($id)) { throw "[$Diagnostic] $id" }
+    $byId.Add($id,$row)
+  }
+  [string[]]$ids = @($byId.Keys)
+  [Array]::Sort($ids,[StringComparer]::Ordinal)
   $result = @(
-    foreach ($row in @($Rows | Sort-Object -Property $IdField -CaseSensitive)) {
-      $id = [string]$row.$IdField
-      if ([string]::IsNullOrWhiteSpace($id) -or -not $seen.Add($id)) { throw "[$Diagnostic] $id" }
+    foreach ($id in $ids) {
+      $row = $byId[$id]
       $copy = [ordered]@{}
       foreach ($property in @($row.PSObject.Properties | Sort-Object Name -CaseSensitive)) { $copy[$property.Name] = $property.Value }
       [pscustomobject]$copy
