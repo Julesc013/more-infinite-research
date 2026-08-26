@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-spdx-2.3-compatibility.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spdxVersion",
+    "dataLicense",
+    "SPDXID",
+    "name",
+    "documentNamespace",
+    "creationInfo",
+    "documentDescribes",
+    "packages",
+    "files",
+    "relationships"
+  ],
+  "properties": {
+    "spdxVersion": {"const": "SPDX-2.3"},
+    "dataLicense": {"const": "CC0-1.0"},
+    "SPDXID": {"const": "SPDXRef-DOCUMENT"},
+    "name": {"type": "string", "minLength": 1},
+    "documentNamespace": {"format": "uri"},
+    "creationInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created", "creators"],
+      "properties": {
+        "created": {"format": "date-time"},
+        "creators": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "documentDescribes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"pattern": "^SPDXRef-Package-mir4-[a-z0-9-]+$"}
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "SPDXID", "versionInfo", "downloadLocation", "filesAnalyzed", "licenseConcluded", "licenseDeclared", "copyrightText", "externalRefs"],
+        "properties": {
+          "SPDXID": {"pattern": "^SPDXRef-Package-mir4-[a-z0-9-]+$"},
+          "filesAnalyzed": {"const": true},
+          "licenseConcluded": {"const": "NOASSERTION"},
+          "licenseDeclared": {"const": "MPL-2.0"},
+          "copyrightText": {"const": "NOASSERTION"}
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["fileName", "SPDXID", "checksums", "licenseConcluded", "licenseInfoInFiles", "copyrightText"],
+        "properties": {
+          "checksums": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["algorithm", "checksumValue"],
+              "properties": {
+                "algorithm": {"const": "SHA256"},
+                "checksumValue": {"pattern": "^[a-f0-9]{64}$"}
+              }
+            }
+          },
+          "licenseConcluded": {"const": "NOASSERTION"},
+          "copyrightText": {"const": "NOASSERTION"}
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["spdxElementId", "relationshipType", "relatedSpdxElement"],
+        "properties": {
+          "relationshipType": {"enum": ["DESCRIBES", "CONTAINS"]}
+        }
+      }
+    }
+  }
+}

@@ -203,6 +203,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-compatibility-factory-data-bundle-v1 | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-compatibility-subject-ledger-v1 | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-compilation-run-v1 | [MIR 4 Semantic Compiler Shadow](../../architecture/mir4-semantic-compiler.md) | current |
+| mir4-component-inventory-projections | [MIR 4 Supply-Chain and Preservation](../../maintainer/mir4-supply-chain-preservation.md) | current |
 | mir4-continuity-bundle-v1 | [MIR 4 Runtime, State, Migration, and Continuity](../../architecture/mir4-runtime-continuity.md) | current |
 | mir4-continuity-incident-successor-runbook | [MIR 4 Continuity, Incident, and Successor Operations](../../maintainer/mir4-continuity.md) | current |
 | mir4-dev-and-source-freeze-stop-boundary | [MIR 4 Full-Platform Private Closeout](../../maintainer/mir4-full-platform-closeout.md) | current |
@@ -272,6 +273,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-r0-bootstrap-root-set | [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md) | current |
 | mir4-r0-current-status | [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md) | current |
 | mir4-r0-executable-queue | [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md) | current |
+| mir4-release-capsule-preservation | [MIR 4 Supply-Chain and Preservation](../../maintainer/mir4-supply-chain-preservation.md) | current |
 | mir4-release-ledger-policy | [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md) | current |
 | mir4-release-operations-runbook | [MIR 4 Release Operations](../../maintainer/mir4-release-operations.md) | current |
 | mir4-release-readiness-reconciliation | [MIR 4 Full-Platform Private Closeout](../../maintainer/mir4-full-platform-closeout.md) | current |
@@ -285,6 +287,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-spark-sol-handoff | [MIR 4 Spark To Sol Handoff And Completion Plan](../../maintainer/mir4-spark-sol-handoff.md) | current |
 | mir4-stable-diagnostic-registry | [MIR Canonical JSON V1](../../reference/mir4-canonical-json-v1.md) | current |
 | mir4-state-spec-v1 | [MIR 4 Runtime, State, Migration, and Continuity](../../architecture/mir4-runtime-continuity.md) | current |
+| mir4-supply-chain-provenance | [MIR 4 Supply-Chain and Preservation](../../maintainer/mir4-supply-chain-preservation.md) | current |
 | mir4-support-bundle-redaction | [MIR 4 Environment Evidence V1](../../reference/mir4-environment-evidence.md) | current |
 | mir4-synthesis-maturity-matrix-v1 | [MIR 4 ProcessIR, Effect Channels, and Synthesis](../../architecture/mir4-processir-synthesis.md) | current |
 | mir4-synthetic-successor-host-proof | [MIR 4 Historical, Museum, and Successor-Host Closure](../../architecture/mir4-historical-succession.md) | current |

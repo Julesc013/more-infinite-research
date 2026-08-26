@@ -186,6 +186,7 @@ Ages are measured against the newest governed review date, 2026-08-26, so checko
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-24 | 2 | current-window |
 | docs/maintainer/mir4-release-operations.md | current | 2026-08-26 | 0 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 6 | current-window |
+| docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-26 | 0 | current-window |
 | docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-23 | 3 | current-window |
 | docs/maintainer/modpack-campaigns.md | current | 2026-08-03 | 23 | current-window |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | current | 2026-08-03 | 23 | current-window |

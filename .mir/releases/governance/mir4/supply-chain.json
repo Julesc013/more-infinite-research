@@ -1,0 +1,209 @@
+{
+  "schema": 1,
+  "kind": "MIR4SupplyChainAuthorityV1",
+  "programme_id": "M4C02-09-24H",
+  "turn": "T15",
+  "state": "pre-freeze-supply-chain-preparation",
+  "source_version": "4.0.0",
+  "candidate_state": "pre-freeze-unallocated",
+  "package_visible": false,
+  "standards": {
+    "primary_sbom": {
+      "name": "SPDX",
+      "version": "3.0.1",
+      "serialization": "JSON-LD",
+      "context": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld",
+      "spec_commit": "61a649da8ca27924ac1ca8d2a061cb228839b24c",
+      "official_schema_sha256": "582C64E809D5B3EF9BD0C4DE13A32391B47B0284A3E8D199569FB96F649234B1"
+    },
+    "compatibility_sbom": {"name": "SPDX", "version": "2.3", "serialization": "JSON"},
+    "provenance": {
+      "statement": "https://in-toto.io/Statement/v1",
+      "predicate": "https://slsa.dev/provenance/v1",
+      "spec_commit": "4d7f142300264276bd3d45ab91d2b0eeb4227932",
+      "official_schema_sha256": "0D68F4CE799A5152151E0EFD0FC7AE3B3769B512810D8667EAB2CE77E25DE40F"
+    },
+    "canonicalization": "MIR4BootstrapCanonicalJsonV1"
+  },
+  "construction": {
+    "network_policy": "disabled",
+    "source_date_epoch": "git-commit-time",
+    "archive_order": "ordinal-path",
+    "archive_timestamp": "1980-01-01T00:00:00Z",
+    "archive_permissions": 0,
+    "path_policy": "portable-relative-no-traversal",
+    "text_policy": "canonical-records-utf8-lf-no-bom-source-payload-preserved",
+    "clean_roots_required": 2,
+    "byte_identical_repetitions_required": 2
+  },
+  "identity_sets": {
+    "contract_set": [
+      "spec/api/mir4-v1/contracts.json",
+      "spec/api/mir4-v1/schema-namespace.json",
+      "spec/api/mir4-v1/diagnostics.json",
+      "spec/api/mir4-v1/compatibility.json",
+      "spec/canonicalization/mir-canonical-json-v1.json"
+    ],
+    "platform_profile": [
+      ".mir/targets.json",
+      ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+      ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json"
+    ],
+    "toolchain_locks": [
+      "mir.lock",
+      ".mir/releases/governance/mir4/github-actions-lock-v2.json"
+    ]
+  },
+  "components": [
+    {
+      "component_id": "mir4-source-release",
+      "name": "More Infinite Research 4 source release",
+      "version": "4.0.0",
+      "artifact_class": "source-release",
+      "target": null,
+      "source": {"selector": "repository-tracked-source", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-repository-wide-copyright-notice-observed"},
+      "digest": {"algorithm": "SHA-256", "mode": "ordinal-path-byte-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-source-release.zip"},
+      "source_map": {"mode": "mixed-generated-and-manual", "generator": "tools/lib/mir4/SupplyChain.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-player-f210",
+      "name": "More Infinite Research 4 F210 player distribution",
+      "version": "4.0.21000",
+      "artifact_class": "player-distribution",
+      "target": "f210",
+      "source": {"selector": "player-package-source", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "repository-history-attribution-only-no-new-ownership-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-content-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "more-infinite-research_4.0.21000.zip"},
+      "source_map": {"mode": "one-emitter-package-source", "generator": "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE", "thumbnail.png"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-player-f200",
+      "name": "More Infinite Research 4 F200 player distribution",
+      "version": "4.0.20000",
+      "artifact_class": "player-distribution",
+      "target": "f200",
+      "source": {"selector": "player-package-source", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "repository-history-attribution-only-no-new-ownership-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-content-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "more-infinite-research_4.0.20000.zip"},
+      "source_map": {"mode": "one-emitter-package-source", "generator": "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE", "thumbnail.png"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-preview-api-sdk-v1",
+      "name": "MIR4 API SDK V1 developer preview",
+      "version": "4.0.0-preview",
+      "artifact_class": "developer-preview",
+      "target": null,
+      "source": {"selector": "preview-payload", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-payload-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-api-sdk-v1-preview.zip"},
+      "source_map": {"mode": "generated-preview", "generator": "tools/lib/mir4/PlatformPreview.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-preview-mep-v1",
+      "name": "MIR4 MEP V1 developer preview",
+      "version": "4.0.0-preview",
+      "artifact_class": "developer-preview",
+      "target": null,
+      "source": {"selector": "preview-payload", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-payload-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-mep-v1-preview.zip"},
+      "source_map": {"mode": "generated-preview", "generator": "tools/lib/mir4/PlatformPreview.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-preview-reference-extension-v1",
+      "name": "MIR4 reference extension V1 developer preview",
+      "version": "4.0.0-preview",
+      "artifact_class": "developer-preview",
+      "target": null,
+      "source": {"selector": "preview-payload", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-payload-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-reference-extension-v1-preview.zip"},
+      "source_map": {"mode": "generated-preview", "generator": "tools/lib/mir4/PlatformPreview.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-preview-inspector-v1",
+      "name": "MIR4 Inspector V1 developer preview",
+      "version": "4.0.0-preview",
+      "artifact_class": "developer-preview",
+      "target": null,
+      "source": {"selector": "preview-payload", "repository": "Julesc013/more-infinite-research", "paths": []},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "archive-bytes-and-payload-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-inspector-v1-preview.zip"},
+      "source_map": {"mode": "generated-preview", "generator": "tools/lib/mir4/PlatformPreview.ps1"},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-offline-seal-verifier",
+      "name": "MIR4 offline seal and restoration verifier",
+      "version": "4.0.0",
+      "artifact_class": "verifier-tool",
+      "target": null,
+      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/lib/mir4/OfflineCandidateCustody.ps1", "spec/schemas/mir4-offline-seal.schema.json", "spec/schemas/mir4-restoration-receipt.schema.json"]},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "ordinal-path-byte-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-offline-seal-verifier"},
+      "source_map": {"mode": "manual-tool-source", "generator": null},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    },
+    {
+      "component_id": "mir4-supply-chain-verifier",
+      "name": "MIR4 supply-chain verifier",
+      "version": "4.0.0",
+      "artifact_class": "verifier-tool",
+      "target": null,
+      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/lib/mir4/SupplyChain.ps1", "tools/commands/mir4/Invoke-MIR4SupplyChain.ps1", "spec/schemas/mir4-supply-chain-authority-v1.schema.json"]},
+      "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
+      "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
+      "digest": {"algorithm": "SHA-256", "mode": "ordinal-path-byte-root"},
+      "inclusion": {"required": true, "release_capsule_partition": "public", "artifact_name": "mir4-supply-chain-verifier"},
+      "source_map": {"mode": "manual-tool-source", "generator": null},
+      "redistribution_custody": {"classification": "repository-declared-mpl-2.0-license-preservation-required", "evidence": ["LICENSE"], "separate-rights-grant_asserted": false}
+    }
+  ],
+  "attestation": {
+    "offline_namespace": "mir4-supply-chain",
+    "github_subject_list_required": true,
+    "trusted_roots_required": true,
+    "revocation_snapshot_required": true,
+    "production_key_generation_authorized": false
+  },
+  "capsule": {
+    "public_partition_required": true,
+    "private_partition_inventory_required": true,
+    "private_key_bytes_forbidden": true,
+    "content_addressed": true,
+    "append_only": true,
+    "offline_restore_required": true
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  }
+}

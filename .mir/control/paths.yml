@@ -69,6 +69,11 @@ paths:
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json
   spec.schemas.mir4-final-programme-reconciliation: spec/schemas/mir4-final-programme-reconciliation.schema.json
+  spec.schemas.mir4-supply-chain-authority-v1: spec/schemas/mir4-supply-chain-authority-v1.schema.json
+  spec.schemas.mir4-component-inventory-v1: spec/schemas/mir4-component-inventory-v1.schema.json
+  spec.schemas.mir4-spdx-3.0.1-profile: spec/schemas/mir4-spdx-3.0.1-profile.schema.json
+  spec.schemas.mir4-spdx-2.3-compatibility: spec/schemas/mir4-spdx-2.3-compatibility.schema.json
+  spec.schemas.mir4-slsa-provenance-v1: spec/schemas/mir4-slsa-provenance-v1.schema.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
   validation.adapters: validation/adapters
@@ -81,6 +86,7 @@ paths:
   validation.scenarios.local-2.0: validation/scenarios/local-2.0.json
   validation.scenarios.local-2.1: validation/scenarios/local-2.1.json
   validation.tests: validation/tests
+  validation.tests.mir4.supply-chain-foundation: validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
@@ -157,6 +163,7 @@ paths:
   tools.commands.mir4.assurance-scale-records: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
   tools.commands.mir4.pre-freeze: tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
   tools.commands.mir4.release-workflow: tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
+  tools.commands.mir4.supply-chain: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
   tools.lib.mir4: tools/lib/mir4
   tools.lib.mir4.bootstrap-materialization: tools/lib/mir4/BootstrapMaterialization.ps1
   tools.lib.mir4.target-compiler: tools/lib/mir4/TargetCompiler.ps1
@@ -174,6 +181,7 @@ paths:
   tools.lib.mir4.offline-candidate-custody: tools/lib/mir4/OfflineCandidateCustody.ps1
   tools.lib.mir4.package-presentation: tools/lib/mir4/PackagePresentation.ps1
   tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
+  tools.lib.mir4.supply-chain: tools/lib/mir4/SupplyChain.ps1
   tools.lib.mir4.release-phase-engine: tools/lib/mir4/ReleasePhaseEngine.ps1
   tools.lib.mir4.release-adapters: tools/lib/mir4/ReleaseAdapters.ps1
   tools.lib.mir4.release-lifecycle-adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
@@ -257,6 +265,7 @@ paths:
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json
   releases.governance.mir4.github-actions-lock-v2: .mir/releases/governance/mir4/github-actions-lock-v2.json
+  releases.governance.mir4.supply-chain: .mir/releases/governance/mir4/supply-chain.json
   releases.governance.mir4.ruleset-snapshot-2026-08-24: .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json
   releases.waves.mir4-r0-queue: .mir/releases/waves/mir4-r0/queue.json

@@ -1348,6 +1348,16 @@ docs:
     source_of_truth_for:
       - mir4-spark-sol-handoff
       - mir4-m4c01-next-work-plan
+  - path: docs/maintainer/mir4-supply-chain-preservation.md
+    title: "MIR 4 Supply-Chain and Preservation"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-component-inventory-projections
+      - mir4-supply-chain-provenance
+      - mir4-release-capsule-preservation
   - path: docs/maintainer/mir4-w09-manual-playtest.md
     title: "MIR 4 W09 Manual Playtest Handoff"
     status: current
