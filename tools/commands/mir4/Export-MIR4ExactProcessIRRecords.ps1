@@ -24,7 +24,7 @@ function Resolve-T12Output([string]$Relative,[string]$AllowedRoot){
 }
 function Write-T12Json([string]$Path,$Value){
   $parent=Split-Path -Parent $Path;if(-not(Test-Path -LiteralPath $parent)){New-Item -ItemType Directory -Path $parent -Force|Out-Null}
-  [IO.File]::WriteAllText($Path,(ConvertTo-MIR4CanonicalJsonV1 $Value)+"`n",[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($Path,(ConvertTo-MIR4ProcessIRCanonicalJson $Value)+"`n",[Text.UTF8Encoding]::new($false))
 }
 function Test-T12Reference([string]$Root){
   $manifestPath=Join-Path $Root 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'

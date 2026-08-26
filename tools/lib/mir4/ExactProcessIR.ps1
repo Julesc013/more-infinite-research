@@ -28,7 +28,13 @@ function Get-MIR4T12FileSha256 {
 
 function Get-MIR4T12RecordDigest {
   param([Parameter(Mandatory)]$Value,[string]$Domain='mir4:exact-processir:1')
-  Get-MIR4CanonicalDigestV1 -Value $Value -Domain $Domain -OmitTopLevelDigest
+  if($Domain-cnotmatch'^mir4:[a-z0-9][a-z0-9.:-]{0,95}$'){throw "[mir4-t12-digest-domain] $Domain"}
+  $material=[ordered]@{}
+  if($Value-is[Collections.IDictionary]){foreach($key in $Value.Keys){if([string]$key-cne'digest'){$material[[string]$key]=$Value[$key]}}}
+  else{foreach($property in $Value.PSObject.Properties){if($property.Name-cne'digest'){$material[$property.Name]=$property.Value}}}
+  $json=ConvertTo-MIR4ProcessIRCanonicalJson $material
+  $bytes=[Text.UTF8Encoding]::new($false).GetBytes($Domain+"`0"+$json)
+  $sha=[Security.Cryptography.SHA256]::Create();try{'sha256:'+([BitConverter]::ToString($sha.ComputeHash($bytes)).Replace('-','').ToLowerInvariant())}finally{$sha.Dispose()}
 }
 
 function Add-MIR4T12RecordDigest {
