@@ -275,7 +275,8 @@ function Invoke-MIR4T12ExactCapture {
     $observerSource=Join-Path $run 'observer-source'
     Write-MIR4T12ObserverSource -RepoRoot $repo -Path $observerSource -Capture $Capture -Target $target -MaximumProcesses ([int]$Authority.maximum_processes_per_capture)
     Publish-MIRModDirectoryArchive -Source $observerSource -Name 'mir4-processir-exact-observer' -Version '0.1.0' -ModsDir $mods|Out-Null
-    $enabled=@('more-infinite-research','mir4-processir-exact-observer')+@($resolved.name)+@($evidence.scenario.official_mods)
+    $enabled=@('more-infinite-research','mir4-processir-exact-observer')+@($resolved|ForEach-Object{[string]$_.name})+@($evidence.scenario.official_mods|ForEach-Object{[string]$_})
+    $enabled=@($enabled|Where-Object{-not[string]::IsNullOrWhiteSpace([string]$_)})
     Write-MIRModList -ModsDir $mods -EnabledMods $enabled -OfficialBuiltinMods @($target.available_official_mods)
     $result=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $run -ScenarioName ([string]$Capture.id) -ScenarioTimeoutSeconds 900
     if(-not$result.passed){$stderr=if(Test-Path -LiteralPath $result.stderr){Get-Content -Raw -LiteralPath $result.stderr}else{''};throw "[mir4-t12-factorio] $($Capture.id) repetition=$repetition exit=$($result.exit_code) $stderr"}
