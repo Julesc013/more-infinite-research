@@ -26,4 +26,4 @@ foreach($entry in $records.GetEnumerator()){
   if($Check){if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or-not[Linq.Enumerable]::SequenceEqual([byte[]][IO.File]::ReadAllBytes($path),[byte[]]$bytes)){throw "[mir4-processir-export-stale] $($entry.Key)"}}
   else{New-Item -ItemType Directory -Force -Path $output|Out-Null;[IO.File]::WriteAllBytes($path,$bytes)}
 }
-[pscustomobject]@{status='passed';source_identity=$source;output=$output;records=@($records.Keys);maturity='developer-preview';blockers=@('BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT');package_visible=$false;publication_authorized=$false}|ConvertTo-Json -Depth 8
+[pscustomobject]@{status='passed-with-declared-custody-gap';source_identity=$source;output=$output;records=@($records.Keys);maturity='developer-preview';blockers=@('BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO');package_visible=$false;publication_authorized=$false}|ConvertTo-Json -Depth 8

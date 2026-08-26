@@ -65,6 +65,16 @@ if(@($t11.evolved_bindings).Count-lt29-or@($t11.current_authorities).Count-lt40-
    @($t11.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t11-authority-evolution]'
 }
+$t12=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t12.evolved_bindings).Count-lt1-or@($t12.current_authorities).Count-lt15-or
+   [string]$t12.turn-cne'T12'-or[string]$t12.status-cne'T12-EXACT-PROCESSIR-PASSED-WITH-DECLARED-CUSTODY-BLOCKER-PRODUCTION-UNAUTHORIZED'-or
+   [string]$t12.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [int]$t12.conformance.capture_count-ne10-or[int]$t12.conformance.required_capture_count-ne11-or
+   -not[bool]$t12.conformance.all_deterministic-or-not[bool]$t12.conformance.t12_machine_work_complete-or
+   [bool]$t12.conformance.f200_k2so_archive_custody_complete-or-not[bool]$t12.conformance.narrow_blocker_declared-or
+   @($t12.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t12-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

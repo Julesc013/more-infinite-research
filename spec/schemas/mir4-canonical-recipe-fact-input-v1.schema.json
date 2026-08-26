@@ -4,7 +4,7 @@
   "title": "MIR 4 canonical recipe/risk fact transport V1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "fixture_id", "expected", "source", "processes"],
+  "required": ["schema", "kind", "fixture_id", "source", "processes"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4CanonicalRecipeFactInputV1"},
@@ -28,7 +28,8 @@
         "profile": {"type": "string", "minLength": 1, "maxLength": 128},
         "exact_target": {"type": "boolean"},
         "recipe_facts_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
-        "risk_facts_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        "risk_facts_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "environment_lock_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
       }
     },
     "processes": {
@@ -64,7 +65,11 @@
         "name": {"type": "string", "minLength": 1, "maxLength": 256},
         "amount": {"$ref": "#/$defs/quantity"},
         "probability": {"$ref": "#/$defs/quantity"},
-        "productivity_sensitive": {"type": "boolean"}
+        "productivity_sensitive": {"type": "boolean"},
+        "catalyst_amount": {"type": "number", "minimum": 0},
+        "ignored_by_productivity": {"type": "number", "minimum": 0},
+        "temperature": {"type": "object"},
+        "quality": {"type": "object"}
       }
     },
     "risk": {
@@ -75,7 +80,9 @@
         "fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
         "confidence": {"enum": ["complete", "partial", "opaque"]},
         "hard_flags": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
-        "review_flags": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}}
+        "review_flags": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+        "terminal_fingerprint": {"type": "string", "minLength": 1, "maxLength": 128},
+        "evidence": {"type": "array", "maxItems": 64, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 512}}
       }
     },
     "process": {
@@ -93,7 +100,14 @@
         "catalysts": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 256}},
         "returned_containers": {"type": "array", "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 256}},
         "cycle_bound": {"enum": ["bounded", "unbounded", "unknown", "not-applicable"]},
-        "risk": {"$ref": "#/$defs/risk"}
+        "risk": {"$ref": "#/$defs/risk"},
+        "categories": {"type": "array", "maxItems": 64, "uniqueItems": true, "items": {"type": "string"}},
+        "machines": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string"}},
+        "surface_conditions": {"type": ["array", "object", "null"]},
+        "unlocks": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string"}},
+        "owners": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string"}},
+        "source_mod": {"type": "object"},
+        "energy_required": {"type": ["number", "null"], "minimum": 0}
       }
     }
   }

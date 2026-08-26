@@ -595,7 +595,7 @@ function Test-MIR4PlatformConformance {
   }
   $w06 = New-MIR4W06Records -RepoRoot $repo -SourceIdentity $null
   if(-not$w06.parity.passed-or-not$w06.parity.bilateral_gate.passed-or-not$w06.effects.opaque_preserved-or$w06.synthesis.automatic_player_mutation){throw '[mir4-platform-w06-conformance]'}
-  if([string]$w06.parity.exact_target_status-cne'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'){throw '[mir4-platform-w06-exact-target-truth]'}
+  if([string]$w06.parity.exact_target_status-cne'CAPTURED-EXACT-F210-F200-PROCESSIR-PREVIEW-WITH-DECLARED-CUSTODY-BLOCKER'-or-not$w06.parity.exact_target_evidence.deterministic-or$w06.parity.exact_target_evidence.authoritative){throw '[mir4-platform-w06-exact-target-truth]'}
   $w07Ledger=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json')|ConvertFrom-Json -Depth 100
   Test-MIR4CompatibilitySubjectLedger -Ledger $w07Ledger -RepoRoot $repo|Out-Null
   $w07Bundle=Get-Content -Raw -LiteralPath (Join-Path $repo 'sdk/preview/mir4/reference/inspection-bundle-v1.json')|ConvertFrom-Json -Depth 100

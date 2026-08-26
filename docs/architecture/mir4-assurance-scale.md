@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
 ---
@@ -27,7 +27,7 @@ A compilation-only change does not invalidate capture, realization or evaluation
 
 ## Observation slices
 
-The fixed slice set is recipe facts, ProcessIR, technology graph, science/lab graph, ownership, settings, runtime state, diagnostics, presentation, locale and package identity. Available slices contain sorted authority-reference leaves and a deterministic Merkle root. An absent authoritative observation is represented as `unavailable` with no fabricated digest. The current exact-target ProcessIR snapshot therefore remains `BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT`.
+The fixed slice set is recipe facts, ProcessIR, technology graph, science/lab graph, ownership, settings, runtime state, diagnostics, presentation, locale and package identity. Available slices contain sorted authority-reference leaves and a deterministic Merkle root. An absent authoritative observation is represented as `unavailable` with no fabricated digest. T12 now supplies the ProcessIR slice from its exact, deterministic, package-excluded receipt; the separate F200 K2SO archive-custody gap remains scoped to that environment and does not erase the captured F210/F200 base and official observations.
 
 ## Impact, reuse and proof cover
 

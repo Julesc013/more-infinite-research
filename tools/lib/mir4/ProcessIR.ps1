@@ -60,6 +60,17 @@ function Copy-MIR4ProcessIRValue {
   return (ConvertTo-MIR4ProcessIRCanonicalJson $Value) | ConvertFrom-Json
 }
 
+function Get-MIR4ProcessIROptionalValue {
+  param(
+    [Parameter(Mandatory)]$Object,
+    [Parameter(Mandatory)][string]$Name,
+    [AllowNull()]$Default=$null
+  )
+  $property=$Object.PSObject.Properties[$Name]
+  if($null-eq$property-or$null-eq$property.Value){return $Default}
+  return $property.Value
+}
+
 function Get-MIR4ProcessIRSynthesisAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4ProcessIRRepoRoot $RepoRoot
@@ -108,12 +119,20 @@ function ConvertTo-MIR4ProcessIRQuantity {
 
 function ConvertTo-MIR4ProcessIRFlow {
   param([Parameter(Mandatory)]$Flow)
+  $catalystAmount = $Flow.PSObject.Properties['catalyst_amount']
+  $ignoredByProductivity = $Flow.PSObject.Properties['ignored_by_productivity']
+  $temperature = $Flow.PSObject.Properties['temperature']
+  $quality = $Flow.PSObject.Properties['quality']
   return [ordered]@{
     type=[string]$Flow.type
     name=[string]$Flow.name
     amount=(ConvertTo-MIR4ProcessIRQuantity $Flow.amount)
     probability=(ConvertTo-MIR4ProcessIRQuantity $Flow.probability)
     productivity_sensitive=[bool]$Flow.productivity_sensitive
+    catalyst_amount=$(if($null-ne$catalystAmount-and$null-ne$catalystAmount.Value){[decimal]$catalystAmount.Value}else{[decimal]0})
+    ignored_by_productivity=$(if($null-ne$ignoredByProductivity-and$null-ne$ignoredByProductivity.Value){[decimal]$ignoredByProductivity.Value}else{[decimal]0})
+    temperature=$(if($null-ne$temperature-and$null-ne$temperature.Value){Copy-MIR4ProcessIRValue $temperature.Value}else{[ordered]@{status='unavailable'}})
+    quality=$(if($null-ne$quality-and$null-ne$quality.Value){Copy-MIR4ProcessIRValue $quality.Value}else{[ordered]@{status='unavailable'}})
   }
 }
 
@@ -129,19 +148,23 @@ function Get-MIR4MinimalCycleWitness {
   foreach ($start in @($Nodes | Sort-Object -CaseSensitive)) {
     $queue = [Collections.Generic.Queue[object]]::new()
     $queue.Enqueue([object]@($start))
-    while ($queue.Count -gt 0) {
+    $seen = @{$start=$true}
+    $found = $null
+    :cycleSearch while ($queue.Count -gt 0) {
       $path = @($queue.Dequeue())
       $last = [string]$path[-1]
       foreach ($next in @($Adjacency[$last] | Where-Object { $allowed.ContainsKey([string]$_) } | Sort-Object -CaseSensitive)) {
         $nextValue = [string]$next
         if ($nextValue -ceq $start) {
-          $cycle = @($path + $start)
-          $candidates += [pscustomobject]@{edge_count=$cycle.Count-1;key=($cycle -join '>');nodes=$cycle}
-        } elseif ($nextValue -notin $path -and $path.Count -lt $Nodes.Count) {
+          $found = @($path + $start)
+          break cycleSearch
+        } elseif (-not $seen.ContainsKey($nextValue)) {
+          $seen[$nextValue] = $true
           $queue.Enqueue([object]@($path + $nextValue))
         }
       }
     }
+    if ($null -ne $found) { $candidates += [pscustomobject]@{edge_count=$found.Count-1;key=($found -join '>');nodes=$found} }
   }
   if ($candidates.Count -eq 0) { return @($Nodes | Sort-Object -CaseSensitive) }
   return @(($candidates | Sort-Object edge_count,key | Select-Object -First 1).nodes)
@@ -201,6 +224,15 @@ function New-MIR4ProcessIRV1 {
     $intersection = @($inputKeys | Where-Object { $_ -in $outputKeys } | Sort-Object -Unique -CaseSensitive)
     $hardFlags = @($sourceProcess.risk.hard_flags | ForEach-Object { [string]$_ } | Sort-Object -Unique -CaseSensitive)
     $reviewFlags = @($sourceProcess.risk.review_flags | ForEach-Object { [string]$_ } | Sort-Object -Unique -CaseSensitive)
+    $categories=@(Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'categories' -Default @())
+    $machines=@(Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'machines' -Default @())
+    $surfaceConditions=Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'surface_conditions'
+    $unlocks=@(Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'unlocks' -Default @())
+    $owners=@(Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'owners' -Default @())
+    $sourceMod=Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'source_mod'
+    $energyRequired=Get-MIR4ProcessIROptionalValue -Object $sourceProcess -Name 'energy_required'
+    $terminalFingerprint=Get-MIR4ProcessIROptionalValue -Object $sourceProcess.risk -Name 'terminal_fingerprint'
+    $riskEvidence=@(Get-MIR4ProcessIROptionalValue -Object $sourceProcess.risk -Name 'evidence' -Default @())
     $certainty = if ($hardFlags.Count -gt 0 -or [string]$sourceProcess.cycle_bound -eq 'unbounded') { 'UNSAFE' } elseif (-not [bool]$sourceProcess.shape_supported -or [string]$sourceProcess.risk.confidence -ne 'complete' -or [string]$sourceProcess.cycle_bound -eq 'unknown') { 'UNKNOWN' } elseif ($reviewFlags.Count -gt 0) { 'REVIEW_REQUIRED' } else { 'CERTIFIED_SAFE' }
     $identityMaterial = [ordered]@{target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;recipe=[string]$sourceProcess.recipe;variant=[string]$sourceProcess.variant;fact_id=[string]$sourceProcess.id;recipe_facts_sha256=[string]$InputRecord.source.recipe_facts_sha256}
     $identity = [ordered]@{id=([string]$sourceProcess.id);target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;recipe=[string]$sourceProcess.recipe;variant=[string]$sourceProcess.variant;source_fingerprint=(Get-MIR4ProcessIRDigest $identityMaterial)}
@@ -218,7 +250,14 @@ function New-MIR4ProcessIRV1 {
       self_intersection=$intersection
       shape_supported=[bool]$sourceProcess.shape_supported
       cycle_bound=[string]$sourceProcess.cycle_bound
-      risk=[ordered]@{fingerprint=[string]$sourceProcess.risk.fingerprint;confidence=[string]$sourceProcess.risk.confidence;hard_flags=$hardFlags;review_flags=$reviewFlags;copied_not_reclassified=$true}
+      categories=@($categories|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      machines=@($machines|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      surface_conditions=(Copy-MIR4ProcessIRValue $surfaceConditions)
+      unlocks=@($unlocks|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      owners=@($owners|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive)
+      source_mod=(Copy-MIR4ProcessIRValue $sourceMod)
+      energy_required=$energyRequired
+      risk=[ordered]@{fingerprint=[string]$sourceProcess.risk.fingerprint;terminal_fingerprint=$(if($terminalFingerprint){[string]$terminalFingerprint}else{$null});confidence=[string]$sourceProcess.risk.confidence;hard_flags=$hardFlags;review_flags=$reviewFlags;evidence=@($riskEvidence|ForEach-Object{[string]$_}|Sort-Object -Unique -CaseSensitive);copied_not_reclassified=$true}
       certainty=$certainty
       disposition=$(if($certainty -eq 'UNSAFE'){'FailHardSafety'}elseif($certainty -eq 'UNKNOWN'){'RequestReview'}elseif($certainty -eq 'REVIEW_REQUIRED'){'RequestReview'}else{'Preserve'})
       safety_status='pending-graph-evaluation'
@@ -267,9 +306,10 @@ function New-MIR4ProcessIRV1 {
   $overall = @($processes | Sort-Object @{Expression={$rank[[string]$_.certainty]};Descending=$true},@{Expression={[string]$_.identity.id}} | Select-Object -First 1)[0].certainty
   $disposition = if($overall -eq 'UNSAFE'){'FailHardSafety'}elseif($overall -in @('UNKNOWN','REVIEW_REQUIRED')){'RequestReview'}else{'Preserve'}
   $graphMaterial = [ordered]@{processes=$processes;sccs=$sccs}
+  $environmentLockDigest=Get-MIR4ProcessIROptionalValue -Object $InputRecord.source -Name 'environment_lock_digest'
   $record = [ordered]@{
     schema=1;kind='MIR4ProcessIRV1';fixture_id=[string]$InputRecord.fixture_id
-    source=[ordered]@{authority=[string]$InputRecord.source.authority;target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;exact_target=[bool]$InputRecord.source.exact_target;recipe_facts_sha256=[string]$InputRecord.source.recipe_facts_sha256;risk_facts_sha256=[string]$InputRecord.source.risk_facts_sha256}
+    source=[ordered]@{authority=[string]$InputRecord.source.authority;target=[string]$InputRecord.source.target;profile=[string]$InputRecord.source.profile;exact_target=[bool]$InputRecord.source.exact_target;recipe_facts_sha256=[string]$InputRecord.source.recipe_facts_sha256;risk_facts_sha256=[string]$InputRecord.source.risk_facts_sha256;environment_lock_digest=$(if($environmentLockDigest){[string]$environmentLockDigest}else{$null})}
     processes=$processes;sccs=$sccs;overall_classification=[string]$overall;terminal_disposition=$disposition
     graph_digest=(Get-MIR4ProcessIRDigest $graphMaterial);mutation_authorized=$false;authoritative=$false;digest=''
   }
@@ -403,8 +443,15 @@ function New-MIR4W06Records {
   $permutationPassed=[string]$irs['scc-order-a'].graph_digest-ceq[string]$irs['scc-order-b'].graph_digest
   $bilateral=[ordered]@{known_safe_admissible=([string]$safeAssessment.assessment-eq'admissible-preview-proposal-only');known_unsafe_rejected=([string]$unsafeAssessment.assessment-eq'rejected-hard-safety'-and[string]$unsafeAssessment.disposition-eq'FailHardSafety');reject_everything=$false;passed=$false}
   $bilateral.passed=$bilateral.known_safe_admissible-and$bilateral.known_unsafe_rejected-and-not$bilateral.reject_everything
-  $passed=@($fixtureRows|Where-Object{-not$_.passed}).Count-eq 0-and$permutationPassed-and$riskParity-and$bilateral.passed
-  $parity=[ordered]@{schema=1;kind='MIR4ProcessIRParityResultV1';programme_id='M4C02-09-24H';source_identity=$SourceIdentity;authority='.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json';maturity='developer-preview';scope='synthetic-fixture-parity-only';exact_target_status=[string]$authority.exact_target_snapshot.status;exact_target_reason=[string]$authority.exact_target_snapshot.reason;fixture_results=@($fixtureRows|Sort-Object fixture_id -CaseSensitive);bilateral_gate=$bilateral;risk_parity=[ordered]@{copied_not_reclassified=$true;all_fixture_fingerprints_preserved=$riskParity;permutation_graph_invariant=$permutationPassed;passed=($riskParity-and$permutationPassed)};package_visible=$false;public_release_proof=$false;player_mutation_authorized=$false;evidence_refs=@($fixtureRows|Sort-Object path|ForEach-Object{[ordered]@{path=$_.path;sha256=$_.sha256}});passed=$passed;digest=''}
+  $exact=[ordered]@{status=[string]$authority.exact_target_snapshot.status;receipt=[string]$authority.exact_target_snapshot.receipt;manifest=[string]$authority.exact_target_snapshot.manifest;capture_count=[int]$authority.exact_target_snapshot.capture_count;required_capture_count=[int]$authority.exact_target_snapshot.required_capture_count;custody_blocker=[string]$authority.exact_target_snapshot.custody_blocker;deterministic=$false;package_source_unchanged=$false;authoritative=$false;public_release_proof=$false}
+  $exactRefs=@()
+  foreach($property in @('receipt','manifest')){$relative=[string]$exact[$property];$path=Join-Path $repo $relative;if(-not(Test-Path -LiteralPath $path -PathType Leaf)){throw "[mir4-w06-exact-reference-missing] $relative"};$exactRefs+=[ordered]@{path=$relative;sha256=(Get-MIR4PlatformInputSha256 $path)}}
+  $receipt=Get-Content -Raw -LiteralPath (Join-Path $repo $exact.receipt)|ConvertFrom-Json -Depth 100
+  if([string]$receipt.exact_target_processir_status-cne$exact.status-or[int]$receipt.capture_count-ne$exact.capture_count-or[int]$receipt.required_capture_count-ne$exact.required_capture_count-or-not$receipt.all_deterministic-or-not$receipt.package_source_unchanged){throw '[mir4-w06-exact-reference-invalid]'}
+  $exact.deterministic=$true;$exact.package_source_unchanged=$true
+  $passed=@($fixtureRows|Where-Object{-not$_.passed}).Count-eq 0-and$permutationPassed-and$riskParity-and$bilateral.passed-and$exact.deterministic-and$exact.package_source_unchanged
+  $evidenceRefs=@($fixtureRows|Sort-Object path|ForEach-Object{[ordered]@{path=$_.path;sha256=$_.sha256}})+$exactRefs
+  $parity=[ordered]@{schema=1;kind='MIR4ProcessIRParityResultV1';programme_id='M4C02-09-24H';source_identity=$SourceIdentity;authority='.mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json';maturity='developer-preview';scope='bilateral-synthetic-plus-exact-target-preview';exact_target_status=[string]$authority.exact_target_snapshot.status;exact_target_reason=[string]$authority.exact_target_snapshot.reason;exact_target_evidence=$exact;fixture_results=@($fixtureRows|Sort-Object fixture_id -CaseSensitive);bilateral_gate=$bilateral;risk_parity=[ordered]@{copied_not_reclassified=$true;all_fixture_fingerprints_preserved=$riskParity;permutation_graph_invariant=$permutationPassed;passed=($riskParity-and$permutationPassed)};package_visible=$false;public_release_proof=$false;player_mutation_authorized=$false;evidence_refs=$evidenceRefs;passed=$passed;digest=''}
   Add-MIR4ProcessIRDigest $parity|Out-Null
   $effects=New-MIR4EffectChannelRegistryV1 -RepoRoot $repo -Authority $authority -SourceIdentity $SourceIdentity
   $synthesis=New-MIR4SynthesisMaturityMatrixV1 -SafeIR $safe -UnsafeIR $unsafe -UnknownIR $unknown -Authority $authority -SourceIdentity $SourceIdentity

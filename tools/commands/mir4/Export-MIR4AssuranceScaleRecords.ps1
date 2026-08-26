@@ -24,7 +24,7 @@ function New-SliceInput([string]$Path){
 }
 $sliceInputs=[pscustomobject][ordered]@{
   'recipe-facts'=New-SliceInput '.mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json'
-  'process-ir'=[pscustomobject][ordered]@{status='unavailable';authority_ref='sdk/preview/mir4/reference/process-ir-parity-result.json';digest=$null;rows=@();reason='BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'}
+  'process-ir'=New-SliceInput 'sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json'
   'technology-graph'=New-SliceInput '.mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json'
   'science-lab-graph'=New-SliceInput '.mir/releases/waves/mir4-r0/MIR4-K2-Science-SOL06V1.json'
   ownership=New-SliceInput '.mir/control-plane/ownership.json'

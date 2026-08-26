@@ -1,0 +1,41 @@
+
+{
+  "mods": 
+  [
+    
+    {
+      "name": "base",
+      "enabled": true
+    },
+    
+    {
+      "name": "elevated-rails",
+      "enabled": false
+    },
+    
+    {
+      "name": "quality",
+      "enabled": false
+    },
+    
+    {
+      "name": "recycler",
+      "enabled": false
+    },
+    
+    {
+      "name": "space-age",
+      "enabled": false
+    },
+    
+    {
+      "name": "mir4-processir-exact-observer",
+      "enabled": true
+    },
+    
+    {
+      "name": "more-infinite-research",
+      "enabled": true
+    }
+  ]
+}

@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C10"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
 ---
@@ -26,8 +26,8 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | `4.8` | `migration-graph-and-continuity` | preview | implemented-private-contracts | MAINTAINER-MANUAL-PLAYTEST |
 | `4.9` | `mep-and-module-ecosystem` | preview | implemented-data-only-preview | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
 | `4.10` | `api-sdk-and-tooling-bindings` | preview | implemented-generated-preview | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
-| `4.11` | `process-ir-and-effect-channels` | preview | implemented-synthetic-parity-preview | BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT |
-| `4.12` | `autonomous-synthesis-and-candidate-grammar` | preview | implemented-diagnose-conservative-experimental | BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT, MAINTAINER-TECHNOLOGY-ACCEPTANCE |
+| `4.11` | `process-ir-and-effect-channels` | preview | implemented-synthetic-and-exact-target-parity-preview | BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO |
+| `4.12` | `autonomous-synthesis-and-candidate-grammar` | preview | implemented-diagnose-conservative-experimental | BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO, MAINTAINER-TECHNOLOGY-ACCEPTANCE |
 | `4.13` | `offline-inspector-workbench` | preview | implemented-offline-preview | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
 | `4.14` | `compatibility-factory-and-support-assessment` | preview | implemented-data-only-preview | none |
 | `4.15` | `assurance-scale-proof-reuse-and-release-budgets` | shadow | implemented-proposal-and-offline-drill | BLOCKED-TRUSTED-TIMING-CAPACITY-EVIDENCE |

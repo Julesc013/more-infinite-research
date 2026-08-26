@@ -238,8 +238,20 @@ fixtures:
       - bilateral-known-safe-and-known-unsafe-gate
       - opaque-effect-channel-preservation
       - no-automatic-candidate-without-complete-independent-certificates
-      - exact-target-snapshot-blocker-retained
+      - exact-target-snapshot-reference-bound
       - player-package-non-interference
+
+  mir4-processir-exact-observer:
+    requires_features: []
+    path: fixtures/mir4-processir-exact-observer
+    shipped: false
+    validates:
+      - post-finalizer-compilation-snapshot-read-only-observation
+      - terminal-recipe-risk-fingerprint-preservation
+      - exact-target-and-environment-binding
+      - deterministic-two-repetition-capture
+      - explicit-unavailable-parameter-flow-preservation
+      - no-prototype-write-or-player-package-inclusion
 
   mir4-inspector-compatibility-v1:
     requires_features: []
@@ -247,6 +259,7 @@ fixtures:
     shipped: false
     validates:
       - bounded-copied-read-only-inspection-dtos
+      - bounded-exact-processir-a-b-comparison
       - deterministic-pagination-filtering-and-local-file-export
       - accessibility-localization-and-zero-idle-runtime-work
       - normalized-ten-subject-evidence-ledger

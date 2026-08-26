@@ -91,12 +91,13 @@ function Test-MIR4InspectorHtmlV1 {
 function New-MIR4InspectorWorkbenchResultV1 {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Ledger,[Parameter(Mandatory)]$FactoryPlan,
-    [Parameter(Mandatory)]$FactoryPackage,[AllowNull()]$SourceIdentity=$null
+    [Parameter(Mandatory)]$FactoryPackage,[AllowNull()]$SourceIdentity=$null,[AllowNull()]$ProcessIRComparison=$null
   )
   $repo = Get-MIR4W07RepoRoot $RepoRoot
   Import-MIR4W07CanonicalSupport -RepoRoot $repo
   $authority = Get-MIR4InspectorCompatibilityAuthority -RepoRoot $repo
-  $bundle = New-MIR4InspectionBundleV1 -RepoRoot $repo -Ledger $Ledger -SourceIdentity $SourceIdentity
+  $exactComparison=Resolve-MIR4W07ProcessIRComparison -RepoRoot $repo -Comparison $ProcessIRComparison
+  $bundle = New-MIR4InspectionBundleV1 -RepoRoot $repo -Ledger $Ledger -SourceIdentity $SourceIdentity -ProcessIRComparison $(if($null-ne$exactComparison){$exactComparison.value}else{$null})
   Test-MIR4InspectionBundleV1 -Bundle $bundle -RepoRoot $repo | Out-Null
   $html = Get-MIR4InspectorV1Html
   Test-MIR4InspectorHtmlV1 -Html $html | Out-Null
@@ -111,7 +112,7 @@ function New-MIR4InspectorWorkbenchResultV1 {
     accessibility=[ordered]@{keyboard_paging=$true;keyboard_filter=$true;focus_visible=$true;screen_reader_labels=$true;table_captions_and_headers=$true;live_status_and_error_regions=$true}
     localization=[ordered]@{catalogue='inline-local-preview-catalogue';ui_text_separated_from_render_logic=$true;default_locale='en'}
     compatibility_factory=[ordered]@{pipeline=@($authority.factory_pipeline);subject_count=[int]$FactoryPlan.subject_inventory_count;plan_digest=[string]$FactoryPlan.digest;package=$FactoryPackage;arbitrary_code=$false;executable_content=$false;validation='passed'}
-    blockers=[ordered]@{subjects=$blocked;ir4='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER';process_ir='BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'}
+    blockers=[ordered]@{subjects=$blocked;ir4='BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER';process_ir=$(if($null-ne$exactComparison){'CAPTURED-EXACT-TARGET-PROCESSIR-PREVIEW'}else{'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'})}
     passed=$true;package_visible=$false;public_release_proof=$false;player_mutation_authorized=$false;public_support_authorized=$false;publication_authorized=$false;digest=''
   }
   Add-MIR4ModuleDigest $record | Out-Null

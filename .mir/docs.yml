@@ -174,7 +174,8 @@ docs:
       - mir4-process-ir-v1-preview
       - mir4-effect-channel-registry-v1
       - mir4-synthesis-maturity-matrix-v1
-      - mir4-exact-target-processir-snapshot-blocker
+      - mir4-exact-target-processir-t12-capture
+      - mir4-exact-target-processir-custody-boundary
   - path: docs/architecture/mir4-inspector-compatibility.md
     title: "MIR 4 Inspector and Compatibility Workbench"
     status: current
@@ -187,6 +188,7 @@ docs:
       - mir4-compatibility-factory-data-bundle-v1
       - mir4-compatibility-evidence-transfer-boundary
       - mir4-independent-production-consumer-blocker-w07
+      - mir4-exact-processir-offline-comparison
   - path: docs/architecture/mir4-assurance-scale.md
     title: "MIR 4 Assurance Scale and Offline Drill"
     status: current

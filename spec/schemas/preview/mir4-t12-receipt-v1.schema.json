@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.moreinfiniteresearch.net/mir4/t12-receipt/1/schema.json",
+  "title": "MIR 4 T12 exact ProcessIR receipt V1",
+  "type": "object",
+  "required": ["schema", "kind", "work_package", "status", "source_identity", "capture_count", "required_capture_count", "targets", "capture_ids", "blocker_count", "blockers", "repetitions", "all_deterministic", "comparison_count", "inspector_bundle_count", "exact_target_processir_status", "bilateral_synthetic_gate_preserved", "terminal_fact_authority_preserved", "explicit_unavailable_not_zero", "package_source_before", "package_source_after", "package_source_unchanged", "player_mutation_authorized", "prototype_write_authorized", "planner_or_emitter_admission_authorized", "public_support_authorized", "release_admission_authorized", "package_visible", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T12ReceiptV1"},
+    "work_package": {"const": "T12"},
+    "status": {"enum": ["completed-machine-work", "completed-machine-work-with-custody-blocker"]},
+    "capture_count": {"type": "integer", "minimum": 2},
+    "required_capture_count": {"type": "integer", "minimum": 9},
+    "all_deterministic": {"const": true},
+    "inspector_bundle_count": {"type": "integer", "minimum": 1},
+    "package_source_unchanged": {"const": true},
+    "package_visible": {"const": false},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

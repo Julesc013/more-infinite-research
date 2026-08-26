@@ -138,17 +138,27 @@ package_excluded_modules:
     stability: developer-preview-blocked-independent-production-consumer
   mir4_processir_synthesis_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
-    implementation: tools/lib/mir4/ProcessIR.ps1
-    exporter: tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1
+    exact_capture_authority: .mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json
+    implementations:
+      - tools/lib/mir4/ProcessIR.ps1
+      - tools/lib/mir4/ExactProcessIR.ps1
+    exporters:
+      - tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1
+      - tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1
     input_schema: spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json
     output_schemas:
       - spec/schemas/mir4-process-ir-v1.schema.json
       - spec/schemas/mir4-effect-channel-registry-v1.schema.json
       - spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json
+      - spec/schemas/preview/mir4-exact-process-ir-snapshot-v1.schema.json
+      - spec/schemas/preview/mir4-process-ir-comparison-v1.schema.json
+      - spec/schemas/preview/mir4-t12-receipt-v1.schema.json
     fixtures: fixtures/mir4-process-ir-v1
+    exact_observer_fixture: fixtures/mir4-processir-exact-observer
+    exact_reference_root: sdk/preview/mir4/reference/t12
     documentation: docs/architecture/mir4-processir-synthesis.md
-    boundary: package-excluded copied-fact ProcessIR certificates, effect owner references, and descriptive proposal classification only; no data.raw scan, risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
-    stability: developer-preview-blocked-exact-target-processir-snapshot
+    boundary: package-excluded exact post-finalizer observation, copied-fact ProcessIR certificates, effect owner references, bounded offline comparisons, and descriptive proposal classification only; the observer cannot write prototypes and the preview has no risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
+    stability: developer-preview-exact-f210-f200-captured-with-declared-f200-k2so-custody-blocker
   mir4_inspector_compatibility_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     implementations:
@@ -164,9 +174,10 @@ package_excluded_modules:
       - spec/schemas/mir4-inspector-workbench-result-v1.schema.json
     fixtures: fixtures/mir4-inspector-compatibility-v1
     generated_root: sdk/preview/mir4/inspector-v1
+    exact_comparison_root: sdk/preview/mir4/reference/t12/inspector
     documentation: docs/architecture/mir4-inspector-compatibility.md
     boundary: bounded copied read-only DTO inspection, normalized private subject assessments, and deterministic data-only compatibility bundles; no raw mutable compiler objects, callbacks, executable adapters, blanket modpack support booleans, claim transfer, player mutation, signing, sealing, or publication
-    stability: developer-preview-blocked-independent-production-consumer-and-exact-profile-claim-transfer
+    stability: developer-preview-with-exact-processir-comparison-blocked-independent-production-consumer-and-exact-profile-claim-transfer
   mir4_environment_evidence_v1:
     implementation: tools/lib/mir4/EnvironmentEvidence.ps1
     command: tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1
@@ -247,6 +258,11 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T09-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
@@ -281,6 +297,11 @@ package_excluded_modules:
       - spec/schemas/mir4-release-fault-corpus-v1.schema.json
       - spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-t07-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t08-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t09-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t10-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t11-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t12-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
       - spec/schemas/mir4-release-target-build-result-v1.schema.json
       - spec/schemas/mir4-release-target-qualification-result-v1.schema.json
@@ -301,6 +322,9 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
       - validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
       - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
+      - validation/tests/mir4/Test-MIR4SdkV1T08.ps1
+      - validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1
+      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority

@@ -13,9 +13,10 @@ foreach($flag in @('semantic_authority','evidence_ledger_authority','verificatio
 
 $sliceInputs=[ordered]@{}
 foreach($id in @($authority.observation_slices)){$sliceInputs[$id]=[pscustomobject][ordered]@{status='available';authority_ref="fixture:$id";rows=@([pscustomobject][ordered]@{authority_ref="fixture:$id";digest=(Get-MIRCPSha256Text -Value $id)});reason='synthetic-test-authority-only'}}
-$sliceInputs['process-ir']=[pscustomobject][ordered]@{status='unavailable';authority_ref='fixture:process-ir';digest=$null;rows=@();reason='BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'}
+$t12Receipt='sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json'
+$sliceInputs['process-ir']=[pscustomobject][ordered]@{status='available';authority_ref=$t12Receipt;rows=@([pscustomobject][ordered]@{authority_ref=$t12Receipt;digest=(Get-MIR4W08FileSha256 (Join-Path $repo $t12Receipt))});reason='exact-target-T12-preview-observation'}
 $slices=New-MIR4W08SliceSet -SliceInputs ([pscustomobject]$sliceInputs) -RepoRoot $repo
-if(@($slices.slices).Count-ne 11-or$slices.available_count-ne 10-or$slices.unavailable_count-ne 1-or$slices.complete-or$null-ne@($slices.slices|Where-Object id -eq process-ir)[0].root_sha256){throw '[mir4-w08-slices]'}
+if(@($slices.slices).Count-ne 11-or$slices.available_count-ne 11-or$slices.unavailable_count-ne 0-or-not$slices.complete-or$null-eq@($slices.slices|Where-Object id -eq process-ir)[0].root_sha256){throw '[mir4-w08-slices]'}
 $permuted=[ordered]@{};foreach($id in @($authority.observation_slices|Sort-Object -Descending)){$permuted[$id]=$sliceInputs[$id]}
 if([string](New-MIR4W08SliceSet -SliceInputs ([pscustomobject]$permuted) -RepoRoot $repo).aggregate_root_sha256-cne[string]$slices.aggregate_root_sha256){throw '[mir4-w08-slice-order-invariance]'}
 
