@@ -265,6 +265,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-processir-developer-guide | [MIR 4 ProcessIR Preview](../../developer/processir.md) | current |
 | mir4-production-authorization-boundary | [MIR 4 M4C01 Candidate Runbook](../../maintainer/mir4-m4c01-runbook.md) | current |
 | mir4-proof-cover-proposal | [MIR 4 Assurance Scale and Offline Drill](../../architecture/mir4-assurance-scale.md) | current |
+| mir4-protected-signing-ceremony | [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md) | current |
 | mir4-provider-micro-protocol-adapter | [MIR 4 Semantic Compiler Shadow](../../architecture/mir4-semantic-compiler.md) | current |
 | mir4-public-preview-asset-contract | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |
 | mir4-publisher-confinement-and-restore-drill | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |

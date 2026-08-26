@@ -69,12 +69,19 @@ package_excluded_modules:
   mir4_release_governance_v1:
     authority: .mir/releases/governance/mir4/release-governance.json
     allowed_signers: .mir/releases/governance/mir4/allowed-signers.json
+    signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
     implementation: tools/lib/mir4/ReleaseGovernance.ps1
+    signing_ceremony_preparation_implementation: tools/lib/mir4/SigningCeremonyPreparation.ps1
     command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
     ledger_schema: spec/schemas/mir4-release-ledger-event.schema.json
     revocation_schema: spec/schemas/mir4-key-revocation.schema.json
+    signing_ceremony_preparation_authority_schema: spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json
+    signing_ceremony_preparation_receipt_schema: spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_schema: spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_template: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
     documentation: docs/maintainer/mir4-release-governance.md
-    boundary: release-custody policy and external-layout validation only; no source freeze, key generation without protected human secret input, signing, sealing, promotion, tagging, or publication
+    boundary: release-custody policy, external-layout validation, and disposable proof-only signing/recovery rehearsal only; no production key generation without protected human secret input, source freeze, production signing, sealing, promotion, tagging, or publication
     stability: stable-governance-contract-blocked-human-secret-input
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
@@ -1219,6 +1226,10 @@ validation_tooling:
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
     mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
     mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
+    mir4_signing_ceremony_preparation: tools/lib/mir4/SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
+    mir4_signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_gate: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
     mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
     mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
@@ -1349,6 +1360,7 @@ validation_tooling:
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
     - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
+    - root governance and continuity guides are canonical repository-policy documents owned by documentation governance and remain package-excluded unless separately admitted by the package whitelist
     - source-of-truth projections are owned by domain command families under tools commands while scripts retains parameter-compatible read-only wrappers and immutable historical worktrees may invoke their contemporary legacy paths
     - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
     - typed change incident task release and transition records are authoritative and human-readable status files are generated views

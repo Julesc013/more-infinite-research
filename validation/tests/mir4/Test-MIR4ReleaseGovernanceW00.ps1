@@ -9,6 +9,13 @@ if ([string]$authority.state -cne 'BLOCKED-HUMAN-SECRET-INPUT' -or [string]$auth
   throw '[mir4-w00-blocker] The current secret-input blocker was not represented honestly.'
 }
 if (@($authority.blocked_subtasks).Count -ne 3) { throw '[mir4-w00-blocker-set] Expected three key-dependent blockers.' }
+if ([string]$authority.signing_ceremony_preparation.state -cne 'MACHINE-PREPARATION-COMPLETE-HUMAN-CEREMONY-REQUIRED' -or
+    [bool]$authority.signing_ceremony_preparation.production_signing_authorized -or
+    [bool]$authority.signing_ceremony_preparation.protected_roots_configured -or
+    [bool]$authority.signing_ceremony_preparation.protected_secret_authority_available -or
+    [bool]$authority.signing_ceremony_preparation.maintainer_acceptance_present) {
+  throw '[mir4-w00-signing-ceremony-preparation] Machine preparation must not cross the protected signing gate.'
+}
 if ([string]$authority.archive.environment_variable -cne 'MIR_ARCHIVE_HOME' -or
     [string]$authority.publisher.environment_variable -cne 'MIR_PUBLISHER_HOME') {
   throw '[mir4-w00-logical-roots] Release custody must use logical environment roots.'
@@ -54,10 +61,17 @@ $packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
 foreach ($path in @(
   '.mir/releases/governance/mir4/release-governance.json',
   '.mir/releases/governance/mir4/allowed-signers.json',
+  '.mir/releases/governance/mir4/signing-ceremony-preparation.json',
+  'spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json',
+  'spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json',
+  'spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json',
+  'spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json',
   'spec/schemas/mir4-release-ledger-event.schema.json',
   'spec/schemas/mir4-key-revocation.schema.json',
   'tools/lib/mir4/ReleaseGovernance.ps1',
+  'tools/lib/mir4/SigningCeremonyPreparation.ps1',
   'tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1',
+  'tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1',
   'docs/maintainer/mir4-release-governance.md'
 )) {
   if ($path -in $packageFiles) { throw "[mir4-w00-package-visible] $path" }

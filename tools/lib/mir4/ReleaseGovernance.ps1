@@ -88,6 +88,14 @@ function Test-MIR4ReleaseGovernanceAuthority {
       [bool]$authority.signing_authority.reused) {
     throw '[mir4-governance-signing-authority] Signing separation changed.'
   }
+  if ([string]$authority.signing_ceremony_preparation.authority_path -cne '.mir/releases/governance/mir4/signing-ceremony-preparation.json' -or
+      [string]$authority.signing_ceremony_preparation.state -cne 'MACHINE-PREPARATION-COMPLETE-HUMAN-CEREMONY-REQUIRED' -or
+      [bool]$authority.signing_ceremony_preparation.production_signing_authorized -or
+      [bool]$authority.signing_ceremony_preparation.protected_roots_configured -or
+      [bool]$authority.signing_ceremony_preparation.protected_secret_authority_available -or
+      [bool]$authority.signing_ceremony_preparation.maintainer_acceptance_present) {
+    throw '[mir4-governance-signing-ceremony-preparation] Protected signing gate changed.'
+  }
   $requiredNamespaces = @('mir4-source', 'mir4-target', 'mir4-ledger')
   if ((@($authority.signing_authority.namespaces | Sort-Object) -join '|') -cne (@($requiredNamespaces | Sort-Object) -join '|')) {
     throw '[mir4-governance-namespaces] Signing namespaces changed.'

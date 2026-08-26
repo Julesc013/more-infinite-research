@@ -38,6 +38,14 @@
     "fingerprint": null,
     "secret_material_recorded": false
   },
+  "signing_ceremony_preparation": {
+    "authority_path": ".mir/releases/governance/mir4/signing-ceremony-preparation.json",
+    "state": "MACHINE-PREPARATION-COMPLETE-HUMAN-CEREMONY-REQUIRED",
+    "production_signing_authorized": false,
+    "protected_roots_configured": false,
+    "protected_secret_authority_available": false,
+    "maintainer_acceptance_present": false
+  },
   "allowed_signers": {
     "authority_path": ".mir/releases/governance/mir4/allowed-signers.json",
     "status": "awaiting-protected-key",

@@ -1328,6 +1328,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-signing-authority-separation
+      - mir4-protected-signing-ceremony
       - mir4-key-recovery-and-revocation
       - mir4-release-ledger-policy
       - mir4-archive-and-publisher-confinement
