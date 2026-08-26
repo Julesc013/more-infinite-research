@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-runtime-feature-spec-v1
+  - mir4-state-spec-v1
+  - mir4-runtime-registration-plan-v1
+  - mir4-migration-graph-v1
+  - mir4-continuity-bundle-v1
 ---
 # MIR 4 runtime, state, migration, and continuity
 

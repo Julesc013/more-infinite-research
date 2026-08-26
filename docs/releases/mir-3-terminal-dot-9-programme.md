@@ -8,6 +8,15 @@ owner: mir-maintainers
 last_reviewed: 2026-08-09
 supersedes: [docs/releases/3.2.5-to-2.6-convergence-programme.md, docs/releases/ultimate-convergence-audit-action-register.md, docs/architecture/3.3-2.6-convergence-platform-roadmap.md]
 superseded_by: []
+source_of_truth_for:
+  - mir-3-terminal-dot-9-programme
+  - mir-3-terminal-release-train
+  - mir-3-terminal-product-intake
+  - mir-3-terminal-settings-scope-audit
+  - mir-3-successor-bootstrap-firewall
+  - mir-3-final-defect-index
+  - mir-3-terminal-product-admission
+  - mir-3-mod-portal-discussion-reconciliation
 ---
 
 # MIR 3 Terminal `.9` Programme

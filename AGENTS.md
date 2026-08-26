@@ -2,39 +2,42 @@
 
 ## Project
 
-More Infinite Research is a Factorio mod. The 3.x direction is a modular compatibility compiler for infinite research technologies.
+More Infinite Research 4 is a proof-governed Factorio research product line. MIR 4.0.0 combines stable F210/F200 player targets, separately distributed developer previews, and executable package-excluded shadow architecture.
 
-## Local Factorio Engine Authority
+## Local Factorio engine authority
 
-- Use the Steam installation at `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
-- Use the preserved installations under `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; for example, Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
-- Do not download, replace, retarget, or mutate Steam depots to obtain historical engines unless the maintainer explicitly requests it.
+- Use `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
+- Use `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Never download, replace, retarget, or mutate Steam depots for historical engines without explicit maintainer authority.
 
-## Required Reading By Task
+## Required reading by task
 
-- Docs work: read `.mir/docs.yml` and `docs/maintainer/documentation-governance.md`.
-- Architecture work: read `.mir/modules.yml` and `docs/architecture/module-boundaries.md`.
-- Compatibility work: read `.mir/compatibility.yml`, `.mir/streams.yml`, and `docs/compatibility/claim-levels.md`.
-- Generated stream work: read `.mir/streams.yml` and `docs/reference/schemas/stream-spec.md`.
-- Fixture work: read `.mir/fixtures.yml` and `docs/maintainer/fixture-workflow.md`.
-- Backport work: read `.mir/branches.yml` and `docs/maintainer/backporting.md`.
+- Documentation: Markdown front matter, generated `.mir/docs.yml`, and `docs/maintainer/documentation-governance.md`.
+- Architecture or repository roots: `.mir/modules.yml`, `.mir/control/paths.yml`, and `docs/architecture/module-boundaries.md`.
+- Compatibility: `.mir/compatibility.yml`, `.mir/streams.yml`, and `docs/compatibility/claim-levels.md`.
+- Generated streams: `.mir/streams.yml` and `docs/reference/schemas/stream-spec.md`.
+- Fixtures: `.mir/fixtures.yml` and `docs/maintainer/fixture-workflow.md`.
+- Release operations: `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json` and `RELEASE-RUNBOOK.md`.
+- Backports: `.mir/branches.yml` and `docs/maintainer/backporting.md`.
 
-## Rules
+## Non-negotiable rules
 
-- Do not put docs, fixtures, scripts, tests, `.mir`, `.codex`, `.github`, `build`, `dist`, `AGENTS.md`, `CONTRIBUTING.md`, or `todo.md` in the release zip.
-- Do not let compatibility policy files mutate prototypes directly.
-- Only emission code may create or mutate generated technology prototypes.
-- Every generated technology needs a stable stream manifest row.
-- Every public compatibility claim needs fixture or named load-check evidence.
-- Update `.mir/` manifests when docs, capabilities, streams, compatibility claims, fixtures, branch policy, module boundaries, or agent routing change.
-- Before running tests, materialize or inspect the MIR verification plan and run only its required work unless a broader profile or `--no-reuse` was explicitly requested. Reuse evidence only for an exact trusted fingerprint; adopt a matching in-progress worker instead of cancelling it or starting duplicate work; never substitute mutable job status for the aggregate evidence gate.
-- In Codex sessions, treat `gh` failures from the `codexsandboxoffline` Windows identity or blocked outbound sockets as sandbox-context failures, not evidence that the maintainer's GitHub token is invalid. Retry GitHub operations in the approved machine/network context and ask for reauthentication only if `gh auth status` fails there.
+- Keep docs, fixtures, scripts, tests, `.mir`, `.codex`, `.github`, `build`, `dist`, and repository guidance out of player ZIPs.
+- Compatibility policy never mutates prototypes. Only admitted emission code may create or mutate generated technology prototypes.
+- Every generated technology needs a stable stream manifest row; every public claim needs named exact evidence.
+- Preserve one emitter and package-source parity unless a separately authorized cutover changes them.
+- Preview, shadow, and experimental systems do not gain player mutation, release, signing, publication, or support authority by implementation alone.
+- Regenerate `.mir` projections when authorities change. Never hand-edit generated queues, dashboards, indexes, or receipts.
+- Finish completed work through PR merge and remote readback. Leave local `dev` clean and exactly equal to `origin/dev`.
 
-## Validation
+## Verification
 
-Run the narrowest relevant validation first, then the broader gate before a release.
+Before tests, materialize or inspect the MIR verification plan. Reuse evidence only for its exact trusted fingerprint and adopt matching in-progress work rather than duplicating it.
+
+Run the narrowest selected checks first. The broad static fallback is:
 
 ```powershell
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
+Treat GitHub failures from the offline sandbox identity as execution-context failures. Retry in the approved machine/network context and request reauthentication only if `gh auth status` fails there.

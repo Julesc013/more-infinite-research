@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-3-terminal-release-guide
+  - mir-3-to-mir-4-handoff
+  - mir-3-terminal-feature-omission-matrix
+  - mir-3-terminal-upgrade-matrix
+  - mir-3-terminal-known-limitations
 ---
 
 # MIR 3 Terminal Release and MIR 4 Handoff Guide

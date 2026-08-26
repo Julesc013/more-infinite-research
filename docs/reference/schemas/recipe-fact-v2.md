@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - recipe-fact-v2
+  - relationship-indexes
 ---
 
 # RecipeFactV2 And Relationship Indexes

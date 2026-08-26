@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-03
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
+source_of_truth_for:
+  - settings-reference
+  - base-continuation-cost-setting-semantics
 ---
 
 # Settings Reference

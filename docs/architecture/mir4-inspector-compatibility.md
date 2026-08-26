@@ -8,6 +8,13 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-inspector-v1-preview
+  - mir4-compatibility-subject-ledger-v1
+  - mir4-compatibility-factory-data-bundle-v1
+  - mir4-compatibility-evidence-transfer-boundary
+  - mir4-independent-production-consumer-blocker-w07
+  - mir4-exact-processir-offline-comparison
 ---
 # MIR 4 Inspector and Compatibility Factory
 

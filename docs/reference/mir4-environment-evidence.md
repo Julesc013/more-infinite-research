@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-portable-exact-environment-lock
+  - mir4-environment-diff
+  - mir4-support-bundle-redaction
+  - mir4-reproducer-preserving-minimization
 ---
 # MIR 4 Environment Evidence V1
 

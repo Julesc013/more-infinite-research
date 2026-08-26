@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/mir4/documentation-continuity-t14-v1.schema.json",
+  "title": "MIR4DocumentationContinuityT14V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "turn",
+    "recorded_at",
+    "result",
+    "maturity",
+    "metadata_authority",
+    "compatibility_projection",
+    "generated_projections",
+    "package_source_fingerprint_before",
+    "package_source_fingerprint_after",
+    "package_visible_delta",
+    "player_executable_sources_unchanged",
+    "one_emitter_preserved",
+    "clean_extracted_preview_tutorial_passed",
+    "root_documentation_mir4_first",
+    "maintainer_continuity_complete",
+    "queue_generation_authority_preserved",
+    "source_freeze_authorized",
+    "signing_or_sealing_authorized",
+    "promotion_authorized",
+    "publication_authorized"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4DocumentationContinuityT14V1" },
+    "turn": { "const": "T14" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "result": { "const": "completed" },
+    "maturity": { "type": "string", "minLength": 1 },
+    "metadata_authority": { "const": "markdown-frontmatter" },
+    "compatibility_projection": { "const": ".mir/docs.yml" },
+    "generated_projections": {
+      "type": "array",
+      "minItems": 5,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "package_source_fingerprint_before": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "package_source_fingerprint_after": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "package_visible_delta": {
+      "type": "array",
+      "const": [ "README.md" ]
+    },
+    "player_executable_sources_unchanged": { "const": true },
+    "one_emitter_preserved": { "const": true },
+    "clean_extracted_preview_tutorial_passed": { "const": true },
+    "root_documentation_mir4_first": { "const": true },
+    "maintainer_continuity_complete": { "const": true },
+    "queue_generation_authority_preserved": { "const": true },
+    "source_freeze_authorized": { "const": false },
+    "signing_or_sealing_authorized": { "const": false },
+    "promotion_authorized": { "const": false },
+    "publication_authorized": { "const": false }
+  }
+}

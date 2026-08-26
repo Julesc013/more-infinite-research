@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-21
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - research-cost-v2-experimental-contract
+  - research-cost-v2-exact-rational-and-rounding-law
+  - research-cost-v2-sparse-profile-layering
+  - research-cost-v2-stable-admission-boundary
 ---
 
 # ResearchCostModel V2 Preview

@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-compilation-run-v1
+  - mir4-provider-micro-protocol-adapter
+  - mir4-merge-law-catalogue
+  - mir4-feature-setting-cutover
 ---
 # MIR 4 Semantic Compiler Shadow
 

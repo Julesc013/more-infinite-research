@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compiler-provider-schema
+  - compiler-provider-extension-contract
 ---
 
 # CompilerProvider Schema

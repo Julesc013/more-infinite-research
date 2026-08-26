@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-version-authority
+  - mir4-distribution-target-registry
+  - mir4-distribution-version-codec
 ---
 
 # ADR 0001: MIR 4 Version Authority

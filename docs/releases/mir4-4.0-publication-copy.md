@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-4.0-github-release-copy
+  - mir4-4.0-mod-portal-copy
+  - mir4-4.0-player-faq
 ---
 
 # MIR 4.0 Publication Copy

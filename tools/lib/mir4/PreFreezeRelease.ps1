@@ -20,6 +20,62 @@ function Get-MIR4PreFreezeFileSha256 {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($utf8.GetBytes($canonical)))
 }
 
+function Test-MIR4T14HistoricalDocumentationSha256 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$ExpectedSha256
+  )
+  $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  $path = Join-Path $repo $RelativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or $ExpectedSha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+  if ((Get-MIR4PreFreezeFileSha256 -Path $path) -ceq $ExpectedSha256) { return $true }
+
+  $authority = Read-MIR4PreFreezeJson -RepoRoot $repo `
+    -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json' `
+    -Kind 'MIR4DocumentationContinuityT14V1'
+  if ([string]$authority.result -cne 'completed' -or
+      [string]$authority.metadata_authority -cne 'markdown-frontmatter' -or
+      [string]$authority.compatibility_projection -cne '.mir/docs.yml' -or
+      -not [bool]$authority.queue_generation_authority_preserved) {
+    return $false
+  }
+
+  $utf8 = [Text.UTF8Encoding]::new($false, $true)
+  $text = $utf8.GetString([IO.File]::ReadAllBytes($path))
+  if ($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF) { $text = $text.Substring(1) }
+  $lf = [string][char]10
+  $text = $text.Replace(([string][char]13 + $lf), $lf).Replace([string][char]13, $lf)
+  $lines = [regex]::Split($text, $lf)
+  $historical = [Collections.Generic.List[string]]::new()
+  $insideFrontMatter = $false
+  $skipSourceIds = $false
+  $removedSourceIdLines = 0
+  foreach ($line in $lines) {
+    if ($line -ceq '---') {
+      $insideFrontMatter = -not $insideFrontMatter
+      $skipSourceIds = $false
+      $historical.Add($line)
+      continue
+    }
+    if ($insideFrontMatter -and $line -match '^source_of_truth_for:\s*$') {
+      $skipSourceIds = $true
+      $removedSourceIdLines++
+      continue
+    }
+    if ($skipSourceIds -and $line -match '^\s+-\s+\S') {
+      $removedSourceIdLines++
+      continue
+    }
+    $skipSourceIds = $false
+    $historical.Add($line)
+  }
+  if ($removedSourceIdLines -lt 2) { return $false }
+  $historicalBytes = $utf8.GetBytes(($historical -join $lf).Normalize([Text.NormalizationForm]::FormC))
+  $historicalSha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($historicalBytes))
+  return $historicalSha256 -ceq $ExpectedSha256
+}
+
 function Read-MIR4PreFreezeJson {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -143,6 +199,8 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json' = 'spec/schemas/mir4-release-compatibility-canaries-t13-v1.schema.json'
     'sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json' = 'spec/schemas/preview/mir4-t13-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t13-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json' = 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t14-authority-evolution-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -170,6 +228,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json';kind='MIR4T11AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json';kind='MIR4T12AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json';kind='MIR4T13AuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json';kind='MIR4T14AuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

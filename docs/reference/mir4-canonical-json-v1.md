@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-canonical-json-v1-contract
+  - mir4-permanent-schema-namespace
+  - mir4-stable-diagnostic-registry
+  - mir4-v0-v1-compatibility-policy
 ---
 # MIR Canonical JSON V1
 

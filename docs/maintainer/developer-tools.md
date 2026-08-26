@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compatibility-command-routing
 ---
 # Developer Tools
 

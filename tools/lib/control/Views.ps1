@@ -276,7 +276,7 @@ function New-MIRCPCurrentCandidateLines {
   foreach ($line in @(
     "---", "title: `"Current Development Candidate`"", "status: current", "applies_to: `"$($Release.release)`"",
     "audience: release-manager", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $ReviewDate",
-    "supersedes: []", "superseded_by: []", "---", "", "# Current Development Candidate", "",
+    "supersedes: []", "superseded_by: []", "source_of_truth_for:", "  - generated-current-candidate-view", "---", "", "# Current Development Candidate", "",
     "> Generated from typed ReleaseRecords by ``tools/commands/control/Invoke-MIRControlPlane.ps1 views``. Do not edit this view.", "",
     "| Field | Authority |", "| --- | --- |",
     "| MIR version | $(Format-MIRCPCode $Release.release) |",
@@ -319,7 +319,7 @@ function New-MIRCPDashboardLines {
   foreach ($line in @(
     "---", "title: `"MIR Control Plane Dashboard`"", "status: current", "applies_to: `"release-engineering`"",
     "audience: release-manager", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $ReviewDate",
-    "supersedes: []", "superseded_by: []", "---", "", "# MIR Control Plane Dashboard", "",
+    "supersedes: []", "superseded_by: []", "source_of_truth_for:", "  - generated-control-plane-dashboard", "---", "", "# MIR Control Plane Dashboard", "",
     "> Generated from ``path:releases.records/*.json``, CandidateClosureRecords, ChangeRecords, IncidentRecords, and TaskNodes. Machine records are authoritative.", "",
     "## Releases", "", "| Release | Candidate | Namespace / minimum next ordinal | Target | Branch | Historical state | Effective status | Exceptions |", "| --- | --- | --- | --- | --- | --- | --- | ---: |"
   )) { $lines.Add($line) }

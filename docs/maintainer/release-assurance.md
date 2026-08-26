@@ -8,6 +8,14 @@ owner: mir-maintainers
 last_reviewed: 2026-08-10
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - release-assurance-contract
+  - package-qualification-source-authority
+  - runtime-performance-release-gate
+  - protected-release-capsule-transfer
+  - current-verification-profile-release-binding
+  - prequalification-approved-delta-pending-binding
+  - required-external-input-planning
 ---
 
 # Release Assurance And Candidate Sealing

@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-24
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compiler-boundary-schemas
 ---
 
 # Compiler Boundary Schemas

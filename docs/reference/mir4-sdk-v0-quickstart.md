@@ -9,6 +9,8 @@ last_reviewed: 2026-08-24
 supersedes: []
 superseded_by:
   - docs/reference/mir4-sdk-v1-quickstart.md
+source_of_truth_for:
+  - mir4-sdk-v0-migration-quickstart
 ---
 
 # MIR 4 SDK V0 Preview Quickstart

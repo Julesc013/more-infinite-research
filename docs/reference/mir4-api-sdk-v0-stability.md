@@ -9,6 +9,8 @@ last_reviewed: 2026-08-24
 supersedes: []
 superseded_by:
   - docs/reference/generated/mir4-api-sdk-v1.md
+source_of_truth_for:
+  - mir4-api-sdk-v0-migration-policy
 ---
 
 # MIR 4 API and SDK V0 Stability Policy

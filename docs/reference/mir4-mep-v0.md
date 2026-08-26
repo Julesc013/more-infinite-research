@@ -9,6 +9,8 @@ last_reviewed: 2026-08-24
 supersedes: []
 superseded_by:
   - docs/architecture/mir4-module-ecosystem.md
+source_of_truth_for:
+  - mir4-mep-v0-migration-input
 ---
 # MIR Extension Protocol V0 Preview
 

@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-mep-v1-preview-contract
+  - mir4-extension-closure-v1
+  - mir4-api-sdk-v1-preview
+  - mir4-extension-builder
+  - mir4-independent-production-consumer-blocker
 ---
 
 # MIR 4 Module Ecosystem

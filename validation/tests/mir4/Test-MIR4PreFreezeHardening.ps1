@@ -11,55 +11,55 @@ if([string]$receipt.status-cne'DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED'){throw 
 $evolution=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($evolution.evolved_bindings).Count-ne1-or[string]$evolution.evolved_bindings[0].path-cne'.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
    [bool]$evolution.evolved_bindings[0].package_visible-or[bool]$evolution.evolved_bindings[0].release_authority-or
-   [string]$evolution.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)){
+   [string]$evolution.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'){
   throw '[mir4-prefreeze-explicit-authority-evolution]'
 }
 $t03=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t03.evolved_bindings).Count-ne2-or@($t03.current_authorities).Count-ne6-or
    (@($t03.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
-   [string]$t03.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t03.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t03.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t03-authority-evolution]'
 }
 $t04=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t04.evolved_bindings).Count-ne3-or@($t04.current_authorities).Count-ne15-or
    (@($t04.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json|tools/lib/mir4/ReleaseAdapters.ps1'-or
-   [string]$t04.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t04.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t04.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t04-authority-evolution]'
 }
 $t05=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t05.evolved_bindings).Count-ne3-or@($t05.current_authorities).Count-ne21-or
    (@($t05.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json|tools/lib/mir4/ReleaseAdapters.ps1'-or
-   [string]$t05.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t05.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t05.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t05-authority-evolution]'
 }
 $t06=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t06.evolved_bindings).Count-ne2-or@($t06.current_authorities).Count-ne10-or
    (@($t06.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|.mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json'-or
-   [string]$t06.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t06.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t06.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t06-authority-evolution]'
 }
 $t07=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t07.evolved_bindings).Count-ne3-or@($t07.current_authorities).Count-ne32-or
    (@($t07.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|tools/lib/mir4/PlatformPreview.ps1|tools/lib/mir4/PreFreezeRelease.ps1'-or
-   [string]$t07.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t07.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t07.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t07-authority-evolution]'
 }
 $t08=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t08.evolved_bindings).Count-ne4-or@($t08.current_authorities).Count-lt40-or
    (@($t08.evolved_bindings.path|Sort-Object)-join'|')-cne'.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json|tools/lib/mir4/ExperimentalApiSdk.ps1|tools/lib/mir4/PlatformPreview.ps1|tools/lib/mir4/PreFreezeRelease.ps1'-or
-   [string]$t08.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t08.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    @($t08.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t08-authority-evolution]'
 }
 $t11=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t11.evolved_bindings).Count-lt29-or@($t11.current_authorities).Count-lt40-or
    [string]$t11.turn-cne'T11'-or[string]$t11.status-cne'T11-F210-MEP-DISCOVERY-PASSED-PRODUCTION-UNAUTHORIZED'-or
-   [string]$t11.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t11.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    -not[bool]$t11.conformance.permutation_digest_stable-or-not[bool]$t11.conformance.host_absence_inert-or
    -not[bool]$t11.conformance.conflict_quarantine_passed-or-not[bool]$t11.conformance.terminal_emitter_unchanged-or
    @($t11.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
@@ -68,7 +68,7 @@ if(@($t11.evolved_bindings).Count-lt29-or@($t11.current_authorities).Count-lt40-
 $t12=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t12.evolved_bindings).Count-lt1-or@($t12.current_authorities).Count-lt15-or
    [string]$t12.turn-cne'T12'-or[string]$t12.status-cne'T12-EXACT-PROCESSIR-PASSED-WITH-DECLARED-CUSTODY-BLOCKER-PRODUCTION-UNAUTHORIZED'-or
-   [string]$t12.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t12.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    [int]$t12.conformance.capture_count-ne10-or[int]$t12.conformance.required_capture_count-ne11-or
    -not[bool]$t12.conformance.all_deterministic-or-not[bool]$t12.conformance.t12_machine_work_complete-or
    [bool]$t12.conformance.f200_k2so_archive_custody_complete-or-not[bool]$t12.conformance.narrow_blocker_declared-or
@@ -78,7 +78,7 @@ if(@($t12.evolved_bindings).Count-lt1-or@($t12.current_authorities).Count-lt15-o
 $t13=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t13.evolved_bindings).Count-lt10-or@($t13.current_authorities).Count-lt25-or
    [string]$t13.turn-cne'T13'-or[string]$t13.status-cne'T13-EXACT-RELEASE-CANARIES-PASSED-T14-NEXT-PRODUCTION-UNAUTHORIZED'-or
-   [string]$t13.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t13.player_package_source_sha256-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
    [int]$t13.conformance.canary_count-ne8-or[int]$t13.conformance.capture_count-ne11-or[int]$t13.conformance.reload_count-ne22-or
    -not[bool]$t13.conformance.all_clean_loads_passed-or-not[bool]$t13.conformance.all_first_reloads_passed-or-not[bool]$t13.conformance.all_second_reloads_passed-or
    -not[bool]$t13.conformance.all_target_upgrades_passed-or-not[bool]$t13.conformance.all_claims_exact_and_expiring-or
@@ -87,11 +87,24 @@ if(@($t13.evolved_bindings).Count-lt10-or@($t13.current_authorities).Count-lt25-
    @($t13.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t13-authority-evolution]'
 }
+$t14=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if(@($t14.evolved_bindings).Count-lt15-or@($t14.current_authorities).Count-lt25-or
+   [string]$t14.turn-cne'T14'-or[string]$t14.status-cne'T14-DOCUMENTATION-CONTINUITY-PASSED-T15-NEXT-PRODUCTION-UNAUTHORIZED'-or
+   [string]$t14.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [int]$t14.conformance.document_count-lt425-or[int]$t14.conformance.source_of_truth_count-lt341-or
+   [int]$t14.conformance.generated_projection_count-ne6-or[int]$t14.conformance.root_document_count-ne11-or
+   [int]$t14.conformance.developer_document_count-ne13-or-not[bool]$t14.conformance.clean_extracted_preview_tutorial_passed-or
+   -not[bool]$t14.conformance.player_executable_sources_unchanged-or-not[bool]$t14.conformance.one_emitter_preserved-or
+   (@($t14.conformance.package_visible_delta)-join'|')-cne'README.md'-or[bool]$t14.conformance.release_transition_authority-or
+   @($t14.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-t14-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne4){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $plan=Get-Content -Raw -LiteralPath (Join-Path $repo $planPath)|ConvertFrom-Json -Depth 100
-if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne[string]$plan.source_baseline.package_source_sha256){throw '[mir4-prefreeze-package-diff]'}
+if([string]$plan.source_baseline.package_source_sha256-cne[string]$t13.player_package_source_sha256-or
+   (Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne[string]$t14.player_package_source_sha256){throw '[mir4-prefreeze-package-diff]'}
 if([int]$plan.verification_plan.invalid-ne0-or[int]$plan.verification_plan.passed-ne30-or
    @($plan.targets|Where-Object{$_.release_role-cne'mandatory'-or$_.development_package.release_identity-or[string]::IsNullOrWhiteSpace([string]$_.engine.sha256)}).Count-ne0){
   throw '[mir4-prefreeze-zero-invalid-plan]'

@@ -97,6 +97,8 @@ paths:
   tools.commands.workspace.cleanup: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
   tools.commands.docs: tools/commands/docs
   tools.commands.docs.format: tools/commands/docs/Format-MIRMarkdown.ps1
+  tools.commands.docs.index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+  tools.commands.docs.immutable-source-truth: .mir/docs-immutable-source-truth.json
   tools.commands.docs.authority: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
   tools.commands.docs.pipeline: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
   tools.commands.docs.defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1

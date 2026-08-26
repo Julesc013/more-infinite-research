@@ -173,6 +173,16 @@ package_excluded_modules:
     validator: validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     boundary: exact locked F210 and F200 release-canary input with clean load, two byte-preserving reloads, target-shared direct-predecessor upgrade proof, bounded performance, claim limitations, and expiry; no blanket ecosystem claim, automatic synthesis, player or prototype mutation, source freeze, signing, sealing, promotion, or publication authority
     stability: pre-freeze-release-canary-exact-eleven-captures-eight-bounded-subjects
+  mir4_documentation_continuity_t14:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json
+    immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    immutable_source_truth_schema: spec/schemas/mir-immutable-documentation-source-truth-v1.schema.json
+    schema: spec/schemas/mir4-documentation-continuity-t14-v1.schema.json
+    writer: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    validator: validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1
+    documentation: docs/developer/README.md
+    boundary: MIR4-first root, developer, maintainer, generated metadata, and continuity documentation with one declared README-only package-visible delta; no player executable, emitter, source-freeze, signing, sealing, promotion, or publication authority
+    stability: stable-documentation-and-package-excluded-developer-preview
   mir4_inspector_compatibility_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     implementations:
@@ -1287,6 +1297,10 @@ validation_tooling:
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
     documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
+    documentation_index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    documentation_metadata_authority: markdown-frontmatter
+    documentation_immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    documentation_compatibility_projection: .mir/docs.yml
     generated_authority_documentation: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
     pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
     readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1

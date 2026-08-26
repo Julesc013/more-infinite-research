@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-f210-extension-owned-mod-data-discovery
+  - mir4-mep-host-absence-inertness
+  - mir4-mep-read-only-shadow-planning
 ---
 
 # MIR 4 F210 read-only MEP discovery

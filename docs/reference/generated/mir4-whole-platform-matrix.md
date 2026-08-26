@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - generated-mir4-whole-platform-maturity
 ---
 # MIR 4 whole platform matrix
 

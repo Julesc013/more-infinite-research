@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compiler-schema-authorities
+  - compiler-schema-drift-policy
+  - compiler-authority-projection-command
 ---
 
 # Compiler Authority Table

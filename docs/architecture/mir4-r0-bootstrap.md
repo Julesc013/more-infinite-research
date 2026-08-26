@@ -8,6 +8,13 @@ owner: mir-maintainers
 last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-r0-bootstrap-architecture
+  - mir4-r0-bootstrap-root-set
+  - mir4-r0-current-status
+  - mir4-r0-executable-queue
+  - mir4-bootstrap-target-readiness
+  - mir3-terminal-public-visibility-status
 ---
 
 # MIR 4 R0 Bootstrap

@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-four-stage-proof-identities
+  - mir4-eleven-observation-slice-roots
+  - mir4-proof-cover-proposal
+  - mir4-24-6-1-release-budget-design
+  - mir4-non-production-offline-publisher-drill
 ---
 
 # MIR 4 assurance scale and offline drill

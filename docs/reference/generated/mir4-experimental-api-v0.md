@@ -9,6 +9,8 @@ last_reviewed: 2026-08-24
 supersedes: []
 superseded_by:
   - docs/reference/generated/mir4-api-sdk-v1.md
+source_of_truth_for:
+  - generated-api-v0-migration-reference
 ---
 # MIR 4 API/SDK V0 Preview
 

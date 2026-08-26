@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-26
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-t13-exact-release-canary-contract
+  - mir4-t13-lifecycle-reload-proof
+  - mir4-t13-target-upgrade-binding
+  - mir4-t13-claim-limitations-and-expiry
+  - mir4-f200-k2so-custody-closure
 ---
 # MIR 4 Exact Release Compatibility Canaries
 

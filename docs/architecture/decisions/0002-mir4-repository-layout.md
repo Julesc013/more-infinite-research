@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-repository-layout
 ---
 
 # ADR 0002: MIR 4 Repository Layout

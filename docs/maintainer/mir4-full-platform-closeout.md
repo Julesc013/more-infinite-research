@@ -8,6 +8,12 @@ owner: mir-maintainers
 last_reviewed: 2026-08-24
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-full-platform-39-record-closeout
+  - mir4-independent-luna-audit-input-binding
+  - mir4-dev-and-source-freeze-stop-boundary
+  - mir4-release-readiness-reconciliation
+  - mir4-blocker-scope-matrix
 ---
 
 # MIR 4 full-platform private closeout

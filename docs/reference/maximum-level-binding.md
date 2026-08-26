@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-21
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - maximum-level-binding-policy-v3
 ---
 
 # Maximum-Level Binding Contract

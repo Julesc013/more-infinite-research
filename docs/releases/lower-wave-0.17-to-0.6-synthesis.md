@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-lower-wave-0.17-to-0.6-release-synthesis
 ---
 
 # MIR Lower-Wave 0.17 To 0.6 Release Synthesis

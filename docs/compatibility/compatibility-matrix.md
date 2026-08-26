@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-07
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compatibility-matrix
 ---
 # MIR Compatibility Matrix
 
