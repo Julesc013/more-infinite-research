@@ -153,13 +153,23 @@ function ConvertTo-MIR4T12Array {
 
 function ConvertTo-MIR4T12Flow {
   param([Parameter(Mandatory)]$Entry,[Parameter(Mandatory)][bool]$ProductivitySensitive)
+  $type=$Entry.PSObject.Properties['type']
+  $catalystAmount=$Entry.PSObject.Properties['catalyst_amount']
+  $ignoredByProductivity=$Entry.PSObject.Properties['ignored_by_productivity']
+  $temperature=$Entry.PSObject.Properties['temperature']
+  $minimumTemperature=$Entry.PSObject.Properties['minimum_temperature']
+  $maximumTemperature=$Entry.PSObject.Properties['maximum_temperature']
+  $qualityMinimum=$Entry.PSObject.Properties['quality_min']
+  $qualityMaximum=$Entry.PSObject.Properties['quality_max']
+  $qualityChange=$Entry.PSObject.Properties['quality_change']
+  $affectedByQuality=$Entry.PSObject.Properties['affected_by_quality']
   [ordered]@{
-    type=$(if([string]::IsNullOrWhiteSpace([string]$Entry.type)){'item'}else{[string]$Entry.type});name=[string]$Entry.name
+    type=$(if($null-eq$type-or[string]::IsNullOrWhiteSpace([string]$type.Value)){'item'}else{[string]$type.Value});name=[string]$Entry.name
     amount=ConvertTo-MIR4T12Quantity $Entry;probability=ConvertTo-MIR4T12Probability $Entry;productivity_sensitive=$ProductivitySensitive
-    catalyst_amount=$(if($null-ne$Entry.catalyst_amount){[decimal]$Entry.catalyst_amount}else{[decimal]0})
-    ignored_by_productivity=$(if($null-ne$Entry.ignored_by_productivity){[decimal]$Entry.ignored_by_productivity}else{[decimal]0})
-    temperature=[ordered]@{value=$(if($null-ne$Entry.temperature){$Entry.temperature}else{$null});minimum=$(if($null-ne$Entry.minimum_temperature){$Entry.minimum_temperature}else{$null});maximum=$(if($null-ne$Entry.maximum_temperature){$Entry.maximum_temperature}else{$null});status=$(if($null-ne$Entry.temperature-or$null-ne$Entry.minimum_temperature-or$null-ne$Entry.maximum_temperature){'available'}else{'unavailable'})}
-    quality=[ordered]@{minimum=$(if($null-ne$Entry.quality_min){$Entry.quality_min}else{$null});maximum=$(if($null-ne$Entry.quality_max){$Entry.quality_max}else{$null});change=$(if($null-ne$Entry.quality_change){$Entry.quality_change}else{$null});affected=$(if($null-ne$Entry.affected_by_quality){[bool]$Entry.affected_by_quality}else{$null});status=$(if($null-ne$Entry.quality_min-or$null-ne$Entry.quality_max-or$null-ne$Entry.quality_change-or$null-ne$Entry.affected_by_quality){'available'}else{'unavailable'})}
+    catalyst_amount=$(if($null-ne$catalystAmount-and$null-ne$catalystAmount.Value){[decimal]$catalystAmount.Value}else{[decimal]0})
+    ignored_by_productivity=$(if($null-ne$ignoredByProductivity-and$null-ne$ignoredByProductivity.Value){[decimal]$ignoredByProductivity.Value}else{[decimal]0})
+    temperature=[ordered]@{value=$(if($null-ne$temperature){$temperature.Value}else{$null});minimum=$(if($null-ne$minimumTemperature){$minimumTemperature.Value}else{$null});maximum=$(if($null-ne$maximumTemperature){$maximumTemperature.Value}else{$null});status=$(if($null-ne$temperature-or$null-ne$minimumTemperature-or$null-ne$maximumTemperature){'available'}else{'unavailable'})}
+    quality=[ordered]@{minimum=$(if($null-ne$qualityMinimum){$qualityMinimum.Value}else{$null});maximum=$(if($null-ne$qualityMaximum){$qualityMaximum.Value}else{$null});change=$(if($null-ne$qualityChange){$qualityChange.Value}else{$null});affected=$(if($null-ne$affectedByQuality){[bool]$affectedByQuality.Value}else{$null});status=$(if($null-ne$qualityMinimum-or$null-ne$qualityMaximum-or$null-ne$qualityChange-or$null-ne$affectedByQuality){'available'}else{'unavailable'})}
   }
 }
 

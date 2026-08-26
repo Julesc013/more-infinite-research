@@ -108,16 +108,20 @@ function ConvertTo-MIR4ProcessIRQuantity {
 
 function ConvertTo-MIR4ProcessIRFlow {
   param([Parameter(Mandatory)]$Flow)
+  $catalystAmount = $Flow.PSObject.Properties['catalyst_amount']
+  $ignoredByProductivity = $Flow.PSObject.Properties['ignored_by_productivity']
+  $temperature = $Flow.PSObject.Properties['temperature']
+  $quality = $Flow.PSObject.Properties['quality']
   return [ordered]@{
     type=[string]$Flow.type
     name=[string]$Flow.name
     amount=(ConvertTo-MIR4ProcessIRQuantity $Flow.amount)
     probability=(ConvertTo-MIR4ProcessIRQuantity $Flow.probability)
     productivity_sensitive=[bool]$Flow.productivity_sensitive
-    catalyst_amount=$(if($null-ne$Flow.catalyst_amount){[decimal]$Flow.catalyst_amount}else{[decimal]0})
-    ignored_by_productivity=$(if($null-ne$Flow.ignored_by_productivity){[decimal]$Flow.ignored_by_productivity}else{[decimal]0})
-    temperature=$(if($null-ne$Flow.temperature){Copy-MIR4ProcessIRValue $Flow.temperature}else{[ordered]@{status='unavailable'}})
-    quality=$(if($null-ne$Flow.quality){Copy-MIR4ProcessIRValue $Flow.quality}else{[ordered]@{status='unavailable'}})
+    catalyst_amount=$(if($null-ne$catalystAmount-and$null-ne$catalystAmount.Value){[decimal]$catalystAmount.Value}else{[decimal]0})
+    ignored_by_productivity=$(if($null-ne$ignoredByProductivity-and$null-ne$ignoredByProductivity.Value){[decimal]$ignoredByProductivity.Value}else{[decimal]0})
+    temperature=$(if($null-ne$temperature-and$null-ne$temperature.Value){Copy-MIR4ProcessIRValue $temperature.Value}else{[ordered]@{status='unavailable'}})
+    quality=$(if($null-ne$quality-and$null-ne$quality.Value){Copy-MIR4ProcessIRValue $quality.Value}else{[ordered]@{status='unavailable'}})
   }
 }
 
