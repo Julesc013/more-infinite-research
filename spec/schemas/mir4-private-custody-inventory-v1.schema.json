@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-private-custody-inventory-v1.schema.json",
+  "title": "MIR 4 private custody inventory V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "programme_id",
+    "turn",
+    "status",
+    "private_payloads_embedded",
+    "credentials_embedded",
+    "private_keys_embedded",
+    "entries",
+    "transition_authority",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PrivateCustodyInventoryV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "status": {"const": "public-index-private-payloads-absent"},
+    "private_payloads_embedded": {"const": false},
+    "credentials_embedded": {"const": false},
+    "private_keys_embedded": {"const": false},
+    "entries": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/entry"},
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": ["object_id", "target", "version", "expected_sha256"],
+            "properties": {
+              "object_id": {"const": "factorio-engine-f210"},
+              "target": {"const": "f210"},
+              "version": {"const": "2.1.14"},
+              "expected_sha256": {"const": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"}
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["object_id", "target", "version", "expected_sha256"],
+            "properties": {
+              "object_id": {"const": "factorio-engine-f200"},
+              "target": {"const": "f200"},
+              "version": {"const": "2.0.77"},
+              "expected_sha256": {"const": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"}
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "third-party-mod-archives"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "unredacted-evidence"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "manual-raw-evidence"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "factorio-saves"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "private-acquisition-data"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["object_class"], "properties": {"object_class": {"const": "protected-signing-material"}}}, "minContains": 1, "maxContains": 1}
+      ]
+    },
+    "transition_authority": {"$ref": "#/$defs/transition"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "nullableSha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+    "nullableText": {"oneOf": [{"type": "string", "minLength": 1, "maxLength": 256}, {"type": "null"}]},
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "object_id",
+        "object_class",
+        "target",
+        "version",
+        "expected_sha256",
+        "custody_class",
+        "rights_class",
+        "availability",
+        "acquisition_requirement",
+        "payload_embedded",
+        "encrypted_store_required"
+      ],
+      "properties": {
+        "object_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,127}$"},
+        "object_class": {
+          "enum": [
+            "factorio-engine",
+            "third-party-mod-archives",
+            "unredacted-evidence",
+            "manual-raw-evidence",
+            "factorio-saves",
+            "private-acquisition-data",
+            "protected-signing-material"
+          ]
+        },
+        "target": {"oneOf": [{"enum": ["f210", "f200"]}, {"type": "null"}]},
+        "version": {"$ref": "#/$defs/nullableText"},
+        "expected_sha256": {"$ref": "#/$defs/nullableSha256"},
+        "custody_class": {"type": "string", "minLength": 1, "maxLength": 128},
+        "rights_class": {"type": "string", "minLength": 1, "maxLength": 128},
+        "availability": {"type": "string", "minLength": 1, "maxLength": 128},
+        "acquisition_requirement": {"type": "string", "minLength": 1, "maxLength": 512},
+        "payload_embedded": {"const": false},
+        "encrypted_store_required": {"type": "boolean"}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["production_signing", "production_seal", "publication"],
+      "properties": {
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

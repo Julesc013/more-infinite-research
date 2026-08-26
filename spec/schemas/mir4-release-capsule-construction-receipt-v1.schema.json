@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-capsule-construction-receipt-v1.schema.json",
+  "title": "MIR 4 release capsule construction receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "programme_id",
+    "turn",
+    "operation",
+    "status",
+    "capsule",
+    "source",
+    "object_descriptor_count",
+    "unique_payload_count",
+    "construction",
+    "production_authority",
+    "release_transition_performed",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseCapsuleConstructionReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "operation": {"const": "construct"},
+    "status": {"const": "passed"},
+    "capsule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_sha256", "content_sha256", "bytes", "entry_count", "manifest_record_sha256"],
+      "properties": {
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "entry_count": {"type": "integer", "minimum": 2},
+        "manifest_record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "source": {"$ref": "#/$defs/source"},
+    "object_descriptor_count": {"const": 17},
+    "unique_payload_count": {"type": "integer", "minimum": 14, "maximum": 17},
+    "construction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network", "path_order", "timestamp", "permissions", "append_only_receipt"],
+      "properties": {
+        "network": {"const": "disabled"},
+        "path_order": {"const": "ordinal"},
+        "timestamp": {"const": "1980-01-01T00:00:00Z"},
+        "permissions": {"const": 0},
+        "append_only_receipt": {"const": true}
+      }
+    },
+    "production_authority": {"const": false},
+    "release_transition_performed": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree"],
+      "properties": {
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"}
+      }
+    }
+  }
+}

@@ -46,6 +46,36 @@ The verifier binds the signed payload to the source commit and tree, canonical i
 
 Never use proof-only key creation for T16. Production key generation, passphrase custody, recovery approval, production signing, and publication remain explicit maintainer gates.
 
+## Construct the portable release capsule
+
+Run .\tools\commands\mir4\Invoke-MIR4ReleaseCapsule.ps1 -Mode Build only after the supply-chain projection and four V1 developer-preview archives exist for the same clean source commit and tree. Pass the proof-only public key explicitly when the default ignored build location is not used.
+
+The command verifies the component inventory, both SBOM projections, SLSA provenance, proof-only signature, trusted public key, revocation snapshot, and preview manifests before constructing anything. It creates a deterministic Git-produced source snapshot, then writes one ZIP rooted at mir4-release-capsule. Public objects live at objects/sha256/<first-two-uppercase-hex>/<uppercase-sha256>; the manifest records logical roles separately from content identity, so duplicate bytes cannot create ambiguous custody.
+
+The non-production capsule carries:
+
+- the exact source archive and its commit/tree envelope;
+- the current pre-freeze source and target record set;
+- the canonical inventory, SPDX 3.0.1 and 2.3 projections, SLSA provenance, verified attestation, and proof-only public key;
+- all four developer-preview archives and their embedded manifests;
+- a proof-closure summary, deterministic restore instructions, and the public-safe private-custody index.
+
+The manifest deliberately contains only a tag plan for v4.0.0. It records allocation and authorization as false. Construction is append-only: an existing archive or receipt may be reused only when its bytes are identical; a conflicting rewrite fails closed.
+
+## Public-safe and private custody partitions
+
+The private-custody inventory names the exact F210 and F200 engine locks and separately classifies third-party mod closures, unredacted evidence, manual raw evidence, saves, acquisition data, and protected signing material. It contains no payload, machine path, credential, passphrase, or private key.
+
+An unavailable private object is not silently treated as restored. The restoration receipt retains its stable object identity, availability state, and exact acquisition requirement. Engine reacquisition must follow the local engine authority: the current 2.1 Steam installation may be used as installed, while 2.0 and older engines remain under D:\Programs\Factorio\<version>. Never download, replace, retarget, or mutate a historical Steam depot without maintainer authority.
+
+## Offline restoration
+
+Run the capsule command with -Mode Restore, the exact capsule path, an empty restore root, and the exact OpenSSH ssh-keygen executable. The implementation has no network-capable construction or restoration path and records zero network calls; it never reads mutable GitHub state.
+
+Restoration streams and rehashes every content-addressed object, safely expands the exact Git source, verifies contract, platform, and toolchain identity sets, verifies the F210/F200 package-source rows, checks all preview payload and embedded-metadata hashes, validates the inventory and SLSA binding, independently verifies the attestation and revocation inputs, validates the proof index, and exercises the publisher admission contract in dummy-none credential mode. The restored publisher receives no source checkout, package builder, signing key, credential, mutation, or production-publication authority.
+
+The receipt is independent of its absolute restore path, so two clean roots produce the same record hash. The gate rejects a missing object, wrong digest, wrong target, wrong source or tree, revoked proof root, corrupt inventory, non-empty restore destination, or unavailable private payload presented as restored.
+
 ## Rights and custody
 
 The repository declares MPL-2.0 through LICENSE; the authority conservatively records concluded license and copyright as NOASSERTION. It does not invent ownership or a separate redistribution grant for binary artwork. Private engines, third-party archives, unredacted evidence, acquisition data, recovery material, credentials, and private keys remain outside ordinary repository and public-capsule history.

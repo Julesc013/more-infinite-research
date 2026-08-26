@@ -1,0 +1,303 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-capsule-manifest-v1.schema.json",
+  "title": "MIR 4 release capsule manifest V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "programme_id",
+    "turn",
+    "status",
+    "source",
+    "identity_sets",
+    "targets",
+    "objects",
+    "partitions",
+    "proof_closure",
+    "publication_intents",
+    "restore",
+    "transition_authority",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseCapsuleManifestV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "status": {"const": "non-production-prefreeze-portable-capsule"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit", "tree", "tag_plan"],
+      "properties": {
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"},
+        "tag_plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tag", "allocated", "authorized"],
+          "properties": {
+            "tag": {"const": "v4.0.0"},
+            "allocated": {"const": false},
+            "authorized": {"const": false}
+          }
+        }
+      }
+    },
+    "identity_sets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/identitySet"},
+      "allOf": [
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "contract_set"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "platform_profile"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["name"], "properties": {"name": {"const": "toolchain_locks"}}}, "minContains": 1, "maxContains": 1}
+      ]
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {"$ref": "#/$defs/f210"},
+        {"$ref": "#/$defs/f200"}
+      ],
+      "items": false
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/object"},
+      "allOf": [
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "source-archive"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "source-archive-envelope"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "source-release-record"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "target-distribution-record-set"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "component-inventory"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "sbom-spdx-3.0.1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "sbom-spdx-2.3"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "provenance-slsa-v1"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "supply-chain-attestation"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "proof-public-key"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "proof-closure-summary"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "restore-instructions"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "rights-custody-inventory"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["role"], "properties": {"role": {"const": "preview-asset"}}}, "minContains": 4, "maxContains": 4}
+      ]
+    },
+    "partitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_safe", "private_custody"],
+      "properties": {
+        "public_safe": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["embedded", "descriptor_count", "unique_payload_count"],
+          "properties": {
+            "embedded": {"const": true},
+            "descriptor_count": {"const": 17},
+            "unique_payload_count": {"type": "integer", "minimum": 14, "maximum": 17}
+          }
+        },
+        "private_custody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["payloads_embedded", "inventory_object_sha256", "credential_values_embedded", "private_keys_embedded"],
+          "properties": {
+            "payloads_embedded": {"const": false},
+            "inventory_object_sha256": {"$ref": "#/$defs/sha256"},
+            "credential_values_embedded": {"const": false},
+            "private_keys_embedded": {"const": false}
+          }
+        }
+      }
+    },
+    "proof_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "component_inventory_root",
+        "provenance_sha256",
+        "attestation_record_sha256",
+        "public_key_fingerprint",
+        "revocation_source_commit"
+      ],
+      "properties": {
+        "component_inventory_root": {"$ref": "#/$defs/sha256"},
+        "provenance_sha256": {"$ref": "#/$defs/sha256"},
+        "attestation_record_sha256": {"$ref": "#/$defs/sha256"},
+        "public_key_fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+={0,3}$"},
+        "revocation_source_commit": {"$ref": "#/$defs/gitObject"}
+      }
+    },
+    "publication_intents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_release", "f210", "f200", "developer_previews"],
+      "properties": {
+        "source_release": {"const": false},
+        "f210": {"const": false},
+        "f200": {"const": false},
+        "developer_previews": {"const": false}
+      }
+    },
+    "restore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["network_required", "mutable_github_state_required", "clean_root_required", "dummy_publisher_only", "private_reacquisition_explicit"],
+      "properties": {
+        "network_required": {"const": false},
+        "mutable_github_state_required": {"const": false},
+        "clean_root_required": {"const": true},
+        "dummy_publisher_only": {"const": true},
+        "private_reacquisition_explicit": {"const": true}
+      }
+    },
+    "transition_authority": {"$ref": "#/$defs/transition"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "identitySet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "root_sha256", "file_count"],
+      "properties": {
+        "name": {"enum": ["contract_set", "platform_profile", "toolchain_locks"]},
+        "root_sha256": {"$ref": "#/$defs/sha256"},
+        "file_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "component_id", "distribution_version", "materialization", "content_sha256", "publication_intent"],
+      "properties": {
+        "target": {"enum": ["f210", "f200"]},
+        "component_id": {"enum": ["mir4-player-f210", "mir4-player-f200"]},
+        "distribution_version": {"enum": ["4.0.21000", "4.0.20000"]},
+        "materialization": {"enum": ["source-closure", "artifact", "provided-payload"]},
+        "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "publication_intent": {"const": false}
+      }
+    },
+    "f210": {
+      "allOf": [
+        {"$ref": "#/$defs/target"},
+        {
+          "type": "object",
+          "required": ["target", "component_id", "distribution_version"],
+          "properties": {
+            "target": {"const": "f210"},
+            "component_id": {"const": "mir4-player-f210"},
+            "distribution_version": {"const": "4.0.21000"}
+          }
+        }
+      ]
+    },
+    "f200": {
+      "allOf": [
+        {"$ref": "#/$defs/target"},
+        {
+          "type": "object",
+          "required": ["target", "component_id", "distribution_version"],
+          "properties": {
+            "target": {"const": "f200"},
+            "component_id": {"const": "mir4-player-f200"},
+            "distribution_version": {"const": "4.0.20000"}
+          }
+        }
+      ]
+    },
+    "nullableIdentity": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        {"type": "null"}
+      ]
+    },
+    "nullableTarget": {
+      "oneOf": [
+        {"enum": ["f210", "f200"]},
+        {"type": "null"}
+      ]
+    },
+    "object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "object_id",
+        "role",
+        "logical_name",
+        "media_type",
+        "component_id",
+        "target",
+        "sha256",
+        "bytes",
+        "path",
+        "required_for_restore"
+      ],
+      "properties": {
+        "object_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,255}$"},
+        "role": {
+          "enum": [
+            "source-archive",
+            "source-archive-envelope",
+            "source-release-record",
+            "target-distribution-record-set",
+            "component-inventory",
+            "sbom-spdx-3.0.1",
+            "sbom-spdx-2.3",
+            "provenance-slsa-v1",
+            "supply-chain-attestation",
+            "proof-public-key",
+            "proof-closure-summary",
+            "restore-instructions",
+            "rights-custody-inventory",
+            "preview-asset"
+          ]
+        },
+        "logical_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "media_type": {"type": "string", "pattern": "^[a-z0-9.+-]+/[a-z0-9.+-]+$"},
+        "component_id": {"$ref": "#/$defs/nullableIdentity"},
+        "target": {"$ref": "#/$defs/nullableTarget"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "path": {"type": "string", "pattern": "^objects/sha256/[0-9A-F]{2}/[0-9A-F]{64}$"},
+        "required_for_restore": {"const": true}
+      }
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_freeze",
+        "candidate_allocation",
+        "production_signing",
+        "production_seal",
+        "promotion_to_main",
+        "tagging",
+        "publication"
+      ],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}
