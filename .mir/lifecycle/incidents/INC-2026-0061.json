@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "id": "INC-2026-0061",
+  "kind": "MIR4CrashRecoveryRecordV1",
+  "title": "Recover the interrupted T15 attempt after host memory exhaustion",
+  "state": "closed-recovered",
+  "recorded_at": "2026-08-26T22:27:55.6874041+10:00",
+  "repository": "Julesc013/more-infinite-research",
+  "observed_before_recovery": {
+    "local_head": "79acc059c1e6f230b6952c0a675f75ff7d37a7ea",
+    "local_tree": "5526b67d56c5dddc6dea5c309aef548b844f419b",
+    "origin_dev_head": "79acc059c1e6f230b6952c0a675f75ff7d37a7ea",
+    "origin_dev_tree": "5526b67d56c5dddc6dea5c309aef548b844f419b",
+    "dev_ahead": 0,
+    "dev_behind": 0,
+    "primary_worktree_clean": true,
+    "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"
+  },
+  "inventory": {
+    "local_branches": 167,
+    "remote_tracking_branches": 133,
+    "registered_worktrees_before_t15_activation": 100,
+    "existing_worktrees_before_t15_activation": 46,
+    "dirty_existing_worktrees_preserved": 8,
+    "stashes": 0,
+    "primary_staged_paths": 0,
+    "primary_unstaged_paths": 0,
+    "primary_untracked_paths": 0,
+    "ignored_paths_inventoried": 30284,
+    "t15_branch": {
+      "name": "codex/mir4-t15-supply-chain-preservation",
+      "head": "79acc059c1e6f230b6952c0a675f75ff7d37a7ea",
+      "reflog_event": "branch-created-from-head",
+      "created_at": "2026-08-26T21:23:10+10:00",
+      "commits_after_t14": 0
+    }
+  },
+  "resource_observation": {
+    "total_physical_memory_bytes": 17047683072,
+    "free_physical_memory_kib_at_inventory": 6263476,
+    "page_file_size_kib": 2072576,
+    "repository_volume_free_gib": 12.27,
+    "rescue_volume_free_gib": 15.8,
+    "maximum_memory_heavy_jobs": 1,
+    "maximum_simultaneous_factorio_processes": 1,
+    "maximum_active_implementation_worktrees": 2,
+    "maximum_lightweight_parallel_lanes": 2
+  },
+  "process_recovery": {
+    "orphaned_factorio_processes_found": 0,
+    "orphaned_worker_processes_found": 0,
+    "processes_terminated": [],
+    "factorio_or_codex_crash_dump_after_t14_found": false
+  },
+  "rescue": {
+    "location": "D:/MIR4-rescue/20260826-221044-post-oom",
+    "git_bundle": "repository.bundle",
+    "git_bundle_sha256": "0A1AEE8C5E2627AE0A3B0D7AB4E73B2680753F4A8CC0AF2F0FAA6EE33F2297FD",
+    "hash_manifest": "hash-manifest.csv",
+    "hash_manifest_sha256": "BFD2C3FE4FD477C8B3A0DF463F915B6F58E4DE7351586A03F4992751B68A2E11",
+    "files_in_initial_manifest": 117,
+    "binary_patches_preserved": true,
+    "untracked_files_copied": true,
+    "factorio_logs_saves_and_crash_dumps": "metadata-inventoried-no-post-t14-attempt-object-found",
+    "credential_or_private_key_payloads_copied": false
+  },
+  "classification": [
+    {
+      "subject": "codex/mir4-t15-supply-chain-preservation",
+      "class": "valid-unmerged-t15-branch-scaffold",
+      "disposition": "adopt-branch-and-start-from-exact-origin-dev",
+      "reason": "The branch was created from T14 but contains no T15 commit, worktree change, build result, or evidence object."
+    },
+    {
+      "subject": "eight-dirty-existing-worktrees",
+      "class": "historical-or-unrelated-local-work",
+      "disposition": "preserved-not-adopted",
+      "reason": "Every changed worktree predates T14 or belongs to MIR3, earlier MIR4 integration, generated queue repair, attribute verification, playtest, or provenance work; none binds T15 or the current source tree."
+    },
+    {
+      "subject": "MIR4-Post-Merge-Integration-Receipt-SOL14V1-and-MIR4-Source-Freeze-Decision-Packet-SOL14V1",
+      "class": "valid-later-turn-historical-work-superseded-by-current-programme",
+      "disposition": "preserved-not-adopted",
+      "reason": "The records bind the older 1a7f9d71 source and explicitly deny source-freeze authority; the current programme remains pre-freeze-unallocated at 79acc059."
+    },
+    {
+      "subject": "post-t14-build-evidence-package-log-save-or-temp-output",
+      "class": "not-found",
+      "disposition": "nothing-discarded-or-recreated",
+      "reason": "The timestamp and keyword inventory found no file changed after the T14 merge in repository build/evidence/worktree roots or C:/tmp, and no relevant external MIR root was configured."
+    }
+  ],
+  "reconciliation": {
+    "fetch_all_prune_completed": true,
+    "origin_dev_advanced": false,
+    "dev_equals_origin_dev": true,
+    "package_fingerprint_matches_t14_authority": true,
+    "recovered_t15_source_or_evidence_adopted": false,
+    "work_destroyed": false,
+    "next_work_package": "T15-supply-chain-and-preservation-hardening"
+  },
+  "authority": {
+    "package_player_authority_changed": false,
+    "source_freeze_authorized": false,
+    "candidate_allocation_authorized": false,
+    "production_signing_authorized": false,
+    "promotion_authorized": false,
+    "tagging_authorized": false,
+    "publication_authorized": false
+  }
+}
