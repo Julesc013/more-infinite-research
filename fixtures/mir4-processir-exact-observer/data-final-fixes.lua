@@ -4,6 +4,7 @@
 local config = require("capture_config")
 local snapshot_adapter = require("__more-infinite-research__.prototypes.mir.pipeline.compilation_snapshot_adapter")
 local recipe_risk_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_risk_facts")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 
 local function sorted_copy(values)
   local out = {}
@@ -82,8 +83,13 @@ local function source_identity()
   }
 end
 
-local snapshot = snapshot_adapter.capture({source_fingerprints = {t12_capture = config.capture_id}})
-local risks = recipe_risk_facts.snapshot()
+-- MIR deliberately closes its production CompilerContext before dependent mods
+-- run. Establish a fresh observation-only context so every cache is rebuilt
+-- from the finalized Factorio surface; no production compiler state is reused.
+local snapshot, risks = compiler_context.with_active(compiler_context.new(), function()
+  local captured = snapshot_adapter.capture({source_fingerprints = {t12_capture = config.capture_id}})
+  return captured, recipe_risk_facts.snapshot()
+end)
 local recipes = snapshot.fact_domains.recipes
 local machine_index = machines_by_category(snapshot.fact_domains.entities)
 local names, total = selected_names(recipes, risks)
