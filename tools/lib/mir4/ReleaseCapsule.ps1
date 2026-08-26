@@ -629,6 +629,16 @@ function New-MIR4ReleaseCapsuleV1 {
       -not (Test-MIR4SupplyChainAttestationV1 -RepoRoot $repo -AttestationPath ([string]$descriptorByRole['supply-chain-attestation'][0].source_path) -SshKeygenPath $SshKeygenPath -TrustedPublicKeyPath ([string]$publicKeyRows[0].source_path) -ScratchRoot (Join-Path $output 'attestation-construction-verification') -ExpectedSourceCommit ([string]$Inventory.source.commit) -ExpectedSourceTree ([string]$Inventory.source.tree) -ExpectedWorkflowRef ([string]$Attestation.payload.workflow.ref) -ExpectedInventoryRecordSha256 ([string]$Inventory.record_sha256) -ExpectedProvenanceSha256 (Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $SlsaProvenance)))) {
     throw '[mir4-release-capsule-attestation-verification]'
   }
+  foreach ($preview in @($descriptorByRole['preview-asset'])) {
+    $subject = @($Attestation.payload.subjects | Where-Object {
+      [string]$_.name -ceq [string]$preview.component_id
+    })
+    if (-not (Test-MIR4PreviewAssetArchiveV1 -Path ([string]$preview.source_path) -ExpectedCommit ([string]$Inventory.source.commit) -ExpectedTree ([string]$Inventory.source.tree)) -or
+        $subject.Count -ne 1 -or
+        [string]$subject[0].digest.sha256 -cne ([string]$preview.sha256).ToLowerInvariant()) {
+      throw "[mir4-release-capsule-preview-binding] $($preview.logical_name)"
+    }
+  }
   foreach ($row in $descriptorRows) {
     if ($null -eq $row.component_id) { continue }
     $component = @($Inventory.components | Where-Object { [string]$_.component_id -ceq [string]$row.component_id })
@@ -1023,14 +1033,14 @@ function Test-MIR4PreviewAssetArchiveV1 {
     foreach ($entry in $inventory.entries) { $entryMap[[string]$entry.path] = $entry }
     foreach ($file in $manifest.files) {
       if (-not $entryMap.ContainsKey([string]$file.path) -or
-          [string]$entryMap[[string]$file.path].raw_sha256 -cne [string]$file.sha256 -or
+          [string]$entryMap[[string]$file.path].raw_sha256 -cne ([string]$file.sha256).ToUpperInvariant() -or
           [long]$entryMap[[string]$file.path].raw_bytes -ne [long]$file.bytes) {
         return $false
       }
     }
     foreach ($embedded in $manifest.embedded_metadata) {
       if (-not $entryMap.ContainsKey([string]$embedded.path) -or
-          [string]$entryMap[[string]$embedded.path].raw_sha256 -cne [string]$embedded.sha256) {
+          [string]$entryMap[[string]$embedded.path].raw_sha256 -cne ([string]$embedded.sha256).ToUpperInvariant()) {
         return $false
       }
     }
