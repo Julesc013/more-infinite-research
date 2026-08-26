@@ -912,11 +912,14 @@ function Test-MIR4Spdx301Document {
         return $false
       }
     }
-    foreach ($hash in @($graph | ForEach-Object { @($_.verifiedUsing) } | Where-Object { $null -ne $_ })) {
-      if ([string]$hash.type -cne 'Hash' -or
-          [string]$hash.algorithm -cne 'sha256' -or
-          [string]$hash.hashValue -cnotmatch '^[a-f0-9]{64}$') {
-        return $false
+    foreach ($element in $graph) {
+      if (-not $element.PSObject.Properties['verifiedUsing']) { continue }
+      foreach ($hash in @($element.verifiedUsing)) {
+        if ([string]$hash.type -cne 'Hash' -or
+            [string]$hash.algorithm -cne 'sha256' -or
+            [string]$hash.hashValue -cnotmatch '^[a-f0-9]{64}$') {
+          return $false
+        }
       }
     }
     $raw = ConvertTo-MIR4BootstrapCanonicalJson -Value $Document
