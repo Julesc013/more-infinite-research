@@ -81,7 +81,7 @@ function ConvertTo-MIR4WholePlatformMarkdown {
     'audience: developer',
     'doc_type: reference',
     'owner: mir-maintainers',
-    'last_reviewed: 2026-08-23',
+    'last_reviewed: 2026-08-26',
     'supersedes: []',
     'superseded_by: []',
     '---',

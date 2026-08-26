@@ -162,12 +162,12 @@
       "id": "process-ir-and-effect-channels",
       "release_destination": "4.0.0",
       "maturity": "preview",
-      "completion_state": "implemented-synthetic-parity-preview",
+      "completion_state": "implemented-synthetic-and-exact-target-parity-preview",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json"],
-      "implementations": ["tools/lib/mir4/ProcessIR.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1"],
+      "implementations": ["tools/lib/mir4/ProcessIR.ps1", "tools/lib/mir4/ExactProcessIR.ps1"],
+      "verification": ["validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1", "validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1"],
       "cutover": "process-shape-by-process-shape-after-exact-target-snapshot",
-      "blockers": ["BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT"]
+      "blockers": ["BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO"]
     },
     {
       "former_slot": "4.12",
@@ -179,7 +179,7 @@
       "implementations": ["tools/lib/mir4/ProcessIR.ps1", "tools/lib/mir4/SafetyKernel.ps1", "tools/lib/mir4/PolicyEngine.ps1"],
       "verification": ["validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1"],
       "cutover": "candidate-by-candidate-after-complete-certificate-and-technology-acceptance",
-      "blockers": ["BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT", "MAINTAINER-TECHNOLOGY-ACCEPTANCE"]
+      "blockers": ["BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO", "MAINTAINER-TECHNOLOGY-ACCEPTANCE"]
     },
     {
       "former_slot": "4.13",

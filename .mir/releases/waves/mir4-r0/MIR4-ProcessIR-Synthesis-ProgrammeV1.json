@@ -189,8 +189,15 @@
     {"id":"Pyanodons","status":"review-required","scope":"private-exact-environment-preview"}
   ],
   "exact_target_snapshot": {
-    "status": "BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT",
-    "reason": "No package-excluded serialized, hash-bound terminal recipe_facts plus recipe_risk_facts snapshot from an exact target is locally governed. Synthetic fixture parity is the maximum honest W06 evidence."
+    "status": "CAPTURED-EXACT-F210-F200-PROCESSIR-PREVIEW-WITH-DECLARED-CUSTODY-BLOCKER",
+    "reason": "T12 governs deterministic, package-excluded, hash-bound post-finalizer ProcessIR snapshots for F210 and F200 base/official plus six retained F210 ecosystems. F200 K2SO remains blocked on exact historical archive custody and no substitute is admitted.",
+    "receipt": "sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json",
+    "manifest": "sdk/preview/mir4/reference/t12/MIR4_T12_EXACT_PROCESSIR_MANIFEST.json",
+    "capture_count": 10,
+    "required_capture_count": 11,
+    "custody_blocker": "BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO",
+    "authoritative": false,
+    "public_release_proof": false
   },
   "outputs": [
     "MIR4_PROCESSIR_PARITY_RESULT.json",

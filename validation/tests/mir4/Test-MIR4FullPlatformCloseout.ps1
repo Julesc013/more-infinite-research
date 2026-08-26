@@ -34,7 +34,7 @@ $bundle.checks[1].status='passed';$plan.source_tree='c'*40
 if(Test-MIR4FullPlatformGateBinding -Plan $plan -Summary $summary -Bundle $bundle -SourceIdentity $source){throw '[mir4-full-platform-stale-gate-admitted]'}
 
 $blockers=@(Get-MIR4FullPlatformBlockers)
-$requiredBlockers=@('BLOCKED-HUMAN-SECRET-INPUT','BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER','BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT','BLOCKED-MISSING-EXACT-ENGINE-f018','BLOCKED-MISSING-TRUSTED-TIMING-CAPACITY-EVIDENCE','BLOCKED-MUSEUM-RIGHTS-CUSTODY-RESTORE-CLOSURE','BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST')
+$requiredBlockers=@('BLOCKED-HUMAN-SECRET-INPUT','BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER','BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO','BLOCKED-MISSING-EXACT-ENGINE-f018','BLOCKED-MISSING-TRUSTED-TIMING-CAPACITY-EVIDENCE','BLOCKED-MUSEUM-RIGHTS-CUSTODY-RESTORE-CLOSURE','BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST')
 if($blockers.Count-ne$requiredBlockers.Count-or@($requiredBlockers|Where-Object{$_-notin@($blockers.id)}).Count){throw '[mir4-full-platform-blocker-loss]'}
 if(@($blockers|Where-Object{$_.workaround_permitted}).Count){throw '[mir4-full-platform-blocker-workaround-admitted]'}
 

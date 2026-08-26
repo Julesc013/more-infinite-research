@@ -1,0 +1,81 @@
+
+{
+  "mods": 
+  [
+    
+    {
+      "name": "base",
+      "enabled": true
+    },
+    
+    {
+      "name": "elevated-rails",
+      "enabled": true
+    },
+    
+    {
+      "name": "quality",
+      "enabled": true
+    },
+    
+    {
+      "name": "recycler",
+      "enabled": true
+    },
+    
+    {
+      "name": "space-age",
+      "enabled": true
+    },
+    
+    {
+      "name": "ChangeInserterDropLane",
+      "enabled": true
+    },
+    
+    {
+      "name": "flib",
+      "enabled": true
+    },
+    
+    {
+      "name": "k2so-assets",
+      "enabled": true
+    },
+    
+    {
+      "name": "Krastorio2",
+      "enabled": true
+    },
+    
+    {
+      "name": "Krastorio2-spaced-out",
+      "enabled": true
+    },
+    
+    {
+      "name": "Krastorio2Assets",
+      "enabled": true
+    },
+    
+    {
+      "name": "Krastorio2MenuSimulations",
+      "enabled": true
+    },
+    
+    {
+      "name": "mir4-processir-exact-observer",
+      "enabled": true
+    },
+    
+    {
+      "name": "more-infinite-research",
+      "enabled": true
+    },
+    
+    {
+      "name": "xy-k2so-enhancements-nulls-fork",
+      "enabled": true
+    }
+  ]
+}

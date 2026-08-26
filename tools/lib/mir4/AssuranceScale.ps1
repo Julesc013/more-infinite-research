@@ -224,7 +224,7 @@ function New-MIR4W08AssuranceScaleResult {
     freshness_revocation=[ordered]@{freshness_authority=[string]$authority.control_plane_authorities.freshness;freshness_sha256=(Get-MIR4W08FileSha256 (Join-Path $repo ([string]$authority.control_plane_authorities.freshness)));freshness_classes=@($freshness.classes.PSObject.Properties.Name|Sort-Object);revocation_authority=[string]$authority.control_plane_authorities.revocation;revocation_sha256=(Get-MIR4W08FileSha256 (Join-Path $repo ([string]$authority.control_plane_authorities.revocation)));active_revocations=@($revocation.rules|Where-Object active).Count;override_authorized=$false}
     mutation_calibration=[ordered]@{authority=[string]$authority.control_plane_authorities.mutation_calibration;cases=[int]$calibration.cases;false_negative_budget=[int]$calibration.false_negative_budget;status='passed'}
     partial_recovery=$recovery;nondeterminism_incident=$incident;counterexample=$counterexample;proof_cover=$proofCover
-    blockers=@($authority.initial_blockers|Where-Object{$_-eq'BLOCKED-EXACT-TARGET-PROCESSIR-SNAPSHOT'})
+    blockers=@($slices.slices|Where-Object status -eq unavailable|ForEach-Object{[string]$_.reason}|Where-Object{-not[string]::IsNullOrWhiteSpace($_)}|Sort-Object -Unique)
     status=$(if($slices.complete-and$proofCover.status-eq'complete-proposal-only'-and-not$impact.governance_failure){'passed-projection-only'}else{'partial-with-bounded-blockers'})
     package_visible=$false;public_release_proof=$false;evidence_ledger_authority=$false;verification_plan_authority=$false;source_freeze_authorized=$false;production_signing_or_sealing_authorized=$false;publication_authorized=$false;record_sha256=''
   }
