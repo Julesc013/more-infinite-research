@@ -258,6 +258,11 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T09-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
@@ -292,6 +297,11 @@ package_excluded_modules:
       - spec/schemas/mir4-release-fault-corpus-v1.schema.json
       - spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-t07-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t08-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t09-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t10-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t11-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t12-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
       - spec/schemas/mir4-release-target-build-result-v1.schema.json
       - spec/schemas/mir4-release-target-qualification-result-v1.schema.json
@@ -312,6 +322,9 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
       - validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
       - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
+      - validation/tests/mir4/Test-MIR4SdkV1T08.ps1
+      - validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1
+      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
