@@ -27,12 +27,12 @@ function Get-MIR4T12FileSha256 {
 }
 
 function Get-MIR4T12RecordDigest {
-  param([Parameter(Mandatory)]$Value,[string]$Domain='org.more-infinite-research/mir4/exact-processir/1')
+  param([Parameter(Mandatory)]$Value,[string]$Domain='mir4:exact-processir:1')
   Get-MIR4CanonicalDigestV1 -Value $Value -Domain $Domain -OmitTopLevelDigest
 }
 
 function Add-MIR4T12RecordDigest {
-  param([Parameter(Mandatory)]$Value,[string]$Domain='org.more-infinite-research/mir4/exact-processir/1')
+  param([Parameter(Mandatory)]$Value,[string]$Domain='mir4:exact-processir:1')
   $Value.digest=Get-MIR4T12RecordDigest -Value $Value -Domain $Domain
   $Value
 }
@@ -114,7 +114,7 @@ function Read-MIR4T12ObserverLog {
   }
   if($headers.Count-ne 1-or$footers.Count-ne 1-or$rows.Count-ne[int]$headers[0].selected_processes-or$rows.Count-ne[int]$footers[0].emitted_rows-or-not$footers[0].complete){throw "[mir4-t12-observer-protocol] $CaptureId headers=$($headers.Count) rows=$($rows.Count) footers=$($footers.Count)"}
   $material=[ordered]@{header=$headers[0];rows=@($rows|Sort-Object recipe -CaseSensitive);footer=$footers[0]}
-  [pscustomobject][ordered]@{header=$material.header;rows=$material.rows;footer=$material.footer;digest=(Get-MIR4T12RecordDigest -Value $material -Domain 'org.more-infinite-research/mir4/exact-processir-observer/1')}
+  [pscustomobject][ordered]@{header=$material.header;rows=$material.rows;footer=$material.footer;digest=(Get-MIR4T12RecordDigest -Value $material -Domain 'mir4:exact-processir-observer:1')}
 }
 
 function ConvertTo-MIR4T12Quantity {
@@ -164,14 +164,14 @@ function ConvertTo-MIR4T12CanonicalInput {
       $unsupported=@($variant.results|Where-Object{$null-ne$_.shared_probability-or($null-ne$_.extra_count_fraction-and[decimal]$_.extra_count_fraction-ne 0)})
       $riskMaterial=[ordered]@{recipe=[string]$row.recipe;terminal_fingerprint=[string]$row.risk.risk_fingerprint;hard_flags=@($row.risk.hard_flags);review_flags=@($row.risk.review_flags);evidence=@($row.risk.evidence);shared_input_output=@($row.risk.shared_input_output)}
       $idMaterial=[ordered]@{capture=[string]$Capture.id;recipe=[string]$row.recipe;variant=[string]$variant.name;ordinal=$variantOrdinal}
-      $idDigest=(Get-MIR4T12RecordDigest -Value $idMaterial -Domain 'org.more-infinite-research/mir4/process-id/1').Substring(7,24)
+      $idDigest=(Get-MIR4T12RecordDigest -Value $idMaterial -Domain 'mir4:process-id:1').Substring(7,24)
       $classification=if([string]$row.fact.source_class-eq'recycling'){'recycling'}elseif([string]$row.recipe-match'(?i)recover|recovery'){'recovery'}elseif($unsupported.Count){'opaque'}else{'ordinary'}
       $processes+=[ordered]@{
         id="process-$idDigest";recipe=[string]$row.recipe;variant=[string]$variant.name;classification=$classification;shape_supported=($unsupported.Count-eq 0)
         inputs=$inputs;outputs=$outputs;catalysts=$catalysts;returned_containers=$returned;cycle_bound=$(if(@($row.risk.hard_flags).Count){'unknown'}else{'not-applicable'})
         categories=@($variant.categories);machines=@($row.machines);surface_conditions=@($variant.surface_conditions);unlocks=@($row.unlocks);owners=@($row.productivity_owners);source_mod=$row.source_mod
         energy_required=$(if($null-ne$variant.energy_required){$variant.energy_required}else{$null})
-        risk=[ordered]@{fingerprint=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'org.more-infinite-research/mir4/terminal-risk-fact/1');terminal_fingerprint=[string]$row.risk.risk_fingerprint;confidence=$(if($unsupported.Count){'partial'}else{'complete'});hard_flags=@($row.risk.hard_flags|Sort-Object -Unique -CaseSensitive);review_flags=@($row.risk.review_flags|Sort-Object -Unique -CaseSensitive);evidence=@($row.risk.evidence|Sort-Object -Unique -CaseSensitive)}
+        risk=[ordered]@{fingerprint=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'mir4:terminal-risk-fact:1');terminal_fingerprint=[string]$row.risk.risk_fingerprint;confidence=$(if($unsupported.Count){'partial'}else{'complete'});hard_flags=@($row.risk.hard_flags|Sort-Object -Unique -CaseSensitive);review_flags=@($row.risk.review_flags|Sort-Object -Unique -CaseSensitive);evidence=@($row.risk.evidence|Sort-Object -Unique -CaseSensitive)}
       }
     }
     $observationRows+=[ordered]@{recipe=[string]$row.recipe;fact=$row.fact;risk=$row.risk;unlocks=@($row.unlocks);productivity_owners=@($row.productivity_owners);machines=@($row.machines);source_mod=$row.source_mod}
@@ -180,7 +180,7 @@ function ConvertTo-MIR4T12CanonicalInput {
   $riskMaterial=@($observationRows|ForEach-Object{[ordered]@{recipe=$_.recipe;risk=$_.risk}})
   $input=[pscustomobject][ordered]@{
     schema=1;kind='MIR4CanonicalRecipeFactInputV1';fixture_id=[string]$Capture.id
-    source=[ordered]@{authority='terminal-exact-target';target=[string]$Capture.target;profile=[string]$Capture.scenario_id;exact_target=$true;recipe_facts_sha256=(Get-MIR4T12RecordDigest -Value $factMaterial -Domain 'org.more-infinite-research/mir4/recipe-facts/1');risk_facts_sha256=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'org.more-infinite-research/mir4/risk-facts/1');environment_lock_digest=[string]$EnvironmentLock.digest}
+    source=[ordered]@{authority='terminal-exact-target';target=[string]$Capture.target;profile=[string]$Capture.scenario_id;exact_target=$true;recipe_facts_sha256=(Get-MIR4T12RecordDigest -Value $factMaterial -Domain 'mir4:recipe-facts:1');risk_facts_sha256=(Get-MIR4T12RecordDigest -Value $riskMaterial -Domain 'mir4:risk-facts:1');environment_lock_digest=[string]$EnvironmentLock.digest}
     processes=@($processes|Sort-Object id -CaseSensitive)
   }
   [pscustomobject][ordered]@{input=$input;observations=$observationRows}
@@ -218,7 +218,7 @@ function New-MIR4T12ComparisonV1 {
     process_changes=@($changes|Select-Object -First 100);process_change_count=$changes.Count;truncated=($changes.Count-gt 100);classification_before=$A.classification_counts;classification_after=$B.classification_counts
     safe_unsafe_unknown_explicit=$true;offline=$true;network_or_upload_authorized=$false;mutation_authorized=$false;public_support_claim=$false;package_visible=$false;digest=''
   }
-  Add-MIR4T12RecordDigest -Value $record -Domain 'org.more-infinite-research/mir4/processir-comparison/1'|Out-Null
+  Add-MIR4T12RecordDigest -Value $record -Domain 'mir4:processir-comparison:1'|Out-Null
   $record
 }
 

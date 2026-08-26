@@ -38,7 +38,7 @@ function Test-T12Reference([string]$Root){
   foreach($lockFile in Get-ChildItem -LiteralPath (Join-Path $Root 'locks') -File -Filter '*.json'){$lock=Get-Content -Raw -LiteralPath $lockFile.FullName|ConvertFrom-Json -Depth 100;Test-MIR4EnvironmentLockV1 $lock|Out-Null}
   foreach($snapshotFile in Get-ChildItem -LiteralPath (Join-Path $Root 'snapshots') -File -Filter '*.json'){$snapshot=Get-Content -Raw -LiteralPath $snapshotFile.FullName|ConvertFrom-Json -Depth 100;if([string]$snapshot.digest-cne(Get-MIR4T12RecordDigest $snapshot)-or-not$snapshot.observer.deterministic-or$snapshot.package_visible-or$snapshot.authoritative){throw "[mir4-t12-reference-snapshot] $($snapshot.capture_id)"}}
   $receipt=Get-Content -Raw -LiteralPath (Join-Path $Root 'MIR4_T12_RECEIPT.json')|ConvertFrom-Json -Depth 100
-  if([string]$receipt.digest-cne(Get-MIR4T12RecordDigest -Value $receipt -Domain 'org.more-infinite-research/mir4/t12-receipt/1')-or[string]$receipt.status-notin@('completed-machine-work','completed-machine-work-with-custody-blocker')-or-not$receipt.package_source_unchanged){throw '[mir4-t12-reference-receipt]'}
+  if([string]$receipt.digest-cne(Get-MIR4T12RecordDigest -Value $receipt -Domain 'mir4:t12-receipt:1')-or[string]$receipt.status-notin@('completed-machine-work','completed-machine-work-with-custody-blocker')-or-not$receipt.package_source_unchanged){throw '[mir4-t12-reference-receipt]'}
   [pscustomobject][ordered]@{status='passed';capture_count=[int]$receipt.capture_count;reference_root=$Root;package_visible=$false}
 }
 
@@ -63,7 +63,7 @@ foreach($capture in $selected){
   catch{
     if(-not$_.Exception.Message.StartsWith('[mir4-t12-exact-archive-missing]')){throw}
     $blocker=[pscustomobject][ordered]@{schema=1;kind='MIR4T12CustodyBlockerV1';work_package='T12';capture_id=[string]$capture.id;target=[string]$capture.target;scenario_id=[string]$capture.scenario_id;status='blocked-exact-archive-custody';reason=$_.Exception.Message;evidence_ref=[string]$capture.evidence;lock_ref=[string]$capture.lock;fabricated_substitute=$false;package_visible=$false;digest=''}
-    Add-MIR4T12RecordDigest -Value $blocker -Domain 'org.more-infinite-research/mir4/t12-custody-blocker/1'|Out-Null
+    Add-MIR4T12RecordDigest -Value $blocker -Domain 'mir4:t12-custody-blocker:1'|Out-Null
     $blockers+=$blocker;Write-T12Json -Path (Join-Path $output "blockers/$($capture.id).json") -Value $blocker
     Write-Warning "T12 capture $($capture.id) retained an explicit custody blocker: $($_.Exception.Message)"
     continue
@@ -85,9 +85,9 @@ foreach($snapshot in $snapshots){
 }
 $w06=New-MIR4W06Records -RepoRoot $repo -SourceIdentity $source
 $effects=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactEffectObservationV1';source_identity=$source;effect_channel_registry_digest=[string]$w06.effects.digest;captures=@($snapshots|Sort-Object capture_id|ForEach-Object{[ordered]@{capture_id=$_.capture_id;environment_lock_digest=$_.environment_lock_digest;snapshot_digest=$_.digest;classification_counts=$_.classification_counts}});copied_not_reclassified=$true;automatic_mutation=$false;package_visible=$false;digest=''}
-Add-MIR4T12RecordDigest -Value $effects -Domain 'org.more-infinite-research/mir4/t12-effects/1'|Out-Null
+Add-MIR4T12RecordDigest -Value $effects -Domain 'mir4:t12-effects:1'|Out-Null
 $opportunities=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactOpportunityCatalogueV1';source_identity=$source;constructors=@($w06.synthesis.constructors);modes=@($w06.synthesis.modes.id);captures=@($snapshots|Sort-Object capture_id|ForEach-Object{[ordered]@{capture_id=$_.capture_id;overall_classification=$_.process_ir.overall_classification;terminal_disposition=$_.process_ir.terminal_disposition;snapshot_digest=$_.digest}});diagnose_or_conservative_preview_only=$true;automatic_synthesis_authorized=$false;planner_admission=$false;package_visible=$false;digest=''}
-Add-MIR4T12RecordDigest -Value $opportunities -Domain 'org.more-infinite-research/mir4/t12-opportunities/1'|Out-Null
+Add-MIR4T12RecordDigest -Value $opportunities -Domain 'mir4:t12-opportunities:1'|Out-Null
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_EXACT_EFFECTS.json') -Value $effects
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_OPPORTUNITIES.json') -Value $opportunities
 $packageAfter=Get-MIRPackageSourceFingerprint -RepoRoot $repo
@@ -101,13 +101,13 @@ $receipt=[pscustomobject][ordered]@{
   package_source_before=$packageBefore;package_source_after=$packageAfter;package_source_unchanged=($packageBefore-ceq$packageAfter)
   player_mutation_authorized=$false;prototype_write_authorized=$false;planner_or_emitter_admission_authorized=$false;public_support_authorized=$false;release_admission_authorized=$false;package_visible=$false;digest=''
 }
-Add-MIR4T12RecordDigest -Value $receipt -Domain 'org.more-infinite-research/mir4/t12-receipt/1'|Out-Null
+Add-MIR4T12RecordDigest -Value $receipt -Domain 'mir4:t12-receipt:1'|Out-Null
 if(-not$receipt.package_source_unchanged-or-not$receipt.all_deterministic){throw '[mir4-t12-exit-gate]'}
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_RECEIPT.json') -Value $receipt
 
 $files=@(Get-ChildItem -LiteralPath $output -Recurse -File -Filter '*.json'|Where-Object{$_.Name-cne'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json'}|Sort-Object FullName|ForEach-Object{[ordered]@{path=[IO.Path]::GetRelativePath($output,$_.FullName).Replace('\','/');bytes=$_.Length;sha256='sha256:'+(Get-MIR4T12FileSha256 $_.FullName)}})
 $manifest=[pscustomobject][ordered]@{schema=1;kind='MIR4T12ExactProcessIRManifestV1';source_identity=$source;capture_count=$snapshots.Count;blocker_count=$blockers.Count;comparison_count=$comparisons.Count;files=$files;complete=(($snapshots.Count+$blockers.Count)-eq$authority.captures.Count);package_visible=$false;digest=''}
-Add-MIR4T12RecordDigest -Value $manifest -Domain 'org.more-infinite-research/mir4/t12-manifest/1'|Out-Null
+Add-MIR4T12RecordDigest -Value $manifest -Domain 'mir4:t12-manifest:1'|Out-Null
 Write-T12Json -Path (Join-Path $output 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json') -Value $manifest
 
 if($PublishReference){
