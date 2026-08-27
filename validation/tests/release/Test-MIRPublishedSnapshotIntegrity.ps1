@@ -146,10 +146,14 @@ try {
                         $t17 = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
                             -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json' `
                             -Kind 'MIR4T17MachinePreparationAuthorityEvolutionReceiptV1'
+                        $targetCompilerMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath 'releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json' `
+                            -Kind 'MIR4TargetCompilerMigrationReceiptV1'
                         $programmeTransitions = @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t14Transitions = @($t14.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t15Transitions = @($t15.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t17Transitions = @($t17.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $targetCompilerTransitions = @($targetCompilerMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $authorizedPreFreezeTransition =
                             [string]$programme.kind -ceq 'MIR4PreFreezeExecutionProgrammeV1' -and
                             [string]$programme.release_cut.source_version -cne [string]$info.version -and
@@ -171,7 +175,11 @@ try {
                             -not [bool]$t17.human_gate.f210_decision_recorded -and
                             -not [bool]$t17.human_gate.f200_decision_recorded -and
                             -not [bool]$t17.human_gate.acceptance_inferred -and
-                            $t17Transitions.Count -eq 0
+                            $t17Transitions.Count -eq 0 -and
+                            [string]$targetCompilerMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            @($targetCompilerMigration.package_visible_delta).Count -eq 0 -and
+                            @($targetCompilerMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
+                            $targetCompilerTransitions.Count -eq 0
                         if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-t14-t17' }
                     }
                     catch {

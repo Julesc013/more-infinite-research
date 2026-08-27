@@ -33,7 +33,7 @@
   ],
   "merge_laws": [
     {"id":"hard-safety","operator":"restrictive-meet","owner":"tools/lib/mir4/SafetyKernel.ps1","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
-    {"id":"target-support","operator":"restrictive-support-meet","owner":"tools/lib/mir4/TargetCompiler.ps1","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"target-support","operator":"restrictive-support-meet","owner":"tools/mir/application/targets/TargetCompiler.ps1","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
     {"id":"feature-disable","operator":"disable-dominates","owner":"prototypes/mir/planner/compilation_plan.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
     {"id":"owner","operator":"stable-exclusive-precedence","owner":"prototypes/mir/providers/pipeline/owner_arbitration.lua","status":"implemented-adapter","properties":["idempotent","permutation-invariant"]},
     {"id":"science-packs","operator":"normalized-set-union","owner":"prototypes/mir/planner/science.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
@@ -51,7 +51,7 @@
     {"id":"PrototypeMutationPlan","owner":"prototypes/mir/domain/compiler/transformation_plan.lua","status":"existing-executor-only"},
     {"id":"RuntimeRegistrationPlan","owner":"W04","status":"deferred-runtime-owner"},
     {"id":"MigrationPlan","owner":"W04","status":"deferred-runtime-owner"},
-    {"id":"TargetProjectionPlan","owner":"tools/lib/mir4/TargetCompiler.ps1","status":"reference-only"},
+    {"id":"TargetProjectionPlan","owner":"tools/mir/application/targets/TargetCompiler.ps1","status":"reference-only"},
     {"id":"PublicationPlan","owner":".mir/releases/governance/mir4/release-governance.json","status":"blocked-release-governance"}
   ],
   "legacy_adapter": {

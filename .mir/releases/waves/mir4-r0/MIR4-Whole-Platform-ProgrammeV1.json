@@ -56,7 +56,7 @@
       "maturity": "preview",
       "completion_state": "implemented-private-provider-abi",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json", ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"],
-      "implementations": ["tools/lib/mir4/TargetCompiler.ps1", "tools/commands/mir4/New-MIR4TargetProductSet.ps1"],
+      "implementations": ["tools/mir/application/targets/TargetCompiler.ps1", "tools/commands/mir4/New-MIR4TargetProductSet.ps1"],
       "verification": ["validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1"],
       "cutover": "provider-by-provider-after-target-law-and-package-parity",
       "blockers": ["BLOCKED-F018-EXACT-ENGINE", "BLOCKED-MUSEUM-CUSTODY"]

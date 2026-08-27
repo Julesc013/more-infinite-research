@@ -8,6 +8,7 @@ $script:MIR4TechnologyAcceptanceMigrationProofPath='assurance/repository/technol
 $script:MIR4TechnologyAcceptanceMigrationProofSchemaPath='contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json'
 $script:MIR4TechnologyAcceptanceMigrationReceiptPath='releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json'
 $script:MIR4TechnologyAcceptanceMigrationReceiptSchemaPath='contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json'
+$script:MIR4TechnologyAcceptanceMigrationReceiptSha256='011AC795CBB9FBC850E5821D367F1D57264DB79A16540694B4AD4771EB38E879'
 $script:MIR4TechnologyAcceptancePredecessorReceiptPath='releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json'
 $script:MIR4TechnologyAcceptancePredecessorReceiptSha256='4DEFD2256070F627031AC39FB244619E5E7E1949061DED5F89CF438D810F4B78'
 $script:MIR4TechnologyAcceptanceParityDigestV1='sha256:c856a429b8f8bad9609bdfa9e508035e52ed4e0fdc4c09a2cac778aa37315eda'
@@ -127,83 +128,26 @@ function Test-MIR4TechnologyAcceptanceFunctionalParityV1 {
 }
 
 function New-MIR4TechnologyAcceptanceMigrationReceiptV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $migration=Get-MIR4TechnologyAcceptanceMigrationAuthorityV1 -RepoRoot $repo
-  $proof=Get-MIR4TechnologyAcceptanceMigrationProofPolicyV1 -RepoRoot $repo
-  $prior=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration
-  [void](Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4TechnologyAcceptancePredecessorReceiptPath `
-    -ExpectedSha256 $script:MIR4TechnologyAcceptancePredecessorReceiptSha256 `
-    -SchemaPath 'contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json' `
-    -Kind 'MIR4WholePlatformMigrationReceiptV1' `
-    -DigestDomain 'mir4:whole-platform-migration-receipt:1' `
-    -ErrorPrefix 'mir4-technology-acceptance-predecessor')
-  [void](Test-MIR4TechnologyAcceptanceCompatibilityForwarderV1 -RepoRoot $repo)
-  [void](Test-MIR4TechnologyAcceptanceDeclaredConsumersV1 -RepoRoot $repo)
-  [void](Test-MIR4TechnologyAcceptanceFunctionalParityV1 -RepoRoot $repo)
-  [void](Test-MIR4TargetKeyDeclaredConsumersV1 -RepoRoot $repo)
-
-  $integrationPaths=@(
-    '.gitattributes','.mir/assurance.json','.mir/control/repository-fixed-point.json','.mir/control/paths.yml',
-    '.mir/control-plane/ownership.json','.mir/modules.yml','.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
-    'assurance/.mir-root.json','governance/.mir-root.json','tests/.mir-root.json','validation/tests.yml','tools/mir.ps1',
-    'tools/lib/mir4/PreFreezeRelease.ps1','tools/lib/mir4/PlatformPreview.ps1','tools/lib/assurance/Evidence.ps1',
-    'tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1','tools/mir/application/platform/WholePlatform.ps1',
-    'tools/mir/application/targets/TargetKeyMigration.ps1',
-    'tools/mir/domain/repository/RepositoryFixedPoint.ps1','tools/mir/application/platform/WholePlatformMigration.ps1',
-    'tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1','tests/platform/Test-MIR4WholePlatformMigration.ps1',
-    'tests/platform/Test-MIR4WholePlatform.ps1','tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
-    'validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1','validation/tests/tooling/Test-MIRAssurance.ps1',
-    'docs/architecture/mir4-repository-fixed-point.md','docs/architecture/module-boundaries.md',
-    'docs/reference/generated/mir4-whole-platform-matrix.md','docs/releases/mir4-4.0-whole-platform-programme.md',
-    'mir.lock','sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/inspection-bundle-v1.json',
-    'sdk/preview/mir4/reference/inspector-workbench-result-v1.json','sdk/preview/mir4/reference/query-snapshot-f210.json'
-  )
-  $parity=[ordered]@{
-    canonical_writer_count=@($migration.writers).Count
-    shared_migration_engine=$true
-    compatibility_forwarder_verified=$true
-    technology_acceptance_function_parity=$true
-    target_key_successor_consumer_verified=$true
-    declared_consumers_use_final_path=$true
-    focused_test_registered=$true
-    release_history_successor_verified=$true
-    release_history_fingerprint_bound=$true
-    authority_schema_verified=$true
-    assurance_schema_verified=$true
-    rollback_recorded=(-not[string]::IsNullOrWhiteSpace([string]$migration.rollback.command))
-    duplicate_writers=@()
-  }
-  return New-MIR4AppendOnlyAuthorityMigrationReceiptV1 -RepoRoot $repo -Migration $migration -Proof $proof -Prior $prior `
-    -ReceiptKind 'MIR4TechnologyAcceptanceMigrationReceiptV1' `
-    -ReceiptState 'TECHNOLOGY-ACCEPTANCE-APPLICATION-AND-TEST-CUTOVER-VERIFIED-COMPATIBILITY-RETAINED' `
-    -ReceiptPath $script:MIR4TechnologyAcceptanceMigrationReceiptPath `
-    -MigrationAuthorityPath $script:MIR4TechnologyAcceptanceMigrationAuthorityPath `
-    -AssurancePath $script:MIR4TechnologyAcceptanceMigrationProofPath `
-    -Scope 'package-excluded-technology-acceptance-migration' `
-    -EvolutionReason 'Package-excluded technology-acceptance application and focused test migration with release-history successor assurance correction.' `
-    -DigestDomain 'mir4:technology-acceptance-migration-receipt:1' `
-    -Parity $parity -IntegrationPaths $integrationPaths
+  throw '[mir4-technology-acceptance-migration-receipt-immutable]'
 }
 
 function Get-MIR4TechnologyAcceptanceMigrationReceiptTextV1 {
+  throw '[mir4-technology-acceptance-migration-receipt-immutable]'
+}
+
+function Test-MIR4TechnologyAcceptanceHistoricalMigrationReceiptV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
-  return (ConvertTo-MIR4CanonicalJsonV1 -Value (New-MIR4TechnologyAcceptanceMigrationReceiptV1 -RepoRoot $RepoRoot))+[char]10
+  return Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $RepoRoot `
+    -ReceiptPath $script:MIR4TechnologyAcceptanceMigrationReceiptPath `
+    -ExpectedSha256 $script:MIR4TechnologyAcceptanceMigrationReceiptSha256 `
+    -SchemaPath $script:MIR4TechnologyAcceptanceMigrationReceiptSchemaPath `
+    -Kind 'MIR4TechnologyAcceptanceMigrationReceiptV1' `
+    -DigestDomain 'mir4:technology-acceptance-migration-receipt:1' `
+    -ErrorPrefix 'mir4-technology-acceptance-migration'
 }
 
 function Invoke-MIR4TechnologyAcceptanceMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $path=Join-Path $repo $script:MIR4TechnologyAcceptanceMigrationReceiptPath
-  $text=Get-MIR4TechnologyAcceptanceMigrationReceiptTextV1 -RepoRoot $repo
-  if($Check){
-    if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or[IO.File]::ReadAllText($path)-cne$text){throw '[mir4-technology-acceptance-migration-receipt-stale]'}
-    if(-not(Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4TechnologyAcceptanceMigrationReceiptPath -SchemaPath $script:MIR4TechnologyAcceptanceMigrationReceiptSchemaPath)){
-      throw '[mir4-technology-acceptance-migration-receipt-schema]'
-    }
-  }else{
-    New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent)|Out-Null
-    [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
-  }
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4TechnologyAcceptanceMigrationReceiptPath
+  if(-not$Check){throw '[mir4-technology-acceptance-migration-receipt-immutable]'}
+  return Test-MIR4TechnologyAcceptanceHistoricalMigrationReceiptV1 -RepoRoot $RepoRoot
 }

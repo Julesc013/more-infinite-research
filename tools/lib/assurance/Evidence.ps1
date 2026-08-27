@@ -255,7 +255,15 @@ function Get-MIRAssuranceInputFingerprint {
         ".mir/releases/waves/mir4-r0",
         "releases/migrations",
         "contracts/repository",
+        "governance/repository/migrations",
+        "assurance/repository",
         "spec/schemas",
+        "tools/mir/application/migration",
+        "tools/mir/application/targets",
+        "tools/mir/application/technology",
+        "tools/mir/cli",
+        "tests/targets",
+        "tests/technology",
         "tools/lib/mir4/PreFreezeRelease.ps1"
       )
       if ([int]$successorAuthority.file_count -lt 5) {

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 426 pages as of 2026-08-27.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 426 pages as of 2026-08-28.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -71,11 +71,11 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-24 |
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
-| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-27 |
+| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
-| docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-23 |
-| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-08-27 |
+| docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
+| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |

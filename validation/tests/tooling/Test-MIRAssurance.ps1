@@ -480,6 +480,8 @@ foreach ($requiredSuccessorCheck in @(
   'MIR4-T14-Authority-Evolution-ReceiptV1.json',
   'MIR4-T15-Authority-Evolution-ReceiptV1.json',
   'MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json',
+  'MIR4-Target-Compiler-Tooling-MigrationV1.json',
+  'MIR4TargetCompilerMigrationReceiptV1',
   'player_executable_sources_unchanged',
   'human_gate.acceptance_inferred'
 )) {
@@ -491,6 +493,14 @@ foreach ($requiredSuccessorFingerprint in @(
   '.mir/releases/waves/mir4-r0',
   'releases/migrations',
   'contracts/repository',
+  'governance/repository/migrations',
+  'assurance/repository',
+  'tools/mir/application/migration',
+  'tools/mir/application/targets',
+  'tools/mir/application/technology',
+  'tools/mir/cli',
+  'tests/targets',
+  'tests/technology',
   'tools/lib/mir4/PreFreezeRelease.ps1'
 )) {
   if ($assuranceEvidenceSource -notmatch [regex]::Escape($requiredSuccessorFingerprint)) {

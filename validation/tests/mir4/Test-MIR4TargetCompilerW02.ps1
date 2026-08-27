@@ -16,7 +16,7 @@ if(@($contracts.targets.facilities|Where-Object{[string]$_.disposition-notin@($a
 if(@($contracts.targets.provider_spec.provenance|Where-Object{[string]::IsNullOrWhiteSpace([string]$_.sha256)}).Count-ne 0){throw '[mir4-w02-provider-provenance]'}
 
 $packageFiles=@(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
-foreach($path in @('.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json','tools/lib/mir4/TargetCompiler.ps1','tools/commands/mir4/New-MIR4TargetProductSet.ps1')){if($path-in$packageFiles){throw "[mir4-w02-package-visible] $path"}}
+foreach($path in @('.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json','tools/mir/application/targets/TargetCompiler.ps1','tools/commands/mir4/New-MIR4TargetProductSet.ps1')){if($path-in$packageFiles){throw "[mir4-w02-package-visible] $path"}}
 $packageSourceBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $productOutput='build/mir4/test-w02-target-products-f012'
 & (Join-Path $RepoRoot 'tools/commands/mir4/New-MIR4TargetProductSet.ps1') -RepoRoot $RepoRoot -Target f012 -OutputRoot $productOutput|Out-Null
