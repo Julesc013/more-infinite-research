@@ -1,6 +1,6 @@
 {
-  "schema": 1,
-  "kind": "MIR4VisibleRootProjectionV1",
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
   "id": "src",
   "path": "src",
   "mode": "shadow-reader",
@@ -14,6 +14,7 @@
     "migrations"
   ],
   "writable_authority": false,
+  "marker_is_writable_authority": false,
   "package_visible": false,
   "source": ".mir/control/repository-fixed-point.json"
 }

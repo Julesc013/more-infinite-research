@@ -638,7 +638,7 @@ switch ($area) {
         $repositoryArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
-        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }

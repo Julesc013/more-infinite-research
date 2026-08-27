@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "MIR4RepositoryMigrationAuthorityV1",
+  "migration_id": "MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-TOOL-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "scope": "repository fixed-point tooling, contracts, assurance, tests, and migration receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {
+      "fact_family": "repository-root-projections-and-migration-receipt",
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "command": "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1"
+    }
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/fixed-point-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-contract","current_path":null,"final_path":"contracts/repository/mir4-repository-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-repository-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-repository-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/fixed-point-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"repository-byte-normalization","current_path":".gitattributes","final_path":".gitattributes","state":"evolved-current-authority","package_visible":false},
+    {"family":"repository-assurance-routing","current_path":".mir/assurance.json","final_path":".mir/assurance.json","state":"evolved-current-authority","package_visible":false},
+    {"family":"repository-domain","current_path":"tools/lib/mir4/RepositoryFixedPoint.ps1","final_path":"tools/mir/domain/repository/RepositoryFixedPoint.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"repository-inventory-port","current_path":null,"final_path":"tools/mir/ports/repository/RepositoryInventory.ps1","state":"authoritative","package_visible":false},
+    {"family":"repository-git-adapter","current_path":"tools/lib/mir4/RepositoryFixedPoint.ps1","final_path":"tools/mir/adapters/repository/GitRepositoryInventory.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"repository-application","current_path":"tools/lib/mir4/RepositoryFixedPoint.ps1","final_path":"tools/mir/application/repository/RepositoryFixedPoint.ps1","state":"sole-writer-old-forwarder-retained","package_visible":false},
+    {"family":"repository-cli","current_path":"tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1","final_path":"tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"repository-test","current_path":"validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1","final_path":"tests/repository/Test-MIR4RepositoryFixedPoint.ps1","state":"authoritative-old-forwarder-retained","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/RepositoryFixedPoint.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1","role":"command-forwarder","writable":false},
+    {"path":"validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1","role":"test-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-repository-migration-merge-commit>",
+    "preserves": [".mir/control/repository-fixed-point.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "seal": false,
+    "promotion": false,
+    "tagging": false,
+    "publication": false
+  }
+}

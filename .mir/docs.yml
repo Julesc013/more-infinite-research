@@ -463,7 +463,7 @@ docs:
     doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for:
-      - mir4-visible-root-shadow-layout
+      - mir4-visible-root-authority-migration
       - mir4-path-classification-and-external-roots
       - mir4-physical-move-gate
   - path: docs/architecture/mir4-runtime-continuity.md

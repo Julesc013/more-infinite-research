@@ -57,15 +57,30 @@ package_excluded_modules:
     generated_reference: docs/reference/generated/mir4-whole-platform-matrix.md
     boundary: executable inventory and per-technology review queue only; no prototype or runtime mutation, automatic acceptance, compatibility-claim transfer, source freeze, signing, sealing, promotion, tag, publication, main mutation, or legacy mutation
     stability: stable-private-programme-with-preview-acceptance-workflow
-  mir4_repository_fixed_point_v1:
+  mir4_repository_fixed_point_v2:
     authority: .mir/control/repository-fixed-point.json
+    migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
+    migration_contracts:
+      - contracts/repository/mir4-repository-migration-authority-v1.schema.json
+      - contracts/repository/mir4-repository-migration-proof-v1.schema.json
+      - contracts/repository/mir4-repository-migration-receipt-v1.schema.json
+    assurance_policy: assurance/repository/fixed-point-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json
     path_authority: .mir/control/paths.yml
     ownership_authority: .mir/control-plane/ownership.json
-    implementation: tools/lib/mir4/RepositoryFixedPoint.ps1
-    command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+    domain: tools/mir/domain/repository/RepositoryFixedPoint.ps1
+    port: tools/mir/ports/repository/RepositoryInventory.ps1
+    adapter: tools/mir/adapters/repository/GitRepositoryInventory.ps1
+    application: tools/mir/application/repository/RepositoryFixedPoint.ps1
+    command: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+    test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+    compatibility_entrypoints:
+      - tools/lib/mir4/RepositoryFixedPoint.ps1
+      - tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+      - validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
     documentation: docs/architecture/mir4-repository-fixed-point.md
-    boundary: read-only shadow roots, complete inventory, and external non-secret state initialization; no physical source move, writer cutover, package mutation, or deletion authority
-    stability: stable-shadow-fixed-point
+    boundary: package-excluded root activation plus one canonical repository tooling/test writer with compatibility forwarders; no player-source move, package mutation, deletion, source freeze, signing, promotion, or publication authority
+    stability: stable-package-excluded-tooling-cutover-with-compatibility-readers
   mir4_release_governance_v1:
     authority: .mir/releases/governance/mir4/release-governance.json
     allowed_signers: .mir/releases/governance/mir4/allowed-signers.json
@@ -1247,10 +1262,14 @@ validation_tooling:
     mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
     mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
-    mir4_repository_fixed_point: tools/lib/mir4/RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point: tools/mir/application/repository/RepositoryFixedPoint.ps1
     mir4_repository_fixed_point_authority: .mir/control/repository-fixed-point.json
-    mir4_repository_fixed_point_command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
-    mir4_repository_fixed_point_gate: validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
+    mir4_repository_migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
+    mir4_repository_fixed_point_command: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_gate: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_library: tools/lib/mir4/RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_gate: validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
     mir4_release_dag_spec: spec/platform/mir4-preview-v0/release-dag.json
     mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1

@@ -134,3 +134,13 @@ docs/releases/mir4-4.0-whole-platform-programme.md text eol=lf
 prototypes/mir/runtime/**/*.lua text eol=lf
 migrations/*.json text eol=lf
 migrations/*.lua text eol=lf
+
+# Repository-migration locks and receipts raw-hash this authority closure.
+# Pin checkout bytes across Windows and hosted runners; receipt projections
+# separately record canonical-text hashing for independently evolved inputs.
+assurance/repository/** text eol=lf
+contracts/repository/** text eol=lf
+governance/repository/** text eol=lf
+releases/migrations/** text eol=lf
+tests/repository/** text eol=lf
+tools/mir/** text eol=lf

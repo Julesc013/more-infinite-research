@@ -71,7 +71,7 @@ Ages are measured against the newest governed review date, 2026-08-27, so checko
 | docs/architecture/mir4-platform-preview.md | current | 2026-08-24 | 3 | current-window |
 | docs/architecture/mir4-processir-synthesis.md | current | 2026-08-26 | 1 | current-window |
 | docs/architecture/mir4-r0-bootstrap.md | current | 2026-08-25 | 2 | current-window |
-| docs/architecture/mir4-repository-fixed-point.md | current | 2026-08-23 | 4 | current-window |
+| docs/architecture/mir4-repository-fixed-point.md | current | 2026-08-27 | 0 | current-window |
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 4 | current-window |
 | docs/architecture/mir4-semantic-compiler.md | current | 2026-08-23 | 4 | current-window |
 | docs/architecture/mir4-target-compiler.md | current | 2026-08-23 | 4 | current-window |
@@ -216,7 +216,7 @@ Ages are measured against the newest governed review date, 2026-08-27, so checko
 | docs/reference/generated/mir4-api-sdk-v1.md | current | 2026-08-26 | 1 | current-window |
 | docs/reference/generated/mir4-experimental-api-v0.md | deprecated | 2026-08-24 | 3 | current-window |
 | docs/reference/generated/mir4-platform-component-matrix.md | current | 2026-08-24 | 3 | current-window |
-| docs/reference/generated/mir4-whole-platform-matrix.md | current | 2026-08-26 | 1 | current-window |
+| docs/reference/generated/mir4-whole-platform-matrix.md | current | 2026-08-27 | 0 | current-window |
 | docs/reference/generated/README.md | current | 2026-08-03 | 24 | current-window |
 | docs/reference/generated/technology-quality-and-promotion.md | current | 2026-08-18 | 9 | current-window |
 | docs/reference/glossary.md | draft | 2026-07-07 | 51 | current-window |
