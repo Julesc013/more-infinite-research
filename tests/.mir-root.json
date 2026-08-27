@@ -12,6 +12,7 @@
     "tests/platform",
     "tests/technology",
     "tests/compiler",
+    "tests/runtime",
     "validation/tests",
     "validation/tests.yml"
   ],

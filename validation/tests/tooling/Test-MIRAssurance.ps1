@@ -484,6 +484,8 @@ foreach ($requiredSuccessorCheck in @(
   'MIR4TargetCompilerMigrationReceiptV1',
   'MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json',
   'MIR4SemanticCompilerPolicyMigrationReceiptV1',
+  'MIR4-Runtime-Continuity-Tooling-MigrationV1.json',
+  'MIR4RuntimeContinuityMigrationReceiptV1',
   'player_executable_sources_unchanged',
   'human_gate.acceptance_inferred'
 )) {
@@ -500,11 +502,13 @@ foreach ($requiredSuccessorFingerprint in @(
   'tools/mir/application/migration',
   'tools/mir/application/targets',
   'tools/mir/application/compiler',
+  'tools/mir/application/runtime',
   'tools/mir/application/technology',
   'tools/mir/domain/safety',
   'tools/mir/domain/policy',
   'tools/mir/cli',
   'tests/compiler',
+  'tests/runtime',
   'tests/targets',
   'tests/technology',
   'tools/lib/mir4/PreFreezeRelease.ps1'
