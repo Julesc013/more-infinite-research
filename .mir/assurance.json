@@ -45,8 +45,8 @@
     },
     {
       "id": "repository-migration",
-      "patterns": ["^\\.gitattributes$", "^\\.mir/(?:assurance\\.json|control/repository-fixed-point\\.json)$", "^(?:assurance|contracts|governance|tests)/repository/", "^releases/migrations/", "^(?:assurance|changes|contracts|docs|examples|governance|modules|releases|sdk|spec|src|targets|tests|tools/mir)/\\.mir-root\\.json$", "^tools/mir/(?:(?:adapters|application|domain|ports)/repository/|cli/Invoke-MIR4RepositoryFixedPoint\\.ps1$)"],
-      "tests": ["docs.check", "tooling.self-test", "static.full", "static.package", "static.mir4-repository-fixed-point-v2"]
+      "patterns": ["^\\.gitattributes$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json)|control-plane/ownership\\.json|releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1\\.json)$", "^(?:assurance|contracts|governance)/repository/", "^tests/(?:repository|canonicalization)/", "^releases/migrations/", "^(?:assurance|changes|contracts|docs|examples|governance|modules|releases|sdk|spec|src|targets|tests|tools/mir)/\\.mir-root\\.json$", "^tools/mir/(?:(?:adapters|application|domain|ports)/(?:repository|canonicalization)/|cli/Invoke-MIR4(?:RepositoryFixedPoint|CanonicalizationMigration)\\.ps1$)", "^tools/lib/mir4/(?:CanonicalJsonV1|EnvironmentEvidence|ExperimentalApiSdk|ModuleEcosystem|PlatformPreview|PreFreezeRelease|WholePlatform)\\.ps1$", "^validation/tests/mir4/Test-MIR4(?:CanonicalizationDiagnosticsT07|RepositoryFixedPointW01)\\.ps1$", "^validation/tests\\.yml$", "^tools/mir\\.ps1$", "^docs/architecture/(?:mir4-repository-fixed-point|module-boundaries)\\.md$", "^docs/reference/generated/mir4-whole-platform-matrix\\.md$", "^mir\\.lock$"],
+      "tests": ["docs.check", "tooling.self-test", "static.full", "static.package", "static.mir4-repository-fixed-point-v2", "static.mir4-canonicalization-diagnostics-t07", "static.mir4-canonicalization-migration-v1"]
     },
     {
       "id": "runtime-or-migration",

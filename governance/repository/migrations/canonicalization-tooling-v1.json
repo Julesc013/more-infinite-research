@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIR4CanonicalizationMigrationAuthorityV1",
+  "migration_id": "MIR4-CANONICALIZATION-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-CANONICALIZATION-TOOL-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json",
+    "sha256": "5B188181285DB7F89E6F0CA91221F9028EEDF212CA62D5BEC2A56D59D3510D26"
+  },
+  "scope": "package-excluded canonical JSON implementation, test, migration writer, contracts, assurance, and append-only receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {
+      "fact_family": "canonicalization-migration-receipt",
+      "path": "tools/mir/application/canonicalization/CanonicalizationMigration.ps1",
+      "command": "tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1"
+    }
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/canonicalization-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-contract","current_path":null,"final_path":"contracts/repository/mir4-canonicalization-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-canonicalization-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/canonicalization-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"canonicalization-domain","current_path":"tools/lib/mir4/CanonicalJsonV1.ps1","final_path":"tools/mir/domain/canonicalization/CanonicalJsonV1.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"module-ecosystem-canonicalization-consumer","current_path":"tools/lib/mir4/ModuleEcosystem.ps1","final_path":"tools/lib/mir4/ModuleEcosystem.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"environment-evidence-canonicalization-consumer","current_path":"tools/lib/mir4/EnvironmentEvidence.ps1","final_path":"tools/lib/mir4/EnvironmentEvidence.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"canonicalization-migration-application","current_path":null,"final_path":"tools/mir/application/canonicalization/CanonicalizationMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"canonicalization-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"canonicalization-test","current_path":"validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1","final_path":"tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"canonicalization-migration-test","current_path":null,"final_path":"tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1","state":"authoritative","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/CanonicalJsonV1.ps1","role":"library-forwarder","writable":false},
+    {"path":"validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1","role":"test-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-canonicalization-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "seal": false,
+    "promotion": false,
+    "tagging": false,
+    "publication": false
+  }
+}

@@ -16,6 +16,17 @@ paths:
   mir4.repository-migration.application: tools/mir/application/repository/RepositoryFixedPoint.ps1
   mir4.repository-migration.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+  mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
+  mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
+  mir4.canonicalization-migration.receipt: releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json
+  mir4.canonicalization-migration.authority-schema: contracts/repository/mir4-canonicalization-migration-authority-v1.schema.json
+  mir4.canonicalization-migration.proof-schema: contracts/repository/mir4-canonicalization-migration-proof-v1.schema.json
+  mir4.canonicalization-migration.receipt-schema: contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json
+  mir4.canonicalization.domain: tools/mir/domain/canonicalization/CanonicalJsonV1.ps1
+  mir4.canonicalization-migration.application: tools/mir/application/canonicalization/CanonicalizationMigration.ps1
+  mir4.canonicalization-migration.cli: tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1
+  mir4.canonicalization.test: tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+  mir4.canonicalization-migration.test: tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json

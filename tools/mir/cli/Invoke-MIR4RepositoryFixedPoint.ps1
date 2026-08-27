@@ -9,7 +9,7 @@ $ErrorActionPreference='Stop'
 
 if ($Command -eq 'generate') {
   Invoke-MIR4RepositoryRootProjection -RepoRoot $RepoRoot
-  $migrationReceipt = Invoke-MIR4RepositoryMigrationProjectionV1 -RepoRoot $RepoRoot
+  $migrationReceipt = Invoke-MIR4RepositoryMigrationProjectionV1 -RepoRoot $RepoRoot -Check
 } elseif ($Command -eq 'check') {
   Invoke-MIR4RepositoryRootProjection -RepoRoot $RepoRoot -Check
   $migrationReceipt = Invoke-MIR4RepositoryMigrationProjectionV1 -RepoRoot $RepoRoot -Check

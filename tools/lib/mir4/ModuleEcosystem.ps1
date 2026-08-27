@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'CanonicalJsonV1.ps1')
+. (Join-Path $PSScriptRoot '../../mir/domain/canonicalization/CanonicalJsonV1.ps1')
 . (Join-Path $PSScriptRoot 'DiagnosticsV1.ps1')
 
 function Get-MIR4ModuleEcosystemRepoRoot {

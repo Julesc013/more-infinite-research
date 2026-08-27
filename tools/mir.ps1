@@ -44,6 +44,7 @@ Usage:
   .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 canonicalization-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -52,7 +53,7 @@ Usage:
   .\tools\mir.ps1 mir4 exact-processir <export|check> [--capture <id>]... [--repetitions <1-4>] [--output <path>] [--reference <path>] [--publish-reference]
   .\tools\mir.ps1 mir4 release-canaries <export|check> [--capture-root <path>] [--upgrade-root <path>] [--output <path>] [--reference <path>] [--publish-reference]
   .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
-  .\tools\mir.ps1 mir4 whole-platform <check|matrix|target-key> [--target <FNNN>]
+  .\tools\mir.ps1 mir4 whole-platform <generate|check|matrix|target-key> [--target <FNNN>]
   .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
   .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate|doctor|lock|diff|ci-init|discover> [--extension <path>] [--discovery <snapshot.json>] [--output <path>] [--id <reverse.dns.id>] [--template <minimal|all-fragments|unavailable>] [--target <FNNN>] [--base <path>] [--candidate <path>]
   .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
@@ -640,6 +641,15 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
       }
+      "canonicalization-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 canonicalization-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 canonicalization-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1") @migrationArguments
+      }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
         $subcommand = [string]$Args[2]
@@ -762,9 +772,9 @@ switch ($area) {
         & (Join-Path $repo "tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1") @inspectorArguments
       }
       "whole-platform" {
-        if ($Args.Count -lt 3) { throw "mir4 whole-platform requires check, matrix, or target-key." }
+        if ($Args.Count -lt 3) { throw "mir4 whole-platform requires generate, check, matrix, or target-key." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('check','matrix','target-key')) { throw "Unknown mir4 whole-platform command: $subcommand" }
+        if ($subcommand -notin @('generate','check','matrix','target-key')) { throw "Unknown mir4 whole-platform command: $subcommand" }
         $wholeArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
         if ($subcommand -eq 'target-key') {
           $wholeArguments.Target = Get-MIRArgValue -Items $Args -Name '--target'

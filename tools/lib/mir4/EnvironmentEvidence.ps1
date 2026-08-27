@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'CanonicalJsonV1.ps1')
+. (Join-Path $PSScriptRoot '../../mir/domain/canonicalization/CanonicalJsonV1.ps1')
 
 $script:MIR4EnvironmentPrivateFields = @(
   'access_token','api_key','authorization','cookie','credential','email','home','hostname',

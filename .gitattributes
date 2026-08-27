@@ -143,4 +143,5 @@ contracts/repository/** text eol=lf
 governance/repository/** text eol=lf
 releases/migrations/** text eol=lf
 tests/repository/** text eol=lf
+tests/canonicalization/** text eol=lf
 tools/mir/** text eol=lf
