@@ -24,6 +24,9 @@ catch { if (-not $_.Exception.Message.StartsWith('[mir4-canonicalization-migrati
 $authority = Get-MIR4DiagnosticsMigrationAuthorityV1 -RepoRoot $repo
 $proof = Get-MIR4DiagnosticsMigrationProofPolicyV1 -RepoRoot $repo
 $receipt = Invoke-MIR4DiagnosticsMigrationProjectionV1 -RepoRoot $repo -Check
+Assert-MIR4DiagnosticsMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4DiagnosticsMigrationReceiptPath) -Algorithm SHA256).Hash -ceq $script:MIR4DiagnosticsMigrationReceiptSha256) 'mir4-diagnostics-migration-immutable-bytes'
+try { Invoke-MIR4DiagnosticsMigrationProjectionV1 -RepoRoot $repo | Out-Null; throw '[mir4-diagnostics-migration-write-enabled]' }
+catch { if (-not $_.Exception.Message.StartsWith('[mir4-diagnostics-migration-receipt-immutable]')) { throw } }
 $inventory = Get-MIR4RepositoryInventory -RepoRoot $repo
 Assert-MIR4DiagnosticsMigrationV1 ([int]$inventory.summary.unknown -eq 0) 'mir4-diagnostics-migration-inventory-unknown'
 Assert-MIR4DiagnosticsMigrationV1 (-not [bool]$inventory.deletion_authorized) 'mir4-diagnostics-migration-deletion-authority'
@@ -71,18 +74,10 @@ foreach ($binding in @($receipt.evolved_bindings)) {
   $path = [string]$binding.path
   Assert-MIR4DiagnosticsMigrationV1 ($prior.authority_hashes.ContainsKey($path)) 'mir4-diagnostics-migration-evolved-prior-missing' $path
   Assert-MIR4DiagnosticsMigrationV1 ([string]$binding.previous_sha256 -ceq [string]$prior.authority_hashes[$path]) 'mir4-diagnostics-migration-evolved-prior-sha256' $path
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4DiagnosticsMigrationV1 ([string]$binding.current_sha256 -ceq $actual) 'mir4-diagnostics-migration-evolved-current-sha256' $path
   Assert-MIR4DiagnosticsMigrationV1 (-not [bool]$binding.package_visible -and -not [bool]$binding.release_authority) 'mir4-diagnostics-migration-evolved-firewall' $path
-}
-foreach ($binding in @($receipt.current_authorities)) {
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$binding.path)) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4DiagnosticsMigrationV1 ([string]$binding.sha256 -ceq $actual) 'mir4-diagnostics-migration-current-authority' ([string]$binding.path)
 }
 foreach ($component in @($receipt.components)) {
   Assert-MIR4DiagnosticsMigrationV1 ([string]$component.hash_mode -ceq 'canonical-text-v1') 'mir4-diagnostics-migration-component-mode' ([string]$component.path)
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$component.path)) -Mode 'canonical-text-v1'
-  Assert-MIR4DiagnosticsMigrationV1 ([string]$component.sha256 -ceq $actual) 'mir4-diagnostics-migration-component-sha256' ([string]$component.path)
 }
 $digest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:diagnostics-migration-receipt:1' -OmitTopLevelDigest
 Assert-MIR4DiagnosticsMigrationV1 ([string]$receipt.digest -ceq $digest) 'mir4-diagnostics-migration-receipt-digest'
@@ -104,6 +99,8 @@ function Invoke-MIR4DiagnosticsMigrationCommandProbeV1 {
 $checkResult = Invoke-MIR4DiagnosticsMigrationCommandProbeV1 -Command check
 $showResult = Invoke-MIR4DiagnosticsMigrationCommandProbeV1 -Command show
 Assert-MIR4DiagnosticsMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $checkResult) -ceq (ConvertTo-MIR4CanonicalJsonV1 -Value $showResult)) 'mir4-diagnostics-migration-cli-parity'
+$generateOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1') -Command generate -RepoRoot $repo 2>&1 | Out-String).Trim()
+Assert-MIR4DiagnosticsMigrationV1 ($LASTEXITCODE -ne 0 -and $generateOutput -match 'mir4-diagnostics-migration-receipt-immutable') 'mir4-diagnostics-migration-generate-disabled'
 $facadeOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 diagnostics-migration check 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) { throw "[mir4-diagnostics-migration-facade] $facadeOutput" }
 $facadeResult = $facadeOutput | ConvertFrom-Json -Depth 100
@@ -113,6 +110,7 @@ Assert-MIR4DiagnosticsMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $r
 [pscustomobject][ordered]@{
   status='passed'
   migration_id=[string]$receipt.migration_id
+  state='accepted-immutable-predecessor'
   canonical_implementation='tools/mir/domain/diagnostics/DiagnosticsV1.ps1'
   compatibility_entrypoints=@($authority.compatibility_entrypoints | ForEach-Object { [string]$_.path })
   predecessor_receipt_sha256=$script:MIR4DiagnosticsPredecessorReceiptSha256

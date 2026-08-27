@@ -7,6 +7,7 @@ $script:MIR4DiagnosticsMigrationProofPath = 'assurance/repository/diagnostics-to
 $script:MIR4DiagnosticsMigrationProofSchemaPath = 'contracts/repository/mir4-diagnostics-migration-proof-v1.schema.json'
 $script:MIR4DiagnosticsMigrationReceiptPath = 'releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json'
 $script:MIR4DiagnosticsMigrationReceiptSchemaPath = 'contracts/repository/mir4-diagnostics-migration-receipt-v1.schema.json'
+$script:MIR4DiagnosticsMigrationReceiptSha256 = 'EB7CB542741401A93F53261A4B90A9D17D128C8C97E2D68626088D181743F4A6'
 $script:MIR4DiagnosticsPredecessorReceiptPath = 'releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json'
 $script:MIR4DiagnosticsPredecessorReceiptSha256 = 'B126E835EDE63832D62833B4A96FD888301DB608858A1D94BC2D4B93F7ADA27A'
 $script:MIR4DiagnosticsRegistrySha256 = '76DEC33A6807AFB32D9B9D197FF22A65AEC2613F9B7F04CE576D49D8C44238EB'
@@ -105,90 +106,26 @@ function Test-MIR4DiagnosticsFunctionalParityV1 {
 }
 
 function New-MIR4DiagnosticsMigrationReceiptV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot)
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $migration = Get-MIR4DiagnosticsMigrationAuthorityV1 -RepoRoot $repo
-  $proof = Get-MIR4DiagnosticsMigrationProofPolicyV1 -RepoRoot $repo
-  $prior = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration
-  [void](Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4DiagnosticsPredecessorReceiptPath -ExpectedSha256 $script:MIR4DiagnosticsPredecessorReceiptSha256 -SchemaPath 'contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json' -Kind 'MIR4CanonicalizationMigrationReceiptV1' -DigestDomain 'mir4:canonicalization-migration-receipt:1' -ErrorPrefix 'mir4-diagnostics-predecessor')
-  [void](Test-MIR4DiagnosticsCompatibilityForwarderV1 -RepoRoot $repo)
-  [void](Test-MIR4DiagnosticsDeclaredConsumersV1 -RepoRoot $repo)
-  [void](Test-MIR4DiagnosticsFunctionalParityV1 -RepoRoot $repo)
-
-  $integrationPaths = @(
-    '.gitattributes',
-    '.mir/assurance.json',
-    '.mir/control/repository-fixed-point.json',
-    '.mir/control/paths.yml',
-    '.mir/control-plane/ownership.json',
-    '.mir/modules.yml',
-    '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
-    'validation/tests.yml',
-    'tools/mir.ps1',
-    'tools/lib/mir4/PreFreezeRelease.ps1',
-    'tools/lib/mir4/PlatformPreview.ps1',
-    'tools/lib/mir4/ModuleEcosystem.ps1',
-    'tools/mir/domain/repository/RepositoryFixedPoint.ps1',
-    'tools/mir/application/canonicalization/CanonicalizationMigration.ps1',
-    'tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1',
-    'tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1',
-    'tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1',
-    'tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
-    'docs/architecture/mir4-repository-fixed-point.md',
-    'docs/architecture/module-boundaries.md',
-    'docs/reference/generated/mir4-whole-platform-matrix.md',
-    'mir.lock',
-    'sdk/preview/mir4/reference/compilation-runs.json',
-    'sdk/preview/mir4/reference/inspection-bundle-v1.json',
-    'sdk/preview/mir4/reference/inspector-workbench-result-v1.json',
-    'sdk/preview/mir4/reference/query-snapshot-f210.json'
-  )
-  $parity = [ordered]@{
-    canonical_writer_count=@($migration.writers).Count
-    shared_migration_engine=$true
-    compatibility_forwarder_verified=$true
-    diagnostics_registry_parity=$true
-    diagnostic_function_parity=$true
-    declared_consumers_use_final_path=$true
-    focused_test_registered=$true
-    authority_schema_verified=$true
-    assurance_schema_verified=$true
-    rollback_recorded=(-not [string]::IsNullOrWhiteSpace([string]$migration.rollback.command))
-    duplicate_writers=@()
-  }
-  return New-MIR4AppendOnlyAuthorityMigrationReceiptV1 -RepoRoot $repo -Migration $migration -Proof $proof -Prior $prior `
-    -ReceiptKind 'MIR4DiagnosticsMigrationReceiptV1' `
-    -ReceiptState 'DIAGNOSTICS-DOMAIN-AND-TEST-CUTOVER-VERIFIED-COMPATIBILITY-RETAINED' `
-    -ReceiptPath $script:MIR4DiagnosticsMigrationReceiptPath `
-    -MigrationAuthorityPath $script:MIR4DiagnosticsMigrationAuthorityPath `
-    -AssurancePath $script:MIR4DiagnosticsMigrationProofPath `
-    -Scope 'package-excluded-diagnostics-migration' `
-    -EvolutionReason 'Package-excluded diagnostics implementation and focused test migration with reusable append-only receipt succession.' `
-    -DigestDomain 'mir4:diagnostics-migration-receipt:1' `
-    -Parity $parity `
-    -IntegrationPaths $integrationPaths
+  throw '[mir4-diagnostics-migration-receipt-immutable]'
 }
 
 function Get-MIR4DiagnosticsMigrationReceiptTextV1 {
+  throw '[mir4-diagnostics-migration-receipt-immutable]'
+}
+
+function Test-MIR4DiagnosticsHistoricalMigrationReceiptV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
-  return (ConvertTo-MIR4CanonicalJsonV1 -Value (New-MIR4DiagnosticsMigrationReceiptV1 -RepoRoot $RepoRoot)) + [char]10
+  return Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $RepoRoot `
+    -ReceiptPath $script:MIR4DiagnosticsMigrationReceiptPath `
+    -ExpectedSha256 $script:MIR4DiagnosticsMigrationReceiptSha256 `
+    -SchemaPath $script:MIR4DiagnosticsMigrationReceiptSchemaPath `
+    -Kind 'MIR4DiagnosticsMigrationReceiptV1' `
+    -DigestDomain 'mir4:diagnostics-migration-receipt:1' `
+    -ErrorPrefix 'mir4-diagnostics-migration'
 }
 
 function Invoke-MIR4DiagnosticsMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $path = Join-Path $repo $script:MIR4DiagnosticsMigrationReceiptPath
-  $text = Get-MIR4DiagnosticsMigrationReceiptTextV1 -RepoRoot $repo
-  if ($Check) {
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [IO.File]::ReadAllText($path) -cne $text) {
-      throw '[mir4-diagnostics-migration-receipt-stale]'
-    }
-    if (-not (Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4DiagnosticsMigrationReceiptPath -SchemaPath $script:MIR4DiagnosticsMigrationReceiptSchemaPath)) {
-      throw '[mir4-diagnostics-migration-receipt-schema]'
-    }
-  } else {
-    New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent) | Out-Null
-    [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
-  }
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4DiagnosticsMigrationReceiptPath
+  if (-not $Check) { throw '[mir4-diagnostics-migration-receipt-immutable]' }
+  return Test-MIR4DiagnosticsHistoricalMigrationReceiptV1 -RepoRoot $RepoRoot
 }
