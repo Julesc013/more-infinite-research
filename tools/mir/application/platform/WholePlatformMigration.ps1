@@ -7,6 +7,7 @@ $script:MIR4WholePlatformMigrationProofPath = 'assurance/repository/whole-platfo
 $script:MIR4WholePlatformMigrationProofSchemaPath = 'contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json'
 $script:MIR4WholePlatformMigrationReceiptPath = 'releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json'
 $script:MIR4WholePlatformMigrationReceiptSchemaPath = 'contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json'
+$script:MIR4WholePlatformMigrationReceiptSha256 = '4DEFD2256070F627031AC39FB244619E5E7E1949061DED5F89CF438D810F4B78'
 $script:MIR4WholePlatformPredecessorReceiptPath = 'releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json'
 $script:MIR4WholePlatformPredecessorReceiptSha256 = '79E3ECC14FDC354A3F2509F4AC3366E790547F6E606B2F65096E7CFD5866C06D'
 $script:MIR4WholePlatformParityDigestV1 = 'sha256:50eb0da4637175c4257904a29d58a45e39f9898d5fb67e92f10fcf73e541b46a'
@@ -114,93 +115,26 @@ function Test-MIR4WholePlatformFunctionalParityV1 {
 }
 
 function New-MIR4WholePlatformMigrationReceiptV1 {
-  param([Parameter(Mandatory)][string]$RepoRoot)
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $migration = Get-MIR4WholePlatformMigrationAuthorityV1 -RepoRoot $repo
-  $proof = Get-MIR4WholePlatformMigrationProofPolicyV1 -RepoRoot $repo
-  $prior = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration
-  [void](Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4WholePlatformPredecessorReceiptPath `
-    -ExpectedSha256 $script:MIR4WholePlatformPredecessorReceiptSha256 `
-    -SchemaPath 'contracts/repository/mir4-target-key-migration-receipt-v1.schema.json' `
-    -Kind 'MIR4TargetKeyMigrationReceiptV1' `
-    -DigestDomain 'mir4:target-key-migration-receipt:1' `
-    -ErrorPrefix 'mir4-whole-platform-predecessor')
-  [void](Test-MIR4WholePlatformCompatibilityForwardersV1 -RepoRoot $repo)
-  [void](Test-MIR4WholePlatformDeclaredConsumersV1 -RepoRoot $repo)
-  [void](Test-MIR4WholePlatformFunctionalParityV1 -RepoRoot $repo)
-
-  $integrationPaths = @(
-    '.gitattributes',
-    '.mir/assurance.json',
-    '.mir/control/repository-fixed-point.json',
-    '.mir/control/paths.yml',
-    '.mir/control-plane/ownership.json',
-    '.mir/modules.yml',
-    '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json',
-    'validation/tests.yml',
-    'tools/mir.ps1',
-    'tools/lib/mir4/PreFreezeRelease.ps1',
-    'tools/lib/mir4/PlatformPreview.ps1',
-    'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1',
-    'tools/mir/domain/repository/RepositoryFixedPoint.ps1',
-    'tools/mir/application/targets/TargetKeyMigration.ps1',
-    'tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1',
-    'tests/targets/Test-MIR4TargetKeyMigration.ps1',
-    'tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
-    'docs/architecture/mir4-repository-fixed-point.md',
-    'docs/architecture/module-boundaries.md',
-    'docs/reference/generated/mir4-whole-platform-matrix.md',
-    'mir.lock',
-    'sdk/preview/mir4/reference/compilation-runs.json',
-    'sdk/preview/mir4/reference/inspection-bundle-v1.json',
-    'sdk/preview/mir4/reference/inspector-workbench-result-v1.json',
-    'sdk/preview/mir4/reference/query-snapshot-f210.json'
-  )
-  $parity = [ordered]@{
-    canonical_writer_count=@($migration.writers).Count
-    shared_migration_engine=$true
-    compatibility_forwarders_verified=$true
-    whole_platform_function_parity=$true
-    declared_consumers_use_final_path=$true
-    canonical_test_cutover=$true
-    authority_schema_verified=$true
-    assurance_schema_verified=$true
-    rollback_recorded=(-not [string]::IsNullOrWhiteSpace([string]$migration.rollback.command))
-    duplicate_writers=@()
-  }
-  return New-MIR4AppendOnlyAuthorityMigrationReceiptV1 -RepoRoot $repo -Migration $migration -Proof $proof -Prior $prior `
-    -ReceiptKind 'MIR4WholePlatformMigrationReceiptV1' `
-    -ReceiptState 'WHOLE-PLATFORM-APPLICATION-AND-TEST-CUTOVER-VERIFIED-COMPATIBILITY-RETAINED' `
-    -ReceiptPath $script:MIR4WholePlatformMigrationReceiptPath `
-    -MigrationAuthorityPath $script:MIR4WholePlatformMigrationAuthorityPath `
-    -AssurancePath $script:MIR4WholePlatformMigrationProofPath `
-    -Scope 'package-excluded-whole-platform-migration' `
-    -EvolutionReason 'Package-excluded whole-platform application and canonical test migration with append-only receipt succession.' `
-    -DigestDomain 'mir4:whole-platform-migration-receipt:1' `
-    -Parity $parity `
-    -IntegrationPaths $integrationPaths
+  throw '[mir4-whole-platform-migration-receipt-immutable]'
 }
 
 function Get-MIR4WholePlatformMigrationReceiptTextV1 {
+  throw '[mir4-whole-platform-migration-receipt-immutable]'
+}
+
+function Test-MIR4WholePlatformHistoricalMigrationReceiptV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
-  return (ConvertTo-MIR4CanonicalJsonV1 -Value (New-MIR4WholePlatformMigrationReceiptV1 -RepoRoot $RepoRoot)) + [char]10
+  return Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $RepoRoot `
+    -ReceiptPath $script:MIR4WholePlatformMigrationReceiptPath `
+    -ExpectedSha256 $script:MIR4WholePlatformMigrationReceiptSha256 `
+    -SchemaPath $script:MIR4WholePlatformMigrationReceiptSchemaPath `
+    -Kind 'MIR4WholePlatformMigrationReceiptV1' `
+    -DigestDomain 'mir4:whole-platform-migration-receipt:1' `
+    -ErrorPrefix 'mir4-whole-platform-migration'
 }
 
 function Invoke-MIR4WholePlatformMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $path = Join-Path $repo $script:MIR4WholePlatformMigrationReceiptPath
-  $text = Get-MIR4WholePlatformMigrationReceiptTextV1 -RepoRoot $repo
-  if ($Check) {
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [IO.File]::ReadAllText($path) -cne $text) {
-      throw '[mir4-whole-platform-migration-receipt-stale]'
-    }
-    if (-not (Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4WholePlatformMigrationReceiptPath -SchemaPath $script:MIR4WholePlatformMigrationReceiptSchemaPath)) {
-      throw '[mir4-whole-platform-migration-receipt-schema]'
-    }
-  } else {
-    New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent) | Out-Null
-    [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
-  }
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4WholePlatformMigrationReceiptPath
+  if(-not$Check){throw '[mir4-whole-platform-migration-receipt-immutable]'}
+  return Test-MIR4WholePlatformHistoricalMigrationReceiptV1 -RepoRoot $RepoRoot
 }

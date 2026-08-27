@@ -7,7 +7,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-. (Join-Path $RepoRoot 'tools/lib/mir4/TechnologyAcceptance.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/technology/TechnologyAcceptance.ps1')
 
 $queue = New-MIR4TechnologyAcceptanceQueue -RepoRoot $RepoRoot -CatalogPath $CatalogPath -Target $Target -Ecosystem $Ecosystem
 $json = $queue | ConvertTo-Json -Depth 100

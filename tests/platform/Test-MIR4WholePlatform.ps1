@@ -2,7 +2,7 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')))
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/platform/WholePlatform.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/TechnologyAcceptance.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/technology/TechnologyAcceptance.ps1')
 
 $matrix = Test-MIR4WholePlatformProgramme -RepoRoot $RepoRoot
 if ($matrix.area_count -ne 18 -or $matrix.later_release_area_count -ne 0 -or $matrix.executable_area_count -ne 18) {

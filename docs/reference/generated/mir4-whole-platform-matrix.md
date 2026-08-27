@@ -34,7 +34,7 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | `4.14` | `compatibility-factory-and-support-assessment` | preview | implemented-data-only-preview | none |
 | `4.15` | `assurance-scale-proof-reuse-and-release-budgets` | shadow | implemented-proposal-and-offline-drill | BLOCKED-TRUSTED-TIMING-CAPACITY-EVIDENCE |
 | `4.16` | `historical-museum-and-successor-host` | mixed | private-historical-plus-blocked-museum-plus-synthetic-host | BLOCKED-MUSEUM-CUSTODY, BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST |
-| `4.17` | `ecosystem-technology-acceptance-and-tuning` | preview | implemented-queue-and-existing-lifecycle-gates | MAINTAINER-TECHNOLOGY-ACCEPTANCE |
+| `4.17` | `ecosystem-technology-acceptance-and-tuning` | preview | implemented-queue-canonical-application-migrated-compatibility-reader-retained | MAINTAINER-TECHNOLOGY-ACCEPTANCE |
 
 Canonical human-facing target keys use uppercase `F`, for example `F210` and `F200`. Existing lowercase target IDs remain accepted only as compatibility inputs and inside immutable historical evidence.
 

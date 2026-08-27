@@ -252,10 +252,14 @@ function Get-MIRAssuranceInputFingerprint {
       }
       $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
       $successorAuthority = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
-        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
+        ".mir/releases/waves/mir4-r0",
+        "releases/migrations",
+        "contracts/repository",
+        "spec/schemas",
+        "tools/lib/mir4/PreFreezeRelease.ps1"
       )
-      if ([int]$successorAuthority.file_count -ne 1) {
-        throw "Unable to resolve the staged pre-freeze successor authority for release-history fingerprinting."
+      if ([int]$successorAuthority.file_count -lt 5) {
+        throw "Unable to resolve the staged append-only pre-freeze authority closure for release-history fingerprinting."
       }
       $packageFiles = @(Get-MIRAssurancePackageFiles)
       $packageSource = [ordered]@{

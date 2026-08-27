@@ -1,5 +1,5 @@
 param(
-  [ValidateSet('generate','check','show')][string]$Command='check',
+  [ValidateSet('check','show')][string]$Command='check',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$OutputPath=''
 )
@@ -7,9 +7,7 @@ param(
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot '../application/platform/WholePlatformMigration.ps1')
 
-$receipt = if ($Command -eq 'generate') {
-  Invoke-MIR4WholePlatformMigrationProjectionV1 -RepoRoot $RepoRoot
-} elseif ($Command -eq 'check') {
+$receipt = if ($Command -eq 'check') {
   Invoke-MIR4WholePlatformMigrationProjectionV1 -RepoRoot $RepoRoot -Check
 } else {
   Get-MIR4RepositoryJsonV1 -RepoRoot $RepoRoot -Path $script:MIR4WholePlatformMigrationReceiptPath
