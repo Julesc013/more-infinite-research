@@ -54,8 +54,8 @@ if(-not$laws.complete-or-not$laws.implemented_passed-or@($laws.deferred_owners).
 $runs=@(New-MIR4NormalizedCompilationRuns -RepoRoot $RepoRoot -Providers $providers)
 if(@($runs|Where-Object{$_.runtime_state.inventory_kind-ne'MIR4RuntimeStateMatrixV1'-or$_.runtime_state.status-ne'W04-shadow-contract-complete-runtime-proof-required'-or$_.runtime_state.mutation_authorized}).Count-ne 0){throw '[mir4-w04-compilation-run-reference]'}
 $output='build/mir4/test-w04-runtime-continuity'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath|Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -CandidateZip $candidatePath -Check|Out-Null
 foreach($name in @('MIR4_RUNTIME_STATE_MATRIX.json','MIR4_MIGRATION_GRAPH_MATRIX.json','MIR4_CONTINUITY_BUNDLE.json')){$record=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$output/$name")|ConvertFrom-Json;if([string]$record.source_identity.commit-cne$head-or[string]$record.source_identity.tree-cne$tree-or$record.package_visible-or$record.public_release_proof){throw "[mir4-w04-export-identity] $name"}}
 foreach($path in @($authority.terminal_player_authority)) { & git -C $RepoRoot diff --quiet HEAD^ HEAD -- ([string]$path); if($LASTEXITCODE-ne 0){throw "[mir4-w04-terminal-player-delta] $path"} }
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore){throw '[mir4-w04-package-mutation]'}

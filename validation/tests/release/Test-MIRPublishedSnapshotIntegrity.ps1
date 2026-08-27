@@ -152,12 +152,16 @@ try {
                         $semanticCompilerPolicyMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
                             -RelativePath 'releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json' `
                             -Kind 'MIR4SemanticCompilerPolicyMigrationReceiptV1'
+                        $runtimeContinuityMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath 'releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json' `
+                            -Kind 'MIR4RuntimeContinuityMigrationReceiptV1'
                         $programmeTransitions = @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t14Transitions = @($t14.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t15Transitions = @($t15.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t17Transitions = @($t17.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $targetCompilerTransitions = @($targetCompilerMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $semanticCompilerPolicyTransitions = @($semanticCompilerPolicyMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $runtimeContinuityTransitions = @($runtimeContinuityMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $authorizedPreFreezeTransition =
                             [string]$programme.kind -ceq 'MIR4PreFreezeExecutionProgrammeV1' -and
                             [string]$programme.release_cut.source_version -cne [string]$info.version -and
@@ -187,8 +191,12 @@ try {
                             [string]$semanticCompilerPolicyMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
                             @($semanticCompilerPolicyMigration.package_visible_delta).Count -eq 0 -and
                             @($semanticCompilerPolicyMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
-                            $semanticCompilerPolicyTransitions.Count -eq 0
-                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-semantic-compiler-policy-successor' }
+                            $semanticCompilerPolicyTransitions.Count -eq 0 -and
+                            [string]$runtimeContinuityMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            @($runtimeContinuityMigration.package_visible_delta).Count -eq 0 -and
+                            @($runtimeContinuityMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
+                            $runtimeContinuityTransitions.Count -eq 0
+                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-runtime-continuity-successor' }
                     }
                     catch {
                         $authorizedPreFreezeTransition = $false

@@ -3,6 +3,14 @@
   "kind": "MIR4RuntimeContinuityProgrammeV1",
   "programme_id": "M4C02-09-24H",
   "state": "private-shadow-executable",
+  "tooling": {
+    "application": "tools/mir/application/runtime/RuntimeStateModel.ps1",
+    "exporter": "tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1",
+    "compatibility_entrypoints": ["tools/lib/mir4/RuntimeStateModel.ps1", "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/runtime-continuity-tooling-v1.json",
+    "migration_proof": "assurance/repository/runtime-continuity-tooling-v1.json",
+    "migration_receipt": "releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json"
+  },
   "schemas": {
     "runtime_state_matrix": "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
     "migration_graph_matrix": "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",

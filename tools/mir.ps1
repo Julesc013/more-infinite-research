@@ -50,7 +50,8 @@ Usage:
   .\tools\mir.ps1 mir4 whole-platform-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 technology-acceptance-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-compiler-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 semantic-compiler-policy-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 semantic-compiler-policy-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 runtime-continuity-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -702,13 +703,22 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1") @migrationArguments
       }
       "semantic-compiler-policy-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 semantic-compiler-policy-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 semantic-compiler-policy-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 semantic-compiler-policy-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 semantic-compiler-policy-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1") @migrationArguments
+      }
+      "runtime-continuity-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 runtime-continuity-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1") @migrationArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
@@ -756,7 +766,7 @@ switch ($area) {
           $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
           if (-not [string]::IsNullOrWhiteSpace($output)) { $runtimeArguments.OutputRoot = $output }
           if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
-          & (Join-Path $repo "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1") @runtimeArguments
+          & (Join-Path $repo "tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1") @runtimeArguments
         }
       }
       "module-ecosystem" {

@@ -1,0 +1,30 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-runtime-continuity-migration-authority-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","state","fixed_point_authority","predecessor_receipt","scope","activated_roots","writers","path_map","compatibility_entrypoints","rollback","sunset","package_source_authority_unchanged","package_source_sha256","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},
+    "kind":{"const":"MIR4RuntimeContinuityMigrationAuthorityV1"},
+    "migration_id":{"const":"MIR4-RUNTIME-CONTINUITY-TOOLING-V1"},
+    "state":{"const":"PACKAGE-EXCLUDED-RUNTIME-CONTINUITY-APPLICATION-CLI-AND-TEST-WRITER-CUTOVER"},
+    "fixed_point_authority":{"const":".mir/control/repository-fixed-point.json"},
+    "predecessor_receipt":{"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"const":"releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json"},"sha256":{"const":"A1F7B204B839C6425D37EDB34208B0F37FBEA0DC40E1FE45658CED78DC53C5C9"}}},
+    "scope":{"type":"string","minLength":1},
+    "activated_roots":{"type":"array","minItems":6,"maxItems":6,"uniqueItems":true,"items":{"enum":["governance","contracts","assurance","tests","tools-mir","releases"]}},
+    "writers":{"type":"array","minItems":1,"maxItems":1,"items":{"$ref":"#/$defs/writer"}},
+    "path_map":{"type":"array","minItems":25,"items":{"$ref":"#/$defs/pathMap"}},
+    "compatibility_entrypoints":{"type":"array","minItems":2,"maxItems":2,"uniqueItems":true,"items":{"$ref":"#/$defs/compatibility"}},
+    "rollback":{"type":"object","additionalProperties":false,"required":["mode","command","preserves"],"properties":{"mode":{"const":"revert-exact-merged-work-package"},"command":{"type":"string","minLength":1},"preserves":{"type":"array","minItems":3,"uniqueItems":true,"items":{"type":"string","minLength":1}}}},
+    "sunset":{"type":"object","additionalProperties":false,"required":["state","required_gates"],"properties":{"state":{"const":"deferred-compatibility-readers-retained"},"required_gates":{"type":"array","minItems":4,"uniqueItems":true,"items":{"type":"string","minLength":1}}}},
+    "package_source_authority_unchanged":{"const":true},
+    "package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "release_transition_authority":{"$ref":"#/$defs/releaseFirewall"}
+  },
+  "$defs":{
+    "writer":{"type":"object","additionalProperties":false,"required":["fact_family","path","command"],"properties":{"fact_family":{"const":"runtime-continuity-migration-receipt"},"path":{"const":"tools/mir/application/runtime/RuntimeContinuityMigration.ps1"},"command":{"const":"tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1"}}},
+    "pathMap":{"type":"object","additionalProperties":false,"required":["family","current_path","final_path","state","package_visible"],"properties":{"family":{"type":"string","minLength":1},"current_path":{"type":["string","null"]},"final_path":{"type":"string","minLength":1},"state":{"type":"string","minLength":1},"package_visible":{"const":false}}},
+    "compatibility":{"type":"object","additionalProperties":false,"required":["path","role","writable"],"properties":{"path":{"enum":["tools/lib/mir4/RuntimeStateModel.ps1","tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1"]},"role":{"enum":["library-forwarder","command-forwarder"]},"writable":{"const":false}}},
+    "releaseFirewall":{"type":"object","additionalProperties":false,"required":["source_freeze","candidate_allocation","production_signing","seal","promotion","tagging","publication"],"properties":{"source_freeze":{"const":false},"candidate_allocation":{"const":false},"production_signing":{"const":false},"seal":{"const":false},"promotion":{"const":false},"tagging":{"const":false},"publication":{"const":false}}}
+  }
+}
