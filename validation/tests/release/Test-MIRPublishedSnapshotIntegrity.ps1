@@ -14,6 +14,7 @@ $sourceLockRelative = ".mir/releases/sources/published-source-locks.json"
 $sourceLockPath = Join-Path $repoRoot ($sourceLockRelative -replace "/", "\")
 $distributionManifestPath = Join-Path $repoRoot ".mir\distributions.json"
 . (Join-Path $repoRoot "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repoRoot "tools\lib\mir4\PreFreezeRelease.ps1")
 
 if (-not (Test-Path -LiteralPath $sourceLockPath -PathType Leaf)) {
     throw "Published source-lock authority not found: $sourceLockPath"
@@ -113,6 +114,7 @@ try {
             if ($actualPackageSourceSha256 -ne $expectedPackageSourceSha256) {
                 $programmePath = Join-Path $repoRoot ".mir\releases\waves\mir4-r0\MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
                 $authorizedPreFreezeTransition = $false
+                $authorizedAuthorityKind = $null
                 if (Test-Path -LiteralPath $programmePath -PathType Leaf) {
                     $programme = Get-Content -LiteralPath $programmePath -Raw | ConvertFrom-Json -Depth 100
                     $enabledTransitions = @(
@@ -126,12 +128,61 @@ try {
                         [string]$programme.source_baseline.package_source_sha256 -ceq $actualPackageSourceSha256 -and
                         [string]$programme.status -match "RELEASE-BLOCKED$" -and
                         $enabledTransitions.Count -eq 0
+                    if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'source-baseline' }
+                }
+                if (-not $authorizedPreFreezeTransition) {
+                    try {
+                        # T14 intentionally evolved only the package-facing README. T15 and
+                        # the T17 machine-preparation receipt retain that exact fingerprint,
+                        # while Test-MIR4PreFreezeAuthorities replays every schema-checked
+                        # append-only successor and rejects authority or transition drift.
+                        Test-MIR4PreFreezeAuthorities -RepoRoot $repoRoot | Out-Null
+                        $t14 = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json' `
+                            -Kind 'MIR4T14AuthorityEvolutionReceiptV1'
+                        $t15 = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' `
+                            -Kind 'MIR4T15AuthorityEvolutionReceiptV1'
+                        $t17 = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json' `
+                            -Kind 'MIR4T17MachinePreparationAuthorityEvolutionReceiptV1'
+                        $programmeTransitions = @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $t14Transitions = @($t14.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $t15Transitions = @($t15.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $t17Transitions = @($t17.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $authorizedPreFreezeTransition =
+                            [string]$programme.kind -ceq 'MIR4PreFreezeExecutionProgrammeV1' -and
+                            [string]$programme.release_cut.source_version -cne [string]$info.version -and
+                            [string]$programme.release_cut.candidate_state -ceq 'pre-freeze-unallocated' -and
+                            [string]$programme.status -ceq 'T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED' -and
+                            $programmeTransitions.Count -eq 0 -and
+                            [string]$t14.player_package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            (@($t14.conformance.package_visible_delta) -join '|') -ceq 'README.md' -and
+                            [bool]$t14.conformance.player_executable_sources_unchanged -and
+                            [bool]$t14.conformance.one_emitter_preserved -and
+                            -not [bool]$t14.conformance.release_transition_authority -and
+                            $t14Transitions.Count -eq 0 -and
+                            [string]$t15.player_package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            -not [bool]$t15.conformance.release_transition_authority -and
+                            $t15Transitions.Count -eq 0 -and
+                            [string]$t17.player_package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            @($t17.package_visible_delta).Count -eq 0 -and
+                            [string]$t17.execution_state.programme_status -ceq [string]$programme.status -and
+                            -not [bool]$t17.human_gate.f210_decision_recorded -and
+                            -not [bool]$t17.human_gate.f200_decision_recorded -and
+                            -not [bool]$t17.human_gate.acceptance_inferred -and
+                            $t17Transitions.Count -eq 0
+                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-t14-t17' }
+                    }
+                    catch {
+                        $authorizedPreFreezeTransition = $false
+                    }
                 }
                 if ($authorizedPreFreezeTransition) {
                     Write-Host (
                         "PASS $($info.version): published source remains immutable while the explicit " +
                         "$($programme.release_cut.source_version) pre-freeze authority binds development roots " +
-                        "$actualPackageSourceSha256 and denies production transitions"
+                        "$actualPackageSourceSha256 and denies production transitions ($authorizedAuthorityKind)"
                     )
                 }
                 else {

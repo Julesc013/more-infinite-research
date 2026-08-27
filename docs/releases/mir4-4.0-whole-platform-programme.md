@@ -19,7 +19,7 @@ MIR 4.0.0 owns the complete MIR 4 platform source programme. The former 4.0 thro
 
 This consolidation does not collapse maturity. Stable player behavior remains bounded by the admitted compiler, emitter, runtime, migration, and target authorities. Preview, shadow, experimental, omitted, and blocked implementations live in the 4.0 source tree but cannot mutate player output or acquire a compatibility claim merely because their code exists.
 
-The canonical machine authority is `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json`; `tools/mir/application/platform/WholePlatform.ps1` is its package-excluded application, and the generated inventory is [MIR 4 Whole Platform Matrix](../reference/generated/mir4-whole-platform-matrix.md). The former library and validation-test paths remain read-only compatibility forwarders.
+The canonical machine authority is `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json`; `tools/mir/application/platform/WholePlatform.ps1` is its package-excluded application, and the generated inventory is [MIR 4 Whole Platform Matrix](../reference/generated/mir4-whole-platform-matrix.md). The former library and validation-test paths remain read-only compatibility forwarders. Technology acceptance now has its own canonical package-excluded application at `tools/mir/application/technology/TechnologyAcceptance.ps1`; the former library path remains a read-only forwarder.
 
 ## Target naming
 
@@ -27,7 +27,7 @@ Human-facing target keys use an uppercase `F`: `F210`, `F200`, `F110`, `F100`, a
 
 ## Technology-by-technology acceptance
 
-Compatibility is tuned by ecosystem, but admission is one exact technology at a time. The queue generator consumes the final schema-3 `TechnologyCatalog`, binds each current selection and exact design and qualification fingerprint, and emits no mutation authority. A materializing candidate then follows the existing lifecycle: quality assessment, review dossier, maintainer approval, promotion, migration when required, and exact promotion admission.
+Compatibility is tuned by ecosystem, but admission is one exact technology at a time. The queue generator consumes the final schema-3 `TechnologyCatalog`, binds each current selection and exact design and qualification fingerprint, and emits no mutation authority. Its focused test and append-only migration receipt prove that this cutover preserves result parity and cannot infer approval. A materializing candidate then follows the existing lifecycle: quality assessment, review dossier, maintainer approval, promotion, migration when required, and exact promotion admission.
 
 The recommended ecosystem order is Base and official mods, AAI, BZ, Krastorio 2, Space Exploration, Industrial Revolution 3 and 4, Bob, Angel, Pyanodons, then combined packs. The order is operational, not a compatibility claim. A pack is never represented by one blanket supported Boolean.
 

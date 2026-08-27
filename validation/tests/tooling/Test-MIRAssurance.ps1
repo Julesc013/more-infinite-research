@@ -475,6 +475,28 @@ if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
   $publishedSnapshotIntegrity -match 'Measure-Object -Property Length -Sum') {
   throw "Published snapshot byte counts must come from canonical Git blobs, not checkout line endings."
 }
+foreach ($requiredSuccessorCheck in @(
+  'Test-MIR4PreFreezeAuthorities',
+  'MIR4-T14-Authority-Evolution-ReceiptV1.json',
+  'MIR4-T15-Authority-Evolution-ReceiptV1.json',
+  'MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json',
+  'player_executable_sources_unchanged',
+  'human_gate.acceptance_inferred'
+)) {
+  if ($publishedSnapshotIntegrity -notmatch [regex]::Escape($requiredSuccessorCheck)) {
+    throw "Published snapshot integrity omits append-only successor proof: $requiredSuccessorCheck"
+  }
+}
+foreach ($requiredSuccessorFingerprint in @(
+  '.mir/releases/waves/mir4-r0',
+  'releases/migrations',
+  'contracts/repository',
+  'tools/lib/mir4/PreFreezeRelease.ps1'
+)) {
+  if ($assuranceEvidenceSource -notmatch [regex]::Escape($requiredSuccessorFingerprint)) {
+    throw "Release-history fingerprint omits successor authority input: $requiredSuccessorFingerprint"
+  }
+}
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
 . $coreScript

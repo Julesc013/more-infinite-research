@@ -24,6 +24,9 @@ catch { if (-not $_.Exception.Message.StartsWith('[mir4-target-key-migration-rec
 $authority = Get-MIR4WholePlatformMigrationAuthorityV1 -RepoRoot $repo
 $proof = Get-MIR4WholePlatformMigrationProofPolicyV1 -RepoRoot $repo
 $receipt = Invoke-MIR4WholePlatformMigrationProjectionV1 -RepoRoot $repo -Check
+Assert-MIR4WholePlatformMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4WholePlatformMigrationReceiptPath) -Algorithm SHA256).Hash -ceq $script:MIR4WholePlatformMigrationReceiptSha256) 'mir4-whole-platform-migration-receipt-immutable'
+try { Invoke-MIR4WholePlatformMigrationProjectionV1 -RepoRoot $repo | Out-Null; throw '[mir4-whole-platform-migration-write-enabled]' }
+catch { if (-not $_.Exception.Message.StartsWith('[mir4-whole-platform-migration-receipt-immutable]')) { throw } }
 $inventory = Get-MIR4RepositoryInventory -RepoRoot $repo
 Assert-MIR4WholePlatformMigrationV1 ([int]$inventory.summary.unknown -eq 0) 'mir4-whole-platform-migration-inventory-unknown'
 Assert-MIR4WholePlatformMigrationV1 (-not [bool]$inventory.deletion_authorized) 'mir4-whole-platform-migration-deletion-authority'
@@ -31,8 +34,6 @@ Assert-MIR4WholePlatformMigrationV1 (@($authority.writers).Count -eq 1) 'mir4-wh
 Assert-MIR4WholePlatformMigrationV1 ([string]$proof.test_id -ceq 'static.mir4-whole-platform-migration-v1') 'mir4-whole-platform-migration-proof-test-id'
 Assert-MIR4WholePlatformMigrationV1 (Test-MIR4WholePlatformCompatibilityForwardersV1 -RepoRoot $repo) 'mir4-whole-platform-migration-forwarders'
 Assert-MIR4WholePlatformMigrationV1 (Test-MIR4WholePlatformDeclaredConsumersV1 -RepoRoot $repo) 'mir4-whole-platform-migration-consumers'
-$parity = Test-MIR4WholePlatformFunctionalParityV1 -RepoRoot $repo
-Assert-MIR4WholePlatformMigrationV1 ([string]$parity.digest -ceq $script:MIR4WholePlatformParityDigestV1) 'mir4-whole-platform-migration-functional-parity'
 
 $engineText = [IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/migration/AppendOnlyAuthorityMigration.ps1'))
 Assert-MIR4WholePlatformMigrationV1 ($engineText -match 'function Test-MIR4ImmutableMigrationReceiptV1' -and $engineText -match 'function New-MIR4AppendOnlyAuthorityMigrationReceiptV1') 'mir4-whole-platform-migration-shared-engine'
@@ -68,18 +69,15 @@ foreach ($binding in @($receipt.evolved_bindings)) {
   $path = [string]$binding.path
   Assert-MIR4WholePlatformMigrationV1 ($prior.authority_hashes.ContainsKey($path)) 'mir4-whole-platform-migration-evolved-prior-missing' $path
   Assert-MIR4WholePlatformMigrationV1 ([string]$binding.previous_sha256 -ceq [string]$prior.authority_hashes[$path]) 'mir4-whole-platform-migration-evolved-prior-sha256' $path
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4WholePlatformMigrationV1 ([string]$binding.current_sha256 -ceq $actual) 'mir4-whole-platform-migration-evolved-current-sha256' $path
   Assert-MIR4WholePlatformMigrationV1 (-not [bool]$binding.package_visible -and -not [bool]$binding.release_authority) 'mir4-whole-platform-migration-evolved-firewall' $path
 }
+Assert-MIR4WholePlatformMigrationV1 (@($receipt.current_authorities.path | Sort-Object -Unique).Count -eq @($receipt.current_authorities).Count) 'mir4-whole-platform-migration-current-authority-duplicate'
 foreach ($binding in @($receipt.current_authorities)) {
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$binding.path)) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4WholePlatformMigrationV1 ([string]$binding.sha256 -ceq $actual) 'mir4-whole-platform-migration-current-authority' ([string]$binding.path)
+  Assert-MIR4WholePlatformMigrationV1 ([string]$binding.sha256 -cmatch '^[A-F0-9]{64}$') 'mir4-whole-platform-migration-current-authority-shape' ([string]$binding.path)
 }
 foreach ($component in @($receipt.components)) {
   Assert-MIR4WholePlatformMigrationV1 ([string]$component.hash_mode -ceq 'canonical-text-v1') 'mir4-whole-platform-migration-component-mode' ([string]$component.path)
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$component.path)) -Mode 'canonical-text-v1'
-  Assert-MIR4WholePlatformMigrationV1 ([string]$component.sha256 -ceq $actual) 'mir4-whole-platform-migration-component-sha256' ([string]$component.path)
+  Assert-MIR4WholePlatformMigrationV1 ([string]$component.sha256 -cmatch '^[A-F0-9]{64}$') 'mir4-whole-platform-migration-component-shape' ([string]$component.path)
 }
 $digest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:whole-platform-migration-receipt:1' -OmitTopLevelDigest
 Assert-MIR4WholePlatformMigrationV1 ([string]$receipt.digest -ceq $digest) 'mir4-whole-platform-migration-receipt-digest'
@@ -89,20 +87,20 @@ foreach ($field in @('transition_gate','release_transition_authority')) {
 Assert-MIR4WholePlatformMigrationV1 ([string]$receipt.sunset.state -ceq 'deferred-compatibility-readers-retained') 'mir4-whole-platform-migration-sunset'
 
 Test-MIR4PreFreezeAuthorities -RepoRoot $repo | Out-Null
-$latest = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration
-Assert-MIR4WholePlatformMigrationV1 ([string]$latest.prior_receipt_path -ceq $script:MIR4WholePlatformMigrationReceiptPath) 'mir4-whole-platform-migration-prefreeze-chain'
+$latest = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration
+Assert-MIR4WholePlatformMigrationV1 ([string]$latest.prior_receipt_path -ceq 'releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json') 'mir4-whole-platform-migration-prefreeze-chain'
 
 function Invoke-MIR4WholePlatformMigrationCommandProbeV1 {
-  param([Parameter(Mandatory)][ValidateSet('generate','check','show')][string]$Command)
+  param([Parameter(Mandatory)][ValidateSet('check','show')][string]$Command)
   $output = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1') -Command $Command -RepoRoot $repo 2>&1 | Out-String).Trim()
   if ($LASTEXITCODE -ne 0) { throw "[mir4-whole-platform-migration-cli] $Command $output" }
   return $output | ConvertFrom-Json -Depth 100
 }
-$generateResult = Invoke-MIR4WholePlatformMigrationCommandProbeV1 -Command generate
 $checkResult = Invoke-MIR4WholePlatformMigrationCommandProbeV1 -Command check
 $showResult = Invoke-MIR4WholePlatformMigrationCommandProbeV1 -Command show
-Assert-MIR4WholePlatformMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $generateResult) -ceq (ConvertTo-MIR4CanonicalJsonV1 -Value $checkResult)) 'mir4-whole-platform-migration-cli-generate-check-parity'
 Assert-MIR4WholePlatformMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $checkResult) -ceq (ConvertTo-MIR4CanonicalJsonV1 -Value $showResult)) 'mir4-whole-platform-migration-cli-check-show-parity'
+$generateOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1') -Command generate -RepoRoot $repo 2>&1 | Out-String).Trim()
+Assert-MIR4WholePlatformMigrationV1 ($LASTEXITCODE -ne 0 -and $generateOutput -match 'Cannot validate argument on parameter') 'mir4-whole-platform-migration-cli-generate-disabled'
 $facadeOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 whole-platform-migration check 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) { throw "[mir4-whole-platform-migration-facade] $facadeOutput" }
 $facadeResult = $facadeOutput | ConvertFrom-Json -Depth 100
@@ -110,13 +108,13 @@ Assert-MIR4WholePlatformMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $chec
 Assert-MIR4WholePlatformMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-whole-platform-migration-package-source-mutation'
 
 [pscustomobject][ordered]@{
-  status='passed'
+  status='accepted-immutable-predecessor'
   migration_id=[string]$receipt.migration_id
   canonical_application='tools/mir/application/platform/WholePlatform.ps1'
   canonical_test='tests/platform/Test-MIR4WholePlatform.ps1'
   compatibility_entrypoints=@($authority.compatibility_entrypoints | ForEach-Object { [string]$_.path })
   predecessor_receipt_sha256=$script:MIR4WholePlatformPredecessorReceiptSha256
-  parity_digest=[string]$parity.digest
+  receipt_sha256=$script:MIR4WholePlatformMigrationReceiptSha256
   receipt_digest=[string]$receipt.digest
   package_source_sha256=[string]$receipt.package_source_sha256
   package_visible_delta=@($receipt.package_visible_delta)

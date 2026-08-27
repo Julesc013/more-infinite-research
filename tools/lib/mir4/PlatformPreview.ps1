@@ -75,6 +75,11 @@ $script:MIR4PlatformInputPaths = @(
   'contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json',
   'contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json',
   'assurance/repository/whole-platform-tooling-v1.json',
+  'governance/repository/migrations/technology-acceptance-tooling-v1.json',
+  'contracts/repository/mir4-technology-acceptance-migration-authority-v1.schema.json',
+  'contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json',
+  'contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json',
+  'assurance/repository/technology-acceptance-tooling-v1.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
   'tools/lib/mir4/MepDiscovery.ps1',
@@ -150,6 +155,11 @@ $script:MIR4PlatformInputPaths = @(
   'tests/platform/Test-MIR4WholePlatformMigration.ps1',
   'tools/lib/mir4/WholePlatform.ps1',
   'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1',
+  'tools/mir/application/technology/TechnologyAcceptance.ps1',
+  'tools/mir/application/technology/TechnologyAcceptanceMigration.ps1',
+  'tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1',
+  'tests/technology/Test-MIR4TechnologyAcceptance.ps1',
+  'tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1',
   'tools/lib/mir4/TechnologyAcceptance.ps1'
 )
 
@@ -802,7 +812,7 @@ function New-MIR4PlatformPreviewPackages {
     'docs/releases/mir4-4.0-whole-platform-programme.md','docs/reference/generated/mir4-whole-platform-matrix.md',
     'tools/mir/domain/targets/TargetKey.ps1','tools/lib/mir4/TargetKey.ps1',
     'tools/mir/application/platform/WholePlatform.ps1','tools/lib/mir4/WholePlatform.ps1',
-    'tools/lib/mir4/TechnologyAcceptance.ps1',
+    'tools/mir/application/technology/TechnologyAcceptance.ps1','tools/lib/mir4/TechnologyAcceptance.ps1',
     'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1','tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1'
   )
   $sets['mir4-platform-preview-v0.zip'] += @(

@@ -61,6 +61,17 @@ paths:
   mir4.whole-platform-migration.cli: tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1
   mir4.whole-platform.test: tests/platform/Test-MIR4WholePlatform.ps1
   mir4.whole-platform-migration.test: tests/platform/Test-MIR4WholePlatformMigration.ps1
+  mir4.technology-acceptance-migration.authority: governance/repository/migrations/technology-acceptance-tooling-v1.json
+  mir4.technology-acceptance-migration.proof: assurance/repository/technology-acceptance-tooling-v1.json
+  mir4.technology-acceptance-migration.receipt: releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json
+  mir4.technology-acceptance-migration.authority-schema: contracts/repository/mir4-technology-acceptance-migration-authority-v1.schema.json
+  mir4.technology-acceptance-migration.proof-schema: contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json
+  mir4.technology-acceptance-migration.receipt-schema: contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json
+  mir4.technology-acceptance.application: tools/mir/application/technology/TechnologyAcceptance.ps1
+  mir4.technology-acceptance-migration.application: tools/mir/application/technology/TechnologyAcceptanceMigration.ps1
+  mir4.technology-acceptance-migration.cli: tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1
+  mir4.technology-acceptance.test: tests/technology/Test-MIR4TechnologyAcceptance.ps1
+  mir4.technology-acceptance-migration.test: tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json

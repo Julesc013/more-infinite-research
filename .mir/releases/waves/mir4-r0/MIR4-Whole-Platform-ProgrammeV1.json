@@ -234,10 +234,10 @@
       "id": "ecosystem-technology-acceptance-and-tuning",
       "release_destination": "4.0.0",
       "maturity": "preview",
-      "completion_state": "implemented-queue-and-existing-lifecycle-gates",
+      "completion_state": "implemented-queue-canonical-application-migrated-compatibility-reader-retained",
       "authorities": [".mir/technology-lifecycle.json", ".mir/technology-governance.json", ".mir/compatibility.yml", ".mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json"],
-      "implementations": ["tools/lib/mir4/TechnologyAcceptance.ps1", "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1", "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4WholePlatform.ps1", "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
+      "implementations": ["tools/mir/application/technology/TechnologyAcceptance.ps1", "tools/lib/mir4/TechnologyAcceptance.ps1", "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1", "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1"],
+      "verification": ["tests/technology/Test-MIR4TechnologyAcceptance.ps1", "tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1", "tests/platform/Test-MIR4WholePlatform.ps1", "validation/tests/mir4/Test-MIR4WholePlatform.ps1", "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
       "cutover": "one-exact-technology-at-a-time-after-quality-review-approval-promotion-and-migration-admission",
       "blockers": ["MAINTAINER-TECHNOLOGY-ACCEPTANCE"]
     }

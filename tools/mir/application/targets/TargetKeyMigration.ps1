@@ -62,7 +62,7 @@ function Test-MIR4TargetKeyDeclaredConsumersV1 {
   $bindings = [ordered]@{
     'tools/mir.ps1' = 'mir/domain/targets/TargetKey.ps1'
     'tools/mir/application/platform/WholePlatform.ps1' = 'domain/targets/TargetKey.ps1'
-    'tools/lib/mir4/TechnologyAcceptance.ps1' = 'mir/domain/targets/TargetKey.ps1'
+    'tools/mir/application/technology/TechnologyAcceptance.ps1' = 'domain/targets/TargetKey.ps1'
     'tools/lib/mir4/PlatformPreview.ps1' = 'mir/domain/targets/TargetKey.ps1'
   }
   foreach ($entry in $bindings.GetEnumerator()) {

@@ -10,6 +10,7 @@
     "tests/diagnostics",
     "tests/targets",
     "tests/platform",
+    "tests/technology",
     "validation/tests",
     "validation/tests.yml"
   ],
