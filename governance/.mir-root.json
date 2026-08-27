@@ -12,6 +12,7 @@
     "governance/repository/migrations/whole-platform-tooling-v1.json",
     "governance/repository/migrations/technology-acceptance-tooling-v1.json",
     "governance/repository/migrations/target-compiler-tooling-v1.json",
+    "governance/repository/migrations/semantic-compiler-policy-tooling-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"

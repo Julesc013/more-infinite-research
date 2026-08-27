@@ -5,7 +5,7 @@ param(
 )
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/lib/mir4/SafetyKernel.ps1')
+. (Join-Path $repo 'tools/mir/domain/safety/SafetyKernel.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ProcessIR.ps1')
 $status=@(& git -C $repo status --porcelain)
 if($LASTEXITCODE-ne 0-or$status.Count-ne 0){throw '[mir4-processir-export-dirty-tree]'}

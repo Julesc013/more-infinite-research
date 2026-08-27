@@ -226,7 +226,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeTargetKeyMigration,
     [switch]$IncludeWholePlatformMigration,
     [switch]$IncludeTechnologyAcceptanceMigration,
-    [switch]$IncludeTargetCompilerMigration
+    [switch]$IncludeTargetCompilerMigration,
+    [switch]$IncludeSemanticCompilerPolicyMigration
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -284,6 +285,10 @@ function Get-MIR4PreFreezeAuthorityState {
   if ($IncludeTargetCompilerMigration) {
     if (-not $IncludeTechnologyAcceptanceMigration) { throw '[mir4-prefreeze-target-compiler-migration-requires-technology-acceptance-migration]' }
     $links += @{path='releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json';kind='MIR4TargetCompilerMigrationReceiptV1'}
+  }
+  if ($IncludeSemanticCompilerPolicyMigration) {
+    if (-not $IncludeTargetCompilerMigration) { throw '[mir4-prefreeze-semantic-compiler-policy-migration-requires-target-compiler-migration]' }
+    $links += @{path='releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json';kind='MIR4SemanticCompilerPolicyMigrationReceiptV1'}
   }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
@@ -360,6 +365,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json' = 'contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json' = 'contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json' = 'contracts/repository/mir4-target-compiler-migration-receipt-v1.schema.json'
+    'releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json' = 'contracts/repository/mir4-semantic-compiler-policy-migration-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -397,6 +403,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json';kind='MIR4WholePlatformMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json';kind='MIR4TechnologyAcceptanceMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json';kind='MIR4TargetCompilerMigrationReceiptV1'}
+    @{path='releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json';kind='MIR4SemanticCompilerPolicyMigrationReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

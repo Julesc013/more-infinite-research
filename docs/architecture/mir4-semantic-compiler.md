@@ -16,6 +16,8 @@ source_of_truth_for:
 ---
 # MIR 4 Semantic Compiler Shadow
 
+The package-excluded semantic compiler is now owned by visible canonical roots: `tools/mir/domain/safety/SafetyKernel.ps1`, `tools/mir/domain/policy/PolicyEngine.ps1`, `tools/mir/application/compiler/NormalizedCompiler.ps1`, and `tools/mir/application/compiler/CompilationRun.ps1`. Deterministic record export is owned by `tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1`. The former `tools/lib/mir4` and `tools/commands/mir4` paths are read-only compatibility forwarders and are not writers.
+
 W03 completes a reference-based `CompilationRunV1` without creating a second player compiler. Each run binds the W02 target contract and provider, the platform input lock, module closure, terminal normalized snapshot, existing fact and graph adapters, policy and claim owners, lifecycle plans, operation executor, runtime inventory, proof obligations, and bounded public projection authority.
 
 `FeatureManifestRefV1` and `SettingSpecRefV1` are aggregate indexes. They reference the terminal snapshot, target profile, settings manifest, and existing Lua owners; they do not copy facts, policies, plans, or runtime records. `CompilerContext` remains the outer lifecycle compatibility adapter, and all terminal Lua planning, mutation execution, journals, results, and public artifacts remain player-authoritative.
