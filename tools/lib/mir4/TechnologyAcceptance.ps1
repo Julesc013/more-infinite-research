@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'TargetKey.ps1')
+. (Join-Path $PSScriptRoot '../../mir/domain/targets/TargetKey.ps1')
 
 function Get-MIR4AcceptanceSha256 {
   param([Parameter(Mandatory)]$Value)
