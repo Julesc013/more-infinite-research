@@ -9,6 +9,7 @@
     "tests/canonicalization",
     "tests/diagnostics",
     "tests/targets",
+    "tests/platform",
     "validation/tests",
     "validation/tests.yml"
   ],

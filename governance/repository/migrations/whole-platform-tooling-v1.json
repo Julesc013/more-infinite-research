@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "kind": "MIR4WholePlatformMigrationAuthorityV1",
+  "migration_id": "MIR4-WHOLE-PLATFORM-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-WHOLE-PLATFORM-APPLICATION-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json",
+    "sha256": "79E3ECC14FDC354A3F2509F4AC3366E790547F6E606B2F65096E7CFD5866C06D"
+  },
+  "scope": "package-excluded whole-platform application, canonical test, contracts, assurance, and successor receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {"fact_family":"whole-platform-migration-receipt","path":"tools/mir/application/platform/WholePlatformMigration.ps1","command":"tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1"}
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/whole-platform-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/whole-platform-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"whole-platform-application","current_path":"tools/lib/mir4/WholePlatform.ps1","final_path":"tools/mir/application/platform/WholePlatform.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"whole-platform-command-consumer","current_path":"tools/commands/mir4/Invoke-MIR4WholePlatform.ps1","final_path":"tools/commands/mir4/Invoke-MIR4WholePlatform.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"whole-platform-functional-test","current_path":"validation/tests/mir4/Test-MIR4WholePlatform.ps1","final_path":"tests/platform/Test-MIR4WholePlatform.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"platform-preview-whole-platform-consumer","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"whole-platform-migration-application","current_path":null,"final_path":"tools/mir/application/platform/WholePlatformMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"whole-platform-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"whole-platform-migration-test","current_path":null,"final_path":"tests/platform/Test-MIR4WholePlatformMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"target-key-historical-receipt-checker","current_path":"tools/mir/application/targets/TargetKeyMigration.ps1","final_path":"tools/mir/application/targets/TargetKeyMigration.ps1","state":"evolved-to-immutable-reader","package_visible":false},
+    {"family":"target-key-historical-receipt-cli","current_path":"tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1","state":"evolved-generate-disabled","package_visible":false},
+    {"family":"target-key-historical-receipt-test","current_path":"tests/targets/Test-MIR4TargetKeyMigration.ps1","final_path":"tests/targets/Test-MIR4TargetKeyMigration.ps1","state":"evolved-historical-verification","package_visible":false},
+    {"family":"whole-platform-module-binding","current_path":".mir/modules.yml","final_path":".mir/modules.yml","state":"evolved-current-consumer","package_visible":false},
+    {"family":"whole-platform-generated-reference","current_path":"docs/reference/generated/mir4-whole-platform-matrix.md","final_path":"docs/reference/generated/mir4-whole-platform-matrix.md","state":"generated-by-canonical-application","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/WholePlatform.ps1","role":"library-forwarder","writable":false},
+    {"path":"validation/tests/mir4/Test-MIR4WholePlatform.ps1","role":"test-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-whole-platform-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json", "releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json", "releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {"source_freeze":false,"candidate_allocation":false,"production_signing":false,"seal":false,"promotion":false,"tagging":false,"publication":false}
+}

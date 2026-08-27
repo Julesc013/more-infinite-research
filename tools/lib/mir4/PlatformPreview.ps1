@@ -70,6 +70,11 @@ $script:MIR4PlatformInputPaths = @(
   'contracts/repository/mir4-target-key-migration-proof-v1.schema.json',
   'contracts/repository/mir4-target-key-migration-receipt-v1.schema.json',
   'assurance/repository/target-key-tooling-v1.json',
+  'governance/repository/migrations/whole-platform-tooling-v1.json',
+  'contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json',
+  'contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json',
+  'contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json',
+  'assurance/repository/whole-platform-tooling-v1.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
   'tools/lib/mir4/MepDiscovery.ps1',
@@ -138,6 +143,11 @@ $script:MIR4PlatformInputPaths = @(
   'tests/targets/Test-MIR4TargetKey.ps1',
   'tests/targets/Test-MIR4TargetKeyMigration.ps1',
   'tools/lib/mir4/TargetKey.ps1',
+  'tools/mir/application/platform/WholePlatform.ps1',
+  'tools/mir/application/platform/WholePlatformMigration.ps1',
+  'tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1',
+  'tests/platform/Test-MIR4WholePlatform.ps1',
+  'tests/platform/Test-MIR4WholePlatformMigration.ps1',
   'tools/lib/mir4/WholePlatform.ps1',
   'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1',
   'tools/lib/mir4/TechnologyAcceptance.ps1'
@@ -791,7 +801,8 @@ function New-MIR4PlatformPreviewPackages {
     'spec/schemas/mir4-whole-platform-programme-v1.schema.json','spec/schemas/mir4-technology-acceptance-queue-v1.schema.json',
     'docs/releases/mir4-4.0-whole-platform-programme.md','docs/reference/generated/mir4-whole-platform-matrix.md',
     'tools/mir/domain/targets/TargetKey.ps1','tools/lib/mir4/TargetKey.ps1',
-    'tools/lib/mir4/WholePlatform.ps1','tools/lib/mir4/TechnologyAcceptance.ps1',
+    'tools/mir/application/platform/WholePlatform.ps1','tools/lib/mir4/WholePlatform.ps1',
+    'tools/lib/mir4/TechnologyAcceptance.ps1',
     'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1','tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1'
   )
   $sets['mir4-platform-preview-v0.zip'] += @(

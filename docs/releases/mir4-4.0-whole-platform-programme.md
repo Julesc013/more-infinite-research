@@ -19,7 +19,7 @@ MIR 4.0.0 owns the complete MIR 4 platform source programme. The former 4.0 thro
 
 This consolidation does not collapse maturity. Stable player behavior remains bounded by the admitted compiler, emitter, runtime, migration, and target authorities. Preview, shadow, experimental, omitted, and blocked implementations live in the 4.0 source tree but cannot mutate player output or acquire a compatibility claim merely because their code exists.
 
-The canonical machine authority is `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json`; the generated inventory is [MIR 4 Whole Platform Matrix](../reference/generated/mir4-whole-platform-matrix.md).
+The canonical machine authority is `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json`; `tools/mir/application/platform/WholePlatform.ps1` is its package-excluded application, and the generated inventory is [MIR 4 Whole Platform Matrix](../reference/generated/mir4-whole-platform-matrix.md). The former library and validation-test paths remain read-only compatibility forwarders.
 
 ## Target naming
 

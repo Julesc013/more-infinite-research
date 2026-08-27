@@ -5,7 +5,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-. (Join-Path $RepoRoot 'tools/lib/mir4/WholePlatform.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/platform/WholePlatform.ps1')
 
 switch ($Command) {
   'generate' {

@@ -1,0 +1,25 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","state","fixed_point_authority","predecessor_receipt","scope","activated_roots","writers","path_map","compatibility_entrypoints","rollback","sunset","package_source_authority_unchanged","package_source_sha256","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4WholePlatformMigrationAuthorityV1"},"migration_id":{"const":"MIR4-WHOLE-PLATFORM-TOOLING-V1"},"state":{"const":"PACKAGE-EXCLUDED-WHOLE-PLATFORM-APPLICATION-AND-TEST-WRITER-CUTOVER"},
+    "fixed_point_authority":{"const":".mir/control/repository-fixed-point.json"},
+    "predecessor_receipt":{"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"const":"releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json"},"sha256":{"const":"79E3ECC14FDC354A3F2509F4AC3366E790547F6E606B2F65096E7CFD5866C06D"}}},
+    "scope":{"type":"string","minLength":1},
+    "activated_roots":{"type":"array","minItems":6,"maxItems":6,"uniqueItems":true,"items":{"enum":["governance","contracts","assurance","tests","tools-mir","releases"]}},
+    "writers":{"type":"array","minItems":1,"maxItems":1,"items":{"$ref":"#/$defs/writer"}},
+    "path_map":{"type":"array","minItems":18,"items":{"$ref":"#/$defs/pathMap"}},
+    "compatibility_entrypoints":{"type":"array","minItems":2,"maxItems":2,"items":{"$ref":"#/$defs/compatibility"}},
+    "rollback":{"type":"object","additionalProperties":false,"required":["mode","command","preserves"],"properties":{"mode":{"const":"revert-exact-merged-work-package"},"command":{"type":"string","minLength":1},"preserves":{"type":"array","minItems":5,"uniqueItems":true,"items":{"type":"string","minLength":1}}}},
+    "sunset":{"type":"object","additionalProperties":false,"required":["state","required_gates"],"properties":{"state":{"const":"deferred-compatibility-readers-retained"},"required_gates":{"type":"array","minItems":4,"uniqueItems":true,"items":{"type":"string","minLength":1}}}},
+    "package_source_authority_unchanged":{"const":true},"package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},"release_transition_authority":{"$ref":"#/$defs/releaseFirewall"}
+  },
+  "$defs":{
+    "writer":{"type":"object","additionalProperties":false,"required":["fact_family","path","command"],"properties":{"fact_family":{"const":"whole-platform-migration-receipt"},"path":{"const":"tools/mir/application/platform/WholePlatformMigration.ps1"},"command":{"const":"tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1"}}},
+    "pathMap":{"type":"object","additionalProperties":false,"required":["family","current_path","final_path","state","package_visible"],"properties":{"family":{"type":"string","minLength":1},"current_path":{"type":["string","null"]},"final_path":{"type":"string","minLength":1},"state":{"type":"string","minLength":1},"package_visible":{"const":false}}},
+    "compatibility":{"type":"object","additionalProperties":false,"required":["path","role","writable"],"properties":{"path":{"enum":["tools/lib/mir4/WholePlatform.ps1","validation/tests/mir4/Test-MIR4WholePlatform.ps1"]},"role":{"enum":["library-forwarder","test-forwarder"]},"writable":{"const":false}}},
+    "releaseFirewall":{"type":"object","additionalProperties":false,"required":["source_freeze","candidate_allocation","production_signing","seal","promotion","tagging","publication"],"properties":{"source_freeze":{"const":false},"candidate_allocation":{"const":false},"production_signing":{"const":false},"seal":{"const":false},"promotion":{"const":false},"tagging":{"const":false},"publication":{"const":false}}}
+  }
+}
