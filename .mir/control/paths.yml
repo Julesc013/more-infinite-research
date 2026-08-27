@@ -72,6 +72,17 @@ paths:
   mir4.technology-acceptance-migration.cli: tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1
   mir4.technology-acceptance.test: tests/technology/Test-MIR4TechnologyAcceptance.ps1
   mir4.technology-acceptance-migration.test: tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1
+  mir4.target-compiler-migration.authority: governance/repository/migrations/target-compiler-tooling-v1.json
+  mir4.target-compiler-migration.proof: assurance/repository/target-compiler-tooling-v1.json
+  mir4.target-compiler-migration.receipt: releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json
+  mir4.target-compiler-migration.authority-schema: contracts/repository/mir4-target-compiler-migration-authority-v1.schema.json
+  mir4.target-compiler-migration.proof-schema: contracts/repository/mir4-target-compiler-migration-proof-v1.schema.json
+  mir4.target-compiler-migration.receipt-schema: contracts/repository/mir4-target-compiler-migration-receipt-v1.schema.json
+  mir4.target-compiler.application: tools/mir/application/targets/TargetCompiler.ps1
+  mir4.target-compiler-migration.application: tools/mir/application/targets/TargetCompilerMigration.ps1
+  mir4.target-compiler-migration.cli: tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1
+  mir4.target-compiler.test: tests/targets/Test-MIR4TargetCompiler.ps1
+  mir4.target-compiler-migration.test: tests/targets/Test-MIR4TargetCompilerMigration.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json

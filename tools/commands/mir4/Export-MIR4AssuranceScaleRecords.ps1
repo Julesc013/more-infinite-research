@@ -42,7 +42,7 @@ $candidateProjectionDigest=Get-MIR4W08FileSha256 (Join-Path $repo '.mir/control-
 $identityInputs=[pscustomobject][ordered]@{
   capture=[pscustomobject][ordered]@{environment_signature=$targetRegistryDigest;candidate_sha256=$candidateProjectionDigest;target='f210';inputs=[ordered]@{target_registry_sha256=$targetRegistryDigest;settings_root_sha256=@($sliceSet.slices|Where-Object id -eq settings)[0].root_sha256;package_identity_root_sha256=@($sliceSet.slices|Where-Object id -eq package-identity)[0].root_sha256;scope='authority-projection-only'}}
   compilation=[pscustomobject][ordered]@{abi=1;target='f210';snapshot_refs=@($sliceSet.slices|Where-Object{$_.id-in@('recipe-facts','technology-graph','science-lab-graph','ownership')}|ForEach-Object{[string]$_.root_sha256});policy_ref='MIR4-Semantic-Compiler-ProgrammeV1'}
-  realization=[pscustomobject][ordered]@{abi=1;target='f210';accepted_plan_refs=@('MIR4-Target-Compiler-ProgrammeV1','MIR4-Semantic-Compiler-ProgrammeV1');candidate_sha256=$candidateProjectionDigest;executor_ref='tools/lib/mir4/TargetCompiler.ps1'}
+  realization=[pscustomobject][ordered]@{abi=1;target='f210';accepted_plan_refs=@('MIR4-Target-Compiler-ProgrammeV1','MIR4-Semantic-Compiler-ProgrammeV1');candidate_sha256=$candidateProjectionDigest;executor_ref='tools/mir/application/targets/TargetCompiler.ps1'}
   evaluation=[pscustomobject][ordered]@{abi=1;expected_status='captured'}
 }
 $proofFixture=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/mir4-assurance-scale-v1/proof-cover.json')|ConvertFrom-Json -Depth 50

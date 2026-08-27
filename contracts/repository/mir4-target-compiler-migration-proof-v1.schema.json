@@ -1,0 +1,12 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-target-compiler-migration-proof-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","test_id","required_checks","evidence_entrypoint","functional_evidence_entrypoint","package_source_sha256","unknown_policy","independent_human_acceptance_required","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4TargetCompilerMigrationProofPolicyV1"},"migration_id":{"const":"MIR4-TARGET-COMPILER-TOOLING-V1"},"test_id":{"const":"static.mir4-target-compiler-migration-v1"},
+    "required_checks":{"type":"array","minItems":20,"maxItems":20,"uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "evidence_entrypoint":{"const":"tests/targets/Test-MIR4TargetCompilerMigration.ps1"},"functional_evidence_entrypoint":{"const":"tests/targets/Test-MIR4TargetCompiler.ps1"},
+    "package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},"unknown_policy":{"const":"fail"},"independent_human_acceptance_required":{"const":false},"release_transition_authority":{"const":false}
+  }
+}

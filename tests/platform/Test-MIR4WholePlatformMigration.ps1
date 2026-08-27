@@ -87,8 +87,8 @@ foreach ($field in @('transition_gate','release_transition_authority')) {
 Assert-MIR4WholePlatformMigrationV1 ([string]$receipt.sunset.state -ceq 'deferred-compatibility-readers-retained') 'mir4-whole-platform-migration-sunset'
 
 Test-MIR4PreFreezeAuthorities -RepoRoot $repo | Out-Null
-$latest = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration
-Assert-MIR4WholePlatformMigrationV1 ([string]$latest.prior_receipt_path -ceq 'releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json') 'mir4-whole-platform-migration-prefreeze-chain'
+$latest = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration
+Assert-MIR4WholePlatformMigrationV1 ([string]$latest.prior_receipt_path -ceq 'releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json') 'mir4-whole-platform-migration-prefreeze-chain'
 
 function Invoke-MIR4WholePlatformMigrationCommandProbeV1 {
   param([Parameter(Mandatory)][ValidateSet('check','show')][string]$Command)

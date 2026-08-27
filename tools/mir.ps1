@@ -48,7 +48,8 @@ Usage:
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 whole-platform-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 technology-acceptance-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 technology-acceptance-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 target-compiler-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -682,13 +683,22 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1") @migrationArguments
       }
       "technology-acceptance-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 technology-acceptance-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 technology-acceptance-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 technology-acceptance-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 technology-acceptance-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1") @migrationArguments
+      }
+      "target-compiler-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 target-compiler-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 target-compiler-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1") @migrationArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }

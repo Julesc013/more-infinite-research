@@ -1,21 +1,23 @@
 param(
-  [ValidateSet('check','show')][string]$Command='check',
+  [ValidateSet('generate','check','show')][string]$Command='check',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$OutputPath=''
 )
 
 $ErrorActionPreference='Stop'
-. (Join-Path $PSScriptRoot '../application/technology/TechnologyAcceptanceMigration.ps1')
+. (Join-Path $PSScriptRoot '../application/targets/TargetCompilerMigration.ps1')
 
-$receipt=if($Command-eq'check'){
-  Invoke-MIR4TechnologyAcceptanceMigrationProjectionV1 -RepoRoot $RepoRoot -Check
+$receipt=if($Command-eq'generate'){
+  Invoke-MIR4TargetCompilerMigrationProjectionV1 -RepoRoot $RepoRoot
+}elseif($Command-eq'check'){
+  Invoke-MIR4TargetCompilerMigrationProjectionV1 -RepoRoot $RepoRoot -Check
 }else{
-  Get-MIR4RepositoryJsonV1 -RepoRoot $RepoRoot -Path $script:MIR4TechnologyAcceptanceMigrationReceiptPath
+  Get-MIR4RepositoryJsonV1 -RepoRoot $RepoRoot -Path $script:MIR4TargetCompilerMigrationReceiptPath
 }
 $result=[ordered]@{
-  schema=1;kind='MIR4TechnologyAcceptanceMigrationResultV1';migration_id=[string]$receipt.migration_id;state=[string]$receipt.state
+  schema=1;kind='MIR4TargetCompilerMigrationResultV1';migration_id=[string]$receipt.migration_id;state=[string]$receipt.state
   predecessor_receipt=[string]$receipt.predecessor_receipt.path;predecessor_sha256=[string]$receipt.predecessor_receipt.sha256
-  receipt=$script:MIR4TechnologyAcceptanceMigrationReceiptPath;digest=[string]$receipt.digest
+  receipt=$script:MIR4TargetCompilerMigrationReceiptPath;digest=[string]$receipt.digest
   package_source_sha256=[string]$receipt.package_source_sha256;package_visible_delta=@($receipt.package_visible_delta);release_transition_authority=$false
 }
 $json=($result|ConvertTo-Json -Depth 20)+[char]10

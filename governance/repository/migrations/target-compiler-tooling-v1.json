@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR4TargetCompilerMigrationAuthorityV1",
+  "migration_id": "MIR4-TARGET-COMPILER-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-TARGET-COMPILER-APPLICATION-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json",
+    "sha256": "011AC795CBB9FBC850E5821D367F1D57264DB79A16540694B4AD4771EB38E879"
+  },
+  "scope": "package-excluded target-compiler application, focused test, current consumers, contracts, assurance, and successor receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {"fact_family":"target-compiler-migration-receipt","path":"tools/mir/application/targets/TargetCompilerMigration.ps1","command":"tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1"}
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/target-compiler-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-target-compiler-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-target-compiler-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-target-compiler-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/target-compiler-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"target-compiler-application","current_path":"tools/lib/mir4/TargetCompiler.ps1","final_path":"tools/mir/application/targets/TargetCompiler.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"target-compiler-functional-test","current_path":null,"final_path":"tests/targets/Test-MIR4TargetCompiler.ps1","state":"authoritative","package_visible":false},
+    {"family":"target-compiler-w02-consumer","current_path":"validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1","final_path":"validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"target-compiler-platform-preview-consumer","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"target-compiler-assurance-scale-consumer","current_path":"tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1","final_path":"tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"target-compiler-migration-application","current_path":null,"final_path":"tools/mir/application/targets/TargetCompilerMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"target-compiler-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"target-compiler-migration-test","current_path":null,"final_path":"tests/targets/Test-MIR4TargetCompilerMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"technology-acceptance-historical-receipt-checker","current_path":"tools/mir/application/technology/TechnologyAcceptanceMigration.ps1","final_path":"tools/mir/application/technology/TechnologyAcceptanceMigration.ps1","state":"evolved-to-immutable-reader","package_visible":false},
+    {"family":"technology-acceptance-historical-receipt-cli","current_path":"tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1","state":"evolved-generate-disabled","package_visible":false},
+    {"family":"technology-acceptance-historical-receipt-test","current_path":"tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1","final_path":"tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1","state":"evolved-historical-verification","package_visible":false},
+    {"family":"published-snapshot-successor-verifier","current_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","final_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","state":"evolved-append-only-successor-verifier","package_visible":false},
+    {"family":"release-history-assurance-fingerprint","current_path":"tools/lib/assurance/Evidence.ps1","final_path":"tools/lib/assurance/Evidence.ps1","state":"evolved-authority-closure-fingerprint","package_visible":false},
+    {"family":"release-history-assurance-self-test","current_path":"validation/tests/tooling/Test-MIRAssurance.ps1","final_path":"validation/tests/tooling/Test-MIRAssurance.ps1","state":"evolved-regression-proof","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/TargetCompiler.ps1","role":"library-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-target-compiler-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {"source_freeze":false,"candidate_allocation":false,"production_signing":false,"seal":false,"promotion":false,"tagging":false,"publication":false}
+}
