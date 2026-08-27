@@ -7,6 +7,7 @@
   "current_authorities": [
     "assurance/repository/fixed-point-tooling-v1.json",
     "assurance/repository/canonicalization-tooling-v1.json",
+    "assurance/repository/diagnostics-tooling-v1.json",
     "tools/lib/assurance",
     "validation",
     ".mir/control-plane"

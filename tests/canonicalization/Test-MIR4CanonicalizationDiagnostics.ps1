@@ -2,7 +2,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1')
-. (Join-Path $repo 'tools/lib/mir4/DiagnosticsV1.ps1')
+. (Join-Path $repo 'tools/mir/domain/diagnostics/DiagnosticsV1.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ModuleEcosystem.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ExperimentalApiSdk.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')

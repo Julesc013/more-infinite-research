@@ -18,7 +18,7 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | Former slot | Platform area | 4.0 maturity | Completion | Blockers |
 | --- | --- | --- | --- | --- |
 | `4.0` | `release-identity-and-package-foundation` | stable | implemented-private | BLOCKED-HUMAN-SECRET-INPUT, MAINTAINER-MANUAL-PLAYTEST |
-| `4.1` | `repository-and-authority-fixed-point` | mixed | append-only-repository-and-canonicalization-tool-and-test-writer-cutovers-with-compatibility-readers | remaining-repository-authority-families, package-visible-source-cutover-parity-and-independent-acceptance |
+| `4.1` | `repository-and-authority-fixed-point` | mixed | append-only-repository-canonicalization-and-diagnostics-tool-and-test-writer-cutovers-with-compatibility-readers | remaining-repository-authority-families, package-visible-source-cutover-parity-and-independent-acceptance |
 | `4.2` | `generalized-target-compiler` | preview | implemented-private-provider-abi | BLOCKED-F018-EXACT-ENGINE, BLOCKED-MUSEUM-CUSTODY |
 | `4.3` | `semantic-contribution-compiler` | shadow | implemented-reference-aggregate | none |
 | `4.4` | `feature-manifest-and-setting-spec` | shadow | implemented-reference-aggregate | none |

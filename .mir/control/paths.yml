@@ -27,6 +27,18 @@ paths:
   mir4.canonicalization-migration.cli: tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1
   mir4.canonicalization.test: tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
   mir4.canonicalization-migration.test: tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1
+  mir4.authority-migration.engine: tools/mir/application/migration/AppendOnlyAuthorityMigration.ps1
+  mir4.diagnostics-migration.authority: governance/repository/migrations/diagnostics-tooling-v1.json
+  mir4.diagnostics-migration.proof: assurance/repository/diagnostics-tooling-v1.json
+  mir4.diagnostics-migration.receipt: releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json
+  mir4.diagnostics-migration.authority-schema: contracts/repository/mir4-diagnostics-migration-authority-v1.schema.json
+  mir4.diagnostics-migration.proof-schema: contracts/repository/mir4-diagnostics-migration-proof-v1.schema.json
+  mir4.diagnostics-migration.receipt-schema: contracts/repository/mir4-diagnostics-migration-receipt-v1.schema.json
+  mir4.diagnostics.domain: tools/mir/domain/diagnostics/DiagnosticsV1.ps1
+  mir4.diagnostics-migration.application: tools/mir/application/diagnostics/DiagnosticsMigration.ps1
+  mir4.diagnostics-migration.cli: tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1
+  mir4.diagnostics.test: tests/diagnostics/Test-MIR4DiagnosticsV1.ps1
+  mir4.diagnostics-migration.test: tests/diagnostics/Test-MIR4DiagnosticsMigration.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json

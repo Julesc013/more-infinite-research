@@ -7,6 +7,7 @@
   "current_authorities": [
     "governance/repository/migrations/fixed-point-tooling-v1.json",
     "governance/repository/migrations/canonicalization-tooling-v1.json",
+    "governance/repository/migrations/diagnostics-tooling-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"
