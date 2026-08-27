@@ -23,8 +23,8 @@
     "prototypes/mir/index/relationships.lua",
     "prototypes/mir/domain/effects/metadata.lua",
     "prototypes/mir/domain/effects/generated_target_contracts.lua",
-    "tools/lib/mir4/SafetyKernel.ps1",
-    "tools/lib/mir4/PolicyEngine.ps1",
+    "tools/mir/domain/safety/SafetyKernel.ps1",
+    "tools/mir/domain/policy/PolicyEngine.ps1",
     ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
     ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
     ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json"
@@ -178,7 +178,7 @@
       "migration": "preserve-owner-state",
       "presentation": "opaque-review-required",
       "proof": "owner-opaque-no-rewrite",
-      "owner_path": "tools/lib/mir4/SafetyKernel.ps1",
+      "owner_path": "tools/mir/domain/safety/SafetyKernel.ps1",
       "disposition": "Preserve"
     }
   ],

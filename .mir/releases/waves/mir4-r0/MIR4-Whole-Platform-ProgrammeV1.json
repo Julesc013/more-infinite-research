@@ -68,8 +68,8 @@
       "maturity": "shadow",
       "completion_state": "implemented-reference-aggregate",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json"],
-      "implementations": ["tools/lib/mir4/CompilationRun.ps1", "tools/lib/mir4/NormalizedCompiler.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
+      "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "tools/mir/application/compiler/NormalizedCompiler.ps1", "tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
+      "verification": ["tests/compiler/Test-MIR4SemanticCompiler.ps1", "tests/compiler/Test-MIR4SemanticCompilerMigration.ps1", "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
       "cutover": "bounded-family-after-old-new-target-migration-package-parity",
       "blockers": []
     },
@@ -80,7 +80,7 @@
       "maturity": "shadow",
       "completion_state": "implemented-reference-aggregate",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json", ".mir/streams.yml"],
-      "implementations": ["tools/lib/mir4/CompilationRun.ps1", "prototypes/mir/settings/registry.lua"],
+      "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "prototypes/mir/settings/registry.lua"],
       "verification": ["validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1", "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"],
       "cutover": "feature-and-setting-owner-by-owner-with-generated-parity",
       "blockers": []
@@ -92,7 +92,7 @@
       "maturity": "shadow",
       "completion_state": "implemented-non-authoritative",
       "authorities": ["spec/platform/mir4-preview-v0/platform.json", ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json"],
-      "implementations": ["tools/lib/mir4/SafetyKernel.ps1", "tools/lib/mir4/PolicyEngine.ps1"],
+      "implementations": ["tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
       "verification": ["validation/tests/mir4/Test-MIR4PlatformPreview.ps1", "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
       "cutover": "law-by-law-with-safety-monotonicity-and-differential-proof",
       "blockers": []
@@ -104,7 +104,7 @@
       "maturity": "mixed",
       "completion_state": "stable-terminal-authority-plus-shadow-aggregate",
       "authorities": [".mir/technology-lifecycle.json", ".mir/modules.yml"],
-      "implementations": ["prototypes/mir/planner/compiler.lua", "prototypes/mir/emit/technology_operation_executor.lua", "tools/lib/mir4/CompilationRun.ps1"],
+      "implementations": ["prototypes/mir/planner/compiler.lua", "prototypes/mir/emit/technology_operation_executor.lua", "tools/mir/application/compiler/CompilationRun.ps1"],
       "verification": ["validation/tests/compiler/Test-MIRCompiler.ps1", "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
       "cutover": "terminal-player-executors-remain-authoritative-until-bounded-parity",
       "blockers": []
@@ -176,7 +176,7 @@
       "maturity": "preview",
       "completion_state": "implemented-diagnose-conservative-experimental",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json"],
-      "implementations": ["tools/lib/mir4/ProcessIR.ps1", "tools/lib/mir4/SafetyKernel.ps1", "tools/lib/mir4/PolicyEngine.ps1"],
+      "implementations": ["tools/lib/mir4/ProcessIR.ps1", "tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
       "verification": ["validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1"],
       "cutover": "candidate-by-candidate-after-complete-certificate-and-technology-acceptance",
       "blockers": ["BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO", "MAINTAINER-TECHNOLOGY-ACCEPTANCE"]

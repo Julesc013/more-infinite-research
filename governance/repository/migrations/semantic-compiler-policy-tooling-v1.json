@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "MIR4SemanticCompilerPolicyMigrationAuthorityV1",
+  "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-SEMANTIC-COMPILER-POLICY-DOMAIN-APPLICATION-CLI-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json",
+    "sha256": "799232DAFAF72E3A3B4862DFE19667D39BEAE2FAE6118B4F2228EB98A7E41EBC"
+  },
+  "scope": "package-excluded semantic compiler, safety and policy domains, deterministic exporter, focused tests, contracts, assurance, and successor receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {"fact_family":"semantic-compiler-policy-migration-receipt","path":"tools/mir/application/compiler/SemanticCompilerPolicyMigration.ps1","command":"tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1"}
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/semantic-compiler-policy-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-semantic-compiler-policy-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-semantic-compiler-policy-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-semantic-compiler-policy-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/semantic-compiler-policy-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"safety-kernel-domain","current_path":"tools/lib/mir4/SafetyKernel.ps1","final_path":"tools/mir/domain/safety/SafetyKernel.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"policy-engine-domain","current_path":"tools/lib/mir4/PolicyEngine.ps1","final_path":"tools/mir/domain/policy/PolicyEngine.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"normalized-compiler-application","current_path":"tools/lib/mir4/NormalizedCompiler.ps1","final_path":"tools/mir/application/compiler/NormalizedCompiler.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"compilation-run-application","current_path":"tools/lib/mir4/CompilationRun.ps1","final_path":"tools/mir/application/compiler/CompilationRun.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"semantic-export-cli","current_path":"tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1","final_path":"tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"semantic-functional-test","current_path":null,"final_path":"tests/compiler/Test-MIR4SemanticCompiler.ps1","state":"authoritative","package_visible":false},
+    {"family":"semantic-migration-application","current_path":null,"final_path":"tools/mir/application/compiler/SemanticCompilerPolicyMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"semantic-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"semantic-migration-test","current_path":null,"final_path":"tests/compiler/Test-MIR4SemanticCompilerMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"target-compiler-historical-receipt-checker","current_path":"tools/mir/application/targets/TargetCompilerMigration.ps1","final_path":"tools/mir/application/targets/TargetCompilerMigration.ps1","state":"evolved-to-immutable-reader","package_visible":false},
+    {"family":"target-compiler-historical-receipt-cli","current_path":"tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1","state":"evolved-generate-disabled","package_visible":false},
+    {"family":"target-compiler-historical-receipt-test","current_path":"tests/targets/Test-MIR4TargetCompilerMigration.ps1","final_path":"tests/targets/Test-MIR4TargetCompilerMigration.ps1","state":"evolved-historical-verification","package_visible":false},
+    {"family":"platform-preview-consumer","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"processir-consumer","current_path":"tools/lib/mir4/ExactProcessIR.ps1","final_path":"tools/lib/mir4/ExactProcessIR.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"processir-export-consumer","current_path":"tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1","final_path":"tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"semantic-w03-consumer","current_path":"validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1","final_path":"validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"published-snapshot-successor-verifier","current_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","final_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","state":"evolved-append-only-successor-verifier","package_visible":false},
+    {"family":"release-history-assurance-fingerprint","current_path":"tools/lib/assurance/Evidence.ps1","final_path":"tools/lib/assurance/Evidence.ps1","state":"evolved-authority-closure-fingerprint","package_visible":false},
+    {"family":"release-history-assurance-self-test","current_path":"validation/tests/tooling/Test-MIRAssurance.ps1","final_path":"validation/tests/tooling/Test-MIRAssurance.ps1","state":"evolved-regression-proof","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/SafetyKernel.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/PolicyEngine.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/NormalizedCompiler.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/CompilationRun.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1","role":"command-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-semantic-compiler-policy-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {"source_freeze":false,"candidate_allocation":false,"production_signing":false,"seal":false,"promotion":false,"tagging":false,"publication":false}
+}

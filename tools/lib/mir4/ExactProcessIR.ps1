@@ -1,5 +1,5 @@
 if (-not (Get-Command New-MIR4ProcessIRV1 -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot 'SafetyKernel.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/domain/safety/SafetyKernel.ps1')
   . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 }
 if (-not (Get-Command New-MIR4EnvironmentLockV1 -ErrorAction SilentlyContinue)) {

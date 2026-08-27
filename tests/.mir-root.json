@@ -11,6 +11,7 @@
     "tests/targets",
     "tests/platform",
     "tests/technology",
+    "tests/compiler",
     "validation/tests",
     "validation/tests.yml"
   ],

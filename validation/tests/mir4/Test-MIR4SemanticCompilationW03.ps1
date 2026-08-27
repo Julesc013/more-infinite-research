@@ -19,8 +19,8 @@ if(@($cutover.targets).Count-ne 17-or@($cutover.targets|Where-Object{-not$_.feat
 if(-not$laws.implemented_passed-or@($laws.laws|Where-Object{$_.passed}).Count-ne 12-or@($laws.deferred_owners).Count-ne 0-or-not$laws.complete){throw '[mir4-w03-merge-laws]'}
 if(@($authority.terminal_player_authority|Where-Object{-not(Test-Path -LiteralPath (Join-Path $RepoRoot ([string]$_)) -PathType Leaf)}).Count-ne 0){throw '[mir4-w03-terminal-authority]'}
 $output='build/mir4/test-w03-semantic-compiler'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output|Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -Check|Out-Null
 $head=(& git -C $RepoRoot rev-parse HEAD).Trim();$tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
 foreach($name in @('MIR4_COMPILATION_RUN_CONTRACT.json','MIR4_FEATURE_SETTING_CUTOVER_MATRIX.json','MIR4_PROVIDER_MICRO_PROTOCOL_MATRIX.json','MIR4_MERGE_LAW_CATALOGUE.json')){$record=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$output/$name")|ConvertFrom-Json;if([string]$record.source_identity.commit-cne$head-or[string]$record.source_identity.tree-cne$tree-or$record.package_visible-or$record.public_release_proof){throw "[mir4-w03-export-identity] $name"}}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore){throw '[mir4-w03-package-mutation]'}
