@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C10"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-27
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -18,7 +18,7 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | Former slot | Platform area | 4.0 maturity | Completion | Blockers |
 | --- | --- | --- | --- | --- |
 | `4.0` | `release-identity-and-package-foundation` | stable | implemented-private | BLOCKED-HUMAN-SECRET-INPUT, MAINTAINER-MANUAL-PLAYTEST |
-| `4.1` | `repository-and-authority-fixed-point` | shadow | implemented-shadow-fixed-point | none |
+| `4.1` | `repository-and-authority-fixed-point` | mixed | package-excluded-tool-and-test-writer-cutover-with-compatibility-readers | remaining-repository-authority-families, package-visible-source-cutover-parity-and-independent-acceptance |
 | `4.2` | `generalized-target-compiler` | preview | implemented-private-provider-abi | BLOCKED-F018-EXACT-ENGINE, BLOCKED-MUSEUM-CUSTODY |
 | `4.3` | `semantic-contribution-compiler` | shadow | implemented-reference-aggregate | none |
 | `4.4` | `feature-manifest-and-setting-spec` | shadow | implemented-reference-aggregate | none |

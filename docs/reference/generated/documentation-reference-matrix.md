@@ -305,7 +305,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-v0-v1-compatibility-policy | [MIR Canonical JSON V1](../../reference/mir4-canonical-json-v1.md) | current |
 | mir4-v1-preview-asset-portability | [MIR 4 SDK V1 Developer Preview Quickstart](../../reference/mir4-sdk-v1-quickstart.md) | current |
 | mir4-version-authority | [ADR 0001: MIR 4 Version Authority](../../architecture/decisions/0001-mir4-version-authority.md) | current |
-| mir4-visible-root-shadow-layout | [MIR 4 Repository Fixed Point](../../architecture/mir4-repository-fixed-point.md) | current |
+| mir4-visible-root-authority-migration | [MIR 4 Repository Fixed Point](../../architecture/mir4-repository-fixed-point.md) | current |
 | mir4-w09-historical-museum-matrix | [MIR 4 Historical, Museum, and Successor-Host Closure](../../architecture/mir4-historical-succession.md) | current |
 | mir4-w09-manual-playtest-checklist | [MIR 4 W09 Manual Playtest Handoff](../../maintainer/mir4-w09-manual-playtest.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |

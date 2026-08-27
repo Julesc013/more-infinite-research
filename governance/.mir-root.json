@@ -1,15 +1,17 @@
 {
-  "schema": 1,
-  "kind": "MIR4VisibleRootProjectionV1",
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
   "id": "governance",
   "path": "governance",
-  "mode": "shadow-reader",
+  "mode": "active-migration-authority",
   "current_authorities": [
+    "governance/repository/migrations/fixed-point-tooling-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"
   ],
   "writable_authority": false,
+  "marker_is_writable_authority": false,
   "package_visible": false,
   "source": ".mir/control/repository-fixed-point.json"
 }

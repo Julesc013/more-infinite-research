@@ -1,6 +1,7 @@
 . (Join-Path $PSScriptRoot 'CanonicalJsonV1.ps1')
 
 $script:MIR4PlatformInputPaths = @(
+  '.gitattributes',
   'mir.toml',
   'spec/platform/mir4-preview-v0/platform.json',
   'spec/platform/mir4-preview-v0/release-dag.json',
@@ -49,6 +50,11 @@ $script:MIR4PlatformInputPaths = @(
   '.mir/technology-lifecycle.json',
   '.mir/technology-governance.json',
   '.mir/control/repository-fixed-point.json',
+  'governance/repository/migrations/fixed-point-tooling-v1.json',
+  'contracts/repository/mir4-repository-migration-authority-v1.schema.json',
+  'contracts/repository/mir4-repository-migration-proof-v1.schema.json',
+  'contracts/repository/mir4-repository-migration-receipt-v1.schema.json',
+  'assurance/repository/fixed-point-tooling-v1.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
   'tools/lib/mir4/MepDiscovery.ps1',
@@ -94,6 +100,12 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/SuccessorHost.ps1',
   'tools/lib/mir4/ReleaseDag.ps1',
   'tools/lib/mir4/RepositoryFixedPoint.ps1',
+  'tools/mir/domain/repository/RepositoryFixedPoint.ps1',
+  'tools/mir/ports/repository/RepositoryInventory.ps1',
+  'tools/mir/adapters/repository/GitRepositoryInventory.ps1',
+  'tools/mir/application/repository/RepositoryFixedPoint.ps1',
+  'tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1',
+  'tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
   'tools/lib/mir4/TargetKey.ps1',
   'tools/lib/mir4/WholePlatform.ps1',
   'tools/lib/mir4/TechnologyAcceptance.ps1'

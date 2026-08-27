@@ -71,7 +71,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-24 |
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
-| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-23 |
+| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-27 |
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-23 |
@@ -216,7 +216,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/generated/mir4-api-sdk-v1.md | MIR 4 API and SDK V1 Preview | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/reference/generated/mir4-experimental-api-v0.md | MIR 4 API/SDK V0 Preview | deprecated | developer | reference | mir-maintainers | 2026-08-24 |
 | docs/reference/generated/mir4-platform-component-matrix.md | MIR 4 Platform Component Matrix | current | developer | reference | mir-maintainers | 2026-08-24 |
-| docs/reference/generated/mir4-whole-platform-matrix.md | MIR 4 Whole Platform Matrix | current | developer | reference | mir-maintainers | 2026-08-26 |
+| docs/reference/generated/mir4-whole-platform-matrix.md | MIR 4 Whole Platform Matrix | current | developer | reference | mir-maintainers | 2026-08-27 |
 | docs/reference/generated/README.md | Generated Reference Views | current | maintainer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/generated/technology-quality-and-promotion.md | Technology Quality And Promotion Inventory | current | maintainer | reference | mir-maintainers | 2026-08-18 |
 | docs/reference/glossary.md | Glossary | draft | developer | reference | mir-maintainers | 2026-07-07 |

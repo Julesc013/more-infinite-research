@@ -739,6 +739,33 @@
       ]
     },
     {
+      "id": "static.mir4-repository-fixed-point-v2",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/repository-fixed-point.json",
+        ".mir/control/paths.yml",
+        ".mir/control-plane/ownership.json",
+        ".mir/modules.yml",
+        "governance/repository/**",
+        "contracts/repository/**",
+        "assurance/repository/**",
+        "releases/migrations/**",
+        "tools/mir/domain/repository/**",
+        "tools/mir/ports/repository/**",
+        "tools/mir/adapters/repository/**",
+        "tools/mir/application/repository/**",
+        "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1",
+        "tools/lib/mir4/RepositoryFixedPoint.ps1",
+        "tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-platform-preview",
       "kind": "static",
       "layer": "F0",

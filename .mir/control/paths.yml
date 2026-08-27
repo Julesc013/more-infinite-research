@@ -4,6 +4,18 @@ authority: mir-repository-paths-v1
 paths:
   package.root: .
   mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
+  mir4.repository-migration.authority: governance/repository/migrations/fixed-point-tooling-v1.json
+  mir4.repository-migration.proof: assurance/repository/fixed-point-tooling-v1.json
+  mir4.repository-migration.receipt: releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json
+  mir4.repository-migration.authority-schema: contracts/repository/mir4-repository-migration-authority-v1.schema.json
+  mir4.repository-migration.proof-schema: contracts/repository/mir4-repository-migration-proof-v1.schema.json
+  mir4.repository-migration.receipt-schema: contracts/repository/mir4-repository-migration-receipt-v1.schema.json
+  mir4.repository-migration.domain: tools/mir/domain/repository/RepositoryFixedPoint.ps1
+  mir4.repository-migration.port: tools/mir/ports/repository/RepositoryInventory.ps1
+  mir4.repository-migration.adapter: tools/mir/adapters/repository/GitRepositoryInventory.ps1
+  mir4.repository-migration.application: tools/mir/application/repository/RepositoryFixedPoint.ps1
+  mir4.repository-migration.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+  mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
