@@ -144,4 +144,5 @@ governance/repository/** text eol=lf
 releases/migrations/** text eol=lf
 tests/repository/** text eol=lf
 tests/canonicalization/** text eol=lf
+tests/diagnostics/** text eol=lf
 tools/mir/** text eol=lf

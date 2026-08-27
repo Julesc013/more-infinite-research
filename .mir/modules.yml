@@ -168,7 +168,6 @@ package_excluded_modules:
     compatibility_policy: spec/api/mir4-v1/compatibility.json
     implementations:
       - tools/mir/domain/canonicalization/CanonicalJsonV1.ps1
-      - tools/lib/mir4/DiagnosticsV1.ps1
       - spec/canonicalization/reference/mir4_canonical_json_v1.py
     compatibility_implementations:
       - tools/lib/mir4/CanonicalJsonV1.ps1
@@ -185,8 +184,22 @@ package_excluded_modules:
       - spec/schemas/preview/mir4-preview-compatibility-policy-v1.schema.json
     fixtures: fixtures/mir4-canonical-json-v1
     documentation: docs/reference/mir4-canonical-json-v1.md
-    boundary: package-excluded deterministic data representation, permanent schema identity, stable diagnostic lookup, and explicit preview migration only; no player-package mutation, compiler or emitter authority, release transition, signing, publication, or public support claim
-    stability: stable-v1-canonicalization-and-diagnostic-authority-with-preview-consumer-contracts
+    boundary: package-excluded deterministic data representation, permanent schema identity, and explicit preview migration only; no player-package mutation, compiler or emitter authority, release transition, signing, publication, or public support claim
+    stability: stable-v1-canonicalization-authority-with-preview-consumer-contracts
+  mir4_diagnostics_v1:
+    authority: spec/api/mir4-v1/diagnostics.json
+    implementation: tools/mir/domain/diagnostics/DiagnosticsV1.ps1
+    migration_authority: governance/repository/migrations/diagnostics-tooling-v1.json
+    migration_proof: assurance/repository/diagnostics-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/DiagnosticsV1.ps1
+    verification:
+      - tests/diagnostics/Test-MIR4DiagnosticsV1.ps1
+      - tests/diagnostics/Test-MIR4DiagnosticsMigration.ps1
+      - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+    boundary: stable package-excluded diagnostic registry access, construction, ordering, and rendering only; no player mutation or release transition authority
+    stability: stable-v1-domain-authority-migrated-compatibility-reader-retained
   mir4_module_ecosystem_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
     discovery_contract: .mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json
