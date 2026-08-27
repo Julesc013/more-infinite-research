@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('check', 'matrix', 'target-key')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('generate', 'check', 'matrix', 'target-key')][string]$Command,
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')),
   [string]$Target
 )
@@ -8,6 +8,10 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/WholePlatform.ps1')
 
 switch ($Command) {
+  'generate' {
+    $path = Invoke-MIR4WholePlatformProjection -RepoRoot $RepoRoot
+    Write-Host "[ok] MIR 4 whole-platform matrix generated: $path"
+  }
   'check' {
     $matrix = Test-MIR4WholePlatformProgramme -RepoRoot $RepoRoot
     Write-Host "[ok] MIR 4 whole-platform consolidation passed: areas=$($matrix.area_count) destination=4.0.0"

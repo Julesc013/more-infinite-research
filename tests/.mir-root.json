@@ -6,6 +6,7 @@
   "mode": "active-test-root",
   "current_authorities": [
     "tests/repository",
+    "tests/canonicalization",
     "validation/tests",
     "validation/tests.yml"
   ],

@@ -1,4 +1,4 @@
-. (Join-Path $PSScriptRoot 'CanonicalJsonV1.ps1')
+. (Join-Path $PSScriptRoot '../../mir/domain/canonicalization/CanonicalJsonV1.ps1')
 
 $script:MIR4PlatformInputPaths = @(
   '.gitattributes',
@@ -55,6 +55,11 @@ $script:MIR4PlatformInputPaths = @(
   'contracts/repository/mir4-repository-migration-proof-v1.schema.json',
   'contracts/repository/mir4-repository-migration-receipt-v1.schema.json',
   'assurance/repository/fixed-point-tooling-v1.json',
+  'governance/repository/migrations/canonicalization-tooling-v1.json',
+  'contracts/repository/mir4-canonicalization-migration-authority-v1.schema.json',
+  'contracts/repository/mir4-canonicalization-migration-proof-v1.schema.json',
+  'contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json',
+  'assurance/repository/canonicalization-tooling-v1.json',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
   'tools/lib/mir4/MepDiscovery.ps1',
@@ -70,6 +75,7 @@ $script:MIR4PlatformInputPaths = @(
   'tools/templates/mir4/sdk-v1/conformance/Invoke-MIR4SdkV1Conformance.ps1',
   'spec/schemas/preview/mir4-sdk-v1-conformance-corpus.schema.json',
   'tools/lib/mir4/CanonicalJsonV1.ps1',
+  'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1',
   'tools/lib/mir4/DiagnosticsV1.ps1',
   'tools/lib/mir4/PlatformPreview.ps1',
   'spec/schemas/preview/mir4-extension-lock-v1.schema.json',
@@ -106,8 +112,13 @@ $script:MIR4PlatformInputPaths = @(
   'tools/mir/application/repository/RepositoryFixedPoint.ps1',
   'tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1',
   'tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
+  'tools/mir/application/canonicalization/CanonicalizationMigration.ps1',
+  'tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1',
+  'tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1',
+  'tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1',
   'tools/lib/mir4/TargetKey.ps1',
   'tools/lib/mir4/WholePlatform.ps1',
+  'tools/commands/mir4/Invoke-MIR4WholePlatform.ps1',
   'tools/lib/mir4/TechnologyAcceptance.ps1'
 )
 
@@ -799,7 +810,7 @@ function New-MIR4PlatformPreviewPackages {
     'spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json','spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json',
     'spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json','docs/architecture/mir4-module-ecosystem.md',
     'docs/reference/mir4-canonical-json-v1.md','docs/reference/mir4-first-extension.md','docs/reference/mir4-f210-mep-discovery.md',
-    'tools/lib/mir4/CanonicalJsonV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
+    'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1','tools/lib/mir4/CanonicalJsonV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
     'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1','tools/lib/mir4/MepDiscovery.ps1',
     'tools/commands/mir4/Invoke-MIR4Extension.ps1',
     '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',

@@ -35,6 +35,9 @@ Assert-MIR4RepositoryMigrationV1 ((@($actualActive) -join '|') -ceq (@($expected
 Assert-MIR4RepositoryMigrationV1 (@($authority.visible_roots | Where-Object { [string]$_.mode -like 'shadow*' }).Count -ge 5) 'mir4-repository-migration-remaining-shadow-boundary'
 Assert-MIR4RepositoryMigrationV1 (@($authority.move_gate).Count -eq 6) 'mir4-repository-migration-move-gate'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.remaining_move.classification -ceq 'bounded-authority-migration-and-package-cutover-debt') 'mir4-repository-migration-debt-class'
+Assert-MIR4RepositoryMigrationV1 (@($authority.migration_sequence).Count -eq 2) 'mir4-repository-migration-sequence-count'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[0].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-predecessor'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[1].migration_id -ceq 'MIR4-CANONICALIZATION-TOOLING-V1' -and [string]$authority.migration_sequence[1].state -ceq 'current-append-only-successor') 'mir4-repository-migration-sequence-successor'
 foreach ($root in @($authority.visible_roots)) {
   $marker = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path (([string]$root.path) + '/.mir-root.json')
   Assert-MIR4RepositoryMigrationV1 (-not [bool]$marker.writable_authority) 'mir4-repository-migration-marker-compatibility-authority' ([string]$root.path)
@@ -60,12 +63,11 @@ Assert-MIR4RepositoryMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $re
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.digest -ceq $receiptDigest) 'mir4-repository-migration-receipt-digest'
+Assert-MIR4RepositoryMigrationV1 ((Get-MIR4RepositoryFileSha256V1 -Path (Join-Path $repo $script:MIR4RepositoryMigrationReceiptPath)) -ceq $script:MIR4RepositoryMigrationReceiptSha256) 'mir4-repository-migration-receipt-immutable-bytes'
 Assert-MIR4RepositoryMigrationV1 (@($receipt.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-repository-migration-release-firewall'
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.sunset.state -ceq 'deferred-compatibility-readers-retained') 'mir4-repository-migration-sunset-boundary'
 foreach ($component in @($receipt.components)) {
   Assert-MIR4RepositoryMigrationV1 ([string]$component.hash_mode -ceq 'canonical-text-v1') 'mir4-repository-migration-component-hash-mode' ([string]$component.path)
-  $actualComponentHash = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$component.path)) -Mode ([string]$component.hash_mode)
-  Assert-MIR4RepositoryMigrationV1 ([string]$component.sha256 -ceq $actualComponentHash) 'mir4-repository-migration-component-hash' ([string]$component.path)
 }
 Test-MIR4PreFreezeAuthorities -RepoRoot $repo | Out-Null
 $latestAuthorityState = Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration

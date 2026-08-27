@@ -107,6 +107,25 @@ function ConvertTo-MIR4WholePlatformMarkdown {
   return ($lines -join "`n") + "`n"
 }
 
+function Invoke-MIR4WholePlatformProjection {
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
+
+  $repo = Get-MIR4WholePlatformRepoRoot -RepoRoot $RepoRoot
+  $generated = ConvertTo-MIR4WholePlatformMarkdown -Matrix (Get-MIR4WholePlatformMatrix -RepoRoot $repo)
+  $generatedPath = Join-Path $repo 'docs/reference/generated/mir4-whole-platform-matrix.md'
+  $crlf = ([string][char]13) + ([string][char]10)
+  $lf = [string][char]10
+  if ($Check) {
+    if (-not (Test-Path -LiteralPath $generatedPath -PathType Leaf) -or
+        [IO.File]::ReadAllText($generatedPath).Replace($crlf,$lf) -cne $generated.Replace($crlf,$lf)) {
+      throw '[mir4-whole-platform-generated-doc] Generated whole-platform matrix is stale.'
+    }
+  } else {
+    [IO.File]::WriteAllText($generatedPath,$generated,[Text.UTF8Encoding]::new($false))
+  }
+  return $generatedPath
+}
+
 function Test-MIR4WholePlatformProgramme {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
@@ -122,11 +141,6 @@ function Test-MIR4WholePlatformProgramme {
       throw "[mir4-target-key-round-trip] $example"
     }
   }
-  $generated = ConvertTo-MIR4WholePlatformMarkdown -Matrix $matrix
-  $generatedPath = Join-Path $repo 'docs/reference/generated/mir4-whole-platform-matrix.md'
-  if (-not (Test-Path -LiteralPath $generatedPath -PathType Leaf) -or
-      (Get-Content -Raw -LiteralPath $generatedPath).Replace("`r`n", "`n") -cne $generated.Replace("`r`n", "`n")) {
-    throw '[mir4-whole-platform-generated-doc] Generated whole-platform matrix is stale.'
-  }
+  Invoke-MIR4WholePlatformProjection -RepoRoot $repo -Check | Out-Null
   return $matrix
 }

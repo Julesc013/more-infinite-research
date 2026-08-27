@@ -227,7 +227,7 @@ function Get-MIR4ModuleEcosystemSdkFiles {
   $migrationV0 = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/reference-extension/extension.json')|ConvertFrom-Json -Depth 100
   $migrationV1 = ConvertFrom-MIR4MepV0ToV1 -Envelope $migrationV0
   $files = [ordered]@{}
-  $files['sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/mir4/CanonicalJsonV1.ps1')
+  $files['sdk/preview/mir4/canonical-json-v1/powershell/MIR4.CanonicalJson.V1.psm1'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1')
   $files['sdk/preview/mir4/canonical-json-v1/python/mir4_canonical_json_v1.py'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/canonicalization/reference/mir4_canonical_json_v1.py')
   $files['sdk/preview/mir4/api-v1/diagnostics.json'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/api/mir4-v1/diagnostics.json')
   $files['sdk/preview/mir4/api-v1/compatibility.json'] = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/api/mir4-v1/compatibility.json')

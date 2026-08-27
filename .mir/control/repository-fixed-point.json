@@ -7,6 +7,10 @@
   "physical_cutover": false,
   "current_package_source_remains_authoritative": true,
   "migration_authority": "governance/repository/migrations/fixed-point-tooling-v1.json",
+  "migration_sequence": [
+    {"migration_id":"MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1","authority":"governance/repository/migrations/fixed-point-tooling-v1.json","receipt":"releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json","state":"accepted-immutable-predecessor"},
+    {"migration_id":"MIR4-CANONICALIZATION-TOOLING-V1","authority":"governance/repository/migrations/canonicalization-tooling-v1.json","receipt":"releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json","state":"current-append-only-successor"}
+  ],
   "root_markers": ".mir-root.json",
   "classification_order": [
     "normative-authority",
@@ -21,7 +25,7 @@
     "unknown"
   ],
   "visible_roots": [
-    {"id":"governance","path":"governance","mode":"active-migration-authority","current_authorities":["governance/repository/migrations/fixed-point-tooling-v1.json",".mir/control",".mir/control-plane",".mir/*.yml"]},
+    {"id":"governance","path":"governance","mode":"active-migration-authority","current_authorities":["governance/repository/migrations/fixed-point-tooling-v1.json","governance/repository/migrations/canonicalization-tooling-v1.json",".mir/control",".mir/control-plane",".mir/*.yml"]},
     {"id":"contracts","path":"contracts","mode":"active-contract-root","current_authorities":["contracts/repository","spec/api","spec/schemas"]},
     {"id":"spec","path":"spec","mode":"canonical","current_authorities":["spec"]},
     {"id":"src","path":"src","mode":"shadow-reader","current_authorities":["prototypes","data.lua","data-updates.lua","data-final-fixes.lua","control.lua","settings.lua","migrations"]},
@@ -29,8 +33,8 @@
     {"id":"modules","path":"modules","mode":"shadow-reader","current_authorities":[".mir/modules.yml","prototypes/mir/capabilities","prototypes/mir/domain"]},
     {"id":"sdk","path":"sdk","mode":"canonical-package-excluded","current_authorities":["sdk"]},
     {"id":"tools-mir","path":"tools/mir","mode":"active-layered-tooling","current_authorities":["tools/mir/domain","tools/mir/application","tools/mir/ports","tools/mir/adapters","tools/mir/cli","tools/mir.ps1","tools/commands","tools/lib"]},
-    {"id":"tests","path":"tests","mode":"active-test-root","current_authorities":["tests/repository","validation/tests","validation/tests.yml"]},
-    {"id":"assurance","path":"assurance","mode":"active-proof-policy-root","current_authorities":["assurance/repository/fixed-point-tooling-v1.json","tools/lib/assurance","validation",".mir/control-plane"]},
+    {"id":"tests","path":"tests","mode":"active-test-root","current_authorities":["tests/repository","tests/canonicalization","validation/tests","validation/tests.yml"]},
+    {"id":"assurance","path":"assurance","mode":"active-proof-policy-root","current_authorities":["assurance/repository/fixed-point-tooling-v1.json","assurance/repository/canonicalization-tooling-v1.json","tools/lib/assurance","validation",".mir/control-plane"]},
     {"id":"changes","path":"changes","mode":"shadow-reader","current_authorities":[".mir/lifecycle/changes",".mir/lifecycle/incidents",".mir/lifecycle/tasks"]},
     {"id":"releases","path":"releases","mode":"active-migration-receipt-root","current_authorities":["releases/migrations",".mir/releases",".mir/releases.json",".mir/distributions.json"]},
     {"id":"docs","path":"docs","mode":"canonical","current_authorities":["docs",".mir/docs.yml"]},
@@ -54,7 +58,7 @@
   ],
   "remaining_move": {
     "classification": "bounded-authority-migration-and-package-cutover-debt",
-    "reason": "Repository tooling and tests are migrating one authority family at a time; package-visible source remains deferred until exact F210/F200 parity, rollback, and independent acceptance exist.",
+    "reason": "Repository tooling, tests, and package-excluded domain implementations are migrating one authority family at a time through append-only receipts; package-visible source remains deferred until exact F210/F200 parity, rollback, and independent acceptance exist.",
     "rollback": "Revert the exact merged migration work package; retain the current package writer and all compatibility entrypoints until a governed sunset receipt is accepted."
   }
 }

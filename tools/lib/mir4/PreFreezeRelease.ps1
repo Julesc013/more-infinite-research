@@ -220,7 +220,8 @@ function Get-MIR4PreFreezeAuthorityState {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [switch]$IncludeT17MachinePreparation,
-    [switch]$IncludeRepositoryMigration
+    [switch]$IncludeRepositoryMigration,
+    [switch]$IncludeCanonicalizationMigration
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -254,6 +255,10 @@ function Get-MIR4PreFreezeAuthorityState {
   if ($IncludeRepositoryMigration) {
     if (-not $IncludeT17MachinePreparation) { throw '[mir4-prefreeze-repository-migration-requires-t17]' }
     $links += @{path='releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json';kind='MIR4RepositoryMigrationReceiptV1'}
+  }
+  if ($IncludeCanonicalizationMigration) {
+    if (-not $IncludeRepositoryMigration) { throw '[mir4-prefreeze-canonicalization-migration-requires-repository-migration]' }
+    $links += @{path='releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json';kind='MIR4CanonicalizationMigrationReceiptV1'}
   }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
@@ -324,6 +329,7 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
+    'releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json' = 'contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -355,6 +361,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json';kind='MIR4T15AuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json';kind='MIR4T17MachinePreparationAuthorityEvolutionReceiptV1'}
     @{path='releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json';kind='MIR4RepositoryMigrationReceiptV1'}
+    @{path='releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json';kind='MIR4CanonicalizationMigrationReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
