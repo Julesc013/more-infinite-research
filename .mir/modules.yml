@@ -44,7 +44,12 @@ stage_entrypoints:
 package_excluded_modules:
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
-    implementation: tools/lib/mir4/WholePlatform.ps1
+    implementation: tools/mir/application/platform/WholePlatform.ps1
+    migration_authority: governance/repository/migrations/whole-platform-tooling-v1.json
+    migration_proof: assurance/repository/whole-platform-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/WholePlatform.ps1
     target_key_contract: tools/mir/domain/targets/TargetKey.ps1
     target_key_compatibility_contract: tools/lib/mir4/TargetKey.ps1
     technology_acceptance: tools/lib/mir4/TechnologyAcceptance.ps1
@@ -54,10 +59,14 @@ package_excluded_modules:
     schemas:
       - spec/schemas/mir4-whole-platform-programme-v1.schema.json
       - spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
+    verification:
+      - tests/platform/Test-MIR4WholePlatform.ps1
+      - tests/platform/Test-MIR4WholePlatformMigration.ps1
+      - validation/tests/mir4/Test-MIR4WholePlatform.ps1
     documentation: docs/releases/mir4-4.0-whole-platform-programme.md
     generated_reference: docs/reference/generated/mir4-whole-platform-matrix.md
-    boundary: executable inventory and per-technology review queue only; no prototype or runtime mutation, automatic acceptance, compatibility-claim transfer, source freeze, signing, sealing, promotion, tag, publication, main mutation, or legacy mutation
-    stability: stable-private-programme-with-preview-acceptance-workflow
+    boundary: package-excluded executable inventory, generated reference, and per-technology review queue only; no prototype or runtime mutation, automatic acceptance, compatibility-claim transfer, source freeze, signing, sealing, promotion, tag, publication, main mutation, or legacy mutation
+    stability: stable-application-authority-migrated-compatibility-readers-retained
   mir4_repository_fixed_point_v2:
     authority: .mir/control/repository-fixed-point.json
     migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
@@ -74,6 +83,13 @@ package_excluded_modules:
       - contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json
     successor_assurance_policy: assurance/repository/canonicalization-tooling-v1.json
     successor_migration_receipt: releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json
+    current_successor_migration_authority: governance/repository/migrations/whole-platform-tooling-v1.json
+    current_successor_migration_contracts:
+      - contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json
+      - contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json
+      - contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json
+    current_successor_assurance_policy: assurance/repository/whole-platform-tooling-v1.json
+    current_successor_migration_receipt: releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json
     path_authority: .mir/control/paths.yml
     ownership_authority: .mir/control-plane/ownership.json
     domain: tools/mir/domain/repository/RepositoryFixedPoint.ps1
@@ -92,7 +108,7 @@ package_excluded_modules:
       - tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
       - validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
     documentation: docs/architecture/mir4-repository-fixed-point.md
-    boundary: package-excluded root activation plus append-only repository, canonicalization, diagnostics, and target-key tooling/test writer cutovers with compatibility forwarders; no player-source move, package mutation, deletion, source freeze, signing, promotion, or publication authority
+    boundary: package-excluded root activation plus append-only repository, canonicalization, diagnostics, target-key, and whole-platform application/test writer cutovers with compatibility forwarders; no player-source move, package mutation, deletion, source freeze, signing, promotion, or publication authority
     stability: stable-package-excluded-append-only-migration-sequence-with-compatibility-readers
   mir4_release_governance_v1:
     authority: .mir/releases/governance/mir4/release-governance.json
@@ -211,13 +227,13 @@ package_excluded_modules:
       - tools/lib/mir4/TargetKey.ps1
     consumers:
       - tools/mir.ps1
-      - tools/lib/mir4/WholePlatform.ps1
+      - tools/mir/application/platform/WholePlatform.ps1
       - tools/lib/mir4/TechnologyAcceptance.ps1
       - tools/lib/mir4/PlatformPreview.ps1
     verification:
       - tests/targets/Test-MIR4TargetKey.ps1
       - tests/targets/Test-MIR4TargetKeyMigration.ps1
-      - validation/tests/mir4/Test-MIR4WholePlatform.ps1
+      - tests/platform/Test-MIR4WholePlatform.ps1
     boundary: stable package-excluded uppercase FNNN target identity and lowercase compatibility projection only; no target admission, player mutation, compatibility claim, or release transition authority
     stability: stable-v1-domain-authority-migrated-compatibility-reader-retained
   mir4_module_ecosystem_v1:

@@ -50,6 +50,17 @@ paths:
   mir4.target-key-migration.cli: tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1
   mir4.target-key.test: tests/targets/Test-MIR4TargetKey.ps1
   mir4.target-key-migration.test: tests/targets/Test-MIR4TargetKeyMigration.ps1
+  mir4.whole-platform-migration.authority: governance/repository/migrations/whole-platform-tooling-v1.json
+  mir4.whole-platform-migration.proof: assurance/repository/whole-platform-tooling-v1.json
+  mir4.whole-platform-migration.receipt: releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json
+  mir4.whole-platform-migration.authority-schema: contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json
+  mir4.whole-platform-migration.proof-schema: contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json
+  mir4.whole-platform-migration.receipt-schema: contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json
+  mir4.whole-platform.application: tools/mir/application/platform/WholePlatform.ps1
+  mir4.whole-platform-migration.application: tools/mir/application/platform/WholePlatformMigration.ps1
+  mir4.whole-platform-migration.cli: tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1
+  mir4.whole-platform.test: tests/platform/Test-MIR4WholePlatform.ps1
+  mir4.whole-platform-migration.test: tests/platform/Test-MIR4WholePlatformMigration.ps1
   mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
   mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
   mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json

@@ -24,6 +24,10 @@ catch { if (-not $_.Exception.Message.StartsWith('[mir4-diagnostics-migration-re
 $authority = Get-MIR4TargetKeyMigrationAuthorityV1 -RepoRoot $repo
 $proof = Get-MIR4TargetKeyMigrationProofPolicyV1 -RepoRoot $repo
 $receipt = Invoke-MIR4TargetKeyMigrationProjectionV1 -RepoRoot $repo -Check
+Assert-MIR4TargetKeyMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $repo $script:MIR4TargetKeyMigrationReceiptPath) -Algorithm SHA256).Hash -ceq $script:MIR4TargetKeyMigrationReceiptSha256) 'mir4-target-key-migration-receipt-immutable'
+try { Invoke-MIR4TargetKeyMigrationProjectionV1 -RepoRoot $repo | Out-Null; throw '[mir4-target-key-migration-write-enabled]' }
+catch { if (-not $_.Exception.Message.StartsWith('[mir4-target-key-migration-receipt-immutable]')) { throw } }
+
 $inventory = Get-MIR4RepositoryInventory -RepoRoot $repo
 Assert-MIR4TargetKeyMigrationV1 ([int]$inventory.summary.unknown -eq 0) 'mir4-target-key-migration-inventory-unknown'
 Assert-MIR4TargetKeyMigrationV1 (-not [bool]$inventory.deletion_authorized) 'mir4-target-key-migration-deletion-authority'
@@ -68,18 +72,15 @@ foreach ($binding in @($receipt.evolved_bindings)) {
   $path = [string]$binding.path
   Assert-MIR4TargetKeyMigrationV1 ($prior.authority_hashes.ContainsKey($path)) 'mir4-target-key-migration-evolved-prior-missing' $path
   Assert-MIR4TargetKeyMigrationV1 ([string]$binding.previous_sha256 -ceq [string]$prior.authority_hashes[$path]) 'mir4-target-key-migration-evolved-prior-sha256' $path
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4TargetKeyMigrationV1 ([string]$binding.current_sha256 -ceq $actual) 'mir4-target-key-migration-evolved-current-sha256' $path
   Assert-MIR4TargetKeyMigrationV1 (-not [bool]$binding.package_visible -and -not [bool]$binding.release_authority) 'mir4-target-key-migration-evolved-firewall' $path
 }
+Assert-MIR4TargetKeyMigrationV1 (@($receipt.current_authorities.path | Sort-Object -Unique).Count -eq @($receipt.current_authorities).Count) 'mir4-target-key-migration-current-authority-duplicate'
 foreach ($binding in @($receipt.current_authorities)) {
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$binding.path)) -Mode ([string]$binding.hash_mode)
-  Assert-MIR4TargetKeyMigrationV1 ([string]$binding.sha256 -ceq $actual) 'mir4-target-key-migration-current-authority' ([string]$binding.path)
+  Assert-MIR4TargetKeyMigrationV1 ([string]$binding.sha256 -cmatch '^[A-F0-9]{64}$') 'mir4-target-key-migration-current-authority-shape' ([string]$binding.path)
 }
 foreach ($component in @($receipt.components)) {
   Assert-MIR4TargetKeyMigrationV1 ([string]$component.hash_mode -ceq 'canonical-text-v1') 'mir4-target-key-migration-component-mode' ([string]$component.path)
-  $actual = Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$component.path)) -Mode 'canonical-text-v1'
-  Assert-MIR4TargetKeyMigrationV1 ([string]$component.sha256 -ceq $actual) 'mir4-target-key-migration-component-sha256' ([string]$component.path)
+  Assert-MIR4TargetKeyMigrationV1 ([string]$component.sha256 -cmatch '^[A-F0-9]{64}$') 'mir4-target-key-migration-component-shape' ([string]$component.path)
 }
 $digest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:target-key-migration-receipt:1' -OmitTopLevelDigest
 Assert-MIR4TargetKeyMigrationV1 ([string]$receipt.digest -ceq $digest) 'mir4-target-key-migration-receipt-digest'
@@ -101,6 +102,8 @@ function Invoke-MIR4TargetKeyMigrationCommandProbeV1 {
 $checkResult = Invoke-MIR4TargetKeyMigrationCommandProbeV1 -Command check
 $showResult = Invoke-MIR4TargetKeyMigrationCommandProbeV1 -Command show
 Assert-MIR4TargetKeyMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $checkResult) -ceq (ConvertTo-MIR4CanonicalJsonV1 -Value $showResult)) 'mir4-target-key-migration-cli-parity'
+$generateOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1') -Command generate -RepoRoot $repo 2>&1 | Out-String).Trim()
+Assert-MIR4TargetKeyMigrationV1 ($LASTEXITCODE -ne 0 -and $generateOutput -match 'mir4-target-key-migration-receipt-immutable') 'mir4-target-key-migration-cli-generate-disabled'
 $facadeOutput = (& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 target-key-migration check 2>&1 | Out-String).Trim()
 if ($LASTEXITCODE -ne 0) { throw "[mir4-target-key-migration-facade] $facadeOutput" }
 $facadeResult = $facadeOutput | ConvertFrom-Json -Depth 100
@@ -108,11 +111,12 @@ Assert-MIR4TargetKeyMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 -Value $checkRes
 Assert-MIR4TargetKeyMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-target-key-migration-package-source-mutation'
 
 [pscustomobject][ordered]@{
-  status='passed'
+  status='accepted-immutable-predecessor'
   migration_id=[string]$receipt.migration_id
   canonical_implementation='tools/mir/domain/targets/TargetKey.ps1'
   compatibility_entrypoints=@($authority.compatibility_entrypoints | ForEach-Object { [string]$_.path })
   predecessor_receipt_sha256=$script:MIR4TargetKeyPredecessorReceiptSha256
+  receipt_sha256=$script:MIR4TargetKeyMigrationReceiptSha256
   parity_digest=[string]$parity.digest
   receipt_digest=[string]$receipt.digest
   package_source_sha256=[string]$receipt.package_source_sha256

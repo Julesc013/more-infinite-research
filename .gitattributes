@@ -146,4 +146,5 @@ tests/repository/** text eol=lf
 tests/canonicalization/** text eol=lf
 tests/diagnostics/** text eol=lf
 tests/targets/** text eol=lf
+tests/platform/** text eol=lf
 tools/mir/** text eol=lf

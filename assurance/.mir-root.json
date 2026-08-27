@@ -9,6 +9,7 @@
     "assurance/repository/canonicalization-tooling-v1.json",
     "assurance/repository/diagnostics-tooling-v1.json",
     "assurance/repository/target-key-tooling-v1.json",
+    "assurance/repository/whole-platform-tooling-v1.json",
     "tools/lib/assurance",
     "validation",
     ".mir/control-plane"
