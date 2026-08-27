@@ -80,6 +80,18 @@ $script:MIR4PlatformInputPaths = @(
   'contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json',
   'contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json',
   'assurance/repository/technology-acceptance-tooling-v1.json',
+  'governance/repository/migrations/module-sdk-mep-tooling-v1.json',
+  'contracts/repository/mir4-module-sdk-mep-migration-authority-v1.schema.json',
+  'contracts/repository/mir4-module-sdk-mep-migration-proof-v1.schema.json',
+  'contracts/repository/mir4-module-sdk-mep-migration-receipt-v1.schema.json',
+  'assurance/repository/module-sdk-mep-tooling-v1.json',
+  'tools/mir/application/extensions/ExperimentalApiSdk.ps1',
+  'tools/mir/application/extensions/ExtensionDeveloperExperience.ps1',
+  'tools/mir/application/extensions/MepDiscovery.ps1',
+  'tools/mir/application/extensions/SdkV1.ps1',
+  'tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1',
+  'tools/mir/cli/Invoke-MIR4Extension.ps1',
+  'tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/lib/mir4/ExtensionDeveloperExperience.ps1',
   'tools/lib/mir4/MepDiscovery.ps1',
@@ -113,6 +125,7 @@ $script:MIR4PlatformInputPaths = @(
   'tools/lib/mir4/TargetCompiler.ps1',
   'tools/mir/application/compiler/CompilationRun.ps1',
   'tools/mir/application/runtime/RuntimeStateModel.ps1',
+  'tools/mir/application/extensions/ModuleEcosystem.ps1',
   'tools/lib/mir4/ModuleEcosystem.ps1',
   'tools/lib/mir4/ProcessIR.ps1',
   'tools/lib/mir4/SupportAssessment.ps1',
@@ -277,9 +290,9 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot '../../mir/application/compiler/NormalizedCompiler.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/targets/TargetCompiler.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/runtime/RuntimeStateModel.ps1')
-. (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
-. (Join-Path $PSScriptRoot 'MepDiscovery.ps1')
-. (Join-Path $PSScriptRoot 'ExperimentalApiSdk.ps1')
+. (Join-Path $PSScriptRoot '../../mir/application/extensions/ModuleEcosystem.ps1')
+. (Join-Path $PSScriptRoot '../../mir/application/extensions/MepDiscovery.ps1')
+. (Join-Path $PSScriptRoot '../../mir/application/extensions/ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 . (Join-Path $PSScriptRoot 'Inspector.ps1')
 . (Join-Path $PSScriptRoot 'CompatibilityFactory.ps1')
@@ -392,7 +405,7 @@ function Get-MIR4InspectorHtml {
 function Get-MIR4PlatformGeneratedFiles {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  . (Join-Path $repo 'tools/lib/mir4/ExperimentalApiSdk.ps1')
+  . (Join-Path $repo 'tools/mir/application/extensions/ExperimentalApiSdk.ps1')
   $platform = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/platform/mir4-preview-v0/platform.json') | ConvertFrom-Json
   $wholePlatform = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json') | ConvertFrom-Json
   $releaseDag = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/platform/mir4-preview-v0/release-dag.json') | ConvertFrom-Json
@@ -860,7 +873,9 @@ function New-MIR4PlatformPreviewPackages {
     'docs/reference/mir4-canonical-json-v1.md','docs/reference/mir4-first-extension.md','docs/reference/mir4-f210-mep-discovery.md',
     'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1','tools/lib/mir4/CanonicalJsonV1.ps1',
     'tools/mir/domain/diagnostics/DiagnosticsV1.ps1','tools/lib/mir4/DiagnosticsV1.ps1',
-    'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1','tools/lib/mir4/MepDiscovery.ps1',
+    'tools/mir/application/extensions/ModuleEcosystem.ps1','tools/mir/application/extensions/ExtensionDeveloperExperience.ps1','tools/mir/application/extensions/MepDiscovery.ps1','tools/mir/application/extensions/SdkV1.ps1',
+    'tools/mir/cli/Invoke-MIR4Extension.ps1',
+    'tools/lib/mir4/ModuleEcosystem.ps1','tools/lib/mir4/ExtensionDeveloperExperience.ps1','tools/lib/mir4/MepDiscovery.ps1','tools/lib/mir4/SdkV1.ps1',
     'tools/commands/mir4/Invoke-MIR4Extension.ps1',
     '.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json',
     '.mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json',

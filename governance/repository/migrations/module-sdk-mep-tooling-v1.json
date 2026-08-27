@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "MIR4ModuleSdkMepMigrationAuthorityV1",
+  "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-MODULE-SDK-MEP-APPLICATION-CLI-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json",
+    "sha256": "731091D00E0ABA7E7E07E736E0C5299D45FAE588421A953E401310B2ACCBDC78"
+  },
+  "scope": "package-excluded module ecosystem, API SDK, extension developer experience, MEP discovery, SDK conformance, three deterministic CLIs, focused tests, contracts, assurance, and successor receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {"fact_family":"module-sdk-mep-migration-receipt","path":"tools/mir/application/extensions/ModuleSdkMepMigration.ps1","command":"tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1"}
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/module-sdk-mep-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-module-sdk-mep-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-module-sdk-mep-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-module-sdk-mep-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/module-sdk-mep-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"module-ecosystem-application","current_path":"tools/lib/mir4/ModuleEcosystem.ps1","final_path":"tools/mir/application/extensions/ModuleEcosystem.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"experimental-api-sdk-application","current_path":"tools/lib/mir4/ExperimentalApiSdk.ps1","final_path":"tools/mir/application/extensions/ExperimentalApiSdk.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"extension-developer-experience-application","current_path":"tools/lib/mir4/ExtensionDeveloperExperience.ps1","final_path":"tools/mir/application/extensions/ExtensionDeveloperExperience.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"mep-discovery-application","current_path":"tools/lib/mir4/MepDiscovery.ps1","final_path":"tools/mir/application/extensions/MepDiscovery.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"sdk-v1-application","current_path":"tools/lib/mir4/SdkV1.ps1","final_path":"tools/mir/application/extensions/SdkV1.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"module-ecosystem-export-cli","current_path":"tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1","final_path":"tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"experimental-api-cli","current_path":"tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1","final_path":"tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"extension-builder-cli","current_path":"tools/commands/mir4/Invoke-MIR4Extension.ps1","final_path":"tools/mir/cli/Invoke-MIR4Extension.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"module-sdk-mep-functional-test","current_path":null,"final_path":"tests/extensions/Test-MIR4ModuleEcosystem.ps1","state":"authoritative","package_visible":false},
+    {"family":"module-sdk-mep-migration-application","current_path":null,"final_path":"tools/mir/application/extensions/ModuleSdkMepMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"module-sdk-mep-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"module-sdk-mep-migration-test","current_path":null,"final_path":"tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"runtime-historical-receipt-checker","current_path":"tools/mir/application/runtime/RuntimeContinuityMigration.ps1","final_path":"tools/mir/application/runtime/RuntimeContinuityMigration.ps1","state":"evolved-to-immutable-reader","package_visible":false},
+    {"family":"runtime-historical-receipt-cli","current_path":"tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1","state":"evolved-generate-disabled","package_visible":false},
+    {"family":"runtime-historical-receipt-test","current_path":"tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1","final_path":"tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1","state":"evolved-historical-verification","package_visible":false},
+    {"family":"platform-preview-consumer","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"developer-cli-consumer","current_path":"tools/mir.ps1","final_path":"tools/mir.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"module-w05-consumer","current_path":"validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1","final_path":"validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"extension-t09-consumer","current_path":"validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1","final_path":"validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"discovery-t11-consumer","current_path":"validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1","final_path":"validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"experimental-api-consumer","current_path":"validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1","final_path":"validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"canonicalization-consumer","current_path":"tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1","final_path":"tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"support-assessment-consumer","current_path":"tools/lib/mir4/SupportAssessment.ps1","final_path":"tools/lib/mir4/SupportAssessment.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"module-programme-authority","current_path":".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json","final_path":".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json","state":"evolved-tooling-binding-only","package_visible":false},
+    {"family":"whole-platform-programme-consumer","current_path":".mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json","final_path":".mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json","state":"evolved-current-consumer","package_visible":false},
+    {"family":"published-snapshot-successor-verifier","current_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","final_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","state":"evolved-append-only-successor-verifier","package_visible":false},
+    {"family":"release-history-assurance-fingerprint","current_path":"tools/lib/assurance/Evidence.ps1","final_path":"tools/lib/assurance/Evidence.ps1","state":"evolved-authority-closure-fingerprint","package_visible":false},
+    {"family":"release-history-assurance-self-test","current_path":"validation/tests/tooling/Test-MIRAssurance.ps1","final_path":"validation/tests/tooling/Test-MIRAssurance.ps1","state":"evolved-regression-proof","package_visible":false},
+    {"family":"fixed-point-authority","current_path":".mir/control/repository-fixed-point.json","final_path":".mir/control/repository-fixed-point.json","state":"evolved-append-only-sequence","package_visible":false},
+    {"family":"pre-freeze-authority-chain","current_path":"tools/lib/mir4/PreFreezeRelease.ps1","final_path":"tools/lib/mir4/PreFreezeRelease.ps1","state":"evolved-append-only-successor-chain","package_visible":false},
+    {"family":"module-boundary-documentation","current_path":"docs/architecture/module-boundaries.md","final_path":"docs/architecture/module-boundaries.md","state":"evolved-current-documentation","package_visible":false},
+    {"family":"module-ecosystem-documentation","current_path":"docs/architecture/mir4-module-ecosystem.md","final_path":"docs/architecture/mir4-module-ecosystem.md","state":"evolved-current-documentation","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/ModuleEcosystem.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/ExperimentalApiSdk.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/ExtensionDeveloperExperience.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/MepDiscovery.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/lib/mir4/SdkV1.ps1","role":"library-forwarder","writable":false},
+    {"path":"tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1","role":"command-forwarder","writable":false},
+    {"path":"tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1","role":"command-forwarder","writable":false},
+    {"path":"tools/commands/mir4/Invoke-MIR4Extension.ps1","role":"command-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-module-sdk-mep-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {"source_freeze":false,"candidate_allocation":false,"production_signing":false,"seal":false,"promotion":false,"tagging":false,"publication":false}
+}

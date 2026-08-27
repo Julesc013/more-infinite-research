@@ -18,7 +18,7 @@ Extract `mir4-mep-v1-preview.zip` into an empty directory, enter its `mir4-mep-v
 
 ```powershell
 $root = (Get-Location).Path
-$command = Join-Path $root 'tools/commands/mir4/Invoke-MIR4Extension.ps1'
+$command = Join-Path $root 'tools/mir/cli/Invoke-MIR4Extension.ps1'
 & $command -Command doctor -RepoRoot $root
 & $command -Command init -RepoRoot $root -ExtensionId org.example.first -Template minimal -OutputRoot work/first
 & $command -Command validate -RepoRoot $root -ExtensionPath work/first/extension.json

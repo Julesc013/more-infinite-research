@@ -1,7 +1,7 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 
-. (Join-Path $RepoRoot 'tools/lib/mir4/MepDiscovery.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/extensions/MepDiscovery.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
@@ -67,7 +67,7 @@ $resultSchema=Join-Path $RepoRoot 'spec/schemas/preview/mir4-f210-mep-discovery-
 if(-not(($reference|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile $resultSchema)){throw '[mir4-t11-result-schema]'}
 
 $cliRoot=Join-Path $RepoRoot 'build/results/mir4-t11-mep-discovery'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command discover -RepoRoot $RepoRoot -DiscoveryPath 'fixtures/mir4-mep-discovery-v1/positive/order-b.json' -OutputRoot $cliRoot|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Invoke-MIR4Extension.ps1') -Command discover -RepoRoot $RepoRoot -DiscoveryPath 'fixtures/mir4-mep-discovery-v1/positive/order-b.json' -OutputRoot $cliRoot|Out-Null
 $cli=Get-Content -Raw -LiteralPath (Join-Path $cliRoot 'f210-mep-discovery.json')|ConvertFrom-Json -Depth 100
 if([string]$cli.digest-cne[string]$reference.digest){throw '[mir4-t11-cli]'}
 
@@ -81,7 +81,7 @@ foreach($needle in @('function M.discover_mod_data','more-infinite-research.exte
 if($lua-match'data\s*:\s*extend|data\.raw\s*\[[^\]]+\]\s*='){throw '[mir4-t11-lua-prototype-write]'}
 
 $shipped=@(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
-foreach($path in @('tools/lib/mir4/MepDiscovery.ps1','docs/reference/mir4-f210-mep-discovery.md','fixtures/mir4-mep-discovery-v1','sdk/preview/mir4/reference/f210-mep-discovery-v1.json','spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json','spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json')){
+foreach($path in @('tools/mir/application/extensions/MepDiscovery.ps1','tools/lib/mir4/MepDiscovery.ps1','docs/reference/mir4-f210-mep-discovery.md','fixtures/mir4-mep-discovery-v1','sdk/preview/mir4/reference/f210-mep-discovery-v1.json','spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json','spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json')){
   if(@($shipped|Where-Object{$_-eq$path-or$_.StartsWith($path+'/')}).Count){throw "[mir4-t11-package-visible] $path"}
 }
 if((Get-FileHash -LiteralPath $emitterPath -Algorithm SHA256).Hash-cne$emitterBefore){throw '[mir4-t11-emitter-mutation]'}

@@ -18,7 +18,7 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | Former slot | Platform area | 4.0 maturity | Completion | Blockers |
 | --- | --- | --- | --- | --- |
 | `4.0` | `release-identity-and-package-foundation` | stable | implemented-private | BLOCKED-HUMAN-SECRET-INPUT, MAINTAINER-MANUAL-PLAYTEST |
-| `4.1` | `repository-and-authority-fixed-point` | mixed | append-only-repository-through-runtime-continuity-application-cli-and-test-writer-cutovers-with-compatibility-readers | remaining-repository-authority-families, package-visible-source-cutover-parity-and-independent-acceptance |
+| `4.1` | `repository-and-authority-fixed-point` | mixed | append-only-repository-through-module-sdk-mep-application-cli-and-test-writer-cutovers-with-compatibility-readers | remaining-repository-authority-families, package-visible-source-cutover-parity-and-independent-acceptance |
 | `4.2` | `generalized-target-compiler` | preview | implemented-private-provider-abi | BLOCKED-F018-EXACT-ENGINE, BLOCKED-MUSEUM-CUSTODY |
 | `4.3` | `semantic-contribution-compiler` | shadow | implemented-reference-aggregate | none |
 | `4.4` | `feature-manifest-and-setting-spec` | shadow | implemented-reference-aggregate | none |
@@ -26,7 +26,7 @@ Generated from `.mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
 | `4.6` | `governed-lifecycle-plans-and-executors` | mixed | stable-terminal-authority-plus-shadow-aggregate | none |
 | `4.7` | `runtime-feature-and-state-kernel` | mixed | stable-terminal-runtime-plus-shadow-contracts | MAINTAINER-MANUAL-PLAYTEST |
 | `4.8` | `migration-graph-and-continuity` | preview | implemented-private-contracts | MAINTAINER-MANUAL-PLAYTEST |
-| `4.9` | `mep-and-module-ecosystem` | preview | implemented-data-only-preview | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
+| `4.9` | `mep-and-module-ecosystem` | preview | implemented-data-only-preview-canonical-application-cli-and-test-cutover | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
 | `4.10` | `api-sdk-and-tooling-bindings` | preview | implemented-generated-preview | BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER |
 | `4.11` | `process-ir-and-effect-channels` | preview | implemented-synthetic-and-exact-target-parity-preview | BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO |
 | `4.12` | `autonomous-synthesis-and-candidate-grammar` | preview | implemented-diagnose-conservative-experimental | BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO, MAINTAINER-TECHNOLOGY-ACCEPTANCE |

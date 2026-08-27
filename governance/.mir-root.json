@@ -14,6 +14,7 @@
     "governance/repository/migrations/target-compiler-tooling-v1.json",
     "governance/repository/migrations/semantic-compiler-policy-tooling-v1.json",
     "governance/repository/migrations/runtime-continuity-tooling-v1.json",
+    "governance/repository/migrations/module-sdk-mep-tooling-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"

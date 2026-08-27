@@ -1,5 +1,5 @@
 if (-not (Get-Command Get-MIR4ModuleDigest -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot 'ModuleEcosystem.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/application/extensions/ModuleEcosystem.ps1')
 }
 
 function Get-MIR4W07RepoRoot {

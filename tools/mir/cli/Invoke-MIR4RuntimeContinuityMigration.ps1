@@ -8,7 +8,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot '../application/runtime/RuntimeContinuityMigration.ps1')
 
 $receipt=if($Command-eq'generate'){
-  Invoke-MIR4RuntimeContinuityMigrationProjectionV1 -RepoRoot $RepoRoot
+  throw '[mir4-runtime-continuity-migration-receipt-immutable] generation-disabled-after-successor-cutover'
 }elseif($Command-eq'check'){
   Invoke-MIR4RuntimeContinuityMigrationProjectionV1 -RepoRoot $RepoRoot -Check
 }else{

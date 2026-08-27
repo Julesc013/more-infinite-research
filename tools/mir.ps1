@@ -51,7 +51,8 @@ Usage:
   .\tools\mir.ps1 mir4 technology-acceptance-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-compiler-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 semantic-compiler-policy-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 runtime-continuity-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 runtime-continuity-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 module-sdk-mep-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -601,7 +602,7 @@ switch ($area) {
         $subcommand = [string]$Args[2]
         $allowed = if ($verb -eq "api") { @("check", "conformance") } else { @("generate", "check") }
         if ($subcommand -notin $allowed) { throw "Unknown mir4 $verb command: $subcommand" }
-        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
       }
       "platform" {
         if ($Args.Count -lt 3) { throw "mir4 platform requires a subcommand." }
@@ -712,13 +713,22 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1") @migrationArguments
       }
       "runtime-continuity-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 runtime-continuity-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 runtime-continuity-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1") @migrationArguments
+      }
+      "module-sdk-mep-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 module-sdk-mep-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 module-sdk-mep-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1") @migrationArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
@@ -778,7 +788,7 @@ switch ($area) {
         $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $moduleArguments.OutputRoot = $output }
         if (-not [string]::IsNullOrWhiteSpace($candidate)) { $moduleArguments.CandidateZip = $candidate }
-        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1") @moduleArguments
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1") @moduleArguments
       }
       "processir-synthesis" {
         if ($Args.Count -lt 3) { throw "mir4 processir-synthesis requires export or check." }
@@ -883,7 +893,7 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($base)) { $builderArguments.BasePath = $base }
         if (-not [string]::IsNullOrWhiteSpace($candidate)) { $builderArguments.CandidatePath = $candidate }
         if (-not [string]::IsNullOrWhiteSpace($discovery)) { $builderArguments.DiscoveryPath = $discovery }
-        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4Extension.ps1") @builderArguments
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4Extension.ps1") @builderArguments
       }
       "handoff-m4c01" {
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"

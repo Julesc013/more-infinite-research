@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
-$command = Join-Path $repo 'tools\commands\mir4\Invoke-MIR4ExperimentalApi.ps1'
+$command = Join-Path $repo 'tools\mir\cli\Invoke-MIR4ExperimentalApi.ps1'
 
 foreach ($operation in @('sdk-check', 'api-check', 'api-conformance')) {
   & $command -Command $operation -RepoRoot $repo
@@ -34,6 +34,8 @@ $experimentalPaths = @(
   'spec/schemas/experimental',
   'fixtures/mir4-api-v0',
   'docs/reference/generated/mir4-experimental-api-v0.md',
+  'tools/mir/application/extensions/ExperimentalApiSdk.ps1',
+  'tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1',
   'tools/lib/mir4/ExperimentalApiSdk.ps1',
   'tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1',
   'validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1'

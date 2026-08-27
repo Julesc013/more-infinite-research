@@ -17,6 +17,33 @@
   "public_support_authorized": false,
   "signing_or_sealing_authorized": false,
   "publication_authorized": false,
+  "tooling": {
+    "applications": [
+      "tools/mir/application/extensions/ModuleEcosystem.ps1",
+      "tools/mir/application/extensions/ExperimentalApiSdk.ps1",
+      "tools/mir/application/extensions/ExtensionDeveloperExperience.ps1",
+      "tools/mir/application/extensions/MepDiscovery.ps1",
+      "tools/mir/application/extensions/SdkV1.ps1"
+    ],
+    "commands": [
+      "tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1",
+      "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1",
+      "tools/mir/cli/Invoke-MIR4Extension.ps1"
+    ],
+    "migration_authority": "governance/repository/migrations/module-sdk-mep-tooling-v1.json",
+    "compatibility_entrypoints": [
+      "tools/lib/mir4/ModuleEcosystem.ps1",
+      "tools/lib/mir4/ExperimentalApiSdk.ps1",
+      "tools/lib/mir4/ExtensionDeveloperExperience.ps1",
+      "tools/lib/mir4/MepDiscovery.ps1",
+      "tools/lib/mir4/SdkV1.ps1",
+      "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1",
+      "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1",
+      "tools/commands/mir4/Invoke-MIR4Extension.ps1"
+    ],
+    "package_visible": false,
+    "release_transition_authority": false
+  },
   "inputs": [
     ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
     ".mir/targets.json",
