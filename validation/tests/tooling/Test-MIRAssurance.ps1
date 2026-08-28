@@ -496,6 +496,8 @@ foreach ($requiredSuccessorCheck in @(
   'MIR4AssuranceOfflineCustodyMigrationReceiptV1',
   'MIR4-Historical-Tooling-MigrationV1.json',
   'MIR4HistoricalToolingMigrationReceiptV1',
+  'MIR4-Release-Tooling-MigrationV1.json',
+  'MIR4ReleaseToolingMigrationReceiptV1',
   'player_executable_sources_unchanged',
   'human_gate.acceptance_inferred'
 )) {
@@ -535,6 +537,7 @@ foreach ($requiredSuccessorFingerprint in @(
   'tools/mir/application/assurance',
   'tools/mir/application/custody',
   'tools/mir/application/history',
+  'tools/mir/application/release',
   'tools/mir/application/technology',
   'tools/mir/domain/safety',
   'tools/mir/domain/policy',
@@ -549,6 +552,7 @@ foreach ($requiredSuccessorFingerprint in @(
   'tests/inspection',
   'tests/assurance',
   'tests/history',
+  'tests/release-tooling',
   'tests/targets',
   'tests/technology',
   'validation/tests/mir4',

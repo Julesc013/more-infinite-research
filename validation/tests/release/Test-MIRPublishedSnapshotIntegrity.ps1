@@ -170,6 +170,9 @@ try {
                         $historicalToolingMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
                             -RelativePath 'releases/migrations/MIR4-Historical-Tooling-MigrationV1.json' `
                             -Kind 'MIR4HistoricalToolingMigrationReceiptV1'
+                        $releaseToolingMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath 'releases/migrations/MIR4-Release-Tooling-MigrationV1.json' `
+                            -Kind 'MIR4ReleaseToolingMigrationReceiptV1'
                         $programmeTransitions = @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t14Transitions = @($t14.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t15Transitions = @($t15.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
@@ -182,6 +185,7 @@ try {
                         $inspectorCompatibilityTransitions = @($inspectorCompatibilityMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $assuranceOfflineCustodyTransitions = @($assuranceOfflineCustodyMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $historicalToolingTransitions = @($historicalToolingMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $releaseToolingTransitions = @($releaseToolingMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $authorizedPreFreezeTransition =
                             [string]$programme.kind -ceq 'MIR4PreFreezeExecutionProgrammeV1' -and
                             [string]$programme.release_cut.source_version -cne [string]$info.version -and
@@ -248,8 +252,16 @@ try {
                             [bool]$historicalToolingMigration.parity.historical_t14_evidence_read_only -and
                             [bool]$historicalToolingMigration.parity.release_dag_read_only -and
                             [bool]$historicalToolingMigration.parity.compatibility_policy_read_only -and
-                            $historicalToolingTransitions.Count -eq 0
-                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-historical-tooling-successor' }
+                            $historicalToolingTransitions.Count -eq 0 -and
+                            [string]$releaseToolingMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            @($releaseToolingMigration.package_visible_delta).Count -eq 0 -and
+                            @($releaseToolingMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
+                            [bool]$releaseToolingMigration.parity.release_dag_functional_parity -and
+                            [bool]$releaseToolingMigration.parity.release_dag_authority_read_only -and
+                            [bool]$releaseToolingMigration.parity.release_phase_engine_out_of_scope -and
+                            [bool]$releaseToolingMigration.parity.compatibility_policy_read_only -and
+                            $releaseToolingTransitions.Count -eq 0
+                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-release-tooling-successor' }
                     }
                     catch {
                         $authorizedPreFreezeTransition = $false

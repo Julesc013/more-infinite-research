@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-release-tooling-migration-authority-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "migration_id", "state", "fixed_point_authority", "predecessor_receipt", "scope", "activated_roots", "writers", "path_map", "compatibility_entrypoints", "rollback", "sunset", "package_source_authority_unchanged", "package_source_sha256", "release_transition_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseToolingMigrationAuthorityV1"},
+    "migration_id": {"const": "MIR4-RELEASE-TOOLING-V1"},
+    "state": {"const": "PACKAGE-EXCLUDED-RELEASE-DAG-APPLICATION-AND-TEST-WRITER-CUTOVER"},
+    "fixed_point_authority": {"const": ".mir/control/repository-fixed-point.json"},
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json"},
+        "sha256": {"const": "2DD6E9A15A239968B22539EE1C203345CFA6FB29498911770D1035503737E104"}
+      }
+    },
+    "scope": {"type": "string", "minLength": 1},
+    "activated_roots": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true},
+    "writers": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "object", "required": ["fact_family", "path", "command"]}},
+    "path_map": {"type": "array", "minItems": 40, "items": {"type": "object", "required": ["family", "current_path", "final_path", "state", "package_visible"], "properties": {"package_visible": {"const": false}}}},
+    "compatibility_entrypoints": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true},
+    "rollback": {"type": "object", "required": ["mode", "command", "preserves"]},
+    "sunset": {"type": "object", "required": ["state", "required_gates"]},
+    "package_source_authority_unchanged": {"const": true},
+    "package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "release_transition_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "seal", "promotion", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "seal": {"const": false},
+        "promotion": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

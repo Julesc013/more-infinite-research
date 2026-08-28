@@ -5,7 +5,7 @@ applies_to: "4.0.0 candidate programme"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -26,7 +26,7 @@ Anything below Stable is forbidden from mutating prototypes, settings, persisten
 
 `LegacyCompilerHostAdapterV1` reads the existing target snapshots, stream manifest, compatibility manifest, fixture manifest, module boundaries, and package surface. It emits an immutable `CompilationRunV0` shadow record. The normalized compiler is therefore a comparison model over the current compiler, not a second prototype emitter.
 
-The preview is physically split across visible roots. `tools/mir/application/compiler/NormalizedCompiler.ps1` owns target providers and FeatureManifest/SettingSpec adapters, `tools/mir/application/compiler/CompilationRun.ps1` owns semantic reference runs, `tools/mir/domain/safety/SafetyKernel.ps1` owns non-overridable rejection, `tools/mir/domain/policy/PolicyEngine.ps1` owns review dispositions but cannot authorize mutation or override safety, and `tools/mir/application/runtime/RuntimeStateModel.ps1` owns runtime/state inventory and migration-law projections. The remaining preview-era components stay under `tools/lib/mir4` until their bounded migration families: `ProcessIR.ps1` owns package-excluded ProcessIR certificates, effect-channel owner references, and proposal classification, and `ReleaseDag.ps1` validates the acyclic release workflow. `PlatformPreview.ps1` is the composition and deterministic packaging facade.
+The preview is physically split across visible roots. `tools/mir/application/compiler/NormalizedCompiler.ps1` owns target providers and FeatureManifest/SettingSpec adapters, `tools/mir/application/compiler/CompilationRun.ps1` owns semantic reference runs, `tools/mir/domain/safety/SafetyKernel.ps1` owns non-overridable rejection, `tools/mir/domain/policy/PolicyEngine.ps1` owns review dispositions but cannot authorize mutation or override safety, and `tools/mir/application/runtime/RuntimeStateModel.ps1` owns runtime/state inventory and migration-law projections. `tools/mir/application/processir/ProcessIR.ps1` owns package-excluded ProcessIR certificates, effect-channel owner references, and proposal classification. `tools/mir/application/release/ReleaseDag.ps1` validates the acyclic release workflow; its former `tools/lib/mir4` path is a read-only compatibility forwarder. `PlatformPreview.ps1` is the composition and deterministic packaging facade.
 
 `mir4 platform compile` supplies an executable extension-to-shadow loop. The V1 developer surface validates typed MEP V1 data; the original V0 loop remains a migration-compatibility input. Both bind a target provider, normalize each fragment, evaluate the hard-safety kernel before policy, and serialize stable diagnostics and a digest without acquiring mutation authority.
 

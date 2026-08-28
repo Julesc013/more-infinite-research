@@ -25,7 +25,7 @@ W09 composes evidence owned elsewhere. Target identity and disposition remain wi
 
 The W09 module owns only two output projections: `MIR4_HISTORICAL_MUSEUM_MATRIX.json` and `MIR4_SUCCESSOR_HOST_RESULT.json`. The latter embeds the append-only package succession witness. Neither output feeds back into an upstream owner.
 
-The canonical package-excluded applications are `tools/mir/application/history/HistoricalSuccession.ps1` and `tools/mir/application/history/SuccessorHost.ps1`; `tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1` is their canonical exporter. The former `tools/lib/mir4` and `tools/commands/mir4` paths are one-line read-only compatibility forwarders. `HistoricalToolingMigration.ps1` is the sole current migration-receipt writer, while the accepted assurance/offline-custody predecessor writer is immutable. `ReleaseDag.ps1` remains outside this migration family and retains its existing authority for the later release-tooling cutover.
+The canonical package-excluded applications are `tools/mir/application/history/HistoricalSuccession.ps1` and `tools/mir/application/history/SuccessorHost.ps1`; `tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1` is their canonical exporter. The former `tools/lib/mir4` and `tools/commands/mir4` paths are one-line read-only compatibility forwarders. The accepted historical-tooling receipt and writer are now immutable predecessors. Release-DAG validation remains outside the historical family and is owned by the separate package-excluded `tools/mir/application/release/ReleaseDag.ps1` cutover.
 
 ## Historical and museum matrix
 

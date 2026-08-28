@@ -18,6 +18,7 @@
     "tests/inspection",
     "tests/assurance",
     "tests/history",
+    "tests/release-tooling",
     "validation/tests",
     "validation/tests.yml"
   ],
