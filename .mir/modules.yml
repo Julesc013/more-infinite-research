@@ -502,17 +502,31 @@ package_excluded_modules:
       - validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
     stability: developer-preview-canonical-assurance-and-custody-applications-migrated-compatibility-readers-retained-blocked-trusted-timing-capacity-and-human-secret-evidence
   mir4_historical_succession_v1:
+    migration_authority: governance/repository/migrations/historical-tooling-v1.json
+    migration_assurance: assurance/repository/historical-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Historical-Tooling-MigrationV1.json
     authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
+    authority_schema: spec/schemas/mir4-historical-succession-programme-v1.schema.json
     implementations:
+      - tools/mir/application/history/HistoricalSuccession.ps1
+      - tools/mir/application/history/SuccessorHost.ps1
+    exporter: tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1
+    compatibility_entrypoints:
       - tools/lib/mir4/HistoricalSuccession.ps1
       - tools/lib/mir4/SuccessorHost.ps1
-    exporter: tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1
+      - tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1
+    migration_writer: tools/mir/application/history/HistoricalToolingMigration.ps1
+    migration_cli: tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1
     output_schemas:
       - spec/schemas/mir4-historical-museum-matrix-v1.schema.json
       - spec/schemas/mir4-successor-host-result-v1.schema.json
     fixtures: fixtures/mir4-historical-succession-v1
     documentation: docs/architecture/mir4-historical-succession.md
     playtest_handoff: docs/maintainer/mir4-w09-manual-playtest.md
+    tests:
+      - tests/history/Test-MIR4HistoricalTooling.ps1
+      - tests/history/Test-MIR4HistoricalToolingMigration.ps1
+      - validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1
     boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
     stability: developer-preview-shadow-partial-with-bounded-blockers
   mir4_full_platform_closeout_v1:
@@ -1532,6 +1546,9 @@ validation_tooling:
     mir4_assurance_offline_custody_migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
     mir4_assurance_offline_custody_migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
     mir4_assurance_offline_custody_migration_gate: tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
+    mir4_historical_tooling_migration_authority: governance/repository/migrations/historical-tooling-v1.json
+    mir4_historical_tooling_migration_receipt: releases/migrations/MIR4-Historical-Tooling-MigrationV1.json
+    mir4_historical_tooling_migration_gate: tests/history/Test-MIR4HistoricalToolingMigration.ps1
     mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json

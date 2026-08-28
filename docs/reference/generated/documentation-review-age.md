@@ -64,7 +64,7 @@ Ages are measured against the newest governed review date, 2026-08-28, so checko
 | docs/architecture/factorio-lifecycle.md | current | 2026-07-08 | 51 | current-window |
 | docs/architecture/mir-extension-protocol-v1.md | archived | 2026-08-08 | 20 | current-window |
 | docs/architecture/mir4-assurance-scale.md | current | 2026-08-26 | 2 | current-window |
-| docs/architecture/mir4-historical-succession.md | current | 2026-08-23 | 5 | current-window |
+| docs/architecture/mir4-historical-succession.md | current | 2026-08-28 | 0 | current-window |
 | docs/architecture/mir4-inspector-compatibility.md | current | 2026-08-28 | 0 | current-window |
 | docs/architecture/mir4-module-ecosystem.md | current | 2026-08-26 | 2 | current-window |
 | docs/architecture/mir4-offline-release-authority.md | draft | 2026-08-07 | 21 | current-window |

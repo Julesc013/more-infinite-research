@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-historical-tooling-migration-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "migration_id", "test_id", "required_checks", "evidence_entrypoint", "functional_evidence_entrypoint", "pre_cutover_functional_digest", "pre_cutover_archive_content_sha256", "functional_parity_digest", "compatibility_policy_sha256", "t14_receipt_sha256", "release_dag_sha256", "pre_cutover_programme_sha256", "package_source_sha256", "unknown_policy", "independent_human_acceptance_required", "release_transition_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4HistoricalToolingMigrationProofPolicyV1"},
+    "migration_id": {"const": "MIR4-HISTORICAL-TOOLING-V1"},
+    "test_id": {"const": "static.mir4-historical-tooling-migration-v1"},
+    "required_checks": {"type": "array", "minItems": 30, "maxItems": 30, "uniqueItems": true},
+    "evidence_entrypoint": {"const": "tests/history/Test-MIR4HistoricalToolingMigration.ps1"},
+    "functional_evidence_entrypoint": {"const": "tests/history/Test-MIR4HistoricalTooling.ps1"},
+    "pre_cutover_functional_digest": {"const": "sha256:a66ac831c64f82246d406c209f6c389abde61dd767021b141a0b235c887708f4"},
+    "pre_cutover_archive_content_sha256": {"const": "sha256:c5b5c7d1a82f7d2d68d7f324249cbf56150a3cb43accb5944305e152196fe0b1"},
+    "functional_parity_digest": {"const": "sha256:beda067ccc49a56b9b836994e96517b3869275a461d0a67eeff617361ce25c6f"},
+    "compatibility_policy_sha256": {"const": "54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2"},
+    "t14_receipt_sha256": {"const": "AD83B044BF955D136FF68484D5913F1B857238D73229ED03F8B278AB5CB6EED0"},
+    "release_dag_sha256": {"const": "C2CD3A4A84A21FB2722C5203CC9ED318BB1876C5C4388EB73BA5ADFE21CD4EE1"},
+    "pre_cutover_programme_sha256": {"const": "E4EACFB6F11B152713348F01C492550B174313FBDE82516A1DDBDA03C2826C08"},
+    "package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "unknown_policy": {"const": "fail"},
+    "independent_human_acceptance_required": {"const": false},
+    "release_transition_authority": {"const": false}
+  }
+}
