@@ -65,7 +65,7 @@ $archive=Join-Path $assets 'mir4-mep-v1-preview.zip'
 $extract=Join-Path $resultRoot 'extract'
 Expand-Archive -LiteralPath $archive -DestinationPath $extract
 $portableRoot=Join-Path $extract 'mir4-mep-v1-preview'
-$command=Join-Path $portableRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1'
+$command=Join-Path $portableRoot 'tools/mir/cli/Invoke-MIR4Extension.ps1'
 $work=Join-Path $portableRoot 'work/first'
 
 $doctor=& $command -Command doctor -RepoRoot $portableRoot|ConvertFrom-Json

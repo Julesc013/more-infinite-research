@@ -3,8 +3,8 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/domain/canonicalization/CanonicalJsonV1.ps1')
 . (Join-Path $repo 'tools/mir/domain/diagnostics/DiagnosticsV1.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ModuleEcosystem.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ExperimentalApiSdk.ps1')
+. (Join-Path $repo 'tools/mir/application/extensions/ModuleEcosystem.ps1')
+. (Join-Path $repo 'tools/mir/application/extensions/ExperimentalApiSdk.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 

@@ -20,6 +20,8 @@ source_of_truth_for:
 
 W05 completes the package-excluded developer-preview contract for extensions, public read APIs, bindings, and local extension tooling. It does not alter the Factorio player package or authorize a public ecosystem claim.
 
+The canonical package-excluded owners are `tools/mir/application/extensions/ModuleEcosystem.ps1`, `tools/mir/application/extensions/ExperimentalApiSdk.ps1`, `tools/mir/application/extensions/ExtensionDeveloperExperience.ps1`, `tools/mir/application/extensions/MepDiscovery.ps1`, and `tools/mir/application/extensions/SdkV1.ps1`. Their command surface is owned by `tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1`, `tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1`, and `tools/mir/cli/Invoke-MIR4Extension.ps1`. The former `tools/lib/mir4` and `tools/commands/mir4` paths are read-only compatibility forwarders; they are not duplicate implementations or receipt writers.
+
 ## Authority and flow
 
 Target identity and transport facts come from W02. Compilation projections come from W03. Migration edge identity and continuity come from W04. W05 validates and resolves extension envelopes, then exposes copied, bounded projections through nine read APIs. W06 retains ProcessIR and external-effect semantics; W07 retains inspector, claims, and public compatibility presentation.
@@ -39,3 +41,5 @@ Generated assets include JSON Schema, Lua builders, validators and the pure read
 ## Graduation boundary
 
 No governed exact Industrial Revolution 4 repository/archive closure and accepted consumer scope is locally available. The synthetic external reference extension therefore proves preview conformance only. `BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER` remains open, `graduated` remains false, and no public support or publication authority is asserted.
+
+The append-only RFP-06 cutover is governed by `governance/repository/migrations/module-sdk-mep-tooling-v1.json`, verified by `tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1`, and written only by `tools/mir/application/extensions/ModuleSdkMepMigration.ps1` through `tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1`. Its predecessor receipt is byte-immutable, its functional and compatibility entry points are parity-checked, and its release-transition flags are all false.

@@ -271,8 +271,8 @@ paths:
   tools.commands.mir4.target-products: tools/commands/mir4/New-MIR4TargetProductSet.ps1
   tools.commands.mir4.semantic-compiler-records: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
   tools.commands.mir4.runtime-continuity-records: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
-  tools.commands.mir4.module-ecosystem-records: tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1
-  tools.commands.mir4.extension-builder: tools/commands/mir4/Invoke-MIR4Extension.ps1
+  tools.commands.mir4.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
+  tools.commands.mir4.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
   tools.commands.mir4.inspector-compatibility-records: tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1
   tools.commands.mir4.exact-processir-records: tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1
   tools.commands.mir4.assurance-scale-records: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
@@ -295,7 +295,17 @@ paths:
   tools.mir.application.runtime.runtime-continuity-migration: tools/mir/application/runtime/RuntimeContinuityMigration.ps1
   tools.mir.cli.runtime-continuity-records: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
   tools.mir.cli.runtime-continuity-migration: tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1
-  tools.lib.mir4.module-ecosystem: tools/lib/mir4/ModuleEcosystem.ps1
+  tools.lib.mir4.module-ecosystem: tools/mir/application/extensions/ModuleEcosystem.ps1
+  tools.mir.application.extensions.module-ecosystem: tools/mir/application/extensions/ModuleEcosystem.ps1
+  tools.mir.application.extensions.experimental-api-sdk: tools/mir/application/extensions/ExperimentalApiSdk.ps1
+  tools.mir.application.extensions.developer-experience: tools/mir/application/extensions/ExtensionDeveloperExperience.ps1
+  tools.mir.application.extensions.mep-discovery: tools/mir/application/extensions/MepDiscovery.ps1
+  tools.mir.application.extensions.sdk-v1: tools/mir/application/extensions/SdkV1.ps1
+  tools.mir.application.extensions.module-sdk-mep-migration: tools/mir/application/extensions/ModuleSdkMepMigration.ps1
+  tools.mir.cli.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
+  tools.mir.cli.experimental-api: tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1
+  tools.mir.cli.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
+  tools.mir.cli.module-sdk-mep-migration: tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1
   tools.lib.mir4.compatibility-index: tools/lib/mir4/CompatibilityIndex.ps1
   tools.lib.mir4.support-assessment: tools/lib/mir4/SupportAssessment.ps1
   tools.lib.mir4.inspector: tools/lib/mir4/Inspector.ps1

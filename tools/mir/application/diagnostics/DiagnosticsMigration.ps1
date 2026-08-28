@@ -60,10 +60,11 @@ function Test-MIR4DiagnosticsCompatibilityForwarderV1 {
 function Test-MIR4DiagnosticsDeclaredConsumersV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  foreach ($path in @('tools/lib/mir4/ModuleEcosystem.ps1','tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1','tools/lib/mir4/PlatformPreview.ps1')) {
+  foreach ($path in @('tools/mir/application/extensions/ModuleEcosystem.ps1','tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1','tools/lib/mir4/PlatformPreview.ps1')) {
     $text = [IO.File]::ReadAllText((Join-Path $repo $path)).Replace('\','/')
     if ($text -cnotmatch [regex]::Escape('tools/mir/domain/diagnostics/DiagnosticsV1.ps1') -and
-        $text -cnotmatch [regex]::Escape('mir/domain/diagnostics/DiagnosticsV1.ps1')) {
+        $text -cnotmatch [regex]::Escape('mir/domain/diagnostics/DiagnosticsV1.ps1') -and
+        $text -cnotmatch [regex]::Escape('domain/diagnostics/DiagnosticsV1.ps1')) {
       throw "[mir4-diagnostics-consumer-final-path] $path"
     }
   }

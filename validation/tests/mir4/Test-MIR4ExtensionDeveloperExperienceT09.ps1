@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+. (Join-Path $repo 'tools/mir/application/extensions/ExtensionDeveloperExperience.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
@@ -16,7 +16,7 @@ $buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd('\')+'\'
 if(-not($resultRoot+'\').StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-t09-output-boundary]'}
 if(Test-Path -LiteralPath $resultRoot){Remove-Item -LiteralPath $resultRoot -Recurse -Force}
 New-Item -ItemType Directory -Force -Path $resultRoot|Out-Null
-$command=Join-Path $repo 'tools/commands/mir4/Invoke-MIR4Extension.ps1'
+$command=Join-Path $repo 'tools/mir/cli/Invoke-MIR4Extension.ps1'
 
 $doctor=& $command -Command doctor -RepoRoot $repo|ConvertFrom-Json -Depth 100
 if([string]$doctor.status-cne'passed'-or@($doctor.commands).Count-ne11-or[bool]$doctor.player_mutation_authorized){throw '[mir4-t09-doctor]'}
@@ -88,9 +88,9 @@ $portableRoot=Join-Path $extract 'mir4-mep-v1-preview'
 $portable=& (Join-Path $portableRoot 'sdk/preview/mir4/mep-v1/conformance.ps1') -RepoRoot $portableRoot|ConvertFrom-Json
 if([string]$portable.status-cne'passed'-or-not[bool]$portable.offline-or[bool]$portable.player_mutation_authorized){throw '[mir4-t09-clean-archive-conformance]'}
 $portableExample=Join-Path $portableRoot 'sdk/preview/mir4/mep-v1/examples/positive/extension.json'
-& (Join-Path $portableRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command doctor -RepoRoot $portableRoot -ExtensionPath $portableExample|Out-Null
-& (Join-Path $portableRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command validate -RepoRoot $portableRoot -ExtensionPath $portableExample|Out-Null
-& (Join-Path $portableRoot 'tools/commands/mir4/Invoke-MIR4Extension.ps1') -Command test -RepoRoot $portableRoot -ExtensionPath $portableExample -Target f210|Out-Null
+& (Join-Path $portableRoot 'tools/mir/cli/Invoke-MIR4Extension.ps1') -Command doctor -RepoRoot $portableRoot -ExtensionPath $portableExample|Out-Null
+& (Join-Path $portableRoot 'tools/mir/cli/Invoke-MIR4Extension.ps1') -Command validate -RepoRoot $portableRoot -ExtensionPath $portableExample|Out-Null
+& (Join-Path $portableRoot 'tools/mir/cli/Invoke-MIR4Extension.ps1') -Command test -RepoRoot $portableRoot -ExtensionPath $portableExample -Target f210|Out-Null
 
 $clock.Stop()
 if($clock.Elapsed.TotalSeconds-ge300){throw "[mir4-t09-five-minute-path] $($clock.Elapsed.TotalSeconds)"}

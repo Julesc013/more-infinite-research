@@ -17,8 +17,8 @@ source_of_truth_for:
 Run the bundled `migrate` command with a V0 envelope and a new output directory. The converter creates V1 data but does not overwrite the input:
 
 ```powershell
-& tools/commands/mir4/Invoke-MIR4Extension.ps1 -Command migrate -RepoRoot . -ExtensionPath old/extension.json -OutputRoot migrated
-& tools/commands/mir4/Invoke-MIR4Extension.ps1 -Command validate -RepoRoot . -ExtensionPath migrated/extension-v1.json
+& tools/mir/cli/Invoke-MIR4Extension.ps1 -Command migrate -RepoRoot . -ExtensionPath old/extension.json -OutputRoot migrated
+& tools/mir/cli/Invoke-MIR4Extension.ps1 -Command validate -RepoRoot . -ExtensionPath migrated/extension-v1.json
 ```
 
 Review target constraints, unavailable values, dependency order, diagnostics, and the new digest. Migration grants no player authority; repeat lock, explain, test, and package.

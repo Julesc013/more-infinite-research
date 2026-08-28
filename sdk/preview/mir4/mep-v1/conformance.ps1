@@ -1,6 +1,6 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path)
 $ErrorActionPreference='Stop'
-. (Join-Path $RepoRoot 'tools/lib/mir4/ExtensionDeveloperExperience.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/extensions/ExtensionDeveloperExperience.ps1')
 $value=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/mep-v1/examples/positive/extension.json')|ConvertFrom-Json -Depth 100
 Test-MIR4MepV1Envelope -Envelope $value -RepoRoot $RepoRoot|Out-Null
 $closure=Resolve-MIR4ExtensionClosureV1 -RepoRoot $RepoRoot -Extensions @($value) -Target f210
