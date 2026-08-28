@@ -454,8 +454,12 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-with-exact-processir-comparison-blocked-independent-production-consumer-and-exact-profile-claim-transfer
   mir4_environment_evidence_v1:
-    implementation: tools/lib/mir4/EnvironmentEvidence.ps1
-    command: tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1
+    implementation: tools/mir/application/assurance/EnvironmentEvidence.ps1
+    command: tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1
+    migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    compatibility_implementation: tools/lib/mir4/EnvironmentEvidence.ps1
+    compatibility_command: tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1
     schemas:
       - spec/schemas/preview/mir4-environment-lock-v1.schema.json
       - spec/schemas/preview/mir4-environment-diff-v1.schema.json
@@ -468,14 +472,21 @@ package_excluded_modules:
       - sdk/preview/mir4/reference/support-bundle-minimized-v1.json
     documentation: docs/reference/mir4-environment-evidence.md
     boundary: portable exact read-only environment identity, bounded redacted diagnostics, and reproducer-preserving evidence minimization only; no private host state, executable content, network access, player mutation, prototype writes, public support claim, release transition, signing, sealing, or publication
-    stability: developer-preview-package-excluded
+    stability: developer-preview-canonical-assurance-application-cli-migrated-compatibility-readers-retained
   mir4_assurance_scale_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
     implementations:
+      - tools/mir/application/assurance/AssuranceScale.ps1
+      - tools/mir/application/assurance/ReleaseBudget.ps1
+      - tools/mir/application/assurance/OfflineDrill.ps1
+    exporter: tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1
+    migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    compatibility_implementations:
       - tools/lib/mir4/AssuranceScale.ps1
       - tools/lib/mir4/ReleaseBudget.ps1
       - tools/lib/mir4/OfflineDrill.ps1
-    exporter: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
+    compatibility_exporter: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
     output_schemas:
       - spec/schemas/mir4-assurance-scale-result-v1.schema.json
       - spec/schemas/mir4-release-budget-plan-v1.schema.json
@@ -483,7 +494,13 @@ package_excluded_modules:
     fixtures: fixtures/mir4-assurance-scale-v1
     documentation: docs/architecture/mir4-assurance-scale.md
     boundary: read-only Control Plane v5 and Assurance v4 crosswalk, four proof identities, Merkle authority slices, proposal-only proof cover and deadline arithmetic, and dummy-fixture offline drills; no third evidence ledger, active selector ownership, real source/candidate/publisher access, player mutation, source freeze, production signing/sealing, promotion, tag, upload, or publication
-    stability: developer-preview-and-shadow-blocked-exact-processir-and-trusted-timing-capacity-evidence
+    verification:
+      - tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1
+      - tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
+      - validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1
+      - validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1
+      - validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
+    stability: developer-preview-canonical-assurance-and-custody-applications-migrated-compatibility-readers-retained-blocked-trusted-timing-capacity-and-human-secret-evidence
   mir4_historical_succession_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
     implementations:
@@ -631,7 +648,7 @@ package_excluded_modules:
     support_assessment: tools/mir/application/inspection/SupportAssessment.ps1
     inspector: tools/mir/application/inspection/Inspector.ps1
     compatibility_factory: tools/mir/application/inspection/CompatibilityFactory.ps1
-    environment_evidence: tools/lib/mir4/EnvironmentEvidence.ps1
+    environment_evidence: tools/mir/application/assurance/EnvironmentEvidence.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
     inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
     release_dag: tools/lib/mir4/ReleaseDag.ps1
@@ -1510,7 +1527,11 @@ validation_tooling:
     mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
-    mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody_compatibility: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_assurance_offline_custody_migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    mir4_assurance_offline_custody_migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    mir4_assurance_offline_custody_migration_gate: tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
     mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json

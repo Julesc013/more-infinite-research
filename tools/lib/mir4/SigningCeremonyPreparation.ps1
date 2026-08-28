@@ -5,7 +5,7 @@ if (-not (Get-Command Test-MIR4ReleaseGovernanceAuthority -ErrorAction SilentlyC
   . (Join-Path $PSScriptRoot 'ReleaseGovernance.ps1')
 }
 if (-not (Get-Command New-MIR4ProofOnlyEd25519KeyPairV1 -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot 'OfflineCandidateCustody.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/application/custody/OfflineCandidateCustody.ps1')
 }
 if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '..\validation\PackageIdentity.ps1')

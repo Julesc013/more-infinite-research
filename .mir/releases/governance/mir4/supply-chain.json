@@ -159,7 +159,7 @@
       "version": "4.0.0",
       "artifact_class": "verifier-tool",
       "target": null,
-      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/lib/mir4/OfflineCandidateCustody.ps1", "spec/schemas/mir4-offline-seal.schema.json", "spec/schemas/mir4-restoration-receipt.schema.json"]},
+      "source": {"selector": "explicit-files", "repository": "Julesc013/more-infinite-research", "paths": ["tools/mir/application/custody/OfflineCandidateCustody.ps1", "spec/schemas/mir4-offline-seal.schema.json", "spec/schemas/mir4-restoration-receipt.schema.json"]},
       "license": {"declared": "MPL-2.0", "concluded": "NOASSERTION", "evidence": "LICENSE"},
       "copyright": {"text": "NOASSERTION", "classification": "no-new-copyright-claim"},
       "digest": {"algorithm": "SHA-256", "mode": "ordinal-path-byte-root"},

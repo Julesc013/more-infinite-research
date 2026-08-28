@@ -1,0 +1,11 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-assurance-offline-custody-migration-proof-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","test_id","required_checks","evidence_entrypoint","functional_evidence_entrypoint","pre_cutover_functional_digest","functional_parity_digest","assurance_v4_preservation_digest","compatibility_policy_sha256","t10_receipt_sha256","t15_receipt_sha256","t15_acceptance_sha256","package_source_sha256","unknown_policy","independent_human_acceptance_required","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4AssuranceOfflineCustodyMigrationProofPolicyV1"},"migration_id":{"const":"MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1"},"test_id":{"const":"static.mir4-assurance-offline-custody-migration-v1"},"required_checks":{"type":"array","minItems":32,"maxItems":32,"uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "evidence_entrypoint":{"const":"tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1"},"functional_evidence_entrypoint":{"const":"tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1"},"pre_cutover_functional_digest":{"const":"sha256:96d98127324aadfba99f876cb4c72587135c7b6a04f1f6653bfcddc9494eaacd"},"functional_parity_digest":{"const":"sha256:96d98127324aadfba99f876cb4c72587135c7b6a04f1f6653bfcddc9494eaacd"},
+    "assurance_v4_preservation_digest":{"const":"258A613A59B70EF0C33B1FFE7EF79BD78A04D68190700B6F1128B30857F2E8F8"},"compatibility_policy_sha256":{"const":"54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2"},"t10_receipt_sha256":{"const":"7407D577451932536EA6DDF568CF58929D982E10CEE092A8963319A50809E40F"},"t15_receipt_sha256":{"const":"294A1E2001F3BA8E6813329E3C8BC609B0D07413AC365A0AFEF525A1188D76F0"},"t15_acceptance_sha256":{"const":"5CE4D1504FBD03D96B23948E591832CAA0C2B9C48DFBDA6002C13761560EC8BE"},"package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},"unknown_policy":{"const":"fail"},"independent_human_acceptance_required":{"const":false},"release_transition_authority":{"const":false}
+  }
+}

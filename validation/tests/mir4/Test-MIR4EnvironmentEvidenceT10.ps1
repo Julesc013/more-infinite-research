@@ -1,7 +1,7 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 
-. (Join-Path $RepoRoot 'tools/lib/mir4/EnvironmentEvidence.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/assurance/EnvironmentEvidence.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
@@ -58,12 +58,12 @@ foreach($value in @($references.f210,$references.f200,$references.diff,$referenc
 }
 
 $cliOutput=Join-Path $RepoRoot 'build/mir4/t10/environment-reference.json'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1') reference -RepoRoot $RepoRoot -OutputPath $cliOutput
+& (Join-Path $RepoRoot 'tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1') reference -RepoRoot $RepoRoot -OutputPath $cliOutput
 if(-not(Test-Path -LiteralPath $cliOutput -PathType Leaf)){throw '[mir4-t10-cli-output]'}
 
 $shipped=@(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
 foreach($path in @(
-  'tools/lib/mir4/EnvironmentEvidence.ps1','tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1',
+  'tools/mir/application/assurance/EnvironmentEvidence.ps1','tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1',
   'docs/reference/mir4-environment-evidence.md','fixtures/mir4-environment-evidence-v1',
   'spec/schemas/preview/mir4-environment-lock-v1.schema.json','spec/schemas/preview/mir4-environment-diff-v1.schema.json',
   'spec/schemas/preview/mir4-support-bundle-v1.schema.json'

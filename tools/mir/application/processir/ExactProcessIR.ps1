@@ -3,7 +3,7 @@ if (-not (Get-Command New-MIR4ProcessIRV1 -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot 'ProcessIR.ps1')
 }
 if (-not (Get-Command New-MIR4EnvironmentLockV1 -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot '../../../lib/mir4/EnvironmentEvidence.ps1')
+  . (Join-Path $PSScriptRoot '../assurance/EnvironmentEvidence.ps1')
 }
 
 function Get-MIR4T12RepoRoot {

@@ -42,6 +42,7 @@ Usage:
   .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
   .\tools\mir.ps1 mir4 platform compile --target <FNNN> --extension <path> --output <path>
   .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
@@ -54,7 +55,8 @@ Usage:
   .\tools\mir.ps1 mir4 runtime-continuity-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 module-sdk-mep-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 processir-exact-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 inspector-compatibility-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 inspector-compatibility-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 assurance-offline-custody-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -631,7 +633,16 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($inputValue)) { $environmentArguments.InputPath = $inputValue }
         if (-not [string]::IsNullOrWhiteSpace($otherValue)) { $environmentArguments.OtherPath = $otherValue }
         if (-not [string]::IsNullOrWhiteSpace($outputValue)) { $environmentArguments.OutputPath = $outputValue }
-        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1") @environmentArguments
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1") @environmentArguments
+      }
+      "assurance-scale" {
+        if ($Args.Count -lt 3) { throw "mir4 assurance-scale requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 assurance-scale command: $subcommand" }
+        $assuranceArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $assuranceArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1") @assuranceArguments
       }
       "release-governance" {
         if ($Args.Count -lt 3) { throw "mir4 release-governance requires check or initialize." }
@@ -742,13 +753,22 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1") @migrationArguments
       }
       "inspector-compatibility-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 inspector-compatibility-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 inspector-compatibility-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4InspectorCompatibilityMigration.ps1") @migrationArguments
+      }
+      "assurance-offline-custody-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 assurance-offline-custody-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 assurance-offline-custody-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1") @migrationArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }

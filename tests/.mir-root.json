@@ -16,6 +16,7 @@
     "tests/extensions",
     "tests/processir",
     "tests/inspection",
+    "tests/assurance",
     "validation/tests",
     "validation/tests.yml"
   ],

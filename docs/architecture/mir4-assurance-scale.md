@@ -57,10 +57,12 @@ The drill does not freeze source, allocate an RC, create a production signature 
 
 ## Outputs and rollback
 
-`Export-MIR4AssuranceScaleRecords.ps1` writes three source-bound records beneath `build/mir4/m4c02-assurance-scale`:
+The canonical `tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1` entrypoint writes three source-bound records beneath `build/mir4/m4c02-assurance-scale`; the former `tools/commands/mir4` path is a read-only compatibility forwarder:
 
 - `MIR4_ASSURANCE_SCALE_RESULT.json`
 - `MIR4_RELEASE_BUDGET_PLAN.json`
 - `MIR4_OFFLINE_DRILL_RESULT.json`
+
+The canonical W08 applications live under `tools/mir/application/assurance`. Environment evidence shares that package-excluded assurance boundary, while proof-only candidate custody lives under `tools/mir/application/custody`. Their former `tools/lib/mir4` paths are compatibility forwarders only; no migration grants release, signing, sealing, publication, player-mutation, or prototype-write authority.
 
 Rollback removes only the W08 programme, tooling, schemas, fixtures, documentation, validation and ignored build output. It leaves Control Plane v5, Assurance v4, evidence indexes, candidates, source, packages and release governance unchanged.

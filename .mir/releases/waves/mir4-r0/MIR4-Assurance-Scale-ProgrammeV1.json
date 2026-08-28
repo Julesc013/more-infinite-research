@@ -1,10 +1,32 @@
 {
+  "$schema": "../../../../spec/schemas/mir4-assurance-scale-programme-v1.schema.json",
   "schema": 1,
   "kind": "MIR4AssuranceScaleProgrammeV1",
   "programme_id": "M4C02-09-24H",
   "wave": "W08",
   "maturity": "developer-preview",
   "authority": "read-only-control-plane-and-assurance-crosswalk",
+  "implementations": [
+    "tools/mir/application/assurance/AssuranceScale.ps1",
+    "tools/mir/application/assurance/ReleaseBudget.ps1",
+    "tools/mir/application/assurance/OfflineDrill.ps1",
+    "tools/mir/application/assurance/EnvironmentEvidence.ps1",
+    "tools/mir/application/custody/OfflineCandidateCustody.ps1"
+  ],
+  "cli": [
+    "tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1",
+    "tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1"
+  ],
+  "compatibility_entrypoints": [
+    "tools/lib/mir4/AssuranceScale.ps1",
+    "tools/lib/mir4/ReleaseBudget.ps1",
+    "tools/lib/mir4/OfflineDrill.ps1",
+    "tools/lib/mir4/EnvironmentEvidence.ps1",
+    "tools/lib/mir4/OfflineCandidateCustody.ps1",
+    "tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1",
+    "tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1"
+  ],
+  "migration_receipt": "releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json",
   "semantic_authority": false,
   "evidence_ledger_authority": false,
   "verification_plan_authority": false,
