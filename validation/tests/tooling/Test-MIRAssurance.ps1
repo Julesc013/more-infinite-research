@@ -488,6 +488,8 @@ foreach ($requiredSuccessorCheck in @(
   'MIR4RuntimeContinuityMigrationReceiptV1',
   'MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json',
   'MIR4ModuleSdkMepMigrationReceiptV1',
+  'MIR4-ProcessIR-Exact-Tooling-MigrationV1.json',
+  'MIR4ProcessIRExactMigrationReceiptV1',
   'player_executable_sources_unchanged',
   'human_gate.acceptance_inferred'
 )) {

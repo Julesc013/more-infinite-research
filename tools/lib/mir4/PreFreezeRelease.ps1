@@ -229,7 +229,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeTargetCompilerMigration,
     [switch]$IncludeSemanticCompilerPolicyMigration,
     [switch]$IncludeRuntimeContinuityMigration,
-    [switch]$IncludeModuleSdkMepMigration
+    [switch]$IncludeModuleSdkMepMigration,
+    [switch]$IncludeProcessIRExactMigration
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -299,6 +300,10 @@ function Get-MIR4PreFreezeAuthorityState {
   if ($IncludeModuleSdkMepMigration) {
     if (-not $IncludeRuntimeContinuityMigration) { throw '[mir4-prefreeze-module-sdk-mep-migration-requires-runtime-continuity-migration]' }
     $links += @{path='releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json';kind='MIR4ModuleSdkMepMigrationReceiptV1'}
+  }
+  if ($IncludeProcessIRExactMigration) {
+    if (-not $IncludeModuleSdkMepMigration) { throw '[mir4-prefreeze-processir-exact-migration-requires-module-sdk-mep-migration]' }
+    $links += @{path='releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json';kind='MIR4ProcessIRExactMigrationReceiptV1'}
   }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
@@ -378,6 +383,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json' = 'contracts/repository/mir4-semantic-compiler-policy-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json' = 'contracts/repository/mir4-runtime-continuity-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json' = 'contracts/repository/mir4-module-sdk-mep-migration-receipt-v1.schema.json'
+    'releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json' = 'contracts/repository/mir4-processir-exact-migration-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -418,6 +424,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json';kind='MIR4SemanticCompilerPolicyMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json';kind='MIR4RuntimeContinuityMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json';kind='MIR4ModuleSdkMepMigrationReceiptV1'}
+    @{path='releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json';kind='MIR4ProcessIRExactMigrationReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

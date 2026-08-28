@@ -69,7 +69,7 @@ Ages are measured against the newest governed review date, 2026-08-28, so checko
 | docs/architecture/mir4-module-ecosystem.md | current | 2026-08-26 | 2 | current-window |
 | docs/architecture/mir4-offline-release-authority.md | draft | 2026-08-07 | 21 | current-window |
 | docs/architecture/mir4-platform-preview.md | current | 2026-08-24 | 4 | current-window |
-| docs/architecture/mir4-processir-synthesis.md | current | 2026-08-26 | 2 | current-window |
+| docs/architecture/mir4-processir-synthesis.md | current | 2026-08-28 | 0 | current-window |
 | docs/architecture/mir4-r0-bootstrap.md | current | 2026-08-25 | 3 | current-window |
 | docs/architecture/mir4-repository-fixed-point.md | current | 2026-08-28 | 0 | current-window |
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 5 | current-window |

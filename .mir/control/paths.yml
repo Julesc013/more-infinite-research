@@ -274,7 +274,8 @@ paths:
   tools.commands.mir4.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
   tools.commands.mir4.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
   tools.commands.mir4.inspector-compatibility-records: tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1
-  tools.commands.mir4.exact-processir-records: tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1
+  tools.commands.mir4.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
+  tools.commands.mir4.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
   tools.commands.mir4.assurance-scale-records: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
   tools.commands.mir4.pre-freeze: tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
   tools.commands.mir4.release-workflow: tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
@@ -302,14 +303,20 @@ paths:
   tools.mir.application.extensions.mep-discovery: tools/mir/application/extensions/MepDiscovery.ps1
   tools.mir.application.extensions.sdk-v1: tools/mir/application/extensions/SdkV1.ps1
   tools.mir.application.extensions.module-sdk-mep-migration: tools/mir/application/extensions/ModuleSdkMepMigration.ps1
+  tools.mir.application.processir.processir: tools/mir/application/processir/ProcessIR.ps1
+  tools.mir.application.processir.exact-processir: tools/mir/application/processir/ExactProcessIR.ps1
+  tools.mir.application.processir.migration: tools/mir/application/processir/ProcessIRExactMigration.ps1
   tools.mir.cli.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
   tools.mir.cli.experimental-api: tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1
   tools.mir.cli.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
   tools.mir.cli.module-sdk-mep-migration: tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1
+  tools.mir.cli.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
+  tools.mir.cli.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
+  tools.mir.cli.processir-exact-migration: tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1
   tools.lib.mir4.compatibility-index: tools/lib/mir4/CompatibilityIndex.ps1
   tools.lib.mir4.support-assessment: tools/lib/mir4/SupportAssessment.ps1
   tools.lib.mir4.inspector: tools/lib/mir4/Inspector.ps1
-  tools.lib.mir4.exact-processir: tools/lib/mir4/ExactProcessIR.ps1
+  tools.lib.mir4.exact-processir: tools/mir/application/processir/ExactProcessIR.ps1
   tools.lib.mir4.compatibility-factory: tools/lib/mir4/CompatibilityFactory.ps1
   tools.lib.mir4.assurance-scale: tools/lib/mir4/AssuranceScale.ps1
   tools.lib.mir4.release-budget: tools/lib/mir4/ReleaseBudget.ps1

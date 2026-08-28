@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR4ProcessIRExactMigrationProofPolicyV1",
+  "migration_id": "MIR4-PROCESSIR-EXACT-TOOLING-V1",
+  "test_id": "static.mir4-processir-exact-migration-v1",
+  "required_checks": ["predecessor-byte-immutability","predecessor-schema-and-digest","predecessor-writer-disabled","authority-schema","proof-policy-schema","verification-plan-no-unknown-paths","successor-receipt-schema-and-fixed-point","single-writer","shared-append-only-migration-engine","four-compatibility-forwarders","processir-functional-parity","processir-export-command-parity","exact-check-command-parity","declared-consumers-use-final-paths","focused-test-cutover","compatibility-policy-read-only","player-runtime-authority-read-only","exact-custody-blocker-retained","historical-T12-evidence-read-only","release-history-successor-proof","release-history-fingerprint-closure","package-source-non-interference","rollback-present","sunset-deferred","append-only-authority-chain","release-firewall"],
+  "evidence_entrypoint": "tests/processir/Test-MIR4ProcessIRExactMigration.ps1",
+  "functional_evidence_entrypoint": "tests/processir/Test-MIR4ProcessIRExact.ps1",
+  "pre_cutover_functional_digest": "sha256:5ec65105a147e82af3e2d10abd00a75fc98ba60808974c2332564316b82858bd",
+  "functional_parity_digest": "sha256:39875970a8681a9f3c5aef1ded577362d41962c7744a5c5aace4f1afb5739ba8",
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "unknown_policy": "fail",
+  "independent_human_acceptance_required": false,
+  "release_transition_authority": false
+}

@@ -1,7 +1,7 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/ExactProcessIR.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/processir/ExactProcessIR.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/Inspector.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
@@ -11,7 +11,7 @@ if(@($authority.captures).Count-ne 11-or[int]$authority.required_repetitions-ne 
 foreach($flag in @('semantic_authority','player_mutation_authorized','prototype_write_authorized','planner_or_emitter_admission_authorized','automatic_synthesis_authorized','public_support_authorized','release_admission_authorized','signing_or_sealing_authorized','publication_authorized')){if([bool]$authority.$flag){throw "[mir4-t12-authority-boundary] $flag"}}
 
 $reference=Join-Path $RepoRoot 'sdk/preview/mir4/reference/t12'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1') -RepoRoot $RepoRoot -ReferenceRoot 'sdk/preview/mir4/reference/t12' -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1') -RepoRoot $RepoRoot -ReferenceRoot 'sdk/preview/mir4/reference/t12' -Check|Out-Null
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $reference 'MIR4_T12_EXACT_PROCESSIR_MANIFEST.json')|ConvertFrom-Json -Depth 100
 $receipt=Get-Content -Raw -LiteralPath (Join-Path $reference 'MIR4_T12_RECEIPT.json')|ConvertFrom-Json -Depth 100
 if(-not$manifest.complete-or[int]$manifest.capture_count-ne 10-or[int]$manifest.blocker_count-ne 1-or[int]$manifest.comparison_count-ne 8-or[int]$manifest.inspector_bundle_count-ne 8){throw '[mir4-t12-manifest-counts]'}

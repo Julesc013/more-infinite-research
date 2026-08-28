@@ -17,6 +17,14 @@
   "public_support_authorized": false,
   "signing_or_sealing_authorized": false,
   "publication_authorized": false,
+  "tooling": {
+    "applications": ["tools/mir/application/processir/ProcessIR.ps1"],
+    "commands": ["tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/processir-exact-tooling-v1.json",
+    "compatibility_entrypoints": ["tools/lib/mir4/ProcessIR.ps1","tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1"],
+    "package_visible": false,
+    "release_transition_authority": false
+  },
   "inputs": [
     "prototypes/mir/index/recipe_facts.lua",
     "prototypes/mir/index/recipe_risk_facts.lua",

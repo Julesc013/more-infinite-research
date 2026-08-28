@@ -158,6 +158,9 @@ try {
                         $moduleSdkMepMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
                             -RelativePath 'releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json' `
                             -Kind 'MIR4ModuleSdkMepMigrationReceiptV1'
+                        $processIRExactMigration = Read-MIR4PreFreezeJson -RepoRoot $repoRoot `
+                            -RelativePath 'releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json' `
+                            -Kind 'MIR4ProcessIRExactMigrationReceiptV1'
                         $programmeTransitions = @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t14Transitions = @($t14.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $t15Transitions = @($t15.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
@@ -166,6 +169,7 @@ try {
                         $semanticCompilerPolicyTransitions = @($semanticCompilerPolicyMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $runtimeContinuityTransitions = @($runtimeContinuityMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $moduleSdkMepTransitions = @($moduleSdkMepMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
+                        $processIRExactTransitions = @($processIRExactMigration.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value })
                         $authorizedPreFreezeTransition =
                             [string]$programme.kind -ceq 'MIR4PreFreezeExecutionProgrammeV1' -and
                             [string]$programme.release_cut.source_version -cne [string]$info.version -and
@@ -203,8 +207,14 @@ try {
                             [string]$moduleSdkMepMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
                             @($moduleSdkMepMigration.package_visible_delta).Count -eq 0 -and
                             @($moduleSdkMepMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
-                            $moduleSdkMepTransitions.Count -eq 0
-                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-module-sdk-mep-successor' }
+                            $moduleSdkMepTransitions.Count -eq 0 -and
+                            [string]$processIRExactMigration.package_source_sha256 -ceq $actualPackageSourceSha256 -and
+                            @($processIRExactMigration.package_visible_delta).Count -eq 0 -and
+                            @($processIRExactMigration.release_transition_authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and
+                            [bool]$processIRExactMigration.parity.historical_t12_evidence_read_only -and
+                            [bool]$processIRExactMigration.parity.exact_custody_blocker_retained -and
+                            $processIRExactTransitions.Count -eq 0
+                        if ($authorizedPreFreezeTransition) { $authorizedAuthorityKind = 'append-only-processir-exact-successor' }
                     }
                     catch {
                         $authorizedPreFreezeTransition = $false
