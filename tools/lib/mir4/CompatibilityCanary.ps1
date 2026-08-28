@@ -1,5 +1,5 @@
 if (-not (Get-Command Get-MIR4T12RecordDigest -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot 'ExactProcessIR.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/application/processir/ExactProcessIR.ps1')
 }
 if (-not (Get-Command Invoke-FactorioProcess -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../validation/FactorioProcess.ps1')

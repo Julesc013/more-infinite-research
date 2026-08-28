@@ -52,7 +52,8 @@ Usage:
   .\tools\mir.ps1 mir4 target-compiler-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 semantic-compiler-policy-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 module-sdk-mep-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 module-sdk-mep-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 processir-exact-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -722,13 +723,22 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1") @migrationArguments
       }
       "module-sdk-mep-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 module-sdk-mep-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 module-sdk-mep-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 module-sdk-mep-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 module-sdk-mep-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1") @migrationArguments
+      }
+      "processir-exact-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 processir-exact-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 processir-exact-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1") @migrationArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
@@ -797,7 +807,7 @@ switch ($area) {
         $processArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $processArguments.OutputRoot = $output }
-        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1") @processArguments
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1") @processArguments
       }
       "exact-processir" {
         if ($Args.Count -lt 3) { throw "mir4 exact-processir requires export or check." }
@@ -820,7 +830,7 @@ switch ($area) {
           if ($subcommand -eq 'check') { throw "--publish-reference is valid only for exact-processir export." }
           $exactArguments.PublishReference = $true
         }
-        & (Join-Path $repo "tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1") @exactArguments
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1") @exactArguments
       }
       "release-canaries" {
         if ($Args.Count -lt 3) { throw "mir4 release-canaries requires export or check." }

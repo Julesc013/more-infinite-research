@@ -14,6 +14,15 @@
   "release_admission_authorized": false,
   "signing_or_sealing_authorized": false,
   "publication_authorized": false,
+  "tooling": {
+    "applications": ["tools/mir/application/processir/ExactProcessIR.ps1"],
+    "commands": ["tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/processir-exact-tooling-v1.json",
+    "compatibility_entrypoints": ["tools/lib/mir4/ExactProcessIR.ps1","tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1"],
+    "reference_mode": "read-only-exact-historical-evidence",
+    "package_visible": false,
+    "release_transition_authority": false
+  },
   "maximum_processes_per_capture": 128,
   "required_repetitions": 2,
   "observer_source": "fixtures/mir4-processir-exact-observer/data-final-fixes.lua",

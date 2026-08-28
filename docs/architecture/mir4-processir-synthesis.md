@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H W06 and T12"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -45,9 +45,16 @@ Every captured snapshot retains bounded recipe inputs and outputs, exact/bounded
 
 The reference set under `sdk/preview/mir4/reference/t12` contains the immutable T12 snapshots, locks, bounded A/B comparisons, Inspector bundles, blocker, manifest, and receipt. The T13 reference under `sdk/preview/mir4/reference/t13` supersedes only the current custody assessment and adds exact lifecycle canaries; it does not mutate T12 evidence. Neither reference authorizes synthesis, player mutation, public support claims, source freeze, signing, sealing, promotion, or publication.
 
+## Canonical tooling and migration
+
+The canonical W06 and T12 implementations are `tools/mir/application/processir/ProcessIR.ps1` and `tools/mir/application/processir/ExactProcessIR.ps1`. Their canonical exporters live under `tools/mir/cli`. The former `tools/lib/mir4` and `tools/commands/mir4` paths are read-only compatibility forwarders and have no independent writer authority.
+
+`governance/repository/migrations/processir-exact-tooling-v1.json` governs this package-excluded cutover. Its append-only receipt binds functional parity, exact-reference byte preservation, the unchanged player source fingerprint, rollback, and disabled release transitions. Exact reference verification is check-only during this migration: no alternate engine, archive, or newly captured evidence may replace the historical T12 records.
+
 ```powershell
 .\tools\mir.ps1 mir4 processir-synthesis export
 .\tools\mir.ps1 mir4 processir-synthesis check
 .\tools\mir.ps1 mir4 exact-processir export --repetitions 2 --publish-reference
 .\tools\mir.ps1 mir4 exact-processir check
+.\tools\mir.ps1 mir4 processir-exact-migration check
 ```

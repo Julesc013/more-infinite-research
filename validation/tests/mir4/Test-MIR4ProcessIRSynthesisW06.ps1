@@ -61,11 +61,11 @@ if(@($linkResult.links|Where-Object status -eq linked).Count-ne 2){throw '[mir4-
 $tampered=$linked|ConvertTo-Json -Depth 100|ConvertFrom-Json;(@($tampered.fragments|Where-Object kind -eq ProcessClassificationFragment)[0]).data.certificate_ref='process:'+[string]$safe.processes[0].identity.id+'@sha256:'+('0'*64);$tampered.digest='';$tampered.digest=Get-MIR4ModuleDigest $tampered
 try{Resolve-MIR4W06MepReferences -RepoRoot $RepoRoot -Envelope $tampered -ProcessIR $safe -EffectRegistry $records.effects|Out-Null;throw '[mir4-w06-mep-tamper-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-w06-mep-reference-mismatch]')){throw}}
 
-$sourceText=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/mir4/ProcessIR.ps1')
+$sourceText=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/processir/ProcessIR.ps1')
 if($sourceText-match'(?m)\bdata\.raw\b'-or$sourceText-match'prototypes/mir/(?:planner|emit|runtime).*\.(?:lua|ps1)'){throw '[mir4-w06-forbidden-terminal-import]'}
 $output='build/mir4/test-w06-processir-synthesis'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output|Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $output -Check|Out-Null
 $head=(& git -C $RepoRoot rev-parse HEAD).Trim();$tree=(& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
 $schemaByName=@{'MIR4_PROCESSIR_PARITY_RESULT.json'='spec/schemas/mir4-process-ir-v1.schema.json';'MIR4_EFFECT_CHANNEL_REGISTRY.json'='spec/schemas/mir4-effect-channel-registry-v1.schema.json';'MIR4_SYNTHESIS_MATURITY_MATRIX.json'='spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json'}
 foreach($name in $schemaByName.Keys){$path=Join-Path $RepoRoot "$output/$name";$record=Get-Content -Raw -LiteralPath $path|ConvertFrom-Json;if(-not((Get-Content -Raw -LiteralPath $path)|Test-Json -SchemaFile (Join-Path $RepoRoot $schemaByName[$name]))){throw "[mir4-w06-output-schema] $name"};if([string]$record.source_identity.commit-cne$head-or[string]$record.source_identity.tree-cne$tree-or$record.package_visible-or$record.public_release_proof-or$record.player_mutation_authorized){throw "[mir4-w06-output-identity] $name"}}

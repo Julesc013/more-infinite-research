@@ -35,7 +35,7 @@ Assert-MIR4RepositoryMigrationV1 ((@($actualActive) -join '|') -ceq (@($expected
 Assert-MIR4RepositoryMigrationV1 (@($authority.visible_roots | Where-Object { [string]$_.mode -like 'shadow*' }).Count -ge 5) 'mir4-repository-migration-remaining-shadow-boundary'
 Assert-MIR4RepositoryMigrationV1 (@($authority.move_gate).Count -eq 6) 'mir4-repository-migration-move-gate'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.remaining_move.classification -ceq 'bounded-authority-migration-and-package-cutover-debt') 'mir4-repository-migration-debt-class'
-Assert-MIR4RepositoryMigrationV1 (@($authority.migration_sequence).Count -eq 10) 'mir4-repository-migration-sequence-count'
+Assert-MIR4RepositoryMigrationV1 (@($authority.migration_sequence).Count -eq 11) 'mir4-repository-migration-sequence-count'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[0].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[1].migration_id -ceq 'MIR4-CANONICALIZATION-TOOLING-V1' -and [string]$authority.migration_sequence[1].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-canonicalization-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[2].migration_id -ceq 'MIR4-DIAGNOSTICS-TOOLING-V1' -and [string]$authority.migration_sequence[2].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-diagnostics-predecessor'
@@ -45,7 +45,8 @@ Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[5].migra
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[6].migration_id -ceq 'MIR4-TARGET-COMPILER-TOOLING-V1' -and [string]$authority.migration_sequence[6].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-target-compiler-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[7].migration_id -ceq 'MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1' -and [string]$authority.migration_sequence[7].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-semantic-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[8].migration_id -ceq 'MIR4-RUNTIME-CONTINUITY-TOOLING-V1' -and [string]$authority.migration_sequence[8].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-runtime-predecessor'
-Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[9].migration_id -ceq 'MIR4-MODULE-SDK-MEP-TOOLING-V1' -and [string]$authority.migration_sequence[9].state -ceq 'current-append-only-successor') 'mir4-repository-migration-sequence-successor'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[9].migration_id -ceq 'MIR4-MODULE-SDK-MEP-TOOLING-V1' -and [string]$authority.migration_sequence[9].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-module-sdk-mep-predecessor'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[10].migration_id -ceq 'MIR4-PROCESSIR-EXACT-TOOLING-V1' -and [string]$authority.migration_sequence[10].state -ceq 'current-append-only-successor') 'mir4-repository-migration-sequence-successor'
 foreach ($root in @($authority.visible_roots)) {
   $marker = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path (([string]$root.path) + '/.mir-root.json')
   Assert-MIR4RepositoryMigrationV1 (-not [bool]$marker.writable_authority) 'mir4-repository-migration-marker-compatibility-authority' ([string]$root.path)
