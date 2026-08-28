@@ -212,7 +212,7 @@
       "maturity": "shadow",
       "completion_state": "implemented-proposal-and-offline-drill",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json", ".mir/assurance.json"],
-      "implementations": ["tools/lib/mir4/AssuranceScale.ps1", "tools/lib/mir4/ReleaseBudget.ps1", "tools/lib/mir4/OfflineDrill.ps1"],
+      "implementations": ["tools/mir/application/assurance/AssuranceScale.ps1", "tools/mir/application/assurance/ReleaseBudget.ps1", "tools/mir/application/assurance/OfflineDrill.ps1", "tools/mir/application/assurance/EnvironmentEvidence.ps1", "tools/mir/application/custody/OfflineCandidateCustody.ps1"],
       "verification": ["validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1"],
       "cutover": "proof-class-by-proof-class-with-zero-selector-false-negatives",
       "blockers": ["BLOCKED-TRUSTED-TIMING-CAPACITY-EVIDENCE"]

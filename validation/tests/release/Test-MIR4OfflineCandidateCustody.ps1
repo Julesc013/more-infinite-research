@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
 } else { (Resolve-Path -LiteralPath $RepoRoot).Path }
-. (Join-Path $RepoRoot "tools/lib/mir4/OfflineCandidateCustody.ps1")
+. (Join-Path $RepoRoot "tools/mir/application/custody/OfflineCandidateCustody.ps1")
 
 function Assert-True([bool]$Condition, [string]$Message) { if (-not $Condition) { throw $Message } }
 function Assert-Throws([scriptblock]$Action, [string]$Message) {

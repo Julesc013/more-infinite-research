@@ -10,6 +10,8 @@ $script:MIR4InspectorCompatibilityMigrationProofPath='assurance/repository/inspe
 $script:MIR4InspectorCompatibilityMigrationProofSchemaPath='contracts/repository/mir4-inspector-compatibility-migration-proof-v1.schema.json'
 $script:MIR4InspectorCompatibilityMigrationReceiptPath='releases/migrations/MIR4-Inspector-Compatibility-Tooling-MigrationV1.json'
 $script:MIR4InspectorCompatibilityMigrationReceiptSchemaPath='contracts/repository/mir4-inspector-compatibility-migration-receipt-v1.schema.json'
+$script:MIR4InspectorCompatibilityMigrationReceiptSha256='BD60E60AB7E5B12711CC7B11274FBA92EE202708790B84863B4FCB54B8195B81'
+$script:MIR4InspectorCompatibilityMigrationReceiptBytes=56839
 $script:MIR4InspectorCompatibilityPredecessorReceiptPath='releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json'
 $script:MIR4InspectorCompatibilityPredecessorReceiptSha256='163714759F02DEFC8D6301923CC6796F1382D1ABF3841712FC87F4C9FEEACE8E'
 $script:MIR4InspectorCompatibilityPreCutoverDigestV1='sha256:3b16e26301d2f2827369a9db0437e3c6c97ce0965096f921dd8b6d7d8c5bb527'
@@ -138,9 +140,16 @@ function Get-MIR4InspectorCompatibilityMigrationReceiptTextV1 {
   return (ConvertTo-MIR4CanonicalJsonV1 -Value (New-MIR4InspectorCompatibilityMigrationReceiptV1 -RepoRoot $RepoRoot))+[char]10
 }
 
+function Get-MIR4InspectorCompatibilityMigrationReceiptV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $receipt=Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4InspectorCompatibilityMigrationReceiptPath -ExpectedSha256 $script:MIR4InspectorCompatibilityMigrationReceiptSha256 -SchemaPath $script:MIR4InspectorCompatibilityMigrationReceiptSchemaPath -Kind 'MIR4InspectorCompatibilityMigrationReceiptV1' -DigestDomain 'mir4:inspector-compatibility-migration-receipt:1' -ErrorPrefix 'mir4-inspector-compatibility-migration'
+  if((Get-Item -LiteralPath (Join-Path $repo $script:MIR4InspectorCompatibilityMigrationReceiptPath)).Length-ne$script:MIR4InspectorCompatibilityMigrationReceiptBytes){throw '[mir4-inspector-compatibility-migration-receipt-byte-length]'}
+  return $receipt
+}
+
 function Invoke-MIR4InspectorCompatibilityMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$path=Join-Path $repo $script:MIR4InspectorCompatibilityMigrationReceiptPath;$text=Get-MIR4InspectorCompatibilityMigrationReceiptTextV1 -RepoRoot $repo
-  if($Check){if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or[IO.File]::ReadAllText($path)-cne$text){throw '[mir4-inspector-compatibility-migration-receipt-stale]'};if(-not(Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4InspectorCompatibilityMigrationReceiptPath -SchemaPath $script:MIR4InspectorCompatibilityMigrationReceiptSchemaPath)){throw '[mir4-inspector-compatibility-migration-receipt-schema]'}}else{New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent)|Out-Null;[IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))}
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4InspectorCompatibilityMigrationReceiptPath
+  if(-not$Check){throw '[mir4-inspector-compatibility-migration-receipt-immutable] generation-disabled-after-successor-cutover'}
+  return Get-MIR4InspectorCompatibilityMigrationReceiptV1 -RepoRoot $RepoRoot
 }

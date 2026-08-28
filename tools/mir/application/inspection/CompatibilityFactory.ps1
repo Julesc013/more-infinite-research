@@ -1,7 +1,7 @@
 if (-not (Get-Command Get-MIR4CompatibilityPage -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot 'CompatibilityIndex.ps1')
 }
-. (Join-Path $PSScriptRoot '../../../lib/mir4/EnvironmentEvidence.ps1')
+. (Join-Path $PSScriptRoot '../assurance/EnvironmentEvidence.ps1')
 
 function New-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Request,[Parameter(Mandatory)]$Ledger,[Parameter(Mandatory)][string]$RepoRoot)

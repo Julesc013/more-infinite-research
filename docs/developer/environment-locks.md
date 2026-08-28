@@ -16,6 +16,6 @@ source_of_truth_for:
 
 EnvironmentLockV1 binds the Factorio target, engine, MIR identity, ordered mods, configuration, and evidence inputs. EnvironmentDiffV1 reports structured changes between two valid locks. SupportBundleV1 binds a failure proposition to its lock, observations, diagnostics, and custody.
 
-Use `tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1` in the repository, or the matching bundled interface, to create and validate records. Generate a minimized bundle only after reproducing the same proposition; minimization cannot broaden the claim.
+Use `tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1` in the repository, or the compatibility forwarder at `tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1`, to create and validate records. Generate a minimized bundle only after reproducing the same proposition; minimization cannot broaden the claim.
 
 Commit reusable synthetic locks and fixtures. Keep personal paths, credentials, saves, proprietary mods, and machine secrets out of support bundles.

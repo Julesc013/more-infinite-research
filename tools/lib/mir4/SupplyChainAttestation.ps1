@@ -2,7 +2,7 @@ if (-not (Get-Command New-MIR4ComponentInventoryV1 -ErrorAction SilentlyContinue
   . (Join-Path $PSScriptRoot 'SupplyChain.ps1')
 }
 if (-not (Get-Command Test-MIR4OpenSshSignatureV1 -ErrorAction SilentlyContinue)) {
-  . (Join-Path $PSScriptRoot 'OfflineCandidateCustody.ps1')
+  . (Join-Path $PSScriptRoot '../../mir/application/custody/OfflineCandidateCustody.ps1')
 }
 
 $script:MIR4SupplyChainAttestationNamespaceV1 = 'mir4-supply-chain-attestation-v1'

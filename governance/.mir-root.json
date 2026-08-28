@@ -17,6 +17,7 @@
     "governance/repository/migrations/module-sdk-mep-tooling-v1.json",
     "governance/repository/migrations/processir-exact-tooling-v1.json",
     "governance/repository/migrations/inspector-compatibility-tooling-v1.json",
+    "governance/repository/migrations/assurance-offline-custody-tooling-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"

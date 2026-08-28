@@ -1,9 +1,9 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/lib/mir4/AssuranceScale.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ReleaseBudget.ps1')
-. (Join-Path $repo 'tools/lib/mir4/OfflineDrill.ps1')
+. (Join-Path $repo 'tools/mir/application/assurance/AssuranceScale.ps1')
+. (Join-Path $repo 'tools/mir/application/assurance/ReleaseBudget.ps1')
+. (Join-Path $repo 'tools/mir/application/assurance/OfflineDrill.ps1')
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 Import-MIR4W08ControlPlane -RepoRoot $repo
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
@@ -76,12 +76,12 @@ $packagePath=Join-Path $repo "$drillRoot/constructed/dummy-mir4-package.zip";$pa
 $manifest=[pscustomobject][ordered]@{archive_sha256=(Get-MIR4W08FileSha256 $packageCopy)}
 try{Invoke-MIR4W08DummyPublisher -DrillRoot $conflictRoot -PackagePath $packageCopy -Manifest $manifest -DestinationId conflict|Out-Null;throw '[mir4-w08-publisher-conflict-accepted]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-w08-publisher-conflicting-transfer]')){throw}}
 
-foreach($file in @('tools/lib/mir4/AssuranceScale.ps1','tools/lib/mir4/ReleaseBudget.ps1','tools/lib/mir4/OfflineDrill.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $repo $file);if($text-match'(?i)source-freeze-authorized\s*=\s*\$true|production_signing_or_sealing_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-w08-forbidden-authority] $file"}}
-$offlineText=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/mir4/OfflineDrill.ps1');if($offlineText-match'(?i)Invoke-WebRequest|Invoke-RestMethod|Start-BitsTransfer|System\.Net\.Http|\bgh\b|ReleaseGovernance|OfflineCandidateCustody|Factorio|git -C'){throw '[mir4-w08-offline-capability-leak]'}
+foreach($file in @('tools/mir/application/assurance/AssuranceScale.ps1','tools/mir/application/assurance/ReleaseBudget.ps1','tools/mir/application/assurance/OfflineDrill.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $repo $file);if($text-match'(?i)source-freeze-authorized\s*=\s*\$true|production_signing_or_sealing_authorized\s*=\s*\$true|publication_authorized\s*=\s*\$true'){throw "[mir4-w08-forbidden-authority] $file"}}
+$offlineText=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir/application/assurance/OfflineDrill.ps1');if($offlineText-match'(?i)Invoke-WebRequest|Invoke-RestMethod|Start-BitsTransfer|System\.Net\.Http|\bgh\b|ReleaseGovernance|OfflineCandidateCustody|Factorio|git -C'){throw '[mir4-w08-offline-capability-leak]'}
 
 $recordsOut='build/mir4/m4c02-assurance-scale'
-& (Join-Path $repo 'tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1') -RepoRoot $repo -OutputRoot $recordsOut|Out-Null
-& (Join-Path $repo 'tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1') -RepoRoot $repo -OutputRoot $recordsOut -Check|Out-Null
+& (Join-Path $repo 'tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1') -RepoRoot $repo -OutputRoot $recordsOut|Out-Null
+& (Join-Path $repo 'tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1') -RepoRoot $repo -OutputRoot $recordsOut -Check|Out-Null
 foreach($pair in @(@{name='MIR4_ASSURANCE_SCALE_RESULT.json';schema='spec/schemas/mir4-assurance-scale-result-v1.schema.json'},@{name='MIR4_RELEASE_BUDGET_PLAN.json';schema='spec/schemas/mir4-release-budget-plan-v1.schema.json'},@{name='MIR4_OFFLINE_DRILL_RESULT.json';schema='spec/schemas/mir4-offline-drill-result-v1.schema.json'})){$record=Get-Content -Raw -LiteralPath (Join-Path $repo "$recordsOut/$($pair.name)")|ConvertFrom-Json -Depth 100;if(-not(($record|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile (Join-Path $repo $pair.schema))-or[string]$record.record_sha256-cne(Get-MIR4W08RecordSha256 $record)-or$record.package_visible-or$record.public_release_proof-or$record.source_freeze_authorized-or$record.production_signing_or_sealing_authorized-or$record.publication_authorized){throw "[mir4-w08-output] $($pair.name)"}}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-w08-package-mutation]'}
 Write-Host '[ok] MIR 4 W08 assurance identities, slice roots, exact impact/recovery, proof cover, 24/6/1 design budgets, and confined offline publisher drill passed.'
