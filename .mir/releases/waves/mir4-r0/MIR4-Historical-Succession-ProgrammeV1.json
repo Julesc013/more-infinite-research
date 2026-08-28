@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../spec/schemas/mir4-historical-succession-programme-v1.schema.json",
   "schema": 1,
   "kind": "MIR4HistoricalSuccessionProgrammeV1",
   "programme_id": "M4C02-09-24H",
@@ -18,6 +19,19 @@
   "promotion_or_tag_authorized": false,
   "network_or_upload_authorized": false,
   "publication_authorized": false,
+  "implementations": [
+    "tools/mir/application/history/HistoricalSuccession.ps1",
+    "tools/mir/application/history/SuccessorHost.ps1"
+  ],
+  "cli": [
+    "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1"
+  ],
+  "compatibility_entrypoints": [
+    "tools/lib/mir4/HistoricalSuccession.ps1",
+    "tools/lib/mir4/SuccessorHost.ps1",
+    "tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1"
+  ],
+  "migration_receipt": "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json",
   "imports": [
     ".mir/releases/records/3.2.11.json",
     ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json",

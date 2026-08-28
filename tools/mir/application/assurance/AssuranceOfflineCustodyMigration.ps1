@@ -21,6 +21,8 @@ $script:MIR4AssuranceOfflineCustodyT10ReceiptSha256='7407D577451932536EA6DDF568C
 $script:MIR4AssuranceOfflineCustodyT15ReceiptSha256='294A1E2001F3BA8E6813329E3C8BC609B0D07413AC365A0AFEF525A1188D76F0'
 $script:MIR4AssuranceOfflineCustodyT15AcceptanceSha256='5CE4D1504FBD03D96B23948E591832CAA0C2B9C48DFBDA6002C13761560EC8BE'
 $script:MIR4AssuranceV4PreservationDigestV1='258A613A59B70EF0C33B1FFE7EF79BD78A04D68190700B6F1128B30857F2E8F8'
+$script:MIR4AssuranceOfflineCustodyMigrationReceiptSha256='3B6F3B057BD74353B4A12FB5F7C108C3AE41470C375D74DAC424E888668ED749'
+$script:MIR4AssuranceOfflineCustodyMigrationReceiptBytes=53137
 
 function Get-MIR4AssuranceOfflineCustodyMigrationAuthorityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -149,7 +151,9 @@ function Get-MIR4AssuranceOfflineCustodyMigrationReceiptTextV1 {
 
 function Invoke-MIR4AssuranceOfflineCustodyMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$path=Join-Path $repo $script:MIR4AssuranceOfflineCustodyMigrationReceiptPath;$text=Get-MIR4AssuranceOfflineCustodyMigrationReceiptTextV1 -RepoRoot $repo
-  if($Check){if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or[IO.File]::ReadAllText($path)-cne$text){throw '[mir4-assurance-offline-custody-migration-receipt-stale]'};if(-not(Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4AssuranceOfflineCustodyMigrationReceiptPath -SchemaPath $script:MIR4AssuranceOfflineCustodyMigrationReceiptSchemaPath)){throw '[mir4-assurance-offline-custody-migration-receipt-schema]'}}else{New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent)|Out-Null;[IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))}
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4AssuranceOfflineCustodyMigrationReceiptPath
+  if(-not$Check){throw '[mir4-assurance-offline-custody-migration-receipt-immutable] generation-disabled-after-successor-cutover'}
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $receipt=Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4AssuranceOfflineCustodyMigrationReceiptPath -ExpectedSha256 $script:MIR4AssuranceOfflineCustodyMigrationReceiptSha256 -SchemaPath $script:MIR4AssuranceOfflineCustodyMigrationReceiptSchemaPath -Kind 'MIR4AssuranceOfflineCustodyMigrationReceiptV1' -DigestDomain 'mir4:assurance-offline-custody-migration-receipt:1' -ErrorPrefix 'mir4-assurance-offline-custody-migration'
+  if((Get-Item -LiteralPath (Join-Path $repo $script:MIR4AssuranceOfflineCustodyMigrationReceiptPath)).Length-ne$script:MIR4AssuranceOfflineCustodyMigrationReceiptBytes){throw '[mir4-assurance-offline-custody-migration-receipt-byte-length]'}
+  return $receipt
 }

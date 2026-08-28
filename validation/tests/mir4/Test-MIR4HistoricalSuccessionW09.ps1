@@ -3,8 +3,8 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
-. (Join-Path $repo 'tools/lib/mir4/HistoricalSuccession.ps1')
-. (Join-Path $repo 'tools/lib/mir4/SuccessorHost.ps1')
+. (Join-Path $repo 'tools/mir/application/history/HistoricalSuccession.ps1')
+. (Join-Path $repo 'tools/mir/application/history/SuccessorHost.ps1')
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 $authority=Get-MIR4W09Authority -RepoRoot $repo
@@ -34,6 +34,6 @@ $witness=$successorA.succession_witness
 if(@($witness.changed_package_roots).Count-ne 14-or-not$witness.append_only-or$witness.prior_release_evidence_mutated-or-not$witness.published_predecessor.evidence_valid_for_predecessor-or$witness.evidence_disposition.c35_revoked-or$witness.evidence_disposition.transferable_to_mir4-or[string]$witness.published_predecessor.package_source_sha256-cne'FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89'-or[string]$witness.current_mir4.package_source_sha256-cne$packageBefore){throw '[mir4-w09-succession-witness]'}
 foreach($blocker in @('BLOCKED-HUMAN-SECRET-INPUT','BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER','BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO','BLOCKED-MUSEUM-RIGHTS-CUSTODY-RESTORE-CLOSURE','BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST')){if($blocker-notin@($successorA.blockers)){throw "[mir4-w09-blocker] $blocker"}}
 
-foreach($file in @('tools/lib/mir4/HistoricalSuccession.ps1','tools/lib/mir4/SuccessorHost.ps1','tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $repo $file);if($text-match'(?i)publication_authorized\s*=\s*\$true|source_freeze_authorized\s*=\s*\$true|production_signing_or_sealing_authorized\s*=\s*\$true|Invoke-WebRequest|Invoke-RestMethod|Start-BitsTransfer|System\.Net\.Http'){throw "[mir4-w09-capability-leak] $file"}}
+foreach($file in @('tools/mir/application/history/HistoricalSuccession.ps1','tools/mir/application/history/SuccessorHost.ps1','tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $repo $file);if($text-match'(?i)publication_authorized\s*=\s*\$true|source_freeze_authorized\s*=\s*\$true|production_signing_or_sealing_authorized\s*=\s*\$true|Invoke-WebRequest|Invoke-RestMethod|Start-BitsTransfer|System\.Net\.Http'){throw "[mir4-w09-capability-leak] $file"}}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-w09-package-mutation]'}
 Write-Host '[ok] MIR 4 W09 historical/museum inventory, exact blockers, offline closure, synthetic external provider, successor-host replay/reconstruction, and append-only succession witness passed.'

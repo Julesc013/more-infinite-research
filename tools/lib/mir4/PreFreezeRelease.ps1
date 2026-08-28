@@ -232,7 +232,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeModuleSdkMepMigration,
     [switch]$IncludeProcessIRExactMigration,
     [switch]$IncludeInspectorCompatibilityMigration,
-    [switch]$IncludeAssuranceOfflineCustodyMigration
+    [switch]$IncludeAssuranceOfflineCustodyMigration,
+    [switch]$IncludeHistoricalToolingMigration
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -315,6 +316,10 @@ function Get-MIR4PreFreezeAuthorityState {
     if (-not $IncludeInspectorCompatibilityMigration) { throw '[mir4-prefreeze-assurance-offline-custody-migration-requires-inspector-compatibility-migration]' }
     $links += @{path='releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json';kind='MIR4AssuranceOfflineCustodyMigrationReceiptV1'}
   }
+  if ($IncludeHistoricalToolingMigration) {
+    if (-not $IncludeAssuranceOfflineCustodyMigration) { throw '[mir4-prefreeze-historical-tooling-migration-requires-assurance-offline-custody-migration]' }
+    $links += @{path='releases/migrations/MIR4-Historical-Tooling-MigrationV1.json';kind='MIR4HistoricalToolingMigrationReceiptV1'}
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -396,6 +401,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json' = 'contracts/repository/mir4-processir-exact-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Inspector-Compatibility-Tooling-MigrationV1.json' = 'contracts/repository/mir4-inspector-compatibility-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json' = 'contracts/repository/mir4-assurance-offline-custody-migration-receipt-v1.schema.json'
+    'releases/migrations/MIR4-Historical-Tooling-MigrationV1.json' = 'contracts/repository/mir4-historical-tooling-migration-receipt-v1.schema.json'
   }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
@@ -439,6 +445,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json';kind='MIR4ProcessIRExactMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Inspector-Compatibility-Tooling-MigrationV1.json';kind='MIR4InspectorCompatibilityMigrationReceiptV1'}
     @{path='releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json';kind='MIR4AssuranceOfflineCustodyMigrationReceiptV1'}
+    @{path='releases/migrations/MIR4-Historical-Tooling-MigrationV1.json';kind='MIR4HistoricalToolingMigrationReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

@@ -56,7 +56,9 @@ Usage:
   .\tools\mir.ps1 mir4 module-sdk-mep-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 processir-exact-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 inspector-compatibility-migration <check|show> [--output <path>]
-  .\tools\mir.ps1 mir4 assurance-offline-custody-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -762,13 +764,31 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4InspectorCompatibilityMigration.ps1") @migrationArguments
       }
       "assurance-offline-custody-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 assurance-offline-custody-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 assurance-offline-custody-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 assurance-offline-custody-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 assurance-offline-custody-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1") @migrationArguments
+      }
+      "historical-tooling-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 historical-tooling-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 historical-tooling-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1") @migrationArguments
+      }
+      "historical-succession" {
+        if ($Args.Count -lt 3) { throw "mir4 historical-succession requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 historical-succession command: $subcommand" }
+        $historicalArguments = @{ RepoRoot=$repo.Path; Check=($subcommand -eq 'check') }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $historicalArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1") @historicalArguments
       }
       "targets" {
         if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }

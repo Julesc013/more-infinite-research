@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-23
+last_reviewed: 2026-08-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -24,6 +24,8 @@ Status: developer-preview shadow evidence for W09 (`M4C02-09-24H`). This module 
 W09 composes evidence owned elsewhere. Target identity and disposition remain with Target Registry V6 and the W02 target compiler. Historical archive construction remains with `New-MIR4HistoricalPrivateCandidate.ps1`; exact historical runtime remains with its dedicated runtime harness. Museum source generation remains with `MuseumCompiler.psm1`. Extension closure and transports remain W05-owned, continuity remains W04-owned, and freshness/revocation remains W08-owned.
 
 The W09 module owns only two output projections: `MIR4_HISTORICAL_MUSEUM_MATRIX.json` and `MIR4_SUCCESSOR_HOST_RESULT.json`. The latter embeds the append-only package succession witness. Neither output feeds back into an upstream owner.
+
+The canonical package-excluded applications are `tools/mir/application/history/HistoricalSuccession.ps1` and `tools/mir/application/history/SuccessorHost.ps1`; `tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1` is their canonical exporter. The former `tools/lib/mir4` and `tools/commands/mir4` paths are one-line read-only compatibility forwarders. `HistoricalToolingMigration.ps1` is the sole current migration-receipt writer, while the accepted assurance/offline-custody predecessor writer is immutable. `ReleaseDag.ps1` remains outside this migration family and retains its existing authority for the later release-tooling cutover.
 
 ## Historical and museum matrix
 
