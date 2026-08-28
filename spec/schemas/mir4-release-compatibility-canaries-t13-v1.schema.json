@@ -3,7 +3,8 @@
   "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/control/release-compatibility-canaries-t13-v1.schema.json",
   "title": "MIR 4 T13 release compatibility canary authority",
   "type": "object",
-  "required": ["schema", "kind", "work_package", "programme_id", "maturity", "canonicalization", "exact_processir_authority", "diagnostic_registry", "required_capture_count", "required_canary_count", "lifecycle", "target_upgrades", "common_expiry_triggers", "canaries", "release_qualification_input", "semantic_authority", "player_mutation_authorized", "prototype_write_authorized", "automatic_synthesis_authorized", "public_support_claim_authorized", "source_freeze_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "package_visible"],
+  "additionalProperties": false,
+  "required": ["schema", "kind", "work_package", "programme_id", "maturity", "canonicalization", "exact_processir_authority", "diagnostic_registry", "required_capture_count", "required_canary_count", "lifecycle", "target_upgrades", "common_expiry_triggers", "canaries", "release_qualification_input", "semantic_authority", "player_mutation_authorized", "prototype_write_authorized", "automatic_synthesis_authorized", "public_support_claim_authorized", "source_freeze_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "tooling", "package_visible"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4ReleaseCompatibilityCanariesT13V1"},
@@ -29,6 +30,20 @@
     "signing_or_sealing_authorized": {"const": false},
     "promotion_authorized": {"const": false},
     "publication_authorized": {"const": false},
+    "tooling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applications", "commands", "migration_authority", "compatibility_entrypoints", "reference_mode", "package_visible", "release_transition_authority"],
+      "properties": {
+        "applications": {"const": ["tools/mir/application/inspection/CompatibilityCanary.ps1"]},
+        "commands": {"const": ["tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1"]},
+        "migration_authority": {"const": "governance/repository/migrations/inspector-compatibility-tooling-v1.json"},
+        "compatibility_entrypoints": {"const": ["tools/lib/mir4/CompatibilityCanary.ps1", "tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1"]},
+        "reference_mode": {"const": "read-only-exact-historical-evidence"},
+        "package_visible": {"const": false},
+        "release_transition_authority": {"const": false}
+      }
+    },
     "package_visible": {"const": false}
   }
 }

@@ -1,13 +1,16 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/Inspector.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/CompatibilityFactory.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/inspection/Inspector.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/inspection/CompatibilityFactory.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
+$authorityText=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json')
+if(-not($authorityText|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-inspector-compatibility-programme-v1.schema.json'))){throw '[mir4-w07-authority-schema]'}
 $authority=Get-MIR4InspectorCompatibilityAuthority -RepoRoot $RepoRoot
 if(@($authority.inspector_sections).Count-ne 11-or@($authority.named_ecosystems).Count-ne 10-or@($authority.safe_choice_priority).Count-ne 7-or@($authority.factory_pipeline).Count-ne 7-or@($authority.factory_zip_allowlist).Count-ne 9){throw '[mir4-w07-authority-counts]'}
+if([bool]$authority.tooling.package_visible-or[bool]$authority.tooling.release_transition_authority-or[string]$authority.tooling.migration_authority-cne'governance/repository/migrations/inspector-compatibility-tooling-v1.json'){throw '[mir4-w07-tooling-authority]'}
 foreach($flag in @('semantic_authority','terminal_compatibility_policy_authority','terminal_claim_authority','player_package_mutation_authorized','prototype_write_authorized','runtime_state_mutation_authorized','migration_execution_authorized','planner_or_emitter_admission_authorized','safety_kernel_override_authorized','arbitrary_code_generation_authorized','network_or_upload_authorized','public_support_authorized','signing_or_sealing_authorized','publication_authorized')){if([bool]$authority.$flag){throw "[mir4-w07-authority-boundary] $flag"}}
 
 $ledger=New-MIR4CompatibilitySubjectLedger -RepoRoot $RepoRoot -SourceIdentity $null
@@ -73,13 +76,13 @@ foreach($check in @(@{Value=$workbench.inspection_bundle;Schema='spec/schemas/mi
 
 $processIr=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'sdk/preview/mir4/reference/process-ir-parity-result.json')|ConvertFrom-Json -Depth 100
 if([string]$processIr.exact_target_status-cne'CAPTURED-EXACT-F210-F200-PROCESSIR-PREVIEW-WITH-DECLARED-CUSTODY-BLOCKER'-or-not$processIr.exact_target_evidence.deterministic-or$processIr.exact_target_evidence.authoritative-or$processIr.public_release_proof-or-not[string]::IsNullOrWhiteSpace([string]$processIr.source_identity.commit)-or-not[string]::IsNullOrWhiteSpace([string]$processIr.source_identity.tree)){throw '[mir4-w07-processir-claim-gate]'}
-foreach($source in @('tools/lib/mir4/CompatibilityIndex.ps1','tools/lib/mir4/SupportAssessment.ps1','tools/lib/mir4/Inspector.ps1','tools/lib/mir4/CompatibilityFactory.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $source);if($text-match'(?m)\bdata\.raw\b'-or$text-match'prototypes/mir/(?:planner|emit|runtime)'){throw "[mir4-w07-forbidden-terminal-import] $source"}}
+foreach($source in @('tools/mir/application/inspection/CompatibilityIndex.ps1','tools/mir/application/inspection/SupportAssessment.ps1','tools/mir/application/inspection/Inspector.ps1','tools/mir/application/inspection/CompatibilityFactory.ps1')){$text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $source);if($text-match'(?m)\bdata\.raw\b'-or$text-match'prototypes/mir/(?:planner|emit|runtime)'){throw "[mir4-w07-forbidden-terminal-import] $source"}}
 
 Invoke-MIR4PlatformGenerate -RepoRoot $RepoRoot -Check|Out-Null
 Test-MIR4PlatformConformance -RepoRoot $RepoRoot|Out-Null
 $recordsOut='build/mir4/m4c02-inspector-compatibility'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $recordsOut|Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $recordsOut -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $recordsOut|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1') -RepoRoot $RepoRoot -OutputRoot $recordsOut -Check|Out-Null
 foreach($name in @('MIR4_INSPECTOR_WORKBENCH_RESULT.json','MIR4_COMPATIBILITY_SUBJECT_LEDGER.json')){$record=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "$recordsOut/$name")|ConvertFrom-Json -Depth 100;if($record.package_visible-or$record.public_release_proof-or$record.player_mutation_authorized){throw "[mir4-w07-record-boundary] $name"}}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$packageBefore){throw '[mir4-w07-package-mutation]'}
 Write-Host '[ok] MIR 4 W07 bounded Inspector, normalized evidence, and data-only compatibility factory passed.'

@@ -17,7 +17,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/mir/application/processir/ExactProcessIR.ps1')
-. (Join-Path $repo 'tools/lib/mir4/Inspector.ps1')
+. (Join-Path $repo 'tools/mir/application/inspection/Inspector.ps1')
 
 function Resolve-T12Output([string]$Relative,[string]$AllowedRoot){
   $full=[IO.Path]::GetFullPath((Join-Path $repo $Relative));$allowed=[IO.Path]::GetFullPath((Join-Path $repo $AllowedRoot)).TrimEnd('\')+'\'

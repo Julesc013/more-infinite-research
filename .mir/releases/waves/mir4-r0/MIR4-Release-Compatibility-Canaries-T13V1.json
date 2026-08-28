@@ -129,5 +129,14 @@
   "signing_or_sealing_authorized": false,
   "promotion_authorized": false,
   "publication_authorized": false,
+  "tooling": {
+    "applications": ["tools/mir/application/inspection/CompatibilityCanary.ps1"],
+    "commands": ["tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/inspector-compatibility-tooling-v1.json",
+    "compatibility_entrypoints": ["tools/lib/mir4/CompatibilityCanary.ps1","tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1"],
+    "reference_mode": "read-only-exact-historical-evidence",
+    "package_visible": false,
+    "release_transition_authority": false
+  },
   "package_visible": false
 }

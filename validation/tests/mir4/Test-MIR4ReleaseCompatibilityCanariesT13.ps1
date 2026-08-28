@@ -1,15 +1,16 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/CompatibilityCanary.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/inspection/CompatibilityCanary.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4T13Authority -RepoRoot $RepoRoot
 $authorityJson=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json')
 if(-not($authorityJson|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-release-compatibility-canaries-t13-v1.schema.json'))){throw '[mir4-t13-authority-schema]'}
+if([bool]$authority.tooling.package_visible-or[bool]$authority.tooling.release_transition_authority-or[string]$authority.tooling.reference_mode-cne'read-only-exact-historical-evidence'){throw '[mir4-t13-tooling-authority]'}
 foreach($flag in @('semantic_authority','player_mutation_authorized','prototype_write_authorized','automatic_synthesis_authorized','public_support_claim_authorized','source_freeze_authorized','signing_or_sealing_authorized','promotion_authorized','publication_authorized','package_visible')){if([bool]$authority.$flag){throw "[mir4-t13-authority-firewall] $flag"}}
 
-& (Join-Path $RepoRoot 'tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1') -RepoRoot $RepoRoot -Check|Out-Null
+& (Join-Path $RepoRoot 'tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1') -RepoRoot $RepoRoot -Check|Out-Null
 $root=Join-Path $RepoRoot 'sdk/preview/mir4/reference/t13'
 $receipt=Get-Content -Raw -LiteralPath (Join-Path $root 'MIR4_T13_RECEIPT.json')|ConvertFrom-Json -Depth 100
 if(-not(($receipt|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/preview/mir4-t13-receipt-v1.schema.json'))-or

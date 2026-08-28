@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -31,9 +31,15 @@ T12 exact ProcessIR snapshots -> bounded A/B comparison DTO
   -> offline Inspector V1 and data-only Compatibility Factory bundle
 ```
 
-`tools/lib/mir4/SupportAssessment.ps1` is the sole W07 subject-assessment owner. Every named ecosystem has separate availability, hard-safety, implementation, target-portability, migration, proof, claim, evidence, and revocation dimensions. There is no modpack-wide support Boolean. Evidence from SOL07 is labeled `historical-development-evidence-nontransferable`; it cannot qualify a different source, candidate, target, public claim, or release.
+`tools/mir/application/inspection/SupportAssessment.ps1` is the sole W07 subject-assessment owner. Every named ecosystem has separate availability, hard-safety, implementation, target-portability, migration, proof, claim, evidence, and revocation dimensions. There is no modpack-wide support Boolean. Evidence from SOL07 is labeled `historical-development-evidence-nontransferable`; it cannot qualify a different source, candidate, target, public claim, or release.
 
-`tools/lib/mir4/CompatibilityFactory.ps1` implements the closed priority order from generic correction through preserve/review/omit and an experimental trusted adapter last. A selected lower option retains explicit reasons for rejecting every higher option. Its deterministic ZIP contains only JSON, schemas, provenance, plans, explanations, portability, and ledger data. Lua, PowerShell, callbacks, prototype paths, runtime code, migrations, and undeclared entries are rejected.
+`tools/mir/application/inspection/CompatibilityFactory.ps1` implements the closed priority order from generic correction through preserve/review/omit and an experimental trusted adapter last. A selected lower option retains explicit reasons for rejecting every higher option. Its deterministic ZIP contains only JSON, schemas, provenance, plans, explanations, portability, and ledger data. Lua, PowerShell, callbacks, prototype paths, runtime code, migrations, and undeclared entries are rejected.
+
+## Canonical tooling and migration
+
+The five canonical W07/T13 applications live under `tools/mir/application/inspection`, and their two canonical exporters live under `tools/mir/cli`. The former `tools/lib/mir4` and `tools/commands/mir4` paths are read-only compatibility forwarders with no independent writer authority.
+
+`governance/repository/migrations/inspector-compatibility-tooling-v1.json` governs the package-excluded cutover. Its append-only receipt binds W07 assessment and Inspector behavior, the immutable T13 exact-canary reference, compatibility-entrypoint parity, unchanged compatibility policy and player source, rollback, and disabled release transitions.
 
 Inspector V0 remains unchanged under `sdk/preview/mir4/inspector`. Inspector V1 lives separately under `sdk/preview/mir4/inspector-v1`. V1 accepts only `MIR4InspectionBundleV1`, renders eleven fixed bounded sections, uses native keyboard controls and accessible tables/live regions, keeps strings in a localization catalogue, and has a network-denying content security policy. It performs no upload, remote fetch, runtime polling, or mutation.
 
