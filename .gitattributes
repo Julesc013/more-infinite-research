@@ -148,4 +148,5 @@ tests/diagnostics/** text eol=lf
 tests/targets/** text eol=lf
 tests/platform/** text eol=lf
 tests/technology/** text eol=lf
+tests/release-tooling/** text eol=lf
 tools/mir/** text eol=lf

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-release-tooling-migration-receipt-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "kind", "migration_id", "state", "fixed_point_authority", "migration_authority", "assurance_policy", "predecessor_receipt", "predecessor_immutability", "activated_roots", "components", "evolved_bindings", "current_authorities", "parity", "transition_gate", "sunset", "package_source_sha256", "package_visible_delta", "release_transition_authority", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseToolingMigrationReceiptV1"},
+    "migration_id": {"const": "MIR4-RELEASE-TOOLING-V1"},
+    "state": {"const": "RELEASE-DAG-APPLICATION-AND-TEST-CUTOVER-VERIFIED-COMPATIBILITY-RETAINED"},
+    "predecessor_receipt": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"const": "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json"}, "sha256": {"const": "2DD6E9A15A239968B22539EE1C203345CFA6FB29498911770D1035503737E104"}}},
+    "package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "package_visible_delta": {"type": "array", "maxItems": 0},
+    "transition_gate": {"$ref": "#/$defs/releaseFirewall"},
+    "release_transition_authority": {"$ref": "#/$defs/releaseFirewall"}
+  },
+  "$defs": {
+    "releaseFirewall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "seal", "promotion", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "seal": {"const": false},
+        "promotion": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

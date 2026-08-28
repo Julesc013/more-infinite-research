@@ -529,6 +529,22 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1
     boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
     stability: developer-preview-shadow-partial-with-bounded-blockers
+  mir4_release_tooling_v1:
+    migration_authority: governance/repository/migrations/release-tooling-v1.json
+    migration_assurance: assurance/repository/release-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Release-Tooling-MigrationV1.json
+    authority: spec/platform/mir4-preview-v0/release-dag.json
+    implementation: tools/mir/application/release/ReleaseDag.ps1
+    compatibility_entrypoint: tools/lib/mir4/ReleaseDag.ps1
+    migration_writer: tools/mir/application/release/ReleaseToolingMigration.ps1
+    migration_cli: tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1
+    documentation: docs/architecture/mir4-platform-preview.md
+    tests:
+      - tests/release-tooling/Test-MIR4ReleaseTooling.ps1
+      - tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1
+      - validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+    boundary: read-only validation of the stable release DAG contract; no phase execution, candidate allocation, prototype or runtime mutation, source freeze, production signing, sealing, promotion, tag, upload, publication, or public support authority
+    stability: stable-canonical-release-dag-application-migrated-compatibility-reader-retained
   mir4_full_platform_closeout_v1:
     implementation: tools/lib/mir4/FullPlatformCloseout.ps1
     exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
@@ -665,7 +681,7 @@ package_excluded_modules:
     environment_evidence: tools/mir/application/assurance/EnvironmentEvidence.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
     inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
-    release_dag: tools/lib/mir4/ReleaseDag.ps1
+    release_dag: tools/mir/application/release/ReleaseDag.ps1
     command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     generated_root: sdk/preview/mir4
     current_release_asset_generation: v1
@@ -1489,7 +1505,7 @@ validation_tooling:
     mir4_runtime_continuity_migration_test: tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1
     mir4_runtime_continuity_gate: validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1
     mir4_process_ir: tools/mir/application/processir/ProcessIR.ps1
-    mir4_release_dag: tools/lib/mir4/ReleaseDag.ps1
+    mir4_release_dag: tools/mir/application/release/ReleaseDag.ps1
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
     mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
     mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
@@ -1549,6 +1565,9 @@ validation_tooling:
     mir4_historical_tooling_migration_authority: governance/repository/migrations/historical-tooling-v1.json
     mir4_historical_tooling_migration_receipt: releases/migrations/MIR4-Historical-Tooling-MigrationV1.json
     mir4_historical_tooling_migration_gate: tests/history/Test-MIR4HistoricalToolingMigration.ps1
+    mir4_release_tooling_migration_authority: governance/repository/migrations/release-tooling-v1.json
+    mir4_release_tooling_migration_receipt: releases/migrations/MIR4-Release-Tooling-MigrationV1.json
+    mir4_release_tooling_migration_gate: tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1
     mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json

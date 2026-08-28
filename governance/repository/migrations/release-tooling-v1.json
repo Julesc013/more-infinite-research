@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseToolingMigrationAuthorityV1",
+  "migration_id": "MIR4-RELEASE-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-RELEASE-DAG-APPLICATION-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json",
+    "sha256": "2DD6E9A15A239968B22539EE1C203345CFA6FB29498911770D1035503737E104"
+  },
+  "scope": "Read-only MIR4 release-DAG validation tooling only; release phase execution, signing, sealing, promotion, publication, player source, compatibility policy, and historical receipts remain unchanged.",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {
+      "fact_family": "release-tooling-migration-receipt",
+      "path": "tools/mir/application/release/ReleaseToolingMigration.ps1",
+      "command": "tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1"
+    }
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/release-tooling-v1.json","state":"canonical","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-release-tooling-migration-authority-v1.schema.json","state":"canonical","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-release-tooling-migration-proof-v1.schema.json","state":"canonical","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-release-tooling-migration-receipt-v1.schema.json","state":"canonical","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/release-tooling-v1.json","state":"canonical","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Release-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"migration-writer","current_path":null,"final_path":"tools/mir/application/release/ReleaseToolingMigration.ps1","state":"sole-receipt-writer","package_visible":false},
+    {"family":"migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1","state":"canonical-command","package_visible":false},
+    {"family":"release-dag-application","current_path":"tools/lib/mir4/ReleaseDag.ps1","final_path":"tools/mir/application/release/ReleaseDag.ps1","state":"canonical-abi-preserved","package_visible":false},
+    {"family":"release-dag-forwarder","current_path":"tools/lib/mir4/ReleaseDag.ps1","final_path":"tools/lib/mir4/ReleaseDag.ps1","state":"compatibility-read-only","package_visible":false},
+    {"family":"release-dag-authority","current_path":"spec/platform/mir4-preview-v0/release-dag.json","final_path":"spec/platform/mir4-preview-v0/release-dag.json","state":"read-only-authority","package_visible":false},
+    {"family":"focused-functional-test","current_path":null,"final_path":"tests/release-tooling/Test-MIR4ReleaseTooling.ps1","state":"canonical-test","package_visible":false},
+    {"family":"migration-test","current_path":null,"final_path":"tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1","state":"canonical-test","package_visible":false},
+    {"family":"platform-preview","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"canonical-consumer","package_visible":false},
+    {"family":"platform-preview-test","current_path":"validation/tests/mir4/Test-MIR4PlatformPreview.ps1","final_path":"validation/tests/mir4/Test-MIR4PlatformPreview.ps1","state":"canonical-consumer","package_visible":false},
+    {"family":"path-registry","current_path":".mir/control/paths.yml","final_path":".mir/control/paths.yml","state":"canonical-paths","package_visible":false},
+    {"family":"module-registry","current_path":".mir/modules.yml","final_path":".mir/modules.yml","state":"canonical-paths","package_visible":false},
+    {"family":"test-catalogue","current_path":"validation/tests.yml","final_path":"validation/tests.yml","state":"focused-registration","package_visible":false},
+    {"family":"facade","current_path":"tools/mir.ps1","final_path":"tools/mir.ps1","state":"canonical-routing","package_visible":false},
+    {"family":"fixed-point-authority","current_path":".mir/control/repository-fixed-point.json","final_path":".mir/control/repository-fixed-point.json","state":"append-only-successor","package_visible":false},
+    {"family":"prefreeze-chain","current_path":"tools/lib/mir4/PreFreezeRelease.ps1","final_path":"tools/lib/mir4/PreFreezeRelease.ps1","state":"append-only-successor","package_visible":false},
+    {"family":"release-history-assurance-fingerprint","current_path":"tools/lib/assurance/Evidence.ps1","final_path":"tools/lib/assurance/Evidence.ps1","state":"append-only-successor-fingerprint","package_visible":false},
+    {"family":"published-snapshot-successor-verifier","current_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","final_path":"validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1","state":"append-only-successor-verifier","package_visible":false},
+    {"family":"release-history-assurance-self-test","current_path":"validation/tests/tooling/Test-MIRAssurance.ps1","final_path":"validation/tests/tooling/Test-MIRAssurance.ps1","state":"append-only-successor-fingerprint","package_visible":false},
+    {"family":"module-boundary-documentation","current_path":"docs/architecture/module-boundaries.md","final_path":"docs/architecture/module-boundaries.md","state":"canonical-documentation","package_visible":false},
+    {"family":"platform-preview-documentation","current_path":"docs/architecture/mir4-platform-preview.md","final_path":"docs/architecture/mir4-platform-preview.md","state":"canonical-documentation","package_visible":false},
+    {"family":"historical-documentation","current_path":"docs/architecture/mir4-historical-succession.md","final_path":"docs/architecture/mir4-historical-succession.md","state":"append-only-successor","package_visible":false},
+    {"family":"fixed-point-documentation","current_path":"docs/architecture/mir4-repository-fixed-point.md","final_path":"docs/architecture/mir4-repository-fixed-point.md","state":"append-only-successor","package_visible":false},
+    {"family":"platform-lock","current_path":"mir.lock","final_path":"mir.lock","state":"generated-projection","package_visible":false},
+    {"family":"assurance-root-marker","current_path":"assurance/.mir-root.json","final_path":"assurance/.mir-root.json","state":"generated-projection","package_visible":false},
+    {"family":"governance-root-marker","current_path":"governance/.mir-root.json","final_path":"governance/.mir-root.json","state":"generated-projection","package_visible":false},
+    {"family":"tests-root-marker","current_path":"tests/.mir-root.json","final_path":"tests/.mir-root.json","state":"generated-projection","package_visible":false},
+    {"family":"predecessor-writer","current_path":"tools/mir/application/history/HistoricalToolingMigration.ps1","final_path":"tools/mir/application/history/HistoricalToolingMigration.ps1","state":"check-only-immutable","package_visible":false},
+    {"family":"predecessor-cli","current_path":"tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1","state":"check-only-immutable","package_visible":false},
+    {"family":"predecessor-test","current_path":"tests/history/Test-MIR4HistoricalToolingMigration.ps1","final_path":"tests/history/Test-MIR4HistoricalToolingMigration.ps1","state":"immutable-predecessor-test","package_visible":false},
+    {"family":"predecessor-assurance-test","current_path":"tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1","final_path":"tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1","state":"evolved-release-history-successor-verification","package_visible":false},
+    {"family":"fixed-point-implementation","current_path":"tools/mir/domain/repository/RepositoryFixedPoint.ps1","final_path":"tools/mir/domain/repository/RepositoryFixedPoint.ps1","state":"append-only-successor","package_visible":false},
+    {"family":"fixed-point-test","current_path":"tests/repository/Test-MIR4RepositoryFixedPoint.ps1","final_path":"tests/repository/Test-MIR4RepositoryFixedPoint.ps1","state":"append-only-successor","package_visible":false},
+    {"family":"platform-component-matrix","current_path":"docs/reference/generated/mir4-platform-component-matrix.md","final_path":"docs/reference/generated/mir4-platform-component-matrix.md","state":"generated-projection","package_visible":false},
+    {"family":"whole-platform-matrix","current_path":"docs/reference/generated/mir4-whole-platform-matrix.md","final_path":"docs/reference/generated/mir4-whole-platform-matrix.md","state":"generated-projection","package_visible":false},
+    {"family":"whole-platform-documentation","current_path":"docs/releases/mir4-4.0-whole-platform-programme.md","final_path":"docs/releases/mir4-4.0-whole-platform-programme.md","state":"generated-projection","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/ReleaseDag.ps1","role":"library-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "Revert the exact merged RFP-11 work package; restore the former package-excluded ReleaseDag path and retain player source, release execution, and historical receipts unchanged.",
+    "preserves": ["player-package-source", "release-phase-engine", "compatibility-policy", "historical-receipts", "release-authority-firewalls"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-reader-retained",
+    "required_gates": ["all-declared-consumers-use-final-path", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "seal": false,
+    "promotion": false,
+    "tagging": false,
+    "publication": false
+  }
+}

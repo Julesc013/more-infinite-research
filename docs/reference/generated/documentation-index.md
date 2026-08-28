@@ -68,7 +68,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-module-ecosystem.md | MIR 4 Module Ecosystem | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-offline-release-authority.md | MIR 4 Offline Release Authority | draft | maintainer | reference | mir-maintainers | 2026-08-07 |
-| docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-24 |
+| docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
 | docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-28 |

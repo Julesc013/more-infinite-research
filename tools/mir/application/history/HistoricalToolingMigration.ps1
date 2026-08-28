@@ -19,6 +19,8 @@ $script:MIR4HistoricalToolingArchiveContentSha256V1='sha256:c5b5c7d1a82f7d2d68d7
 $script:MIR4HistoricalToolingCompatibilityPolicySha256='54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2'
 $script:MIR4HistoricalToolingT14ReceiptSha256='AD83B044BF955D136FF68484D5913F1B857238D73229ED03F8B278AB5CB6EED0'
 $script:MIR4HistoricalToolingReleaseDagSha256='C2CD3A4A84A21FB2722C5203CC9ED318BB1876C5C4388EB73BA5ADFE21CD4EE1'
+$script:MIR4HistoricalToolingMigrationReceiptSha256='2DD6E9A15A239968B22539EE1C203345CFA6FB29498911770D1035503737E104'
+$script:MIR4HistoricalToolingMigrationReceiptBytes=40658
 
 function Get-MIR4HistoricalToolingMigrationAuthorityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -142,7 +144,9 @@ function Get-MIR4HistoricalToolingMigrationReceiptTextV1 {
 
 function Invoke-MIR4HistoricalToolingMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$path=Join-Path $repo $script:MIR4HistoricalToolingMigrationReceiptPath;$text=Get-MIR4HistoricalToolingMigrationReceiptTextV1 -RepoRoot $repo
-  if($Check){if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or[IO.File]::ReadAllText($path)-cne$text){throw '[mir4-historical-tooling-migration-receipt-stale]'};if(-not(Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4HistoricalToolingMigrationReceiptPath -SchemaPath $script:MIR4HistoricalToolingMigrationReceiptSchemaPath)){throw '[mir4-historical-tooling-migration-receipt-schema]'}}else{New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent)|Out-Null;[IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))}
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4HistoricalToolingMigrationReceiptPath
+  if(-not$Check){throw '[mir4-historical-tooling-migration-receipt-immutable] generation-disabled-after-successor-cutover'}
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $receipt=Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4HistoricalToolingMigrationReceiptPath -ExpectedSha256 $script:MIR4HistoricalToolingMigrationReceiptSha256 -SchemaPath $script:MIR4HistoricalToolingMigrationReceiptSchemaPath -Kind 'MIR4HistoricalToolingMigrationReceiptV1' -DigestDomain 'mir4:historical-tooling-migration-receipt:1' -ErrorPrefix 'mir4-historical-tooling-migration'
+  if((Get-Item -LiteralPath (Join-Path $repo $script:MIR4HistoricalToolingMigrationReceiptPath)).Length-ne$script:MIR4HistoricalToolingMigrationReceiptBytes){throw '[mir4-historical-tooling-migration-receipt-byte-length]'}
+  return $receipt
 }

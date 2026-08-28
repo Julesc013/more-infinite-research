@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-release-tooling-migration-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "migration_id", "test_id", "required_checks", "evidence_entrypoint", "functional_evidence_entrypoint", "pre_cutover_functional_digest", "functional_parity_digest", "pre_cutover_implementation_sha256", "release_dag_authority_sha256", "compatibility_policy_sha256", "t14_receipt_sha256", "package_source_sha256", "unknown_policy", "independent_human_acceptance_required", "release_transition_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseToolingMigrationProofPolicyV1"},
+    "migration_id": {"const": "MIR4-RELEASE-TOOLING-V1"},
+    "test_id": {"const": "static.mir4-release-tooling-migration-v1"},
+    "required_checks": {"type": "array", "minItems": 28, "maxItems": 28, "uniqueItems": true},
+    "evidence_entrypoint": {"const": "tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1"},
+    "functional_evidence_entrypoint": {"const": "tests/release-tooling/Test-MIR4ReleaseTooling.ps1"},
+    "pre_cutover_functional_digest": {"const": "sha256:59043062e11420aee5daaeee51f8735f538b3091b0a87b43ec9c22e10743f99d"},
+    "functional_parity_digest": {"const": "sha256:59043062e11420aee5daaeee51f8735f538b3091b0a87b43ec9c22e10743f99d"},
+    "pre_cutover_implementation_sha256": {"const": "C2CD3A4A84A21FB2722C5203CC9ED318BB1876C5C4388EB73BA5ADFE21CD4EE1"},
+    "release_dag_authority_sha256": {"const": "4D7532BCE19B995CC215FA4E26E6079278E26E8FF3C1E9AE72C5F1422E24DDBD"},
+    "compatibility_policy_sha256": {"const": "54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2"},
+    "t14_receipt_sha256": {"const": "AD83B044BF955D136FF68484D5913F1B857238D73229ED03F8B278AB5CB6EED0"},
+    "package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "unknown_policy": {"const": "fail"},
+    "independent_human_acceptance_required": {"const": false},
+    "release_transition_authority": {"const": false}
+  }
+}

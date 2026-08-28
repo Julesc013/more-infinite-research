@@ -33,7 +33,7 @@ function Get-MIR4RepositoryFixedPointAuthority {
     throw '[mir4-repository-cutover-boundary]'
   }
   if ([string]$authority.migration_authority -cne $script:MIR4RepositoryMigrationAuthorityPath) { throw '[mir4-repository-migration-authority-binding]' }
-  if (@($authority.migration_sequence).Count -ne 14 -or
+  if (@($authority.migration_sequence).Count -ne 15 -or
       [string]$authority.migration_sequence[0].migration_id -cne 'MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1' -or
       [string]$authority.migration_sequence[0].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[1].migration_id -cne 'MIR4-CANONICALIZATION-TOOLING-V1' -or
@@ -61,7 +61,9 @@ function Get-MIR4RepositoryFixedPointAuthority {
       [string]$authority.migration_sequence[12].migration_id -cne 'MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1' -or
       [string]$authority.migration_sequence[12].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[13].migration_id -cne 'MIR4-HISTORICAL-TOOLING-V1' -or
-      [string]$authority.migration_sequence[13].state -cne 'current-append-only-successor') {
+      [string]$authority.migration_sequence[13].state -cne 'accepted-immutable-predecessor' -or
+      [string]$authority.migration_sequence[14].migration_id -cne 'MIR4-RELEASE-TOOLING-V1' -or
+      [string]$authority.migration_sequence[14].state -cne 'current-append-only-successor') {
     throw '[mir4-repository-migration-sequence]'
   }
   $ids = @($authority.visible_roots | ForEach-Object { [string]$_.id })

@@ -327,6 +327,8 @@ paths:
   tools.mir.application.history.historical-succession: tools/mir/application/history/HistoricalSuccession.ps1
   tools.mir.application.history.successor-host: tools/mir/application/history/SuccessorHost.ps1
   tools.mir.application.history.migration: tools/mir/application/history/HistoricalToolingMigration.ps1
+  tools.mir.application.release.release-dag: tools/mir/application/release/ReleaseDag.ps1
+  tools.mir.application.release.migration: tools/mir/application/release/ReleaseToolingMigration.ps1
   tools.mir.application.custody.offline-candidate: tools/mir/application/custody/OfflineCandidateCustody.ps1
   tools.mir.cli.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
   tools.mir.cli.compatibility-canary-records: tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1
@@ -336,6 +338,7 @@ paths:
   tools.mir.cli.assurance-offline-custody-migration: tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1
   tools.mir.cli.historical-succession-records: tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1
   tools.mir.cli.historical-tooling-migration: tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1
+  tools.mir.cli.release-tooling-migration: tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1
   tools.lib.mir4.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
   tools.lib.mir4.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
   tools.lib.mir4.inspector: tools/mir/application/inspection/Inspector.ps1
@@ -347,6 +350,7 @@ paths:
   tools.lib.mir4.offline-candidate-custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
   tools.lib.mir4.historical-succession: tools/mir/application/history/HistoricalSuccession.ps1
   tools.lib.mir4.successor-host: tools/mir/application/history/SuccessorHost.ps1
+  tools.lib.mir4.release-dag: tools/mir/application/release/ReleaseDag.ps1
   tools.lib.mir4.package-presentation: tools/lib/mir4/PackagePresentation.ps1
   tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
   tools.lib.mir4.supply-chain: tools/lib/mir4/SupplyChain.ps1
