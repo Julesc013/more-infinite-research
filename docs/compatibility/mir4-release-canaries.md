@@ -5,7 +5,7 @@ applies_to: "4.0.0 pre-freeze T13"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-28
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -39,12 +39,15 @@ ProcessIR remains conservative. A clean-loading canary can still contain FailHar
 
 T13 is package-excluded release-qualification evidence. It does not itself authorize a public support claim, source freeze, signing, sealing, promotion, or publication.
 
+The canonical canary application is `tools/mir/application/inspection/CompatibilityCanary.ps1`, and its canonical exporter is `tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1`. The former library and command paths are read-only compatibility forwarders. The Inspector/compatibility migration binds these paths while preserving the tracked T13 receipt and manifest byte-for-byte.
+
 ## Commands
 
 Check the tracked reference:
 
 ~~~powershell
 .\tools\mir.ps1 mir4 release-canaries check
+.\tools\mir.ps1 mir4 inspector-compatibility-migration check
 ~~~
 
 Rebuild the reference only after exact T12 captures and both target upgrade matrices exist:

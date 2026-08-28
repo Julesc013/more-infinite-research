@@ -273,7 +273,7 @@ paths:
   tools.commands.mir4.runtime-continuity-records: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
   tools.commands.mir4.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
   tools.commands.mir4.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
-  tools.commands.mir4.inspector-compatibility-records: tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1
+  tools.commands.mir4.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
   tools.commands.mir4.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
   tools.commands.mir4.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
   tools.commands.mir4.assurance-scale-records: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
@@ -313,11 +313,20 @@ paths:
   tools.mir.cli.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
   tools.mir.cli.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
   tools.mir.cli.processir-exact-migration: tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1
-  tools.lib.mir4.compatibility-index: tools/lib/mir4/CompatibilityIndex.ps1
-  tools.lib.mir4.support-assessment: tools/lib/mir4/SupportAssessment.ps1
-  tools.lib.mir4.inspector: tools/lib/mir4/Inspector.ps1
+  tools.mir.application.inspection.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
+  tools.mir.application.inspection.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
+  tools.mir.application.inspection.inspector: tools/mir/application/inspection/Inspector.ps1
+  tools.mir.application.inspection.compatibility-factory: tools/mir/application/inspection/CompatibilityFactory.ps1
+  tools.mir.application.inspection.compatibility-canary: tools/mir/application/inspection/CompatibilityCanary.ps1
+  tools.mir.application.inspection.migration: tools/mir/application/inspection/InspectorCompatibilityMigration.ps1
+  tools.mir.cli.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
+  tools.mir.cli.compatibility-canary-records: tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1
+  tools.mir.cli.inspector-compatibility-migration: tools/mir/cli/Invoke-MIR4InspectorCompatibilityMigration.ps1
+  tools.lib.mir4.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
+  tools.lib.mir4.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
+  tools.lib.mir4.inspector: tools/mir/application/inspection/Inspector.ps1
   tools.lib.mir4.exact-processir: tools/mir/application/processir/ExactProcessIR.ps1
-  tools.lib.mir4.compatibility-factory: tools/lib/mir4/CompatibilityFactory.ps1
+  tools.lib.mir4.compatibility-factory: tools/mir/application/inspection/CompatibilityFactory.ps1
   tools.lib.mir4.assurance-scale: tools/lib/mir4/AssuranceScale.ps1
   tools.lib.mir4.release-budget: tools/lib/mir4/ReleaseBudget.ps1
   tools.lib.mir4.offline-drill: tools/lib/mir4/OfflineDrill.ps1

@@ -65,7 +65,7 @@ Ages are measured against the newest governed review date, 2026-08-28, so checko
 | docs/architecture/mir-extension-protocol-v1.md | archived | 2026-08-08 | 20 | current-window |
 | docs/architecture/mir4-assurance-scale.md | current | 2026-08-26 | 2 | current-window |
 | docs/architecture/mir4-historical-succession.md | current | 2026-08-23 | 5 | current-window |
-| docs/architecture/mir4-inspector-compatibility.md | current | 2026-08-26 | 2 | current-window |
+| docs/architecture/mir4-inspector-compatibility.md | current | 2026-08-28 | 0 | current-window |
 | docs/architecture/mir4-module-ecosystem.md | current | 2026-08-26 | 2 | current-window |
 | docs/architecture/mir4-offline-release-authority.md | draft | 2026-08-07 | 21 | current-window |
 | docs/architecture/mir4-platform-preview.md | current | 2026-08-24 | 4 | current-window |
@@ -124,7 +124,7 @@ Ages are measured against the newest governed review date, 2026-08-28, so checko
 | docs/compatibility/campaigns/README.md | current | 2026-07-07 | 52 | current-window |
 | docs/compatibility/claim-levels.md | current | 2026-07-23 | 36 | current-window |
 | docs/compatibility/compatibility-matrix.md | current | 2026-07-07 | 52 | current-window |
-| docs/compatibility/mir4-release-canaries.md | current | 2026-08-26 | 2 | current-window |
+| docs/compatibility/mir4-release-canaries.md | current | 2026-08-28 | 0 | current-window |
 | docs/compatibility/policy-overlays.md | current | 2026-07-07 | 52 | current-window |
 | docs/compatibility/portable-return-ledger.md | current | 2026-07-13 | 46 | current-window |
 | docs/compatibility/README.md | current | 2026-08-05 | 23 | current-window |

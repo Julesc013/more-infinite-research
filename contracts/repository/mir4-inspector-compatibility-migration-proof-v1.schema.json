@@ -1,0 +1,10 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-inspector-compatibility-migration-proof-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","test_id","required_checks","evidence_entrypoint","functional_evidence_entrypoint","pre_cutover_functional_digest","functional_parity_digest","t13_receipt_sha256","t13_manifest_sha256","compatibility_policy_sha256","terminal_claims_sha256","package_source_sha256","unknown_policy","independent_human_acceptance_required","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4InspectorCompatibilityMigrationProofPolicyV1"},"migration_id":{"const":"MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1"},"test_id":{"const":"static.mir4-inspector-compatibility-migration-v1"},"required_checks":{"type":"array","minItems":28,"maxItems":28,"uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "evidence_entrypoint":{"const":"tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1"},"functional_evidence_entrypoint":{"const":"tests/inspection/Test-MIR4InspectorCompatibility.ps1"},"pre_cutover_functional_digest":{"const":"sha256:3b16e26301d2f2827369a9db0437e3c6c97ce0965096f921dd8b6d7d8c5bb527"},"functional_parity_digest":{"const":"sha256:3b16e26301d2f2827369a9db0437e3c6c97ce0965096f921dd8b6d7d8c5bb527"},"t13_receipt_sha256":{"const":"D8AD00B861F0C31A7CE4A7DA239AF250EEED4F586F78921F80A10CF9E771FF9F"},"t13_manifest_sha256":{"const":"5184A4715F1E66714E36B53DC25EAE7DC3AE92978D9141000684978F0AEE925C"},"compatibility_policy_sha256":{"const":"54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2"},"terminal_claims_sha256":{"const":"01953ECA6FC6EEF25145FEE865A1E7D8FF65E99E10941363B2A843569ABD8DC0"},"package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},"unknown_policy":{"const":"fail"},"independent_human_acceptance_required":{"const":false},"release_transition_authority":{"const":false}
+  }
+}

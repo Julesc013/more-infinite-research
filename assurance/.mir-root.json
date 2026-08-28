@@ -16,6 +16,7 @@
     "assurance/repository/runtime-continuity-tooling-v1.json",
     "assurance/repository/module-sdk-mep-tooling-v1.json",
     "assurance/repository/processir-exact-tooling-v1.json",
+    "assurance/repository/inspector-compatibility-tooling-v1.json",
     "tools/lib/assurance",
     "validation",
     ".mir/control-plane"

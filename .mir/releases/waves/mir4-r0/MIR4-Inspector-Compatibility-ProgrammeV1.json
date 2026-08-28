@@ -19,6 +19,14 @@
   "public_support_authorized": false,
   "signing_or_sealing_authorized": false,
   "publication_authorized": false,
+  "tooling": {
+    "applications": ["tools/mir/application/inspection/SupportAssessment.ps1","tools/mir/application/inspection/CompatibilityIndex.ps1","tools/mir/application/inspection/CompatibilityFactory.ps1","tools/mir/application/inspection/Inspector.ps1"],
+    "commands": ["tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/inspector-compatibility-tooling-v1.json",
+    "compatibility_entrypoints": ["tools/lib/mir4/SupportAssessment.ps1","tools/lib/mir4/CompatibilityIndex.ps1","tools/lib/mir4/CompatibilityFactory.ps1","tools/lib/mir4/Inspector.ps1","tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1"],
+    "package_visible": false,
+    "release_transition_authority": false
+  },
   "inputs": [
     ".mir/compatibility.yml",
     "spec/compatibility/claims.json",

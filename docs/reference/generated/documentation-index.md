@@ -65,7 +65,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir-extension-protocol-v1.md | MIR Extension Protocol v1 Roadmap | archived | developer | archive | mir-maintainers | 2026-08-08 |
 | docs/architecture/mir4-assurance-scale.md | MIR 4 Assurance Scale and Offline Drill | current | maintainer | explanation | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-historical-succession.md | MIR 4 Historical, Museum, and Successor-Host Closure | current | developer | explanation | mir-maintainers | 2026-08-23 |
-| docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-26 |
+| docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-module-ecosystem.md | MIR 4 Module Ecosystem | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-offline-release-authority.md | MIR 4 Offline Release Authority | draft | maintainer | reference | mir-maintainers | 2026-08-07 |
 | docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-24 |
@@ -124,7 +124,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/compatibility/campaigns/README.md | Compatibility Campaigns | current | release-manager | release-plan | mir-maintainers | 2026-07-07 |
 | docs/compatibility/claim-levels.md | Compatibility Claims | current | modpack-author | explanation | mir-maintainers | 2026-07-23 |
 | docs/compatibility/compatibility-matrix.md | MIR Compatibility Matrix | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
-| docs/compatibility/mir4-release-canaries.md | MIR 4 Exact Release Compatibility Canaries | current | maintainer | reference | mir-maintainers | 2026-08-26 |
+| docs/compatibility/mir4-release-canaries.md | MIR 4 Exact Release Compatibility Canaries | current | maintainer | reference | mir-maintainers | 2026-08-28 |
 | docs/compatibility/policy-overlays.md | Policy Overlays | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
 | docs/compatibility/portable-return-ledger.md | Portable Return Ledger | current | maintainer | release-plan | mir-maintainers | 2026-07-13 |
 | docs/compatibility/README.md | Compatibility and Validation | current | modpack-author | explanation | mir-maintainers | 2026-08-05 |

@@ -2,7 +2,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/processir/ExactProcessIR.ps1')
-. (Join-Path $RepoRoot 'tools/lib/mir4/Inspector.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/inspection/Inspector.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot

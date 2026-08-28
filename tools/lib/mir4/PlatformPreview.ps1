@@ -39,6 +39,7 @@ $script:MIR4PlatformInputPaths = @(
   'spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json',
   'spec/schemas/mir4-compatibility-factory-plan-v1.schema.json',
   'spec/schemas/mir4-inspector-workbench-result-v1.schema.json',
+  'spec/schemas/mir4-inspector-compatibility-programme-v1.schema.json',
   'spec/schemas/mir4-historical-museum-matrix-v1.schema.json',
   'spec/schemas/mir4-successor-host-result-v1.schema.json',
   '.mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json',
@@ -128,11 +129,11 @@ $script:MIR4PlatformInputPaths = @(
   'tools/mir/application/extensions/ModuleEcosystem.ps1',
   'tools/lib/mir4/ModuleEcosystem.ps1',
   'tools/mir/application/processir/ProcessIR.ps1',
-  'tools/lib/mir4/SupportAssessment.ps1',
-  'tools/lib/mir4/CompatibilityIndex.ps1',
-  'tools/lib/mir4/CompatibilityFactory.ps1',
+  'tools/mir/application/inspection/SupportAssessment.ps1',
+  'tools/mir/application/inspection/CompatibilityIndex.ps1',
+  'tools/mir/application/inspection/CompatibilityFactory.ps1',
   'tools/lib/mir4/EnvironmentEvidence.ps1',
-  'tools/lib/mir4/Inspector.ps1',
+  'tools/mir/application/inspection/Inspector.ps1',
   'tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1',
   'spec/schemas/preview/mir4-environment-lock-v1.schema.json',
   'spec/schemas/preview/mir4-environment-diff-v1.schema.json',
@@ -294,8 +295,8 @@ function Get-MIR4PlatformPredecessorPath {
 . (Join-Path $PSScriptRoot '../../mir/application/extensions/MepDiscovery.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/extensions/ExperimentalApiSdk.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/processir/ProcessIR.ps1')
-. (Join-Path $PSScriptRoot 'Inspector.ps1')
-. (Join-Path $PSScriptRoot 'CompatibilityFactory.ps1')
+. (Join-Path $PSScriptRoot '../../mir/application/inspection/Inspector.ps1')
+. (Join-Path $PSScriptRoot '../../mir/application/inspection/CompatibilityFactory.ps1')
 . (Join-Path $PSScriptRoot 'ReleaseDag.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/compiler/CompilationRun.ps1')
 
@@ -849,7 +850,7 @@ function New-MIR4PlatformPreviewPackages {
     'fixtures/mir4-inspector-compatibility-v1/evidence/ir4-no-exact-closure.json',
     'fixtures/mir4-inspector-compatibility-v1/evidence/aai-historical-exact-nontransferable.json',
     'fixtures/mir4-inspector-compatibility-v1/evidence/synthetic-claim-attempt.json',
-    'tools/lib/mir4/SupportAssessment.ps1','tools/lib/mir4/CompatibilityIndex.ps1','tools/lib/mir4/CompatibilityFactory.ps1','tools/lib/mir4/Inspector.ps1'
+    'tools/mir/application/inspection/SupportAssessment.ps1','tools/mir/application/inspection/CompatibilityIndex.ps1','tools/mir/application/inspection/CompatibilityFactory.ps1','tools/mir/application/inspection/Inspector.ps1'
   )
   $sets['mir4-inspector-v1-preview.zip'] = @(
     'sdk/preview/mir4/inspector-v1/index.html','sdk/preview/mir4/inspector-v1/Export-MIR4InspectionBundle.ps1','sdk/preview/mir4/inspector-v1/README.md',
