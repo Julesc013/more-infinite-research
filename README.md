@@ -6,7 +6,7 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
-## MIR 4.0 Whole-Platform Genesis
+## New design
 
 MIR 4.0.0 has one source version and target-coded distribution versions:
 
