@@ -2,6 +2,11 @@ Set-StrictMode -Version Latest
 
 . (Join-Path $PSScriptRoot '../../mir/application/release/F210QualificationPolicy.ps1')
 
+$script:MIR4FinalMilePlaytestCandidateAuthorityRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json'
+$script:MIR4FinalMilePlaytestCandidateAuthoritySchemaRelativePath = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
+$script:MIR4MaintainerFinalGitHubReleaseAuthorizationRelativePath = '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json'
+$script:MIR4MaintainerFinalGitHubReleaseAuthorizationSchemaRelativePath = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
+
 function Get-MIR4PreFreezeRepoRoot {
   param([Parameter(Mandatory)][string]$RepoRoot)
   return (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -89,6 +94,80 @@ function Read-MIR4PreFreezeJson {
   $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
   if ([string]$record.kind -cne $Kind) { throw "[mir4-prefreeze-kind] $RelativePath" }
   return $record
+}
+
+function Get-MIR4FinalMilePlaytestCandidateAuthorityV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  $path = Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthorityRelativePath
+  $schema = Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthoritySchemaRelativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or -not (Test-Path -LiteralPath $schema -PathType Leaf)) {
+    throw '[mir4-final-mile-playtest-authority-missing]'
+  }
+  $text = Get-Content -Raw -LiteralPath $path
+  if (-not ($text | Test-Json -SchemaFile $schema -ErrorAction SilentlyContinue)) {
+    throw '[mir4-final-mile-playtest-authority-schema]'
+  }
+  $authority = $text | ConvertFrom-Json -Depth 100
+  if ((@($authority.targets | ForEach-Object { [string]$_.target } | Sort-Object) -join '|') -cne 'F200|F210') {
+    throw '[mir4-final-mile-playtest-authority-targets]'
+  }
+  if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne [string]$authority.source_baseline.package_source_sha256) {
+    throw '[mir4-final-mile-playtest-authority-package-source]'
+  }
+  foreach ($descriptor in @($authority.authorization) + @($authority.targets | ForEach-Object { $_.candidate_manifest; $_.assurance })) {
+    $descriptorPath = Join-Path $repo ([string]$descriptor.path)
+    if (-not (Test-Path -LiteralPath $descriptorPath -PathType Leaf) -or
+        (Get-MIR4PreFreezeFileSha256 $descriptorPath) -cne [string]$descriptor.sha256 -or
+        [long](Get-Item -LiteralPath $descriptorPath).Length -ne [long]$descriptor.bytes) {
+      throw "[mir4-final-mile-playtest-authority-descriptor] $($descriptor.path)"
+    }
+  }
+  if ([string]$authority.authorization.path -cne $script:MIR4MaintainerFinalGitHubReleaseAuthorizationRelativePath) {
+    throw '[mir4-final-mile-playtest-authorization-path]'
+  }
+  $authorizationPath = Join-Path $repo $script:MIR4MaintainerFinalGitHubReleaseAuthorizationRelativePath
+  $authorizationSchema = Join-Path $repo $script:MIR4MaintainerFinalGitHubReleaseAuthorizationSchemaRelativePath
+  if (-not (Test-Path -LiteralPath $authorizationSchema -PathType Leaf)) { throw '[mir4-final-mile-playtest-authorization-schema-missing]' }
+  $authorizationText = Get-Content -Raw -LiteralPath $authorizationPath
+  if (-not ($authorizationText | Test-Json -SchemaFile $authorizationSchema -ErrorAction SilentlyContinue)) {
+    throw '[mir4-final-mile-playtest-authorization-schema]'
+  }
+  $authorization = $authorizationText | ConvertFrom-Json -Depth 100
+  foreach ($property in @('branch','commit','tree','package_source_sha256')) {
+    if ([string]$authorization.starting_source.$property -cne [string]$authority.source_baseline.$property) {
+      throw "[mir4-final-mile-playtest-authorization-source] $property"
+    }
+  }
+  foreach ($target in @($authority.targets)) {
+    $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.candidate_manifest.path)) | ConvertFrom-Json -Depth 100
+    $assurance = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.assurance.path)) | ConvertFrom-Json -Depth 100
+    $decision = @($authorization.playtest_decisions | Where-Object { [string]$_.target -ceq [string]$target.target })
+    $expectedAssuranceTarget = if ([string]$target.target -ceq 'F210') { '2.1' } else { '2.0' }
+    if ([string]$manifest.local_distribution.archive_sha256 -cne [string]$target.development_package.sha256 -or
+        [string]$manifest.local_distribution.content_sha256 -cne [string]$target.development_package.content_sha256 -or
+        [long]$manifest.local_distribution.bytes -ne [long]$target.development_package.bytes -or
+        [int]$manifest.local_distribution.entry_count -ne [int]$target.development_package.entry_count -or
+        [string]$assurance.status -cne 'passed' -or [int]$assurance.counts.expected -ne [int]$target.assurance.expected -or
+        [int]$assurance.counts.failed -ne 0 -or [int]$assurance.counts.incomplete -ne 0 -or
+        [string]$assurance.plan.target -cne $expectedAssuranceTarget -or
+        [string]$assurance.plan.package_source_sha256 -cne [string]$authority.source_baseline.package_source_sha256 -or
+        [string]$assurance.plan.domain_manifest.artifact.sha256 -cne [string]$target.development_package.sha256 -or
+        [string]$assurance.plan.domain_manifest.artifact.content_sha256 -cne [string]$target.development_package.content_sha256 -or
+        $decision.Count -ne 1 -or [string]$decision[0].distribution -cne [string]$target.distribution_version -or
+        [string]$decision[0].candidate_zip_sha256 -cne [string]$target.development_package.sha256 -or
+        [string]$decision[0].content_root -cne [string]$target.development_package.content_sha256 -or
+        [string]$decision[0].engine.version -cne [string]$target.engine.version -or
+        [string]$decision[0].engine.build -cne [string]$target.engine.build -or
+        [string]$decision[0].engine.executable_sha256 -cne [string]$target.engine.sha256) {
+      throw "[mir4-final-mile-playtest-authority-binding] $($target.target)"
+    }
+  }
+  return $authority
 }
 
 function Test-MIR4RulesetSnapshot {
@@ -238,7 +317,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeHistoricalToolingMigration,
     [switch]$IncludeReleaseToolingMigration,
     [switch]$IncludeF210QualificationPolicyEvolution,
-    [switch]$IncludeFinalMileToolingEvolution
+    [switch]$IncludeFinalMileToolingEvolution,
+    [switch]$IncludeFinalReleaseClosureEvolution
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -337,6 +417,10 @@ function Get-MIR4PreFreezeAuthorityState {
     if (-not $IncludeF210QualificationPolicyEvolution) { throw '[mir4-prefreeze-final-mile-tooling-evolution-requires-f210-policy-evolution]' }
     $links += @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalMileToolingAuthorityEvolutionReceiptV1'}
   }
+  if ($IncludeFinalReleaseClosureEvolution) {
+    if (-not $IncludeFinalMileToolingEvolution) { throw '[mir4-prefreeze-final-release-closure-evolution-requires-final-mile-tooling-evolution]' }
+    $links += @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'}
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -408,6 +492,9 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json' = 'contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json' = 'contracts/repository/mir4-diagnostics-migration-receipt-v1.schema.json'
@@ -470,6 +557,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-Release-Tooling-MigrationV1.json';kind='MIR4ReleaseToolingMigrationReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json';kind='MIR4F210QualificationPolicyAuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalMileToolingAuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -721,7 +809,7 @@ function Get-MIR4ReleaseDoctor {
 
   $governance = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/governance/mir4/release-governance.json' -Kind 'MIR4ReleaseGovernanceV1'
   $checks.Add((New-MIR4DoctorCheck 'protected-signing-secret' 'human' 'blocked' ([string]$governance.state)))
-  $plan = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' -Kind 'MIR4PreFreezeDevelopmentPlanV1'
+  $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
   $currentF210Resolution = try { Get-MIR4F210EngineResolutionV1 -RepoRoot $repo } catch { $null }
   $acceptedTargets = @{}
   foreach ($decisionFile in @(Get-ChildItem -LiteralPath (Join-Path $repo 'build/mir4/playtests') -Recurse -Filter 'manual-decision.json' -File -ErrorAction SilentlyContinue)) {
@@ -989,7 +1077,7 @@ function New-MIR4PlaytestSession {
   if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
     . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
   }
-  $plan = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' -Kind 'MIR4PreFreezeDevelopmentPlanV1'
+  $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
   $t15Path = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json'
   $t15 = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T15AuthorityEvolutionReceiptV1'
   $f210Resolution = $null
@@ -1037,7 +1125,7 @@ function New-MIR4PlaytestSession {
   $launcher = Join-Path $output 'Invoke-MIR4PlaytestEngine.ps1'
   $observationsPath = Join-Path $output 'observations.json'
   $decisionTemplatePath = Join-Path $output 'manual-decision.template.json'
-  $planPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+  $planPath = Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthorityRelativePath
   $handoffPath = Join-Path $repo 'docs/maintainer/mir4-w09-manual-playtest.md'
   $scenarioContract = @(Get-MIR4PlaytestScenarioContract -Target $Target)
   $record = [pscustomobject][ordered]@{
@@ -1052,7 +1140,7 @@ function New-MIR4PlaytestSession {
       f210_engine_resolution=$f210Resolution
       manual_handoff=(Get-MIR4PlaytestFileDescriptor $handoffPath)
       source_baseline=$plan.source_baseline
-      verification_plan=$plan.verification_plan
+      verification_plan=[ordered]@{profile='mir4-final-mile';assurance=$row.assurance}
       package_source_sha256=$packageSourceSha256
     }
     settings=$(if([string]::IsNullOrWhiteSpace($SettingsPath)){$null}else{Get-MIR4PlaytestFileDescriptor $SettingsPath})
@@ -1236,14 +1324,17 @@ function Complete-MIR4PlaytestSession {
   if ([string]$session.kind -cne 'MIR4PlaytestSessionV1' -or [bool]$session.decision_inferred -or [bool]$session.production_release_authorized) {
     throw '[mir4-playtest-finalize-session]'
   }
-  $planPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+  $planPath = [string]$session.authority.development_plan.path
   if ((Get-MIR4PreFreezeFileSha256 $planPath) -cne [string]$session.authority.development_plan.sha256) { throw '[mir4-playtest-finalize-plan-superseded]' }
   if (-not (Test-Path -LiteralPath ([string]$session.authority.current_package_authority.path) -PathType Leaf) -or
       (Get-MIR4PreFreezeFileSha256 ([string]$session.authority.current_package_authority.path)) -cne [string]$session.authority.current_package_authority.sha256 -or
       (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne [string]$session.authority.package_source_sha256) {
     throw '[mir4-playtest-finalize-package-source-superseded]'
   }
-  $plan = Get-Content -Raw -LiteralPath $planPath | ConvertFrom-Json -Depth 100
+  $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
+  if ([IO.Path]::GetFullPath($planPath) -cne [IO.Path]::GetFullPath((Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthorityRelativePath))) {
+    throw '[mir4-playtest-finalize-plan-path]'
+  }
   $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq [string]$session.target })
   $expectedEngineSha256 = if ([string]$session.target -ceq 'F210') {
     $resolution = Get-MIR4F210EngineResolutionV1 -RepoRoot $repo -FactorioBin ([string]$session.engine.path)

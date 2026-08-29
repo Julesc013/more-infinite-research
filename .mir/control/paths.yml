@@ -335,6 +335,7 @@ paths:
   tools.mir.application.release.f210-qualification-policy: tools/mir/application/release/F210QualificationPolicy.ps1
   tools.commands.mir4.update-f210-qualification-policy-authority: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
   tools.commands.mir4.update-final-mile-tooling-authority: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
+  tools.commands.mir4.update-final-release-closure-authority: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
   tools.mir.application.release.migration: tools/mir/application/release/ReleaseToolingMigration.ps1
   tools.mir.application.custody.offline-candidate: tools/mir/application/custody/OfflineCandidateCustody.ps1
   tools.mir.cli.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
@@ -430,6 +431,9 @@ paths:
   releases.waves.mir4-r0-f210-release-qualification-policy: .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
   releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-final-mile-tooling-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-maintainer-final-github-release-authorization: .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
+  releases.waves.mir4-r0-final-mile-playtest-candidate-authority: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
+  releases.waves.mir4-r0-final-release-closure-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
   releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
   releases.waves.mir4-r0-supply-chain-preservation-t15: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json

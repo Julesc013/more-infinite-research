@@ -14,8 +14,8 @@ source_of_truth_for:
 
 # Documentation owner dashboard
 
-Generated from Markdown front matter as of 2026-08-29.
+Generated from Markdown front matter as of 2026-08-30.
 
 | Owner | Total | Current | Draft | Historical or retired |
 | --- | ---: | ---: | ---: | ---: |
-| mir-maintainers | 426 | 280 | 20 | 126 |
+| mir-maintainers | 427 | 281 | 20 | 126 |

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "MIR4MaintainerChatReleaseAuthorizationV1",
+  "status": "maintainer-instruction-to-be-materialized-through-governed-local-receipts",
+  "recorded_from_user_turn_date": "2026-08-30",
+  "timezone": "Australia/Melbourne",
+  "maintainer": {
+    "display_name": "Jules Carbon",
+    "github_login": "Julesc013"
+  },
+  "repository": "Julesc013/more-infinite-research",
+  "starting_source": {
+    "branch": "dev",
+    "commit": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8",
+    "tree": "7a36189d21e2c9c30e87d6f18afeb350d7e931a1",
+    "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"
+  },
+  "playtest_decisions": [
+    {
+      "target": "F210",
+      "distribution": "4.0.21000",
+      "decision": "ACCEPTED",
+      "candidate_zip_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+      "content_root": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+      "engine": {
+        "version": "2.1.17",
+        "build": "87315",
+        "steam_build": "24955935",
+        "executable_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+      }
+    },
+    {
+      "target": "F200",
+      "distribution": "4.0.20000",
+      "decision": "ACCEPTED",
+      "candidate_zip_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "content_root": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+      "engine": {
+        "version": "2.0.77",
+        "build": "84539",
+        "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      }
+    }
+  ],
+  "additional_github_targets": [
+    {
+      "target": "F110",
+      "distribution": "4.0.11000",
+      "publish_if_exact_proof_remains_green": true,
+      "candidate_zip_sha256": "BE63F76255068BAC1BA891B9C9331E4EA943538A37808DFF546E5B1A3ECEB62D",
+      "content_root": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "engine_version": "1.1.110",
+      "engine_executable_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+    },
+    {
+      "target": "F100",
+      "distribution": "4.0.10000",
+      "publish_if_exact_proof_remains_green": true,
+      "candidate_zip_sha256": "EA495B37C0B91F0728226290CDAEFDF4BBD3C1DBA7D0997AAF5E5107FE79AD3F",
+      "content_root": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "engine_version": "1.0.0",
+      "engine_executable_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+    }
+  ],
+  "release_authorization": {
+    "source_version": "4.0.0",
+    "candidate": "M4RC1",
+    "source_freeze": "AUTHORIZED-CONDITIONALLY",
+    "production_signing": "AUTHORIZED-AFTER-T16-AND-FROZEN-PROOF-CLOSURE",
+    "seal": "AUTHORIZED-AFTER-EXACT-HASH-MATCH",
+    "main_promotion": "AUTHORIZED-AFTER-SEAL-AND-OFFLINE-RESTORE",
+    "tagging": "AUTHORIZED-AFTER-PROMOTION-GATE",
+    "github_publication": "AUTHORIZED",
+    "mod_portal_publication": "DEFERRED-TO-MAINTAINER",
+    "github_assets": {
+      "player_targets": [
+        "F210",
+        "F200",
+        "F110",
+        "F100"
+      ],
+      "developer_preview_assets": [
+        "mir4-api-sdk-v1-preview.zip",
+        "mir4-mep-v1-preview.zip",
+        "mir4-reference-extension-v1-preview.zip",
+        "mir4-inspector-v1-preview.zip"
+      ]
+    }
+  },
+  "conditions": [
+    "T16 protected signing and recovery must be completed interactively and accepted; no secret may enter this record.",
+    "The exact F210 and F200 ACCEPTED receipts must be materialized against the current validated session roots.",
+    "The frozen source must remain on the PR #184 lineage and retain the exact package-source SHA-256 above.",
+    "Changes after the starting source may only be package-excluded human receipts, release records, generated release copy, or independently reviewed release-controller corrections; any player-package-source change voids this authorization.",
+    "The T19 F210 lock must remain Factorio 2.1.17 build 87315 with the executable SHA-256 above; drift voids the exact candidate authorization and requires fresh qualification and a new acceptance.",
+    "Every frozen player ZIP must reproduce the exact candidate ZIP SHA-256 listed above. A mismatch stops before signing.",
+    "All automated, independent, restore, confinement, and public-readback gates must pass.",
+    "No Factorio Mod Portal upload or information-page mutation is authorized by this record."
+  ],
+  "secret_values_present": false,
+  "warning": "This exported chat decision is not itself a production signing receipt, ledger event, Git tag, GitHub release, or substitute for repository-native human-receipt validation."
+}
+
+

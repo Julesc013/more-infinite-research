@@ -128,6 +128,17 @@ if([string]$t17.turn-cne'T17'-or
    @($t17.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t17-machine-preparation-authority-evolution]'
 }
+$closure=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if([string]$closure.kind-cne'MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'-or
+   [string]$closure.status-cne'FINAL-RELEASE-AUTHORIZATION-IMPORTED-EXACT-PLAYTEST-SESSIONS-PREPARED-HUMAN-EVIDENCE-AND-CUSTODY-GATES-REMAIN'-or
+   [string]$closure.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   -not[bool]$closure.readme.exact_candidate_copy_preserved-or-not[bool]$closure.readme.post_release_update_deferred-or
+   [bool]$closure.portal_copy.live_portal_mutation_authorized-or
+   [string]$closure.branch_topology.legacy_role-cne'previous-major-alias'-or
+   @($closure.package_visible_delta).Count-ne0-or
+   @($closure.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-final-release-closure-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
