@@ -17,6 +17,8 @@ $script:MIR4ReleaseToolingImplementationSha256='C2CD3A4A84A21FB2722C5203CC9ED318
 $script:MIR4ReleaseToolingDagAuthoritySha256='4D7532BCE19B995CC215FA4E26E6079278E26E8FF3C1E9AE72C5F1422E24DDBD'
 $script:MIR4ReleaseToolingCompatibilityPolicySha256='54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2'
 $script:MIR4ReleaseToolingT14ReceiptSha256='AD83B044BF955D136FF68484D5913F1B857238D73229ED03F8B278AB5CB6EED0'
+$script:MIR4ReleaseToolingMigrationReceiptSha256='E9A099B1F54E63C1D23CBE20DC524329931BC769170EA44937C0515EB3675E45'
+$script:MIR4ReleaseToolingMigrationReceiptBytes=38343
 
 function Get-MIR4ReleaseToolingMigrationAuthorityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -90,6 +92,35 @@ function Test-MIR4ReleaseToolingFunctionalParityV1 {
   return $result
 }
 
+function Test-MIR4ReleaseToolingFinalMileSuccessorV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $successorPath='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json'
+  $state=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo `
+    -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration `
+    -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration `
+    -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration `
+    -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration `
+    -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration `
+    -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration `
+    -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration `
+    -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution
+  if([string]$state.prior_receipt_path-cne$successorPath){return $false}
+  $successor=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $successorPath
+  if([string]$successor.kind-cne'MIR4FinalMileToolingAuthorityEvolutionReceiptV1'-or
+     [string]$successor.change_id-cne'MIR4-FINAL-MILE-TOOLING-2026-08-29'-or
+     @($successor.package_visible_delta).Count-ne0-or
+     [string]$successor.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+     @($successor.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){return $false}
+  $paths=@('releases/migrations/MIR4-Release-Tooling-MigrationV1.json','tools/mir.ps1','tools/mir/application/release/ReleaseToolingMigration.ps1','tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1','tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1')
+  foreach($path in $paths){
+    if(-not$state.authority_hashes.ContainsKey($path)){return $false}
+    $mode=if($state.authority_hash_modes.ContainsKey($path)){[string]$state.authority_hash_modes[$path]}else{'raw-bytes'}
+    if((Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode $mode)-cne[string]$state.authority_hashes[$path]){return $false}
+  }
+  return $true
+}
+
 function New-MIR4ReleaseToolingMigrationReceiptV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$migration=Get-MIR4ReleaseToolingMigrationAuthorityV1 -RepoRoot $repo;$proof=Get-MIR4ReleaseToolingMigrationProofPolicyV1 -RepoRoot $repo
@@ -123,7 +154,9 @@ function Get-MIR4ReleaseToolingMigrationReceiptTextV1 {
 
 function Invoke-MIR4ReleaseToolingMigrationProjectionV1 {
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$path=Join-Path $repo $script:MIR4ReleaseToolingMigrationReceiptPath;$text=Get-MIR4ReleaseToolingMigrationReceiptTextV1 -RepoRoot $repo
-  if($Check){if(-not(Test-Path -LiteralPath $path -PathType Leaf)-or[IO.File]::ReadAllText($path)-cne$text){throw '[mir4-release-tooling-migration-receipt-stale]'};if(-not(Test-MIR4RepositoryJsonSchemaV1 -RepoRoot $repo -Path $script:MIR4ReleaseToolingMigrationReceiptPath -SchemaPath $script:MIR4ReleaseToolingMigrationReceiptSchemaPath)){throw '[mir4-release-tooling-migration-receipt-schema]'}}else{New-Item -ItemType Directory -Force -Path (Split-Path $path -Parent)|Out-Null;[IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))}
-  return Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4ReleaseToolingMigrationReceiptPath
+  if(-not$Check){throw '[mir4-release-tooling-migration-receipt-immutable] generation-disabled-after-successor-cutover'}
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $receipt=Test-MIR4ImmutableMigrationReceiptV1 -RepoRoot $repo -ReceiptPath $script:MIR4ReleaseToolingMigrationReceiptPath -ExpectedSha256 $script:MIR4ReleaseToolingMigrationReceiptSha256 -SchemaPath $script:MIR4ReleaseToolingMigrationReceiptSchemaPath -Kind 'MIR4ReleaseToolingMigrationReceiptV1' -DigestDomain 'mir4:release-tooling-migration-receipt:1' -ErrorPrefix 'mir4-release-tooling-migration'
+  if((Get-Item -LiteralPath (Join-Path $repo $script:MIR4ReleaseToolingMigrationReceiptPath)).Length-ne$script:MIR4ReleaseToolingMigrationReceiptBytes){throw '[mir4-release-tooling-migration-receipt-byte-length]'}
+  return $receipt
 }

@@ -54,6 +54,7 @@ $roles = [ordered]@{
   'docs/releases/mir4-4.0-publication-copy.md' = 'mir4-4.0-publication-copy'
   'docs/user/mir3-to-mir4.md' = 'mir3-to-mir4-upgrade-guide'
   'fixtures/assert-k2-science-phase-policy/data-final-fixes.lua' = 'exact-v1-v2-k2-policy-qualification-harness'
+  'releases/migrations/MIR4-Release-Tooling-MigrationV1.json' = 'immutable-release-tooling-migration-receipt'
   'spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json' = 'final-mile-tooling-evolution-schema'
   'scripts/Invoke-MIRReleaseTargetedGate.ps1' = 'exact-private-cross-target-release-gate'
   'scripts/Invoke-MIRAssurance.ps1' = 'final-mile-assurance-v4-entrypoint'
@@ -69,6 +70,7 @@ $roles = [ordered]@{
   'tools/lib/assurance/Release.ps1' = 'current-private-lane-assurance-planner'
   'tools/mir/application/assurance/AssuranceOfflineCustodyMigration.ps1' = 'assurance-v4-final-mile-successor-validator'
   'tools/lib/mir4/PreFreezeRelease.ps1' = 'final-mile-authority-chain-integration'
+  'tools/mir.ps1' = 'final-mile-cli-authority'
   'validation/tests.yml' = 'final-mile-test-catalogue'
   'validation/tests/mir4/Test-MIR4K2ScienceSOL06.ps1' = 'sol06-successor-authority-validator'
   'validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1' = 'private-lane-planner-validator'
@@ -76,6 +78,9 @@ $roles = [ordered]@{
   'validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1' = 'f210-policy-terminal-chain-validator'
   'tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1' = 'assurance-v4-final-mile-successor-functional-test'
   'tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1' = 'assurance-v4-final-mile-successor-migration-test'
+  'tools/mir/application/release/ReleaseToolingMigration.ps1' = 'release-tooling-final-mile-successor-validator'
+  'tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1' = 'immutable-release-tooling-migration-cli'
+  'tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1' = 'release-tooling-final-mile-successor-test'
 }
 
 $evolved = [Collections.Generic.List[object]]::new()

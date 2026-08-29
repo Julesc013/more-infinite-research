@@ -162,6 +162,15 @@
       "release_authority": false
     },
     {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "5ED56774635336EF0D5686428EC4062E9D70026FE8203B2633A14884ABD7988A",
+      "current_sha256": "9D8B3865C1285B3AEEFDBD08ECD5B78A62E9B7BE7C5211578ABD0D1AE0ABE80D",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
       "path": "validation/tests.yml",
       "previous_sha256": "B27761F5BDD93F78C9E684EB7E239AFFB580D7B2472F846D5958BD041280659F",
       "current_sha256": "6345322FA54ADE7AAF484D7BEA7711BE02D3A4E90A707DA7CD01D14C338BB7A1",
@@ -196,6 +205,33 @@
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseToolingMigration.ps1",
+      "previous_sha256": "5F7FEC6D9CD32DB8785B95DC5F8C9972B8FE5CD0CF9D8E2584C3FAF7CAD16454",
+      "current_sha256": "0E7B19827BA8FA087CEE575C0574FBD9B31F2008E9A4C816C299BD8423819212",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1",
+      "previous_sha256": "F6E6A2798134E77104493053BE29950467F3E405730F5B75707876A25A79DBEA",
+      "current_sha256": "E2DA201CF0D630F2825F914C5297C872BCBD867C7462488AADBC458F3FF9D5C8",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1",
+      "previous_sha256": "428E1BB3EF5BF2A74E04EEC4A272497F57042D570BEC10B0E048DED85234BB09",
+      "current_sha256": "3817A7382CD5C44BCBF1A29CAF6E5B5966A239133350510019EC997D23252A60",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
     }
   ],
   "current_authorities": [
@@ -218,6 +254,12 @@
       "role": "exact-v1-v2-k2-policy-qualification-harness"
     },
     {
+      "path": "releases/migrations/MIR4-Release-Tooling-MigrationV1.json",
+      "sha256": "E9A099B1F54E63C1D23CBE20DC524329931BC769170EA44937C0515EB3675E45",
+      "hash_mode": "canonical-text-v1",
+      "role": "immutable-release-tooling-migration-receipt"
+    },
+    {
       "path": "spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json",
       "sha256": "0CB4324444796C46913E1FA84438E903E63F557726A31BCBEBD6990AF4C629C9",
       "hash_mode": "canonical-text-v1",
@@ -237,7 +279,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "2F3DED9C8EF1AFE073D741EC3241469BA8C61374D43ECA997265AF293CCDF8DA",
+      "sha256": "D0324DD277D1FCB401A87FBA7E45BF45DB33012EB9C283ED97F2A6A83C548131",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },

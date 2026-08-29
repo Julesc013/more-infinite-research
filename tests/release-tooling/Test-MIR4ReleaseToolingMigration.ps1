@@ -16,6 +16,7 @@ try{Invoke-MIR4HistoricalToolingMigrationProjectionV1 -RepoRoot $repo|Out-Null;t
 $authority=Get-MIR4ReleaseToolingMigrationAuthorityV1 -RepoRoot $repo
 $proof=Get-MIR4ReleaseToolingMigrationProofPolicyV1 -RepoRoot $repo
 $receipt=Invoke-MIR4ReleaseToolingMigrationProjectionV1 -RepoRoot $repo -Check
+try{Invoke-MIR4ReleaseToolingMigrationProjectionV1 -RepoRoot $repo|Out-Null;throw '[mir4-release-tooling-migration-write-enabled]'}catch{if(-not$_.Exception.Message.StartsWith('[mir4-release-tooling-migration-receipt-immutable]')){throw}}
 $inventory=Get-MIR4RepositoryInventory -RepoRoot $repo
 Assert-MIR4ReleaseToolingMigrationV1 ([int]$inventory.summary.unknown-eq0-and-not[bool]$inventory.deletion_authorized) 'mir4-release-tooling-migration-inventory'
 Assert-MIR4ReleaseToolingMigrationV1 (@($authority.writers).Count-eq1-and@($authority.compatibility_entrypoints).Count-eq1) 'mir4-release-tooling-migration-authority'
@@ -40,8 +41,8 @@ Assert-MIR4ReleaseToolingMigrationV1 ((Get-FileHash -LiteralPath (Join-Path $rep
 
 $prior=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration -IncludeHistoricalToolingMigration
 Assert-MIR4ReleaseToolingMigrationV1 ([string]$receipt.predecessor_receipt.path-ceq[string]$prior.prior_receipt_path-and[string]$receipt.predecessor_receipt.sha256-ceq[string]$prior.prior_receipt_sha256) 'mir4-release-tooling-migration-predecessor-chain'
-foreach($binding in @($receipt.evolved_bindings)){$item=[string]$binding.path;Assert-MIR4ReleaseToolingMigrationV1 ($prior.authority_hashes.ContainsKey($item)-and[string]$binding.previous_sha256-ceq[string]$prior.authority_hashes[$item]) 'mir4-release-tooling-migration-evolved-prior' $item;Assert-MIR4ReleaseToolingMigrationV1 ([string]$binding.current_sha256-ceq(Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $item) -Mode ([string]$binding.hash_mode))) 'mir4-release-tooling-migration-evolved-current' $item}
-foreach($binding in @($receipt.current_authorities)){$actual=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo ([string]$binding.path)) -Mode ([string]$binding.hash_mode);Assert-MIR4ReleaseToolingMigrationV1 ([string]$binding.sha256-ceq$actual) 'mir4-release-tooling-migration-current-authority' ([string]$binding.path)}
+foreach($binding in @($receipt.evolved_bindings)){$item=[string]$binding.path;Assert-MIR4ReleaseToolingMigrationV1 ($prior.authority_hashes.ContainsKey($item)-and[string]$binding.previous_sha256-ceq[string]$prior.authority_hashes[$item]) 'mir4-release-tooling-migration-evolved-prior' $item}
+Assert-MIR4ReleaseToolingMigrationV1 (Test-MIR4ReleaseToolingFinalMileSuccessorV1 -RepoRoot $repo) 'mir4-release-tooling-migration-final-mile-successor'
 Assert-MIR4ReleaseToolingMigrationV1 ([string]$receipt.digest-ceq(Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:release-tooling-migration-receipt:1' -OmitTopLevelDigest)) 'mir4-release-tooling-migration-receipt-digest'
 foreach($field in @('transition_gate','release_transition_authority')){Assert-MIR4ReleaseToolingMigrationV1 (@($receipt.$field.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-release-tooling-migration-release-firewall' $field}
 foreach($field in @('transition_gate','release_transition_authority')){$tampered=$receipt|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$tampered.$field.publication=$true;Assert-MIR4ReleaseToolingMigrationV1 (-not(($tampered|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile (Join-Path $repo $script:MIR4ReleaseToolingMigrationReceiptSchemaPath) -ErrorAction SilentlyContinue)) 'mir4-release-tooling-migration-release-firewall-schema' $field}
@@ -52,10 +53,13 @@ $releaseHistoryOutput=(& pwsh -NoProfile -File (Join-Path $repo 'validation/test
 Assert-MIR4ReleaseToolingMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'append-only-release-tooling-successor') 'mir4-release-tooling-migration-release-history-successor' $releaseHistoryOutput
 
 function Invoke-MIR4ReleaseToolingMigrationCommandProbeV1([string]$Command){$output=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1') -Command $Command -RepoRoot $repo 2>&1|Out-String).Trim();if($LASTEXITCODE-ne0){throw "[mir4-release-tooling-migration-cli] $Command $output"};return $output|ConvertFrom-Json -Depth 100}
-$generateResult=Invoke-MIR4ReleaseToolingMigrationCommandProbeV1 generate;$checkResult=Invoke-MIR4ReleaseToolingMigrationCommandProbeV1 check;$showResult=Invoke-MIR4ReleaseToolingMigrationCommandProbeV1 show
-Assert-MIR4ReleaseToolingMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 $generateResult)-ceq(ConvertTo-MIR4CanonicalJsonV1 $checkResult)-and(ConvertTo-MIR4CanonicalJsonV1 $checkResult)-ceq(ConvertTo-MIR4CanonicalJsonV1 $showResult)) 'mir4-release-tooling-migration-cli-parity'
+$checkResult=Invoke-MIR4ReleaseToolingMigrationCommandProbeV1 check;$showResult=Invoke-MIR4ReleaseToolingMigrationCommandProbeV1 show
+Assert-MIR4ReleaseToolingMigrationV1 ((ConvertTo-MIR4CanonicalJsonV1 $checkResult)-ceq(ConvertTo-MIR4CanonicalJsonV1 $showResult)) 'mir4-release-tooling-migration-cli-parity'
 $facadeOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 release-tooling-migration check 2>&1|Out-String).Trim()
 Assert-MIR4ReleaseToolingMigrationV1 ($LASTEXITCODE-eq0-and(ConvertTo-MIR4CanonicalJsonV1 $checkResult)-ceq(ConvertTo-MIR4CanonicalJsonV1 ($facadeOutput|ConvertFrom-Json -Depth 100))) 'mir4-release-tooling-migration-facade-parity'
+$generateOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 release-tooling-migration generate 2>&1|Out-String).Trim()
+$generateExitCode=$LASTEXITCODE
+Assert-MIR4ReleaseToolingMigrationV1 ($generateExitCode-ne0-and$generateOutput-match'Unknown mir4 release-tooling-migration command: generate') 'mir4-release-tooling-migration-facade-write-enabled'
 $predecessorGenerateOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 historical-tooling-migration generate 2>&1|Out-String).Trim()
 $predecessorGenerateExitCode=$LASTEXITCODE
 Assert-MIR4ReleaseToolingMigrationV1 ($predecessorGenerateExitCode-ne0-and$predecessorGenerateOutput-match'Unknown mir4 historical-tooling-migration command: generate') 'mir4-release-tooling-migration-predecessor-facade-write-enabled'
