@@ -110,7 +110,7 @@
     {
       "path": "validation/tests.yml",
       "previous_sha256": "B27761F5BDD93F78C9E684EB7E239AFFB580D7B2472F846D5958BD041280659F",
-      "current_sha256": "F8DE3B410E1CDE0D4EFC742BECC92761ABF0EF24D9402048198E579A5B28D594",
+      "current_sha256": "6345322FA54ADE7AAF484D7BEA7711BE02D3A4E90A707DA7CD01D14C338BB7A1",
       "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -146,8 +146,14 @@
       "role": "final-mile-tooling-evolution-schema"
     },
     {
+      "path": "scripts/Invoke-MIRReleaseTargetedGate.ps1",
+      "sha256": "11E3BF18749F1832580A39BC4CE67ED8319E1A5A98C851DADDF759FF2481F569",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-private-cross-target-release-gate"
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "31DF4A76A681ACDD9D71CE34478F5642D7BA3D7649A6D84D17EAE879D8887108",
+      "sha256": "F7ED012FE4C40B70AC6EF4F6A4E230EF6B15E64E90BFCB4206B62B3D5F38706D",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },
@@ -165,7 +171,7 @@
     },
     {
       "path": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
-      "sha256": "EB31E487988E3E25B251F303720FC1023A1E3FB0E2E07B77FA87322D85833335",
+      "sha256": "6F386A32FEF04A62987F4F9F3F6C3576EF0F476657ED9B1878E9D1D5D0C7E462",
       "hash_mode": "canonical-text-v1",
       "role": "private-lane-planner-validator"
     },

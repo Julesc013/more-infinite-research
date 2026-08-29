@@ -53,6 +53,7 @@ $roles = [ordered]@{
   'docs/releases/mir4-4.0-publication-copy.md' = 'mir4-4.0-publication-copy'
   'docs/user/mir3-to-mir4.md' = 'mir3-to-mir4-upgrade-guide'
   'spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json' = 'final-mile-tooling-evolution-schema'
+  'scripts/Invoke-MIRReleaseTargetedGate.ps1' = 'exact-private-cross-target-release-gate'
   'tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1' = 'final-mile-tooling-evolution-writer'
   'tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1' = 'terminal-post-publication-sync-controller'
   'tools/lib/assurance/Release.ps1' = 'current-private-lane-assurance-planner'
