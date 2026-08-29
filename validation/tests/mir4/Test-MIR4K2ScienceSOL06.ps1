@@ -6,6 +6,15 @@ $ErrorActionPreference = 'Stop'
 $receiptPath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-K2-Science-SOL06V1.json'
 $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
+$finalMilePath = Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json'
+$finalMile = Get-Content -Raw -LiteralPath $finalMilePath | ConvertFrom-Json -Depth 100 -DateKind String
+$successorFixturePath = 'fixtures/assert-k2-science-phase-policy/data-final-fixes.lua'
+if ([string]$finalMile.kind -cne 'MIR4FinalMileToolingAuthorityEvolutionReceiptV1' -or
+    [string]$finalMile.predecessor_receipt.sha256 -cne 'CAB840352F129A028D2BD061DAD44A29C43BEB5C39F8639C1D8B64CC1E210831' -or
+    @($finalMile.package_visible_delta).Count -ne 0 -or
+    @($finalMile.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+  throw 'SOL-06 successor authority is invalid or grants a release transition.'
+}
 
 if ([int]$receipt.schema -ne 1 -or [string]$receipt.kind -ne 'MIR4K2ScienceSOL06V1' -or
     [string]$receipt.status -ne 'PASS' -or [string]$receipt.work_package -ne 'SOL-06' -or
@@ -45,9 +54,25 @@ foreach ($artifact in @($implementation.authorities)) {
     throw "SOL-06 authority lacks a SHA-256 binding: $($artifact.path)"
   }
   $path = Join-Path $RepoRoot ([string]$artifact.path)
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or
-      (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne [string]$artifact.file_sha256) {
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "SOL-06 authority differs from its receipt: $($artifact.path)"
+  }
+  $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+  if ($actual -ne [string]$artifact.file_sha256) {
+    if ([string]$artifact.path -cne $successorFixturePath) {
+      throw "SOL-06 authority differs from its receipt: $($artifact.path)"
+    }
+    $successor = @($finalMile.current_authorities | Where-Object { [string]$_.path -ceq $successorFixturePath })
+    $canonicalText = [IO.File]::ReadAllText($path).Replace("`r`n", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($canonicalText)
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try { $canonicalSha256 = ([BitConverter]::ToString($sha.ComputeHash($bytes))).Replace('-', '') }
+    finally { $sha.Dispose() }
+    if ($successor.Count -ne 1 -or [string]$successor[0].sha256 -cne $canonicalSha256 -or
+        [string]$successor[0].hash_mode -cne 'canonical-text-v1' -or
+        [string]$successor[0].role -cne 'exact-v1-v2-k2-policy-qualification-harness') {
+      throw 'SOL-06 fixture changed without the exact package-excluded final-mile successor authority.'
+    }
   }
 }
 $policySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'prototypes/mir/compatibility/policies/k2_science_phase.lua')

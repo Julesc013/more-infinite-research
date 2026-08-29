@@ -39,7 +39,7 @@
       "path": ".github/workflows/branch-policy.yml",
       "previous_sha256": "D9717CBC3FC71E520D8FFEAB65BB5930410542D0AA0E5055F667D37AC609996C",
       "current_sha256": "EC1EA6C483609750E6BBC84D767A38FC0B886A3A533E669A7969DC51E5E1F46D",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -48,7 +48,7 @@
       "path": ".mir/control/paths.yml",
       "previous_sha256": "9ED089E10A994AAABE0DCD438BB80858AB4B41658D0A445737809594F7537A01",
       "current_sha256": "78A667BF37B1D056EA51C25AD21594718B0917F3B62592827B90E5FAE0467C7A",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -57,7 +57,16 @@
       "path": ".mir/docs.yml",
       "previous_sha256": "C153F0E78E212DDD276833822F05B31F1869078571CC663874760C403916D8DC",
       "current_sha256": "A9DBCE91A917A165A4E3A1554A03F1DFB2CC17610991BDD721224C6ABEDC7983",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/fixtures.yml",
+      "previous_sha256": "3B4249362F276F2389A7F30DC50F2FF2DF61E25DE5EC19A178B9CABB6DF6EDAE",
+      "current_sha256": "0DBB414688FA45EA6AE02BE14A07F87138B07301C194C01267E0D2BAC7266C18",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -66,7 +75,7 @@
       "path": ".mir/modules.yml",
       "previous_sha256": "D73568813F95C33333FC96BBBF6D08CF90F61838F102C33725F7FD8655920047",
       "current_sha256": "B04DC4C579CF82093FDC1A89EAF93F00E02AE6B6689B0339C4717731FE3C0512",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -75,7 +84,7 @@
       "path": "docs/reference/generated/documentation-index.md",
       "previous_sha256": "419C9556B9C9FBEBD30B20DEEA0FD4B61D7682F77B4B4D0AA6CFF1029301F071",
       "current_sha256": "DEDA14AC322D037C441E010CC3AA2DCC818297D91FA4EB83747153CD946B4490",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -84,7 +93,7 @@
       "path": "docs/reference/generated/documentation-reference-matrix.md",
       "previous_sha256": "FBC3F529B81236D76ABB7EB65D1DC147C64F409EC29C912D08A3EEE4EE3868DE",
       "current_sha256": "93AA669BE404DEC4E2B6D7DC65F72DC6F94E924BE6020FA82802690BDF186D74",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -93,7 +102,7 @@
       "path": "docs/reference/generated/documentation-review-age.md",
       "previous_sha256": "214B911C1D379146FE89A589AABFB1BB01304C06474E295EFB085C86F92DACA9",
       "current_sha256": "2DF3A91E51B4ABE3DB865E49DAA79553220C7076D131E3A9BF973DF75E0D43C8",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -102,7 +111,7 @@
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "929A0188C1F391F383378DA83B39F49ACD890B0093FDC08B902EAE0E0C9C56A5",
       "current_sha256": "E0C521F68E90BC463DE1EE03EBE85BB90E57234E25DA866FB4BEE710ED0B3089",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -111,7 +120,7 @@
       "path": "validation/tests.yml",
       "previous_sha256": "B27761F5BDD93F78C9E684EB7E239AFFB580D7B2472F846D5958BD041280659F",
       "current_sha256": "6345322FA54ADE7AAF484D7BEA7711BE02D3A4E90A707DA7CD01D14C338BB7A1",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -120,7 +129,7 @@
       "path": "validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
       "previous_sha256": "C98F14FC8977C3F3B7B866FD5FE7353A28DFC16BA99C9D54FFC9BE6ACF6AB97E",
       "current_sha256": "5BDD0FA0986D80538887953FEF8B015546AD410CD011F6C1BBB3393E36C7E183",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -140,6 +149,12 @@
       "role": "mir3-to-mir4-upgrade-guide"
     },
     {
+      "path": "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
+      "sha256": "16EC3E094C1B0E1EF8931414F1A616C022DC6E202F6446AC58015B48E6ED513A",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-v1-v2-k2-policy-qualification-harness"
+    },
+    {
       "path": "spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json",
       "sha256": "0CB4324444796C46913E1FA84438E903E63F557726A31BCBEBD6990AF4C629C9",
       "hash_mode": "canonical-text-v1",
@@ -153,7 +168,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "F7ED012FE4C40B70AC6EF4F6A4E230EF6B15E64E90BFCB4206B62B3D5F38706D",
+      "sha256": "0DB7CF5393079CCF527B7BEC5CAD4D662B00C0BFD45ADC033C194DE443A1FA7A",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },
@@ -168,6 +183,12 @@
       "sha256": "C2AE178CDC1C89B8D94BC75612B6505B1522438ADB5416CA9A0A66866A9EE498",
       "hash_mode": "canonical-text-v1",
       "role": "current-private-lane-assurance-planner"
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4K2ScienceSOL06.ps1",
+      "sha256": "C1EDBB65B2B7708584A4F7901E1A473073872B835E2EF388132DFF0A3CB7DE87",
+      "hash_mode": "canonical-text-v1",
+      "role": "sol06-successor-authority-validator"
     },
     {
       "path": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
