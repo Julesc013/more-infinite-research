@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4FinalMileToolingAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-29T21:30:00+10:00",
+  "recorded_at": "08/29/2026 21:30:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "change_id": "MIR4-FINAL-MILE-TOOLING-2026-08-29",
   "predecessor_receipt": {
@@ -39,7 +39,7 @@
       "path": ".github/workflows/branch-policy.yml",
       "previous_sha256": "D9717CBC3FC71E520D8FFEAB65BB5930410542D0AA0E5055F667D37AC609996C",
       "current_sha256": "EC1EA6C483609750E6BBC84D767A38FC0B886A3A533E669A7969DC51E5E1F46D",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -48,7 +48,7 @@
       "path": ".mir/control/paths.yml",
       "previous_sha256": "9ED089E10A994AAABE0DCD438BB80858AB4B41658D0A445737809594F7537A01",
       "current_sha256": "78A667BF37B1D056EA51C25AD21594718B0917F3B62592827B90E5FAE0467C7A",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -57,7 +57,7 @@
       "path": ".mir/docs.yml",
       "previous_sha256": "C153F0E78E212DDD276833822F05B31F1869078571CC663874760C403916D8DC",
       "current_sha256": "A9DBCE91A917A165A4E3A1554A03F1DFB2CC17610991BDD721224C6ABEDC7983",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -66,7 +66,16 @@
       "path": ".mir/modules.yml",
       "previous_sha256": "D73568813F95C33333FC96BBBF6D08CF90F61838F102C33725F7FD8655920047",
       "current_sha256": "B04DC4C579CF82093FDC1A89EAF93F00E02AE6B6689B0339C4717731FE3C0512",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "mir.lock",
+      "previous_sha256": "33E74DFA4B8D02BDCE6A3B8657A0F019E29DCF5C0DACE2A786E87BBF0ED6BE34",
+      "current_sha256": "BD23680EF1A44E24B7553B5D1217F539392F076CCC451861B779F67AF0D8924A",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -75,7 +84,7 @@
       "path": "docs/reference/generated/documentation-index.md",
       "previous_sha256": "419C9556B9C9FBEBD30B20DEEA0FD4B61D7682F77B4B4D0AA6CFF1029301F071",
       "current_sha256": "DEDA14AC322D037C441E010CC3AA2DCC818297D91FA4EB83747153CD946B4490",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -84,7 +93,7 @@
       "path": "docs/reference/generated/documentation-reference-matrix.md",
       "previous_sha256": "FBC3F529B81236D76ABB7EB65D1DC147C64F409EC29C912D08A3EEE4EE3868DE",
       "current_sha256": "93AA669BE404DEC4E2B6D7DC65F72DC6F94E924BE6020FA82802690BDF186D74",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -93,7 +102,43 @@
       "path": "docs/reference/generated/documentation-review-age.md",
       "previous_sha256": "214B911C1D379146FE89A589AABFB1BB01304C06474E295EFB085C86F92DACA9",
       "current_sha256": "2DF3A91E51B4ABE3DB865E49DAA79553220C7076D131E3A9BF973DF75E0D43C8",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "44027CC70089297DFDEA3EE1AF6B6A198AE0E868D487AD790CC431ED0B956D1B",
+      "current_sha256": "53C09E5FFD9ABFD5ADF9B82D6DE296A534979EEB01C77735F5E005B7D3585615",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "079E4BD41B4990CB9748BDAA3F70C561ADFD9E92DF0295004624A8DC341D843A",
+      "current_sha256": "D3CE4BFCEFECD565C1F4A85BB6A9C4CC997C031A80F65DE4168A8163309C482D",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "523ACFFE64B5BA7B7A020A901040886A88A437BCF3F5D8533D4EBE62A616B06D",
+      "current_sha256": "0FAE5C5CFA43246E99371100C0BB289ACEEE879B6ECEB81AA0E376D616D78A9D",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "F8B77F9B845093C4ECCEFD28DCA8ADF488D568AEBF0036D181A19A944171D0F7",
+      "current_sha256": "EE89383D532BFE411BA67816B7DFD1CEF60F3DB6D3F9D46F0BD8A3E85ABEB9F1",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -102,7 +147,7 @@
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "929A0188C1F391F383378DA83B39F49ACD890B0093FDC08B902EAE0E0C9C56A5",
       "current_sha256": "E0C521F68E90BC463DE1EE03EBE85BB90E57234E25DA866FB4BEE710ED0B3089",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -111,7 +156,7 @@
       "path": "validation/tests.yml",
       "previous_sha256": "B27761F5BDD93F78C9E684EB7E239AFFB580D7B2472F846D5958BD041280659F",
       "current_sha256": "6345322FA54ADE7AAF484D7BEA7711BE02D3A4E90A707DA7CD01D14C338BB7A1",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -120,7 +165,7 @@
       "path": "validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
       "previous_sha256": "C98F14FC8977C3F3B7B866FD5FE7353A28DFC16BA99C9D54FFC9BE6ACF6AB97E",
       "current_sha256": "5BDD0FA0986D80538887953FEF8B015546AD410CD011F6C1BBB3393E36C7E183",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
       "release_authority": false
@@ -159,7 +204,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "C817E8B28F7B32420FE27ACA361569732F929BC5899A9B2E0484810432A0ED84",
+      "sha256": "7FC05EED9042CB1CCD623FB238D65F081E2062030A2230C75B013EC280031DCD",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },
