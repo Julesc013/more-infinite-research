@@ -1312,6 +1312,7 @@ docs:
       - mir4-manual-playtest-evidence-lifecycle
       - mir4-public-preview-asset-contract
       - mir4-publisher-confinement-and-restore-drill
+      - mir4-f210-engine-selection-and-freeze-lock
   - path: docs/maintainer/mir4-qualification-and-promotion.md
     title: "MIR 4 Qualification and Promotion"
     status: current
@@ -2740,6 +2741,8 @@ docs:
       - mir4-4.0-github-release-copy
       - mir4-4.0-mod-portal-copy
       - mir4-4.0-player-faq
+      - mir4-4.0-target-changelog-copy
+      - mir4-4.0-release-announcement
   - path: docs/releases/mir4-4.0-whole-platform-programme.md
     title: "MIR 4.0 Whole Platform Programme"
     status: current

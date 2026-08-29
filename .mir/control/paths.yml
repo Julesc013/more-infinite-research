@@ -181,6 +181,9 @@ paths:
   spec.schemas.mir4-t15-independent-machine-acceptance-v1: spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
   spec.schemas.mir4-t15-authority-evolution-receipt-v1: spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
   spec.schemas.mir4-playtest-evidence-v1: spec/schemas/mir4-playtest-evidence-v1.schema.json
+  spec.schemas.mir4-f210-release-qualification-policy-v1: spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
+  spec.schemas.mir4-f210-qualification-policy-authority-evolution-receipt-v1: spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+  spec.schemas.mir4-final-mile-tooling-authority-evolution-receipt-v1: spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
   spec.schemas.mir4-t17-machine-preparation-authority-evolution-receipt-v1: spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
   spec.templates.mir4-protected-signing-ceremony-receipt-v1: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
@@ -202,6 +205,7 @@ paths:
   validation.tests.mir4.signing-ceremony-preparation: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
   validation.tests.mir4.supply-chain-preservation-t15: validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
   validation.tests.mir4.playtest-handoff-t17: validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
+  validation.tests.mir4.f210-qualification-policy: validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
@@ -328,6 +332,9 @@ paths:
   tools.mir.application.history.successor-host: tools/mir/application/history/SuccessorHost.ps1
   tools.mir.application.history.migration: tools/mir/application/history/HistoricalToolingMigration.ps1
   tools.mir.application.release.release-dag: tools/mir/application/release/ReleaseDag.ps1
+  tools.mir.application.release.f210-qualification-policy: tools/mir/application/release/F210QualificationPolicy.ps1
+  tools.commands.mir4.update-f210-qualification-policy-authority: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+  tools.commands.mir4.update-final-mile-tooling-authority: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
   tools.mir.application.release.migration: tools/mir/application/release/ReleaseToolingMigration.ps1
   tools.mir.application.custody.offline-candidate: tools/mir/application/custody/OfflineCandidateCustody.ps1
   tools.mir.cli.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
@@ -420,6 +427,9 @@ paths:
   releases.waves.mir4-r0-post-readiness-merge-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
   releases.waves.mir4-r0-pr152-independent-readiness-acceptance: .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
   releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
+  releases.waves.mir4-r0-f210-release-qualification-policy: .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
+  releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-final-mile-tooling-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
   releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
   releases.waves.mir4-r0-supply-chain-preservation-t15: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 426 pages as of 2026-08-28.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 426 pages as of 2026-08-29.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -181,13 +181,13 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
-| docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
+| docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-29 |
 | docs/maintainer/mir4-qualification-and-promotion.md | MIR 4 Qualification and Promotion | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-release-governance.md | MIR 4 Release Governance | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
 | docs/maintainer/mir4-release-operations.md | MIR 4 Release Operations | current | release-manager | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-spark-sol-handoff.md | MIR 4 Spark To Sol Handoff And Completion Plan | current | release-manager | release-plan | mir-maintainers | 2026-08-20 |
 | docs/maintainer/mir4-supply-chain-preservation.md | MIR 4 Supply-Chain and Preservation | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
-| docs/maintainer/mir4-w09-manual-playtest.md | MIR 4 W09 Manual Playtest Handoff | current | maintainer | how-to | mir-maintainers | 2026-08-27 |
+| docs/maintainer/mir4-w09-manual-playtest.md | MIR 4 W09 Manual Playtest Handoff | current | maintainer | how-to | mir-maintainers | 2026-08-29 |
 | docs/maintainer/modpack-campaigns.md | Modpack Campaigns | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | MIR 2.5.0 Offline Continuity And Final Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/playtest-intake.md | Playtest Intake | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
@@ -364,8 +364,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir3-post-terminal-emergency-hotfix.md | MIR 3 Post-Terminal Emergency Hotfix | current | release-manager | reference | mir-maintainers | 2026-08-16 |
 | docs/releases/mir3-terminal-mod-portal-upload-checklist.md | MIR 3 Terminal Mod Portal Upload Checklist | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
 | docs/releases/mir3-terminal-release-and-mir4-handoff.md | MIR 3 Terminal Release and MIR 4 Handoff Guide | current | release-manager | reference | mir-maintainers | 2026-08-25 |
-| docs/releases/mir4-4.0-candidate-programme.md | MIR 4.0 Candidate Programme | current | release-manager | release-plan | mir-maintainers | 2026-08-24 |
-| docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-24 |
+| docs/releases/mir4-4.0-candidate-programme.md | MIR 4.0 Candidate Programme | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
+| docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
@@ -440,7 +440,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/user/faq.md | FAQ | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/generated-technologies.md | Generated Technologies | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/installation.md | Installation | current | player | how-to | mir-maintainers | 2026-07-07 |
-| docs/user/mir3-to-mir4.md | Upgrading from MIR 3 to MIR 4 | current | player | how-to | mir-maintainers | 2026-08-18 |
+| docs/user/mir3-to-mir4.md | Upgrading from MIR 3 to MIR 4 | current | player | how-to | mir-maintainers | 2026-08-29 |
 | docs/user/README.md | User Guide | current | player | how-to | mir-maintainers | 2026-07-07 |
 | docs/user/settings.md | Settings | current | player | how-to | mir-maintainers | 2026-08-03 |
 | docs/user/troubleshooting.md | Troubleshooting | current | player | how-to | mir-maintainers | 2026-07-07 |

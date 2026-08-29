@@ -782,9 +782,9 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1") @migrationArguments
       }
       "release-tooling-migration" {
-        if ($Args.Count -lt 3) { throw "mir4 release-tooling-migration requires generate, check, or show." }
+        if ($Args.Count -lt 3) { throw "mir4 release-tooling-migration requires check or show." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 release-tooling-migration command: $subcommand" }
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 release-tooling-migration command: $subcommand" }
         $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
