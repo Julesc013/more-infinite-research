@@ -475,7 +475,6 @@ fixtures:
         Krastorio2: absent
         Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
     validates:
-      - exact-v1-and-v2-policy-harness-selection
       - target-specific-bounded-version-envelopes
       - required-science-identity-capability-fingerprint
       - no-behavior-when-k2-is-absent

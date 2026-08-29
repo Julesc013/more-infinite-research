@@ -63,15 +63,6 @@
       "release_authority": false
     },
     {
-      "path": ".mir/fixtures.yml",
-      "previous_sha256": "3B4249362F276F2389A7F30DC50F2FF2DF61E25DE5EC19A178B9CABB6DF6EDAE",
-      "current_sha256": "0DBB414688FA45EA6AE02BE14A07F87138B07301C194C01267E0D2BAC7266C18",
-      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, and prepare complete release copy without granting a release transition.",
-      "scope": "package-excluded-control-plane",
-      "package_visible": false,
-      "release_authority": false
-    },
-    {
       "path": ".mir/modules.yml",
       "previous_sha256": "D73568813F95C33333FC96BBBF6D08CF90F61838F102C33725F7FD8655920047",
       "current_sha256": "B04DC4C579CF82093FDC1A89EAF93F00E02AE6B6689B0339C4717731FE3C0512",
@@ -168,7 +159,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "0DB7CF5393079CCF527B7BEC5CAD4D662B00C0BFD45ADC033C194DE443A1FA7A",
+      "sha256": "C817E8B28F7B32420FE27ACA361569732F929BC5899A9B2E0484810432A0ED84",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },

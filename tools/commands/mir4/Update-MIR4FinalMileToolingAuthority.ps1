@@ -44,7 +44,6 @@ $roles = [ordered]@{
   '.github/workflows/branch-policy.yml' = 'governed-legacy-alias-controller'
   '.mir/control/paths.yml' = 'final-mile-control-path-projection'
   '.mir/docs.yml' = 'final-mile-documentation-projection'
-  '.mir/fixtures.yml' = 'final-mile-fixture-claim-projection'
   '.mir/modules.yml' = 'final-mile-module-boundary-authority'
   'docs/reference/generated/documentation-index.md' = 'final-mile-generated-documentation-index'
   'docs/reference/generated/documentation-navigation.md' = 'final-mile-generated-documentation-navigation'
