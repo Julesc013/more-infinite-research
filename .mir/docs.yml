@@ -1312,6 +1312,7 @@ docs:
       - mir4-manual-playtest-evidence-lifecycle
       - mir4-public-preview-asset-contract
       - mir4-publisher-confinement-and-restore-drill
+      - mir4-f210-engine-selection-and-freeze-lock
   - path: docs/maintainer/mir4-qualification-and-promotion.md
     title: "MIR 4 Qualification and Promotion"
     status: current

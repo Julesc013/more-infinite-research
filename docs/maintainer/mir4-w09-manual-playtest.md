@@ -5,7 +5,7 @@ applies_to: "4.0.0 M4C02-09-24H"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-27
+last_reviewed: 2026-08-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -26,7 +26,7 @@ Use this after the automated campaign is green and before any source freeze or r
 
 ## Prepare the exact sessions
 
-Use `tools/mir.ps1 playtest prepare --target F210 --candidate <exact-f210-development-package> --predecessor dist/more-infinite-research_3.2.11.zip --factorio <exact-factorio-2.1.14-executable> --json` and the corresponding F200 command with `dist/more-infinite-research_2.5.11.zip` and `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`. The command fails closed if the current package source, development plan, package, predecessor, or engine no longer matches the governed hashes. If Steam has advanced past the governed F210 patch, stop and obtain the exact engine through maintainer-approved custody; do not replace or retarget the Steam depot.
+Use `tools/mir.ps1 playtest prepare --target F210 --candidate <exact-f210-development-package> --predecessor dist/more-infinite-research_3.2.11.zip --json`. F210 automatically resolves the authorized `C:\Program Files\Steam` experimental installation under the append-only qualification policy and locks its exact version, builds, executable, and app manifest into the session. Use the corresponding F200 command with `dist/more-infinite-research_2.5.11.zip` and `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`. The command fails closed if the current package source, development plan, policy, package, predecessor, Steam manifest, or engine no longer matches the governed identities. If Steam advances after preparation, discard that F210 session and rebuild and requalify on the new selected engine; do not retarget a historical engine depot or reuse the old session.
 
 Each prepared root contains `session.json`, `review-checklist.md`, `Invoke-MIR4PlaytestEngine.ps1`, isolated `profile/` and `packages/` trees, `observations.json`, `capture-queue/`, and `manual-decision.template.json`. The template is explicitly non-evidence. Run the launcher with `-Package Predecessor` for the direct-upgrade source and with `-Package Candidate` for the fresh candidate, upgrade, and reload observations. Add `-SavePath <path>` when the engine should open a specific save.
 

@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 pre-freeze development"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-27
+last_reviewed: 2026-08-29
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,6 +14,7 @@ source_of_truth_for:
   - mir4-manual-playtest-evidence-lifecycle
   - mir4-public-preview-asset-contract
   - mir4-publisher-confinement-and-restore-drill
+  - mir4-f210-engine-selection-and-freeze-lock
 ---
 # MIR 4 pre-freeze hardening
 
@@ -35,6 +36,14 @@ T06 closes the ten-phase non-production rehearsal and fault-injection programme.
 
 The workflow contract and release doctor use six ordered maturity fields: `workflow_registered`, `workflow_fail_closed`, `workflow_executor_implemented`, `workflow_dry_run_passed`, `workflow_production_rehearsal_passed`, and `workflow_production_authorized`. Registration and fail-closed behavior are safety properties, not evidence that a named release operation can run. All ten phases now truthfully report implementation, dry-run, and non-production production-shaped rehearsal maturity. `workflow_production_authorized` remains false for every phase. Source freeze remains blocked by protected signing/recovery, explicit maintainer F210/F200 playtest acceptance, later dependency work, and the separately authorized freeze decision.
 
+## F210 engine selection
+
+`.mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json` supersedes the development plan's historical 2.1.14 engine binding for new F210 pre-freeze executions without altering that evidence. Before source freeze, F210 resolves the highest official experimental 2.1.x currently installed in the single authorized Steam installation at `C:\Program Files\Steam\steamapps\common\Factorio`; the support floor remains 2.1.8. Every build, automated qualification, and playtest session locks the observed version, Factorio build, Windows file version, executable SHA-256, Steam build ID, and app-manifest SHA-256. The resolver does not claim a globally latest version from local state.
+
+T19 must convert the then-current observation into an exact freeze lock only after explicit source-freeze authorization. Any later engine, Steam build, manifest, or official-data identity drift invalidates the F210 candidate and requires a rebuild plus complete F210 requalification; evidence from a nearby patch is never reused silently. This policy does not itself authorize T19, candidate allocation, signing, sealing, promotion, or publication.
+
+After Factorio 2.1 becomes officially stable and a separate append-only transition authority activates the stable phase, F210 uses two exact lanes: stable minimum 2.1.8 and latest official stable 2.1.x. Each lane receives its own exact candidate engine and official-data lock. The policy changes qualification selection, not the public compatibility floor and not any prototype.
+
 ## Pre-freeze checks
 
 Run:
@@ -51,7 +60,7 @@ Run any of the ten phase dry runs against exact source identities with:
 
 Use only repository-descendant package-excluded paths. Qualification execution reads `<proof-root>/qualification-workers/f200.json` and `f210.json`; independent verification reads the corresponding files under `<proof-root>/independent-receipts/`. Their schemas are the tracked worker and independent receipt V1 contracts. `M4RC1` is rejected while allocation is unauthorized. Execute, resume, verify, compensate, and receipt operations are available only inside the same non-production attempt boundary.
 
-The doctor checks the authority schemas and bindings, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Until all phase adapters are implemented and rehearsed, `workflow-executor-maturity` is an automated blocker. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
+The doctor checks the authority schemas and bindings, current F210 policy and authorized Steam experimental resolution, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
 
 Audit the recorded branch and tag policy with:
 
@@ -61,7 +70,7 @@ The snapshot is evidence of the observed GitHub configuration, not permission to
 
 ## Manual playtest evidence
 
-Prepare isolated F210 or F200 sessions with `tools/mir.ps1 playtest prepare`. The command rejects a changed package-source authority or any candidate, predecessor, or engine hash mismatch before writing below `build/mir4/playtests/<target>/`. A prepared session contains separate immutable candidate and predecessor copies, a candidate-selected mods directory, isolated Factorio config and user-data roots, a hash-locked launcher, the complete target-specific scenario checklist, an observations template, typed capture directories, a deliberately invalid decision template, and no inferred result.
+Prepare isolated F210 or F200 sessions with `tools/mir.ps1 playtest prepare`. F210 resolves and binds the current authorized Steam experimental automatically; F200 retains its tracked exact-engine binding. The command rejects a changed package-source authority or any candidate, predecessor, policy, Steam manifest, or engine hash mismatch before writing below `build/mir4/playtests/<target>/`. A prepared session contains separate immutable candidate and predecessor copies, a candidate-selected mods directory, isolated Factorio config and user-data roots, a hash-locked launcher, the complete target-specific scenario checklist, an observations template, typed capture directories, a deliberately invalid decision template, and no inferred result.
 
 Run the prepared launcher from its session root. Use `-Package Predecessor` to create or inspect the direct-upgrade source save, then use `-Package Candidate -SavePath <save>` for the upgrade and each reload. The launcher re-verifies the engine and selected package, stages exactly one MIR archive, passes the governed `--config`, `--no-log-rotation`, `--mod-directory`, and optional `--load-game` arguments, and retains the resulting log under `capture-queue/logs/`. It does not create a decision.
 
