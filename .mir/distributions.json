@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "tracked-root-dist-inventory",
-  "generated_at": "2026-08-18",
-  "distribution_count": 70,
+  "generated_at": "2026-08-30",
+  "distribution_count": 74,
   "policy": {
     "tagged_archives_are_immutable": true,
     "superseded_candidates_are_not_releases": true,
@@ -513,6 +513,38 @@
       "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
       "kind": "tagged-publicly-verified",
       "source_ref": "3.2.11"
+    },
+    {
+      "version": "4.0.10000",
+      "path": "dist/more-infinite-research_4.0.10000.zip",
+      "bytes": 399073,
+      "sha256": "EA495B37C0B91F0728226290CDAEFDF4BBD3C1DBA7D0997AAF5E5107FE79AD3F",
+      "kind": "mir4-final-mile-candidate-authorized-not-release",
+      "source_ref": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8"
+    },
+    {
+      "version": "4.0.11000",
+      "path": "dist/more-infinite-research_4.0.11000.zip",
+      "bytes": 399073,
+      "sha256": "BE63F76255068BAC1BA891B9C9331E4EA943538A37808DFF546E5B1A3ECEB62D",
+      "kind": "mir4-final-mile-candidate-authorized-not-release",
+      "source_ref": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8"
+    },
+    {
+      "version": "4.0.20000",
+      "path": "dist/more-infinite-research_4.0.20000.zip",
+      "bytes": 1067014,
+      "sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+      "kind": "mir4-final-mile-candidate-authorized-not-release",
+      "source_ref": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8"
+    },
+    {
+      "version": "4.0.21000",
+      "path": "dist/more-infinite-research_4.0.21000.zip",
+      "bytes": 1069552,
+      "sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+      "kind": "mir4-final-mile-candidate-authorized-not-release",
+      "source_ref": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8"
     }
   ]
 }

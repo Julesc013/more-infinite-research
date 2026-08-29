@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-30T04:26:35.8774167+10:00",
+  "recorded_at": "2026-08-30T06:49:56.7191568+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "change_id": "MIR4-FINAL-RELEASE-CLOSURE-2026-08-30",
   "predecessor_receipt": {
@@ -190,6 +190,12 @@
   ],
   "current_authorities": [
     {
+      "path": ".mir/distributions.json",
+      "sha256": "8424C86F3911F148BB8CD754D737E66D94E4FCBE51648FFCCB16C736D707224E",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-root-distribution-inventory-with-mir4-final-mile-candidates"
+    },
+    {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
       "sha256": "7A59C83A6DBBFCD803843D49FBBCCAC6990D4C59642C361CB695239277BDA65B",
       "hash_mode": "canonical-text-v1",
@@ -227,7 +233,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1",
-      "sha256": "7DC4D1D18CEE371D62DE410DF0510DECFC6F4E823FD8C1459568453BAB38B5D0",
+      "sha256": "F40C541CCE73A67A95F1A6FA9B1C3D35D7B5E6085C476BA2F8AB5891C7A656EE",
       "hash_mode": "canonical-text-v1",
       "role": "final-release-closure-evolution-writer"
     }

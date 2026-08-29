@@ -55,6 +55,7 @@ $candidateAuthority = Get-RawDescriptor $candidateAuthorityRelative $candidateAu
 Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $RepoRoot | Out-Null
 
 $roles = [ordered]@{
+  '.mir/distributions.json' = 'exact-root-distribution-inventory-with-mir4-final-mile-candidates'
   '.mir/control/paths.yml' = 'final-release-closure-control-path-projection'
   '.mir/docs.yml' = 'final-release-closure-documentation-projection'
   '.mir/modules.yml' = 'final-release-closure-module-boundary-authority'
