@@ -11,7 +11,7 @@ Its ten phase adapters are source freeze, target build, target qualification, pr
 ## Readiness order
 
 1. Reconcile exact repository, programme, queue, branch, and external-state identity.
-2. Run the release doctor. Distinguish registered, fail-closed, executor-implemented, dry-run-passed, production-rehearsal-passed, and production-authorized.
+2. Run the release doctor. Distinguish registered, fail-closed, executor-implemented, dry-run-passed, production-rehearsal-passed, and production-authorized. For F210 before freeze, the doctor selects the installed official Steam experimental 2.1.x at or above 2.1.8 and records an exact execution identity. At T19, explicit freeze authorization must pin that exact identity; drift requires rebuild and requalification. After the official 2.1 stable transition, use exact stable-minimum 2.1.8 and latest-stable lanes.
 3. Obtain protected signing/recovery acceptance and explicit F210/F200 maintainer playtest receipts.
 4. Close defects under independent review.
 5. Receive explicit source-freeze authorization and allocate the candidate identity.

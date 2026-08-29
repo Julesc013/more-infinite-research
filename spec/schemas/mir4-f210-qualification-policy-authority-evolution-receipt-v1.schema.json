@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR 4 F210 qualification policy authority evolution receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "execution_state", "qualification_policy", "evolved_bindings", "current_authorities", "player_package_source_sha256", "package_visible_delta", "human_gate", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4F210QualificationPolicyAuthorityEvolutionReceiptV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "change_id": {"const": "MIR4-F210-PREFREEZE-QUALIFICATION-POLICY-2026-08-29"},
+    "predecessor_receipt": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "releases/migrations/MIR4-Release-Tooling-MigrationV1.json"},
+        "sha256": {"const": "E9A099B1F54E63C1D23CBE20DC524329931BC769170EA44937C0515EB3675E45"}
+      }
+    },
+    "execution_state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["programme_status", "t16_status", "t17_status", "t18_status", "t19_status"],
+      "properties": {
+        "programme_status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-T18-DEPENDENCY-BLOCKED-RELEASE-BLOCKED"},
+        "t16_status": {"const": "blocked-human"},
+        "t17_status": {"const": "blocked-human"},
+        "t18_status": {"const": "blocked-dependency"},
+        "t19_status": {"const": "blocked-human"}
+      }
+    },
+    "qualification_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "record_sha256", "pre_freeze_channel", "support_floor", "freeze_requires_explicit_authorization", "future_stable_dual_lane"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "pre_freeze_channel": {"const": "experimental"},
+        "support_floor": {"const": "2.1.8"},
+        "freeze_requires_explicit_authorization": {"const": true},
+        "future_stable_dual_lane": {"const": true}
+      }
+    },
+    "evolved_bindings": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 5, "items": {"$ref": "#/$defs/current"}},
+    "player_package_source_sha256": {"const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},
+    "package_visible_delta": {"const": []},
+    "human_gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["protected_signing_authorized", "f210_decision_recorded", "f200_decision_recorded", "acceptance_inferred"],
+      "properties": {
+        "protected_signing_authorized": {"const": false},
+        "f210_decision_recorded": {"const": false},
+        "f200_decision_recorded": {"const": false},
+        "acceptance_inferred": {"const": false}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "status": {"const": "F210-PREFREEZE-QUALIFICATION-POLICY-ADMITTED-RELEASE-TRANSITIONS-UNAUTHORIZED"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 1},
+        "scope": {"const": "package-excluded-control-plane"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"enum": ["raw-bytes", "canonical-text-v1"]},
+        "role": {"type": "string", "minLength": 1}
+      }
+    },
+    "transitionGate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

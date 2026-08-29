@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-24
+last_reviewed: 2026-08-29
 supersedes:
   - docs/releases/mir4-bootstrap-local-beta-plan.md
 superseded_by: []
@@ -34,7 +34,7 @@ The five governed maturity classes are Stable, Shadow, Preview, Experimental and
 
 | Target | Distribution | Predecessor | Candidate role | 4.0 admission rule |
 | --- | --- | --- | --- | --- |
-| F210 | `4.0.21000` | `3.2.11` | Mandatory | Must be fully qualified on exact Factorio 2.1.14 |
+| F210 | `4.0.21000` | `3.2.11` | Mandatory | Before freeze, select and exactly bind the installed official Steam experimental 2.1.x at or above 2.1.8; freeze that exact engine at T19; after 2.1 stable, qualify exact stable-minimum 2.1.8 and latest-stable lanes |
 | F200 | `4.0.20000` | `2.5.11` | Mandatory | Must be fully qualified on exact Factorio 2.0.77 with maximum representable parity |
 | F110 | `4.0.11000` | `1.9.9` | Conditional | Independent qualification or explicit deferral |
 | F100 | `4.0.10000` | `1.8.9` | Conditional | Independent qualification or explicit deferral |
@@ -46,6 +46,8 @@ The five governed maturity classes are Stable, Shadow, Preview, Experimental and
 | F013 | `4.0.01300` | `1.3.9` | Experimental/private | Private evidence only until all admission gates pass |
 
 Padded historical distribution identities are canonical archive identities. Factorio 0.x may normalize the numeric patch component when displaying it in logs; evidence records both forms.
+
+The append-only F210 qualification policy changes future selection, not historical evidence: the development-plan and T17 2.1.14 records remain intact. Any selected-engine drift invalidates the affected F210 build and qualification. The policy neither widens the `base >= 2.1.8` support floor nor authorizes source freeze or release.
 
 ## 4.0 platform contents
 

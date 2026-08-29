@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "kind": "MIR4F210ReleaseQualificationPolicyV1",
+  "recorded_at": "2026-08-29T18:40:00+10:00",
+  "target": "F210",
+  "factorio_line": "2.1",
+  "support_floor": "2.1.8",
+  "pre_freeze": {
+    "phase": "experimental",
+    "selection": "highest-official-experimental-installed-on-single-authorized-steam-path-at-execution-time",
+    "steam": {
+      "app_id": "427520",
+      "branch": "experimental",
+      "app_manifest": "C:\\Program Files\\Steam\\steamapps\\appmanifest_427520.acf",
+      "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe"
+    },
+    "execution_binding": "exact-version-build-file-version-binary-sha256-steam-build-id-and-manifest-sha256",
+    "drift": "invalidate-prior-execution-and-rerun-affected-build-and-qualification"
+  },
+  "freeze": {
+    "trigger": "explicit-T19-source-freeze-authorization",
+    "lock": "exact-selected-version-build-file-version-binary-sha256-steam-build-id-manifest-sha256-and-official-data-identities",
+    "drift": "candidate-invalid-rebuild-and-full-f210-requalification-required"
+  },
+  "post_stable": {
+    "activation": "official-2.1-stable-availability-plus-append-only-transition-authority",
+    "minimum_lane": {"id": "stable-minimum", "version": "2.1.8", "channel": "stable"},
+    "latest_lane": {"id": "stable-latest", "selection": "latest-official-stable-2.1.x", "channel": "stable"},
+    "candidate_lock": "each-lane-exact-version-build-binary-and-official-data-identities"
+  },
+  "historical_evidence": [
+    ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json",
+    ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json"
+  ],
+  "boundaries": {
+    "compatibility_floor_changed": false,
+    "prototype_mutation_authorized": false,
+    "source_freeze_authorized": false,
+    "candidate_allocation_authorized": false,
+    "signing_authorized": false,
+    "publication_authorized": false
+  },
+  "status": "active-pre-freeze-experimental-selection-policy-production-release-unauthorized",
+  "record_sha256": "7DC4D7CBD8B1F5AB8FB0B0CDF819489C9BAA18008607EDA1A27AD3EE297F504F"
+}

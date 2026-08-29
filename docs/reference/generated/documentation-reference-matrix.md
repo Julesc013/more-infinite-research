@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-28.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-29.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -225,6 +225,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-extension-factorio-testing-guide | [Testing MIR Extensions Against Factorio](../../developer/testing-against-factorio.md) | current |
 | mir4-extension-publication-guide | [Publishing a MIR 4 Extension](../../developer/publishing-an-extension.md) | current |
 | mir4-f200-k2so-custody-closure | [MIR 4 Exact Release Compatibility Canaries](../../compatibility/mir4-release-canaries.md) | current |
+| mir4-f210-engine-selection-and-freeze-lock | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |
 | mir4-f210-extension-owned-mod-data-discovery | [MIR 4 F210 Read-Only MEP Discovery](../../reference/mir4-f210-mep-discovery.md) | current |
 | mir4-feature-setting-cutover | [MIR 4 Semantic Compiler Shadow](../../architecture/mir4-semantic-compiler.md) | current |
 | mir4-first-extension-tutorial | [Your First MIR 4 Extension](../../reference/mir4-first-extension.md) | current |
