@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-30T03:34:48.2357561+10:00",
+  "recorded_at": "2026-08-30T04:21:14.8920175+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "change_id": "MIR4-FINAL-RELEASE-CLOSURE-2026-08-30",
   "predecessor_receipt": {
@@ -163,7 +163,7 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "E0C521F68E90BC463DE1EE03EBE85BB90E57234E25DA866FB4BEE710ED0B3089",
-      "current_sha256": "1753A222BAAD20627831433F24CE3D230AB0B746058EFB2D3B89B5CDDE4DE7DA",
+      "current_sha256": "A8556B7E91C3A1A45A5D11137F330B64CEB68E37F8D52B5F79F5D636137BD851",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -172,7 +172,7 @@
     {
       "path": "validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
       "previous_sha256": "EF23CDB9301651B393834C79E828C6D66250BF983F55C498BF3D7344CBAB854B",
-      "current_sha256": "5C10E17FFA36D196C70BD441ED2720B5C9D76741051553D82597952EA20088CE",
+      "current_sha256": "0911D2C1ACBCD99733B98FC2C3DB750051FE98DA1763AED007B23B360F418D9D",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,

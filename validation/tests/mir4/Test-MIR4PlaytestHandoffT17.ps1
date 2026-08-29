@@ -40,9 +40,9 @@ try{
 
   $planPath=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json'
   $authorizationPath=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json'
-  $candidateManifestPath=Join-Path $fixture 'build/results/fixture/candidate-manifest.json'
-  $f210AssurancePath=Join-Path $fixture 'build/results/fixture/f210-assurance.json'
-  $f200AssurancePath=Join-Path $fixture 'build/results/fixture/f200-assurance.json'
+  $candidateManifestPath=Join-Path $fixture 'build/mir4/fixture/candidate-manifest.json'
+  $f210AssurancePath=Join-Path $fixture 'build/results/assurance/fixture/f210-assurance.json'
+  $f200AssurancePath=Join-Path $fixture 'build/results/assurance/fixture/f200-assurance.json'
   $t15Path=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json'
   $handoffPath=Join-Path $fixture 'docs/maintainer/mir4-w09-manual-playtest.md'
   Write-TestJson $authorizationPath ([ordered]@{
@@ -92,15 +92,15 @@ try{
       development_package=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64);bytes=(Get-Item $candidate).Length;entry_count=1;release_identity=$false}
       engine=[ordered]@{version='2.1.test';build=1;path=$engine;sha256=$engineSha;steam_build=$null}
       predecessor=[ordered]@{release='3.2.11';path=$predecessor;sha256=$predecessorSha;content_sha256=('E'*64)}
-      candidate_manifest=[ordered]@{path='build/results/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
-      assurance=[ordered]@{path='build/results/fixture/f210-assurance.json';bytes=$f210AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f210AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
+      candidate_manifest=[ordered]@{path='build/mir4/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
+      assurance=[ordered]@{path='build/results/assurance/fixture/f210-assurance.json';bytes=$f210AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f210AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
     },[ordered]@{
       target='F200';distribution_version='4.0.20000'
       development_package=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64);bytes=(Get-Item $candidate).Length;entry_count=1;release_identity=$false}
       engine=[ordered]@{version='2.0.test';build=1;path=$engine;sha256=$engineSha;steam_build=$null}
       predecessor=[ordered]@{release='2.5.11';path=$predecessor;sha256=$predecessorSha;content_sha256=('E'*64)}
-      candidate_manifest=[ordered]@{path='build/results/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
-      assurance=[ordered]@{path='build/results/fixture/f200-assurance.json';bytes=$f200AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f200AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
+      candidate_manifest=[ordered]@{path='build/mir4/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
+      assurance=[ordered]@{path='build/results/assurance/fixture/f200-assurance.json';bytes=$f200AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f200AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
     })
     transition_gate=[ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;production_seal=$false;promotion_to_main=$false;tagging=$false;publication=$false}
     secret_values_present=$false
