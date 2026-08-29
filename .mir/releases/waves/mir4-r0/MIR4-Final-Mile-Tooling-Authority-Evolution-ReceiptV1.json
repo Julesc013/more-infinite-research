@@ -144,6 +144,15 @@
       "release_authority": false
     },
     {
+      "path": "tools/mir/application/assurance/AssuranceOfflineCustodyMigration.ps1",
+      "previous_sha256": "2E82C28C80C13A2F60FDDC4541199EB12A312A198311A541CFE16E807962569A",
+      "current_sha256": "34B6A6012346121B86AE34B44CBED3BBA17E11907E3CD59E4E1D47CD5DFB9583",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "929A0188C1F391F383378DA83B39F49ACD890B0093FDC08B902EAE0E0C9C56A5",
       "current_sha256": "E0C521F68E90BC463DE1EE03EBE85BB90E57234E25DA866FB4BEE710ED0B3089",
@@ -165,6 +174,24 @@
       "path": "validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
       "previous_sha256": "C98F14FC8977C3F3B7B866FD5FE7353A28DFC16BA99C9D54FFC9BE6ACF6AB97E",
       "current_sha256": "5BDD0FA0986D80538887953FEF8B015546AD410CD011F6C1BBB3393E36C7E183",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1",
+      "previous_sha256": "B874B5BF8CCB96D5C4E3C5A8EDC9E7F4BDD0DBF865661CF23AED1186EEF99BF4",
+      "current_sha256": "46A7D2E6A64E2FE1257D26889B6BB6E73B44206450FFC3C692746CCCE1C3BF16",
+      "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1",
+      "previous_sha256": "BF7F1D84B9692DE6C1CF59FE2A3FBE04140694F026F8C00CCA246338638902DB",
+      "current_sha256": "F06C83421666D74E9F35CC0E7E27309C1645C7C1D258028E8980F39EE137A65E",
       "reason": "Repair the governed post-publication legacy alias controller, advance local-playtest assurance to the exact V3 authority, add exact-candidate version-aware qualification fixtures, regenerate dependent platform projections, and prepare complete release copy without granting a release transition.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -203,8 +230,14 @@
       "role": "exact-private-cross-target-release-gate"
     },
     {
+      "path": "scripts/Invoke-MIRAssurance.ps1",
+      "sha256": "E60EC2B1794245948852A235DBCAED4ED1FBDE90DD1F99A9D14AFE42EA22E091",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-mile-assurance-v4-entrypoint"
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
-      "sha256": "7FC05EED9042CB1CCD623FB238D65F081E2062030A2230C75B013EC280031DCD",
+      "sha256": "2F3DED9C8EF1AFE073D741EC3241469BA8C61374D43ECA997265AF293CCDF8DA",
       "hash_mode": "canonical-text-v1",
       "role": "final-mile-tooling-evolution-writer"
     },
@@ -213,6 +246,24 @@
       "sha256": "5E9B3B51B997D18B38D949CFCC1E2EE09EA5A6B01E8B87C7E4E72F686ACF7C60",
       "hash_mode": "canonical-text-v1",
       "role": "terminal-post-publication-sync-controller"
+    },
+    {
+      "path": "tools/lib/assurance/Core.ps1",
+      "sha256": "D0DD92018078DE8839B9846DF43FB48BD81A97D5EEE82E5B1D196AD48A53EB59",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-mile-assurance-v4-core"
+    },
+    {
+      "path": "tools/lib/assurance/Domains.ps1",
+      "sha256": "CF5163335DD15985F6B7A4879069C151E37BB529F835092F6E926A939B85E010",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-mile-assurance-v4-domains"
+    },
+    {
+      "path": "tools/lib/assurance/Hashing.ps1",
+      "sha256": "08E131BE3849D6720BF160FDE3356C9EE1E7EBD2268E4E7DD314FD87245581F0",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-mile-assurance-v4-hashing"
     },
     {
       "path": "tools/lib/assurance/Release.ps1",

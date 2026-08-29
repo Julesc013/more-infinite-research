@@ -14,6 +14,6 @@ $parity=Test-MIR4AssuranceOfflineCustodyFunctionalParityV1 -RepoRoot $repo
 Assert-MIR4AssuranceOfflineCustodyV1 ([string]$parity.digest-ceq$script:MIR4AssuranceOfflineCustodyPreCutoverDigestV1) 'mir4-assurance-offline-custody-pre-cutover-parity'
 Assert-MIR4AssuranceOfflineCustodyV1 ([int]$parity.record.w08.critical_path.seconds-eq10-and@($parity.record.w08.proof_cover.selected).Count-eq2-and@($parity.record.w08.recovery.pending).Count-eq1) 'mir4-assurance-offline-custody-w08-shape'
 Assert-MIR4AssuranceOfflineCustodyV1 ([bool]$parity.record.custody.descendant-and-not[bool]$parity.record.custody.sibling-and[string]$parity.record.custody.invalid_mode-match'only.*proof-only') 'mir4-assurance-offline-custody-boundary-shape'
-Assert-MIR4AssuranceOfflineCustodyV1 ((Get-MIR4AssuranceV4PreservationDigestV1 -RepoRoot $repo)-ceq$script:MIR4AssuranceV4PreservationDigestV1) 'mir4-assurance-offline-custody-assurance-v4'
+Assert-MIR4AssuranceOfflineCustodyV1 (Test-MIR4AssuranceV4PreservationOrFinalMileSuccessorV1 -RepoRoot $repo) 'mir4-assurance-offline-custody-assurance-v4'
 Assert-MIR4AssuranceOfflineCustodyV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-assurance-offline-custody-package-mutation'
 [pscustomobject][ordered]@{status='accepted';functional_parity_digest=[string]$parity.digest;critical_path_seconds=10;environment_target_count=2;compatibility_entrypoint_count=7;package_source_sha256=$packageBefore;package_visible=$false;release_transition_authority=$false}

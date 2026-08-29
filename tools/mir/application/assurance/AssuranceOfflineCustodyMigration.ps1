@@ -51,6 +51,38 @@ function Get-MIR4AssuranceV4PreservationDigestV1 {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes(($rows-join"`n"))))
 }
 
+function Test-MIR4AssuranceV4PreservationOrFinalMileSuccessorV1 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  if((Get-MIR4AssuranceV4PreservationDigestV1 -RepoRoot $repo)-ceq$script:MIR4AssuranceV4PreservationDigestV1){return $true}
+
+  $receiptPath='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json'
+  $state=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo `
+    -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration `
+    -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration `
+    -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration `
+    -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration `
+    -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration `
+    -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration `
+    -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration `
+    -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution
+  if([string]$state.prior_receipt_path-cne$receiptPath){return $false}
+  $receipt=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $receiptPath
+  if([string]$receipt.kind-cne'MIR4FinalMileToolingAuthorityEvolutionReceiptV1'-or
+     [string]$receipt.change_id-cne'MIR4-FINAL-MILE-TOOLING-2026-08-29'-or
+     @($receipt.package_visible_delta).Count-ne0-or
+     [string]$receipt.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+     @($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){return $false}
+
+  $paths=@('scripts/Invoke-MIRAssurance.ps1','tools/lib/assurance/Core.ps1','tools/lib/assurance/Domains.ps1','tools/lib/assurance/Hashing.ps1','tools/lib/assurance/Release.ps1')
+  foreach($path in $paths){
+    if(-not$state.authority_hashes.ContainsKey($path)){return $false}
+    $mode=if($state.authority_hash_modes.ContainsKey($path)){[string]$state.authority_hash_modes[$path]}else{'raw-bytes'}
+    if((Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $path) -Mode $mode)-cne[string]$state.authority_hashes[$path]){return $false}
+  }
+  return $true
+}
+
 function Test-MIR4AssuranceOfflineCustodyForwardersV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
