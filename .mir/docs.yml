@@ -2768,6 +2768,14 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/mir4-post-4.0-roadmap.md
+    title: "MIR 4 Post-4.0 Roadmap"
+    status: draft
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-post-4.0-roadmap
   - path: docs/releases/mod-portal-page.md
     title: "More Infinite Research Mod Portal Page"
     status: current

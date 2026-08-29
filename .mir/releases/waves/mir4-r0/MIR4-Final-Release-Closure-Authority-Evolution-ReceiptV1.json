@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-30T04:21:14.8920175+10:00",
+  "recorded_at": "2026-08-30T06:49:56.7191568+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "change_id": "MIR4-FINAL-RELEASE-CLOSURE-2026-08-30",
   "predecessor_receipt": {
@@ -55,7 +55,7 @@
     {
       "path": ".mir/docs.yml",
       "previous_sha256": "A9DBCE91A917A165A4E3A1554A03F1DFB2CC17610991BDD721224C6ABEDC7983",
-      "current_sha256": "013FF919123ED37457C9F6E77020D18660F696AD8C5DD7F78EC440C2B59318BB",
+      "current_sha256": "1D652443D94550190E61451691E98CC8BD476CDB0CCF79C1D25BFEE698D6EBD6",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -73,7 +73,7 @@
     {
       "path": "docs/reference/generated/documentation-index.md",
       "previous_sha256": "DEDA14AC322D037C441E010CC3AA2DCC818297D91FA4EB83747153CD946B4490",
-      "current_sha256": "A37658A2D75F6565AD29CC2AE35A7AD02057BE4DF64AD99957A6F3C1A8A9F6DF",
+      "current_sha256": "50267CDB79CEE2A8FD954AC461880580F26CB9244DBACEDB1003D9ACFDA6FBFF",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -91,7 +91,7 @@
     {
       "path": "docs/reference/generated/documentation-owner-dashboard.md",
       "previous_sha256": "310A443D02258E5951753CB9D7A33D2120B3EE7C680CE851D0368DAE53CE944B",
-      "current_sha256": "D8A5FD09B25206475E905F2134715960DDC8242BE213CA49CEECCA4CE9429027",
+      "current_sha256": "5C0394CF3FB2EF12DAB7724192C50B1DEE05DD05B353CDE2C6617EC2E4F5808E",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -100,7 +100,7 @@
     {
       "path": "docs/reference/generated/documentation-reference-matrix.md",
       "previous_sha256": "93AA669BE404DEC4E2B6D7DC65F72DC6F94E924BE6020FA82802690BDF186D74",
-      "current_sha256": "757BAFA38D367DF6D724117F7BB0CA661F4EE127AEA7F0B02248A72545EC54EB",
+      "current_sha256": "28946361CEFB5786DE38B998228910CE4D0103B1F6021DAB667FDDA6658D4125",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -109,7 +109,7 @@
     {
       "path": "docs/reference/generated/documentation-review-age.md",
       "previous_sha256": "2DF3A91E51B4ABE3DB865E49DAA79553220C7076D131E3A9BF973DF75E0D43C8",
-      "current_sha256": "3ACB8C82CB7FAE708B101327BDB1AC37D2FADF0405728D704C14B5ECE2ECD5C0",
+      "current_sha256": "DB576B5DDB3690A8BCD7560628A7B4A25179620356CAEFFC24DAEEBE7811C888",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -190,6 +190,12 @@
   ],
   "current_authorities": [
     {
+      "path": ".mir/distributions.json",
+      "sha256": "8424C86F3911F148BB8CD754D737E66D94E4FCBE51648FFCCB16C736D707224E",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-root-distribution-inventory-with-mir4-final-mile-candidates"
+    },
+    {
       "path": ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
       "sha256": "7A59C83A6DBBFCD803843D49FBBCCAC6990D4C59642C361CB695239277BDA65B",
       "hash_mode": "canonical-text-v1",
@@ -227,7 +233,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1",
-      "sha256": "7DC4D1D18CEE371D62DE410DF0510DECFC6F4E823FD8C1459568453BAB38B5D0",
+      "sha256": "F40C541CCE73A67A95F1A6FA9B1C3D35D7B5E6085C476BA2F8AB5891C7A656EE",
       "hash_mode": "canonical-text-v1",
       "role": "final-release-closure-evolution-writer"
     }
