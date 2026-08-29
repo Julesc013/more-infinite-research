@@ -3,6 +3,9 @@ local compiler_context = require("__more-infinite-research__.prototypes.mir.pipe
 local route_policy = require(
   "__more-infinite-research__.prototypes.mir.capabilities.science_integration.production_route_policy")
 
+local route_policy_id = route_policy.policy_id
+local route_policy_v2 = route_policy_id == "SciencePackProductionRoutePolicyV2"
+
 local function fail(message)
   error("MIR generated prerequisite safety validation failed: " .. message)
 end
@@ -50,11 +53,14 @@ local alternate_route = science.production_route_for_pack("mir-fixture-alternate
 if not alternate_route or alternate_route.recipe ~= "mir-fixture-alternate-route-early" then
   fail("alternate-route provenance did not retain the earliest safe recipe.")
 end
-if alternate_route.route_class ~= route_policy.classes.ordinary_alternate then
+if route_policy_id ~= "SciencePackProductionRoutePolicyV1" and not route_policy_v2 then
+  fail("unsupported production-route policy " .. tostring(route_policy_id) .. ".")
+end
+if route_policy_v2 and alternate_route.route_class ~= route_policy.classes.ordinary_alternate then
   fail("alternate-route classification was " .. tostring(alternate_route.route_class) .. ".")
 end
-if alternate_route.provenance.selection_policy ~= "SciencePackProductionRoutePolicyV2" then
-  fail("alternate-route provenance did not bind SciencePackProductionRoutePolicyV2.")
+if alternate_route.provenance.selection_policy ~= route_policy_id then
+  fail("alternate-route provenance did not bind " .. tostring(route_policy_id) .. ".")
 end
 alternate_route.recipe = "tampered-by-fixture"
 if science.production_route_for_pack("mir-fixture-alternate-route-science-pack").recipe
@@ -62,6 +68,7 @@ if science.production_route_for_pack("mir-fixture-alternate-route-science-pack")
   fail("alternate-route cache escaped its defensive-copy boundary.")
 end
 
+if route_policy_v2 then
 local canonical_primary = {
   recipe = "mir-fixture-primary-science-pack",
   route_class = route_policy.classes.ordinary_primary,
@@ -160,14 +167,18 @@ declared_self_return.route_class = route_policy.classes.self_return
 if route_policy.select({declared_self_return}) ~= nil then
   fail("a declared self-return route was allowed to prove first acquisition.")
 end
+end
 
-for _, unreachable_pack in ipairs({
+local unreachable_packs = {
   "mir-fixture-self-lock-science-pack",
   "mir-fixture-cycle-science-pack-a",
-  "mir-fixture-cycle-science-pack-b",
-  "mir-fixture-self-return-science-pack",
-  "mir-fixture-recycling-only-science-pack"
-}) do
+  "mir-fixture-cycle-science-pack-b"
+}
+if route_policy_v2 then
+  table.insert(unreachable_packs, "mir-fixture-self-return-science-pack")
+  table.insert(unreachable_packs, "mir-fixture-recycling-only-science-pack")
+end
+for _, unreachable_pack in ipairs(unreachable_packs) do
   local status = science.pack_production_status(unreachable_pack)
   if status ~= "unreachable" then
     fail(unreachable_pack .. " should be unreachable, got " .. tostring(status) .. ".")
@@ -213,13 +224,15 @@ end
 local generated_count = 0
 local fixture_pack_user_count = 0
 local unreachable_pack_user_count = 0
-local unreachable_packs = {
+local unreachable_pack_set = {
   ["mir-fixture-self-lock-science-pack"] = true,
   ["mir-fixture-cycle-science-pack-a"] = true,
-  ["mir-fixture-cycle-science-pack-b"] = true,
-  ["mir-fixture-self-return-science-pack"] = true,
-  ["mir-fixture-recycling-only-science-pack"] = true
+  ["mir-fixture-cycle-science-pack-b"] = true
 }
+if route_policy_v2 then
+  unreachable_pack_set["mir-fixture-self-return-science-pack"] = true
+  unreachable_pack_set["mir-fixture-recycling-only-science-pack"] = true
+end
 for name, technology in pairs(technologies) do
   if string.match(name, "^recipe%-prod%-research_") then
     generated_count = generated_count + 1
@@ -232,7 +245,7 @@ for name, technology in pairs(technologies) do
         fail("generated technology " .. name .. " uses unreachable science pack " .. tostring(pack_name) .. ".")
       end
       if pack_name == fixture_pack then fixture_pack_user_count = fixture_pack_user_count + 1 end
-      if unreachable_packs[pack_name] then unreachable_pack_user_count = unreachable_pack_user_count + 1 end
+      if unreachable_pack_set[pack_name] then unreachable_pack_user_count = unreachable_pack_user_count + 1 end
     end
   end
 end
