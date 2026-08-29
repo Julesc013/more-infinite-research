@@ -9,14 +9,22 @@ local function assert_equal(left, right, message)
   if fingerprint.of(left) ~= fingerprint.of(right) then fail(message) end
 end
 
+local policy_id = policy.policy_id
+local policy_v2 = policy_id == "K2SciencePhasePolicyV2"
+if policy_id ~= "K2SciencePhasePolicyV1" and not policy_v2 then
+  fail("unsupported K2 science phase policy " .. tostring(policy_id) .. ".")
+end
+
 local capabilities = {science_packs = {}}
-for _, name in ipairs(policy.required_science_packs()) do capabilities.science_packs[name] = true end
+if policy_v2 then
+  for _, name in ipairs(policy.required_science_packs()) do capabilities.science_packs[name] = true end
+end
 
 local f210_versions = {
-  base = "2.1.14",
   Krastorio2 = "2.1.2",
   ["Krastorio2-spaced-out"] = "2.0.13"
 }
+if policy_v2 then f210_versions.base = "2.1.14" end
 
 local f200_versions = {
   base = "2.0.73",
@@ -39,10 +47,12 @@ local phase_two_input = {
 local phase_two_before = fingerprint.of(phase_two_input)
 local normalized, decision = policy.normalize(phase_two_input, f210_versions, capabilities)
 if fingerprint.of(phase_two_input) ~= phase_two_before then fail("normalization mutated its input.") end
-if decision.policy_id ~= "K2SciencePhasePolicyV2" or decision.status ~= "normalized"
-    or decision.applicable ~= true or decision.changed ~= true
-    or decision.matched_profile ~= "factorio-2.1-k2so" or decision.qualified_target ~= "f210" then
+if decision.policy_id ~= policy_id or decision.status ~= "normalized"
+    or decision.applicable ~= true or decision.changed ~= true then
   fail("qualified Factorio 2.1 K2/K2SO normalization did not emit the expected decision.")
+end
+if policy_v2 and (decision.matched_profile ~= "factorio-2.1-k2so" or decision.qualified_target ~= "f210") then
+  fail("qualified Factorio 2.1 K2/K2SO normalization matched the wrong V2 profile.")
 end
 assert_equal(normalized, {
   {"production-science-pack", 7},
@@ -68,6 +78,7 @@ assert_equal(phase_one, {
 }, "production/utility phase did not remove only the K2 basic card.")
 if #phase_one == 0 then fail("phase-one normalization emitted an empty ingredient list.") end
 
+if policy_v2 then
 for label, versions in pairs({
   f210_lower_endpoint = {base = "2.1.0", Krastorio2 = "2.1.2", ["Krastorio2-spaced-out"] = "2.0.11"},
   f210_interior_patch = {base = "2.1.14", Krastorio2 = "2.1.2", ["Krastorio2-spaced-out"] = "2.0.12"},
@@ -105,4 +116,18 @@ for label, envelope in pairs({
   if inactive.status ~= "not-applicable" or inactive.applicable ~= false or inactive.changed ~= false then
     fail(label .. " envelope did not fail closed as not-applicable.")
   end
+end
+else
+for label, versions in pairs({
+  absent = {},
+  k2_only = {Krastorio2 = "2.1.2"},
+  wrong_k2 = {Krastorio2 = "2.1.1", ["Krastorio2-spaced-out"] = "2.0.13"},
+  wrong_k2so = {Krastorio2 = "2.1.2", ["Krastorio2-spaced-out"] = "2.0.12"}
+}) do
+  local untouched, inactive = policy.normalize(phase_two_input, versions)
+  assert_equal(untouched, phase_two_input, label .. " envelope unexpectedly changed science.")
+  if inactive.status ~= "not-applicable" or inactive.applicable ~= false or inactive.changed ~= false then
+    fail(label .. " envelope did not fail closed as not-applicable.")
+  end
+end
 end
