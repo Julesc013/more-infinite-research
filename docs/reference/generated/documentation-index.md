@@ -365,7 +365,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir3-terminal-mod-portal-upload-checklist.md | MIR 3 Terminal Mod Portal Upload Checklist | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
 | docs/releases/mir3-terminal-release-and-mir4-handoff.md | MIR 3 Terminal Release and MIR 4 Handoff Guide | current | release-manager | reference | mir-maintainers | 2026-08-25 |
 | docs/releases/mir4-4.0-candidate-programme.md | MIR 4.0 Candidate Programme | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
-| docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-24 |
+| docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
@@ -440,7 +440,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/user/faq.md | FAQ | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/generated-technologies.md | Generated Technologies | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/installation.md | Installation | current | player | how-to | mir-maintainers | 2026-07-07 |
-| docs/user/mir3-to-mir4.md | Upgrading from MIR 3 to MIR 4 | current | player | how-to | mir-maintainers | 2026-08-18 |
+| docs/user/mir3-to-mir4.md | Upgrading from MIR 3 to MIR 4 | current | player | how-to | mir-maintainers | 2026-08-29 |
 | docs/user/README.md | User Guide | current | player | how-to | mir-maintainers | 2026-07-07 |
 | docs/user/settings.md | Settings | current | player | how-to | mir-maintainers | 2026-08-03 |
 | docs/user/troubleshooting.md | Troubleshooting | current | player | how-to | mir-maintainers | 2026-07-07 |

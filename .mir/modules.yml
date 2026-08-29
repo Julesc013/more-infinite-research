@@ -573,6 +573,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
       - .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
       - .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
@@ -599,6 +600,7 @@ package_excluded_modules:
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
     f210_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+    final_mile_tooling_authority_writer: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
@@ -623,6 +625,7 @@ package_excluded_modules:
       - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
       - spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
       - spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-playtest-evidence-v1.schema.json
       - spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json
@@ -668,6 +671,8 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
       - validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
       - validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
+      - validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
+      - validation/tests/release/Test-MIRTerminalGovernance.ps1
     validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, pre-freeze F210 Steam experimental selection, future stable minimum/latest lane policy, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority

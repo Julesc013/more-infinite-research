@@ -180,6 +180,8 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-mod-portal-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-player-faq | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-product-contract | [MIR 4.0 Candidate Programme](../../releases/mir4-4.0-candidate-programme.md) | current |
+| mir4-4.0-release-announcement | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
+| mir4-4.0-target-changelog-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-whole-platform-consolidation | [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md) | current |
 | mir4-4.0.0-candidate-release-notes | [More Infinite Research 4.0.0 Candidate Release Notes](../../releases/notes/release-notes-4.0.0-candidate.md) | current |
 | mir4-api-sdk-v0-migration-policy | [MIR 4 API and SDK V0 Stability Policy](../../reference/mir4-api-sdk-v0-stability.md) | deprecated |

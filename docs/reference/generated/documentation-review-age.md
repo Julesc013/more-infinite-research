@@ -365,7 +365,7 @@ Ages are measured against the newest governed review date, 2026-08-29, so checko
 | docs/releases/mir3-terminal-mod-portal-upload-checklist.md | current | 2026-08-15 | 14 | current-window |
 | docs/releases/mir3-terminal-release-and-mir4-handoff.md | current | 2026-08-25 | 4 | current-window |
 | docs/releases/mir4-4.0-candidate-programme.md | current | 2026-08-29 | 0 | current-window |
-| docs/releases/mir4-4.0-publication-copy.md | current | 2026-08-24 | 5 | current-window |
+| docs/releases/mir4-4.0-publication-copy.md | current | 2026-08-29 | 0 | current-window |
 | docs/releases/mir4-4.0-whole-platform-programme.md | current | 2026-08-23 | 6 | current-window |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | archived | 2026-08-17 | 12 | current-window |
 | docs/releases/mod-portal-page.md | current | 2026-08-08 | 21 | current-window |
@@ -440,7 +440,7 @@ Ages are measured against the newest governed review date, 2026-08-29, so checko
 | docs/user/faq.md | current | 2026-07-07 | 53 | current-window |
 | docs/user/generated-technologies.md | current | 2026-07-07 | 53 | current-window |
 | docs/user/installation.md | current | 2026-07-07 | 53 | current-window |
-| docs/user/mir3-to-mir4.md | current | 2026-08-18 | 11 | current-window |
+| docs/user/mir3-to-mir4.md | current | 2026-08-29 | 0 | current-window |
 | docs/user/README.md | current | 2026-07-07 | 53 | current-window |
 | docs/user/settings.md | current | 2026-08-03 | 26 | current-window |
 | docs/user/troubleshooting.md | current | 2026-07-07 | 53 | current-window |

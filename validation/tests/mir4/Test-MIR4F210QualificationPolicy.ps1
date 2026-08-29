@@ -29,7 +29,7 @@ if ([string]$receipt.kind -cne 'MIR4F210QualificationPolicyAuthorityEvolutionRec
     @($receipt.package_visible_delta).Count -ne 0) {
   throw '[mir4-f210-policy-evolution-contract]'
 }
-& (Join-Path $repo 'tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1') -RepoRoot $repo -Check | Out-Null
+& (Join-Path $repo 'tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1') -RepoRoot $repo -Check | Out-Null
 
 Assert-MIR4F210EngineFactsV1 -Policy $policy -Version '2.1.17' -Build 87315 -FileVersion '2.1.17.87315' `
   -Distribution steam -Platform win64 -SteamAppId 427520 -SteamBranch experimental -SteamBuildId 24955935 `
