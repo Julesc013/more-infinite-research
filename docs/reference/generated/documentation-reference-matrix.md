@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-29.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-30.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -178,6 +178,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-definition-of-done | [MIR 4.0 Candidate Programme](../../releases/mir4-4.0-candidate-programme.md) | current |
 | mir4-4.0-github-release-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-mod-portal-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
+| mir4-4.0-mod-portal-extended-description-copy | [MIR 4.0 Mod Portal Extended Description](../../releases/mir4-4.0-mod-portal-extended-description.md) | current |
 | mir4-4.0-player-faq | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-product-contract | [MIR 4.0 Candidate Programme](../../releases/mir4-4.0-candidate-programme.md) | current |
 | mir4-4.0-release-announcement | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |

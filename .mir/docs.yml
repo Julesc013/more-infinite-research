@@ -2731,6 +2731,14 @@ docs:
       - mir4-target-admission-model
       - mir4-candidate-wave-programme
       - mir4-4.0-definition-of-done
+  - path: docs/releases/mir4-4.0-mod-portal-extended-description.md
+    title: "MIR 4.0 Mod Portal Extended Description"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.0-mod-portal-extended-description-copy
   - path: docs/releases/mir4-4.0-publication-copy.md
     title: "MIR 4.0 Publication Copy"
     status: current

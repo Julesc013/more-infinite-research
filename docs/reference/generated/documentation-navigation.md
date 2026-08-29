@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-08-29.
+Current-page navigation generated from Markdown front matter as of 2026-08-30.
 
 ## developer
 
@@ -269,6 +269,7 @@ Current-page navigation generated from Markdown front matter as of 2026-08-29.
 
 ### reference
 
+- [MIR 4.0 Mod Portal Extended Description](../../releases/mir4-4.0-mod-portal-extended-description.md)
 - [More Infinite Research Mod Portal Page](../../releases/mod-portal-page.md)
 - [Release Notes](../../releases/notes/README.md)
 

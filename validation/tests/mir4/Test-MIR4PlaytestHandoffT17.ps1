@@ -20,8 +20,12 @@ if(-not($resolvedFixture+'\').StartsWith($allowed,[StringComparison]::OrdinalIgn
 try{
   New-Item -ItemType Directory -Path $fixture -Force|Out-Null
   $fixtureSchema=Join-Path $fixture 'spec/schemas/mir4-playtest-evidence-v1.schema.json'
+  $authoritySchema=Join-Path $fixture 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
+  $authorizationSchema=Join-Path $fixture 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
   New-Item -ItemType Directory -Path (Split-Path -Parent $fixtureSchema) -Force|Out-Null
   Copy-Item -LiteralPath (Join-Path $repo 'spec/schemas/mir4-playtest-evidence-v1.schema.json') -Destination $fixtureSchema
+  Copy-Item -LiteralPath (Join-Path $repo 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json') -Destination $authoritySchema
+  Copy-Item -LiteralPath (Join-Path $repo 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json') -Destination $authorizationSchema
   $candidate=Join-Path $fixture 'inputs/more-infinite-research_4.0.20000.zip'
   $predecessor=Join-Path $fixture 'inputs/more-infinite-research_2.5.11.zip'
   $engine=Join-Path $fixture 'inputs/factorio.exe'
@@ -34,19 +38,72 @@ try{
   $engineSha=Get-MIR4PreFreezeFileSha256 $engine
   $packageSourceSha=Get-MIRPackageSourceFingerprint -RepoRoot $fixture
 
-  $planPath=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
+  $planPath=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json'
+  $authorizationPath=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json'
+  $candidateManifestPath=Join-Path $fixture 'build/mir4/fixture/candidate-manifest.json'
+  $f210AssurancePath=Join-Path $fixture 'build/results/assurance/fixture/f210-assurance.json'
+  $f200AssurancePath=Join-Path $fixture 'build/results/assurance/fixture/f200-assurance.json'
   $t15Path=Join-Path $fixture '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json'
   $handoffPath=Join-Path $fixture 'docs/maintainer/mir4-w09-manual-playtest.md'
+  Write-TestJson $authorizationPath ([ordered]@{
+    schema=1;kind='MIR4MaintainerChatReleaseAuthorizationV1';status='maintainer-instruction-to-be-materialized-through-governed-local-receipts'
+    recorded_from_user_turn_date='2026-08-30';timezone='fixture';maintainer=[ordered]@{display_name='fixture';github_login='fixture'}
+    repository='Julesc013/more-infinite-research'
+    starting_source=[ordered]@{branch='dev';commit=('a'*40);tree=('b'*40);package_source_sha256=$packageSourceSha}
+    playtest_decisions=@(
+      [ordered]@{target='F210';distribution='4.0.21000';decision='ACCEPTED';candidate_zip_sha256=$candidateSha;content_root=('D'*64);engine=[ordered]@{version='2.1.test';build='1';executable_sha256=$engineSha}},
+      [ordered]@{target='F200';distribution='4.0.20000';decision='ACCEPTED';candidate_zip_sha256=$candidateSha;content_root=('D'*64);engine=[ordered]@{version='2.0.test';build='1';executable_sha256=$engineSha}}
+    )
+    additional_github_targets=@(
+      [ordered]@{target='F110';distribution='4.0.11000';publish_if_exact_proof_remains_green=$true;candidate_zip_sha256=('1'*64);content_root=('2'*64);engine_version='1.1.test';engine_executable_sha256=('3'*64)},
+      [ordered]@{target='F100';distribution='4.0.10000';publish_if_exact_proof_remains_green=$true;candidate_zip_sha256=('4'*64);content_root=('5'*64);engine_version='1.0.test';engine_executable_sha256=('6'*64)}
+    )
+    release_authorization=[ordered]@{
+      source_version='4.0.0';candidate='M4RC1';source_freeze='AUTHORIZED-CONDITIONALLY';production_signing='AUTHORIZED-AFTER-T16-AND-FROZEN-PROOF-CLOSURE'
+      seal='AUTHORIZED-AFTER-EXACT-HASH-MATCH';main_promotion='AUTHORIZED-AFTER-SEAL-AND-OFFLINE-RESTORE';tagging='AUTHORIZED-AFTER-PROMOTION-GATE'
+      github_publication='AUTHORIZED';mod_portal_publication='DEFERRED-TO-MAINTAINER'
+      github_assets=[ordered]@{player_targets=@('F210','F200','F110','F100');developer_preview_assets=@('mir4-api-sdk-v1-preview.zip','mir4-mep-v1-preview.zip','mir4-reference-extension-v1-preview.zip','mir4-inspector-v1-preview.zip')}
+    }
+    conditions=@('fixture-1','fixture-2','fixture-3','fixture-4','fixture-5','fixture-6','fixture-7','fixture-8')
+    secret_values_present=$false;warning='fixture only'
+  })
+  Write-TestJson $candidateManifestPath ([ordered]@{
+    local_distribution=[ordered]@{archive_sha256=$candidateSha;content_sha256=('D'*64);bytes=(Get-Item $candidate).Length;entry_count=1}
+  })
+  Write-TestJson $f210AssurancePath ([ordered]@{
+    status='passed';counts=[ordered]@{expected=1;failed=0;incomplete=0}
+    plan=[ordered]@{target='2.1';package_source_sha256=$packageSourceSha;domain_manifest=[ordered]@{artifact=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64)}}}
+  })
+  Write-TestJson $f200AssurancePath ([ordered]@{
+    status='passed';counts=[ordered]@{expected=1;failed=0;incomplete=0}
+    plan=[ordered]@{target='2.0';package_source_sha256=$packageSourceSha;domain_manifest=[ordered]@{artifact=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64)}}}
+  })
+  $authorizationItem=Get-Item -LiteralPath $authorizationPath
+  $candidateManifestItem=Get-Item -LiteralPath $candidateManifestPath
+  $f210AssuranceItem=Get-Item -LiteralPath $f210AssurancePath
+  $f200AssuranceItem=Get-Item -LiteralPath $f200AssurancePath
   Write-TestJson $planPath ([ordered]@{
-    schema=1;kind='MIR4PreFreezeDevelopmentPlanV1'
-    source_baseline=[ordered]@{branch='dev';commit=('a'*40);tree=('b'*40);package_source_sha256=('c'*64)}
+    schema=1;kind='MIR4FinalMilePlaytestCandidateAuthorityV1';recorded_at=[DateTime]::UtcNow.ToString('o')
+    programme_id='M4C10-WHOLE-4X-IN-4.0';status='EXACT-F210-F200-CANDIDATES-ADMITTED-FOR-PLAYTEST-RECEIPT-MATERIALIZATION'
+    source_baseline=[ordered]@{branch='dev';commit=('a'*40);tree=('b'*40);package_source_sha256=$packageSourceSha}
+    authorization=[ordered]@{path='.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json';bytes=$authorizationItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $authorizationItem.FullName)}
     targets=@([ordered]@{
-      target='F200';release_role='mandatory';distribution_version='4.0.20000'
-      development_package=[ordered]@{sha256=$candidateSha;content_sha256=('d'*64);bytes=(Get-Item $candidate).Length;entry_count=1;release_identity=$false}
-      engine=[ordered]@{version='2.0.test';path=$engine;sha256=$engineSha}
-      predecessor=[ordered]@{release='2.5.11';path=$predecessor;sha256=$predecessorSha;content_sha256=('e'*64)}
+      target='F210';distribution_version='4.0.21000'
+      development_package=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64);bytes=(Get-Item $candidate).Length;entry_count=1;release_identity=$false}
+      engine=[ordered]@{version='2.1.test';build=1;path=$engine;sha256=$engineSha;steam_build=$null}
+      predecessor=[ordered]@{release='3.2.11';path=$predecessor;sha256=$predecessorSha;content_sha256=('E'*64)}
+      candidate_manifest=[ordered]@{path='build/mir4/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
+      assurance=[ordered]@{path='build/results/assurance/fixture/f210-assurance.json';bytes=$f210AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f210AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
+    },[ordered]@{
+      target='F200';distribution_version='4.0.20000'
+      development_package=[ordered]@{sha256=$candidateSha;content_sha256=('D'*64);bytes=(Get-Item $candidate).Length;entry_count=1;release_identity=$false}
+      engine=[ordered]@{version='2.0.test';build=1;path=$engine;sha256=$engineSha;steam_build=$null}
+      predecessor=[ordered]@{release='2.5.11';path=$predecessor;sha256=$predecessorSha;content_sha256=('E'*64)}
+      candidate_manifest=[ordered]@{path='build/mir4/fixture/candidate-manifest.json';bytes=$candidateManifestItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $candidateManifestItem.FullName)}
+      assurance=[ordered]@{path='build/results/assurance/fixture/f200-assurance.json';bytes=$f200AssuranceItem.Length;sha256=(Get-MIR4PreFreezeFileSha256 $f200AssuranceItem.FullName);status='passed';expected=1;failed=0;incomplete=0}
     })
-    verification_plan=[ordered]@{profile='fixture';plan_sha256=('f'*64);plan_material_sha256=('1'*64);required_test_set_sha256=('2'*64);bundle_sha256=('3'*64);total=1;passed=1;failed=0;invalid=0}
+    transition_gate=[ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;production_seal=$false;promotion_to_main=$false;tagging=$false;publication=$false}
+    secret_values_present=$false
   })
   Write-TestJson $t15Path ([ordered]@{schema=1;kind='MIR4T15AuthorityEvolutionReceiptV1';player_package_source_sha256=$packageSourceSha})
   New-Item -ItemType Directory -Path (Split-Path -Parent $handoffPath) -Force|Out-Null

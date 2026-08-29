@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json",
+  "title": "MIR 4 maintainer final GitHub release authorization V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_from_user_turn_date", "timezone", "maintainer", "repository", "starting_source", "playtest_decisions", "additional_github_targets", "release_authorization", "conditions", "secret_values_present", "warning"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4MaintainerChatReleaseAuthorizationV1"},
+    "status": {"const": "maintainer-instruction-to-be-materialized-through-governed-local-receipts"},
+    "recorded_from_user_turn_date": {"type": "string", "format": "date"},
+    "timezone": {"type": "string", "minLength": 1},
+    "maintainer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["display_name", "github_login"],
+      "properties": {
+        "display_name": {"type": "string", "minLength": 1},
+        "github_login": {"type": "string", "minLength": 1}
+      }
+    },
+    "repository": {"const": "Julesc013/more-infinite-research"},
+    "starting_source": {"$ref": "#/$defs/source"},
+    "playtest_decisions": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/playtestDecision"}
+    },
+    "additional_github_targets": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/additionalTarget"}
+    },
+    "release_authorization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_version", "candidate", "source_freeze", "production_signing", "seal", "main_promotion", "tagging", "github_publication", "mod_portal_publication", "github_assets"],
+      "properties": {
+        "source_version": {"const": "4.0.0"},
+        "candidate": {"const": "M4RC1"},
+        "source_freeze": {"const": "AUTHORIZED-CONDITIONALLY"},
+        "production_signing": {"const": "AUTHORIZED-AFTER-T16-AND-FROZEN-PROOF-CLOSURE"},
+        "seal": {"const": "AUTHORIZED-AFTER-EXACT-HASH-MATCH"},
+        "main_promotion": {"const": "AUTHORIZED-AFTER-SEAL-AND-OFFLINE-RESTORE"},
+        "tagging": {"const": "AUTHORIZED-AFTER-PROMOTION-GATE"},
+        "github_publication": {"const": "AUTHORIZED"},
+        "mod_portal_publication": {"const": "DEFERRED-TO-MAINTAINER"},
+        "github_assets": {
+          "type": "object", "additionalProperties": false,
+          "required": ["player_targets", "developer_preview_assets"],
+          "properties": {
+            "player_targets": {"const": ["F210", "F200", "F110", "F100"]},
+            "developer_preview_assets": {"const": ["mir4-api-sdk-v1-preview.zip", "mir4-mep-v1-preview.zip", "mir4-reference-extension-v1-preview.zip", "mir4-inspector-v1-preview.zip"]}
+          }
+        }
+      }
+    },
+    "conditions": {"type": "array", "minItems": 8, "items": {"type": "string", "minLength": 1}},
+    "secret_values_present": {"const": false},
+    "warning": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["branch", "commit", "tree", "package_source_sha256"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "tree": {"pattern": "^[a-f0-9]{40}$"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "playtestDecision": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "distribution", "decision", "candidate_zip_sha256", "content_root", "engine"],
+      "properties": {
+        "target": {"enum": ["F210", "F200"]},
+        "distribution": {"pattern": "^4\\.0\\.(21000|20000)$"},
+        "decision": {"const": "ACCEPTED"},
+        "candidate_zip_sha256": {"$ref": "#/$defs/sha256"},
+        "content_root": {"$ref": "#/$defs/sha256"},
+        "engine": {
+          "type": "object", "additionalProperties": false,
+          "required": ["version", "build", "executable_sha256"],
+          "properties": {
+            "version": {"type": "string", "minLength": 1},
+            "build": {"type": "string", "pattern": "^[0-9]+$"},
+            "steam_build": {"type": "string", "minLength": 1},
+            "executable_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "additionalTarget": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "distribution", "publish_if_exact_proof_remains_green", "candidate_zip_sha256", "content_root", "engine_version", "engine_executable_sha256"],
+      "properties": {
+        "target": {"enum": ["F110", "F100"]},
+        "distribution": {"pattern": "^4\\.0\\.(11000|10000)$"},
+        "publish_if_exact_proof_remains_green": {"const": true},
+        "candidate_zip_sha256": {"$ref": "#/$defs/sha256"},
+        "content_root": {"$ref": "#/$defs/sha256"},
+        "engine_version": {"type": "string", "minLength": 1},
+        "engine_executable_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}
