@@ -2735,7 +2735,7 @@ docs:
     title: "MIR 4.0 Mod Portal Extended Description"
     status: current
     audience: player
-    doc_type: release-note
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-4.0-mod-portal-extended-description-copy

@@ -269,12 +269,9 @@ Current-page navigation generated from Markdown front matter as of 2026-08-30.
 
 ### reference
 
+- [MIR 4.0 Mod Portal Extended Description](../../releases/mir4-4.0-mod-portal-extended-description.md)
 - [More Infinite Research Mod Portal Page](../../releases/mod-portal-page.md)
 - [Release Notes](../../releases/notes/README.md)
-
-### release-note
-
-- [MIR 4.0 Mod Portal Extended Description](../../releases/mir4-4.0-mod-portal-extended-description.md)
 
 ### release-plan
 

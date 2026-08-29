@@ -3,7 +3,7 @@ title: "MIR 4.0 Mod Portal Extended Description"
 status: current
 applies_to: "MIR 4.0.0"
 audience: player
-doc_type: release-note
+doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-08-30
 supersedes: []
@@ -85,4 +85,3 @@ Yes. The separate developer preview includes the data-only MIR Extension Protoco
 Open a Mod Portal discussion or GitHub issue with the Factorio version, MIR package version, exact mod list and startup settings, `factorio-current.log`, a save or minimal reproducer, and the MIR support bundle when available. Never include passwords, API tokens, signing material, or unrelated private files.
 
 Developer previews are separate GitHub downloads, not installable player mods.
-

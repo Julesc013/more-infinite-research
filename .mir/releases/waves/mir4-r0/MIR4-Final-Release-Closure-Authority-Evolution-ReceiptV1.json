@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1",
-  "recorded_at": "2026-08-30T02:46:02.0889604+10:00",
+  "recorded_at": "2026-08-30T02:53:50.7547973+10:00",
   "programme_id": "M4C10-WHOLE-4X-IN-4.0",
   "change_id": "MIR4-FINAL-RELEASE-CLOSURE-2026-08-30",
   "predecessor_receipt": {
@@ -55,7 +55,7 @@
     {
       "path": ".mir/docs.yml",
       "previous_sha256": "A9DBCE91A917A165A4E3A1554A03F1DFB2CC17610991BDD721224C6ABEDC7983",
-      "current_sha256": "33C096C7414DF56F6265CE065E4781D73D239C8D934D2C63CA04BE15F50AA0C4",
+      "current_sha256": "013FF919123ED37457C9F6E77020D18660F696AD8C5DD7F78EC440C2B59318BB",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -73,7 +73,7 @@
     {
       "path": "docs/reference/generated/documentation-index.md",
       "previous_sha256": "DEDA14AC322D037C441E010CC3AA2DCC818297D91FA4EB83747153CD946B4490",
-      "current_sha256": "D678A0D17F0E19F6F093708726716D2F0A3D617EEA382EA82B28C3E9F069610E",
+      "current_sha256": "A37658A2D75F6565AD29CC2AE35A7AD02057BE4DF64AD99957A6F3C1A8A9F6DF",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -82,7 +82,7 @@
     {
       "path": "docs/reference/generated/documentation-navigation.md",
       "previous_sha256": "3FC86B484DD0B2AB93396EF60BED3EE10DCCB9B65AB86E4D8800C6FC64F71E3F",
-      "current_sha256": "D814447982752332B1447248CC15EA461ED5FEAA1FD5ECAC4AE71DF333925917",
+      "current_sha256": "1EAF6A485E600BC36C2224B0CE8020FF73FBD787E721B2765731259158EA8D90",
       "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation projections, and preserve all human and production transition gates.",
       "scope": "package-excluded-control-plane",
       "package_visible": false,
@@ -158,7 +158,7 @@
     },
     {
       "path": "docs/releases/mir4-4.0-mod-portal-extended-description.md",
-      "sha256": "B6C7A2405BA882D9831996BCA5E397BC520B1804CEF1A87517312F5B9E9C7988",
+      "sha256": "2AFD217AA2D50C31F2247D83A05B4BB87BB6BE26255D5C519F58243B51307668",
       "hash_mode": "canonical-text-v1",
       "role": "copy-only-mod-portal-extended-description"
     },
