@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-bootstrap-root-set.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-bootstrap-root-set.schema.json",
+  "title": "MIR 4 bootstrap semantic, authority, and qualification roots",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "package_visible",
+    "semantic_authority",
+    "source_generation",
+    "canonicalization",
+    "hash_algorithm",
+    "derived_from",
+    "targets",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4BootstrapRootSetV1"},
+    "status": {"const": "current-pre-eol-package-excluded"},
+    "package_visible": {"const": false},
+    "semantic_authority": {"const": false},
+    "source_generation": {"const": "MIR4-R0-pre-release"},
+    "canonicalization": {"const": "utf8-null-delimited-labelled-fields-v1"},
+    "hash_algorithm": {"const": "sha256"},
+    "derived_from": {
+      "type": "object",
+      "required": ["path", "record_sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "prefixItems": [
+        {
+          "allOf": [
+            {"$ref": "#/$defs/target"},
+            {
+              "properties": {
+                "target_id": {"const": "f210"},
+                "factorio_line": {"const": "2.1"},
+                "predecessor_release": {"const": "3.2.10"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/target"},
+            {
+              "properties": {
+                "target_id": {"const": "f200"},
+                "factorio_line": {"const": "2.0"},
+                "predecessor_release": {"const": "2.5.10"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/target"},
+            {
+              "properties": {
+                "target_id": {"const": "f110"},
+                "factorio_line": {"const": "1.1"},
+                "predecessor_release": {"const": "1.9.9"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/target"},
+            {
+              "properties": {
+                "target_id": {"const": "f100"},
+                "factorio_line": {"const": "1.0"},
+                "predecessor_release": {"const": "1.8.9"}
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "gitObject": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "snapshotIdentity": {
+      "type": "object",
+      "required": ["path", "record_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.[0-9]+/.+\\.json$"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "baselineIdentity": {
+      "type": "object",
+      "required": ["path", "record_sha256", "input_root_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1, "pattern": "^\\.mir/releases/terminal/baselines/[0-9]+\\.[0-9]+\\.[0-9]+/baseline-manifest\\.json$"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "input_root_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "root": {
+      "type": "object",
+      "required": ["domain", "sha256"],
+      "properties": {
+        "domain": {"type": "string"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "target_id",
+        "factorio_line",
+        "predecessor_release",
+        "source_identity",
+        "terminal_distribution",
+        "baseline_identity",
+        "snapshot_identity",
+        "exact_engine",
+        "roots"
+      ],
+      "properties": {
+        "target_id": {"enum": ["f210", "f200", "f110", "f100"]},
+        "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]},
+        "predecessor_release": {"enum": ["3.2.10", "2.5.10", "1.9.9", "1.8.9"]},
+        "source_identity": {
+          "type": "object",
+          "required": ["candidate_commit", "candidate_tree", "common_source_commit"],
+          "properties": {
+            "candidate_commit": {"$ref": "#/$defs/gitObject"},
+            "candidate_tree": {"$ref": "#/$defs/gitObject"},
+            "common_source_commit": {"$ref": "#/$defs/gitObject"}
+          },
+          "additionalProperties": false
+        },
+        "terminal_distribution": {
+          "type": "object",
+          "required": ["archive_sha256", "content_sha256"],
+          "properties": {
+            "archive_sha256": {"$ref": "#/$defs/sha256"},
+            "content_sha256": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        },
+        "baseline_identity": {"$ref": "#/$defs/baselineIdentity"},
+        "snapshot_identity": {"$ref": "#/$defs/snapshotIdentity"},
+        "exact_engine": {
+          "type": "object",
+          "required": ["version", "executable_sha256"],
+          "properties": {
+            "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-only)?$"},
+            "executable_sha256": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        },
+        "roots": {
+          "type": "object",
+          "required": ["semantic", "authority", "qualification"],
+          "properties": {
+            "semantic": {
+              "allOf": [
+                {"$ref": "#/$defs/root"},
+                {"properties": {"domain": {"const": "mir4.bootstrap.semantic.v1"}}}
+              ]
+            },
+            "authority": {
+              "allOf": [
+                {"$ref": "#/$defs/root"},
+                {"properties": {"domain": {"const": "mir4.bootstrap.authority.v1"}}}
+              ]
+            },
+            "qualification": {
+              "allOf": [
+                {"$ref": "#/$defs/root"},
+                {"properties": {"domain": {"const": "mir4.bootstrap.qualification.v1"}}}
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

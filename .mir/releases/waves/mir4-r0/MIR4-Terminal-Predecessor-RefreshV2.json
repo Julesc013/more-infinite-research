@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "kind": "MIR4-Terminal-Predecessor-RefreshV2",
+  "status": "accepted-current-pre-eol-package-excluded",
+  "recorded_at": "2026-08-17T11:40:00+10:00",
+  "package_visible": false,
+  "authority_id": "MIR4-terminal-predecessor-refresh-v2",
+  "imports": [
+    ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json",
+    ".mir/releases/records/2.5.10.json",
+    ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json",
+    ".mir/releases/records/2.5.9.json",
+    ".mir/releases/terminal/baselines/2.5.9/baseline-manifest.json"
+  ],
+  "semantic_reads": [
+    "immutable-2.5.9-baseline",
+    "post-terminal-2.5.10-public-release",
+    "factorio-2.0.77-applicability-proof",
+    "mir4-terminal-predecessor-refresh-v1"
+  ],
+  "semantic_writes": [
+    "mir4-factorio-2.0-predecessor",
+    "mir4-factorio-2.0-runtime-settings-transport",
+    "m4-003-factorio-2.0-required-follow-up"
+  ],
+  "target_dispositions": {
+    "factorio-2.1": "retain-3.2.10-predecessor-from-refresh-v1",
+    "factorio-2.0": "advance-predecessor-to-2.5.10-after-positive-applicability-proof",
+    "factorio-1.x": "retain-existing-dot9-predecessors",
+    "historical-2.5.9": "retain-immutable-baseline-snapshot"
+  },
+  "digest_classes": {
+    "semantic": "2.5.10-runtime-settings-transport-continuation",
+    "authority": "append-only-emergency-predecessor-refresh",
+    "qualification": "factorio-2.0.77-exact-engine-and-public-byte-verification"
+  },
+  "migration": {
+    "from": "factorio-2.0-predecessor-2.5.9",
+    "to": "factorio-2.0-predecessor-2.5.10",
+    "state": "accepted-before-m4-003-factorio-2.0-resumption"
+  },
+  "rollback": {
+    "strategy": "retain-both-immutable-baselines-and-block-f200-materialization-on-any-binding-mismatch",
+    "permitted_until": "mir4-semantic-authority-cutover"
+  },
+  "parity_test": [
+    "exact-2.5.10-public-bytes",
+    "direct-five-stream-factorio-2.0-caps",
+    "mirset1-five-stream-factorio-2.0-caps",
+    "factorio-2.0-cap-lowering-configuration-change",
+    "factorio-2.0.77-exact-lock"
+  ],
+  "sunset_condition": "superseded-by-sealed-mir4-terminal-import-and-qualified-m4-003-completion",
+  "payload": {
+    "factorio_2_1": {
+      "predecessor_release": "3.2.10",
+      "authority": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json"
+    },
+    "factorio_2_0": {
+      "predecessor_release": "2.5.10",
+      "historical_baseline_retained": "2.5.9",
+      "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+      "package_source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "package_source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+      "tag_object": "30a0b8b2c18125d7078739ef9b3d035871af3568",
+      "engine": {
+        "version": "2.0.77",
+        "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+      },
+      "applicability": "positive-package-visible-runtime-adapter-required"
+    },
+    "mir4_semantic_authority": false,
+    "public_4x_authorized": false
+  },
+  "hard_boundary": "This refresh advances only the MIR 4 Factorio 2.0 predecessor. It grants no MIR 4 semantic authority, target admission, sealing, signing, or public 4.x publication authority."
+}

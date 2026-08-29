@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "kind": "Mir3PostTerminalEmergencyPublicationReceiptV1",
+  "release": "2.5.10",
+  "channel": "github",
+  "candidate_id": "2.5-P14",
+  "candidate_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+  "package_source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+  "package_source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+  "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+  "download_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+  "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
+  "bytes": 1062874,
+  "entries": 302,
+  "tag": {
+    "name": "2.5.10",
+    "object_sha": "30a0b8b2c18125d7078739ef9b3d035871af3568",
+    "peeled_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+    "kind": "annotated-unsigned",
+    "immutable": true
+  },
+  "github_release": {
+    "id": 371484719,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/2.5.10",
+    "draft": false,
+    "prerelease": false,
+    "latest": false
+  },
+  "asset": {
+    "id": 517437614,
+    "name": "more-infinite-research_2.5.10.zip",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/download/2.5.10/more-infinite-research_2.5.10.zip",
+    "digest": "sha256:251efdab4983cdff0e2c150304df7b7846edea6e1b5b0927c3fbbd8449e65dab",
+    "bytes": 1062874
+  },
+  "download_verification": {
+    "archive_sha256": "passed",
+    "content_sha256": "passed",
+    "bytes": "passed",
+    "entries": "passed",
+    "package_composition": "passed"
+  },
+  "engine_acceptance": {
+    "status": "passed-exact-engine-qualification",
+    "version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "applicability": {
+    "decision": "positive-package-visible-factorio-2.0-runtime-adapter-required",
+    "direct_settings_scenario": "generated-maximum-level-five-streams-2-0",
+    "profile_import_scenario": "generated-maximum-level-five-streams-mirset1-2-0",
+    "configuration_change_scenario": "generated-maximum-level-lowering-config-change-2-0",
+    "deterministic_reconstructions": 3
+  },
+  "published_at": "2026-08-17T01:31:33Z",
+  "verified_at": "2026-08-17T11:35:00+10:00",
+  "status": "published-and-verified"
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "kind": "MIR4ExperimentalContractSetV0",
+  "stability": "experimental-package-excluded",
+  "canonicalization": "mir-canonical-json-v0",
+  "digest_algorithm": "sha256",
+  "max_capabilities": 128,
+  "max_extensions": 32,
+  "contracts": [
+    {"kind":"MIR4HostManifestV0","description":"Host identity and advertised read-only capabilities."},
+    {"kind":"MIR4ExtensionEnvelopeV0","description":"Namespaced extension declaration transported to a host."},
+    {"kind":"MIR4QuerySnapshotV0","description":"Immutable projection of public compiler artifacts."},
+    {"kind":"MIR4ProfileV0","description":"Declarative consumer profile with no executor access."},
+    {"kind":"MIR4DiagnosticV0","description":"Stable diagnostic code, severity and bounded context."},
+    {"kind":"MIR4SupportSnapshotV0","description":"Target-specific support and transport disposition."}
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 2,
+  "release": "3.2.11",
+  "factorio_line": "2.1",
+  "factorio_version": "2.1.14",
+  "baseline": {
+    "version": "3.2.10",
+    "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+    "package_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9"
+  },
+  "candidate": {
+    "candidate_id": "C35",
+    "version": "3.2.11",
+    "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+    "package_content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "manual_scenarios": "validation/scenarios/local-2.1.json",
+  "phase_source_lane": "diagnostics-off.factorio-total",
+  "artifact_volume_lanes": [
+    "diagnostics-off.factorio-total",
+    "diagnostics-on.factorio-total"
+  ],
+  "phase_lanes": [
+    {"id": "compiler.snapshot", "probe_phase": "snapshot"},
+    {"id": "compiler.graph", "probe_phase": "graph"},
+    {"id": "compiler.planning", "probe_phase": "planning"},
+    {"id": "compiler.postconditions", "probe_phase": "postconditions"}
+  ],
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-default",
+      "official_mods": [],
+      "settings": {}
+    },
+    {
+      "id": "space-age.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "space-age-default",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-1-bz-suite-space-age",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-1-krastorio-spaced-out",
+      "official_mods": ["elevated-rails", "quality", "recycler", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-off",
+      "official_mods": [],
+      "settings": {"mir-debug-generation-report": false}
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-on",
+      "official_mods": [],
+      "settings": {"mir-debug-generation-report": true}
+    }
+  ]
+}

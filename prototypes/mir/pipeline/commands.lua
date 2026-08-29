@@ -158,6 +158,14 @@ local commands = {
     implementation = "prototypes/mir/planner/output_validator.lua",
     apply = function(context) require("prototypes.mir.pipeline.compiler_orchestrator").assert_output(context) end
   },
+  ["apply-maximum-level-presentation"] = {
+    kind = "emission",
+    requires_features = {"scripted_techs"},
+    implementation = "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+    apply = function(context)
+      require("prototypes.mir.pipeline.mutations.maximum_level_presentation").apply(context)
+    end
+  },
   ["publish-compiler-artifacts"] = {
     kind = "publication",
     requires_features = {},
@@ -193,7 +201,8 @@ local ORDERING = {
   ["emit-compiler-reports"] = {phase = 80, dependencies = {"emit-compatibility-diagnostics"}},
   ["emit-compatibility-planner"] = {phase = 80, dependencies = {"emit-compiler-reports"}},
   ["assert-plan-output"] = {phase = 90, dependencies = {"emit-compatibility-planner"}},
-  ["publish-compiler-artifacts"] = {phase = 95, dependencies = {"assert-plan-output"}},
+  ["apply-maximum-level-presentation"] = {phase = 92, dependencies = {"assert-plan-output"}},
+  ["publish-compiler-artifacts"] = {phase = 95, dependencies = {"apply-maximum-level-presentation"}},
   ["flush-diagnostics"] = {phase = 100, dependencies = {"publish-compiler-artifacts"}}
 }
 

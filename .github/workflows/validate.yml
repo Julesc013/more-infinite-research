@@ -17,10 +17,17 @@ jobs:
     runs-on: windows-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      mir4_bootstrap: ${{ steps.mode.outputs.mir4_bootstrap }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - id: mode
+        name: Resolve typed verification mode
+        shell: pwsh
+        run: |
+          $mir4 = Test-Path -LiteralPath .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json -PathType Leaf
+          "mir4_bootstrap=$($mir4.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
@@ -33,9 +40,11 @@ jobs:
         shell: pwsh
         run: ./tools/mir.ps1 assurance doctor --target $env:MIR_VALIDATION_TARGET --json
       - name: Build byte-bound development archive
+        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         shell: pwsh
         run: ./tools/mir.ps1 assurance build --target $env:MIR_VALIDATION_TARGET --output build/results/assurance/development-build.json
       - name: Resolve content-addressed development candidate
+        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         shell: pwsh
         run: |
           $receipt = Get-Content -Raw -LiteralPath build/results/assurance/development-build.json | ConvertFrom-Json
@@ -46,9 +55,18 @@ jobs:
             throw "Development candidate is not present at its governed content-addressed path: $relative"
           }
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Bind absent MIR 4 hosted candidate
+        if: ${{ steps.mode.outputs.mir4_bootstrap == 'true' }}
+        shell: pwsh
+        run: |
+          $candidate = Join-Path $PWD 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip'
+          if (Test-Path -LiteralPath $candidate) { throw 'Hosted MIR 4 static planning must not fabricate or import a candidate.' }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
         shell: pwsh
-        run: ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile fast --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
+        run: |
+          $profile = if ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
+          ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile $profile --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
       - id: matrix
         name: Export required work
         shell: pwsh
@@ -72,6 +90,7 @@ jobs:
           path: build/results/assurance/verification-plan.json
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
+        if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         with:
           include-hidden-files: true
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
@@ -99,12 +118,12 @@ jobs:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
       - uses: actions/download-artifact@v4
-        if: ${{ matrix.no_op != true }}
+        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/candidate-transfer
       - name: Resolve exact development candidate
-        if: ${{ matrix.no_op != true }}
+        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
@@ -121,6 +140,17 @@ jobs:
           if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
             throw "Transferred development candidate does not match the plan-bound archive identity."
           }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Restore absent MIR 4 candidate binding
+        if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap == 'true' }}
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
+              [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
+            throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
+          }
+          $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
@@ -195,10 +225,12 @@ jobs:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
       - uses: actions/download-artifact@v4
+        if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/candidate-transfer
       - name: Resolve exact development candidate
+        if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
@@ -215,6 +247,17 @@ jobs:
           if ((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash -ne [string]$plan.candidate_descriptor.sha256) {
             throw "Transferred development candidate does not match the plan-bound archive identity."
           }
+          "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Restore absent MIR 4 candidate binding
+        if: ${{ needs.plan.outputs.mir4_bootstrap == 'true' }}
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
+              [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
+            throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
+          }
+          $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4

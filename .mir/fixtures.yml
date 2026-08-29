@@ -162,6 +162,15 @@ real_mod_gates:
     status: required
 
 fixtures:
+  mir4-api-v0-conformance:
+    requires_features: []
+    path: fixtures/mir4-api-v0
+    validates:
+      - six-experimental-v0-contracts
+      - canonical-digest-vectors
+      - stable-negative-diagnostics
+      - extension-profile-round-trip
+
   museum-synthetic-installation:
     requires_features: []
     path: fixtures/museum/synthetic-installation
@@ -365,6 +374,74 @@ fixtures:
       - scripted-final-restoration
       - scripted-settings-disable-restoration
       - scripted-settings-reenable
+
+  upgrade-2-5-9-to-4-0-20000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-2-5-9-to-4-0-20000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.9"
+    archetypes:
+      - base-default
+    validates:
+      - exact-2-5-9-source-archive
+      - startup-profile-retention
+      - stable-base-technology-level-retention
+      - current-research-retention
+      - fractional-research-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-0-20000-candidate-normal-mod-directory-load
+
+  upgrade-2-5-10-to-4-0-20000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-2-5-10-to-4-0-20000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "2.5.10"
+    archetypes:
+      - base-default
+    validates:
+      - exact-2-5-10-source-archive
+      - startup-profile-retention
+      - stable-base-technology-level-retention
+      - current-research-retention
+      - fractional-research-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-0-20000-candidate-normal-mod-directory-load
+
+  upgrade-1-9-9-to-4-0-11000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-9-9-to-4-0-11000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "1.9.9"
+    archetypes:
+      - base-default
+    validates:
+      - exact-1-9-9-source-archive
+      - startup-profile-retention
+      - stable-base-technology-level-retention
+      - current-research-retention
+      - fractional-research-progress-retention
+      - fixture-global-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-0-11000-candidate-normal-mod-directory-load
+
+  upgrade-1-8-9-to-4-0-10000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-1-8-9-to-4-0-10000
+    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: "1.8.9"
+    archetypes:
+      - base-default
+    validates:
+      - exact-1-8-9-source-archive
+      - startup-profile-retention
+      - stable-base-technology-level-retention
+      - current-research-retention
+      - fractional-research-progress-retention
+      - fixture-global-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-0-10000-candidate-normal-mod-directory-load
 
   upgrade-3-0-5-to-3-1-0:
     requires_features: [scripted_techs]
@@ -734,6 +811,8 @@ fixtures:
     path: fixtures/assert-generated-max-level
     supplemental_paths:
       - fixtures/assert-generated-cap-transition
+      - fixtures/assert-generated-max-level-2-0
+      - fixtures/assert-generated-cap-transition-2-0
       - fixtures/assert-base-continuation-cap-transition
       - fixtures/assert-native-owner-cap-transition
       - fixtures/assert-native-owner-cap-relaxation
@@ -742,6 +821,8 @@ fixtures:
       - zero-means-infinite
       - positive-value-is-absolute-highest-level
       - generated-stream-cap-enforcement
+      - factorio-2.0-generated-five-stream-cap-enforcement
+      - factorio-2.0-direct-and-MIRSET1-runtime-settings-transport
       - generated-base-continuation-cap-enforcement
       - five-native-owner-cap-enforcement
       - completed-levels-retained-above-lowered-cap

@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot9ModPortalVisibilityRecheckV1",
+  "status": "api-and-rendered-table-two-visible-sha1-matched-redownloads-pending",
+  "observed_at": "2026-08-16T07:33:23.8503766+10:00",
+  "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "scope": "read-only-unauthenticated-public-visibility-recheck",
+  "package_visible": false,
+  "authority": {
+    "semantic": false,
+    "build": false,
+    "upload": false,
+    "tag": false,
+    "allocation": false,
+    "public_output": false,
+    "mir3_eol_seal": false
+  },
+  "prior_custody_observation": {
+    "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
+    "sha256": "13FC741342124F0EE93EAC8ADB27DECC3828C1D6028187131BB3CF8A555528AF"
+  },
+  "request_profile": {
+    "method": "GET",
+    "authentication": "none",
+    "user_agent": "MIR-custody-observer/1.0"
+  },
+  "sources": [
+    {
+      "surface": "official-full-api",
+      "url": "https://mods.factorio.com/api/mods/more-infinite-research/full",
+      "started_at": "2026-08-16T07:33:23.8503766+10:00",
+      "completed_at": "2026-08-16T07:33:24.0758074+10:00",
+      "http_status": 200,
+      "media_type": "application/json",
+      "response_bytes": 123340,
+      "response_sha256": "D1C654C4AAB7A0E1FBD172A3FFA8C8AD01D24B74A163CFF684CF8F478F65CA63",
+      "response_body_retained": false,
+      "parser": "ConvertFrom-Json/releases-exact-version-filter",
+      "parser_outcome": "two-exact-terminal-releases-found",
+      "matched_rows": [
+        {
+          "version": "3.2.9",
+          "factorio_version": "2.1",
+          "portal_sha1": "602e98292508aa20ed3e1567da396ea5e4c29f7b",
+          "released_at": "2026-08-15T08:05:22.426Z"
+        },
+        {
+          "version": "2.5.9",
+          "factorio_version": "2.0",
+          "portal_sha1": "e05b0d17f1ce8cf3465347fe85056fca6451506f",
+          "released_at": "2026-08-15T13:18:08.140Z"
+        }
+      ]
+    },
+    {
+      "surface": "official-rendered-download-table",
+      "url": "https://mods.factorio.com/mod/more-infinite-research/downloads",
+      "started_at": "2026-08-16T07:33:24.1586406+10:00",
+      "completed_at": "2026-08-16T07:33:24.8635748+10:00",
+      "http_status": 200,
+      "media_type": "text/html; charset=utf-8",
+      "response_bytes": 49185,
+      "response_sha256": "483D6DD1689F8E6D9B5C4960D50E7503BB47F401C7C5A2840D43998AA83C3B80",
+      "response_body_retained": false,
+      "parser": "first-tbody/tr/direct-text-td[0,1]",
+      "parser_outcome": "two-exact-terminal-release-rows-found",
+      "matched_rows": [
+        {"version": "2.5.9", "factorio_version": "2.0"},
+        {"version": "3.2.9", "factorio_version": "2.1"}
+      ]
+    }
+  ],
+  "releases": [
+    {
+      "version": "3.2.9",
+      "factorio_version": "2.1",
+      "sealed_archive_sha1": "602e98292508aa20ed3e1567da396ea5e4c29f7b",
+      "api_visible": true,
+      "portal_sha1": "602e98292508aa20ed3e1567da396ea5e4c29f7b",
+      "sha1_matches_sealed": true,
+      "rendered_table_visible": true,
+      "authenticated_redownload": "pending-not-reperformed",
+      "exact_engine_smoke": "pending-redownload"
+    },
+    {
+      "version": "2.5.9",
+      "factorio_version": "2.0",
+      "sealed_archive_sha1": "e05b0d17f1ce8cf3465347fe85056fca6451506f",
+      "api_visible": true,
+      "portal_sha1": "e05b0d17f1ce8cf3465347fe85056fca6451506f",
+      "sha1_matches_sealed": true,
+      "rendered_table_visible": true,
+      "authenticated_redownload": "pending-not-reperformed",
+      "exact_engine_smoke": "pending-redownload"
+    }
+  ],
+  "claim_disposition": {
+    "api_two_release_visibility": "confirmed",
+    "rendered_table_two_release_visibility": "confirmed",
+    "api_ui_visibility_discrepancy": "disproven-at-observation-time",
+    "documentation_action": "remove-stale-2.5.9-rendered-omission-claim"
+  },
+  "custody_state": {
+    "authenticated_redownloads_complete": 0,
+    "authenticated_redownload_state_source": "imported-prior-custody-observation-not-reperformed",
+    "exact_engine_smokes_complete": 0,
+    "mir3_eol_blocked": true,
+    "remaining_blockers": [
+      "authenticated-redownloads-pending",
+      "exact-engine-smokes-pending-redownload"
+    ]
+  },
+  "hard_boundary": "This read-only recheck records public visibility only. It does not authorize a build, upload, replacement, tag, version allocation, public output, semantic authority change, MIR 3 EOL seal, MIR 4 package, or MIR 4 release.",
+  "record_sha256": "40F97C184A982EC17512ABB24564A9B78CDB248D0A1F68A2B47EAC0111DB9CCF"
+}

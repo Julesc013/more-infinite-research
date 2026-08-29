@@ -11,7 +11,8 @@ elseif mir_version == "3.2.0"
     or mir_version == "3.2.4"
     or mir_version == "3.2.5"
     or mir_version == "3.2.9"
-    or mir_version == "3.2.10" then
+    or mir_version == "3.2.10"
+    or mir_version == "3.2.11" then
   compilation_module = "__more-infinite-research__.prototypes.mir.pipeline.compiler_orchestrator"
 else
   error("performance probe does not govern MIR version " .. tostring(mir_version))

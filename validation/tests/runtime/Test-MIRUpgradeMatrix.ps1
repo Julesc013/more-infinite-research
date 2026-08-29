@@ -27,6 +27,18 @@ $cases = @(
   [ordered]@{ id = "mod-set-configuration-change"; source_only = @("upgrade-modset-source") }
 )
 
+$privateLocalPlaytestFixtures = @(
+  'assert-upgrade-2-5-10-to-4-0-20000',
+  'assert-upgrade-2-5-9-to-4-0-20000',
+  'assert-upgrade-1-9-9-to-4-0-11000',
+  'assert-upgrade-1-8-9-to-4-0-10000'
+)
+if ($FixtureName -in $privateLocalPlaytestFixtures) {
+  # Legacy targets do not have Space Age or the modern automatic-family
+  # fixture surface. Their direct-predecessor contract is target-local.
+  $cases = @([ordered]@{ id = 'base-default'; source_only = @() })
+}
+
 if ($FixtureName -eq "assert-upgrade-3-2-1-to-3-2-2") {
   $cases += [ordered]@{ id = "affected-planet-discovery"; source_only = @() }
 }
@@ -58,7 +70,7 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
-  if ($FixtureName -in @("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10") -and
+  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10") + $privateLocalPlaytestFixtures) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
        "upgraded-save-second-reload-passed" -notin $assertions -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or

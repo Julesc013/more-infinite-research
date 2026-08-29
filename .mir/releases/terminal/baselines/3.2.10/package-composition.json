@@ -1,0 +1,1838 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalHotfixPackageCompositionV1",
+  "release": "3.2.10",
+  "root_directory": "more-infinite-research_3.2.10",
+  "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+  "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
+  "bytes": 1065178,
+  "entries": 304,
+  "forbidden_package_surfaces_absent": true,
+  "files": [
+    {
+      "path": "changelog.txt",
+      "sha256": "5F70276FAB79DCDDCEAAAE24D32C16B03DB955F679CC369C6B422D341FDFF3DB",
+      "bytes": 77386,
+      "compressed_bytes": 19285
+    },
+    {
+      "path": "control.lua",
+      "sha256": "91EC8A63FFEC27AACDDC9F6EC841A64E782EA923214AC5FB37C367A716E4ACE9",
+      "bytes": 46,
+      "compressed_bytes": 48
+    },
+    {
+      "path": "data-final-fixes.lua",
+      "sha256": "70AC7A3036FF553AAA53F1B3D0A3D3FA827B7BD7852E09AC4D16D884A31B1C71",
+      "bytes": 55,
+      "compressed_bytes": 57
+    },
+    {
+      "path": "data-updates.lua",
+      "sha256": "B9A7B194DF1DDCBFE9A7A4025EC98FB8F5F7794B575E4EBA1498F628EA4FC868",
+      "bytes": 51,
+      "compressed_bytes": 53
+    },
+    {
+      "path": "data.lua",
+      "sha256": "F8960D123D2626DEDA5D1E4F02ACA07C749FE7FD94A951FB45422B8077D03518",
+      "bytes": 43,
+      "compressed_bytes": 45
+    },
+    {
+      "path": "info.json",
+      "sha256": "A87337CB5F0CA4995B8A8C4CBCA1D2A43A3957673627D71221FF95FF8F850A8C",
+      "bytes": 565,
+      "compressed_bytes": 308
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04",
+      "bytes": 16726,
+      "compressed_bytes": 5307
+    },
+    {
+      "path": "locale/af/more-infinite-research.cfg",
+      "sha256": "E8D01029DFDB33D7F9C3A25713966D516551E5382D60EFF895F156D78770EC36",
+      "bytes": 47526,
+      "compressed_bytes": 10502
+    },
+    {
+      "path": "locale/ar/more-infinite-research.cfg",
+      "sha256": "CAD7CCB56C4853156AA6D9D14FB9B6C7AD431967F44202BBCC1CC8574A4DB69B",
+      "bytes": 64405,
+      "compressed_bytes": 12024
+    },
+    {
+      "path": "locale/be/more-infinite-research.cfg",
+      "sha256": "CF6FD26268D2EEE3035170F12E2C735281802DE4D7D8590625E11A660383BB4C",
+      "bytes": 75114,
+      "compressed_bytes": 13199
+    },
+    {
+      "path": "locale/bg/more-infinite-research.cfg",
+      "sha256": "AB48FB1BCC92FDBAAF9771F54B64628817D8B56ECBE0FDF914E56A6AFEAFEC16",
+      "bytes": 78664,
+      "compressed_bytes": 13007
+    },
+    {
+      "path": "locale/ca/more-infinite-research.cfg",
+      "sha256": "ED9845FD31A8AC27B80B5BA809B59A522BB0B1D346A4B7BE5DD18E7EDCF2437F",
+      "bytes": 52522,
+      "compressed_bytes": 10950
+    },
+    {
+      "path": "locale/cs/more-infinite-research.cfg",
+      "sha256": "862D19310B7646B0C1EA82700C3EE3C0793A60839A811E6A95265C48FEE8A7DA",
+      "bytes": 50939,
+      "compressed_bytes": 11702
+    },
+    {
+      "path": "locale/da/more-infinite-research.cfg",
+      "sha256": "B6DC72DDF3C351CFC954BEBF4A353D68F5DF542E5536357A998E4D652256B900",
+      "bytes": 48631,
+      "compressed_bytes": 10572
+    },
+    {
+      "path": "locale/de/more-infinite-research.cfg",
+      "sha256": "A06C5C5CB0EFB530386C2503A32D9738FB2D8C086BA0A57C684459042136A26C",
+      "bytes": 53950,
+      "compressed_bytes": 11886
+    },
+    {
+      "path": "locale/el/more-infinite-research.cfg",
+      "sha256": "B97BD265FCF7B7E393296D9DDC589292E435D78A097B579A498EBDB90E94E65E",
+      "bytes": 79344,
+      "compressed_bytes": 13673
+    },
+    {
+      "path": "locale/en/more-infinite-research.cfg",
+      "sha256": "41D3F4BAF69231A6DAF8E8A9A4CA2ADFD6EFF01B785ABC249B0DCDCD57D27C45",
+      "bytes": 45035,
+      "compressed_bytes": 9418
+    },
+    {
+      "path": "locale/eo/more-infinite-research.cfg",
+      "sha256": "36CFAA838B19E477CC9505D8E2C1B289F5F86E2D9D91DB382DB3E1B2F5F569B4",
+      "bytes": 47135,
+      "compressed_bytes": 10569
+    },
+    {
+      "path": "locale/es-ES/more-infinite-research.cfg",
+      "sha256": "B26DDEE6684DAC6B9BBB59531C836843E796D373BC55541CF4F41B5EE30B98DC",
+      "bytes": 53680,
+      "compressed_bytes": 11010
+    },
+    {
+      "path": "locale/et/more-infinite-research.cfg",
+      "sha256": "A27FFDC4B0E37239D1167F5C8D346FBA1735CC03BDCE0B2649A58428125971E3",
+      "bytes": 48238,
+      "compressed_bytes": 11033
+    },
+    {
+      "path": "locale/eu/more-infinite-research.cfg",
+      "sha256": "D446B1E924B5E3AD02BDB0E794D6447364531B2E117645BCE2F948D38184E9BA",
+      "bytes": 50689,
+      "compressed_bytes": 10915
+    },
+    {
+      "path": "locale/fa/more-infinite-research.cfg",
+      "sha256": "6C9DAC1BA2241A3510209E7009AC8A20A6171612AEF71076BB5F03F8C2B88F1F",
+      "bytes": 65878,
+      "compressed_bytes": 12170
+    },
+    {
+      "path": "locale/fi/more-infinite-research.cfg",
+      "sha256": "5E9895481F5C25AD69D6E89B58922CCDA2E6B67D1335FD856FC46984F1D71D5A",
+      "bytes": 49761,
+      "compressed_bytes": 11354
+    },
+    {
+      "path": "locale/fil/more-infinite-research.cfg",
+      "sha256": "413A5FA862D2853A72638653F4157D3D00AD3D3CD247821531CD15C46C1C3FF0",
+      "bytes": 54343,
+      "compressed_bytes": 10892
+    },
+    {
+      "path": "locale/fr/more-infinite-research.cfg",
+      "sha256": "08D33AF1FFDD70AB9BF3115D28B42D976A101B169F671C587D150A9B54D4B2A5",
+      "bytes": 54727,
+      "compressed_bytes": 11396
+    },
+    {
+      "path": "locale/fy-NL/more-infinite-research.cfg",
+      "sha256": "DC05B173890142E34510AB4A176006553B04ECF1FACAFEA5A80C657D6E06E892",
+      "bytes": 48033,
+      "compressed_bytes": 10685
+    },
+    {
+      "path": "locale/ga-IE/more-infinite-research.cfg",
+      "sha256": "BEFC5C97D853BBF039B57A89B5F8910F21DCEA582631841E6528B9055E7002FB",
+      "bytes": 53390,
+      "compressed_bytes": 11367
+    },
+    {
+      "path": "locale/he/more-infinite-research.cfg",
+      "sha256": "E7C67AF0109B892FFBCF2DEBDC7568F49537CB1B4AD32B3EABF91010480217C9",
+      "bytes": 59864,
+      "compressed_bytes": 11321
+    },
+    {
+      "path": "locale/hr/more-infinite-research.cfg",
+      "sha256": "0E4530E0ED2BB28EE05CA916329457BC752A38DFA8431416208338F94A3C2136",
+      "bytes": 50057,
+      "compressed_bytes": 11167
+    },
+    {
+      "path": "locale/hu/more-infinite-research.cfg",
+      "sha256": "23F49D8133807D0675867383F542B5F25393C48CE43CA48B213B048D87C40D66",
+      "bytes": 54205,
+      "compressed_bytes": 11928
+    },
+    {
+      "path": "locale/id/more-infinite-research.cfg",
+      "sha256": "CB7CF0963D2A3ABE409AD718C21AAAB60E4DE76073C5FCFC04108B4A731F5F1C",
+      "bytes": 48962,
+      "compressed_bytes": 10182
+    },
+    {
+      "path": "locale/is/more-infinite-research.cfg",
+      "sha256": "FCAB392D8ED3952F45676D9BAF5BCF5AD9543A786516CF2F3D55D4F3EB257B61",
+      "bytes": 47830,
+      "compressed_bytes": 11166
+    },
+    {
+      "path": "locale/it/more-infinite-research.cfg",
+      "sha256": "750807A19BFCC071F5FF2E6D92CDD535EF4F1F03BB1F86D399F010750A79476B",
+      "bytes": 52883,
+      "compressed_bytes": 10970
+    },
+    {
+      "path": "locale/ja/more-infinite-research.cfg",
+      "sha256": "8F8709FADD58DA2258FB278BCD954034F87CBEE0ECF16529C63842D86D2D4500",
+      "bytes": 57603,
+      "compressed_bytes": 12366
+    },
+    {
+      "path": "locale/ka/more-infinite-research.cfg",
+      "sha256": "010AAE330C696F8F24F096B278351FA4059BCE5439A269E6BC060F01418DCBC6",
+      "bytes": 100310,
+      "compressed_bytes": 13132
+    },
+    {
+      "path": "locale/kk/more-infinite-research.cfg",
+      "sha256": "D1F169CF9A1A77CCC76A6F2BD8B2528533DF510CC2CD050D0ECF1CAFA29FA1C0",
+      "bytes": 72816,
+      "compressed_bytes": 12455
+    },
+    {
+      "path": "locale/ko/more-infinite-research.cfg",
+      "sha256": "3DFBB50D2499460CC1A4B4B5E088CACE02A1CAE91B60E19A0AB176844669E6E0",
+      "bytes": 52176,
+      "compressed_bytes": 11499
+    },
+    {
+      "path": "locale/lt/more-infinite-research.cfg",
+      "sha256": "ED7DFFD28AD526BAFE0673B24F3801D3FE0EA1708C6BD7FBF74E8A511EA8E196",
+      "bytes": 49694,
+      "compressed_bytes": 11484
+    },
+    {
+      "path": "locale/lv/more-infinite-research.cfg",
+      "sha256": "703EE865749C8A85F136CF9E098784E7437030116303D46293DF3D6EFD868616",
+      "bytes": 52074,
+      "compressed_bytes": 11279
+    },
+    {
+      "path": "locale/nl/more-infinite-research.cfg",
+      "sha256": "F72536BE312E5270B6EC59A3E60C5897CF74D0234D5ECE86F26FD0CD06BD69FC",
+      "bytes": 51419,
+      "compressed_bytes": 11027
+    },
+    {
+      "path": "locale/no/more-infinite-research.cfg",
+      "sha256": "F2405886752EF66FDA07E7C12DF6138AE18D0FEC04A27C638FA239D0724DE355",
+      "bytes": 47707,
+      "compressed_bytes": 10400
+    },
+    {
+      "path": "locale/pl/more-infinite-research.cfg",
+      "sha256": "C498751F3D9CD4968AC8978294128FEA0BEA9B58D8B645119F9FF6D5DB785977",
+      "bytes": 52128,
+      "compressed_bytes": 11654
+    },
+    {
+      "path": "locale/pt-BR/more-infinite-research.cfg",
+      "sha256": "FD4281E125D43889327866364C3DFFDF78D45F06A16BAC74EFF61E804A10078A",
+      "bytes": 51706,
+      "compressed_bytes": 10766
+    },
+    {
+      "path": "locale/pt-PT/more-infinite-research.cfg",
+      "sha256": "CD8E7ABEF0B9559BADB8E17A4F012891D21940E5CDB53FDE45EFA39A8374486C",
+      "bytes": 51688,
+      "compressed_bytes": 10775
+    },
+    {
+      "path": "locale/ro/more-infinite-research.cfg",
+      "sha256": "735D706E030DB6C4AFC30CC56640D8AD36356550BD3C2039BC7FFC294AAE290B",
+      "bytes": 52555,
+      "compressed_bytes": 11184
+    },
+    {
+      "path": "locale/ru/more-infinite-research.cfg",
+      "sha256": "A69994D17F8B51F1C4306C836332D514B8849561B943A496220FE73105557A21",
+      "bytes": 79710,
+      "compressed_bytes": 13680
+    },
+    {
+      "path": "locale/sk/more-infinite-research.cfg",
+      "sha256": "0CC91FD83830ECE28B873426195E615FD19C90BA597F211B8153E9C9D4F1C3AC",
+      "bytes": 50726,
+      "compressed_bytes": 11836
+    },
+    {
+      "path": "locale/sl/more-infinite-research.cfg",
+      "sha256": "4E6503A9A28A147D0AE1BF5608698FCF6EAF554108696768D9A3048FB4C62459",
+      "bytes": 49214,
+      "compressed_bytes": 11117
+    },
+    {
+      "path": "locale/sq/more-infinite-research.cfg",
+      "sha256": "9537AD5F4745F187AF4E40AB9A22D3F9E27986AC920AEAEEA03415187B047EE6",
+      "bytes": 53622,
+      "compressed_bytes": 11341
+    },
+    {
+      "path": "locale/sr/more-infinite-research.cfg",
+      "sha256": "64F209E20FF4B74731DCB10722350D9E0A10F69C1306E7F51AEA678E5EFA6744",
+      "bytes": 76941,
+      "compressed_bytes": 13666
+    },
+    {
+      "path": "locale/sv-SE/more-infinite-research.cfg",
+      "sha256": "64A77B5D1FCF7A53755B48D80A78A9C963099BFF1CDFD002872B27A55697C7AB",
+      "bytes": 48573,
+      "compressed_bytes": 10600
+    },
+    {
+      "path": "locale/th/more-infinite-research.cfg",
+      "sha256": "B5DDA081CB999DD4381102FFEAC5FCD39BE2936F2F4E064C902505008C872026",
+      "bytes": 93813,
+      "compressed_bytes": 12778
+    },
+    {
+      "path": "locale/tr/more-infinite-research.cfg",
+      "sha256": "CF1586B5B00A083699B986C87400770F33107F3A29DE7EB1C566A2F7E2A0BBC6",
+      "bytes": 50841,
+      "compressed_bytes": 11058
+    },
+    {
+      "path": "locale/uk/more-infinite-research.cfg",
+      "sha256": "DE03C4AD19C04269CEF476FA30831DB1441842F8255486EA4A632505578681CF",
+      "bytes": 74327,
+      "compressed_bytes": 13163
+    },
+    {
+      "path": "locale/vi/more-infinite-research.cfg",
+      "sha256": "D0C1A82D946DB3BB67043D97E92C3711A9AEB79664E392A80BA354B7CCBACF7A",
+      "bytes": 59024,
+      "compressed_bytes": 11188
+    },
+    {
+      "path": "locale/zh-CN/more-infinite-research.cfg",
+      "sha256": "7E4FA8E69B31752FB757AEE171C896DE5CBCDEFE6C895BBA324CF78F4D03A021",
+      "bytes": 42446,
+      "compressed_bytes": 11055
+    },
+    {
+      "path": "locale/zh-TW/more-infinite-research.cfg",
+      "sha256": "EBD8A12BB436571D09B83E72E48F7DBEBED8F5BCD092B7EF3D9D8815E09CF91D",
+      "bytes": 42554,
+      "compressed_bytes": 11139
+    },
+    {
+      "path": "migrations/more-infinite-research_2.0.5.json",
+      "sha256": "07A2759B963321A87B1047029AE426C7B2784033BC7C4F899D2640C037C5EEE2",
+      "bytes": 142,
+      "compressed_bytes": 99
+    },
+    {
+      "path": "migrations/more-infinite-research_2.1.0.json",
+      "sha256": "F427B215D77BC86608010ADC1D0D1A1C98BE61F0D7140EF716D77E46DAB8092D",
+      "bytes": 125,
+      "compressed_bytes": 87
+    },
+    {
+      "path": "prototypes/mir/capabilities/contract.lua",
+      "sha256": "B32F72A3B92AFC24E023CD3394280F1764AD927D93F2B4092580E4AB9D950AD8",
+      "bytes": 1493,
+      "compressed_bytes": 582
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/planner.lua",
+      "sha256": "12503B163878AFBC460C55B8151051217B9EB10BA6D09620A722ADA35E3D7635",
+      "bytes": 831,
+      "compressed_bytes": 355
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+      "sha256": "31E3D3A25F9057C33ABEB27B4F95CA55F00505D47037D5817D6BDB39494E201E",
+      "bytes": 12249,
+      "compressed_bytes": 2736
+    },
+    {
+      "path": "prototypes/mir/capabilities/registry.lua",
+      "sha256": "70DDA47669F47496F25CDC0707C4A206CD63D4A2204330CB890E73BDCE8981F5",
+      "bytes": 15170,
+      "compressed_bytes": 3373
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "sha256": "500D9F8111CE396283E2A004191C5391E6A49E1C71A28DA246F1812816F2DD2F",
+      "bytes": 6094,
+      "compressed_bytes": 1546
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "sha256": "724CD93A6B40CDF97830BBB49F3485AA0326DA0C6B8A6B1414C8BB4639B8F6BF",
+      "bytes": 6605,
+      "compressed_bytes": 1560
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_registry.lua",
+      "sha256": "3CDC76982F45413E5589065E73AD3861B55AFC75A672C5E301F7DAFA953A3943",
+      "bytes": 3098,
+      "compressed_bytes": 847
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+      "sha256": "39E655B84B59976701C2DAB17ECE79ADEDC07A124D2E6C2AB7C2EC69155C4FAB",
+      "bytes": 3367,
+      "compressed_bytes": 955
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+      "sha256": "B5C878D8820AA8D2CE5A437818AD43AAACA734141285320EA57A0481A4B8C7E6",
+      "bytes": 2402,
+      "compressed_bytes": 678
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "sha256": "6A0443E1BE0268006194100EAED87024C36D0CFE95D5CBDFB0A5BFD4EC851B8E",
+      "bytes": 3931,
+      "compressed_bytes": 807
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "sha256": "B0DF0F0E58EBB681242ECD9DF18EA50DA7C8C73DA3BEC2222893460D4CEB5CD4",
+      "bytes": 8391,
+      "compressed_bytes": 1537
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "sha256": "BC8AB449769F4459A23A19BBEAEDC2878A3517E8E5DD875C78052CFA30321F55",
+      "bytes": 10777,
+      "compressed_bytes": 2283
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+      "sha256": "8BC07C597766C260B94E3D0E377C76401C66AA048926FD1EC6AF3202CCA666F2",
+      "bytes": 4355,
+      "compressed_bytes": 1148
+    },
+    {
+      "path": "prototypes/mir/compatibility/claim_registry.lua",
+      "sha256": "D368CE73CB6D4FE0AA59D093A3A5580EE23756AFB7398B05EB85CF9070B94539",
+      "bytes": 10381,
+      "compressed_bytes": 1881
+    },
+    {
+      "path": "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
+      "sha256": "6C81A0CC1A37893A91ED91D8E9AE2274F5A3E4FFF56A18E3DC1C8CEC0FFEC1A1",
+      "bytes": 1533,
+      "compressed_bytes": 570
+    },
+    {
+      "path": "prototypes/mir/compatibility/diagnostics/atan_ash.lua",
+      "sha256": "2E9B6F81FEF7A1416E21548203BBD2A502C570D209C9630029F87A061B8A2084",
+      "bytes": 1416,
+      "compressed_bytes": 505
+    },
+    {
+      "path": "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua",
+      "sha256": "249267B9397EAE311B2850FA3C7BBBDED6FD99574112C4D7A670361C18F445B9",
+      "bytes": 7981,
+      "compressed_bytes": 1864
+    },
+    {
+      "path": "prototypes/mir/compatibility/diagnostics/registry.lua",
+      "sha256": "FDDA31B32F223925C2AC616CD176ABA90444D0012B70B9C4046933D1772B437D",
+      "bytes": 406,
+      "compressed_bytes": 198
+    },
+    {
+      "path": "prototypes/mir/compatibility/overlay_loader.lua",
+      "sha256": "531D64615AEA4F7067E74617E3EEB41313AD88C7F0A0C7C9634C794ED7EA0D3E",
+      "bytes": 290,
+      "compressed_bytes": 166
+    },
+    {
+      "path": "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
+      "sha256": "6D90E0C4F8A8C2D7B785D4E16608715EFBA6E4C50898806FD668E9A923133845",
+      "bytes": 1424,
+      "compressed_bytes": 520
+    },
+    {
+      "path": "prototypes/mir/compatibility/overlays/atan_ash.lua",
+      "sha256": "70F35FF546F39EE043D7944D302AAB84E78FA9540FFC0624857D9BD7766C64E8",
+      "bytes": 1339,
+      "compressed_bytes": 507
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/precedence.lua",
+      "sha256": "0723F2AEEC80A00193A3EED45A9E5933113D147D1132F93CB5FE9EB226E5ABA5",
+      "bytes": 2150,
+      "compressed_bytes": 769
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/registry.lua",
+      "sha256": "0B5FDEFA417C710610E12D6CF68CE19C59D151569DB213D7E5F4425F7487048D",
+      "bytes": 9728,
+      "compressed_bytes": 2435
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/schema.lua",
+      "sha256": "D580330701A300A038B490EB5E717423B817DF70D97F5D97048F1866A58280C9",
+      "bytes": 9700,
+      "compressed_bytes": 2340
+    },
+    {
+      "path": "prototypes/mir/compatibility/planner.lua",
+      "sha256": "5D300B9532B0F9D9A79D406D95969D88603BC61D803B1CB04738F30A07DDD60D",
+      "bytes": 10461,
+      "compressed_bytes": 2493
+    },
+    {
+      "path": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "sha256": "FF317BC49E4FBB4F3BFF2FAC17B32A6407A75D2024EEB3C7E1D9544A8CF13710",
+      "bytes": 2703,
+      "compressed_bytes": 899
+    },
+    {
+      "path": "prototypes/mir/compatibility/policy_authority.lua",
+      "sha256": "A4F62FE429E64D2DAD2F01580D2B6BFC88E2129D682FD64C1E1A564854FD5FF5",
+      "bytes": 2204,
+      "compressed_bytes": 566
+    },
+    {
+      "path": "prototypes/mir/compatibility/profiles.lua",
+      "sha256": "EC346717BF56D07563FD58DFC51415690015F7E22594B9FCA785A6540D548FE3",
+      "bytes": 5576,
+      "compressed_bytes": 1504
+    },
+    {
+      "path": "prototypes/mir/compatibility/registry.lua",
+      "sha256": "D2EADE8A676D4FDA248C561E73AEA77FCFCB2DD4F204E8D3A469E71E15106AAC",
+      "bytes": 167,
+      "compressed_bytes": 106
+    },
+    {
+      "path": "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua",
+      "sha256": "3E924C4B80BB96F7646B76B16E7923009E435AD7FDC26E6EE787A06A4009A5AE",
+      "bytes": 6105,
+      "compressed_bytes": 1597
+    },
+    {
+      "path": "prototypes/mir/compatibility/repairs/registry.lua",
+      "sha256": "BAD4B16F2C7AB1A66AA9008F49016D528FE6936ADE8D2C137E0F869C871FDCD2",
+      "bytes": 221,
+      "compressed_bytes": 132
+    },
+    {
+      "path": "prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua",
+      "sha256": "98204236FA78CBBA6A2CBF470A749FCE74D8B442C64F2BA5314415C83CC5D793",
+      "bytes": 3316,
+      "compressed_bytes": 947
+    },
+    {
+      "path": "prototypes/mir/core/deepcopy.lua",
+      "sha256": "D18F286FD1AAFA9648133B7E32217F6B4B1E7697B2590D7A793F165447F3524C",
+      "bytes": 307,
+      "compressed_bytes": 152
+    },
+    {
+      "path": "prototypes/mir/core/fingerprint.lua",
+      "sha256": "06AD153D035E80504448DA7B7140C6B4C9DA10A7F1419B62A7CE6B3F3C2A5CD8",
+      "bytes": 8269,
+      "compressed_bytes": 1900
+    },
+    {
+      "path": "prototypes/mir/core/schema.lua",
+      "sha256": "D201F32A123AC1DC015C5C1CC62DCF5716659C9694EF620D3103CE4A84CF985E",
+      "bytes": 1023,
+      "compressed_bytes": 410
+    },
+    {
+      "path": "prototypes/mir/core/structural_equal.lua",
+      "sha256": "ADCEC6CB0FCE47E4702CE7AEDBD776966F44565FCEF4137AA1E3260B110F2B14",
+      "bytes": 604,
+      "compressed_bytes": 245
+    },
+    {
+      "path": "prototypes/mir/core/table.lua",
+      "sha256": "314A6247D496C528FD5851A9736158EC62C17F5FAA58640A07DEC8939DAA440B",
+      "bytes": 177,
+      "compressed_bytes": 120
+    },
+    {
+      "path": "prototypes/mir/core/trusted_record.lua",
+      "sha256": "E7A7314E94758D8CC46D41292C96A096575962C968D3FF6E1D4F73C838722A4C",
+      "bytes": 2743,
+      "compressed_bytes": 714
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compilation_snapshot.lua",
+      "sha256": "921F13B156F6B2CC158E08B2087F1F3CA767A04DACCD55327990D36ADC838780",
+      "bytes": 12836,
+      "compressed_bytes": 2369
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_input.lua",
+      "sha256": "5AA29FB26A53A2FCBFB93A1F1C0EF7D15598C226D748301C2EAC12E28D2C96C5",
+      "bytes": 6836,
+      "compressed_bytes": 1230
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_result.lua",
+      "sha256": "524F42956863DA7F1D36CDDF195D0A3B6231B434CE6B55BC7B6CDF37B03A599B",
+      "bytes": 10824,
+      "compressed_bytes": 2343
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/execution_mode.lua",
+      "sha256": "ACCEB79BBEA388B90F568C8AB7E3BB1171472C0BCCB8274DE9779D004688B00D",
+      "bytes": 1176,
+      "compressed_bytes": 469
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/mutation_journal.lua",
+      "sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F",
+      "bytes": 7727,
+      "compressed_bytes": 1734
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/policy_snapshot.lua",
+      "sha256": "F93CC8AC2ABB9FDBDC139C88E434D77C57FE5B6B030A66AEB8B7C4594B61AE58",
+      "bytes": 4816,
+      "compressed_bytes": 1128
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/public_artifact_budget.lua",
+      "sha256": "9410BF22A036EF1AC6CC4290901B2262FF478152D47B49AA6422E58E962186FA",
+      "bytes": 711,
+      "compressed_bytes": 359
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_operation.lua",
+      "sha256": "3DD80295518A8E40365BAD03279F4D72615CF223469162B7CA0EC37AB620FC9E",
+      "bytes": 5834,
+      "compressed_bytes": 1305
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_plan.lua",
+      "sha256": "149C6082938987FB94E32B595A0E84048D92EAED5A0EB0E4179EECD03F3E1753",
+      "bytes": 4817,
+      "compressed_bytes": 1110
+    },
+    {
+      "path": "prototypes/mir/domain/decisions/decision_record.lua",
+      "sha256": "B5A0BE3BEC0B0CD5210F7129D334BC07AADBB0C17F0F832CEFB28A8D7B18A252",
+      "bytes": 3230,
+      "compressed_bytes": 977
+    },
+    {
+      "path": "prototypes/mir/domain/diagnostics/codes.lua",
+      "sha256": "D6455E5795859A3E9380B71DD69C0443374AD82ECE1AA2F788964C058E828DFE",
+      "bytes": 1307,
+      "compressed_bytes": 548
+    },
+    {
+      "path": "prototypes/mir/domain/effects/generated_target_contracts.lua",
+      "sha256": "2D23AE9A5E1D2AA4DCFC0D2BC580C97EF50BCD8741B4319817C40CEDE1F48B83",
+      "bytes": 2313,
+      "compressed_bytes": 428
+    },
+    {
+      "path": "prototypes/mir/domain/effects/metadata.lua",
+      "sha256": "88A0DB27C39231C1EC46F708D7286C4D6EFE3B12A62656465BB2F31A93F902A6",
+      "bytes": 1778,
+      "compressed_bytes": 637
+    },
+    {
+      "path": "prototypes/mir/domain/environment_identity.lua",
+      "sha256": "E86E24D3ABAC63F5388CFFB7FFB1E2D54E15F5768D1DA956D2648CD126F878F7",
+      "bytes": 5599,
+      "compressed_bytes": 1338
+    },
+    {
+      "path": "prototypes/mir/domain/evidence/compiler_evidence.lua",
+      "sha256": "99573DCD020B953CD611263370783DCF852CAF11F2ABEE768FD0085AA4FF945E",
+      "bytes": 1975,
+      "compressed_bytes": 483
+    },
+    {
+      "path": "prototypes/mir/domain/facts/generated_technology_registry.lua",
+      "sha256": "9C0C1706A5C897C049C1B45500E533974ED59F5D495B9F6B233100935D84D1B8",
+      "bytes": 955,
+      "compressed_bytes": 405
+    },
+    {
+      "path": "prototypes/mir/domain/facts/recipe_semantics.lua",
+      "sha256": "F9A44107BBC1C066F35F22B5D6281733819D9D7E827B346F56DD1F1C51E85B4B",
+      "bytes": 1599,
+      "compressed_bytes": 403
+    },
+    {
+      "path": "prototypes/mir/domain/facts/registry.lua",
+      "sha256": "255E48F2875F8AE00106F2B99BC184774B00D68B7FE6DE376834D3C3F98C7E9A",
+      "bytes": 56,
+      "compressed_bytes": 58
+    },
+    {
+      "path": "prototypes/mir/domain/native_owner/contract.lua",
+      "sha256": "86FE10DC8236FFD3AC7364DF00091C4C4CB44308B1DD1B3E4E4F1034748ABE8E",
+      "bytes": 1669,
+      "compressed_bytes": 512
+    },
+    {
+      "path": "prototypes/mir/domain/native_owner/cost_model.lua",
+      "sha256": "A74598753DD9E990BC23291010901ACE499725363967FB41E374CDCA34B37CE9",
+      "bytes": 4464,
+      "compressed_bytes": 1043
+    },
+    {
+      "path": "prototypes/mir/domain/qualification_environment_identity.lua",
+      "sha256": "C240F6E20E51ACA22A40EB8FC53CD7D8621D231BC9B5D1307AA1521D01A7BEA3",
+      "bytes": 1273,
+      "compressed_bytes": 464
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/classification.lua",
+      "sha256": "6208A3BDBEE81D0B7391F2BB25CA8ABFDECC01527E3827D4B80C4431ED9139D1",
+      "bytes": 10176,
+      "compressed_bytes": 2515
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/compatibility_slice.lua",
+      "sha256": "D92CC40BE19AE3F6128EC4A9EDA102325A7446E1AD0C1A16EBD961ACC4C5C1E2",
+      "bytes": 13876,
+      "compressed_bytes": 3106
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/formula.lua",
+      "sha256": "574C8B3CD07E91A4ECFECD8259443E568940C27EC5FC137E2D25FF5A38F30627",
+      "bytes": 1972,
+      "compressed_bytes": 591
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/model.lua",
+      "sha256": "89072B22B2ADE5D0DFEF8FAB60DFFC5B784466364F0D5E875B1BF18C90ABA32A",
+      "bytes": 4007,
+      "compressed_bytes": 1039
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/projection.lua",
+      "sha256": "A37A1CE1CF8BF7561C84F0504096C0A61BEE1519EB255D43847ADB25B33EAAE8",
+      "bytes": 1248,
+      "compressed_bytes": 439
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/transition_descriptor.lua",
+      "sha256": "8E304DB8F0727E2DD351DE81AD74B303E7FBBC9FCFE8F40DC055CB5BB5329CA0",
+      "bytes": 5354,
+      "compressed_bytes": 1382
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/validation.lua",
+      "sha256": "2A66484BB453D7C9BF18F29DB3DF54CF45404603004A0993463EC7553DFF28D0",
+      "bytes": 4301,
+      "compressed_bytes": 1253
+    },
+    {
+      "path": "prototypes/mir/domain/streams/descriptor.lua",
+      "sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
+      "bytes": 11425,
+      "compressed_bytes": 2960
+    },
+    {
+      "path": "prototypes/mir/domain/streams/raw_catalog.lua",
+      "sha256": "18ADCC5E022D5F5BBB5FF7B667B0D66E1AD115B6186CB85A03B5FBF507268C10",
+      "bytes": 535,
+      "compressed_bytes": 260
+    },
+    {
+      "path": "prototypes/mir/domain/streams/stream_spec.lua",
+      "sha256": "6FFC04BC7C1CB076D3677A9B0EEA6C738C330BD862AAA01A8A9DFF9F9193AE7E",
+      "bytes": 1213,
+      "compressed_bytes": 411
+    },
+    {
+      "path": "prototypes/mir/domain/technology/applicability_envelope.lua",
+      "sha256": "31B16F0D7027A38BB14936AFFB004624F61BB07C414051F52D30B03E957D15C2",
+      "bytes": 6327,
+      "compressed_bytes": 1493
+    },
+    {
+      "path": "prototypes/mir/domain/technology/design_assessment.lua",
+      "sha256": "CB8BF299B555BCE3604C8D2CDC3F2697CEC76662029D328E7BBBDA7A56BA7482",
+      "bytes": 200,
+      "compressed_bytes": 125
+    },
+    {
+      "path": "prototypes/mir/domain/technology/effect_safety_policy.lua",
+      "sha256": "3EF11B84C35A587508A0FDF8394E82EAF76CCA7B6C60D9EA9011E7A8F857BA00",
+      "bytes": 983,
+      "compressed_bytes": 420
+    },
+    {
+      "path": "prototypes/mir/domain/technology/gate.lua",
+      "sha256": "E004FF72A468543BE5D13B110AFB8CF46BDEFBD9597DD583E6E5783BDD863AC3",
+      "bytes": 6440,
+      "compressed_bytes": 1446
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_hard_gate_authority.lua",
+      "sha256": "6237C154D8E5AFC811603901508574D6CDAB6211D3F5D76B89FD390FCDF31A53",
+      "bytes": 1067,
+      "compressed_bytes": 258
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_promotion_registry.lua",
+      "sha256": "E8962BC9E1839EB5922944CC67E04C333E57C54330CD0B3E9030130B5E2A60EE",
+      "bytes": 1503,
+      "compressed_bytes": 421
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_quality_profiles.lua",
+      "sha256": "66578148236612993AAAF4C3B2D6DAA0A7075B2E5E068B807FB1EAFCCBD4568B",
+      "bytes": 6896,
+      "compressed_bytes": 963
+    },
+    {
+      "path": "prototypes/mir/domain/technology/hard_gate_authority.lua",
+      "sha256": "62CE23985C877595B08409F4AB9475DAC113D7C6A06753C9D22C680A85083907",
+      "bytes": 1139,
+      "compressed_bytes": 432
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_authorization.lua",
+      "sha256": "E932DF75C5B0CE20AE8E4C3AC9E5ABDE20061C7897FB06ECAFE68C74623467C9",
+      "bytes": 2600,
+      "compressed_bytes": 828
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+      "sha256": "99C1F7584F38982E7366C6365BB415B2C638C2E76BCD210AAD86D5CD13E385CD",
+      "bytes": 2027,
+      "compressed_bytes": 730
+    },
+    {
+      "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+      "sha256": "BF5C3402DFCDD240485EDBAAE051C6B7075C04FE62749AB0CBA8B374C16FBF77",
+      "bytes": 7591,
+      "compressed_bytes": 1807
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_approval.lua",
+      "sha256": "2805B3AB21B401419020D9564A9CF41B7702C79277588D1D60E919D9BD318351",
+      "bytes": 4110,
+      "compressed_bytes": 1077
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_candidate.lua",
+      "sha256": "A15FD8ED38E6E98DB66384FE189E7CCEA0990B777FE061431A80E4CFE40773DB",
+      "bytes": 5331,
+      "compressed_bytes": 1236
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_design.lua",
+      "sha256": "8BED9810A8282BE0B6BF172018E0852328FE246917CEE2FC0AD735270C1A8471",
+      "bytes": 52274,
+      "compressed_bytes": 10495
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_migration.lua",
+      "sha256": "F26A69F8B59A0836C14146009459B082AD94019C546AA0074303E424AA6F6A5A",
+      "bytes": 2086,
+      "compressed_bytes": 672
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_promotion.lua",
+      "sha256": "BD9E34FFBFDE77DDE56181BF7FE4B7191F8AAAB179B6DBD5FB7179B6A58EF741",
+      "bytes": 2671,
+      "compressed_bytes": 815
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_qualification.lua",
+      "sha256": "724CDD0932CBBF488E4DE4417A3D84EFB254AC3B841C41FEC2842AC6706C41F0",
+      "bytes": 224,
+      "compressed_bytes": 162
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+      "sha256": "59AE45146673E0044C67FD2EB3D8753AF194DE8D62EB9CB80FEE5A7A5A40FD26",
+      "bytes": 4390,
+      "compressed_bytes": 1297
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_risk.lua",
+      "sha256": "A8C1B7E1A9050050C7BF261B37410324B0B4C9D268C954302F1E1270B4416AEA",
+      "bytes": 2533,
+      "compressed_bytes": 828
+    },
+    {
+      "path": "prototypes/mir/emit/base_continuation_executor.lua",
+      "sha256": "5AB80A7F8181CA4C85760DE9DE8C3DE4F1B17C6D350B72D3957C677358D8EE83",
+      "bytes": 628,
+      "compressed_bytes": 288
+    },
+    {
+      "path": "prototypes/mir/emit/base_extension_builder.lua",
+      "sha256": "32E4921CA0BC66FF4607364CEEB66C870614C7495C695183103345977A70DF4E",
+      "bytes": 146,
+      "compressed_bytes": 111
+    },
+    {
+      "path": "prototypes/mir/emit/base_extensions.lua",
+      "sha256": "09AC3B1B1C2385F09B1005EF929EDCF81D93675A953E780DD60100A8F86C4407",
+      "bytes": 430,
+      "compressed_bytes": 227
+    },
+    {
+      "path": "prototypes/mir/emit/compiler_evidence_adapter.lua",
+      "sha256": "AD940680FBB5FCC57A17AFFE97B2A345F299D3368CC49B356D092D8FFAF5D06E",
+      "bytes": 863,
+      "compressed_bytes": 345
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "sha256": "02EEE534CA59285EAE77D57071F3DF5E219C80270F195068A85DF41B497A363E",
+      "bytes": 8019,
+      "compressed_bytes": 1808
+    },
+    {
+      "path": "prototypes/mir/emit/icon_builder.lua",
+      "sha256": "FD677AAAECC429CC3DF68750915C79EB026E627CD342B88F3CE938026DF4A1BC",
+      "bytes": 170,
+      "compressed_bytes": 124
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "sha256": "E6C16609EDE05A79BD34CC1DAC55C91CEB78145ED16A0F3B67442850CAF53142",
+      "bytes": 3305,
+      "compressed_bytes": 512
+    },
+    {
+      "path": "prototypes/mir/emit/research_cost_compatibility_adapter.lua",
+      "sha256": "25CFC1EACFD259C99EB559E1A2B2A8D68A9977EB02D80EF486F7ABAC1C42605E",
+      "bytes": 977,
+      "compressed_bytes": 399
+    },
+    {
+      "path": "prototypes/mir/emit/stream_executor.lua",
+      "sha256": "87D241AB0B2ED9BD6DFD1B61D2AFDBCB04515373E196B72BF16D593E4AA7497F",
+      "bytes": 1799,
+      "compressed_bytes": 675
+    },
+    {
+      "path": "prototypes/mir/emit/stream_spec_adapter.lua",
+      "sha256": "8A68F60C6A8C9A50092EAD78E324D4D03BE966004713D183D2A341424B4644B6",
+      "bytes": 331,
+      "compressed_bytes": 194
+    },
+    {
+      "path": "prototypes/mir/emit/technology_builder.lua",
+      "sha256": "892B80735867D3D9D4B20D790D18C71F2C915A384677D376A91C3199D95CB824",
+      "bytes": 1534,
+      "compressed_bytes": 535
+    },
+    {
+      "path": "prototypes/mir/emit/technology_design_adapter.lua",
+      "sha256": "6F18A48E6304828D4395AD8473A30BCA22CF4A50D4FA6C623F9A304AB8E76124",
+      "bytes": 1197,
+      "compressed_bytes": 465
+    },
+    {
+      "path": "prototypes/mir/emit/technology_graph_safety.lua",
+      "sha256": "8467B375F695F1C20DE36EE75506F61F6127CA6545FA12FF0FF11D76E730A772",
+      "bytes": 10497,
+      "compressed_bytes": 2717
+    },
+    {
+      "path": "prototypes/mir/emit/technology_operation_executor.lua",
+      "sha256": "F15C57DFF132DDBB059BD4D9BFAD1ADC8DA764D7B8FA037BC251F918190B9DEB",
+      "bytes": 3074,
+      "compressed_bytes": 1010
+    },
+    {
+      "path": "prototypes/mir/emit/technology_replacement.lua",
+      "sha256": "E57C46A978809AD0ACDFE954FF3986D9354DEADC10DF486F588D142D38CDCB4C",
+      "bytes": 8678,
+      "compressed_bytes": 1880
+    },
+    {
+      "path": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "sha256": "FAEDB7D11A8CA6B373119A295660FD1564EA5D1FB43E5EA06B0DB18E4CC9A311",
+      "bytes": 6473,
+      "compressed_bytes": 1635
+    },
+    {
+      "path": "prototypes/mir/families/operator_dsl.lua",
+      "sha256": "EA5C563450401522BE7EFCF3B104AAEE464C7D41AC2C62455B93C95B9E29809E",
+      "bytes": 8812,
+      "compressed_bytes": 2198
+    },
+    {
+      "path": "prototypes/mir/families/registry.lua",
+      "sha256": "93F4216480286016952AAEB7AF422C19A07B318DFFC3F9A950D04F746E5B8F76",
+      "bytes": 4959,
+      "compressed_bytes": 1492
+    },
+    {
+      "path": "prototypes/mir/families/resolver.lua",
+      "sha256": "40D31C0D940ABE7238AE759DDACE66BB9A512D5A230B933F577EF1752E32E028",
+      "bytes": 13305,
+      "compressed_bytes": 3078
+    },
+    {
+      "path": "prototypes/mir/families/rules.lua",
+      "sha256": "806C716AE8D3CC7A38CB03AEC6DEF23F053628B3153D2A165AE6FCD72B43BA33",
+      "bytes": 299,
+      "compressed_bytes": 203
+    },
+    {
+      "path": "prototypes/mir/graph/condensation.lua",
+      "sha256": "0F43A0BA7EC9AFA1D05A9B0791FC42A3D731BE91494894B3D716B55DB5468798",
+      "bytes": 760,
+      "compressed_bytes": 349
+    },
+    {
+      "path": "prototypes/mir/graph/diff.lua",
+      "sha256": "8E2F034A62D35F153C9783BEE0F85004AB6784C1FC19056A4142519ECE61C90B",
+      "bytes": 494,
+      "compressed_bytes": 208
+    },
+    {
+      "path": "prototypes/mir/graph/evidence.lua",
+      "sha256": "0D76065282F8417BA31BF76139ED8DB069AD63A5F79BBF3E69CA30948FA25B2D",
+      "bytes": 488,
+      "compressed_bytes": 202
+    },
+    {
+      "path": "prototypes/mir/graph/qualification.lua",
+      "sha256": "542CBAE3C7CA39060806925F61628A4B8538872DE9ED33752C71DF70B2A667CA",
+      "bytes": 15867,
+      "compressed_bytes": 3696
+    },
+    {
+      "path": "prototypes/mir/graph/reachability.lua",
+      "sha256": "677F2C4554A416A15EC3A4E11B785C2D1319B9E9877B53C609F5E85983EF061D",
+      "bytes": 406,
+      "compressed_bytes": 186
+    },
+    {
+      "path": "prototypes/mir/graph/researchability_index.lua",
+      "sha256": "5CDC5962898E392C44452E92437F795B58F3C3C9C349749B8BF4F229118D399C",
+      "bytes": 4054,
+      "compressed_bytes": 1140
+    },
+    {
+      "path": "prototypes/mir/graph/researchability.lua",
+      "sha256": "F91B8F2094CEDA38AF63BB91B435F39926344BAB742FD280A9F36BABEC43E53E",
+      "bytes": 692,
+      "compressed_bytes": 286
+    },
+    {
+      "path": "prototypes/mir/graph/scc.lua",
+      "sha256": "454D54C1B2F78A6C10776F45B0F9B1F0352FF9AB262866F6CE6EECD997E35E4E",
+      "bytes": 2734,
+      "compressed_bytes": 911
+    },
+    {
+      "path": "prototypes/mir/graph/snapshot.lua",
+      "sha256": "95321E7261485B681CF673D0BBA7151EE3CFEF6AD3F569B0F87F9C72C9D3C5ED",
+      "bytes": 8317,
+      "compressed_bytes": 2044
+    },
+    {
+      "path": "prototypes/mir/index/item_prototype_facts.lua",
+      "sha256": "68B99EE3DFB0B98794A6D15DD3F87CD6E56DC49DCB31570DF251C1214EA457ED",
+      "bytes": 4032,
+      "compressed_bytes": 1115
+    },
+    {
+      "path": "prototypes/mir/index/labs.lua",
+      "sha256": "EA0588049C2DFD3B3555B3A2C0EBC987D0FDDAB0CC877DDAE891981D62AE052A",
+      "bytes": 376,
+      "compressed_bytes": 168
+    },
+    {
+      "path": "prototypes/mir/index/owners.lua",
+      "sha256": "A34EB4AC4494DD2DBBDCCB7F69662EF3307D88CB76B7E83CDD61C40FCC82926C",
+      "bytes": 189,
+      "compressed_bytes": 126
+    },
+    {
+      "path": "prototypes/mir/index/productivity_owners.lua",
+      "sha256": "EC148F4ED6469FB6D598E86C5AEF5605B7A6B7C87E8C3D9C77D0FB1530953AD3",
+      "bytes": 5900,
+      "compressed_bytes": 1457
+    },
+    {
+      "path": "prototypes/mir/index/recipe_facts.lua",
+      "sha256": "7E0888B17128D358B34ACE5D300802A8488A49653148D592D26CB8FB922FE081",
+      "bytes": 16482,
+      "compressed_bytes": 3500
+    },
+    {
+      "path": "prototypes/mir/index/recipe_risk_facts.lua",
+      "sha256": "1472C81F2ADBDC7E234A151674F4E193C27244EECBC116FFC8173DC8F9EFEB2E",
+      "bytes": 8349,
+      "compressed_bytes": 2298
+    },
+    {
+      "path": "prototypes/mir/index/recipe_unlocks.lua",
+      "sha256": "5EADF41AF639E2ED4E7DA9321F87D0E94E3ABE20A43A18E73C0E989C3902009B",
+      "bytes": 1192,
+      "compressed_bytes": 396
+    },
+    {
+      "path": "prototypes/mir/index/recipes.lua",
+      "sha256": "9AABE9F04AB0B6BA9F034549493D1E919C6F2B80F12D213C1946F6B5618FFD69",
+      "bytes": 280,
+      "compressed_bytes": 147
+    },
+    {
+      "path": "prototypes/mir/index/recycling.lua",
+      "sha256": "084E278A6781D5059A78BE65E7DB21CDFB1D6E7991E4D7B1F647CAE42F1420E3",
+      "bytes": 5371,
+      "compressed_bytes": 1532
+    },
+    {
+      "path": "prototypes/mir/index/registry_builder.lua",
+      "sha256": "A8D5223E9EAEEDB787B8DB9A370EC9DACA936E19B21F0E97293BA4BE4FC54BA3",
+      "bytes": 13613,
+      "compressed_bytes": 3128
+    },
+    {
+      "path": "prototypes/mir/index/relationships.lua",
+      "sha256": "AF18027080397B8578F385B4C4EAE15054EC68F337F02E7C8A109805018AEA80",
+      "bytes": 4815,
+      "compressed_bytes": 1351
+    },
+    {
+      "path": "prototypes/mir/index/rule_surfaces.lua",
+      "sha256": "C410980EE388A2763D9758A77520723411689AA14F9BFC3457FD403CA41CAA47",
+      "bytes": 310,
+      "compressed_bytes": 143
+    },
+    {
+      "path": "prototypes/mir/index/technologies.lua",
+      "sha256": "E315DB20E45F9CAC8C673DBB4AA70F130FF29D46FFD91C89E8AA11F00E0840F3",
+      "bytes": 295,
+      "compressed_bytes": 151
+    },
+    {
+      "path": "prototypes/mir/integrity/effect_contracts.lua",
+      "sha256": "925564AF2E3B66A805D99D5E65C8FA7B2AE74725572265B58A77D193D235B5A3",
+      "bytes": 3661,
+      "compressed_bytes": 998
+    },
+    {
+      "path": "prototypes/mir/integrity/technology_effects.lua",
+      "sha256": "4CB4A2AD89F2549B66735570E6358ABEA21D2E945EFBEC11127CEA96A99C062A",
+      "bytes": 1462,
+      "compressed_bytes": 490
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "sha256": "FD85A23265F0D661E0E5FA01AA69E3CF2BFAE294E26AC9002221C86F27C2AA8D",
+      "bytes": 13188,
+      "compressed_bytes": 2419
+    },
+    {
+      "path": "prototypes/mir/pipeline/compilation_snapshot_adapter.lua",
+      "sha256": "8A96F4149CA7E1B221BD61BF04324D246A72FA7FA54D9A00ED2F5582494C1705",
+      "bytes": 6374,
+      "compressed_bytes": 1673
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_context.lua",
+      "sha256": "65490A92DAC0ED079EFE40211E16E5E331C050D3DE606E35D671219C2A30926E",
+      "bytes": 7821,
+      "compressed_bytes": 2027
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "sha256": "31A5DE31CBCCEE409FAB416865EF3BEE5578F775C82F3C5943225739606EE6EE",
+      "bytes": 22180,
+      "compressed_bytes": 4361
+    },
+    {
+      "path": "prototypes/mir/pipeline/extent.lua",
+      "sha256": "2551765972B2AB181C91FA54414166477EBB38E9FB24C5669FE1EB1E43EC24C3",
+      "bytes": 2308,
+      "compressed_bytes": 706
+    },
+    {
+      "path": "prototypes/mir/pipeline/module_permissions.lua",
+      "sha256": "DBAC07646AEFDB16DBC6C09A990BE6B665CA1559AA99AE585C82CD1461F614FD",
+      "bytes": 3177,
+      "compressed_bytes": 992
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "sha256": "8648C1D0673BA7389F1EC2B4F0F3E7B91F5B5153343989D8205BE4F9297E6491",
+      "bytes": 1238,
+      "compressed_bytes": 452
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_productivity.lua",
+      "sha256": "F676F64887A4DF8DC812FF8C76304FF7CE0C6AB12DC6ABF5CC8A090D2478D4C7",
+      "bytes": 1183,
+      "compressed_bytes": 435
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/max_level.lua",
+      "sha256": "336F69D45A852037703D4F2091945E9DB6BFECC9CC19B71E469C13CE60CC95FD",
+      "bytes": 358,
+      "compressed_bytes": 192
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/weapon_speed.lua",
+      "sha256": "FDCE19D70DA3887A4A3C5D34925B17FB7036D400DCB20588B4101F9EC9E277C0",
+      "bytes": 357,
+      "compressed_bytes": 196
+    },
+    {
+      "path": "prototypes/mir/pipeline/policy_snapshot_adapter.lua",
+      "sha256": "21DBC44A2BC8326CF7B9ECF5D1283E0D3435D269B63C7557F7225E6F9C3E8695",
+      "bytes": 1836,
+      "compressed_bytes": 582
+    },
+    {
+      "path": "prototypes/mir/pipeline/prototype_limits.lua",
+      "sha256": "5195C6630958C763485274A56C343F26C63E18A548E4D0B976BE580E0F9315EE",
+      "bytes": 10907,
+      "compressed_bytes": 2803
+    },
+    {
+      "path": "prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+      "sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
+      "bytes": 1188,
+      "compressed_bytes": 438
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuation_builder.lua",
+      "sha256": "869BECDE321CFCCC8A05CD4A7FA4641D20BF5B172247648005668CE430788BEA",
+      "bytes": 1062,
+      "compressed_bytes": 427
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations.lua",
+      "sha256": "C1E375043D764D68D2BE1C2DE6B17F7E27459974FE170B1A6A67997CC02B088E",
+      "bytes": 27312,
+      "compressed_bytes": 6379
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan.lua",
+      "sha256": "A1FFEB52014D910E5761945B9555291AE7C6E5E7CFE0564FCDA2C6D96493D566",
+      "bytes": 42880,
+      "compressed_bytes": 7687
+    },
+    {
+      "path": "prototypes/mir/planner/compiler.lua",
+      "sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
+      "bytes": 9538,
+      "compressed_bytes": 2055
+    },
+    {
+      "path": "prototypes/mir/planner/costs.lua",
+      "sha256": "E4CB7C625BB4A1CD1A87D0DF8AE620EEEA8307D7D4EC5A6F84EE521E42F8A98A",
+      "bytes": 3890,
+      "compressed_bytes": 885
+    },
+    {
+      "path": "prototypes/mir/planner/direct_effects.lua",
+      "sha256": "776F1017F68F02DB6BDBE8AE0B7F721F341465A70609D987D71881DA2D7B4176",
+      "bytes": 1272,
+      "compressed_bytes": 499
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership.lua",
+      "sha256": "FA2E3571659F896D244BFFF7C40534ECDE875C6A5487CF8A188A81CF75AE9DC7",
+      "bytes": 15564,
+      "compressed_bytes": 3265
+    },
+    {
+      "path": "prototypes/mir/planner/generation_plan.lua",
+      "sha256": "0F69C79BD291E9A7E46B9DAA3D04A314C4C3EB7EFA253B386D2E591C09F8EAD0",
+      "bytes": 12510,
+      "compressed_bytes": 2766
+    },
+    {
+      "path": "prototypes/mir/planner/native_modifiers.lua",
+      "sha256": "FE4235EBBD588CB37C100FBF0ECCEE2FD5B17DE8A8F1D9D0D2258457872EDA6C",
+      "bytes": 2188,
+      "compressed_bytes": 764
+    },
+    {
+      "path": "prototypes/mir/planner/native_owner_binding.lua",
+      "sha256": "F71BBBDD47085BC4A2B9A4F88B3FD078C9A471631C521587FD2C04623FEF97BE",
+      "bytes": 9775,
+      "compressed_bytes": 2502
+    },
+    {
+      "path": "prototypes/mir/planner/output_validator.lua",
+      "sha256": "9C742236169C72E51F838844B7FF3315E3AD2E9D61EC030AFD8CB0FE96E05A6B",
+      "bytes": 9643,
+      "compressed_bytes": 2198
+    },
+    {
+      "path": "prototypes/mir/planner/prerequisites.lua",
+      "sha256": "36DFD9B135442C93D2722A6351FCF7A7F09117C31B8E687BF84D7CFE8D154AC0",
+      "bytes": 2940,
+      "compressed_bytes": 882
+    },
+    {
+      "path": "prototypes/mir/planner/requirements.lua",
+      "sha256": "63B433C78C08604926F97CA285093AD579E960ED4DBD4B2EE442103F11368A42",
+      "bytes": 1823,
+      "compressed_bytes": 525
+    },
+    {
+      "path": "prototypes/mir/planner/science.lua",
+      "sha256": "BC29B8B31F6A0A6587B12B4DEF795309F036A8221F7972725C5C69D4C777EDF7",
+      "bytes": 1143,
+      "compressed_bytes": 400
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler.lua",
+      "sha256": "25FE274FA4364CC34F29F2616EFF2802A25A586CEF209B06774A9398A7A6961C",
+      "bytes": 22159,
+      "compressed_bytes": 4861
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog.lua",
+      "sha256": "190C8AF83E767177B067E848543428D2600CC5F12E4B23FECC67B0A0EC7034B1",
+      "bytes": 19159,
+      "compressed_bytes": 3637
+    },
+    {
+      "path": "prototypes/mir/planner/technology_graph.lua",
+      "sha256": "EF22F7CDABDBAEDC41AF8BDBFC1160CA6B256D026CA358BDB52089ED1DD74128",
+      "bytes": 209,
+      "compressed_bytes": 146
+    },
+    {
+      "path": "prototypes/mir/planner/technology_requirements.lua",
+      "sha256": "F1EFFD29A78DED059648A2666E089A5043C63F2C0BD7EE0998FB4D34E2135B43",
+      "bytes": 1673,
+      "compressed_bytes": 524
+    },
+    {
+      "path": "prototypes/mir/planner/technology_selection_policy.lua",
+      "sha256": "E101524BC57622E8DA1B0743379A14F5F0DA1BE9C2875EA7DE00449B9618FDF2",
+      "bytes": 5017,
+      "compressed_bytes": 1259
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/data_raw.lua",
+      "sha256": "FEECAA1ADAEFDF5D53594A63C2616BACED85EB03DFFEFFABBE539D2AF76EC31F",
+      "bytes": 906,
+      "compressed_bytes": 312
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/effect_target_inventory.lua",
+      "sha256": "83EA60DF304EA94FEDAACF00490895556DB48D1C201E622A40E8373D241FA3EB",
+      "bytes": 2594,
+      "compressed_bytes": 716
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/environment_identity.lua",
+      "sha256": "CCED615B4018E4D17B2D03E5B04B8EEE727078FB93CE0CEB6AE239724F2C7453",
+      "bytes": 1235,
+      "compressed_bytes": 386
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/mods.lua",
+      "sha256": "BDD5803C4D11316829622B0EA94A63B8705FCAB25CA445EA7EAEC2A037AE0EAD",
+      "bytes": 454,
+      "compressed_bytes": 204
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "sha256": "4B72EA0396147277736FBA2F68CF0E09D19ED1996F129F8086B4DBE951FCB2D9",
+      "bytes": 4188,
+      "compressed_bytes": 1150
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/runtime_state.lua",
+      "sha256": "2F36854B538F73291E8386BCFEFB708E9F96B2778DC350B54E22C11E38418706",
+      "bytes": 691,
+      "compressed_bytes": 283
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_line.lua",
+      "sha256": "77DFB871D503838A4733D7E4E7150E3B112144DA42F121E66CFC05B9C904AF85",
+      "bytes": 4576,
+      "compressed_bytes": 1069
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "sha256": "9896BF099CB283CE61AAFFF9EA817C9EB73F35573ED277E01F7AC51412F6483E",
+      "bytes": 15498,
+      "compressed_bytes": 1664
+    },
+    {
+      "path": "prototypes/mir/policy/capabilities.lua",
+      "sha256": "AF410157B3778C65C5014D94D1C8DB137E9E2B1A4ABE413E5B2C4FC9B1C64728",
+      "bytes": 2004,
+      "compressed_bytes": 589
+    },
+    {
+      "path": "prototypes/mir/policy/competing_base_extensions.lua",
+      "sha256": "737B469DA4F13BDC14C914E2A0EA0BFE7DFF6F4C603404C78F3E31AEE88904AB",
+      "bytes": 4027,
+      "compressed_bytes": 1163
+    },
+    {
+      "path": "prototypes/mir/policy/competing_productivity.lua",
+      "sha256": "F5E853A553CEC1A11120A7EBF7E8D9C63CE3094D0397D1F49746CBE0FD2B2594",
+      "bytes": 7154,
+      "compressed_bytes": 1858
+    },
+    {
+      "path": "prototypes/mir/policy/max_level.lua",
+      "sha256": "E0DB553D3C849BDECE0C618630C3C7A08E47856AC8351B53B7BECC4F7FA22605",
+      "bytes": 1005,
+      "compressed_bytes": 418
+    },
+    {
+      "path": "prototypes/mir/policy/native_effect_coverage.lua",
+      "sha256": "94BE9A793A6632E45C37475E48117490BAB309A59B51ED9CCCE2F065818CCBAD",
+      "bytes": 3805,
+      "compressed_bytes": 1036
+    },
+    {
+      "path": "prototypes/mir/policy/owner_policy.lua",
+      "sha256": "373FBE8E99E16167BEAF0158E39A2E7D5D133D217EB275524006D3675895ADAC",
+      "bytes": 2168,
+      "compressed_bytes": 673
+    },
+    {
+      "path": "prototypes/mir/policy/productivity_cap_scope.lua",
+      "sha256": "7E66BD309259A9F0AD2D37E8538224AD986E81EE67278908CC3DE3DD3FB7D687",
+      "bytes": 3697,
+      "compressed_bytes": 1099
+    },
+    {
+      "path": "prototypes/mir/policy/weapon_speed.lua",
+      "sha256": "6C32969F58FE4EED896FFFDD4CF19BA8F62FE855CC5F67EB67B2E7933628E85B",
+      "bytes": 3059,
+      "compressed_bytes": 979
+    },
+    {
+      "path": "prototypes/mir/presentation/icon_builder.lua",
+      "sha256": "E5EC5C6DDF0E3113D6753A09E166BF3FAF0D89B989A4EF5E0EAEA1F7EA7DA9C9",
+      "bytes": 10021,
+      "compressed_bytes": 2142
+    },
+    {
+      "path": "prototypes/mir/providers/builtins.lua",
+      "sha256": "91247E44C0DAE3EF7915ED4E1154C7CB106AEEAFE391128E483563DC3FDD396C",
+      "bytes": 6964,
+      "compressed_bytes": 2142
+    },
+    {
+      "path": "prototypes/mir/providers/contract.lua",
+      "sha256": "36887B283CEF3BD072D4ACC23B53551BB3E265CF792CD4FBE8D467B78841CEF2",
+      "bytes": 5006,
+      "compressed_bytes": 1267
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/budget.lua",
+      "sha256": "EC19366CD511857F5EED0421BCB67864DA40FFBFB56C07ABD83501C5557ED5B4",
+      "bytes": 3862,
+      "compressed_bytes": 1125
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/classification.lua",
+      "sha256": "4150F48DF2D24F4F93B8646A644A222AB7FA3B3807BFEDD8D2A86FD088BF7E1C",
+      "bytes": 1141,
+      "compressed_bytes": 378
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/decision.lua",
+      "sha256": "90E07EAB680A39D8DF02E1D69732595A6436F82529A2BED909ABEDA821EA210F",
+      "bytes": 2439,
+      "compressed_bytes": 796
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/discovery.lua",
+      "sha256": "56F4CC3BF0DF338BD39EAA54D3F1DE4CE11DA8FF1C0EAD4D1152D763957DE3C1",
+      "bytes": 2254,
+      "compressed_bytes": 774
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/hazard_policy.lua",
+      "sha256": "CA88E07C92619F4DAD498E051EA791F91063A94CF03CE32142F86D77B6957773",
+      "bytes": 871,
+      "compressed_bytes": 335
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/normalization.lua",
+      "sha256": "609F4A9374A4BE61B7B67E59A4E4261B08D7A84AA6D24F111A34F55196372B18",
+      "bytes": 538,
+      "compressed_bytes": 254
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/owner_arbitration.lua",
+      "sha256": "D1245FB0F47B4C94B9C3B0F9A954CB8FF8AE0B758778A58C765419C324F4CB1A",
+      "bytes": 506,
+      "compressed_bytes": 232
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/pack_policy.lua",
+      "sha256": "D5723AECDB4F205D007B0B325A8C36DBC26425573AA969055745C63340426633",
+      "bytes": 338,
+      "compressed_bytes": 189
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/provider_claim.lua",
+      "sha256": "6EF54AC93F4EAF0AFABBB9BCE5B0D2744D771704CD3D3E72DD3FF6289BB5E2A8",
+      "bytes": 3130,
+      "compressed_bytes": 976
+    },
+    {
+      "path": "prototypes/mir/providers/provider_metrics.lua",
+      "sha256": "723081DCAFDFAC60D59CFC3B4C115088E6FE9BC6190A798D930350BEAF9579C7",
+      "bytes": 7261,
+      "compressed_bytes": 1944
+    },
+    {
+      "path": "prototypes/mir/providers/registry.lua",
+      "sha256": "77FAF925620E10C03A1D31B0BDAAA492735E8056D11FEE76A155D2852CE28578",
+      "bytes": 797,
+      "compressed_bytes": 298
+    },
+    {
+      "path": "prototypes/mir/report/compatibility_diagnostics.lua",
+      "sha256": "AE727E32B259C5AA64F05F17FE3A1D91D72BA4E52CA19AA354FB5DA14CFAC120",
+      "bytes": 599,
+      "compressed_bytes": 255
+    },
+    {
+      "path": "prototypes/mir/report/compiler_diagnostics.lua",
+      "sha256": "062B246D5A82C9FFB98A11DDD84799C37BC41F086429A6B8B0BF4B00C347C586",
+      "bytes": 6156,
+      "compressed_bytes": 1446
+    },
+    {
+      "path": "prototypes/mir/report/compiler_telemetry.lua",
+      "sha256": "0AE4E6F80423DED9C5073AF05EFCBCAD2423A58FA7CD04EE334A39110B953010",
+      "bytes": 4890,
+      "compressed_bytes": 1403
+    },
+    {
+      "path": "prototypes/mir/report/coverage.lua",
+      "sha256": "2D6B6E00FD6522777E15A66BB4E481D91E4B1550B19968C07080F53C263A4272",
+      "bytes": 10128,
+      "compressed_bytes": 2591
+    },
+    {
+      "path": "prototypes/mir/report/decision_export.lua",
+      "sha256": "124EC9C61546BB3E01E7E4B50D808C29A80C0E7FC3CA28707DEE330389B14BDD",
+      "bytes": 449,
+      "compressed_bytes": 220
+    },
+    {
+      "path": "prototypes/mir/report/diagnostics_sink.lua",
+      "sha256": "3D8688100F86FFBB99E1AFEEFB834A49CEBDED94229AEA4DE58918AD6848415E",
+      "bytes": 12613,
+      "compressed_bytes": 2710
+    },
+    {
+      "path": "prototypes/mir/report/public_compiler_artifacts.lua",
+      "sha256": "839BC36FB377892D5DFDF5B076AABAAE5C620D4A7D5F2E6D5E756A32F1319B00",
+      "bytes": 11028,
+      "compressed_bytes": 2392
+    },
+    {
+      "path": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+      "sha256": "5C87E41DAD5FA476BE1BCE7DED41654DAC02AA873D9DC4800457E89202A6F2C0",
+      "bytes": 3788,
+      "compressed_bytes": 1070
+    },
+    {
+      "path": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+      "sha256": "8973E17244AC389253B8CD06C5BBD694771995949767C95A6313D90B729BDBCC",
+      "bytes": 4440,
+      "compressed_bytes": 1180
+    },
+    {
+      "path": "prototypes/mir/runtime/maximum_level_control.lua",
+      "sha256": "26CDF46CD6728F949A765D23F7C876846662E67E49FA6FA98BB6B498E5226CFE",
+      "bytes": 5298,
+      "compressed_bytes": 1457
+    },
+    {
+      "path": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+      "sha256": "0E2FC69B9338F9A4A1B2ED7DC4495D2EE08F0D02135CF07491BB352222BC1098",
+      "bytes": 1911,
+      "compressed_bytes": 700
+    },
+    {
+      "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "sha256": "15DDCEE63ACB65D52DD7E345DFEA2FC2C92B7266698BF14EC78B003C87AB7C15",
+      "bytes": 4644,
+      "compressed_bytes": 1174
+    },
+    {
+      "path": "prototypes/mir/runtime/scripted_techs.lua",
+      "sha256": "964849B4BCBE567E1165E943C26FED1B82840F160629E4613AE2DFF2F38A6A0F",
+      "bytes": 3161,
+      "compressed_bytes": 803
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_profile.lua",
+      "sha256": "03DFCAC8505D043A3BCC35473F0D31206318AD45CE664104F2ADB0CE9B9FFDB4",
+      "bytes": 5393,
+      "compressed_bytes": 1420
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_resolver.lua",
+      "sha256": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720",
+      "bytes": 1110,
+      "compressed_bytes": 384
+    },
+    {
+      "path": "prototypes/mir/runtime/startup_settings.lua",
+      "sha256": "77B04FB969BD146AA0A67FAE37E649435EC627788CB1BD7FD72967C43D7376A0",
+      "bytes": 966,
+      "compressed_bytes": 321
+    },
+    {
+      "path": "prototypes/mir/runtime/state.lua",
+      "sha256": "72AE3AD63EDF56D4437CECEE68F6D0A62F7ED0F8F63F8C135FA9D55CFDB4D739",
+      "bytes": 367,
+      "compressed_bytes": 168
+    },
+    {
+      "path": "prototypes/mir/settings/automatic_compiler_contract.lua",
+      "sha256": "866D65F28BAB805BD7680CB090DD60E673A7949F7044C59A97C355AEE12C2E98",
+      "bytes": 11173,
+      "compressed_bytes": 2558
+    },
+    {
+      "path": "prototypes/mir/settings/automatic_compiler_policy.lua",
+      "sha256": "2374BF61B35E85C713316DF67A4902448ADF2870006371B92364A4646F14336B",
+      "bytes": 737,
+      "compressed_bytes": 258
+    },
+    {
+      "path": "prototypes/mir/settings/builder.lua",
+      "sha256": "99D6D3C5F4FD9B496CA63F1946B88F4121777612505A7C3FC6DC66D046197846",
+      "bytes": 985,
+      "compressed_bytes": 343
+    },
+    {
+      "path": "prototypes/mir/settings/catalog.lua",
+      "sha256": "A359BECC5A431BB48C9478E998B5097775A0015E84781AE56AF993B6187A094F",
+      "bytes": 20306,
+      "compressed_bytes": 3528
+    },
+    {
+      "path": "prototypes/mir/settings/cost_contract.lua",
+      "sha256": "4FABFED1511D892FD94B81C62A6FBBF2E70C8C95E2E4A1A7C9B0EC4434DFA39B",
+      "bytes": 1510,
+      "compressed_bytes": 447
+    },
+    {
+      "path": "prototypes/mir/settings/defaults.lua",
+      "sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
+      "bytes": 5841,
+      "compressed_bytes": 1005
+    },
+    {
+      "path": "prototypes/mir/settings/effect_contracts.lua",
+      "sha256": "3784AE76B5AAB7E9E331E3D10D50EB475C8ACA6436B602634E0041DE65EA9825",
+      "bytes": 4851,
+      "compressed_bytes": 1371
+    },
+    {
+      "path": "prototypes/mir/settings/effect_scaling.lua",
+      "sha256": "D2AE6861735681905279CF7960FB9579889EBAD356E29A763A6B0F7DFCBE3929",
+      "bytes": 3293,
+      "compressed_bytes": 976
+    },
+    {
+      "path": "prototypes/mir/settings/effective.lua",
+      "sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
+      "bytes": 2965,
+      "compressed_bytes": 867
+    },
+    {
+      "path": "prototypes/mir/settings/order.lua",
+      "sha256": "FDF606A66225876C8E835DAEE4AA3C458DFFA921E7E854A270A85DD93B8833D2",
+      "bytes": 578,
+      "compressed_bytes": 307
+    },
+    {
+      "path": "prototypes/mir/settings/pipeline_extent.lua",
+      "sha256": "996B9F61FC61E9BCA14EB8F2D9AAEC7521CA72F40F369700903F38726204D09C",
+      "bytes": 992,
+      "compressed_bytes": 424
+    },
+    {
+      "path": "prototypes/mir/settings/profile_codec.lua",
+      "sha256": "66A79FDEDD78A59C75B8DA53367BEF7B489B57BBC6732B9BA85AFF194113CAFC",
+      "bytes": 7591,
+      "compressed_bytes": 1975
+    },
+    {
+      "path": "prototypes/mir/settings/prototype_limits.lua",
+      "sha256": "80C7BA32FC1B09E4ECB6135C2C0200E836F4F3BC71013C510514FA6590A6A97C",
+      "bytes": 7358,
+      "compressed_bytes": 1483
+    },
+    {
+      "path": "prototypes/mir/settings/registry.lua",
+      "sha256": "ACD34FD2E41B524514B75E0BA0B97948766D5708BDF8B86B1ED553843033C442",
+      "bytes": 3214,
+      "compressed_bytes": 682
+    },
+    {
+      "path": "prototypes/mir/settings/resolver.lua",
+      "sha256": "FE00D102D84029F498829E983F5D0E7D1A756CFFD875FBD5E6FF3662FFD13438",
+      "bytes": 1358,
+      "compressed_bytes": 400
+    },
+    {
+      "path": "prototypes/mir/settings/stage_adapter.lua",
+      "sha256": "FB570C413F6C1126301F3D1BF28F72791964C9F238A013EA5FD7E3A8FE431332",
+      "bytes": 574,
+      "compressed_bytes": 230
+    },
+    {
+      "path": "prototypes/mir/settings/stage_builder.lua",
+      "sha256": "EFA724F34AC025E824781B429D1D11B803AEBA5066673FFDEE2AE9F86D15236D",
+      "bytes": 9476,
+      "compressed_bytes": 1840
+    },
+    {
+      "path": "prototypes/mir/settings/test_overrides.lua",
+      "sha256": "D7EDE19F45211E0188E5DA14FC3DF1E558A830D382A08F868EAB533C43C47BE3",
+      "bytes": 165,
+      "compressed_bytes": 124
+    },
+    {
+      "path": "prototypes/mir/settings/visibility.lua",
+      "sha256": "CABC78A56A8C610795518B4E6E01C9F8E362937C1A1CDE3FF01F99E9254BE31D",
+      "bytes": 1522,
+      "compressed_bytes": 421
+    },
+    {
+      "path": "prototypes/mir/stage/control.lua",
+      "sha256": "F672C7C05F7AE0F916A08FF501DB841A2BB513B9358852BA641C9BB7DC04C0F3",
+      "bytes": 752,
+      "compressed_bytes": 322
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes_steps.lua",
+      "sha256": "97C3F63AEF2A44370CBA343A0B50BF703D00838F34595D4E35F15EFACB61658B",
+      "bytes": 1837,
+      "compressed_bytes": 480
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes.lua",
+      "sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998",
+      "bytes": 152,
+      "compressed_bytes": 118
+    },
+    {
+      "path": "prototypes/mir/stage/data_updates.lua",
+      "sha256": "7559F1B446DEDD3D04DF317564B83DA99EE49414270EC114CB23E9A359278631",
+      "bytes": 135,
+      "compressed_bytes": 111
+    },
+    {
+      "path": "prototypes/mir/stage/data.lua",
+      "sha256": "20F0511C6BAF2A88B227CC27FF88422543F30523208E3965776E5635109852BE",
+      "bytes": 90,
+      "compressed_bytes": 83
+    },
+    {
+      "path": "prototypes/mir/stage/settings.lua",
+      "sha256": "A4DE49CBC27F8B92ACC451771BFD724105D44D698F7EB2C4CEDEF05AC37DA7D9",
+      "bytes": 96,
+      "compressed_bytes": 88
+    },
+    {
+      "path": "prototypes/mir/streams/generated_continuation_manifest.json",
+      "sha256": "657A4C0E8E252AA759069FC7FD0CB69DB7B8BAC209D6752F719B3D7E099E6C48",
+      "bytes": 1994,
+      "compressed_bytes": 384
+    },
+    {
+      "path": "prototypes/mir/streams/generated_stream_manifest.json",
+      "sha256": "C39F12EC0177882B7574FFCED76D9F35C41E672BB0656532BD3A128E31625130",
+      "bytes": 39914,
+      "compressed_bytes": 2760
+    },
+    {
+      "path": "prototypes/mir/streams/registry.lua",
+      "sha256": "98F9398FA7F1AE290868D424740007AE6DB73BA8539563950A0A04401555891E",
+      "bytes": 1274,
+      "compressed_bytes": 562
+    },
+    {
+      "path": "prototypes/streams/direct-effects.lua",
+      "sha256": "5A333CB8F4D2DB9957D6C2A9B19EF4BDB84BCBF4321435B6418823073975BBC1",
+      "bytes": 10403,
+      "compressed_bytes": 1847
+    },
+    {
+      "path": "prototypes/streams/init.lua",
+      "sha256": "266DADD09558858F91BD876AB2D5BE8EF7251B090F56639144A786C6BC7D6351",
+      "bytes": 280,
+      "compressed_bytes": 138
+    },
+    {
+      "path": "prototypes/streams/productivity.lua",
+      "sha256": "3F53C3C408BE8D1425E9C3AC44BBF6D5240556B2CED4AD8B4A2CCD382A6196EB",
+      "bytes": 25894,
+      "compressed_bytes": 4776
+    },
+    {
+      "path": "README.md",
+      "sha256": "DC40ED1CF1E6F1F5298EFCF7CE680AC271986DB4721A3B7D170F4316F8D9C725",
+      "bytes": 75407,
+      "compressed_bytes": 22387
+    },
+    {
+      "path": "settings.lua",
+      "sha256": "1C7B5AC2024532390BC77E655325CAC7680D05EA553B842FDB3E45AF3518F59E",
+      "bytes": 47,
+      "compressed_bytes": 49
+    },
+    {
+      "path": "thumbnail.png",
+      "sha256": "65FDEC0B0B30967B0EDBC3B340D87B01D6A2E6D971A731734673023C02331FAB",
+      "bytes": 90975,
+      "compressed_bytes": 90958
+    }
+  ],
+  "record_sha256": "0A952B6517935E23298B13F148E7156BB40AB62CE760C8F055D3D941733372EF"
+}

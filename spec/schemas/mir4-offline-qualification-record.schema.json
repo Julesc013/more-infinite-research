@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.example/schemas/mir4-offline-qualification-record.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-offline-qualification-record.schema.json",
+  "title": "MIR4OfflineQualificationRecordV1",
+  "type": "object",
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "qualification_scope",
+    "publication_authority",
+    "candidate_manifest",
+    "candidate_plan",
+    "exact_engine_evidence",
+    "candidate",
+    "engine",
+    "proof_root_sha256",
+    "status",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4OfflineQualificationRecordV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "qualification_scope": {"const": "local-offline-proof-only"},
+    "publication_authority": {"const": false},
+    "candidate_manifest": {"$ref": "#/$defs/candidateManifestBinding"},
+    "candidate_plan": {"$ref": "#/$defs/candidatePlanBinding"},
+    "exact_engine_evidence": {"$ref": "#/$defs/exactEngineEvidenceBinding"},
+    "candidate": {
+      "$ref": "#/$defs/candidate"
+    },
+    "engine": {
+      "type": "object",
+      "required": ["version", "executable_sha256", "network_denied"],
+      "properties": {
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+(?:\\.[0-9]+(?:\\.[0-9]+)?)?(?:-only)?$"},
+        "executable_sha256": {"$ref": "#/$defs/sha256"},
+        "network_denied": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "proof_root_sha256": {"$ref": "#/$defs/sha256"},
+    "status": {"enum": ["passed", "failed", "blocked"]},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{64}$"
+    },
+    "candidateManifestBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "candidate-manifest"},
+        "kind": {"const": "MIR4BootstrapLocalCandidateManifestV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "candidatePlanBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "candidate-plan"},
+        "kind": {"const": "MIR4BootstrapLocalCandidatePlanV2"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "exactEngineEvidenceBinding": {
+      "type": "object",
+      "required": ["role", "kind", "record_sha256", "file_sha256"],
+      "properties": {
+        "role": {"const": "exact-engine-evidence"},
+        "kind": {"const": "MIR4ExactEngineQualificationEvidenceBundleV1"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["candidate_id", "target_id", "distribution_version", "archive_name", "archive_sha256", "bytes"],
+      "properties": {
+        "candidate_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "target_id": {"enum": ["factorio-2.1", "factorio-2.0", "factorio-1.1", "factorio-1.0"]},
+        "distribution_version": {"type": "string", "pattern": "^4\\.[0-9]+\\.[0-9]{5}$"},
+        "archive_name": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*\\.zip$"},
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1, "maximum": 9007199254740991}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

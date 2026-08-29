@@ -163,6 +163,72 @@
       "tags": []
     },
     {
+      "pattern": "tools/lib/mir4/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/validation/MIR4DistributionIdentity.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4R0Identity.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4BootstrapMaterialization.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/evidence/mir4-r0/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "spec/schemas/mir4-*.schema.json",
       "groups": [],
       "scenarios": [],
@@ -170,6 +236,12 @@
     },
     {
       "pattern": "spec/schemas/mir3-dot9-mod-portal-custody-observation.schema.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -300,6 +372,18 @@
     {
       "pattern": "fixtures/**",
       "groups": ["local-mod-library"]
+    },
+    {
+      "pattern": "spec/api/mir4-v0/**",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "sdk/experimental/mir4/**",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "tools/lib/mir4/ExperimentalApiSdk.ps1",
+      "tags": ["smoke"]
     },
     {
       "pattern": "scripts/Invoke-MIRValidation.ps1",

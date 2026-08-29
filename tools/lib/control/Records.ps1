@@ -167,6 +167,159 @@ function Get-MIRCPCommitPackageSourceHash {
   }
 }
 
+function Get-MIRCPGitOutputIdentity {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string[]]$Arguments
+  )
+
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = "git"
+  $startInfo.WorkingDirectory = $RepoRoot
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  $startInfo.UseShellExecute = $false
+  foreach ($argument in $Arguments) { [void]$startInfo.ArgumentList.Add($argument) }
+
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  [void]$process.Start()
+  $bytes = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $errorText = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "Git command failed: $errorText" }
+    $material = $bytes.ToArray()
+    $sha = [Security.Cryptography.SHA256]::Create()
+    try {
+      $hash = [BitConverter]::ToString($sha.ComputeHash($material)).Replace("-", "")
+    } finally {
+      $sha.Dispose()
+    }
+    return [pscustomobject][ordered]@{sha256=$hash;bytes=[long]$material.Length}
+  } finally {
+    $bytes.Dispose()
+    $process.Dispose()
+  }
+}
+
+function Get-MIRCPGitBlobIdentity {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Blob
+  )
+
+  if ($Blob -cnotmatch '^[a-f0-9]{40}$') { throw "Invalid Git blob identity: $Blob" }
+  return Get-MIRCPGitOutputIdentity -RepoRoot $RepoRoot -Arguments @("cat-file", "blob", $Blob)
+}
+
+function Test-MIRCPApprovedBootstrapCorrection {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Lock,
+    [Parameter(Mandatory)][string]$ObservedPackageSourceSha256
+  )
+
+  $recordPath = Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json"
+  if (-not (Test-Path -LiteralPath $recordPath -PathType Leaf)) { return $false }
+  . (Join-Path $RepoRoot "tools\lib\mir4\BootstrapMaterialization.ps1")
+  $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
+  if (-not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      [int]$record.schema -ne 2 -or
+      [string]$record.kind -cne "MIR4ApprovedBootstrapCorrectionDeltaV2" -or
+      [string]$record.authority_family -cne "MIRApprovedDeltaV1" -or
+      [string]$record.status -cne "approved-local-bootstrap-correction-composite-only" -or
+      (@($record.findings) -join "|") -cne "MIR3-TERM-0033|MIR3-TERM-0032" -or
+      [string]$record.target_key -cne "f210" -or
+      [bool]$record.public_output_authorized -or
+      [bool]$record.authority_scope.release_admission_authorized -or
+      [bool]$record.authority_scope.signing_or_sealing_authorized -or
+      [bool]$record.authority_scope.publication_authorized -or
+      [bool]$record.authority_scope.transitive_target_inheritance_authorized) {
+    return $false
+  }
+  $imports = @($record.imports)
+  if ($imports.Count -ne 1 -or
+      [string]$imports[0].path -cne ".mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json") {
+    return $false
+  }
+  $importPath = Join-Path $RepoRoot ([string]$imports[0].path)
+  if (-not (Test-Path -LiteralPath $importPath -PathType Leaf) -or
+      (Get-MIR4BootstrapTextSha256 -Path $importPath) -cne [string]$imports[0].text_sha256) {
+    return $false
+  }
+  $importRecord = Get-Content -Raw -LiteralPath $importPath | ConvertFrom-Json
+  if (-not (Test-MIR4BootstrapRecordHash -Record $importRecord) -or
+      [string]$importRecord.record_sha256 -cne [string]$imports[0].record_sha256) {
+    return $false
+  }
+  if ([string]$record.predecessor.release -cne [string]$Lock.release -or
+      [string]$record.predecessor.archive_sha256 -cne [string]$Lock.archive_sha256 -or
+      [string]$record.predecessor.content_sha256 -cne [string]$Lock.package_source_sha256 -or
+      [string]$record.base_source.commit -cne [string]$Lock.package_source_commit -or
+      [string]$record.base_source.tree -cne [string]$Lock.package_source_tree -or
+      [string]$record.correction_commit -cne [string]$record.integration_source.commit -or
+      @($record.deltas).Count -ne 4) {
+    return $false
+  }
+
+  $integrationTree = @(& git -C $RepoRoot rev-parse "$([string]$record.integration_source.commit)^{tree}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $integrationTree.Count -ne 1 -or
+      [string]$integrationTree[0] -cne [string]$record.integration_source.tree) {
+    return $false
+  }
+
+  $roots = @(Get-MIRPackageSourceRoots)
+  $expected = @($record.deltas.path | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $integrationChanged = @(& git -C $RepoRoot diff --name-only ([string]$Lock.package_source_commit) ([string]$record.integration_source.commit) -- @roots)
+  if ($LASTEXITCODE -ne 0) { return $false }
+  $integrationChanged = @($integrationChanged | ForEach-Object { ([string]$_).Replace('\', '/') } | Sort-Object -Unique)
+  $currentChanged = @(& git -C $RepoRoot diff --name-only ([string]$Lock.package_source_commit) -- @roots)
+  if ($LASTEXITCODE -ne 0) { return $false }
+  $currentChanged = @($currentChanged | ForEach-Object { ([string]$_).Replace('\', '/') } | Sort-Object -Unique)
+  if ($expected.Count -ne 4 -or
+      ($integrationChanged -join '|') -cne ($expected -join '|') -or
+      ($currentChanged -join '|') -cne ($expected -join '|')) {
+    return $false
+  }
+
+  $patchArguments = @(
+    "diff", "--no-ext-diff", "--no-color", "--full-index",
+    [string]$Lock.package_source_commit, [string]$record.integration_source.commit, "--"
+  ) + @($record.deltas.path | ForEach-Object { [string]$_ })
+  $patchIdentity = Get-MIRCPGitOutputIdentity -RepoRoot $RepoRoot -Arguments $patchArguments
+  if ([string]$patchIdentity.sha256 -cne [string]$record.canonical_patch.sha256 -or
+      [long]$patchIdentity.bytes -ne [long]$record.canonical_patch.bytes) {
+    return $false
+  }
+
+  foreach ($delta in @($record.deltas)) {
+    $path = [string]$delta.path
+    $currentPath = Join-Path $RepoRoot $path
+    $beforeBlob = @(& git -C $RepoRoot rev-parse "$([string]$Lock.package_source_commit):$path" 2>$null)
+    $integrationBlob = @(& git -C $RepoRoot rev-parse "$([string]$record.integration_source.commit):$path" 2>$null)
+    $afterBlob = @(& git -C $RepoRoot hash-object -- $currentPath 2>$null)
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $currentPath -PathType Leaf) -or
+        $beforeBlob.Count -ne 1 -or $integrationBlob.Count -ne 1 -or $afterBlob.Count -ne 1 -or
+        [string]$beforeBlob[0] -cne [string]$delta.before_blob -or
+        [string]$integrationBlob[0] -cne [string]$delta.after_blob -or
+        [string]$afterBlob[0] -cne [string]$delta.after_blob) {
+      return $false
+    }
+    $beforeIdentity = Get-MIRCPGitBlobIdentity -RepoRoot $RepoRoot -Blob ([string]$delta.before_blob)
+    $afterIdentity = Get-MIRCPGitBlobIdentity -RepoRoot $RepoRoot -Blob ([string]$delta.after_blob)
+    if ([string]$beforeIdentity.sha256 -cne [string]$delta.before_sha256 -or
+        [long]$beforeIdentity.bytes -ne [long]$delta.before_bytes -or
+        [string]$afterIdentity.sha256 -cne [string]$delta.after_sha256 -or
+        [long]$afterIdentity.bytes -ne [long]$delta.after_bytes) {
+      return $false
+    }
+  }
+
+  return -not [string]::IsNullOrWhiteSpace($ObservedPackageSourceSha256)
+}
+
 function Assert-MIRCPPackageFreeze {
   param(
     [string]$RepoRoot = "",
@@ -196,7 +349,9 @@ function Assert-MIRCPPackageFreeze {
   }
   $currentHash = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   if ($currentHash -ne [string]$active[0].package_source_sha256) {
-    throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
+    if (-not (Test-MIRCPApprovedBootstrapCorrection -RepoRoot $repo -Lock $active[0] -ObservedPackageSourceSha256 $currentHash)) {
+      throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
+    }
   }
   $archivePath = Join-Path $repo ([string]$active[0].archive)
   if (Test-Path -LiteralPath $archivePath -PathType Leaf) {

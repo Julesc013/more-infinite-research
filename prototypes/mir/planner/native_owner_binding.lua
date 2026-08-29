@@ -124,6 +124,9 @@ local function build_plan(key, spec, owner, binding, buckets)
   local expected = deepcopy(input)
   local configured = {}
   local planned_max_level = max_level.value <= 0 and "infinite" or math.floor(max_level.value)
+  local prototype_max_level = target_line.feature_enabled("scripted_techs")
+    and "infinite"
+    or planned_max_level
 
   if configured_cost.changed then
     expected.unit.count = configured_cost.count
@@ -135,12 +138,7 @@ local function build_plan(key, spec, owner, binding, buckets)
     configured.research_time = true
   end
   if max_level.changed then
-    -- A finite prototype max_level causes Factorio to clamp already-completed
-    -- force research during configuration changes, before control-stage
-    -- recovery can run. Keep the eligible infinite owner structurally
-    -- infinite and carry the selected absolute cap into the runtime policy.
-    expected.max_level = (target_line.feature_enabled("scripted_techs") and target_line.mod_data_supported())
-      and "infinite" or planned_max_level
+    expected.max_level = prototype_max_level
     configured.max_level = true
   end
 

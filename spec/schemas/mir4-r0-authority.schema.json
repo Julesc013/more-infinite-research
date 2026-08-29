@@ -35,7 +35,8 @@
         "MIR4-Equivalence-PolicyV1",
         "MIR4-Emergency-LaneV1",
         "MIR4-Offline-Release-AuthorityV1",
-        "MIR3-to-MIR4-Governance-ReconciliationV1"
+        "MIR3-to-MIR4-Governance-ReconciliationV1",
+        "MIR4-Terminal-Predecessor-RefreshV1"
       ]
     },
     "status": {"type": "string", "minLength": 1},

@@ -1,11 +1,11 @@
 ---
 title: "Current Development Candidate"
 status: current
-applies_to: "3.2.10"
+applies_to: "3.2.11"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-16
+last_reviewed: 2026-08-18
 supersedes: []
 superseded_by: []
 ---
@@ -16,28 +16,31 @@ superseded_by: []
 
 | Field | Authority |
 | --- | --- |
-| MIR version | `3.2.10` |
-| Candidate identity | `C34` |
+| MIR version | `3.2.11` |
+| Candidate identity | `C35` |
 | Candidate namespace | `C` |
-| Predecessor maximum ordinal | `33` |
-| Minimum next ordinal | `34` |
-| Assignment condition | `emergency-fixed-point-and-source-freeze-satisfied` |
+| Predecessor maximum ordinal | `34` |
+| Minimum next ordinal | `35` |
+| Assignment condition | `exact-source-freeze-and-three-build-reconstruction-satisfied` |
 | Target | `2.1` |
 | Branch | `main` |
-| State | `publicly-verified` |
-| Package source commit | `19ddb7db4c960f77aef53d2bb47d23e0f311918f` |
-| Package source tree | `46eb4cd0c48a1d997a632a3ff83606d19d9af19a` |
-| Package source SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
-| Archive | `dist/more-infinite-research_3.2.10.zip` |
-| Archive bytes | `1065178` |
-| Archive entries | `304` |
-| Archive SHA-256 | `5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7` |
-| Package content SHA-256 | `B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9` |
+| State | `sealed` |
+| Package source commit | `0a32864d1f1d1fdea090369bc1a22fbd511e290a` |
+| Package source tree | `b6102e8ed616955fc335d784a98357b62111322a` |
+| Package source SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
+| Archive | `dist/more-infinite-research_3.2.11.zip` |
+| Archive bytes | `1067720` |
+| Archive entries | `305` |
+| Archive SHA-256 | `5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A` |
+| Package content SHA-256 | `FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89` |
 
 ## Remaining state transitions
 
-None.
+- [ ] `promoted`
+- [ ] `tagged`
+- [ ] `published`
+- [ ] `publicly-verified`
 
 ## Assurance exceptions
 
-- `MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1`:  Disposition: `pending`.
+None.
