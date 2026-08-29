@@ -100,6 +100,14 @@ function Get-MIR4FinalMilePlaytestCandidateAuthorityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  $externalEvidenceMode = [string]$env:MIR4_EXTERNAL_EVIDENCE_MODE
+  $hostedReceiptOnly = $externalEvidenceMode -ceq 'hosted-receipt'
+  if (-not [string]::IsNullOrWhiteSpace($externalEvidenceMode) -and -not $hostedReceiptOnly) {
+    throw '[mir4-final-mile-playtest-external-evidence-mode]'
+  }
+  if ($hostedReceiptOnly -and [string]$env:GITHUB_ACTIONS -cne 'true') {
+    throw '[mir4-final-mile-playtest-hosted-receipt-context]'
+  }
   $path = Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthorityRelativePath
   $schema = Join-Path $repo $script:MIR4FinalMilePlaytestCandidateAuthoritySchemaRelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or -not (Test-Path -LiteralPath $schema -PathType Leaf)) {
@@ -119,12 +127,28 @@ function Get-MIR4FinalMilePlaytestCandidateAuthorityV1 {
   if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne [string]$authority.source_baseline.package_source_sha256) {
     throw '[mir4-final-mile-playtest-authority-package-source]'
   }
-  foreach ($descriptor in @($authority.authorization) + @($authority.targets | ForEach-Object { $_.candidate_manifest; $_.assurance })) {
-    $descriptorPath = Join-Path $repo ([string]$descriptor.path)
-    if (-not (Test-Path -LiteralPath $descriptorPath -PathType Leaf) -or
-        (Get-MIR4PreFreezeFileSha256 $descriptorPath) -cne [string]$descriptor.sha256 -or
-        [long](Get-Item -LiteralPath $descriptorPath).Length -ne [long]$descriptor.bytes) {
-      throw "[mir4-final-mile-playtest-authority-descriptor] $($descriptor.path)"
+  $authorizationDescriptorPath = Join-Path $repo ([string]$authority.authorization.path)
+  if (-not (Test-Path -LiteralPath $authorizationDescriptorPath -PathType Leaf) -or
+      (Get-MIR4PreFreezeFileSha256 $authorizationDescriptorPath) -cne [string]$authority.authorization.sha256 -or
+      [long](Get-Item -LiteralPath $authorizationDescriptorPath).Length -ne [long]$authority.authorization.bytes) {
+    throw "[mir4-final-mile-playtest-authority-descriptor] $($authority.authorization.path)"
+  }
+  foreach ($descriptor in @($authority.targets | ForEach-Object { $_.candidate_manifest; $_.assurance })) {
+    $relative = ([string]$descriptor.path).Replace('\', '/')
+    $allowedPrivateRoot = $relative.StartsWith('build/mir4/', [StringComparison]::Ordinal) -or
+      $relative.StartsWith('build/results/assurance/', [StringComparison]::Ordinal)
+    if ([IO.Path]::IsPathRooted([string]$descriptor.path) -or $relative -match '(^|/)\.\.(/|$)' -or
+        -not $allowedPrivateRoot -or [string]$descriptor.sha256 -cnotmatch '^[A-F0-9]{64}$' -or
+        [long]$descriptor.bytes -le 0) {
+      throw "[mir4-final-mile-playtest-authority-external-descriptor] $($descriptor.path)"
+    }
+    if (-not $hostedReceiptOnly) {
+      $descriptorPath = Join-Path $repo ([string]$descriptor.path)
+      if (-not (Test-Path -LiteralPath $descriptorPath -PathType Leaf) -or
+          (Get-MIR4PreFreezeFileSha256 $descriptorPath) -cne [string]$descriptor.sha256 -or
+          [long](Get-Item -LiteralPath $descriptorPath).Length -ne [long]$descriptor.bytes) {
+        throw "[mir4-final-mile-playtest-authority-descriptor] $($descriptor.path)"
+      }
     }
   }
   if ([string]$authority.authorization.path -cne $script:MIR4MaintainerFinalGitHubReleaseAuthorizationRelativePath) {
@@ -144,21 +168,28 @@ function Get-MIR4FinalMilePlaytestCandidateAuthorityV1 {
     }
   }
   foreach ($target in @($authority.targets)) {
-    $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.candidate_manifest.path)) | ConvertFrom-Json -Depth 100
-    $assurance = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.assurance.path)) | ConvertFrom-Json -Depth 100
     $decision = @($authorization.playtest_decisions | Where-Object { [string]$_.target -ceq [string]$target.target })
     $expectedAssuranceTarget = if ([string]$target.target -ceq 'F210') { '2.1' } else { '2.0' }
-    if ([string]$manifest.local_distribution.archive_sha256 -cne [string]$target.development_package.sha256 -or
-        [string]$manifest.local_distribution.content_sha256 -cne [string]$target.development_package.content_sha256 -or
-        [long]$manifest.local_distribution.bytes -ne [long]$target.development_package.bytes -or
-        [int]$manifest.local_distribution.entry_count -ne [int]$target.development_package.entry_count -or
-        [string]$assurance.status -cne 'passed' -or [int]$assurance.counts.expected -ne [int]$target.assurance.expected -or
-        [int]$assurance.counts.failed -ne 0 -or [int]$assurance.counts.incomplete -ne 0 -or
-        [string]$assurance.plan.target -cne $expectedAssuranceTarget -or
-        [string]$assurance.plan.package_source_sha256 -cne [string]$authority.source_baseline.package_source_sha256 -or
-        [string]$assurance.plan.domain_manifest.artifact.sha256 -cne [string]$target.development_package.sha256 -or
-        [string]$assurance.plan.domain_manifest.artifact.content_sha256 -cne [string]$target.development_package.content_sha256 -or
-        $decision.Count -ne 1 -or [string]$decision[0].distribution -cne [string]$target.distribution_version -or
+    if ($hostedReceiptOnly) {
+      $externalEvidenceCurrent = [string]$target.assurance.status -ceq 'passed' -and
+        [int]$target.assurance.expected -gt 0 -and [int]$target.assurance.failed -eq 0 -and
+        [int]$target.assurance.incomplete -eq 0
+    } else {
+      $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.candidate_manifest.path)) | ConvertFrom-Json -Depth 100
+      $assurance = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$target.assurance.path)) | ConvertFrom-Json -Depth 100
+      $externalEvidenceCurrent = [string]$manifest.local_distribution.archive_sha256 -ceq [string]$target.development_package.sha256 -and
+        [string]$manifest.local_distribution.content_sha256 -ceq [string]$target.development_package.content_sha256 -and
+        [long]$manifest.local_distribution.bytes -eq [long]$target.development_package.bytes -and
+        [int]$manifest.local_distribution.entry_count -eq [int]$target.development_package.entry_count -and
+        [string]$assurance.status -ceq 'passed' -and [int]$assurance.counts.expected -eq [int]$target.assurance.expected -and
+        [int]$assurance.counts.failed -eq 0 -and [int]$assurance.counts.incomplete -eq 0 -and
+        [string]$assurance.plan.target -ceq $expectedAssuranceTarget -and
+        [string]$assurance.plan.package_source_sha256 -ceq [string]$authority.source_baseline.package_source_sha256 -and
+        [string]$assurance.plan.domain_manifest.artifact.sha256 -ceq [string]$target.development_package.sha256 -and
+        [string]$assurance.plan.domain_manifest.artifact.content_sha256 -ceq [string]$target.development_package.content_sha256
+    }
+    if (-not $externalEvidenceCurrent -or $decision.Count -ne 1 -or
+        [string]$decision[0].distribution -cne [string]$target.distribution_version -or
         [string]$decision[0].candidate_zip_sha256 -cne [string]$target.development_package.sha256 -or
         [string]$decision[0].content_root -cne [string]$target.development_package.content_sha256 -or
         [string]$decision[0].engine.version -cne [string]$target.engine.version -or

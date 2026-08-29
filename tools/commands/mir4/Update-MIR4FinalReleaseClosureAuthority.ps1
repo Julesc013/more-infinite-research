@@ -63,6 +63,11 @@ $roles = [ordered]@{
   'docs/reference/generated/documentation-owner-dashboard.md' = 'final-release-closure-documentation-owner-dashboard'
   'docs/reference/generated/documentation-reference-matrix.md' = 'final-release-closure-documentation-reference-matrix'
   'docs/reference/generated/documentation-review-age.md' = 'final-release-closure-documentation-review-age'
+  'mir.lock' = 'final-release-closure-platform-input-lock'
+  'sdk/preview/mir4/reference/compilation-runs.json' = 'final-release-closure-compilation-run-projection'
+  'sdk/preview/mir4/reference/inspection-bundle-v1.json' = 'final-release-closure-inspection-bundle-projection'
+  'sdk/preview/mir4/reference/inspector-workbench-result-v1.json' = 'final-release-closure-inspector-workbench-projection'
+  'sdk/preview/mir4/reference/query-snapshot-f210.json' = 'final-release-closure-query-snapshot-projection'
   'tools/lib/mir4/PreFreezeRelease.ps1' = 'exact-final-mile-playtest-authority-controller'
   'validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1' = 'exact-final-mile-playtest-authority-functional-test'
   'validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1' = 'final-release-closure-authority-chain-validator'
@@ -88,7 +93,7 @@ foreach ($entry in $roles.GetEnumerator()) {
     if ($actual -cne $previous) {
       $evolved.Add([ordered]@{
         path=$path;previous_sha256=$previous;current_sha256=$actual
-        reason='Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation projections, and preserve all human and production transition gates.'
+        reason='Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.'
         scope='package-excluded-control-plane';package_visible=$false;release_authority=$false
       })
     }
