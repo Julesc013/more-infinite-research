@@ -6,6 +6,11 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1')
 
+# Test fixtures own their event topology. An enclosing GitHub workflow event is
+# not promotion input for the baseline, tamper, or compensation cases below.
+$outerEventName=$env:GITHUB_EVENT_NAME;$outerEventPath=$env:GITHUB_EVENT_PATH;$outerRef=$env:GITHUB_REF;$outerSha=$env:GITHUB_SHA
+$env:GITHUB_EVENT_NAME=$null;$env:GITHUB_EVENT_PATH=$null;$env:GITHUB_REF=$null;$env:GITHUB_SHA=$null
+
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $developmentPlanPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $developmentPlan=Get-Content -Raw -LiteralPath (Join-Path $repo $developmentPlanPath)|ConvertFrom-Json -Depth 100
@@ -177,4 +182,5 @@ $publisherWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workf
 if($publisherWorkflow-match'actions/checkout|Build-MIRPackage|New-MIR4BootstrapLocalCandidate|mir4\s+platform\s+package'-or
    $publisherWorkflow-notmatch'publisher-forbidden-capability'){throw '[mir4-t05-publisher-has-builder]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-t05-package-mutation]'}
+$env:GITHUB_EVENT_NAME=$outerEventName;$env:GITHUB_EVENT_PATH=$outerEventPath;$env:GITHUB_REF=$outerRef;$env:GITHUB_SHA=$outerSha
 Write-Host '[ok] MIR 4 T05 unsigned seal assembly, fast-forward promotion plan, builder-free publication reconciliation, exact readback, clean restore, tamper rejection, and compensation passed.'
