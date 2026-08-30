@@ -1,11 +1,11 @@
 ---
 title: "MIR 4 Post-4.0 Roadmap"
-status: draft
+status: current
 applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-30
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -42,17 +42,17 @@ For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4
 
 ## Dependency-ordered work
 
-The active fixed point is deliberately smaller than the full report.
+The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, and branch-authority foundation closed on 2026-08-31; change-fragment and release-rendering work is next.
 
 | Work package | Outcome | State after this change |
 | --- | --- | --- |
 | M40-00 | Preserve exact 4.0.0 refs, assets, remote controls, and offline restore closure | Complete |
 | M40-01 | Operate the protected `release/4.0` maintenance lane | Active |
-| M41-00 | Adopt operating, deployment, patch, and proof-applicability contracts | Active; closes on merge and readback |
-| M41-01 | Repair pull-request proof selection for event base, trust class, and synthetic merge topology | Active; closes on CI proof and merge |
-| M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Next |
-| M41-03 | Introduce change fragments and generate every release narrative | Queued after M41-01 |
-| M41-04 | Make `main` the sole integration authority while keeping `dev` exactly mirrored during transition | Queued after M41-02 |
+| M41-00 | Adopt operating, deployment, patch, and proof-applicability contracts | Complete |
+| M41-01 | Repair pull-request proof selection for event base, trust class, and synthetic merge topology | Complete |
+| M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Complete |
+| M41-03 | Introduce change fragments and generate every release narrative | Next |
+| M41-04 | Make `main` the sole integration authority while keeping `dev` exactly mirrored during transition | Complete while `dev` is retained |
 | M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
 | M42-00 | Characterize the package boundary and generate each target independently | Blocked on the complete 4.1 fixed point |
 | M42-01 | Converge PowerShell behind one supported CLI and one release engine | Blocked on M42-00 |
