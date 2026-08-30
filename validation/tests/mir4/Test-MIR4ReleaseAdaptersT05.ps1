@@ -6,6 +6,11 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1')
 
+# Test fixtures own their event topology. An enclosing GitHub workflow event is
+# not promotion input for the baseline, tamper, or compensation cases below.
+$outerEventName=$env:GITHUB_EVENT_NAME;$outerEventPath=$env:GITHUB_EVENT_PATH;$outerRef=$env:GITHUB_REF;$outerSha=$env:GITHUB_SHA
+$env:GITHUB_EVENT_NAME=$null;$env:GITHUB_EVENT_PATH=$null;$env:GITHUB_REF=$null;$env:GITHUB_SHA=$null
+
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $developmentPlanPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $developmentPlan=Get-Content -Raw -LiteralPath (Join-Path $repo $developmentPlanPath)|ConvertFrom-Json -Depth 100
@@ -39,6 +44,29 @@ $schemas=@(
   'spec/schemas/mir4-release-restore-drill-result-v1.schema.json'
 )
 foreach($schema in $schemas){Get-Content -Raw -LiteralPath (Join-Path $repo $schema)|ConvertFrom-Json -Depth 100|Out-Null}
+$contractPairs=[ordered]@{
+  'spec/distribution/mir4-deployment-contract-v1.json'='spec/schemas/mir4-deployment-contract-v1.schema.json'
+  'spec/releases/mir4-patch-policy-v1.json'='spec/schemas/mir4-patch-policy-v1.schema.json'
+  'spec/assurance/mir4-proof-applicability-v1.json'='spec/schemas/mir4-proof-applicability-v1.schema.json'
+  'spec/programmes/mir4-4x-operating-programme-v1.json'='spec/schemas/mir4-4x-operating-programme-v1.schema.json'
+}
+foreach($pair in $contractPairs.GetEnumerator()){
+  $raw=Get-Content -Raw -LiteralPath (Join-Path $repo $pair.Key)
+  if(-not($raw|Test-Json -SchemaFile (Join-Path $repo $pair.Value))){throw "[mir4-t05-post-release-contract] $($pair.Key)"}
+}
+$assurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json -Depth 100
+$postReleaseProfile=@($assurance.profiles.'mir4-post-release')
+$expectedPostReleaseProfile=@('docs.check','tooling.self-test','static.package','static.branch-policy','static.mir4-release-adapters-t05')
+if(($postReleaseProfile-join'|')-cne($expectedPostReleaseProfile-join'|')){throw '[mir4-t05-post-release-profile]'}
+$validateWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/validate.yml')
+if(-not$validateWorkflow.Contains("'mir4-post-release'")-or-not$validateWorkflow.Contains('spec/programmes/mir4-4x-operating-programme-v1.json')){throw '[mir4-t05-post-release-workflow]'}
+$applicability=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/assurance/mir4-proof-applicability-v1.json')|ConvertFrom-Json -Depth 100
+$prApplicability=@($applicability.propositions|Where-Object{[string]$_.id-ceq'promotion-plan-pr-simulation'})
+if($prApplicability.Count-ne1-or[bool]$prApplicability[0].production_authority-or
+   'pull_request'-notin@($prApplicability[0].valid_events)-or'untrusted-pull-request'-notin@($prApplicability[0].trust_classes)-or
+   'synthetic-merge-ref'-notin@($prApplicability[0].ref_topologies)-or'simulation'-notin@($prApplicability[0].evidence_modes)){
+  throw '[mir4-t05-pr-applicability-contract]'
+}
 
 $sealAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase release-seal
 $seal=Complete-T05 release-seal (Join-Path $testRoot 'seal') $sealAdapter
@@ -60,6 +88,24 @@ $promotionAdapter=Get-MIR4ReleasePhaseAdapter -RepoRoot $repo -Phase promotion
 $promotion=Complete-T05 promotion (Join-Path $testRoot 'promotion') $promotionAdapter
 if(-not[bool]$promotion.execute.result.detail.fast_forward_proven-or[bool]$promotion.execute.result.detail.ref_update_performed-or
    [bool]$promotion.execute.result.detail.tag_created){throw '[mir4-t05-promotion-plan]'}
+
+$savedEventName=$env:GITHUB_EVENT_NAME;$savedEventPath=$env:GITHUB_EVENT_PATH;$savedRef=$env:GITHUB_REF;$savedSha=$env:GITHUB_SHA
+$prInputs=$inputs.PSObject.Copy();$prInputs.candidate_id='DEV-T05-PR-CONTEXT'
+$prEventPath=Join-Path $testRoot 'pull-request-event.json';New-Item -ItemType Directory -Force -Path (Split-Path $prEventPath -Parent)|Out-Null
+$prEvent=[ordered]@{pull_request=[ordered]@{base=[ordered]@{ref='main';sha=[string]$inputs.source_commit};head=[ordered]@{ref='work/t05-event-proof';sha=[string]$inputs.source_commit};merge_commit_sha=[string]$inputs.source_commit}}
+[IO.File]::WriteAllText($prEventPath,($prEvent|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+try{
+  $env:GITHUB_EVENT_NAME='pull_request';$env:GITHUB_EVENT_PATH=$prEventPath;$env:GITHUB_REF='refs/pull/999/merge';$env:GITHUB_SHA=[string]$inputs.source_commit
+  $prPromotion=Complete-T05 promotion (Join-Path $testRoot 'promotion-pr-context') $promotionAdapter $prInputs
+  if([string]$prPromotion.execute.result.detail.observed_ref-cne'event.pull_request.base.sha'-or
+     [string]$prPromotion.execute.result.detail.proof_context.trust_class-cne'untrusted-pull-request'-or
+     [string]$prPromotion.execute.result.detail.proof_context.ref_topology-cne'synthetic-merge-ref'-or
+     [string]$prPromotion.execute.result.detail.proof_context.evidence_mode-cne'simulation'){
+    throw '[mir4-t05-pr-proof-context]'
+  }
+}finally{
+  $env:GITHUB_EVENT_NAME=$savedEventName;$env:GITHUB_EVENT_PATH=$savedEventPath;$env:GITHUB_REF=$savedRef;$env:GITHUB_SHA=$savedSha
+}
 
 $promotionTamperInputs=$inputs.PSObject.Copy();$promotionTamperInputs.candidate_id='DEV-T05-PROMOTION-TAMPER'
 $promotionTamperRoot=Join-Path $testRoot 'promotion-tamper';$promotionTamperPlan=Invoke-T05 Plan promotion $promotionTamperRoot $promotionAdapter $promotionTamperInputs
@@ -136,4 +182,5 @@ $publisherWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workf
 if($publisherWorkflow-match'actions/checkout|Build-MIRPackage|New-MIR4BootstrapLocalCandidate|mir4\s+platform\s+package'-or
    $publisherWorkflow-notmatch'publisher-forbidden-capability'){throw '[mir4-t05-publisher-has-builder]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-t05-package-mutation]'}
+$env:GITHUB_EVENT_NAME=$outerEventName;$env:GITHUB_EVENT_PATH=$outerEventPath;$env:GITHUB_REF=$outerRef;$env:GITHUB_SHA=$outerSha
 Write-Host '[ok] MIR 4 T05 unsigned seal assembly, fast-forward promotion plan, builder-free publication reconciliation, exact readback, clean restore, tamper rejection, and compensation passed.'

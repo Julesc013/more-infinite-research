@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-4x-operating-programme-v1.schema.json",
+  "title": "MIR 4.x operating programme V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "objective", "permanent_invariants", "work_packages", "outcome_trains", "wip_limits"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4XOperatingProgrammeV1"},
+    "status": {"const": "active"},
+    "objective": {"type": "string", "minLength": 40},
+    "permanent_invariants": {"type": "array", "minItems": 6, "items": {"type": "string"}, "uniqueItems": true},
+    "work_packages": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "outcome", "depends_on", "state"],
+        "properties": {
+          "id": {"pattern": "^M(40|41|42|43|44|45|46)-[0-9]{2}$"},
+          "outcome": {"type": "string", "minLength": 8},
+          "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "state": {"enum": ["complete", "active", "queued", "blocked-dependency"]}
+        }
+      }
+    },
+    "outcome_trains": {"type": "array", "minItems": 6, "items": {"type": "object"}},
+    "wip_limits": {"type": "object"}
+  }
+}

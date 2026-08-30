@@ -81,20 +81,9 @@ function ConvertTo-MIR4BootstrapCanonicalValue {
   param([Parameter(Mandatory)][AllowNull()]$Value)
 
   if ($Value -is [string]) {
-    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?Z$') {
-      return [DateTime]::Parse(
-        $Value,
-        [Globalization.CultureInfo]::InvariantCulture,
-        [Globalization.DateTimeStyles]::RoundtripKind
-      )
-    }
-    if ($Value -cmatch '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,7})?[+-]\d{2}:\d{2}$') {
-      return [DateTimeOffset]::Parse(
-        $Value,
-        [Globalization.CultureInfo]::InvariantCulture,
-        [Globalization.DateTimeStyles]::RoundtripKind
-      )
-    }
+    # Canonical record timestamps are lexical RFC 3339 values. Converting them
+    # to runtime date objects lets ConvertTo-Json apply host-version or local
+    # time-zone rules, which makes an authority self-hash machine-dependent.
     return $Value
   }
   if ($Value -is [Collections.IDictionary]) {
@@ -126,8 +115,8 @@ function ConvertTo-MIR4BootstrapCanonicalJson {
 
   # BootstrapCanonicalJsonV1 is intentionally narrow: tool-created ordered objects,
   # integer numbers, arrays in authority order, lexical RFC 3339 timestamps,
-  # UTF-8, no BOM, and no insignificant space. Timestamp normalization preserves
-  # an explicit offset (or Z) so record hashes cannot depend on the runner timezone.
+  # UTF-8, no BOM, and no insignificant space. Timestamp text preserves its
+  # explicit offset (or Z), independent of the runner time zone.
   $canonicalValue = ConvertTo-MIR4BootstrapCanonicalValue -Value $Value
   return (($canonicalValue | ConvertTo-Json -Depth 100 -Compress) -replace "`r`n", "`n" -replace "`r", "`n")
 }

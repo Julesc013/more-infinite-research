@@ -118,8 +118,10 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
         -not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
       throw 'Candidate-programme approved-delta authority or target registry is absent.'
     }
-    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
-    $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
+    # These self-hashed authorities preserve lexical RFC 3339 timestamps.
+    # PowerShell otherwise converts them through the runner's local time zone.
+    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -DateKind String
+    $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json -DateKind String
     $targetRows = @($registry.payload.targets | Where-Object {
       [string]$_.factorio -eq [string]$Context.target
     })

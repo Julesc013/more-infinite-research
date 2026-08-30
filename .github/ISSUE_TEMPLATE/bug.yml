@@ -1,0 +1,44 @@
+name: Player bug
+description: Report reproducible incorrect behavior, loading failure, migration failure, or crash.
+title: "bug: "
+labels: ["bug", "triage"]
+body:
+  - type: dropdown
+    id: target
+    attributes:
+      label: MIR target
+      options: ["F210 / Factorio 2.1", "F200 / Factorio 2.0", "F110 / Factorio 1.1", "F100 / Factorio 1.0", "Unknown"]
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Exact MIR and Factorio versions
+      placeholder: "MIR 4.0.21000; Factorio 2.1.x"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Give the smallest repeatable sequence and say whether a new save reproduces it.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Attach a minimized SupportBundleV1 or relevant log excerpt. Remove secrets and personal paths; do not upload a save or full mod archive unless requested.
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Public-report check
+      options:
+        - label: This report contains no credential, private key, recovery share, or unpatched security vulnerability.
+          required: true

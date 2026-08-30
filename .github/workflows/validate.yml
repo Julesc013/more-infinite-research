@@ -76,7 +76,8 @@ jobs:
       - name: Materialize content-addressed verification plan
         shell: pwsh
         run: |
-          $profile = if ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
+          $postRelease = Test-Path -LiteralPath spec/programmes/mir4-4x-operating-programme-v1.json -PathType Leaf
+          $profile = if ($postRelease) { 'mir4-post-release' } elseif ('${{ steps.mode.outputs.mir4_bootstrap }}' -eq 'true') { 'mir4-bootstrap' } else { 'fast' }
           ./tools/mir.ps1 verify plan --target $env:MIR_VALIDATION_TARGET --profile $profile --candidate $env:MIR_DEVELOPMENT_CANDIDATE --output build/results/assurance/verification-plan.json
       - id: matrix
         name: Export required work
@@ -117,7 +118,10 @@ jobs:
       max-parallel: 2
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     concurrency:
-      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      # GitHub keeps at most one running and one pending job per concurrency
+      # group. Separate event/ref topologies so a main push cannot cancel the
+      # corresponding main-to-dev mirror PR evidence row.
+      group: mir-${{ github.event_name }}-${{ github.ref }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262

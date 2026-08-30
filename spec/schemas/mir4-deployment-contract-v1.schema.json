@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-deployment-contract-v1.schema.json",
+  "title": "MIR 4 deployment contract V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "applies_to", "guarantees", "target_policy", "package_exclusions"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4DeploymentContractV1"},
+    "status": {"const": "accepted-post-4.0"},
+    "applies_to": {"const": "MIR 4.0.1+"},
+    "guarantees": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "rule"],
+        "properties": {
+          "id": {"pattern": "^MIR-DEPLOY-00[1-6]$"},
+          "rule": {"type": "string", "minLength": 20}
+        }
+      }
+    },
+    "target_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary", "conditional", "experimental", "independent_generation"],
+      "properties": {
+        "primary": {"const": ["F210", "F200"]},
+        "conditional": {"const": ["F110", "F100"]},
+        "experimental": {"type": "array", "items": {"pattern": "^F[0-9]{3}$"}, "uniqueItems": true},
+        "independent_generation": {"const": true}
+      }
+    },
+    "package_exclusions": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    }
+  }
+}

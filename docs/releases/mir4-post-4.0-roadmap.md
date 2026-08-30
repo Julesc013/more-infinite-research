@@ -12,94 +12,108 @@ source_of_truth_for:
   - mir4-post-4.0-roadmap
 ---
 
-# MIR 4 post-4.0 roadmap
+# MIR 4.x operating programme
 
-This roadmap begins after the immutable MIR 4.0.0 release event. It does not alter the accepted 4.0.0 packages, qualify an unaccepted target, graduate a preview subsystem, move the `legacy` branch, or authorize publication by itself. Each release still requires exact target-local evidence and the normal release gates.
+MIR 4.0.0 proved that the project can produce a multi-target, proof-governed product line. MIR 4.x now has two simultaneous duties: keep the released 4.0 line repairable and make future development physically coherent. The programme therefore runs a stable patch lane and one development lane under shared findings, shared semantic intent, independently qualified target packages, and immutable published bytes.
 
-## Release-line rules
+The objective is not another platform layer. It is one semantic source, one obvious repository structure, one public command surface, one authority per mutable fact, one generated release narrative, independently generated target packages, and detailed evidence that never clutters or enters the player package.
 
-- `dev` remains the integration branch for MIR 4 work.
-- `main` receives only qualified release promotions.
-- `legacy` remains the previous-major MIR 3 alias throughout MIR 4 unless a separate, reviewed historical-succession authority moves it after a future major release.
-- Patch releases preserve public settings, technology identities, migration continuity, and package-source parity except for a narrowly documented correctness or compatibility fix.
-- Minor releases may add capabilities, but preview, shadow, and experimental components graduate only through subject-specific acceptance evidence.
-- Every supported Factorio target keeps its own distribution version, engine lock, package identity, qualification evidence, and publication receipt.
+The machine-readable programme is `spec/programmes/mir4-4x-operating-programme-v1.json`. The self-contained package promise is `spec/distribution/mir4-deployment-contract-v1.json`; patch semantics are in `spec/releases/mir4-patch-policy-v1.json`; proof applicability is in `spec/assurance/mir4-proof-applicability-v1.json`.
 
-## MIR 4.0.1 — release feedback and correctness
+## Permanent product invariants
 
-Purpose: close verified defects or documentation gaps found during the 4.0.0 publication and early adoption window without starting an architecture cutover.
+- A player downloads one self-contained MIR ZIP for the selected Factorio target. Official MIR features and integrations for that target are inside it and are inert when the corresponding external mod is absent.
+- Optional extensions may add behavior but cannot be required to recover a capability advertised as part of MIR.
+- F210 and F200 are primary maintained targets. F110 and F100 are conditional targets that qualify independently and may publish later without delaying an otherwise complete source release. Older targets remain experimental or museum work until exact engine, predecessor, rights, package, and support custody exist.
+- Each target receives its own numeric distribution version, package, engine proof, qualification, seal, publication receipt, and public readback. Evidence from one target never substitutes for another.
+- Compatibility policy supplies facts, claims, profiles, and proof requirements; it never mutates prototypes. Only admitted emission code creates or changes generated technology prototypes.
+- Published versions, tags, and package bytes are immutable. The unsigned `v4.0.0` tag and its historical annotation are preserved rather than rewritten.
+- Repository, governance, documentation, fixtures, tests, SDK material, build records, and assurance evidence remain outside player ZIPs.
 
-Planned scope:
+## Two live lanes
 
-- reconcile GitHub and Mod Portal release copy, FAQ answers, installation guidance, and compatibility wording against public readback;
-- fix reproducible player-facing defects in the admitted emitter while preserving one-emitter package-source parity;
-- strengthen diagnostics for invalid settings, missing optional technologies, migration problems, and target-specific omissions;
-- capture upgrade evidence from the exact 4.0.0 target packages to every 4.0.1 target candidate;
-- retain F210 and F200 as mandatory targets and evaluate F110 and F100 independently under their conditional release policy;
-- keep developer preview archives separate from player ZIPs and keep all repository, proof, fixture, and tooling content package-excluded.
+`release/4.0` is the maintained 4.0.x line rooted at the exact peeled `v4.0.0` commit. It accepts only reproduced player defects, security corrections, save or migration repairs, exact-target compatibility corrections, and release-copy or installation corrections. It does not accept repository redesign, feature work, compiler decomposition, or speculative cleanup.
 
-Exit criteria:
+`main` is the canonical development line for 4.1.0 and later. While the protected `dev` branch is retained, every accepted `main` change is mirrored to `dev` by an auditable fast-forward or a no-delta synchronization pull request. New work starts from `main`; `dev` is not a second integration queue. Removal of `dev` is a later explicit transition, not an assumption hidden inside this programme.
 
-- every included change has a named issue, reproduction, affected-target analysis, and exact verification evidence;
-- deterministic rebuilds reproduce every accepted target ZIP;
-- direct upgrade, reload, configuration, compatibility, and performance checks pass on each released target;
-- signing, sealing, offline restore, publication, and public readback close under the same production controls as 4.0.0.
+A finding that originates on the stable line is fixed with the smallest valid 4.0 change and immediately forward-ported to `main`. A finding that originates on `main` is backported only when it reproduces against the exact 4.0 base. Both directions require one shared finding ID, target dispositions, semantic-equivalence evidence, upgrade evidence, and an explicit package delta. Merging the old tree wholesale into the new tree is forbidden.
 
-## MIR 4.1.0 — first governed feature train
+For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4.0.11001`, and `4.0.10001`. The established codec remains `target code × 100 + source patch`; no ad hoc target version namespace is introduced.
 
-Purpose: deliver the first post-bootstrap feature release while converting only proven platform work from preview or shadow status into supported production behavior.
+## Dependency-ordered work
 
-Candidate scope, subject to separate acceptance decisions:
+The active fixed point is deliberately smaller than the full report.
 
-- player-facing research configuration improvements that preserve stable technology identity and explicit target capabilities;
-- selective graduation of target-compiler or semantic-compiler responsibilities after parity, migration, rollback, and package-boundary proof;
-- a supported extension surface derived from the experimental API and module SDK, with a versioned compatibility contract and negative tests;
-- improved inspector and compatibility diagnostics backed by exact fixture and engine evidence;
-- ProcessIR-based analysis or synthesis only where it reproduces admitted emitter output and does not create a second uncontrolled production emitter;
-- clearer target capability reporting for omitted, unsupported, and compatibility-provided research families.
+| Work package | Outcome | State after this change |
+| --- | --- | --- |
+| M40-00 | Preserve exact 4.0.0 refs, assets, remote controls, and offline restore closure | Complete |
+| M40-01 | Operate the protected `release/4.0` maintenance lane | Active |
+| M41-00 | Adopt operating, deployment, patch, and proof-applicability contracts | Active; closes on merge and readback |
+| M41-01 | Repair pull-request proof selection for event base, trust class, and synthetic merge topology | Active; closes on CI proof and merge |
+| M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Next |
+| M41-03 | Introduce change fragments and generate every release narrative | Queued after M41-01 |
+| M41-04 | Make `main` the sole integration authority while keeping `dev` exactly mirrored during transition | Queued after M41-02 |
+| M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
+| M42-00 | Characterize the package boundary and generate each target independently | Blocked on the complete 4.1 fixed point |
+| M42-01 | Converge PowerShell behind one supported CLI and one release engine | Blocked on M42-00 |
+| M42-02 | Split Lua compiler stages behind characterization and mutation boundaries | Blocked on M42-00 |
 
-Non-goals:
+Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No broad Lua move starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback.
 
-- blanket graduation of the MIR 4 platform preview;
-- prototype mutation from compatibility policy;
-- merging preview assets into player packages;
-- claiming pack-wide compatibility from narrow evidence;
-- changing historical branch aliases as a side effect of a minor release.
+The current package-source boundary still includes `README.md` in every player ZIP. M41-05 must therefore either admit and prove that exact presentation delta or wait until M42-00 removes the repository landing page from player packages. Incidental README edits are forbidden because they silently change package identity.
 
-Exit criteria:
+## Preserved 4.0.0 baseline
 
-- each graduated subject has an authority transition naming its old and new owner, proof root, rollback route, and migration contract;
-- public API and data-format changes have versioned schemas, examples, conformance tests, and compatibility policy;
-- target-local packages remain deterministic, package-safe, and independently qualified;
-- upgrades from the latest 4.0.x release pass on every published target.
+The post-release programme began from annotated tag object `65b6d49a08546085e905f487e4b821578de63a68`, peeled commit `5ca449820bdfa5595ca03686f32c74904c46daf3`, and tree `83527c89f58e2d49edbc06dbae8fe747081ebc68`. The pre-release `dev` commit `9a8477aa83300646d41922efd39adb728c6a28e2` has that same tree. `release/4.0` was created at the peeled release commit and protected by GitHub ruleset `21859574`.
 
-## MIR 4.1.x — stabilization lane
+The offline pre-refactor Git bundle was restored successfully and has SHA-256 `F63A120B800C11D8D6E59652B3620D6B28FAA9C123141C7B21D9FE3AE91832A0`. GitHub release `379184899` remains published as `MIR 4.0.0`; its unsigned tag, historical annotation, mutable-release state, blank asset labels, and exact bytes are observations to preserve rather than history to rewrite.
 
-Patch releases after 4.1.0 prioritize regressions, migration repair, compatibility evidence, documentation, and performance. New platform graduation waits for a minor release unless an urgent security or data-loss repair requires the emergency lane.
+| Asset | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `more-infinite-research_4.0.21000.zip` | 1,069,552 | `38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1` |
+| `more-infinite-research_4.0.20000.zip` | 1,067,014 | `5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE` |
+| `more-infinite-research_4.0.11000.zip` | 399,073 | `BE63F76255068BAC1BA891B9C9331E4EA943538A37808DFF546E5B1A3ECEB62D` |
+| `more-infinite-research_4.0.10000.zip` | 399,073 | `EA495B37C0B91F0728226290CDAEFDF4BBD3C1DBA7D0997AAF5E5107FE79AD3F` |
+| `mir4-api-sdk-v1-preview.zip` | 69,800 | `78A9469C19CA2AFCDD6F53C1171DD7F8E3734B4AB59546A39523E1CE3F509CD3` |
+| `mir4-inspector-v1-preview.zip` | 50,706 | `66F3807B53E5088F4FE15427B91C35ED9205B2AFFAD65B498A4AA532DF9BFBC2` |
+| `mir4-mep-v1-preview.zip` | 94,105 | `D221B813B39030A9B3FA14800EE8C59846D3D0CF5BF90A29D8DD70CE5CC0619E` |
+| `mir4-reference-extension-v1-preview.zip` | 20,577 | `A0ABA772A6115882E32838B2189F504250B8E354D57A90C5A8AA5E77204D5183` |
+| `SHA256SUMS.txt` | 798 | `054536B8CE1C05E47C1166294EC9427EC70A3B612F1DA0AD599C5E6EC3B20E7D` |
 
-## MIR 4.2.0 and later — evidence-led expansion
+The Mod Portal API exposed F210, F200, and F110 with SHA-1 values equal to the downloaded GitHub bytes. F100 was not present in the observed portal release list. No 4.0.1 source version is allocated by this record.
 
-Later minor trains may expand supported extension capabilities, inspection, synthesis, compatibility automation, or historical target tooling. A train is admitted only when its scope has an owner, target matrix, migration story, rollback plan, measurable acceptance criteria, and an evidence budget that can be completed before freeze.
+## Stable repair procedure
 
-Potential trains are ordered by proof readiness rather than implementation age:
+Triage a defect once under one finding ID. Record reproduction, severity, affected targets, save or migration impact, compatibility scope, package-visible paths, and both lane dispositions. For a stable-origin defect, branch from `release/4.0`, make the smallest correction, prove each exact affected package, and immediately forward-port the semantic intent and regression fixture to `main`. For a development-origin defect, correct `main` first and backport only after the finding reproduces on the exact 4.0 base without importing development architecture.
 
-1. graduate the smallest stable extension contract that external modules can test without receiving prototype-mutation or publication authority;
-2. consolidate target and semantic compilation behind one production owner after exact fixed-point parity;
-3. expand compatibility certification and inspection with subject-level claims;
-4. improve offline assurance, reproducible release capsules, and public verification tooling;
-5. consider additional historical targets only when exact engines, predecessor packages, and sustainable support custody exist.
+Never merge either lane wholesale into the other. A bounded cherry-pick is acceptable only when it carries no irrelevant history; otherwise implement the same intent separately and bind both changes with semantic-equivalence, upgrade, target-disposition, and package-delta evidence. F210 and F200 remain primary independently qualified targets. F110 and F100 qualify independently and may publish later as supplemental target releases.
 
-## Next-major boundary
+## Outcome trains
 
-MIR 5 planning begins only when a change cannot be delivered honestly under MIR 4 compatibility and migration promises. The `legacy` alias may move from MIR 3 to the final supported MIR 4 line only through a dedicated succession event with public readback, preserved MIR 3 tags, and an explicit rollback route.
+Version numbers below are candidate labels assigned only at source freeze. Outcomes may be combined, split, skipped, or renumbered.
 
-## Planning intake
+| Candidate | Required outcome |
+| --- | --- |
+| 4.0.x | Verified stable defects only; no release exists merely to carry repository work |
+| 4.1.0 | Repository and release fixed point: truthful public state, main-trunk operation, change fragments, generated release copy, GitHub surface, concise docs, and explicit authorities |
+| 4.2.0 | Source, package, compiler, and target authority fixed point: real source/package separation, independent target generation, one release engine, PowerShell convergence, compiler characterization and bounded decomposition |
+| 4.3.0 | Runtime, MEP, API, and SDK contracts graduate independently with conformance, compatibility, rollback, and at least one real external consumer where the contract requires it |
+| 4.4.0 | Exact ProcessIR and certified synthesis graduate only where they reproduce the admitted emitter and cannot create a second uncontrolled production emitter |
+| 4.5.0 | Inspector and compatibility factory deliver exact, expiring, evidence-bound support claims and actionable diagnostics |
+| 4.6.0+ | Ecosystem breadth, historical targets, assurance scale, LTS, preservation, external-provider pilots, advanced proof, and the evergreen fixed-point audit proceed by proof readiness rather than a pre-reserved version ladder |
 
-Every proposed roadmap item should record:
+The next major begins only when a change cannot be delivered honestly under MIR 4 settings, technology identity, save migration, API, and distribution promises.
 
-- player or developer problem and expected outcome;
-- affected targets and package-visible surface;
-- owning module and authority transition, if any;
-- compatibility, migration, rollback, and security impact;
-- required fixtures, exact engines, tests, and human review;
-- release-train recommendation and reasons it cannot fit a smaller train.
+## Release operation
+
+Public source releases use plain names such as `MIR 4.1.0`, `MIR 4.1.0 Beta 1`, and `MIR 4.1.1`. Internal programme themes do not appear in release titles. Future source tags are annotated and signed; target tags use `dist/fNNN/v<distribution-version>`.
+
+A source release is drafted only after source freeze. Every ready target package is attached to the primary source-family release. A target that completes later may use a supplemental target release, preserving source-release immutability without lowering that target's proof bar. The default stable asset set is the affected player ZIPs, one Developer Kit when developer surfaces changed, `SHA256SUMS.txt`, one release manifest, and an optional detailed metadata archive.
+
+Release bodies contain one material-outcome sentence, a small download table, three to eight primary changes, upgrade and compatibility guidance, material known issues, and links to detailed records. They contain no raw logs, local paths, candidate ceremony narrative, or full evidence dump.
+
+## Decision gates
+
+Every work package must name one exact base, one bounded writer, one reversible change, the selected proof closure, any required independent review, and post-merge readback. A component graduates per contract, never because a whole preview bundle has existed for long enough. A proof is valid only for its declared event, trust class, ref topology, credential class, environment class, and simulation or realization mode.
+
+Progress is measured by fixed points closed, ambiguity removed, stable lead time, target build time, flaky-test rate, escaped defects, proof reuse, and the time required to restore an exact release—not by the number of version labels consumed.
