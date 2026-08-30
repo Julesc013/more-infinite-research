@@ -1,15 +1,29 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path)
 $ErrorActionPreference='Stop'
-$repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
-. (Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1')
-
-# Test fixtures own their event topology. An enclosing GitHub workflow event is
-# not promotion input for the baseline, tamper, or compensation cases below.
+$sourceRepo=(Resolve-Path -LiteralPath $RepoRoot).Path;$repo=$sourceRepo;$mirrorWorktree=$null
 $outerEventName=$env:GITHUB_EVENT_NAME;$outerEventPath=$env:GITHUB_EVENT_PATH;$outerRef=$env:GITHUB_REF;$outerSha=$env:GITHUB_SHA
-$env:GITHUB_EVENT_NAME=$null;$env:GITHUB_EVENT_PATH=$null;$env:GITHUB_REF=$null;$env:GITHUB_SHA=$null
+try{
+  $mainCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
+  if($mainCommit-cmatch'^[0-9a-f]{40}$'){
+    & git -C $sourceRepo merge-base --is-ancestor $mainCommit HEAD
+    if($LASTEXITCODE-ne0){
+      $headTree=(& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim();$mainTree=(& git -C $sourceRepo rev-parse "$mainCommit^{tree}").Trim()
+      if($headTree-cne$mainTree){throw '[mir4-t05-non-main-lineage-tree]'}
+      $temporaryRoot=if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP)){[IO.Path]::GetTempPath()}else{$env:RUNNER_TEMP}
+      $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-main-'+[guid]::NewGuid().ToString('N'))
+      & git -C $sourceRepo worktree add --detach $mirrorWorktree $mainCommit 2>$null|Out-Null
+      if($LASTEXITCODE-ne0){throw '[mir4-t05-main-worktree]'}
+      $repo=(Resolve-Path -LiteralPath $mirrorWorktree).Path
+    }
+  }
+  . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+  . (Join-Path $repo 'tools/lib/mir4/ReleasePhaseEngine.ps1')
+  . (Join-Path $repo 'tools/lib/mir4/ReleaseAdapters.ps1')
+  . (Join-Path $repo 'tools/lib/mir4/ReleaseLifecycleAdapters.ps1')
+
+  # Test fixtures own their event topology. An enclosing GitHub workflow event is
+  # not promotion input for the baseline, tamper, or compensation cases below.
+  $env:GITHUB_EVENT_NAME=$null;$env:GITHUB_EVENT_PATH=$null;$env:GITHUB_REF=$null;$env:GITHUB_SHA=$null
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $developmentPlanPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
@@ -182,5 +196,10 @@ $publisherWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workf
 if($publisherWorkflow-match'actions/checkout|Build-MIRPackage|New-MIR4BootstrapLocalCandidate|mir4\s+platform\s+package'-or
    $publisherWorkflow-notmatch'publisher-forbidden-capability'){throw '[mir4-t05-publisher-has-builder]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$packageBefore){throw '[mir4-t05-package-mutation]'}
-$env:GITHUB_EVENT_NAME=$outerEventName;$env:GITHUB_EVENT_PATH=$outerEventPath;$env:GITHUB_REF=$outerRef;$env:GITHUB_SHA=$outerSha
-Write-Host '[ok] MIR 4 T05 unsigned seal assembly, fast-forward promotion plan, builder-free publication reconciliation, exact readback, clean restore, tamper rejection, and compensation passed.'
+  Write-Host '[ok] MIR 4 T05 unsigned seal assembly, fast-forward promotion plan, builder-free publication reconciliation, exact readback, clean restore, tamper rejection, and compensation passed.'
+}finally{
+  $env:GITHUB_EVENT_NAME=$outerEventName;$env:GITHUB_EVENT_PATH=$outerEventPath;$env:GITHUB_REF=$outerRef;$env:GITHUB_SHA=$outerSha
+  if(-not[string]::IsNullOrWhiteSpace([string]$mirrorWorktree)-and(Test-Path -LiteralPath $mirrorWorktree -PathType Container)){
+    & git -C $sourceRepo worktree remove --force $mirrorWorktree 2>$null|Out-Null
+  }
+}
