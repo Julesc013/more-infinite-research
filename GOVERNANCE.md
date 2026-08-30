@@ -22,6 +22,6 @@ Maintainers exclusively approve protected signing and recovery readiness, F210/F
 
 ## Change custody
 
-Normal work targets protected `dev` by pull request. The aggregate verification gate must pass before merge. `main` advances only through the governed promotion phase from the sealed candidate. Immutable release evidence is never rewritten; corrections are new events.
+Normal MIR 4.1 and later work targets protected `main` by pull request. The aggregate verification gate must pass before merge. Retained `dev` mirrors `main` and receives no independent work. MIR 4.0.x corrections target protected `release/4.0` under the patch contract. Immutable release evidence is never rewritten; corrections are new events.
 
 See [Contributing](CONTRIBUTING.md), [Release runbook](RELEASE-RUNBOOK.md), and [Project continuity](PROJECT-CONTINUITY.md).

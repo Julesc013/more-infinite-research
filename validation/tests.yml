@@ -26,6 +26,7 @@
       "inputs": [
         "scripts/Invoke-MIRAssurance.ps1",
         "tools/lib/assurance/**",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
         "validation/tests/tooling/Test-MIRAssurance.ps1",
         "validation/tests/release/Test-MIRTerminalGovernance.ps1",
         "validation/tests/release/Test-MIRGitHubAdministration.ps1",
@@ -48,6 +49,20 @@
         ".mir/releases.json",
         "spec/schemas/**",
         "validation/profiles/**"
+      ]
+    },
+    {
+      "id": "static.branch-policy",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/release/Test-MIRBranchPolicy.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/branches.yml",
+        ".github/workflows/branch-policy.yml",
+        ".github/workflows/validate.yml",
+        "validation/tests/release/Test-MIRBranchPolicy.ps1",
+        "repository"
       ]
     },
     {
@@ -2168,7 +2183,9 @@
       "layer": "F0",
       "command": "./validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
       "requires_factorio": false,
-      "inputs": [
+    "inputs": [
+        ".mir/assurance.json",
+        ".github/workflows/validate.yml",
         ".github/workflows/mir4-release-seal.yml",
         ".github/workflows/mir4-promotion.yml",
         ".github/workflows/mir4-target-publication.yml",
@@ -2183,7 +2200,15 @@
         "spec/schemas/mir4-release-target-publication-result-v1.schema.json",
         "spec/schemas/mir4-release-public-readback-result-v1.schema.json",
         "spec/schemas/mir4-release-restore-drill-result-v1.schema.json",
+        "spec/schemas/mir4-deployment-contract-v1.schema.json",
+        "spec/schemas/mir4-patch-policy-v1.schema.json",
+        "spec/schemas/mir4-proof-applicability-v1.schema.json",
+        "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
         "spec/schemas/mir4-t05-authority-evolution-receipt-v1.schema.json",
+        "spec/distribution/mir4-deployment-contract-v1.json",
+        "spec/releases/mir4-patch-policy-v1.json",
+        "spec/assurance/mir4-proof-applicability-v1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
         "tools/lib/mir4/ReleasePhaseEngine.ps1",
         "tools/lib/mir4/ReleaseAdapters.ps1",
         "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",

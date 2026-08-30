@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR4ProofApplicabilityV1",
+  "status": "accepted",
+  "default_policy": "undeclared-context-is-inapplicable",
+  "propositions": [
+    {
+      "id": "promotion-plan-pr-simulation",
+      "valid_events": ["pull_request"],
+      "trust_classes": ["untrusted-pull-request"],
+      "ref_topologies": ["synthetic-merge-ref"],
+      "credential_classes": ["none"],
+      "environment_classes": ["github-hosted-read-only"],
+      "evidence_modes": ["simulation"],
+      "production_authority": false
+    },
+    {
+      "id": "promotion-plan-branch-simulation",
+      "valid_events": ["local", "push", "workflow_dispatch"],
+      "trust_classes": ["trusted-read-only"],
+      "ref_topologies": ["branch-tip"],
+      "credential_classes": ["not-required"],
+      "environment_classes": ["maintainer-workstation", "github-hosted-read-only"],
+      "evidence_modes": ["simulation"],
+      "production_authority": false
+    },
+    {
+      "id": "protected-signing-realization",
+      "valid_events": ["workflow_dispatch"],
+      "trust_classes": ["maintainer-authorized"],
+      "ref_topologies": ["sealed-source-tag"],
+      "credential_classes": ["protected-signing-key"],
+      "environment_classes": ["protected-signing-environment"],
+      "evidence_modes": ["realization"],
+      "production_authority": true
+    },
+    {
+      "id": "public-readback-realization",
+      "valid_events": ["workflow_dispatch", "release"],
+      "trust_classes": ["trusted-read-only"],
+      "ref_topologies": ["immutable-source-tag", "immutable-distribution-tag"],
+      "credential_classes": ["public-download", "mod-portal-download"],
+      "environment_classes": ["publisher-readback", "independent-readback"],
+      "evidence_modes": ["realization"],
+      "production_authority": false
+    }
+  ]
+}

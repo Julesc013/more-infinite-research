@@ -1,0 +1,13 @@
+# Default ownership; narrower release and authority paths remain maintainer-reviewed.
+* @Julesc013
+
+/.github/ @Julesc013
+/.mir/ @Julesc013
+/governance/ @Julesc013
+/contracts/ @Julesc013
+/spec/ @Julesc013
+/releases/ @Julesc013
+/tools/ @Julesc013
+/validation/ @Julesc013
+/prototypes/ @Julesc013
+/migrations/ @Julesc013

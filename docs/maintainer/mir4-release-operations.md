@@ -24,15 +24,15 @@ Protected signing/recovery acceptance records the approved signer identity, publ
 
 ## Freeze through restore
 
-1. Freeze one exact `dev` commit/tree after explicit authorization.
+1. Freeze one exact `main` commit/tree after explicit authorization; verify the retained `dev` mirror has the same tree.
 2. Allocate M4RC1 and build F210/F200 plus preview assets once.
 3. Qualify exact packages: fresh load, predecessor upgrade, repeated reload, settings, research, migrations, canaries, performance, package exclusion, and deterministic reproduction.
 4. Obtain independent aggregate verification.
 5. Seal exact bytes with protected signing and append the release ledger.
-6. Promote the sealed tree to `main`, create governed tags, and publish target-specific assets.
+6. Verify the frozen `main` commit is unchanged, create governed signed tags, and publish target-specific assets.
 7. Redownload public bytes and compare hash, size, archive root, metadata, signature, and smoke result.
 8. Restore offline from preserved source, tools, locks, and assets; compare to the public seal.
 
 An outage pauses at the current event. Resume with the same event identity and bytes. A defect after seal creates a new candidate; it never modifies the seal.
 
-For branch and PR cleanup, every merged work package ends with local `dev == origin/dev`, divergence `0/0`, and a clean worktree.
+For branch and PR cleanup, every merged work package ends with remote `main` and `dev` on the same tree, local `dev == origin/dev`, divergence `0/0`, and a clean worktree.

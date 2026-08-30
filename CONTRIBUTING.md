@@ -4,12 +4,12 @@ MIR 4.0 is a whole-platform source programme with a deliberately narrow authorit
 
 ## Branch routing
 
-- Target protected `dev` for MIR 4 implementation, documentation, governance, preview, shadow, target, and release-engine work.
+- Target protected `main` for MIR 4.1 and later implementation, documentation, governance, preview, shadow, target, and release-engine work.
 - Use a short-lived branch and a pull request. Do not leave completed work only in a local branch.
-- `main` advances only through the release promotion executor from a sealed, independently qualified candidate.
+- Use `release/4.0` only for admitted 4.0.x player corrections. Keep retained `dev` as an exact transition mirror of `main`; do not use it as an independent integration queue.
 - Historical and backport branches change only under their explicit terminal programme.
 
-After a PR merges, fetch the remote, fast-forward local `dev`, verify `dev == origin/dev`, verify divergence is `0/0`, and remove the local feature branch.
+After a PR merges, fetch the remote, read back `main`, synchronize protected `dev`, verify `main^{tree} == dev^{tree}`, leave local `dev == origin/dev` with divergence `0/0`, and remove the local feature branch.
 
 ## Authority and maturity
 
@@ -26,7 +26,7 @@ See [Governance](GOVERNANCE.md), [Extension Protocol](EXTENSION-PROTOCOL.md), an
 
 ## Development workflow
 
-1. Start from clean, current `origin/dev`.
+1. Start from clean, current `origin/main`.
 2. Read the task-specific authorities listed in `AGENTS.md`.
 3. Make one bounded change and classify its package visibility.
 4. Materialize or inspect the exact verification plan.

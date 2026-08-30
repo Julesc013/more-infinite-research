@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR4DeploymentContractV1",
+  "status": "accepted-post-4.0",
+  "applies_to": "MIR 4.0.1+",
+  "guarantees": [
+    {"id": "MIR-DEPLOY-001", "rule": "Every supported Factorio target is delivered as one self-contained MIR player ZIP."},
+    {"id": "MIR-DEPLOY-002", "rule": "Official integrations required for the target are built into that ZIP and remain inert when their external mod is absent."},
+    {"id": "MIR-DEPLOY-003", "rule": "No separately downloaded MIR core, feature module, compatibility pack, runtime, or shared library is required for normal play."},
+    {"id": "MIR-DEPLOY-004", "rule": "Optional extensions may add capabilities but may not be required to recover behavior advertised as part of MIR itself."},
+    {"id": "MIR-DEPLOY-005", "rule": "Each target package is generated, versioned, qualified, sealed, published, and read back independently from the same source release."},
+    {"id": "MIR-DEPLOY-006", "rule": "Developer kits, schemas, fixtures, tests, governance, assurance evidence, repository tools, and release records remain outside player ZIPs."}
+  ],
+  "target_policy": {
+    "primary": ["F210", "F200"],
+    "conditional": ["F110", "F100"],
+    "experimental": ["F018", "F017", "F016", "F015", "F014", "F013"],
+    "independent_generation": true
+  },
+  "package_exclusions": [".github", ".mir", ".codex", "assurance", "build", "changes", "contracts", "docs", "fixtures", "governance", "releases", "scripts", "sdk", "spec", "tests", "tools"]
+}

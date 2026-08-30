@@ -97,9 +97,40 @@ function Invoke-MIR4ReleaseSealAdapter {
 
 function Get-MIR4PromotionBase {
   param([string]$RepoRoot)
+  $eventName=[string]$env:GITHUB_EVENT_NAME
+  if($eventName-ceq'pull_request'){
+    $eventPath=[string]$env:GITHUB_EVENT_PATH
+    if([string]::IsNullOrWhiteSpace($eventPath)-or-not(Test-Path -LiteralPath $eventPath -PathType Leaf)){throw '[mir4-promotion-pr-event-unavailable]'}
+    $event=Get-Content -Raw -LiteralPath $eventPath|ConvertFrom-Json -Depth 100
+    $baseRef=[string]$event.pull_request.base.ref;$baseSha=[string]$event.pull_request.base.sha
+    $mergeSha=[string]$event.pull_request.merge_commit_sha;$workflowSha=[string]$env:GITHUB_SHA
+    if($baseRef-cne'main'-or$baseSha-cnotmatch'^[0-9a-f]{40}$'-or$mergeSha-cnotmatch'^[0-9a-f]{40}$'-or$workflowSha-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-promotion-pr-event-invalid]'}
+    & git -C $RepoRoot cat-file -e "$baseSha^{commit}" 2>$null
+    if($LASTEXITCODE-ne0){throw '[mir4-promotion-pr-base-unavailable]'}
+    return [pscustomobject][ordered]@{
+      ref='event.pull_request.base.sha';commit=$baseSha
+      proof_context=[pscustomobject][ordered]@{
+        event_name='pull_request';trust_class='untrusted-pull-request';ref_topology='synthetic-merge-ref'
+        credential_class='none';environment_class='github-hosted-read-only';evidence_mode='simulation'
+        base_ref='main';source_ref=[string]$event.pull_request.head.ref;event_source_commit=$workflowSha
+        event_payload_merge_commit=$mergeSha
+      }
+    }
+  }
   foreach($ref in @('refs/remotes/origin/main','refs/heads/main')){
     $value=& git -C $RepoRoot rev-parse --verify $ref 2>$null
-    if($LASTEXITCODE-eq0-and[string]$value-cmatch'^[0-9a-f]{40}$'){return [pscustomobject][ordered]@{ref=$ref;commit=([string]$value).Trim()}}
+    if($LASTEXITCODE-eq0-and[string]$value-cmatch'^[0-9a-f]{40}$'){
+      return [pscustomobject][ordered]@{
+        ref=$ref;commit=([string]$value).Trim()
+        proof_context=[pscustomobject][ordered]@{
+          event_name=$(if([string]::IsNullOrWhiteSpace($eventName)){'local'}else{$eventName})
+          trust_class='trusted-read-only';ref_topology='branch-tip';credential_class='not-required'
+          environment_class=$(if([string]::IsNullOrWhiteSpace($eventName)){'maintainer-workstation'}else{'github-hosted-read-only'})
+          evidence_mode='simulation';base_ref='main';source_ref=$(if([string]::IsNullOrWhiteSpace([string]$env:GITHUB_REF)){'HEAD'}else{[string]$env:GITHUB_REF})
+          event_source_commit=$null
+        }
+      }
+    }
   }
   throw '[mir4-promotion-base-unavailable]'
 }
@@ -108,18 +139,21 @@ function Invoke-MIR4PromotionAdapter {
   param([string]$RepoRoot,$Context)
   $boundary=Assert-MIR4ReleaseAdapterContext -RepoRoot $RepoRoot -Context $Context -Phase promotion
   $source=Get-MIR4ReleaseAdapterSourceState -RepoRoot $boundary.repo -Context $Context;$base=Get-MIR4PromotionBase $boundary.repo
+  if([string]$base.proof_context.event_source_commit-cmatch'^[0-9a-f]{40}$'-and[string]$base.proof_context.event_source_commit-cne[string]$source.commit){throw '[mir4-promotion-pr-source-mismatch]'}
   & git -C $boundary.repo merge-base --is-ancestor ([string]$base.commit) ([string]$source.commit)
   if($LASTEXITCODE-ne0){throw '[mir4-promotion-non-fast-forward]'}
   $targets=@(Get-MIR4ReleaseLifecycleTargets -RepoRoot $boundary.repo -Context $Context);$identity=Get-MIR4ReleaseLifecycleIdentity $Context $targets
   $executeRoot=Join-Path $boundary.attempt_root 'artifacts/execute';$path=Join-Path $executeRoot 'fast-forward-promotion-plan.json'
-  $makePlan={ [pscustomobject][ordered]@{schema=1;kind='MIR4FastForwardPromotionPlanV1';identity_sha256=Get-MIR4ReleasePhaseSha256 $identity;branch='main';observed_ref=[string]$base.ref;from_commit=[string]$base.commit;to_commit=[string]$source.commit;to_tree=[string]$source.tree;fast_forward_required=$true;fast_forward_proven=$true;ref_update_performed=$false;tag_created=$false;production_authorized=$false;release_transition_performed=$false;record_sha256=''} }
+  $makePlan={ [pscustomobject][ordered]@{schema=1;kind='MIR4FastForwardPromotionPlanV1';identity_sha256=Get-MIR4ReleasePhaseSha256 $identity;branch='main';observed_ref=[string]$base.ref;from_commit=[string]$base.commit;to_commit=[string]$source.commit;to_tree=[string]$source.tree;proof_context=$base.proof_context;fast_forward_required=$true;fast_forward_proven=$true;ref_update_performed=$false;tag_created=$false;production_authorized=$false;release_transition_performed=$false;record_sha256=''} }
   switch([string]$Context.operation){
     'DryRun'{$detail=&$makePlan;return New-MIR4ReleaseLifecycleResult $boundary.repo $Context promotion MIR4PromotionPhaseResultV1 DryRun $detail @() @('main-ref-observed','exact-source-descendant','fast-forward-only','git-port-read-only','promotion-denied')}
     'Execute'{$record=Write-MIR4ReleaseLifecycleRecord (&$makePlan) $path;return New-MIR4ReleaseLifecycleResult $boundary.repo $Context promotion MIR4PromotionPhaseResultV1 Execute $record @((Get-MIR4ReleaseAdapterFileDescriptor -RepoRoot $boundary.repo -Path $path)) @('fast-forward-plan-created','ancestry-proven','exact-tree-bound','ref-not-updated','tag-not-created')}
     'Verify'{
       $record=Get-Content -Raw -LiteralPath $path|ConvertFrom-Json -Depth 100;$null=Assert-MIR4ReleaseLifecycleRecord $record MIR4FastForwardPromotionPlanV1 $Context $targets;$current=Get-MIR4PromotionBase $boundary.repo
-      if([string]$record.from_commit-cne[string]$current.commit-or[string]$record.to_commit-cne[string]$source.commit-or[string]$record.to_tree-cne[string]$source.tree-or-not[bool]$record.fast_forward_proven-or[bool]$record.ref_update_performed-or[bool]$record.tag_created){throw '[mir4-promotion-plan-stale]'}
-      return New-MIR4ReleaseLifecycleResult $boundary.repo $Context promotion MIR4PromotionPhaseResultV1 Verify $record @((Get-MIR4ReleaseAdapterFileDescriptor -RepoRoot $boundary.repo -Path $path)) @('main-ref-unchanged','source-identity-reverified','ancestry-reverified','no-ref-mutation','production-boundary-reverified')
+      if([string]$record.from_commit-cne[string]$current.commit-or[string]$record.to_commit-cne[string]$source.commit-or[string]$record.to_tree-cne[string]$source.tree-or
+         (ConvertTo-MIR4ReleasePhaseCanonicalJson $record.proof_context)-cne(ConvertTo-MIR4ReleasePhaseCanonicalJson $current.proof_context)-or
+         -not[bool]$record.fast_forward_proven-or[bool]$record.ref_update_performed-or[bool]$record.tag_created){throw '[mir4-promotion-plan-stale]'}
+      return New-MIR4ReleaseLifecycleResult $boundary.repo $Context promotion MIR4PromotionPhaseResultV1 Verify $record @((Get-MIR4ReleaseAdapterFileDescriptor -RepoRoot $boundary.repo -Path $path)) @('event-aware-base-reverified','source-identity-reverified','ancestry-reverified','no-ref-mutation','production-boundary-reverified')
     }
     'Compensate'{
       $artifacts=if(Test-Path -LiteralPath $path -PathType Leaf){@(Get-MIR4ReleaseAdapterFileDescriptor -RepoRoot $boundary.repo -Path $path)}else{@()};if(Test-Path -LiteralPath $executeRoot -PathType Container){Remove-Item -LiteralPath $executeRoot -Recurse -Force}
