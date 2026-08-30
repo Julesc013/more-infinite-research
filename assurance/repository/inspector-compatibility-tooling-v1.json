@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kind": "MIR4InspectorCompatibilityMigrationProofPolicyV1",
+  "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+  "test_id": "static.mir4-inspector-compatibility-migration-v1",
+  "required_checks": ["predecessor-byte-immutability","predecessor-schema-and-digest","predecessor-writer-disabled","authority-schema","proof-policy-schema","verification-plan-no-unknown-paths","successor-receipt-schema-and-fixed-point","single-writer","shared-append-only-migration-engine","seven-compatibility-forwarders","inspector-functional-parity","inspector-export-command-parity","canary-check-command-parity","declared-consumers-use-final-paths","focused-test-cutover","compatibility-policy-read-only","terminal-claims-pre-cutover-digest","terminal-claims-read-only","player-runtime-authority-read-only","historical-t13-evidence-read-only","exact-canary-claim-boundary-retained","release-history-successor-proof","release-history-fingerprint-closure","package-source-non-interference","rollback-present","sunset-deferred","append-only-authority-chain","release-firewall"],
+  "evidence_entrypoint": "tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1",
+  "functional_evidence_entrypoint": "tests/inspection/Test-MIR4InspectorCompatibility.ps1",
+  "pre_cutover_functional_digest": "sha256:3b16e26301d2f2827369a9db0437e3c6c97ce0965096f921dd8b6d7d8c5bb527",
+  "functional_parity_digest": "sha256:3b16e26301d2f2827369a9db0437e3c6c97ce0965096f921dd8b6d7d8c5bb527",
+  "t13_receipt_sha256": "D8AD00B861F0C31A7CE4A7DA239AF250EEED4F586F78921F80A10CF9E771FF9F",
+  "t13_manifest_sha256": "5184A4715F1E66714E36B53DC25EAE7DC3AE92978D9141000684978F0AEE925C",
+  "compatibility_policy_sha256": "54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2",
+  "terminal_claims_sha256": "01953ECA6FC6EEF25145FEE865A1E7D8FF65E99E10941363B2A843569ABD8DC0",
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "unknown_policy": "fail",
+  "independent_human_acceptance_required": false,
+  "release_transition_authority": false
+}

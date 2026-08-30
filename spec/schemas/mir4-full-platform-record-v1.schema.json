@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-full-platform-record-v1.schema.json",
+  "x-mir-canonical-path": "spec/schemas/mir4-full-platform-record-v1.schema.json",
+  "title": "MIR4FullPlatformRecordV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "source_identity",
+    "maturity",
+    "authority",
+    "package_visible",
+    "public_release_proof_exists",
+    "evidence_refs",
+    "payload",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"type": "string", "pattern": "^MIR4[A-Za-z0-9]+V1$"},
+    "status": {"type": "string", "minLength": 1},
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["programme_id", "commit", "tree", "source_version", "package_source_sha256"],
+      "properties": {
+        "programme_id": {"const": "M4C02-09-24H"},
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"},
+        "source_version": {"const": "4.0.0"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "maturity": {
+      "enum": ["stable-governance", "stable-shadow", "preview", "shadow", "experimental", "blocked-with-evidence", "mixed"]
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "mode", "source_paths"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "mode": {"enum": ["canonical", "read-only-composition", "evidence-only-aggregation", "external-independent-audit"]},
+        "source_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "package_visible": {"const": false},
+    "public_release_proof_exists": {"const": false},
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/evidenceRef"}
+    },
+    "payload": {"type": "object"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "role": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

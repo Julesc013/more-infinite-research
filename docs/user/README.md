@@ -15,6 +15,7 @@ superseded_by: []
 These pages explain MIR from the player and modpack-author point of view.
 
 - [Installation](installation.md)
+- [Upgrading from MIR 3 to MIR 4](mir3-to-mir4.md)
 - [Settings](settings.md)
 - [Generated technologies](generated-technologies.md)
 - [Diagnostics](diagnostics.md)

@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "kind": "Mir3TerminalReleaseClosureV1",
+  "release": "3.2.11",
+  "status": "github-closed-mod-portal-pending",
+  "package_visible": false,
+  "frozen_manifest": {
+    "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixSourceFreezeV2.json",
+    "sha256": "D7845E556B58275A43348DBD494F4473D095640AE52092C37FE5C4F5D16E9E7D"
+  },
+  "review": {
+    "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json",
+    "sha256": "180F27209D46EB8014D92EF3AA26FB681EE94B270C1F1F202DD0CF05E36F0587",
+    "decision": "maintainer-accepted-release-specific-override"
+  },
+  "seal": {
+    "path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json",
+    "sha256": "A403CF300C18C03BD00BDCA93EBEC0B257E821D5F4D1EE6B353D2525B9531834",
+    "status": "deterministically-reconstructed"
+  },
+  "tag": {
+    "name": "3.2.11",
+    "object_sha": "62eb06fc98b4b151d71dba8f02a055ca5a8a99e3",
+    "peeled_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+    "immutable": true
+  },
+  "github": {
+    "receipt": ".mir/evidence/terminal-publication/2026-08-18/github/3.2.11.json",
+    "status": "published-and-verified",
+    "release_url": "https://github.com/Julesc013/more-infinite-research/releases/tag/3.2.11",
+    "download_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
+  },
+  "mod_portal": {
+    "state": "maintainer-upload-not-independently-custody-verified",
+    "authenticated_redownload": "pending"
+  },
+  "final_channel_state": "github-published-and-verified-mod-portal-custody-pending",
+  "record_sha256": "84C36AF1075EF740DBCDE0A429B93D4D62EB628A9BC5C46DB718BF7BA7FD8675"
+}

@@ -29,6 +29,103 @@ $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location -LiteralPath $repo
+. (Join-Path $repo "tools\lib\mir4\BootstrapMaterialization.ps1")
+
+function Assert-MIRReleaseGateCrossTargetCandidate {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$FactorioLine,
+    [Parameter(Mandatory)][string]$CandidateZip,
+    [Parameter(Mandatory)][string]$CandidateSourceCommit,
+    [Parameter(Mandatory)][string]$FactorioBin
+  )
+
+  $targetByLine = @{
+    "2.0" = "f200"
+  }
+  if (-not $targetByLine.ContainsKey($FactorioLine)) {
+    throw "Cross-target release-gate testing is not authorized for Factorio line '$FactorioLine'."
+  }
+  $targetKey = [string]$targetByLine[$FactorioLine]
+  $laneRoot = Join-Path $RepoRoot "build\mir4\local-playtest-shadow"
+  $authorityPath = Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Private-Lane-AuthorizationV3.json"
+  $manifestPath = Join-Path $laneRoot "manifests\$targetKey.json"
+  if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+    throw "Cross-target release-gate testing requires the exact V3 private-lane authority and target manifest."
+  }
+
+  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -Depth 100
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
+      [string]$authority.kind -cne "MIR4PrivateLaneAuthorizationV3" -or
+      [string]$authority.authority_family -cne "MIRLocalArtifactLaneAuthorizationV1" -or
+      [bool]$authority.package_visible -or
+      [bool]$authority.release_admission_authorized -or
+      [bool]$authority.public_identity_authorized -or
+      [bool]$authority.public_output_authorized -or
+      [bool]$authority.signing_or_sealing_authorized -or
+      [bool]$authority.publication_authorized -or
+      [bool]$authority.wildcard_targets_authorized -or
+      [bool]$authority.gate_waivers_authorized) {
+    throw "Cross-target release-gate testing requires a valid, private, release-orthogonal V3 authority."
+  }
+
+  $rows = @($authority.authorized_targets | Where-Object {
+    [string]$_.target_key -ceq $targetKey -and [string]$_.factorio_line -ceq $FactorioLine
+  })
+  if ($rows.Count -ne 1) { throw "Cross-target release-gate testing requires one exact authorized target row." }
+  $row = $rows[0]
+  if ([string]$CandidateSourceCommit -cne [string]$row.source_commit -or
+      [string]$manifest.kind -cne "MIR4LocalPlaytestCandidateManifestV1" -or
+      [string]$manifest.lane -cne "local-playtest-shadow" -or
+      [string]$manifest.target_key -cne $targetKey -or
+      [string]$manifest.factorio_line -cne $FactorioLine -or
+      [string]$manifest.distribution_version -cne [string]$row.distribution_version -or
+      [string]$manifest.admission -cne "non-authoritative-shadow-blocked-by-eol" -or
+      [bool]$manifest.public_output_authorized -or
+      [bool]$manifest.release_claim_permitted -or
+      [string]$manifest.local_lane_authority.record_sha256 -cne [string]$authority.record_sha256) {
+    throw "Cross-target release-gate testing inputs do not match the exact authorized target identity."
+  }
+
+  $expectedCandidate = [IO.Path]::GetFullPath((Join-Path $laneRoot ([string]$manifest.local_distribution.path)))
+  if (-not $expectedCandidate.Equals([IO.Path]::GetFullPath($CandidateZip), [StringComparison]::OrdinalIgnoreCase) -or
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $CandidateZip).Hash -cne [string]$manifest.local_distribution.archive_sha256) {
+    throw "Cross-target release-gate testing requires the exact governed candidate path and bytes."
+  }
+  if ((Get-FileHash -Algorithm SHA256 -LiteralPath $FactorioBin).Hash -cne [string]$row.engine_sha256) {
+    throw "Cross-target release-gate testing requires the exact target-bound Factorio engine."
+  }
+
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $archive = [IO.Compression.ZipFile]::OpenRead($CandidateZip)
+  try {
+    $infoEntries = @($archive.Entries | Where-Object { $_.FullName -match "^[^/]+/info\.json$" })
+    if ($infoEntries.Count -ne 1) { throw "Cross-target candidate must contain one package-root info.json." }
+    $reader = [IO.StreamReader]::new($infoEntries[0].Open(), [Text.Encoding]::UTF8, $true)
+    try { $candidateInfo = $reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() }
+  } finally {
+    $archive.Dispose()
+  }
+  if ([string]$candidateInfo.name -cne "more-infinite-research" -or
+      [string]$candidateInfo.version -cne [string]$row.distribution_version -or
+      [string]$candidateInfo.factorio_version -cne $FactorioLine) {
+    throw "Cross-target candidate metadata does not match the authorized distribution and Factorio line."
+  }
+
+  return [pscustomobject][ordered]@{
+    authority = "MIR4PrivateLaneAuthorizationV3"
+    target_key = $targetKey
+    factorio_line = $FactorioLine
+    cross_target_candidate_authorization = $script:crossTargetCandidateAuthorization
+    distribution_version = [string]$row.distribution_version
+    candidate_sha256 = [string]$manifest.local_distribution.archive_sha256
+    engine_sha256 = [string]$row.engine_sha256
+    release_authority = $false
+  }
+}
 
 $modInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 $modName = [string]$modInfo.name
@@ -37,9 +134,7 @@ $targetFactorioVersion = [string]$modInfo.factorio_version
 if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
   $FactorioLine = $targetFactorioVersion
 }
-if ($FactorioLine -ne $targetFactorioVersion) {
-  throw "Requested FactorioLine '$FactorioLine' does not match info.json factorio_version '$targetFactorioVersion'. Switch to the matching source branch before running this release gate."
-}
+$requiresCrossTargetAuthorization = $FactorioLine -ne $targetFactorioVersion
 if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
   $AuditFactorioVersions = @($FactorioLine)
 }
@@ -233,6 +328,7 @@ $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
 }
 
 $script:releaseGateResults = @()
+$script:crossTargetCandidateAuthorization = $null
 $script:resolvedFactorioBin = Resolve-MIRReleaseGateFactorioBinary -Path $FactorioBin
 $script:resolvedCandidateZip = ""
 if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
@@ -240,6 +336,18 @@ if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
 }
 if (-not [string]::IsNullOrWhiteSpace($CandidateSourceCommit) -and $CandidateSourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
   throw "CandidateSourceCommit must be a full 40-character git commit."
+}
+if ($requiresCrossTargetAuthorization) {
+  if ([string]::IsNullOrWhiteSpace($script:resolvedCandidateZip) -or
+      [string]::IsNullOrWhiteSpace($CandidateSourceCommit)) {
+    throw "Cross-target release-gate testing requires an exact candidate ZIP and source commit."
+  }
+  $script:crossTargetCandidateAuthorization = Assert-MIRReleaseGateCrossTargetCandidate `
+    -RepoRoot $repo.Path `
+    -FactorioLine $FactorioLine `
+    -CandidateZip $script:resolvedCandidateZip `
+    -CandidateSourceCommit $CandidateSourceCommit `
+    -FactorioBin $script:resolvedFactorioBin
 }
 $script:resolvedLocalModDir = ""
 $script:packageOutputDir = $PackageOutputDir

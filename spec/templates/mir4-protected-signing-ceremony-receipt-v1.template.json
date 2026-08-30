@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR4ProtectedSigningCeremonyReceiptTemplateV1",
+  "canonicalization": "MIR4BootstrapCanonicalJsonV1",
+  "programme_id": "M4C02-09-24H",
+  "turn": "T16",
+  "status": "TEMPLATE-NOT-EVIDENCE",
+  "required_human_values": [
+    "authorization.record_path",
+    "authorization.record_sha256",
+    "custody_validation.approved_custodian_sid_set_sha256",
+    "public_signer.public_key",
+    "public_signer.fingerprint",
+    "recovery.copies[0].copy_id",
+    "recovery.copies[0].ciphertext_sha256",
+    "recovery.copies[0].custodian_class",
+    "recovery.copies[1].copy_id",
+    "recovery.copies[1].ciphertext_sha256",
+    "recovery.copies[1].custodian_class",
+    "recovery.ciphertexts_distinct",
+    "recovery.separate_locations_verified",
+    "recovery.separate_custodians_verified",
+    "recovery.clean_restore.restored_at",
+    "allowed_signers.record_sha256",
+    "human_acceptance.maintainer",
+    "human_acceptance.decided_at"
+  ],
+  "forbidden_values": [
+    "private-key-bytes",
+    "private-key-path",
+    "passphrase",
+    "recovery-plaintext",
+    "encryption-key",
+    "credential-value"
+  ],
+  "acceptance_rule": "Materialize a new receipt conforming to the production schema; never edit this template into evidence.",
+  "production_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signature": false,
+    "seal": false,
+    "promotion": false,
+    "tag": false,
+    "publication": false
+  },
+  "secret_values_present": false,
+  "record_sha256": null
+}

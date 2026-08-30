@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-spdx-3.0.1-profile.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["@context", "@graph"],
+  "properties": {
+    "@context": {"const": "https://spdx.org/rdf/3.0.1/spdx-context.jsonld"},
+    "@graph": {
+      "type": "array",
+      "minItems": 9,
+      "contains": {
+        "type": "object",
+        "required": ["type", "spdxId", "profileConformance"],
+        "properties": {
+          "type": {"const": "SpdxDocument"},
+          "profileConformance": {
+            "type": "array",
+            "allOf": [
+              {"contains": {"const": "core"}},
+              {"contains": {"const": "software"}},
+              {"contains": {"const": "simpleLicensing"}}
+            ]
+          }
+        }
+      }
+    }
+  }
+}

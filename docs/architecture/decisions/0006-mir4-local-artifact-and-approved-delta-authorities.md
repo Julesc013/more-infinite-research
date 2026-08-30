@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-17
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-local-artifact-lane-authorization-v1
+  - mir-approved-delta-v1
+  - mir4-local-playtest-shadow-boundary
+  - mir4-approved-bootstrap-correction-boundary
 ---
 
 # ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities

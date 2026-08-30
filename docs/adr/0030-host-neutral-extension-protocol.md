@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-04
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-extension-protocol-v1-decision
 ---
 
 # ADR 0030: Host-Neutral MIR Extension Protocol v1

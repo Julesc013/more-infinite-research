@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-08
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - dual-parent-backport-integration
+  - backport-reconstruction-contract
 ---
 
 # Deterministic Backport Reconstruction

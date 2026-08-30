@@ -1,0 +1,31 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "assurance",
+  "path": "assurance",
+  "mode": "active-proof-policy-root",
+  "current_authorities": [
+    "assurance/repository/fixed-point-tooling-v1.json",
+    "assurance/repository/canonicalization-tooling-v1.json",
+    "assurance/repository/diagnostics-tooling-v1.json",
+    "assurance/repository/target-key-tooling-v1.json",
+    "assurance/repository/whole-platform-tooling-v1.json",
+    "assurance/repository/technology-acceptance-tooling-v1.json",
+    "assurance/repository/target-compiler-tooling-v1.json",
+    "assurance/repository/semantic-compiler-policy-tooling-v1.json",
+    "assurance/repository/runtime-continuity-tooling-v1.json",
+    "assurance/repository/module-sdk-mep-tooling-v1.json",
+    "assurance/repository/processir-exact-tooling-v1.json",
+    "assurance/repository/inspector-compatibility-tooling-v1.json",
+    "assurance/repository/assurance-offline-custody-tooling-v1.json",
+    "assurance/repository/historical-tooling-v1.json",
+    "assurance/repository/release-tooling-v1.json",
+    "tools/lib/assurance",
+    "validation",
+    ".mir/control-plane"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

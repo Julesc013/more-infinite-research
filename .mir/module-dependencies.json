@@ -39,7 +39,7 @@
     "presentation->core","presentation->platform","presentation->settings",
     "providers->compatibility","providers->core","providers->domain","providers->families","providers->index","providers->policy",
     "report->capabilities","report->core","report->domain","report->emit","report->families","report->index","report->integrity","report->pipeline","report->platform","report->settings",
-    "runtime->domain","runtime->platform","runtime->settings",
+    "runtime->domain","runtime->platform","runtime->settings","runtime->streams",
     "settings->core","settings->domain","settings->pipeline","settings->platform","settings->streams",
     "stage->compatibility","stage->pipeline","stage->platform","stage->report","stage->runtime","stage->settings","stage->streams",
     "streams->compatibility","streams->core","streams->domain","streams->platform"

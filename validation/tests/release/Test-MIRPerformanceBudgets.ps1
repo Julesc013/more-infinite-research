@@ -282,7 +282,7 @@ foreach ($snippet in @("Measure-MIRPerformanceRegression.ps1", "Test-MIRPerforma
   }
 }
 $producerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
-foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId", "historical target package source", "package-root equivalent", "campaign.candidate.package_source_commit", "declares official module data absent", "official_data_roots", "declaredOfficialModules", "ManualScenariosRelativePath", "manual_scenarios_sha256", "RequiredProbePhases", "RequiresProbeTelemetry", "omitted-by-capability", "ArtifactVolumeLaneIds", 'New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine', 'SanitationBudgetPath = (Join-Path $RepoRoot', 'FactorioLine = [string]$campaign.factorio_line', 'Join-Path $executionRoot')) {
+foreach ($snippet in @("schema = 3", "artifact_volume", "counter_budget_failures", "MIR_PERFORMANCE_PROBE", "paired-balanced", "ProbeSmokeOnly", "CompatSmokeLaneId", "historical target package source", "package-root equivalent", "campaign.candidate.package_source_commit", "declares official module data absent", "official_data_roots", "declaredOfficialModules", "ManualScenariosRelativePath", "manual_scenarios_sha256", "RequiredProbePhases", "RequiresProbeTelemetry", "omitted-by-capability", "ArtifactVolumeLaneIds", 'New-MIRCampaignSettingsOverrideMod -ModsDir $modsDir -Settings $Lane.settings -FactorioLine', 'Copy-MIRCampaignProbe -ModsDir $modsDir -FactorioLine', 'base >= $minimumBase', 'SanitationBudgetPath = (Join-Path $RepoRoot', 'FactorioLine = [string]$campaign.factorio_line', 'Join-Path $executionRoot')) {
   if ($producerSource -notmatch [regex]::Escape($snippet)) {
     throw "Performance campaign producer lacks required schema-3 behavior '$snippet'."
   }
@@ -296,7 +296,7 @@ foreach ($snippet in @("compact-context-scratch-v1", "conservative_path_budget",
 $performanceCampaignHelpers = Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1"
 . $performanceCampaignHelpers
 $helperSource = Get-Content -Raw -LiteralPath $performanceCampaignHelpers
-foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget", "Resolve-MIRPerformanceArtifactVolumePolicy", "complete legacy current-target telemetry authority")) {
+foreach ($snippet in @("mir-performance-staging-provenance", "compact-context-scratch-v2", "Copy-MIRPerformanceArtifactsVerified", "case or Unicode-normalization collision", "conservative_path_budget", "Resolve-MIRPerformanceArtifactVolumePolicy", "Resolve-MIRPerformanceLanePlan", "active and omitted lane set", "complete legacy current-target telemetry authority")) {
   if ($helperSource -notmatch [regex]::Escape($snippet)) {
     throw "Canonical performance staging helper lacks required 0012 behavior '$snippet'."
   }
@@ -329,6 +329,16 @@ try {
 }
 if (-not $legacyPolicyRejected) {
   throw "An incomplete policy-less current-target campaign must fail closed."
+}
+$f200CampaignPath = Join-Path $RepoRoot ".mir\performance-campaigns\4.0.20000-M4C01.json"
+if (Test-Path -LiteralPath $f200CampaignPath -PathType Leaf) {
+  $f200Campaign = Get-Content -Raw -LiteralPath $f200CampaignPath | ConvertFrom-Json
+  $f200LanePlan = Resolve-MIRPerformanceLanePlan -Campaign $f200Campaign -BudgetManifest $manifest
+  if ((Resolve-MIRPerformanceArtifactVolumePolicy -Campaign $f200Campaign) -ne "omitted-by-capability" -or
+      @($f200LanePlan.active_ids).Count -ne 6 -or @($f200LanePlan.omitted_lanes).Count -ne 4 -or
+      @($f200LanePlan.omitted_lanes | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.reason) }).Count -ne 0) {
+    throw "The f200 M4C01 campaign must bind six executable lanes and four exact target-capability omissions."
+  }
 }
 $harnessSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\validation\PerformanceCampaign.ps1")
 foreach ($snippet in @("scenarioAuthority", "repository-relative scenario authority", 'Alias("RepoRoot")', "ExecutionRoot", "TargetAuthorityRoot", 'scope="execution"', 'scope="target"')) {

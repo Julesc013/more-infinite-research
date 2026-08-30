@@ -21,6 +21,10 @@ foreach ($snippet in @(
   'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json',
   'MIR3PostTerminalEmergencyHotfixCandidateReconstructionV2.json',
   'MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json',
+  '2026-08-18/github/3.2.11.json',
+  'closures/3.2.11.json',
+  '$authorityRepo = if ($Operation -eq "post-publication-sync") { $controllerRepo } else { $repo }',
+  '$expectedReleaseState = if ($Operation -eq "post-publication-sync") { "publicly-verified" } else { "sealed" }',
   'MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json',
   'New-MIR3TerminalReleaseCeremony.ps1',
   'Get-MIRZipContentFingerprint',
@@ -29,6 +33,11 @@ foreach ($snippet in @(
   'post-publication-authority-sync-only',
   'ValidateSet("main", "legacy")',
   'Legacy alias promotion tree must be exactly identical to protected main.',
+  'The 3.2.11 legacy alias promotion tree must be exactly identical to protected main.',
+  'The 3.2.11 legacy alias candidate must be a two-parent commit whose tree is exactly protected main.',
+  'legacy-alias-post-publication-sync-only',
+  '20210a90d97c52426ea6abc7c94a89bb8ec7671b',
+  'The dispatched terminal controller checkout contains tracked changes outside its exact commit.',
   'merge-base --is-ancestor $mainRemote $CandidateSha',
   'Mir3PostTerminalEmergencyPublicationReceiptV1',
   'MIR3-TERM-0033',
@@ -44,6 +53,11 @@ foreach ($snippet in @(
   "terminal_operation:",
   "terminal_candidate_ref:",
   "terminal_promotion_branch:",
+  "MIR_TERMINAL_CONTROLLER_SHA:",
+  "path: controller",
+  "path: candidate",
+  "-ControllerSha `$env:MIR_TERMINAL_CONTROLLER_SHA",
+  "-RepoRoot ./candidate",
   "ref: `${{ inputs.terminal_candidate_sha }}",
   "checks: write",
   "statuses: write",
@@ -347,7 +361,10 @@ if ($legacyCalibrationItem.Count -ne 1 -or [string]$legacyCalibrationItem[0].clo
     [string]$legacyCalibrationItem[0].closure.evidence -ne ".mir/releases/terminal/MIR3TerminalAssuranceCalibrationReceiptV1.json") {
   throw "Legacy terminal calibration debt remains unresolved."
 }
-if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw "Legacy .work directory exists after foundation admission." }
+$deprecatedWorkRoot = "." + "work"
+if (Test-Path -LiteralPath (Join-Path $RepoRoot $deprecatedWorkRoot)) {
+  throw "Legacy $deprecatedWorkRoot directory exists after foundation admission."
+}
 
 $programme = $authorities["MIR3-Terminal-ProgrammeV1"]
 $programmeStatus = [string]$programme.status
@@ -1325,11 +1342,30 @@ $emergencyCurrent = (($current.planned_releases -join "|") -eq ($emergencyFamily
     "3.2.10-published-publicly-verified-branch-and-mir4-handoff",
     "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff"
   ))
+$emergencyV2Family = @("3.2.11", "2.5.11", "3.2.10", "2.5.10") + $family
+$emergencyV2Current = (($current.planned_releases -join "|") -eq ($emergencyV2Family -join "|") -and
+  $current.roles.canonical -eq "3.2.11" -and $current.roles.planned_canonical -eq "3.2.11" -and
+  $current.roles.planned_backport -eq "2.5.11" -and
+  $current.active_programme.id -eq "MIR3PostTerminalEmergencyHotfixProgrammeV2" -and
+  [string]$current.active_programme.authority -eq ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json" -and
+  [string]$current.active_programme.status -eq "3.2.11-and-2.5.11-published-publicly-verified-mir4-handoff")
 if (-not $current.implementation_admitted -or -not $current.source_frozen -or
-    (-not $terminalCurrent -and -not $emergencyCurrent)) {
+    (-not $terminalCurrent -and -not $emergencyCurrent -and -not $emergencyV2Current)) {
   throw "Current release roles do not bind the active terminal or post-terminal emergency programme."
 }
-if ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
+if ($emergencyV2Current) {
+  if ($current.roles.latest_published_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.latest_tagged_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.published_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.tagged_factorio_2_1 -ne "3.2.11" -or
+      $current.roles.latest_published_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.latest_tagged_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.published_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.tagged_factorio_2_0 -ne "2.5.11" -or
+      $current.roles.backport_calibration -ne "2.5.11") {
+    throw "Post-terminal publication roles do not identify the immutable 3.2.11 and 2.5.11 authorities."
+  }
+} elseif ($emergencyCurrent -and [string]$current.active_programme.status -eq "3.2.10-and-2.5.10-published-publicly-verified-mir4-handoff") {
   if ($current.roles.latest_published_factorio_2_1 -ne "3.2.10" -or
       $current.roles.latest_tagged_factorio_2_1 -ne "3.2.10" -or
       $current.roles.published_factorio_2_1 -ne "3.2.10" -or

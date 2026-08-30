@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-private-lane-authorization-v3.schema.json",
+  "title": "MIR 4 private local-playtest lane authorization V3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "authority_family", "status", "canonicalization", "approved_by", "package_visible", "semantic_authority", "semantic_difference_authorized", "release_admission_authorized", "public_identity_authorized", "public_output_authorized", "signing_or_sealing_authorized", "publication_authorized", "wildcard_targets_authorized", "gate_waivers_authorized", "output_root", "supersedes", "imports", "authorized_targets", "allowed_operations", "allowed_statuses", "forbidden_operations", "private_transfer", "expiry", "rollback", "hard_boundary", "record_sha256"],
+  "properties": {
+    "schema": { "const": 3 },
+    "kind": { "const": "MIR4PrivateLaneAuthorizationV3" },
+    "authority_family": { "const": "MIRLocalArtifactLaneAuthorizationV1" },
+    "status": { "const": "authorized-private-local-playtest-shadow" },
+    "canonicalization": { "const": "MIR4BootstrapCanonicalJsonV1" },
+    "approved_by": { "const": "explicit-maintainer-bounded-authorization-2026-08-18" },
+    "package_visible": { "const": false },
+    "semantic_authority": { "const": false },
+    "semantic_difference_authorized": { "const": false },
+    "release_admission_authorized": { "const": false },
+    "public_identity_authorized": { "const": false },
+    "public_output_authorized": { "const": false },
+    "signing_or_sealing_authorized": { "const": false },
+    "publication_authorized": { "const": false },
+    "wildcard_targets_authorized": { "const": false },
+    "gate_waivers_authorized": { "const": false },
+    "output_root": { "const": "build/mir4/local-playtest-shadow" },
+    "supersedes": {
+      "const": {
+        "path": ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json",
+        "record_sha256": "AF1A9AD0A98284BF96489382EB8A0E416E7093B29DB113E49C511E6D0918EF2D",
+        "disposition": "historical-dot10-predecessor-authorization"
+      }
+    },
+    "imports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate_plan", "target_profiles", "terminal_predecessor_refresh", "terminal_import_contract", "terminal_import", "bootstrap_root_set", "terminal_import_composite"],
+      "properties": {
+        "candidate_plan": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json" }, "record_sha256": { "const": "6F889ECB0A6853274A66F243FC9FF7BCF222680B1DA0ED06EF0217B5BF8A8910" } } }] },
+        "target_profiles": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/targets.json" } } }] },
+        "terminal_predecessor_refresh": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json" } } }] },
+        "terminal_import_contract": { "allOf": [{ "$ref": "#/$defs/fileImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json" } } }] },
+        "terminal_import": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json" }, "record_sha256": { "const": "9E32D57535047CC0637B00025E799D886E7C2DA5925EB1FAE0001331C3531ECE" } } }] },
+        "bootstrap_root_set": { "allOf": [{ "$ref": "#/$defs/recordImport" }, { "properties": { "path": { "const": ".mir/releases/waves/mir4-r0/bootstrap-root-set.json" }, "record_sha256": { "const": "F71B9FA4E88BE0BE3DD23A770493B08448EEAEAD719D19BC755E2A22A0030C6D" } } }] },
+        "terminal_import_composite": { "$ref": "#/$defs/fileImport" }
+      }
+    },
+    "authorized_targets": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "prefixItems": [
+        { "allOf": [{ "$ref": "#/$defs/target" }, { "$ref": "#/$defs/f200" }] },
+        { "allOf": [{ "$ref": "#/$defs/target" }, { "$ref": "#/$defs/f110" }] },
+        { "allOf": [{ "$ref": "#/$defs/target" }, { "$ref": "#/$defs/f100" }] }
+      ],
+      "items": false
+    },
+    "allowed_operations": { "const": ["construct-deterministic-local-artifact", "check-local-artifact", "run-local-smoke", "run-local-predecessor-upgrade", "export-candidate-bound-evidence", "controlled-private-transfer"] },
+    "allowed_statuses": { "const": ["built-unqualified-local-playtest-candidate", "locally-smoke-qualified-playtest-candidate", "locally-upgrade-qualified-playtest-candidate"] },
+    "forbidden_operations": { "const": ["public-identity-allocation", "git-tag", "dist-write", "upload", "publication", "production-seal", "public-release-or-beta-claim", "broad-support-claim", "wildcard-target", "generic-gate-waiver", "package-visible-difference-outside-existing-equivalence"] },
+    "private_transfer": { "const": { "permitted": true, "custody": "maintainer-controlled-private-machines-only", "public_or_uncontrolled_transfer": false, "numeric_public_version_requires_private_custody": true } },
+    "expiry": { "const": ["formal-target-admission-supersedes", "bound-target-source-changes", "bound-plan-or-profile-changes", "candidate-abandoned"] },
+    "rollback": { "const": "Delete only ignored build/mir4/local-playtest-shadow artifacts and their exported local evidence; do not alter release authority, dist, tags, seals, or public systems." },
+    "hard_boundary": { "type": "string", "minLength": 1 },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "gitSha1": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "fileImport": { "type": "object", "additionalProperties": false, "required": ["path", "file_sha256"], "properties": { "path": { "type": "string", "minLength": 1 }, "file_sha256": { "$ref": "#/$defs/sha256" } } },
+    "recordImport": { "type": "object", "additionalProperties": false, "required": ["path", "file_sha256", "record_sha256"], "properties": { "path": { "type": "string", "minLength": 1 }, "file_sha256": { "$ref": "#/$defs/sha256" }, "record_sha256": { "$ref": "#/$defs/sha256" } } },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target_key", "factorio_line", "distribution_version", "source_commit", "source_tree", "predecessor_release", "predecessor_archive_sha256", "predecessor_content_sha256", "engine_version", "engine_sha256", "package_difference_disposition"],
+      "properties": {
+        "target_key": { "enum": ["f200", "f110", "f100"] },
+        "factorio_line": { "enum": ["2.0", "1.1", "1.0"] },
+        "distribution_version": { "enum": ["4.0.20000", "4.0.11000", "4.0.10000"] },
+        "source_commit": { "$ref": "#/$defs/gitSha1" },
+        "source_tree": { "$ref": "#/$defs/gitSha1" },
+        "predecessor_release": { "enum": ["2.5.11", "1.9.9", "1.8.9"] },
+        "predecessor_archive_sha256": { "$ref": "#/$defs/sha256" },
+        "predecessor_content_sha256": { "$ref": "#/$defs/sha256" },
+        "engine_version": { "enum": ["2.0.77", "1.1.110", "1.0.0-only"] },
+        "engine_sha256": { "$ref": "#/$defs/sha256" },
+        "package_difference_disposition": { "const": "metadata-only-version-and-root-difference" }
+      }
+    },
+    "f200": { "properties": { "target_key": { "const": "f200" }, "factorio_line": { "const": "2.0" }, "distribution_version": { "const": "4.0.20000" }, "source_commit": { "const": "57324642e7423d784d7f22b9be4a2b6b350bf012" }, "source_tree": { "const": "7786bdeaee398e069abdf7de797f82f645ccba45" }, "predecessor_release": { "const": "2.5.11" }, "predecessor_archive_sha256": { "const": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C" }, "predecessor_content_sha256": { "const": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D" }, "engine_version": { "const": "2.0.77" }, "engine_sha256": { "const": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B" } } },
+    "f110": { "properties": { "target_key": { "const": "f110" }, "factorio_line": { "const": "1.1" }, "distribution_version": { "const": "4.0.11000" }, "source_commit": { "const": "2243cfd31c0d6c575782c5b004514c3845d1907c" }, "source_tree": { "const": "cd8704581f5cd8f8da6238fd76f2b0c5ee7e56ff" }, "predecessor_release": { "const": "1.9.9" }, "predecessor_archive_sha256": { "const": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843" }, "predecessor_content_sha256": { "const": "3494AB647325B3C26FAA14CC59616A798DB32A7BB003C8B9C7D74916F936D064" }, "engine_version": { "const": "1.1.110" }, "engine_sha256": { "const": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1" } } },
+    "f100": { "properties": { "target_key": { "const": "f100" }, "factorio_line": { "const": "1.0" }, "distribution_version": { "const": "4.0.10000" }, "source_commit": { "const": "8cdc87db5a686b12b1aa3c6f432ae8e4b74a4309" }, "source_tree": { "const": "2d5599b1c31fbc5b35bce69ce651159d0877e7a4" }, "predecessor_release": { "const": "1.8.9" }, "predecessor_archive_sha256": { "const": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A" }, "predecessor_content_sha256": { "const": "7508A815AEDE466551E1ED4EBE0B941B4D323F539FC6163182BE6F65BFF29A2E" }, "engine_version": { "const": "1.0.0-only" }, "engine_sha256": { "const": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70" } } }
+  }
+}

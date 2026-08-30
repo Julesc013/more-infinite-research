@@ -101,6 +101,65 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
     }
   }
 
+  # MIR 4 candidate-programme profiles intentionally exist before a typed
+  # release record or approved-delta artifact. Bind the pending fingerprint to
+  # the exact implementation authorization and target registry instead of
+  # fabricating release authority or treating the absent future artifact as an
+  # assurance-tooling failure.
+  if ([string]$Context.verification_profile.release_authority_mode -eq 'candidate-programme') {
+    $authorityRelative = ([string]$Context.verification_profile.release_authority).Replace('\', '/')
+    if ($authorityRelative -notmatch '^\.mir/releases/waves/mir4-r0/[A-Za-z0-9._-]+\.json$') {
+      throw "Candidate-programme approved-delta authority path is unsafe: $authorityRelative"
+    }
+    $authorityPath = Join-Path $repo $authorityRelative
+    $registryRelative = '.mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json'
+    $registryPath = Join-Path $repo $registryRelative
+    if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
+      throw 'Candidate-programme approved-delta authority or target registry is absent.'
+    }
+    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+    $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json
+    $targetRows = @($registry.payload.targets | Where-Object {
+      [string]$_.factorio -eq [string]$Context.target
+    })
+    if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+        -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
+        [string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+        [string]$authority.status -ne 'authorized-in-progress' -or
+        @($authority.authorized) -notcontains 'exact-engine-development-proof' -or
+        @($authority.not_authorized) -notcontains 'production-seal' -or
+        @($authority.not_authorized) -notcontains 'github-release-publication' -or
+        @($authority.not_authorized) -notcontains 'mod-portal-mir4-upload' -or
+        [string]$registry.kind -ne 'MIR4-Target-RegistryV5' -or
+        [string]$registry.status -ne 'accepted-candidate-programme-current' -or
+        $registry.package_visible -or $targetRows.Count -ne 1) {
+      throw 'Candidate-programme approved-delta authority boundary is invalid.'
+    }
+    $targetRow = $targetRows[0]
+    $expectedVersion = "4.0.$([string]$targetRow.distribution_target_code)00"
+    if ([string]$targetRow.mir3_predecessor -ne $fromVersion -or
+        $expectedVersion -ne $toVersion -or
+        [string]$targetRow.disposition -notin @('candidate-mandatory', 'candidate-conditional')) {
+      throw 'Candidate-programme approved-delta profile does not match the exact target registry row.'
+    }
+    $material = [ordered]@{
+      kind='approved-delta-transition'
+      state='pending'
+      from_version=$fromVersion
+      to_version=$toVersion
+      path=$relativePath
+      release_record=$authorityRelative
+      release_state=[string]$authority.status
+      release_record_sha256=(Get-MIRAssuranceSha256 -Path $authorityPath)
+      target_registry=$registryRelative
+      target_registry_sha256=(Get-MIRAssuranceSha256 -Path $registryPath)
+      authority_class='candidate-programme-development-only'
+    }
+    $material['sha256'] = Get-MIRAssuranceJsonHash -Value $material
+    return $material
+  }
+
   $path = Join-Path $repo $relativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Approved-delta transition artifact is absent: $relativePath"
@@ -192,14 +251,88 @@ function Get-MIRAssuranceInputFingerprint {
         throw "Unable to resolve the staged compact source-lock authority for release-history fingerprinting."
       }
       $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
+      $successorAuthority = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
+        ".gitattributes",
+        ".mir/assurance.json",
+        ".mir/compatibility.yml",
+        ".mir/control",
+        ".mir/control-plane/ownership.json",
+        ".mir/docs.yml",
+        ".mir/modules.yml",
+        ".mir/releases/governance/mir4/supply-chain.json",
+        ".mir/releases/waves/mir4-r0",
+        "assurance/.mir-root.json",
+        "releases/migrations",
+        "contracts/repository",
+        "governance/.mir-root.json",
+        "governance/repository/migrations",
+        "assurance/repository",
+        "tests/.mir-root.json",
+        "validation/tests.yml",
+        "tools/mir.ps1",
+        "mir.lock",
+        "spec/compatibility/claims.json",
+        "spec/schemas",
+        "tools/mir/application/migration",
+        "tools/mir/application/targets",
+        "tools/mir/application/compiler",
+        "tools/mir/application/runtime",
+        "tools/mir/application/extensions",
+        "tools/mir/application/processir",
+        "tools/mir/application/inspection",
+        "tools/mir/application/assurance",
+        "tools/mir/application/custody",
+        "tools/mir/application/history",
+        "tools/mir/application/release",
+        "tools/mir/application/technology",
+        "tools/mir/domain/safety",
+        "tools/mir/domain/policy",
+        "tools/mir/cli",
+        "tools/lib/assurance",
+        "tools/lib/mir4",
+        "tools/commands/mir4",
+        "tests/compiler",
+        "tests/runtime",
+        "tests/extensions",
+        "tests/processir",
+        "tests/inspection",
+        "tests/assurance",
+        "tests/history",
+        "tests/release-tooling",
+        "tests/targets",
+        "tests/technology",
+        "validation/tests/mir4",
+        "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+        "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+        "validation/tests/tooling/Test-MIRAssurance.ps1",
+        "docs/architecture",
+        "docs/compatibility",
+        "docs/developer/environment-locks.md",
+        "docs/reference/generated",
+        "docs/releases",
+        "sdk/preview/mir4/reference/t13"
+      )
+      if ([int]$successorAuthority.file_count -lt 5) {
+        throw "Unable to resolve the staged append-only pre-freeze authority closure for release-history fingerprinting."
+      }
+      $packageFiles = @(Get-MIRAssurancePackageFiles)
+      $packageSource = [ordered]@{
+        kind="package-source"
+        file_count=$packageFiles.Count
+        sha256=(Get-MIRAssuranceTreeHash -Paths $packageFiles)
+      }
       $material = [ordered]@{
         source_lock=$sourceLock
         inventory=$inventory
+        successor_authority=$successorAuthority
+        package_source=$packageSource
       }
       return [ordered]@{
         kind="release-history"
         source_lock=$sourceLock
         inventory=$inventory
+        successor_authority=$successorAuthority
+        package_source=$packageSource
         sha256=(Get-MIRAssuranceJsonHash -Value $material)
       }
     }
@@ -921,8 +1054,15 @@ function Write-MIRAssuranceWorkerReceipt {
     throw "Cannot write a worker receipt without the plan's coordination producer for '$([string]$Test.id)'."
   }
   $receiptProducer = Get-MIRAssuranceProducer
+  $receiptProducerSha256 = Get-MIRAssuranceJsonHash -Value $receiptProducer
+  $evidenceProducerSha256 = Get-MIRAssuranceJsonHash -Value $Capsule.producer
+  $evidenceDisposition = if ($receiptProducerSha256 -eq $evidenceProducerSha256) {
+    "produced-by-worker"
+  } else {
+    "adopted-exact-trusted-capsule"
+  }
   $receipt = [ordered]@{
-    schema="mir-assurance-worker-receipt-v2"
+    schema="mir-assurance-worker-receipt-v3"
     plan=[ordered]@{
       material_sha256=$planMaterialSha256
       required_test_set_sha256=[string]$Plan.required_test_set_sha256
@@ -949,6 +1089,7 @@ function Write-MIRAssuranceWorkerReceipt {
     }
     producer=$receiptProducer
     evidence_producer=$Capsule.producer
+    evidence_disposition=$evidenceDisposition
     completed_at=(ConvertTo-MIRAssuranceTimestampText -Value $Capsule.completed_at)
   }
   $receiptPath = Join-Path $paths.root "worker-receipts\$planMaterialSha256.json"
@@ -978,7 +1119,7 @@ function Read-MIRAssuranceWorkerObject {
   catch { throw "Worker artifact for '$([string]$Test.id)' has an invalid worker receipt." }
   $expectedSafeId = ([string]$Test.id) -replace '[^A-Za-z0-9._-]', '_'
   $receiptMismatches = [Collections.Generic.List[string]]::new()
-  if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v2") { $receiptMismatches.Add("schema") }
+  if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v3") { $receiptMismatches.Add("schema") }
   if ([string]$receipt.plan.material_sha256 -ne [string]$Plan.plan_material_sha256) { $receiptMismatches.Add("plan-material") }
   if ([string]$receipt.plan.required_test_set_sha256 -ne [string]$Plan.required_test_set_sha256) { $receiptMismatches.Add("required-test-set") }
   $receiptGeneratedAt = ConvertTo-MIRAssuranceDateTimeOffset -Value $receipt.plan.generated_at
@@ -1001,7 +1142,14 @@ function Read-MIRAssuranceWorkerObject {
   if ([string]$receipt.result.capsule_sha256 -notmatch '^[A-Fa-f0-9]{64}$') { $receiptMismatches.Add("capsule-digest") }
   if (-not (Test-MIRAssuranceTrustedProducer -Producer $receipt.producer -Context $Context)) { $receiptMismatches.Add("receipt-trust-context") }
   if (-not (Test-MIRAssuranceTrustedProducer -Producer $receipt.evidence_producer -Context $Context)) { $receiptMismatches.Add("evidence-trust-context") }
-  if ((Get-MIRAssuranceJsonHash -Value $receipt.producer) -ne (Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer)) { $receiptMismatches.Add("worker-producer-binding") }
+  $receiptProducerSha256 = Get-MIRAssuranceJsonHash -Value $receipt.producer
+  $evidenceProducerSha256 = Get-MIRAssuranceJsonHash -Value $receipt.evidence_producer
+  $expectedEvidenceDisposition = if ($receiptProducerSha256 -eq $evidenceProducerSha256) {
+    "produced-by-worker"
+  } else {
+    "adopted-exact-trusted-capsule"
+  }
+  if ([string]$receipt.evidence_disposition -ne $expectedEvidenceDisposition) { $receiptMismatches.Add("evidence-disposition") }
   foreach ($field in @("repository", "workflow", "run_id", "run_attempt", "job", "commit", "ref", "event", "trust_class")) {
     if ([string]::IsNullOrWhiteSpace([string]$receipt.producer.$field)) { $receiptMismatches.Add("receipt-producer-$field") }
   }
@@ -1245,7 +1393,7 @@ function Import-MIRAssuranceWorkerEvidence {
       continue
     }
     $receiptTestId = [string]$receipt.work.test_id
-    if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v2" -or
+    if ([string]$receipt.schema -ne "mir-assurance-worker-receipt-v3" -or
         [string]$receipt.plan.material_sha256 -ne [string]$Plan.plan_material_sha256 -or
         -not $expectedRows.ContainsKey($receiptTestId)) {
       $matchedExpected = @($work | Where-Object { $directory.Name -eq "$ArtifactPrefix$([string]$_.safe_test_id)" })

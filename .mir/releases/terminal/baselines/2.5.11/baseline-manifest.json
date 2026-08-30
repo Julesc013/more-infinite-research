@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalHotfixBaselineContinuationV2",
+  "release": "2.5.11",
+  "target": "2.0",
+  "status": "captured-public-custody-pending-mir4-refresh",
+  "package_visible": false,
+  "capture_tool": {
+    "path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
+    "version": "2",
+    "sha256": "1EDC6192E52ED41A67C106D1A54C22DB6F1EC032924FE30A5085E4A9A98A21E4"
+  },
+  "foundation": {
+    "release": "2.5.10",
+    "manifest": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
+    "root_sha256": "D8F7543D496D36AA1DC94A20F4D3D04BA78A834C42A3798684825D06ACC664AB",
+    "retained_as_immutable_historical_snapshot": true
+  },
+  "distribution": {
+    "path": "dist/more-infinite-research_2.5.11.zip",
+    "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+    "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+    "bytes": 1065193,
+    "entries": 303,
+    "tag": "2.5.11"
+  },
+  "input_root_sha256": "66E331CE620FBE5CF1395EDE2486FC667EDC209959B856B63C4B8A1E9CD1DAB1",
+  "files": [
+    {
+      "logical_path": "authority/.mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
+      "source_path": ".mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json",
+      "sha256": "9FE6CAE3D01263C4235232F37BAA02C17CFF0136E0C4D939F6957B0E236726F5",
+      "bytes": 2383,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/deltas/2.5.10-to-2.5.11.json",
+      "source_path": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
+      "sha256": "4531BBF9BFA60BAAF0F1EA6CE64FF7DF1DE292214250E532656AA0FEF31A5563",
+      "bytes": 44174,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/findings/MIR3-TERM-0033.json",
+      "source_path": ".mir/releases/emergency/findings/MIR3-TERM-0033.json",
+      "sha256": "7267376581A115ECE443490981422389E2B7A0F72012BD1ED068630F6DD790CC",
+      "bytes": 2521,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/findings/MIR3-TERM-0034.json",
+      "source_path": ".mir/releases/emergency/findings/MIR3-TERM-0034.json",
+      "sha256": "06C0390177024C3E0EE913AEED0DC2FDD1B1898020B9D51F7615DE055AB5896F",
+      "bytes": 1812,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+      "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json",
+      "sha256": "1BE04C2D705EB86740FE99E53F7C67AC9B9AD34298EE9BB0DB41C0B99B2CAF44",
+      "bytes": 989,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+      "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixChangeSetV2.json",
+      "sha256": "FD07AAA8A9AFCB904F99FE4EF70C67C8E8FC8FB3161C12960DCA426EE4BF0C02",
+      "bytes": 903,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
+      "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2.json",
+      "sha256": "8C0271EAFE06412037583771ED2384D1C6BC57EC3848F7246469D06ED39B907F",
+      "bytes": 2093,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
+      "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixProgrammeV2.json",
+      "sha256": "A257DFC519967492AC8D95F997A05348E7524707C524F0D5ECDA1ED077E4972A",
+      "bytes": 1160,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json",
+      "source_path": ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixTargetMatrixV2.json",
+      "sha256": "9F983F25AB039EA12F2AC536CD8C63D066B1ED848E0B29702DB9A573EAF55FC4",
+      "bytes": 1087,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/records/2.5.11.json",
+      "source_path": ".mir/releases/records/2.5.11.json",
+      "sha256": "17BEDF0B36DE28F0AA5F79B2D2996BB35579A32A5D91B5837DAF0F7409267145",
+      "bytes": 3153,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
+      "source_path": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
+      "sha256": "E9BAC0A371B86E919599F7CEB781D5A991313E04645E1F40810B8FD996CE0BF4",
+      "bytes": 6785,
+      "role": "immutable-2.5.10-foundation"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
+      "source_path": ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
+      "sha256": "AB3F5EA27247DDAE80411257E4065A810753A4E3840013D47374A7FAAB849D96",
+      "bytes": 4376,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
+      "source_path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
+      "sha256": "A80B9935288B1D79BDAB630B3D14CDFE3B36BC0D1605C4B26316FB0720A48E3F",
+      "bytes": 4891,
+      "role": "normalized-import-snapshot"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/baselines/2.5.11/package-composition.json",
+      "source_path": ".mir/releases/terminal/baselines/2.5.11/package-composition.json",
+      "sha256": "6CDD3CCD982DA0A58C505D99A97E47D1728E98E1A4D326F593EC7AFF70E0C65A",
+      "bytes": 64361,
+      "role": "hotfix-package-composition"
+    },
+    {
+      "logical_path": "authority/.mir/releases/terminal/closures/2.5.11.json",
+      "source_path": ".mir/releases/terminal/closures/2.5.11.json",
+      "sha256": "127505377BA255C2F1F888A185DABC1D5739CA25D38A483CF146F4D76296BEB8",
+      "bytes": 1606,
+      "role": "release-closure"
+    },
+    {
+      "logical_path": "authority/docs/releases/notes/release-notes-2.5.11.md",
+      "source_path": "docs/releases/notes/release-notes-2.5.11.md",
+      "sha256": "344B837193F3E37EC98ACBB398A9AC2BC94640122CAABA70AF0BF320980B6EBE",
+      "bytes": 1639,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json",
+      "source_path": "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json",
+      "sha256": "08486C7F62966F2425EF2A5851AA828E9F941022B1625466F8857EECC9BB4393",
+      "bytes": 1995,
+      "role": "post-terminal-hotfix-authority"
+    },
+    {
+      "logical_path": "authority/tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
+      "source_path": "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
+      "sha256": "1EDC6192E52ED41A67C106D1A54C22DB6F1EC032924FE30A5085E4A9A98A21E4",
+      "bytes": 14203,
+      "role": "post-terminal-hotfix-authority"
+    }
+  ],
+  "normalized_snapshot": {
+    "logical_path": "authority/.mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
+    "source_path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
+    "sha256": "A80B9935288B1D79BDAB630B3D14CDFE3B36BC0D1605C4B26316FB0720A48E3F",
+    "bytes": 4891,
+    "role": "normalized-import-snapshot"
+  },
+  "public_custody": {
+    "github": "published-and-verified",
+    "mod_portal": "maintainer-upload-not-independently-custody-verified",
+    "authenticated_redownload": "pending"
+  },
+  "continuation": {
+    "supersedes_for_factorio_2_0_predecessor": "2.5.10",
+    "preserves_historical_baseline": true,
+    "closed_findings": [
+      "MIR3-TERM-0033",
+      "MIR3-TERM-0034"
+    ],
+    "factorio_2_1_predecessor": "3.2.11"
+  },
+  "completion": {
+    "state": "captured-for-mir4-predecessor-refresh-v3",
+    "required_files_present": true,
+    "exact_engine_lock_bound": true,
+    "open_findings": [],
+    "mir4_behavioral_proof_required": true
+  },
+  "record_sha256": "15323DD05DC3AEDC75C499EB3EC39218B80C90368254C049269B29F31C664D0C"
+}

@@ -91,7 +91,9 @@ $requiredKinds = @(
   "MIR4-Offline-Release-AuthorityV1",
   "MIR3-to-MIR4-Governance-ReconciliationV1",
   "MIR4-Terminal-Predecessor-RefreshV1",
-  "MIR4-Terminal-Predecessor-RefreshV2"
+  "MIR4-Terminal-Predecessor-RefreshV2",
+  "MIR4-Terminal-Predecessor-RefreshV3",
+  "MIR4-Terminal-Import-CompositeV3"
 )
 $authorityFiles = @($requiredKinds | ForEach-Object { "$authorityDirectory/$_.json" })
 foreach ($path in $authorityFiles) {
@@ -121,15 +123,19 @@ foreach ($path in @($authorityFiles + @(
   "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1",
   "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuation.ps1",
   "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1",
+  "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuationV2.ps1",
+  "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
   "tools/commands/release/Import-MIR3TerminalBaselines.ps1",
   "spec/schemas/mir3-dot9-terminal-baseline-bundle-manifest.schema.json",
   "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation.schema.json",
   "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json",
+  "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation-v2.schema.json",
+  "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json",
   "spec/schemas/mir4-terminal-normalized-snapshot.schema.json",
   "spec/schemas/mir4-terminal-baseline-import.schema.json",
   "spec/schemas/mir4-r0-authority.schema.json",
-  ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json",
-  "spec/schemas/mir4-target-registry-v3.schema.json"
+  ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json",
+  "spec/schemas/mir4-target-registry-v4.schema.json"
 ))) { $allInputs.Add((Get-AuthorityIdentity $path)) }
 
 $rows = @()
@@ -188,8 +194,8 @@ foreach ($catalogRow in @($catalog.releases)) {
 
 # The immutable .9 family remains fully captured above. For the current Factorio
 # 2.1 predecessor only, replace the executable import row with the append-only
-# 3.2.10 emergency continuation. The historical 3.2.9 files remain bound inputs.
-$continuationVersion = "3.2.10"
+# 3.2.11 emergency continuation. The historical 3.2.9 and 3.2.10 files remain bound inputs.
+$continuationVersion = "3.2.11"
 $continuationManifestPath = ".mir/releases/terminal/baselines/$continuationVersion/baseline-manifest.json"
 $continuationSnapshotPath = ".mir/releases/terminal/baselines/$continuationVersion/normalized-snapshot.json"
 $continuationClosurePath = ".mir/releases/terminal/closures/$continuationVersion.json"
@@ -199,12 +205,12 @@ $continuationClosure = Read-Json $continuationClosurePath
 Assert-RecordSha256 $continuationManifest "$continuationVersion continuation manifest"
 Assert-RecordSha256 $continuationSnapshot "$continuationVersion normalized snapshot"
 Assert-RecordSha256 $continuationClosure "$continuationVersion release closure"
-if ([string]$continuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV1" -or
-    [string]$continuationManifest.status -cne "captured-public-custody-pending-open-mir4-follow-up" -or
+if ([string]$continuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV2" -or
+    [string]$continuationManifest.status -cne "captured-public-custody-pending-mir4-refresh" -or
     [bool]$continuationSnapshot.semantic_authority -or
     [string]$continuationSnapshot.status -cne "importable-pre-eol-public-custody-pending" -or
     [string]$continuationClosure.status -cne "github-closed-mod-portal-pending") {
-  throw "The 3.2.10 continuation is not import-ready."
+  throw "The 3.2.11 continuation is not import-ready."
 }
 foreach ($file in @($continuationManifest.files)) {
   $path = Join-Path $RepoRoot ([string]$file.source_path)
@@ -242,7 +248,7 @@ $rows = @($continuationRow) + @($rows | Where-Object { [string]$_.release -cne "
 # The Factorio 2.0 predecessor advanced independently after exact applicability,
 # deterministic reconstruction, and public-byte verification. Replace only the
 # executable f200 import row; retain the immutable 2.5.9 bundle as a bound input.
-$f200ContinuationVersion = "2.5.10"
+$f200ContinuationVersion = "2.5.11"
 $f200ContinuationManifestPath = ".mir/releases/terminal/baselines/$f200ContinuationVersion/baseline-manifest.json"
 $f200ContinuationSnapshotPath = ".mir/releases/terminal/baselines/$f200ContinuationVersion/normalized-snapshot.json"
 $f200ContinuationClosurePath = ".mir/releases/terminal/closures/$f200ContinuationVersion.json"
@@ -252,13 +258,13 @@ $f200ContinuationClosure = Read-Json $f200ContinuationClosurePath
 Assert-RecordSha256 $f200ContinuationManifest "$f200ContinuationVersion continuation manifest"
 Assert-RecordSha256 $f200ContinuationSnapshot "$f200ContinuationVersion normalized snapshot"
 Assert-RecordSha256 $f200ContinuationClosure "$f200ContinuationVersion release closure"
-if ([string]$f200ContinuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV1" -or
-    [string]$f200ContinuationManifest.status -cne "captured-public-custody-pending-open-mir4-follow-up" -or
+if ([string]$f200ContinuationManifest.kind -cne "MIR3PostTerminalHotfixBaselineContinuationV2" -or
+    [string]$f200ContinuationManifest.status -cne "captured-public-custody-pending-mir4-refresh" -or
     [bool]$f200ContinuationSnapshot.semantic_authority -or
     [string]$f200ContinuationSnapshot.target -cne "2.0" -or
     [string]$f200ContinuationSnapshot.status -cne "importable-pre-eol-public-custody-pending" -or
     [string]$f200ContinuationClosure.status -cne "github-closed-mod-portal-pending") {
-  throw "The 2.5.10 continuation is not import-ready."
+  throw "The 2.5.11 continuation is not import-ready."
 }
 foreach ($file in @($f200ContinuationManifest.files)) {
   $path = Join-Path $RepoRoot ([string]$file.source_path)
@@ -291,8 +297,8 @@ $f200ContinuationRow = [ordered]@{
   import_disposition = "normalized-shadow-input-no-semantic-authority-before-eol"
   snapshot = $f200ContinuationSnapshot
 }
-$rows = @($rows | Where-Object { [string]$_.release -ceq "3.2.10" }) + @($f200ContinuationRow) +
-  @($rows | Where-Object { [string]$_.release -cnotin @("3.2.10", "2.5.9") })
+$rows = @($rows | Where-Object { [string]$_.release -ceq "3.2.11" }) + @($f200ContinuationRow) +
+  @($rows | Where-Object { [string]$_.release -cnotin @("3.2.11", "2.5.9") })
 
 $inputRows = @($allInputs.ToArray() | Sort-Object path -Unique)
 $inputMaterial = ($inputRows | ForEach-Object { "$($_.path)`0$($_.sha256)" }) -join "`n"
@@ -310,8 +316,8 @@ $material = [ordered]@{
   releases = @($rows)
   guarantees = @(
     "all-nine-historical-dot9-distributions-remain-exact-and-bound",
-    "factorio-2.1-predecessor-continues-at-exact-public-3.2.10",
-    "factorio-2.0-predecessor-continues-at-exact-public-2.5.10",
+    "factorio-2.1-predecessor-continues-at-exact-public-3.2.11",
+    "factorio-2.0-predecessor-continues-at-exact-public-2.5.11",
     "factorio-1.x-and-older-predecessors-remain-dot9",
     "all-nine-current-import-views-self-contained",
     "terminal-claim-maturity-not-promoted",

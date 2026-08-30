@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-23
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compiler-environment-identities
 ---
 
 # ADR 0026: Runtime And Qualification Environments

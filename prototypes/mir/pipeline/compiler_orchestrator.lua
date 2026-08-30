@@ -25,66 +25,9 @@ local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local compiler_result_contract = require("prototypes.mir.domain.compiler.compiler_result")
 local research_cost_compatibility = require("prototypes.mir.domain.research_cost.compatibility_slice")
 local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
+local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
 
 local M = {}
-
-local function maximum_level_policy(plan)
-  local bindings = {}
-  local function presentation(selected)
-    if type(selected) == "number" and selected > 0
-        and target_line.feature_enabled("scripted_techs") then
-      return {
-        mode = "finite-runtime-cap",
-        internal_prototype_max_level = "infinite",
-        show_levels_info = false,
-        visible_when_disabled = true
-      }
-    end
-    return {
-      mode = "native-prototype-maximum",
-      internal_prototype_max_level = selected,
-      show_levels_info = true
-    }
-  end
-  for _, row in ipairs(plan.stream_plan.rows or {}) do
-    if row.action == "emit" then
-      table.insert(bindings, {
-        technology = row.technology_name,
-        setting = "ips-max-level-" .. tostring(row.stream_key),
-        selected = row.planned_max_level,
-        source = "generated-stream",
-        operation = "emit",
-        presentation = presentation(row.planned_max_level)
-      })
-    elseif row.action == "adopt" and row.adoption then
-      table.insert(bindings, {
-        technology = row.adoption.owner,
-        setting = "ips-max-level-" .. tostring(row.stream_key),
-        selected = row.adoption.planned_max_level,
-        source = "native-owner",
-        operation = row.adoption.operation,
-        presentation = presentation(row.adoption.planned_max_level)
-      })
-    end
-  end
-  for _, operation in ipairs(plan.base_extension_operations or {}) do
-    table.insert(bindings, {
-      technology = operation.technology_name,
-      setting = "mir-max-level-" .. tostring(operation.key),
-      selected = operation.planned_max_level,
-      source = "base-continuation",
-      operation = operation.operation,
-      presentation = presentation(operation.planned_max_level)
-    })
-  end
-  table.sort(bindings, function(left, right) return left.technology < right.technology end)
-  return {
-    schema = 2,
-    kind = "MIRMaximumLevelPolicyV2",
-    semantics = "absolute-highest-technology-level",
-    bindings = bindings
-  }
-end
 
 local function now()
   return os and type(os.clock) == "function" and os.clock() or 0
@@ -204,6 +147,12 @@ local function compile_active(context)
   latest.pure_compilation = pure_compilation
   latest.transformation_plan = pure_compilation.transformation_plan
   latest.transformation_plan_fingerprint = pure_compilation.transformation_plan.plan_fingerprint
+  local maximum_level_policy = maximum_level_binding.from_plan(latest, {
+    target_profile = target_line.factorio_version,
+    scripted_techs_supported = target_line.feature_enabled("scripted_techs"),
+    mod_data_supported = target_line.mod_data_supported(),
+    plan_fingerprint = latest.fingerprint
+  })
   context:set_state("compiler_input", input)
   context:set_state("compilation_snapshot", input_snapshot)
   context:set_state("qualification_snapshot", final_snapshot)
@@ -213,6 +162,7 @@ local function compile_active(context)
   context:set_state("technology_candidate_catalog", latest.technology_catalog)
   context:set_state("technology_qualifications", latest.technology_catalog.qualifications)
   context:set_state("compiler_result", latest.compiler_result)
+  context:set_state("maximum_level_policy", maximum_level_policy)
   context:record_immutable_artifact(
     "technology_candidate_catalog", latest.technology_catalog, technology_catalog_contract)
   stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
@@ -225,6 +175,12 @@ end
 function M.compile(context)
   context = context or compiler_context.current()
   return compiler_context.with_active(context, compile_active, context)
+end
+
+function M.maximum_level_policy(context)
+  context = context or compiler_context.current()
+  M.compile(context)
+  return context:state_view("maximum_level_policy")
 end
 
 function M.apply_streams(context)
@@ -273,6 +229,7 @@ function M.snapshot(context)
     stream_plan = plan.stream_plan,
     base_extension_operations = plan.base_extension_operations,
     validation_summary = plan.validation_summary,
+    maximum_level_policy = context:state_view("maximum_level_policy"),
     telemetry = telemetry.snapshot()
   }
   snapshot.telemetry_fingerprint = fingerprint.of(snapshot.telemetry)
@@ -364,7 +321,7 @@ function M.publish(context)
   telemetry.count("technology_design_count", design_count)
   telemetry.count("technology_design_canonical_bytes", design_bytes)
   mod_data.emit_generation_plan(public_plan)
-  mod_data.emit_maximum_level_policy(maximum_level_policy(plan))
+  mod_data.emit_maximum_level_policy(M.maximum_level_policy(context))
   mod_data.emit_technology_catalog(public_catalog)
   if include_internal then
     telemetry.count("generation_plan_internal_bytes", #fingerprint.canonical(plan.stream_plan))

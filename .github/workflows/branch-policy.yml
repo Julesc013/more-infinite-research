@@ -60,7 +60,7 @@ jobs:
   branch-policy:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
       - name: Validate permanent branch policy
@@ -71,32 +71,49 @@ jobs:
     name: promotion-verification
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.terminal_release != 'none' }}
     runs-on: windows-latest
+    env:
+      MIR_TERMINAL_CANDIDATE_REF: ${{ inputs.terminal_candidate_ref }}
+      MIR_TERMINAL_CANDIDATE_SHA: ${{ inputs.terminal_candidate_sha }}
+      MIR_TERMINAL_CONTROLLER_SHA: ${{ github.sha }}
+      MIR_TERMINAL_OPERATION: ${{ inputs.terminal_operation }}
+      MIR_TERMINAL_PROMOTION_BRANCH: ${{ inputs.terminal_promotion_branch }}
+      MIR_TERMINAL_RELEASE: ${{ inputs.terminal_release }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out the dispatched package-excluded controller
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
+          path: controller
+          ref: ${{ github.sha }}
+      - name: Check out the exact immutable candidate separately
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          path: candidate
           ref: ${{ inputs.terminal_candidate_sha }}
       - id: validate
         name: Validate exact candidate, archive, acceptance, seals, and promotion boundary
         shell: pwsh
         run: |
-          ./tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1 `
-            -Release '${{ inputs.terminal_release }}' `
-            -CandidateSha '${{ inputs.terminal_candidate_sha }}' `
-            -Operation '${{ inputs.terminal_operation }}' `
-            -CandidateRef '${{ inputs.terminal_candidate_ref }}' `
-            -PromotionBranch '${{ inputs.terminal_promotion_branch }}' `
-            -OutputPath 'build/results/terminal-promotion/${{ inputs.terminal_release }}.json'
+          ./controller/tools/commands/release/Test-MIR3TerminalPromotionCandidate.ps1 `
+            -Release $env:MIR_TERMINAL_RELEASE `
+            -CandidateSha $env:MIR_TERMINAL_CANDIDATE_SHA `
+            -ControllerSha $env:MIR_TERMINAL_CONTROLLER_SHA `
+            -Operation $env:MIR_TERMINAL_OPERATION `
+            -CandidateRef $env:MIR_TERMINAL_CANDIDATE_REF `
+            -PromotionBranch $env:MIR_TERMINAL_PROMOTION_BRANCH `
+            -RepoRoot ./candidate `
+            -OutputPath "build/results/terminal-promotion/$($env:MIR_TERMINAL_RELEASE).json"
       - name: Preserve exact promotion verification
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mir3-terminal-promotion-${{ inputs.terminal_release }}-${{ inputs.terminal_candidate_sha }}
-          path: build/results/terminal-promotion/${{ inputs.terminal_release }}.json
+          path: candidate/build/results/terminal-promotion/${{ inputs.terminal_release }}.json
           if-no-files-found: warn
       - name: Attach required verification context to the immutable candidate
         if: always()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         env:
           VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
           CANDIDATE_SHA: ${{ inputs.terminal_candidate_sha }}

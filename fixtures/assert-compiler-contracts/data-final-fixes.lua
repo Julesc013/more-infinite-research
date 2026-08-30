@@ -33,6 +33,13 @@ local focused_contracts = {
   technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval"),
   technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
 }
+do
+  local available, contract = pcall(
+    require,
+    "__more-infinite-research__.prototypes.mir.domain.technology.maximum_level_binding"
+  )
+  focused_contracts.maximum_level_binding = available and contract or false
+end
 local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
@@ -59,6 +66,13 @@ local c9_contracts = {
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
+end
+
+if not focused_contracts.maximum_level_binding then
+  local mir_version = mods and mods["more-infinite-research"] or ""
+  if not tostring(mir_version):match("^4%.0%.%d+$") then
+    fail("MaximumLevelBinding is absent outside the governed MIR 4 terminal-bootstrap target")
+  end
 end
 
 (function()
@@ -104,6 +118,106 @@ local function expect_error(label, expected, callback)
     fail(label .. " failed with unexpected message: " .. tostring(message))
   end
 end
+
+if focused_contracts.maximum_level_binding then (function()
+  local plan = {
+    fingerprint = "maximum-level-binding-fixture-plan",
+    stream_plan = {rows = {
+      {
+        action = "adopt", stream_key = "research_native", manifest_id = "stream:native",
+        adoption = {owner = "native-productivity", planned_max_level = 0, operation = "configure_native_owner"}
+      },
+      {
+        action = "emit", stream_key = "research_generated", manifest_id = "stream:generated",
+        technology_name = "generated-productivity", planned_max_level = 13
+      }
+    }},
+    base_extension_operations = {
+      {
+        key = "braking-force", manifest_id = "base-extension:braking-force",
+        technology_name = "braking-force-8", planned_max_level = 5, operation = "emit"
+      }
+    }
+  }
+  local options = {
+    target_profile = "2.1", scripted_techs_supported = true,
+    mod_data_supported = true, plan_fingerprint = plan.fingerprint
+  }
+  local policy = focused_contracts.maximum_level_binding.from_plan(plan, options)
+  if policy.schema ~= 3 or policy.kind ~= "MIRMaximumLevelPolicyV3"
+      or policy.finalizer_status ~= "pending" or #policy.bindings ~= 3 then
+    fail("MaximumLevelBinding policy authority did not normalize all three ownership routes")
+  end
+  local by_technology = {}
+  for _, binding in ipairs(policy.bindings) do by_technology[binding.technology_id] = binding end
+  local generated = by_technology["generated-productivity"]
+  local native = by_technology["native-productivity"]
+  local continuation = by_technology["braking-force-8"]
+  if not generated or generated.cap.requested ~= 13 or generated.cap.effective ~= 13
+      or generated.binding.scope ~= "exact-stream" or generated.binding.precedence_rank ~= 3
+      or type(generated.setting) ~= "table"
+      or generated.setting.name ~= "ips-max-level-research_generated"
+      or generated.setting.profile ~= "effective-startup-settings"
+      or generated.prototype_strategy.max_level ~= "infinite"
+      or generated.runtime_strategy.mode ~= "absolute-cap-controller"
+      or generated.presentation_strategy.description ~= "exact-effective-cap"
+      or not generated.migration_behavior.retain_completed_bonus
+      or type(generated.binding_fingerprint) ~= "string" then
+    fail("generated MaximumLevelBinding is incomplete")
+  end
+  if not native or native.cap.effective ~= "infinite"
+      or native.binding.scope ~= "exact-native-owner" or native.binding.precedence_rank ~= 2 then
+    fail("native-owner MaximumLevelBinding did not normalize infinite cap semantics")
+  end
+  if not continuation or continuation.binding.scope ~= "exact-technology"
+      or continuation.binding.precedence_rank ~= 1 then
+    fail("base-continuation MaximumLevelBinding precedence drifted")
+  end
+
+  local conflict_plan = {
+    fingerprint = "maximum-level-binding-equal-precedence-conflict",
+    stream_plan = {rows = {
+      {action = "emit", stream_key = "conflict_a", technology_name = "conflicting-technology", planned_max_level = 4},
+      {action = "emit", stream_key = "conflict_b", technology_name = "conflicting-technology", planned_max_level = 5}
+    }},
+    base_extension_operations = {}
+  }
+  local conflict_policy = focused_contracts.maximum_level_binding.from_plan(conflict_plan, options)
+  local conflict = conflict_policy.bindings[1]
+  if #conflict_policy.bindings ~= 1
+      or not conflict
+      or conflict.binding.resolution ~= "blocking-equal-precedence-conflict"
+      or conflict.diagnostics.status ~= "blocking-conflict"
+      or conflict.diagnostics.active_code ~= "maximum_level_equal_precedence_conflict"
+      or conflict.diagnostics.conflicting_setting ~= "ips-max-level-conflict_b" then
+    fail("MaximumLevelBinding did not retain setting identity for equal-precedence conflict resolution")
+  end
+
+  local reversed = deepcopy(plan)
+  reversed.stream_plan.rows[1], reversed.stream_plan.rows[2] =
+    reversed.stream_plan.rows[2], reversed.stream_plan.rows[1]
+  if focused_contracts.maximum_level_binding.from_plan(reversed, options).artifact_fingerprint
+      ~= policy.artifact_fingerprint then
+    fail("MaximumLevelBinding policy depends on compiler row order")
+  end
+  local observations = {}
+  for technology_id in pairs(by_technology) do
+    observations[technology_id] = {
+      adapter = "factorio-data-final-fixes-v1",
+      observed_prototype_max_level = "infinite"
+    }
+  end
+  local accepted = focused_contracts.maximum_level_binding.observe_finalizers(policy, observations)
+  if accepted.finalizer_status ~= "accepted" then
+    fail("known MaximumLevelBinding finalizer observations were not accepted")
+  end
+  observations["generated-productivity"].adapter = "unknown-finalizer"
+  local blocked = focused_contracts.maximum_level_binding.observe_finalizers(policy, observations)
+  if blocked.finalizer_status ~= "blocking-conflict"
+      or blocked.bindings[2].diagnostics.active_code ~= "maximum_level_unknown_finalizer_adapter" then
+    fail("unknown MaximumLevelBinding finalizer did not emit a stable blocking diagnostic")
+  end
+end)(); end
 
 local function valid_pack(id, line, mod_id, version)
   return {

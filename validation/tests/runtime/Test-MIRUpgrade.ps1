@@ -265,6 +265,8 @@ foreach ($sourceModName in $sourceOnlyModNames) {
 Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc
 
 $requiresReloadProof = $FixtureName -in @(
+  "assert-upgrade-3-2-11-to-4-0-21000",
+  "assert-upgrade-2-5-11-to-4-0-20000",
   "assert-upgrade-3-2-2-to-3-2-3",
   "assert-upgrade-3-2-3-to-3-2-4",
   "assert-upgrade-3-2-3-to-3-2-5",

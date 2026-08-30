@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "targets",
+  "path": "targets",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    ".mir/targets.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+    "tools/commands/targets",
+    "tools/mir/application/targets/TargetCompiler.ps1"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

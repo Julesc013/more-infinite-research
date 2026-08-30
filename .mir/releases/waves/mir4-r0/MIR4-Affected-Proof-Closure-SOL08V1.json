@@ -1,0 +1,218 @@
+{
+  "schema": 1,
+  "kind": "MIR4AffectedProofClosureSOL08V1",
+  "work_package": "SOL-08",
+  "status": "PASS",
+  "package_visible": false,
+  "release_admission_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "source": {
+    "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+    "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a",
+    "materializer": "tools/commands/mir4/New-MIR4AffectedTargetCandidateSet.ps1"
+  },
+  "candidate_manifest": {
+    "path": "build/results/mir4-sol/sol08/target-candidates/MIR4_AFFECTED_TARGET_CANDIDATES.json",
+    "file_sha256": "6CEE17818EF743189D1B46FF15FC32698E885C30A1BA410BFE294CBD3AC44ECC",
+    "status": "built-unqualified-local-development-candidates"
+  },
+  "targets": [
+    {
+      "target_key": "f210",
+      "factorio_line": "2.1",
+      "version": "4.0.21000",
+      "candidate": "build/results/mir4-sol/sol08/target-candidates/distributions/more-infinite-research_4.0.21000.zip",
+      "archive_sha256": "5058499D4A2802B0F1D9FDC50C1887C36A76AA2C9A4BD9B5F8DFFB58D1ACBD7D",
+      "content_sha256": "E898C21075452B045C62879535E6639C424276223063E4170FF05D4F72070B6B",
+      "bytes": 1076523,
+      "entry_count": 307,
+      "engine_version": "2.1.14.87180",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "predecessor_version": "3.2.11",
+      "predecessor_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+      "deterministic_repetitions": ["A", "B"]
+    },
+    {
+      "target_key": "f200",
+      "factorio_line": "2.0",
+      "version": "4.0.20000",
+      "candidate": "build/results/mir4-sol/sol08/target-candidates/distributions/more-infinite-research_4.0.20000.zip",
+      "archive_sha256": "0078768BDDAEB4E8AE243D406919C38C55AC6C2CB96A492E890175EDEB0860C4",
+      "content_sha256": "ECFA5CA900FF2917D29FFA1637D945C7519D7D3FEE6C856195E22426B8A60FD3",
+      "bytes": 1071065,
+      "entry_count": 304,
+      "engine_version": "2.0.77.84539",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "predecessor_version": "2.5.11",
+      "predecessor_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "deterministic_repetitions": ["A", "B"]
+    }
+  ],
+  "package_deltas": [
+    {
+      "target_key": "f210",
+      "path": "build/results/mir4-sol/sol08/f210-archive-delta-v1.json",
+      "file_sha256": "9194568EF94B50377E1A65A4596951A89399A995F0FBD0094856723B39504E36",
+      "added": 0,
+      "changed": 1,
+      "removed": 0,
+      "unexpected": 0,
+      "allowed_paths": ["info.json"]
+    },
+    {
+      "target_key": "f200",
+      "path": "build/results/mir4-sol/sol08/f200-archive-delta-v1.json",
+      "file_sha256": "C243B8B70CE26A57CC85611378FD45049BCD95D03CC35B002CFDF626FE5FFF25",
+      "added": 1,
+      "changed": 6,
+      "removed": 0,
+      "unexpected": 0,
+      "allowed_paths": [
+        "info.json",
+        "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "prototypes/mir/capabilities/science_integration/science_packs.lua",
+        "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "prototypes/mir/planner/base_continuations.lua",
+        "prototypes/mir/planner/science.lua"
+      ]
+    }
+  ],
+  "composition": [
+    {
+      "target_key": "f210",
+      "path": "build/results/mir4-sol/sol08/f210-package-composition-v1.json",
+      "file_sha256": "7F6EE0F9EB11FFCA021F5620DAF00736BF2BCA7D815AE5158AA0B32EC8E4AE47",
+      "review_required": false
+    },
+    {
+      "target_key": "f200",
+      "path": "build/results/mir4-sol/sol08/f200-package-composition-v1.json",
+      "file_sha256": "E30F9AE2DBC314D3C5546925946119A6427598A76693E22C22C6978B748577B3",
+      "review_required": false
+    }
+  ],
+  "upgrade_matrices": [
+    {
+      "target_key": "f210",
+      "path": "build/results/mir4-sol/sol11/f210-upgrade-matrix-corrected-v2.json",
+      "file_sha256": "FFE4C9D544FCCA74727967B07FE2A4CF07859DAE50062568EE9F3FFFF409377F",
+      "required_archetypes": ["base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change"],
+      "passed": 5,
+      "reloads_per_archetype": 2
+    },
+    {
+      "target_key": "f200",
+      "path": "build/results/mir4-sol/sol11/f200-upgrade-matrix-corrected.json",
+      "file_sha256": "075AA34135C43CD6FC4E7246E692C0EEB7D22A7418FF40328AE3766759086A8B",
+      "required_archetypes": ["base-default"],
+      "passed": 1,
+      "reloads_per_archetype": 2
+    }
+  ],
+  "exact_load_evidence": [
+    {
+      "id": "f210-base-official",
+      "path": "build/results/mir4-sol/sol11/f210-base-corrected-v3/campaign-evidence.json",
+      "file_sha256": "CC34BCD2683F4662F99368707DA20C20F7056A7DD284B9ED7C6E58715DB254E2",
+      "lock_path": "build/results/mir4-sol/sol11/f210-base-corrected-v3/compat-candidates.lock.json",
+      "lock_sha256": "5636B9EA8104503241E88D1905665B08382CFE5E3FB68C6CC4979FCF30B233BA",
+      "target_key": "f210",
+      "accepted_scenarios": ["base-baseline", "space-age-baseline"]
+    },
+    {
+      "id": "f210-affected",
+      "path": "build/results/mir4-sol/sol11/f210-affected-corrected-v2/campaign-evidence.json",
+      "file_sha256": "1F49B4678D6414EF6DB3166D084C677B3BEB7793A7A07C74857BE83365D3A1D3",
+      "lock_path": "build/results/mir4-sol/sol11/f210-affected-corrected-v2/compat-candidates.lock.json",
+      "lock_sha256": "E717587049343A087393B8C70E18574E352C8EBB44563E061EAC96AE71DEE456",
+      "target_key": "f210",
+      "accepted_scenarios": ["local-2-1-corrundum-maxcap-13", "local-2-1-cubium-production-routes", "local-2-1-recycler-progression-routes", "local-2-1-krastorio-spaced-out"]
+    },
+    {
+      "id": "f200-base-official",
+      "path": "build/results/mir4-sol/sol11/f200-base-corrected-v1/campaign-evidence.json",
+      "file_sha256": "95387F26F8E898E49D9C7A351073206487F41B46C09B1B9AF420D95FEC3EB44A",
+      "lock_path": "build/results/mir4-sol/sol11/f200-base-corrected-v1/compat-candidates.lock.json",
+      "lock_sha256": "5B02B0E25EA1C764481E0B839AFA4CCFD66A74C52526B1C04A1D74E30F33E23A",
+      "target_key": "f200",
+      "accepted_scenarios": ["local-2-0-base-baseline", "local-2-0-space-age-baseline-if-installed"]
+    },
+    {
+      "id": "f200-k2so",
+      "path": "build/results/mir4-sol/sol11/f200-k2so-corrected-v1/campaign-evidence.json",
+      "file_sha256": "B0026BAB3785F308EF248A9C9373B6BAAD63368C9F1B8B30B7BBA07468C835A1",
+      "lock_path": "build/results/mir4-sol/sol11/f200-k2so-corrected-v1/compat-candidates.lock.json",
+      "lock_sha256": "FB614ADEF022D26CC4CF74CAE2F8E43C6D7AD688EF865A51B85C4A9CD683A4E4",
+      "target_key": "f200",
+      "accepted_scenarios": ["local-2-0-krastorio-spaced-out"]
+    },
+    {
+      "id": "f200-recycler-characterization",
+      "path": "build/results/mir4-sol/sol11/f200-recycler-corrected-v1/campaign-evidence.json",
+      "file_sha256": "0217BD14249EC02D3E206812147D9E7B0BC8E3CBFBE42B023177B20905059DE8",
+      "lock_path": "build/results/mir4-sol/sol11/f200-recycler-corrected-v1/compat-candidates.lock.json",
+      "lock_sha256": "4304B1B35F32A615C7D2FA6D657B1E34811769192AC55FE27C2A580396854D32",
+      "target_key": "f200",
+      "accepted_scenarios": ["local-2-0-recycler-progression-routes"],
+      "disposition": "not-reproduced-on-exact-1.0.0-surface-absent",
+      "assertion": "recycler-1-routes-rejected=true surface-present=false exercised=0"
+    }
+  ],
+  "verification_plans": [
+    {
+      "target_key": "f210",
+      "path": "build/results/mir4-sol/sol08/f210-verification-plan-v2-preproof-auto.json",
+      "file_sha256": "0B648C518ED90C0705382FFF7D4EDC9C8F9687E7013C19F0536E741C9BA2036F",
+      "plan_material_sha256": "3770997E8BBB5D130C4197DFA0AEE01D98179A783B485F6E754D59A1A2D632A0",
+      "required_test_set_sha256": "A9662E3BA99FD6FC708C2436F919AB6798519D5ED8E68AB14505DFD9C4F954E7",
+      "counts": {"total": 158, "run": 156, "reuse": 0, "invalid": 2},
+      "runtime_upgrade": "RUN"
+    },
+    {
+      "target_key": "f200",
+      "path": "build/results/mir4-sol/sol08/f200-verification-plan-v3-preproof-auto.json",
+      "file_sha256": "1E1B00D021C627D8CFCC295994954247092B952D787CD4E408537322ADBF6B9A",
+      "plan_material_sha256": "9FBEC8B2A0BF0F023927A4C4AB01625E19D97096B4887789C12CC913ABE70BA5",
+      "required_test_set_sha256": "EEC741A9091EB775D7C72B46ED8BC775BA67B8BD717F48AB1C34D8A67852AA21",
+      "counts": {"total": 30, "run": 28, "reuse": 0, "invalid": 2},
+      "runtime_upgrade": "RUN"
+    }
+  ],
+  "assurance": {
+    "evidence_store_test": "PASS",
+    "evidence_store_scope": ["exact-fingerprint-reuse", "matching-lease-adoption", "revocation-invalidation", "corrupt-object-quarantine"],
+    "private_f200_authority_class": "private-affected-correction-testing-only",
+    "private_f200_fail_closed_inputs": ["manifest-status", "candidate-path", "candidate-archive-sha256", "candidate-content-sha256", "engine-sha256", "predecessor-sha256", "private-lane-authority-self-hash", "no-release-admission", "no-signing-or-sealing", "no-publication"],
+    "broad_self_test": {
+      "status": "PASS",
+      "message": "Candidate-programme pending approved-delta fingerprint is bound to exact M4C01 implementation authority and target registry without release admission.",
+      "disposition": "assurance regression passed in the approved machine context"
+    }
+  },
+  "performance": {
+    "status": "NOT_RERUN",
+    "reason": "SOL08 closes corrected-package construction, exact loads, and upgrade migration; it does not change the accepted performance budget or claim final release qualification.",
+    "final_release_requirement": "fresh candidate-bound performance disposition remains mandatory at release qualification when a final source-frozen candidate exists"
+  },
+  "superseded_attempts": [
+    {"id": "f200-affected-v1", "classification": "incomplete-dependency-closure", "product_failure": false},
+    {"id": "f200-affected-v2", "classification": "fixture-assumed-a-surface-absent-from-recycler-progression-1.0.0", "product_failure": false}
+  ],
+  "exit_gate": {
+    "deterministic_target_candidates_built": true,
+    "package_deltas_bounded": true,
+    "package_denylist_clean": true,
+    "exact_f210_loads_passed": 6,
+    "exact_f200_loads_passed": 4,
+    "upgrade_archetypes_passed": 6,
+    "two_reloads_per_upgrade_archetype": true,
+    "product_failures": 0,
+    "broad_compatibility_claims_added": 0,
+    "old_m4c01_bytes_superseded_for_corrected_target_proof": true,
+    "source_freeze_authorized": false,
+    "publication_authorized": false,
+    "next_work_package": "SOL-09"
+  }
+}

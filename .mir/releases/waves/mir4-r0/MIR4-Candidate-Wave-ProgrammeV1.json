@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR4CandidateWaveProgrammeV1",
+  "status": "accepted-candidate-programme-current",
+  "recorded_at": "2026-08-18T12:00:00+10:00",
+  "package_visible": false,
+  "source_version": "4.0.0",
+  "public_version_rule": "candidate-ids-never-enter-factorio-public-version",
+  "waves": [
+    {"id":"M4C00","purpose":"terminal-and-authority-baseline","state":"complete"},
+    {"id":"M4C01","purpose":"hybrid-full-platform-integration-preview","state":"active"},
+    {"id":"M4C02","purpose":"repository-and-authority-fixed-point","state":"planned"},
+    {"id":"M4C03","purpose":"target-normalized-compiler-runtime-cutover-preview","state":"planned"},
+    {"id":"M4C04","purpose":"mep-api-sdk-inspector-hardening","state":"planned"},
+    {"id":"M4C05","purpose":"process-ir-autonomous-diagnosis-historical-shadows","state":"planned"},
+    {"id":"M4RC1","purpose":"first-source-frozen-release-candidate","state":"planned"}
+  ],
+  "integration_rule": "short-lived-reviewed-branches-into-dev",
+  "freeze_rule": "only-release-blocking-fixes-after-source-freeze-and-affected-proof-invalidated",
+  "record_sha256": "703C3AD441C77E79AF951517C2E1E2DEF2C891D23E3C1BC054257EA37A449414"
+}

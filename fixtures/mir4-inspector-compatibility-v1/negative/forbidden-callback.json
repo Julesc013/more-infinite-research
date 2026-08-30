@@ -1,0 +1,1 @@
+{"schema":1,"kind":"MIR4SupportBundleV1","bundle_id":"org.example.bad","target":"f210","subjects":[{"subject_id":"aai","safe_choice":"target-capability-or-provider","callback":"run"}],"expected_diagnostic":"mir4-w07-forbidden-field"}

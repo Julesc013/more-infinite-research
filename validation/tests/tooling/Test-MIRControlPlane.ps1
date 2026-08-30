@@ -14,7 +14,10 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 }
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
-$freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks
+$info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
+$verificationProfile = Read-MIRCPJson -Path "validation/profiles/factorio-$([string]$info.factorio_version).json" -RepoRoot $repo
+$candidateProgramme = [string]$verificationProfile.release_authority_mode -eq 'candidate-programme'
+$freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks -AllowCandidateProgrammeWorkingTree:$candidateProgramme
 foreach ($command in @("Invoke-MIRCPFreshCalibration", "New-MIRCPFreshCalibrationProof", "Get-MIRCPCalibrationProofState", "Resolve-MIRCPManifestTaskResult")) {
   if ($null -eq (Get-Command $command -CommandType Function -ErrorAction SilentlyContinue)) { throw "Control-plane calibration command is unavailable: $command" }
 }

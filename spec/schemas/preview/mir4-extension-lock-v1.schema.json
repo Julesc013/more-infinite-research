@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/extension-lock.schema.json",
+  "title": "MIR 4 extension environment lock V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["kind","schema","maturity","extension","target","host","closure_digest","required_capabilities","missing_capabilities","dependencies","conflicts","transport","status","canonicalization","portable","package_visible","player_mutation_authorized","prototype_write_authorized","release_authority","digest"],
+  "properties": {
+    "kind": {"const": "MIR4ExtensionLockV1"},
+    "schema": {"const": 1},
+    "maturity": {"const": "developer-preview"},
+    "extension": {"type": "object","additionalProperties": false,"required": ["id","version","digest"],"properties": {"id": {"type": "string","pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$"},"version": {"type": "string","minLength": 1},"digest": {"$ref": "#/$defs/digest"}}},
+    "target": {"type": "string","pattern": "^f[0-9]{3}$"},
+    "host": {"type": "object"},
+    "closure_digest": {"$ref": "#/$defs/digest"},
+    "required_capabilities": {"type": "array","maxItems": 64,"uniqueItems": true,"items": {"type": "string","minLength": 1}},
+    "missing_capabilities": {"type": "array","maxItems": 64,"uniqueItems": true,"items": {"type": "string","minLength": 1}},
+    "dependencies": {"type": "array","maxItems": 64,"uniqueItems": true,"items": {"type": "string","minLength": 1}},
+    "conflicts": {"type": "array","maxItems": 64,"uniqueItems": true,"items": {"type": "string","minLength": 1}},
+    "transport": {"type": "object","additionalProperties": false,"required": ["name","admission","maturity","available"],"properties": {"name": {"type": "string","minLength": 1},"admission": {"type": "string","minLength": 1},"maturity": {"type": "string","minLength": 1},"available": {"type": "boolean"}}},
+    "status": {"enum": ["preview-ready","review-required","unavailable"]},
+    "canonicalization": {"const": "mir-canonical-json/1"},
+    "portable": {"const": true},
+    "package_visible": {"const": false},
+    "player_mutation_authorized": {"const": false},
+    "prototype_write_authorized": {"const": false},
+    "release_authority": {"const": false},
+    "digest": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {"digest": {"type": "string","pattern": "^sha256:[0-9a-f]{64}$"}}
+}

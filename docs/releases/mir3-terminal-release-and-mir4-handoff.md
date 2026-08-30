@@ -5,9 +5,15 @@ applies_to: "3.2.9-1.3.9"
 audience: release-manager
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-15
+last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-3-terminal-release-guide
+  - mir-3-to-mir-4-handoff
+  - mir-3-terminal-feature-omission-matrix
+  - mir-3-terminal-upgrade-matrix
+  - mir-3-terminal-known-limitations
 ---
 
 # MIR 3 Terminal Release and MIR 4 Handoff Guide
@@ -48,6 +54,6 @@ Promote only `main` to 3.2.9 and `legacy` to 2.5.9. The seven lower releases rem
 
 The 2026-08-16 Mod Portal API observation found exact SHA-1 parity for 3.2.9 and 2.5.9. Releases 1.9.9 through 1.3.9 were not uploaded, and no authenticated Mod Portal redownload was complete. MIR 3 product development is closed, but archival EOL therefore remains blocked even though all nine GitHub releases are published and verified.
 
-MIR 4 R0 is active on the package-excluded successor plane. All nine final `.9` logical baseline views and normalized imports are deterministically capture-ready, with final sealing still conditional on Mod Portal custody. `tools/mir.ps1 mir4 check` reports `READY_FOR_MIR4_R0_IMPLEMENTATION`; the next local task is the unpublished Factorio 2.1 emergency-lane proof.
+MIR 4 R0 is active on the package-excluded successor plane. The post-terminal 3.2.11 and 2.5.11 releases are published and verified, and the current MIR 4 authority records PR 149 and draft PR 146 as residuals requiring disposition before source freeze. `tools/mir.ps1 mir4 check` projects `T01-COMPLETE-T02-READY-RELEASE-BLOCKED`; the next critical-path task is the non-production release phase-engine kernel.
 
-The append-only governance reconciliation requires a locally sealed behavior-equivalent 4.x distribution and idempotent publication dry run before EOL, then permits public 4.x replication only after the EOL seal. R0 may not move package-visible source, flip semantic authority, create a public 4.x package or tag, or delete MIR 3 reconstruction machinery.
+The current pre-freeze execution authority does not permit R0 to move package-visible source, flip semantic authority, allocate M4RC1, sign, seal, promote, create a public 4.x package or tag, publish, or delete MIR 3 reconstruction machinery. Those transitions remain blocked by executor maturity, protected signing and recovery, and explicit F210/F200 maintainer playtest acceptance.

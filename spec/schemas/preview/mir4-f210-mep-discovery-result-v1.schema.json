@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/f210-mep-discovery-result.schema.json",
+  "title": "MIR 4 read-only F210 MEP discovery result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","maturity","target","factorio_line","environment_lock_digest","host","transport","counts","records","closure","shadow_plans","diagnostics","result","canonicalization","package_visible","player_mutation_authorized","prototype_write_authorized","public_support_authorized","release_authority","digest"],
+  "properties": {
+    "schema":{"const":1},
+    "kind":{"const":"MIR4F210MepDiscoveryResultV1"},
+    "maturity":{"const":"developer-preview"},
+    "target":{"const":"f210"},
+    "factorio_line":{"const":"2.1"},
+    "environment_lock_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "host":{"type":"object","additionalProperties":false,"required":["present","id","version","status"],"properties":{"present":{"type":"boolean"},"id":{"type":["string","null"]},"version":{"type":["string","null"]},"status":{"enum":["active-preview","absent-inert"]}}},
+    "transport":{"type":"object","additionalProperties":false,"required":["name","data_type","mode","admission"],"properties":{"name":{"const":"extension-owned-mod-data-record"},"data_type":{"const":"more-infinite-research.extension.v1"},"mode":{"const":"read-only-discovery"},"admission":{"const":"blocked-by-terminal-emitter"}}},
+    "counts":{"type":"object","additionalProperties":false,"required":["snapshot_records","matching_records","ignored_records","validated_records","accepted_records","quarantined_records"],"properties":{"snapshot_records":{"type":"integer","minimum":0,"maximum":64},"matching_records":{"type":"integer","minimum":0,"maximum":32},"ignored_records":{"type":"integer","minimum":0,"maximum":64},"validated_records":{"type":"integer","minimum":0,"maximum":32},"accepted_records":{"type":"integer","minimum":0,"maximum":32},"quarantined_records":{"type":"integer","minimum":0,"maximum":32}}},
+    "records":{"type":"array","maxItems":32,"items":{"type":"object","additionalProperties":false,"required":["prototype_name","extension_id","extension_version","namespace","extension_digest","status"],"properties":{"prototype_name":{"type":"string","minLength":1,"maxLength":200},"extension_id":{"type":"string","minLength":1,"maxLength":128},"extension_version":{"type":"string","minLength":1,"maxLength":64},"namespace":{"type":"string","minLength":1,"maxLength":128},"extension_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},"status":{"enum":["accepted-shadow","quarantined"]}}}},
+    "closure":{"type":["object","null"]},
+    "shadow_plans":{"type":"array","maxItems":32,"items":{"type":"object"}},
+    "diagnostics":{"type":"array","maxItems":64,"items":{"type":"object"}},
+    "result":{"enum":["shadow-complete","host-absent-inert","quarantined"]},
+    "canonicalization":{"const":"mir-canonical-json/1"},
+    "package_visible":{"const":false},
+    "player_mutation_authorized":{"const":false},
+    "prototype_write_authorized":{"const":false},
+    "public_support_authorized":{"const":false},
+    "release_authority":{"const":false},
+    "digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}
+  }
+}

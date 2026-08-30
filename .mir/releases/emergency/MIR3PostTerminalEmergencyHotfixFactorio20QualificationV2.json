@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIR3PostTerminalEmergencyHotfixFactorio20QualificationV2",
+  "status": "exact-engine-qualified-and-sealed-awaiting-publication",
+  "release": "2.5.11",
+  "candidate_id": "2.5-P15",
+  "candidate": {
+    "qualification_source_commit": "2ee4afa7a12d382dbc53fe18ba05cb96a7518446",
+    "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
+    "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+    "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+    "deterministic_reconstructions": 3
+  },
+  "engine": {
+    "version": "2.0.77",
+    "file_version": "2.0.77.84539",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "installation_authority": "preserved-versioned-local-installation"
+  },
+  "maximum_level_contract": {
+    "direct_startup_settings": "passed",
+    "mirset1_profile_import": "passed",
+    "five_reported_streams": "passed",
+    "generated_streams": "passed",
+    "configuration_lowering": "passed",
+    "base_continuation_boundary": "passed",
+    "base_competitor_rollback": "passed",
+    "space_age_package_load": "passed",
+    "space_age_generation_integrity": "passed"
+  },
+  "governed_upgrades": {
+    "sources": ["2.5.10", "2.5.9", "2.5.5"],
+    "archetypes_per_source": 5,
+    "passed": 15,
+    "required": 15
+  },
+  "approved_delta": {
+    "path": ".mir/releases/deltas/2.5.10-to-2.5.11.json",
+    "artifact_sha256": "0B9E01643A199D2AF18BA52B1AAA5469BBAE62D94C973BAC46AC2914E2C22232",
+    "reviewed_differences": 53,
+    "intentional_differences": 53,
+    "unapproved_differences": 0,
+    "exact_engine_loads": 14
+  },
+  "static_validation": {
+    "command": ".\\scripts\\Invoke-MIRValidation.ps1 -StaticOnly",
+    "status": "passed",
+    "deterministic_build_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C"
+  },
+  "remaining": [
+    "tag-and-github-publication",
+    "github-public-byte-verification",
+    "mod-portal-maintainer-upload"
+  ],
+  "recorded_at": "2026-08-18T00:00:00+10:00"
+}

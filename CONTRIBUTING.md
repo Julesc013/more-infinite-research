@@ -1,92 +1,68 @@
 # Contributing
 
-Thanks for helping improve **More Infinite Research**. MIR 3 is in its terminal stabilization programme across several Factorio target lines, so branch choice and release disposition matter.
+MIR 4.0 is a whole-platform source programme with a deliberately narrow authority model. Contributions are welcome when they preserve exact target identity, one writer per fact, one authorized emitter, and evidence-bound claims.
 
-## Branch Policy
+## Branch routing
 
-The repository has **three permanent branches** on `origin`:
+- Target protected `dev` for MIR 4 implementation, documentation, governance, preview, shadow, target, and release-engine work.
+- Use a short-lived branch and a pull request. Do not leave completed work only in a local branch.
+- `main` advances only through the release promotion executor from a sealed, independently qualified candidate.
+- Historical and backport branches change only under their explicit terminal programme.
 
-- **`main`**: published **Factorio `2.1.x`** line rooted at immutable tag `3.2.5`, plus synchronized release planning and qualified promotions.
-- **`dev`**: canonical terminal-planning and implementation line for `3.2.9`, shared tooling, tests, and target-neutral corrections.
-- **`legacy`**: published **Factorio `2.0.x`** line at immutable tag `2.5.5`; it advances only through governed `2.5.9` promotion.
+After a PR merges, fetch the remote, fast-forward local `dev`, verify `dev == origin/dev`, verify divergence is `0/0`, and remove the local feature branch.
 
-Short-lived feature branches are fine, but they should target one of these permanent branches by pull request.
+## Authority and maturity
 
-Use this routing:
+Every change must identify its maturity: stable, preview, shadow, experimental, or omitted. Preview and shadow code may be complete and executable without gaining player mutation, signing, publication, or support authority.
 
-- Target **`dev`** for admitted MIR 3 corrections, shared tooling, governance, and eventual `3.2.9` work.
-- Target **`main`** only for synchronized release records or a qualified promotion from `dev`.
-- Target **`legacy`** only through a governed, independently qualified Factorio 2.0 promotion.
+- Compatibility policy describes decisions; it never mutates prototypes.
+- Only the admitted emitter creates or mutates generated technologies.
+- Every generated technology has a stable stream manifest row.
+- Every public compatibility claim names fixture or exact load-check evidence.
+- Target behavior needs an explicit disposition and target-local proof.
+- Changes to authorities must update their machine-readable manifests.
 
-Do not merge Factorio `2.1`-only APIs or metadata into **`legacy`** unless the change is guarded or rewritten for Factorio `2.0`.
+See [Governance](GOVERNANCE.md), [Extension Protocol](EXTENSION-PROTOCOL.md), and [the module boundaries](docs/architecture/module-boundaries.md).
 
-The `.5` tags and packages are immutable. Do not create `.6`, `.7`, or `.8` releases. Route every later MIR 3 correction to `3.2.9`, `2.5.9`, or the matching `1.x.9` target under the [terminal programme](docs/releases/mir-3-terminal-dot-9-programme.md). Feature and platform redesign belongs to the MIR 4 handoff.
+## Development workflow
 
-## Compatibility Expectations
+1. Start from clean, current `origin/dev`.
+2. Read the task-specific authorities listed in `AGENTS.md`.
+3. Make one bounded change and classify its package visibility.
+4. Materialize or inspect the exact verification plan.
+5. Run the selected narrow checks, then the broader profile required by the risk.
+6. Regenerate governed projections through their writers; never hand-edit generated dashboards or queues.
+7. Open a PR, wait for the aggregate evidence gate, merge, and read back the protected branch.
 
-More Infinite Research prefers **opportunistic compatibility**:
-
-- Discover recipes, items, technologies, science packs, and labs from visible prototypes.
-- Skip unavailable or unsafe generated research instead of hard-failing.
-- Keep third-party compatibility mod dependencies out of `info.json` unless there is no safer option.
-- Preserve existing generated prototype IDs unless a migration plan exists.
-- Leave finite vanilla and other-mod upgrade chains alone.
-
-For `legacy`, keep Factorio `2.0.x` constraints in mind:
-
-- `info.json` must keep `factorio_version = "2.0"`.
-- Do not depend on Factorio `2.1` technology modifier APIs.
-- Do not assume Factorio `2.1` science-pack item behavior unless the backport implements a safe alternative.
-
-## Pull Request Checklist
-
-Before opening a pull request:
-
-- Pick the correct base branch: **`dev`**, **`main`**, or **`legacy`**.
-- Keep the change focused on one behavior or release task.
-- Update README, changelog, locale, and compatibility docs when behavior changes.
-- Classify each change against the terminal programme and its affected target lines.
-- Never rebuild a published `.5` ZIP. Build only after a new `.9` source and candidate are explicitly admitted.
-- Materialize the exact MIR verification plan before running its selected work.
-
-For most repo changes on `main` or `dev`, first materialize or inspect the exact change-aware plan, then run only its selected work. The static command remains the narrow fallback for changes that select it:
+For documentation, edit Markdown front matter and regenerate:
 
 ```powershell
-.\tools\commands\package\Build-MIRPackage.ps1
+.\tools\commands\docs\Update-MIRDocumentationIndex.ps1
+.\tools\commands\docs\Update-MIRDocumentationIndex.ps1 -Check
+```
+
+For the static gate:
+
+```powershell
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
-For risky generation, science-pack, cargo logistics, or compatibility changes, also run runtime validation:
+Use the current Factorio 2.1 Steam engine only for F210. Use the preserved Factorio 2.0 installation for F200. Do not retarget Steam depots for historical testing.
 
-```powershell
-.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
-```
+## Pull-request evidence
 
-For branch policy changes:
+A PR should state:
 
-```powershell
-.\validation\tests\release\Test-MIRBranchPolicy.ps1
-```
+- exact base commit and tree;
+- writable paths and authorities changed;
+- maturity and player-package visibility;
+- proof obligations and verification-plan identity;
+- package-source fingerprint result;
+- rollback or compensation boundary;
+- remaining human, credential, or external-service blockers.
 
-## Changelog and Mod Portal Notes
+Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](RELEASE-RUNBOOK.md).
 
-The Factorio mod portal ingests the packaged README and changelog, so write them for players first:
+## Changelog and player copy
 
-- Keep changelog bullets concise and useful to players, server admins, or compatibility maintainers.
-- Keep each `changelog.txt` line at or below **132 characters**.
-- This 132-character line cap applies only to `changelog.txt`; Markdown docs use normal prose.
-- Lead with shipped behavior: added research, changed balance, fixed compatibility, changed settings, or migration.
-- Keep related details together when they are one user-facing change; do not create fake continuation bullets.
-- Mention implementation details only when they affect compatibility, settings, migrations, or save behavior.
-- Do not log abandoned experiments, release-candidate churn, validation fixtures, smoke checks, or package mechanics.
-
-## Release Notes
-
-Release commits should leave:
-
-- `info.json` matching the intended Factorio line.
-- `changelog.txt` with the release version and date.
-- `dist/more-infinite-research_<version>.zip` deterministically built from the admitted unpublished candidate; published archives remain untouched.
-- Static validation passing.
-- Runtime validation passing when the change touches prototype generation or compatibility behavior.
-- The typed ReleaseRecord, release notes, approved delta, tag, and public verification consistent with the exact package identity.
+Write package-facing text for players. Keep `changelog.txt` lines at or below 132 characters. Record shipped behavior, settings, compatibility, and migration effects; omit abandoned experiments and internal candidate churn.

@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json",
+  "title": "MIR 4 release capsule restoration receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "canonicalization",
+    "programme_id",
+    "turn",
+    "operation",
+    "status",
+    "capsule",
+    "source",
+    "targets",
+    "checks",
+    "network",
+    "publisher",
+    "private_reacquisition",
+    "private_payloads_restored",
+    "output_was_empty",
+    "production_authority",
+    "release_transition_performed",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseCapsuleRestorationReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T15"},
+    "operation": {"const": "restore"},
+    "status": {"const": "passed-public-safe-private-reacquisition-explicit"},
+    "capsule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["archive_sha256", "content_sha256", "manifest_record_sha256"],
+      "properties": {
+        "archive_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "manifest_record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree", "restored", "exact_identity_sets_verified"],
+      "properties": {
+        "commit": {"$ref": "#/$defs/gitObject"},
+        "tree": {"$ref": "#/$defs/gitObject"},
+        "restored": {"const": true},
+        "exact_identity_sets_verified": {"const": true}
+      }
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {"$ref": "#/$defs/f210"},
+        {"$ref": "#/$defs/f200"}
+      ],
+      "items": false
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capsule_integrity",
+        "source_archive",
+        "contracts_and_toolchain",
+        "target_package_source",
+        "preview_assets",
+        "sbom_provenance",
+        "attestation_signature",
+        "revocation",
+        "proof_index",
+        "publisher_dummy_admission"
+      ],
+      "properties": {
+        "capsule_integrity": {"const": true},
+        "source_archive": {"const": true},
+        "contracts_and_toolchain": {"const": true},
+        "target_package_source": {"const": true},
+        "preview_assets": {"const": true},
+        "sbom_provenance": {"const": true},
+        "attestation_signature": {"const": true},
+        "revocation": {"const": true},
+        "proof_index": {"const": true},
+        "publisher_dummy_admission": {"const": true}
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "mutable_github_state_used", "network_calls"],
+      "properties": {
+        "policy": {"const": "disabled"},
+        "mutable_github_state_used": {"const": false},
+        "network_calls": {"const": 0}
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dummy_admission_record_sha256", "credentials_present", "production_authority"],
+      "properties": {
+        "dummy_admission_record_sha256": {"$ref": "#/$defs/sha256"},
+        "credentials_present": {"const": false},
+        "production_authority": {"const": false}
+      }
+    },
+    "private_reacquisition": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["object_id", "availability", "acquisition_requirement"],
+        "properties": {
+          "object_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,127}$"},
+          "availability": {"type": "string", "minLength": 1, "maxLength": 128},
+          "acquisition_requirement": {"type": "string", "minLength": 1, "maxLength": 512}
+        }
+      }
+    },
+    "private_payloads_restored": {"const": false},
+    "output_was_empty": {"const": true},
+    "production_authority": {"const": false},
+    "release_transition_performed": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "f210": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "status"],
+      "properties": {
+        "target": {"const": "f210"},
+        "status": {"const": "verified-prefreeze-package-source"}
+      }
+    },
+    "f200": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "status"],
+      "properties": {
+        "target": {"const": "f200"},
+        "status": {"const": "verified-prefreeze-package-source"}
+      }
+    }
+  }
+}

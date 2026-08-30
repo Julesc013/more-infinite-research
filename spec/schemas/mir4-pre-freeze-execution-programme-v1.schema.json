@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-pre-freeze-execution-programme-v1.schema.json",
+  "title": "MIR 4 pre-freeze execution programme V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "recorded_at",
+    "programme_id",
+    "source_baseline",
+    "planning_inputs",
+    "release_cut",
+    "workflow_maturity_vocabulary",
+    "blockers",
+    "mir3_residuals",
+    "turns",
+    "next_dependency_ready_turn",
+    "transition_gate",
+    "status"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PreFreezeExecutionProgrammeV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "source_baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "branch", "commit", "tree", "main_commit", "legacy_commit", "package_source_sha256"],
+      "properties": {
+        "repository": {"const": "Julesc013/more-infinite-research"},
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[0-9a-f]{40}$"},
+        "tree": {"pattern": "^[0-9a-f]{40}$"},
+        "main_commit": {"pattern": "^[0-9a-f]{40}$"},
+        "legacy_commit": {"pattern": "^[0-9a-f]{40}$"},
+        "package_source_sha256": {"pattern": "^[A-F0-9]{64}$"}
+      }
+    },
+    "planning_inputs": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "sha256", "classification"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "sha256": {"pattern": "^[A-F0-9]{64}$"},
+          "classification": {"const": "planning-evidence-only-not-execution-authority"}
+        }
+      }
+    },
+    "release_cut": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_version", "candidate_state", "next_candidate", "stable_targets", "conditional_targets", "private_experimental_targets", "developer_preview_asset_count", "player_authority"],
+      "properties": {
+        "source_version": {"const": "4.0.0"},
+        "candidate_state": {"const": "pre-freeze-unallocated"},
+        "next_candidate": {"const": "M4RC1"},
+        "stable_targets": {"const": ["F210", "F200"]},
+        "conditional_targets": {"const": ["F110", "F100"]},
+        "private_experimental_targets": {"const": ["F018", "F017", "F016", "F015", "F014", "F013"]},
+        "developer_preview_asset_count": {"const": 4},
+        "player_authority": {"const": "terminal-compiler-emitter-runtime-and-materializers"}
+      }
+    },
+    "workflow_maturity_vocabulary": {
+      "const": [
+        "workflow_registered",
+        "workflow_fail_closed",
+        "workflow_executor_implemented",
+        "workflow_dry_run_passed",
+        "workflow_production_rehearsal_passed",
+        "workflow_production_authorized"
+      ]
+    },
+    "blockers": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "state", "scope", "blocks", "authority"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "state": {"enum": ["OPEN", "SATISFIED", "NOT-APPLICABLE"]},
+          "scope": {"enum": ["stable-player-release", "component-graduation", "target-publication", "slo-claim", "technology-or-compatibility-claim", "repository-hygiene"]},
+          "blocks": {"type": "array", "items": {"type": "string"}},
+          "authority": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "mir3_residuals": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "observed_state", "required_disposition", "release_blocking"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "observed_state": {"type": "string", "minLength": 1},
+          "required_disposition": {"type": "string", "minLength": 1},
+          "release_blocking": {"type": "boolean"}
+        }
+      }
+    },
+    "turns": {
+      "type": "array",
+      "minItems": 22,
+      "maxItems": 22,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "state", "depends_on", "human_required", "release_transition"],
+        "properties": {
+          "id": {"pattern": "^T(0[0-9]|1[0-9]|2[0-1])$"},
+          "name": {"type": "string", "minLength": 1},
+          "state": {"enum": ["completed", "ready", "blocked-dependency", "blocked-human"]},
+          "depends_on": {"type": "array", "items": {"pattern": "^T(0[0-9]|1[0-9]|2[0-1])$"}},
+          "human_required": {"type": "boolean"},
+          "release_transition": {"type": "boolean"}
+        }
+      }
+    },
+    "next_dependency_ready_turn": {"type": "null"},
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "status": {"const": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"}
+  }
+}

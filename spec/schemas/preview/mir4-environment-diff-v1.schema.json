@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/environment-diff-v1.schema.json",
+  "title":"MIR 4 EnvironmentDiffV1 developer preview",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","maturity","base_digest","candidate_digest","status","change_count","changes","summary","canonicalization","portable","privacy_safe","package_visible","player_mutation_authorized","prototype_write_authorized","public_support_authorized","release_authority","digest"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4EnvironmentDiffV1"},"maturity":{"const":"developer-preview"},
+    "base_digest":{"$ref":"#/$defs/digest"},"candidate_digest":{"$ref":"#/$defs/digest"},"status":{"enum":["identical","changed"]},"change_count":{"type":"integer","minimum":0,"maximum":7},
+    "changes":{"type":"array","maxItems":7,"items":{"type":"object","additionalProperties":false,"required":["path","category","before","after"],"properties":{"path":{"type":"string"},"category":{"enum":["target","engine","mir","mods","startup_settings","extensions","contracts"]},"before":{},"after":{}}}},
+    "summary":{"type":"object"},"canonicalization":{"const":"mir-canonical-json/1"},"portable":{"const":true},"privacy_safe":{"const":true},
+    "package_visible":{"const":false},"player_mutation_authorized":{"const":false},"prototype_write_authorized":{"const":false},"public_support_authorized":{"const":false},"release_authority":{"const":false},"digest":{"$ref":"#/$defs/digest"}
+  },
+  "$defs":{"digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"}}
+}

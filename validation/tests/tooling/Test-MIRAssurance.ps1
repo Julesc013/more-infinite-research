@@ -326,20 +326,22 @@ foreach ($target in @("2.0", "2.1")) {
 }
 $publishedRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.5.json") | ConvertFrom-Json
 $terminalRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.9.json") | ConvertFrom-Json
-$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.10.json") | ConvertFrom-Json
+$currentRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\records\3.2.11.json") | ConvertFrom-Json
 $currentProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\profiles\factorio-2.1.json") | ConvertFrom-Json
+$mir4Authority = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-M4C01-Implementation-AuthorizationV1.json") | ConvertFrom-Json
+$mir4Targets = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\releases\waves\mir4-r0\MIR4-Target-RegistryV5.json") | ConvertFrom-Json
+$mir4F210 = @($mir4Targets.payload.targets | Where-Object id -eq 'factorio-2.1')
 $currentReleaseBoundary = "{0}|{1}" -f [string]$currentRelease.state, [string]$currentRelease.candidate_id
-if ($currentReleaseBoundary -notin @(
-      "planned|not-assigned", "source-frozen|C34", "package-built|C34",
-      "focused-qualified|C34", "candidate-qualified|C34", "manually-accepted|C34",
-      "automated-qualified-awaiting-human-review|C34",
-      "protected-qualified|C34", "sealed|C34", "promoted|C34", "tagged|C34",
-      "published|C34", "publicly-verified|C34"
-    ) -or [string]$currentRelease.candidate_floor -ne "C34" -or
-    [string]$currentProfile.upgrade.from_version -ne [string]$currentRelease.upgrade.from_version -or
-    [string]$currentProfile.upgrade.to_version -ne [string]$currentRelease.upgrade.to_version -or
-    [string]$currentProfile.upgrade.fixture -ne [string]$currentRelease.upgrade.fixture) {
-  throw "Factorio 2.1 assurance profile must bind the current 3.2.10 hotfix upgrade authority."
+if ($currentReleaseBoundary -ne 'publicly-verified|C35' -or [string]$currentRelease.candidate_floor -ne 'C35' -or
+    [string]$currentProfile.release_authority_mode -ne 'candidate-programme' -or
+    [string]$currentProfile.release_authority -ne '.mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json' -or
+    [string]$mir4Authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+    [string]$mir4Authority.status -ne 'authorized-in-progress' -or $mir4F210.Count -ne 1 -or
+    [string]$mir4F210[0].mir3_predecessor -ne [string]$currentProfile.upgrade.from_version -or
+    [string]$currentProfile.upgrade.from_version -ne '3.2.11' -or
+    [string]$currentProfile.upgrade.to_version -ne '4.0.21000' -or
+    [string]$currentProfile.upgrade.fixture -ne 'assert-upgrade-3-2-11-to-4-0-21000') {
+  throw "Factorio 2.1 assurance profile must bind the exact 3.2.11 to MIR 4 M4C01 candidate-programme authority."
 }
 if ([string]$terminalRelease.state -ne "publicly-verified" -or
     [string]$terminalRelease.candidate_id -ne "C33" -or
@@ -472,6 +474,101 @@ $publishedSnapshotIntegrity = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot
 if ($publishedSnapshotIntegrity -notmatch 'git ls-tree -r -l' -or
   $publishedSnapshotIntegrity -match 'Measure-Object -Property Length -Sum') {
   throw "Published snapshot byte counts must come from canonical Git blobs, not checkout line endings."
+}
+foreach ($requiredSuccessorCheck in @(
+  'Test-MIR4PreFreezeAuthorities',
+  'MIR4-T14-Authority-Evolution-ReceiptV1.json',
+  'MIR4-T15-Authority-Evolution-ReceiptV1.json',
+  'MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json',
+  'MIR4-Target-Compiler-Tooling-MigrationV1.json',
+  'MIR4TargetCompilerMigrationReceiptV1',
+  'MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json',
+  'MIR4SemanticCompilerPolicyMigrationReceiptV1',
+  'MIR4-Runtime-Continuity-Tooling-MigrationV1.json',
+  'MIR4RuntimeContinuityMigrationReceiptV1',
+  'MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json',
+  'MIR4ModuleSdkMepMigrationReceiptV1',
+  'MIR4-ProcessIR-Exact-Tooling-MigrationV1.json',
+  'MIR4ProcessIRExactMigrationReceiptV1',
+  'MIR4-Inspector-Compatibility-Tooling-MigrationV1.json',
+  'MIR4InspectorCompatibilityMigrationReceiptV1',
+  'MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json',
+  'MIR4AssuranceOfflineCustodyMigrationReceiptV1',
+  'MIR4-Historical-Tooling-MigrationV1.json',
+  'MIR4HistoricalToolingMigrationReceiptV1',
+  'MIR4-Release-Tooling-MigrationV1.json',
+  'MIR4ReleaseToolingMigrationReceiptV1',
+  'player_executable_sources_unchanged',
+  'human_gate.acceptance_inferred'
+)) {
+  if ($publishedSnapshotIntegrity -notmatch [regex]::Escape($requiredSuccessorCheck)) {
+    throw "Published snapshot integrity omits append-only successor proof: $requiredSuccessorCheck"
+  }
+}
+foreach ($requiredSuccessorFingerprint in @(
+  '.gitattributes',
+  '.mir/assurance.json',
+  '.mir/compatibility.yml',
+  '.mir/control',
+  '.mir/control-plane/ownership.json',
+  '.mir/docs.yml',
+  '.mir/modules.yml',
+  '.mir/releases/governance/mir4/supply-chain.json',
+  '.mir/releases/waves/mir4-r0',
+  'assurance/.mir-root.json',
+  'releases/migrations',
+  'contracts/repository',
+  'governance/.mir-root.json',
+  'governance/repository/migrations',
+  'assurance/repository',
+  'tests/.mir-root.json',
+  'validation/tests.yml',
+  'tools/mir.ps1',
+  'mir.lock',
+  'spec/compatibility/claims.json',
+  'spec/schemas',
+  'tools/mir/application/migration',
+  'tools/mir/application/targets',
+  'tools/mir/application/compiler',
+  'tools/mir/application/runtime',
+  'tools/mir/application/extensions',
+  'tools/mir/application/processir',
+  'tools/mir/application/inspection',
+  'tools/mir/application/assurance',
+  'tools/mir/application/custody',
+  'tools/mir/application/history',
+  'tools/mir/application/release',
+  'tools/mir/application/technology',
+  'tools/mir/domain/safety',
+  'tools/mir/domain/policy',
+  'tools/mir/cli',
+  'tools/lib/assurance',
+  'tools/lib/mir4',
+  'tools/commands/mir4',
+  'tests/compiler',
+  'tests/runtime',
+  'tests/extensions',
+  'tests/processir',
+  'tests/inspection',
+  'tests/assurance',
+  'tests/history',
+  'tests/release-tooling',
+  'tests/targets',
+  'tests/technology',
+  'validation/tests/mir4',
+  'validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1',
+  'validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1',
+  'validation/tests/tooling/Test-MIRAssurance.ps1',
+  'docs/architecture',
+  'docs/compatibility',
+  'docs/developer/environment-locks.md',
+  'docs/reference/generated',
+  'docs/releases',
+  'sdk/preview/mir4/reference/t13'
+)) {
+  if ($assuranceEvidenceSource -notmatch [regex]::Escape($requiredSuccessorFingerprint)) {
+    throw "Release-history fingerprint omits successor authority input: $requiredSuccessorFingerprint"
+  }
 }
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
@@ -614,7 +711,7 @@ foreach ($requiredWorkflowSnippet in @(
   "MIR_CP_TRUST_CLASS: ci",
   "MIR_PROTECTED_ENVIRONMENT: release-candidate",
   "environment: release-candidate",
-  "needs: [context, package]",
+  "needs: [context, package, environments]",
   "needs: [context, static, package, environments, transitions, ecosystem]",
   "needs: [context, transitions, ecosystem, performance]",
   "needs: [context, static, package, environments, transitions, ecosystem, performance, manual]",
@@ -657,8 +754,9 @@ foreach ($requiredReleaseCandidateSnippet in @(
   '-CandidateZip $candidateArchive',
   'Run strict targeted compatibility gate',
   'MIR_COMPAT_RUNTIME_ROOT: ''C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}''',
+  'MIR_RC_CANDIDATE_SHA: ${{ inputs.candidate_sha }}',
   "--candidate `$candidateArchive",
-  '--candidate-source ''${{ inputs.candidate_sha }}''',
+  '--candidate-source $env:MIR_RC_CANDIDATE_SHA',
   "--output 'build/results/release-gate'",
   'MIRProtectedReleaseCandidateRunV1',
   'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}',
@@ -705,7 +803,7 @@ if ($validateWorkflow -match "github\.(ref|head_ref|base_ref)\s*==\s*'[^']*legac
   throw "Hosted validation must treat legacy as the Factorio 2.1 terminal alias and reserve the Factorio 2.0 lane for tmp/2.0."
 }
 if ($validateWorkflow.Contains('$candidate = Join-Path $PWD ([string]$plan.candidate)') -or
-    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 4 -or
+    @([regex]::Matches($validateWorkflow, '\$plan\.candidate_descriptor\.path')).Count -ne 6 -or
     @([regex]::Matches($validateWorkflow, '\[IO\.Path\]::IsPathRooted\(\$candidateRelative\)')).Count -ne 2) {
   throw "Hosted workers and aggregate verification must reconstruct the candidate from the governed repo-relative descriptor path, never the planner checkout's absolute path."
 }
@@ -764,7 +862,9 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
 
 $assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredIngestionGuard in @(
-  'mir-assurance-worker-receipt-v2',
+  'mir-assurance-worker-receipt-v3',
+  'adopted-exact-trusted-capsule',
+  'evidence-disposition',
   'Test-MIRAssuranceFreshCampaignEvidence',
   'Get-MIRAssuranceCampaignCheckpoint',
   'stale-ignored',
@@ -785,6 +885,19 @@ foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "che
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
+foreach ($bootstrapAuthorityBinding in @(
+  '[string]$verificationProfile.release_authority_mode -eq "candidate-programme"',
+  '[string]$info.version -eq [string]$verificationProfile.upgrade.from_version'
+)) {
+  if (-not $assuranceCore.Contains($bootstrapAuthorityBinding)) {
+    throw "MIR 4 assurance bootstrap selection is not bound to the current candidate-programme predecessor: $bootstrapAuthorityBinding"
+  }
+}
+$bootstrapBuilder = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapLocalCandidate.ps1")
+if (-not $bootstrapBuilder.Contains("foreach (`$targetPlan in `$targets) {`r`n  `$correction = Get-MIR4PlanCorrection -PlanTarget `$targetPlan") -and
+    -not $bootstrapBuilder.Contains("foreach (`$targetPlan in `$targets) {`n  `$correction = Get-MIR4PlanCorrection -PlanTarget `$targetPlan")) {
+  throw "MIR 4 bootstrap materialization does not bind the optional correction per target and can inherit caller scope."
+}
 foreach ($generatedOutputExclusion in @('build/results/*', 'build/*', 'build/results/*')) {
   if (-not $assuranceCore.Contains($generatedOutputExclusion)) {
     throw "Generated runtime summaries could enter their own future input fingerprint: $generatedOutputExclusion"

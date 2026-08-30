@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
 } else { (Resolve-Path -LiteralPath $RepoRoot).Path }
-. (Join-Path $RepoRoot "tools/lib/mir4/OfflineCandidateCustody.ps1")
+. (Join-Path $RepoRoot "tools/mir/application/custody/OfflineCandidateCustody.ps1")
 
 function Assert-True([bool]$Condition, [string]$Message) { if (-not $Condition) { throw $Message } }
 function Assert-Throws([scriptblock]$Action, [string]$Message) {
@@ -22,11 +22,11 @@ function Get-OpenSshKeygenPath {
   return (Resolve-Path -LiteralPath $found[0]).Path
 }
 
-$currentPlanPath = (Resolve-Path (Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json")).Path
-$currentPlan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $currentPlanPath -SchemaPath (Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json")
+$currentPlanPath = (Resolve-Path (Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json")).Path
+$currentPlan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $currentPlanPath -SchemaPath (Join-Path $RepoRoot "spec/schemas/mir4-bootstrap-local-candidate-plan-v3.schema.json")
 $currentF210 = @($currentPlan.targets | Where-Object { [string]$_.target_key -ceq "f210" })[0]
 $currentBaseline = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ([string]$currentF210.predecessor.baseline_manifest)) | ConvertFrom-Json -Depth 100
-Assert-True ([string]$currentBaseline.record_sha256 -ceq [string]$currentF210.predecessor.baseline_record_sha256) "The hash-bound MIR 4 candidate plan V2 has a stale f210 terminal baseline."
+Assert-True ([string]$currentBaseline.record_sha256 -ceq [string]$currentF210.predecessor.baseline_record_sha256) "The hash-bound MIR 4 candidate plan V3 has a stale f210 terminal baseline."
 
 $sshKeygen = Get-OpenSshKeygenPath
 $buildTests = Join-Path $RepoRoot "build/tests"
@@ -37,8 +37,8 @@ $governedRoot = $null
 
 try {
   $schemas = Join-Path $RepoRoot "spec/schemas"
-  $planPath = (Resolve-Path (Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json")).Path
-  $plan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $planPath -SchemaPath (Join-Path $schemas "mir4-bootstrap-local-candidate-plan-v2.schema.json")
+  $planPath = (Resolve-Path (Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json")).Path
+  $plan = Assert-MIR4GovernedBootstrapRecordFileV1 -Path $planPath -SchemaPath (Join-Path $schemas "mir4-bootstrap-local-candidate-plan-v3.schema.json")
   $target = @($plan.targets | Where-Object { [string]$_.target_key -ceq "f210" })[0]
 
   # Consume only the governed materializer output; admission re-runs its complete -Check path.

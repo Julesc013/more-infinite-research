@@ -37,7 +37,16 @@ if ([string]::IsNullOrWhiteSpace($CampaignPath)) {
   $CampaignPath = ".mir\performance-campaigns\$($candidateInfo.version)-$($activeCandidate.candidate_id).json"
 }
 if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) {
-  $LocalModZipDir = Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine"
+  $libraryEnvironmentName = 'MIR_TESTMODS_' + $factorioLine.Replace('.', '_')
+  $libraryEnvironmentValue = [Environment]::GetEnvironmentVariable($libraryEnvironmentName)
+  $libraryCandidates = @(
+    $libraryEnvironmentValue,
+    (Join-Path (Split-Path -Parent $RepoRoot) "testmods\$factorioLine"),
+    (Join-Path $RepoRoot "testmods\$factorioLine"),
+    (Join-Path (Split-Path -Parent $RepoRoot) "testmods_$factorioLine")
+  ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+  $LocalModZipDir = $libraryCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -First 1
+  if ([string]::IsNullOrWhiteSpace($LocalModZipDir)) { $LocalModZipDir = $libraryCandidates[-1] }
 }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$($candidateInfo.version)-performance-regression.json"

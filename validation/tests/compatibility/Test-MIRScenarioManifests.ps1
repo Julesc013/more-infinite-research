@@ -16,6 +16,15 @@ $manifestPaths = @(
 $allowedTargets = @("2.0", "2.1")
 $allowedClaims = @("loads", "observed", "cooperates", "diagnostic-only", "partial-support", "full-family-support", "full-pack-support")
 
+$compatAuditSource = Get-Content -Raw -LiteralPath (
+  Join-Path $RepoRoot "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+$factorioProcessIndex = $compatAuditSource.IndexOf("FactorioProcess.ps1", [StringComparison]::Ordinal)
+$settingsOverridesIndex = $compatAuditSource.IndexOf("SettingsOverrides.ps1", [StringComparison]::Ordinal)
+if ($factorioProcessIndex -lt 0 -or $settingsOverridesIndex -lt 0 -or
+    $factorioProcessIndex -gt $settingsOverridesIndex) {
+  throw "Compatibility audit must load Factorio path-budget helpers before settings override materialization."
+}
+
 function Assert-MIRProperty {
   param($Object, [string]$Name, [string]$Context)
   if ($null -eq $Object -or $Object.PSObject.Properties.Name -notcontains $Name) {
@@ -60,7 +69,28 @@ foreach ($relativePath in $manifestPaths) {
       $null = Assert-MIRProperty -Object $setup -Name $setupProperty -Context "$context setup"
     }
 
-    $null = Assert-MIRProperty -Object $scenario -Name "settings" -Context $context
+    $settings = Assert-MIRProperty -Object $scenario -Name "settings" -Context $context
+    foreach ($settingProperty in @($settings.PSObject.Properties)) {
+      if ([string]::IsNullOrWhiteSpace([string]$settingProperty.Name)) {
+        throw "$context settings contains an empty startup-setting name."
+      }
+      if ($null -eq $settingProperty.Value -or
+          $settingProperty.Value -isnot [bool] -and
+          $settingProperty.Value -isnot [string] -and
+          $settingProperty.Value -isnot [byte] -and
+          $settingProperty.Value -isnot [sbyte] -and
+          $settingProperty.Value -isnot [int16] -and
+          $settingProperty.Value -isnot [uint16] -and
+          $settingProperty.Value -isnot [int32] -and
+          $settingProperty.Value -isnot [uint32] -and
+          $settingProperty.Value -isnot [int64] -and
+          $settingProperty.Value -isnot [uint64] -and
+          $settingProperty.Value -isnot [single] -and
+          $settingProperty.Value -isnot [double] -and
+          $settingProperty.Value -isnot [decimal]) {
+        throw "$context setting '$($settingProperty.Name)' must be a scalar startup-setting value."
+      }
+    }
     $expectedPlan = Assert-MIRProperty -Object $scenario -Name "expected_plan" -Context $context
     foreach ($planProperty in @("mode", "required_result", "maximum_dependency_failures")) {
       $null = Assert-MIRProperty -Object $expectedPlan -Name $planProperty -Context "$context expected_plan"
@@ -89,6 +119,26 @@ foreach ($relativePath in $manifestPaths) {
         }
       }
     }
+    if ($expectedPlan.PSObject.Properties.Name -contains "required_audit_rows") {
+      $requiredAuditRows = @($expectedPlan.required_audit_rows)
+      if ($requiredAuditRows.Count -eq 0) { throw "$context expected_plan.required_audit_rows must not be empty." }
+      foreach ($expectedRow in $requiredAuditRows) {
+        $properties = @($expectedRow.PSObject.Properties)
+        if ($properties.Count -eq 0 -or @($properties | Where-Object {
+              [string]::IsNullOrWhiteSpace([string]$_.Name) -or
+              [string]::IsNullOrWhiteSpace([string]$_.Value)
+            }).Count -gt 0) {
+          throw "$context expected_plan.required_audit_rows entries must contain non-empty exact property matches."
+        }
+      }
+    }
+    foreach ($fragmentField in @("required_log_fragments", "forbidden_log_fragments")) {
+      if ($expectedPlan.PSObject.Properties.Name -notcontains $fragmentField) { continue }
+      $fragments = @($expectedPlan.$fragmentField)
+      if ($fragments.Count -eq 0 -or @($fragments | Where-Object { [string]::IsNullOrWhiteSpace([string]$_) }).Count -gt 0) {
+        throw "$context expected_plan.$fragmentField must contain non-empty literal fragments."
+      }
+    }
 
     $timeout = [int](Assert-MIRProperty -Object $scenario -Name "timeout_seconds" -Context $context)
     if ($timeout -lt 1 -or $timeout -gt 3600) { throw "$context timeout_seconds must be between 1 and 3600." }
@@ -96,6 +146,26 @@ foreach ($relativePath in $manifestPaths) {
       throw "$context retains a schema-1 field; use roots and setup.include_space_age."
     }
   }
+}
+
+$local21Manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\scenarios\local-2.1.json") | ConvertFrom-Json
+$corrundumScenario = @($local21Manifest.scenarios | Where-Object { $_.name -eq "local-2-1-corrundum-maxcap-13" })
+if ($corrundumScenario.Count -ne 1) {
+  throw "validation/scenarios/local-2.1.json must contain exactly one local-2-1-corrundum-maxcap-13 scenario."
+}
+$corrundumRoots = @($corrundumScenario[0].roots | ForEach-Object { [string]$_ })
+if ($corrundumRoots -notcontains "PlanetsLib" -or $corrundumRoots -notcontains "corrundum") {
+  throw "local-2-1-corrundum-maxcap-13 must root both exact PlanetsLib and Corrundum archives."
+}
+if ([int]$corrundumScenario[0].settings.'ips-max-level-research_processing_unit' -ne 13 -or
+    [int]$corrundumScenario[0].settings.'ips-max-level-research_lubricant_productivity' -ne 13 -or
+    [int]$corrundumScenario[0].settings.'mir-max-level-braking-force' -ne 13) {
+  throw "local-2-1-corrundum-maxcap-13 must retain the cap-13 reproduction settings."
+}
+if (@($corrundumScenario[0].expected_plan.required_log_fragments).Count -ne 9 -or
+    @($corrundumScenario[0].expected_plan.required_audit_rows).Count -ne 1 -or
+    @($corrundumScenario[0].expected_plan.forbidden_log_fragments) -notcontains "Maximum-level conflict") {
+  throw "local-2-1-corrundum-maxcap-13 must machine-check the schema repair and all nine cap-13 bindings without conflicts."
 }
 
 $profileScenarioPaths = [ordered]@{

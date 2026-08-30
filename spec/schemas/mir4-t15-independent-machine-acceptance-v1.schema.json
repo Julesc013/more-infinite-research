@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json",
+  "title": "MIR 4 T15 independent machine acceptance V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "reviewed_at", "programme_id", "turn", "reviewer", "review_input", "accepted_propositions", "evidence_results", "explicit_non_acceptances", "verdict", "package_visible", "release_authority", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4T15IndependentMachineAcceptanceV1"},
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "turn": {"const": "T15"},
+    "reviewer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "worktree_branch", "human_reviewer_claimed", "human_acceptance_inferred"],
+      "properties": {"class": {"const": "separate-clean-worktree-machine-audit"}, "worktree_branch": {"const": "codex/mir4-t15-independent-audit"}, "human_reviewer_claimed": {"const": false}, "human_acceptance_inferred": {"const": false}}
+    },
+    "review_input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_commit", "source_tree", "machine_authority_path", "machine_authority_sha256", "audit_diagnostic_record_sha256", "audit_diagnostic_file_sha256", "external_export_manifest_record_sha256", "external_export_manifest_file_sha256"],
+      "properties": {
+        "source_commit": {"const": "c4a68809a54a81ae0a1959d257c2e4a97ef0e490"},
+        "source_tree": {"const": "c76a5fb46bc950264652b7033c6ce72b7f9b1991"},
+        "machine_authority_path": {"const": ".mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json"},
+        "machine_authority_sha256": {"const": "84B6C8FB0215F198972C27D28995A3324A46B6D6ED0D7E1C6A330B3FAA9A0C90"},
+        "audit_diagnostic_record_sha256": {"const": "72FA27A0172448F35D09F2161743DA50C576DB6991A90BB720432C0F5B9DDB6E"},
+        "audit_diagnostic_file_sha256": {"const": "B1EF351537376E278DC39A6F938ACA8E289B50CFA2DF8D4A34BF35A54A2771DC"},
+        "external_export_manifest_record_sha256": {"const": "C0AA4781AA197F9C3438C135FCB9700B2A5AC8129F090DA0007C08309D867C72"},
+        "external_export_manifest_file_sha256": {"const": "8B4C36506D3A0682994EAAB33E7D4C36B6F7321EA5641FEC055F3EF004D1ACCC"}
+      }
+    },
+    "accepted_propositions": {
+      "type": "array", "minItems": 12, "maxItems": 12, "uniqueItems": true,
+      "items": {"enum": ["canonical-component-inventory-and-spdx-projections", "deterministic-provenance-and-attestation-verification", "public-safe-offline-attestation-custody", "network-disabled-reproducible-capsule-construction", "release-capsule-content-addressed-inventory", "rights-and-redistribution-classification", "dual-clean-root-offline-restoration", "runner-isolation-and-workflow-byte-invariance", "publisher-confinement-and-dummy-admission", "production-signing-machine-preparation-only", "public-safe-external-rescue-export", "player-package-source-unchanged"]}
+    },
+    "evidence_results": {
+      "type": "object", "additionalProperties": false,
+      "required": ["registered_workers_passed", "capsule_direct_verification", "independent_restores_passed", "confinement_cross_worktree_match", "release_governance_w00", "private_proof_key_retained", "unknown_verification_paths"],
+      "properties": {"registered_workers_passed": {"const": 5}, "capsule_direct_verification": {"const": "passed"}, "independent_restores_passed": {"const": 2}, "confinement_cross_worktree_match": {"const": true}, "release_governance_w00": {"const": "passed"}, "private_proof_key_retained": {"const": false}, "unknown_verification_paths": {"const": 0}}
+    },
+    "explicit_non_acceptances": {"$ref": "#/$defs/nonAcceptances"},
+    "verdict": {"const": "ACCEPTED-T15-MACHINE-SCOPE"},
+    "package_visible": {"const": false},
+    "release_authority": {"const": false},
+    "status": {"const": "T15-INDEPENDENT-MACHINE-ACCEPTANCE-PASSED-HUMAN-GATES-UNCHANGED"}
+  },
+  "$defs": {
+    "nonAcceptances": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maintainer_playtest", "protected_signing_ceremony", "private_key_or_passphrase", "source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {"maintainer_playtest": {"const": false}, "protected_signing_ceremony": {"const": false}, "private_key_or_passphrase": {"const": false}, "source_freeze": {"const": false}, "candidate_allocation": {"const": false}, "production_signing": {"const": false}, "production_seal": {"const": false}, "promotion_to_main": {"const": false}, "tagging": {"const": false}, "publication": {"const": false}}
+    }
+  }
+}

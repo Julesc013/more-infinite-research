@@ -55,27 +55,123 @@ generated_policy_authority:
     - public claims remain separately governed and evidence-bound
 
 science_phase_policies:
-  - id: K2SciencePhasePolicyV1
+  - id: K2SciencePhasePolicyV2
     implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
-    applicability:
-      Krastorio2: "2.1.2"
-      Krastorio2-spaced-out: "2.0.13"
+    profiles:
+      - id: factorio-2.1-k2so
+        target: f210
+        mod_ids: [base, Krastorio2, Krastorio2-spaced-out]
+        version_ranges:
+          base: ">=2.1.0 <2.2.0"
+          Krastorio2: ">=2.1.2 <2.1.3"
+          Krastorio2-spaced-out: ">=2.0.11 <2.0.14"
+        proof_roots:
+          - local-2-1-krastorio-spaced-out
+        exact_endpoint_evidence:
+          lower: build/results/mir4-sol/sol06/k2so-f210-lower-v3
+          upper: build/results/mir4-sol/sol06/k2so-f210-upper-v3
+      - id: factorio-2.0-k2so-standalone
+        target: f200
+        mod_ids: [base, Krastorio2-spaced-out]
+        forbidden_mod_ids: [Krastorio2]
+        version_ranges:
+          base: ">=2.0.73 <2.1.0"
+          Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
+        proof_roots:
+          - local-2-0-krastorio-spaced-out
+    capability_fingerprint:
+      source: research-pack-prototype-identities
+      profile_rule: every identity required by the matched target profile must exist
+      factorio-2.1-k2so-additional-identities:
+        - kr-basic-tech-card
+      common_required_science_identities:
+        - automation-science-pack
+        - chemical-science-pack
+        - kr-advanced-tech-card
+        - kr-matter-tech-card
+        - kr-singularity-tech-card
+        - logistic-science-pack
+        - military-science-pack
+        - production-science-pack
+        - space-science-pack
+        - utility-science-pack
     scope: MIR-owned generated stream and base-continuation technologies only
     application_stage: planner-after-lab-compatibility-before-technology-design
     behavior:
       production_or_utility: remove-kr-basic-tech-card
       advanced_space_matter_or_singularity: remove-basic-automation-logistic-military-chemical
     invariants:
-      - no behavior outside the exact admitted version envelope
+      - no behavior outside a bounded target-specific version envelope
+      - no behavior when required science identities are absent
+      - normalized output remains accepted by at least one lab because normalization only removes ingredients from a prequalified lab-compatible set
+      - Factorio 2.0 standalone K2SO rejects a co-loaded Krastorio2 identity
       - stable technology IDs
       - idempotent ingredient normalization
       - preserve ingredient order shapes and amounts
       - never emit an empty or lab-invalid ingredient list
       - never invoke private K2 finalization code
     fixture: fixtures/assert-k2-science-phase-policy
-    exact_real_campaign: local-2-1-krastorio-spaced-out
-    admission_status: implemented-awaiting-exact-runtime-proof
-    public_claim: none-until-exact-runtime-proof
+    exact_real_campaigns:
+      - local-2-1-krastorio-spaced-out
+      - local-2-0-krastorio-spaced-out
+    admission_status: implemented-exact-f210-and-private-f200-development-proof-passed
+    public_claim: development-evidence-only-no-public-release-claim-authorized
+
+science_pack_production_route_policy:
+  id: SciencePackProductionRoutePolicyV2
+  implementation: prototypes/mir/capabilities/science_integration/production_route_policy.lua
+  authority_source: prototypes/mir/index/recipe_facts.lua
+  default_progression_authoritative:
+    - ordinary-primary
+    - ordinary-alternate
+    - extraction
+  default_non_authoritative:
+    - recycling
+    - recovery
+    - self-return
+    - catalyst-regeneration
+    - opaque
+  exact_declaration:
+    sources: [exact-profile, mep]
+    required_proof: [process-ir-certificate, target-proof]
+    self_return_declarable: false
+  invariants:
+    - only-net-acquisition-proves-default-progression
+    - factorio-generated-recycling-suffix-is-a-stable-recycling-witness
+    - initially-enabled-recycling-does-not-outrank-ordinary-production
+    - rejected-routes-retain-explainable-witnesses
+    - compatibility-policy-does-not-mutate-recipe-or-technology-prototypes
+  fixture: fixtures/assert-generated-prerequisite-safety
+  exact_real_campaigns:
+    - local-2-1-cubium-production-routes
+    - local-2-1-recycler-progression-routes
+  public_claim: generic-route-correction-only-exact-ecosystem-claims-remain-evidence-bound
+
+maximum_level_binding_policy:
+  id: MIRMaximumLevelPolicyV3
+  authority: prototypes/mir/domain/technology/maximum_level_binding.lua
+  transport: prototypes/mir/emit/mod_data.lua
+  runtime_consumer: prototypes/mir/runtime/maximum_level_control.lua
+  presentation_consumer: prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
+  semantics: absolute-highest-technology-level
+  precedence:
+    - exact-technology
+    - exact-native-owner
+    - exact-stream
+    - family
+    - ecosystem-profile
+    - global
+  invariants:
+    - one-normalized-binding-per-technology
+    - zero-means-infinite-and-positive-values-are-absolute-caps
+    - script-capable-targets-retain-lossless-infinite-prototypes
+    - completed-levels-progress-and-bonuses-survive-cap-changes
+    - only-mir-disabled-technologies-are-restored
+    - known-finalizer-observations-are-recorded
+    - unknown-or-conflicting-finalizers-block-runtime-normalization
+  fixture: fixtures/assert-compiler-contracts
+  exact_real_campaign: local-2-1-corrundum-maxcap-13
+  public_claim: generic-maximum-level-contract-only-exact-ecosystem-claims-remain-evidence-bound
 
 mod_interactions:
   policy: .mir/mod-interaction-policy.json
@@ -101,6 +197,31 @@ technology_prerequisite_cycle_repairs:
     fixture: fixtures/external-technology-cycle
     claim_level: diagnostic-only
     public_scope: bounded startup-cycle interoperability repair only
+
+loader_schema_repairs:
+  - id: cubium-ambient-sound-planets
+    mod: cubium
+    exact_version: "1.0.30"
+    factorio_line: "2.1"
+    trigger: ambient-sound-planet-singular-field-rejected-by-factorio-2.1
+    mutation: move-cubium-ambient-sound-planet-to-single-entry-planets-table
+    implementation: prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua
+    exact_real_campaign: local-2-1-cubium-production-routes
+    exact_real_roots: [cubium, mir-fixture-assert-cubium-production-routes]
+    claim_level: diagnostic-only
+    public_scope: exact-version loader-schema and science-route interoperability only
+
+  - id: corrundum-ambient-sound-planets
+    mod: corrundum
+    exact_version: "1.0.47"
+    factorio_line: "2.1"
+    trigger: ambient-sound-planet-singular-field-rejected-by-factorio-2.1
+    mutation: move-corrundum-ambient-sound-planet-to-single-entry-planets-table
+    implementation: prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua
+    exact_real_campaign: local-2-1-corrundum-maxcap-13
+    exact_real_roots: [PlanetsLib, corrundum]
+    claim_level: diagnostic-only
+    public_scope: exact-version loader-schema interoperability repair only
 
 load_order_requirements:
   - id: space-exploration-finalized-recipe-set
@@ -177,6 +298,27 @@ campaigns:
       - space-exploration
     replacement_candidate_status: unqualified
     claim_boundary: exact-archive-load-claims-only-not-release-qualification
+  mir4_sol07_development_campaign:
+    ledger: .mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json
+    status: exact-current-candidate-representative-campaign-passed-with-bounded-unclaimed-overhauls
+    candidate_archive_sha256: 27E4A872ECBC9D9ED4AB9B4431F26450EB039A52379D408BE6A99342780CB223
+    factorio_2_1_executable_sha256: E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F
+    exact_current_candidate_subjects:
+      - base-and-official
+      - planetslib-corrundum
+      - cubium
+      - recycler-progression
+      - k2-k2so
+      - aai
+      - bz
+      - bob
+    bounded_without_current_claim:
+      - industrial-revolution-3
+      - industrial-revolution-4
+      - space-exploration
+      - angel
+      - pyanodons
+    claim_boundary: development evidence only; no blanket compatibility, release qualification, or publication authority
 
 claims:
   allowed_levels:
@@ -288,6 +430,55 @@ targets:
       generated_through_existing_stream: research_mining_drill
       diagnostic_only:
         - native-mining-yield-productivity
+
+    corrundum:
+      mod: corrundum
+      doc: docs/compatibility/targets/corrundum.md
+      claim_level: diagnostic-only
+      maturity: local-exact-campaign
+      behavior: loader-schema-repair
+      scope: exact-version-interoperability
+      public_claim: exact-version Factorio 2.1 loader-schema repair only
+      fixtures: []
+      streams: []
+      diagnostic_only:
+        - exact-automated-maximum-level-runtime-contract-passed-manual-visual-review-unproven
+        - science-pack-prerequisite-selection-until-runtime-proof
+      schema_repairs:
+        - factorio_2_1_ambient_sound_schema:corrundum_1.0.47
+
+    cubium:
+      mod: cubium
+      doc: docs/compatibility/targets/cubium.md
+      claim_level: diagnostic-only
+      maturity: exact-runtime-fixture-qualified
+      behavior: repaired
+      scope: named-behavior
+      public_claim: exact Cubium 1.0.30 loader-schema and science production-route interoperability only
+      fixtures:
+        - fixtures/assert-cubium-production-routes
+      streams: []
+      diagnostic_only:
+        - broad-cubium-support
+        - progression-beyond-science-production-route-selection
+      schema_repairs:
+        - factorio_2_1_ambient_sound_schema:cubium_1.0.30
+
+    recycler-progression:
+      mod: recycler-progression
+      doc: docs/compatibility/targets/recycler-progression.md
+      claim_level: diagnostic-only
+      maturity: exact-runtime-fixture-qualified
+      behavior: repaired
+      scope: named-behavior
+      public_claim: exact Recycler Progression 1.1.1 science production-route interoperability only
+      fixtures:
+        - fixtures/assert-recycler-progression-routes
+      streams: []
+      diagnostic_only:
+        - broad-recycler-progression-support
+        - recycler-entity-tier-progression
+        - factorio-2.0-version-1.0.0-until-target-local-proof
 
     modules-t4:
       mod: modules-t4
@@ -412,6 +603,57 @@ targets:
       streams: []
       diagnostic_only:
         - broad-aai-suite-support
+
+mir4_environment_evidence:
+  maturity: developer-preview
+  claim_level: none
+  public_claim: false
+  package_visible: false
+  authority: tools/lib/mir4/EnvironmentEvidence.ps1
+  contracts:
+    - MIR4EnvironmentLockV1
+    - MIR4EnvironmentDiffV1
+    - MIR4SupportBundleV1
+  privacy:
+    private_host_fields: rejected
+    diagnostic_values: redacted
+  minimization: required-witness-transitive-closure
+  release_authority: false
+
+mir4_release_canaries_t13:
+  authority: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+  machine_receipt: sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json
+  reference_root: sdk/preview/mir4/reference/t13
+  maturity: pre-freeze-release-canary
+  claim_level: exact-locked-release-canary-input
+  target_disposition: qualified-exact-release-canary
+  exact_capture_count: 11
+  canary_count: 8
+  subjects:
+    - base-and-official-closure
+    - cubium
+    - corrundum
+    - recycler-progression
+    - k2-k2so-f210
+    - k2-k2so-f200
+    - aai-selected
+    - bz-selected
+  lifecycle:
+    - exact-engine-clean-load
+    - first-byte-preserving-reload
+    - second-byte-preserving-reload
+    - target-direct-predecessor-upgrade-matrix
+    - affected-closure-performance-budget
+  expiry:
+    - exact-engine-identity-change
+    - mir-candidate-package-identity-change
+    - exact-archive-closure-change
+    - startup-settings-change
+    - governed-policy-or-fixture-change
+  f200_k2so_archive_custody: complete-t13-supersedes-historical-t12-blocker
+  public_claim: false
+  package_visible: false
+  release_transition_authority: false
 
 rules:
   - every target declares compatibility maturity behavior and scope independently

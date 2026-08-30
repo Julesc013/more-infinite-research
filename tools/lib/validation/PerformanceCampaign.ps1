@@ -70,6 +70,12 @@ function Resolve-MIRPerformanceArtifactVolumePolicy {
     if ($declaredPolicy -notin @("required", "omitted-by-capability")) {
       throw "Performance campaign has an unsupported artifact-volume policy: $declaredPolicy"
     }
+    if ($declaredPolicy -eq "omitted-by-capability") {
+      if (@($Campaign.artifact_volume_lanes | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }).Count -ne 0 -or
+          [string]::IsNullOrWhiteSpace([string]$Campaign.artifact_volume_omission_reason)) {
+        throw "Performance campaign artifact-volume omission requires no active telemetry lanes and an exact capability reason."
+      }
+    }
     return $declaredPolicy
   }
 
@@ -87,6 +93,59 @@ function Resolve-MIRPerformanceArtifactVolumePolicy {
   }
 
   throw "Performance campaign omits artifact-volume policy without the complete legacy current-target telemetry authority."
+}
+
+function Resolve-MIRPerformanceLanePlan {
+  param(
+    [Parameter(Mandatory)]$Campaign,
+    [Parameter(Mandatory)]$BudgetManifest
+  )
+
+  $activeIds = @(
+    @($Campaign.lanes) + @($Campaign.phase_lanes) |
+      ForEach-Object { [string]$_.id } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+  )
+  $omissions = @($Campaign.omitted_lanes | Where-Object { $null -ne $_ })
+  $omittedIds = @(
+    $omissions |
+      ForEach-Object { [string]$_.id } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+  )
+  $expectedIds = @($BudgetManifest.regression_lanes | ForEach-Object { [string]$_.id })
+
+  foreach ($set in @($activeIds, $omittedIds, $expectedIds)) {
+    if (@($set | Group-Object | Where-Object Count -gt 1).Count -ne 0) {
+      throw "Performance campaign lane authority contains duplicate IDs."
+    }
+  }
+  if (@($activeIds | Where-Object { $_ -in $omittedIds }).Count -ne 0) {
+    throw "Performance campaign cannot both execute and omit the same lane."
+  }
+  foreach ($omission in $omissions) {
+    if ([string]::IsNullOrWhiteSpace([string]$omission.id) -or
+        [string]::IsNullOrWhiteSpace([string]$omission.reason)) {
+      throw "Performance campaign target-lane omissions require a governed ID and reason."
+    }
+  }
+  $declaredIds = @($activeIds + $omittedIds | Sort-Object)
+  if ((@($expectedIds | Sort-Object) -join "`n") -ne ($declaredIds -join "`n")) {
+    throw "Performance campaign active and omitted lane set does not match the regression budget manifest."
+  }
+  foreach ($laneId in @($Campaign.artifact_volume_lanes)) {
+    if ([string]$laneId -notin $activeIds) {
+      throw "Performance campaign cannot collect artifact-volume telemetry from an omitted lane: $laneId"
+    }
+  }
+
+  return [pscustomobject][ordered]@{
+    active_ids = @($activeIds | Sort-Object)
+    omitted_lanes = @(
+      $omissions |
+        Sort-Object id |
+        ForEach-Object { [ordered]@{ id=[string]$_.id; reason=[string]$_.reason } }
+    )
+  }
 }
 
 function Get-MIRPerformanceHarnessFingerprint {

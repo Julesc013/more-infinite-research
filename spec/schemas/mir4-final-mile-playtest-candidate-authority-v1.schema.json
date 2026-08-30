@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json",
+  "title": "MIR 4 final-mile playtest candidate authority V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "status", "source_baseline", "authorization", "targets", "transition_gate", "secret_values_present"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4FinalMilePlaytestCandidateAuthorityV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "status": {"const": "EXACT-F210-F200-CANDIDATES-ADMITTED-FOR-PLAYTEST-RECEIPT-MATERIALIZATION"},
+    "source_baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "tree", "package_source_sha256"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "tree": {"pattern": "^[a-f0-9]{40}$"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "authorization": {"$ref": "#/$defs/descriptor"},
+    "targets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "distribution_version", "development_package", "engine", "predecessor", "candidate_manifest", "assurance"],
+        "properties": {
+          "target": {"enum": ["F210", "F200"]},
+          "distribution_version": {"pattern": "^4\\.0\\.(21000|20000)$"},
+          "development_package": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["sha256", "content_sha256", "bytes", "entry_count", "release_identity"],
+            "properties": {
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "content_sha256": {"$ref": "#/$defs/sha256"},
+              "bytes": {"type": "integer", "minimum": 1},
+              "entry_count": {"type": "integer", "minimum": 1},
+              "release_identity": {"const": false}
+            }
+          },
+          "engine": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["version", "build", "path", "sha256"],
+            "properties": {
+              "version": {"type": "string", "minLength": 1},
+              "build": {"type": "integer", "minimum": 1},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "steam_build": {"type": ["string", "null"]}
+            }
+          },
+          "predecessor": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["release", "path", "sha256", "content_sha256"],
+            "properties": {
+              "release": {"type": "string", "minLength": 1},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"$ref": "#/$defs/sha256"},
+              "content_sha256": {"$ref": "#/$defs/sha256"}
+            }
+          },
+          "candidate_manifest": {"$ref": "#/$defs/descriptor"},
+          "assurance": {
+            "allOf": [
+              {"$ref": "#/$defs/descriptor"},
+              {
+                "type": "object",
+                "required": ["status", "expected", "failed", "incomplete"],
+                "properties": {
+                  "status": {"const": "passed"},
+                  "expected": {"type": "integer", "minimum": 1},
+                  "failed": {"const": 0},
+                  "incomplete": {"const": 0}
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "secret_values_present": {"const": false}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "descriptor": {
+      "type": "object",
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 1},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

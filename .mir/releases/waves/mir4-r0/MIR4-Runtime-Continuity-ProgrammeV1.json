@@ -1,0 +1,214 @@
+{
+  "schema": 1,
+  "kind": "MIR4RuntimeContinuityProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "private-shadow-executable",
+  "tooling": {
+    "application": "tools/mir/application/runtime/RuntimeStateModel.ps1",
+    "exporter": "tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1",
+    "compatibility_entrypoints": ["tools/lib/mir4/RuntimeStateModel.ps1", "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/runtime-continuity-tooling-v1.json",
+    "migration_proof": "assurance/repository/runtime-continuity-tooling-v1.json",
+    "migration_receipt": "releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json"
+  },
+  "schemas": {
+    "runtime_state_matrix": "spec/schemas/mir4-runtime-state-matrix-v1.schema.json",
+    "migration_graph_matrix": "spec/schemas/mir4-migration-graph-matrix-v1.schema.json",
+    "continuity_bundle": "spec/schemas/mir4-continuity-bundle-v1.schema.json"
+  },
+  "terminal_player_authority": [
+    "control.lua",
+    "prototypes/mir/stage/control.lua",
+    "prototypes/mir/platform/factorio/runtime_state.lua",
+    "prototypes/mir/runtime/state.lua",
+    "prototypes/mir/runtime/scripted_techs.lua",
+    "prototypes/mir/runtime/settings_profile.lua",
+    "migrations/more-infinite-research_2.0.5.json",
+    "migrations/more-infinite-research_2.1.0.json"
+  ],
+  "runtime_features": [
+    {
+      "id": "runtime.scripted-dispatcher",
+      "version": 1,
+      "source": "prototypes/mir/runtime/scripted_techs.lua",
+      "handlers": ["register"],
+      "target_requirements": ["scripted_techs"],
+      "state_ids": ["state.scripted-techs"],
+      "determinism": "declared-group-and-ordinal-order",
+      "complexity_budget": {"event_groups": 9, "idle_tick": 0, "diagnostics_per_dispatch": 32},
+      "migration_refs": ["migration.same-target", "migration.skipped-patch"],
+      "disable_or_removal": "dispatcher-not-registered-when-target-feature-disabled"
+    },
+    {
+      "id": "runtime.spoilage-preservation",
+      "version": 1,
+      "source": "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+      "handlers": ["on_init", "on_configuration_changed", "on_research_finished", "on_research_reversed", "on_technology_effects_reset"],
+      "target_requirements": ["scripted_techs"],
+      "state_ids": ["state.spoilage-preservation"],
+      "determinism": "force-order-independent-highest-level-and-bounded-clamp",
+      "complexity_budget": {"force_scan": "O(forces)", "idle_tick": 0, "diagnostics_per_dispatch": 8},
+      "migration_refs": ["migration.same-target", "migration.profile-schema"],
+      "disable_or_removal": "restore-owned-baseline-when-current-value-still-owned-else-rebase"
+    },
+    {
+      "id": "runtime.agricultural-growth-speed",
+      "version": 1,
+      "source": "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
+      "handlers": ["on_init", "on_configuration_changed", "on_research_finished", "on_research_reversed", "on_technology_effects_reset", "on_tower_planted_seed"],
+      "target_requirements": ["scripted_techs"],
+      "state_ids": ["state.agricultural-growth-speed"],
+      "determinism": "per-force-level-and-event-tick-bounded-transform",
+      "complexity_budget": {"force_scan": "O(forces)", "idle_tick": 0, "diagnostics_per_dispatch": 8},
+      "migration_refs": ["migration.same-target"],
+      "disable_or_removal": "stop-applying-and-reconstruct-cache"
+    },
+    {
+      "id": "runtime.productivity-family-adoption",
+      "version": 1,
+      "source": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "handlers": ["on_init", "on_configuration_changed"],
+      "target_requirements": ["productivity_family_adoption"],
+      "state_ids": ["state.productivity-family-adoption"],
+      "determinism": "mod-data-signature-and-engine-normalized-progress-preservation",
+      "complexity_budget": {"force_scan": "O(forces)", "idle_tick": 0, "diagnostics_per_dispatch": 8},
+      "migration_refs": ["migration.ownership-transfer", "migration.same-target"],
+      "disable_or_removal": "retain-engine-normalized-progress-and-drop-reconstructible-history"
+    },
+    {
+      "id": "runtime.maximum-level-control",
+      "version": 1,
+      "source": "prototypes/mir/runtime/maximum_level_control.lua",
+      "handlers": ["on_init", "on_configuration_changed", "on_research_finished", "on_research_reversed", "on_research_queued", "on_technology_effects_reset", "on_force_created", "on_forces_merged"],
+      "target_requirements": ["scripted_techs"],
+      "state_ids": ["state.maximum-level-control"],
+      "determinism": "policy-binding-and-force-index-stable-normalization",
+      "complexity_budget": {"force_scan": "O(forces*(managed+queue))", "idle_tick": 0, "diagnostics_per_dispatch": 64},
+      "migration_refs": ["migration.same-target", "migration.profile-schema"],
+      "disable_or_removal": "restore-only-properties-owned-by-this-feature"
+    },
+    {
+      "id": "runtime.planet-discovery-recovery",
+      "version": 1,
+      "source": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+      "handlers": ["on_configuration_changed"],
+      "target_requirements": ["scripted_techs"],
+      "state_ids": [],
+      "determinism": "sorted-researched-location-repair-for-exact-version-edge",
+      "complexity_budget": {"force_scan": "O(forces*technologies*effects)", "idle_tick": 0, "diagnostics_per_dispatch": 32},
+      "migration_refs": ["migration.repair"],
+      "disable_or_removal": "no-persistent-state"
+    },
+    {
+      "id": "runtime.settings-profile",
+      "version": 1,
+      "source": "prototypes/mir/runtime/settings_profile.lua",
+      "handlers": ["register"],
+      "target_requirements": ["settings_profiles"],
+      "state_ids": [],
+      "determinism": "bounded-canonical-profile-codec",
+      "complexity_budget": {"commands": 2, "remote_interfaces": 1, "idle_tick": 0, "diagnostics_per_dispatch": 8},
+      "migration_refs": ["migration.profile-schema"],
+      "disable_or_removal": "commands-and-interface-not-registered"
+    }
+  ],
+  "state_specs": [
+    {
+      "id": "state.scripted-techs",
+      "schema": 1,
+      "owner": "runtime.scripted-dispatcher",
+      "bucket": "scripted_techs",
+      "fields": [{"path": "allocation", "classification": "disposable-cache", "retention": "drop-safe", "reconstruction": "empty-bucket-on-dispatch"}],
+      "aliases": [],
+      "tombstones": [],
+      "ownership_transfer": "none"
+    },
+    {
+      "id": "state.spoilage-preservation",
+      "schema": 1,
+      "owner": "runtime.spoilage-preservation",
+      "bucket": "spoilage_preservation",
+      "fields": [
+        {"path": "baseline", "classification": "authoritative", "retention": "preserve-until-restored-or-rebased", "reconstruction": "not-losslessly-reconstructible-after-application"},
+        {"path": "last_applied_value", "classification": "authoritative", "retention": "preserve-for-ownership-check", "reconstruction": "not-losslessly-reconstructible-after-third-party-change"},
+        {"path": "applied_multiplier", "classification": "reconstructible", "retention": "recompute", "reconstruction": "effective-level-and-setting"},
+        {"path": "effective_level", "classification": "reconstructible", "retention": "recompute", "reconstruction": "highest-valid-force-technology-level"}
+      ],
+      "aliases": [],
+      "tombstones": [],
+      "ownership_transfer": "external-write-causes-baseline-rebase"
+    },
+    {
+      "id": "state.agricultural-growth-speed",
+      "schema": 1,
+      "owner": "runtime.agricultural-growth-speed",
+      "bucket": "agricultural_growth_speed",
+      "fields": [{"path": "force_multipliers", "classification": "reconstructible", "retention": "recompute", "reconstruction": "force-levels-and-effective-setting"}],
+      "aliases": [],
+      "tombstones": [],
+      "ownership_transfer": "none"
+    },
+    {
+      "id": "state.productivity-family-adoption",
+      "schema": 1,
+      "owner": "runtime.productivity-family-adoption",
+      "bucket": "productivity_family_adoption",
+      "fields": [
+        {"path": "version", "classification": "reconstructible", "retention": "recompute", "reconstruction": "authoritative-mod-data"},
+        {"path": "adopted_count", "classification": "reconstructible", "retention": "recompute", "reconstruction": "authoritative-mod-data"},
+        {"path": "bindings", "classification": "reconstructible", "retention": "retain-for-transition-diagnostic", "reconstruction": "authoritative-mod-data-and-prototypes"},
+        {"path": "signature", "classification": "reconstructible", "retention": "retain-for-change-detection", "reconstruction": "authoritative-mod-data"}
+      ],
+      "aliases": [],
+      "tombstones": [],
+      "ownership_transfer": "engine-normalized-progress-remains-engine-owned"
+    },
+    {
+      "id": "state.maximum-level-control",
+      "schema": 1,
+      "owner": "runtime.maximum-level-control",
+      "bucket": "maximum_level_control",
+      "fields": [
+        {"path": "disabled_by_cap", "classification": "authoritative", "retention": "preserve-for-owned-enable-restoration", "reconstruction": "not-losslessly-reconstructible"},
+        {"path": "visibility_by_cap", "classification": "authoritative", "retention": "preserve-for-owned-visibility-restoration", "reconstruction": "not-losslessly-reconstructible"},
+        {"path": "managed_technologies", "classification": "reconstructible", "retention": "recompute", "reconstruction": "maximum-level-policy-mod-data"},
+        {"path": "policy_version", "classification": "reconstructible", "retention": "recompute", "reconstruction": "runtime-policy-constant"},
+        {"path": "observations", "classification": "disposable-cache", "retention": "drop-safe", "reconstruction": "current-force-and-prototype-observation"}
+      ],
+      "aliases": [],
+      "tombstones": [],
+      "ownership_transfer": "restore-only-properties-recorded-as-owned"
+    }
+  ],
+  "registration_groups": [
+    {"id":"lifecycle.init","registration":"script.on_init","filter":"none","subscribers":["runtime.spoilage-preservation:on_init","runtime.agricultural-growth-speed:on_init","runtime.productivity-family-adoption:on_init","runtime.maximum-level-control:on_init"]},
+    {"id":"lifecycle.configuration-changed","registration":"script.on_configuration_changed","filter":"none","subscribers":["runtime.spoilage-preservation:on_configuration_changed","runtime.agricultural-growth-speed:on_configuration_changed","runtime.productivity-family-adoption:on_configuration_changed","runtime.maximum-level-control:on_configuration_changed","runtime.planet-discovery-recovery:on_configuration_changed"]},
+    {"id":"event.research-finished","registration":"defines.events.on_research_finished","filter":"valid-research-then-technology-name","subscribers":["runtime.spoilage-preservation:on_research_finished","runtime.agricultural-growth-speed:on_research_finished","runtime.maximum-level-control:on_research_finished"]},
+    {"id":"event.research-reversed","registration":"defines.events.on_research_reversed","filter":"valid-research-then-technology-name","subscribers":["runtime.spoilage-preservation:on_research_reversed","runtime.agricultural-growth-speed:on_research_reversed","runtime.maximum-level-control:on_research_reversed"]},
+    {"id":"event.research-queued","registration":"defines.events.on_research_queued","filter":"valid-research-then-technology-name","subscribers":["runtime.maximum-level-control:on_research_queued"]},
+    {"id":"event.technology-effects-reset","registration":"defines.events.on_technology_effects_reset","filter":"event-available","subscribers":["runtime.spoilage-preservation:on_technology_effects_reset","runtime.agricultural-growth-speed:on_technology_effects_reset","runtime.maximum-level-control:on_technology_effects_reset"]},
+    {"id":"event.force-created","registration":"defines.events.on_force_created","filter":"event-available","subscribers":["runtime.maximum-level-control:on_force_created"]},
+    {"id":"event.forces-merged","registration":"defines.events.on_forces_merged","filter":"event-available","subscribers":["runtime.maximum-level-control:on_forces_merged"]},
+    {"id":"event.tower-planted-seed","registration":"defines.events.on_tower_planted_seed","filter":"valid-plant-before-dispatch","subscribers":["runtime.agricultural-growth-speed:on_tower_planted_seed"]}
+  ],
+  "migration_edges": [
+    {"id":"migration.same-target","kind":"same-target-source-upgrade","from":"mir3-predecessor","to":"mir4-private-target","status":"existing-runtime-and-fixture-evidence","precedence":100,"evidence":["validation/tests/runtime/Test-MIRUpgrade.ps1"]},
+    {"id":"migration.skipped-patch","kind":"skipped-source-patches","from":"older-supported-predecessor","to":"mir4-private-target","status":"fixture-evidence-runtime-qualification-required","precedence":100,"evidence":["validation/tests/runtime/Test-MIRUpgradeMatrix.ps1"]},
+    {"id":"migration.cross-target","kind":"cross-target-transition","from":"source-target","to":"different-target","status":"private-contract-only-runtime-proof-required","precedence":50,"evidence":[".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"]},
+    {"id":"migration.extension-install-remove","kind":"extension-install-remove","from":"extension-closure-a","to":"extension-closure-b","status":"deferred-W05","precedence":50,"evidence":["spec/api/mir4-v0/contracts.json"]},
+    {"id":"migration.ownership-transfer","kind":"ownership-transfer","from":"generated-family","to":"reviewed-native-owner","status":"existing-f210-runtime-adapter","precedence":100,"evidence":["prototypes/mir/runtime/productivity_family_adoption.lua"]},
+    {"id":"migration.profile-schema","kind":"profile-schema-transition","from":"profile-or-state-schema-n","to":"profile-or-state-schema-n-plus-one","status":"private-contract-runtime-proof-required","precedence":100,"evidence":["prototypes/mir/runtime/state.lua"]},
+    {"id":"migration.repair","kind":"repair","from":"3.2.0-or-3.2.1","to":"3.2.2","status":"existing-exact-version-repair","precedence":200,"evidence":["prototypes/mir/runtime/planet_discovery_recovery.lua"]},
+    {"id":"migration.downgrade","kind":"downgrade","from":"newer-source-or-target","to":"older-source-or-target","status":"unsupported-with-evidence","precedence":1000,"evidence":["docs/maintainer/backporting.md"]},
+    {"id":"migration.technology-rename-2.0.5","kind":"same-target-source-upgrade","from":"pre-2.0.5","to":"2.0.5","status":"engine-migration-json","precedence":200,"evidence":["migrations/more-infinite-research_2.0.5.json"]},
+    {"id":"migration.technology-rename-2.1.0","kind":"same-target-source-upgrade","from":"pre-2.1.0","to":"2.1.0","status":"engine-migration-json","precedence":200,"evidence":["migrations/more-infinite-research_2.1.0.json"]}
+  ],
+  "semantic_authority": false,
+  "player_package_mutation_authorized": false,
+  "runtime_registration_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "rollback": "Remove W04 package-excluded records and projections and restore W03 runtime and migration law rows to deferred; retain all terminal runtime and migration files unchanged."
+}

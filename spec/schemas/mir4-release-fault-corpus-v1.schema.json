@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-fault-corpus-v1.schema.json",
+  "title": "MIR 4 ten-phase non-production rehearsal and fault corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "phase_engine", "non_production", "production_authorized", "phases", "aggregate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseFaultCorpusV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "phase_engine": {"const": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json"},
+    "non_production": {"const": true},
+    "production_authorized": {"const": false},
+    "phases": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["phase", "happy_path", "fault"],
+        "properties": {
+          "phase": {"enum": ["source-freeze", "target-build", "target-qualification", "preview-assets", "independent-verification", "release-seal", "promotion", "target-publication", "public-readback", "restore-drill"]},
+          "happy_path": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["test_id", "path", "operations", "final_state", "production_mutation_performed", "release_transition_performed"],
+            "properties": {
+              "test_id": {"enum": ["static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05"]},
+              "path": {"pattern": "^validation/tests/mir4/Test-MIR4ReleaseAdaptersT0[345]\\.ps1$"},
+              "operations": {"const": ["Plan", "DryRun", "Execute", "Verify", "Receipt"]},
+              "final_state": {"const": "verified"},
+              "production_mutation_performed": {"const": false},
+              "release_transition_performed": {"const": false}
+            }
+          },
+          "fault": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "injection", "expected_error_prefix", "assertion_path", "fail_closed"],
+            "properties": {
+              "id": {"pattern": "^F-[A-Z0-9-]+$"},
+              "injection": {"type": "string", "minLength": 1},
+              "expected_error_prefix": {"pattern": "^\\[mir4-[a-z0-9-]+\\]"},
+              "assertion_path": {"pattern": "^validation/tests/mir4/Test-MIR4ReleaseAdaptersT0[345]\\.ps1$"},
+              "fail_closed": {"const": true}
+            }
+          }
+        }
+      }
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["all_ten_registered", "all_ten_fail_closed", "all_ten_executors_implemented", "all_ten_dry_run_passed", "all_ten_production_rehearsal_passed", "required_test_ids", "verification_profile", "production_mutation_performed", "release_transition_performed"],
+      "properties": {
+        "all_ten_registered": {"const": true},
+        "all_ten_fail_closed": {"const": true},
+        "all_ten_executors_implemented": {"const": true},
+        "all_ten_dry_run_passed": {"const": true},
+        "all_ten_production_rehearsal_passed": {"const": true},
+        "required_test_ids": {"const": ["static.mir4-release-adapters-t03", "static.mir4-release-adapters-t04", "static.mir4-release-adapters-t05", "static.mir4-release-doctor-t06"]},
+        "verification_profile": {"const": "mir4-bootstrap"},
+        "production_mutation_performed": {"const": false},
+        "release_transition_performed": {"const": false}
+      }
+    },
+    "status": {"const": "PASSED-NON-PRODUCTION-REHEARSAL-PRODUCTION-UNAUTHORIZED"}
+  }
+}

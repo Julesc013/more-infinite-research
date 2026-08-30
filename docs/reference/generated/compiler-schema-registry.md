@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-18
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - generated-compiler-schema-view
 ---
 
 # Compiler Schema Registry

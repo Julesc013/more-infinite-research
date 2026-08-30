@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json",
+  "title": "MIR 4 post-readiness merge receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "merge", "verification", "hosted_result", "development_distributions", "authority_bindings", "player_package", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PostReadinessMergeReceiptSOL15V1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M4C10-WHOLE-4X-IN-4.0"},
+    "merge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pull_request", "base_commit", "head_commit", "merge_commit", "merge_tree", "merged_at", "destination_branch"],
+      "properties": {
+        "pull_request": {"const": 152},
+        "base_commit": {"$ref": "#/$defs/gitSha"},
+        "head_commit": {"$ref": "#/$defs/gitSha"},
+        "merge_commit": {"$ref": "#/$defs/gitSha"},
+        "merge_tree": {"$ref": "#/$defs/gitSha"},
+        "merged_at": {"type": "string", "format": "date-time"},
+        "destination_branch": {"const": "dev"}
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "plan_sha256", "plan_material_sha256", "required_test_set_sha256", "aggregate_evidence_sha256", "materialized_bundle_file_sha256", "total", "passed", "failed", "invalid", "status"],
+      "properties": {
+        "profile": {"const": "mir4-bootstrap"},
+        "plan_sha256": {"$ref": "#/$defs/sha256"},
+        "plan_material_sha256": {"$ref": "#/$defs/sha256"},
+        "required_test_set_sha256": {"$ref": "#/$defs/sha256"},
+        "aggregate_evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "materialized_bundle_file_sha256": {"$ref": "#/$defs/sha256"},
+        "total": {"const": 30},
+        "passed": {"const": 30},
+        "failed": {"const": 0},
+        "invalid": {"const": 0},
+        "status": {"const": "passed"}
+      }
+    },
+    "hosted_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "post_merge_runs", "required_contexts", "expected_skips_are_not_failures"],
+      "properties": {
+        "status": {"const": "passed"},
+        "post_merge_runs": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["workflow", "run_id", "conclusion"],
+            "properties": {
+              "workflow": {"type": "string", "minLength": 1},
+              "run_id": {"type": "integer", "minimum": 1},
+              "conclusion": {"const": "success"}
+            }
+          }
+        },
+        "required_contexts": {"type": "array", "contains": {"const": "branch-policy"}, "minContains": 1},
+        "expected_skips_are_not_failures": {"const": true}
+      }
+    },
+    "development_distributions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "distribution_version", "archive_sha256", "content_sha256", "release_identity"],
+        "properties": {
+          "target": {"enum": ["F210", "F200"]},
+          "distribution_version": {"pattern": "^4\\.0\\.(210|200)00$"},
+          "archive_sha256": {"$ref": "#/$defs/sha256"},
+          "content_sha256": {"$ref": "#/$defs/sha256"},
+          "release_identity": {"const": false}
+        }
+      }
+    },
+    "authority_bindings": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "role"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"$ref": "#/$defs/sha256"},
+          "role": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "player_package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_sha256", "pr152_changed_package_path_count", "package_visible"],
+      "properties": {
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "pr152_changed_package_path_count": {"const": 0},
+        "package_visible": {"const": false}
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_frozen", "source_freeze_authorized", "candidate_allocated", "production_signing_authorized", "promotion_to_main_authorized", "tagging_authorized", "publication_authorized"],
+      "properties": {
+        "source_frozen": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocated": {"const": false},
+        "production_signing_authorized": {"const": false},
+        "promotion_to_main_authorized": {"const": false},
+        "tagging_authorized": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    },
+    "status": {"const": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED"}
+  },
+  "$defs": {
+    "gitSha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  }
+}

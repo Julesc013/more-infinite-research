@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "kind": "MIR4T15IndependentMachineAcceptanceV1",
+  "reviewed_at": "2026-08-27T05:07:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "turn": "T15",
+  "reviewer": {
+    "class": "separate-clean-worktree-machine-audit",
+    "worktree_branch": "codex/mir4-t15-independent-audit",
+    "human_reviewer_claimed": false,
+    "human_acceptance_inferred": false
+  },
+  "review_input": {
+    "source_commit": "c4a68809a54a81ae0a1959d257c2e4a97ef0e490",
+    "source_tree": "c76a5fb46bc950264652b7033c6ce72b7f9b1991",
+    "machine_authority_path": ".mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json",
+    "machine_authority_sha256": "84B6C8FB0215F198972C27D28995A3324A46B6D6ED0D7E1C6A330B3FAA9A0C90",
+    "audit_diagnostic_record_sha256": "72FA27A0172448F35D09F2161743DA50C576DB6991A90BB720432C0F5B9DDB6E",
+    "audit_diagnostic_file_sha256": "B1EF351537376E278DC39A6F938ACA8E289B50CFA2DF8D4A34BF35A54A2771DC",
+    "external_export_manifest_record_sha256": "C0AA4781AA197F9C3438C135FCB9700B2A5AC8129F090DA0007C08309D867C72",
+    "external_export_manifest_file_sha256": "8B4C36506D3A0682994EAAB33E7D4C36B6F7321EA5641FEC055F3EF004D1ACCC"
+  },
+  "accepted_propositions": [
+    "canonical-component-inventory-and-spdx-projections",
+    "deterministic-provenance-and-attestation-verification",
+    "public-safe-offline-attestation-custody",
+    "network-disabled-reproducible-capsule-construction",
+    "release-capsule-content-addressed-inventory",
+    "rights-and-redistribution-classification",
+    "dual-clean-root-offline-restoration",
+    "runner-isolation-and-workflow-byte-invariance",
+    "publisher-confinement-and-dummy-admission",
+    "production-signing-machine-preparation-only",
+    "public-safe-external-rescue-export",
+    "player-package-source-unchanged"
+  ],
+  "evidence_results": {
+    "registered_workers_passed": 5,
+    "capsule_direct_verification": "passed",
+    "independent_restores_passed": 2,
+    "confinement_cross_worktree_match": true,
+    "release_governance_w00": "passed",
+    "private_proof_key_retained": false,
+    "unknown_verification_paths": 0
+  },
+  "explicit_non_acceptances": {
+    "maintainer_playtest": false,
+    "protected_signing_ceremony": false,
+    "private_key_or_passphrase": false,
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "verdict": "ACCEPTED-T15-MACHINE-SCOPE",
+  "package_visible": false,
+  "release_authority": false,
+  "status": "T15-INDEPENDENT-MACHINE-ACCEPTANCE-PASSED-HUMAN-GATES-UNCHANGED"
+}

@@ -219,6 +219,58 @@ Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
   & (Join-Path $repo "validation\tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "MIR 4 W00 release governance is separated and honestly classified" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4ReleaseGovernanceW00.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 W01 repository shadow fixed point has one writer and no unknown path" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4RepositoryFixedPointW01.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 W02 target compiler separates identity, support, profiles, and product policy" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4TargetCompilerW02.ps1") -RepoRoot $repo
+}
+
+  Invoke-RepoCheck "MIR 4 W03 semantic compiler is a complete non-mutating reference aggregate" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4SemanticCompilationW03.ps1") -RepoRoot $repo
+  }
+
+  Invoke-RepoCheck "MIR 4 W04 runtime, state, migration, and continuity contracts are package-excluded" {
+    & (Join-Path $repo "validation\tests\mir4\Test-MIR4RuntimeContinuityW04.ps1") -RepoRoot $repo -CandidateZip $CandidateZip
+  }
+
+Invoke-RepoCheck "MIR 4 public feedback has one governed reproducer and authority map per family" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4PublicFeedbackIntake.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-03 normalized maximum-level binding and exact runtime evidence are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4MaximumLevelSOL03.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-04 production-route policy and exact runtime evidence are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4ProductionRouteSOL04.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-05 ResearchCostModel V2 preview and stable-defer boundary are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4ResearchCostV2SOL05.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-06 bounded K2 science policy and exact target evidence are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4K2ScienceSOL06.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-07 exact compatibility subject ledger and bounded campaign outcomes are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4CompatibilityCampaignSOL07.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-08 affected-target packages, exact loads, and two-reload upgrade proof are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4AffectedProofSOL08.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR 4 SOL-09 M4C01 development closeout and exact release blockers are complete" {
+  & (Join-Path $repo "validation\tests\mir4\Test-MIR4M4C01CloseoutSOL09.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "MIR 4 bootstrap materialization and offline custody are deterministic and proof-only" {
   & (Join-Path $repo "tools\commands\release\Test-MIR4R0Bootstrap.ps1") -RepoRoot $repo
   & (Join-Path $repo "validation\tests\release\Test-MIR4FinalProgrammeReconciliation.ps1") -RepoRoot $repo
@@ -665,7 +717,23 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
+  $nonModFixtureDirs = @(
+    "compat-matrix",
+    "golden-plans",
+    "mir4-api-v0",
+    "mir4-assurance-scale-v1",
+    "mir4-canonical-json-v1",
+    "mir4-environment-evidence-v1",
+    "mir4-historical-succession-v1",
+    "mir4-inspector-compatibility-v1",
+    "mir4-mep-discovery-v1",
+    "mir4-mep-v0",
+    "mir4-mep-v1",
+    "mir4-process-ir-v0",
+    "mir4-process-ir-v1",
+    "museum",
+    "run-profiles"
+  )
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -691,8 +759,11 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "assert-upgrade-1-9-9-to-4-0-11000" = "1.1"
       "assert-generated-cap-transition-2-0" = "2.0"
       "assert-generated-max-level-2-0" = "2.0"
+      "assert-recycler-progression-routes-f200" = "2.0"
       "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
+      "assert-upgrade-2-5-10-to-2-5-11" = "2.0"
+      "assert-upgrade-2-5-11-to-4-0-20000" = "2.0"
     }
     $allowedMIR4TargetNativeFixture = $isFactorio21Line -and
       $mir4TargetNativeFixtures.ContainsKey($fixture.Name) -and
@@ -1903,6 +1974,82 @@ Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
   }
 }
 
+Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded and governed" {
+  $registryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\registry.lua")
+  $repairText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\factorio_2_1_ambient_sound_schema.lua")
+  $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
+  $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
+  $docsText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\docs.yml")
+  $targetDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\targets\corrundum.md")
+  $scenarioText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\scenarios\local-2.1.json")
+  $testImpactText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\test-impact.yml")
+  $sanitationBudgetText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\sanitation-budgets.json")
+  $compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+  foreach ($check in @(
+    @{ File = "registry.lua"; Text = $registryText; Snippet = 'require("prototypes.mir.compatibility.repairs.factorio_2_1_ambient_sound_schema").apply()' },
+    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = '["1.0.47"] = true' },
+    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'sound.planets = {sound.planet}' },
+    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'sound.planet = nil' },
+    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'D.rule_mutation({' },
+    @{ File = ".mir\modules.yml"; Text = $modulesText; Snippet = 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'factorio_2_1_ambient_sound_schema:corrundum_1.0.47' },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'exact_real_roots: [PlanetsLib, corrundum]' },
+    @{ File = ".mir\docs.yml"; Text = $docsText; Snippet = 'docs/compatibility/targets/corrundum.md' },
+    @{ File = "docs\compatibility\targets\corrundum.md"; Text = $targetDocText; Snippet = 'exact-version Factorio `2.1` loader-schema repair' },
+    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"name": "local-2-1-corrundum-maxcap-13"' },
+    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"PlanetsLib"' },
+    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"required_log_fragments"' },
+    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"Maximum-level conflict"' },
+    @{ File = "Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$runtimeContractPassed' },
+    @{ File = "Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'required_audit_assertions = $requiredAuditAssertions' },
+    @{ File = ".mir\test-impact.yml"; Text = $testImpactText; Snippet = '"scenarios": ["local-2-1-corrundum-maxcap-13", "local-2-1-cubium-production-routes"]' },
+    @{ File = ".mir\sanitation-budgets.json"; Text = $sanitationBudgetText; Snippet = '"local-2-1-corrundum-maxcap-13": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0}' }
+  )) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing governed Corrundum ambient-sound schema repair wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "schema-3 MaximumLevelBinding is the governed cross-route cap authority" {
+  $bindingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\technology\maximum_level_binding.lua")
+  $orchestratorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\compiler_orchestrator.lua")
+  $presentationText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\mutations\maximum_level_presentation.lua")
+  $runtimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\maximum_level_control.lua")
+  $modDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\mod_data.lua")
+  $fixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-compiler-contracts\data-final-fixes.lua")
+  $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
+  $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
+  $docsText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\docs.yml")
+  $contractDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\reference\maximum-level-binding.md")
+  foreach ($check in @(
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'local SCHEMA = 3' },
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'local KIND = "MIRMaximumLevelPolicyV3"' },
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = '["exact-technology"] = 1' },
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'semantics = "absolute-highest-technology-level"' },
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'retain_completed_bonus = true' },
+    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'maximum_level_unknown_finalizer_adapter' },
+    @{ File = "compiler_orchestrator.lua"; Text = $orchestratorText; Snippet = 'maximum_level_binding.from_plan(latest' },
+    @{ File = "compiler_orchestrator.lua"; Text = $orchestratorText; Snippet = 'context:set_state("maximum_level_policy", maximum_level_policy)' },
+    @{ File = "maximum_level_presentation.lua"; Text = $presentationText; Snippet = 'maximum_level_binding.observe_finalizers(policy, observations)' },
+    @{ File = "maximum_level_control.lua"; Text = $runtimeText; Snippet = 'binding.record_type == "MaximumLevelBinding"' },
+    @{ File = "mod_data.lua"; Text = $modDataText; Snippet = 'more-infinite-research.maximum-level-policy-v3' },
+    @{ File = "assert-compiler-contracts"; Text = $fixtureText; Snippet = 'unknown MaximumLevelBinding finalizer did not emit a stable blocking diagnostic' },
+    @{ File = ".mir\modules.yml"; Text = $modulesText; Snippet = 'prototypes/mir/domain/technology/maximum_level_binding.lua' },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'maximum_level_binding_policy:' },
+    @{ File = ".mir\docs.yml"; Text = $docsText; Snippet = 'docs/reference/maximum-level-binding.md' },
+    @{ File = "maximum-level-binding.md"; Text = $contractDocText; Snippet = '`MIRMaximumLevelPolicyV3` is the one maximum-level registry' }
+  )) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing schema-3 MaximumLevelBinding wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+  if ($bindingText.Contains("data.raw") -or $bindingText.Contains("prototypes.technology") -or
+      $bindingText.Contains('require("prototypes.mir.platform.factorio.target_line")')) {
+    throw "MaximumLevelBinding domain authority must remain pure and target-neutral."
+  }
+}
+
 Invoke-RepoCheck "bounded technology prerequisite cycle repairs are wired" {
   $registryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\registry.lua")
   $repairText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\technology_prerequisite_cycles.lua")
@@ -2551,7 +2698,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "museum", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "mir4-api-v0", "mir4-mep-v0", "mir4-process-ir-v0", "museum", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",

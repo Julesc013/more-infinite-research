@@ -42,13 +42,672 @@ stage_entrypoints:
   control.lua: prototypes/mir/stage/control.lua
 
 package_excluded_modules:
+  mir4_whole_platform_programme_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
+    implementation: tools/mir/application/platform/WholePlatform.ps1
+    migration_authority: governance/repository/migrations/whole-platform-tooling-v1.json
+    migration_proof: assurance/repository/whole-platform-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/WholePlatform.ps1
+    target_key_contract: tools/mir/domain/targets/TargetKey.ps1
+    target_key_compatibility_contract: tools/lib/mir4/TargetKey.ps1
+    technology_acceptance: tools/mir/application/technology/TechnologyAcceptance.ps1
+    technology_acceptance_compatibility: tools/lib/mir4/TechnologyAcceptance.ps1
+    commands:
+      - tools/commands/mir4/Invoke-MIR4WholePlatform.ps1
+      - tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1
+    schemas:
+      - spec/schemas/mir4-whole-platform-programme-v1.schema.json
+      - spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
+    verification:
+      - tests/platform/Test-MIR4WholePlatform.ps1
+      - tests/platform/Test-MIR4WholePlatformMigration.ps1
+      - tests/technology/Test-MIR4TechnologyAcceptance.ps1
+      - tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1
+      - validation/tests/mir4/Test-MIR4WholePlatform.ps1
+    documentation: docs/releases/mir4-4.0-whole-platform-programme.md
+    generated_reference: docs/reference/generated/mir4-whole-platform-matrix.md
+    boundary: package-excluded executable inventory, generated reference, and per-technology review queue only; no prototype or runtime mutation, automatic acceptance, compatibility-claim transfer, source freeze, signing, sealing, promotion, tag, publication, main mutation, or legacy mutation
+    stability: stable-application-authority-migrated-compatibility-readers-retained
+  mir4_repository_fixed_point_v2:
+    authority: .mir/control/repository-fixed-point.json
+    migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
+    migration_contracts:
+      - contracts/repository/mir4-repository-migration-authority-v1.schema.json
+      - contracts/repository/mir4-repository-migration-proof-v1.schema.json
+      - contracts/repository/mir4-repository-migration-receipt-v1.schema.json
+    assurance_policy: assurance/repository/fixed-point-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json
+    successor_migration_authority: governance/repository/migrations/canonicalization-tooling-v1.json
+    successor_migration_contracts:
+      - contracts/repository/mir4-canonicalization-migration-authority-v1.schema.json
+      - contracts/repository/mir4-canonicalization-migration-proof-v1.schema.json
+      - contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json
+    successor_assurance_policy: assurance/repository/canonicalization-tooling-v1.json
+    successor_migration_receipt: releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json
+    current_successor_migration_authority: governance/repository/migrations/inspector-compatibility-tooling-v1.json
+    current_successor_migration_contracts:
+      - contracts/repository/mir4-inspector-compatibility-migration-authority-v1.schema.json
+      - contracts/repository/mir4-inspector-compatibility-migration-proof-v1.schema.json
+      - contracts/repository/mir4-inspector-compatibility-migration-receipt-v1.schema.json
+    current_successor_assurance_policy: assurance/repository/inspector-compatibility-tooling-v1.json
+    current_successor_migration_receipt: releases/migrations/MIR4-Inspector-Compatibility-Tooling-MigrationV1.json
+    path_authority: .mir/control/paths.yml
+    ownership_authority: .mir/control-plane/ownership.json
+    domain: tools/mir/domain/repository/RepositoryFixedPoint.ps1
+    port: tools/mir/ports/repository/RepositoryInventory.ps1
+    adapter: tools/mir/adapters/repository/GitRepositoryInventory.ps1
+    application: tools/mir/application/repository/RepositoryFixedPoint.ps1
+    command: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+    test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+    canonicalization_domain: tools/mir/domain/canonicalization/CanonicalJsonV1.ps1
+    canonicalization_migration_application: tools/mir/application/canonicalization/CanonicalizationMigration.ps1
+    canonicalization_migration_command: tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1
+    canonicalization_test: tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+    canonicalization_migration_test: tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1
+    compatibility_entrypoints:
+      - tools/lib/mir4/RepositoryFixedPoint.ps1
+      - tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+      - validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
+    documentation: docs/architecture/mir4-repository-fixed-point.md
+    boundary: package-excluded root activation plus append-only repository, canonicalization, diagnostics, target-key, whole-platform, technology-acceptance, target-compiler, semantic-compiler/policy, runtime-continuity, module/SDK/MEP, ProcessIR exact, and Inspector/compatibility application/CLI/test writer cutovers with compatibility forwarders; no player-source move, package mutation, compatibility-policy mutation, deletion, source freeze, signing, promotion, or publication authority
+    stability: stable-package-excluded-append-only-migration-sequence-with-compatibility-readers
+  mir4_release_governance_v1:
+    authority: .mir/releases/governance/mir4/release-governance.json
+    allowed_signers: .mir/releases/governance/mir4/allowed-signers.json
+    signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
+    implementation: tools/lib/mir4/ReleaseGovernance.ps1
+    signing_ceremony_preparation_implementation: tools/lib/mir4/SigningCeremonyPreparation.ps1
+    command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
+    ledger_schema: spec/schemas/mir4-release-ledger-event.schema.json
+    revocation_schema: spec/schemas/mir4-key-revocation.schema.json
+    signing_ceremony_preparation_authority_schema: spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json
+    signing_ceremony_preparation_receipt_schema: spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_schema: spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json
+    protected_signing_ceremony_receipt_template: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
+    documentation: docs/maintainer/mir4-release-governance.md
+    boundary: release-custody policy, external-layout validation, and disposable proof-only signing/recovery rehearsal only; no production key generation without protected human secret input, source freeze, production signing, sealing, promotion, tagging, or publication
+    stability: stable-governance-contract-blocked-human-secret-input
+  mir4_supply_chain_v1:
+    authority: .mir/releases/governance/mir4/supply-chain.json
+    completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
+    independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
+    authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
+    implementation: tools/lib/mir4/SupplyChain.ps1
+    attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
+    capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
+    runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
+    command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
+    capsule_command: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
+    runner_confinement_command: tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1
+    schemas:
+      - spec/schemas/mir4-supply-chain-authority-v1.schema.json
+      - spec/schemas/mir4-component-inventory-v1.schema.json
+      - spec/schemas/mir4-spdx-3.0.1-profile.schema.json
+      - spec/schemas/mir4-spdx-2.3-compatibility.schema.json
+      - spec/schemas/mir4-slsa-provenance-v1.schema.json
+      - spec/schemas/mir4-supply-chain-attestation-v1.schema.json
+      - spec/schemas/mir4-private-custody-inventory-v1.schema.json
+      - spec/schemas/mir4-release-capsule-manifest-v1.schema.json
+      - spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
+      - spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
+      - spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
+      - spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
+      - spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
+      - spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
+    tests:
+      - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
+      - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+      - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
+    documentation: docs/maintainer/mir4-supply-chain-preservation.md
+    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
+    stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
+  research_cost_v2_preview:
+    authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
+    profile_authority: spec/schemas/experimental/mir4-research-cost-profile-rules-v1.schema.json
+    implementation: tools/lib/mir4/ResearchCostV2.ps1
+    documentation: docs/reference/research-cost-v2-preview.md
+    boundary: exact arithmetic, graph, profile, explanation, and analytical transition preview only; no prototype emission or runtime mutation
+    stability: experimental-package-excluded-v1-remains-authoritative
   experimental_api_sdk_v0:
     authority: spec/api/mir4-v0/contracts.json
-    implementation: tools/lib/mir4/ExperimentalApiSdk.ps1
-    command: tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
-    generated_root: sdk/experimental/mir4
+    implementation: tools/mir/application/extensions/ExperimentalApiSdk.ps1
+    command: tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1
+    compatibility_implementation: tools/lib/mir4/ExperimentalApiSdk.ps1
+    compatibility_command: tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
+    generated_root: sdk/preview/mir4/api-v0
+    legacy_generated_root: sdk/experimental/mir4
     boundary: read-only static contracts; no CompilerContext, executor, SafetyKernel, or prototype mutation access
-    stability: experimental-not-public-api
+    stability: developer-preview-canonical-application-migrated-compatibility-readers-retained
+  mir4_canonical_json_v1:
+    authority: spec/canonicalization/mir-canonical-json-v1.json
+    schema_namespace: spec/api/mir4-v1/schema-namespace.json
+    diagnostic_registry: spec/api/mir4-v1/diagnostics.json
+    compatibility_policy: spec/api/mir4-v1/compatibility.json
+    implementations:
+      - tools/mir/domain/canonicalization/CanonicalJsonV1.ps1
+      - spec/canonicalization/reference/mir4_canonical_json_v1.py
+    compatibility_implementations:
+      - tools/lib/mir4/CanonicalJsonV1.ps1
+    verification:
+      - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+      - tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1
+    compatibility_tests:
+      - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
+    schemas:
+      - spec/schemas/preview/mir4-canonical-json-v1.schema.json
+      - spec/schemas/preview/mir4-canonical-json-vectors-v1.schema.json
+      - spec/schemas/preview/mir4-schema-namespace-v1.schema.json
+      - spec/schemas/preview/mir4-diagnostic-registry-v1.schema.json
+      - spec/schemas/preview/mir4-preview-compatibility-policy-v1.schema.json
+    fixtures: fixtures/mir4-canonical-json-v1
+    documentation: docs/reference/mir4-canonical-json-v1.md
+    boundary: package-excluded deterministic data representation, permanent schema identity, and explicit preview migration only; no player-package mutation, compiler or emitter authority, release transition, signing, publication, or public support claim
+    stability: stable-v1-canonicalization-authority-with-preview-consumer-contracts
+  mir4_diagnostics_v1:
+    authority: spec/api/mir4-v1/diagnostics.json
+    implementation: tools/mir/domain/diagnostics/DiagnosticsV1.ps1
+    migration_authority: governance/repository/migrations/diagnostics-tooling-v1.json
+    migration_proof: assurance/repository/diagnostics-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/DiagnosticsV1.ps1
+    verification:
+      - tests/diagnostics/Test-MIR4DiagnosticsV1.ps1
+      - tests/diagnostics/Test-MIR4DiagnosticsMigration.ps1
+      - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+    boundary: stable package-excluded diagnostic registry access, construction, ordering, and rendering only; no player mutation or release transition authority
+    stability: stable-v1-domain-authority-migrated-compatibility-reader-retained
+  mir4_target_key_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
+    implementation: tools/mir/domain/targets/TargetKey.ps1
+    migration_authority: governance/repository/migrations/target-key-tooling-v1.json
+    migration_proof: assurance/repository/target-key-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/TargetKey.ps1
+    consumers:
+      - tools/mir.ps1
+      - tools/mir/application/platform/WholePlatform.ps1
+      - tools/mir/application/technology/TechnologyAcceptance.ps1
+      - tools/lib/mir4/PlatformPreview.ps1
+    verification:
+      - tests/targets/Test-MIR4TargetKey.ps1
+      - tests/targets/Test-MIR4TargetKeyMigration.ps1
+      - tests/platform/Test-MIR4WholePlatform.ps1
+    boundary: stable package-excluded uppercase FNNN target identity and lowercase compatibility projection only; no target admission, player mutation, compatibility claim, or release transition authority
+    stability: stable-v1-domain-authority-migrated-compatibility-reader-retained
+  mir4_technology_acceptance_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
+    implementation: tools/mir/application/technology/TechnologyAcceptance.ps1
+    migration_authority: governance/repository/migrations/technology-acceptance-tooling-v1.json
+    migration_proof: assurance/repository/technology-acceptance-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/TechnologyAcceptance.ps1
+    command: tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1
+    schemas:
+      - spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
+      - contracts/repository/mir4-technology-acceptance-migration-authority-v1.schema.json
+      - contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json
+      - contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json
+    verification:
+      - tests/technology/Test-MIR4TechnologyAcceptance.ps1
+      - tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1
+      - tests/platform/Test-MIR4WholePlatform.ps1
+    boundary: package-excluded per-technology review-queue projection only; no prototype mutation, automatic acceptance, promotion, compatibility-claim transfer, source freeze, signing, sealing, tagging, publication, or maintainer-decision authority
+    stability: stable-v1-application-authority-migrated-immutable-receipt-compatibility-reader-retained
+  mir4_target_compiler_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
+    implementation: tools/mir/application/targets/TargetCompiler.ps1
+    migration_authority: governance/repository/migrations/target-compiler-tooling-v1.json
+    migration_proof: assurance/repository/target-compiler-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/TargetCompiler.ps1
+    schemas:
+      - spec/schemas/mir4-target-registry-v6.schema.json
+      - contracts/repository/mir4-target-compiler-migration-authority-v1.schema.json
+      - contracts/repository/mir4-target-compiler-migration-proof-v1.schema.json
+      - contracts/repository/mir4-target-compiler-migration-receipt-v1.schema.json
+    verification:
+      - tests/targets/Test-MIR4TargetCompiler.ps1
+      - tests/targets/Test-MIR4TargetCompilerMigration.ps1
+      - validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
+    boundary: package-excluded target contracts, provider projections, and provider-law evidence only; no prototype mutation, support-claim transfer, source freeze, signing, sealing, promotion, tagging, publication, or maintainer-decision authority
+    stability: stable-v1-application-authority-migrated-compatibility-reader-retained
+  mir4_semantic_compiler_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
+    safety_kernel: tools/mir/domain/safety/SafetyKernel.ps1
+    policy_engine: tools/mir/domain/policy/PolicyEngine.ps1
+    implementations:
+      - tools/mir/application/compiler/NormalizedCompiler.ps1
+      - tools/mir/application/compiler/CompilationRun.ps1
+    exporter: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
+    migration_authority: governance/repository/migrations/semantic-compiler-policy-tooling-v1.json
+    migration_proof: assurance/repository/semantic-compiler-policy-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/SafetyKernel.ps1
+      - tools/lib/mir4/PolicyEngine.ps1
+      - tools/lib/mir4/NormalizedCompiler.ps1
+      - tools/lib/mir4/CompilationRun.ps1
+      - tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1
+    schemas:
+      - spec/schemas/mir4-compilation-run-v1.schema.json
+      - contracts/repository/mir4-semantic-compiler-policy-migration-authority-v1.schema.json
+      - contracts/repository/mir4-semantic-compiler-policy-migration-proof-v1.schema.json
+      - contracts/repository/mir4-semantic-compiler-policy-migration-receipt-v1.schema.json
+    verification:
+      - tests/compiler/Test-MIR4SemanticCompiler.ps1
+      - tests/compiler/Test-MIR4SemanticCompilerMigration.ps1
+      - validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
+    boundary: package-excluded safety decisions, policy dispositions, normalized target projections, semantic reference compilation runs, and deterministic record export only; no prototype or runtime mutation, compatibility-policy mutation, support-claim transfer, source freeze, signing, sealing, promotion, tagging, publication, or maintainer-decision authority
+    stability: stable-v1-domain-and-application-authority-migrated-compatibility-readers-retained
+  mir4_module_ecosystem_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
+    discovery_contract: .mir/releases/waves/mir4-r0/MIR4-F210-MEP-Discovery-ContractV1.json
+    api_contracts: spec/api/mir4-v1/contracts.json
+    canonicalization: spec/canonicalization/mir-canonical-json-v1.json
+    schema_namespace: spec/api/mir4-v1/schema-namespace.json
+    diagnostic_registry: spec/api/mir4-v1/diagnostics.json
+    compatibility_policy: spec/api/mir4-v1/compatibility.json
+    implementation: tools/mir/application/extensions/ModuleEcosystem.ps1
+    discovery_implementation: tools/mir/application/extensions/MepDiscovery.ps1
+    generator: tools/mir/application/extensions/ExperimentalApiSdk.ps1
+    developer_experience: tools/mir/application/extensions/ExtensionDeveloperExperience.ps1
+    sdk_conformance: tools/mir/application/extensions/SdkV1.ps1
+    builder: tools/mir/cli/Invoke-MIR4Extension.ps1
+    experimental_api_command: tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1
+    exporter: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
+    migration_authority: governance/repository/migrations/module-sdk-mep-tooling-v1.json
+    migration_proof: assurance/repository/module-sdk-mep-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Module-Sdk-Mep-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/ModuleEcosystem.ps1
+      - tools/lib/mir4/MepDiscovery.ps1
+      - tools/lib/mir4/ExperimentalApiSdk.ps1
+      - tools/lib/mir4/ExtensionDeveloperExperience.ps1
+      - tools/lib/mir4/SdkV1.ps1
+    compatibility_commands:
+      - tools/commands/mir4/Invoke-MIR4Extension.ps1
+      - tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1
+      - tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1
+    generated_roots:
+      - sdk/preview/mir4/mep-v1
+      - sdk/preview/mir4/api-v1
+      - sdk/preview/mir4/reference-extension-v1
+    discovery_schemas:
+      - spec/schemas/preview/mir4-f210-mod-data-snapshot-v1.schema.json
+      - spec/schemas/preview/mir4-f210-mep-discovery-result-v1.schema.json
+    discovery_fixtures: fixtures/mir4-mep-discovery-v1
+    discovery_reference: sdk/preview/mir4/reference/f210-mep-discovery-v1.json
+    discovery_documentation: docs/reference/mir4-f210-mep-discovery.md
+    documentation: docs/architecture/mir4-module-ecosystem.md
+    verification:
+      - tests/extensions/Test-MIR4ModuleEcosystem.ps1
+      - tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1
+      - validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1
+    boundary: typed data-only fragments, deterministic extension closure, copied bounded APIs, package-excluded SDK tooling, and read-only F210 mod-data snapshot discovery; no callbacks, mutable compiler context, prototype writes, emitter admission, migration execution, W06 semantic ownership, or public support authority
+    stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-blocked-independent-production-consumer
+  mir4_processir_synthesis_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
+    exact_capture_authority: .mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json
+    implementations:
+      - tools/mir/application/processir/ProcessIR.ps1
+      - tools/mir/application/processir/ExactProcessIR.ps1
+    exporters:
+      - tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
+      - tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
+    input_schema: spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json
+    output_schemas:
+      - spec/schemas/mir4-process-ir-v1.schema.json
+      - spec/schemas/mir4-effect-channel-registry-v1.schema.json
+      - spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json
+      - spec/schemas/preview/mir4-exact-process-ir-snapshot-v1.schema.json
+      - spec/schemas/preview/mir4-process-ir-comparison-v1.schema.json
+      - spec/schemas/preview/mir4-t12-receipt-v1.schema.json
+    fixtures: fixtures/mir4-process-ir-v1
+    exact_observer_fixture: fixtures/mir4-processir-exact-observer
+    exact_reference_root: sdk/preview/mir4/reference/t12
+    migration_authority: governance/repository/migrations/processir-exact-tooling-v1.json
+    migration_proof: assurance/repository/processir-exact-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-ProcessIR-Exact-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/ProcessIR.ps1
+      - tools/lib/mir4/ExactProcessIR.ps1
+    compatibility_exporters:
+      - tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1
+      - tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1
+    documentation: docs/architecture/mir4-processir-synthesis.md
+    verification:
+      - tests/processir/Test-MIR4ProcessIRExact.ps1
+      - tests/processir/Test-MIR4ProcessIRExactMigration.ps1
+      - validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1
+      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
+    boundary: package-excluded exact post-finalizer observation, copied-fact ProcessIR certificates, effect owner references, bounded offline comparisons, and descriptive proposal classification only; the observer cannot write prototypes and the preview has no risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
+    stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-exact-reference-read-only
+  mir4_release_compatibility_canaries_t13:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+    implementation: tools/mir/application/inspection/CompatibilityCanary.ps1
+    exporter: tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1
+    compatibility_implementation: tools/lib/mir4/CompatibilityCanary.ps1
+    compatibility_exporter: tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1
+    schemas:
+      - spec/schemas/mir4-release-compatibility-canaries-t13-v1.schema.json
+      - spec/schemas/preview/mir4-t13-exact-capture-canary-v1.schema.json
+      - spec/schemas/preview/mir4-release-compatibility-canary-v1.schema.json
+      - spec/schemas/preview/mir4-t13-receipt-v1.schema.json
+    reference_root: sdk/preview/mir4/reference/t13
+    documentation: docs/compatibility/mir4-release-canaries.md
+    validator: validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+    boundary: exact locked F210 and F200 release-canary input with clean load, two byte-preserving reloads, target-shared direct-predecessor upgrade proof, bounded performance, claim limitations, and expiry; no blanket ecosystem claim, automatic synthesis, player or prototype mutation, source freeze, signing, sealing, promotion, or publication authority
+    stability: pre-freeze-release-canary-exact-eleven-captures-eight-bounded-subjects
+  mir4_documentation_continuity_t14:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json
+    immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    immutable_source_truth_schema: spec/schemas/mir-immutable-documentation-source-truth-v1.schema.json
+    schema: spec/schemas/mir4-documentation-continuity-t14-v1.schema.json
+    writer: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    validator: validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1
+    documentation: docs/developer/README.md
+    boundary: MIR4-first root, developer, maintainer, generated metadata, and continuity documentation with one declared README-only package-visible delta; no player executable, emitter, source-freeze, signing, sealing, promotion, or publication authority
+    stability: stable-documentation-and-package-excluded-developer-preview
+  mir4_inspector_compatibility_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
+    authority_schema: spec/schemas/mir4-inspector-compatibility-programme-v1.schema.json
+    implementations:
+      - tools/mir/application/inspection/CompatibilityIndex.ps1
+      - tools/mir/application/inspection/SupportAssessment.ps1
+      - tools/mir/application/inspection/Inspector.ps1
+      - tools/mir/application/inspection/CompatibilityFactory.ps1
+    exporter: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
+    migration_authority: governance/repository/migrations/inspector-compatibility-tooling-v1.json
+    migration_proof: assurance/repository/inspector-compatibility-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Inspector-Compatibility-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/CompatibilityIndex.ps1
+      - tools/lib/mir4/SupportAssessment.ps1
+      - tools/lib/mir4/Inspector.ps1
+      - tools/lib/mir4/CompatibilityFactory.ps1
+    compatibility_exporters:
+      - tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1
+      - tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1
+    output_schemas:
+      - spec/schemas/mir4-inspection-bundle-v1.schema.json
+      - spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json
+      - spec/schemas/mir4-compatibility-factory-plan-v1.schema.json
+      - spec/schemas/mir4-inspector-workbench-result-v1.schema.json
+    fixtures: fixtures/mir4-inspector-compatibility-v1
+    generated_root: sdk/preview/mir4/inspector-v1
+    exact_comparison_root: sdk/preview/mir4/reference/t12/inspector
+    documentation: docs/architecture/mir4-inspector-compatibility.md
+    boundary: bounded copied read-only DTO inspection, normalized private subject assessments, and deterministic data-only compatibility bundles; no raw mutable compiler objects, callbacks, executable adapters, blanket modpack support booleans, claim transfer, player mutation, signing, sealing, or publication
+    verification:
+      - tests/inspection/Test-MIR4InspectorCompatibility.ps1
+      - tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1
+      - validation/tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+    stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-with-exact-processir-comparison-blocked-independent-production-consumer-and-exact-profile-claim-transfer
+  mir4_environment_evidence_v1:
+    implementation: tools/mir/application/assurance/EnvironmentEvidence.ps1
+    command: tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1
+    migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    compatibility_implementation: tools/lib/mir4/EnvironmentEvidence.ps1
+    compatibility_command: tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1
+    schemas:
+      - spec/schemas/preview/mir4-environment-lock-v1.schema.json
+      - spec/schemas/preview/mir4-environment-diff-v1.schema.json
+      - spec/schemas/preview/mir4-support-bundle-v1.schema.json
+    fixtures: fixtures/mir4-environment-evidence-v1
+    generated_references:
+      - sdk/preview/mir4/reference/environment-lock-f210-v1.json
+      - sdk/preview/mir4/reference/environment-lock-f200-v1.json
+      - sdk/preview/mir4/reference/environment-diff-f210-f200-v1.json
+      - sdk/preview/mir4/reference/support-bundle-minimized-v1.json
+    documentation: docs/reference/mir4-environment-evidence.md
+    boundary: portable exact read-only environment identity, bounded redacted diagnostics, and reproducer-preserving evidence minimization only; no private host state, executable content, network access, player mutation, prototype writes, public support claim, release transition, signing, sealing, or publication
+    stability: developer-preview-canonical-assurance-application-cli-migrated-compatibility-readers-retained
+  mir4_assurance_scale_v1:
+    authority: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
+    implementations:
+      - tools/mir/application/assurance/AssuranceScale.ps1
+      - tools/mir/application/assurance/ReleaseBudget.ps1
+      - tools/mir/application/assurance/OfflineDrill.ps1
+    exporter: tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1
+    migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    compatibility_implementations:
+      - tools/lib/mir4/AssuranceScale.ps1
+      - tools/lib/mir4/ReleaseBudget.ps1
+      - tools/lib/mir4/OfflineDrill.ps1
+    compatibility_exporter: tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1
+    output_schemas:
+      - spec/schemas/mir4-assurance-scale-result-v1.schema.json
+      - spec/schemas/mir4-release-budget-plan-v1.schema.json
+      - spec/schemas/mir4-offline-drill-result-v1.schema.json
+    fixtures: fixtures/mir4-assurance-scale-v1
+    documentation: docs/architecture/mir4-assurance-scale.md
+    boundary: read-only Control Plane v5 and Assurance v4 crosswalk, four proof identities, Merkle authority slices, proposal-only proof cover and deadline arithmetic, and dummy-fixture offline drills; no third evidence ledger, active selector ownership, real source/candidate/publisher access, player mutation, source freeze, production signing/sealing, promotion, tag, upload, or publication
+    verification:
+      - tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1
+      - tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
+      - validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1
+      - validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1
+      - validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
+    stability: developer-preview-canonical-assurance-and-custody-applications-migrated-compatibility-readers-retained-blocked-trusted-timing-capacity-and-human-secret-evidence
+  mir4_historical_succession_v1:
+    migration_authority: governance/repository/migrations/historical-tooling-v1.json
+    migration_assurance: assurance/repository/historical-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Historical-Tooling-MigrationV1.json
+    authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
+    authority_schema: spec/schemas/mir4-historical-succession-programme-v1.schema.json
+    implementations:
+      - tools/mir/application/history/HistoricalSuccession.ps1
+      - tools/mir/application/history/SuccessorHost.ps1
+    exporter: tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1
+    compatibility_entrypoints:
+      - tools/lib/mir4/HistoricalSuccession.ps1
+      - tools/lib/mir4/SuccessorHost.ps1
+      - tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1
+    migration_writer: tools/mir/application/history/HistoricalToolingMigration.ps1
+    migration_cli: tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1
+    output_schemas:
+      - spec/schemas/mir4-historical-museum-matrix-v1.schema.json
+      - spec/schemas/mir4-successor-host-result-v1.schema.json
+    fixtures: fixtures/mir4-historical-succession-v1
+    documentation: docs/architecture/mir4-historical-succession.md
+    playtest_handoff: docs/maintainer/mir4-w09-manual-playtest.md
+    tests:
+      - tests/history/Test-MIR4HistoricalTooling.ps1
+      - tests/history/Test-MIR4HistoricalToolingMigration.ps1
+      - validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1
+    boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
+    stability: developer-preview-shadow-partial-with-bounded-blockers
+  mir4_release_tooling_v1:
+    migration_authority: governance/repository/migrations/release-tooling-v1.json
+    migration_assurance: assurance/repository/release-tooling-v1.json
+    migration_receipt: releases/migrations/MIR4-Release-Tooling-MigrationV1.json
+    authority: spec/platform/mir4-preview-v0/release-dag.json
+    implementation: tools/mir/application/release/ReleaseDag.ps1
+    compatibility_entrypoint: tools/lib/mir4/ReleaseDag.ps1
+    migration_writer: tools/mir/application/release/ReleaseToolingMigration.ps1
+    migration_cli: tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1
+    documentation: docs/architecture/mir4-platform-preview.md
+    tests:
+      - tests/release-tooling/Test-MIR4ReleaseTooling.ps1
+      - tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1
+      - validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+    boundary: read-only validation of the stable release DAG contract; no phase execution, candidate allocation, prototype or runtime mutation, source freeze, production signing, sealing, promotion, tag, upload, publication, or public support authority
+    stability: stable-canonical-release-dag-application-migrated-compatibility-reader-retained
+  mir4_full_platform_closeout_v1:
+    implementation: tools/lib/mir4/FullPlatformCloseout.ps1
+    exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
+    output_schema: spec/schemas/mir4-full-platform-record-v1.schema.json
+    independent_audit_input_schema: spec/schemas/mir4-luna-audit-input-v1.schema.json
+    documentation: docs/maintainer/mir4-full-platform-closeout.md
+    boundary: evidence-only aggregation of the existing W00-W09 authorities, exact generated records, governed verification evidence, and independent audit result; no product, policy, compiler, prototype, runtime, migration, release, secret, ledger, source-freeze, signing, sealing, promotion, tag, upload, publication, or Dev-mutation authority
+    stability: stable-evidence-adapter-partial-with-bounded-blockers
+  mir4_release_readiness_reconciliation_v1:
+    historical_authority: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
+    historical_schema: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
+    current_authority: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
+    current_schema: spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json
+    generated_views:
+      - .mir/releases/waves/mir4-r0/dashboard.json
+      - .mir/releases/waves/mir4-r0/queue.json
+      - todo.md
+    validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
+    documentation: docs/maintainer/mir4-full-platform-closeout.md
+    boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
+    stability: stable-t15-complete-t16-t17-human-blocked-release-blocked
+  mir4_pre_freeze_hardening_v1:
+    authorities:
+      - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
+      - .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T09-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
+      - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
+      - .mir/releases/governance/mir4/github-actions-lock.json
+      - .mir/releases/governance/mir4/github-actions-lock-v2.json
+      - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
+    implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
+    f210_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+    final_mile_tooling_authority_writer: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
+    final_release_closure_authority_writer: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
+    phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
+    release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
+    release_lifecycle_adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
+    commands:
+      - tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
+      - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
+      - tools/commands/mir4/Update-MIR4PlaytestHandoffT17.ps1
+      - tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
+    workflows:
+      - .github/workflows/mir4-source-freeze.yml
+      - .github/workflows/mir4-target-build.yml
+      - .github/workflows/mir4-target-qualification.yml
+      - .github/workflows/mir4-preview-assets.yml
+      - .github/workflows/mir4-independent-verification.yml
+      - .github/workflows/mir4-release-seal.yml
+      - .github/workflows/mir4-promotion.yml
+      - .github/workflows/mir4-target-publication.yml
+      - .github/workflows/mir4-public-readback.yml
+      - .github/workflows/mir4-restore-drill.yml
+    schemas:
+      - spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json
+      - spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json
+      - spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
+      - spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json
+      - spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json
+      - spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-playtest-evidence-v1.schema.json
+      - spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-release-workflow-contract-v1.schema.json
+      - spec/schemas/mir4-release-phase-engine-contract-v1.schema.json
+      - spec/schemas/mir4-t02-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t03-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t04-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t05-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-release-fault-corpus-v1.schema.json
+      - spec/schemas/mir4-t06-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t07-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t08-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t09-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t10-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t11-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t12-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-t13-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-release-source-freeze-result-v1.schema.json
+      - spec/schemas/mir4-release-target-build-result-v1.schema.json
+      - spec/schemas/mir4-release-target-qualification-result-v1.schema.json
+      - spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json
+      - spec/schemas/mir4-release-preview-assets-result-v1.schema.json
+      - spec/schemas/mir4-release-independent-verification-result-v1.schema.json
+      - spec/schemas/mir4-independent-verification-receipt-v1.schema.json
+      - spec/schemas/mir4-release-seal-result-v1.schema.json
+      - spec/schemas/mir4-release-promotion-result-v1.schema.json
+      - spec/schemas/mir4-release-target-publication-result-v1.schema.json
+      - spec/schemas/mir4-release-public-readback-result-v1.schema.json
+      - spec/schemas/mir4-release-restore-drill-result-v1.schema.json
+      - spec/schemas/mir4-github-actions-lock-v1.schema.json
+      - spec/schemas/mir4-github-actions-lock-v2.schema.json
+      - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
+    supporting_validators:
+      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
+      - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+      - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
+      - validation/tests/mir4/Test-MIR4SdkV1T08.ps1
+      - validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1
+      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
+      - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+      - validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
+      - validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
+      - validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
+      - validation/tests/release/Test-MIRTerminalGovernance.ps1
+    validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+    documentation: docs/maintainer/mir4-pre-freeze-hardening.md
+    boundary: package-excluded release preparation, exact-input validation, pre-freeze F210 Steam experimental selection, future stable minimum/latest lane policy, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    stability: stable-pre-freeze-control-plane-with-exact-f210-execution-locks-t03-t06-non-production-rehearsal-and-human-and-freeze-blockers
+  mir4_platform_preview_v0:
+    authority: spec/platform/mir4-preview-v0/platform.json
+    implementation: tools/lib/mir4/PlatformPreview.ps1
+    safety_kernel: tools/mir/domain/safety/SafetyKernel.ps1
+    policy_engine: tools/mir/domain/policy/PolicyEngine.ps1
+    normalized_compiler: tools/mir/application/compiler/NormalizedCompiler.ps1
+    runtime_state_model: tools/mir/application/runtime/RuntimeStateModel.ps1
+    process_ir: tools/mir/application/processir/ProcessIR.ps1
+    process_ir_authority: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
+    compatibility_index: tools/mir/application/inspection/CompatibilityIndex.ps1
+    support_assessment: tools/mir/application/inspection/SupportAssessment.ps1
+    inspector: tools/mir/application/inspection/Inspector.ps1
+    compatibility_factory: tools/mir/application/inspection/CompatibilityFactory.ps1
+    environment_evidence: tools/mir/application/assurance/EnvironmentEvidence.ps1
+    package_presentation: tools/lib/mir4/PackagePresentation.ps1
+    inspector_compatibility_authority: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
+    release_dag: tools/mir/application/release/ReleaseDag.ps1
+    command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
+    generated_root: sdk/preview/mir4
+    current_release_asset_generation: v1
+    legacy_input_generation: v0-migration-only
+    boundary: read-only projections and diagnose-only shadow execution; no prototype emission, state mutation, or public support authority
+    stability: v1-developer-preview-and-shadow-with-v0-migration-input
 
 runtime_boundaries:
   control.lua:
@@ -192,6 +851,7 @@ modules:
     - prototypes/mir/domain/technology/technology_candidate.lua
     - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
+    - prototypes/mir/domain/technology/maximum_level_binding.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
     - prototypes/mir/domain/technology/gate.lua
     - prototypes/mir/domain/technology/safety_qualification.lua
@@ -329,6 +989,7 @@ modules:
     - prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
     - prototypes/mir/compatibility/diagnostics/atan_ash.lua
     - prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua
+    - prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua
     - prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
     - prototypes/mir/compatibility/repairs/registry.lua
   runtime:
@@ -597,6 +1258,7 @@ rules:
   - Prototype-family emission must consult the current target profile before calling the Factorio data adapter.
   - Compatibility overlays register policy only.
   - Compatibility repairs may normalize exact-version upstream loader schemas or remove one topology-proven cross-mod cycle edge.
+  - MaximumLevelBinding is the single normalized cap registry consumed by presentation, mod-data transport, and runtime control.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.
@@ -781,10 +1443,13 @@ validation_tooling:
     mir4_r0_version_authority_historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
     mir4_r0_target_registry_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
     mir4_r0_target_registry_historical_v2_schema: spec/schemas/mir4-target-registry-v2.schema.json
-    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
-    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v3.schema.json
+    mir4_r0_target_registry_historical_v3: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
+    mir4_r0_target_registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json
+    mir4_r0_target_registry_schema: spec/schemas/mir4-target-registry-v4.schema.json
     mir4_terminal_predecessor_refresh_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV1.json
-    mir4_terminal_predecessor_refresh: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json
+    mir4_terminal_predecessor_refresh_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV2.json
+    mir4_terminal_predecessor_refresh: .mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json
+    mir4_terminal_import_composite: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-CompositeV3.json
     mir4_terminal_import_contract_historical: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV1.json
     mir4_terminal_import_contract: .mir/releases/waves/mir4-r0/MIR4-Terminal-Import-ContractV2.json
     mir3_factorio_2_0_post_terminal_continuation_schema: spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json
@@ -798,20 +1463,24 @@ validation_tooling:
     mir4_r0_bootstrap_root_set_schema: spec/schemas/mir4-bootstrap-root-set.schema.json
     mir4_r0_bootstrap_root_set_generator: tools/commands/release/New-MIR4BootstrapRootSet.ps1
     mir4_r0_bootstrap_gate: tools/commands/release/Test-MIR4R0Bootstrap.ps1
-    mir3_factorio_2_0_post_terminal_continuation_generator: tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1
+    mir3_factorio_2_0_post_terminal_continuation_generator: tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1
+    mir3_factorio_2_1_post_terminal_continuation_generator: tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuationV2.ps1
     mir4_terminal_baseline_import_generator: tools/commands/release/Import-MIR3TerminalBaselines.ps1
     mir4_bootstrap_candidate_plan_historical: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
     mir4_bootstrap_candidate_plan_historical_schema: spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json
-    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
-    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json
+    mir4_bootstrap_candidate_plan_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
+    mir4_bootstrap_candidate_plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json
+    mir4_bootstrap_candidate_plan_schema: spec/schemas/mir4-bootstrap-local-candidate-plan-v3.schema.json
+    mir4_dot11_predecessor_refresh_generator: tools/commands/release/New-MIR4Dot11PredecessorRefreshV3.ps1
     mir4_bootstrap_approved_correction_historical: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json
     mir4_bootstrap_approved_correction_historical_schema: spec/schemas/mir4-approved-bootstrap-correction-delta.schema.json
     mir4_bootstrap_approved_correction: .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json
     mir4_bootstrap_approved_correction_schema: spec/schemas/mir4-approved-bootstrap-correction-delta-v2.schema.json
     mir4_local_artifact_lane_authorization_historical: .mir/releases/waves/mir4-r0/MIR4-Local-Playtest-Shadow-AuthorizationV1.json
     mir4_local_artifact_lane_authorization_historical_schema: spec/schemas/mir4-local-playtest-shadow-authorization.schema.json
-    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
-    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v2.schema.json
+    mir4_local_artifact_lane_authorization_historical_v2: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
+    mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json
+    mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v3.schema.json
     mir4_local_playtest_candidate_manifest_schema: spec/schemas/mir4-local-playtest-candidate-manifest.schema.json
     mir4_local_artifact_lane_gate: validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
@@ -821,6 +1490,79 @@ validation_tooling:
     mir4_bootstrap_git_source_proof_schema: spec/schemas/mir4-bootstrap-git-source-proof.schema.json
     mir4_bootstrap_reconstruction_receipt_schema: spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json
     mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
+    mir4_platform_preview: tools/lib/mir4/PlatformPreview.ps1
+    mir4_safety_kernel: tools/mir/domain/safety/SafetyKernel.ps1
+    mir4_policy_engine: tools/mir/domain/policy/PolicyEngine.ps1
+    mir4_normalized_compiler: tools/mir/application/compiler/NormalizedCompiler.ps1
+    mir4_target_compiler: tools/mir/application/targets/TargetCompiler.ps1
+    mir4_target_compiler_compatibility: tools/lib/mir4/TargetCompiler.ps1
+    mir4_target_compiler_test: tests/targets/Test-MIR4TargetCompiler.ps1
+    mir4_target_compiler_migration_test: tests/targets/Test-MIR4TargetCompilerMigration.ps1
+    mir4_target_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
+    mir4_target_registry_v6_schema: spec/schemas/mir4-target-registry-v6.schema.json
+    mir4_target_product_builder: tools/commands/mir4/New-MIR4TargetProductSet.ps1
+    mir4_target_compiler_gate: validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
+    mir4_semantic_compiler: tools/mir/application/compiler/CompilationRun.ps1
+    mir4_semantic_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
+    mir4_compilation_run_v1_schema: spec/schemas/mir4-compilation-run-v1.schema.json
+    mir4_semantic_compiler_exporter: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
+    mir4_semantic_compiler_test: tests/compiler/Test-MIR4SemanticCompiler.ps1
+    mir4_semantic_compiler_migration_test: tests/compiler/Test-MIR4SemanticCompilerMigration.ps1
+    mir4_semantic_compiler_gate: validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
+    mir4_runtime_state_model: tools/mir/application/runtime/RuntimeStateModel.ps1
+    mir4_runtime_continuity_authority: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+    mir4_runtime_continuity_migration_authority: governance/repository/migrations/runtime-continuity-tooling-v1.json
+    mir4_runtime_continuity_migration_proof: assurance/repository/runtime-continuity-tooling-v1.json
+    mir4_runtime_continuity_migration_receipt: releases/migrations/MIR4-Runtime-Continuity-Tooling-MigrationV1.json
+    mir4_runtime_continuity_compatibility:
+      - tools/lib/mir4/RuntimeStateModel.ps1
+      - tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1
+    mir4_runtime_state_matrix_schema: spec/schemas/mir4-runtime-state-matrix-v1.schema.json
+    mir4_migration_graph_matrix_schema: spec/schemas/mir4-migration-graph-matrix-v1.schema.json
+    mir4_continuity_bundle_schema: spec/schemas/mir4-continuity-bundle-v1.schema.json
+    mir4_runtime_continuity_exporter: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
+    mir4_runtime_continuity_functional_test: tests/runtime/Test-MIR4RuntimeContinuity.ps1
+    mir4_runtime_continuity_migration_test: tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1
+    mir4_runtime_continuity_gate: validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1
+    mir4_process_ir: tools/mir/application/processir/ProcessIR.ps1
+    mir4_release_dag: tools/mir/application/release/ReleaseDag.ps1
+    mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
+    mir4_release_governance_authority: .mir/releases/governance/mir4/release-governance.json
+    mir4_allowed_signers_authority: .mir/releases/governance/mir4/allowed-signers.json
+    mir4_signing_ceremony_preparation: tools/lib/mir4/SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
+    mir4_signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_gate: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+    mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
+    mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
+    mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
+    mir4_repository_fixed_point: tools/mir/application/repository/RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_authority: .mir/control/repository-fixed-point.json
+    mir4_repository_migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
+    mir4_repository_fixed_point_command: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_gate: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_library: tools/lib/mir4/RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_command: tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1
+    mir4_repository_fixed_point_compatibility_gate: validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1
+    mir4_release_dag_spec: spec/platform/mir4-preview-v0/release-dag.json
+    mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
+    mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1
+    mir4_platform_preview_gate: validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+    mir4_platform_preview_authority_historical_v1: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
+    mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
+    mir4_candidate_wave_authority: .mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json
+    mir4_m4c01_implementation_authority: .mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json
+    mir4_target_registry_historical_v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
+    mir4_target_registry_current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
+    mir4_hybrid_platform_authority_schema: spec/schemas/mir4-hybrid-platform-authority.schema.json
+    mir4_m4c01_authority_schema: spec/schemas/mir4-m4c01-implementation-authorization.schema.json
+    mir4_hybrid_platform_authority_gate: validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1
+    mir4_historical_private_candidate_authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json
+    mir4_historical_private_candidate_authority_schema: spec/schemas/mir4-historical-private-candidate-authorization.schema.json
+    mir4_historical_private_candidate_builder: tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1
+    mir4_package_presentation_authority: .mir/releases/waves/mir4-r0/MIR4-Package-Presentation-OverlayV1.json
+    mir4_package_presentation_authority_schema: spec/schemas/mir4-package-presentation-overlay.schema.json
+    mir4_m4c01_player_candidate_builder: tools/commands/release/New-MIR4M4C01PlayerCandidateSet.ps1
     mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
     mir4_bootstrap_capsule_runner: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
     mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
@@ -835,7 +1577,18 @@ validation_tooling:
     mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
-    mir4_offline_candidate_custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody_compatibility: tools/lib/mir4/OfflineCandidateCustody.ps1
+    mir4_assurance_offline_custody_migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
+    mir4_assurance_offline_custody_migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json
+    mir4_assurance_offline_custody_migration_gate: tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
+    mir4_historical_tooling_migration_authority: governance/repository/migrations/historical-tooling-v1.json
+    mir4_historical_tooling_migration_receipt: releases/migrations/MIR4-Historical-Tooling-MigrationV1.json
+    mir4_historical_tooling_migration_gate: tests/history/Test-MIR4HistoricalToolingMigration.ps1
+    mir4_release_tooling_migration_authority: governance/repository/migrations/release-tooling-v1.json
+    mir4_release_tooling_migration_receipt: releases/migrations/MIR4-Release-Tooling-MigrationV1.json
+    mir4_release_tooling_migration_gate: tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1
+    mir4_package_presentation: tools/lib/mir4/PackagePresentation.ps1
     mir4_exact_engine_qualification_evidence_schema: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
     mir4_offline_qualification_schema: spec/schemas/mir4-offline-qualification-record.schema.json
     mir4_offline_review_schema: spec/schemas/mir4-offline-review-record.schema.json
@@ -893,6 +1646,8 @@ validation_tooling:
     approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1
     control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
     control_plane_performance_campaigns: .mir/performance-campaigns
+    mir4_m4c01_f210_performance_campaign: .mir/performance-campaigns/4.0.21000-M4C01.json
+    mir4_m4c01_f200_performance_campaign: .mir/performance-campaigns/4.0.20000-M4C01.json
     runtime_performance_gate: validation/tests/release/Test-MIRPerformanceRegression.ps1
     manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
@@ -905,6 +1660,10 @@ validation_tooling:
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
     compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
     documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
+    documentation_index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+    documentation_metadata_authority: markdown-frontmatter
+    documentation_immutable_source_truth_authority: .mir/docs-immutable-source-truth.json
+    documentation_compatibility_projection: .mir/docs.yml
     generated_authority_documentation: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
     pipeline_documentation: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
     readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
@@ -912,11 +1671,13 @@ validation_tooling:
     compiler_authority_generator: tools/commands/compiler/Update-MIRCompilerAuthorities.ps1
     compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
+    mir4_historical_private_runtime: validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1
     verification_domains: validation/domains.yml
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
     - the visible product plane and hidden operational plane use the canonical logical path catalog and historical aliases are read only
+    - root governance and continuity guides are canonical repository-policy documents owned by documentation governance and remain package-excluded unless separately admitted by the package whitelist
     - source-of-truth projections are owned by domain command families under tools commands while scripts retains parameter-compatible read-only wrappers and immutable historical worktrees may invoke their contemporary legacy paths
     - control plane v5 changes remain tooling-only and reproduce the exact locked 3.2.2 and P9 package identities
     - typed change incident task release and transition records are authoritative and human-readable status files are generated views
@@ -973,6 +1734,7 @@ validation_tooling:
     - a divergent terminal calibration experiment is an evidence and behavioural reference only: it may not be merged or cherry-picked, and its behavior must be ported through current canonical validation ownership with fresh proof
     - terminal shadow release identity is generated from one exact nine-target profile; the materializer may update metadata and package-excluded release authority but delegates all prototype semantics to the named target adapter
     - MIR 4 distribution target codes are immutable three-digit decimal strings retained unchanged through Target Registry V3; leading zeroes are semantic and the values are never parsed as octal
+    - MIR 4 historical private archives retain padded distribution identities while historical Factorio engines may normalize the displayed numeric patch component; evidence binds both forms and never changes the archive identity
     - MIR 4 V1 and V2 target registries are frozen historical evidence; V3 advances only append-only terminal predecessor authority while executable distribution encoding remains governed by the unchanged V2 codec authority
     - MIR 4 bootstrap records use the BootstrapCanonicalJsonV1 implementation owned by the bootstrap materializer; the byte-bound detached capsule pre-verifier reproduces that ABI only until the extracted canonical authority revalidates every record
     - MIR 4 capsule V2 binds the exact package source Git objects, reconstruction tools, schemas, authorities, complete PowerShell home, deterministic member roles and identities, and canonical package builder; A and B run in distinct fresh processes, their complete workspaces are deleted, and C receives only copied immutable capsule inputs without a checkout argument or inherited checkout working directory

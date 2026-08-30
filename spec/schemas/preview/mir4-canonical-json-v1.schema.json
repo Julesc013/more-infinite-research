@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/canonical-json-contract.schema.json",
+  "title": "MIR canonical JSON V1 contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","identifier","schema_namespace","encoding","unicode","objects","arrays","numbers","strings","timestamps","target_ids","unavailable_values","digests","limits"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CanonicalJsonContractV1"},
+    "identifier": {"const": "mir-canonical-json/1"},
+    "schema_namespace": {"const": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/"},
+    "encoding": {"type":"object","additionalProperties":false,"required":["name","bom_allowed","invalid_sequences"],"properties":{"name":{"const":"UTF-8"},"bom_allowed":{"const":false},"invalid_sequences":{"const":"reject"}}},
+    "unicode": {"type":"object","additionalProperties":false,"required":["normalization","applies_to","unpaired_surrogates","normalized_property_collision"],"properties":{"normalization":{"const":"NFC"},"applies_to":{"const":["property-names","string-values"]},"unpaired_surrogates":{"const":"reject"},"normalized_property_collision":{"const":"reject"}}},
+    "objects": {"type":"object","additionalProperties":false,"required":["property_order","duplicate_properties"],"properties":{"property_order":{"const":"ascending-UTF-16-code-unit-order"},"duplicate_properties":{"const":"reject"}}},
+    "arrays": {"type":"object","additionalProperties":false,"required":["generic_order","set_like_fields","extension_closure_order","diagnostic_order"],"properties":{"generic_order":{"const":"preserve"},"set_like_fields":{"type":"string","minLength":1},"extension_closure_order":{"type":"string","minLength":1},"diagnostic_order":{"type":"string","minLength":1}}},
+    "numbers": {"type":"object","additionalProperties":false,"required":["grammar","minimum","maximum","negative_zero","fractional_and_exponent_forms","non_finite"],"properties":{"grammar":{"const":"-?(0|[1-9][0-9]*)"},"minimum":{"const":-9007199254740991},"maximum":{"const":9007199254740991},"negative_zero":{"const":"reject"},"fractional_and_exponent_forms":{"const":"reject"},"non_finite":{"const":"reject"}}},
+    "strings": {"type":"object","additionalProperties":false,"required":["escaping","solidus_escaped","non_ascii"],"properties":{"escaping":{"type":"string","minLength":1},"solidus_escaped":{"const":false},"non_ascii":{"const":"literal-UTF-8"}}},
+    "timestamps": {"type":"object","additionalProperties":false,"required":["grammar","timezone","fractional_seconds"],"properties":{"grammar":{"const":"yyyy-MM-ddTHH:mm:ssZ"},"timezone":{"const":"UTC"},"fractional_seconds":{"const":"reject"}}},
+    "target_ids": {"type":"object","additionalProperties":false,"required":["grammar","case"],"properties":{"grammar":{"const":"^f[0-9]{3}$"},"case":{"const":"lowercase"}}},
+    "unavailable_values": {"type":"object","additionalProperties":false,"required":["representation","null_or_zero_substitution","page_total","page_returned"],"properties":{"representation":{"const":"explicit-status-reason-evidence"},"null_or_zero_substitution":{"const":"forbidden"},"page_total":{"type":"null"},"page_returned":{"const":0}}},
+    "digests": {"type":"object","additionalProperties":false,"required":["algorithm","format","input","top_level_digest_field","domain_grammar","domains"],"properties":{"algorithm":{"const":"SHA-256"},"format":{"const":"sha256:<64-lowercase-hex>"},"input":{"type":"string","minLength":1},"top_level_digest_field":{"const":"omitted"},"domain_grammar":{"type":"string","minLength":1},"domains":{"type":"object","additionalProperties":false,"required":["MIR4ApiResponseV1","MIR4ExtensionEnvelopeV1","MIR4PlatformLockV1","untyped_module_values","other_records"],"properties":{"MIR4ApiResponseV1":{"const":"mir4:api-response-v1"},"MIR4ExtensionEnvelopeV1":{"const":"mir4:extension-envelope-v1"},"MIR4PlatformLockV1":{"const":"mir4:platform-lock-v1"},"untyped_module_values":{"const":"mir4:module-value-v1"},"other_records":{"type":"string","minLength":1}}}}},
+    "limits": {"type":"object","additionalProperties":false,"required":["maximum_depth","maximum_safe_integer"],"properties":{"maximum_depth":{"const":64},"maximum_safe_integer":{"const":9007199254740991}}}
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "kind": "MIR4T05AuthorityEvolutionReceiptV1",
+  "recorded_at": "2026-08-25T23:45:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "turn": "T05",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json",
+    "sha256": "10D2B7E73A66F2B532339B71EDE871096127FDEE521F7B0B7F31686F973B349C"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+      "previous_sha256": "5F8D118C8254049DD7F2F27905EEA583FCB4CED74E4C43F6906B2ACB048243F5",
+      "current_sha256": "C390E36D730259ABA0E7AAB0ED966964FEE48F3EE1E31C1B4B8AFC3A607548B2",
+      "reason": "T05 promotes release seal, promotion, target publication, public readback, and restore drill to implemented, dry-run-passed non-production adapters.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
+      "previous_sha256": "E689F34294D3824DB5C0A2782B67837F1C17B7889E29F7101B23759E0C5BEE95",
+      "current_sha256": "00A4EC23076A726D6683D3355A9197B26E15D11FFA8A4C4CA5377498D27C3CEB",
+      "reason": "T05 is complete and T06 is the next dependency-ready work package; every production transition remains false.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseAdapters.ps1",
+      "previous_sha256": "453499508C70A5E73ED613232DC7C348CB1399F971776D73263B02A0E20D4C58",
+      "current_sha256": "D8901D91026B4E315B5DC08B57C338E48EEA75A759B062E551E628F1EBCB5ABC",
+      "reason": "The shared adapter registry now routes all five T05 phases to exact, non-production lifecycle implementations.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json", "sha256": "C390E36D730259ABA0E7AAB0ED966964FEE48F3EE1E31C1B4B8AFC3A607548B2", "role": "current-workflow-maturity-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json", "sha256": "00A4EC23076A726D6683D3355A9197B26E15D11FFA8A4C4CA5377498D27C3CEB", "role": "current-pre-freeze-execution-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json", "sha256": "BA19E1146795AAAE4F004363B322223A9F91C928AAF4C2CD76AB4438615D7ECB", "role": "non-production-phase-engine-contract"},
+    {"path": "tools/lib/mir4/ReleaseAdapters.ps1", "sha256": "D8901D91026B4E315B5DC08B57C338E48EEA75A759B062E551E628F1EBCB5ABC", "role": "t03-t05-release-adapter-registry"},
+    {"path": "tools/lib/mir4/ReleaseLifecycleAdapters.ps1", "sha256": "CFA1D7F4FF4D47B6C70693ED9F83F610AC2CD24FEF4ED9C7D6F877A8C8010EFB", "role": "t05-release-lifecycle-adapter-implementation"},
+    {"path": "tools/lib/mir4/NormalizedCompiler.ps1", "sha256": "7FFA4099EACFC35B783C7988AD00E1B23847553CDA762871555516860F252B31", "role": "strict-mode-safe-preview-provider-construction"},
+    {"path": "tools/lib/mir4/SupportAssessment.ps1", "sha256": "3FCC097AAA4E9A289D7D4152B3AAB77D85C809557B1E31CD4A4AC30A9B7DBE25", "role": "strict-mode-safe-preview-support-projection"},
+    {"path": "tools/lib/mir4/SafetyKernel.ps1", "sha256": "7BE3946360329E67CC6F3DD28A2EA0909ADAE9DBE384EFB794BCEA862CCD71B4", "role": "strict-mode-safe-optional-hazard-evaluation"},
+    {"path": "tools/lib/mir4/PlatformPreview.ps1", "sha256": "FB28F3BE521847EEAB09FCF7C6863AA1AD7AA28F0E5AF9A9052F16D44539ED8C", "role": "deterministic-four-asset-preview-builder"},
+    {"path": "spec/schemas/mir4-release-source-freeze-result-v1.schema.json", "sha256": "76EF3328215C39194FACBE70709DDEE686F8F192E757A71A3A47550007071C7B", "role": "source-freeze-result-contract"},
+    {"path": "spec/schemas/mir4-release-target-build-result-v1.schema.json", "sha256": "01D74E6801123F5D671CE695BE4AD254DEE7D734C591E7B0021788D0A1269DCD", "role": "target-build-result-contract"},
+    {"path": "spec/schemas/mir4-release-target-qualification-result-v1.schema.json", "sha256": "05C43718285583B01390D3FC97584A26FD85F8B4029CBDB4A6FC3D136EA72862", "role": "target-qualification-result-contract"},
+    {"path": "spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json", "sha256": "B02592E5E5F7C72E7FA76EB941DD8CAE625247D251E45F6E90F9E655FFFFFB9D", "role": "qualification-worker-receipt-contract"},
+    {"path": "spec/schemas/mir4-release-preview-assets-result-v1.schema.json", "sha256": "2F9CB77A6A0C593A30C7DAC73089B374164C245EA735777BCC8329A89AFA3D86", "role": "preview-assets-result-contract"},
+    {"path": "spec/schemas/mir4-release-independent-verification-result-v1.schema.json", "sha256": "B5F31555B170E057E016748BB00F13BCE5109C6F9B70E0D462477BF70C6C3A66", "role": "independent-verification-result-contract"},
+    {"path": "spec/schemas/mir4-independent-verification-receipt-v1.schema.json", "sha256": "B2B51E593889A6680A0D2E31F6FA7CE5BA85D68553E757BE018565A866575E3A", "role": "independent-verification-receipt-contract"},
+    {"path": "spec/schemas/mir4-release-seal-result-v1.schema.json", "sha256": "4044ED7F834586BAAE78B982F50AF83FE783DD22202BBCC1C2E9DC04F1494AF3", "role": "release-seal-result-contract"},
+    {"path": "spec/schemas/mir4-release-promotion-result-v1.schema.json", "sha256": "88FF87405F83146E95B2B8D122DC89DCFC1243A31FD1A998A9EA83DBF507DF5B", "role": "promotion-result-contract"},
+    {"path": "spec/schemas/mir4-release-target-publication-result-v1.schema.json", "sha256": "BEAAA434D97C0BCBEEB41A0A34772D311D6BE76A32276B3992C8CE6BD82EB5CA", "role": "target-publication-result-contract"},
+    {"path": "spec/schemas/mir4-release-public-readback-result-v1.schema.json", "sha256": "2645EA37B36F7A8CF8E9D7045C49175CBF93729B04D3BA6BA2CC3B6B95A067F5", "role": "public-readback-result-contract"},
+    {"path": "spec/schemas/mir4-release-restore-drill-result-v1.schema.json", "sha256": "23FE1E759EA0E8657961A1D9E10861A71A7C289FDDA6B7997D194604A2E98D53", "role": "restore-drill-result-contract"}
+  ],
+  "player_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C",
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "T05-ADAPTERS-IMPLEMENTED-DRY-RUN-PASSED-RELEASE-BLOCKED"
+}

@@ -27,9 +27,9 @@ if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) {
   throw "Test-Json is required for fail-closed MIR 4 local-playtest tests."
 }
 
-$authorityRelative = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json'
+$authorityRelative = '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json'
 $authorityPath = Join-Path $RepoRoot $authorityRelative
-$authoritySchema = Join-Path $RepoRoot 'spec/schemas/mir4-private-lane-authorization-v2.schema.json'
+$authoritySchema = Join-Path $RepoRoot 'spec/schemas/mir4-private-lane-authorization-v3.schema.json'
 $manifestSchema = Join-Path $RepoRoot 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json'
 $text = Get-Content -Raw -LiteralPath $authorityPath
 $authority = $text | ConvertFrom-Json -Depth 100 -DateKind String
@@ -80,10 +80,44 @@ foreach ($target in @($authority.authorized_targets)) {
   Assert-True ([string]$importRows[0].distribution.archive_sha256 -ceq [string]$target.predecessor_archive_sha256 -and
     [string]$rootRows[0].predecessor_release -ceq [string]$target.predecessor_release) "Current terminal import or bootstrap root drifted: $($target.target_key)"
 }
-Assert-True ([string]$authority.authorized_targets[0].predecessor_release -ceq '2.5.10') 'The f200 private lane did not advance to the immutable 2.5.10 predecessor.'
+Assert-True ([string]$authority.authorized_targets[0].predecessor_release -ceq '2.5.11') 'The f200 private lane did not advance to the immutable 2.5.11 predecessor.'
+
+$assuranceReleasePath = Join-Path $RepoRoot 'tools/lib/assurance/Release.ps1'
+$assuranceRelease = Get-Content -Raw -LiteralPath $assuranceReleasePath
+Assert-True ($assuranceRelease -match [regex]::Escape('MIR4-Private-Lane-AuthorizationV3.json') -and
+  $assuranceRelease -match [regex]::Escape('MIR4PrivateLaneAuthorizationV3') -and
+  $assuranceRelease -notmatch [regex]::Escape('MIR4-Private-Lane-AuthorizationV2.json') -and
+  $assuranceRelease -notmatch '\$authority\.kind\s+-ne\s+"MIR4PrivateLaneAuthorizationV2"') 'Assurance planning did not advance to the current V3 private-lane authority.'
+
+$releaseTargetedGatePath = Join-Path $RepoRoot 'scripts/Invoke-MIRReleaseTargetedGate.ps1'
+$releaseTargetedGate = Get-Content -Raw -LiteralPath $releaseTargetedGatePath
+foreach ($required in @(
+  'Assert-MIRReleaseGateCrossTargetCandidate',
+  'MIR4PrivateLaneAuthorizationV3',
+  'Test-MIR4BootstrapRecordHash',
+  'CandidateSourceCommit',
+  'manifest.local_distribution.archive_sha256',
+  'row.engine_sha256',
+  'candidateInfo.factorio_version',
+  'release_authority = $false'
+)) {
+  Assert-True $releaseTargetedGate.Contains($required) "Cross-target release-gate validation is missing: $required"
+}
+Assert-True ($releaseTargetedGate -notmatch [regex]::Escape("Switch to the matching source branch before running this release gate.")) 'The legacy root-info-only target guard still blocks exact MIR 4 private-lane candidates.'
+
+$testCatalog = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+$ecosystemRows = @($testCatalog.tests | Where-Object { [string]$_.id -ceq 'runtime.ecosystem' })
+Assert-True ($ecosystemRows.Count -eq 1) 'Runtime ecosystem assurance is not uniquely declared.'
+foreach ($requiredInput in @(
+  'scripts/Invoke-MIRReleaseTargetedGate.ps1',
+  'tools/lib/mir4/BootstrapMaterialization.ps1',
+  '.mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json'
+)) {
+  Assert-True ($requiredInput -cin @($ecosystemRows[0].inputs)) "Runtime ecosystem fingerprint omits cross-target authority input: $requiredInput"
+}
 
 $packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $RepoRoot)
-foreach ($relative in @($authorityRelative, 'spec/schemas/mir4-private-lane-authorization-v2.schema.json', 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json')) {
+foreach ($relative in @($authorityRelative, 'spec/schemas/mir4-private-lane-authorization-v3.schema.json', 'spec/schemas/mir4-local-playtest-candidate-manifest.schema.json')) {
   Assert-True ($relative -cnotin $packageFiles) "Package-excluded local-playtest path became package-visible: $relative"
 }
 Assert-True (Test-Path -LiteralPath $manifestSchema -PathType Leaf) 'Local-playtest candidate manifest schema is absent.'

@@ -8,6 +8,14 @@ owner: mir-maintainers
 last_reviewed: 2026-08-10
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - release-assurance-contract
+  - package-qualification-source-authority
+  - runtime-performance-release-gate
+  - protected-release-capsule-transfer
+  - current-verification-profile-release-binding
+  - prequalification-approved-delta-pending-binding
+  - required-external-input-planning
 ---
 
 # Release Assurance And Candidate Sealing
@@ -82,6 +90,8 @@ Factorio layers are:
 ## Evidence Ledger
 
 Evidence lives at `build/results/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs. Worker-supplied pointers are never aggregate authority: the importer selects the immutable capsule from the current plan-bound receipt, validates its complete object closure, and derives the destination pointer. A missing, stale, or invalid supplied pointer is recorded but cannot replace or invalidate an otherwise complete immutable contribution.
+
+Worker receipt V3 distinguishes evidence produced by the current worker from exact trusted evidence adopted from the persistent ledger. The receipt producer and capsule producer are validated independently against the same trust context, the declared disposition must match their actual identities, and the capsule remains bound to the planned fingerprint and complete immutable object closure. This permits rapid cross-run reuse without allowing a worker to relabel stale, changed, or untrusted evidence as its own.
 
 A schema-4 capsule binds the test ID, target, definition hash, full effective-input map, exact Factorio installation and resolved mod closure when applicable, trust-class-validated producer identity, exit code, structured `mir-test-result-v1`, assertion outcomes, artifact hashes, stdout and stderr hashes, timestamps, duration, and result digest. `passed.json` is only an atomic pointer to an immutable attempt capsule. Corrupt pointers are quarantined. A changed definition, verifier, policy, binary, mod archive, candidate, or other effective input creates a different fingerprint instead of rewriting history.
 

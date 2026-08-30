@@ -8,6 +8,11 @@ owner: mir-maintainers
 last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-control-plane-v5
+  - control-plane-release-state-machine
+  - control-plane-package-freeze
+  - control-plane-performance-materialization
 ---
 
 # MIR Control Plane v5

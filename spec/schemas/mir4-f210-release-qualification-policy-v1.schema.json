@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-f210-release-qualification-policy-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "target", "factorio_line", "support_floor", "pre_freeze", "freeze", "post_stable", "historical_evidence", "boundaries", "status", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4F210ReleaseQualificationPolicyV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "target": {"const": "F210"},
+    "factorio_line": {"const": "2.1"},
+    "support_floor": {"const": "2.1.8"},
+    "pre_freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["phase", "selection", "steam", "execution_binding", "drift"],
+      "properties": {
+        "phase": {"const": "experimental"},
+        "selection": {"const": "highest-official-experimental-installed-on-single-authorized-steam-path-at-execution-time"},
+        "steam": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["app_id", "branch", "app_manifest", "factorio_binary"],
+          "properties": {
+            "app_id": {"const": "427520"},
+            "branch": {"const": "experimental"},
+            "app_manifest": {"type": "string", "minLength": 1},
+            "factorio_binary": {"type": "string", "minLength": 1}
+          }
+        },
+        "execution_binding": {"const": "exact-version-build-file-version-binary-sha256-steam-build-id-and-manifest-sha256"},
+        "drift": {"const": "invalidate-prior-execution-and-rerun-affected-build-and-qualification"}
+      }
+    },
+    "freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger", "lock", "drift"],
+      "properties": {
+        "trigger": {"const": "explicit-T19-source-freeze-authorization"},
+        "lock": {"const": "exact-selected-version-build-file-version-binary-sha256-steam-build-id-manifest-sha256-and-official-data-identities"},
+        "drift": {"const": "candidate-invalid-rebuild-and-full-f210-requalification-required"}
+      }
+    },
+    "post_stable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["activation", "minimum_lane", "latest_lane", "candidate_lock"],
+      "properties": {
+        "activation": {"const": "official-2.1-stable-availability-plus-append-only-transition-authority"},
+        "minimum_lane": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "channel"],
+          "properties": {"id": {"const": "stable-minimum"}, "version": {"const": "2.1.8"}, "channel": {"const": "stable"}}
+        },
+        "latest_lane": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "selection", "channel"],
+          "properties": {"id": {"const": "stable-latest"}, "selection": {"const": "latest-official-stable-2.1.x"}, "channel": {"const": "stable"}}
+        },
+        "candidate_lock": {"const": "each-lane-exact-version-build-binary-and-official-data-identities"}
+      }
+    },
+    "historical_evidence": {"type": "array", "minItems": 3, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compatibility_floor_changed", "prototype_mutation_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_authorized", "publication_authorized"],
+      "properties": {
+        "compatibility_floor_changed": {"const": false},
+        "prototype_mutation_authorized": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocation_authorized": {"const": false},
+        "signing_authorized": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    },
+    "status": {"const": "active-pre-freeze-experimental-selection-policy-production-release-unauthorized"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

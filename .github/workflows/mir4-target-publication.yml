@@ -1,0 +1,52 @@
+name: MIR4 Target Publication
+on:
+  workflow_dispatch:
+    inputs:
+      source_release_record: {description: Governed public source record name, required: true, type: string}
+      candidate_id: {description: Governed candidate ID, required: true, type: string}
+      source_commit: {description: Exact source commit, required: true, type: string}
+      source_tree: {description: Exact source tree, required: true, type: string}
+      target_distribution_record_set: {description: Governed target record set name, required: true, type: string}
+      release_plan_digest: {description: Governed release plan SHA-256, required: true, type: string}
+      proof_root: {description: Governed proof root, required: true, type: string}
+      seal_root: {description: Governed seal root, required: true, type: string}
+permissions: {contents: read}
+jobs:
+  confined-publisher:
+    runs-on: [self-hosted, Windows, mir4-publisher]
+    environment: mir4-production-publication
+    env:
+      MIR4_CANDIDATE_ID: ${{ inputs.candidate_id }}
+      MIR4_PROOF_ROOT: ${{ inputs.proof_root }}
+      MIR4_RELEASE_PLAN_DIGEST: ${{ inputs.release_plan_digest }}
+      MIR4_SEAL_ROOT: ${{ inputs.seal_root }}
+      MIR4_SOURCE_COMMIT: ${{ inputs.source_commit }}
+      MIR4_SOURCE_RELEASE_RECORD: ${{ inputs.source_release_record }}
+      MIR4_SOURCE_TREE: ${{ inputs.source_tree }}
+      MIR4_TARGET_RECORD_SET: ${{ inputs.target_distribution_record_set }}
+    steps:
+      - name: Publish only pre-sealed bytes from the confined publisher
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:MIR_PUBLISHER_HOME)) { throw '[mir4-publisher-root-absent]' }
+          $root=(Resolve-Path -LiteralPath $env:MIR_PUBLISHER_HOME).Path
+          foreach($forbidden in @('source','repository','.git','compiler','package-builder')){if(Test-Path -LiteralPath (Join-Path $root $forbidden)){throw "[mir4-publisher-forbidden-capability] $forbidden"}}
+          $gate=Join-Path $root 'seal-verifier/Test-MIR4PublicationAdmission.ps1'
+          $client=Join-Path $root 'publication-clients/Invoke-MIR4TargetPublication.ps1'
+          if(-not(Test-Path -LiteralPath $gate -PathType Leaf)){throw '[mir4-publisher-admission-gate-absent]'}
+          if(-not(Test-Path -LiteralPath $client -PathType Leaf)){throw '[mir4-publisher-client-absent]'}
+          $p=@{SourceReleaseRecord=$env:MIR4_SOURCE_RELEASE_RECORD;CandidateId=$env:MIR4_CANDIDATE_ID;SourceCommit=$env:MIR4_SOURCE_COMMIT;SourceTree=$env:MIR4_SOURCE_TREE;TargetDistributionRecordSet=$env:MIR4_TARGET_RECORD_SET;ReleasePlanDigest=$env:MIR4_RELEASE_PLAN_DIGEST;ProofRoot=$env:MIR4_PROOF_ROOT;SealRoot=$env:MIR4_SEAL_ROOT}
+          $admission=& $gate @p
+          if($admission-is[string]){$admission=$admission|ConvertFrom-Json -Depth 30}
+          if($null-eq$admission-or-not[bool]$admission.publication_authorized-or
+             [string]$admission.source_release_record -cne $env:MIR4_SOURCE_RELEASE_RECORD -or
+             [string]$admission.candidate_id -cne $env:MIR4_CANDIDATE_ID -or
+             [string]$admission.source_commit -cne $env:MIR4_SOURCE_COMMIT -or
+             [string]$admission.source_tree -cne $env:MIR4_SOURCE_TREE -or
+             [string]$admission.target_distribution_record_set -cne $env:MIR4_TARGET_RECORD_SET -or
+             [string]$admission.release_plan_digest -cne $env:MIR4_RELEASE_PLAN_DIGEST -or
+             [string]$admission.proof_root -cne $env:MIR4_PROOF_ROOT -or
+             [string]$admission.seal_root -cne $env:MIR4_SEAL_ROOT){
+             throw '[mir4-publisher-admission-denied]'
+           }
+          & $client @p

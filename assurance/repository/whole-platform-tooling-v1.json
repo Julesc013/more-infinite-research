@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "MIR4WholePlatformMigrationProofPolicyV1",
+  "migration_id": "MIR4-WHOLE-PLATFORM-TOOLING-V1",
+  "test_id": "static.mir4-whole-platform-migration-v1",
+  "required_checks": [
+    "predecessor-byte-immutability",
+    "predecessor-schema-and-digest",
+    "predecessor-writer-disabled",
+    "authority-schema",
+    "proof-policy-schema",
+    "verification-plan-no-unknown-paths",
+    "successor-receipt-schema-and-fixed-point",
+    "single-writer",
+    "shared-append-only-migration-engine",
+    "compatibility-forwarders",
+    "whole-platform-function-parity",
+    "declared-consumers-use-final-path",
+    "canonical-test-cutover",
+    "package-source-non-interference",
+    "rollback-present",
+    "sunset-deferred",
+    "append-only-authority-chain",
+    "release-firewall"
+  ],
+  "evidence_entrypoint": "tests/platform/Test-MIR4WholePlatformMigration.ps1",
+  "functional_evidence_entrypoint": "tests/platform/Test-MIR4WholePlatform.ps1",
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "unknown_policy": "fail",
+  "independent_human_acceptance_required": false,
+  "release_transition_authority": false
+}

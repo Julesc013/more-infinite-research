@@ -4,7 +4,7 @@
   "title": "MIR 4 bootstrap local candidate manifest with capsule reconstruction closure",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "canonicalization", "lane", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "correction_authority", "source_capsule", "source_capsule_record_sha256", "capsule_closure", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
+  "required": ["schema", "kind", "status", "canonicalization", "lane", "target_key", "factorio_line", "distribution_version", "admission", "public_output_authorized", "source_capsule", "source_capsule_record_sha256", "capsule_closure", "identity_roots", "reconstructions", "equivalence", "local_distribution", "qualification", "record_sha256"],
   "properties": {
     "schema": { "const": 1 },
     "kind": { "const": "MIR4BootstrapLocalCandidateManifestV1" },
@@ -60,7 +60,7 @@
       ],
       "items": false
     },
-    "equivalence": { "$ref": "#/$defs/equivalence" },
+    "equivalence": { "oneOf": [{ "$ref": "#/$defs/baselineEquivalence" }, { "$ref": "#/$defs/correctedEquivalence" }] },
     "local_distribution": { "$ref": "#/$defs/artifact" },
     "qualification": {
       "type": "object",
@@ -76,6 +76,9 @@
     },
     "record_sha256": { "$ref": "#/$defs/sha256" }
   },
+  "allOf": [
+    { "if": { "required": ["correction_authority"] }, "then": { "properties": { "equivalence": { "$ref": "#/$defs/correctedEquivalence" } } }, "else": { "properties": { "equivalence": { "$ref": "#/$defs/baselineEquivalence" } } } }
+  ],
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
     "path": { "type": "string", "pattern": "^(?:capsules|candidates|distributions|receipts)/(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[A-Za-z0-9._/-]+$" },
@@ -143,7 +146,23 @@
         "entry_count": { "type": "integer", "minimum": 1 }
       }
     },
-    "equivalence": {
+    "baselineEquivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["equivalent", "policy", "allowed_differences", "added", "removed", "changed", "metadata_equivalent", "candidate", "predecessor"],
+      "properties": {
+        "equivalent": { "const": true },
+        "policy": { "const": "MIR4BootstrapPackageEquivalenceV1" },
+        "allowed_differences": { "const": ["generated-package-root", "info.json#/version"] },
+        "added": { "const": [] },
+        "removed": { "const": [] },
+        "changed": { "const": ["info.json"] },
+        "metadata_equivalent": { "const": true },
+        "candidate": { "$ref": "#/$defs/identity" },
+        "predecessor": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "correctedEquivalence": {
       "type": "object",
       "additionalProperties": false,
       "required": ["equivalent", "policy", "correction_kind", "correction_record_sha256", "finding", "added", "removed", "changed", "metadata_equivalent", "exact_correction_delta", "candidate", "predecessor"],

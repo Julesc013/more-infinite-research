@@ -235,6 +235,7 @@ function Test-MIRRuntimePerformanceEvidence {
   } elseif ($artifactVolumePolicy -eq "omitted-by-capability") {
     if ([int]$evidence.artifact_volume.telemetry_schema -ne 0 -or
         [string]$evidence.artifact_volume.aggregation -ne "omitted-by-capability" -or
+        [string]$evidence.artifact_volume.omission_reason -ne [string]$campaign.artifact_volume_omission_reason -or
         $volumeMeasurements.Count -ne 0) {
       throw "Runtime performance evidence does not honor the governed omitted-by-capability artifact-volume policy."
     }
@@ -245,6 +246,19 @@ function Test-MIRRuntimePerformanceEvidence {
   $budgetPath = Join-Path $RepoRoot ".mir\performance-budgets.json"
   $budgetManifest = Get-Content -Raw -LiteralPath $budgetPath | ConvertFrom-Json
   if ([int]$budgetManifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
+  $lanePlan = Resolve-MIRPerformanceLanePlan -Campaign $campaign -BudgetManifest $budgetManifest
+  $expectedOmissionRows = @(
+    $lanePlan.omitted_lanes | ForEach-Object { "$($_.id)`t$($_.reason)" }
+  )
+  $evidenceOmissionRows = @(
+    $evidence.omitted_lanes |
+      Where-Object { $null -ne $_ } |
+      Sort-Object id |
+      ForEach-Object { "$($_.id)`t$($_.reason)" }
+  )
+  if (($expectedOmissionRows -join "`n") -ne ($evidenceOmissionRows -join "`n")) {
+    throw "Runtime performance evidence does not bind the exact target-lane omissions."
+  }
   if ($artifactVolumePolicy -eq "required") {
     foreach ($measurement in $volumeMeasurements) {
       foreach ($bound in @($budgetManifest.compiler_counter_bounds)) {
@@ -256,7 +270,10 @@ function Test-MIRRuntimePerformanceEvidence {
       }
     }
   }
-  $expectedLanes = @($budgetManifest.regression_lanes)
+  $expectedLanes = @(
+    $budgetManifest.regression_lanes |
+      Where-Object { [string]$_.id -in @($lanePlan.active_ids) }
+  )
   $actualLanes = @($evidence.lanes)
   $actualIds = @($actualLanes | ForEach-Object { [string]$_.id })
   if (@($actualIds | Group-Object | Where-Object Count -gt 1).Count -gt 0) { throw "Runtime performance evidence has duplicate lane IDs." }

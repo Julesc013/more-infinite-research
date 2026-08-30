@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-target-qualification-worker-receipt-v1.schema.json",
+  "title": "MIR 4 exact target qualification worker receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "producer_id", "source_commit", "source_tree", "release_plan_digest", "target", "distribution_version", "package", "engine", "evidence_sha256", "status", "release_identity", "publication_authorized", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4TargetQualificationWorkerReceiptV1"},
+    "producer_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "release_plan_digest": {"$ref": "#/$defs/sha256"},
+    "target": {"enum": ["F210", "F200"]},
+    "distribution_version": {"enum": ["4.0.21000", "4.0.20000"]},
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sha256", "content_sha256", "bytes", "entry_count"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/sha256"}, "content_sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1}, "entry_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "engine": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "path", "sha256"],
+      "properties": {"version": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "evidence_sha256": {"$ref": "#/$defs/sha256"},
+    "status": {"const": "passed"},
+    "release_identity": {"const": false},
+    "publication_authorized": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

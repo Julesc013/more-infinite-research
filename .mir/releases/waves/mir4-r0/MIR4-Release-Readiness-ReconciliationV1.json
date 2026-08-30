@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseReadinessReconciliationV1",
+  "recorded_at": "2026-08-24T00:00:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "programme_execution_id": "M4C02-09-24H",
+  "source_baseline": {
+    "branch": "dev",
+    "commit": "3a58d3753bedcaf1107b76655117e0ff84dac960",
+    "tree": "32fb7549283388321d4a7f4cde8c0b7835363da1",
+    "integration_pr": 151
+  },
+  "historical_authorities": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/queue.json",
+      "sha256": "4ed18831c5c14cbcff79bbbeac694cb0c9509ff0d9b6548e7e6efa58af36b11b",
+      "disposition": "retained-immutable-superseded-by-this-reconciliation"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json",
+      "sha256": "cd7f8d39515dcf2931619801bab94fee77cb01d873d0c2481d6c5767abbf5c62",
+      "disposition": "retained-immutable-superseded-by-this-reconciliation"
+    }
+  ],
+  "planning_inputs": [
+    {"name": "MIR4_4_0_ULTIMATE_CURRENT_STATE_AND_RELEASE_PLAN_2026-08-24.md", "sha256": "04a907cf06dd84377ddce6ad0a83d50c53c92096b59194f062530d1d744606a3", "authority": "planning-input-user-request-is-execution-authority"},
+    {"name": "MIR4_4_0_FINAL_ACTION_PLAN_2026-08-24.json", "sha256": "090e5133b3d56b558ed71bd9b68bde769262cc0583f98bdafbb95f582970a6d4", "authority": "planning-input-user-request-is-execution-authority"},
+    {"name": "pasted-text.txt", "sha256": "7de38be0a663c8bda93b5f03df37a91a464823fa9f928fea394715e466cf8a1b", "authority": "planning-input-user-request-is-execution-authority"}
+  ],
+  "queue_reconciliation": [
+    {"task": "M4-000", "historical_state": "closed", "current_state": "retained-complete"},
+    {"task": "M4-001", "historical_state": "closed", "current_state": "retained-complete"},
+    {"task": "M4-002", "historical_state": "closed", "current_state": "retained-complete"},
+    {"task": "M4-003", "historical_state": "ready-reproof-pending", "current_state": "superseded-by-current-readiness-and-fresh-qualification-plan"},
+    {"task": "M4-004A", "historical_state": "open-external-custody", "current_state": "predecessor-bytes-present-current-candidate-binding-still-required"},
+    {"task": "M4-004B", "historical_state": "blocked", "current_state": "scope-split-into-target-and-component-blockers"},
+    {"task": "M4-005", "historical_state": "blocked", "current_state": "dev-integrated-by-pr151-release-transitions-remain-blocked"}
+  ],
+  "blockers": [
+    {"id": "protected-signing-secret", "state": "OPEN", "scope": "stable-player-release", "blocks": ["source-freeze", "candidate-allocation", "signing", "sealing", "promotion", "tagging", "publication"]},
+    {"id": "maintainer-manual-playtest", "state": "OPEN", "scope": "stable-player-release", "blocks": ["production-go-no-go"]},
+    {"id": "current-candidate-predecessor-binding", "state": "OPEN", "scope": "stable-player-release", "blocks": ["mandatory-target-qualification"]},
+    {"id": "independent-mep-production-consumer", "state": "OPEN", "scope": "component-graduation", "blocks": ["mep-api-sdk-stability-graduation"]},
+    {"id": "exact-target-processir-snapshot", "state": "OPEN", "scope": "component-graduation", "blocks": ["processir-and-synthesis-graduation"]},
+    {"id": "trusted-timing-capacity-evidence", "state": "OPEN", "scope": "slo-claim", "blocks": ["performance-slo-public-claim"]},
+    {"id": "f018-exact-engine", "state": "OPEN", "scope": "target-publication", "blocks": ["f018-publication"]},
+    {"id": "museum-custody", "state": "OPEN", "scope": "target-publication", "blocks": ["f012-through-f006-publication"]},
+    {"id": "historical-successor-host", "state": "OPEN", "scope": "component-graduation", "blocks": ["historical-host-graduation"]},
+    {"id": "technology-and-compatibility-acceptance", "state": "OPEN", "scope": "technology-or-compatibility-claim", "blocks": ["unaccepted-technology-or-public-compatibility-claim"]}
+  ],
+  "branch_readiness": {
+    "dev": "authorized-for-reviewed-release-readiness-integration",
+    "release_branch": "planned-not-created-until-source-freeze-authorization",
+    "main": "prepared-by-policy-only-remains-at-3.2.11-until-exact-qualified-tree-promotion"
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "DEV-READINESS-AUTHORIZED-RELEASE-BLOCKED"
+}

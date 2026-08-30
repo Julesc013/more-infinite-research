@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-06
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - local-artifact-retention
 ---
 
 # Local Artifact Retention And Storage

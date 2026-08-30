@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json",
+  "title": "MIR 4 protected signing ceremony receipt V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "canonicalization", "programme_id", "turn", "status", "authorization", "custody_validation", "public_signer", "recovery", "allowed_signers", "human_acceptance", "production_transition_authority", "secret_values_present", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ProtectedSigningCeremonyReceiptV1"},
+    "canonicalization": {"const": "MIR4BootstrapCanonicalJsonV1"},
+    "programme_id": {"const": "M4C02-09-24H"},
+    "turn": {"const": "T16"},
+    "status": {"const": "accepted-protected-signing-authority"},
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_path", "record_sha256", "decision"],
+      "properties": {
+        "record_path": {"type": "string", "minLength": 1},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "decision": {"const": "AUTHORIZED"}
+      }
+    },
+    "custody_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["logical_roots", "absolute_external_roots_verified", "pairwise_disjoint_roots_verified", "publisher_and_builder_separation_verified", "protected_acls_verified", "approved_owner_sids_verified", "approved_custodian_sid_set_sha256", "configured_path_values_recorded"],
+      "properties": {
+        "logical_roots": {"const": ["MIR_SIGNING_HOME", "MIR_RECOVERY_COPY_A_HOME", "MIR_RECOVERY_COPY_B_HOME"]},
+        "absolute_external_roots_verified": {"const": true},
+        "pairwise_disjoint_roots_verified": {"const": true},
+        "publisher_and_builder_separation_verified": {"const": true},
+        "protected_acls_verified": {"const": true},
+        "approved_owner_sids_verified": {"const": true},
+        "approved_custodian_sid_set_sha256": {"$ref": "#/$defs/sha256"},
+        "configured_path_values_recorded": {"const": false}
+      }
+    },
+    "public_signer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal", "algorithm", "public_key", "fingerprint", "namespaces"],
+      "properties": {
+        "principal": {"const": "mir4-release-signing"},
+        "algorithm": {"const": "ssh-ed25519"},
+        "public_key": {"type": "string", "pattern": "^ssh-ed25519 [A-Za-z0-9+/]+={0,3}(?: [^\\r\\n]+)?$"},
+        "fingerprint": {"type": "string", "pattern": "^SHA256:[A-Za-z0-9+/]+$"},
+        "namespaces": {"type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["mir4-source", "mir4-target", "mir4-ledger"]}}
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["copies", "ciphertexts_distinct", "separate_locations_verified", "separate_custodians_verified", "clean_restore"],
+      "properties": {
+        "copies": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["copy_id", "encryption_method", "ciphertext_sha256", "location_class", "custodian_class", "created_at", "restore_procedure"],
+            "properties": {
+              "copy_id": {"type": "string", "minLength": 1},
+              "encryption_method": {"type": "string", "minLength": 1},
+              "ciphertext_sha256": {"$ref": "#/$defs/sha256"},
+              "location_class": {"type": "string", "minLength": 1},
+              "custodian_class": {"type": "string", "minLength": 1},
+              "created_at": {"type": "string", "format": "date-time"},
+              "restore_procedure": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "ciphertexts_distinct": {"const": true},
+        "separate_locations_verified": {"const": true},
+        "separate_custodians_verified": {"const": true},
+        "clean_restore": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["copy_id", "restored_at", "fingerprint_matched", "challenge_namespace", "challenge_signature_verified", "ephemeral_plaintext_destroyed"],
+          "properties": {
+            "copy_id": {"type": "string", "minLength": 1},
+            "restored_at": {"type": "string", "format": "date-time"},
+            "fingerprint_matched": {"const": true},
+            "challenge_namespace": {"const": "mir4-ledger"},
+            "challenge_signature_verified": {"const": true},
+            "ephemeral_plaintext_destroyed": {"const": true}
+          }
+        }
+      }
+    },
+    "allowed_signers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "record_sha256"],
+      "properties": {
+        "path": {"const": ".mir/releases/governance/mir4/allowed-signers.json"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "human_acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maintainer", "decided_at", "decision"],
+      "properties": {
+        "maintainer": {"type": "string", "minLength": 1},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "decision": {"const": "ACCEPTED"}
+      }
+    },
+    "production_transition_authority": {"$ref": "#/$defs/falseTransitions"},
+    "secret_values_present": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signature", "seal", "promotion", "tag", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signature": {"const": false},
+        "seal": {"const": false},
+        "promotion": {"const": false},
+        "tag": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

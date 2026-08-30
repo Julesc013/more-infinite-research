@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "kind": "MIR4SupplyChainPreservationT15V1",
+  "recorded_at": "2026-08-27T05:05:00+10:00",
+  "programme_id": "M4C02-09-24H",
+  "execution_programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "turn": "T15",
+  "source": {
+    "repository": "Julesc013/more-infinite-research",
+    "branch": "codex/mir4-t15-supply-chain-preservation",
+    "commit": "c4a68809a54a81ae0a1959d257c2e4a97ef0e490",
+    "tree": "c76a5fb46bc950264652b7033c6ce72b7f9b1991",
+    "working_tree_clean": true,
+    "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"
+  },
+  "evidence_class": "public-safe-non-production",
+  "verification_plan": {
+    "plan_material_sha256": "827BC56F9C6B0DC5F68E48432242037EDF165D8167E1B908385D8A29D74F2613",
+    "total": 48,
+    "run": 46,
+    "invalid": 2,
+    "unknown_paths": 0,
+    "invalid_tests": [
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ],
+    "invalid_scope": "historical-planning-candidate-dependent-not-t15-machine-acceptance-input"
+  },
+  "supply_chain": {
+    "component_inventory_record_sha256": "4772F9601086C23DECA0EE94FE8496B281C74E284184073285297966F9E26ED2",
+    "component_inventory_file_sha256": "2AA27B13EC4B9BA26220F5C53EB93199BB75457F9CE872AB9671BBF3F7C12225",
+    "spdx_3_0_1_file_sha256": "B2A25B1DFD2D0D18666CEC1D836A3842BE1C3FD25F697A2A968D12CDE247BF13",
+    "spdx_2_3_file_sha256": "02CD5CF2F9706A5104C526DCD79646043FEF8CF21CB0D5BD4A4035162F56A1EC",
+    "provenance_file_sha256": "C043DA87D6195E8D22F5CD8449D3B509B2F5B6E0E63551BB015953102642D088",
+    "attestation_file_sha256": "D15C64DFD675AF8ECC716DE9EEC84C8A9AF6EA1EF6FEA56C9407D5A3ACCD9454",
+    "projection_record_sha256": "3D91C7EE6EBC34095D0723549250663F028BFEAB7F9E32D5176CA6629D84A898",
+    "attestation_identity": "mir4-t15-non-production-capsule-c4a68809",
+    "attestation_verified": true
+  },
+  "release_capsule": {
+    "archive_sha256": "E63F93915430F44C9DDAD780E4EE81E85ACA6EC948367C36AC24A1426D017E22",
+    "content_root_sha256": "198FD4F921409F63326684ED1675BF66028CC8E569D5C74E508F22A88617C8AC",
+    "bytes": 47407823,
+    "manifest_record_sha256": "31A18AF6EF071A91896B15547558A8035CAED50520974FCC10C2F945190B4F42",
+    "construction_record_sha256": "F367F0D69955DFA65715B9616148FC9D00FABE2277F1D356729088C03393BAFC",
+    "descriptor_count": 17,
+    "unique_public_object_count": 17,
+    "direct_verification": "passed",
+    "candidate_state": "pre-freeze-unallocated"
+  },
+  "offline_restoration": {
+    "independent_restore_count": 2,
+    "record_sha256": "C3ABE88A7FFC36586214829CEB64DCF56FFBC9140488118B19AB1A54AF08E810",
+    "receipt_file_sha256": "BA54B7D533ADFD4B0833D364B0E36694771050EA7BE587EFFE3F374F400F7E59",
+    "receipts_byte_identical": true,
+    "network_calls": 0,
+    "all_checks_passed": true
+  },
+  "runner_publisher_confinement": {
+    "workflow_count": 21,
+    "workflow_root_sha256": "3A4B3CCC6AEA0C7D0DE1A5699FA3FF77D3C11C9F26C5A88C88A9C68CB972D022",
+    "record_sha256": "7FA39C9C25195E5F4BC43DC2D5E3B48EC652484F5926DBBF0531C8ED815F6EF7",
+    "cross_worktree_bytes_identical": true,
+    "publisher_confined": true
+  },
+  "signing_preparation": {
+    "status": "machine-preparation-passed-human-ceremony-required",
+    "record_sha256": "8574DFBF21C886A42D482A1D0BFC113F39084930514F76B29A6179EBCCAAEBBD",
+    "human_blocker_count": 4,
+    "proof_private_key_retained": false,
+    "production_authority": false
+  },
+  "preview_assets": [
+    {"id": "mir4-api-sdk-v1-preview", "bytes": 69771, "sha256": "1B1E14920820348645EF895CFD516D5430C08BE23CA92E0140BA000B7016BB9C"},
+    {"id": "mir4-inspector-v1-preview", "bytes": 50724, "sha256": "D4C27B10EF0E61C2DB0565876F7F21B70BD833FB52CDDECDECF2060E811DDE47"},
+    {"id": "mir4-mep-v1-preview", "bytes": 87582, "sha256": "8FAAE0388E8391C0A87EBAF34D2604F7C98D65CB62952655E9F74A85598406C2"},
+    {"id": "mir4-reference-extension-v1-preview", "bytes": 20551, "sha256": "ED70D5139491229C9554ECEED40786E5B734C97AB42DBE3ABF432C458252A802"}
+  ],
+  "workers": [
+    {"test_id": "static.mir4-supply-chain-foundation", "fingerprint": "54EE7169614A2A5DD52E728557BC6544395C393BADF73961217DC4EB70D27306", "file_sha256": "4B71944F23213D6C13848FB0B35229C75F7ABFE63F739F47240E243BD681484F"},
+    {"test_id": "static.mir4-supply-chain-attestation", "fingerprint": "212605E00D094A3690870AE35CB4DDC73C8D73FE977A8E5F1BD349C0D9F376CC", "file_sha256": "B8EBBA5979C2F46F5A7C83403A9C681F1E97A3C2E2919A7C011DF25C3BFA5DDD"},
+    {"test_id": "static.mir4-release-capsule", "fingerprint": "5F9D7B93A6AC8E1A9A5B47052BC7C6CD3937A5D12D6C933B1610B6098C77B102", "file_sha256": "43C7D3665F77B35CD4A471C827EBBC0E46C73509C7FE49F6BE81777E7B428591"},
+    {"test_id": "static.mir4-runner-publisher-confinement", "fingerprint": "51003A634E9819907E09315F1ABF3BB896889B146A0B989D9A040A6800AFFA93", "file_sha256": "3E8163E10077CAB9B82BAAC6CCBED727AD9BEFF98EDD620CC65CDAD6FD5148CE"},
+    {"test_id": "static.mir4-signing-ceremony-preparation", "fingerprint": "8025729AA38FE26A786D007E0EBF9F1253E1C7969643A19B660E00D706AE9452", "file_sha256": "DFC2521E2865FA72960AD64FDFD79335799ECA05835A18F495CA6C532996CFCB"}
+  ],
+  "external_custody": {
+    "manifest_record_sha256": "C0AA4781AA197F9C3438C135FCB9700B2A5AC8129F090DA0007C08309D867C72",
+    "manifest_file_sha256": "8B4C36506D3A0682994EAAB33E7D4C36B6F7321EA5641FEC055F3EF004D1ACCC",
+    "file_count": 29,
+    "private_proof_key_exported": false,
+    "production_authority": false
+  },
+  "independent_machine_audit": {
+    "reviewer_class": "separate-clean-worktree-machine-audit",
+    "diagnostic_record_sha256": "72FA27A0172448F35D09F2161743DA50C576DB6991A90BB720432C0F5B9DDB6E",
+    "diagnostic_file_sha256": "B1EF351537376E278DC39A6F938ACA8E289B50CFA2DF8D4A34BF35A54A2771DC",
+    "status": "passed-ready-for-typed-acceptance",
+    "human_acceptance_inferred": false
+  },
+  "machine_conclusion": {
+    "t15_prerequisites_satisfied": true,
+    "canonical_inventory_single_writer": true,
+    "attestation_generation_and_verification_passed": true,
+    "network_disabled_reproducible_construction_passed": true,
+    "offline_restoration_passed": true,
+    "runner_isolation_passed": true,
+    "publisher_confinement_passed": true,
+    "t16_machine_preparation_complete": true,
+    "remaining_human_turns": ["T16", "T17"]
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "T15-MACHINE-WORK-COMPLETE-INDEPENDENT-AUDIT-PASSED-HUMAN-GATES-REMAIN"
+}

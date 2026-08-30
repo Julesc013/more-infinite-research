@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-08
 supersedes: [docs/releases/archive/mod-portal-page-old.md]
 superseded_by: []
+source_of_truth_for:
+  - mir-universal-mod-portal-copy
 ---
 
 # More Infinite Research

@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-07
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - MIR4-Offline-Release-Authority
 ---
 # MIR 4 Offline Release Authority
 

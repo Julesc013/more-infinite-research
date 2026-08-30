@@ -11,6 +11,7 @@ $scriptRoot = Join-Path $repo "scripts"
 . (Join-Path $repo "tools\lib\cli\PathResolver.ps1")
 . (Join-Path $repo "tools\lib\cli\LocalModIndex.ps1")
 . (Join-Path $repo "tools\lib\cli\Reports.ps1")
+. (Join-Path $repo "tools\mir\domain\targets\TargetKey.ps1")
 
 function Show-MIRHelp {
   Write-Host @"
@@ -27,12 +28,54 @@ Usage:
   .\tools\mir.ps1 mir4 capture-terminal-baselines [--check] [--build-bundles]
   .\tools\mir.ps1 mir4 import-terminal-baselines [--output <path>] [--check]
   .\tools\mir.ps1 mir4 check [--update] [--build-bundles]
-  .\tools\mir.ps1 mir4 build-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>] [--repetitions <n>]
-  .\tools\mir.ps1 mir4 check-local-beta [--target <all|f210|f200|f110|f100>] [--output <path>]
-  .\tools\mir.ps1 mir4 build-local-playtest [--target <all|f200|f110|f100>] [--repetitions <n>]
-  .\tools\mir.ps1 mir4 check-local-playtest [--target <all|f200|f110|f100>]
+  .\tools\mir.ps1 mir4 build-local-beta [--target <all|F210|F200|F110|F100>] [--output <path>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-beta [--target <all|F210|F200|F110|F100>] [--output <path>]
+  .\tools\mir.ps1 mir4 build-local-playtest [--target <all|F200|F110|F100>] [--repetitions <n>]
+  .\tools\mir.ps1 mir4 check-local-playtest [--target <all|F200|F110|F100>]
+  .\tools\mir.ps1 mir4 build-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
+  .\tools\mir.ps1 mir4 check-historical-private [--target <all|F018|F017|F016|F015|F014|F013>]
+  .\tools\mir.ps1 mir4 build-m4c01-player-set
+  .\tools\mir.ps1 mir4 check-m4c01-player-set
+  .\tools\mir.ps1 mir4 runtime-historical-private --target <F017|F016|F015|F014|F013> [--factorio-bin <path>] [--candidate <path>] [--evidence <path>]
   .\tools\mir.ps1 mir4 api <check|conformance>
   .\tools\mir.ps1 mir4 sdk <generate|check>
+  .\tools\mir.ps1 mir4 platform <generate|check|conformance|package>
+  .\tools\mir.ps1 mir4 platform compile --target <FNNN> --extension <path> --output <path>
+  .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 whole-platform-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 technology-acceptance-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 target-compiler-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 semantic-compiler-policy-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 runtime-continuity-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 module-sdk-mep-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 processir-exact-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 inspector-compatibility-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
+  .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
+  .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
+  .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 module-ecosystem <export|check> [--candidate <path>] [--output <path>]
+  .\tools\mir.ps1 mir4 processir-synthesis <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 exact-processir <export|check> [--capture <id>]... [--repetitions <1-4>] [--output <path>] [--reference <path>] [--publish-reference]
+  .\tools\mir.ps1 mir4 release-canaries <export|check> [--capture-root <path>] [--upgrade-root <path>] [--output <path>] [--reference <path>] [--publish-reference]
+  .\tools\mir.ps1 mir4 inspector-compatibility <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 whole-platform <generate|check|matrix|target-key> [--target <FNNN>]
+  .\tools\mir.ps1 mir4 acceptance queue --catalog <path> --target <FNNN> --ecosystem <id> --output <path>
+  .\tools\mir.ps1 mir4 extension <init|validate|explain|test|package|migrate|doctor|lock|diff|ci-init|discover> [--extension <path>] [--discovery <snapshot.json>] [--output <path>] [--id <reverse.dns.id>] [--template <minimal|all-fragments|unavailable>] [--target <FNNN>] [--base <path>] [--candidate <path>]
+  .\tools\mir.ps1 mir4 handoff-m4c01 [--output <path>]
+  .\tools\mir.ps1 release doctor [--json] [--dry-run] [--explain] [--output <path>]
+  .\tools\mir.ps1 playtest prepare --target <F210|F200> [--candidate <path>] [--predecessor <path>] [--factorio <path>] [--settings <path>] [--save <path>] [--output <path>] [--dry-run] [--json]
+  .\tools\mir.ps1 playtest capture --session <path> [--capture <path>]... [--observations <path>] [--dry-run] [--json]
+  .\tools\mir.ps1 playtest finalize --session <path> --decision <ACCEPTED|CHANGES-REQUESTED|REJECTED> --reviewer <name> [--notes <text>] [--dry-run] [--json]
+  .\tools\mir.ps1 rulesets audit [--json] [--output <path>]
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
@@ -80,6 +123,15 @@ function Get-MIRArgValue {
     if ($Items[$i] -eq $Name -and $i + 1 -lt $Items.Count) { return $Items[$i + 1] }
   }
   return $Default
+}
+
+function Get-MIRArgValues {
+  param([string[]]$Items,[string]$Name)
+  $values = @()
+  for ($i = 0; $i -lt $Items.Count; $i++) {
+    if ($Items[$i] -eq $Name -and $i + 1 -lt $Items.Count) { $values += [string]$Items[$i + 1] }
+  }
+  return @($values)
 }
 
 function Test-MIRArgSwitch {
@@ -484,7 +536,8 @@ switch ($area) {
           -BuildBundles:(Test-MIRArgSwitch -Items $Args -Name "--build-bundles")
       }
       { $_ -in @("build-local-beta", "check-local-beta") } {
-        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "f210"
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "F210"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
         $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/emergency-lane"
         $repetitionsText = Get-MIRArgValue -Items $Args -Name "--repetitions" -Default "3"
         $repetitions = 0
@@ -500,9 +553,10 @@ switch ($area) {
           -Check:($verb -eq "check-local-beta")
       }
       { $_ -in @("build-local-playtest", "check-local-playtest") } {
-        $target = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
         if ($target -notin @('all', 'f200', 'f110', 'f100')) {
-          throw "--target must be one of all, f200, f110, or f100 for the private local-playtest lane."
+          throw "--target must be one of all, F200, F110, or F100 for the private local-playtest lane."
         }
         $explicitOutput = Get-MIRArgValue -Items $Args -Name "--output"
         if (-not [string]::IsNullOrWhiteSpace($explicitOutput) -and
@@ -522,12 +576,397 @@ switch ($area) {
           -Repetitions $repetitions `
           -Check:($verb -eq "check-local-playtest")
       }
+      { $_ -in @("build-historical-private", "check-historical-private") } {
+        $targetInput = Get-MIRArgValue -Items $Args -Name "--target" -Default "all"
+        $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
+        if ($target -notin @('all','f018','f017','f016','f015','f014','f013')) {
+          throw "--target must be one of all, F018, F017, F016, F015, F014, or F013."
+        }
+        & (Join-Path $repo "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1") `
+          -RepoRoot $repo.Path -Target $target -Repetitions 3 -Check:($verb -eq "check-historical-private")
+      }
+      { $_ -in @("build-m4c01-player-set", "check-m4c01-player-set") } {
+        & (Join-Path $repo "tools/commands/release/New-MIR4M4C01PlayerCandidateSet.ps1") `
+          -RepoRoot $repo.Path -Check:($verb -eq "check-m4c01-player-set")
+      }
+      "runtime-historical-private" {
+        $target = ConvertTo-MIR4LegacyTargetKey -Target (Get-MIRArgValue -Items $Args -Name "--target")
+        if ($target -notin @('f017','f016','f015','f014','f013')) {
+          throw "--target must be one of F017, F016, F015, F014, or F013. F018 requires an explicitly admitted exact engine."
+        }
+        $runtimeArguments = @{ RepoRoot = $repo.Path; Target = $target }
+        $factorioBin = Get-MIRArgValue -Items $Args -Name "--factorio-bin"
+        $candidate = Get-MIRArgValue -Items $Args -Name "--candidate"
+        $evidence = Get-MIRArgValue -Items $Args -Name "--evidence"
+        if (-not [string]::IsNullOrWhiteSpace($factorioBin)) { $runtimeArguments.FactorioBin = $factorioBin }
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
+        if (-not [string]::IsNullOrWhiteSpace($evidence)) { $runtimeArguments.EvidenceRoot = $evidence }
+        & (Join-Path $repo "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
+      }
       { $_ -in @("api", "sdk") } {
         if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }
         $subcommand = [string]$Args[2]
         $allowed = if ($verb -eq "api") { @("check", "conformance") } else { @("generate", "check") }
         if ($subcommand -notin $allowed) { throw "Unknown mir4 $verb command: $subcommand" }
-        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1") -Command "$verb-$subcommand" -RepoRoot $repo.Path
+      }
+      "platform" {
+        if ($Args.Count -lt 3) { throw "mir4 platform requires a subcommand." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','conformance','package','compile')) {
+          throw "Unknown mir4 platform command: $subcommand"
+        }
+        $platformArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        if ($subcommand -eq 'compile') {
+          $platformArguments.Target = ConvertTo-MIR4LegacyTargetKey -Target (Get-MIRArgValue -Items $Args -Name '--target')
+          $platformArguments.ExtensionPath = Get-MIRArgValue -Items $Args -Name '--extension'
+          $platformArguments.OutputPath = Get-MIRArgValue -Items $Args -Name '--output'
+        }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1") @platformArguments
+      }
+      "environment-evidence" {
+        if ($Args.Count -lt 3) { throw "mir4 environment-evidence requires lock, diff, bundle, minimize, verify, or reference." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('lock','diff','bundle','minimize','verify','reference')) { throw "Unknown mir4 environment-evidence command: $subcommand" }
+        $environmentArguments = @{Mode=$subcommand;RepoRoot=$repo.Path}
+        $inputValue = Get-MIRArgValue -Items $Args -Name '--input'
+        $otherValue = Get-MIRArgValue -Items $Args -Name '--other'
+        $outputValue = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($inputValue)) { $environmentArguments.InputPath = $inputValue }
+        if (-not [string]::IsNullOrWhiteSpace($otherValue)) { $environmentArguments.OtherPath = $otherValue }
+        if (-not [string]::IsNullOrWhiteSpace($outputValue)) { $environmentArguments.OutputPath = $outputValue }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1") @environmentArguments
+      }
+      "assurance-scale" {
+        if ($Args.Count -lt 3) { throw "mir4 assurance-scale requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 assurance-scale command: $subcommand" }
+        $assuranceArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $assuranceArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1") @assuranceArguments
+      }
+      "release-governance" {
+        if ($Args.Count -lt 3) { throw "mir4 release-governance requires check or initialize." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','initialize')) { throw "Unknown mir4 release-governance command: $subcommand" }
+        $governanceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $governanceArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1") @governanceArguments
+      }
+      "repository" {
+        if ($Args.Count -lt 3) { throw "mir4 repository requires generate, check, inventory, or initialize." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','inventory','initialize')) { throw "Unknown mir4 repository command: $subcommand" }
+        $repositoryArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
+      }
+      "canonicalization-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 canonicalization-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 canonicalization-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1") @migrationArguments
+      }
+      "diagnostics-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 diagnostics-migration requires generate, check, or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','show')) { throw "Unknown mir4 diagnostics-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1") @migrationArguments
+      }
+      "target-key-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 target-key-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 target-key-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1") @migrationArguments
+      }
+      "whole-platform-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 whole-platform-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 whole-platform-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1") @migrationArguments
+      }
+      "technology-acceptance-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 technology-acceptance-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 technology-acceptance-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1") @migrationArguments
+      }
+      "target-compiler-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 target-compiler-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 target-compiler-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1") @migrationArguments
+      }
+      "semantic-compiler-policy-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 semantic-compiler-policy-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 semantic-compiler-policy-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1") @migrationArguments
+      }
+      "runtime-continuity-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 runtime-continuity-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1") @migrationArguments
+      }
+      "module-sdk-mep-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 module-sdk-mep-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 module-sdk-mep-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1") @migrationArguments
+      }
+      "processir-exact-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 processir-exact-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 processir-exact-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1") @migrationArguments
+      }
+      "inspector-compatibility-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 inspector-compatibility-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4InspectorCompatibilityMigration.ps1") @migrationArguments
+      }
+      "assurance-offline-custody-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 assurance-offline-custody-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 assurance-offline-custody-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1") @migrationArguments
+      }
+      "historical-tooling-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 historical-tooling-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 historical-tooling-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1") @migrationArguments
+      }
+      "release-tooling-migration" {
+        if ($Args.Count -lt 3) { throw "mir4 release-tooling-migration requires check or show." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('check','show')) { throw "Unknown mir4 release-tooling-migration command: $subcommand" }
+        $migrationArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $migrationArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1") @migrationArguments
+      }
+      "historical-succession" {
+        if ($Args.Count -lt 3) { throw "mir4 historical-succession requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 historical-succession command: $subcommand" }
+        $historicalArguments = @{ RepoRoot=$repo.Path; Check=($subcommand -eq 'check') }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $historicalArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1") @historicalArguments
+      }
+      "targets" {
+        if ($Args.Count -lt 3) { throw "mir4 targets requires contracts, laws, build, or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('contracts','laws','build','check')) { throw "Unknown mir4 targets command: $subcommand" }
+        if ($subcommand -in @('contracts','laws')) {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          $record = if ($subcommand -eq 'contracts') { New-MIR4TargetContractSet -RepoRoot $repo.Path } else { Test-MIR4TargetProviderLaws -RepoRoot $repo.Path }
+          $record | ConvertTo-Json -Depth 100
+        } else {
+          $targetInput = Get-MIRArgValue -Items $Args -Name '--target' -Default 'all'
+          $target = if ($targetInput -ceq 'all') { 'all' } else { ConvertTo-MIR4LegacyTargetKey -Target $targetInput }
+          $targetArguments = @{RepoRoot=$repo.Path;Target=$target;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $targetArguments.OutputRoot = $output }
+          & (Join-Path $repo "tools/commands/mir4/New-MIR4TargetProductSet.ps1") @targetArguments
+        }
+      }
+      "semantic" {
+        if ($Args.Count -lt 3) { throw "mir4 semantic requires export, check, or laws." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check','laws')) { throw "Unknown mir4 semantic command: $subcommand" }
+        if ($subcommand -eq 'laws') {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          Test-MIR4SemanticMergeLaws -RepoRoot $repo.Path | ConvertTo-Json -Depth 100
+        } else {
+          $semanticArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $semanticArguments.OutputRoot = $output }
+          & (Join-Path $repo "tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1") @semanticArguments
+        }
+      }
+      "runtime-continuity" {
+        if ($Args.Count -lt 3) { throw "mir4 runtime-continuity requires export, check, or laws." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check','laws')) { throw "Unknown mir4 runtime-continuity command: $subcommand" }
+        if ($subcommand -eq 'laws') {
+          . (Join-Path $repo "tools/lib/mir4/PlatformPreview.ps1")
+          $runtime = New-MIR4RuntimeStateMatrix -RepoRoot $repo.Path -Providers $null -SourceIdentity $null
+          $migration = New-MIR4MigrationGraphMatrix -RepoRoot $repo.Path -Providers $null -SourceIdentity $null
+          [ordered]@{runtime=$runtime.registration_plan.law_results;migration=$migration.law_results;passed=([bool]$runtime.registration_plan.law_results.all_passed -and [bool]$migration.law_results.all_passed)} | ConvertTo-Json -Depth 20
+        } else {
+          $runtimeArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+          $output = Get-MIRArgValue -Items $Args -Name '--output'
+          $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+          if (-not [string]::IsNullOrWhiteSpace($output)) { $runtimeArguments.OutputRoot = $output }
+          if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
+          & (Join-Path $repo "tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1") @runtimeArguments
+        }
+      }
+      "module-ecosystem" {
+        if ($Args.Count -lt 3) { throw "mir4 module-ecosystem requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 module-ecosystem command: $subcommand" }
+        $moduleArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $moduleArguments.OutputRoot = $output }
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) { $moduleArguments.CandidateZip = $candidate }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1") @moduleArguments
+      }
+      "processir-synthesis" {
+        if ($Args.Count -lt 3) { throw "mir4 processir-synthesis requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 processir-synthesis command: $subcommand" }
+        $processArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $processArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1") @processArguments
+      }
+      "exact-processir" {
+        if ($Args.Count -lt 3) { throw "mir4 exact-processir requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 exact-processir command: $subcommand" }
+        $exactArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $captures = @(Get-MIRArgValues -Items $Args -Name '--capture')
+        if ($captures.Count) { $exactArguments.CaptureId = $captures }
+        $repetitionsText = Get-MIRArgValue -Items $Args -Name '--repetitions' -Default '2'
+        $repetitions = 0
+        if (-not [int]::TryParse($repetitionsText,[ref]$repetitions) -or $repetitions -lt 1 -or $repetitions -gt 4) { throw "--repetitions must be an integer from 1 through 4." }
+        $exactArguments.Repetitions = $repetitions
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $reference = Get-MIRArgValue -Items $Args -Name '--reference'
+        if (-not [string]::IsNullOrWhiteSpace($output)) {
+          if ($subcommand -eq 'check') { $exactArguments.ReferenceRoot = $output } else { $exactArguments.OutputRoot = $output }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($reference)) { $exactArguments.ReferenceRoot = $reference }
+        if (Test-MIRArgSwitch -Items $Args -Name '--publish-reference') {
+          if ($subcommand -eq 'check') { throw "--publish-reference is valid only for exact-processir export." }
+          $exactArguments.PublishReference = $true
+        }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1") @exactArguments
+      }
+      "release-canaries" {
+        if ($Args.Count -lt 3) { throw "mir4 release-canaries requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 release-canaries command: $subcommand" }
+        $canaryArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        foreach($binding in @(
+          @{arg='--capture-root';parameter='CaptureRoot'},
+          @{arg='--upgrade-root';parameter='UpgradeRoot'},
+          @{arg='--output';parameter=$(if($subcommand -eq 'check'){'ReferenceRoot'}else{'OutputRoot'})},
+          @{arg='--reference';parameter='ReferenceRoot'}
+        )){
+          $value=Get-MIRArgValue -Items $Args -Name $binding.arg
+          if(-not[string]::IsNullOrWhiteSpace($value)){$canaryArguments[$binding.parameter]=$value}
+        }
+        if(Test-MIRArgSwitch -Items $Args -Name '--publish-reference'){
+          if($subcommand -eq 'check'){throw "--publish-reference is valid only for release-canaries export."}
+          $canaryArguments.PublishReference=$true
+        }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1") @canaryArguments
+      }
+      "inspector-compatibility" {
+        if ($Args.Count -lt 3) { throw "mir4 inspector-compatibility requires export or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('export','check')) { throw "Unknown mir4 inspector-compatibility command: $subcommand" }
+        $inspectorArguments = @{RepoRoot=$repo.Path;Check=($subcommand -eq 'check')}
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $inspectorArguments.OutputRoot = $output }
+        & (Join-Path $repo "tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1") @inspectorArguments
+      }
+      "whole-platform" {
+        if ($Args.Count -lt 3) { throw "mir4 whole-platform requires generate, check, matrix, or target-key." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('generate','check','matrix','target-key')) { throw "Unknown mir4 whole-platform command: $subcommand" }
+        $wholeArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
+        if ($subcommand -eq 'target-key') {
+          $wholeArguments.Target = Get-MIRArgValue -Items $Args -Name '--target'
+        }
+        & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4WholePlatform.ps1") @wholeArguments
+      }
+      "acceptance" {
+        if ($Args.Count -lt 3 -or [string]$Args[2] -cne 'queue') { throw "mir4 acceptance requires queue." }
+        $catalog = Get-MIRArgValue -Items $Args -Name '--catalog'
+        $target = Get-MIRArgValue -Items $Args -Name '--target'
+        $ecosystem = Get-MIRArgValue -Items $Args -Name '--ecosystem'
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        foreach ($required in @(@{name='--catalog';value=$catalog},@{name='--target';value=$target},@{name='--ecosystem';value=$ecosystem},@{name='--output';value=$output})) {
+          if ([string]::IsNullOrWhiteSpace([string]$required.value)) { throw "mir4 acceptance queue requires $($required.name)." }
+        }
+        & (Join-Path $repo "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1") -RepoRoot $repo.Path -CatalogPath $catalog -Target $target -Ecosystem $ecosystem -OutputPath $output
+      }
+      "extension" {
+        if ($Args.Count -lt 3) { throw "mir4 extension requires init, validate, explain, test, package, migrate, doctor, lock, diff, ci-init, or discover." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('init','validate','explain','test','package','migrate','doctor','lock','diff','ci-init','discover')) { throw "Unknown mir4 extension command: $subcommand" }
+        $builderArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
+        $extension = Get-MIRArgValue -Items $Args -Name '--extension'
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        $id = Get-MIRArgValue -Items $Args -Name '--id'
+        $template = Get-MIRArgValue -Items $Args -Name '--template'
+        $target = Get-MIRArgValue -Items $Args -Name '--target'
+        $base = Get-MIRArgValue -Items $Args -Name '--base'
+        $candidate = Get-MIRArgValue -Items $Args -Name '--candidate'
+        $discovery = Get-MIRArgValue -Items $Args -Name '--discovery'
+        if (-not [string]::IsNullOrWhiteSpace($extension)) { $builderArguments.ExtensionPath = $extension }
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $builderArguments.OutputRoot = $output }
+        if (-not [string]::IsNullOrWhiteSpace($id)) { $builderArguments.ExtensionId = $id }
+        if (-not [string]::IsNullOrWhiteSpace($template)) { $builderArguments.Template = $template }
+        if (-not [string]::IsNullOrWhiteSpace($target)) { $builderArguments.Target = $target.ToLowerInvariant() }
+        if (-not [string]::IsNullOrWhiteSpace($base)) { $builderArguments.BasePath = $base }
+        if (-not [string]::IsNullOrWhiteSpace($candidate)) { $builderArguments.CandidatePath = $candidate }
+        if (-not [string]::IsNullOrWhiteSpace($discovery)) { $builderArguments.DiscoveryPath = $discovery }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4Extension.ps1") @builderArguments
+      }
+      "handoff-m4c01" {
+        $output = Get-MIRArgValue -Items $Args -Name "--output" -Default "build/mir4/m4c01-handoff"
+        & (Join-Path $repo "tools/commands/mir4/Export-MIR4M4C01Handoff.ps1") -RepoRoot $repo.Path -OutputRoot $output
       }
       default { throw "Unknown mir4 command: $verb" }
     }
@@ -578,6 +1017,17 @@ switch ($area) {
   }
   "release" {
     switch ($verb) {
+      "doctor" {
+        $parameters = @{
+          Command='release-doctor';RepoRoot=$repo.Path
+          Json=(Test-MIRArgSwitch -Items $Args -Name '--json')
+          DryRun=(Test-MIRArgSwitch -Items $Args -Name '--dry-run')
+          Explain=(Test-MIRArgSwitch -Items $Args -Name '--explain')
+        }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $parameters.OutputPath = $output }
+        & (Join-Path $repo 'tools/commands/mir4/Invoke-MIR4PreFreeze.ps1') @parameters
+      }
       "gate" {
         $profile = Get-MIRCommandProfile -Items $Args -Default "release-targeted"
         Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
@@ -590,6 +1040,56 @@ switch ($area) {
       }
       default { throw "Unknown release command: $verb" }
     }
+  }
+  "playtest" {
+    if ($verb -notin @('prepare','capture','finalize')) { throw "Unknown playtest command: $verb" }
+    $parameters = @{
+      Command=("playtest-" + $verb);RepoRoot=$repo.Path
+      Json=(Test-MIRArgSwitch -Items $Args -Name '--json')
+      DryRun=(Test-MIRArgSwitch -Items $Args -Name '--dry-run')
+    }
+    if ($verb -eq 'prepare') {
+      $target = (Get-MIRArgValue -Items $Args -Name '--target' -Default 'F210').ToUpperInvariant()
+      if ($target -notin @('F210','F200')) { throw 'playtest prepare --target must be F210 or F200.' }
+      $parameters.Target = $target
+      foreach ($binding in @(
+        @{option='--candidate';parameter='CandidatePath'},
+        @{option='--predecessor';parameter='PredecessorPath'},
+        @{option='--factorio';parameter='FactorioBin'},
+        @{option='--settings';parameter='SettingsPath'},
+        @{option='--save';parameter='SavePath'},
+        @{option='--output';parameter='SessionOutputRoot'}
+      )) {
+        $value = Get-MIRArgValue -Items $Args -Name $binding.option
+        if (-not [string]::IsNullOrWhiteSpace($value)) { $parameters[$binding.parameter] = $value }
+      }
+    } else {
+      $session = Get-MIRArgValue -Items $Args -Name '--session'
+      if ([string]::IsNullOrWhiteSpace($session)) { throw "playtest $verb requires --session." }
+      $parameters.SessionRoot = $session
+      if ($verb -eq 'capture') {
+        $parameters.CapturePath = @(Get-MIRArgValues -Items $Args -Name '--capture')
+        $observations = Get-MIRArgValue -Items $Args -Name '--observations'
+        if (-not [string]::IsNullOrWhiteSpace($observations)) { $parameters.ObservationsPath = $observations }
+      } else {
+        $decision = (Get-MIRArgValue -Items $Args -Name '--decision').ToUpperInvariant()
+        $reviewer = Get-MIRArgValue -Items $Args -Name '--reviewer'
+        if ($decision -notin @('ACCEPTED','CHANGES-REQUESTED','REJECTED') -or [string]::IsNullOrWhiteSpace($reviewer)) {
+          throw 'playtest finalize requires an explicit --decision and --reviewer.'
+        }
+        $parameters.Decision = $decision
+        $parameters.Reviewer = $reviewer
+        $parameters.Notes = Get-MIRArgValue -Items $Args -Name '--notes'
+      }
+    }
+    & (Join-Path $repo 'tools/commands/mir4/Invoke-MIR4PreFreeze.ps1') @parameters
+  }
+  "rulesets" {
+    if ($verb -ne 'audit') { throw "Unknown rulesets command: $verb" }
+    $parameters = @{Command='rulesets-audit';RepoRoot=$repo.Path;Json=(Test-MIRArgSwitch -Items $Args -Name '--json')}
+    $output = Get-MIRArgValue -Items $Args -Name '--output'
+    if (-not [string]::IsNullOrWhiteSpace($output)) { $parameters.OutputPath = $output }
+    & (Join-Path $repo 'tools/commands/mir4/Invoke-MIR4PreFreeze.ps1') @parameters
   }
   "overnight" {
     if ($verb -ne "local") { throw "Unknown overnight command: $verb" }

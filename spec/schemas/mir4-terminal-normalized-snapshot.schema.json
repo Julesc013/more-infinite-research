@@ -16,7 +16,7 @@
     "source_identity": {"type": "object"},
     "distribution": {"type": "object"},
     "engine": {"type": "object"},
-    "predecessors": {"type": "array", "minItems": 2, "maxItems": 2},
+    "predecessors": {"type": "array", "minItems": 2, "maxItems": 3},
     "foundation": {"type": "object"},
     "inventories": {"type": "object"},
     "capability_omissions": {"type": "array"},

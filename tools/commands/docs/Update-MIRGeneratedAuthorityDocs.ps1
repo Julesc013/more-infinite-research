@@ -102,7 +102,8 @@ $governanceLines = [Collections.Generic.List[string]]::new()
 foreach ($line in @(
   "---", "title: `"Technology Quality And Promotion Inventory`"", "status: current",
   "applies_to: `"3.2.0+`"", "audience: maintainer", "doc_type: reference",
-  "owner: mir-maintainers", "last_reviewed: $($ledger.updated_at)", "supersedes: []", "superseded_by: []", "---", "",
+  "owner: mir-maintainers", "last_reviewed: $($ledger.updated_at)", "supersedes: []", "superseded_by: []",
+  "source_of_truth_for:", "  - generated-quality-promotion-view", "---", "",
   "# Technology Quality And Promotion Inventory", "",
   "> Generated from ``.mir/technology-quality-profiles.json`` and ``.mir/technology-governance.json``. Governance records, not this table, are authoritative.", "",
   "## Quality profiles", "",
@@ -139,7 +140,7 @@ $schemaLines = [Collections.Generic.List[string]]::new()
 foreach ($line in @(
   "---", "title: `"Compiler Schema Registry`"", "status: current", "applies_to: `"3.2.0+`"",
   "audience: developer", "doc_type: reference", "owner: mir-maintainers", "last_reviewed: $($ledger.updated_at)",
-  "supersedes: []", "superseded_by: []", "---", "", "# Compiler Schema Registry", "",
+  "supersedes: []", "superseded_by: []", "source_of_truth_for:", "  - generated-compiler-schema-view", "---", "", "# Compiler Schema Registry", "",
   "> Generated from ``.mir/compiler-schema-authority.json``. The machine registry is authoritative.", "",
   "| Record | Current | Readable | Writable | Compatibility projection |", "| --- | ---: | --- | --- | ---: |"
 )) { $schemaLines.Add($line) }

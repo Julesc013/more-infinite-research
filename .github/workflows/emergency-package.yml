@@ -38,7 +38,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || !contains(github.event.head_commit.message, '[emergency-dist]')
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 0
@@ -113,7 +113,7 @@ jobs:
           "identity=$identityPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "sha256=$second" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: mir-emergency-package-${{ github.sha }}
           path: |

@@ -3,16 +3,189 @@ authority: mir-repository-paths-v1
 
 paths:
   package.root: .
+  mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
+  mir4.repository-migration.authority: governance/repository/migrations/fixed-point-tooling-v1.json
+  mir4.repository-migration.proof: assurance/repository/fixed-point-tooling-v1.json
+  mir4.repository-migration.receipt: releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json
+  mir4.repository-migration.authority-schema: contracts/repository/mir4-repository-migration-authority-v1.schema.json
+  mir4.repository-migration.proof-schema: contracts/repository/mir4-repository-migration-proof-v1.schema.json
+  mir4.repository-migration.receipt-schema: contracts/repository/mir4-repository-migration-receipt-v1.schema.json
+  mir4.repository-migration.domain: tools/mir/domain/repository/RepositoryFixedPoint.ps1
+  mir4.repository-migration.port: tools/mir/ports/repository/RepositoryInventory.ps1
+  mir4.repository-migration.adapter: tools/mir/adapters/repository/GitRepositoryInventory.ps1
+  mir4.repository-migration.application: tools/mir/application/repository/RepositoryFixedPoint.ps1
+  mir4.repository-migration.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+  mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
+  mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
+  mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
+  mir4.canonicalization-migration.receipt: releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json
+  mir4.canonicalization-migration.authority-schema: contracts/repository/mir4-canonicalization-migration-authority-v1.schema.json
+  mir4.canonicalization-migration.proof-schema: contracts/repository/mir4-canonicalization-migration-proof-v1.schema.json
+  mir4.canonicalization-migration.receipt-schema: contracts/repository/mir4-canonicalization-migration-receipt-v1.schema.json
+  mir4.canonicalization.domain: tools/mir/domain/canonicalization/CanonicalJsonV1.ps1
+  mir4.canonicalization-migration.application: tools/mir/application/canonicalization/CanonicalizationMigration.ps1
+  mir4.canonicalization-migration.cli: tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1
+  mir4.canonicalization.test: tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
+  mir4.canonicalization-migration.test: tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1
+  mir4.authority-migration.engine: tools/mir/application/migration/AppendOnlyAuthorityMigration.ps1
+  mir4.diagnostics-migration.authority: governance/repository/migrations/diagnostics-tooling-v1.json
+  mir4.diagnostics-migration.proof: assurance/repository/diagnostics-tooling-v1.json
+  mir4.diagnostics-migration.receipt: releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json
+  mir4.diagnostics-migration.authority-schema: contracts/repository/mir4-diagnostics-migration-authority-v1.schema.json
+  mir4.diagnostics-migration.proof-schema: contracts/repository/mir4-diagnostics-migration-proof-v1.schema.json
+  mir4.diagnostics-migration.receipt-schema: contracts/repository/mir4-diagnostics-migration-receipt-v1.schema.json
+  mir4.diagnostics.domain: tools/mir/domain/diagnostics/DiagnosticsV1.ps1
+  mir4.diagnostics-migration.application: tools/mir/application/diagnostics/DiagnosticsMigration.ps1
+  mir4.diagnostics-migration.cli: tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1
+  mir4.diagnostics.test: tests/diagnostics/Test-MIR4DiagnosticsV1.ps1
+  mir4.diagnostics-migration.test: tests/diagnostics/Test-MIR4DiagnosticsMigration.ps1
+  mir4.target-key-migration.authority: governance/repository/migrations/target-key-tooling-v1.json
+  mir4.target-key-migration.proof: assurance/repository/target-key-tooling-v1.json
+  mir4.target-key-migration.receipt: releases/migrations/MIR4-Target-Key-Tooling-MigrationV1.json
+  mir4.target-key-migration.authority-schema: contracts/repository/mir4-target-key-migration-authority-v1.schema.json
+  mir4.target-key-migration.proof-schema: contracts/repository/mir4-target-key-migration-proof-v1.schema.json
+  mir4.target-key-migration.receipt-schema: contracts/repository/mir4-target-key-migration-receipt-v1.schema.json
+  mir4.target-key.domain: tools/mir/domain/targets/TargetKey.ps1
+  mir4.target-key-migration.application: tools/mir/application/targets/TargetKeyMigration.ps1
+  mir4.target-key-migration.cli: tools/mir/cli/Invoke-MIR4TargetKeyMigration.ps1
+  mir4.target-key.test: tests/targets/Test-MIR4TargetKey.ps1
+  mir4.target-key-migration.test: tests/targets/Test-MIR4TargetKeyMigration.ps1
+  mir4.whole-platform-migration.authority: governance/repository/migrations/whole-platform-tooling-v1.json
+  mir4.whole-platform-migration.proof: assurance/repository/whole-platform-tooling-v1.json
+  mir4.whole-platform-migration.receipt: releases/migrations/MIR4-Whole-Platform-Tooling-MigrationV1.json
+  mir4.whole-platform-migration.authority-schema: contracts/repository/mir4-whole-platform-migration-authority-v1.schema.json
+  mir4.whole-platform-migration.proof-schema: contracts/repository/mir4-whole-platform-migration-proof-v1.schema.json
+  mir4.whole-platform-migration.receipt-schema: contracts/repository/mir4-whole-platform-migration-receipt-v1.schema.json
+  mir4.whole-platform.application: tools/mir/application/platform/WholePlatform.ps1
+  mir4.whole-platform-migration.application: tools/mir/application/platform/WholePlatformMigration.ps1
+  mir4.whole-platform-migration.cli: tools/mir/cli/Invoke-MIR4WholePlatformMigration.ps1
+  mir4.whole-platform.test: tests/platform/Test-MIR4WholePlatform.ps1
+  mir4.whole-platform-migration.test: tests/platform/Test-MIR4WholePlatformMigration.ps1
+  mir4.technology-acceptance-migration.authority: governance/repository/migrations/technology-acceptance-tooling-v1.json
+  mir4.technology-acceptance-migration.proof: assurance/repository/technology-acceptance-tooling-v1.json
+  mir4.technology-acceptance-migration.receipt: releases/migrations/MIR4-Technology-Acceptance-Tooling-MigrationV1.json
+  mir4.technology-acceptance-migration.authority-schema: contracts/repository/mir4-technology-acceptance-migration-authority-v1.schema.json
+  mir4.technology-acceptance-migration.proof-schema: contracts/repository/mir4-technology-acceptance-migration-proof-v1.schema.json
+  mir4.technology-acceptance-migration.receipt-schema: contracts/repository/mir4-technology-acceptance-migration-receipt-v1.schema.json
+  mir4.technology-acceptance.application: tools/mir/application/technology/TechnologyAcceptance.ps1
+  mir4.technology-acceptance-migration.application: tools/mir/application/technology/TechnologyAcceptanceMigration.ps1
+  mir4.technology-acceptance-migration.cli: tools/mir/cli/Invoke-MIR4TechnologyAcceptanceMigration.ps1
+  mir4.technology-acceptance.test: tests/technology/Test-MIR4TechnologyAcceptance.ps1
+  mir4.technology-acceptance-migration.test: tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1
+  mir4.target-compiler-migration.authority: governance/repository/migrations/target-compiler-tooling-v1.json
+  mir4.target-compiler-migration.proof: assurance/repository/target-compiler-tooling-v1.json
+  mir4.target-compiler-migration.receipt: releases/migrations/MIR4-Target-Compiler-Tooling-MigrationV1.json
+  mir4.target-compiler-migration.authority-schema: contracts/repository/mir4-target-compiler-migration-authority-v1.schema.json
+  mir4.target-compiler-migration.proof-schema: contracts/repository/mir4-target-compiler-migration-proof-v1.schema.json
+  mir4.target-compiler-migration.receipt-schema: contracts/repository/mir4-target-compiler-migration-receipt-v1.schema.json
+  mir4.target-compiler.application: tools/mir/application/targets/TargetCompiler.ps1
+  mir4.target-compiler-migration.application: tools/mir/application/targets/TargetCompilerMigration.ps1
+  mir4.target-compiler-migration.cli: tools/mir/cli/Invoke-MIR4TargetCompilerMigration.ps1
+  mir4.target-compiler.test: tests/targets/Test-MIR4TargetCompiler.ps1
+  mir4.target-compiler-migration.test: tests/targets/Test-MIR4TargetCompilerMigration.ps1
+  mir4.semantic-compiler-migration.authority: governance/repository/migrations/semantic-compiler-policy-tooling-v1.json
+  mir4.semantic-compiler-migration.proof: assurance/repository/semantic-compiler-policy-tooling-v1.json
+  mir4.semantic-compiler-migration.receipt: releases/migrations/MIR4-Semantic-Compiler-Policy-Tooling-MigrationV1.json
+  mir4.semantic-compiler-migration.authority-schema: contracts/repository/mir4-semantic-compiler-policy-migration-authority-v1.schema.json
+  mir4.semantic-compiler-migration.proof-schema: contracts/repository/mir4-semantic-compiler-policy-migration-proof-v1.schema.json
+  mir4.semantic-compiler-migration.receipt-schema: contracts/repository/mir4-semantic-compiler-policy-migration-receipt-v1.schema.json
+  mir4.semantic-compiler.safety-kernel: tools/mir/domain/safety/SafetyKernel.ps1
+  mir4.semantic-compiler.policy-engine: tools/mir/domain/policy/PolicyEngine.ps1
+  mir4.semantic-compiler.normalized-compiler: tools/mir/application/compiler/NormalizedCompiler.ps1
+  mir4.semantic-compiler.compilation-run: tools/mir/application/compiler/CompilationRun.ps1
+  mir4.semantic-compiler.cli: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
+  mir4.semantic-compiler-migration.application: tools/mir/application/compiler/SemanticCompilerPolicyMigration.ps1
+  mir4.semantic-compiler-migration.cli: tools/mir/cli/Invoke-MIR4SemanticCompilerPolicyMigration.ps1
+  mir4.semantic-compiler.test: tests/compiler/Test-MIR4SemanticCompiler.ps1
+  mir4.semantic-compiler-migration.test: tests/compiler/Test-MIR4SemanticCompilerMigration.ps1
+  mir4.whole-platform.programme: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
+  mir4.target-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
+  mir4.target-registry.current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
+  mir4.target-registry.historical-v5: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV5.json
+  mir4.semantic-compiler.programme: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
+  mir4.runtime-continuity.programme: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
+  mir4.module-ecosystem.programme: .mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json
+  mir4.processir-synthesis.programme: .mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json
+  mir4.processir-exact-t12.authority: .mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json
+  mir4.processir-exact-t12.reference: sdk/preview/mir4/reference/t12
+  mir4.inspector-compatibility.programme: .mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json
+  mir4.assurance-scale.programme: .mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json
+  mir4.historical-succession.programme: .mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json
+  mir4.full-platform-closeout.command: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
+  mir4.release-readiness.reconciliation: .mir/releases/waves/mir4-r0/MIR4-Release-Readiness-ReconciliationV1.json
+  spec.schemas.mir4-release-readiness-reconciliation-v1: spec/schemas/mir4-release-readiness-reconciliation-v1.schema.json
+  final.governance: governance
+  final.contracts: contracts
+  final.spec: spec
+  final.src: src
+  final.targets: targets
+  final.modules: modules
+  final.sdk: sdk
+  final.tools-mir: tools/mir
+  final.tests: tests
+  final.assurance: assurance
+  final.changes: changes
+  final.releases: releases
+  final.docs: docs
+  final.examples: examples
   spec.root: spec
   spec.architecture: spec/architecture
   spec.compatibility: spec/compatibility
   spec.compatibility.claims: spec/compatibility/claims.json
   spec.compatibility.lanes: spec/compatibility/support-lanes.json
   spec.schemas: spec/schemas
+  spec.schemas.mir4-whole-platform-programme-v1: spec/schemas/mir4-whole-platform-programme-v1.schema.json
+  spec.schemas.mir4-technology-acceptance-queue-v1: spec/schemas/mir4-technology-acceptance-queue-v1.schema.json
+  spec.schemas.mir4-target-registry-v6: spec/schemas/mir4-target-registry-v6.schema.json
+  spec.schemas.mir4-compilation-run-v1: spec/schemas/mir4-compilation-run-v1.schema.json
+  spec.schemas.mir4-runtime-state-matrix-v1: spec/schemas/mir4-runtime-state-matrix-v1.schema.json
+  spec.schemas.mir4-migration-graph-matrix-v1: spec/schemas/mir4-migration-graph-matrix-v1.schema.json
+  spec.schemas.mir4-continuity-bundle-v1: spec/schemas/mir4-continuity-bundle-v1.schema.json
+  spec.schemas.mir4-canonical-recipe-fact-input-v1: spec/schemas/mir4-canonical-recipe-fact-input-v1.schema.json
+  spec.schemas.mir4-process-ir-v1: spec/schemas/mir4-process-ir-v1.schema.json
+  spec.schemas.mir4-exact-process-ir-snapshot-v1: spec/schemas/preview/mir4-exact-process-ir-snapshot-v1.schema.json
+  spec.schemas.mir4-process-ir-comparison-v1: spec/schemas/preview/mir4-process-ir-comparison-v1.schema.json
+  spec.schemas.mir4-t12-receipt-v1: spec/schemas/preview/mir4-t12-receipt-v1.schema.json
+  spec.schemas.mir4-effect-channel-registry-v1: spec/schemas/mir4-effect-channel-registry-v1.schema.json
+  spec.schemas.mir4-synthesis-maturity-matrix-v1: spec/schemas/mir4-synthesis-maturity-matrix-v1.schema.json
+  spec.schemas.mir4-inspection-bundle-v1: spec/schemas/mir4-inspection-bundle-v1.schema.json
+  spec.schemas.mir4-compatibility-subject-ledger-v1: spec/schemas/mir4-compatibility-subject-ledger-v1.schema.json
+  spec.schemas.mir4-compatibility-factory-plan-v1: spec/schemas/mir4-compatibility-factory-plan-v1.schema.json
+  spec.schemas.mir4-inspector-workbench-result-v1: spec/schemas/mir4-inspector-workbench-result-v1.schema.json
+  spec.schemas.mir4-assurance-scale-result-v1: spec/schemas/mir4-assurance-scale-result-v1.schema.json
+  spec.schemas.mir4-release-budget-plan-v1: spec/schemas/mir4-release-budget-plan-v1.schema.json
+  spec.schemas.mir4-offline-drill-result-v1: spec/schemas/mir4-offline-drill-result-v1.schema.json
+  spec.schemas.mir4-historical-museum-matrix-v1: spec/schemas/mir4-historical-museum-matrix-v1.schema.json
+  spec.schemas.mir4-successor-host-result-v1: spec/schemas/mir4-successor-host-result-v1.schema.json
+  spec.schemas.mir4-full-platform-record-v1: spec/schemas/mir4-full-platform-record-v1.schema.json
+  spec.schemas.mir4-luna-audit-input-v1: spec/schemas/mir4-luna-audit-input-v1.schema.json
   spec.schemas.mir4-exact-engine-qualification-evidence: spec/schemas/mir4-exact-engine-qualification-evidence-bundle.schema.json
   spec.schemas.mir4-bootstrap-engine-availability: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
   spec.schemas.mir4-bootstrap-target-readiness: spec/schemas/mir4-bootstrap-target-readiness.schema.json
   spec.schemas.mir4-final-programme-reconciliation: spec/schemas/mir4-final-programme-reconciliation.schema.json
+  spec.schemas.mir4-supply-chain-authority-v1: spec/schemas/mir4-supply-chain-authority-v1.schema.json
+  spec.schemas.mir4-component-inventory-v1: spec/schemas/mir4-component-inventory-v1.schema.json
+  spec.schemas.mir4-spdx-3.0.1-profile: spec/schemas/mir4-spdx-3.0.1-profile.schema.json
+  spec.schemas.mir4-spdx-2.3-compatibility: spec/schemas/mir4-spdx-2.3-compatibility.schema.json
+  spec.schemas.mir4-slsa-provenance-v1: spec/schemas/mir4-slsa-provenance-v1.schema.json
+  spec.schemas.mir4-supply-chain-attestation-v1: spec/schemas/mir4-supply-chain-attestation-v1.schema.json
+  spec.schemas.mir4-private-custody-inventory-v1: spec/schemas/mir4-private-custody-inventory-v1.schema.json
+  spec.schemas.mir4-release-capsule-manifest-v1: spec/schemas/mir4-release-capsule-manifest-v1.schema.json
+  spec.schemas.mir4-release-capsule-construction-receipt-v1: spec/schemas/mir4-release-capsule-construction-receipt-v1.schema.json
+  spec.schemas.mir4-release-capsule-restoration-receipt-v1: spec/schemas/mir4-release-capsule-restoration-receipt-v1.schema.json
+  spec.schemas.mir4-runner-publisher-confinement-receipt-v1: spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json
+  spec.schemas.mir4-signing-ceremony-preparation-authority-v1: spec/schemas/mir4-signing-ceremony-preparation-authority-v1.schema.json
+  spec.schemas.mir4-signing-ceremony-preparation-receipt-v1: spec/schemas/mir4-signing-ceremony-preparation-receipt-v1.schema.json
+  spec.schemas.mir4-protected-signing-ceremony-receipt-v1: spec/schemas/mir4-protected-signing-ceremony-receipt-v1.schema.json
+  spec.schemas.mir4-supply-chain-preservation-t15-v1: spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
+  spec.schemas.mir4-t15-independent-machine-acceptance-v1: spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
+  spec.schemas.mir4-t15-authority-evolution-receipt-v1: spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
+  spec.schemas.mir4-playtest-evidence-v1: spec/schemas/mir4-playtest-evidence-v1.schema.json
+  spec.schemas.mir4-f210-release-qualification-policy-v1: spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
+  spec.schemas.mir4-f210-qualification-policy-authority-evolution-receipt-v1: spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+  spec.schemas.mir4-final-mile-tooling-authority-evolution-receipt-v1: spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
+  spec.schemas.mir4-t17-machine-preparation-authority-evolution-receipt-v1: spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
+  spec.templates.mir4-protected-signing-ceremony-receipt-v1: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
   spec.schemas.mir3-dot9-mod-portal-visibility-recheck: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
   validation.root: validation
   validation.adapters: validation/adapters
@@ -25,6 +198,14 @@ paths:
   validation.scenarios.local-2.0: validation/scenarios/local-2.0.json
   validation.scenarios.local-2.1: validation/scenarios/local-2.1.json
   validation.tests: validation/tests
+  validation.tests.mir4.supply-chain-foundation: validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+  validation.tests.mir4.supply-chain-attestation: validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
+  validation.tests.mir4.release-capsule: validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
+  validation.tests.mir4.runner-publisher-confinement: validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+  validation.tests.mir4.signing-ceremony-preparation: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+  validation.tests.mir4.supply-chain-preservation-t15: validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
+  validation.tests.mir4.playtest-handoff-t17: validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
+  validation.tests.mir4.f210-qualification-policy: validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control
@@ -41,6 +222,8 @@ paths:
   tools.commands.workspace.cleanup: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
   tools.commands.docs: tools/commands/docs
   tools.commands.docs.format: tools/commands/docs/Format-MIRMarkdown.ps1
+  tools.commands.docs.index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
+  tools.commands.docs.immutable-source-truth: .mir/docs-immutable-source-truth.json
   tools.commands.docs.authority: tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1
   tools.commands.docs.pipeline: tools/commands/docs/Update-MIRPipelineDocumentation.ps1
   tools.commands.docs.defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
@@ -89,9 +272,102 @@ paths:
   tools.commands.release.mir4-bootstrap-local-candidate: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
   tools.commands.release.mir4-bootstrap-capsule: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
   tools.commands.release.mir4-r0-check: tools/commands/release/Test-MIR4R0Bootstrap.ps1
+  tools.commands.mir4.target-products: tools/commands/mir4/New-MIR4TargetProductSet.ps1
+  tools.commands.mir4.semantic-compiler-records: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
+  tools.commands.mir4.runtime-continuity-records: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
+  tools.commands.mir4.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
+  tools.commands.mir4.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
+  tools.commands.mir4.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
+  tools.commands.mir4.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
+  tools.commands.mir4.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
+  tools.commands.mir4.assurance-scale-records: tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1
+  tools.commands.mir4.pre-freeze: tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
+  tools.commands.mir4.release-workflow: tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
+  tools.commands.mir4.supply-chain: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
+  tools.commands.mir4.release-capsule: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
+  tools.commands.mir4.signing-ceremony-preparation: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
+  tools.commands.mir4.playtest-handoff-t17: tools/commands/mir4/Update-MIR4PlaytestHandoffT17.ps1
   tools.lib.mir4: tools/lib/mir4
   tools.lib.mir4.bootstrap-materialization: tools/lib/mir4/BootstrapMaterialization.ps1
-  tools.lib.mir4.offline-candidate-custody: tools/lib/mir4/OfflineCandidateCustody.ps1
+  tools.lib.mir4.target-compiler: tools/lib/mir4/TargetCompiler.ps1
+  tools.lib.mir4.compilation-run: tools/lib/mir4/CompilationRun.ps1
+  tools.mir.domain.safety.safety-kernel: tools/mir/domain/safety/SafetyKernel.ps1
+  tools.mir.domain.policy.policy-engine: tools/mir/domain/policy/PolicyEngine.ps1
+  tools.mir.application.compiler.normalized-compiler: tools/mir/application/compiler/NormalizedCompiler.ps1
+  tools.mir.application.compiler.compilation-run: tools/mir/application/compiler/CompilationRun.ps1
+  tools.lib.mir4.runtime-state-model: tools/mir/application/runtime/RuntimeStateModel.ps1
+  tools.mir.application.runtime.runtime-state-model: tools/mir/application/runtime/RuntimeStateModel.ps1
+  tools.mir.application.runtime.runtime-continuity-migration: tools/mir/application/runtime/RuntimeContinuityMigration.ps1
+  tools.mir.cli.runtime-continuity-records: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
+  tools.mir.cli.runtime-continuity-migration: tools/mir/cli/Invoke-MIR4RuntimeContinuityMigration.ps1
+  tools.lib.mir4.module-ecosystem: tools/mir/application/extensions/ModuleEcosystem.ps1
+  tools.mir.application.extensions.module-ecosystem: tools/mir/application/extensions/ModuleEcosystem.ps1
+  tools.mir.application.extensions.experimental-api-sdk: tools/mir/application/extensions/ExperimentalApiSdk.ps1
+  tools.mir.application.extensions.developer-experience: tools/mir/application/extensions/ExtensionDeveloperExperience.ps1
+  tools.mir.application.extensions.mep-discovery: tools/mir/application/extensions/MepDiscovery.ps1
+  tools.mir.application.extensions.sdk-v1: tools/mir/application/extensions/SdkV1.ps1
+  tools.mir.application.extensions.module-sdk-mep-migration: tools/mir/application/extensions/ModuleSdkMepMigration.ps1
+  tools.mir.application.processir.processir: tools/mir/application/processir/ProcessIR.ps1
+  tools.mir.application.processir.exact-processir: tools/mir/application/processir/ExactProcessIR.ps1
+  tools.mir.application.processir.migration: tools/mir/application/processir/ProcessIRExactMigration.ps1
+  tools.mir.cli.module-ecosystem-records: tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1
+  tools.mir.cli.experimental-api: tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1
+  tools.mir.cli.extension-builder: tools/mir/cli/Invoke-MIR4Extension.ps1
+  tools.mir.cli.module-sdk-mep-migration: tools/mir/cli/Invoke-MIR4ModuleSdkMepMigration.ps1
+  tools.mir.cli.processir-synthesis-records: tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1
+  tools.mir.cli.exact-processir-records: tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1
+  tools.mir.cli.processir-exact-migration: tools/mir/cli/Invoke-MIR4ProcessIRExactMigration.ps1
+  tools.mir.application.inspection.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
+  tools.mir.application.inspection.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
+  tools.mir.application.inspection.inspector: tools/mir/application/inspection/Inspector.ps1
+  tools.mir.application.inspection.compatibility-factory: tools/mir/application/inspection/CompatibilityFactory.ps1
+  tools.mir.application.inspection.compatibility-canary: tools/mir/application/inspection/CompatibilityCanary.ps1
+  tools.mir.application.inspection.migration: tools/mir/application/inspection/InspectorCompatibilityMigration.ps1
+  tools.mir.application.assurance.assurance-scale: tools/mir/application/assurance/AssuranceScale.ps1
+  tools.mir.application.assurance.release-budget: tools/mir/application/assurance/ReleaseBudget.ps1
+  tools.mir.application.assurance.offline-drill: tools/mir/application/assurance/OfflineDrill.ps1
+  tools.mir.application.assurance.environment-evidence: tools/mir/application/assurance/EnvironmentEvidence.ps1
+  tools.mir.application.assurance.migration: tools/mir/application/assurance/AssuranceOfflineCustodyMigration.ps1
+  tools.mir.application.history.historical-succession: tools/mir/application/history/HistoricalSuccession.ps1
+  tools.mir.application.history.successor-host: tools/mir/application/history/SuccessorHost.ps1
+  tools.mir.application.history.migration: tools/mir/application/history/HistoricalToolingMigration.ps1
+  tools.mir.application.release.release-dag: tools/mir/application/release/ReleaseDag.ps1
+  tools.mir.application.release.f210-qualification-policy: tools/mir/application/release/F210QualificationPolicy.ps1
+  tools.commands.mir4.update-f210-qualification-policy-authority: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+  tools.commands.mir4.update-final-mile-tooling-authority: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
+  tools.commands.mir4.update-final-release-closure-authority: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
+  tools.mir.application.release.migration: tools/mir/application/release/ReleaseToolingMigration.ps1
+  tools.mir.application.custody.offline-candidate: tools/mir/application/custody/OfflineCandidateCustody.ps1
+  tools.mir.cli.inspector-compatibility-records: tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1
+  tools.mir.cli.compatibility-canary-records: tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1
+  tools.mir.cli.inspector-compatibility-migration: tools/mir/cli/Invoke-MIR4InspectorCompatibilityMigration.ps1
+  tools.mir.cli.assurance-scale-records: tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1
+  tools.mir.cli.environment-evidence: tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1
+  tools.mir.cli.assurance-offline-custody-migration: tools/mir/cli/Invoke-MIR4AssuranceOfflineCustodyMigration.ps1
+  tools.mir.cli.historical-succession-records: tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1
+  tools.mir.cli.historical-tooling-migration: tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1
+  tools.mir.cli.release-tooling-migration: tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1
+  tools.lib.mir4.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
+  tools.lib.mir4.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
+  tools.lib.mir4.inspector: tools/mir/application/inspection/Inspector.ps1
+  tools.lib.mir4.exact-processir: tools/mir/application/processir/ExactProcessIR.ps1
+  tools.lib.mir4.compatibility-factory: tools/mir/application/inspection/CompatibilityFactory.ps1
+  tools.lib.mir4.assurance-scale: tools/mir/application/assurance/AssuranceScale.ps1
+  tools.lib.mir4.release-budget: tools/mir/application/assurance/ReleaseBudget.ps1
+  tools.lib.mir4.offline-drill: tools/mir/application/assurance/OfflineDrill.ps1
+  tools.lib.mir4.offline-candidate-custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
+  tools.lib.mir4.historical-succession: tools/mir/application/history/HistoricalSuccession.ps1
+  tools.lib.mir4.successor-host: tools/mir/application/history/SuccessorHost.ps1
+  tools.lib.mir4.release-dag: tools/mir/application/release/ReleaseDag.ps1
+  tools.lib.mir4.package-presentation: tools/lib/mir4/PackagePresentation.ps1
+  tools.lib.mir4.pre-freeze-release: tools/lib/mir4/PreFreezeRelease.ps1
+  tools.lib.mir4.supply-chain: tools/lib/mir4/SupplyChain.ps1
+  tools.lib.mir4.supply-chain-attestation: tools/lib/mir4/SupplyChainAttestation.ps1
+  tools.lib.mir4.release-capsule: tools/lib/mir4/ReleaseCapsule.ps1
+  tools.lib.mir4.signing-ceremony-preparation: tools/lib/mir4/SigningCeremonyPreparation.ps1
+  tools.lib.mir4.release-phase-engine: tools/lib/mir4/ReleasePhaseEngine.ps1
+  tools.lib.mir4.release-adapters: tools/lib/mir4/ReleaseAdapters.ps1
+  tools.lib.mir4.release-lifecycle-adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
   tools.lib.validation.mir4-distribution-identity: tools/lib/validation/MIR4DistributionIdentity.ps1
   tools.lib: tools/lib
   tools.lib.assurance: tools/lib/assurance
@@ -139,18 +415,55 @@ paths:
   releases.waves.mir4-r0-target-registry-historical: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV1.json
   releases.waves.mir4-r0-version-authority-historical: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv1.json
   releases.waves.mir4-r0-target-registry-historical-v2: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV2.json
-  releases.waves.mir4-r0-target-registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV3.json
+  releases.waves.mir4-r0-target-registry: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV4.json
   releases.waves.mir4-r0-version-authority: .mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json
   releases.waves.mir4-r0-codec-vectors: .mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json
   releases.waves.mir4-terminal-baseline-import: .mir/releases/waves/mir4-r0/terminal-baseline-import.json
   releases.waves.mir4-r0-bootstrap-root-set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
   releases.waves.mir4-r0-bootstrap-local-candidate-plan-historical: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV1.json
-  releases.waves.mir4-r0-bootstrap-local-candidate-plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV2.json
-  releases.waves.mir4-r0-private-lane-authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV2.json
+  releases.waves.mir4-r0-bootstrap-local-candidate-plan: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json
+  releases.waves.mir4-r0-private-lane-authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json
   releases.waves.mir4-r0-bootstrap-target-readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
   releases.waves.mir4-r0-final-programme-reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
+  releases.waves.mir4-r0-post-readiness-merge-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
+  releases.waves.mir4-r0-pr152-independent-readiness-acceptance: .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
+  releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
+  releases.waves.mir4-r0-f210-release-qualification-policy: .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
+  releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-final-mile-tooling-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-maintainer-final-github-release-authorization: .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
+  releases.waves.mir4-r0-final-mile-playtest-candidate-authority: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
+  releases.waves.mir4-r0-final-release-closure-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
+  releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
+  releases.waves.mir4-r0-supply-chain-preservation-t15: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
+  releases.waves.mir4-r0-t15-independent-machine-acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
+  releases.waves.mir4-r0-t15-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t17-machine-preparation-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T17-Machine-Preparation-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t02-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t03-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t04-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t05-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T05-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-release-fault-corpus: .mir/releases/waves/mir4-r0/MIR4-Release-Fault-CorpusV1.json
+  releases.waves.mir4-r0-t06-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t07-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T07-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t08-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T08-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t09-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T09-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t10-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T10-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t11-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T11-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-t12-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T12-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-release-compatibility-canaries-t13: .mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json
+  releases.waves.mir4-r0-t13-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-T13-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-platform-maturity-publication-contract-v2: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
+  releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
+  releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json
+  releases.governance.mir4.github-actions-lock-v2: .mir/releases/governance/mir4/github-actions-lock-v2.json
+  releases.governance.mir4.supply-chain: .mir/releases/governance/mir4/supply-chain.json
+  releases.governance.mir4.signing-ceremony-preparation: .mir/releases/governance/mir4/signing-ceremony-preparation.json
+  releases.governance.mir4.ruleset-snapshot-2026-08-24: .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
   releases.waves.mir4-r0-dashboard: .mir/releases/waves/mir4-r0/dashboard.json
   releases.waves.mir4-r0-queue: .mir/releases/waves/mir4-r0/queue.json
+  sdk.preview.mir4.reference.t13-receipt: sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json
   evidence.root: .mir/evidence
   evidence.mir4-r0-engine-availability: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
   evidence.mir3-dot9-mod-portal-visibility-recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json

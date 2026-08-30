@@ -9,30 +9,30 @@
   "hash_algorithm": "sha256",
   "derived_from": {
     "path": ".mir/releases/waves/mir4-r0/terminal-baseline-import.json",
-    "record_sha256": "85F7102DEBF0DABFE031B151241920174712748EE08554B52CC59B4AC3E9D78F"
+    "record_sha256": "9E32D57535047CC0637B00025E799D886E7C2DA5925EB1FAE0001331C3531ECE"
   },
   "targets": [
     {
       "target_id": "f210",
       "factorio_line": "2.1",
-      "predecessor_release": "3.2.10",
+      "predecessor_release": "3.2.11",
       "source_identity": {
-        "candidate_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
-        "candidate_tree": "46eb4cd0c48a1d997a632a3ff83606d19d9af19a",
+        "candidate_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+        "candidate_tree": "b6102e8ed616955fc335d784a98357b62111322a",
         "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
       },
       "terminal_distribution": {
-        "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
-        "content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9"
+        "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
       },
       "baseline_identity": {
-        "path": ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json",
-        "record_sha256": "980519BEB17E1B17F61DA2735482A905142551FDF6C4CC14D4832D4EC2ADA2CA",
-        "input_root_sha256": "6456A368697CEF8FB31B07F0712EB530AA3888CC640740117410E5409D741829"
+        "path": ".mir/releases/terminal/baselines/3.2.11/baseline-manifest.json",
+        "record_sha256": "6A428949ECC970DBC5C67C1A03281A0C5B90679AE5996B5E58DDF2407EAB3566",
+        "input_root_sha256": "1CFCA788E7D0243A4A3801303615DCEFE035B11F90E25BB435CFD1501FD95C57"
       },
       "snapshot_identity": {
-        "path": ".mir/releases/terminal/baselines/3.2.10/normalized-snapshot.json",
-        "record_sha256": "CEC37F7D90D3F1C625E07387B8CD9FE918DD48D2BFF06333A453F04108FAF7F3"
+        "path": ".mir/releases/terminal/baselines/3.2.11/normalized-snapshot.json",
+        "record_sha256": "2F069E77C50E5D1E080CA3B2D5FDC8E9290C468F55D94F232EF6F24F2B905689"
       },
       "exact_engine": {
         "version": "2.1.14",
@@ -41,39 +41,39 @@
       "roots": {
         "semantic": {
           "domain": "mir4.bootstrap.semantic.v1",
-          "sha256": "B5E78ACFA747FE480F7780D135EAC923F2B99FE90C4B103A30EF59B95A25D33E"
+          "sha256": "89E3609D3D746CF3BDB780D21332082E225C393175F47B4D27A9EFA4FD1D2BDD"
         },
         "authority": {
           "domain": "mir4.bootstrap.authority.v1",
-          "sha256": "099DEA1C0EB30C42B03752CFC15CEF15FD3B168ECA2B115D0AA91BE4BED26C77"
+          "sha256": "D51EC434C5AB031C0D2736C1931CD86BA10885FADDC7428057FF02279F01AFC4"
         },
         "qualification": {
           "domain": "mir4.bootstrap.qualification.v1",
-          "sha256": "223FCBF6840D573CFF503289F76E35E099497D9C74822145D0DB2DD96227553F"
+          "sha256": "26989357BD01703663E2A58D6AEFEADE4A424B28DB14A09DB8BB9E28837C089E"
         }
       }
     },
     {
       "target_id": "f200",
       "factorio_line": "2.0",
-      "predecessor_release": "2.5.10",
+      "predecessor_release": "2.5.11",
       "source_identity": {
-        "candidate_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
-        "candidate_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+        "candidate_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
+        "candidate_tree": "7786bdeaee398e069abdf7de797f82f645ccba45",
         "common_source_commit": "255a20df771ae5fa3a38007bd2268bab3e9e1eff"
       },
       "terminal_distribution": {
-        "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
-        "content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66"
+        "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
       },
       "baseline_identity": {
-        "path": ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json",
-        "record_sha256": "EA502219203357E6DAEA62B54196EBF3F21D62638CF61FD0D950D7EF6913DC05",
-        "input_root_sha256": "D8F7543D496D36AA1DC94A20F4D3D04BA78A834C42A3798684825D06ACC664AB"
+        "path": ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json",
+        "record_sha256": "15323DD05DC3AEDC75C499EB3EC39218B80C90368254C049269B29F31C664D0C",
+        "input_root_sha256": "66E331CE620FBE5CF1395EDE2486FC667EDC209959B856B63C4B8A1E9CD1DAB1"
       },
       "snapshot_identity": {
-        "path": ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json",
-        "record_sha256": "2952CFBD3AE258DB71DF133A62BDAF992478BE8F637479CE3B8BF62A8E62B036"
+        "path": ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json",
+        "record_sha256": "1EFA0686034369DDEA79C54EAD7B91C05698357AEBC6AA4672EDE0E782C4B4F8"
       },
       "exact_engine": {
         "version": "2.0.77",
@@ -82,15 +82,15 @@
       "roots": {
         "semantic": {
           "domain": "mir4.bootstrap.semantic.v1",
-          "sha256": "B6320FECF9AFCFC01C3494BD66594352D40C277FB4F5ADFCCA6F3CCDB0DFD4CE"
+          "sha256": "C10E02BB5253A369F343F1D165810DFF66B305A68AE7B51EAF7D0D50B9A5555A"
         },
         "authority": {
           "domain": "mir4.bootstrap.authority.v1",
-          "sha256": "F5D2EB6516AA92C822BFD7C6C8A9B96F281330FD34DA50CAC1309CF9EF591011"
+          "sha256": "FF7A34AA6321916173642B070FFFDD2DB60ACB40E071CECE66F19367FADF7109"
         },
         "qualification": {
           "domain": "mir4.bootstrap.qualification.v1",
-          "sha256": "6FA47BC4E429F32E9044B062225673D0BDFA0F808E9E43A61DB21B00E28BBCB2"
+          "sha256": "19E4A6E429C652B8F4CF4BB8E87B14A01115F1A7A0CAA0735B042E854B9EB2ED"
         }
       }
     },
@@ -177,5 +177,5 @@
       }
     }
   ],
-  "record_sha256": "5E72C16D11BA5F80BE7D1D392BF36C63AE0BED2F972E29F90CB54484585F659A"
+  "record_sha256": "F71B9FA4E88BE0BE3DD23A770493B08448EEAEAD719D19BC755E2A22A0030C6D"
 }

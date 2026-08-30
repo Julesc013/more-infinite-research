@@ -55,6 +55,7 @@ $moduleRoot = Join-Path $repo "tools\lib\compatibility"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+. (Join-Path $repo "tools\lib\validation\FactorioProcess.ps1")
 . (Join-Path $repo "tools\lib\validation\SettingsOverrides.ps1")
 
 $resolvedSanitationBudgetPath = (Resolve-Path -LiteralPath $SanitationBudgetPath).Path
@@ -176,6 +177,21 @@ function Get-MIRObjectProperty {
   $property = $Object.PSObject.Properties[$Name]
   if ($null -eq $property) { return $Default }
   return $property.Value
+}
+
+function Test-MIRCompatAuditRowMatch {
+  param(
+    [Parameter(Mandatory)]$Row,
+    [Parameter(Mandatory)]$Expected
+  )
+
+  foreach ($property in @($Expected.PSObject.Properties)) {
+    $actual = $Row.PSObject.Properties[[string]$property.Name]
+    if ($null -eq $actual -or [string]$actual.Value -cne [string]$property.Value) {
+      return $false
+    }
+  }
+  return $true
 }
 
 function Select-MIRWindow {
@@ -1037,6 +1053,13 @@ function Invoke-MIRScenarioLoad {
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
   Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine
   Enable-CopiedDiagnostics -ModsDir $modsDir
+  $scenarioSettings = Get-MIRObjectProperty -Object $Scenario -Name "settings" -Default ([pscustomobject]@{})
+  $startupOverrides = @{}
+  foreach ($property in @($scenarioSettings.PSObject.Properties)) {
+    $startupOverrides[[string]$property.Name] = $property.Value
+  }
+  Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $startupOverrides
+  Complete-MIRSettingsOverrideMod -ModsDir $modsDir
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
@@ -1103,6 +1126,35 @@ function Invoke-MIRScenarioLoad {
   )
   $allScienceAssertions = @($scienceAssertions) + @($forbiddenScienceAssertions)
   $scienceContractPassed = @($allScienceAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
+  $requiredAuditRows = @(Get-MIRObjectProperty -Object $expectedPlan -Name "required_audit_rows" -Default @())
+  $requiredAuditAssertions = @(
+    foreach ($expectedRow in $requiredAuditRows) {
+      $matchingRows = @($result.audit_rows | Where-Object { Test-MIRCompatAuditRowMatch -Row $_ -Expected $expectedRow })
+      [pscustomobject]@{
+        expected = $expectedRow
+        matching_rows = $matchingRows.Count
+        passed = ($matchingRows.Count -gt 0)
+      }
+    }
+  )
+  $stdoutText = if (-not [string]::IsNullOrWhiteSpace([string]$result.stdout) -and
+      (Test-Path -LiteralPath ([string]$result.stdout) -PathType Leaf)) {
+    [IO.File]::ReadAllText([string]$result.stdout)
+  } else { "" }
+  $requiredLogAssertions = @(
+    foreach ($fragment in @(Get-MIRObjectProperty -Object $expectedPlan -Name "required_log_fragments" -Default @())) {
+      $text = [string]$fragment
+      [pscustomobject]@{fragment=$text; passed=$stdoutText.Contains($text, [StringComparison]::Ordinal)}
+    }
+  )
+  $forbiddenLogAssertions = @(
+    foreach ($fragment in @(Get-MIRObjectProperty -Object $expectedPlan -Name "forbidden_log_fragments" -Default @())) {
+      $text = [string]$fragment
+      [pscustomobject]@{fragment=$text; passed=(-not $stdoutText.Contains($text, [StringComparison]::Ordinal))}
+    }
+  )
+  $runtimeAssertions = @($requiredAuditAssertions) + @($requiredLogAssertions) + @($forbiddenLogAssertions)
+  $runtimeContractPassed = @($runtimeAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -1118,7 +1170,7 @@ function Invoke-MIRScenarioLoad {
     skipped = $false
     skip_reason = ""
     process_passed = [bool]$result.passed
-    passed = ($result.passed -and $scienceContractPassed)
+    passed = ($result.passed -and $scienceContractPassed -and $runtimeContractPassed)
     save = $result.save
     stdout = $result.stdout
     stderr = $result.stderr
@@ -1127,6 +1179,10 @@ function Invoke-MIRScenarioLoad {
     science_contract_passed = $scienceContractPassed
     science_assertions = $scienceAssertions
     forbidden_science_assertions = $forbiddenScienceAssertions
+    runtime_contract_passed = $runtimeContractPassed
+    required_audit_assertions = $requiredAuditAssertions
+    required_log_assertions = $requiredLogAssertions
+    forbidden_log_assertions = $forbiddenLogAssertions
   }
 }
 

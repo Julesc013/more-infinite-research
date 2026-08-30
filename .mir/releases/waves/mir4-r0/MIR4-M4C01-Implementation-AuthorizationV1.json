@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4C01ImplementationAuthorizationV1",
+  "status": "authorized-in-progress",
+  "recorded_at": "2026-08-18T12:00:00+10:00",
+  "approved_by": "explicit-maintainer-approval-2026-08-18",
+  "approval_phrase": "APPROVE MIR4 IMPLEMENTATION — EOL PATH A — HYBRID FULL-PLATFORM 4.0",
+  "baseline": {"branch":"dev","commit":"b460edd330dc19524bad97a2374c4c40c3b2ef36"},
+  "branch": "agent/mir4-full-platform-m4c01",
+  "eol_path": "A-finish-immutable-terminal-portal-custody",
+  "authorized": ["governance-and-documentation","developer-preview-api-sdk-mep-inspector-reference-extension","shadow-target-normalized-compiler-runtime-state-process-ir-synthesis","private-f210-through-f013-candidate-construction","exact-engine-development-proof","reviewed-pr-into-dev"],
+  "not_authorized": ["production-key-create-or-use","authoritative-shadow-cutover","main-promotion","legacy-promotion","v4-tags","github-release-publication","mod-portal-mir4-upload","production-seal","cleanup-or-deletion"],
+  "continuation": "work-autonomously-through-safe-in-scope-implementation-and-validation; represent missing evidence as explicit status",
+  "record_sha256": "487FD02DB0380FA3691311BA6628A70A5758BB1D1BF5C889AC2184496D27D7C2"
+}

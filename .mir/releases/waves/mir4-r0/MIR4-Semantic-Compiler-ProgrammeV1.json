@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIR4SemanticCompilerProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "shadow-reference-compiler-executable",
+  "compilation_run_schema": "spec/schemas/mir4-compilation-run-v1.schema.json",
+  "target_contract_authority": ".mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json",
+  "terminal_player_authority": [
+    "prototypes/mir/pipeline/compiler_context.lua",
+    "prototypes/mir/pipeline/compiler_orchestrator.lua",
+    "prototypes/mir/planner/compiler.lua",
+    "prototypes/mir/planner/compilation_plan.lua",
+    "prototypes/mir/domain/compiler/transformation_plan.lua",
+    "prototypes/mir/emit/technology_operation_executor.lua",
+    "prototypes/mir/domain/compiler/mutation_journal.lua",
+    "prototypes/mir/domain/compiler/compiler_result.lua",
+    "prototypes/mir/report/public_compiler_artifacts.lua"
+  ],
+  "provider_protocols": [
+    {"id":"FactContributor","owner":"prototypes/mir/pipeline/compilation_snapshot_adapter.lua","legacy_field":"discovery"},
+    {"id":"CandidateDiscoverer","owner":"prototypes/mir/providers/pipeline/discovery.lua","legacy_field":"discovery"},
+    {"id":"Normalizer","owner":"prototypes/mir/providers/pipeline/normalization.lua","legacy_field":"normalization"},
+    {"id":"Classifier","owner":"prototypes/mir/providers/pipeline/classification.lua","legacy_field":"classification"},
+    {"id":"RiskContributor","owner":"prototypes/mir/providers/pipeline/hazard_policy.lua","legacy_field":"validation_hooks"},
+    {"id":"PolicyContributor","owner":"prototypes/mir/pipeline/policy_snapshot_adapter.lua","legacy_field":"policy"},
+    {"id":"SettingContributor","owner":"prototypes/mir/settings/catalog.lua","legacy_field":"settings"},
+    {"id":"PresentationContributor","owner":"prototypes/mir/providers/pipeline/decision.lua","legacy_field":"presentation"},
+    {"id":"RuntimeFeatureContributor","owner":"prototypes/mir/runtime/state.lua","legacy_field":"runtime"},
+    {"id":"MigrationContributor","owner":"prototypes/mir/providers/builtins.lua","legacy_field":"migration"},
+    {"id":"DiagnosticContributor","owner":"prototypes/mir/providers/provider_metrics.lua","legacy_field":"diagnostic_codes"},
+    {"id":"ProofContributor","owner":"prototypes/mir/graph/evidence.lua","legacy_field":"validation_hooks"},
+    {"id":"FixtureContributor","owner":"prototypes/mir/providers/contract.lua","legacy_field":"fixtures"}
+  ],
+  "merge_laws": [
+    {"id":"hard-safety","operator":"restrictive-meet","owner":"tools/mir/domain/safety/SafetyKernel.ps1","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"target-support","operator":"restrictive-support-meet","owner":"tools/mir/application/targets/TargetCompiler.ps1","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"feature-disable","operator":"disable-dominates","owner":"prototypes/mir/planner/compilation_plan.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"owner","operator":"stable-exclusive-precedence","owner":"prototypes/mir/providers/pipeline/owner_arbitration.lua","status":"implemented-adapter","properties":["idempotent","permutation-invariant"]},
+    {"id":"science-packs","operator":"normalized-set-union","owner":"prototypes/mir/planner/science.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"prerequisites","operator":"acyclic-normalized-union","owner":"prototypes/mir/planner/technology_graph.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"numeric-values","operator":"bounded-maximum","owner":"prototypes/mir/domain/research_cost/model.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"presentation","operator":"stable-presentation-precedence","owner":"prototypes/mir/pipeline/mutations/maximum_level_presentation.lua","status":"implemented-adapter","properties":["idempotent","permutation-invariant"]},
+    {"id":"diagnostics","operator":"identity-set-union","owner":"prototypes/mir/domain/diagnostics/codes.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"evidence","operator":"fingerprint-set-union","owner":"prototypes/mir/graph/evidence.lua","status":"implemented-adapter","properties":["associative","commutative","idempotent","permutation-invariant"]},
+    {"id":"subscriptions","operator":"runtime-registration-order","owner":"W04","status":"deferred-runtime-owner","properties":[]},
+    {"id":"migrations","operator":"migration-path-selection","owner":"W04","status":"deferred-runtime-owner","properties":[]}
+  ],
+  "plans": [
+    {"id":"SettingsPlan","owner":"prototypes/mir/settings/effective.lua","status":"reference-only"},
+    {"id":"PrototypeNormalizationPlan","owner":"prototypes/mir/planner/compilation_plan.lua","status":"reference-only"},
+    {"id":"PrototypeMutationPlan","owner":"prototypes/mir/domain/compiler/transformation_plan.lua","status":"existing-executor-only"},
+    {"id":"RuntimeRegistrationPlan","owner":"W04","status":"deferred-runtime-owner"},
+    {"id":"MigrationPlan","owner":"W04","status":"deferred-runtime-owner"},
+    {"id":"TargetProjectionPlan","owner":"tools/mir/application/targets/TargetCompiler.ps1","status":"reference-only"},
+    {"id":"PublicationPlan","owner":".mir/releases/governance/mir4/release-governance.json","status":"blocked-release-governance"}
+  ],
+  "legacy_adapter": {
+    "kind": "MIR4LegacyCompilerProviderAdapterV1",
+    "source_contract": "prototypes/mir/providers/contract.lua",
+    "source_registry": "prototypes/mir/providers/builtins.lua",
+    "rewrite_required": false
+  },
+  "semantic_authority": false,
+  "player_package_mutation_authorized": false,
+  "runtime_state_mutation_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "rollback": "Remove CompilationRun V1 and its package-excluded projections; retain the terminal CompilerContext, planner, executors, journals, and public artifacts unchanged."
+}

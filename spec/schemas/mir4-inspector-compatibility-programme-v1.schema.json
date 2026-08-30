@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/control/inspector-compatibility-programme-v1.schema.json",
+  "title": "MIR 4 W07 inspector compatibility programme authority",
+  "type": "object",
+  "required": ["schema", "kind", "tooling"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4InspectorCompatibilityProgrammeV1"},
+    "tooling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applications", "commands", "migration_authority", "compatibility_entrypoints", "package_visible", "release_transition_authority"],
+      "properties": {
+        "applications": {"const": ["tools/mir/application/inspection/SupportAssessment.ps1", "tools/mir/application/inspection/CompatibilityIndex.ps1", "tools/mir/application/inspection/CompatibilityFactory.ps1", "tools/mir/application/inspection/Inspector.ps1"]},
+        "commands": {"const": ["tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1"]},
+        "migration_authority": {"const": "governance/repository/migrations/inspector-compatibility-tooling-v1.json"},
+        "compatibility_entrypoints": {"const": ["tools/lib/mir4/SupportAssessment.ps1", "tools/lib/mir4/CompatibilityIndex.ps1", "tools/lib/mir4/CompatibilityFactory.ps1", "tools/lib/mir4/Inspector.ps1", "tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1"]},
+        "package_visible": {"const": false},
+        "release_transition_authority": {"const": false}
+      }
+    }
+  }
+}

@@ -8,6 +8,9 @@ owner: mir-maintainers
 last_reviewed: 2026-08-17
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - backporting-policy
+  - backport-target-profile-projection
 ---
 
 # Target-Line Versioning And Backports
@@ -107,6 +110,9 @@ Stop the affected target when its predecessor identity is lost, its reconstructe
 Transport failure is resumable publication work. Verify remote state and retry only the failed operation with the same frozen bytes; never rebuild, move a correct tag, or invent evidence.
 
 ## Machine-readable authority
+
+For MIR 4.0, `dev` is the only active integration branch. `release/mir4-4.0.0` remains an inactive policy template until a separate source-freeze authorization names one exact `dev` commit. `main` remains at published MIR 3.2.11 until that identical tree and its already-built bytes have passed qualification, manual acceptance, independent acceptance, signing, sealing, and production go/no-go. Do not rebuild or add a commit between qualification and promotion.
+
 
 - `.mir/branches.yml` defines branch and target routing.
 - `.mir/targets.json` defines target capabilities.

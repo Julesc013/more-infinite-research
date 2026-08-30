@@ -394,13 +394,15 @@ function Get-MIRAssuranceContext {
   $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
   $target = Get-MIRAssuranceOption -Name "--target" -Default ([string]$config.default_target)
+  $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   $sourceTree = @(& git -C $repo rev-parse "HEAD^{tree}" 2>$null)
   if ($LASTEXITCODE -ne 0 -or $sourceTree.Count -ne 1) { throw "Unable to resolve the development source tree." }
   $defaultCandidate = Get-MIRAssuranceDevelopmentCandidatePath -Info $info -SourceTree ([string]$sourceTree[0])
   $candidateOption = Get-MIRAssuranceOption -Name "--candidate"
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption) -and
       [string]$target -eq "2.1" -and
-      [string]$info.version -eq "3.2.10" -and
+      [string]$verificationProfile.release_authority_mode -eq "candidate-programme" -and
+      [string]$info.version -eq [string]$verificationProfile.upgrade.from_version -and
       (Test-Path -LiteralPath (Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json") -PathType Leaf)) {
     $candidateOption = Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"
   }
@@ -417,7 +419,6 @@ function Get-MIRAssuranceContext {
   $trustPolicyPath = Get-MIRAssuranceCanonicalTrustPolicyPath
   $trustPolicy = Get-Content -Raw -LiteralPath $trustPolicyPath | ConvertFrom-Json
   if ([int]$trustPolicy.schema -ne 1) { throw "Verification trust policy schema must be 1." }
-  $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   return [pscustomobject]@{
     config=$config
     catalog=$catalog

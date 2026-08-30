@@ -5,38 +5,44 @@ applies_to: "MIR4-R0-pre-release"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-17
+last_reviewed: 2026-08-25
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir4-r0-bootstrap-architecture
+  - mir4-r0-bootstrap-root-set
+  - mir4-r0-current-status
+  - mir4-r0-executable-queue
+  - mir4-bootstrap-target-readiness
+  - mir3-terminal-public-visibility-status
 ---
 
 # MIR 4 R0 Bootstrap
 
-MIR 3 product development is closed except for the immutable post-terminal 3.2.10 and 2.5.10 emergency releases. All historical `.9` releases remain immutable; Mod Portal custody and the archival EOL programme remain open. MIR 4 R0 is active only on the package-excluded successor plane.
+MIR 3 product development is closed. The post-terminal 3.2.11 and 2.5.11 releases and all historical `.9` releases remain immutable; unresolved alias/hotfix PR residue and remaining custody work are tracked separately. MIR 4 R0 is active only on the package-excluded successor plane.
 
-The executable authority is `.mir/releases/waves/mir4-r0/`. It separates programme, entry, version, target, equivalence, layout, terminal import, bootstrap roots, emergency-lane, offline release, and governance-reconciliation decisions. The generated dashboard reports `READY_FOR_MIR4_R0_IMPLEMENTATION`, and the generated queue names Plan V2 candidate materialization and target-local reproof as the next executable M4-003 task.
+The current executable authority is `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json`. It binds the exact Dev baseline, current release cut, workflow maturity vocabulary, blocker authorities, MIR 3 residual disposition, and 22-turn dependency queue. The generated dashboard reports `T05-COMPLETE-T06-READY-RELEASE-BLOCKED`; all ten release phases now have non-production adapters. Release doctor maturity, fault injection, and the exact end-to-end mock release are the next dependency-ready package.
 
 ## Current boundary
 
 ```text
-MIR 3 GitHub publication: 3.2.10 Latest; 2.5.10 published and verified
-MIR 3 Mod Portal custody: partial; seven .9 uploads absent
+MIR 3 GitHub publication: 3.2.11 Latest; 2.5.11 published and verified
+MIR 3 open PR residue: PR 149 alias advance and draft PR 146 require disposition
 MIR 3 product development: closed
-MIR 3 final .9 baselines: deterministic capture ready; custody pending
-MIR 3 EOL: pending
 MIR 4 R0: active, package-excluded, non-authoritative
-public 4.x: forbidden until MIR 3 EOL
+MIR 4 candidate: pre-freeze, M4RC1 unallocated
 f210 exact executable lock: Steam Factorio 2.1.14 maintainer lock bound
-f200 exact executable lock: Factorio 2.0.77 lock bound to 2.5.10 predecessor
-f110/f100 exact executable locks: observed matching
-MIR 4 local construction: Plan V2 current; private lane V2 current; candidate reproof pending
+f200 exact executable lock: Factorio 2.0.77 lock bound to 2.5.11 predecessor
+release phase kernel: event-sourced, idempotent, resumable, tested, non-production only
+release workflows: 10 registered and fail-closed; 0 phase adapters implemented or rehearsed
+source freeze, signing, promotion, tags and publication: blocked
 ```
 
 The dated non-emitting readiness records remain historical evidence. Current predecessor authority binds 3.2.10 to the maintainer-accepted Steam Factorio 2.1.14 executable and 2.5.10 to Factorio 2.0.77. Those locks permit candidate-bound reproof; they do not themselves claim MIR 4 runtime qualification.
 
 Mod Portal custody also remains fail-closed. A dated read-only recheck confirms that both `3.2.9` and `2.5.9` appear in the official API and the rendered downloads table with API SHA-1 values matching their sealed archives. That public visibility does not substitute for custody: authenticated redownload, byte verification, exact-engine public-asset smoke, archive and rights records, and the MIR 3 EOL seal remain open.
 
-Current predecessor identity is owned by `MIR4-Target-RegistryV3`; distribution encoding remains owned by the unchanged `MIR4-Target-RegistryV2` and `MIR4-Versioning-and-Distribution-Identity-ADRv2` codec pair. The registry contains all 17 direct string codes from `210` through `006`; the exhaustive codec fixture covers patches `00`, `01`, `08`, `09`, and `99`, the `65499` internal boundary, and negative inputs. Earlier registry generations remain historical evidence.
+Current target identity is owned by `MIR4-Target-RegistryV6`; distribution encoding remains owned by the unchanged V2 codec authority. Earlier registry generations remain historical evidence.
 
 `tools/mir.ps1 mir4 check` validates the acyclic entry gate, all ten typed R0 authorities, version projection, nine baseline manifests, nine normalized snapshots, nine release-closure views, the all-nine import, the four-target bootstrap root set, dashboard, queue, and unchanged terminal distributions.
 
@@ -52,4 +58,4 @@ The eventual layout separates `src/`, `platforms/factorio/`, and `targets/`. Cur
 
 ## Next slice
 
-Plan V1 and the first private-lane authorization remain historical. `MIR4BootstrapLocalCandidatePlanV2` imports the current terminal import, Target Registry V3, 3.2.10 and 2.5.10 predecessor refresh, and `MIR4ApprovedBootstrapCorrectionDeltaV2`. `MIR4PrivateLaneAuthorizationV2` advances f200 to the immutable 2.5.10 predecessor while retaining f110 and f100 unchanged. The next M4-003 slice is deterministic f210 and f200 construction followed by exact-engine clean-install, direct-upgrade, reload, settings/profile preservation, and MIR3-TERM-0033 rollback reproof. It allocates no public tag and authorizes no public output.
+The former M4-003 bootstrap queue is retained as historical evidence. T02 provides the package-excluded, event-sourced release phase kernel with an explicit phase interface, idempotency, resume, compensation, receipts, and bounded Git, build, engine, signing, and publication ports. It authorizes no production mutation. T03 through T05 implement all ten phase adapters without changing that production boundary. T06 must now prove their truthful doctor projection, injected-fault closure, and exact end-to-end mock composition.

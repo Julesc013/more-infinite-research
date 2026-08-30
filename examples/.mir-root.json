@@ -1,0 +1,16 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "examples",
+  "path": "examples",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    "fixtures",
+    "sdk/preview/mir4/reference",
+    "sdk/preview/mir4/reference-extension"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

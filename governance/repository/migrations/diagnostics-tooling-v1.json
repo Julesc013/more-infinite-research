@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "MIR4DiagnosticsMigrationAuthorityV1",
+  "migration_id": "MIR4-DIAGNOSTICS-TOOLING-V1",
+  "state": "PACKAGE-EXCLUDED-DIAGNOSTICS-DOMAIN-AND-TEST-WRITER-CUTOVER",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json",
+    "sha256": "B126E835EDE63832D62833B4A96FD888301DB608858A1D94BC2D4B93F7ADA27A"
+  },
+  "scope": "package-excluded diagnostics implementation, focused test, reusable append-only migration engine, contracts, assurance, and successor receipt only",
+  "activated_roots": ["governance", "contracts", "assurance", "tests", "tools-mir", "releases"],
+  "writers": [
+    {
+      "fact_family": "diagnostics-migration-receipt",
+      "path": "tools/mir/application/diagnostics/DiagnosticsMigration.ps1",
+      "command": "tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1"
+    }
+  ],
+  "path_map": [
+    {"family":"migration-governance","current_path":null,"final_path":"governance/repository/migrations/diagnostics-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-authority-contract","current_path":null,"final_path":"contracts/repository/mir4-diagnostics-migration-authority-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-proof-contract","current_path":null,"final_path":"contracts/repository/mir4-diagnostics-migration-proof-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt-contract","current_path":null,"final_path":"contracts/repository/mir4-diagnostics-migration-receipt-v1.schema.json","state":"authoritative","package_visible":false},
+    {"family":"migration-assurance","current_path":null,"final_path":"assurance/repository/diagnostics-tooling-v1.json","state":"authoritative","package_visible":false},
+    {"family":"migration-receipt","current_path":null,"final_path":"releases/migrations/MIR4-Diagnostics-Tooling-MigrationV1.json","state":"generated-by-sole-writer","package_visible":false},
+    {"family":"append-only-migration-engine","current_path":null,"final_path":"tools/mir/application/migration/AppendOnlyAuthorityMigration.ps1","state":"authoritative-reusable-engine","package_visible":false},
+    {"family":"diagnostics-domain","current_path":"tools/lib/mir4/DiagnosticsV1.ps1","final_path":"tools/mir/domain/diagnostics/DiagnosticsV1.ps1","state":"authoritative-old-forwarder-retained","package_visible":false},
+    {"family":"module-ecosystem-diagnostics-consumer","current_path":"tools/lib/mir4/ModuleEcosystem.ps1","final_path":"tools/lib/mir4/ModuleEcosystem.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"canonicalization-diagnostics-consumer","current_path":"tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1","final_path":"tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"platform-preview-diagnostics-consumer","current_path":"tools/lib/mir4/PlatformPreview.ps1","final_path":"tools/lib/mir4/PlatformPreview.ps1","state":"evolved-current-consumer","package_visible":false},
+    {"family":"diagnostics-functional-test","current_path":null,"final_path":"tests/diagnostics/Test-MIR4DiagnosticsV1.ps1","state":"authoritative","package_visible":false},
+    {"family":"diagnostics-migration-application","current_path":null,"final_path":"tools/mir/application/diagnostics/DiagnosticsMigration.ps1","state":"sole-writer","package_visible":false},
+    {"family":"diagnostics-migration-cli","current_path":null,"final_path":"tools/mir/cli/Invoke-MIR4DiagnosticsMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"diagnostics-migration-test","current_path":null,"final_path":"tests/diagnostics/Test-MIR4DiagnosticsMigration.ps1","state":"authoritative","package_visible":false},
+    {"family":"canonicalization-historical-receipt-checker","current_path":"tools/mir/application/canonicalization/CanonicalizationMigration.ps1","final_path":"tools/mir/application/canonicalization/CanonicalizationMigration.ps1","state":"evolved-to-immutable-reader","package_visible":false},
+    {"family":"canonicalization-historical-receipt-cli","current_path":"tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1","final_path":"tools/mir/cli/Invoke-MIR4CanonicalizationMigration.ps1","state":"evolved-generate-disabled","package_visible":false},
+    {"family":"canonicalization-historical-receipt-test","current_path":"tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1","final_path":"tests/canonicalization/Test-MIR4CanonicalizationMigration.ps1","state":"evolved-historical-verification","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"tools/lib/mir4/DiagnosticsV1.ps1","role":"library-forwarder","writable":false}
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "git revert --no-edit <exact-diagnostics-migration-merge-commit>",
+    "preserves": ["releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json", "releases/migrations/MIR4-Canonicalization-Tooling-MigrationV1.json", "player-package-source", "historical-evidence"]
+  },
+  "sunset": {
+    "state": "deferred-compatibility-readers-retained",
+    "required_gates": ["all-declared-consumers-use-final-paths", "canonical-and-compatibility-result-parity", "rollback-rehearsal", "sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "release_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "seal": false,
+    "promotion": false,
+    "tagging": false,
+    "publication": false
+  }
+}

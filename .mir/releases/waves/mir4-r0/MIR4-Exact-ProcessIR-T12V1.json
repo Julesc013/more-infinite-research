@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "MIR4ExactProcessIRT12V1",
+  "work_package": "T12",
+  "maturity": "developer-preview",
+  "authority": "package-excluded exact observation only",
+  "terminal_fact_authority_preserved": true,
+  "semantic_authority": false,
+  "player_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "planner_or_emitter_admission_authorized": false,
+  "automatic_synthesis_authorized": false,
+  "public_support_authorized": false,
+  "release_admission_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "tooling": {
+    "applications": ["tools/mir/application/processir/ExactProcessIR.ps1"],
+    "commands": ["tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1"],
+    "migration_authority": "governance/repository/migrations/processir-exact-tooling-v1.json",
+    "compatibility_entrypoints": ["tools/lib/mir4/ExactProcessIR.ps1","tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1"],
+    "reference_mode": "read-only-exact-historical-evidence",
+    "package_visible": false,
+    "release_transition_authority": false
+  },
+  "maximum_processes_per_capture": 128,
+  "required_repetitions": 2,
+  "observer_source": "fixtures/mir4-processir-exact-observer/data-final-fixes.lua",
+  "candidate_source": {
+    "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+    "tree": "33f373e42b74697f08d2b3e0bf36a233fcb9bfcd"
+  },
+  "targets": {
+    "f210": {
+      "factorio_line": "2.1",
+      "engine_version": "2.1.14",
+      "engine_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F",
+      "candidate": "build/results/mir4-sol/sol08/target-candidates/distributions/more-infinite-research_4.0.21000.zip",
+      "candidate_version": "4.0.21000",
+      "candidate_sha256": "5058499D4A2802B0F1D9FDC50C1887C36A76AA2C9A4BD9B5F8DFFB58D1ACBD7D",
+      "available_official_mods": ["elevated-rails", "quality", "recycler", "space-age"]
+    },
+    "f200": {
+      "factorio_line": "2.0",
+      "engine_version": "2.0.77",
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "candidate": "build/results/mir4-sol/sol08/target-candidates/distributions/more-infinite-research_4.0.20000.zip",
+      "candidate_version": "4.0.20000",
+      "candidate_sha256": "0078768BDDAEB4E8AE243D406919C38C55AC6C2CB96A492E890175EDEB0860C4",
+      "available_official_mods": ["elevated-rails", "quality", "space-age"]
+    }
+  },
+  "captures": [
+    {"id":"f210-base","target":"f210","scenario_id":"base-baseline","evidence":"build/results/mir4-sol/sol11/f210-base-corrected-v3/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-base-corrected-v3/compat-candidates.lock.json","selectors":["science","productivity","recycling"]},
+    {"id":"f210-official","target":"f210","scenario_id":"space-age-baseline","evidence":"build/results/mir4-sol/sol11/f210-base-corrected-v3/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-base-corrected-v3/compat-candidates.lock.json","selectors":["science","quality","recycling","cryogenic"]},
+    {"id":"f200-base","target":"f200","scenario_id":"local-2-0-base-baseline","evidence":"build/results/mir4-sol/sol11/f200-base-corrected-v1/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f200-base-corrected-v1/compat-candidates.lock.json","selectors":["science","productivity","recycling"]},
+    {"id":"f200-official","target":"f200","scenario_id":"local-2-0-space-age-baseline-if-installed","evidence":"build/results/mir4-sol/sol11/f200-base-corrected-v1/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f200-base-corrected-v1/compat-candidates.lock.json","selectors":["science","quality","recycling","cryogenic"]},
+    {"id":"f210-corrundum","target":"f210","scenario_id":"local-2-1-corrundum-maxcap-13","evidence":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/compat-candidates.lock.json","selectors":["corrundum","electrochemical","platinum"]},
+    {"id":"f210-cubium","target":"f210","scenario_id":"local-2-1-cubium-production-routes","evidence":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/compat-candidates.lock.json","selectors":["cubium","cube","dream"]},
+    {"id":"f210-recycler","target":"f210","scenario_id":"local-2-1-recycler-progression-routes","evidence":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/compat-candidates.lock.json","selectors":["recycl","scrap","recovery"]},
+    {"id":"f210-k2so","target":"f210","scenario_id":"local-2-1-krastorio-spaced-out","evidence":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f210-affected-corrected-v2/compat-candidates.lock.json","selectors":["kr-","matter","imersite","singularity"]},
+    {"id":"f200-k2so","target":"f200","scenario_id":"local-2-0-krastorio-spaced-out","evidence":"build/results/mir4-sol/sol11/f200-k2so-corrected-v1/campaign-evidence.json","lock":"build/results/mir4-sol/sol11/f200-k2so-corrected-v1/compat-candidates.lock.json","selectors":["kr-","matter","imersite","singularity"]},
+    {"id":"f210-aai","target":"f210","scenario_id":"local-2-1-aai-loaders-industry","evidence":".mir/evidence/3.1.0-rc2-ecosystem-campaign.json","lock":".mir/evidence/3.1.0-rc2-ecosystem-lock.json","selectors":["aai","loader","motor","industrial"]},
+    {"id":"f210-bz","target":"f210","scenario_id":"local-2-1-bz-suite-space-age","evidence":".mir/evidence/3.1.0-rc2-ecosystem-campaign.json","lock":".mir/evidence/3.1.0-rc2-ecosystem-lock.json","selectors":["lead","titanium","zircon","silicon","tin","carbon"]}
+  ],
+  "determinism": "Two isolated repetitions must produce the same canonical observer digest and ProcessIR digest.",
+  "unavailable_rule": "A value not exposed by the terminal Factorio fact surface is an explicit unavailable record; it is never coerced to zero, empty, safe, or supported.",
+  "rollback": "Remove T12 authority, observer, exact capture library/command/schema/tests/references and Inspector compare integration. Preserve terminal compiler, player emitter, target candidates, runtime, migrations and W06/W07 synthetic gates unchanged."
+}

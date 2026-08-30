@@ -208,7 +208,19 @@ disable-blueprint-storage=true
   )
 
   $timer = [Diagnostics.Stopwatch]::StartNew()
-  $process = Start-Process -FilePath $factorioBinResolved -ArgumentList $args -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
+  $processParameters = @{
+    FilePath = $factorioBinResolved
+    ArgumentList = $args
+    PassThru = $true
+    RedirectStandardOutput = $logPath
+    RedirectStandardError = "$logPath.err"
+  }
+  if ([Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT) {
+    $processParameters.WindowStyle = "Hidden"
+  } else {
+    $processParameters.NoNewWindow = $true
+  }
+  $process = Start-Process @processParameters
   $timedOut = $false
   $waitMilliseconds = [Math]::Max(1, $ScenarioTimeoutSeconds) * 1000
   if (-not $process.WaitForExit($waitMilliseconds)) {

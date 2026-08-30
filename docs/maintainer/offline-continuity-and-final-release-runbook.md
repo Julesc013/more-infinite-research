@@ -8,6 +8,10 @@ owner: mir-maintainers
 last_reviewed: 2026-08-03
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir-2.5.0-offline-continuity
+  - mir-2.5.0-final-release-sequence
+  - control-plane-v5-cutover-sequence
 ---
 
 # MIR 2.5.0 Offline Continuity And Final Release Runbook

@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "kind": "MIR4FinalMilePlaytestCandidateAuthorityV1",
+  "recorded_at": "2026-08-30T02:30:01.9921208+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "status": "EXACT-F210-F200-CANDIDATES-ADMITTED-FOR-PLAYTEST-RECEIPT-MATERIALIZATION",
+  "source_baseline": {
+    "branch": "dev",
+    "commit": "63897c0c1f88739ff49a35e7b3c3b0fedcf566c8",
+    "tree": "7a36189d21e2c9c30e87d6f18afeb350d7e931a1",
+    "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"
+  },
+  "authorization": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
+    "bytes": 4745,
+    "sha256": "7A59C83A6DBBFCD803843D49FBBCCAC6990D4C59642C361CB695239277BDA65B"
+  },
+  "targets": [
+    {
+      "target": "F210",
+      "distribution_version": "4.0.21000",
+      "development_package": {
+        "sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+        "content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+        "bytes": 1069552,
+        "entry_count": 305,
+        "release_identity": false
+      },
+      "engine": {
+        "version": "2.1.17",
+        "build": 87315,
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+        "sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+        "steam_build": "24955935"
+      },
+      "predecessor": {
+        "release": "3.2.11",
+        "path": "dist/more-infinite-research_3.2.11.zip",
+        "sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
+        "content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89"
+      },
+      "candidate_manifest": {
+        "path": "build/mir4/emergency-lane/manifests/f210.json",
+        "bytes": 7823,
+        "sha256": "CADFAC687591108D41AF2664542B1FB49DE6F800C34094160A623D28BFDA624B"
+      },
+      "assurance": {
+        "path": "build/results/assurance/mir4-final-mile-f210-verify.json",
+        "bytes": 2778910,
+        "sha256": "A7C4957001B586C07EA26BF0CF91615B5516170F7BD1C1BFA26B0637A054F311",
+        "status": "passed",
+        "expected": 147,
+        "failed": 0,
+        "incomplete": 0
+      }
+    },
+    {
+      "target": "F200",
+      "distribution_version": "4.0.20000",
+      "development_package": {
+        "sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+        "content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+        "bytes": 1067014,
+        "entry_count": 303,
+        "release_identity": false
+      },
+      "engine": {
+        "version": "2.0.77",
+        "build": 84539,
+        "path": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "steam_build": null
+      },
+      "predecessor": {
+        "release": "2.5.11",
+        "path": "dist/more-infinite-research_2.5.11.zip",
+        "sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+        "content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D"
+      },
+      "candidate_manifest": {
+        "path": "build/mir4/local-playtest-shadow/manifests/f200.json",
+        "bytes": 8222,
+        "sha256": "988C265D1FF0C952059382968C6C6241FCCEB73C5A3C067E22C818AB24A4EC67"
+      },
+      "assurance": {
+        "path": "build/results/assurance/mir4-final-mile-f200-verify.json",
+        "bytes": 498406,
+        "sha256": "328E76B48BF4BF6E34F68E7B78D2CF331B6C691BEF280E130AE36E49FF58E480",
+        "status": "passed",
+        "expected": 19,
+        "failed": 0,
+        "incomplete": 0
+      }
+    }
+  ],
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "secret_values_present": false
+}

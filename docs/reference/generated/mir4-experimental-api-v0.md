@@ -1,19 +1,24 @@
 ---
-title: "MIR 4 Experimental API V0"
-status: current
-applies_to: "4.0 bootstrap tooling"
+title: "MIR 4 API/SDK V0 Preview"
+status: deprecated
+applies_to: "4.0 developer preview migration input"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-17
+last_reviewed: 2026-08-24
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/reference/generated/mir4-api-sdk-v1.md
+source_of_truth_for:
+  - generated-api-v0-migration-reference
 ---
-# MIR 4 Experimental API V0
+# MIR 4 API/SDK V0 Preview
 
-Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read-only experimental tooling, not stable MEP 1.0 or a public support contract.
+> Deprecated compatibility input. Use API/SDK V1 for new consumers; retain V0 only for deterministic V0-to-V1 migration.
 
-## Quickstart
+Generated from `spec/api/mir4-v0/contracts.json`. This package-excluded, read-only tooling does not establish a player support claim.
+
+## Migration checks
 
 - `.\tools\mir.ps1 mir4 sdk generate`
 - `.\tools\mir.ps1 mir4 sdk check`
@@ -31,4 +36,4 @@ Generated from `spec/api/mir4-v0/contracts.json`. This is package-excluded, read
 
 Canonical JSON recursively sorts object keys, preserves array order, uses compact UTF-8, and hashes the record with `digest` omitted. Unknown top-level fields, invalid reverse-DNS namespaces, more than 128 capabilities, more than 32 extensions, and digest mismatch fail closed.
 
-Target transports: f210 may use a proven read-only projection; f200 remains stage-local/package-excluded; f110 and f100 use build-time static manifests. Mutable compiler context, executors, and safety internals are never exposed.
+Target transports are read-only. Mutable compiler context, executors, SafetyKernel internals, and prototype emission are never exposed. V0 source artifacts remain package-excluded migration inputs and are not emitted as release-facing preview archives.

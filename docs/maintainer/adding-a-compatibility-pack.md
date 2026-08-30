@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - compatibility-pack-workflow
 ---
 
 # Adding A Compatibility Pack

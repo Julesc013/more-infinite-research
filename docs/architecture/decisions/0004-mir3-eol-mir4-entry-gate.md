@@ -8,6 +8,8 @@ owner: mir-maintainers
 last_reviewed: 2026-08-16
 supersedes: []
 superseded_by: []
+source_of_truth_for:
+  - mir3-eol-mir4-entry-gate-reconciliation
 ---
 
 # ADR 0004: MIR 3 EOL and MIR 4 Entry Gate

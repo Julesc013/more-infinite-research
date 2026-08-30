@@ -12,6 +12,8 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $docsRoot = Join-Path $repo "docs"
 $mirRoot = Join-Path $repo ".mir"
 
+& (Join-Path $repo "tools\commands\docs\Update-MIRDocumentationIndex.ps1") -RepoRoot $repo -Check | Out-Null
+
 $allowedStatuses = @("current", "draft", "historical-checkpoint", "deprecated", "archived")
 $allowedDocTypes = @("tutorial", "how-to", "reference", "explanation", "adr", "release-plan", "archive")
 $allowedAudiences = @("player", "modpack-author", "maintainer", "developer", "release-manager")

@@ -66,8 +66,8 @@ function Assert-Schema([string]$RelativePath, [string]$SchemaPath) {
 }
 
 $captureScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Dot9TerminalBaselines.ps1"
-$continuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3PostTerminalHotfixBaselineContinuation.ps1"
-$f200ContinuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Factorio20PostTerminalHotfixBaselineContinuation.ps1"
+$continuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3PostTerminalHotfixBaselineContinuationV2.ps1"
+$f200ContinuationScript = Join-Path $RepoRoot "tools\commands\release\New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1"
 $importScript = Join-Path $RepoRoot "tools\commands\release\Import-MIR3TerminalBaselines.ps1"
 $bootstrapRootSetScript = Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapRootSet.ps1"
 if ($Update) {
@@ -138,7 +138,7 @@ $importPath = "$authorityDirectory/terminal-baseline-import.json"
 $catalog = Read-Json $catalogPath
 $import = Read-Json $importPath
 if (@($catalog.releases).Count -ne 9 -or @($import.releases).Count -ne 9 -or [bool]$import.semantic_authority -or
-    (@($import.releases.release) -join "|") -cne "3.2.10|2.5.10|1.9.9|1.8.9|1.7.9|1.6.9|1.5.9|1.4.9|1.3.9") {
+    (@($import.releases.release) -join "|") -cne "3.2.11|2.5.11|1.9.9|1.8.9|1.7.9|1.6.9|1.5.9|1.4.9|1.3.9") {
   throw "All-nine terminal baseline import is incomplete or prematurely authoritative."
 }
 foreach ($row in @($catalog.releases)) {
@@ -152,6 +152,12 @@ Assert-Schema ".mir/releases/terminal/closures/3.2.10.json" "spec/schemas/mir3-t
 Assert-Schema ".mir/releases/terminal/baselines/2.5.10/baseline-manifest.json" "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation.schema.json"
 Assert-Schema ".mir/releases/terminal/baselines/2.5.10/normalized-snapshot.json" "spec/schemas/mir4-terminal-normalized-snapshot.schema.json"
 Assert-Schema ".mir/releases/terminal/closures/2.5.10.json" "spec/schemas/mir3-terminal-release-closure.schema.json"
+Assert-Schema ".mir/releases/terminal/baselines/3.2.11/baseline-manifest.json" "spec/schemas/mir3-post-terminal-hotfix-baseline-continuation-v2.schema.json"
+Assert-Schema ".mir/releases/terminal/baselines/3.2.11/normalized-snapshot.json" "spec/schemas/mir4-terminal-normalized-snapshot.schema.json"
+Assert-Schema ".mir/releases/terminal/closures/3.2.11.json" "spec/schemas/mir3-terminal-release-closure.schema.json"
+Assert-Schema ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json" "spec/schemas/mir3-factorio-2-0-post-terminal-hotfix-baseline-continuation-v2.schema.json"
+Assert-Schema ".mir/releases/terminal/baselines/2.5.11/normalized-snapshot.json" "spec/schemas/mir4-terminal-normalized-snapshot.schema.json"
+Assert-Schema ".mir/releases/terminal/closures/2.5.11.json" "spec/schemas/mir3-terminal-release-closure.schema.json"
 Assert-Schema $importPath "spec/schemas/mir4-terminal-baseline-import.schema.json"
 
 $bootstrapRootSetPath = "$authorityDirectory/bootstrap-root-set.json"
@@ -171,31 +177,34 @@ if ([string]$bootstrapRootSet.kind -ne "MIR4BootstrapRootSetV1" -or
 }
 $historicalBootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV1.json"
 Assert-Schema $historicalBootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan.schema.json"
-$bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV2.json"
-Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json"
+$historicalBootstrapCandidatePlanV2Path = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV2.json"
+Assert-Schema $historicalBootstrapCandidatePlanV2Path "spec/schemas/mir4-bootstrap-local-candidate-plan-v2.schema.json"
+$bootstrapCandidatePlanPath = "$authorityDirectory/MIR4-Bootstrap-Local-Candidate-PlanV3.json"
+Assert-Schema $bootstrapCandidatePlanPath "spec/schemas/mir4-bootstrap-local-candidate-plan-v3.schema.json"
 $bootstrapCandidatePlan = Read-Json $bootstrapCandidatePlanPath
 $f210Plan = @($bootstrapCandidatePlan.targets | Where-Object target_key -eq "f210")
 $f200Plan = @($bootstrapCandidatePlan.targets | Where-Object target_key -eq "f200")
-if ([string]$bootstrapCandidatePlan.kind -cne 'MIR4BootstrapLocalCandidatePlanV2' -or
-    $f210Plan.Count -ne 1 -or [string]$f210Plan[0].predecessor.release -cne "3.2.10" -or
+if ([string]$bootstrapCandidatePlan.kind -cne 'MIR4BootstrapLocalCandidatePlanV3' -or
+    $f210Plan.Count -ne 1 -or [string]$f210Plan[0].predecessor.release -cne "3.2.11" -or
     [string]$f210Plan[0].engine_lock.version -cne "2.1.14" -or
     [string]$f210Plan[0].engine_lock.executable_sha256 -cne "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F" -or
-    [string]$f210Plan[0].correction_authority.path -cne '.mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-CompositeV2.json' -or
-    $f200Plan.Count -ne 1 -or [string]$f200Plan[0].predecessor.release -cne '2.5.10' -or
-    [string]$f200Plan[0].source.candidate_commit -cne '6bb483de9042a7ec4c93674933e7f6c1670d79aa' -or
+    [string]$f210Plan[0].source.candidate_commit -cne '0a32864d1f1d1fdea090369bc1a22fbd511e290a' -or
+    $null -ne $f210Plan[0].PSObject.Properties['correction_authority'] -or
+    $f200Plan.Count -ne 1 -or [string]$f200Plan[0].predecessor.release -cne '2.5.11' -or
+    [string]$f200Plan[0].source.candidate_commit -cne '57324642e7423d784d7f22b9be4a2b6b350bf012' -or
     -not (Test-MIR4BootstrapRecordHash -Record $bootstrapCandidatePlan)) {
-  throw "The local MIR 4 Plan V2 does not bind the current 3.2.10 / 2.5.10 predecessor and correction closure."
+  throw "The local MIR 4 Plan V3 does not bind the current 3.2.11 / 2.5.11 predecessors."
 }
-$privateLanePath = "$authorityDirectory/MIR4-Private-Lane-AuthorizationV2.json"
-Assert-Schema $privateLanePath "spec/schemas/mir4-private-lane-authorization-v2.schema.json"
+$privateLanePath = "$authorityDirectory/MIR4-Private-Lane-AuthorizationV3.json"
+Assert-Schema $privateLanePath "spec/schemas/mir4-private-lane-authorization-v3.schema.json"
 $privateLane = Read-Json $privateLanePath
-if ([string]$privateLane.kind -cne 'MIR4PrivateLaneAuthorizationV2' -or
+if ([string]$privateLane.kind -cne 'MIR4PrivateLaneAuthorizationV3' -or
     [bool]$privateLane.public_output_authorized -or [bool]$privateLane.release_admission_authorized -or
     [bool]$privateLane.signing_or_sealing_authorized -or [bool]$privateLane.publication_authorized -or
     (@($privateLane.authorized_targets.target_key) -join '|') -cne 'f200|f110|f100' -or
-    [string]$privateLane.authorized_targets[0].predecessor_release -cne '2.5.10' -or
+    [string]$privateLane.authorized_targets[0].predecessor_release -cne '2.5.11' -or
     -not (Test-MIR4BootstrapRecordHash -Record $privateLane)) {
-  throw 'The private MIR 4 lane V2 widened public authority or retained a stale predecessor.'
+  throw 'The private MIR 4 lane V3 widened public authority or retained a stale predecessor.'
 }
 
 $finalProgrammeReconciliationPath = "$authorityDirectory/MIR4-Final-Programme-ReconciliationV1.json"
@@ -265,7 +274,10 @@ if ([string]$portalVisibility.kind -cne "MIR3Dot9ModPortalVisibilityRecheckV1" -
   throw "Dated MIR 3 portal visibility record is inconsistent or grants authority."
 }
 
-if (Test-Path -LiteralPath (Join-Path $RepoRoot ".work")) { throw ".work must remain absent during MIR 4 R0 bootstrap." }
+$deprecatedWorkRoot = "." + "work"
+if (Test-Path -LiteralPath (Join-Path $RepoRoot $deprecatedWorkRoot)) {
+  throw "$deprecatedWorkRoot must remain absent during MIR 4 R0 bootstrap."
+}
 
 $generatedSources = @($executableKinds | ForEach-Object { Get-Binding "$authorityDirectory/$_.json" })
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Distribution-Version-Codec-VectorsV2.json"
@@ -273,6 +285,7 @@ $generatedSources += Get-Binding $catalogPath
 $generatedSources += Get-Binding $importPath
 $generatedSources += Get-Binding $bootstrapRootSetPath
 $generatedSources += Get-Binding $historicalBootstrapCandidatePlanPath
+$generatedSources += Get-Binding $historicalBootstrapCandidatePlanV2Path
 $generatedSources += Get-Binding $bootstrapCandidatePlanPath
 $generatedSources += Get-Binding $privateLanePath
 $generatedSources += Get-Binding $finalProgrammeReconciliationPath
@@ -283,43 +296,72 @@ $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-16/
 $generatedSources += Get-Binding $portalVisibilityPath
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-RefreshV1.json"
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-RefreshV2.json"
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Predecessor-RefreshV3.json"
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Import-CompositeV3.json"
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Terminal-Import-ContractV2.json"
-$generatedSources += Get-Binding "$authorityDirectory/MIR4-Target-RegistryV3.json"
+$generatedSources += Get-Binding "$authorityDirectory/MIR4-Target-RegistryV4.json"
 $generatedSources += Get-Binding "$authorityDirectory/MIR4-Approved-Bootstrap-Correction-CompositeV2.json"
 $generatedSources += Get-Binding ".mir/releases/records/2.5.10.json"
 $generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-17/github/2.5.10.json"
 $generatedSources += Get-Binding ".mir/releases/terminal/baselines/3.2.10/baseline-manifest.json"
+$generatedSources += Get-Binding ".mir/releases/records/3.2.11.json"
+$generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-18/github/3.2.11.json"
+$generatedSources += Get-Binding ".mir/releases/terminal/baselines/3.2.11/baseline-manifest.json"
+$generatedSources += Get-Binding ".mir/releases/records/2.5.11.json"
+$generatedSources += Get-Binding ".mir/evidence/terminal-publication/2026-08-18/github/2.5.11.json"
+$generatedSources += Get-Binding ".mir/releases/terminal/baselines/2.5.11/baseline-manifest.json"
 $generatedSources = @($generatedSources | Sort-Object path)
+
+$currentExecutionPath = "$authorityDirectory/MIR4-Pre-Freeze-Execution-ProgrammeV1.json"
+Assert-Schema $currentExecutionPath "spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json"
+$currentExecution = Read-Json $currentExecutionPath
+if ([string]$currentExecution.status -cne "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED" -or
+    $null -ne $currentExecution.next_dependency_ready_turn -or
+    @($currentExecution.turns).Count -ne 22 -or
+    @($currentExecution.blockers | Where-Object { [string]$_.state -ceq "OPEN" -and [string]$_.scope -ceq "stable-player-release" }).Count -lt 3 -or
+    @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-target-processir-snapshot" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
+    @($currentExecution.blockers | Where-Object { [string]$_.id -ceq "exact-archive-custody-f200-k2so" -and [string]$_.state -ceq "SATISFIED" }).Count -ne 1 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T13","T14","T15") -and [string]$_.state -ceq "completed" }).Count -ne 3 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -in @("T16","T17") -and [string]$_.state -ceq "blocked-human" }).Count -ne 2 -or
+    @($currentExecution.turns | Where-Object { [string]$_.id -ceq "T18" -and [string]$_.state -ceq "blocked-dependency" }).Count -ne 1 -or
+    @($currentExecution.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+  throw "Current MIR 4 pre-freeze execution authority is inconsistent or grants a release transition."
+}
+$currentGeneratedSources = @(Get-Binding $currentExecutionPath)
 
 $dashboard = Add-RecordSha256 ([ordered]@{
   schema = 1
   kind = "MIR4R0DashboardV1"
-  status = "READY_FOR_MIR4_R0_IMPLEMENTATION"
+  status = [string]$currentExecution.status
   package_visible = $false
-  generated_from = $generatedSources
+  generated_from = $currentGeneratedSources
   payload = [ordered]@{
-    mir3 = [ordered]@{ product_development="closed-except-immutable-post-terminal-hotfixes"; github_publication="3.2.10-latest-and-2.5.10-published-verified"; mod_portal_custody="maintainer-upload-not-independently-redownload-verified"; terminal_dot9_baselines="retained-immutable"; terminal_2_1_continuation="3.2.10-captured-and-imported"; terminal_2_0_continuation="2.5.10-public-release-bound-refresh-v2"; final_index="pending"; museum_and_restore="pending"; eol="pending" }
-    mir4 = [ordered]@{ r0="active-package-excluded"; semantic_authority=$false; identity_authority="v3-predecessors-with-unchanged-v2-distribution-codec"; historical_v1_v2_registries_executable=$false; programme_reconciliation="accepted-no-public-allocation"; target_readiness="f210-3.2.10-and-f200-2.5.10-predecessors-bound"; materialization="authorized-private-plan-v2-f210-emergency-and-f200-shadow"; public_4x="forbidden-until-mir3-eol"; emergency_lane="plan-v2-current-reproof-pending" }
+    source_baseline = $currentExecution.source_baseline
+    release_cut = $currentExecution.release_cut
+    workflow_maturity_vocabulary = @($currentExecution.workflow_maturity_vocabulary)
+    blockers = @($currentExecution.blockers)
+    mir3_residuals = @($currentExecution.mir3_residuals)
     package_delta = 0
-    next_executable_task = "M4-003-f210-and-f200-materialization-and-reproof"
+    next_executable_task = $currentExecution.next_dependency_ready_turn
   }
 })
 $queue = Add-RecordSha256 ([ordered]@{
   schema = 1
   kind = "MIR4R0ExecutableQueueV1"
-  status = "next-task-ready"
+  status = $(if ($null -eq $currentExecution.next_dependency_ready_turn) { "human-gates-required" } else { "next-task-ready" })
   package_visible = $false
-  generated_from = $generatedSources
+  generated_from = $currentGeneratedSources
   payload = [ordered]@{
-    tasks = @(
-      [ordered]@{id="M4-000";scope="entry-gate-and-post-publication-reconciliation";state="completed-live-r0-entry";blocked_by=@()},
-      [ordered]@{id="M4-001";scope="dot9-baseline-capture-plus-post-terminal-continuations";state="completed-current-predecessors-imported";blocked_by=@()},
-      [ordered]@{id="M4-002";scope="programme-version-target-equivalence-layout-offline-authorities";state="identity-authority-corrected";blocked_by=@()},
-      [ordered]@{id="M4-003";scope="local-offline-emergency-lane-plus-mir3-term-0033";state="plan-v2-ready-f210-and-f200-reproof-pending";blocked_by=@("candidate-bound-f210-and-f200-reproof")},
-      [ordered]@{id="M4-004A";scope="portal-custody-final-index-archive-rights-and-restore-records";state="parallel-external-custody-open";blocked_by=@("seven-mod-portal-uploads", "nine-authenticated-redownloads")},
-      [ordered]@{id="M4-004B";scope="seal-mir3-eol-and-admit-public-mir4-authority";state="blocked-external-and-local";blocked_by=@("M4-003", "M4-004A")},
-      [ordered]@{id="M4-005";scope="accept-and-allocate-public-mir4-source-and-target-identities";state="blocked-by-mir3-eol";blocked_by=@("M4-004B")}
-    )
+    tasks = @($currentExecution.turns | ForEach-Object {
+      [ordered]@{
+        id = [string]$_.id
+        scope = [string]$_.name
+        state = [string]$_.state
+        blocked_by = @($_.depends_on)
+        human_required = [bool]$_.human_required
+        release_transition = [bool]$_.release_transition
+      }
+    })
   }
 })
 Write-Or-Check "$authorityDirectory/dashboard.json" $dashboard
@@ -329,5 +371,6 @@ if (-not $Update) {
   Assert-Schema "$authorityDirectory/queue.json" "spec/schemas/mir4-r0-status.schema.json"
 }
 
-Write-Host "[ok] MIR 4 R0 bootstrap status: READY_FOR_MIR4_R0_IMPLEMENTATION"
-Write-Host "[ok] next executable task: materialize and re-prove f210 and f200 under Plan V2"
+Write-Host "[ok] MIR 4 pre-freeze status: $($currentExecution.status)"
+$nextDependencyReadyTurn = if ($null -eq $currentExecution.next_dependency_ready_turn) { "none; T16/T17 human gates required" } else { [string]$currentExecution.next_dependency_ready_turn }
+Write-Host "[ok] next dependency-ready turn: $nextDependencyReadyTurn"

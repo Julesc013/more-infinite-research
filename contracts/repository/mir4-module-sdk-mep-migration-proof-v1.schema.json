@@ -1,0 +1,14 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://more-infinite-research.invalid/contracts/repository/mir4-module-sdk-mep-migration-proof-v1.schema.json",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","migration_id","test_id","required_checks","evidence_entrypoint","functional_evidence_entrypoint","pre_cutover_functional_digest","functional_parity_digest","package_source_sha256","unknown_policy","independent_human_acceptance_required","release_transition_authority"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4ModuleSdkMepMigrationProofPolicyV1"},"migration_id":{"const":"MIR4-MODULE-SDK-MEP-TOOLING-V1"},"test_id":{"const":"static.mir4-module-sdk-mep-migration-v1"},
+    "required_checks":{"type":"array","minItems":26,"maxItems":26,"uniqueItems":true,"items":{"type":"string","minLength":1}},
+    "evidence_entrypoint":{"const":"tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1"},"functional_evidence_entrypoint":{"const":"tests/extensions/Test-MIR4ModuleEcosystem.ps1"},
+    "pre_cutover_functional_digest":{"const":"sha256:5f813a132879013c1d3682ed78ac34e454d2d9c88cab6ec866f3adb31307d284"},
+    "functional_parity_digest":{"const":"sha256:11b21f03ae7839e0b555dc0604b5d02413d7c11dc023be25cf975dff6c448050"},
+    "package_source_sha256":{"const":"F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E"},"unknown_policy":{"const":"fail"},"independent_human_acceptance_required":{"const":false},"release_transition_authority":{"const":false}
+  }
+}

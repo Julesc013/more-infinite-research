@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "tests",
+  "path": "tests",
+  "mode": "active-test-root",
+  "current_authorities": [
+    "tests/repository",
+    "tests/canonicalization",
+    "tests/diagnostics",
+    "tests/targets",
+    "tests/platform",
+    "tests/technology",
+    "tests/compiler",
+    "tests/runtime",
+    "tests/extensions",
+    "tests/processir",
+    "tests/inspection",
+    "tests/assurance",
+    "tests/history",
+    "tests/release-tooling",
+    "validation/tests",
+    "validation/tests.yml"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

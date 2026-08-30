@@ -2,45 +2,45 @@
   "authority": "canonical-release-ledger",
   "development": {
     "factorio-2.0": {
-      "archive": "dist/more-infinite-research_2.5.10.zip",
-      "archive_bytes": 1062874,
+      "archive": "dist/more-infinite-research_2.5.11.zip",
+      "archive_bytes": 1065193,
       "archive_class": "immutable-publicly-verified-release",
-      "archive_entries": 302,
-      "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
+      "archive_entries": 303,
+      "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
       "assurance_exception_ids": [],
-      "branch": "hotfix/mir3-max-level-2.5.10",
-      "candidate_floor": "2.5-P14",
-      "candidate_id": "2.5-P14",
+      "branch": "hotfix/mir3-max-level-2.5.11",
+      "candidate_floor": "2.5-P15",
+      "candidate_id": "2.5-P15",
       "development_branch": "dev",
       "manual_review": "pending",
-      "mir_version": "2.5.10",
-      "package_content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
-      "package_source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "mir_version": "2.5.11",
+      "package_content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+      "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
       "package_source_material": {
-        "file_count": 302,
+        "file_count": 303,
         "hash_algorithm": "git-commit-normalized-package-v1",
         "schema": 1,
-        "source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a"
+        "source_tree": "7786bdeaee398e069abdf7de797f82f645ccba45"
       },
-      "package_source_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
-      "package_source_tree": "a4c8f76556209f3038b9a0f01ea2e37be5b1af0a",
+      "package_source_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+      "package_source_tree": "7786bdeaee398e069abdf7de797f82f645ccba45",
       "protected_qualification": "pending",
       "publication_status": "publicly-verified",
       "qualification": "publicly-verified",
       "remaining_obligations": [
         "mod-portal-maintainer-upload",
-        "corrected-terminal-baseline-handoff-to-mir4"
+        "mir4-f200-private-candidate-reproof"
       ],
       "remaining_states": [],
-      "source_anchor": "2.5.9",
-      "status": "2.5-P14-publicly-verified",
-      "tag": "2.5.10",
-      "tag_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa"
+      "source_anchor": "2.5.10",
+      "status": "2.5-P15-publicly-verified",
+      "tag": "2.5.11",
+      "tag_commit": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af"
     },
     "factorio-2.1": {
       "archive": "dist/more-infinite-research_3.2.11.zip",
       "archive_bytes": 1067720,
-      "archive_class": "frozen-unreleased-candidate",
+      "archive_class": "immutable-publicly-verified-release",
       "archive_entries": 305,
       "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
       "assurance_exception_ids": [],
@@ -61,51 +61,47 @@
       "package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
       "package_source_tree": "b6102e8ed616955fc335d784a98357b62111322a",
       "protected_qualification": "pending",
-      "publication_status": "sealed",
-      "qualification": "sealed",
+      "publication_status": "publicly-verified",
+      "qualification": "publicly-verified",
       "remaining_obligations": [
-        "protected-promotion",
-        "github-publication-and-public-byte-verification",
-        "mod-portal-maintainer-upload"
+        "mod-portal-maintainer-upload",
+        "legacy-branch-alias-repoint",
+        "mir4-f210-private-candidate-reproof"
       ],
-      "remaining_states": [
-        "promoted",
-        "tagged",
-        "published",
-        "publicly-verified"
-      ],
+      "remaining_states": [],
       "source_anchor": "3.2.10",
-      "status": "C35-sealed"
+      "status": "C35-publicly-verified",
+      "tag": "3.2.11",
+      "tag_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629"
     }
   },
   "generated_from": [
     "path:releases.current",
     "path:releases.records/3.2.11.json",
-    "path:releases.records/2.5.10.json",
-    "path:releases.records/3.2.10.json"
+    "path:releases.records/2.5.11.json"
   ],
   "published_baselines": {
     "factorio-2.0": {
-      "archive": "dist/more-infinite-research_2.5.10.zip",
-      "archive_sha256": "251EFDAB4983CDFF0E2C150304DF7B7846EDEA6E1B5B0927C3FBBD8449E65DAB",
-      "branch": "hotfix/mir3-max-level-2.5.10",
-      "mir_version": "2.5.10",
-      "package_content_sha256": "55908E821FB48F244C9A81560F81BBFDF6CD274195D38F1A2811E652588D5D66",
-      "package_source_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa",
+      "archive": "dist/more-infinite-research_2.5.11.zip",
+      "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C",
+      "branch": "hotfix/mir3-max-level-2.5.11",
+      "mir_version": "2.5.11",
+      "package_content_sha256": "F8964470F580810C2113750A1A5F10CCA8084D7CE0F42108BECC993D7076D32D",
+      "package_source_commit": "57324642e7423d784d7f22b9be4a2b6b350bf012",
       "status": "release-publicly-verified",
-      "tag": "2.5.10",
-      "tag_commit": "6bb483de9042a7ec4c93674933e7f6c1670d79aa"
+      "tag": "2.5.11",
+      "tag_commit": "e08e6b0a8c054c8e9d09a7081cec3bd65de0e3af"
     },
     "factorio-2.1": {
-      "archive": "dist/more-infinite-research_3.2.10.zip",
-      "archive_sha256": "5D88F2F971622E04846F6FC26859777F429C71FE34ECD9250AB2BA56B9A4C1B7",
+      "archive": "dist/more-infinite-research_3.2.11.zip",
+      "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A",
       "branch": "main",
-      "mir_version": "3.2.10",
-      "package_content_sha256": "B1F8CA3131D2161F2BA7D9181D060EB59C2D5F368D04546264A3150A01B915A9",
-      "package_source_commit": "19ddb7db4c960f77aef53d2bb47d23e0f311918f",
+      "mir_version": "3.2.11",
+      "package_content_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+      "package_source_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
       "status": "release-publicly-verified",
-      "tag": "3.2.10",
-      "tag_commit": "4cbea531a1043e0cacb9ac5c496731c8d77bbdb6"
+      "tag": "3.2.11",
+      "tag_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629"
     }
   },
   "rules": {

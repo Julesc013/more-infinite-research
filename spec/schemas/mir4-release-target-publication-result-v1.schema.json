@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-release-target-publication-result-v1.schema.json",
+  "title": "MIR 4 target publication phase result V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "phase",
+    "phase_result_kind",
+    "operation",
+    "status",
+    "idempotency_key",
+    "artifact_root",
+    "production_mutation_performed",
+    "release_transition_performed",
+    "detail",
+    "artifacts",
+    "checks"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "kind": {
+      "const": "MIR4ReleasePhaseAdapterResultV1"
+    },
+    "phase": {
+      "const": "target-publication"
+    },
+    "phase_result_kind": {
+      "const": "MIR4TargetPublicationPhaseResultV1"
+    },
+    "operation": {
+      "enum": [
+        "DryRun",
+        "Execute",
+        "Verify",
+        "Compensate"
+      ]
+    },
+    "status": {
+      "const": "passed"
+    },
+    "idempotency_key": {
+      "$ref": "#/$defs/sha256"
+    },
+    "artifact_root": {
+      "type": "string",
+      "pattern": "^build/mir4/release-phase-engine/"
+    },
+    "production_mutation_performed": {
+      "const": false
+    },
+    "release_transition_performed": {
+      "const": false
+    },
+    "detail": {
+      "type": "object"
+    },
+    "artifacts": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

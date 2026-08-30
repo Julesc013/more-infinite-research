@@ -323,7 +323,8 @@ function Test-MIRCPApprovedBootstrapCorrection {
 function Assert-MIRCPPackageFreeze {
   param(
     [string]$RepoRoot = "",
-    [switch]$AllLocks
+    [switch]$AllLocks,
+    [switch]$AllowCandidateProgrammeWorkingTree
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
@@ -349,7 +350,37 @@ function Assert-MIRCPPackageFreeze {
   }
   $currentHash = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   if ($currentHash -ne [string]$active[0].package_source_sha256) {
-    if (-not (Test-MIRCPApprovedBootstrapCorrection -RepoRoot $repo -Lock $active[0] -ObservedPackageSourceSha256 $currentHash)) {
+    $candidateProgramme = $false
+    if ($AllowCandidateProgrammeWorkingTree) {
+      $profilePath = Join-Path $repo "validation\profiles\factorio-$target.json"
+      if (-not (Test-Path -LiteralPath $profilePath -PathType Leaf)) {
+        throw "Candidate-programme package-freeze exception has no target profile: $target"
+      }
+      $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
+      $authorityRelative = ([string]$profile.release_authority).Replace('\', '/')
+      if ([string]$profile.release_authority_mode -ne 'candidate-programme' -or
+          $authorityRelative -notmatch '^\.mir/releases/waves/mir4-r0/[A-Za-z0-9._-]+\.json$') {
+        throw "Candidate-programme package-freeze exception lacks an exact safe authority: $target"
+      }
+      $candidateAuthorityPath = Join-Path $repo $authorityRelative
+      if (-not (Test-Path -LiteralPath $candidateAuthorityPath -PathType Leaf)) {
+        throw "Candidate-programme package-freeze authority is absent: $authorityRelative"
+      }
+      . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+      $candidateAuthority = Get-Content -Raw -LiteralPath $candidateAuthorityPath | ConvertFrom-Json
+      if (-not (Test-MIR4BootstrapRecordHash -Record $candidateAuthority) -or
+          [string]$candidateAuthority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+          [string]$candidateAuthority.status -ne 'authorized-in-progress' -or
+          @($candidateAuthority.authorized) -notcontains 'governance-and-documentation' -or
+          @($candidateAuthority.not_authorized) -notcontains 'production-seal' -or
+          @($candidateAuthority.not_authorized) -notcontains 'github-release-publication' -or
+          @($candidateAuthority.not_authorized) -notcontains 'mod-portal-mir4-upload') {
+        throw 'Candidate-programme package-freeze authority violates its development-only boundary.'
+      }
+      $candidateProgramme = $true
+    }
+    if (-not $candidateProgramme -and
+        -not (Test-MIRCPApprovedBootstrapCorrection -RepoRoot $repo -Lock $active[0] -ObservedPackageSourceSha256 $currentHash)) {
       throw "Current package roots changed from lock $($active[0].id): expected $($active[0].package_source_sha256), observed $currentHash."
     }
   }
@@ -366,5 +397,10 @@ function Assert-MIRCPPackageFreeze {
       }
     }
   }
-  return [pscustomobject][ordered]@{lock_id=[string]$active[0].id; target=$target; package_source_sha256=$currentHash}
+  return [pscustomobject][ordered]@{
+    lock_id=[string]$active[0].id
+    target=$target
+    package_source_sha256=$currentHash
+    status=if ($currentHash -eq [string]$active[0].package_source_sha256) { 'published-lock-exact' } elseif ($AllowCandidateProgrammeWorkingTree) { 'published-lock-preserved-candidate-programme-working-tree-active' } else { 'approved-bootstrap-correction' }
+  }
 }

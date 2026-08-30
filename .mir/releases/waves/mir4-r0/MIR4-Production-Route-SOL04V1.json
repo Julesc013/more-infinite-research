@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "kind": "MIR4ProductionRouteSOL04V1",
+  "status": "PASS",
+  "recorded_at": "2026-08-21T00:00:00+10:00",
+  "work_package": "SOL-04",
+  "package_visible": false,
+  "publication_authorized": false,
+  "scope": {
+    "starting_source": {
+      "commit": "65796a468a5247c8b31143a82db5fa3c94926d46",
+      "reconciled_predecessor_commit": "e190836c8b8f781c4e41dafc08df367ca986b33a"
+    },
+    "authority": "SciencePackProductionRoutePolicyV2",
+    "claim_boundary": "The generic route-selection contract plus the exact Cubium 1.0.30 and Recycler Progression 1.1.1 Factorio 2.1.14 assertion closures are proven. Recycler Progression 1.0.0 is source-locked only and remains unqualified until target-local Factorio 2.0 proof. Broad ecosystem support and publication remain unproven."
+  },
+  "candidate": {
+    "path": "build/results/mir4-sol/sol04/candidate-v6/more-infinite-research_3.2.11.zip",
+    "version": "3.2.11",
+    "archive_sha256": "689E7C5D9364FAF6AE7C06AC2032E5DCBCB95E05833672A87CA036BFC094603F",
+    "content_sha256": "80A0C50EE03B3FBA999DDB4F520B9BAB55EEA4588E22D8A291E84125D7DFF563",
+    "disposition": "local-development-evidence-only-not-a-release-candidate"
+  },
+  "verification_plan": {
+    "path": "build/results/mir4-sol/sol04/production-route-verification-plan-v2-preclose.json",
+    "file_sha256": "E135814509C63551C62F8AE78035A904A807564C125B46AE4C7F4BF95495D003",
+    "plan_material_sha256": "F61B32461AAF438136A6415546DA581A6E3DC42C9C4121CF2E187D0AC8ECFA65",
+    "required_test_set_sha256": "3E0E60C9E9C89D252067E44FF533138D3D0BEDFDB595B07014CD6B8CD9285787",
+    "counts": {
+      "total": 152,
+      "reuse": 0,
+      "wait": 0,
+      "run": 150,
+      "invalid": 2
+    },
+    "invalid_future_work": [
+      "static.mir4-bootstrap-materialization",
+      "static.mir4-offline-custody"
+    ],
+    "invalid_reason": "Both entries require the governed bootstrap output produced in SOL-09; neither invalidates SOL-04."
+  },
+  "generic_runtime_proof": {
+    "scenario": "generated-prerequisite-safety",
+    "path": "build/results/mir4-sol/sol04/generated-prerequisite-safety-v3-summary.json",
+    "file_sha256": "E1409907367D83D98C6BA3B2610B6D75BD295A190A3AE575EA5A87927C0EC076",
+    "status": "passed",
+    "candidate_archive_sha256": "689E7C5D9364FAF6AE7C06AC2032E5DCBCB95E05833672A87CA036BFC094603F",
+    "candidate_content_sha256": "80A0C50EE03B3FBA999DDB4F520B9BAB55EEA4588E22D8A291E84125D7DFF563"
+  },
+  "exact_runtime_proofs": [
+    {
+      "scenario": "local-2-1-cubium-production-routes",
+      "result": "passed",
+      "claim_level": "diagnostic-only",
+      "campaign_evidence": {
+        "path": "build/results/mir4-sol/sol04/cubium-routes-v3-run1/campaign-evidence.json",
+        "file_sha256": "87FF2C84E49C06C81D034311C5392DCF892A0823C5D97665292A72FE11162750"
+      },
+      "load_results": {
+        "path": "build/results/mir4-sol/sol04/cubium-routes-v3-run1/load-results.json",
+        "file_sha256": "AC53A2B51F123DB92F39BB2C04591A969ABBF1CABE80DA0BC43D54A09D142DE2"
+      },
+      "engine_log": {
+        "path": "build/results/mir4-sol/sol04/cubium-routes-v3-run1/runs/u-b5d07334d2ad/local-2-1-cubium-production-routes.log",
+        "file_sha256": "9FFC18E0BED6EA225D124F2B65ADB4116B3E0D090A8C56547AF56B43AC710414"
+      },
+      "dependency_lock_sha256": "927CA7135AE2DD3339DF5CA72682B59B3F10CEC60C7352349D362CC48A850BC5",
+      "factorio": {
+        "version": "2.1.14.87180",
+        "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      },
+      "roots": [
+        {
+          "name": "cubium",
+          "version": "1.0.30",
+          "archive_sha256": "E7282BF8DF12A5D256934B84B84711703B17A5224FB1D7409202411C9FD54FB4"
+        },
+        {
+          "name": "mir-fixture-assert-cubium-production-routes",
+          "version": "0.1.0",
+          "archive_sha256": "630BD15DAD42C59F71832AF9EC3C8ABBD32472F044A3D6B32765607CF9045AFB"
+        }
+      ],
+      "assertions": {
+        "required_audit_rows": 1,
+        "required_audit_rows_passed": 1,
+        "required_log_fragments": 1,
+        "required_log_fragments_passed": 1,
+        "forbidden_log_fragments": 1,
+        "forbidden_log_fragments_passed": 1,
+        "total": 3,
+        "passed": 3
+      }
+    },
+    {
+      "scenario": "local-2-1-recycler-progression-routes",
+      "result": "passed",
+      "claim_level": "diagnostic-only",
+      "campaign_evidence": {
+        "path": "build/results/mir4-sol/sol04/recycler-progression-v3-run5/campaign-evidence.json",
+        "file_sha256": "A283B5B1B73E0976CB10105AF8CB4EA29FA7A380B65966CD5839CFB4C48B2CDF"
+      },
+      "load_results": {
+        "path": "build/results/mir4-sol/sol04/recycler-progression-v3-run5/load-results.json",
+        "file_sha256": "03BC5E04DA24DA7BDB3F543470B1B0D068134E231B3FFA382064B4067E196696"
+      },
+      "engine_log": {
+        "path": "build/results/mir4-sol/sol04/recycler-progression-v3-run5/runs/u-40cc97cb65f1/local-2-1-recycler-progression-routes.log",
+        "file_sha256": "04AF2EEDDF8D410BCC67F4CF1973C17AAFB4BA0BF552DA7BA46B8DB6DCCD809A"
+      },
+      "dependency_lock_sha256": "A769E2C67FA380F0F0784E977A64E9DD7F04B240A9DAB53B48111C94D1C44672",
+      "factorio": {
+        "version": "2.1.14.87180",
+        "executable_sha256": "E396BD25C068DD4C5EF45E93E6A87DBA0E12EEA964B6A5B73163041CC4A6143F"
+      },
+      "roots": [
+        {
+          "name": "recycler-progression",
+          "version": "1.1.1",
+          "archive_sha256": "47CB00BE06606AFA08AF512FC81951CABBAF38D7724FBB0884365C6BEF9A0810"
+        },
+        {
+          "name": "mir-fixture-assert-recycler-progression-routes",
+          "version": "0.1.0",
+          "archive_sha256": "7538B810D7C44BCAB3BA64002AB63460386127861C554C378B088B214C948192"
+        }
+      ],
+      "assertions": {
+        "required_audit_rows": 0,
+        "required_audit_rows_passed": 0,
+        "required_log_fragments": 1,
+        "required_log_fragments_passed": 1,
+        "forbidden_log_fragments": 1,
+        "forbidden_log_fragments_passed": 1,
+        "total": 2,
+        "passed": 2
+      }
+    }
+  ],
+  "bounded_pending_targets": [
+    {
+      "mod": "recycler-progression",
+      "version": "1.0.0",
+      "factorio_line": "2.0",
+      "archive_sha256": "CB3A0C07E630E2DD7E4CD8088E7C211FACEDCCB1A2DB0491BE317C31200E9619",
+      "status": "source-locked-awaiting-target-local-proof",
+      "planned_work_package": "SOL-08",
+      "public_claim": "none"
+    }
+  ],
+  "implementation_authorities": [
+    "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+    "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+    "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
+    "fixtures/assert-generated-prerequisite-safety/data-final-fixes.lua",
+    "fixtures/assert-cubium-production-routes/data-final-fixes.lua",
+    "fixtures/assert-recycler-progression-routes/data-final-fixes.lua"
+  ],
+  "findings": [
+    "Cubium's late cubic alternatives no longer displace the reachable ordinary primary science-pack recipes.",
+    "Recycler Progression's hidden recycling unlocks remain rejected, explainable routes and do not inject recycler-1 into generated prerequisites.",
+    "A route's non-progression classification is retained even when its unlock graph is independently unreachable or cyclic.",
+    "The two verification-plan invalid entries are future SOL-09 bootstrap custody artifacts, not SOL-04 product failures."
+  ],
+  "exit_gate": {
+    "generic_route_policy_proven": true,
+    "ordinary_primary_preference_proven": true,
+    "immediate_alternate_exception_proven": true,
+    "rejected_route_witnesses_proven": true,
+    "exact_cubium_f210_proven": true,
+    "exact_recycler_progression_f210_proven": true,
+    "recycler_progression_f200_qualified": false,
+    "publication_authorized": false,
+    "next_work_package": "SOL-05"
+  }
+}

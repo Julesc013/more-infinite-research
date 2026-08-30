@@ -1,0 +1,16 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "modules",
+  "path": "modules",
+  "mode": "shadow-reader",
+  "current_authorities": [
+    ".mir/modules.yml",
+    "prototypes/mir/capabilities",
+    "prototypes/mir/domain"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

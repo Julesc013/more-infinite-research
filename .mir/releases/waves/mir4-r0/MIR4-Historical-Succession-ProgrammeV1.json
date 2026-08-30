@@ -1,0 +1,86 @@
+{
+  "$schema": "../../../../spec/schemas/mir4-historical-succession-programme-v1.schema.json",
+  "schema": 1,
+  "kind": "MIR4HistoricalSuccessionProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "wave": "W09",
+  "maturity": "developer-preview-shadow",
+  "package_visible": false,
+  "semantic_authority": false,
+  "target_policy_authority": false,
+  "museum_admission_authority": false,
+  "rights_or_custody_authority": false,
+  "player_package_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "runtime_state_mutation_authorized": false,
+  "migration_execution_authorized": false,
+  "source_freeze_authorized": false,
+  "production_signing_or_sealing_authorized": false,
+  "promotion_or_tag_authorized": false,
+  "network_or_upload_authorized": false,
+  "publication_authorized": false,
+  "implementations": [
+    "tools/mir/application/history/HistoricalSuccession.ps1",
+    "tools/mir/application/history/SuccessorHost.ps1"
+  ],
+  "cli": [
+    "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1"
+  ],
+  "compatibility_entrypoints": [
+    "tools/lib/mir4/HistoricalSuccession.ps1",
+    "tools/lib/mir4/SuccessorHost.ps1",
+    "tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1"
+  ],
+  "migration_receipt": "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json",
+  "imports": [
+    ".mir/releases/records/3.2.11.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Terminal-Predecessor-RefreshV3.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json",
+    ".mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json",
+    ".mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json",
+    ".mir/releases/terminal/MIR-3-MUSEUM-INDEX.json",
+    ".mir/museum-targets.json"
+  ],
+  "outputs": [
+    "MIR4_HISTORICAL_MUSEUM_MATRIX.json",
+    "MIR4_SUCCESSOR_HOST_RESULT.json"
+  ],
+  "historical_targets": ["f018", "f017", "f016", "f015", "f014", "f013"],
+  "museum_targets": ["f012", "f011", "f010", "f009", "f008", "f007", "f006"],
+  "successor_target": "f300",
+  "succession_witness": {
+    "published_predecessor_release": "3.2.11",
+    "published_predecessor_commit": "0a32864d1f1d1fdea090369bc1a22fbd511e290a",
+    "published_predecessor_tree": "b6102e8ed616955fc335d784a98357b62111322a",
+    "published_predecessor_package_source_sha256": "FFF55368B65766D29049DF8E4DC845B38A6D4A65F1512EE62D277AD796181F89",
+    "current_mir4_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C",
+    "introducing_commit": "ea5b37983e4f682c841eba662a87276f082d4afd",
+    "changed_package_roots": [
+      "README.md",
+      "info.json",
+      "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+      "prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
+      "prototypes/mir/compatibility/repairs/registry.lua",
+      "prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "prototypes/mir/emit/mod_data.lua",
+      "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+      "prototypes/mir/planner/science.lua",
+      "prototypes/mir/runtime/maximum_level_control.lua"
+    ]
+  },
+  "mandatory_blockers": [
+    "BLOCKED-HUMAN-SECRET-INPUT",
+    "BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER",
+    "BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO",
+    "BLOCKED-MISSING-TRUSTED-TIMING-CAPACITY-EVIDENCE",
+    "BLOCKED-MUSEUM-RIGHTS-CUSTODY-RESTORE-CLOSURE"
+  ],
+  "rollback": "Remove only W09 package-excluded authority, tools, schemas, fixtures, documentation, and build projections. Preserve immutable MIR3 evidence and all W02-W08 owners unchanged."
+}

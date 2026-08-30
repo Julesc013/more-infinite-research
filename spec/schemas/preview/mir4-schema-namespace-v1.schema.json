@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/schema-namespace.schema.json",
+  "title": "MIR 4 permanent schema namespace registry V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","namespace","owner","immutability","schemas"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4SchemaNamespaceV1"},
+    "namespace": {"const":"https://julesc013.github.io/more-infinite-research/schemas/mir4/v1/"},
+    "owner": {"const":"Julesc013/more-infinite-research"},
+    "immutability": {"const":"published-identifiers-are-never-reassigned"},
+    "schemas": {
+      "type":"array","minItems":7,"uniqueItems":true,
+      "items":{"type":"object","additionalProperties":false,"required":["record","id","path","legacy_ids"],"properties":{
+        "record":{"type":"string","pattern":"^MIR4[A-Za-z0-9]+V1$"},
+        "id":{"type":"string","pattern":"^https://julesc013\\.github\\.io/more-infinite-research/schemas/mir4/v1/[a-z0-9-]+\\.schema\\.json$"},
+        "path":{"type":"string","pattern":"^spec/schemas/preview/[a-z0-9-]+\\.schema\\.json$"},
+        "legacy_ids":{"type":"array","uniqueItems":true,"items":{"type":"string","minLength":1}}
+      }}
+    }
+  }
+}

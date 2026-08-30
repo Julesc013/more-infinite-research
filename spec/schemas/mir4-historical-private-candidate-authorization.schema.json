@@ -1,0 +1,19 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://mir.invalid/schemas/mir4-historical-private-candidate-authorization.schema.json",
+  "type":"object",
+  "required":["schema","kind","status","approved_by","package_visible","semantic_authority","public_output_authorized","signing_or_sealing_authorized","publication_authorized","output_root","targets","allowed_differences","required_proof","record_sha256"],
+  "properties":{
+    "schema":{"const":1},
+    "kind":{"const":"MIR4HistoricalPrivateCandidateAuthorizationV1"},
+    "status":{"const":"authorized-private-experimental"},
+    "package_visible":{"const":false},
+    "semantic_authority":{"const":false},
+    "public_output_authorized":{"const":false},
+    "signing_or_sealing_authorized":{"const":false},
+    "publication_authorized":{"const":false},
+    "output_root":{"const":"build/mir4/historical-private"},
+    "targets":{"type":"array","minItems":6,"maxItems":6,"items":{"type":"object","required":["target_key","factorio_line","distribution_version","predecessor_release","predecessor_archive","predecessor_archive_sha256","predecessor_snapshot","predecessor_snapshot_record_sha256","projection","engine"]}},
+    "record_sha256":{"type":"string","pattern":"^[A-F0-9]{64}$"}
+  }
+}

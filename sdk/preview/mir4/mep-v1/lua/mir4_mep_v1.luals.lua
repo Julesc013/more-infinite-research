@@ -1,0 +1,14 @@
+---@class MIR4FragmentV1
+---@field id string
+---@field kind 'CompatibilityFragment'|'ProfileFragment'|'ProofFragment'|'PresentationFragment'|'CapabilityRequirement'|'ExtensionDependency'|'ExtensionConflict'|'FinalizationRequirement'|'ProcessClassificationFragment'|'MigrationFragment'|'TargetDispositionFragment'|'ExternalEffectChannelDeclaration'
+---@field data table
+---@class MIR4ExtensionEnvelopeV1
+---@field kind 'MIR4ExtensionEnvelopeV1'
+---@field schema 1
+---@field extension_id string
+---@field extension_version string
+---@field namespace string
+---@field targets string[]
+---@field fragments MIR4FragmentV1[]
+---@field canonicalization 'mir-canonical-json/1'
+---@field digest string

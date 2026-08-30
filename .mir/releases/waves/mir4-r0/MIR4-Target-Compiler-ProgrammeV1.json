@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "MIR4TargetCompilerProgrammeV1",
+  "programme_id": "M4C02-09-24H",
+  "state": "private-platform-executable",
+  "identity_authority": ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+  "profile_authority": ".mir/targets.json",
+  "distribution_codec_authority": ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
+  "provider_abi": {
+    "kind": "MIR4TargetProviderSpecV1",
+    "maturity": "preview",
+    "owned_fields": [
+      "capability_omissions",
+      "distribution_version",
+      "factorio_version",
+      "package_root"
+    ],
+    "laws": [
+      "determinism",
+      "supported-subset-round-trip",
+      "unowned-field-preservation",
+      "idempotence",
+      "locality",
+      "explicit-loss",
+      "no-hidden-product-policy",
+      "provenance-completeness",
+      "budget-compliance"
+    ],
+    "forbidden_policy_fields": [
+      "recipe_rules",
+      "stream_rules",
+      "technology_rules",
+      "setting_defaults",
+      "compatibility_claims"
+    ],
+    "maximum_provider_bytes": 131072,
+    "maximum_operations": 32
+  },
+  "target_groups": [
+    {"targets":["f210","f200"],"maturity":"stable","mode":"private-candidate-mechanism","public_support":false},
+    {"targets":["f110","f100"],"maturity":"preview","mode":"conditional-reduced-private-candidate","public_support":false},
+    {"targets":["f018","f017","f016","f015","f014","f013"],"maturity":"experimental","mode":"private-historical","public_support":false},
+    {"targets":["f012","f011","f010","f009","f008","f007","f006"],"maturity":"omitted-by-target","mode":"museum-input-gated","public_support":false}
+  ],
+  "facility_dispositions": [
+    "native",
+    "adapted",
+    "emulated",
+    "finite-substitute",
+    "compiled-out",
+    "omitted-by-capability",
+    "unsupported-with-evidence"
+  ],
+  "authoritative_materializers": [
+    "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
+    "tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1"
+  ],
+  "generalized_dispatcher": "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
+  "output_root": "build/mir4/m4c02-target-products",
+  "semantic_authority": false,
+  "player_package_mutation_authorized": false,
+  "public_support_authorized": false,
+  "signing_or_sealing_authorized": false,
+  "publication_authorized": false,
+  "rollback": "Remove private output and provider projections; Registry V5 and both proven materializers remain authoritative."
+}

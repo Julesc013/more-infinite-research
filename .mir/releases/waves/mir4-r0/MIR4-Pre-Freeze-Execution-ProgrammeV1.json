@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "kind": "MIR4PreFreezeExecutionProgrammeV1",
+  "recorded_at": "2026-08-27T05:08:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "source_baseline": {
+    "repository": "Julesc013/more-infinite-research",
+    "branch": "dev",
+    "commit": "8e269b6379ef3958f92fb747cef389f0f098feb6",
+    "tree": "dc3c7415c725bf10c0908d35ed93e530a49a77b1",
+    "main_commit": "e3d787deb35ff30157bb2013fa1cc745a445e629",
+    "legacy_commit": "20210a90d97c52426ea6abc7c94a89bb8ec7671b",
+    "package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C"
+  },
+  "planning_inputs": [
+    {
+      "name": "MIR4_ULTIMATE_CURRENT_STATE_AND_FINAL_PLAN_2026-08-24.md",
+      "sha256": "243551F4C7CE9FB2D44D33941ED02C78882795A44A36B59445F79311E907794A",
+      "classification": "planning-evidence-only-not-execution-authority"
+    },
+    {
+      "name": "MIR4_CHAT_RETIREMENT_HANDOFF_PACKAGE_2026-08-24.zip",
+      "sha256": "1F68E0A8538305673FDDF6694BCFF52342B4CE89407AC659218AB9B94B00925F",
+      "classification": "planning-evidence-only-not-execution-authority"
+    }
+  ],
+  "release_cut": {
+    "source_version": "4.0.0",
+    "candidate_state": "pre-freeze-unallocated",
+    "next_candidate": "M4RC1",
+    "stable_targets": ["F210", "F200"],
+    "conditional_targets": ["F110", "F100"],
+    "private_experimental_targets": ["F018", "F017", "F016", "F015", "F014", "F013"],
+    "developer_preview_asset_count": 4,
+    "player_authority": "terminal-compiler-emitter-runtime-and-materializers"
+  },
+  "workflow_maturity_vocabulary": [
+    "workflow_registered",
+    "workflow_fail_closed",
+    "workflow_executor_implemented",
+    "workflow_dry_run_passed",
+    "workflow_production_rehearsal_passed",
+    "workflow_production_authorized"
+  ],
+  "blockers": [
+    {
+      "id": "release-workflow-executor-maturity",
+      "state": "SATISFIED",
+      "scope": "stable-player-release",
+      "blocks": ["source-freeze", "candidate-allocation", "release-qualification", "release-seal", "promotion", "publication"],
+      "authority": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json"
+    },
+    {
+      "id": "protected-signing-and-recovery",
+      "state": "OPEN",
+      "scope": "stable-player-release",
+      "blocks": ["source-freeze", "candidate-allocation", "production-signing", "release-seal", "promotion", "tagging", "publication"],
+      "authority": ".mir/releases/governance/mir4/release-governance.json"
+    },
+    {
+      "id": "maintainer-playtest-f210",
+      "state": "OPEN",
+      "scope": "stable-player-release",
+      "blocks": ["production-go-no-go"],
+      "authority": "build/mir4/playtests/f210/**/manual-decision.json"
+    },
+    {
+      "id": "maintainer-playtest-f200",
+      "state": "OPEN",
+      "scope": "stable-player-release",
+      "blocks": ["production-go-no-go"],
+      "authority": "build/mir4/playtests/f200/**/manual-decision.json"
+    },
+    {
+      "id": "independent-mep-production-consumer",
+      "state": "OPEN",
+      "scope": "component-graduation",
+      "blocks": ["mep-api-sdk-stability-graduation"],
+      "authority": ".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json"
+    },
+    {
+      "id": "exact-target-processir-snapshot",
+      "state": "SATISFIED",
+      "scope": "component-graduation",
+      "blocks": ["processir-and-synthesis-graduation"],
+      "authority": "sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json"
+    },
+    {
+      "id": "exact-archive-custody-f200-k2so",
+      "state": "SATISFIED",
+      "scope": "technology-or-compatibility-claim",
+      "blocks": ["f200-k2so-exact-processir-claim"],
+      "authority": "sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json"
+    }
+  ],
+  "mir3_residuals": [
+    {
+      "id": "github-pr-149",
+      "observed_state": "open-main-to-legacy-alias-advance-to-3.2.11",
+      "required_disposition": "merge-close-or-explicitly-supersede-before-source-freeze",
+      "release_blocking": true
+    },
+    {
+      "id": "github-pr-146",
+      "observed_state": "open-draft-2.5.11-hotfix-already-published-through-separate-authority",
+      "required_disposition": "close-or-explicitly-supersede-before-source-freeze",
+      "release_blocking": true
+    }
+  ],
+  "turns": [
+    {"id": "T00", "name": "Retirement handoff and exact-state lock", "state": "completed", "depends_on": [], "human_required": false, "release_transition": false},
+    {"id": "T01", "name": "Authority and backlog reconciliation", "state": "completed", "depends_on": ["T00"], "human_required": false, "release_transition": false},
+    {"id": "T02", "name": "Release phase engine kernel", "state": "completed", "depends_on": ["T01"], "human_required": false, "release_transition": false},
+    {"id": "T03", "name": "Source-freeze and target-build executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
+    {"id": "T04", "name": "Qualification, preview and independent-verification executors", "state": "completed", "depends_on": ["T02"], "human_required": false, "release_transition": false},
+    {"id": "T05", "name": "Seal, promotion, publication, readback and restore executors", "state": "completed", "depends_on": ["T03", "T04"], "human_required": false, "release_transition": false},
+    {"id": "T06", "name": "Release doctor maturity and fault-injection closure", "state": "completed", "depends_on": ["T05"], "human_required": false, "release_transition": false},
+    {"id": "T07", "name": "Canonicalization, schema namespace and diagnostic authority", "state": "completed", "depends_on": ["T01"], "human_required": false, "release_transition": false},
+    {"id": "T08", "name": "SDK V1 preview completion", "state": "completed", "depends_on": ["T07"], "human_required": false, "release_transition": false},
+    {"id": "T09", "name": "Extension developer experience", "state": "completed", "depends_on": ["T07"], "human_required": false, "release_transition": false},
+    {"id": "T10", "name": "Environment lock, diff, support bundle and minimizer", "state": "completed", "depends_on": ["T07"], "human_required": false, "release_transition": false},
+    {"id": "T11", "name": "Read-only F210 MEP discovery", "state": "completed", "depends_on": ["T09"], "human_required": false, "release_transition": false},
+    {"id": "T12", "name": "Exact target ProcessIR preview and Inspector compare", "state": "completed", "depends_on": ["T10"], "human_required": false, "release_transition": false},
+    {"id": "T13", "name": "Release compatibility canary cut", "state": "completed", "depends_on": ["T10", "T12"], "human_required": false, "release_transition": false},
+    {"id": "T14", "name": "MIR4 public, contributor, maintainer and continuity documentation", "state": "completed", "depends_on": ["T01", "T07", "T09", "T10"], "human_required": false, "release_transition": false},
+    {"id": "T15", "name": "Supply-chain and preservation hardening", "state": "completed", "depends_on": ["T05", "T07"], "human_required": false, "release_transition": false},
+    {"id": "T16", "name": "Protected signing and recovery ceremony", "state": "blocked-human", "depends_on": ["T05"], "human_required": true, "release_transition": false},
+    {"id": "T17", "name": "Pre-freeze F210/F200 maintainer playtests", "state": "blocked-human", "depends_on": ["T01"], "human_required": true, "release_transition": false},
+    {"id": "T18", "name": "Pre-freeze defect closure and independent audit", "state": "blocked-dependency", "depends_on": ["T06", "T08", "T11", "T13", "T14", "T15", "T16", "T17"], "human_required": false, "release_transition": false},
+    {"id": "T19", "name": "Source-freeze authorization and M4RC1 allocation", "state": "blocked-human", "depends_on": ["T18"], "human_required": true, "release_transition": true},
+    {"id": "T20", "name": "Frozen candidate qualification and final acceptance", "state": "blocked-dependency", "depends_on": ["T19"], "human_required": true, "release_transition": true},
+    {"id": "T21", "name": "Production seal, promotion, tags, publication and public readback", "state": "blocked-dependency", "depends_on": ["T20"], "human_required": true, "release_transition": true}
+  ],
+  "next_dependency_ready_turn": null,
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED"
+}

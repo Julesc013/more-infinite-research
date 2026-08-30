@@ -1,0 +1,21 @@
+{
+  "schema": 2,
+  "kind": "MIR4VisibleRootProjectionV2",
+  "id": "tools-mir",
+  "path": "tools/mir",
+  "mode": "active-layered-tooling",
+  "current_authorities": [
+    "tools/mir/domain",
+    "tools/mir/application",
+    "tools/mir/ports",
+    "tools/mir/adapters",
+    "tools/mir/cli",
+    "tools/mir.ps1",
+    "tools/commands",
+    "tools/lib"
+  ],
+  "writable_authority": false,
+  "marker_is_writable_authority": false,
+  "package_visible": false,
+  "source": ".mir/control/repository-fixed-point.json"
+}

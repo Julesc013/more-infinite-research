@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "kind": "MIR4T04AuthorityEvolutionReceiptV1",
+  "recorded_at": "2026-08-25T22:20:00+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "turn": "T04",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json",
+    "sha256": "4FBA15D6E24924947EFE6CA5EEFCB1ED8D6DFB3939A734C10ACB2C9A7E9BD669"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json",
+      "previous_sha256": "1C82801F049B1FA8C638FF44795634A5EC02B215AFCD86EE91538A43107DE790",
+      "current_sha256": "5F8D118C8254049DD7F2F27905EEA583FCB4CED74E4C43F6906B2ACB048243F5",
+      "reason": "T04 promotes target qualification, deterministic preview assets, and independent verification to implemented, dry-run-passed non-production adapters.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json",
+      "previous_sha256": "425C5E6B69AF500A0B7C904417703F25A89B5C34B3924C939E1F43D5D040AE90",
+      "current_sha256": "E689F34294D3824DB5C0A2782B67837F1C17B7889E29F7101B23759E0C5BEE95",
+      "reason": "T04 is complete and T05 is the next dependency-ready work package; every production transition remains false.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseAdapters.ps1",
+      "previous_sha256": "7BAC8968E965CA1E5B08BA2CCA950225C112050538F6130E6A9BC2B438096A5B",
+      "current_sha256": "453499508C70A5E73ED613232DC7C348CB1399F971776D73263B02A0E20D4C58",
+      "reason": "The reusable adapter library now implements exact qualification worker adoption, deterministic preview assets, and independent receipt import with resumable partial evidence.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json", "sha256": "5F8D118C8254049DD7F2F27905EEA583FCB4CED74E4C43F6906B2ACB048243F5", "role": "current-workflow-maturity-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json", "sha256": "E689F34294D3824DB5C0A2782B67837F1C17B7889E29F7101B23759E0C5BEE95", "role": "current-pre-freeze-execution-authority"},
+    {"path": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json", "sha256": "BA19E1146795AAAE4F004363B322223A9F91C928AAF4C2CD76AB4438615D7ECB", "role": "non-production-phase-engine-contract"},
+    {"path": "tools/lib/mir4/ReleaseAdapters.ps1", "sha256": "453499508C70A5E73ED613232DC7C348CB1399F971776D73263B02A0E20D4C58", "role": "t03-t04-release-adapter-implementation"},
+    {"path": "tools/lib/mir4/NormalizedCompiler.ps1", "sha256": "7FFA4099EACFC35B783C7988AD00E1B23847553CDA762871555516860F252B31", "role": "strict-mode-safe-preview-provider-construction"},
+    {"path": "tools/lib/mir4/SupportAssessment.ps1", "sha256": "3FCC097AAA4E9A289D7D4152B3AAB77D85C809557B1E31CD4A4AC30A9B7DBE25", "role": "strict-mode-safe-preview-support-projection"},
+    {"path": "tools/lib/mir4/SafetyKernel.ps1", "sha256": "7BE3946360329E67CC6F3DD28A2EA0909ADAE9DBE384EFB794BCEA862CCD71B4", "role": "strict-mode-safe-optional-hazard-evaluation"},
+    {"path": "tools/lib/mir4/PlatformPreview.ps1", "sha256": "FB28F3BE521847EEAB09FCF7C6863AA1AD7AA28F0E5AF9A9052F16D44539ED8C", "role": "deterministic-four-asset-preview-builder"},
+    {"path": "spec/schemas/mir4-release-source-freeze-result-v1.schema.json", "sha256": "76EF3328215C39194FACBE70709DDEE686F8F192E757A71A3A47550007071C7B", "role": "source-freeze-result-contract"},
+    {"path": "spec/schemas/mir4-release-target-build-result-v1.schema.json", "sha256": "01D74E6801123F5D671CE695BE4AD254DEE7D734C591E7B0021788D0A1269DCD", "role": "target-build-result-contract"},
+    {"path": "spec/schemas/mir4-release-target-qualification-result-v1.schema.json", "sha256": "05C43718285583B01390D3FC97584A26FD85F8B4029CBDB4A6FC3D136EA72862", "role": "target-qualification-result-contract"},
+    {"path": "spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json", "sha256": "B02592E5E5F7C72E7FA76EB941DD8CAE625247D251E45F6E90F9E655FFFFFB9D", "role": "qualification-worker-receipt-contract"},
+    {"path": "spec/schemas/mir4-release-preview-assets-result-v1.schema.json", "sha256": "2F9CB77A6A0C593A30C7DAC73089B374164C245EA735777BCC8329A89AFA3D86", "role": "preview-assets-result-contract"},
+    {"path": "spec/schemas/mir4-release-independent-verification-result-v1.schema.json", "sha256": "B5F31555B170E057E016748BB00F13BCE5109C6F9B70E0D462477BF70C6C3A66", "role": "independent-verification-result-contract"},
+    {"path": "spec/schemas/mir4-independent-verification-receipt-v1.schema.json", "sha256": "B2B51E593889A6680A0D2E31F6FA7CE5BA85D68553E757BE018565A866575E3A", "role": "independent-verification-receipt-contract"}
+  ],
+  "player_package_source_sha256": "9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C",
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "T04-ADAPTERS-IMPLEMENTED-DRY-RUN-PASSED-RELEASE-BLOCKED"
+}

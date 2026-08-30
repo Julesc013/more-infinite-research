@@ -221,9 +221,6 @@ if ([int]$envelope.schema -ne 2 -or [string]$envelope.status -cne 'local-unpubli
     [bool]$envelope.public_output_authorized -ne $false -or -not $validTarget) {
   throw 'The capsule runner received an envelope outside the two bounded unpublished construction lanes.'
 }
-if ($lane -ceq 'emergency' -and $null -eq $envelope.PSObject.Properties['correction_authority']) {
-  throw 'The f210 capsule envelope must bind the approved MIR3-TERM-0033 correction.'
-}
 if ($lane -ceq 'local-playtest-shadow' -and $null -ne $envelope.PSObject.Properties['correction_authority']) {
   throw 'A lower-target local-playtest capsule cannot inherit the f210 correction authority.'
 }
@@ -277,10 +274,10 @@ try {
   Assert-Exact $manifest.target.distribution_version $envelope.distribution_version 'Internal manifest distribution version'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.source) (ConvertTo-CanonicalJson $envelope.source) 'Internal manifest source authority'
   Assert-Exact (ConvertTo-CanonicalJson $manifest.target.predecessor) (ConvertTo-CanonicalJson $envelope.predecessor) 'Internal manifest predecessor authority'
-  if ($lane -ceq 'emergency') {
+  if ($lane -ceq 'emergency' -and $null -ne $envelope.PSObject.Properties['correction_authority']) {
     Assert-Exact (ConvertTo-CanonicalJson $manifest.target.correction_authority) (ConvertTo-CanonicalJson $envelope.correction_authority) 'Internal manifest correction authority'
   } elseif ($null -ne $manifest.target.PSObject.Properties['correction_authority']) {
-    throw 'The lower-target internal manifest inherited an f210 correction binding.'
+    throw 'The capsule internal manifest has a correction binding absent from its envelope.'
   }
   if ($lane -ceq 'local-playtest-shadow') {
     Assert-Exact (ConvertTo-CanonicalJson $manifest.target.local_lane_authority) (ConvertTo-CanonicalJson $envelope.local_lane_authority) 'Internal manifest local lane authority'
@@ -340,7 +337,7 @@ if (-not (Test-MIR4BootstrapRecordHash -Record $envelope)) {
 }
 
 $correction = $null
-if ($lane -ceq 'emergency') {
+if ($lane -ceq 'emergency' -and $null -ne $envelope.PSObject.Properties['correction_authority']) {
   $correctionRelativePath = [string]$envelope.correction_authority.path
   Assert-SafeRelativePath $correctionRelativePath
   $correctionPath = Assert-Descendant $workspace (Join-Path $workspace $correctionRelativePath)
@@ -365,11 +362,11 @@ if ($lane -ceq 'local-playtest-shadow') {
   Assert-SafeRelativePath $laneRelativePath
   $lanePath = Assert-Descendant $workspace (Join-Path $workspace $laneRelativePath)
   $laneText = Get-Content -Raw -LiteralPath $lanePath
-  if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-private-lane-authorization-v2.schema.json'))) {
+  if (-not ($laneText | Test-Json -SchemaFile (Join-Path $schemaRoot 'mir4-private-lane-authorization-v3.schema.json'))) {
     throw 'The private local-playtest lane authority fails its exact schema.'
   }
   $laneAuthority = $laneText | ConvertFrom-Json -Depth 100 -DateKind String
-  Assert-Record $laneAuthority 'MIR4PrivateLaneAuthorizationV2'
+  Assert-Record $laneAuthority 'MIR4PrivateLaneAuthorizationV3'
   Assert-Exact $laneAuthority.authority_family 'MIRLocalArtifactLaneAuthorizationV1' 'Local lane authority family'
   Assert-Exact $laneAuthority.record_sha256 $envelope.local_lane_authority.record_sha256 'Local lane record binding'
   Assert-Exact $laneAuthority.kind $envelope.local_lane_authority.kind 'Local lane kind binding'

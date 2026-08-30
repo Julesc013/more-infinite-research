@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "kind": "MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1",
+  "recorded_at": "2026-08-30T06:49:56.7191568+10:00",
+  "programme_id": "M4C10-WHOLE-4X-IN-4.0",
+  "change_id": "MIR4-FINAL-RELEASE-CLOSURE-2026-08-30",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json",
+    "sha256": "A51ABC8AF6A22B8122F93BF5467E3A00818B4727EEBA2799540215349FBE91C2"
+  },
+  "maintainer_authorization": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
+    "bytes": 4745,
+    "sha256": "7A59C83A6DBBFCD803843D49FBBCCAC6990D4C59642C361CB695239277BDA65B"
+  },
+  "playtest_candidate_authority": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json",
+    "bytes": 4023,
+    "sha256": "6832C75E66EDB61BDEFE8573CE56C00CC8E88B6B79113E6764736510371443BF"
+  },
+  "execution_state": {
+    "t16_status": "blocked-human-custody-ceremony",
+    "t17_status": "exact-sessions-prepared-observations-and-captures-pending",
+    "t18_status": "blocked-dependency",
+    "source_freeze_status": "authorized-conditionally-not-executed",
+    "production_release_status": "authorized-conditionally-not-executed"
+  },
+  "readme": {
+    "path": "README.md",
+    "player_package_visible": true,
+    "exact_candidate_copy_preserved": true,
+    "post_release_update_deferred": true
+  },
+  "portal_copy": {
+    "path": "docs/releases/mir4-4.0-mod-portal-extended-description.md",
+    "status": "prepared-copy-only",
+    "live_portal_mutation_authorized": false
+  },
+  "branch_topology": {
+    "dev_role": "active-development",
+    "main_role": "current-stable-after-governed-promotion",
+    "legacy_role": "previous-major-alias",
+    "legacy_mir4_sync_authorized": false
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "78A667BF37B1D056EA51C25AD21594718B0917F3B62592827B90E5FAE0467C7A",
+      "current_sha256": "482A7D6EF000B23FD85E0D1EA34CF928C5DC3D4DE4F229432498237C22620770",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "A9DBCE91A917A165A4E3A1554A03F1DFB2CC17610991BDD721224C6ABEDC7983",
+      "current_sha256": "1D652443D94550190E61451691E98CC8BD476CDB0CCF79C1D25BFEE698D6EBD6",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "B04DC4C579CF82093FDC1A89EAF93F00E02AE6B6689B0339C4717731FE3C0512",
+      "current_sha256": "E0FFA7EE6F6B716A9840A5F31692C504A3AA288ECEB21E6ED1F5265239691E22",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "DEDA14AC322D037C441E010CC3AA2DCC818297D91FA4EB83747153CD946B4490",
+      "current_sha256": "50267CDB79CEE2A8FD954AC461880580F26CB9244DBACEDB1003D9ACFDA6FBFF",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "3FC86B484DD0B2AB93396EF60BED3EE10DCCB9B65AB86E4D8800C6FC64F71E3F",
+      "current_sha256": "1EAF6A485E600BC36C2224B0CE8020FF73FBD787E721B2765731259158EA8D90",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "310A443D02258E5951753CB9D7A33D2120B3EE7C680CE851D0368DAE53CE944B",
+      "current_sha256": "5C0394CF3FB2EF12DAB7724192C50B1DEE05DD05B353CDE2C6617EC2E4F5808E",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "93AA669BE404DEC4E2B6D7DC65F72DC6F94E924BE6020FA82802690BDF186D74",
+      "current_sha256": "28946361CEFB5786DE38B998228910CE4D0103B1F6021DAB667FDDA6658D4125",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "2DF3A91E51B4ABE3DB865E49DAA79553220C7076D131E3A9BF973DF75E0D43C8",
+      "current_sha256": "DB576B5DDB3690A8BCD7560628A7B4A25179620356CAEFFC24DAEEBE7811C888",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "mir.lock",
+      "previous_sha256": "BD23680EF1A44E24B7553B5D1217F539392F076CCC451861B779F67AF0D8924A",
+      "current_sha256": "945FC7C55571895C616923D8ADE1A38E8F51561BD0ABC4A5718D769029381169",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "53C09E5FFD9ABFD5ADF9B82D6DE296A534979EEB01C77735F5E005B7D3585615",
+      "current_sha256": "0C9DBD3192232F1A9F585B709901175F73799999C21E89376CFD612F5566C66F",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "D3CE4BFCEFECD565C1F4A85BB6A9C4CC997C031A80F65DE4168A8163309C482D",
+      "current_sha256": "354EBFC37B41A1DDC7012DFD15F4E31FEA515A567E97243895D5B164BD5731F1",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "0FAE5C5CFA43246E99371100C0BB289ACEEE879B6ECEB81AA0E376D616D78A9D",
+      "current_sha256": "A35CF15113D580A9BA3942A3C349D1227B1CB56A210B90B1046A43986BACC5B6",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "EE89383D532BFE411BA67816B7DFD1CEF60F3DB6D3F9D46F0BD8A3E85ABEB9F1",
+      "current_sha256": "16A564E1F842B028BC9D5DBBBBBE4CC9D092598463E3BF87F8CA5DDB612E60E9",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "E0C521F68E90BC463DE1EE03EBE85BB90E57234E25DA866FB4BEE710ED0B3089",
+      "current_sha256": "A8556B7E91C3A1A45A5D11137F330B64CEB68E37F8D52B5F79F5D636137BD851",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
+      "previous_sha256": "EF23CDB9301651B393834C79E828C6D66250BF983F55C498BF3D7344CBAB854B",
+      "current_sha256": "0911D2C1ACBCD99733B98FC2C3DB750051FE98DA1763AED007B23B360F418D9D",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "8EC9C61E8AA98737CA0BBAEDF444C1336E272B298026A2F33E5E05E57DC37072",
+      "current_sha256": "BC888D6DC3AFC48BD3D5086D12676C44307D5D552B272B792210B2A333B816F2",
+      "reason": "Import the exact maintainer GitHub release decision, bind the accepted F210 and F200 candidates to evidence-backed session preparation, regenerate documentation and platform fixed-point projections, and preserve all human and production transition gates.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": ".mir/distributions.json",
+      "sha256": "8424C86F3911F148BB8CD754D737E66D94E4FCBE51648FFCCB16C736D707224E",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-root-distribution-inventory-with-mir4-final-mile-candidates"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
+      "sha256": "7A59C83A6DBBFCD803843D49FBBCCAC6990D4C59642C361CB695239277BDA65B",
+      "hash_mode": "canonical-text-v1",
+      "role": "imported-maintainer-github-release-authorization"
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json",
+      "sha256": "6832C75E66EDB61BDEFE8573CE56C00CC8E88B6B79113E6764736510371443BF",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-f210-f200-playtest-candidate-authority"
+    },
+    {
+      "path": "docs/releases/mir4-4.0-mod-portal-extended-description.md",
+      "sha256": "2AFD217AA2D50C31F2247D83A05B4BB87BB6BE26255D5C519F58243B51307668",
+      "hash_mode": "canonical-text-v1",
+      "role": "copy-only-mod-portal-extended-description"
+    },
+    {
+      "path": "spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json",
+      "sha256": "0BD70BB13D12AA92CF7E3685819929374E223825DDDE94C1BB19CFB4360C5E25",
+      "hash_mode": "canonical-text-v1",
+      "role": "maintainer-authorization-schema"
+    },
+    {
+      "path": "spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json",
+      "sha256": "F8E98C74EBBE64F31DC27B4345D32748E17F371021B7012F24F94C8BD5C52E5A",
+      "hash_mode": "canonical-text-v1",
+      "role": "exact-playtest-candidate-authority-schema"
+    },
+    {
+      "path": "spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json",
+      "sha256": "BC3DE738BE138D7EAF9D490BCB72836E22D1FDABEC3770DBE5DDB6F49FB113C0",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-release-closure-evolution-schema"
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1",
+      "sha256": "F40C541CCE73A67A95F1A6FA9B1C3D35D7B5E6085C476BA2F8AB5891C7A656EE",
+      "hash_mode": "canonical-text-v1",
+      "role": "final-release-closure-evolution-writer"
+    }
+  ],
+  "player_package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "package_visible_delta": [],
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "FINAL-RELEASE-AUTHORIZATION-IMPORTED-EXACT-PLAYTEST-SESSIONS-PREPARED-HUMAN-EVIDENCE-AND-CUSTODY-GATES-REMAIN"
+}
