@@ -4,7 +4,7 @@
   "status": "accepted",
   "lanes": {
     "stable": {"branch": "release/4.0", "source_versions": "4.0.x", "base": "v4.0.0", "package_visible_refactor": false},
-    "development": {"branch": "main", "source_versions": "4.1.0+", "dev_mirror": "fast-forward after every accepted main change while dev is retained"}
+    "development": {"branch": "main", "source_versions": "4.1.0+", "dev_mirror": "exact-tree fast-forward or protected no-delta synchronization after every accepted main change while dev is retained"}
   },
   "admission": ["reproduced-player-defect", "security-correction", "save-or-migration-correction", "exact-target-compatibility-correction", "release-copy-or-installation-correction"],
   "versioning": {
