@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-08-30.
+Current-page navigation generated from Markdown front matter as of 2026-08-31.
 
 ## developer
 
@@ -214,6 +214,7 @@ Current-page navigation generated from Markdown front matter as of 2026-08-30.
 
 ### release-plan
 
+- [MIR 4 Post-4.0 Roadmap](../../releases/mir4-post-4.0-roadmap.md)
 - [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md)
 - [Portable Return Ledger](../../compatibility/portable-return-ledger.md)
 

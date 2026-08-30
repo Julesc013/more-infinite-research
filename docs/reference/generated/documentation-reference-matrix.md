@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-30.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-08-31.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -263,7 +263,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-permanent-schema-namespace | [MIR Canonical JSON V1](../../reference/mir4-canonical-json-v1.md) | current |
 | mir4-physical-move-gate | [MIR 4 Repository Fixed Point](../../architecture/mir4-repository-fixed-point.md) | current |
 | mir4-portable-exact-environment-lock | [MIR 4 Environment Evidence V1](../../reference/mir4-environment-evidence.md) | current |
-| mir4-post-4.0-roadmap | [MIR 4 Post-4.0 Roadmap](../../releases/mir4-post-4.0-roadmap.md) | draft |
+| mir4-post-4.0-roadmap | [MIR 4 Post-4.0 Roadmap](../../releases/mir4-post-4.0-roadmap.md) | current |
 | mir4-pre-freeze-release-doctor | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |
 | mir4-private-target-product-set | [MIR 4 Target Compiler](../../architecture/mir4-target-compiler.md) | current |
 | mir4-process-ir-v1-preview | [MIR 4 ProcessIR, Effect Channels, and Synthesis](../../architecture/mir4-processir-synthesis.md) | current |
