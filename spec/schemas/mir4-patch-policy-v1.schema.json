@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-patch-policy-v1.schema.json",
+  "title": "MIR 4 patch policy V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "lanes", "admission", "versioning", "cross_lane_rule", "release_rule"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PatchPolicyV1"},
+    "status": {"const": "accepted"},
+    "lanes": {"type": "object"},
+    "admission": {"type": "array", "minItems": 4, "items": {"type": "string"}, "uniqueItems": true},
+    "versioning": {"type": "object"},
+    "cross_lane_rule": {"type": "object"},
+    "release_rule": {"type": "object"}
+  }
+}

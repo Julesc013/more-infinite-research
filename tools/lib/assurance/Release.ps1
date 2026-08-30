@@ -801,6 +801,13 @@ function Invoke-MIRAssuranceCheckSeal {
 function Invoke-MIRAssuranceSelfTest {
   param([Parameter(Mandatory)]$Context)
 
+  $timestampProbeRecord = '{"recorded_at":"2026-08-18T12:00:00+10:00"}' |
+    ConvertFrom-Json -DateKind String
+  $timestampProbe = ConvertTo-MIR4BootstrapCanonicalJson -Value $timestampProbeRecord
+  if ($timestampProbe -cne '{"recorded_at":"2026-08-18T12:00:00+10:00"}') {
+    throw 'Bootstrap authority timestamps must remain lexical and time-zone independent.'
+  }
+
   $canonicalTrustPath = Get-MIRAssuranceCanonicalTrustPolicyPath
   $canonicalTrustSha256 = Get-MIRAssuranceCanonicalJsonFileHash -Path $canonicalTrustPath
   $decoyTrustPath = Join-Path $repo "validation\domains.yml"

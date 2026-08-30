@@ -26,11 +26,11 @@ source_of_truth_for:
 
 ## Freeze
 
-Freeze one exact `dev` commit and tree. After freeze, only release-blocking fixes are allowed; every fix invalidates the affected proof. No package-visible documentation or architecture work may be added after the final candidate bytes are qualified.
+Freeze one exact `main` commit and tree after verifying the retained `dev` mirror has the same tree. After freeze, only release-blocking fixes are allowed; every fix invalidates the affected proof. No package-visible documentation or architecture work may be added after the final candidate bytes are qualified.
 
 ## Production authorization
 
-Production work requires a separate explicit go/no-go. It covers signing identity and custody, final target admission, exact package seals, two independent publication dry runs, restore proof, `main` promotion, tags, GitHub assets and Mod Portal uploads. The promotion tree must equal the sealed tree and the packages must not be rebuilt.
+Production work requires a separate explicit go/no-go. It covers signing identity and custody, final target admission, exact package seals, two independent publication dry runs, restore proof, exact frozen-`main` readback, tags, GitHub assets and Mod Portal uploads. The tagged tree must equal the sealed tree and the packages must not be rebuilt.
 
 ## Publication and readback
 
@@ -38,4 +38,4 @@ GitHub receives player packages, preview developer assets, checksums, manifests,
 
 ## Hotfix
 
-Branch from the published `main` commit or tag, calculate the affected target set, run target-local proof, publish only affected target bytes, record new immutable receipts and forward-port the fix to `dev`. Do not create permanent target branches or manually rebuild historical packages.
+Branch from `release/4.0` for a 4.0.x correction, calculate the affected target set, run target-local proof, publish only affected target bytes, record new immutable receipts, and forward-port the intent and regression proof to `main`. Synchronize `dev` from `main` afterward. Do not create permanent target branches or manually rebuild historical packages.

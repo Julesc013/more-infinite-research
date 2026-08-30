@@ -6,11 +6,13 @@ on:
       - main
       - dev
       - legacy
+      - 'release/**'
   pull_request:
     branches:
       - main
       - dev
       - legacy
+      - 'release/**'
   workflow_dispatch:
     inputs:
       terminal_release:

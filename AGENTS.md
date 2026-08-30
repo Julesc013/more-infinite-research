@@ -18,7 +18,7 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - Generated streams: `.mir/streams.yml` and `docs/reference/schemas/stream-spec.md`.
 - Fixtures: `.mir/fixtures.yml` and `docs/maintainer/fixture-workflow.md`.
 - Release operations: `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json` and `RELEASE-RUNBOOK.md`.
-- Backports: `.mir/branches.yml` and `docs/maintainer/backporting.md`.
+- Backports: `.mir/branches.yml`, `docs/releases/mir4-post-4.0-roadmap.md`, and the MIR 3 history in `docs/maintainer/backporting.md`.
 
 ## Non-negotiable rules
 
@@ -28,7 +28,7 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - Preserve one emitter and package-source parity unless a separately authorized cutover changes them.
 - Preview, shadow, and experimental systems do not gain player mutation, release, signing, publication, or support authority by implementation alone.
 - Regenerate `.mir` projections when authorities change. Never hand-edit generated queues, dashboards, indexes, or receipts.
-- Finish completed work through PR merge and remote readback. Leave local `dev` clean and exactly equal to `origin/dev`.
+- Finish completed work through PR merge, remote readback, and protected `main` to `dev` synchronization. Leave local `dev` clean and exactly equal to `origin/dev`, with the remote `main` and `dev` trees equal.
 
 ## Verification
 

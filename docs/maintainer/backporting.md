@@ -1,7 +1,7 @@
 ---
 title: "Target-Line Versioning And Backports"
 status: current
-applies_to: "MIR 3.2.5 through the authorized 3.2.11/2.5.11 emergency hotfixes and successor terminal aliases"
+applies_to: "MIR 3.2.5 through the authorized 3.2.11/2.5.11 terminal corrections"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
@@ -13,7 +13,7 @@ source_of_truth_for:
   - backport-target-profile-projection
 ---
 
-# Target-Line Versioning And Backports
+# Target-line versioning and backports
 
 The MIR 3 `.5` wave established one immutable published package for every supported target from Factorio 2.1 through 0.13. All later MIR 3 corrections converge in the matching `.9` release under the [terminal `.9` programme](../releases/mir-3-terminal-dot-9-programme.md).
 
@@ -111,8 +111,7 @@ Transport failure is resumable publication work. Verify remote state and retry o
 
 ## Machine-readable authority
 
-For MIR 4.0, `dev` is the only active integration branch. `release/mir4-4.0.0` remains an inactive policy template until a separate source-freeze authorization names one exact `dev` commit. `main` remains at published MIR 3.2.11 until that identical tree and its already-built bytes have passed qualification, manual acceptance, independent acceptance, signing, sealing, and production go/no-go. Do not rebuild or add a commit between qualification and promotion.
-
+This page retains MIR 3 history. Current MIR 4 lane routing and cross-lane fixes are governed by the [MIR 4 Post-4.0 Roadmap](../releases/mir4-post-4.0-roadmap.md).
 
 - `.mir/branches.yml` defines branch and target routing.
 - `.mir/targets.json` defines target capabilities.

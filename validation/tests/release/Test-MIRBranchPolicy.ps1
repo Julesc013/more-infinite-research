@@ -18,7 +18,12 @@ $branches = @{
   dev = @{
     FactorioVersion = "2.1"
     BaseDependencyPattern = "^base\s+>=\s+2\.1(\.|$)"
-    Description = "experimental development branch for the main Factorio 2.1.x line"
+    Description = "protected transition mirror of the MIR 4 development line"
+  }
+  "release/4.0" = @{
+    FactorioVersion = "2.1"
+    BaseDependencyPattern = "^base\s+>=\s+2\.1(\.|$)"
+    Description = "maintained MIR 4.0.x patch line"
   }
   legacy = @{
     FactorioVersion = "2.1"
@@ -67,10 +72,10 @@ if ($originHead -and $originHead -ne "refs/remotes/origin/main") {
 
 $baseRef = $env:GITHUB_BASE_REF
 if (-not [string]::IsNullOrWhiteSpace($baseRef) -and -not $branches.ContainsKey($baseRef)) {
-  throw "Pull requests must target one of main, dev, or legacy; found $baseRef."
+  throw "Pull requests must target main, dev, legacy, or release/4.0; found $baseRef."
 }
 
-foreach ($branch in @("main", "dev", "legacy")) {
+foreach ($branch in @("main", "dev", "legacy", "release/4.0")) {
   $ref = "refs/remotes/origin/$branch"
   if (-not (Test-GitRefExists $ref)) {
     throw "Missing permanent branch origin/$branch."
@@ -97,4 +102,4 @@ foreach ($branch in @("main", "dev", "legacy")) {
   }
 }
 
-Write-Host "[ok] branch policy validated for origin/main, origin/dev, and the governed legacy transition to the MIR 3 Factorio 2.1 alias."
+Write-Host "[ok] branch policy validated for origin/main, its dev transition mirror, release/4.0, and the governed legacy alias."

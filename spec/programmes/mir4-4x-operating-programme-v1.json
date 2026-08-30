@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "kind": "MIR4XOperatingProgrammeV1",
+  "status": "active",
+  "objective": "Keep every supported MIR 4 target releasable while converging repository, release, compiler, compatibility, and evidence authorities without changing published 4.0.0 bytes.",
+  "permanent_invariants": [
+    "one semantic source",
+    "one self-contained player ZIP per target",
+    "one public command surface",
+    "one authority per mutable fact",
+    "one generated release narrative",
+    "independently generated and qualified target packages",
+    "evidence remains package-excluded",
+    "published versions and bytes are immutable"
+  ],
+  "work_packages": [
+    {"id": "M40-00", "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure", "depends_on": [], "state": "complete"},
+    {"id": "M40-01", "outcome": "Operate the release/4.0 patch lane and cross-lane defect protocol", "depends_on": ["M40-00"], "state": "active"},
+    {"id": "M41-00", "outcome": "Adopt the MIR 4.x operating, deployment, patch, and proof contracts", "depends_on": ["M40-00"], "state": "active"},
+    {"id": "M41-01", "outcome": "Make pull-request proof selection event, trust, and ref-topology aware", "depends_on": ["M41-00"], "state": "active"},
+    {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "depends_on": ["M41-01"], "state": "queued"},
+    {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "depends_on": ["M41-01"], "state": "queued"},
+    {"id": "M41-04", "outcome": "Make main canonical while keeping dev an exact protected mirror during transition", "depends_on": ["M41-02"], "state": "queued"},
+    {"id": "M41-05", "outcome": "Complete concise landing documentation and reader-oriented routing", "depends_on": ["M41-03"], "state": "queued"},
+    {"id": "M42-00", "outcome": "Establish source/package characterization and independently generated target packages", "depends_on": ["M41-03", "M41-04", "M41-05"], "state": "blocked-dependency"},
+    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI and one release engine", "depends_on": ["M42-00"], "state": "blocked-dependency"},
+    {"id": "M42-02", "outcome": "Decompose Lua compiler stages behind characterization and mutation boundaries", "depends_on": ["M42-00"], "state": "blocked-dependency"},
+    {"id": "M43-00", "outcome": "Graduate runtime, MEP, API, and SDK contracts per contract", "depends_on": ["M42-01", "M42-02"], "state": "blocked-dependency"},
+    {"id": "M44-00", "outcome": "Graduate exact ProcessIR and certified synthesis only after emitter parity", "depends_on": ["M43-00"], "state": "blocked-dependency"},
+    {"id": "M45-00", "outcome": "Deliver inspector and compatibility factory with expiring exact claims", "depends_on": ["M44-00"], "state": "blocked-dependency"},
+    {"id": "M46-00", "outcome": "Scale assurance, historical targets, preservation, and evergreen audit", "depends_on": ["M45-00"], "state": "blocked-dependency"}
+  ],
+  "outcome_trains": [
+    {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},
+    {"candidate": "4.1.0", "outcome": "Repository and release fixed point", "release_required": false},
+    {"candidate": "4.2.0", "outcome": "Source, package, compiler, and target authority fixed point", "release_required": false},
+    {"candidate": "4.3.0", "outcome": "Runtime, MEP, API, and SDK graduation", "release_required": false},
+    {"candidate": "4.4.0", "outcome": "ProcessIR and certified synthesis", "release_required": false},
+    {"candidate": "4.5.0", "outcome": "Inspector and compatibility factory", "release_required": false},
+    {"candidate": "4.6.0+", "outcome": "Ecosystem breadth, historical targets, assurance scale, preservation, and evergreen fixed point", "release_required": false}
+  ],
+  "wip_limits": {"product_feature_trains": 1, "authority_migrations": 1, "stable_patch": 1, "broad_lua_refactor_before_M42_00": 0}
+}

@@ -1,0 +1,14 @@
+changelog:
+  exclude:
+    labels: ["skip-changelog", "internal-only"]
+  categories:
+    - title: Player changes
+      labels: ["player", "bug", "enhancement"]
+    - title: Compatibility
+      labels: ["compatibility"]
+    - title: Developer surfaces
+      labels: ["api", "sdk", "extensions", "developer"]
+    - title: Repository and release engineering
+      labels: ["governance", "release", "tooling", "documentation", "dependencies"]
+    - title: Other changes
+      labels: ["*"]

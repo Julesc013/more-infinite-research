@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "MIR4PatchPolicyV1",
+  "status": "accepted",
+  "lanes": {
+    "stable": {"branch": "release/4.0", "source_versions": "4.0.x", "base": "v4.0.0", "package_visible_refactor": false},
+    "development": {"branch": "main", "source_versions": "4.1.0+", "dev_mirror": "fast-forward after every accepted main change while dev is retained"}
+  },
+  "admission": ["reproduced-player-defect", "security-correction", "save-or-migration-correction", "exact-target-compatibility-correction", "release-copy-or-installation-correction"],
+  "versioning": {
+    "source": "4.MINOR.PATCH",
+    "distribution_formula": "encoded_component = decimal(distribution_target_code) * 100 + source_patch",
+    "examples": {"4.0.1/F210": "4.0.21001", "4.0.1/F200": "4.0.20001", "4.0.1/F110": "4.0.11001", "4.0.1/F100": "4.0.10001"},
+    "source_patch_range": [0, 99]
+  },
+  "cross_lane_rule": {
+    "stable_origin": "Implement the smallest correction on release/4.0, then immediately forward-port the intent and regression proof to main.",
+    "development_origin": "Implement on main, then backport only when the defect reproduces against the exact maintained 4.0 target and the smaller patch remains valid.",
+    "required_record": ["shared finding id", "affected target set", "lane dispositions", "semantic-equivalence proof", "upgrade proof", "package delta"]
+  },
+  "release_rule": {
+    "source_release_required": false,
+    "trigger": "Publish 4.0.x only for an admitted player, security, migration, or exact compatibility correction.",
+    "primary_targets": ["F210", "F200"],
+    "conditional_targets": ["F110", "F100"],
+    "supplemental_target_release_allowed": true,
+    "published_bytes_immutable": true
+  }
+}

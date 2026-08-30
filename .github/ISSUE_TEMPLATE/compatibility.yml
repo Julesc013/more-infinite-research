@@ -1,0 +1,33 @@
+name: Compatibility finding
+description: Report an exact interaction with another mod or mod set.
+title: "compat: "
+labels: ["compatibility", "triage"]
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Exact environment
+      description: MIR distribution, Factorio version, other mod names and versions.
+    validations:
+      required: true
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Exact compatibility proposition
+      description: State the one behavior that should work and what actually happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction and evidence
+      description: Prefer a minimized SupportBundleV1 and a new-save reproduction.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Claim boundary
+      options:
+        - label: I understand this report does not establish blanket support for the mod or modpack.
+          required: true

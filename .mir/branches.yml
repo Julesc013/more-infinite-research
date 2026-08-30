@@ -1,11 +1,13 @@
 schema: 1
 
 remote_topology:
-  recorded_at: 2026-08-24
+  recorded_at: 2026-08-30
   permanent_branches:
     - main
     - dev
     - legacy
+  maintained_release_branches:
+    - release/4.0
   active_temporary_branches: []
   held_temporary_branches: []
   inactive_policy_templates:
@@ -20,9 +22,10 @@ remote_topology:
     archived_unique_heads: 24
     superseded_pull_request: 31
   rules:
-    - main remains the published MIR 3.2.11 Factorio 2.1 line until one exact qualified and sealed MIR 4.0.0 tree is authorized for fast-forward promotion; no post-qualification commit, rebuild, or synthetic evidence may intervene
-    - dev is the canonical MIR 4 integration branch and retains MIR 3.2.11 and 2.5.11 emergency-correction ancestry, the shared Control Plane, validation tooling, governance, and target-neutral corrections
-    - release/mir4-4.0.0 is a planned inactive policy template and may be created from one exact dev commit only after source-freeze authorization; preparing its policy does not allocate M4RC1
+    - main is the canonical MIR 4.1 and later integration branch after the exact MIR 4.0.0 release promotion
+    - dev is a protected transition mirror of main and receives no independent integration work; while retained, it must be synchronized after every accepted main change
+    - release/4.0 is the maintained MIR 4.0.x patch branch rooted at the exact peeled v4.0.0 commit and accepts only admitted stable corrections
+    - release/mir4-4.0.0 remains an inactive historical policy template and is not reused for maintenance
     - legacy is the movable previous-major terminal alias; it advances to published MIR 3.2.11 through a governed non-force two-parent commit and may later advance once to the sealed MIR 4 terminal authority when MIR 5 opens, always with a tree exactly matching the outgoing major terminal authority
     - immutable Factorio 2.0 releases 2.5.9 and 2.5.10 remain preserved by their annotated tags and public releases after the movable legacy branch changes role; authorized 2.5.11 is rooted at immutable 2.5.10 rather than legacy
     - temporary remote candidate branches are created only when protected qualification requires one and are deleted after release
@@ -32,7 +35,7 @@ remote_topology:
 branches:
   main:
     remote_state: permanent
-    purpose: published Factorio 2.1 line at immutable MIR 3.2.11
+    purpose: canonical MIR 4.1 and later integration and release-source line
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -40,6 +43,10 @@ branches:
       - fixture-correction
       - validated-release-candidate-promotion
       - exact-qualified-mir4-4.0.0-promotion
+      - architecture
+      - new-capabilities
+      - refactors
+      - canonical-target-neutral-fix
     rejects:
       - unsealed-mir4-candidate
       - post-qualification-package-change
@@ -49,16 +56,33 @@ branches:
 
   dev:
     remote_state: permanent
-    purpose: canonical MIR 4 integration plus MIR 3.2.11 and 2.5.11 emergency correction ancestry, shared Control Plane v5, validation tooling, and governance
+    purpose: protected exact transition mirror of main; no independent integration queue
     factorio_version: "2.1"
     accepts:
-      - architecture
-      - new-capabilities
-      - docs
-      - fixtures
-      - refactors
-      - validation
-      - canonical-target-neutral-fix
+      - exact-main-fast-forward
+      - no-delta-main-synchronization
+    rejects:
+      - independent-feature-work
+      - independent-fix-work
+      - release-candidate-allocation
+
+  release/4.0:
+    remote_state: maintained-release
+    purpose: exact MIR 4.0.x stable patch lane rooted at v4.0.0
+    factorio_version: multi-target
+    source_branch: v4.0.0
+    accepts:
+      - reproduced-player-defect
+      - security-correction
+      - save-or-migration-correction
+      - exact-target-compatibility-correction
+      - release-copy-or-installation-correction
+    rejects:
+      - product-feature
+      - broad-refactor
+      - repository-reorganization
+      - compiler-decomposition
+      - speculative-cleanup
 
   release/mir4-4.0.0:
     remote_state: inactive-policy-template
@@ -117,12 +141,24 @@ branches:
 
 backport_rules:
   pure_classifier_fix:
-    from: dev
+    from: main
+    to:
+      - release/4.0
+    requires:
+      - exact-4.0-reproduction
+      - fixture
+      - no-stream-id-change
+      - semantic-equivalence
+
+  stable_origin_fix:
+    from: release/4.0
     to:
       - main
     requires:
-      - fixture
-      - no-stream-id-change
+      - shared-finding-id
+      - forward-port-disposition
+      - regression-proof
+      - semantic-equivalence
 
   generated_stream_change:
     requires:

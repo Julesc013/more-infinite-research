@@ -1,0 +1,28 @@
+name: Feature proposal
+description: Propose a player, target, extension, tooling, or documentation outcome.
+title: "feat: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and desired outcome
+      description: Describe the player or developer problem before describing an implementation.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options: ["Player behavior", "Compatibility", "Target support", "Extension/API/SDK", "Inspector/diagnostics", "Release/tooling", "Documentation"]
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility, migration, and target impact
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Suggested acceptance evidence
+      description: Name fixtures, engines, upgrade paths, conformance tests, or external consumers that would prove the outcome.
