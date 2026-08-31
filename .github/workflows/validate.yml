@@ -128,12 +128,12 @@ jobs:
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ matrix.no_op != true }}
         with:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
@@ -236,11 +236,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
           name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
@@ -286,7 +286,7 @@ jobs:
       - name: Download isolated worker evidence
         id: download-workers
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*
           path: build/results/assurance/worker-evidence
