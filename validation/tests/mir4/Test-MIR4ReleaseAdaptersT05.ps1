@@ -17,10 +17,24 @@ try{
   $baseRef="refs/remotes/origin/$baseBranch"
   $baseCommit=(& git -C $sourceRepo rev-parse --verify $baseRef 2>$null).Trim()
   if($baseCommit-cmatch'^[0-9a-f]{40}$'){
+    $headTree=(& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim()
     & git -C $sourceRepo merge-base --is-ancestor $baseCommit HEAD
-    if($LASTEXITCODE-ne0){
-      $headTree=(& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim();$baseTree=(& git -C $sourceRepo rev-parse "$baseCommit^{tree}").Trim()
+    $baseIsAncestor=$LASTEXITCODE-eq0
+    if(-not$baseIsAncestor){
+      $baseTree=(& git -C $sourceRepo rev-parse "$baseCommit^{tree}").Trim()
       if($headTree-cne$baseTree){throw '[mir4-t05-non-base-lineage-tree]'}
+    }
+    if($baseBranch-cne'main'){
+      $mainCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
+      if($mainCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-main-simulation-source]'}
+      $syntheticCommit=(@('MIR T05 protected-base simulation')|& git -C $sourceRepo -c 'user.name=MIR T05' -c 'user.email=mir-t05@invalid' commit-tree $headTree -p $mainCommit).Trim()
+      if($syntheticCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-synthetic-commit]'}
+      $temporaryRoot=if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP)){[IO.Path]::GetTempPath()}else{$env:RUNNER_TEMP}
+      $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-base-'+[guid]::NewGuid().ToString('N'))
+      & git -C $sourceRepo worktree add --detach $mirrorWorktree $syntheticCommit 2>$null|Out-Null
+      if($LASTEXITCODE-ne0){throw '[mir4-t05-base-worktree]'}
+      $repo=(Resolve-Path -LiteralPath $mirrorWorktree).Path
+    }elseif(-not$baseIsAncestor){
       $temporaryRoot=if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP)){[IO.Path]::GetTempPath()}else{$env:RUNNER_TEMP}
       $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-base-'+[guid]::NewGuid().ToString('N'))
       & git -C $sourceRepo worktree add --detach $mirrorWorktree $baseCommit 2>$null|Out-Null
@@ -40,16 +54,9 @@ try{
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $developmentPlanPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $developmentPlan=Get-Content -Raw -LiteralPath (Join-Path $repo $developmentPlanPath)|ConvertFrom-Json -Depth 100
-$simulationSourceCommit=(& git -C $repo rev-parse HEAD).Trim()
-if($baseBranch-cne'main'){
-  $mainSimulationCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
-  if($mainSimulationCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-main-simulation-source]'}
-  $simulationSourceCommit=$mainSimulationCommit
-}
-$simulationSourceTree=(& git -C $sourceRepo rev-parse "$simulationSourceCommit^{tree}").Trim()
 $inputs=[pscustomobject][ordered]@{
   source_release_record='.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
-  candidate_id='DEV-T05-UNALLOCATED';source_commit=$simulationSourceCommit;source_tree=$simulationSourceTree
+  candidate_id='DEV-T05-UNALLOCATED';source_commit=(& git -C $repo rev-parse HEAD).Trim();source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
   target_distribution_record_set=$developmentPlanPath;release_plan_digest=[string]$developmentPlan.verification_plan.plan_sha256
   proof_root='build/mir4/release-phase-engine/tests/t05-proof';seal_root='not-allocated'
 }
