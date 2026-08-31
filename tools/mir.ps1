@@ -45,6 +45,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
+  .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
@@ -664,6 +665,16 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $rehearsalArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1") @rehearsalArguments
+      }
+      "release-narratives" {
+        if ($Args.Count -lt 3) { throw "mir4 release-narratives requires render or check." }
+        $subcommand = $Args[2]
+        if ($subcommand -notin @('render','check')) { throw "Unknown mir4 release-narratives command: $subcommand" }
+        $planIndex = [Array]::IndexOf($Args, '--plan')
+        $outputIndex = [Array]::IndexOf($Args, '--output')
+        if ($planIndex -lt 0 -or $planIndex + 1 -ge $Args.Count -or $outputIndex -lt 0 -or $outputIndex + 1 -ge $Args.Count) { throw 'mir4 release-narratives requires --plan and --output.' }
+        & (Join-Path $PSScriptRoot 'mir/cli/Invoke-MIR4ReleaseNarratives.ps1') -Command $subcommand -Plan $Args[$planIndex + 1] -Output $Args[$outputIndex + 1] -RepoRoot $repo.Path
+        return
       }
       "repository" {
         if ($Args.Count -lt 3) { throw "mir4 repository requires generate, check, inventory, or initialize." }

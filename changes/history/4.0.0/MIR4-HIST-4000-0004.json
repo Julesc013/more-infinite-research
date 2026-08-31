@@ -1,0 +1,13 @@
+{
+  "schema": 2, "kind": "MIR4ChangeFragmentV2", "change_id": "MIR4-HIST-4000-0004", "status": "released", "change_type": "added",
+  "summary": "Published four separate package-excluded developer previews for MIR APIs, extensions, tooling, and inspection.",
+  "details": ["Developer previews were GitHub assets and were not installable Factorio mods.", "Preview implementation granted no player mutation or support-claim authority."],
+  "semantic_domains": ["developer-surface"], "audiences": ["mod-authors", "contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"not-applicable","reason":"Package-excluded developer surface."}, {"target":"F200","disposition":"not-applicable","reason":"Package-excluded developer surface."},
+    {"target":"F110","disposition":"not-applicable","reason":"Package-excluded developer surface."}, {"target":"F100","disposition":"not-applicable","reason":"Package-excluded developer surface."}
+  ],
+  "package_visibility": "developer-kit", "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge", "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [{"kind":"release-record","value":"https://github.com/Julesc013/more-infinite-research/releases/tag/v4.0.0"}]
+}

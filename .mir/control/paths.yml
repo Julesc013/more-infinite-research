@@ -351,6 +351,7 @@ paths:
   tools.mir.application.history.migration: tools/mir/application/history/HistoricalToolingMigration.ps1
   tools.mir.application.release.release-dag: tools/mir/application/release/ReleaseDag.ps1
   tools.mir.application.release.f210-qualification-policy: tools/mir/application/release/F210QualificationPolicy.ps1
+  tools.mir.application.release.release-narratives: tools/mir/application/release/ReleaseNarratives.ps1
   tools.commands.mir4.update-f210-qualification-policy-authority: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
   tools.commands.mir4.update-final-mile-tooling-authority: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
   tools.commands.mir4.update-final-release-closure-authority: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
@@ -365,6 +366,7 @@ paths:
   tools.mir.cli.historical-succession-records: tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1
   tools.mir.cli.historical-tooling-migration: tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1
   tools.mir.cli.release-tooling-migration: tools/mir/cli/Invoke-MIR4ReleaseToolingMigration.ps1
+  tools.mir.cli.release-narratives: tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1
   tools.lib.mir4.compatibility-index: tools/mir/application/inspection/CompatibilityIndex.ps1
   tools.lib.mir4.support-assessment: tools/mir/application/inspection/SupportAssessment.ps1
   tools.lib.mir4.inspector: tools/mir/application/inspection/Inspector.ps1
@@ -405,6 +407,8 @@ paths:
   control.policy: .mir/control-plane/control-plane.json
   lifecycle.root: .mir/lifecycle
   lifecycle.changes: .mir/lifecycle/changes
+  changes.unreleased: changes/unreleased
+  changes.history: changes/history
   lifecycle.incidents: .mir/lifecycle/incidents
   lifecycle.tasks: .mir/lifecycle/tasks
   releases.root: .mir/releases

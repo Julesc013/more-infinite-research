@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/release/mir4-release-narrative-plan-v1.schema.json",
+  "title": "MIR4ReleaseNarrativePlanV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "plan_id", "renderer_abi", "release", "targets", "change_fragments", "copy", "shadow_only", "publication_authorized"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseNarrativePlanV1"},
+    "plan_id": {"type": "string", "pattern": "^MIR4-(?:HIST|SYN|REL)-[A-Z0-9.-]{4,80}$"},
+    "renderer_abi": {"const": "mir4-release-narratives/1"},
+    "release": {"type": "object", "additionalProperties": false, "required": ["source_version", "title", "tag", "date", "release_kind", "stability"], "properties": {
+      "source_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-(?:alpha|beta|rc)\\.[0-9]+)?$"},
+      "title": {"type": "string", "pattern": "^MIR [0-9]+\\.[0-9]+\\.[0-9]+(?: (?:Alpha|Beta|RC) [0-9]+)?$"},
+      "tag": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+(?:-(?:alpha|beta|rc)\\.[0-9]+)?$"},
+      "date": {"type": "string", "format": "date"},
+      "release_kind": {"enum": ["historical", "hotfix", "patch", "minor", "major", "beta", "rc"]},
+      "stability": {"enum": ["stable", "prerelease"]}
+    }},
+    "targets": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["target", "factorio_line", "distribution_version", "asset_name", "package_action"], "properties": {
+      "target": {"enum": ["F210", "F200", "F110", "F100"]},
+      "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]},
+      "distribution_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+      "asset_name": {"type": "string", "pattern": "^more-infinite-research_[0-9]+\\.[0-9]+\\.[0-9]+\\.zip$"},
+      "package_action": {"enum": ["build", "unchanged-no-package", "omitted"]}
+    }}},
+    "change_fragments": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^(changes|fixtures)/.+\\.json$"}},
+    "copy": {"type": "object", "additionalProperties": false, "required": ["outcome", "upgrade", "compatibility", "known_issues", "details_links"], "properties": {
+      "outcome": {"type": "string", "minLength": 20, "maxLength": 320},
+      "upgrade": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"type": "string", "minLength": 8, "maxLength": 320}},
+      "compatibility": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"type": "string", "minLength": 8, "maxLength": 320}},
+      "known_issues": {"type": "array", "maxItems": 6, "items": {"type": "string", "minLength": 8, "maxLength": 320}},
+      "details_links": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"type": "object", "additionalProperties": false, "required": ["label", "url"], "properties": {"label": {"type": "string", "minLength": 3}, "url": {"type": "string", "pattern": "^https://"}}}}
+    }},
+    "shadow_only": {"const": true},
+    "publication_authorized": {"const": false}
+  }
+}

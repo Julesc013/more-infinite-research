@@ -2787,6 +2787,30 @@
       ]
     },
     {
+      "id": "static.mir4-release-narratives-m41-03",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "changes/history/4.0.0/**",
+        "changes/unreleased/**",
+        "contracts/release/mir4-change-fragment-v2.schema.json",
+        "contracts/release/mir4-defect-record-v1.schema.json",
+        "contracts/release/mir4-change-realization-v1.schema.json",
+        "contracts/release/mir4-release-narrative-plan-v1.schema.json",
+        "contracts/release/mir4-release-narrative-result-v1.schema.json",
+        "fixtures/release/m41-03/**",
+        "tools/mir/application/release/*Renderer.ps1",
+        "tools/mir/application/release/ReleaseNarrativeModel.ps1",
+        "tools/mir/application/release/ReleaseNarratives.ps1",
+        "tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",

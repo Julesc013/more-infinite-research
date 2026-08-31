@@ -1,0 +1,13 @@
+{
+  "schema":1,"kind":"MIR4ReleaseNarrativePlanV1","plan_id":"MIR4-HIST-4.0.0","renderer_abi":"mir4-release-narratives/1",
+  "release":{"source_version":"4.0.0","title":"MIR 4.0.0","tag":"v4.0.0","date":"2026-08-30","release_kind":"historical","stability":"stable"},
+  "targets":[
+    {"target":"F210","factorio_line":"2.1","distribution_version":"4.0.21000","asset_name":"more-infinite-research_4.0.21000.zip","package_action":"build"},
+    {"target":"F200","factorio_line":"2.0","distribution_version":"4.0.20000","asset_name":"more-infinite-research_4.0.20000.zip","package_action":"build"},
+    {"target":"F110","factorio_line":"1.1","distribution_version":"4.0.11000","asset_name":"more-infinite-research_4.0.11000.zip","package_action":"build"},
+    {"target":"F100","factorio_line":"1.0","distribution_version":"4.0.10000","asset_name":"more-infinite-research_4.0.10000.zip","package_action":"build"}
+  ],
+  "change_fragments":["changes/history/4.0.0/MIR4-HIST-4000-0001.json","changes/history/4.0.0/MIR4-HIST-4000-0002.json","changes/history/4.0.0/MIR4-HIST-4000-0003.json","changes/history/4.0.0/MIR4-HIST-4000-0004.json"],
+  "copy":{"outcome":"MIR 4.0.0 established one source family with independently qualified, self-contained packages for four Factorio lines.","upgrade":["Back up the save and install only the package matching the running Factorio line.","Remove the predecessor ZIP, keep startup settings unchanged for the first load, then save and reload after migration."],"compatibility":["F210 and F200 are full maintained targets; F110 and F100 are reduced LTS targets with explicit omissions.","Compatibility claims remain bounded to exact evidence-backed environments."],"known_issues":["Factorio target packages intentionally differ where an engine cannot represent a feature."],"details_links":[{"label":"Preserved MIR 4.0.0 release","url":"https://github.com/Julesc013/more-infinite-research/releases/tag/v4.0.0"}]},
+  "shadow_only":true,"publication_authorized":false
+}

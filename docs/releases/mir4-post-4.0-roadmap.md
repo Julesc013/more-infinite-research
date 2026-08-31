@@ -44,7 +44,7 @@ For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4
 
 ## Dependency-ordered work
 
-The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, branch-authority, and unpublished patch-lane rehearsal foundation closed on 2026-08-31; change-fragment and release-rendering work is next.
+The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, branch-authority, unpublished patch-lane rehearsal, and canonical release-narrative authority closed on 2026-08-31. Package-excluded documentation routing and package characterization are next.
 
 | Work package | Outcome | State after this change |
 | --- | --- | --- |
@@ -53,7 +53,7 @@ The active fixed point is deliberately smaller than the full report. The initial
 | M41-00 | Adopt operating, deployment, patch, and proof-applicability contracts | Complete |
 | M41-01 | Repair pull-request proof selection for event base, trust class, and synthetic merge topology | Complete |
 | M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Complete |
-| M41-03 | Introduce change fragments and generate every release narrative | Next |
+| M41-03 | Introduce change fragments and generate every release narrative | Complete |
 | M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
