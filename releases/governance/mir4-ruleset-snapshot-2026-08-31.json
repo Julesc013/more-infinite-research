@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "kind": "MIR4RulesetSnapshotV1",
+  "captured_at": "2026-08-31T20:17:00+10:00",
+  "repository": "Julesc013/more-infinite-research",
+  "observed_from_commit": "831daa2552f7f3c4820f7fcad24653da15995b7b",
+  "package_visible": false,
+  "authoritative_for_remote_current_state": false,
+  "rulesets": [
+    {
+      "id": 20833408,
+      "name": "MIR main stable integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "includes": ["refs/heads/main"],
+      "rule_types": ["deletion", "non_fast_forward", "required_linear_history", "pull_request", "required_status_checks"],
+      "required_status_checks": ["branch-policy", "verification-gate"],
+      "allowed_merge_methods": ["squash", "rebase"],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-08-31T20:15:35.511+10:00"
+    },
+    {
+      "id": 20833406,
+      "name": "MIR dev integration integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "includes": ["refs/heads/dev"],
+      "rule_types": ["deletion", "non_fast_forward", "required_linear_history", "pull_request", "required_status_checks"],
+      "required_status_checks": ["branch-policy", "verification-gate"],
+      "allowed_merge_methods": ["squash", "rebase"],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-08-31T20:15:36.338+10:00"
+    },
+    {
+      "id": 21859574,
+      "name": "MIR 4.0 maintenance integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "includes": ["refs/heads/release/4.0"],
+      "rule_types": ["deletion", "non_fast_forward", "required_linear_history", "pull_request", "required_status_checks"],
+      "required_status_checks": ["verification-gate"],
+      "allowed_merge_methods": ["squash", "rebase"],
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "updated_at": "2026-08-31T01:27:34.958+10:00"
+    }
+  ],
+  "negative_assertions": {
+    "release_branch_deletion_forbidden": true,
+    "release_branch_non_fast_forward_forbidden": true,
+    "release_branch_direct_push_forbidden": true,
+    "source_and_distribution_tag_update_forbidden": true,
+    "source_and_distribution_tag_deletion_forbidden": true,
+    "tag_bypass_actor_count": 0
+  }
+}

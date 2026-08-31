@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "kind": "MIR4PackagePresentationBaselineV1",
+  "status": "accepted-current-package-presentation-baseline",
+  "recorded_at": "2026-08-31T18:02:00+10:00",
+  "predecessor": {
+    "authority_path": ".mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json",
+    "package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+    "readme_blob_sha1": "f71951dc9cb61137003bb02e66ab880eb67052b7"
+  },
+  "current": {
+    "package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+    "package_zip_sha256": "93DFC2DACB5EFB9E898B6D7A0342282B04210D9ABA596D8A8346428AE8E4629E",
+    "package_zip_content_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+    "package_zip_bytes": 1074631,
+    "readme_blob_sha1": "5c17e14c21314330eef4e74bce49aeb114559034",
+    "package_visible_delta": ["README.md"]
+  },
+  "realization": {
+    "pull_request": 203,
+    "main_commit": "50186ebc90b13a27125df4e1af7806c673f89e5a",
+    "dev_mirror_pull_request": 204,
+    "dev_mirror_commit": "53bd5acab95b24c8aa4241053571f8af5c5338cd"
+  },
+  "invariants": {
+    "player_executable_sources_unchanged": true,
+    "one_emitter_preserved": true,
+    "gameplay_difference_authorized": false,
+    "source_freeze_authorized": false,
+    "candidate_allocation_authorized": false,
+    "signing_or_sealing_authorized": false,
+    "promotion_authorized": false,
+    "publication_authorized": false
+  },
+  "package_coupling": {
+    "state": "accepted-temporary",
+    "reason": "The repository README remains package-visible under the current root-package source layout; PR #203 changed only its CI badge target.",
+    "retirement_gate": "M42-00A package-membership characterization and M41-05B repository/package README separation"
+  }
+}

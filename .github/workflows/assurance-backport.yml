@@ -22,7 +22,7 @@ jobs:
       matrix:
         target: ["2.1", "2.0"]
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
@@ -32,7 +32,7 @@ jobs:
           MIR_BACKPORT_BASELINE_SHA: ${{ inputs.baseline_sha }}
           MIR_BACKPORT_TARGET: ${{ matrix.target }}
         run: ./tools/mir.ps1 assurance backport --target $env:MIR_BACKPORT_TARGET --baseline $env:MIR_BACKPORT_BASELINE_SHA --output "build/results/assurance/backport-$($env:MIR_BACKPORT_TARGET).json"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
           name: assurance-backport-plan-${{ matrix.target }}-${{ inputs.candidate_sha }}

@@ -30,13 +30,15 @@ The machine-readable programme is `spec/programmes/mir4-4x-operating-programme-v
 - Published versions, tags, and package bytes are immutable. The unsigned `v4.0.0` tag and its historical annotation are preserved rather than rewritten.
 - Repository, governance, documentation, fixtures, tests, SDK material, build records, and assurance evidence remain outside player ZIPs.
 
-## Two live lanes
+## Stable maintenance and next-release development
 
 `release/4.0` is the maintained 4.0.x line rooted at the exact peeled `v4.0.0` commit. It accepts only reproduced player defects, security corrections, save or migration repairs, exact-target compatibility corrections, and release-copy or installation corrections. It does not accept repository redesign, feature work, compiler decomposition, or speculative cleanup.
 
-`main` is the canonical development line for 4.1.0 and later. While the protected `dev` branch is retained, every accepted `main` change is mirrored to `dev` by an auditable fast-forward or a no-delta synchronization pull request. New work starts from `main`; `dev` is not a second integration queue. Removal of `dev` is a later explicit transition, not an assumption hidden inside this programme.
+`main` is the latest-stable MIR 4.x line. Bounded patches, hotfixes, repository-governance maintenance, and exact qualified release promotions target `main`. It is not the integration queue for the next minor or major release.
 
-A finding that originates on the stable line is fixed with the smallest valid 4.0 change and immediately forward-ported to `main`. A finding that originates on `main` is backported only when it reproduces against the exact 4.0 base. Both directions require one shared finding ID, target dispositions, semantic-equivalence evidence, upgrade evidence, and an explicit package delta. Merging the old tree wholesale into the new tree is forbidden.
+`dev` is the next-minor or next-major integration line. Feature, architecture, refactor, preview, target, and release-engine work starts from `dev`. Every stable correction on `main` receives an explicit semantic forward-port disposition on `dev`; every public minor or major advances `main` only by exact qualified promotion from `dev`.
+
+A finding that originates on `release/4.0` is fixed with the smallest valid 4.0 change and forward-ported semantically through `main` to `dev`. A finding that originates on stable `main` is forward-ported to `dev` and backported to `release/4.0` only when it reproduces against the exact 4.0 base. A finding discovered on `dev` is corrected there first and reaches `main` only through a qualified release promotion unless the defect also independently reproduces on stable `main`. Every direction requires one shared finding ID, target dispositions, semantic-equivalence evidence, upgrade evidence, and an explicit package delta. Merging an older lane wholesale into a newer lane is forbidden.
 
 For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4.0.11001`, and `4.0.10001`. The established codec remains `target code × 100 + source patch`; no ad hoc target version namespace is introduced.
 
@@ -53,6 +55,7 @@ The active fixed point is deliberately smaller than the full report. The initial
 | M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Complete |
 | M41-03 | Introduce change fragments and generate every release narrative | Next |
 | M41-04 | Make `main` the sole integration authority while keeping `dev` exactly mirrored during transition | Complete while `dev` is retained |
+| M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
 | M42-00 | Characterize the package boundary and generate each target independently | Blocked on the complete 4.1 fixed point |
 | M42-01 | Converge PowerShell behind one supported CLI and one release engine | Blocked on M42-00 |
@@ -84,7 +87,7 @@ The Mod Portal API exposed F210, F200, and F110 with SHA-1 values equal to the d
 
 ## Stable repair procedure
 
-Triage a defect once under one finding ID. Record reproduction, severity, affected targets, save or migration impact, compatibility scope, package-visible paths, and both lane dispositions. For a stable-origin defect, branch from `release/4.0`, make the smallest correction, prove each exact affected package, and immediately forward-port the semantic intent and regression fixture to `main`. For a development-origin defect, correct `main` first and backport only after the finding reproduces on the exact 4.0 base without importing development architecture.
+Triage a defect once under one finding ID. Record reproduction, severity, affected targets, save or migration impact, compatibility scope, package-visible paths, and every lane disposition. For a 4.0-origin defect, branch from `release/4.0`, make the smallest correction, prove each exact affected package, and forward-port the semantic intent and regression fixture through `main` to `dev`. For a current-stable defect, correct `main`, forward-port it to `dev`, and backport it to 4.0 only after exact-base reproduction. For a next-release defect, correct `dev`; do not manufacture a stable change unless the same finding independently reproduces there.
 
 Never merge either lane wholesale into the other. A bounded cherry-pick is acceptable only when it carries no irrelevant history; otherwise implement the same intent separately and bind both changes with semantic-equivalence, upgrade, target-disposition, and package-delta evidence. F210 and F200 remain primary independently qualified targets. F110 and F100 qualify independently and may publish later as supplemental target releases.
 

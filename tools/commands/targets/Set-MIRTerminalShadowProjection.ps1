@@ -7,8 +7,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$MaterializerRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
 if (-not $SourceRepoRoot) {
-  $SourceRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
+  $SourceRepoRoot = $MaterializerRepoRoot
 }
 $SourceRepoRoot = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 $TargetRoot = (Resolve-Path -LiteralPath $TargetRoot).Path
@@ -19,25 +20,43 @@ function ConvertTo-MIRCanonicalText {
   return $Text.Replace("`r`n", "`n").Replace("`r", "`n")
 }
 
-$script:MIRTerminalActionPinsV2 = [ordered]@{
-  'actions/cache/restore' = [pscustomobject]@{ tag = 'v4'; sha = '0057852bfaa89a56745cba8c7296529d2fc39830' }
-  'actions/cache/save' = [pscustomobject]@{ tag = 'v4'; sha = '0057852bfaa89a56745cba8c7296529d2fc39830' }
-  'actions/checkout' = [pscustomobject]@{ tag = 'v4'; sha = '11d5960a326750d5838078e36cf38b85af677262' }
-  'actions/download-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'd3f86a106a0bac45b974a628896c90dbdf5c8093' }
-  'actions/github-script' = [pscustomobject]@{ tag = 'v7'; sha = 'f28e40c7f34bde8b3046d885e986cb6290c5673b' }
-  'actions/upload-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'ea165f8d65b6e75b540449e92b4886f43607fa02' }
+$actionLockPath = Join-Path $SourceRepoRoot 'governance/automation/github-actions-lock.json'
+$actionLockSchemaPath = Join-Path $SourceRepoRoot 'contracts/repository/mir-github-actions-lock-v1.schema.json'
+if (-not (Test-Path -LiteralPath $actionLockPath -PathType Leaf)) {
+  $actionLockPath = Join-Path $SourceRepoRoot '.mir/releases/governance/mir4/github-actions-lock-v2.json'
+  $actionLockSchemaPath = Join-Path $SourceRepoRoot 'spec/schemas/mir4-github-actions-lock-v2.schema.json'
+}
+if (-not (Test-Path -LiteralPath $actionLockPath -PathType Leaf)) {
+  $actionLockPath = Join-Path $MaterializerRepoRoot 'governance/automation/github-actions-lock.json'
+  $actionLockSchemaPath = Join-Path $MaterializerRepoRoot 'contracts/repository/mir-github-actions-lock-v1.schema.json'
+}
+$actionLockText = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $actionLockPath).Path)
+if (-not ($actionLockText | Test-Json -SchemaFile $actionLockSchemaPath)) {
+  throw 'GitHub Actions lock does not satisfy the contract owned by its source tree.'
+}
+$actionLock = $actionLockText | ConvertFrom-Json -Depth 30 -DateKind String
+$script:MIRTerminalActionPinsV2 = [ordered]@{}
+foreach ($action in @($actionLock.actions)) {
+  $script:MIRTerminalActionPinsV2[[string]$action.action] = [pscustomobject]@{
+    tag = [string]$action.requested_tag
+    sha = [string]$action.commit_sha
+  }
 }
 
 function ConvertTo-MIRTerminalPinnedActionRefsV2 {
   param([Parameter(Mandatory)][string]$Text)
 
   $result = ConvertTo-MIRCanonicalText -Text $Text
-  foreach ($entry in $script:MIRTerminalActionPinsV2.GetEnumerator()) {
-    $result = $result.Replace(
-      "$([string]$entry.Key)@$([string]$entry.Value.tag)",
-      "$([string]$entry.Key)@$([string]$entry.Value.sha)"
-    )
-  }
+  $result = [regex]::Replace(
+    $result,
+    '(?m)(?<prefix>uses:\s+)(?<action>actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*)@(?<ref>[^\s#]+)',
+    [Text.RegularExpressions.MatchEvaluator]{
+      param($match)
+      $action = [string]$match.Groups['action'].Value
+      if (-not $script:MIRTerminalActionPinsV2.Contains($action)) { return [string]$match.Value }
+      return "$([string]$match.Groups['prefix'].Value)$action@$([string]$script:MIRTerminalActionPinsV2[$action].sha)"
+    }
+  )
   $references = [regex]::Matches(
     $result,
     '(?m)uses:\s+(?<action>actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*)@(?<ref>[^\s#]+)'
@@ -47,7 +66,7 @@ function ConvertTo-MIRTerminalPinnedActionRefsV2 {
     $ref = [string]$reference.Groups['ref'].Value
     if (-not $script:MIRTerminalActionPinsV2.Contains($action) -or
         $ref -cne [string]$script:MIRTerminalActionPinsV2[$action].sha) {
-      throw "Terminal workflow action is not admitted by the MIR4 V2 action lock: $action@$ref"
+      throw "Terminal workflow action is not admitted by the current MIR action lock: $action@$ref"
     }
   }
   return $result
@@ -237,7 +256,7 @@ jobs:
   verify:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
       - name: Build deterministic terminal shadow archive
@@ -257,7 +276,7 @@ jobs:
         run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
       - name: Upload verification plan
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mir-terminal-shadow-verification-plan
           path: artifacts/assurance/plan.json
@@ -287,7 +306,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $text = $text.Replace("--target $([string]$Target.factorio_line) --plan", "--target $([string]$Target.factorio_line) --candidate '$archive' --plan")
 
   $checkout = @'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 '@.TrimEnd()
@@ -302,7 +321,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   if (-not $text.Contains("Build deterministic terminal shadow archive")) {
     $text = $text.Replace($checkout, $checkoutWithBuild.TrimEnd())
     $conditionalCheckout = @'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
@@ -354,7 +373,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $mergeWorkerEvidence = @'
       - name: Merge worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/evidence
@@ -364,7 +383,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $importWorkerEvidence = @'
       - name: Download isolated worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/worker-evidence

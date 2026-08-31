@@ -3,6 +3,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/repository/RepositoryFixedPoint.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4RepositoryMigrationV1 {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code,[string]$Detail='')
@@ -72,7 +73,9 @@ $migrationPaths = @($migration.path_map | ForEach-Object { [string]$_.final_path
 foreach ($path in @($migrationPaths + @($authority.visible_roots | ForEach-Object { ([string]$_.path) + '/.mir-root.json' }) | Sort-Object -Unique)) {
   Assert-MIR4RepositoryMigrationV1 ($path -notin $packageFiles) 'mir4-repository-migration-package-visible' $path
 }
-Assert-MIR4RepositoryMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-package-fingerprint'
+$currentPackageSourceSha256 = Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo
+Assert-MIR4RepositoryMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $currentPackageSourceSha256) 'mir4-repository-migration-package-fingerprint'
+Assert-MIR4RepositoryMigrationV1 ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-historical-package-fingerprint'
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.digest -ceq $receiptDigest) 'mir4-repository-migration-receipt-digest'
@@ -113,6 +116,7 @@ Assert-MIR4RepositoryMigrationV1 ($canonicalResultJson -ceq $facadeResultJson) '
   compatibility_entrypoints=@($migration.compatibility_entrypoints | ForEach-Object { [string]$_.path })
   receipt_digest=[string]$receipt.digest
   package_source_sha256=[string]$receipt.package_source_sha256
+  current_package_source_sha256=$currentPackageSourceSha256
   package_visible_delta=@($receipt.package_visible_delta)
   release_transition_authority=$false
 }

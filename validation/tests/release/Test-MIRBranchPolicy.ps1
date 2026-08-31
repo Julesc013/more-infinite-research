@@ -18,7 +18,7 @@ $branches = @{
   dev = @{
     FactorioVersion = "2.1"
     BaseDependencyPattern = "^base\s+>=\s+2\.1(\.|$)"
-    Description = "protected transition mirror of the MIR 4 development line"
+    Description = "next-minor or next-major MIR 4 integration line"
   }
   "release/4.0" = @{
     FactorioVersion = "2.1"
@@ -102,4 +102,4 @@ foreach ($branch in @("main", "dev", "legacy", "release/4.0")) {
   }
 }
 
-Write-Host "[ok] branch policy validated for origin/main, its dev transition mirror, release/4.0, and the governed legacy alias."
+Write-Host "[ok] branch policy validated for the latest-stable main line, next-release dev line, release/4.0, and the governed legacy alias."

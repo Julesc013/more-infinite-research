@@ -25,4 +25,4 @@ Describe the user, contributor, release, or assurance outcome. Link the shared f
 - [ ] Player ZIP exclusions and one-emitter boundaries are preserved.
 - [ ] Change fragments or release copy are updated when the change is player-visible.
 - [ ] Documentation projections are regenerated when front matter changed.
-- [ ] Post-merge `main` readback and `dev` synchronization are planned.
+- [ ] Post-merge target-branch readback and every required forward-port, backport, or promotion disposition are planned.
