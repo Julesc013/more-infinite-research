@@ -21,7 +21,7 @@ $receiptA = New-MIR4RunnerPublisherConfinementReceiptV1 -RepoRoot $repo
 $receiptB = New-MIR4RunnerPublisherConfinementReceiptV1 -RepoRoot $repo
 Assert-MIR4RunnerTest (Test-MIR4RunnerPublisherConfinementReceiptV1 -Receipt $receiptA -RepoRoot $repo) 'mir4-runner-current-receipt'
 Assert-MIR4RunnerTest ([string]$receiptA.record_sha256 -ceq [string]$receiptB.record_sha256) 'mir4-runner-determinism'
-Assert-MIR4RunnerTest (@($receiptA.workflow_closure.rows).Count -eq 21) 'mir4-runner-workflow-count'
+Assert-MIR4RunnerTest (@($receiptA.workflow_closure.rows).Count -eq 22) 'mir4-runner-workflow-count'
 Assert-MIR4RunnerTest (@($receiptA.checks).Count -eq 10) 'mir4-runner-check-count'
 foreach ($workflow in @($receiptA.workflow_closure.rows)) {
   $relative = [string]$workflow.path

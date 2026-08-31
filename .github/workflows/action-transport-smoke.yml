@@ -1,0 +1,143 @@
+name: Action Transport Smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - "governance/automation/github-actions-lock.json"
+      - "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    name: produce-transport-fixtures
+    runs-on: ubuntu-latest
+    outputs:
+      directory_sha256: ${{ steps.fixtures.outputs.directory_sha256 }}
+      zip_sha256: ${{ steps.fixtures.outputs.zip_sha256 }}
+      directory_artifact_digest: ${{ steps.upload_directory.outputs.artifact-digest }}
+      zip_artifact_digest: ${{ steps.upload_zip.outputs.artifact-digest }}
+    steps:
+      - name: Prove cache restore is read-only on a unique miss
+        id: cache_restore
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: build/action-transport/cache
+          key: mir-action-transport-read-only-${{ github.run_id }}-${{ github.run_attempt }}
+          lookup-only: true
+      - name: Assert cache miss did not create state
+        shell: pwsh
+        run: |
+          if ('${{ steps.cache_restore.outputs.cache-hit }}' -eq 'true') {
+            throw 'The unique read-only cache key unexpectedly resolved to a cache hit.'
+          }
+          if (Test-Path -LiteralPath build/action-transport/cache) {
+            throw 'Read-only cache restore created the cache payload path on a miss.'
+          }
+      - name: Create deterministic transport fixtures
+        id: fixtures
+        shell: pwsh
+        run: |
+          $root = 'build/action-transport'
+          $plain = Join-Path $root 'plain'
+          New-Item -ItemType Directory -Force -Path $plain | Out-Null
+          [IO.File]::WriteAllText(
+            (Join-Path $plain 'payload.txt'),
+            "MIR action transport`nordinary directory payload`n",
+            [Text.UTF8Encoding]::new($false)
+          )
+          New-Item -ItemType Directory -Force -Path (Join-Path $root 'worker-a') | Out-Null
+          New-Item -ItemType Directory -Force -Path (Join-Path $root 'worker-b') | Out-Null
+          [IO.File]::WriteAllText((Join-Path $root 'worker-a/evidence-a.json'), '{"worker":"a","status":"passed"}', [Text.UTF8Encoding]::new($false))
+          [IO.File]::WriteAllText((Join-Path $root 'worker-b/evidence-b.json'), '{"worker":"b","status":"passed"}', [Text.UTF8Encoding]::new($false))
+          Compress-Archive -LiteralPath (Join-Path $plain 'payload.txt') -DestinationPath (Join-Path $root 'payload.zip')
+          "directory_sha256=$((Get-FileHash -LiteralPath (Join-Path $plain 'payload.txt') -Algorithm SHA256).Hash)" >> $env:GITHUB_OUTPUT
+          "zip_sha256=$((Get-FileHash -LiteralPath (Join-Path $root 'payload.zip') -Algorithm SHA256).Hash)" >> $env:GITHUB_OUTPUT
+      - name: Upload ordinary directory
+        id: upload_directory
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: mir-action-transport-directory
+          path: build/action-transport/plain
+          if-no-files-found: error
+      - name: Upload exact ZIP
+        id: upload_zip
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: mir-action-transport-zip
+          path: build/action-transport/payload.zip
+          if-no-files-found: error
+      - name: Upload worker A evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: mir-action-transport-worker-a
+          path: build/action-transport/worker-a
+          if-no-files-found: error
+      - name: Upload worker B evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: mir-action-transport-worker-b
+          path: build/action-transport/worker-b
+          if-no-files-found: error
+
+  consume:
+    name: consume-and-verify-transport
+    needs: produce
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download ordinary directory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: mir-action-transport-directory
+          path: build/action-transport/downloaded-directory
+      - name: Download exact ZIP
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: mir-action-transport-zip
+          path: build/action-transport/downloaded-zip
+      - name: Merge isolated worker evidence
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: mir-action-transport-worker-*
+          path: build/action-transport/workers
+          merge-multiple: true
+      - name: Prove missing artifacts fail closed
+        id: missing_artifact
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: mir-action-transport-intentionally-missing-${{ github.run_id }}
+          path: build/action-transport/missing
+      - name: Verify byte identity, digest contracts, and failure semantics
+        shell: pwsh
+        run: |
+          $plain = 'build/action-transport/downloaded-directory/payload.txt'
+          $zip = 'build/action-transport/downloaded-zip/payload.zip'
+          if ((Get-FileHash -LiteralPath $plain -Algorithm SHA256).Hash -ne '${{ needs.produce.outputs.directory_sha256 }}') {
+            throw 'Ordinary directory artifact changed in transport.'
+          }
+          if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne '${{ needs.produce.outputs.zip_sha256 }}') {
+            throw 'ZIP artifact bytes changed in transport.'
+          }
+          foreach ($digest in @(
+            '${{ needs.produce.outputs.directory_artifact_digest }}',
+            '${{ needs.produce.outputs.zip_artifact_digest }}'
+          )) {
+            if ($digest -notmatch '^[0-9a-f]{64}$') {
+              throw "Upload action returned an invalid artifact digest: $digest"
+            }
+          }
+          $workers = @(Get-ChildItem -LiteralPath build/action-transport/workers -Filter 'evidence-*.json' -File)
+          if ($workers.Count -ne 2) {
+            throw "Expected two merged worker evidence files; observed $($workers.Count)."
+          }
+          if ('${{ steps.missing_artifact.outcome }}' -ne 'failure') {
+            throw 'Missing artifact retrieval did not fail closed.'
+          }
+          if ((Test-Path -LiteralPath build/action-transport/missing) -and
+              @(Get-ChildItem -LiteralPath build/action-transport/missing -Force).Count -ne 0) {
+            throw 'Missing artifact retrieval produced files.'
+          }
