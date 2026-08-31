@@ -11,7 +11,8 @@
     "one generated release narrative",
     "independently generated and qualified target packages",
     "evidence remains package-excluded",
-    "published versions and bytes are immutable"
+    "published versions and bytes are immutable",
+    "main is the latest-stable line and dev is the next-minor-or-major integration line"
   ],
   "work_packages": [
     {"id": "M40-00", "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure", "depends_on": [], "state": "complete"},
@@ -21,8 +22,9 @@
     {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "depends_on": ["M41-01"], "state": "complete"},
     {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "depends_on": ["M41-01"], "state": "queued"},
     {"id": "M41-04", "outcome": "Make main canonical while keeping dev an exact protected mirror during transition", "depends_on": ["M41-02"], "state": "complete"},
+    {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "depends_on": ["M41-04"], "state": "complete"},
     {"id": "M41-05", "outcome": "Complete concise landing documentation and reader-oriented routing", "depends_on": ["M41-03"], "state": "queued"},
-    {"id": "M42-00", "outcome": "Establish source/package characterization and independently generated target packages", "depends_on": ["M41-03", "M41-04", "M41-05"], "state": "blocked-dependency"},
+    {"id": "M42-00", "outcome": "Establish source/package characterization and independently generated target packages", "depends_on": ["M41-03", "M41-05", "M41-06"], "state": "blocked-dependency"},
     {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI and one release engine", "depends_on": ["M42-00"], "state": "blocked-dependency"},
     {"id": "M42-02", "outcome": "Decompose Lua compiler stages behind characterization and mutation boundaries", "depends_on": ["M42-00"], "state": "blocked-dependency"},
     {"id": "M43-00", "outcome": "Graduate runtime, MEP, API, and SDK contracts per contract", "depends_on": ["M42-01", "M42-02"], "state": "blocked-dependency"},

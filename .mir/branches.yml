@@ -22,8 +22,8 @@ remote_topology:
     archived_unique_heads: 24
     superseded_pull_request: 31
   rules:
-    - main is the canonical MIR 4.1 and later integration branch after the exact MIR 4.0.0 release promotion
-    - dev is a protected transition mirror of main and receives no independent integration work; while retained, it must be synchronized after every accepted main change
+    - main is the protected latest-stable MIR 4.x branch and accepts bounded patch, hotfix, repository-governance, and exact qualified dev-promotion changes
+    - dev is the protected next-minor-or-major integration branch; feature and refactor work targets dev and stable corrections are forward-integrated from main by shared finding identity
     - release/4.0 is the maintained MIR 4.0.x patch branch rooted at the exact peeled v4.0.0 commit and accepts only admitted stable corrections
     - release/mir4-4.0.0 remains an inactive historical policy template and is not reused for maintenance
     - legacy is the movable previous-major terminal alias; it advances to published MIR 3.2.11 through a governed non-force two-parent commit and may later advance once to the sealed MIR 4 terminal authority when MIR 5 opens, always with a tree exactly matching the outgoing major terminal authority
@@ -35,36 +35,44 @@ remote_topology:
 branches:
   main:
     remote_state: permanent
-    purpose: canonical MIR 4.1 and later integration and release-source line
+    purpose: latest stable MIR 4.x patch, hotfix, governance, and qualified release-promotion line
     factorio_version: "2.1"
     accepts:
+      - reproduced-current-stable-defect
+      - security-correction
+      - save-or-migration-correction
+      - exact-target-compatibility-correction
       - release-hotfix
       - docs-correction
       - fixture-correction
-      - validated-release-candidate-promotion
+      - repository-governance-correction
+      - validated-dev-release-promotion
       - exact-qualified-mir4-4.0.0-promotion
-      - architecture
-      - new-capabilities
-      - refactors
-      - canonical-target-neutral-fix
     rejects:
       - unsealed-mir4-candidate
       - post-qualification-package-change
+      - next-minor-or-major-feature-work
+      - broad-refactor
       - broad-new-generation
       - schema-breaking-report-changes
       - large-architecture-rewrite
 
   dev:
     remote_state: permanent
-    purpose: protected exact transition mirror of main; no independent integration queue
+    purpose: protected next-minor-or-major integration and release-candidate source line
     factorio_version: "2.1"
     accepts:
-      - exact-main-fast-forward
-      - no-delta-main-synchronization
+      - architecture
+      - new-capabilities
+      - refactors
+      - canonical-target-neutral-fix
+      - semantic-forward-port-from-main
+      - semantic-forward-port-from-release-4.0
+      - release-candidate-preparation
     rejects:
-      - independent-feature-work
-      - independent-fix-work
-      - release-candidate-allocation
+      - direct-stable-publication
+      - unqualified-main-promotion
+      - release-4.0-only-package-change
 
   release/4.0:
     remote_state: maintained-release
@@ -154,11 +162,33 @@ backport_rules:
     from: release/4.0
     to:
       - main
+      - dev
     requires:
       - shared-finding-id
       - forward-port-disposition
       - regression-proof
       - semantic-equivalence
+
+  current_stable_fix:
+    from: main
+    to:
+      - dev
+    requires:
+      - shared-finding-id
+      - target-disposition
+      - regression-proof
+      - semantic-equivalence
+
+  development_release_promotion:
+    from: dev
+    to:
+      - main
+    requires:
+      - exact-source-freeze
+      - complete-target-dispositions
+      - aggregate-qualification
+      - protected-seal
+      - exact-candidate-promotion
 
   generated_stream_change:
     requires:

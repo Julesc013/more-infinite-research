@@ -184,7 +184,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-08-29 | 2 | current-window |
 | docs/maintainer/mir4-qualification-and-promotion.md | current | 2026-08-18 | 13 | current-window |
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-27 | 4 | current-window |
-| docs/maintainer/mir4-release-operations.md | current | 2026-08-26 | 5 | current-window |
+| docs/maintainer/mir4-release-operations.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 11 | current-window |
 | docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-29 | 2 | current-window |

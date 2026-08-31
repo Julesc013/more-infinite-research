@@ -119,8 +119,8 @@ jobs:
       matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     concurrency:
       # GitHub keeps at most one running and one pending job per concurrency
-      # group. Separate event/ref topologies so a main push cannot cancel the
-      # corresponding main-to-dev mirror PR evidence row.
+      # group. Separate event/ref topologies so a protected-branch push cannot
+      # cancel a related cross-lane pull-request evidence row.
       group: mir-${{ github.event_name }}-${{ github.ref }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
       cancel-in-progress: false
     steps:
