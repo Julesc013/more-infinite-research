@@ -17,7 +17,7 @@
     {
       "path": ".gitattributes",
       "previous_sha256": "A68B08FA62D96649F2D35C21C3B53ADC247E69992BD2877C91B09BA459DB0350",
-      "current_sha256": "07B9785D013F7ACE79FBDBAAD761C255A5F29FED11985DE8E2FB3BED19B1D9A1",
+      "current_sha256": "C9AF7CBFF77103170140189790A117509CA28478445767E81EDCA2A1807C3B07",
       "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
       "scope": "package-excluded-truth-reconciliation",
       "package_visible": false,
@@ -242,7 +242,7 @@
     {
       "path": "validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
       "previous_sha256": "9CCDD7424C4A6E59619AF52A9C0728F413FF92CEACC4EFA6D37A2BCAC9FDBB94",
-      "current_sha256": "D92608012E8A8CCACBCADEE7EF51F80C9088E659EA48032A864505A078885687",
+      "current_sha256": "A55DA3056550A589E57B07D5AEC3A9069BCF411BBF408F9AF17343633297CB74",
       "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
       "scope": "package-excluded-truth-reconciliation",
       "package_visible": false,
@@ -312,7 +312,7 @@
     },
     {
       "path": "mir.lock",
-      "sha256": "B558113D8BC42558A6F4292D94633B3CF7EBBAF5D46E174B3379183663F83764",
+      "sha256": "654BB1A91D33825C5308B77892EC1BFA9E4148278075C397492140BE802932F3",
       "hash_mode": "canonical-text-v1",
       "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
     },
@@ -330,25 +330,25 @@
     },
     {
       "path": "sdk/preview/mir4/reference/compilation-runs.json",
-      "sha256": "90E5B2E192C0AC42DD73B6848BFED36055857C8E51611E2B0EC317A7DF71CCD0",
+      "sha256": "AFEC35742C22691BB6C1E1407193FC97E1CF270B406AF8F33BA9112BFD1DD6FE",
       "hash_mode": "canonical-text-v1",
       "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
     },
     {
       "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
-      "sha256": "5941D0A272687C57588A2B8D9490A5FB0D44A549AC91BC089C0F8348C78C3B5B",
+      "sha256": "A9C78929B862FF3E3E6268CA494B5702ABC4BB4EF5839204F5599F66DD42D6FD",
       "hash_mode": "canonical-text-v1",
       "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
     },
     {
       "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
-      "sha256": "9045B0C72E9E8F468E0CADAEAF7F1B297C5A4CB32F0C48B7B50B2A3495E0F460",
+      "sha256": "E1CB65E48286ADC0B59E0A2CC77320BEBD6F17C19297570616E3F37033D678D8",
       "hash_mode": "canonical-text-v1",
       "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
     },
     {
       "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
-      "sha256": "50B0B056CC9F5F1FF20C15CC92450AF5E2F86EE8019D0BCA119B766B78B3E2A2",
+      "sha256": "729F62D339ABD5E384DDAA633491AB2203733EB160E45795196114C2AE552F79",
       "hash_mode": "canonical-text-v1",
       "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
     },
@@ -394,7 +394,7 @@
     "source_changelog_sha256": "16FE46F6D9C6F07012BB3975D86A685FD475981446D78FF7D3F981B0F763596A",
     "todo_sha256": "718A29A2E16DADF489290E86AF03A8AFC5B75259C54634CB0D38F088F1FD5903",
     "portal_reconciliation_sha256": "3ABC2130B28E0EF22322958BFF9AC2BD5279363813A54A67E89EFB939C76C1D7",
-    "platform_lock_sha256": "B558113D8BC42558A6F4292D94633B3CF7EBBAF5D46E174B3379183663F83764",
+    "platform_lock_sha256": "654BB1A91D33825C5308B77892EC1BFA9E4148278075C397492140BE802932F3",
     "physical_files": 3912,
     "unknown_paths": 0,
     "package_files": 307
