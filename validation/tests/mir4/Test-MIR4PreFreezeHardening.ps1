@@ -157,6 +157,18 @@ if([string]$automationCutover.kind-cne'MIR4PostReleaseAutomationAuthorityCutover
    @($automationCutover.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-post-release-automation-authority-cutover]'
 }
+$branchOperatingModel=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-Branch-Operating-Model-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100
+if([string]$branchOperatingModel.kind-cne'MIR4BranchOperatingModelAuthorityEvolutionV1'-or
+   [string]$branchOperatingModel.status-cne'BRANCH-OPERATING-MODEL-APPLIED-NO-RELEASE-TRANSITION'-or
+   @($branchOperatingModel.evolved_bindings).Count-ne3-or
+   @($branchOperatingModel.current_authorities).Count-ne8-or
+   [string]$branchOperatingModel.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   -not[bool]$branchOperatingModel.invariants.main_latest_stable-or
+   -not[bool]$branchOperatingModel.invariants.dev_next_release_integration-or
+   [int]$branchOperatingModel.invariants.ordinary_bypass_actor_count-ne0-or
+   @($branchOperatingModel.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-post-release-branch-operating-model]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
