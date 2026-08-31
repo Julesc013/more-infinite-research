@@ -463,6 +463,13 @@ docs:
       - mir4-r0-executable-queue
       - mir4-bootstrap-target-readiness
       - mir3-terminal-public-visibility-status
+  - path: docs/architecture/mir4-repository-characterization.md
+    title: "MIR 4 repository characterization"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/architecture/mir4-repository-fixed-point.md
     title: "MIR 4 Repository Fixed Point"
     status: current
@@ -1137,6 +1144,20 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-mep-v0-to-v1-developer-migration
+  - path: docs/explanation/README.md
+    title: "MIR 4 explanation"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/how-to/README.md
+    title: "MIR 4 how-to guides"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/maintainer/2.5.0-post-release-stabilization.md
     title: "MIR 2.5.0 Post-Release Stabilization"
     status: archived
@@ -1271,7 +1292,7 @@ docs:
       - terminal-repository-protection-handoff
       - github-administration-preflight
   - path: docs/maintainer/mir4-authority-map.md
-    title: "MIR 4 Maintainer Authority Map"
+    title: "MIR 4 maintainer authority map"
     status: current
     audience: maintainer
     doc_type: reference
@@ -1404,7 +1425,7 @@ docs:
     source_of_truth_for:
       - structured-playtest-intake
   - path: docs/maintainer/README.md
-    title: "Maintainer Guide"
+    title: "MIR 4 maintainer guide"
     status: current
     audience: maintainer
     doc_type: how-to
@@ -1476,7 +1497,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
   - path: docs/README.md
-    title: "More Infinite Research Documentation"
+    title: "More Infinite Research 4 documentation"
     status: current
     audience: maintainer
     doc_type: reference
@@ -1732,7 +1753,7 @@ docs:
       - offline-family-rule-synthesis
       - technology-rule-synthesis-command
   - path: docs/reference/README.md
-    title: "Reference"
+    title: "MIR 4 reference"
     status: current
     audience: developer
     doc_type: reference
@@ -3295,6 +3316,13 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/tutorials/README.md
+    title: "MIR 4 tutorials"
+    status: current
+    audience: developer
+    doc_type: tutorial
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/user/compatibility-claims.md
     title: "Compatibility Claims"
     status: current
@@ -3339,7 +3367,7 @@ docs:
     source_of_truth_for:
       - mir3-to-mir4-player-upgrade-guide
   - path: docs/user/README.md
-    title: "User Guide"
+    title: "MIR 4 player guide"
     status: current
     audience: player
     doc_type: how-to

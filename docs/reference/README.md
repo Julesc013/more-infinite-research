@@ -1,30 +1,30 @@
 ---
-title: "Reference"
+title: "MIR 4 reference"
 status: current
-applies_to: "3.0.0+"
+applies_to: "MIR 4.x"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
+generated_from: []
 ---
 
-# Reference
+# MIR 4 reference
 
-Reference docs hold exact contracts, schemas, generated IDs, settings details, and report fields.
+Reference pages contain exact contracts, schemas, identifiers, settings, commands, and generated records.
 
-- [Generated ID reference](generated-id-reference.md)
-- [Settings reference](settings.md)
-- [Factorio integration reference](factorio-integration-reference.md)
+- [Settings](settings.md)
+- [Generated IDs](generated-id-reference.md)
+- [Factorio integration](factorio-integration-reference.md)
 - [Factorio API proof points](factorio-api-proof-points.md)
-- [MIR 4 SDK V1 developer preview quickstart](mir4-sdk-v1-quickstart.md)
-- [Generated MIR 4 API/SDK V1 reference](generated/mir4-api-sdk-v1.md)
-- [Deprecated MIR 4 SDK V0 migration quickstart](mir4-sdk-v0-quickstart.md)
-- [Deprecated MIR 4 API and SDK V0 migration policy](mir4-api-sdk-v0-stability.md)
+- [MIR 4 SDK V1 preview quickstart](mir4-sdk-v1-quickstart.md)
+- [Generated MIR 4 API/SDK V1](generated/mir4-api-sdk-v1.md)
 - [MIR Extension Protocol V0](mir4-mep-v0.md)
-- [Deprecated generated MIR 4 API/SDK V0 migration reference](generated/mir4-experimental-api-v0.md)
-- [Generated MIR 4 platform component matrix](generated/mir4-platform-component-matrix.md)
-- [Glossary](glossary.md)
+- [Generated platform component matrix](generated/mir4-platform-component-matrix.md)
 - [Schemas](schemas/README.md)
 - [Reports](reports/README.md)
+- [Glossary](glossary.md)
+
+Deprecated V0 API and SDK pages remain explicit migration references; they are not current support authority.

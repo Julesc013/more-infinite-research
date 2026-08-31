@@ -193,6 +193,18 @@ if([string]$m4103.kind-cne'MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'-or
    @($m4103.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-03-change-and-release-authority]'
 }
+$characterization=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100
+if([string]$characterization.kind-cne'MIR4M4105AM4200ARepositoryCharacterizationAuthorityEvolutionV1'-or
+   [string]$characterization.status-cne'M41-05A-M42-00A-CHARACTERIZATION-COMPLETE-NO-PACKAGE-CUTOVER'-or
+   @($characterization.evolved_bindings).Count-lt10-or
+   @($characterization.current_authorities).Count-lt8-or
+   [string]$characterization.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-FileHash -LiteralPath (Join-Path $repo 'README.md') -Algorithm SHA256).Hash-cne[string]$characterization.root_readme_sha256-or
+   -not[bool]$characterization.invariants.deterministic_reports-or
+   -not[bool]$characterization.invariants.all_bridges_retained-or
+   @($characterization.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-05a-m42-00a-characterization-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

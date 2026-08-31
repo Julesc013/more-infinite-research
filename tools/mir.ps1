@@ -677,9 +677,9 @@ switch ($area) {
         return
       }
       "repository" {
-        if ($Args.Count -lt 3) { throw "mir4 repository requires generate, check, inventory, or initialize." }
+        if ($Args.Count -lt 3) { throw "mir4 repository requires generate, check, inventory, initialize, characterize, or characterization-check." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('generate','check','inventory','initialize')) { throw "Unknown mir4 repository command: $subcommand" }
+        if ($subcommand -notin @('generate','check','inventory','initialize','characterize','characterization-check')) { throw "Unknown mir4 repository command: $subcommand" }
         $repositoryArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }

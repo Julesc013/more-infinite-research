@@ -246,7 +246,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-local-playtest-shadow-boundary | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
 | mir4-m4c01-execution-order | [MIR 4 M4C01 Candidate Runbook](../../maintainer/mir4-m4c01-runbook.md) | current |
 | mir4-m4c01-next-work-plan | [MIR 4 Spark To Sol Handoff And Completion Plan](../../maintainer/mir4-spark-sol-handoff.md) | current |
-| mir4-maintainer-authority-map | [MIR 4 Maintainer Authority Map](../../maintainer/mir4-authority-map.md) | current |
+| mir4-maintainer-authority-map | [MIR 4 maintainer authority map](../../maintainer/mir4-authority-map.md) | current |
 | mir4-manual-playtest-evidence-lifecycle | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |
 | mir4-mep-host-absence-inertness | [MIR 4 F210 Read-Only MEP Discovery](../../reference/mir4-f210-mep-discovery.md) | current |
 | mir4-mep-read-only-shadow-planning | [MIR 4 F210 Read-Only MEP Discovery](../../reference/mir4-f210-mep-discovery.md) | current |

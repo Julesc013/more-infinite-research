@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "kind": "MIR4RepositoryCharacterizationAuthorityV1",
+  "migration_id": "M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1",
+  "state": "PACKAGE-EXCLUDED-DOCUMENTATION-ROUTING-AND-CHARACTERIZATION-ACTIVE",
+  "fixed_point_authority": ".mir/control/repository-fixed-point.json",
+  "scope": "Read-only characterization of existing repository, authority, bridge, documentation, and package-membership facts. No package-source move, README rewrite, bridge retirement, deletion, version allocation, or publication is authorized.",
+  "writers": [
+    {
+      "fact_family": "repository-characterization-bundle",
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "command": "tools/mir.ps1 mir4 repository characterize"
+    }
+  ],
+  "path_map": [
+    {"family":"characterization-authority","current_path":null,"final_path":"governance/repository/migrations/repository-characterization-v1.json","state":"canonical","package_visible":false},
+    {"family":"characterization-contract","current_path":null,"final_path":"contracts/repository/mir4-repository-characterization-authority-v1.schema.json","state":"canonical","package_visible":false},
+    {"family":"characterization-bundle-contract","current_path":null,"final_path":"contracts/repository/mir4-repository-characterization-bundle-v1.schema.json","state":"canonical","package_visible":false},
+    {"family":"characterization-writer","current_path":null,"final_path":"tools/mir/application/repository/RepositoryCharacterization.ps1","state":"sole-report-writer","package_visible":false},
+    {"family":"characterization-cli","current_path":"tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1","final_path":"tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1","state":"canonical-command-extension","package_visible":false},
+    {"family":"characterization-test","current_path":null,"final_path":"validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1","state":"canonical-test","package_visible":false},
+    {"family":"documentation-routing","current_path":"docs/README.md","final_path":"docs/README.md","state":"package-excluded-routing","package_visible":false},
+    {"family":"tutorial-routing","current_path":null,"final_path":"docs/tutorials/README.md","state":"canonical-routing","package_visible":false},
+    {"family":"how-to-routing","current_path":null,"final_path":"docs/how-to/README.md","state":"canonical-routing","package_visible":false},
+    {"family":"explanation-routing","current_path":null,"final_path":"docs/explanation/README.md","state":"canonical-routing","package_visible":false},
+    {"family":"package-visible-readme","current_path":"README.md","final_path":"README.md","state":"characterized-byte-stable-deferred-separation","package_visible":true},
+    {"family":"fixed-point-authority","current_path":".mir/control/repository-fixed-point.json","final_path":".mir/control/repository-fixed-point.json","state":"append-only-successor","package_visible":false},
+    {"family":"prefreeze-chain","current_path":"tools/lib/mir4/PreFreezeRelease.ps1","final_path":"tools/lib/mir4/PreFreezeRelease.ps1","state":"append-only-successor","package_visible":false}
+  ],
+  "compatibility_entrypoints": [
+    {"path":"README.md","role":"package-visible-repository-documentation-bridge","writable":false}
+  ],
+  "report_files": [
+    "authority-ledger.json",
+    "writer-records.json",
+    "reader-records.json",
+    "reader-writer-graph.json",
+    "bridge-expiry.json",
+    "physical-file-inventory.json",
+    "package-membership.json",
+    "documentation-routing.json"
+  ],
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "command": "Revert the exact merged M41-05A/M42-00A work package; retain every existing writer, reader, bridge, and package-source path.",
+    "preserves": ["player-package-source","root-readme-bytes","existing-migration-records","release-authority","compatibility-bridges"]
+  },
+  "sunset": {
+    "state": "characterization-only-no-bridge-retirement",
+    "required_gates": ["package-characterization-accepted","independent-target-materializer-parity","package-readme-authority-cutover","sunset-receipt-accepted"]
+  },
+  "package_source_authority_unchanged": true,
+  "package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "release_transition_authority": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "seal": false,
+    "promotion": false,
+    "tagging": false,
+    "publication": false
+  }
+}

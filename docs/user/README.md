@@ -1,18 +1,19 @@
 ---
-title: "User Guide"
+title: "MIR 4 player guide"
 status: current
-applies_to: "3.0.0+"
+applies_to: "MIR 4.x"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
+generated_from: []
 ---
 
-# User Guide
+# MIR 4 player guide
 
-These pages explain MIR from the player and modpack-author point of view.
+Use these pages to install, configure, upgrade, and troubleshoot one self-contained MIR package for your Factorio target.
 
 - [Installation](installation.md)
 - [Upgrading from MIR 3 to MIR 4](mir3-to-mir4.md)
@@ -23,4 +24,4 @@ These pages explain MIR from the player and modpack-author point of view.
 - [Troubleshooting](troubleshooting.md)
 - [FAQ](faq.md)
 
-Architecture debates, release plans, and schema details belong outside this section.
+Release plans, proof records, repository migrations, and schema details are maintainer or developer material and stay outside the player package.

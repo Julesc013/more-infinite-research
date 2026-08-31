@@ -33,6 +33,16 @@ paths:
   mir4.repository-migration.adapter: tools/mir/adapters/repository/GitRepositoryInventory.ps1
   mir4.repository-migration.application: tools/mir/application/repository/RepositoryFixedPoint.ps1
   mir4.repository-migration.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+  mir4.repository-characterization.authority: governance/repository/migrations/repository-characterization-v1.json
+  mir4.repository-characterization.authority-schema: contracts/repository/mir4-repository-characterization-authority-v1.schema.json
+  mir4.repository-characterization.bundle-schema: contracts/repository/mir4-repository-characterization-bundle-v1.schema.json
+  mir4.repository-characterization.application: tools/mir/application/repository/RepositoryCharacterization.ps1
+  mir4.repository-characterization.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
+  mir4.repository-characterization.output: build/reports/repository-characterization
+  mir4.repository-characterization.test: validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1
+  mir4.repository-characterization.authority-evolution: releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json
+  mir4.repository-characterization.authority-evolution-schema: contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json
+  mir4.repository-characterization.authority-evolution-writer: tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
