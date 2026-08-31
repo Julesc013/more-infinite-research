@@ -465,6 +465,11 @@ paths:
   releases.waves.mir4-r0-pre-freeze-hardening-independent-acceptance: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
   releases.governance.mir4.github-actions-lock: .mir/releases/governance/mir4/github-actions-lock.json
   releases.governance.mir4.github-actions-lock-v2: .mir/releases/governance/mir4/github-actions-lock-v2.json
+  governance.automation.github-actions-lock: governance/automation/github-actions-lock.json
+  contracts.repository.github-actions-lock-v1: contracts/repository/mir-github-actions-lock-v1.schema.json
+  contracts.repository.post-release-automation-authority-cutover-v1: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
+  governance.repository.migrations.post-release-automation-authority-cutover-v1: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
+  tools.commands.mir4.post-release-automation-authority-cutover: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
   releases.governance.mir4.supply-chain: .mir/releases/governance/mir4/supply-chain.json
   releases.governance.mir4.signing-ceremony-preparation: .mir/releases/governance/mir4/signing-ceremony-preparation.json
   releases.governance.mir4.ruleset-snapshot-2026-08-24: .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json

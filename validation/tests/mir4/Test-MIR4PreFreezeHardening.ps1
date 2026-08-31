@@ -148,6 +148,15 @@ if([string]$postReleaseBaseline.kind-cne'MIR4PostReleasePackageBaselineAuthority
    @($postReleaseBaseline.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-post-release-package-baseline-authority-evolution]'
 }
+$automationCutover=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json')|ConvertFrom-Json -Depth 100
+if([string]$automationCutover.kind-cne'MIR4PostReleaseAutomationAuthorityCutoverV1'-or
+   [string]$automationCutover.status-cne'CURRENT-AUTOMATION-AUTHORITY-VISIBLE-HISTORICAL-PREFREEZE-BINDINGS-RETIRED'-or
+   @($automationCutover.retired_bindings).Count-lt30-or
+   -not[bool]$automationCutover.invariants.historical_mir_lock_immutable-or
+   -not[bool]$automationCutover.invariants.visible_current_authority-or
+   @($automationCutover.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-post-release-automation-authority-cutover]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

@@ -5,7 +5,7 @@ applies_to: "M4C02-09-24H T15 pre-freeze preparation"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-27
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -82,7 +82,7 @@ The repository declares MPL-2.0 through LICENSE; the authority conservatively re
 
 ## Runner and publisher confinement
 
-Run `./tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1 -RequireClean` to write the commit-bound T15 confinement receipt. The verifier closes over every tracked and generated workflow source, requires every third-party action to match the full-SHA action lock, checks least-privilege permissions, and rejects direct workflow-dispatch input interpolation inside shell commands. Because the receipt raw-hashes workflow bytes, `.gitattributes` pins every workflow to LF and the verifier fails closed if either that Git attribute contract or the checked-out LF bytes are absent. This makes the workflow closure root invariant across clean worktrees and `core.autocrlf` settings.
+Run `./tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1 -RequireClean` to write the commit-bound T15 confinement receipt. The verifier closes over every tracked and generated workflow source, requires every third-party action to match the full-SHA pins in `governance/automation/github-actions-lock.json`, checks least-privilege permissions, and rejects direct workflow-dispatch input interpolation inside shell commands. Because the receipt raw-hashes workflow bytes, `.gitattributes` pins every workflow to LF and the verifier fails closed if either that Git attribute contract or the checked-out LF bytes are absent. This makes the workflow closure root invariant across clean worktrees and `core.autocrlf` settings. The `.mir/releases/governance/mir4/github-actions-lock-v2.json` predecessor remains immutable evidence for the MIR 4.0 release-era workflow closure.
 
 Public pull requests run on secret-free hosted workers. Factorio-capable protected jobs use the `release-candidate` environment and are serialized to one heavy worker; public static work is capped at two lanes. Builders receive neither signing nor upload credentials, qualifiers cannot modify packages, and external mod closures receive acquisition-only Factorio credentials rather than release credentials. The publisher workflow has no action, checkout, source tree, builder, or private-key capability and must obtain an exact admission decision from its external seal verifier before its external client can run.
 

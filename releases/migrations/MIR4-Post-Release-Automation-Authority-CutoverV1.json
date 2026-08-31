@@ -1,0 +1,292 @@
+{
+  "schema": 1,
+  "kind": "MIR4PostReleaseAutomationAuthorityCutoverV1",
+  "recorded_at": "2026-08-31T18:35:00+10:00",
+  "programme_id": "M41-02-ACTION-RUNTIME-CUTOVER",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json",
+    "sha256": "CAD8AA2A0ED6AB17E0295D8EB5FC78A0B33DD3D7D70F7F5E52EC0178A9B0B6B4"
+  },
+  "base": {
+    "branch": "main",
+    "commit": "49ba61d1023ad155860b4fea3ce298d7c6f0775b",
+    "tree": "fd7771762359ccc156bb696fae36e855fea8de4e"
+  },
+  "evolved_bindings": [],
+  "current_authorities": [],
+  "retired_bindings": [
+    {
+      "path": ".github/workflows/assurance-backport.yml",
+      "historical_sha256": "40A9DABA2309DED2EE4CDEFB1965F36E0ECD260958E8777B7F77EEE70E3EEBBD",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/assurance-full.yml",
+      "historical_sha256": "27CB95ED16D7F8020992A6AE3ACB64479870E82ECDD39B4FA5B532FDDA6900E7",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/assurance-promotion.yml",
+      "historical_sha256": "A7B3F2730FF69A28B2C9A1700B971E8B744F50AA4FBF4BD802E053DB98078E5E",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/assurance-scheduled.yml",
+      "historical_sha256": "9A76859E65645448286007E7561968213EE2BFF17164A0F6498D5CBC6ABD2340",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/assurance-targeted.yml",
+      "historical_sha256": "0AADCE4634D5871D09DE688700BB7295D16FDBFC1AD3A4A1C617B39C956F902B",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/branch-policy.yml",
+      "historical_sha256": "459789C089D48B5D738ECA79FB01B5B1640011CD80E0B744B4D190B6191B0448",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/control-plane-v5.yml",
+      "historical_sha256": "DF667D4157BE544FA0AB8B0ADF13EB1D77C804DABF24EFDF1D997A4EDD2F7834",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/emergency-package.yml",
+      "historical_sha256": "240E3E3FAED6E07BE24511AB49CDED870FB97F2F84D8B67E81B9ADCCE901FCF0",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/extended-compat-audit.yml",
+      "historical_sha256": "ED2E9C2D653598305FC05AF3BBDA32F68FDCE2B7733C0B9F4773292293FA0A67",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-independent-verification.yml",
+      "historical_sha256": "B1A43A6EAF5EEFA0E593760B61A1DD15409F3E5134586C7C8E484AD31088C825",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-preview-assets.yml",
+      "historical_sha256": "5D0612CF1861D636CB8F56924DD54E26DA721865EE17C54028653B9F433A473D",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-promotion.yml",
+      "historical_sha256": "9CC6F90367A0CC94CDC6ACF11D85326B75260EC5323B9F7C4EEBDD8E7619D2DA",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-public-readback.yml",
+      "historical_sha256": "D6ADBB4DC3E43188ED8FF8025847C2E90F84A094DCCED2DD98EB59E4973C1707",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-release-seal.yml",
+      "historical_sha256": "2982B913D3A35F154B36D44D6386740D815EFE818775AB8299CADB9F1C32ABD2",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-restore-drill.yml",
+      "historical_sha256": "E1F310685C95830D859D7F404B8D8536EDA907F56007DBB1E2D539255F44920B",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-source-freeze.yml",
+      "historical_sha256": "BA4CE6DA805ADC22D2EE3A9C832AF2BFE41C0E54FE1980DCAE65DFB689BE0F46",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-target-build.yml",
+      "historical_sha256": "6814642CD52F3CADC2178BBB2418EF1B8F14E9D768C3046ADB9BA62DFEFDFDE6",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-target-publication.yml",
+      "historical_sha256": "D8259EDDA2C8B01D2FBD4DC53E2AD841D028A5FC610BB2396E6A236F55D1891A",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/mir4-target-qualification.yml",
+      "historical_sha256": "69717E8CE7A54CD3C29994869E2BA699FACDE5BEA78E7F927369AD72C839BA85",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/release-candidate.yml",
+      "historical_sha256": "A63B6A74DF6A5A58415E1B849298BD06B3F0632F6D2D7C17CDAEAA3DF47D3DF3",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".github/workflows/validate.yml",
+      "historical_sha256": "8DBA08A244874D099D402DDD968FC789DE7F87F5985ED77C65E5679A81F60ED2",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "historical_sha256": "007768C27FA5A371B5F555D614EA34DEB751B0D54B0DECA6BAB0707C38803403",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": ".mir/modules.yml",
+      "historical_sha256": "C1F76023D3F3D1A647E0A5B567DE5F55ABB2284E0A090ADF09D30F7496026610",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+      "historical_sha256": "5C2CB4CB2FFF0107F19F3A74BD59E71758D9023E869E9579C0108C13CDC6262A",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-action-lock-and-workflow-closure"
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "historical_sha256": "84F3E5A43A0BDF715282988422120A304976E06B219F16929759E74E8B72D08A",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "docs/maintainer/mir4-supply-chain-preservation.md",
+      "historical_sha256": "A6923750EDAC906783088532E4BCACDC0FEC59CB05A88B038AD9339B4E5E9FD4",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "historical_sha256": "25BEB0EEB4BA8C7291FBC86E369FEB22B902A01B12370F91559F134BC2E70DB0",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "historical_sha256": "94D983E3F23CB30BAD06358C9911C6D7F6E974A43E4BD1C819DA2018D21A9F61",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "mir.lock",
+      "historical_sha256": "9FF06BE7E8BBE859BE5B30C86C26AD50EA09C66974FFB033FC5A977EF1F64697",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "historical_sha256": "240AB0713907E8BFB7391C0157D9B613C00421B9C3CFC317F1928594AE3B7A5D",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "historical_sha256": "54F1E229632C648BEBF2280EACFDC28FC97BF94206F47DA17310236F47597DDB",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "historical_sha256": "02B778037E131C1F7A899E61BF50E84E1D1077C1F0E3F558AA30F77102D1AFF3",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "historical_sha256": "ABBE38C41C363A17B0331EC18C23E1E267D172BB0B2F72BEA5E628B38A4E2AC9",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "visible-repository-registry"
+    },
+    {
+      "path": "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json",
+      "historical_sha256": "101FDEABB36B0F29C60AABC0F351D6F613FF2BD22418CB666C957C652F503387",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "historical_sha256": "0B5F5DEE3FC6E46C0F0B55CE17BC3CE6D144A411D346DE7DBC4FD0F4CF24EF98",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    },
+    {
+      "path": "tools/lib/mir4/RunnerPublisherConfinement.ps1",
+      "historical_sha256": "F55708BDA467F49D668341C2F8D4E4C192D02472AA9A111731D6F3E1A75D7B12",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    },
+    {
+      "path": "validation/tests.yml",
+      "historical_sha256": "BB252BD5FC72828C188C6E2A66B83538FB6ECC8A15DA8D32C7EC31384307C36F",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "historical_sha256": "2179A2F11459E2318D967D034F9AD55ABC60C17F97840837DB946AFFA9774BA0",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+      "historical_sha256": "6AF3D2A4482316F8E07257246FA2B29EC56C23137B4150D68AD4F55DB40B36D2",
+      "disposition": "retired-from-current-prefreeze-byte-binding",
+      "current_control": "current-contract-and-static-proof"
+    }
+  ],
+  "successor_authorities": [
+    {
+      "path": "governance/automation/github-actions-lock.json",
+      "sha256": "EDA45FDA6F50C846DFFE45F8F1E9394AC384916D952FF06A4C01FAE3017D822D",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-github-actions-lock"
+    },
+    {
+      "path": "contracts/repository/mir-github-actions-lock-v1.schema.json",
+      "sha256": "3148B0B3AC72338032F7DE7A0273B95009D23EC76A4638B28CE98DEE29BCB54D",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-github-actions-lock-contract"
+    }
+  ],
+  "runner_preflight": {
+    "host": "AERO-15X-WIN10",
+    "runner_version": "2.336.0",
+    "minimum_version": "2.327.1",
+    "powershell_version": "7.6.5",
+    "node24_compatible": true,
+    "runner_registration_present": false
+  },
+  "invariants": {
+    "historical_mir_lock_immutable": true,
+    "visible_current_authority": true,
+    "full_sha_pins": true,
+    "package_source_unchanged": true,
+    "gameplay_difference_authorized": false
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "CURRENT-AUTOMATION-AUTHORITY-VISIBLE-HISTORICAL-PREFREEZE-BINDINGS-RETIRED"
+}

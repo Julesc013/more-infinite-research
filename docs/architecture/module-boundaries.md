@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-28
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -722,6 +722,10 @@ The sanitation pass first validates target membership directly against each live
 `MutationJournal` retains every complete before snapshot and after projection for audit, and each entry fingerprint binds that full material. Finalization sorts and evaluates terminal state once, then constructs the aggregate journal fingerprint from the plan identity, ordered entry identities, operation fingerprints, terminal counts, missing operations, and violation sets. It does not serialize the complete entry snapshots three additional times or build a disposable preview copy before finalization.
 
 Terminal MIR 3 shadow release identity is owned by `.mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json` and materialized by `tools/commands/targets/Set-MIRTerminalShadowProjection.ps1`. The command validates immutable `.5`, pre-`.5`, and portable-source Git inputs, then aligns package metadata, convergence identity, the planned release record, pre-package manifest, qualification context, release-note/changelog identity, and transition plan. It does not copy or mutate prototype semantics: admitted product behavior remains owned by the named target adapter, while no-product-delta targets retain their exact target-native `.5` tree.
+
+Current GitHub Actions pins are owned visibly by `governance/automation/github-actions-lock.json` under `contracts/repository/mir-github-actions-lock-v1.schema.json`. The `.mir/releases/governance/mir4/github-actions-lock-v2.json` file is immutable MIR 4.0 release-era evidence. Current workflow verifiers and terminal-shadow generation read the visible authority. When reconstructing a frozen source tree, the materializer uses that tree's own lock when present and otherwise uses the current materializer repository's visible lock; it never invents a second mutable pin table. Generated workflows normalize admitted action references from the selected authority.
+
+`releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json` closes the boundary between immutable pre-freeze byte bindings and mutable post-release automation. It retires workflow, action-lock, repository-registry, and associated static-proof paths from the historical pre-freeze current-file comparison only after matching their exact predecessor hashes. Current workflows remain fail-closed under the visible action lock, workflow-closure verification, pull-request checks, and runner confinement proof.
 
 The realized graph postcondition projects every live `data.raw` technology through the same normalizer and compares the count and every ordered node field against the previously qualified virtual snapshot. On equality it reuses that exact trusted graph fingerprint instead of allocating and canonicalizing an equivalent second snapshot. A mismatch is admissible only when a frozen replacement journal projects the qualified graph to the exact realized node set and prerequisite arrays; the realized graph is then independently requalified before parity can pass. An empty, incomplete, forged, or over-broad journal still fails closed. Generated-technology presence, enabled state, prerequisite arrays, plan membership, and proof status remain checked independently.
 
