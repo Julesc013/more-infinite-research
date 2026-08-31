@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/contracts/release/mir4-change-realization-v1.schema.json",
+  "title": "MIR 4 ChangeRealizationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "realization_id",
+    "finding_id",
+    "lane",
+    "base",
+    "implementation",
+    "target_effects",
+    "package_delta",
+    "migration_delta",
+    "proof_obligations",
+    "publication_disposition",
+    "semantic_equivalence",
+    "authority"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4ChangeRealizationV1" },
+    "realization_id": { "type": "string", "pattern": "^REAL-MIR4-[A-Z0-9-]{8,80}$" },
+    "finding_id": { "type": "string", "pattern": "^MIR4-(?:FIND|SYN)-[0-9]{4}-[0-9]{4}$" },
+    "lane": { "enum": ["release/4.0", "main", "dev"] },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "commit", "tree"],
+      "properties": {
+        "ref": { "type": "string", "minLength": 1 },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "commit", "summary"],
+      "properties": {
+        "state": { "enum": ["planned-only", "implemented", "qualified"] },
+        "commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{40}$" },
+        "summary": { "type": "string", "minLength": 8, "maxLength": 300 }
+      }
+    },
+    "target_effects": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "disposition"],
+        "properties": {
+          "target": { "enum": ["F210", "F200", "F110", "F100"] },
+          "disposition": {
+            "enum": ["affected", "unchanged", "omitted-by-capability", "not-applicable", "unknown"]
+          }
+        }
+      }
+    },
+    "package_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "expected_to_change", "paths"],
+      "properties": {
+        "state": { "enum": ["none", "planned", "measured"] },
+        "expected_to_change": { "type": "boolean" },
+        "paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^(?![A-Za-z]:|/|.*\\\\).+$" }
+        }
+      }
+    },
+    "migration_delta": { "enum": ["none", "planned", "required", "measured"] },
+    "proof_obligations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+    },
+    "publication_disposition": {
+      "enum": ["rehearsal-only-no-publication", "not-planned", "selective-target-publication", "source-release"]
+    },
+    "semantic_equivalence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relationship", "other_realization_id", "proposition"],
+      "properties": {
+        "relationship": { "enum": ["primary-correction", "forward-port", "backport", "none"] },
+        "other_realization_id": {
+          "type": ["string", "null"],
+          "pattern": "^REAL-MIR4-[A-Z0-9-]{8,80}$"
+        },
+        "proposition": { "type": "string", "minLength": 8, "maxLength": 500 }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "tag", "sign", "seal", "publish"],
+      "properties": {
+        "merge": { "const": false },
+        "tag": { "const": false },
+        "sign": { "const": false },
+        "seal": { "const": false },
+        "publish": { "const": false }
+      }
+    }
+  }
+}

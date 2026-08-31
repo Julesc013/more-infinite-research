@@ -3,16 +3,42 @@ $ErrorActionPreference='Stop'
 $sourceRepo=(Resolve-Path -LiteralPath $RepoRoot).Path;$repo=$sourceRepo;$mirrorWorktree=$null
 $outerEventName=$env:GITHUB_EVENT_NAME;$outerEventPath=$env:GITHUB_EVENT_PATH;$outerRef=$env:GITHUB_REF;$outerSha=$env:GITHUB_SHA
 try{
-  $mainCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
-  if($mainCommit-cmatch'^[0-9a-f]{40}$'){
-    & git -C $sourceRepo merge-base --is-ancestor $mainCommit HEAD
-    if($LASTEXITCODE-ne0){
-      $headTree=(& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim();$mainTree=(& git -C $sourceRepo rev-parse "$mainCommit^{tree}").Trim()
-      if($headTree-cne$mainTree){throw '[mir4-t05-non-main-lineage-tree]'}
+  $baseBranch='main'
+  if($env:GITHUB_EVENT_NAME-ceq'pull_request'-and$env:GITHUB_BASE_REF-cin@('main','dev','release/4.0')){$baseBranch=[string]$env:GITHUB_BASE_REF}
+  else{
+    foreach($candidate in @('main','dev','release/4.0')){
+      $candidateCommit=(& git -C $sourceRepo rev-parse --verify "refs/remotes/origin/$candidate" 2>$null).Trim()
+      if($candidateCommit-cmatch'^[0-9a-f]{40}$'){
+        & git -C $sourceRepo merge-base --is-ancestor $candidateCommit HEAD
+        if($LASTEXITCODE-eq0){$baseBranch=$candidate;break}
+      }
+    }
+  }
+  $baseRef="refs/remotes/origin/$baseBranch"
+  $baseCommit=(& git -C $sourceRepo rev-parse --verify $baseRef 2>$null).Trim()
+  if($baseCommit-cmatch'^[0-9a-f]{40}$'){
+    $headTree=(& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim()
+    & git -C $sourceRepo merge-base --is-ancestor $baseCommit HEAD
+    $baseIsAncestor=$LASTEXITCODE-eq0
+    if(-not$baseIsAncestor){
+      $baseTree=(& git -C $sourceRepo rev-parse "$baseCommit^{tree}").Trim()
+      if($headTree-cne$baseTree){throw '[mir4-t05-non-base-lineage-tree]'}
+    }
+    if($baseBranch-cne'main'){
+      $mainCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
+      if($mainCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-main-simulation-source]'}
+      $syntheticCommit=(@('MIR T05 protected-base simulation')|& git -C $sourceRepo -c 'user.name=MIR T05' -c 'user.email=mir-t05@invalid' commit-tree $headTree -p $mainCommit).Trim()
+      if($syntheticCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-synthetic-commit]'}
       $temporaryRoot=if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP)){[IO.Path]::GetTempPath()}else{$env:RUNNER_TEMP}
-      $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-main-'+[guid]::NewGuid().ToString('N'))
-      & git -C $sourceRepo worktree add --detach $mirrorWorktree $mainCommit 2>$null|Out-Null
-      if($LASTEXITCODE-ne0){throw '[mir4-t05-main-worktree]'}
+      $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-base-'+[guid]::NewGuid().ToString('N'))
+      & git -C $sourceRepo worktree add --detach $mirrorWorktree $syntheticCommit 2>$null|Out-Null
+      if($LASTEXITCODE-ne0){throw '[mir4-t05-base-worktree]'}
+      $repo=(Resolve-Path -LiteralPath $mirrorWorktree).Path
+    }elseif(-not$baseIsAncestor){
+      $temporaryRoot=if([string]::IsNullOrWhiteSpace([string]$env:RUNNER_TEMP)){[IO.Path]::GetTempPath()}else{$env:RUNNER_TEMP}
+      $mirrorWorktree=Join-Path $temporaryRoot ('mir-t05-base-'+[guid]::NewGuid().ToString('N'))
+      & git -C $sourceRepo worktree add --detach $mirrorWorktree $baseCommit 2>$null|Out-Null
+      if($LASTEXITCODE-ne0){throw '[mir4-t05-base-worktree]'}
       $repo=(Resolve-Path -LiteralPath $mirrorWorktree).Path
     }
   }

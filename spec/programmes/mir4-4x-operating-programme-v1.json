@@ -21,7 +21,7 @@
     {"id": "M41-01", "outcome": "Make pull-request proof selection event, trust, and ref-topology aware", "depends_on": ["M41-00"], "state": "complete"},
     {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "depends_on": ["M41-01"], "state": "complete"},
     {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "depends_on": ["M41-01"], "state": "queued"},
-    {"id": "M41-04", "outcome": "Make main canonical while keeping dev an exact protected mirror during transition", "depends_on": ["M41-02"], "state": "complete"},
+    {"id": "M41-04", "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition", "depends_on": ["M41-02"], "state": "complete"},
     {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "depends_on": ["M41-04"], "state": "complete"},
     {"id": "M41-05", "outcome": "Complete concise landing documentation and reader-oriented routing", "depends_on": ["M41-03"], "state": "queued"},
     {"id": "M42-00", "outcome": "Establish source/package characterization and independently generated target packages", "depends_on": ["M41-03", "M41-05", "M41-06"], "state": "blocked-dependency"},

@@ -130,6 +130,22 @@ package_excluded_modules:
     documentation: docs/maintainer/mir4-release-governance.md
     boundary: release-custody policy, external-layout validation, and disposable proof-only signing/recovery rehearsal only; no production key generation without protected human secret input, source freeze, production signing, sealing, promotion, tagging, or publication
     stability: stable-governance-contract-blocked-human-secret-input
+  mir4_patch_lane_rehearsal_v1:
+    patch_policy: spec/releases/mir4-patch-policy-v1.json
+    contracts:
+      - contracts/release/mir4-defect-record-v1.schema.json
+      - contracts/release/mir4-change-realization-v1.schema.json
+      - contracts/release/mir4-patch-lane-rehearsal-result-v1.schema.json
+    fixtures: fixtures/release/m40-01
+    application: tools/mir/application/release/PatchLaneRehearsal.ps1
+    command: tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1
+    receipt: releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json
+    test: validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
+    authority_evolution_receipt: releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json
+    authority_evolution_schema: contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json
+    authority_evolution_writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
+    boundary: package-excluded deterministic planning and disposable local branch rehearsal only; no implementation merge, version allocation, remote branch write, signing, sealing, tagging, package publication, or public release authority
+    stability: stable-m40-01-unpublished-rehearsal-passed
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     current_github_actions_lock: governance/automation/github-actions-lock.json

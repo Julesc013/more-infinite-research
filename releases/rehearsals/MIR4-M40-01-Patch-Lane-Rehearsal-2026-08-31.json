@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "MIR4PatchLaneRehearsalResultV1",
+  "rehearsal_id": "M40-01-SYNTHETIC-F210-2026-08-31",
+  "status": "passed-unpublished",
+  "finding_id": "MIR4-SYN-2026-0001",
+  "inputs": {
+    "defect_record": {
+      "path": "fixtures/release/m40-01/synthetic-f210-defect.json",
+      "sha256": "4665CBD7F03C6F0B6D82CC1C87ED2DCC8FB6343F7F001F8ED7AF78B9E1B609BC"
+    },
+    "stable_realization": {
+      "path": "fixtures/release/m40-01/stable-realization.json",
+      "sha256": "9D1FF406C554D7C5B96524F5EA663011A922636D39955038BAA582ABC09DEFD9"
+    },
+    "main_realization": {
+      "path": "fixtures/release/m40-01/main-forward-port-realization.json",
+      "sha256": "0E1640ABB2A8268374FB2490E42DBEB81C604809A0A4EFAC4FFB19845F3D81B7"
+    },
+    "dev_realization": {
+      "path": "fixtures/release/m40-01/dev-forward-integration-realization.json",
+      "sha256": "72A33F040A62DE87943469C0DDB5B28896E7B6A173D4F8F01964DB3819E984AA"
+    }
+  },
+  "source_identity": {
+    "release_4_0": {
+      "ref": "release/4.0",
+      "commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+      "tree": "83527c89f58e2d49edbc06dbae8fe747081ebc68"
+    },
+    "main": {
+      "ref": "main",
+      "commit": "a8dfd9f199da970567daf3d8bce2669725905e8e",
+      "tree": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"
+    },
+    "dev": {
+      "ref": "dev",
+      "commit": "74c75879246746c8533d2ef7a170aa0dc6bcbbbc",
+      "tree": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"
+    }
+  },
+  "disposable_branch": {
+    "name": "rehearsal/m40-01-synthetic-f210",
+    "base_commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+    "created": true,
+    "checked_out_at_base": true,
+    "removed": true,
+    "remote_write": false
+  },
+  "target_matrix": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "package_action": "plan-and-qualify"
+    },
+    {
+      "target": "F200",
+      "disposition": "unchanged",
+      "package_action": "record-unchanged-no-package"
+    },
+    {
+      "target": "F110",
+      "disposition": "unchanged",
+      "package_action": "record-unchanged-no-package"
+    },
+    {
+      "target": "F100",
+      "disposition": "unchanged",
+      "package_action": "record-unchanged-no-package"
+    }
+  ],
+  "package_plan": {
+    "affected_targets": ["F210"],
+    "unchanged_targets": ["F200", "F110", "F100"],
+    "materializer": "independent-target-plan",
+    "determinism": "same-base-plus-realization-plus-target-produces-byte-identical-plan",
+    "manufacture_unchanged_targets": false
+  },
+  "qualification_plan": {
+    "F210": ["schema", "package", "exact-engine-load", "direct-upgrade", "regression-proposition"],
+    "F200": ["unchanged-package-identity"],
+    "F110": ["unchanged-package-identity"],
+    "F100": ["unchanged-package-identity"]
+  },
+  "forward_port_plan": {
+    "from": "release/4.0",
+    "to": "main",
+    "strategy": "reimplement-intent-and-regression-proof",
+    "shared_finding_id": "MIR4-SYN-2026-0001",
+    "semantic_equivalence_required": true,
+    "dev_disposition": "receive-semantic-forward-port-from-main"
+  },
+  "firewall": {
+    "merge": false,
+    "tag": false,
+    "version_allocation": false,
+    "sign": false,
+    "seal": false,
+    "publish": false,
+    "remote_branch_write": false
+  },
+  "package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "record_digest": "sha256:08427cbb9e4a30f36c53ce3301621c5f9e558d63d16850cfff7df0a8b9cf1a13"
+}

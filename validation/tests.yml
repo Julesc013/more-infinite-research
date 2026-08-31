@@ -66,6 +66,25 @@
       ]
     },
     {
+      "id": "static.mir4-patch-lane-rehearsal",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "contracts/release/mir4-defect-record-v1.schema.json",
+        "contracts/release/mir4-change-realization-v1.schema.json",
+        "contracts/release/mir4-patch-lane-rehearsal-result-v1.schema.json",
+        "fixtures/release/m40-01/**",
+        "tools/mir/application/release/PatchLaneRehearsal.ps1",
+        "tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1",
+        "tools/mir.ps1",
+        "spec/releases/mir4-patch-policy-v1.json",
+        ".mir/branches.yml",
+        "validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1"
+      ]
+    },
+    {
       "id": "static.architecture",
       "kind": "static",
       "layer": "F0",

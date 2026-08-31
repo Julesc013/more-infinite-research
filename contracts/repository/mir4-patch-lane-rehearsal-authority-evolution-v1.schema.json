@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json",
+  "title": "MIR4PatchLaneRehearsalAuthorityEvolutionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "rehearsal_receipt", "player_package_source_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4PatchLaneRehearsalAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M40-01-PATCH-LANE-REHEARSAL"},
+    "change_id": {"const": "MIR4-M40-01-PATCH-LANE-REHEARSAL-2026-08-31"},
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "releases/migrations/MIR4-Branch-Operating-Model-Authority-EvolutionV1.json"},
+        "sha256": {"const": "B7EF0E539329446F6347B9A97D7F5C6F63C6E13CD1CA1C6F992C8562F50B5EFD"}
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "tree"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"const": "74c75879246746c8533d2ef7a170aa0dc6bcbbbc"},
+        "tree": {"const": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"}
+      }
+    },
+    "evolved_bindings": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {"$ref": "#/$defs/evolved"}
+    },
+    "current_authorities": {
+      "type": "array",
+      "minItems": 21,
+      "items": {"$ref": "#/$defs/current"}
+    },
+    "rehearsal_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "record_digest"],
+      "properties": {
+        "path": {"const": "releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "record_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+      }
+    },
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "package_visible_delta": {"const": []},
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_4_0_base_exact", "disposable_branch_removed", "one_affected_target", "unchanged_targets_explicit", "semantic_forward_ports_planned", "remote_refs_unchanged", "package_source_unchanged", "gameplay_difference_authorized"],
+      "properties": {
+        "release_4_0_base_exact": {"const": true},
+        "disposable_branch_removed": {"const": true},
+        "one_affected_target": {"const": true},
+        "unchanged_targets_explicit": {"const": true},
+        "semantic_forward_ports_planned": {"const": true},
+        "remote_refs_unchanged": {"const": true},
+        "package_source_unchanged": {"const": true},
+        "gameplay_difference_authorized": {"const": false}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"const": "PATCH-LANE-REHEARSAL-PROVED-NO-RELEASE-TRANSITION"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"enum": [".mir/control/repository-fixed-point.json", "docs/releases/mir4-post-4.0-roadmap.md", "spec/programmes/mir4-4x-operating-programme-v1.json", "tools/mir.ps1", "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1"]},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 20},
+        "scope": {"const": "package-excluded-maintenance-rehearsal"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "role": {"type": "string", "minLength": 8}
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "tagging", "signing", "sealing", "version_allocation", "publication", "remote_write"],
+      "properties": {
+        "merge": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "version_allocation": {"const": false},
+        "publication": {"const": false},
+        "remote_write": {"const": false}
+      }
+    }
+  }
+}

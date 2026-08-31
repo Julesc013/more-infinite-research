@@ -3,9 +3,10 @@
   "kind": "MIR4VisibleRootProjectionV2",
   "id": "releases",
   "path": "releases",
-  "mode": "active-migration-receipt-root",
+  "mode": "active-release-record-root",
   "current_authorities": [
     "releases/migrations",
+    "releases/rehearsals",
     ".mir/releases",
     ".mir/releases.json",
     ".mir/distributions.json"

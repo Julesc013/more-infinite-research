@@ -169,6 +169,18 @@ if([string]$branchOperatingModel.kind-cne'MIR4BranchOperatingModelAuthorityEvolu
    @($branchOperatingModel.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-post-release-branch-operating-model]'
 }
+$patchLaneRehearsal=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100
+if([string]$patchLaneRehearsal.kind-cne'MIR4PatchLaneRehearsalAuthorityEvolutionV1'-or
+   [string]$patchLaneRehearsal.status-cne'PATCH-LANE-REHEARSAL-PROVED-NO-RELEASE-TRANSITION'-or
+   @($patchLaneRehearsal.evolved_bindings).Count-ne5-or
+   @($patchLaneRehearsal.current_authorities).Count-lt21-or
+   [string]$patchLaneRehearsal.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   -not[bool]$patchLaneRehearsal.invariants.release_4_0_base_exact-or
+   -not[bool]$patchLaneRehearsal.invariants.disposable_branch_removed-or
+   -not[bool]$patchLaneRehearsal.invariants.remote_refs_unchanged-or
+   @($patchLaneRehearsal.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-post-release-patch-lane-rehearsal]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

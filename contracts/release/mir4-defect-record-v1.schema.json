@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/contracts/release/mir4-defect-record-v1.schema.json",
+  "title": "MIR 4 DefectRecordV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "finding_id",
+    "status",
+    "title",
+    "classification",
+    "severity",
+    "disclosure",
+    "reproducer",
+    "affected_source_lines",
+    "target_dispositions",
+    "impact",
+    "regression_proposition",
+    "lane_dispositions",
+    "record_authority"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4DefectRecordV1" },
+    "finding_id": { "type": "string", "pattern": "^MIR4-(?:FIND|SYN)-[0-9]{4}-[0-9]{4}$" },
+    "status": {
+      "enum": ["reported", "reproduced", "admitted", "corrected", "closed", "synthetic-rehearsal"]
+    },
+    "title": { "type": "string", "minLength": 8, "maxLength": 160 },
+    "classification": {
+      "enum": [
+        "reproduced-player-defect",
+        "security-correction",
+        "save-or-migration-correction",
+        "exact-target-compatibility-correction",
+        "release-copy-or-installation-correction"
+      ]
+    },
+    "severity": { "enum": ["low", "moderate", "high", "critical"] },
+    "disclosure": {
+      "enum": ["public-at-merge", "embargoed-until-release", "private-advisory", "internal-only"]
+    },
+    "reproducer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_ref", "base_commit", "target", "steps", "expected", "actual"],
+      "properties": {
+        "base_ref": { "type": "string", "minLength": 1 },
+        "base_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "target": { "enum": ["F210", "F200", "F110", "F100"] },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+        },
+        "expected": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "actual": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "affected_source_lines": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["4.0.x", "stable-main", "next-dev"] }
+    },
+    "target_dispositions": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "disposition", "reason"],
+        "properties": {
+          "target": { "enum": ["F210", "F200", "F110", "F100"] },
+          "disposition": {
+            "enum": ["affected", "unaffected", "omitted-by-capability", "not-applicable", "unknown"]
+          },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 300 }
+        }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["save", "security", "data_loss", "migration"],
+      "properties": {
+        "save": { "enum": ["none", "compatible", "repair-required", "unknown"] },
+        "security": { "enum": ["none", "potential", "confirmed", "unknown"] },
+        "data_loss": { "enum": ["none", "potential", "confirmed", "unknown"] },
+        "migration": { "enum": ["none", "required", "unknown"] }
+      }
+    },
+    "regression_proposition": { "type": "string", "minLength": 12, "maxLength": 600 },
+    "lane_dispositions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_4_0", "main", "dev"],
+      "properties": {
+        "release_4_0": { "enum": ["correct-here", "not-affected", "synthetic-plan-only"] },
+        "main": { "enum": ["semantic-forward-port", "correct-here", "not-affected"] },
+        "dev": { "enum": ["semantic-forward-port", "receive-from-main", "correct-here", "not-affected"] }
+      }
+    },
+    "record_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grants_implementation", "grants_release", "grants_signing", "grants_publication"],
+      "properties": {
+        "grants_implementation": { "const": false },
+        "grants_release": { "const": false },
+        "grants_signing": { "const": false },
+        "grants_publication": { "const": false }
+      }
+    }
+  }
+}
