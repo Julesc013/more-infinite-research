@@ -52,7 +52,7 @@ jobs:
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
           name: mir-targeted-plan-and-candidate
@@ -96,7 +96,7 @@ jobs:
           MIR_ASSURANCE_TARGET: ${{ inputs.target }}
           MIR_ASSURANCE_TEST_ID: ${{ matrix.test_id }}
         run: ./tools/mir.ps1 verify run-one --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --test $env:MIR_ASSURANCE_TEST_ID --fingerprint $env:MIR_ASSURANCE_FINGERPRINT --factorio $env:FACTORIO_BIN
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
           include-hidden-files: true
@@ -150,7 +150,7 @@ jobs:
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
           include-hidden-files: true

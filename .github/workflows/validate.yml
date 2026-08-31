@@ -95,13 +95,13 @@ jobs:
           }
           $matrix = @{ include = $work } | ConvertTo-Json -Depth 10 -Compress
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
           name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance/verification-plan.json
           if-no-files-found: error
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         with:
           include-hidden-files: true
@@ -185,7 +185,7 @@ jobs:
         if: ${{ matrix.no_op == true }}
         shell: pwsh
         run: Write-Host "All required fingerprints were adopted from trusted reusable evidence."
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: ${{ always() && matrix.no_op != true }}
         with:
           include-hidden-files: true
@@ -216,7 +216,7 @@ jobs:
             (($status | ConvertTo-Json -Depth 10) + "`n"),
             [Text.UTF8Encoding]::new($false)
           )
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mir-verification-status-${{ github.run_id }}-${{ github.run_attempt }}
           path: build/results/assurance/workflow-status.json
@@ -318,7 +318,7 @@ jobs:
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:
           include-hidden-files: true
