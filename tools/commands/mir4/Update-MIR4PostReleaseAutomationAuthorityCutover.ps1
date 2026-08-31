@@ -85,6 +85,14 @@ if ($Check) {
   $existing = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json -Depth 100 -DateKind String
   $RecordedAt = [string]$existing.recorded_at
 } elseif ([string]::IsNullOrWhiteSpace($RecordedAt)) { $RecordedAt = [DateTimeOffset]::Now.ToString('o') }
+$successorAuthorities = if ($Check) {
+  @($existing.successor_authorities)
+} else {
+  @(
+    [ordered]@{path=$currentLockRelative;sha256=(Get-MIR4AutomationCanonicalSha256 $currentLockPath);hash_mode='canonical-text-v1';role='current-github-actions-lock'},
+    [ordered]@{path=$currentContractRelative;sha256=(Get-MIR4AutomationCanonicalSha256 $currentContractPath);hash_mode='canonical-text-v1';role='current-github-actions-lock-contract'}
+  )
+}
 
 $record = [ordered]@{
   schema=1
@@ -96,10 +104,7 @@ $record = [ordered]@{
   evolved_bindings=@()
   current_authorities=@()
   retired_bindings=@($retirement)
-  successor_authorities=@(
-    [ordered]@{path=$currentLockRelative;sha256=(Get-MIR4AutomationCanonicalSha256 $currentLockPath);hash_mode='canonical-text-v1';role='current-github-actions-lock'},
-    [ordered]@{path=$currentContractRelative;sha256=(Get-MIR4AutomationCanonicalSha256 $currentContractPath);hash_mode='canonical-text-v1';role='current-github-actions-lock-contract'}
-  )
+  successor_authorities=@($successorAuthorities)
   runner_preflight=[ordered]@{host='AERO-15X-WIN10';runner_version='2.336.0';minimum_version='2.327.1';powershell_version='7.6.5';node24_compatible=$true;runner_registration_present=$false}
   invariants=[ordered]@{historical_mir_lock_immutable=$true;visible_current_authority=$true;full_sha_pins=$true;package_source_unchanged=$true;gameplay_difference_authorized=$false}
   transition_gate=[ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;production_seal=$false;promotion_to_main=$false;tagging=$false;publication=$false}

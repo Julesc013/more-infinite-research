@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIRGitHubActionsLockV1",
-  "recorded_at": "2026-08-31T18:30:00+10:00",
+  "recorded_at": "2026-08-31T19:20:00+10:00",
   "scope": "current-repository-and-generated-workflows",
   "status": "active-mutable-governance-authority",
   "package_visible": false,
@@ -19,7 +19,7 @@
   "actions": [
     {"action": "actions/cache/restore", "requested_tag": "v4", "commit_sha": "0057852bfaa89a56745cba8c7296529d2fc39830", "source": "https://api.github.com/repos/actions/cache/git/ref/tags/v4"},
     {"action": "actions/cache/save", "requested_tag": "v4", "commit_sha": "0057852bfaa89a56745cba8c7296529d2fc39830", "source": "https://api.github.com/repos/actions/cache/git/ref/tags/v4"},
-    {"action": "actions/checkout", "requested_tag": "v4", "commit_sha": "11d5960a326750d5838078e36cf38b85af677262", "source": "https://api.github.com/repos/actions/checkout/git/ref/tags/v4"},
+    {"action": "actions/checkout", "requested_tag": "v7", "commit_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1", "source": "https://api.github.com/repos/actions/checkout/git/ref/tags/v7"},
     {"action": "actions/download-artifact", "requested_tag": "v4", "commit_sha": "d3f86a106a0bac45b974a628896c90dbdf5c8093", "source": "https://api.github.com/repos/actions/download-artifact/git/ref/tags/v4"},
     {"action": "actions/github-script", "requested_tag": "v9", "commit_sha": "3a2844b7e9c422d3c10d287c895573f7108da1b3", "source": "https://api.github.com/repos/actions/github-script/git/ref/tags/v9"},
     {"action": "actions/upload-artifact", "requested_tag": "v4", "commit_sha": "ea165f8d65b6e75b540449e92b4886f43607fa02", "source": "https://api.github.com/repos/actions/upload-artifact/git/ref/tags/v4"}
