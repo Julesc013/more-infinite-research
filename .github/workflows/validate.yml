@@ -40,7 +40,7 @@ jobs:
           $mir4 = Test-Path -LiteralPath .mir/releases/waves/mir4-r0/MIR4-Approved-Bootstrap-Correction-MIR3-TERM-0033V1.json -PathType Leaf
           "mir4_bootstrap=$($mir4.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
@@ -170,7 +170,7 @@ jobs:
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
         if: ${{ matrix.no_op != true }}
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
@@ -276,7 +276,7 @@ jobs:
           $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: build/results/assurance/evidence
           key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
