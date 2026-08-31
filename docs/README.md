@@ -1,48 +1,34 @@
 ---
-title: "More Infinite Research Documentation"
+title: "More Infinite Research 4 documentation"
 status: current
-applies_to: "3.2.5 and the MIR 3 terminal programme"
+applies_to: "MIR 4.x"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
+generated_from: []
 ---
 
-# More Infinite Research Documentation
+# More Infinite Research 4 documentation
 
-MIR 3 is a modular compatibility compiler for infinite research technologies. The `.5` target wave is published and immutable; all later MIR 3 corrections are synthesized in the [terminal `.9` programme](releases/mir-3-terminal-dot-9-programme.md). MIR 4 begins only after that programme is qualified, published, archived, and handed off.
+This is the package-excluded documentation landing page for MIR 4. Choose the route that matches what you are trying to do; the repository root `README.md` remains byte-stable and package-visible until M41-05B deliberately separates repository presentation from generated player-package documentation.
 
-## Start here
+## By reader
 
-- Players and modpack users: [User guide](user/README.md)
-- Current public description: [Mod Portal page](releases/mod-portal-page.md)
-- Published and planned releases: [Release index](releases/README.md)
-- Maintainers: [Maintainer guide](maintainer/README.md)
-- Architecture: [Architecture overview](architecture/README.md)
-- Capabilities: [Capability model](capabilities/README.md)
-- Compatibility: [Compatibility model](compatibility/README.md)
-- Exact schemas and references: [Reference](reference/README.md)
-- Architecture decisions: [ADR index](adr/README.md)
-- Historical docs: [Archive](archive/README.md)
+- Players and modpack users: [user guide](user/README.md)
+- Mod and extension developers: [developer guide](developer/README.md)
+- Contributors and maintainers: [maintainer guide](maintainer/README.md)
+- Exact formats and commands: [reference](reference/README.md)
 
-## Documentation status
+## By need
 
-| Area | Status |
-| --- | --- |
-| Player guidance and Mod Portal copy | Current for the published `.5` wave |
-| Release planning | One active terminal `.9` programme; no `.9` implementation yet |
-| Architecture | Current for MIR 3; superseded 3.3/2.6 concepts route to MIR 4 |
-| Compatibility matrix | Evidence-bound and fixture-backed where claimed |
-| Reference | Current for registered contracts |
-| Archive | Historical; never independent current authority |
+- Learn by completing a guided path: [tutorials](tutorials/README.md)
+- Complete a specific task: [how-to guides](how-to/README.md)
+- Look up an exact contract: [reference](reference/README.md)
+- Understand design and policy: [explanation](explanation/README.md)
 
-## Documentation rules
+Architecture, compatibility, capabilities, releases, decisions, and historical material remain available through the [architecture](architecture/README.md), [compatibility](compatibility/README.md), [capabilities](capabilities/README.md), [release](releases/README.md), [ADR](adr/README.md), and [archive](archive/README.md) indexes.
 
-- Keep one canonical active page per topic.
-- Start every Markdown file under `docs/` with metadata and register it in `.mir/docs.yml`.
-- Name the current replacement in every archived page.
-- Bind compatibility claims to a fixture or named load-check.
-- Treat generated views, including `todo.md`, as projections of machine-readable authority.
-- Do not place docs in release ZIPs.
+Every current Markdown document under `docs/` owns its editable metadata in front matter. `.mir/docs.yml` and generated indexes are projections. Repository documentation, schemas, tests, fixtures, build reports, and evidence do not belong in player ZIPs.

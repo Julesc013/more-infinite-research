@@ -1,11 +1,19 @@
 param(
-  [ValidateSet('generate','check','inventory','initialize')][string]$Command='check',
+  [ValidateSet('generate','check','inventory','initialize','characterize','characterization-check')][string]$Command='check',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$OutputPath=''
 )
 
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot '../application/repository/RepositoryFixedPoint.ps1')
+. (Join-Path $PSScriptRoot '../application/repository/RepositoryCharacterization.ps1')
+
+if ($Command -in @('characterize','characterization-check')) {
+  $characterizationOutput = if ([string]::IsNullOrWhiteSpace($OutputPath)) { 'build/reports/repository-characterization' } else { $OutputPath }
+  $characterization = Invoke-MIR4RepositoryCharacterizationV1 -RepoRoot $RepoRoot -OutputPath $characterizationOutput -Check:($Command -eq 'characterization-check')
+  ($characterization | ConvertTo-Json -Depth 20) + "`n"
+  return
+}
 
 if ($Command -eq 'generate') {
   Invoke-MIR4RepositoryRootProjection -RepoRoot $RepoRoot

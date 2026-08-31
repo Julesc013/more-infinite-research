@@ -56,14 +56,14 @@ The active fixed point is deliberately smaller than the full report. The initial
 | M41-03 | Introduce change fragments and generate every release narrative | Complete |
 | M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
-| M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
-| M42-00 | Characterize the package boundary and generate each target independently | Blocked on the complete 4.1 fixed point |
+| M41-05 | Route documentation by reader need, then separate repository and package landing pages | Active: M41-05A routing complete; M41-05B waits for the package-documentation cutover |
+| M42-00 | Characterize the package boundary and generate each target independently | Active: M42-00A characterization complete; materializer and parity work remain |
 | M42-01 | Converge PowerShell behind one supported CLI and one release engine | Blocked on M42-00 |
 | M42-02 | Split Lua compiler stages behind characterization and mutation boundaries | Blocked on M42-00 |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No broad Lua move starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback.
 
-The current package-source boundary still includes `README.md` in every player ZIP. M41-05 must therefore either admit and prove that exact presentation delta or wait until M42-00 removes the repository landing page from player packages. Incidental README edits are forbidden because they silently change package identity.
+The current package-source boundary still includes `README.md` in every player ZIP. M41-05A therefore routes package-excluded documentation while leaving that root file byte-stable. M42-00A records exact package membership, authorities, readers, writers, bridges, and physical files. After the independent materializer proves parity, M41-05B will separate a concise repository landing page from generated package documentation as an intentional, target-qualified cutover. Incidental README edits remain forbidden.
 
 ## Preserved 4.0.0 baseline
 

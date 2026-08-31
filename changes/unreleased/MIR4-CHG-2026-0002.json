@@ -1,0 +1,25 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0002",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Routed package-excluded MIR 4 documentation and established deterministic repository, authority, bridge, and package characterization.",
+  "details": [
+    "Declared migration facts now generate one authority ledger plus writer, reader, graph, bridge-expiry, physical-file, package-membership, and documentation-routing reports.",
+    "The package-visible root README and player package-source fingerprint remain unchanged pending the independently qualified package-documentation cutover."
+  ],
+  "semantic_domains": ["documentation", "repository-authority", "package-boundary"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"not-applicable","reason":"Package-excluded routing and read-only characterization."},
+    {"target":"F200","disposition":"not-applicable","reason":"Package-excluded routing and read-only characterization."},
+    {"target":"F110","disposition":"not-applicable","reason":"Package-excluded routing and read-only characterization."},
+    {"target":"F100","disposition":"not-applicable","reason":"Package-excluded routing and read-only characterization."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [{"kind":"document","value":"docs/architecture/mir4-repository-characterization.md"}]
+}

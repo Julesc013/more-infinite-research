@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 429 pages as of 2026-08-31.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 433 pages as of 2026-08-31.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -72,6 +72,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
+| docs/architecture/mir4-repository-characterization.md | MIR 4 repository characterization | current | maintainer | explanation | mir-maintainers | 2026-08-31 |
 | docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
@@ -161,6 +162,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/developer/README.md | MIR 4 Developer Documentation | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/developer/testing-against-factorio.md | Testing MIR Extensions Against Factorio | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/developer/v0-to-v1-migration.md | Migrating MEP V0 to V1 | current | developer | how-to | mir-maintainers | 2026-08-26 |
+| docs/explanation/README.md | MIR 4 explanation | current | developer | explanation | mir-maintainers | 2026-08-31 |
+| docs/how-to/README.md | MIR 4 how-to guides | current | maintainer | how-to | mir-maintainers | 2026-08-31 |
 | docs/maintainer/2.5.0-post-release-stabilization.md | MIR 2.5.0 Post-Release Stabilization | archived | release-manager | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/adding-a-capability.md | Adding A Capability | current | developer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/adding-a-compatibility-fixture.md | Adding A Compatibility Fixture | current | developer | how-to | mir-maintainers | 2026-07-07 |
@@ -178,7 +181,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
-| docs/maintainer/mir4-authority-map.md | MIR 4 Maintainer Authority Map | current | maintainer | reference | mir-maintainers | 2026-08-26 |
+| docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
@@ -192,7 +195,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/modpack-campaigns.md | Modpack Campaigns | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | MIR 2.5.0 Offline Continuity And Final Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/playtest-intake.md | Playtest Intake | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
-| docs/maintainer/README.md | Maintainer Guide | current | maintainer | how-to | mir-maintainers | 2026-08-08 |
+| docs/maintainer/README.md | MIR 4 maintainer guide | current | maintainer | how-to | mir-maintainers | 2026-08-31 |
 | docs/maintainer/release-assurance.md | Release Assurance And Candidate Sealing | current | release-manager | how-to | mir-maintainers | 2026-08-10 |
 | docs/maintainer/release-process.md | Release Process | current | release-manager | how-to | mir-maintainers | 2026-08-14 |
 | docs/maintainer/report-diffing.md | Report Diffing | current | developer | how-to | mir-maintainers | 2026-08-03 |
@@ -201,7 +204,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/triage-playbook.md | Triage Playbook | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | Ultimate Convergence Follow-Up Audit Prompt | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/validation.md | Validation | current | maintainer | how-to | mir-maintainers | 2026-07-12 |
-| docs/README.md | More Infinite Research Documentation | current | maintainer | reference | mir-maintainers | 2026-08-08 |
+| docs/README.md | More Infinite Research 4 documentation | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |
 | docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/compiler-diagnostics.md | Compiler Diagnostic Codes | current | developer | reference | mir-maintainers | 2026-07-13 |
@@ -232,7 +235,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/mir4-sdk-v1-quickstart.md | MIR 4 SDK V1 Developer Preview Quickstart | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/reference/mod-interaction-graph.md | Semantic Mod Interaction Graph | current | maintainer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/offline-rule-synthesis.md | Offline Family Rule Synthesis | current | maintainer | reference | mir-maintainers | 2026-08-03 |
-| docs/reference/README.md | Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
+| docs/reference/README.md | MIR 4 reference | current | developer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/reports/cap-diagnostics.md | Capability Diagnostics | draft | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/reports/compatibility-observations.md | Compatibility Observations | draft | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/reports/coverage-report.md | Coverage Report | current | developer | reference | mir-maintainers | 2026-07-20 |
@@ -438,12 +441,13 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/templates/README.md | Templates | current | maintainer | reference | mir-maintainers | 2026-07-07 |
 | docs/templates/release-plan-template.md | Release Plan Template | current | release-manager | reference | mir-maintainers | 2026-07-07 |
 | docs/templates/troubleshooting-entry-template.md | Troubleshooting Entry Template | current | maintainer | reference | mir-maintainers | 2026-07-07 |
+| docs/tutorials/README.md | MIR 4 tutorials | current | developer | tutorial | mir-maintainers | 2026-08-31 |
 | docs/user/compatibility-claims.md | Compatibility Claims | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/diagnostics.md | Diagnostics | current | player | how-to | mir-maintainers | 2026-07-20 |
 | docs/user/faq.md | FAQ | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/generated-technologies.md | Generated Technologies | current | player | explanation | mir-maintainers | 2026-07-07 |
 | docs/user/installation.md | Installation | current | player | how-to | mir-maintainers | 2026-07-07 |
 | docs/user/mir3-to-mir4.md | Upgrading from MIR 3 to MIR 4 | current | player | how-to | mir-maintainers | 2026-08-29 |
-| docs/user/README.md | User Guide | current | player | how-to | mir-maintainers | 2026-07-07 |
+| docs/user/README.md | MIR 4 player guide | current | player | how-to | mir-maintainers | 2026-08-31 |
 | docs/user/settings.md | Settings | current | player | how-to | mir-maintainers | 2026-08-03 |
 | docs/user/troubleshooting.md | Troubleshooting | current | player | how-to | mir-maintainers | 2026-07-07 |

@@ -72,6 +72,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/architecture/mir4-platform-preview.md | current | 2026-08-28 | 3 | current-window |
 | docs/architecture/mir4-processir-synthesis.md | current | 2026-08-28 | 3 | current-window |
 | docs/architecture/mir4-r0-bootstrap.md | current | 2026-08-25 | 6 | current-window |
+| docs/architecture/mir4-repository-characterization.md | current | 2026-08-31 | 0 | current-window |
 | docs/architecture/mir4-repository-fixed-point.md | current | 2026-08-28 | 3 | current-window |
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 8 | current-window |
 | docs/architecture/mir4-semantic-compiler.md | current | 2026-08-23 | 8 | current-window |
@@ -161,6 +162,8 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/developer/README.md | current | 2026-08-26 | 5 | current-window |
 | docs/developer/testing-against-factorio.md | current | 2026-08-26 | 5 | current-window |
 | docs/developer/v0-to-v1-migration.md | current | 2026-08-26 | 5 | current-window |
+| docs/explanation/README.md | current | 2026-08-31 | 0 | current-window |
+| docs/how-to/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/2.5.0-post-release-stabilization.md | archived | 2026-08-08 | 23 | current-window |
 | docs/maintainer/adding-a-capability.md | current | 2026-07-07 | 55 | current-window |
 | docs/maintainer/adding-a-compatibility-fixture.md | current | 2026-07-07 | 55 | current-window |
@@ -178,7 +181,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/maintainer/localization.md | current | 2026-08-03 | 28 | current-window |
 | docs/maintainer/manual-test-plan.md | current | 2026-07-21 | 41 | current-window |
 | docs/maintainer/mir3-terminal-repository-protections.md | current | 2026-08-15 | 16 | current-window |
-| docs/maintainer/mir4-authority-map.md | current | 2026-08-26 | 5 | current-window |
+| docs/maintainer/mir4-authority-map.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/mir4-continuity.md | current | 2026-08-26 | 5 | current-window |
 | docs/maintainer/mir4-full-platform-closeout.md | current | 2026-08-24 | 7 | current-window |
 | docs/maintainer/mir4-m4c01-runbook.md | current | 2026-08-18 | 13 | current-window |
@@ -192,7 +195,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/maintainer/modpack-campaigns.md | current | 2026-08-03 | 28 | current-window |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | current | 2026-08-03 | 28 | current-window |
 | docs/maintainer/playtest-intake.md | current | 2026-07-21 | 41 | current-window |
-| docs/maintainer/README.md | current | 2026-08-08 | 23 | current-window |
+| docs/maintainer/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/release-assurance.md | current | 2026-08-10 | 21 | current-window |
 | docs/maintainer/release-process.md | current | 2026-08-14 | 17 | current-window |
 | docs/maintainer/report-diffing.md | current | 2026-08-03 | 28 | current-window |
@@ -201,7 +204,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/maintainer/triage-playbook.md | current | 2026-07-07 | 55 | current-window |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | archived | 2026-08-08 | 23 | current-window |
 | docs/maintainer/validation.md | current | 2026-07-12 | 50 | current-window |
-| docs/README.md | current | 2026-08-08 | 23 | current-window |
+| docs/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/reference/asset-sources.md | current | 2026-07-23 | 39 | current-window |
 | docs/reference/compiler-authority-table.md | current | 2026-08-03 | 28 | current-window |
 | docs/reference/compiler-diagnostics.md | current | 2026-07-13 | 49 | current-window |
@@ -232,7 +235,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/reference/mir4-sdk-v1-quickstart.md | current | 2026-08-26 | 5 | current-window |
 | docs/reference/mod-interaction-graph.md | current | 2026-08-03 | 28 | current-window |
 | docs/reference/offline-rule-synthesis.md | current | 2026-08-03 | 28 | current-window |
-| docs/reference/README.md | current | 2026-07-07 | 55 | current-window |
+| docs/reference/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/reference/reports/cap-diagnostics.md | draft | 2026-07-07 | 55 | current-window |
 | docs/reference/reports/compatibility-observations.md | draft | 2026-07-07 | 55 | current-window |
 | docs/reference/reports/coverage-report.md | current | 2026-07-20 | 42 | current-window |
@@ -438,12 +441,13 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/templates/README.md | current | 2026-07-07 | 55 | current-window |
 | docs/templates/release-plan-template.md | current | 2026-07-07 | 55 | current-window |
 | docs/templates/troubleshooting-entry-template.md | current | 2026-07-07 | 55 | current-window |
+| docs/tutorials/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/user/compatibility-claims.md | current | 2026-07-07 | 55 | current-window |
 | docs/user/diagnostics.md | current | 2026-07-20 | 42 | current-window |
 | docs/user/faq.md | current | 2026-07-07 | 55 | current-window |
 | docs/user/generated-technologies.md | current | 2026-07-07 | 55 | current-window |
 | docs/user/installation.md | current | 2026-07-07 | 55 | current-window |
 | docs/user/mir3-to-mir4.md | current | 2026-08-29 | 2 | current-window |
-| docs/user/README.md | current | 2026-07-07 | 55 | current-window |
+| docs/user/README.md | current | 2026-08-31 | 0 | current-window |
 | docs/user/settings.md | current | 2026-08-03 | 28 | current-window |
 | docs/user/troubleshooting.md | current | 2026-07-07 | 55 | current-window |

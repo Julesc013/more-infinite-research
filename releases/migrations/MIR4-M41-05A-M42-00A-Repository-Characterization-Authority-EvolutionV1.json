@@ -1,0 +1,361 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4105AM4200ARepositoryCharacterizationAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T00:00:00+10:00",
+  "programme_id": "M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION",
+  "change_id": "MIR4-CHG-2026-0002",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json",
+    "sha256": "8E992F205387851BDA5A6C315DBDD0C156CFA6D30AA1E2A7D9D9217D8A7E916E"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "c8ef730b307af184d542ae1cc70a1b8ff31e1225",
+    "tree": "472f3fba107fc9392977dea5852af038d3154ac9"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "1462D9315397FF159846F0C03CC03304CCC02357828A0F28D69A0416BCC4B6FE",
+      "current_sha256": "C7D78CF35F8D5905087B15505B764C8748D5070A5E735BFC4D28C111DC73B47C",
+      "reason": "Register the bounded characterization proof and impact class.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "A155D9DFDD3DF4E2247057B797039B3E00695BEB9457923CC6034EDA25E4517C",
+      "current_sha256": "5080FB56FB24C5FCCD9C57E21AAE06740B0977898447B115BD90301DB79D177D",
+      "reason": "Expose characterization through the canonical path registry.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/repository-fixed-point.json",
+      "previous_sha256": "4DDB7D7469CB148A8053602E3956F4E0569DE086CECA3069C66115019B7DB3FB",
+      "current_sha256": "387AAA07D6345B8B1C26B8CC7C012ED0073A56BA08937720DC838FA23CBB1E27",
+      "reason": "Append the characterization migration successor.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "6294DAC2CD8F03553369FFA11AB445AF57DDB98F41960F0C307D7E70909C9DDD",
+      "current_sha256": "BB10C8A975AFE82FB5E067F546B8F3ACC343B5D9510588485415FBFB615709F7",
+      "reason": "Regenerate the documentation metadata projection.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "992E9B9F26F71CC8B1DFAF17F8876D4DF252CB5561431DEA955C855067E893F8",
+      "current_sha256": "7BAEBBDCAD5DA87334B34231B4692BABF440439E02F2FA73CEC2F7C35120CD37",
+      "reason": "Declare the package-excluded characterization boundary.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/.mir-root.json",
+      "previous_sha256": "D9F8F58E9FCFE5BA87A5880596B61058C05F060B4744ABD206D3874F1C474E32",
+      "current_sha256": "02F07D5FD45E680ACC0D3FE2F2CB0B76F6816D29F9A65BE7CB7ED2CA14254E22",
+      "reason": "Regenerated governance root projection with the characterization authority.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/maintainer/mir4-authority-map.md",
+      "previous_sha256": "220690C35A0AF76CC5312300A6DE888DE7446202C4793D1241CC1BE985BEBB46",
+      "current_sha256": "3973A44F233EC59C721381859649D8E0F4AB3AA01B87FFBDE7040912514F1D8B",
+      "reason": "Generated-ledger authority routing page.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "CFE857FE841AB6434FA0A1F2F369AAE03E99F9B8F375FAB80BFA2D7503AB67BB",
+      "current_sha256": "8139FDC78280FC869CF979966979D97D21E04CA9BC3010A363FD7FB578E68B34",
+      "reason": "Document the read-only characterization boundary.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "C6CE4CB45F46E7AAE81246A2B37577FD9ED55456381B8DADA170F50B8C43907F",
+      "current_sha256": "3A140C3E75BE3BFB99329BD0FEA96BEC6406A7DDFE34E47A7631F0E19F3A459A",
+      "reason": "Record M41-05A and M42-00A disposition.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "965097826161517587414150414230EBEEE48A5843C87485D8E33D6C1D164B6B",
+      "current_sha256": "FD9000A482CA970A5F4F2D317C86D96DB2282D9592D3E12E7B72C96510324EA3",
+      "reason": "Regenerated documentation index.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "D345719206033C835775AE8251F15C12F1B20B184F4EA6BFF86FB1D2012552D9",
+      "current_sha256": "02708FD9C9E3E279776350E8373A7889D71A13BD4DA49F55A956AA636AD56E11",
+      "reason": "Regenerated documentation navigation.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "448CB4D7BB4542375EF121D80EFB39DE474A5BE6774787AB8CD214B3EA32B4D6",
+      "current_sha256": "13EA02EDC9F7C6DA1FEC91B994FCB6F9916AAFAA6D54FD560EBA84ABF1245FC2",
+      "reason": "Regenerated documentation owner dashboard.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "FDEF3BA3A3AD71B57515ABBAC5512273FC0AAB2BB2AAD3CBAB43013FD846718C",
+      "current_sha256": "8E19233A1426D91289810C1D71C69CB3784766A68A69D87118493B2D7A241937",
+      "reason": "Regenerated documentation review-age projection.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "CDDA86522FB9BD937E535ADAE3242336A8B1CCAF6C71465E5FD9B944DAB15969",
+      "current_sha256": "C9C31EA8BC4F53C1A08DA3B85FE2AB9EF2745D6C4364063946879D9A0C6DFB99",
+      "reason": "Regenerated documentation reference matrix.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "1263E768D10A3368635F3D7147FAF069CE3C6509319A4303D0BE5AF64FA37652",
+      "current_sha256": "7F69ADBE86777A466644F37575991D7175CA924F22DC03092312CA269AFECAC5",
+      "reason": "Activate the two bounded subpackages without closing their parents.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "AB5EF3D9301A20CE18F1960EBE71AA2D67A8B46D070D4502EF99E8C534C6B66B",
+      "current_sha256": "75447C32E56F83C8F401C3CD9F72393E0B66B1BDB0AC68635B7D502583CB6180",
+      "reason": "Advance repository fixed-point successor proof.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "722D1F42643D58EB759D25DCF43A4A70BC30F3B1D1544CAA0A19D1A31B75959E",
+      "current_sha256": "3889CD3D09E83CF14325848683A4CC8ADE007787AFEC984AD8506FA11EFC63F9",
+      "reason": "Append the characterization authority receipt to the chain.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "E789EF199DD6BDACA8DC07ADC1B5AD4A6C03FE3916C29AD7131E6EB60ABF4173",
+      "current_sha256": "0990BFF50BCAFBB8DA691B6FBE936A963310EABC4499C594BD60C07411E31FAD",
+      "reason": "Extend the existing repository command adapter.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "7DB08D0E445EAAFF35C3274229DEC48B3E3278A327445D1BE0C6C6707DF0FDE3",
+      "current_sha256": "D8E922A4E707140A1F18C9A4CD0FF9A91AF732CF55E8B61DD36E264F75F7E3E2",
+      "reason": "Recognize the characterization successor.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "8E496568CBDB826E838711A874181B229614997B01589F4B916BADE91CEB3F77",
+      "current_sha256": "674C7EF54575D6BCF4D87E1A0BDBC830F94E54D2A5B5C1626634AA19A38440D3",
+      "reason": "Expose characterization on the one public command surface.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "39D8173399E3F5520D562950B40D1815507D0F84ADBA7F2F34AE9122E8A86747",
+      "current_sha256": "CCD7F04AF657ED8FA992C92DC00F4896EBDABD8FED86CE6FEC59D3633F75B003",
+      "reason": "Bind the expanded post-release proof profile.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "EB99EC20090D893C6433E1F7ABAFA5A454C8F91E95F731C36BF5D601BC91816C",
+      "current_sha256": "605B10F4E158CFA35E8D45C1D3EE58662FCB6F568059A0879B6CA490C93A538A",
+      "reason": "Require the characterization authority successor.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "3ECD5B35F479D427A7FA65CF87E1450056D71DA989820B595448EFDC1AEAB158",
+      "current_sha256": "D7DC06568F32166EA813D16066FA97D5D3527F490135992F386CE54164EFE2E3",
+      "reason": "Register the executable characterization proof.",
+      "scope": "package-excluded-documentation-and-characterization",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0002.json",
+      "sha256": "B70B93AECB094F9BE2A7BB9D9A23A24FCB3AF60E1E7FE279C67542351CB1B5FF",
+      "hash_mode": "canonical-text-v1",
+      "role": "Accepted repository-only change authority."
+    },
+    {
+      "path": "contracts/repository/mir4-repository-characterization-authority-v1.schema.json",
+      "sha256": "18BE683D4C0DEDEFE66932E56EC03547B96279E95DCC7A51EA16C55EB3CD53FC",
+      "hash_mode": "canonical-text-v1",
+      "role": "Characterization authority contract."
+    },
+    {
+      "path": "contracts/repository/mir4-repository-characterization-bundle-v1.schema.json",
+      "sha256": "7983278A8F1F3B8FE44F7AE786EC399B1A2BB9E0315799DBF995FDC715178E0D",
+      "hash_mode": "canonical-text-v1",
+      "role": "Generated bundle contract."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json",
+      "sha256": "FD1DA820813B511BCC13AD1A3C47C5EF6527113CF9B8B785A3760B50848FE4EE",
+      "hash_mode": "canonical-text-v1",
+      "role": "Authority evolution receipt contract."
+    },
+    {
+      "path": "governance/repository/migrations/repository-characterization-v1.json",
+      "sha256": "797BC7EE4D6AC7639A549D65E78AAE2C6C394163CC680DF754ABC172485B23D0",
+      "hash_mode": "canonical-text-v1",
+      "role": "Canonical characterization migration authority."
+    },
+    {
+      "path": "docs/README.md",
+      "sha256": "3F8C1B1ABCB3C26860537B994466EFD7A3AB0BB0848151E6AAB995FFB7BAEED4",
+      "hash_mode": "canonical-text-v1",
+      "role": "Route MIR 4 documentation by reader and need."
+    },
+    {
+      "path": "docs/user/README.md",
+      "sha256": "8A8639EC578763A07A9D0FD106D1DE09B67F57AEEE638FA7EC905588B3BCB5C2",
+      "hash_mode": "canonical-text-v1",
+      "role": "Route current player documentation."
+    },
+    {
+      "path": "docs/maintainer/README.md",
+      "sha256": "15280303DE8E423A9BA6033215E4F6AF1196F4B184981BCF5B7F193C3B47B68C",
+      "hash_mode": "canonical-text-v1",
+      "role": "Route current maintainer procedures."
+    },
+    {
+      "path": "docs/reference/README.md",
+      "sha256": "7CA680C65355CF8D3E7B50DCEC7C6512A9E440AAC50204B654ABB999AFF4F975",
+      "hash_mode": "canonical-text-v1",
+      "role": "Route current exact reference material."
+    },
+    {
+      "path": "docs/tutorials/README.md",
+      "sha256": "56AC990AEC84D86A5B6A4137262B597F6D34CB37DA4B3D5453BBB197C8C1AC92",
+      "hash_mode": "canonical-text-v1",
+      "role": "Tutorial documentation route."
+    },
+    {
+      "path": "docs/how-to/README.md",
+      "sha256": "3A4CADD6EDC8086881888106E9FC0B8D60347F15C5FBADE175D06AAA1E541BD6",
+      "hash_mode": "canonical-text-v1",
+      "role": "How-to documentation route."
+    },
+    {
+      "path": "docs/explanation/README.md",
+      "sha256": "974753B0B794F85AC28073762A2A834FA2EE096396667B2CC59E9E779D8D5FB5",
+      "hash_mode": "canonical-text-v1",
+      "role": "Explanation documentation route."
+    },
+    {
+      "path": "docs/architecture/mir4-repository-characterization.md",
+      "sha256": "9D68197D81EB673865D5F225CD0362ECB1CE326D58B10026E7250C0F39D5E762",
+      "hash_mode": "canonical-text-v1",
+      "role": "Characterization boundary explanation."
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "sha256": "60C45DA03F9C9BAD5B4311D62360AF384FF03E297F328CB6966908CCF7ECB46A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Sole deterministic report writer."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1",
+      "sha256": "C7ACC55D37A002EC0C8C3F4D774EF72629446FBC8605263B8C937E4D45783DD9",
+      "hash_mode": "canonical-text-v1",
+      "role": "Bounded authority receipt writer."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "sha256": "3B53CA11C713812F3F36781F7E293597DAE5E12B55850EDD766BAB7EB58052B4",
+      "hash_mode": "canonical-text-v1",
+      "role": "Executable characterization proof."
+    }
+  ],
+  "characterization_proof": {
+    "manifest_sha256": "0487858EED9BD6D3020942DE567ADE6378E134850266D3D845E4425D7E9DFFE6",
+    "reports": 8,
+    "physical_files": 3903,
+    "authority_facts": 454,
+    "current_bindings": 288,
+    "writers": 16,
+    "readers": 49,
+    "bridges": 49,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "package_excluded_documentation_routed": true,
+    "declared_authorities_ingested": true,
+    "deterministic_reports": true,
+    "zero_unknown_paths": true,
+    "zero_duplicate_current_bindings": true,
+    "all_bridges_retained": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-05A-M42-00A-CHARACTERIZATION-COMPLETE-NO-PACKAGE-CUTOVER"
+}

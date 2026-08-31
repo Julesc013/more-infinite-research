@@ -2811,6 +2811,27 @@
       ]
     },
     {
+      "id": "static.mir4-repository-characterization-m42-00a",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/repository-fixed-point.json",
+        "governance/repository/migrations/**",
+        "contracts/repository/mir4-repository-characterization-*-v1.schema.json",
+        "tools/mir/application/repository/RepositoryCharacterization.ps1",
+        "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1",
+        "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/mir.ps1",
+        "docs/**",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",

@@ -354,7 +354,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludePostReleaseAutomationCutover,
     [switch]$IncludePostReleaseBranchOperatingModel,
     [switch]$IncludePostReleasePatchLaneRehearsal,
-    [switch]$IncludeM4103ChangeReleaseAuthority
+    [switch]$IncludeM4103ChangeReleaseAuthority,
+    [switch]$IncludeM4105AM4200ACharacterizationAuthority
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -476,6 +477,10 @@ function Get-MIR4PreFreezeAuthorityState {
   if ($IncludeM4103ChangeReleaseAuthority) {
     if (-not $IncludePostReleasePatchLaneRehearsal) { throw '[mir4-prefreeze-m41-03-requires-patch-lane-rehearsal]' }
     $links += @{path='releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json';kind='MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'}
+  }
+  if ($IncludeM4105AM4200ACharacterizationAuthority) {
+    if (-not $IncludeM4103ChangeReleaseAuthority) { throw '[mir4-prefreeze-m41-05a-m42-00a-requires-m41-03]' }
+    $links += @{path='releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json';kind='MIR4M4105AM4200ARepositoryCharacterizationAuthorityEvolutionV1'}
   }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
@@ -641,6 +646,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-Branch-Operating-Model-Authority-EvolutionV1.json';kind='MIR4BranchOperatingModelAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json';kind='MIR4PatchLaneRehearsalAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json';kind='MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'}
+    @{path='releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json';kind='MIR4M4105AM4200ARepositoryCharacterizationAuthorityEvolutionV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

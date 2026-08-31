@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mir.invalid/contracts/repository/mir4-repository-characterization-bundle-v1.schema.json",
+  "type": "object",
+  "required": ["schema","kind","programme_id","source","reports","summary","invariants","transition_gate"],
+  "properties": {
+    "schema": {"const":1},
+    "kind": {"const":"MIR4RepositoryCharacterizationBundleV1"},
+    "programme_id": {"const":"M41-05A-M42-00A"},
+    "source": {"type":"object","required":["repository_fixed_point_sha256","migration_count","package_source_sha256","root_readme_sha256"]},
+    "reports": {"type":"array","minItems":8,"items":{"type":"object","required":["name","kind","sha256","row_count"]}},
+    "summary": {"type":"object","required":["physical_files","authority_facts","current_bindings","writers","readers","bridges","package_files"]},
+    "invariants": {"type":"object","required":["unknown_paths","duplicate_current_bindings","package_source_unchanged","root_readme_byte_stable","deletion_authorized"]},
+    "transition_gate": {"type":"object","additionalProperties":{"const":false}}
+  },
+  "additionalProperties": false
+}
