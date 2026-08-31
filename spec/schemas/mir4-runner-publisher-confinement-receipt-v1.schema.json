@@ -52,7 +52,7 @@
       "additionalProperties": false,
       "required": ["path", "file_sha256", "actions", "generated_sources"],
       "properties": {
-        "path": {"const": ".mir/releases/governance/mir4/github-actions-lock-v2.json"},
+        "path": {"const": "governance/automation/github-actions-lock.json"},
         "file_sha256": {"$ref": "#/$defs/sha256"},
         "actions": {"type": "integer", "minimum": 1},
         "generated_sources": {"type": "integer", "minimum": 1}

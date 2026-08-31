@@ -31,7 +31,13 @@ Assert-MIR4RunnerThrows {
   Assert-MIR4CanonicalLfByteSequenceV1 -Bytes ([Text.Encoding]::UTF8.GetBytes("name: test`r`n")) -Path '<crlf-fixture>'
 } 'mir4-runner-workflow-crlf-negative'
 
-$lock = Get-Content -LiteralPath (Join-Path $repo '.mir/releases/governance/mir4/github-actions-lock-v2.json') -Raw | ConvertFrom-Json -Depth 30
+$lockPath = Join-Path $repo 'governance/automation/github-actions-lock.json'
+$lockSchemaPath = Join-Path $repo 'contracts/repository/mir-github-actions-lock-v1.schema.json'
+$lockText = Get-Content -LiteralPath $lockPath -Raw
+Assert-MIR4RunnerTest ($lockText | Test-Json -SchemaFile $lockSchemaPath) 'mir4-runner-current-action-lock-schema'
+$lock = $lockText | ConvertFrom-Json -Depth 30
+$historicalLockPath = Join-Path $repo ([string]$lock.supersedes.path)
+Assert-MIR4RunnerTest ((Get-FileHash -LiteralPath $historicalLockPath -Algorithm SHA256).Hash -ceq [string]$lock.supersedes.sha256) 'mir4-runner-historical-action-lock-immutable'
 Assert-MIR4RunnerThrows { Assert-MIR4ExternalActionReferenceV1 -Reference 'actions/checkout@v4' -Lock $lock } 'mir4-runner-floating-action-negative'
 $validate = [IO.File]::ReadAllText((Join-Path $repo '.github/workflows/validate.yml'))
 Assert-MIR4RunnerThrows { Assert-MIR4WorkflowTextBoundaryV1 -Purpose public-pr -Text ($validate + "`n    secret: `${{ secrets.RELEASE_TOKEN }}") } 'mir4-runner-public-secret-negative'

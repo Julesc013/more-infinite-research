@@ -115,7 +115,7 @@ jobs:
           if-no-files-found: warn
       - name: Attach required verification context to the immutable candidate
         if: always()
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         env:
           VALIDATION_OUTCOME: ${{ steps.validate.outcome }}
           CANDIDATE_SHA: ${{ inputs.terminal_candidate_sha }}

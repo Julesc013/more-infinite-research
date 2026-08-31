@@ -2526,7 +2526,7 @@
       "requires_factorio": false,
       "inputs": [
         ".mir/releases/governance/mir4/supply-chain.json",
-        ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+        "governance/automation/github-actions-lock.json",
         ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
         ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json",
         ".mir/targets.json",
@@ -2620,11 +2620,11 @@
       "inputs": [
         ".gitattributes",
         ".github/workflows/*.yml",
-        ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+        "governance/automation/github-actions-lock.json",
         ".mir/releases/governance/mir4/supply-chain.json",
         ".mir/modules.yml",
         ".mir/control/paths.yml",
-        "spec/schemas/mir4-github-actions-lock-v2.schema.json",
+        "contracts/repository/mir-github-actions-lock-v1.schema.json",
         "spec/schemas/mir4-supply-chain-authority-v1.schema.json",
         "spec/schemas/mir4-runner-publisher-confinement-receipt-v1.schema.json",
         "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",

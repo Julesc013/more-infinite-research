@@ -75,7 +75,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 8 | current-window |
 | docs/architecture/mir4-semantic-compiler.md | current | 2026-08-23 | 8 | current-window |
 | docs/architecture/mir4-target-compiler.md | current | 2026-08-28 | 3 | current-window |
-| docs/architecture/module-boundaries.md | current | 2026-08-28 | 3 | current-window |
+| docs/architecture/module-boundaries.md | current | 2026-08-31 | 0 | current-window |
 | docs/architecture/native-owner-binding.md | current | 2026-07-20 | 42 | current-window |
 | docs/architecture/procedural-compatibility-kernel.md | current | 2026-08-03 | 28 | current-window |
 | docs/architecture/README.md | current | 2026-08-08 | 23 | current-window |
@@ -186,7 +186,7 @@ Ages are measured against the newest governed review date, 2026-08-31, so checko
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-27 | 4 | current-window |
 | docs/maintainer/mir4-release-operations.md | current | 2026-08-26 | 5 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 11 | current-window |
-| docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-27 | 4 | current-window |
+| docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-31 | 0 | current-window |
 | docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-29 | 2 | current-window |
 | docs/maintainer/modpack-campaigns.md | current | 2026-08-03 | 28 | current-window |
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | current | 2026-08-03 | 28 | current-window |
