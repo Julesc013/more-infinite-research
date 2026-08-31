@@ -24,7 +24,7 @@ $script:MIRTerminalActionPinsV2 = [ordered]@{
   'actions/cache/save' = [pscustomobject]@{ tag = 'v4'; sha = '0057852bfaa89a56745cba8c7296529d2fc39830' }
   'actions/checkout' = [pscustomobject]@{ tag = 'v4'; sha = '11d5960a326750d5838078e36cf38b85af677262' }
   'actions/download-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'd3f86a106a0bac45b974a628896c90dbdf5c8093' }
-  'actions/github-script' = [pscustomobject]@{ tag = 'v7'; sha = 'f28e40c7f34bde8b3046d885e986cb6290c5673b' }
+  'actions/github-script' = [pscustomobject]@{ tag = 'v9'; sha = '3a2844b7e9c422d3c10d287c895573f7108da1b3' }
   'actions/upload-artifact' = [pscustomobject]@{ tag = 'v4'; sha = 'ea165f8d65b6e75b540449e92b4886f43607fa02' }
 }
 
