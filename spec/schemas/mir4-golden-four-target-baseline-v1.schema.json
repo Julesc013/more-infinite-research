@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/mir4-golden-four-target-baseline-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "source_release", "inputs", "targets", "classification", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4GoldenFourTargetBaselineV1"},
+    "status": {"const": "accepted-byte-structure-and-identity-baseline-runtime-replay-required-before-cutover"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "source_release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "commit", "tree"],
+      "properties": {
+        "tag": {"const": "v4.0.0"},
+        "commit": {"$ref": "#/$defs/git"},
+        "tree": {"$ref": "#/$defs/git"}
+      }
+    },
+    "inputs": {"type": "array", "minItems": 4, "items": {"$ref": "#/$defs/input"}},
+    "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/target"}},
+    "classification": {"$ref": "#/$defs/classification"},
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_archive_bytes_bound", "every_archive_entry_inventoried", "all_paths_classified", "overlays_are_byte_deltas_not_full_target_copies", "package_source_unchanged", "version_allocated"],
+      "properties": {
+        "exact_archive_bytes_bound": {"const": true},
+        "every_archive_entry_inventoried": {"const": true},
+        "all_paths_classified": {"const": true},
+        "overlays_are_byte_deltas_not_full_target_copies": {"const": true},
+        "package_source_unchanged": {"const": true},
+        "version_allocated": {"const": false}
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_move", "package_cutover", "old_writer_retirement", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "source_move": {"const": false},
+        "package_cutover": {"const": false},
+        "old_writer_retirement": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha"}
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "git": {"type": "string", "pattern": "^[A-F0-9]{40}$"},
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha"}}
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "stringArray": {"type": "array", "items": {"type": "string"}},
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lifecycle_entrypoints", "setting_paths", "locale_paths", "asset_paths", "migration_paths", "runtime_paths", "stable_stream_ids", "stable_technology_ids", "setting_ids", "state_namespaces"],
+      "properties": {
+        "lifecycle_entrypoints": {"$ref": "#/$defs/stringArray"},
+        "setting_paths": {"$ref": "#/$defs/stringArray"},
+        "locale_paths": {"$ref": "#/$defs/stringArray"},
+        "asset_paths": {"$ref": "#/$defs/stringArray"},
+        "migration_paths": {"$ref": "#/$defs/stringArray"},
+        "runtime_paths": {"$ref": "#/$defs/stringArray"},
+        "stable_stream_ids": {"$ref": "#/$defs/stringArray"},
+        "stable_technology_ids": {"$ref": "#/$defs/stringArray"},
+        "setting_ids": {"$ref": "#/$defs/stringArray"},
+        "state_namespaces": {"$ref": "#/$defs/stringArray"}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "target_id", "factorio_line", "support_tier", "release_blocking", "distribution_target_code", "distribution_version", "distribution_tag", "predecessor", "exact_engine", "archive", "info", "identity_surface", "entries", "runtime_proof"],
+      "properties": {
+        "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "target_id": {"type": "string"},
+        "factorio_line": {"type": "string"},
+        "support_tier": {"type": "string"},
+        "release_blocking": {"type": "boolean"},
+        "distribution_target_code": {"type": "string", "pattern": "^[0-9]{3}$"},
+        "distribution_version": {"type": "string"},
+        "distribution_tag": {"type": "string"},
+        "predecessor": {"type": "string"},
+        "exact_engine": {"type": "object"},
+        "archive": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "root", "sha256", "content_sha256", "bytes", "entry_count"],
+          "properties": {
+            "path": {"type": "string"},
+            "root": {"type": "string"},
+            "sha256": {"$ref": "#/$defs/sha"},
+            "content_sha256": {"$ref": "#/$defs/sha"},
+            "bytes": {"type": "integer"},
+            "entry_count": {"type": "integer"}
+          }
+        },
+        "info": {"type": "object"},
+        "identity_surface": {"$ref": "#/$defs/surface"},
+        "entries": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/entry"}},
+        "runtime_proof": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["release_state", "fresh_load_reload_upgrade_replay", "historical_release_proof_may_not_substitute_for_fresh_4_1_qualification"],
+          "properties": {
+            "release_state": {"const": "published-immutable-baseline"},
+            "fresh_load_reload_upgrade_replay": {"const": "required-before-package-authority-cutover"},
+            "historical_release_proof_may_not_substitute_for_fresh_4_1_qualification": {"const": true}
+          }
+        }
+      }
+    },
+    "entryArray": {"type": "array", "items": {"$ref": "#/$defs/entry"}},
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "common", "families", "targets", "reconstruction"],
+      "properties": {
+        "algorithm": {"const": "byte-identical-maximal-four-target-common-then-family-common-then-target-overlay-v1"},
+        "common": {"$ref": "#/$defs/entryArray"},
+        "families": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["modern", "legacy"],
+          "properties": {"modern": {"$ref": "#/$defs/entryArray"}, "legacy": {"$ref": "#/$defs/entryArray"}}
+        },
+        "targets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["f210", "f200", "f110", "f100"],
+          "properties": {
+            "f210": {"$ref": "#/$defs/entryArray"},
+            "f200": {"$ref": "#/$defs/entryArray"},
+            "f110": {"$ref": "#/$defs/entryArray"},
+            "f100": {"$ref": "#/$defs/entryArray"}
+          }
+        },
+        "reconstruction": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["f210", "f200", "f110", "f100"],
+          "properties": {
+            "f210": {"type": "array", "minItems": 3, "maxItems": 3},
+            "f200": {"type": "array", "minItems": 3, "maxItems": 3},
+            "f110": {"type": "array", "minItems": 3, "maxItems": 3},
+            "f100": {"type": "array", "minItems": 3, "maxItems": 3}
+          }
+        }
+      }
+    }
+  }
+}

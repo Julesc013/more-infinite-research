@@ -2481,6 +2481,11 @@
         "tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1",
         "contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json",
         "releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json",
+        "tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority.ps1",
+        "contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json",
+        "releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json",
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/schemas/mir4-golden-four-target-baseline-v1.schema.json",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "tools/lib/mir4/ReleasePhaseEngine.ps1",
         "tools/lib/mir4/ReleaseAdapters.ps1",
@@ -2835,6 +2840,31 @@
         "docs/**",
         "spec/programmes/mir4-4x-operating-programme-v1.json",
         "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+        "package-source"
+      ]
+    },
+    {
+      "id": "static.mir4-golden-four-target-baseline-m41-f1",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/distributions.json",
+        ".mir/targets.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+        "dist/more-infinite-research_4.0.10000.zip",
+        "dist/more-infinite-research_4.0.11000.zip",
+        "dist/more-infinite-research_4.0.20000.zip",
+        "dist/more-infinite-research_4.0.21000.zip",
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/schemas/mir4-golden-four-target-baseline-v1.schema.json",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/GoldenTargetBaselines.ps1",
+        "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
         "package-source"
       ]
     },

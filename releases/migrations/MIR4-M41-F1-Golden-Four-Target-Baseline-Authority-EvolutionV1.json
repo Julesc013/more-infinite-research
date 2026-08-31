@@ -1,0 +1,245 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F1GoldenFourTargetBaselineAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T10:07:23.1047532+10:00",
+  "programme_id": "M41-F1-GOLDEN-FOUR-TARGET-BASELINE",
+  "change_id": "MIR4-CHG-2026-0004",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json",
+    "sha256": "0CED3F46BFEEBD48F96E169B4591DC6E3894EC8226C19CEE71D3269809A8568C"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "b911f8e3c29ff9bbefdb297a4ffb4913f12d07b2",
+    "tree": "885ca746ff244d539ad5fa880041bb2e3835ad9a"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "747C39DC15845E8073DF75FE897EBE771F840B792384ECF3EDDC9DE9AEE547EE",
+      "current_sha256": "4A73D9FFC80B38DC16FD713ABB239E33AE721EA213F10138CAAC160467E1E2DD",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control-plane/ownership.json",
+      "previous_sha256": "EB460AD463495C3B6D2DE4DD843C54AB6D63D7781CBE34126329D7AC6EC557CF",
+      "current_sha256": "75B2EAC188965540DE0CC3CB68A59E8969ED7B3F2351EADC5D1688543C940F20",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "11916621DB9D7B1349D95B6CF4957D59487654116666711E26E5104FA68E754E",
+      "current_sha256": "35226F77837FBFB2CC682DE7B431F6D67057AA295F4A893ECA86E572F34321EB",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "4AD222086BE9FFBB7A5E6D20B45BF53DF78090762EAB9604E38D91566FC4409B",
+      "current_sha256": "B75CC4CD846F9823EE5B9449EBA39B11DA35D35C7012EB07AD518A14AEB5C19E",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "16FE46F6D9C6F07012BB3975D86A685FD475981446D78FF7D3F981B0F763596A",
+      "current_sha256": "CBEB0BD5122DEBA7530472522B821380D319E9678CB7E2C35FA510F365FC3C57",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "34FD2EE4A1C175F3535A0E710E4E850453AC98C3AA9CE064F4FC956E4907D97B",
+      "current_sha256": "E128343F89222A0CA3DDD5C4E2D22D915E8B257CA89EC91BCFC5B59B94DFC2C8",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "AC505A22F5571FE0BB50115C9B11C41C5520F1AD79632C6156DA8964945712E1",
+      "current_sha256": "D3CF9F04142F0E535A3E7AA51A17A802720A8E58AA8E73B57BE2B4E6500A1462",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "EA1171FA250ECA14CA7F585FF51DD1FFB85D720EB37EC27894052199FEEA57E2",
+      "current_sha256": "6E4685D764D644BDF198CF9FD63DCB8E0FA3568844AED499139B6E0C913CC493",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "668034E6F1D3FA6B06873C50ED3D0DD3BA9C06F7DADDFA8279961D1D5F7CC040",
+      "current_sha256": "510B1C222B170828FA4B7544D0D298FFEB888C8D0A1932F81E69C58E97D4A1C1",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "71F3DFEE52CBB45B3326BB025FFB496FF6F63B4F8EC86ACA44E2289E085CB984",
+      "current_sha256": "25254E03C5C26C45C40244CCF9C4E1C9158D82502FFA0D3D36E823CB9CFF70A1",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "CCD7F04AF657ED8FA992C92DC00F4896EBDABD8FED86CE6FEC59D3633F75B003",
+      "current_sha256": "1A7E57FA2A922D11CBD2404F13E84EA0D5A509A809FF58C819EA6BD8AE9E75FA",
+      "reason": "Register the package-excluded golden four-target archive baseline and byte-exact reconstruction proof.",
+      "scope": "package-excluded-golden-baseline",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0004.json",
+      "sha256": "B89880613DE62DC232B03ADA10396E14FCE9A0F2D2BFF81580C99B1B2BC3A2AE",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json",
+      "sha256": "05E61E518BB6E24A8340A036DE342C5FFDE998ACB140F3988FC5BB640C6770C6",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+      "sha256": "98C83FA4C3E59419B258C42598BFAFC695C947644508FAB42656F4B19AF9415B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "spec/schemas/mir4-golden-four-target-baseline-v1.schema.json",
+      "sha256": "78EF52B452A74477C76F81A01D079150621DA784DDBAEB61DEC6D1D99E56AD93",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority.ps1",
+      "sha256": "0EC6868164192CB6ECB183C30F108D590823594D8CDCC6D33E25DCB19B386675",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "tools/mir/application/package/GoldenTargetBaselines.ps1",
+      "sha256": "EEBD03566B7D15093D335C16BC9233010FAC2D87A4F32272D69DB8CEC1715168",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+      "sha256": "9FAD48F7EF8F48C4C1485047A37197210C19861476299C22CFC69464350E8F8C",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
+      "sha256": "AECB158989891C5B0BD005A51885A2D4C7DF0046049C17ED1F3F40852B7C62AE",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded golden four-target archive baseline authority, implementation, or proof."
+    }
+  ],
+  "baseline_proof": {
+    "baseline_record_sha256": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A",
+    "baseline_authority_sha256": "98C83FA4C3E59419B258C42598BFAFC695C947644508FAB42656F4B19AF9415B",
+    "source_changelog_sha256": "CBEB0BD5122DEBA7530472522B821380D319E9678CB7E2C35FA510F365FC3C57",
+    "target_count": 4,
+    "common_files": 89,
+    "modern_family_files": 202,
+    "legacy_family_files": 81,
+    "target_overlays": {
+      "f210": 14,
+      "f200": 12,
+      "f110": 4,
+      "f100": 4
+    },
+    "archives": [
+      {
+        "target": "f210",
+        "version": "4.0.21000",
+        "archive_sha256": "38541A7ED0A4181811A1E94231FF58A1268F91E7B89C7CA3D9D5F682242094B1",
+        "content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+        "entry_count": 305,
+        "bytes": 1069552
+      },
+      {
+        "target": "f200",
+        "version": "4.0.20000",
+        "archive_sha256": "5C0E299D78C4EE545958448DAE48D87BE5FE1B959875D4CB93A264D95D3DB0AE",
+        "content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+        "entry_count": 303,
+        "bytes": 1067014
+      },
+      {
+        "target": "f110",
+        "version": "4.0.11000",
+        "archive_sha256": "BE63F76255068BAC1BA891B9C9331E4EA943538A37808DFF546E5B1A3ECEB62D",
+        "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+        "entry_count": 174,
+        "bytes": 399073
+      },
+      {
+        "target": "f100",
+        "version": "4.0.10000",
+        "archive_sha256": "EA495B37C0B91F0728226290CDAEFDF4BBD3C1DBA7D0997AAF5E5107FE79AD3F",
+        "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+        "entry_count": 174,
+        "bytes": 399073
+      }
+    ],
+    "physical_files": 3921,
+    "unknown_paths": 0,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "four_archives_exact": true,
+    "classification_complete": true,
+    "reconstruction_byte_exact": true,
+    "stable_identity_surface_captured": true,
+    "runtime_replay_pending": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F1-GOLDEN-FOUR-TARGET-ARCHIVE-BASELINE-COMPLETE-RUNTIME-REPLAY-PENDING"
+}

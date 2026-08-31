@@ -24,7 +24,8 @@
     "changes/history/4.0.0/MIR4-HIST-4000-0004.json",
     "changes/unreleased/MIR4-CHG-2026-0001.json",
     "changes/unreleased/MIR4-CHG-2026-0002.json",
-    "changes/unreleased/MIR4-CHG-2026-0003.json"
+    "changes/unreleased/MIR4-CHG-2026-0003.json",
+    "changes/unreleased/MIR4-CHG-2026-0004.json"
   ],
   "copy": {
     "outcome": "This historical source-family plan generates the canonical source changelog from released and accepted change facts without allocating a new version.",
