@@ -53,7 +53,7 @@
     {
       "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
       "previous_sha256": "F54D62F3654E448A1E1AA6DF9224D756B9E1F85915E76370AADF4FB5D04C58DC",
-      "current_sha256": "A936E74605DE985E35079747481DE58850E1C43ACE71D99E32AB34F55E133CCB",
+      "current_sha256": "721F11930F60B889C7453A1BA12E88096D792C737504DB3FEB6B1EC5AEE3BCAE",
       "reason": "Bind release-adapter proof to the protected PR base while retaining exact-tree detached-mirror portability.",
       "scope": "package-excluded-maintenance-rehearsal",
       "package_visible": false,

@@ -40,9 +40,16 @@ try{
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $developmentPlanPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $developmentPlan=Get-Content -Raw -LiteralPath (Join-Path $repo $developmentPlanPath)|ConvertFrom-Json -Depth 100
+$simulationSourceCommit=(& git -C $repo rev-parse HEAD).Trim()
+if($baseBranch-cne'main'){
+  $mainSimulationCommit=(& git -C $sourceRepo rev-parse --verify refs/remotes/origin/main 2>$null).Trim()
+  if($mainSimulationCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-t05-main-simulation-source]'}
+  $simulationSourceCommit=$mainSimulationCommit
+}
+$simulationSourceTree=(& git -C $sourceRepo rev-parse "$simulationSourceCommit^{tree}").Trim()
 $inputs=[pscustomobject][ordered]@{
   source_release_record='.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
-  candidate_id='DEV-T05-UNALLOCATED';source_commit=(& git -C $repo rev-parse HEAD).Trim();source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+  candidate_id='DEV-T05-UNALLOCATED';source_commit=$simulationSourceCommit;source_tree=$simulationSourceTree
   target_distribution_record_set=$developmentPlanPath;release_plan_digest=[string]$developmentPlan.verification_plan.plan_sha256
   proof_root='build/mir4/release-phase-engine/tests/t05-proof';seal_root='not-allocated'
 }
