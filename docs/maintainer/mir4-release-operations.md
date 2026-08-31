@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-26
+last_reviewed: 2026-08-31
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -24,15 +24,15 @@ Protected signing/recovery acceptance records the approved signer identity, publ
 
 ## Freeze through restore
 
-1. Freeze one exact `main` commit/tree after explicit authorization; verify the retained `dev` mirror has the same tree.
-2. Allocate M4RC1 and build F210/F200 plus preview assets once.
+1. For a minor or major release, freeze one exact `dev` commit/tree after explicit authorization. For a patch or hotfix, freeze one exact `main` commit/tree. Record the source lane and base explicitly.
+2. Allocate the candidate only after freeze and build F210/F200 plus any authorized preview assets once.
 3. Qualify exact packages: fresh load, predecessor upgrade, repeated reload, settings, research, migrations, canaries, performance, package exclusion, and deterministic reproduction.
 4. Obtain independent aggregate verification.
 5. Seal exact bytes with protected signing and append the release ledger.
-6. Verify the frozen `main` commit is unchanged, create governed signed tags, and publish target-specific assets.
+6. For a minor or major release, promote the exact sealed `dev` candidate to `main`; for a patch or hotfix, verify the frozen `main` commit is unchanged. Then create governed signed tags and publish target-specific assets.
 7. Redownload public bytes and compare hash, size, archive root, metadata, signature, and smoke result.
 8. Restore offline from preserved source, tools, locks, and assets; compare to the public seal.
 
 An outage pauses at the current event. Resume with the same event identity and bytes. A defect after seal creates a new candidate; it never modifies the seal.
 
-For branch and PR cleanup, every merged work package ends with remote `main` and `dev` on the same tree, local `dev == origin/dev`, divergence `0/0`, and a clean worktree.
+For branch and PR cleanup, every merged work package ends with the protected target branch read back exactly, all required forward-port or promotion dispositions recorded, and the active local branch clean and equal to its remote. `main` and `dev` are expected to diverge during next-release development.

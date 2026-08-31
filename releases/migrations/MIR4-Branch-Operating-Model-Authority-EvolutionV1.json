@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "kind": "MIR4BranchOperatingModelAuthorityEvolutionV1",
+  "recorded_at": "2026-08-31T20:20:00+10:00",
+  "programme_id": "M41-06-BRANCH-OPERATING-MODEL",
+  "change_id": "MIR4-BRANCH-OPERATING-MODEL-2026-08-31",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json",
+    "sha256": "40B660FED308DB5A947D4CCF126AC3A4A2B32A8F0182CEF52003A6950F911C3F"
+  },
+  "base": {
+    "branch": "main",
+    "commit": "831daa2552f7f3c4820f7fcad24653da15995b7b",
+    "tree": "250c9846299782a711862895fe97803bcfb5b816"
+  },
+  "evolved_bindings": [
+    {
+      "path": "AGENTS.md",
+      "previous_sha256": "ADE50F2DCE7881BCAAE56A71EE02502B9E61BB8F70E689DC1C16A3303BDFA889",
+      "current_sha256": "6D94C0A9F2E2909297327500FE9D5B4520719F2226F6B3D45206FB66154C4350",
+      "reason": "Replace exact-tree mirror completion guidance with branch-local readback and explicit cross-lane dispositions.",
+      "scope": "package-excluded-branch-governance",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "previous_sha256": "56876867585EB3A0FDCE6BBE4218B86283A996B5F5968D6700CAB1A134C13B71",
+      "current_sha256": "C66FCE8BFCE0D3E3EF97E949F90F3C11EE8926522CFCCA7D21BD70ABEBBA5EFB",
+      "reason": "Route latest-stable corrections to main and next-minor or next-major development to dev.",
+      "scope": "package-excluded-branch-governance",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/maintainer/mir4-release-operations.md",
+      "previous_sha256": "42E967AAEA95B1B2D364F9743E5C816CA8A8D54D1B143B6E6D469E5F9A0807CE",
+      "current_sha256": "4A57E9808777D86EFF2A8EDFE077242E417DC9CAF5EB180B0C0FCF7D8A7E5961",
+      "reason": "Separate stable patch freeze from dev release freeze and exact qualified promotion.",
+      "scope": "package-excluded-branch-governance",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": ".mir/branches.yml",
+      "sha256": "48074A7ABEADB3174182A09E726F29DE99C07D94249B9B571F1CE34150DD9A02",
+      "hash_mode": "canonical-text-v1",
+      "role": "branch-routing-authority"
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "sha256": "75EC40DEB205A046E9FF26FB35174608F7B3ABA1FAD7F5B1EBF7EF3700EB23F7",
+      "hash_mode": "canonical-text-v1",
+      "role": "human-operating-programme-view"
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "sha256": "73ADC61E119E3EB4F0243D1E94DF01890363B552B4BC8FA4A08B301770C550A9",
+      "hash_mode": "canonical-text-v1",
+      "role": "machine-operating-programme-authority"
+    },
+    {
+      "path": "validation/tests/release/Test-MIRBranchPolicy.ps1",
+      "sha256": "84C71FB6B1DAD4AD149BE7CDA1211C82E1A427DEB3329F3439339016FF3780EC",
+      "hash_mode": "canonical-text-v1",
+      "role": "branch-routing-static-gate"
+    },
+    {
+      "path": "spec/schemas/mir4-ruleset-snapshot-v1.schema.json",
+      "sha256": "32776AF62AA0373B2EFA5C12D616DBE6BD2D703E3B9FB5A3821A0C882DDE3851",
+      "hash_mode": "canonical-text-v1",
+      "role": "remote-ruleset-readback-contract"
+    },
+    {
+      "path": "contracts/repository/mir4-branch-operating-model-authority-evolution-v1.schema.json",
+      "sha256": "03D53C3AA1E3C87880D3BCCD016F43C2069630BDD08C01A46C5012F5CA574DE2",
+      "hash_mode": "canonical-text-v1",
+      "role": "branch-authority-evolution-contract"
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4BranchOperatingModelAuthority.ps1",
+      "sha256": "6DC1BBA2CB65C847CCB86CBFD46E499C6E5E147D45E91D3DF2297900274F059F",
+      "hash_mode": "canonical-text-v1",
+      "role": "bounded-branch-authority-writer"
+    },
+    {
+      "path": "releases/governance/mir4-ruleset-snapshot-2026-08-31.json",
+      "sha256": "359A024D667E24AE36CEA054A33F29BF88574B6530C167B8C4D3F43EB3A840BC",
+      "hash_mode": "canonical-text-v1",
+      "role": "remote-ruleset-application-readback"
+    }
+  ],
+  "remote_ruleset_snapshot": {
+    "path": "releases/governance/mir4-ruleset-snapshot-2026-08-31.json",
+    "sha256": "359A024D667E24AE36CEA054A33F29BF88574B6530C167B8C4D3F43EB3A840BC",
+    "hash_mode": "canonical-text-v1",
+    "captured_at": "2026-08-31T20:17:00+10:00",
+    "authoritative_for_remote_current_state": false
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "package_visible_delta": [],
+  "invariants": {
+    "main_latest_stable": true,
+    "dev_next_release_integration": true,
+    "release_4_0_maintenance": true,
+    "pull_requests_required": true,
+    "linear_history_required": true,
+    "ordinary_bypass_actor_count": 0,
+    "package_source_unchanged": true,
+    "gameplay_difference_authorized": false
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "BRANCH-OPERATING-MODEL-APPLIED-NO-RELEASE-TRANSITION"
+}
