@@ -172,7 +172,7 @@ if([string]$branchOperatingModel.kind-cne'MIR4BranchOperatingModelAuthorityEvolu
 $patchLaneRehearsal=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100
 if([string]$patchLaneRehearsal.kind-cne'MIR4PatchLaneRehearsalAuthorityEvolutionV1'-or
    [string]$patchLaneRehearsal.status-cne'PATCH-LANE-REHEARSAL-PROVED-NO-RELEASE-TRANSITION'-or
-   @($patchLaneRehearsal.evolved_bindings).Count-ne4-or
+   @($patchLaneRehearsal.evolved_bindings).Count-ne5-or
    @($patchLaneRehearsal.current_authorities).Count-lt21-or
    [string]$patchLaneRehearsal.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
    -not[bool]$patchLaneRehearsal.invariants.release_4_0_base_exact-or

@@ -32,8 +32,8 @@
     },
     "evolved_bindings": {
       "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
+      "minItems": 5,
+      "maxItems": 5,
       "items": {"$ref": "#/$defs/evolved"}
     },
     "current_authorities": {
@@ -79,7 +79,7 @@
       "additionalProperties": false,
       "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
       "properties": {
-        "path": {"enum": [".mir/control/repository-fixed-point.json", "docs/releases/mir4-post-4.0-roadmap.md", "spec/programmes/mir4-4x-operating-programme-v1.json", "tools/mir.ps1"]},
+        "path": {"enum": [".mir/control/repository-fixed-point.json", "docs/releases/mir4-post-4.0-roadmap.md", "spec/programmes/mir4-4x-operating-programme-v1.json", "tools/mir.ps1", "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1"]},
         "previous_sha256": {"$ref": "#/$defs/sha256"},
         "current_sha256": {"$ref": "#/$defs/sha256"},
         "reason": {"type": "string", "minLength": 20},

@@ -44,6 +44,7 @@ $evolvedRoles = [ordered]@{
   'docs/releases/mir4-post-4.0-roadmap.md' = 'Record the unpublished maintenance-lane proof and keep M40 active for real corrections.'
   'spec/programmes/mir4-4x-operating-programme-v1.json' = 'Correct the protected stable-to-dev convergence outcome while preserving the accepted roadmap.'
   'tools/mir.ps1' = 'Expose the typed patch-lane rehearsal through the one supported MIR command surface.'
+  'validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1' = 'Bind release-adapter proof to the protected PR base while retaining exact-tree detached-mirror portability.'
 }
 $evolved = [Collections.Generic.List[object]]::new()
 foreach ($entry in $evolvedRoles.GetEnumerator()) {

@@ -49,6 +49,15 @@
       "scope": "package-excluded-maintenance-rehearsal",
       "package_visible": false,
       "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "F54D62F3654E448A1E1AA6DF9224D756B9E1F85915E76370AADF4FB5D04C58DC",
+      "current_sha256": "A936E74605DE985E35079747481DE58850E1C43ACE71D99E32AB34F55E133CCB",
+      "reason": "Bind release-adapter proof to the protected PR base while retaining exact-tree detached-mirror portability.",
+      "scope": "package-excluded-maintenance-rehearsal",
+      "package_visible": false,
+      "release_authority": false
     }
   ],
   "current_authorities": [
@@ -90,7 +99,7 @@
     },
     {
       "path": "contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json",
-      "sha256": "19BC4F662F51B66B51372E4A1737ED7174CD4B90A2A3E4D901CE60DEA3AC67E3",
+      "sha256": "1133160C27D7461B8228CB16E693126A1CB671B105CCD8D4803428507A254F47",
       "hash_mode": "canonical-text-v1",
       "role": "patch-rehearsal-authority-contract"
     },
@@ -138,7 +147,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1",
-      "sha256": "58C6A36E766848C0F3D500766D3D6B9D72C72F8114D1BBD90948B1B6E1771982",
+      "sha256": "0B7CCC8A7D4ED085B14F286EBBDE7D0BC1F25BA79EE4514D168DDD6A82E0F4D0",
       "hash_mode": "canonical-text-v1",
       "role": "bounded-patch-authority-writer"
     },
@@ -168,7 +177,7 @@
     },
     {
       "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
-      "sha256": "B613F67E85D279D384E92BA5ABABB5C88C941AC986DEC36CEE57A96112FB5315",
+      "sha256": "4B66171592A90EE1813293125444D285F3F6D3DEA44CA9741D24D9C361B22297",
       "hash_mode": "canonical-text-v1",
       "role": "authority-chain-regression-proof"
     },
