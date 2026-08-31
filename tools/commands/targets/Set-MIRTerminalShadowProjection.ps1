@@ -256,7 +256,7 @@ jobs:
   verify:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
       - name: Build deterministic terminal shadow archive
@@ -306,7 +306,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $text = $text.Replace("--target $([string]$Target.factorio_line) --plan", "--target $([string]$Target.factorio_line) --candidate '$archive' --plan")
 
   $checkout = @'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
 '@.TrimEnd()
@@ -321,7 +321,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   if (-not $text.Contains("Build deterministic terminal shadow archive")) {
     $text = $text.Replace($checkout, $checkoutWithBuild.TrimEnd())
     $conditionalCheckout = @'
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         if: ${{ matrix.no_op != true }}
         with:
           fetch-depth: 0
