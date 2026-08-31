@@ -51,6 +51,11 @@ $facadeRoot = 'build/results/validation/m41-03/facade'
 $facade = & (Join-Path $repo 'tools/mir.ps1') mir4 release-narratives render --plan 'fixtures/release/m41-03/plans/synthetic-f210-patch.json' --output $facadeRoot 2>&1 | Out-String
 Assert-MIR4NarrativeTestV1 ($facade -match 'MIR4ReleaseNarrativeResultV1') 'mir4-release-narrative-facade'
 
+$sourceProjection = Update-MIR4SourceChangelogV1 -RepoRoot $repo -PlanPath 'releases/governance/MIR4-Source-Changelog-PlanV1.json' -Check
+$sourceText = [IO.File]::ReadAllText((Join-Path $repo 'CHANGELOG.md'))
+Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -match '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
+Assert-MIR4NarrativeTestV1 ($sourceText -match 'complete physical and executable foundation') 'mir4-source-changelog-accepted-inventory'
+
 $bad = Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/release/m41-03/changes/synthetic-f210-patch.json') | ConvertFrom-Json -Depth 100
 $bad.target_dispositions[0].disposition = 'unknown'
 try { Assert-MIR4NarrativeFragmentV1 -Fragment $bad; throw '[mir4-release-narrative-unknown-accepted]' } catch { Assert-MIR4NarrativeTestV1 ($_.Exception.Message -match 'unknown-target') 'mir4-release-narrative-unknown-blocks-freeze' }

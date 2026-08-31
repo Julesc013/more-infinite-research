@@ -1,0 +1,429 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F0TruthReconciliationAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T13:00:00+10:00",
+  "programme_id": "M41-F0-TRUTH-RECONCILIATION",
+  "change_id": "MIR4-CHG-2026-0003",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json",
+    "sha256": "1D5F3F67701DB9F1281B6FA376D031AD7513118259FACF25DEAC82DD66CD8FBF"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "e727203fca888994aa3fff2a2463be77d3620b45",
+    "tree": "8a06a73d624705beb8963e7b007a85093587c3c5"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".gitattributes",
+      "previous_sha256": "A68B08FA62D96649F2D35C21C3B53ADC247E69992BD2877C91B09BA459DB0350",
+      "current_sha256": "07B9785D013F7ACE79FBDBAAD761C255A5F29FED11985DE8E2FB3BED19B1D9A1",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "C7D78CF35F8D5905087B15505B764C8748D5070A5E735BFC4D28C111DC73B47C",
+      "current_sha256": "747C39DC15845E8073DF75FE897EBE771F840B792384ECF3EDDC9DE9AEE547EE",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control-plane/ownership.json",
+      "previous_sha256": "3CB281477E43E28B185BDB7E22F926D7C475B0781FF3F732C056CEDA25984E5A",
+      "current_sha256": "EB460AD463495C3B6D2DE4DD843C54AB6D63D7781CBE34126329D7AC6EC557CF",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "5080FB56FB24C5FCCD9C57E21AAE06740B0977898447B115BD90301DB79D177D",
+      "current_sha256": "11916621DB9D7B1349D95B6CF4957D59487654116666711E26E5104FA68E754E",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "BB10C8A975AFE82FB5E067F546B8F3ACC343B5D9510588485415FBFB615709F7",
+      "current_sha256": "2DC9E2A3781177650E85CF97AC9506AC5C9BADEEB4BC043E1DD6CB58047BF825",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "7BAEBBDCAD5DA87334B34231B4692BABF440439E02F2FA73CEC2F7C35120CD37",
+      "current_sha256": "4AD222086BE9FFBB7A5E6D20B45BF53DF78090762EAB9604E38D91566FC4409B",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/mir4-change-and-release-authority.md",
+      "previous_sha256": "9D7172B199ECFA467895284CD86F3629F99C79895217D8DB4F95942B393AAA15",
+      "current_sha256": "E5B58BB002E45F28D0109808E2A69F04CD060FC350C29A94858DF44C2282B214",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "8139FDC78280FC869CF979966979D97D21E04CA9BC3010A363FD7FB578E68B34",
+      "current_sha256": "390EE008806FE31B606F749812AA23FA0016D10254C2F7804BCCE98103D47E97",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "FD9000A482CA970A5F4F2D317C86D96DB2282D9592D3E12E7B72C96510324EA3",
+      "current_sha256": "72CCD0B8A5A8460477EB28BBBE84D57FCFF14595F6FA45FC882980169F33D29B",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "02708FD9C9E3E279776350E8373A7889D71A13BD4DA49F55A956AA636AD56E11",
+      "current_sha256": "178B932C8046E22DA2690DF465ECE04496A1B0CB5AB16DEA9BE21B3F71FD308C",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "13EA02EDC9F7C6DA1FEC91B994FCB6F9916AAFAA6D54FD560EBA84ABF1245FC2",
+      "current_sha256": "186855E2489D089C5C50A85568B466F2128D8DE0166EEA993C10DD0EBF11BB88",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "C9C31EA8BC4F53C1A08DA3B85FE2AB9EF2745D6C4364063946879D9A0C6DFB99",
+      "current_sha256": "65E5B1E155D2F0944F86D292366E65042616CEB9839C22522999CAEAAC4C5757",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "8E19233A1426D91289810C1D71C69CB3784766A68A69D87118493B2D7A241937",
+      "current_sha256": "8683DBCD0BEC1A7632555C81F762018C9B62418DBBC6D4BFD21065464E046E70",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "3A140C3E75BE3BFB99329BD0FEA96BEC6406A7DDFE34E47A7631F0E19F3A459A",
+      "current_sha256": "F5F2FAC497B404DA410F0750AF97DBF334D6E1AEFB2584EFB7918FBFE88A3DEE",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "7F69ADBE86777A466644F37575991D7175CA924F22DC03092312CA269AFECAC5",
+      "current_sha256": "8DACEF7821D71B527C89E8EC0D7CBD37C52C35943476EEE64F0107082A7618D6",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "previous_sha256": "5CA87ECE440F2F7B60F4CF93ED06491ABD8401141742B0B964A18064497246EC",
+      "current_sha256": "718A29A2E16DADF489290E86AF03A8AFC5B75259C54634CB0D38F088F1FD5903",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
+      "previous_sha256": "8050F2550BD2C693D1185F4C4F786FCBEB7BD945499841413F98CCBE086D527A",
+      "current_sha256": "02DC83D0E804455B8C2BD48D874A3B6C692F59B37D5A2C86ECBCDA3CAF06A005",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/control/Views.ps1",
+      "previous_sha256": "887AE8E27D0586D5918E43532606A4317DB3B7B5F631DBFC0D26ECAD4DF2C13E",
+      "current_sha256": "DED3B5A1F29EE6888FEFA97611A9444DB0FB98DE466CD47346ABEBC387E22478",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "3889CD3D09E83CF14325848683A4CC8ADE007787AFEC984AD8506FA11EFC63F9",
+      "current_sha256": "AC505A22F5571FE0BB50115C9B11C41C5520F1AD79632C6156DA8964945712E1",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "674C7EF54575D6BCF4D87E1A0BDBC830F94E54D2A5B5C1626634AA19A38440D3",
+      "current_sha256": "EA1171FA250ECA14CA7F585FF51DD1FFB85D720EB37EC27894052199FEEA57E2",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseNarratives.ps1",
+      "previous_sha256": "FDF5AAB0482CFDF2DA18B93C16A0DADB781E8DE62C074D4311F39071B2E53396",
+      "current_sha256": "FEA7488D4625BD4FBF3A8D86AC1D25A5B9709EE1125EA20CAAF156358E98B9A3",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1",
+      "previous_sha256": "17E09C33362BA38525298E7A8A1886E59974ACA08CACDDFD62846256694836F3",
+      "current_sha256": "B3E9A4AFD05F70FD4CDE1487E0581509EFBF272DA7B76BEF414F3D1AE7D1E73F",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "D8E922A4E707140A1F18C9A4CD0FF9A91AF732CF55E8B61DD36E264F75F7E3E2",
+      "current_sha256": "210024F10A5594F450AC2BC1D4AA3D51BD4A3F58F96686155AB3F2E7472CD5F3",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "D7DC06568F32166EA813D16066FA97D5D3527F490135992F386CE54164EFE2E3",
+      "current_sha256": "668034E6F1D3FA6B06873C50ED3D0DD3BA9C06F7DADDFA8279961D1D5F7CC040",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "605B10F4E158CFA35E8D45C1D3EE58662FCB6F568059A0879B6CA490C93A538A",
+      "current_sha256": "71F3DFEE52CBB45B3326BB025FFB496FF6F63B4F8EC86ACA44E2289E085CB984",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+      "previous_sha256": "9CCDD7424C4A6E59619AF52A9C0728F413FF92CEACC4EFA6D37A2BCAC9FDBB94",
+      "current_sha256": "D92608012E8A8CCACBCADEE7EF51F80C9088E659EA48032A864505A078885687",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "3B53CA11C713812F3F36781F7E293597DAE5E12B55850EDD766BAB7EB58052B4",
+      "current_sha256": "E43A16DB598605F967252BB2A8BFE0153E689E1715225001619AA2C373608506",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+      "previous_sha256": "CBC082F47A172C74A74FBB8BD86EC55BD2A25645D851BD08DBC4264A956D8555",
+      "current_sha256": "B95324F13C061C1A0BC9083DADE9E94EC03C0CCD63FE550D7B97BBA9015DA481",
+      "reason": "Reconcile the MIR 4.1 physical-foundation programme and its exact generated or executable projection.",
+      "scope": "package-excluded-truth-reconciliation",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": ".mir/README.md",
+      "sha256": "6153F00D9580D6B7BCBD17D32214EAE5FF966296901079F6D3AF020579198A64",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json",
+      "sha256": "3ABC2130B28E0EF22322958BFF9AC2BD5279363813A54A67E89EFB939C76C1D7",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "16FE46F6D9C6F07012BB3975D86A685FD475981446D78FF7D3F981B0F763596A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0003.json",
+      "sha256": "B797166A8666E90666EF0AAE31165003FB9B025885A5A2C12E802765CEAD7203",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json",
+      "sha256": "D4FCFC0A3B0C5914209343412016488E0C0D3E83CFF3152A12BE0D5800B14AF0",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md",
+      "sha256": "5F004E934C90FEB2EC663D09E423E9AC18C3D05B6FE656F461C28B429A40D744",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "docs/architecture/decisions/README.md",
+      "sha256": "3A43AF374B0CD7254952BB4D5AC1DD76842BB9876D01E0C366B07D9EDADF6168",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "mir.lock",
+      "sha256": "B558113D8BC42558A6F4292D94633B3CF7EBBAF5D46E174B3379183663F83764",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "mir.toml",
+      "sha256": "FCE8C581B61733FDD77297A4847FBCC7833A45760466522A7DA3ED89E4400AF4",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "sha256": "34FD2EE4A1C175F3535A0E710E4E850453AC98C3AA9CE064F4FC956E4907D97B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "sha256": "90E5B2E192C0AC42DD73B6848BFED36055857C8E51611E2B0EC317A7DF71CCD0",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "sha256": "5941D0A272687C57588A2B8D9490A5FB0D44A549AC91BC089C0F8348C78C3B5B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "sha256": "9045B0C72E9E8F468E0CADAEAF7F1B297C5A4CB32F0C48B7B50B2A3495E0F460",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "sha256": "50B0B056CC9F5F1FF20C15CC92450AF5E2F86EE8019D0BCA119B766B78B3E2A2",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json",
+      "sha256": "E0FD006216B96E8079DCACABDF71CAA39DF479F0D31D16B4611EC348704E814A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
+      "sha256": "8786C87364BE3C7F6F99F310DE49A8275A895020BEEE242CE05C6AC4A31E72DB",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1",
+      "sha256": "0DCB61EFA379C23AFE88044A327874A7106EC7EDAE544E7B9CDC807FE331027C",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+      "sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "tools/lib/workspace/RepoPaths.ps1",
+      "sha256": "559A79BA82A97298125EC887F29C3A18188EC7D25F050B9CA94415CB35A3EF8F",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    },
+    {
+      "path": "validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "sha256": "AF9151A0AE4FB19196A01C9AC4184B9C201F07722EB06F255F083B8AE5260834",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded MIR 4.1 truth-reconciliation authority or projection."
+    }
+  ],
+  "truth_proof": {
+    "programme_sha256": "8DACEF7821D71B527C89E8EC0D7CBD37C52C35943476EEE64F0107082A7618D6",
+    "source_changelog_sha256": "16FE46F6D9C6F07012BB3975D86A685FD475981446D78FF7D3F981B0F763596A",
+    "todo_sha256": "718A29A2E16DADF489290E86AF03A8AFC5B75259C54634CB0D38F088F1FD5903",
+    "portal_reconciliation_sha256": "3ABC2130B28E0EF22322958BFF9AC2BD5279363813A54A67E89EFB939C76C1D7",
+    "platform_lock_sha256": "B558113D8BC42558A6F4292D94633B3CF7EBBAF5D46E174B3379183663F83764",
+    "physical_files": 3912,
+    "unknown_paths": 0,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "live_programme_is_current": true,
+    "mutable_candidate_state_removed": true,
+    "historical_prefreeze_scoped": true,
+    "source_changelog_generated": true,
+    "todo_routes_live_programme_first": true,
+    "portal_hash_contradiction_reconciled": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F0-TRUTH-RECONCILED-NO-PACKAGE-CUTOVER"
+}

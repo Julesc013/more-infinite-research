@@ -49,6 +49,8 @@ Assert-MIR4CharacterizationV1 ([int]$bridge.summary.retirement_ready -eq 0) 'mir
 
 $programme=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/mir4-4x-operating-programme-v1.json')|ConvertFrom-Json
 Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M41-05','M42-00') -and $_.state -eq 'active'}).Count -eq 2) 'mir4-characterization-programme-subpackages'
+Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M42-00','M42-01','M42-02') -and $_.completion_boundary -eq '4.1.0'}).Count -eq 3) 'mir4-41-physical-fixed-point-boundary'
+Assert-MIR4CharacterizationV1 ([string]@($programme.outcome_trains|Where-Object candidate -eq '4.2.0')[0].outcome -match 'Integration kernel') 'mir4-42-integration-boundary'
 
 $facade=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 repository characterization-check 2>&1|Out-String).Trim()
 if($LASTEXITCODE-ne 0){throw "[mir4-characterization-facade] $facade"}

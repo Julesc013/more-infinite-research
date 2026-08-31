@@ -109,6 +109,7 @@
     {"pattern": ".mir/releases/deltas/**", "module": "release-delta-authority", "writes": ["release.delta", "assurance.evidence"]},
     {"pattern": "docs/**", "module": "documentation", "writes": ["docs.source"]},
     {"pattern": "todo.md", "module": "control-plane-views", "writes": ["docs.generated"]},
+    {"pattern": "CHANGELOG.md", "module": "release-narrative-writer", "writes": ["docs.generated", "release.presentation"]},
     {"pattern": ".mir/docs.yml", "module": "documentation-governance", "writes": ["docs.source"]},
     {"pattern": ".mir/modules.yml", "module": "architecture-governance", "writes": ["architecture.boundaries"]},
     {"pattern": ".mir/compiler-schema-authority.json", "module": "compiler-schema-governance", "writes": ["compiler.contract", "architecture.boundaries"]},

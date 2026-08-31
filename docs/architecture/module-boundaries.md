@@ -39,7 +39,7 @@ This is the current structure target for the MIR 3 shipped mod. Backport branche
 
 ## Change and release narrative boundary
 
-Accepted change facts live under `changes/unreleased/` and released historical facts under `changes/history/`. `tools/mir/application/release/ReleaseNarratives.ps1` is the only narrative orchestrator; six focused renderers consume an immutable plan and explicit surface and target dispositions. They may write only package-excluded shadow reports. They cannot inspect Git history for changes, infer target support, mutate packages, allocate versions, or grant release transitions. The complete contract is documented in `docs/architecture/mir4-change-and-release-authority.md`.
+Accepted change facts live under `changes/unreleased/` and released historical facts under `changes/history/`. `tools/mir/application/release/ReleaseNarratives.ps1` is the only narrative orchestrator; six focused renderers consume an immutable plan and explicit surface and target dispositions. They may write package-excluded shadow reports and the generated root `CHANGELOG.md` source-family projection. They cannot inspect Git history for changes, infer target support, mutate packages, allocate versions, or grant release transitions. The complete contract is documented in `docs/architecture/mir4-change-and-release-authority.md`.
 
 ## Factorio Shell
 

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-08-31.
+Current-page navigation generated from Markdown front matter as of 2026-09-01.
 
 ## developer
 
@@ -131,6 +131,7 @@ Current-page navigation generated from Markdown front matter as of 2026-08-31.
 - [ADR 0005: Generated ID And Migration Policy](../../adr/0005-generated-id-and-migration-policy.md)
 - [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md)
 - [ADR 0006: Science And Lab Planning Policy](../../adr/0006-science-and-lab-planning-policy.md)
+- [ADR 0007: MIR 4.1 Foundation Completion Boundary](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md)
 - [ADR 0007: Native Modifier Ownership Policy](../../adr/0007-native-modifier-ownership-policy.md)
 - [ADR 0008: Loop-Risk Policy](../../adr/0008-loop-risk-policy.md)
 - [ADR 0009: Compatibility Claim Levels](../../adr/0009-compatibility-claim-levels.md)

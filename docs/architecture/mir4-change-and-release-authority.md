@@ -13,7 +13,7 @@ generated_from: []
 
 # MIR 4 change and release narrative authority
 
-MIR 4 uses accepted JSON change fragments under `changes/unreleased/` as the only mutable authority for release changes. Released fragments move to `changes/history/<source-version>/`; they remain typed historical facts rather than hand-maintained prose. Commit history, filenames, GitHub state, and old release copy are inputs or references, never substitute change authorities.
+MIR 4 uses accepted JSON change fragments under `changes/unreleased/` as the only mutable authority for release changes. Released fragments move to `changes/history/<source-version>/`; they remain typed historical facts rather than hand-maintained prose. Commit history, filenames, GitHub state, and old release copy are inputs or references, never substitute change authorities. `releases/governance/MIR4-Source-Changelog-PlanV1.json` deterministically projects that inventory into package-excluded root `CHANGELOG.md` through `tools/mir.ps1 mir4 release-narratives source-render`.
 
 The `MIR4ChangeFragmentV2` contract requires a stable ID, curated summary, semantic domains, audiences, exact target dispositions, package visibility, save/settings/migration/compatibility/contract/support impacts, disclosure policy, and an explicit disposition for every release surface. An `unknown` target or impact blocks source freeze. Embargoed records may render only the standard redaction until a separate disclosure authority changes their accepted disposition.
 

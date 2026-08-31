@@ -2,7 +2,8 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "objective": "Keep every supported MIR 4 target releasable while converging repository, release, compiler, compatibility, and evidence authorities without changing published 4.0.0 bytes.",
+  "recorded_at": "2026-09-01T12:00:00+10:00",
+  "objective": "Complete MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
   "permanent_invariants": [
     "one semantic source",
     "one self-contained player ZIP per target",
@@ -15,31 +16,29 @@
     "main is the latest-stable line and dev is the next-minor-or-major integration line"
   ],
   "work_packages": [
-    {"id": "M40-00", "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure", "depends_on": [], "state": "complete"},
-    {"id": "M40-01", "outcome": "Operate the release/4.0 patch lane and cross-lane defect protocol", "depends_on": ["M40-00"], "state": "active"},
-    {"id": "M41-00", "outcome": "Adopt the MIR 4.x operating, deployment, patch, and proof contracts", "depends_on": ["M40-00"], "state": "complete"},
-    {"id": "M41-01", "outcome": "Make pull-request proof selection event, trust, and ref-topology aware", "depends_on": ["M41-00"], "state": "complete"},
-    {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "depends_on": ["M41-01"], "state": "complete"},
-    {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "depends_on": ["M41-01"], "state": "complete"},
-    {"id": "M41-04", "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition", "depends_on": ["M41-02"], "state": "complete"},
-    {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "depends_on": ["M41-04"], "state": "complete"},
-    {"id": "M41-05", "outcome": "Route package-excluded documentation, then separate repository and package landing pages after package characterization", "depends_on": ["M41-03"], "state": "active"},
-    {"id": "M42-00", "outcome": "Characterize source/package authority, then establish independently generated target packages", "depends_on": ["M41-03", "M41-06"], "state": "active"},
-    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI and one release engine", "depends_on": ["M42-00"], "state": "blocked-dependency"},
-    {"id": "M42-02", "outcome": "Decompose Lua compiler stages behind characterization and mutation boundaries", "depends_on": ["M42-00"], "state": "blocked-dependency"},
-    {"id": "M43-00", "outcome": "Graduate runtime, MEP, API, and SDK contracts per contract", "depends_on": ["M42-01", "M42-02"], "state": "blocked-dependency"},
-    {"id": "M44-00", "outcome": "Graduate exact ProcessIR and certified synthesis only after emitter parity", "depends_on": ["M43-00"], "state": "blocked-dependency"},
-    {"id": "M45-00", "outcome": "Deliver inspector and compatibility factory with expiring exact claims", "depends_on": ["M44-00"], "state": "blocked-dependency"},
-    {"id": "M46-00", "outcome": "Scale assurance, historical targets, preservation, and evergreen audit", "depends_on": ["M45-00"], "state": "blocked-dependency"}
+    {"id": "M40-00", "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure", "completion_boundary": "4.0.x", "depends_on": [], "state": "complete"},
+    {"id": "M40-01", "outcome": "Operate the release/4.0 patch lane and cross-lane defect protocol", "completion_boundary": "4.0.x", "depends_on": ["M40-00"], "state": "active"},
+    {"id": "M41-00", "outcome": "Adopt the MIR 4.x operating, deployment, patch, and proof contracts", "completion_boundary": "4.1.0", "depends_on": ["M40-00"], "state": "complete"},
+    {"id": "M41-01", "outcome": "Make pull-request proof selection event, trust, and ref-topology aware", "completion_boundary": "4.1.0", "depends_on": ["M41-00"], "state": "complete"},
+    {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "completion_boundary": "4.1.0", "depends_on": ["M41-01"], "state": "complete"},
+    {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "completion_boundary": "4.1.0", "depends_on": ["M41-01"], "state": "complete"},
+    {"id": "M41-04", "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition", "completion_boundary": "4.1.0", "depends_on": ["M41-02"], "state": "complete"},
+    {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "completion_boundary": "4.1.0", "depends_on": ["M41-04"], "state": "complete"},
+    {"id": "M41-05", "outcome": "Route package-excluded documentation, then separate repository and package landing pages after package characterization", "completion_boundary": "4.1.0", "depends_on": ["M41-03"], "state": "active"},
+    {"id": "M42-00", "outcome": "Establish one package source, deterministic overlays, one materializer, and four independently generated targets", "completion_boundary": "4.1.0", "depends_on": ["M41-03", "M41-06"], "state": "active"},
+    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI, one implementation per command, and one release engine", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "blocked-dependency"},
+    {"id": "M42-02", "outcome": "Perform only reviewable behavior-preserving Lua decomposition behind characterized mutation boundaries", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "blocked-dependency"},
+    {"id": "M43-00", "outcome": "Admit integration-kernel and built-in ecosystem capabilities through exact contracts", "completion_boundary": "4.2.0", "depends_on": ["M42-01", "M42-02"], "state": "blocked-dependency"},
+    {"id": "M44-00", "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation", "completion_boundary": "4.3.0", "depends_on": ["M43-00"], "state": "blocked-dependency"},
+    {"id": "M45-00", "outcome": "Allocate a coherent external product outcome only when evidence supports it", "completion_boundary": "4.4.0+", "depends_on": ["M44-00"], "state": "blocked-dependency"},
+    {"id": "M46-00", "outcome": "Retain later MIR 4 work as unallocated evidence-led evolution", "completion_boundary": "4.4.0+", "depends_on": ["M45-00"], "state": "blocked-dependency"}
   ],
   "outcome_trains": [
     {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},
-    {"candidate": "4.1.0", "outcome": "Repository and release fixed point", "release_required": false},
-    {"candidate": "4.2.0", "outcome": "Source, package, compiler, and target authority fixed point", "release_required": false},
-    {"candidate": "4.3.0", "outcome": "Runtime, MEP, API, and SDK graduation", "release_required": false},
-    {"candidate": "4.4.0", "outcome": "ProcessIR and certified synthesis", "release_required": false},
-    {"candidate": "4.5.0", "outcome": "Inspector and compatibility factory", "release_required": false},
-    {"candidate": "4.6.0+", "outcome": "Ecosystem breadth, historical targets, assurance scale, preservation, and evergreen fixed point", "release_required": false}
+    {"candidate": "4.1.0", "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets", "release_required": false},
+    {"candidate": "4.2.0", "outcome": "Integration kernel and rolling built-in ecosystem admissions", "release_required": false},
+    {"candidate": "4.3.0", "outcome": "Industrialized semantic selection, evidence lifecycle, recovery, measured release lanes, offline operation, and preservation", "release_required": false},
+    {"candidate": "4.4.0+", "outcome": "Unallocated until evidence supports a coherent external outcome", "release_required": false}
   ],
   "wip_limits": {"product_feature_trains": 1, "authority_migrations": 1, "stable_patch": 1, "broad_lua_refactor_before_M42_00": 0}
 }

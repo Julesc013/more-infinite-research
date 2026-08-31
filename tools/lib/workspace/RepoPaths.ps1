@@ -337,6 +337,7 @@ function Get-MIRLayoutClass {
     "FORKING.md", "GOVERNANCE.md", "MAINTAINER-HANDOFF.md", "PROJECT-CONTINUITY.md",
     "RELEASE-RUNBOOK.md", "SECURITY.md", "SUPPORT.md", "todo.md", "mir.toml", "mir.lock"
   )) { return "repository-policy" }
+  if ($Path -eq "CHANGELOG.md") { return "repository-shadow-projection" }
   return "unclassified"
 }
 
@@ -403,7 +404,7 @@ function New-MIRLayoutManifest {
     } else {
       "canonical"
     }
-    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("todo.md", "mir.lock")
+    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("CHANGELOG.md", "todo.md", "mir.lock")
     $rows.Add([pscustomobject][ordered]@{
       path=$path
       class=$class

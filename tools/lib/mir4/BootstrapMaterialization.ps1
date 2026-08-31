@@ -167,6 +167,41 @@ function Test-MIR4BootstrapRecordHash {
   return $expected -match '^[A-F0-9]{64}$' -and $expected -eq (Get-MIR4BootstrapRecordSha256 -Record $Record)
 }
 
+function Test-MIR3Dot9PortalVisibilityHashReconciliation {
+  param(
+    [Parameter(Mandatory)]$HistoricalRecord,
+    [Parameter(Mandatory)]$Reconciliation,
+    [Parameter(Mandatory)][string]$HistoricalRecordPath
+  )
+
+  if (-not (Test-Path -LiteralPath $HistoricalRecordPath -PathType Leaf) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $Reconciliation) -or
+      (Get-MIR4Sha256File -Path $HistoricalRecordPath) -cne [string]$Reconciliation.historical_record.raw_sha256 -or
+      [string]$Reconciliation.historical_record.path -cne '.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json' -or
+      [string]$Reconciliation.historical_record.normalized_field -cne 'sources[0].matched_rows[1].released_at:.140Z-to-.14Z' -or
+      [string]$Reconciliation.classification -cne 'inherited-self-hash-canonicalization-interpretation-contradiction' -or
+      [bool]$Reconciliation.current_portal_claim_authorized -or
+      @($Reconciliation.authority.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+    return $false
+  }
+
+  $legacyRecord = $HistoricalRecord | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+  foreach ($source in @($legacyRecord.sources)) {
+    foreach ($row in @($source.matched_rows)) {
+      if ($null -ne $row.PSObject.Properties['released_at'] -and [string]$row.released_at -match '^(?<prefix>.+\.\d*?[1-9])0+Z$') {
+        $row.released_at = [string]$Matches.prefix + 'Z'
+      }
+    }
+  }
+  $legacyHash = Get-MIR4BootstrapRecordSha256 -Record $legacyRecord
+  $lexicalHash = Get-MIR4BootstrapRecordSha256 -Record $HistoricalRecord
+  return $legacyHash -ceq [string]$HistoricalRecord.record_sha256 -and
+    $legacyHash -ceq [string]$Reconciliation.historical_record.stored_record_sha256 -and
+    $legacyHash -ceq [string]$Reconciliation.historical_record.legacy_timestamp_normalized_sha256 -and
+    $lexicalHash -ceq [string]$Reconciliation.historical_record.lexical_rfc3339_sha256 -and
+    $legacyHash -cne $lexicalHash
+}
+
 function Assert-MIR4DescendantPath {
   param(
     [Parameter(Mandatory)][string]$Root,

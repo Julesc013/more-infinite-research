@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-01
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -44,7 +44,7 @@ For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4
 
 ## Dependency-ordered work
 
-The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, branch-authority, unpublished patch-lane rehearsal, and canonical release-narrative authority closed on 2026-08-31. Package-excluded documentation routing and package characterization are next.
+The governance and characterization foundation is complete, so MIR 4.1 now owns the physical and executable fixed point as well. Completion means zero ambiguity, duplicate writers, uncontrolled bridges, unexplained package differences, stale current authorities, or release-critical transitional dependencies. It does not require deletion of bounded, read-only, package-excluded history.
 
 | Work package | Outcome | State after this change |
 | --- | --- | --- |
@@ -57,11 +57,11 @@ The active fixed point is deliberately smaller than the full report. The initial
 | M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Route documentation by reader need, then separate repository and package landing pages | Active: M41-05A routing complete; M41-05B waits for the package-documentation cutover |
-| M42-00 | Characterize the package boundary and generate each target independently | Active: M42-00A characterization complete; materializer and parity work remain |
-| M42-01 | Converge PowerShell behind one supported CLI and one release engine | Blocked on M42-00 |
-| M42-02 | Split Lua compiler stages behind characterization and mutation boundaries | Blocked on M42-00 |
+| M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Active: M42-00A characterization complete; materializer, parity, cutover, and rollback remain |
+| M42-01 | Converge PowerShell behind one supported CLI, one implementation per command, and one release engine inside the 4.1 completion boundary | Blocked on M42-00 |
+| M42-02 | Perform only reviewable behavior-preserving Lua decomposition needed for the 4.1 maintainability fixed point | Blocked on M42-00 |
 
-Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No broad Lua move starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback.
+Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
 
 The current package-source boundary still includes `README.md` in every player ZIP. M41-05A therefore routes package-excluded documentation while leaving that root file byte-stable. M42-00A records exact package membership, authorities, readers, writers, bridges, and physical files. After the independent materializer proves parity, M41-05B will separate a concise repository landing page from generated package documentation as an intentional, target-qualified cutover. Incidental README edits remain forbidden.
 
@@ -85,6 +85,8 @@ The offline pre-refactor Git bundle was restored successfully and has SHA-256 `F
 
 The Mod Portal API exposed F210, F200, and F110 with SHA-1 values equal to the downloaded GitHub bytes. F100 was not present in the observed portal release list. No 4.0.1 source version is allocated by this record.
 
+The dated MIR 3 `.9` Mod Portal visibility observation remains immutable. Its stored self-hash used the earlier date conversion that normalized one `.140Z` timestamp to `.14Z`; `.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json` binds the original bytes, legacy digest, and lexical RFC 3339 digest. The reconciliation grants no current portal claim, history rewrite, build, tag, upload, allocation, or publication authority.
+
 ## Stable repair procedure
 
 The first operational rehearsal is recorded in `releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json`. It created and removed a disposable local branch from the exact `release/4.0` base, selected only F210 as affected, recorded F200/F110/F100 as unchanged without manufacturing packages, produced a deterministic qualification and semantic forward-port plan, rejected publication-authority tampering, preserved all remote refs, and left the player package source fingerprint unchanged. This proof keeps M40-01 operational; it does not allocate 4.0.1 or authorize a real correction.
@@ -100,12 +102,10 @@ Version numbers below are candidate labels assigned only at source freeze. Outco
 | Candidate | Required outcome |
 | --- | --- |
 | 4.0.x | Verified stable defects only; no release exists merely to carry repository work |
-| 4.1.0 | Repository and release fixed point: truthful public state, main-trunk operation, change fragments, generated release copy, GitHub surface, concise docs, and explicit authorities |
-| 4.2.0 | Source, package, compiler, and target authority fixed point: real source/package separation, independent target generation, one release engine, PowerShell convergence, compiler characterization and bounded decomposition |
-| 4.3.0 | Runtime, MEP, API, and SDK contracts graduate independently with conformance, compatibility, rollback, and at least one real external consumer where the contract requires it |
-| 4.4.0 | Exact ProcessIR and certified synthesis graduate only where they reproduce the admitted emitter and cannot create a second uncontrolled production emitter |
-| 4.5.0 | Inspector and compatibility factory deliver exact, expiring, evidence-bound support claims and actionable diagnostics |
-| 4.6.0+ | Ecosystem breadth, historical targets, assurance scale, LTS, preservation, external-provider pilots, advanced proof, and the evergreen fixed-point audit proceed by proof readiness rather than a pre-reserved version ladder |
+| 4.1.0 | Truthful repository; one package source; four target products; one CLI; one release engine; one executable test authority; generated repository and package documentation; bounded maintainable implementation; zero mutable dual authority |
+| 4.2.0 | Integration kernel and rolling built-in ecosystem admissions across ownership, progression, productivity, finalizers, recovery, runtime-mediated channels, and exact advanced-process certificates; public extension contracts still graduate individually |
+| 4.3.0 | Industrialized semantic-impact selection, evidence reuse and revocation, partial-run recovery, nondeterminism handling, measured release lanes, offline operation, EOL automation, and recurring architecture audits |
+| 4.4.0+ | Unallocated until evidence supports a coherent external outcome |
 
 The next major begins only when a change cannot be delivered honestly under MIR 4 settings, technology identity, save migration, API, and distribution promises.
 

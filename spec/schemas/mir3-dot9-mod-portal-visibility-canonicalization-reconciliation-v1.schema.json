@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json",
+  "title": "MIR 3 .9 Mod Portal visibility canonicalization reconciliation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "historical_record", "classification", "disposition", "package_visible", "current_portal_claim_authorized", "authority", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR3Dot9ModPortalVisibilityCanonicalizationReconciliationV1"},
+    "status": {"const": "accepted-historical-canonicalization-reconciliation"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "historical_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "raw_sha256", "stored_record_sha256", "legacy_timestamp_normalized_sha256", "lexical_rfc3339_sha256", "normalized_field"],
+      "properties": {
+        "path": {"const": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"},
+        "raw_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "stored_record_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "legacy_timestamp_normalized_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "lexical_rfc3339_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "normalized_field": {"const": "sources[0].matched_rows[1].released_at:.140Z-to-.14Z"}
+      }
+    },
+    "classification": {"const": "inherited-self-hash-canonicalization-interpretation-contradiction"},
+    "disposition": {"const": "preserve-original-bytes-validate-legacy-hash-and-bind-corrected-lexical-digest"},
+    "package_visible": {"const": false},
+    "current_portal_claim_authorized": {"const": false},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["semantic", "build", "upload", "tag", "allocation", "publication", "history_rewrite"],
+      "properties": {
+        "semantic": {"const": false},
+        "build": {"const": false},
+        "upload": {"const": false},
+        "tag": {"const": false},
+        "allocation": {"const": false},
+        "publication": {"const": false},
+        "history_rewrite": {"const": false}
+      }
+    },
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  }
+}

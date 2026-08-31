@@ -205,6 +205,22 @@ if([string]$characterization.kind-cne'MIR4M4105AM4200ARepositoryCharacterization
    @($characterization.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-05a-m42-00a-characterization-authority]'
 }
+$truthReconciliation=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$truthReconciliation.kind-cne'MIR4M41F0TruthReconciliationAuthorityEvolutionV1'-or
+   [string]$truthReconciliation.status-cne'M41-F0-TRUTH-RECONCILED-NO-PACKAGE-CUTOVER'-or
+   [string]$truthReconciliation.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json'-or
+   [string]$truthReconciliation.predecessor_receipt.sha256-cne'1D5F3F67701DB9F1281B6FA376D031AD7513118259FACF25DEAC82DD66CD8FBF'-or
+   @($truthReconciliation.evolved_bindings).Count-lt20-or
+   @($truthReconciliation.current_authorities).Count-lt10-or
+   [string]$truthReconciliation.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$truthReconciliation.root_readme_sha256-or
+   -not[bool]$truthReconciliation.invariants.live_programme_is_current-or
+   -not[bool]$truthReconciliation.invariants.mutable_candidate_state_removed-or
+   -not[bool]$truthReconciliation.invariants.portal_hash_contradiction_reconciled-or
+   -not[bool]$truthReconciliation.invariants.package_source_unchanged-or
+   @($truthReconciliation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-f0-truth-reconciliation-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
