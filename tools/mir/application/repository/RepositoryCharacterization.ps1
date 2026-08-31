@@ -152,7 +152,7 @@ function New-MIR4RepositoryCharacterizationBundleV1 {
     }
   )
   $packageSourceSha = Get-MIRPackageSourceFingerprint -RepoRoot $repo
-  $readmeSha = Get-MIRFileSha256 -Path (Join-Path $repo 'README.md')
+  $readmeSha = Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md'
 
   $documentationRows = @($physicalRows | Where-Object { ([string]$_.path).StartsWith('docs/', [StringComparison]::Ordinal) -and ([string]$_.path).EndsWith('.md', [StringComparison]::OrdinalIgnoreCase) })
   $statusCounts = [ordered]@{}

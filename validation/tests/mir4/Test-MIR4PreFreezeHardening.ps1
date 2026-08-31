@@ -199,7 +199,7 @@ if([string]$characterization.kind-cne'MIR4M4105AM4200ARepositoryCharacterization
    @($characterization.evolved_bindings).Count-lt10-or
    @($characterization.current_authorities).Count-lt8-or
    [string]$characterization.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
-   (Get-FileHash -LiteralPath (Join-Path $repo 'README.md') -Algorithm SHA256).Hash-cne[string]$characterization.root_readme_sha256-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$characterization.root_readme_sha256-or
    -not[bool]$characterization.invariants.deterministic_reports-or
    -not[bool]$characterization.invariants.all_bridges_retained-or
    @($characterization.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){

@@ -19,7 +19,7 @@ $expectedReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F94
 $state=Get-MIR4PreFreezeAuthorityState -RepoRoot $RepoRoot -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration -IncludeHistoricalToolingMigration -IncludeReleaseToolingMigration -IncludeF210QualificationPolicyEvolution -IncludeFinalMileToolingEvolution -IncludeFinalReleaseClosureEvolution -IncludePostReleasePackageBaselineEvolution -IncludePostReleaseAutomationCutover -IncludePostReleaseBranchOperatingModel -IncludePostReleasePatchLaneRehearsal -IncludeM4103ChangeReleaseAuthority
 if([string]$state.prior_receipt_path-cne$predecessorRelative-or[string]$state.prior_receipt_sha256-cne$predecessorSha256){throw '[mir4-m41-05a-m42-00a-predecessor]'}
 if((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)-cne$expectedPackage){throw '[mir4-m41-05a-m42-00a-package-source]'}
-if((Get-MIRFileSha256 -Path(Join-Path $RepoRoot 'README.md'))-cne$expectedReadme){throw '[mir4-m41-05a-m42-00a-readme]'}
+if((Get-MIRFileContentSha256 -Path(Join-Path $RepoRoot 'README.md') -RelativePath 'README.md')-cne$expectedReadme){throw '[mir4-m41-05a-m42-00a-readme]'}
 
 $roles=[ordered]@{
   '.mir/assurance.json'='Register the bounded characterization proof and impact class.'

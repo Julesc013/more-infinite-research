@@ -206,7 +206,7 @@
     {
       "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
       "previous_sha256": "EB99EC20090D893C6433E1F7ABAFA5A454C8F91E95F731C36BF5D601BC91816C",
-      "current_sha256": "F5B5EC1FB152C3CC3B8D8ED92A383683E30ACAABC5E6C92BBF9E899BC6DDF6E0",
+      "current_sha256": "605B10F4E158CFA35E8D45C1D3EE58662FCB6F568059A0879B6CA490C93A538A",
       "reason": "Require the characterization authority successor.",
       "scope": "package-excluded-documentation-and-characterization",
       "package_visible": false,
@@ -303,13 +303,13 @@
     },
     {
       "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
-      "sha256": "ADD98911184173415DE2AAC298346852137E942481F7BC453AB9089D82935A03",
+      "sha256": "60C45DA03F9C9BAD5B4311D62360AF384FF03E297F328CB6966908CCF7ECB46A",
       "hash_mode": "canonical-text-v1",
       "role": "Sole deterministic report writer."
     },
     {
       "path": "tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1",
-      "sha256": "6B1CF0FEC07ED4A806AD86445EE30895FA565D8009E2825C137705B09569FDD2",
+      "sha256": "C7ACC55D37A002EC0C8C3F4D774EF72629446FBC8605263B8C937E4D45783DD9",
       "hash_mode": "canonical-text-v1",
       "role": "Bounded authority receipt writer."
     },
