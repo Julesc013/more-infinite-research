@@ -96,7 +96,7 @@ foreach($pair in $contractPairs.GetEnumerator()){
 }
 $assurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json -Depth 100
 $postReleaseProfile=@($assurance.profiles.'mir4-post-release')
-$expectedPostReleaseProfile=@('docs.check','tooling.self-test','static.package','static.branch-policy','static.mir4-release-adapters-t05')
+$expectedPostReleaseProfile=@('docs.check','tooling.self-test','static.package','static.branch-policy','static.mir4-release-adapters-t05','static.mir4-release-narratives-m41-03')
 if(($postReleaseProfile-join'|')-cne($expectedPostReleaseProfile-join'|')){throw '[mir4-t05-post-release-profile]'}
 $validateWorkflow=Get-Content -Raw -LiteralPath (Join-Path $repo '.github/workflows/validate.yml')
 if(-not$validateWorkflow.Contains("'mir4-post-release'")-or-not$validateWorkflow.Contains('spec/programmes/mir4-4x-operating-programme-v1.json')){throw '[mir4-t05-post-release-workflow]'}

@@ -1,0 +1,5 @@
+{
+  "schema":2,"kind":"MIR4ChangeFragmentV2","change_id":"MIR4-SYN-4100-0004","status":"accepted","change_type":"security","summary":"Corrected a synthetic sensitive validation boundary before coordinated disclosure.","details":["Sensitive reproducer details remain outside public narrative surfaces until disclosure is authorized."],"semantic_domains":["security"],"audiences":["security","maintainers"],
+  "target_dispositions":[{"target":"F210","disposition":"affected","reason":"Shared boundary."},{"target":"F200","disposition":"affected","reason":"Shared boundary."},{"target":"F110","disposition":"affected","reason":"Shared boundary."},{"target":"F100","disposition":"not-applicable","reason":"Synthetic boundary absent from the omitted target."}],
+  "package_visibility":"player-package","impacts":{"save":"none","settings":"none","migration":"none","compatibility":"compatible","public_contract":"compatible","support_claim":"none"},"security_visibility":"embargoed-until-release","release_surfaces":{"source_changelog":"redact","target_changelog":"redact","github":"redact","mod_portal":"redact","technical":"redact","manifest":"redact"},"references":[]
+}

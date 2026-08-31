@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-03-change-and-release-authority-evolution-v1.schema.json",
+  "title": "MIR4M4103ChangeAndReleaseAuthorityEvolutionV1",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema","kind","recorded_at","programme_id","change_id","predecessor_receipt","base","evolved_bindings","current_authorities","rendering_proof","player_package_source_sha256","package_visible_delta","invariants","transition_gate","status"],
+  "properties": {
+    "schema":{"const":1}, "kind":{"const":"MIR4M4103ChangeAndReleaseAuthorityEvolutionV1"}, "recorded_at":{"type":"string","format":"date-time"},
+    "programme_id":{"const":"M41-03-CHANGE-AND-RELEASE-AUTHORITY"}, "change_id":{"const":"MIR4-CHG-2026-0001"},
+    "predecessor_receipt":{"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"const":"releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json"},"sha256":{"const":"5C8285578229E6B35CD5A54A3665839FA4B6BCB442CFE8FB53F075C2613839BE"}}},
+    "base":{"type":"object","additionalProperties":false,"required":["branch","commit","tree"],"properties":{"branch":{"const":"dev"},"commit":{"const":"df1774bec19173bead7a497b6134d452f2931fd0"},"tree":{"const":"3112e36eb90c151fc57b760065b818b244217f12"}}},
+    "evolved_bindings":{"type":"array","minItems":10,"items":{"$ref":"#/$defs/evolved"}},
+    "current_authorities":{"type":"array","minItems":20,"items":{"$ref":"#/$defs/current"}},
+    "rendering_proof":{"type":"array","minItems":3,"maxItems":3,"items":{"type":"object","additionalProperties":false,"required":["plan_id","result_digest","output_count"],"properties":{"plan_id":{"type":"string"},"result_digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"output_count":{"type":"integer","minimum":6}}}},
+    "player_package_source_sha256":{"const":"8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"}, "package_visible_delta":{"const":[]},
+    "invariants":{"type":"object","additionalProperties":false,"required":["one_change_authority","six_views_from_one_inventory","historical_4_0_0_shadow_only","selective_target_filtering","security_redaction","factorio_format","deterministic_output","package_source_unchanged"],"properties":{"one_change_authority":{"const":true},"six_views_from_one_inventory":{"const":true},"historical_4_0_0_shadow_only":{"const":true},"selective_target_filtering":{"const":true},"security_redaction":{"const":true},"factorio_format":{"const":true},"deterministic_output":{"const":true},"package_source_unchanged":{"const":true}}},
+    "transition_gate":{"$ref":"#/$defs/falseTransitions"}, "status":{"const":"M41-03-CHANGE-AND-RELEASE-AUTHORITY-COMPLETE-NO-RELEASE-TRANSITION"}
+  },
+  "$defs": {
+    "sha256":{"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "evolved":{"type":"object","additionalProperties":false,"required":["path","previous_sha256","current_sha256","reason","scope","package_visible","release_authority"],"properties":{"path":{"type":"string","minLength":1},"previous_sha256":{"$ref":"#/$defs/sha256"},"current_sha256":{"$ref":"#/$defs/sha256"},"reason":{"type":"string","minLength":20},"scope":{"const":"package-excluded-change-and-release-authority"},"package_visible":{"const":false},"release_authority":{"const":false}}},
+    "current":{"type":"object","additionalProperties":false,"required":["path","sha256","hash_mode","role"],"properties":{"path":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/sha256"},"hash_mode":{"const":"canonical-text-v1"},"role":{"type":"string","minLength":8}}},
+    "falseTransitions":{"type":"object","additionalProperties":false,"required":["merge","tagging","signing","sealing","version_allocation","publication","remote_write"],"properties":{"merge":{"const":false},"tagging":{"const":false},"signing":{"const":false},"sealing":{"const":false},"version_allocation":{"const":false},"publication":{"const":false},"remote_write":{"const":false}}}
+  }
+}

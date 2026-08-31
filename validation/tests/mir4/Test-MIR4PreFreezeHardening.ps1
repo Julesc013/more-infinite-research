@@ -181,6 +181,18 @@ if([string]$patchLaneRehearsal.kind-cne'MIR4PatchLaneRehearsalAuthorityEvolution
    @($patchLaneRehearsal.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-post-release-patch-lane-rehearsal]'
 }
+$m4103=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100
+if([string]$m4103.kind-cne'MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'-or
+   [string]$m4103.status-cne'M41-03-CHANGE-AND-RELEASE-AUTHORITY-COMPLETE-NO-RELEASE-TRANSITION'-or
+   @($m4103.evolved_bindings).Count-lt10-or
+   @($m4103.current_authorities).Count-lt20-or
+   [string]$m4103.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   -not[bool]$m4103.invariants.six_views_from_one_inventory-or
+   -not[bool]$m4103.invariants.historical_4_0_0_shadow_only-or
+   -not[bool]$m4103.invariants.selective_target_filtering-or
+   @($m4103.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-03-change-and-release-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

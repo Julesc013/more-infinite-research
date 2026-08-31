@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 428 pages as of 2026-08-31.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 429 pages as of 2026-08-31.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -64,6 +64,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/factorio-lifecycle.md | Factorio Lifecycle Boundaries | current | maintainer | explanation | mir-maintainers | 2026-07-08 |
 | docs/architecture/mir-extension-protocol-v1.md | MIR Extension Protocol v1 Roadmap | archived | developer | archive | mir-maintainers | 2026-08-08 |
 | docs/architecture/mir4-assurance-scale.md | MIR 4 Assurance Scale and Offline Drill | current | maintainer | explanation | mir-maintainers | 2026-08-26 |
+| docs/architecture/mir4-change-and-release-authority.md | MIR 4 change and release narrative authority | current | developer | explanation | mir-maintainers | 2026-08-31 |
 | docs/architecture/mir4-historical-succession.md | MIR 4 Historical, Museum, and Successor-Host Closure | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-module-ecosystem.md | MIR 4 Module Ecosystem | current | developer | reference | mir-maintainers | 2026-08-26 |

@@ -37,6 +37,10 @@ ship on the main 3.x line.
 
 This is the current structure target for the MIR 3 shipped mod. Backport branches may carry temporary compatibility surfaces only when branch policy requires them; those surfaces must not merge back into the main 3.x line.
 
+## Change and release narrative boundary
+
+Accepted change facts live under `changes/unreleased/` and released historical facts under `changes/history/`. `tools/mir/application/release/ReleaseNarratives.ps1` is the only narrative orchestrator; six focused renderers consume an immutable plan and explicit surface and target dispositions. They may write only package-excluded shadow reports. They cannot inspect Git history for changes, infer target support, mutate packages, allocate versions, or grant release transitions. The complete contract is documented in `docs/architecture/mir4-change-and-release-authority.md`.
+
 ## Factorio Shell
 
 Factorio imposes the outer shell:

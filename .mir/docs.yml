@@ -378,6 +378,13 @@ docs:
       - mir4-proof-cover-proposal
       - mir4-24-6-1-release-budget-design
       - mir4-non-production-offline-publisher-drill
+  - path: docs/architecture/mir4-change-and-release-authority.md
+    title: "MIR 4 change and release narrative authority"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/architecture/mir4-historical-succession.md
     title: "MIR 4 Historical, Museum, and Successor-Host Closure"
     status: current

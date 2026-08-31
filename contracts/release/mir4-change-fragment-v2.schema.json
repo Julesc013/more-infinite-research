@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/release/mir4-change-fragment-v2.schema.json",
+  "title": "MIR4ChangeFragmentV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "change_id", "status", "change_type", "summary", "details", "semantic_domains", "audiences", "target_dispositions", "package_visibility", "impacts", "security_visibility", "release_surfaces", "references"],
+  "properties": {
+    "schema": {"const": 2},
+    "kind": {"const": "MIR4ChangeFragmentV2"},
+    "change_id": {"type": "string", "pattern": "^MIR4-(?:CHG|HIST|SYN)-[0-9]{4}-[0-9]{4}$"},
+    "status": {"enum": ["draft", "accepted", "released", "withdrawn"]},
+    "change_type": {"enum": ["added", "changed", "deprecated", "removed", "fixed", "security"]},
+    "summary": {"type": "string", "minLength": 8, "maxLength": 220},
+    "details": {"type": "array", "maxItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 8, "maxLength": 320}},
+    "semantic_domains": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"}},
+    "audiences": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["players", "mod-authors", "contributors", "maintainers", "security"]}},
+    "target_dispositions": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {"type": "object", "additionalProperties": false, "required": ["target", "disposition", "reason"], "properties": {
+        "target": {"enum": ["F210", "F200", "F110", "F100"]},
+        "disposition": {"enum": ["affected", "unaffected", "omitted-by-capability", "not-applicable", "unknown"]},
+        "reason": {"type": "string", "minLength": 3, "maxLength": 240}
+      }}
+    },
+    "package_visibility": {"enum": ["player-package", "developer-kit", "repository-only", "none"]},
+    "impacts": {"type": "object", "additionalProperties": false, "required": ["save", "settings", "migration", "compatibility", "public_contract", "support_claim"], "properties": {
+      "save": {"enum": ["none", "compatible", "repair-required", "unknown"]},
+      "settings": {"enum": ["none", "compatible", "changed", "unknown"]},
+      "migration": {"enum": ["none", "required", "unknown"]},
+      "compatibility": {"enum": ["none", "compatible", "changed", "unknown"]},
+      "public_contract": {"enum": ["none", "compatible", "changed", "unknown"]},
+      "support_claim": {"enum": ["none", "narrowed", "expanded", "unknown"]}
+    }},
+    "security_visibility": {"enum": ["public-at-merge", "embargoed-until-release", "private-advisory", "internal-only"]},
+    "release_surfaces": {"type": "object", "additionalProperties": false, "required": ["source_changelog", "target_changelog", "github", "mod_portal", "technical", "manifest"], "properties": {
+      "source_changelog": {"enum": ["include", "omit", "redact"]},
+      "target_changelog": {"enum": ["include", "omit", "redact"]},
+      "github": {"enum": ["include", "omit", "redact"]},
+      "mod_portal": {"enum": ["include", "omit", "redact"]},
+      "technical": {"enum": ["include", "omit", "redact"]},
+      "manifest": {"enum": ["include", "omit", "redact"]}
+    }},
+    "references": {"type": "array", "uniqueItems": true, "items": {"type": "object", "additionalProperties": false, "required": ["kind", "value"], "properties": {
+      "kind": {"enum": ["issue", "pull-request", "document", "finding", "release-record"]},
+      "value": {"type": "string", "minLength": 1, "maxLength": 300}
+    }}}
+  }
+}

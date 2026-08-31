@@ -25,6 +25,7 @@ Current-page navigation generated from Markdown front matter as of 2026-08-31.
 - [Loader Manufacturing Capability](../../capabilities/loader-manufacturing.md)
 - [Loop Risk Capability](../../capabilities/loop-risk.md)
 - [Mining Drill Manufacturing Capability](../../capabilities/mining-drill-manufacturing.md)
+- [MIR 4 change and release narrative authority](../../architecture/mir4-change-and-release-authority.md)
 - [MIR 4 Historical, Museum, and Successor-Host Closure](../../architecture/mir4-historical-succession.md)
 - [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md)
 - [MIR 4 Platform Preview Architecture](../../architecture/mir4-platform-preview.md)

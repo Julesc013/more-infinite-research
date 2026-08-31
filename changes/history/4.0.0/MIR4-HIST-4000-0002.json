@@ -1,0 +1,13 @@
+{
+  "schema": 2, "kind": "MIR4ChangeFragmentV2", "change_id": "MIR4-HIST-4000-0002", "status": "released", "change_type": "changed",
+  "summary": "Preserved proven compiler, emitter, technology identities, settings, migrations, and runtime state across direct upgrades.",
+  "details": ["Retained target-aware science, prerequisite, process-safety, ownership, and maximum-level validation.", "Kept valid external research owners and rejected duplicate or unsafe effects with diagnostics."],
+  "semantic_domains": ["compiler", "migration", "runtime"], "audiences": ["players", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Direct upgrade from MIR 3.2.11."}, {"target":"F200","disposition":"affected","reason":"Direct upgrade from MIR 2.5.11."},
+    {"target":"F110","disposition":"affected","reason":"Direct upgrade from MIR 1.9.9."}, {"target":"F100","disposition":"affected","reason":"Direct upgrade from MIR 1.8.9."}
+  ],
+  "package_visibility": "player-package", "impacts": {"save":"compatible","settings":"compatible","migration":"required","compatibility":"compatible","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge", "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [{"kind":"document","value":"docs/releases/mir4-4.0-publication-copy.md"}]
+}

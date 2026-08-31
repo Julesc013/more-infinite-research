@@ -3,13 +3,12 @@
   "kind": "MIR4VisibleRootProjectionV2",
   "id": "changes",
   "path": "changes",
-  "mode": "shadow-reader",
+  "mode": "active-change-authority",
   "current_authorities": [
-    ".mir/lifecycle/changes",
-    ".mir/lifecycle/incidents",
-    ".mir/lifecycle/tasks"
+    "changes/unreleased",
+    "changes/history"
   ],
-  "writable_authority": false,
+  "writable_authority": true,
   "marker_is_writable_authority": false,
   "package_visible": false,
   "source": ".mir/control/repository-fixed-point.json"

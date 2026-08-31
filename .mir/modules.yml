@@ -578,6 +578,21 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4PlatformPreview.ps1
     boundary: read-only validation of the stable release DAG contract; no phase execution, candidate allocation, prototype or runtime mutation, source freeze, production signing, sealing, promotion, tag, upload, publication, or public support authority
     stability: stable-canonical-release-dag-application-migrated-compatibility-reader-retained
+  mir4_change_and_release_authority_v1:
+    authority: changes/unreleased
+    historical_corpus: changes/history/4.0.0
+    contracts:
+      - contracts/release/mir4-change-fragment-v2.schema.json
+      - contracts/release/mir4-defect-record-v1.schema.json
+      - contracts/release/mir4-change-realization-v1.schema.json
+      - contracts/release/mir4-release-narrative-plan-v1.schema.json
+      - contracts/release/mir4-release-narrative-result-v1.schema.json
+    implementation: tools/mir/application/release/ReleaseNarratives.ps1
+    command: tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1
+    documentation: docs/architecture/mir4-change-and-release-authority.md
+    test: validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
+    boundary: accepted typed changes render deterministic package-excluded narrative views; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
+    stability: stable-package-excluded-change-and-narrative-authority-v1
   mir4_full_platform_closeout_v1:
     implementation: tools/lib/mir4/FullPlatformCloseout.ps1
     exporter: tools/commands/mir4/Export-MIR4FullPlatform24HRecords.ps1
