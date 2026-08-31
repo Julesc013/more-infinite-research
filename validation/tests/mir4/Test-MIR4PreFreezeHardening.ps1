@@ -157,7 +157,7 @@ if([string]$automationCutover.kind-cne'MIR4PostReleaseAutomationAuthorityCutover
    @($automationCutover.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-post-release-automation-authority-cutover]'
 }
-if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
+if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $plan=Get-Content -Raw -LiteralPath (Join-Path $repo $planPath)|ConvertFrom-Json -Depth 100

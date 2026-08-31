@@ -31,6 +31,6 @@ jobs:
         run: |
           $p=@{Phase='public-readback';Operation='DryRun';SourceReleaseRecord=$env:MIR4_SOURCE_RELEASE_RECORD;CandidateId=$env:MIR4_CANDIDATE_ID;SourceCommit=$env:MIR4_SOURCE_COMMIT;SourceTree=$env:MIR4_SOURCE_TREE;TargetDistributionRecordSet=$env:MIR4_TARGET_RECORD_SET;ReleasePlanDigest=$env:MIR4_RELEASE_PLAN_DIGEST;ProofRoot=$env:MIR4_PROOF_ROOT;SealRoot=$env:MIR4_SEAL_ROOT;OutputPath='build/results/mir4-public-readback/request.json'}
           ./tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1 @p
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with: {name: mir4-public-readback, path: build/results/mir4-public-readback/request.json, if-no-files-found: error}

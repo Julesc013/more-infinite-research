@@ -36,6 +36,13 @@ $lockText = [IO.File]::ReadAllText($currentLockPath)
 if (-not ($lockText | Test-Json -SchemaFile $currentContractPath)) { throw '[mir4-post-release-automation-cutover-lock-schema]' }
 $lock = $lockText | ConvertFrom-Json -Depth 40 -DateKind String
 if ((Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot) -cne $expectedPackageSource) { throw '[mir4-post-release-automation-cutover-package-source]' }
+$outputPath = Join-Path $RepoRoot $outputRelative
+$existing = $null
+if ($Check) {
+  if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw '[mir4-post-release-automation-cutover-missing]' }
+  $existing = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $RecordedAt = [string]$existing.recorded_at
+} elseif ([string]::IsNullOrWhiteSpace($RecordedAt)) { $RecordedAt = [DateTimeOffset]::Now.ToString('o') }
 
 $registryPaths = @(
   '.mir/control/paths.yml',
@@ -60,17 +67,21 @@ $proofPaths = @(
 )
 $automationPaths = @($lock.repository_workflows) + @('.mir/releases/governance/mir4/github-actions-lock-v2.json')
 $retirement = [Collections.Generic.List[object]]::new()
-foreach ($path in @($automationPaths + $registryPaths + $proofPaths | Sort-Object -Unique)) {
-  if (-not $state.authority_hashes.ContainsKey([string]$path)) { throw "[mir4-post-release-automation-cutover-unbound] $path" }
-  $control = if ($path -in $automationPaths) { 'visible-action-lock-and-workflow-closure' }
-    elseif ($path -in $registryPaths) { 'visible-repository-registry' }
-    else { 'current-contract-and-static-proof' }
-  $retirement.Add([ordered]@{
-    path=[string]$path
-    historical_sha256=[string]$state.authority_hashes[[string]$path]
-    disposition='retired-from-current-prefreeze-byte-binding'
-    current_control=$control
-  })
+if ($Check) {
+  foreach ($row in @($existing.retired_bindings)) { $retirement.Add($row) }
+} else {
+  foreach ($path in @($automationPaths + $registryPaths + $proofPaths | Sort-Object -Unique)) {
+    if (-not $state.authority_hashes.ContainsKey([string]$path)) { throw "[mir4-post-release-automation-cutover-unbound] $path" }
+    $control = if ($path -in $automationPaths) { 'visible-action-lock-and-workflow-closure' }
+      elseif ($path -in $registryPaths) { 'visible-repository-registry' }
+      else { 'current-contract-and-static-proof' }
+    $retirement.Add([ordered]@{
+      path=[string]$path
+      historical_sha256=[string]$state.authority_hashes[[string]$path]
+      disposition='retired-from-current-prefreeze-byte-binding'
+      current_control=$control
+    })
+  }
 }
 if ($retirement.Count -lt 30) { throw "[mir4-post-release-automation-cutover-retirement-count] $($retirement.Count)" }
 
@@ -79,12 +90,6 @@ function Get-MIR4AutomationCanonicalSha256([string]$Path) {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($text)))
 }
 
-$outputPath = Join-Path $RepoRoot $outputRelative
-if ($Check) {
-  if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) { throw '[mir4-post-release-automation-cutover-missing]' }
-  $existing = Get-Content -Raw -LiteralPath $outputPath | ConvertFrom-Json -Depth 100 -DateKind String
-  $RecordedAt = [string]$existing.recorded_at
-} elseif ([string]::IsNullOrWhiteSpace($RecordedAt)) { $RecordedAt = [DateTimeOffset]::Now.ToString('o') }
 $successorAuthorities = if ($Check) {
   @($existing.successor_authorities)
 } else {

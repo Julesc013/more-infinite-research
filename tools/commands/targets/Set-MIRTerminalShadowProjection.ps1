@@ -276,7 +276,7 @@ jobs:
         run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
       - name: Upload verification plan
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mir-terminal-shadow-verification-plan
           path: artifacts/assurance/plan.json
@@ -373,7 +373,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $mergeWorkerEvidence = @'
       - name: Merge worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/evidence
@@ -383,7 +383,7 @@ function Get-MIRTerminalMaintainedHostedWorkflowText {
   $importWorkerEvidence = @'
       - name: Download isolated worker evidence
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           pattern: mir-evidence-*
           path: artifacts/assurance/worker-evidence
