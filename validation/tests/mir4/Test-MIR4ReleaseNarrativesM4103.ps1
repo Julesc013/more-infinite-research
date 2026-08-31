@@ -55,6 +55,8 @@ $sourceProjection = Update-MIR4SourceChangelogV1 -RepoRoot $repo -PlanPath 'rele
 $sourceText = [IO.File]::ReadAllText((Join-Path $repo 'CHANGELOG.md'))
 Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -match '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
 Assert-MIR4NarrativeTestV1 ($sourceText -match 'complete physical and executable foundation') 'mir4-source-changelog-accepted-inventory'
+$changelogEol = (& git -C $repo check-attr eol -- CHANGELOG.md 2>&1) -join "`n"
+Assert-MIR4NarrativeTestV1 ($LASTEXITCODE -eq 0 -and $changelogEol -cmatch 'CHANGELOG\.md:\s+eol:\s+lf$') 'mir4-source-changelog-eol'
 
 $bad = Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/release/m41-03/changes/synthetic-f210-patch.json') | ConvertFrom-Json -Depth 100
 $bad.target_dispositions[0].disposition = 'unknown'
