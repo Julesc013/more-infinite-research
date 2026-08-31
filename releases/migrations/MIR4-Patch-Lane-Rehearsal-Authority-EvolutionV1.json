@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "kind": "MIR4PatchLaneRehearsalAuthorityEvolutionV1",
+  "recorded_at": "2026-08-31T22:10:00+10:00",
+  "programme_id": "M40-01-PATCH-LANE-REHEARSAL",
+  "change_id": "MIR4-M40-01-PATCH-LANE-REHEARSAL-2026-08-31",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-Branch-Operating-Model-Authority-EvolutionV1.json",
+    "sha256": "B7EF0E539329446F6347B9A97D7F5C6F63C6E13CD1CA1C6F992C8562F50B5EFD"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "74c75879246746c8533d2ef7a170aa0dc6bcbbbc",
+    "tree": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/control/repository-fixed-point.json",
+      "previous_sha256": "0F1A2ED42091829BE499CFC3A9C4BD23E8DD69C81AE62F5F24BB34B12D2C4D44",
+      "current_sha256": "7DDAEDCADA69AFC19264466FA59E83AA7E71D64C6FA4018CEBA81FD5532EF6ED",
+      "reason": "Expose the release contract and rehearsal record roots without moving player package source.",
+      "scope": "package-excluded-maintenance-rehearsal",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "75EC40DEB205A046E9FF26FB35174608F7B3ABA1FAD7F5B1EBF7EF3700EB23F7",
+      "current_sha256": "6A27BA60F4C5BC366893E23BC0CC75165A36DF470E70FE4A73DA472E350F1D62",
+      "reason": "Record the unpublished maintenance-lane proof and keep M40 active for real corrections.",
+      "scope": "package-excluded-maintenance-rehearsal",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "73ADC61E119E3EB4F0243D1E94DF01890363B552B4BC8FA4A08B301770C550A9",
+      "current_sha256": "BC1393C61AF13BC7DF8690C14596777E30A0BFAC6D2D9E45A450008274328A63",
+      "reason": "Correct the protected stable-to-dev convergence outcome while preserving the accepted roadmap.",
+      "scope": "package-excluded-maintenance-rehearsal",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "9D8B3865C1285B3AEEFDBD08ECD5B78A62E9B7BE7C5211578ABD0D1AE0ABE80D",
+      "current_sha256": "F826FB41222C86267A41A171E25ADA6E9822822F19DD0021400D815202006D5F",
+      "reason": "Expose the typed patch-lane rehearsal through the one supported MIR command surface.",
+      "scope": "package-excluded-maintenance-rehearsal",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": ".mir/control/paths.yml",
+      "sha256": "3D89268F5E694F2C72737A77D41B906052BF93A99DC3483D0BD21F0B30478910",
+      "hash_mode": "canonical-text-v1",
+      "role": "logical-path-projection"
+    },
+    {
+      "path": ".mir/modules.yml",
+      "sha256": "8EA20E196B20CC6F106E9E0668E6C7100B5C14AD59B61EB09DE5E148371233C2",
+      "hash_mode": "canonical-text-v1",
+      "role": "module-boundary-projection"
+    },
+    {
+      "path": "contracts/.mir-root.json",
+      "sha256": "181EC0B3DA4D8977DCF83DE5DB72C4EFA58C8BAAAC9FF9531DDB5BA4DB4C9657",
+      "hash_mode": "canonical-text-v1",
+      "role": "contract-root-marker"
+    },
+    {
+      "path": "contracts/release/mir4-change-realization-v1.schema.json",
+      "sha256": "26055A973B887530F72A45FF2091AA6972895B0DBAA6D1D4EC0E0DE89CA4896E",
+      "hash_mode": "canonical-text-v1",
+      "role": "change-realization-contract"
+    },
+    {
+      "path": "contracts/release/mir4-defect-record-v1.schema.json",
+      "sha256": "1051628FBCDA1DE73584A838FBAB914A1B5083E10C1CC0E493E6F2E51EE47360",
+      "hash_mode": "canonical-text-v1",
+      "role": "defect-record-contract"
+    },
+    {
+      "path": "contracts/release/mir4-patch-lane-rehearsal-result-v1.schema.json",
+      "sha256": "F89AFFC900F06C786D64B34F1C21AA5399422776FCA3560787FDF68BA25C3504",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-result-contract"
+    },
+    {
+      "path": "contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json",
+      "sha256": "19BC4F662F51B66B51372E4A1737ED7174CD4B90A2A3E4D901CE60DEA3AC67E3",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-authority-contract"
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "sha256": "42552E99B1CEB3C6FA930B5D23AF563FDE5E9928D6F6E92B5F966288F5DF5EB2",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-boundary-documentation"
+    },
+    {
+      "path": "fixtures/release/m40-01/dev-forward-integration-realization.json",
+      "sha256": "F7A9E04FF237E4885D2CEA317BFA282E172C3B807C75C732023265717FA39825",
+      "hash_mode": "canonical-text-v1",
+      "role": "dev-forward-integration-fixture"
+    },
+    {
+      "path": "fixtures/release/m40-01/main-forward-port-realization.json",
+      "sha256": "8A60EB6EFE0E0F482352FCECC7DC7F87E26C2F89BD6576BDE0451F37BB658A23",
+      "hash_mode": "canonical-text-v1",
+      "role": "main-forward-port-fixture"
+    },
+    {
+      "path": "fixtures/release/m40-01/stable-realization.json",
+      "sha256": "DA7C3847C932B0662643630F8EC7550F2E10A289DEEA9E4712D1C4AB0C819E6D",
+      "hash_mode": "canonical-text-v1",
+      "role": "stable-realization-fixture"
+    },
+    {
+      "path": "fixtures/release/m40-01/synthetic-f210-defect.json",
+      "sha256": "760141678565C7B5D041E78772D57466E2A905F93C15D34741D177C120D83CB5",
+      "hash_mode": "canonical-text-v1",
+      "role": "synthetic-defect-fixture"
+    },
+    {
+      "path": "releases/.mir-root.json",
+      "sha256": "94E8A1D09519DDE562D812968120A108F90F1CD8B2EBB2670F51297123BAC9EE",
+      "hash_mode": "canonical-text-v1",
+      "role": "release-root-marker"
+    },
+    {
+      "path": "releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json",
+      "sha256": "EA5A370402D0A8952670B541746D98F67218808E57F27E3F3F482AB659CF0CA5",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-proof-receipt"
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1",
+      "sha256": "58C6A36E766848C0F3D500766D3D6B9D72C72F8114D1BBD90948B1B6E1771982",
+      "hash_mode": "canonical-text-v1",
+      "role": "bounded-patch-authority-writer"
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "sha256": "E3045D345E5CBB683D1E4C231AE1B3F741D6DA9EF3800FFB3203D22BDE533AA3",
+      "hash_mode": "canonical-text-v1",
+      "role": "append-only-authority-chain-validator"
+    },
+    {
+      "path": "tools/mir/application/release/PatchLaneRehearsal.ps1",
+      "sha256": "75C0379ACDF885032DD4B01AFACC83B9DD7356B3569F94B8A7385AF25E65772F",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-application-service"
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1",
+      "sha256": "5845C93A349A05217553E44A696747552296DD662F7FD3FC4707339682B77A53",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-command-adapter"
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1",
+      "sha256": "65C36B5685BF15D342FFE05BC255D388674C7065864D8F0E1B3FD7FCAC1ACDC7",
+      "hash_mode": "canonical-text-v1",
+      "role": "patch-rehearsal-executable-proof"
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "sha256": "B613F67E85D279D384E92BA5ABABB5C88C941AC986DEC36CEE57A96112FB5315",
+      "hash_mode": "canonical-text-v1",
+      "role": "authority-chain-regression-proof"
+    },
+    {
+      "path": "validation/tests.yml",
+      "sha256": "1794CC162E2B83D10F4EE290AD554347DA3DB2D11BDB7095B392D9E475CF101D",
+      "hash_mode": "canonical-text-v1",
+      "role": "verification-catalogue-projection"
+    }
+  ],
+  "rehearsal_receipt": {
+    "path": "releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json",
+    "sha256": "EA5A370402D0A8952670B541746D98F67218808E57F27E3F3F482AB659CF0CA5",
+    "hash_mode": "canonical-text-v1",
+    "record_digest": "sha256:08427cbb9e4a30f36c53ce3301621c5f9e558d63d16850cfff7df0a8b9cf1a13"
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "package_visible_delta": [],
+  "invariants": {
+    "release_4_0_base_exact": true,
+    "disposable_branch_removed": true,
+    "one_affected_target": true,
+    "unchanged_targets_explicit": true,
+    "semantic_forward_ports_planned": true,
+    "remote_refs_unchanged": true,
+    "package_source_unchanged": true,
+    "gameplay_difference_authorized": false
+  },
+  "transition_gate": {
+    "merge": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "PATCH-LANE-REHEARSAL-PROVED-NO-RELEASE-TRANSITION"
+}

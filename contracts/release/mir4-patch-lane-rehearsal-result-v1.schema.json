@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/contracts/release/mir4-patch-lane-rehearsal-result-v1.schema.json",
+  "title": "MIR 4 PatchLaneRehearsalResultV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "rehearsal_id",
+    "status",
+    "finding_id",
+    "inputs",
+    "source_identity",
+    "disposable_branch",
+    "target_matrix",
+    "package_plan",
+    "qualification_plan",
+    "forward_port_plan",
+    "firewall",
+    "package_source_sha256",
+    "record_digest"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4PatchLaneRehearsalResultV1" },
+    "rehearsal_id": { "const": "M40-01-SYNTHETIC-F210-2026-08-31" },
+    "status": { "const": "passed-unpublished" },
+    "finding_id": { "const": "MIR4-SYN-2026-0001" },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defect_record", "stable_realization", "main_realization", "dev_realization"],
+      "properties": {
+        "defect_record": { "$ref": "#/$defs/input" },
+        "stable_realization": { "$ref": "#/$defs/input" },
+        "main_realization": { "$ref": "#/$defs/input" },
+        "dev_realization": { "$ref": "#/$defs/input" }
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_4_0", "main", "dev"],
+      "properties": {
+        "release_4_0": { "$ref": "#/$defs/gitIdentity" },
+        "main": { "$ref": "#/$defs/gitIdentity" },
+        "dev": { "$ref": "#/$defs/gitIdentity" }
+      }
+    },
+    "disposable_branch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "base_commit", "created", "checked_out_at_base", "removed", "remote_write"],
+      "properties": {
+        "name": { "const": "rehearsal/m40-01-synthetic-f210" },
+        "base_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "created": { "const": true },
+        "checked_out_at_base": { "const": true },
+        "removed": { "const": true },
+        "remote_write": { "const": false }
+      }
+    },
+    "target_matrix": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "disposition", "package_action"],
+        "properties": {
+          "target": { "enum": ["F210", "F200", "F110", "F100"] },
+          "disposition": { "enum": ["affected", "unchanged"] },
+          "package_action": { "enum": ["plan-and-qualify", "record-unchanged-no-package"] }
+        }
+      }
+    },
+    "package_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["affected_targets", "unchanged_targets", "materializer", "determinism", "manufacture_unchanged_targets"],
+      "properties": {
+        "affected_targets": { "const": ["F210"] },
+        "unchanged_targets": { "const": ["F200", "F110", "F100"] },
+        "materializer": { "const": "independent-target-plan" },
+        "determinism": { "const": "same-base-plus-realization-plus-target-produces-byte-identical-plan" },
+        "manufacture_unchanged_targets": { "const": false }
+      }
+    },
+    "qualification_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["F210", "F200", "F110", "F100"],
+      "properties": {
+        "F210": { "const": ["schema", "package", "exact-engine-load", "direct-upgrade", "regression-proposition"] },
+        "F200": { "const": ["unchanged-package-identity"] },
+        "F110": { "const": ["unchanged-package-identity"] },
+        "F100": { "const": ["unchanged-package-identity"] }
+      }
+    },
+    "forward_port_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "strategy", "shared_finding_id", "semantic_equivalence_required", "dev_disposition"],
+      "properties": {
+        "from": { "const": "release/4.0" },
+        "to": { "const": "main" },
+        "strategy": { "const": "reimplement-intent-and-regression-proof" },
+        "shared_finding_id": { "const": "MIR4-SYN-2026-0001" },
+        "semantic_equivalence_required": { "const": true },
+        "dev_disposition": { "const": "receive-semantic-forward-port-from-main" }
+      }
+    },
+    "firewall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "tag", "version_allocation", "sign", "seal", "publish", "remote_branch_write"],
+      "properties": {
+        "merge": { "const": false },
+        "tag": { "const": false },
+        "version_allocation": { "const": false },
+        "sign": { "const": false },
+        "seal": { "const": false },
+        "publish": { "const": false },
+        "remote_branch_write": { "const": false }
+      }
+    },
+    "package_source_sha256": { "type": "string", "pattern": "^[0-9A-F]{64}$" },
+    "record_digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^(?![A-Za-z]:|/|.*\\\\).+$" },
+        "sha256": { "type": "string", "pattern": "^[0-9A-F]{64}$" }
+      }
+    },
+    "gitIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "commit", "tree"],
+      "properties": {
+        "ref": { "type": "string", "minLength": 1 },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+      }
+    }
+  }
+}

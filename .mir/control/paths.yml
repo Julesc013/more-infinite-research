@@ -9,6 +9,18 @@ paths:
   mir4.package-presentation.evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
   mir4.package-presentation.evolution-schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
   mir4.package-presentation.evolution-writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
+  mir4.patch-rehearsal.patch-policy: spec/releases/mir4-patch-policy-v1.json
+  mir4.patch-rehearsal.defect-contract: contracts/release/mir4-defect-record-v1.schema.json
+  mir4.patch-rehearsal.realization-contract: contracts/release/mir4-change-realization-v1.schema.json
+  mir4.patch-rehearsal.result-contract: contracts/release/mir4-patch-lane-rehearsal-result-v1.schema.json
+  mir4.patch-rehearsal.fixtures: fixtures/release/m40-01
+  mir4.patch-rehearsal.application: tools/mir/application/release/PatchLaneRehearsal.ps1
+  mir4.patch-rehearsal.cli: tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1
+  mir4.patch-rehearsal.receipt: releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json
+  mir4.patch-rehearsal.test: validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
+  mir4.patch-rehearsal.authority-evolution: releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json
+  mir4.patch-rehearsal.authority-evolution-schema: contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json
+  mir4.patch-rehearsal.authority-evolution-writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
   mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
   mir4.repository-migration.authority: governance/repository/migrations/fixed-point-tooling-v1.json
   mir4.repository-migration.proof: assurance/repository/fixed-point-tooling-v1.json

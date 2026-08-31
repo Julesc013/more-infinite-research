@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR4ChangeRealizationV1",
+  "realization_id": "REAL-MIR4-SYN-2026-0001-MAIN",
+  "finding_id": "MIR4-SYN-2026-0001",
+  "lane": "main",
+  "base": {
+    "ref": "main",
+    "commit": "a8dfd9f199da970567daf3d8bce2669725905e8e",
+    "tree": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"
+  },
+  "implementation": {
+    "state": "planned-only",
+    "commit": null,
+    "summary": "Reimplement the stable correction intent against current main and carry the same regression proposition."
+  },
+  "target_effects": [
+    { "target": "F210", "disposition": "affected" },
+    { "target": "F200", "disposition": "unchanged" },
+    { "target": "F110", "disposition": "unchanged" },
+    { "target": "F100", "disposition": "unchanged" }
+  ],
+  "package_delta": {
+    "state": "planned",
+    "expected_to_change": true,
+    "paths": ["changelog.txt"]
+  },
+  "migration_delta": "none",
+  "proof_obligations": [
+    "shared finding identity",
+    "semantic equivalence to stable realization",
+    "F210 target-specific copy regression",
+    "dev forward-integration disposition"
+  ],
+  "publication_disposition": "rehearsal-only-no-publication",
+  "semantic_equivalence": {
+    "relationship": "forward-port",
+    "other_realization_id": "REAL-MIR4-SYN-2026-0001-RELEASE40",
+    "proposition": "The main realization preserves the stable correction intent even when its physical implementation differs."
+  },
+  "authority": {
+    "merge": false,
+    "tag": false,
+    "sign": false,
+    "seal": false,
+    "publish": false
+  }
+}

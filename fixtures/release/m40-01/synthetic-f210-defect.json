@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "MIR4DefectRecordV1",
+  "finding_id": "MIR4-SYN-2026-0001",
+  "status": "synthetic-rehearsal",
+  "title": "Synthetic F210-only installation guidance omission",
+  "classification": "release-copy-or-installation-correction",
+  "severity": "low",
+  "disclosure": "internal-only",
+  "reproducer": {
+    "base_ref": "release/4.0",
+    "base_commit": "5ca449820bdfa5595ca03686f32c74904c46daf3",
+    "target": "F210",
+    "steps": [
+      "Select the preserved MIR 4.0.0 F210 distribution record.",
+      "Render the synthetic target-specific installation guidance.",
+      "Inspect the synthetic upgrade sentence required only by F210."
+    ],
+    "expected": "The F210 package guidance contains the target-specific upgrade sentence.",
+    "actual": "The synthetic F210 guidance omits the target-specific upgrade sentence."
+  },
+  "affected_source_lines": ["4.0.x", "stable-main", "next-dev"],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "The synthetic omission is declared only for the F210 installation surface."
+    },
+    {
+      "target": "F200",
+      "disposition": "unaffected",
+      "reason": "The F200 installation surface does not require the synthetic F210 sentence."
+    },
+    {
+      "target": "F110",
+      "disposition": "unaffected",
+      "reason": "The F110 installation surface does not require the synthetic F210 sentence."
+    },
+    {
+      "target": "F100",
+      "disposition": "unaffected",
+      "reason": "The F100 installation surface does not require the synthetic F210 sentence."
+    }
+  ],
+  "impact": {
+    "save": "none",
+    "security": "none",
+    "data_loss": "none",
+    "migration": "none"
+  },
+  "regression_proposition": "For the same accepted change inventory, only the F210 installation view gains the required synthetic sentence and every other target remains byte-identical.",
+  "lane_dispositions": {
+    "release_4_0": "synthetic-plan-only",
+    "main": "semantic-forward-port",
+    "dev": "receive-from-main"
+  },
+  "record_authority": {
+    "grants_implementation": false,
+    "grants_release": false,
+    "grants_signing": false,
+    "grants_publication": false
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR4ChangeRealizationV1",
+  "realization_id": "REAL-MIR4-SYN-2026-0001-DEV",
+  "finding_id": "MIR4-SYN-2026-0001",
+  "lane": "dev",
+  "base": {
+    "ref": "dev",
+    "commit": "74c75879246746c8533d2ef7a170aa0dc6bcbbbc",
+    "tree": "3d2530f34c3937aa56a030a4b7793307ed21d6a8"
+  },
+  "implementation": {
+    "state": "planned-only",
+    "commit": null,
+    "summary": "Receive the semantic forward-port from main without merging the historical stable lane wholesale."
+  },
+  "target_effects": [
+    { "target": "F210", "disposition": "affected" },
+    { "target": "F200", "disposition": "unchanged" },
+    { "target": "F110", "disposition": "unchanged" },
+    { "target": "F100", "disposition": "unchanged" }
+  ],
+  "package_delta": {
+    "state": "planned",
+    "expected_to_change": true,
+    "paths": ["changelog.txt"]
+  },
+  "migration_delta": "none",
+  "proof_obligations": [
+    "shared finding identity",
+    "semantic equivalence to main realization",
+    "F210 target-specific copy regression",
+    "F200 F110 F100 unchanged-package identity"
+  ],
+  "publication_disposition": "rehearsal-only-no-publication",
+  "semantic_equivalence": {
+    "relationship": "forward-port",
+    "other_realization_id": "REAL-MIR4-SYN-2026-0001-MAIN",
+    "proposition": "The dev integration receives the main correction intent and proof without acquiring direct stable-release publication authority."
+  },
+  "authority": {
+    "merge": false,
+    "tag": false,
+    "sign": false,
+    "seal": false,
+    "publish": false
+  }
+}

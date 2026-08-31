@@ -6,6 +6,7 @@
   "mode": "active-contract-root",
   "current_authorities": [
     "contracts/repository",
+    "contracts/release",
     "spec/api",
     "spec/schemas"
   ],

@@ -44,17 +44,17 @@ For source patch `4.0.1`, distribution versions are `4.0.21001`, `4.0.20001`, `4
 
 ## Dependency-ordered work
 
-The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, and branch-authority foundation closed on 2026-08-31; change-fragment and release-rendering work is next.
+The active fixed point is deliberately smaller than the full report. The initial governance, proof-topology, GitHub-surface, branch-authority, and unpublished patch-lane rehearsal foundation closed on 2026-08-31; change-fragment and release-rendering work is next.
 
 | Work package | Outcome | State after this change |
 | --- | --- | --- |
 | M40-00 | Preserve exact 4.0.0 refs, assets, remote controls, and offline restore closure | Complete |
-| M40-01 | Operate the protected `release/4.0` maintenance lane | Active |
+| M40-01 | Operate the protected `release/4.0` maintenance lane | Active; unpublished synthetic rehearsal passed |
 | M41-00 | Adopt operating, deployment, patch, and proof-applicability contracts | Complete |
 | M41-01 | Repair pull-request proof selection for event base, trust class, and synthetic merge topology | Complete |
 | M41-02 | Converge GitHub rules, community health, security automation, and one stable required check | Complete |
 | M41-03 | Introduce change fragments and generate every release narrative | Next |
-| M41-04 | Make `main` the sole integration authority while keeping `dev` exactly mirrored during transition | Complete while `dev` is retained |
+| M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Replace the root manual with a concise landing page and route the remaining docs by reader need | Queued after M41-03 |
 | M42-00 | Characterize the package boundary and generate each target independently | Blocked on the complete 4.1 fixed point |
@@ -86,6 +86,8 @@ The offline pre-refactor Git bundle was restored successfully and has SHA-256 `F
 The Mod Portal API exposed F210, F200, and F110 with SHA-1 values equal to the downloaded GitHub bytes. F100 was not present in the observed portal release list. No 4.0.1 source version is allocated by this record.
 
 ## Stable repair procedure
+
+The first operational rehearsal is recorded in `releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json`. It created and removed a disposable local branch from the exact `release/4.0` base, selected only F210 as affected, recorded F200/F110/F100 as unchanged without manufacturing packages, produced a deterministic qualification and semantic forward-port plan, rejected publication-authority tampering, preserved all remote refs, and left the player package source fingerprint unchanged. This proof keeps M40-01 operational; it does not allocate 4.0.1 or authorize a real correction.
 
 Triage a defect once under one finding ID. Record reproduction, severity, affected targets, save or migration impact, compatibility scope, package-visible paths, and every lane disposition. For a 4.0-origin defect, branch from `release/4.0`, make the smallest correction, prove each exact affected package, and forward-port the semantic intent and regression fixture through `main` to `dev`. For a current-stable defect, correct `main`, forward-port it to `dev`, and backport it to 4.0 only after exact-base reproduction. For a next-release defect, correct `dev`; do not manufacture a stable change unless the same finding independently reproduces there.
 

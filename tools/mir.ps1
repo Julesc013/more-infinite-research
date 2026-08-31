@@ -44,6 +44,7 @@ Usage:
   .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
   .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
@@ -654,6 +655,15 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $governanceArguments.OutputPath = $output }
         & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1") @governanceArguments
+      }
+      "patch-rehearsal" {
+        if ($Args.Count -lt 3) { throw "mir4 patch-rehearsal requires run or check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('run','check')) { throw "Unknown mir4 patch-rehearsal command: $subcommand" }
+        $rehearsalArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $rehearsalArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1") @rehearsalArguments
       }
       "repository" {
         if ($Args.Count -lt 3) { throw "mir4 repository requires generate, check, inventory, or initialize." }
