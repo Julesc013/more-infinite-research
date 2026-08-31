@@ -3,6 +3,7 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Pa
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/RunnerPublisherConfinement.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4RunnerTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Code)
@@ -41,7 +42,7 @@ Assert-MIR4RunnerThrows { Assert-MIR4WorkflowTextBoundaryV1 -Purpose builder -Te
 $qualifier = [IO.File]::ReadAllText((Join-Path $repo '.github/workflows/mir4-target-qualification.yml'))
 Assert-MIR4RunnerThrows { Assert-MIR4WorkflowTextBoundaryV1 -Purpose qualifier -Text ($qualifier + "`n          Copy-Item package.zip replacement.zip") } 'mir4-runner-qualifier-mutation-negative'
 Assert-MIR4RunnerThrows { Assert-MIR4WorkflowTextBoundaryV1 -Purpose builder -Text ($builder + "`n          Write-Host '`${{ inputs.source_commit }}'") } 'mir4-runner-shell-input-negative'
-Assert-MIR4RunnerTest ([string]$receiptA.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-runner-package-non-interference'
+Assert-MIR4RunnerTest ([string]$receiptA.package_source_sha256 -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)) 'mir4-runner-package-non-interference'
 
 [pscustomobject][ordered]@{
   status = 'passed'

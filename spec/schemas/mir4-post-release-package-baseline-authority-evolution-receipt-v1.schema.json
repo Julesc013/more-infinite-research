@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/mir4/post-release-package-baseline-authority-evolution-receipt-v1.schema.json",
+  "title": "MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "baseline_authority", "evolved_bindings", "current_authorities", "historical_package_source_sha256", "player_package_source_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "programme_id": { "const": "M41-00-POST-RELEASE-RECONCILIATION" },
+    "change_id": { "const": "MIR4-POST-RELEASE-PACKAGE-BASELINE-2026-08-31" },
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json" },
+        "sha256": { "const": "008BA8DE50BF4DC1AD2A3E5190E932B62AAD247BB84E9934A28C2813B79422FB" }
+      }
+    },
+    "baseline_authority": { "$ref": "#/$defs/descriptor" },
+    "evolved_bindings": { "type": "array", "minItems": 12, "items": { "$ref": "#/$defs/evolved" } },
+    "current_authorities": { "type": "array", "minItems": 4, "items": { "$ref": "#/$defs/current" } },
+    "historical_package_source_sha256": { "const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E" },
+    "player_package_source_sha256": { "const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336" },
+    "package_visible_delta": { "const": ["README.md"] },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player_executable_sources_unchanged", "one_emitter_preserved", "gameplay_difference_authorized"],
+      "properties": {
+        "player_executable_sources_unchanged": { "const": true },
+        "one_emitter_preserved": { "const": true },
+        "gameplay_difference_authorized": { "const": false }
+      }
+    },
+    "transition_gate": { "$ref": "#/$defs/falseTransitions" },
+    "status": { "const": "POST-RELEASE-PACKAGE-PRESENTATION-BASELINE-RECORDED-NO-RELEASE-TRANSITION" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": { "const": "spec/distribution/mir4-package-presentation-baseline-v1.json" },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "previous_sha256": { "$ref": "#/$defs/sha256" },
+        "current_sha256": { "$ref": "#/$defs/sha256" },
+        "reason": { "type": "string", "minLength": 1 },
+        "scope": { "enum": ["package-presentation", "package-excluded-control-plane"] },
+        "package_visible": { "type": "boolean" },
+        "release_authority": { "const": false }
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "hash_mode": { "const": "canonical-text-v1" },
+        "role": { "type": "string", "minLength": 1 }
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": { "const": false },
+        "candidate_allocation": { "const": false },
+        "production_signing": { "const": false },
+        "production_seal": { "const": false },
+        "promotion_to_main": { "const": false },
+        "tagging": { "const": false },
+        "publication": { "const": false }
+      }
+    }
+  }
+}
