@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-branch-operating-model-authority-evolution-v1.schema.json",
+  "title": "MIR4BranchOperatingModelAuthorityEvolutionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "remote_ruleset_snapshot", "player_package_source_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4BranchOperatingModelAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-06-BRANCH-OPERATING-MODEL"},
+    "change_id": {"const": "MIR4-BRANCH-OPERATING-MODEL-2026-08-31"},
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"const": "releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json"},
+        "sha256": {"const": "40B660FED308DB5A947D4CCF126AC3A4A2B32A8F0182CEF52003A6950F911C3F"}
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "tree"],
+      "properties": {
+        "branch": {"const": "main"},
+        "commit": {"const": "831daa2552f7f3c4820f7fcad24653da15995b7b"},
+        "tree": {"const": "250c9846299782a711862895fe97803bcfb5b816"}
+      }
+    },
+    "evolved_bindings": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {"$ref": "#/$defs/evolved"}
+    },
+    "current_authorities": {
+      "type": "array",
+      "minItems": 8,
+      "items": {"$ref": "#/$defs/current"}
+    },
+    "remote_ruleset_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "captured_at", "authoritative_for_remote_current_state"],
+      "properties": {
+        "path": {"const": "releases/governance/mir4-ruleset-snapshot-2026-08-31.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "captured_at": {"const": "2026-08-31T20:17:00+10:00"},
+        "authoritative_for_remote_current_state": {"const": false}
+      }
+    },
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "package_visible_delta": {"const": []},
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["main_latest_stable", "dev_next_release_integration", "release_4_0_maintenance", "pull_requests_required", "linear_history_required", "ordinary_bypass_actor_count", "package_source_unchanged", "gameplay_difference_authorized"],
+      "properties": {
+        "main_latest_stable": {"const": true},
+        "dev_next_release_integration": {"const": true},
+        "release_4_0_maintenance": {"const": true},
+        "pull_requests_required": {"const": true},
+        "linear_history_required": {"const": true},
+        "ordinary_bypass_actor_count": {"const": 0},
+        "package_source_unchanged": {"const": true},
+        "gameplay_difference_authorized": {"const": false}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"const": "BRANCH-OPERATING-MODEL-APPLIED-NO-RELEASE-TRANSITION"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"enum": ["AGENTS.md", "CONTRIBUTING.md", "docs/maintainer/mir4-release-operations.md"]},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 20},
+        "scope": {"const": "package-excluded-branch-governance"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "role": {"type": "string", "minLength": 8}
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "candidate_allocation": {"const": false},
+        "production_signing": {"const": false},
+        "production_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

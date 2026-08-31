@@ -188,8 +188,8 @@ function New-MIR4RunnerPublisherConfinementReceiptV1 {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $lockPath = Join-Path $repo '.mir/releases/governance/mir4/github-actions-lock-v2.json'
-  $schemaPath = Join-Path $repo 'spec/schemas/mir4-github-actions-lock-v2.schema.json'
+  $lockPath = Join-Path $repo 'governance/automation/github-actions-lock.json'
+  $schemaPath = Join-Path $repo 'contracts/repository/mir-github-actions-lock-v1.schema.json'
   $lockText = [IO.File]::ReadAllText((Resolve-Path -LiteralPath $lockPath).Path)
   $lock = $lockText | ConvertFrom-Json -Depth 40 -DateKind String
   Assert-MIR4RunnerPublisherCondition ($lockText | Test-Json -SchemaFile $schemaPath) 'mir4-runner-action-lock-schema'
@@ -280,7 +280,7 @@ function New-MIR4RunnerPublisherConfinementReceiptV1 {
       rows = $rows
     }
     action_lock = [pscustomobject][ordered]@{
-      path = '.mir/releases/governance/mir4/github-actions-lock-v2.json'
+      path = 'governance/automation/github-actions-lock.json'
       file_sha256 = Get-MIR4Sha256File -Path $lockPath
       actions = $lockedActions.Count
       generated_sources = @($lock.generated_workflow_sources).Count

@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "kind": "MIRGitHubActionsLockV1",
+  "recorded_at": "2026-08-31T20:05:00+10:00",
+  "scope": "current-repository-and-generated-workflows",
+  "status": "active-mutable-governance-authority",
+  "package_visible": false,
+  "supersedes": {
+    "path": ".mir/releases/governance/mir4/github-actions-lock-v2.json",
+    "sha256": "5C2CB4CB2FFF0107F19F3A74BD59E71758D9023E869E9579C0108C13CDC6262A",
+    "disposition": "immutable-mir-4.0-release-era-authority"
+  },
+  "runtime": {
+    "node_major": 24,
+    "minimum_actions_runner_version": "2.327.1",
+    "protected_runner_capability_preflight": "passed",
+    "protected_runner_operational": false
+  },
+  "actions": [
+    {"action": "actions/cache/restore", "requested_tag": "v6", "commit_sha": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9", "source": "https://api.github.com/repos/actions/cache/git/ref/tags/v6"},
+    {"action": "actions/cache/save", "requested_tag": "v6", "commit_sha": "55cc8345863c7cc4c66a329aec7e433d2d1c52a9", "source": "https://api.github.com/repos/actions/cache/git/ref/tags/v6"},
+    {"action": "actions/checkout", "requested_tag": "v7", "commit_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1", "source": "https://api.github.com/repos/actions/checkout/git/ref/tags/v7"},
+    {"action": "actions/download-artifact", "requested_tag": "v8", "commit_sha": "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c", "source": "https://api.github.com/repos/actions/download-artifact/git/ref/tags/v8"},
+    {"action": "actions/github-script", "requested_tag": "v9", "commit_sha": "3a2844b7e9c422d3c10d287c895573f7108da1b3", "source": "https://api.github.com/repos/actions/github-script/git/ref/tags/v9"},
+    {"action": "actions/upload-artifact", "requested_tag": "v7", "commit_sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", "source": "https://api.github.com/repos/actions/upload-artifact/git/ref/tags/v7"}
+  ],
+  "repository_workflows": [
+    ".github/workflows/action-transport-smoke.yml",
+    ".github/workflows/assurance-backport.yml",
+    ".github/workflows/assurance-full.yml",
+    ".github/workflows/assurance-promotion.yml",
+    ".github/workflows/assurance-scheduled.yml",
+    ".github/workflows/assurance-targeted.yml",
+    ".github/workflows/branch-policy.yml",
+    ".github/workflows/control-plane-v5.yml",
+    ".github/workflows/emergency-package.yml",
+    ".github/workflows/extended-compat-audit.yml",
+    ".github/workflows/mir4-independent-verification.yml",
+    ".github/workflows/mir4-preview-assets.yml",
+    ".github/workflows/mir4-promotion.yml",
+    ".github/workflows/mir4-public-readback.yml",
+    ".github/workflows/mir4-release-seal.yml",
+    ".github/workflows/mir4-restore-drill.yml",
+    ".github/workflows/mir4-source-freeze.yml",
+    ".github/workflows/mir4-target-build.yml",
+    ".github/workflows/mir4-target-publication.yml",
+    ".github/workflows/mir4-target-qualification.yml",
+    ".github/workflows/release-candidate.yml",
+    ".github/workflows/validate.yml"
+  ],
+  "generated_workflow_sources": [
+    "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
+    "tools/lib/mir4/ExtensionDeveloperExperience.ps1"
+  ],
+  "policy": {
+    "full_commit_sha_required": true,
+    "floating_tag_forbidden": true,
+    "exact_workflow_closure_required": true,
+    "explicit_permissions_required": true,
+    "public_pull_request_secrets_forbidden": true,
+    "builder_signing_and_upload_forbidden": true,
+    "qualifier_mutation_forbidden": true,
+    "release_candidate_has_no_third_party_action": true,
+    "publisher_has_no_source_checkout_or_package_builder": true
+  }
+}

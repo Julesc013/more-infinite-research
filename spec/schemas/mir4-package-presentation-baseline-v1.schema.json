@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/mir4/package-presentation-baseline-v1.schema.json",
+  "title": "MIR4PackagePresentationBaselineV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "predecessor",
+    "current",
+    "realization",
+    "invariants",
+    "package_coupling"
+  ],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4PackagePresentationBaselineV1" },
+    "status": { "const": "accepted-current-package-presentation-baseline" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_path", "package_source_sha256", "readme_blob_sha1"],
+      "properties": {
+        "authority_path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json" },
+        "package_source_sha256": { "const": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E" },
+        "readme_blob_sha1": { "pattern": "^[a-f0-9]{40}$" }
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "package_source_sha256",
+        "package_zip_sha256",
+        "package_zip_content_sha256",
+        "package_zip_bytes",
+        "readme_blob_sha1",
+        "package_visible_delta"
+      ],
+      "properties": {
+        "package_source_sha256": { "pattern": "^[A-F0-9]{64}$" },
+        "package_zip_sha256": { "pattern": "^[A-F0-9]{64}$" },
+        "package_zip_content_sha256": { "pattern": "^[A-F0-9]{64}$" },
+        "package_zip_bytes": { "type": "integer", "minimum": 1 },
+        "readme_blob_sha1": { "pattern": "^[a-f0-9]{40}$" },
+        "package_visible_delta": { "const": ["README.md"] }
+      }
+    },
+    "realization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pull_request", "main_commit", "dev_mirror_pull_request", "dev_mirror_commit"],
+      "properties": {
+        "pull_request": { "const": 203 },
+        "main_commit": { "pattern": "^[a-f0-9]{40}$" },
+        "dev_mirror_pull_request": { "const": 204 },
+        "dev_mirror_commit": { "pattern": "^[a-f0-9]{40}$" }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "player_executable_sources_unchanged",
+        "one_emitter_preserved",
+        "gameplay_difference_authorized",
+        "source_freeze_authorized",
+        "candidate_allocation_authorized",
+        "signing_or_sealing_authorized",
+        "promotion_authorized",
+        "publication_authorized"
+      ],
+      "properties": {
+        "player_executable_sources_unchanged": { "const": true },
+        "one_emitter_preserved": { "const": true },
+        "gameplay_difference_authorized": { "const": false },
+        "source_freeze_authorized": { "const": false },
+        "candidate_allocation_authorized": { "const": false },
+        "signing_or_sealing_authorized": { "const": false },
+        "promotion_authorized": { "const": false },
+        "publication_authorized": { "const": false }
+      }
+    },
+    "package_coupling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "reason", "retirement_gate"],
+      "properties": {
+        "state": { "const": "accepted-temporary" },
+        "reason": { "type": "string", "minLength": 1 },
+        "retirement_gate": { "const": "M42-00A package-membership characterization and M41-05B repository/package README separation" }
+      }
+    }
+  }
+}

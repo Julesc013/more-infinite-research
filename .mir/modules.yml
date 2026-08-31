@@ -132,6 +132,17 @@ package_excluded_modules:
     stability: stable-governance-contract-blocked-human-secret-input
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
+    current_github_actions_lock: governance/automation/github-actions-lock.json
+    current_github_actions_lock_schema: contracts/repository/mir-github-actions-lock-v1.schema.json
+    historical_github_actions_lock: .mir/releases/governance/mir4/github-actions-lock-v2.json
+    automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
+    automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
+    automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
+    current_package_presentation_authority: spec/distribution/mir4-package-presentation-baseline-v1.json
+    current_package_presentation_schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
+    current_package_presentation_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
+    current_package_presentation_evolution_schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
+    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
     completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
@@ -139,10 +150,13 @@ package_excluded_modules:
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
     runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
+    package_presentation_compatibility_reader: tools/lib/mir4/PackagePresentation.ps1
     command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
     capsule_command: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
     runner_confinement_command: tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1
     schemas:
+      - contracts/repository/mir-github-actions-lock-v1.schema.json
+      - contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
       - spec/schemas/mir4-supply-chain-authority-v1.schema.json
       - spec/schemas/mir4-component-inventory-v1.schema.json
       - spec/schemas/mir4-spdx-3.0.1-profile.schema.json
@@ -157,6 +171,9 @@ package_excluded_modules:
       - spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
       - spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
       - spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-package-presentation-baseline-v1.schema.json
+      - spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
+      - contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     tests:
       - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
@@ -164,7 +181,7 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
-    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
+    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, publisher confinement, and append-only current package-presentation baseline only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
     stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
@@ -577,6 +594,8 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
+      - releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
@@ -599,12 +618,14 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Hardening-Independent-Acceptance-LUNAV1.json
       - .mir/releases/governance/mir4/github-actions-lock.json
       - .mir/releases/governance/mir4/github-actions-lock-v2.json
+      - governance/automation/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
     f210_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
     final_mile_tooling_authority_writer: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
     final_release_closure_authority_writer: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
+    post_release_automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
     package_presentation: tools/lib/mir4/PackagePresentation.ps1
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
@@ -614,6 +635,7 @@ package_excluded_modules:
       - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
       - tools/commands/mir4/Update-MIR4PlaytestHandoffT17.ps1
       - tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
+      - tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
     workflows:
       - .github/workflows/mir4-source-freeze.yml
       - .github/workflows/mir4-target-build.yml
@@ -634,6 +656,8 @@ package_excluded_modules:
       - spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json
       - spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json
       - spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
+      - contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
       - spec/schemas/mir4-playtest-evidence-v1.schema.json
       - spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json
@@ -665,6 +689,7 @@ package_excluded_modules:
       - spec/schemas/mir4-release-restore-drill-result-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-github-actions-lock-v2.schema.json
+      - contracts/repository/mir-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     supporting_validators:
       - validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
@@ -1533,7 +1558,8 @@ validation_tooling:
     mir4_signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
     mir4_signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
     mir4_signing_ceremony_preparation_gate: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
-    mir4_github_actions_lock_current: .mir/releases/governance/mir4/github-actions-lock-v2.json
+    mir4_github_actions_lock_current: governance/automation/github-actions-lock.json
+    mir4_github_actions_lock_historical: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
     mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
     mir4_repository_fixed_point: tools/mir/application/repository/RepositoryFixedPoint.ps1

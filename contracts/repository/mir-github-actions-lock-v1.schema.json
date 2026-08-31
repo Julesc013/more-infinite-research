@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir-github-actions-lock-v1.schema.json",
+  "title": "MIRGitHubActionsLockV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "scope", "status", "package_visible", "supersedes", "runtime", "actions", "repository_workflows", "generated_workflow_sources", "policy"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIRGitHubActionsLockV1" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "scope": { "const": "current-repository-and-generated-workflows" },
+    "status": { "const": "active-mutable-governance-authority" },
+    "package_visible": { "const": false },
+    "supersedes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "disposition"],
+      "properties": {
+        "path": { "const": ".mir/releases/governance/mir4/github-actions-lock-v2.json" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "disposition": { "const": "immutable-mir-4.0-release-era-authority" }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_major", "minimum_actions_runner_version", "protected_runner_capability_preflight", "protected_runner_operational"],
+      "properties": {
+        "node_major": { "const": 24 },
+        "minimum_actions_runner_version": { "const": "2.327.1" },
+        "protected_runner_capability_preflight": { "const": "passed" },
+        "protected_runner_operational": { "const": false }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action", "requested_tag", "commit_sha", "source"],
+        "properties": {
+          "action": { "type": "string", "pattern": "^actions/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$" },
+          "requested_tag": { "type": "string", "pattern": "^v[0-9]+$" },
+          "commit_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+          "source": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "repository_workflows": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^\\.github/workflows/[A-Za-z0-9._-]+\\.yml$" }
+    },
+    "generated_workflow_sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_commit_sha_required", "floating_tag_forbidden", "exact_workflow_closure_required", "explicit_permissions_required", "public_pull_request_secrets_forbidden", "builder_signing_and_upload_forbidden", "qualifier_mutation_forbidden", "release_candidate_has_no_third_party_action", "publisher_has_no_source_checkout_or_package_builder"],
+      "properties": {
+        "full_commit_sha_required": { "const": true },
+        "floating_tag_forbidden": { "const": true },
+        "exact_workflow_closure_required": { "const": true },
+        "explicit_permissions_required": { "const": true },
+        "public_pull_request_secrets_forbidden": { "const": true },
+        "builder_signing_and_upload_forbidden": { "const": true },
+        "qualifier_mutation_forbidden": { "const": true },
+        "release_candidate_has_no_third_party_action": { "const": true },
+        "publisher_has_no_source_checkout_or_package_builder": { "const": true }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" }
+  }
+}

@@ -3,6 +3,7 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Pa
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SigningCeremonyPreparation.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4SigningPreparationTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Code)
@@ -46,7 +47,7 @@ $scratch = Join-Path $repo ('build\tests\mir4-signing-ceremony-preparation\' + [
 try {
   $receipt = New-MIR4SigningCeremonyPreparationReceiptV1 -RepoRoot $repo -SshKeygenPath $sshKeygen[0] -ScratchRoot $scratch
   Assert-MIR4SigningPreparationTest (Test-MIR4SigningCeremonyPreparationReceiptV1 -Receipt $receipt -RepoRoot $repo) 'mir4-signing-preparation-receipt'
-  Assert-MIR4SigningPreparationTest ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-signing-preparation-package-non-interference'
+  Assert-MIR4SigningPreparationTest ([string]$receipt.package_source_sha256 -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)) 'mir4-signing-preparation-package-non-interference'
   Assert-MIR4SigningPreparationTest (@($receipt.human_blockers).Count -eq 4) 'mir4-signing-preparation-human-blockers'
   Assert-MIR4SigningPreparationTest ([bool]$receipt.rehearsal.original_acl_policy_passed -and [bool]$receipt.rehearsal.restored_acl_policy_passed -and [bool]$receipt.rehearsal.restored_acl_matched) 'mir4-signing-preparation-acl-rehearsal'
   Assert-MIR4SigningPreparationTest (-not (Test-Path -LiteralPath $scratch -PathType Container) -or @(Get-ChildItem -LiteralPath $scratch -Force -ErrorAction SilentlyContinue).Count -eq 0) 'mir4-signing-preparation-secret-residue'

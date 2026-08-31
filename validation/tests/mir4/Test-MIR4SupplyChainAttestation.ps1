@@ -6,6 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SupplyChainAttestation.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4SupplyChainAttestationTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Diagnostic)
@@ -116,7 +117,7 @@ try {
   ) 'mir4-supply-chain-attestation-private-material-leak'
   $packageFingerprint = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   Assert-MIR4SupplyChainAttestationTest (
-    $packageFingerprint -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
+    $packageFingerprint -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)
   ) 'mir4-supply-chain-attestation-package-non-interference'
 
   [pscustomobject][ordered]@{

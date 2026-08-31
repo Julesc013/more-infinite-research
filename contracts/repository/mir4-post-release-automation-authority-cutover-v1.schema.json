@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-post-release-automation-authority-cutover-v1.schema.json",
+  "title": "MIR4PostReleaseAutomationAuthorityCutoverV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "retired_bindings", "successor_authorities", "runner_preflight", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": { "const": 1 },
+    "kind": { "const": "MIR4PostReleaseAutomationAuthorityCutoverV1" },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "programme_id": { "const": "M41-02-ACTION-RUNTIME-CUTOVER" },
+    "predecessor_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "const": ".mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json" },
+        "sha256": { "const": "CAD8AA2A0ED6AB17E0295D8EB5FC78A0B33DD3D7D70F7F5E52EC0178A9B0B6B4" }
+      }
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "tree"],
+      "properties": {
+        "branch": { "const": "main" },
+        "commit": { "const": "49ba61d1023ad155860b4fea3ce298d7c6f0775b" },
+        "tree": { "const": "fd7771762359ccc156bb696fae36e855fea8de4e" }
+      }
+    },
+    "evolved_bindings": { "const": [] },
+    "current_authorities": { "const": [] },
+    "retired_bindings": {
+      "type": "array",
+      "minItems": 30,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "historical_sha256", "disposition", "current_control"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "historical_sha256": { "$ref": "#/$defs/sha256" },
+          "disposition": { "const": "retired-from-current-prefreeze-byte-binding" },
+          "current_control": { "enum": ["visible-action-lock-and-workflow-closure", "visible-repository-registry", "current-contract-and-static-proof"] }
+        }
+      }
+    },
+    "successor_authorities": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "#/$defs/descriptor" }
+    },
+    "runner_preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["host", "runner_version", "minimum_version", "powershell_version", "node24_compatible", "runner_registration_present"],
+      "properties": {
+        "host": { "const": "AERO-15X-WIN10" },
+        "runner_version": { "const": "2.336.0" },
+        "minimum_version": { "const": "2.327.1" },
+        "powershell_version": { "const": "7.6.5" },
+        "node24_compatible": { "const": true },
+        "runner_registration_present": { "const": false }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["historical_mir_lock_immutable", "visible_current_authority", "full_sha_pins", "package_source_unchanged", "gameplay_difference_authorized"],
+      "properties": {
+        "historical_mir_lock_immutable": { "const": true },
+        "visible_current_authority": { "const": true },
+        "full_sha_pins": { "const": true },
+        "package_source_unchanged": { "const": true },
+        "gameplay_difference_authorized": { "const": false }
+      }
+    },
+    "transition_gate": { "$ref": "#/$defs/falseTransitions" },
+    "status": { "const": "CURRENT-AUTOMATION-AUTHORITY-VISIBLE-HISTORICAL-PREFREEZE-BINDINGS-RETIRED" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[A-F0-9]{64}$" },
+    "descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "hash_mode": { "const": "canonical-text-v1" },
+        "role": { "enum": ["current-github-actions-lock", "current-github-actions-lock-contract"] }
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "candidate_allocation", "production_signing", "production_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "source_freeze": { "const": false },
+        "candidate_allocation": { "const": false },
+        "production_signing": { "const": false },
+        "production_seal": { "const": false },
+        "promotion_to_main": { "const": false },
+        "tagging": { "const": false },
+        "publication": { "const": false }
+      }
+    }
+  }
+}
