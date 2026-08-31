@@ -356,7 +356,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludePostReleasePatchLaneRehearsal,
     [switch]$IncludeM4103ChangeReleaseAuthority,
     [switch]$IncludeM4105AM4200ACharacterizationAuthority,
-    [switch]$IncludeM41F0TruthReconciliationAuthority
+    [switch]$IncludeM41F0TruthReconciliationAuthority,
+    [switch]$IncludeM41F1GoldenBaselineAuthority
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -487,6 +488,10 @@ function Get-MIR4PreFreezeAuthorityState {
     if (-not $IncludeM4105AM4200ACharacterizationAuthority) { throw '[mir4-prefreeze-m41-f0-requires-characterization]' }
     $links += @{path='releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json';kind='MIR4M41F0TruthReconciliationAuthorityEvolutionV1'}
   }
+  if ($IncludeM41F1GoldenBaselineAuthority) {
+    if (-not $IncludeM41F0TruthReconciliationAuthority) { throw '[mir4-prefreeze-m41-f1-requires-m41-f0]' }
+    $links += @{path='releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json';kind='MIR4M41F1GoldenFourTargetBaselineAuthorityEvolutionV1'}
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -581,6 +586,9 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-Branch-Operating-Model-Authority-EvolutionV1.json' = 'contracts/repository/mir4-branch-operating-model-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json' = 'contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-03-change-and-release-authority-evolution-v1.schema.json'
+    'releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json'
+    'releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json'
+    'releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -653,6 +661,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json';kind='MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json';kind='MIR4M4105AM4200ARepositoryCharacterizationAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json';kind='MIR4M41F0TruthReconciliationAuthorityEvolutionV1'}
+    @{path='releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json';kind='MIR4M41F1GoldenFourTargetBaselineAuthorityEvolutionV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

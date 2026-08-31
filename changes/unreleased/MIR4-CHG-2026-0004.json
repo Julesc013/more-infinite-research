@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0004",
+  "status": "accepted",
+  "change_type": "added",
+  "summary": "Bound the four published MIR 4.0 target packages as exact golden baselines and derived a minimal deterministic common/family/target overlay model.",
+  "details": [
+    "The generated authority inventories every F210, F200, F110, and F100 package path and byte hash together with metadata, lifecycle, setting, locale, asset, migration, runtime, stream, technology, and state-namespace surfaces.",
+    "Exact reconstruction uses 89 all-target common files, 202 modern-family files, 81 legacy-family files, and target overlays of 14, 12, 4, and 4 files without copying a full target tree.",
+    "Fresh load, reload, and upgrade replay remains mandatory before package-authority cutover; the baseline grants no source move, version allocation, tagging, signing, sealing, or publication authority."
+  ],
+  "semantic_domains": ["package-boundary", "repository-authority", "release"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The immutable public 4.0.21000 archive is characterized without modification."},
+    {"target":"F200","disposition":"unaffected","reason":"The immutable public 4.0.20000 archive is characterized without modification."},
+    {"target":"F110","disposition":"unaffected","reason":"The immutable public 4.0.11000 archive is characterized without modification."},
+    {"target":"F100","disposition":"unaffected","reason":"The immutable public 4.0.10000 archive is characterized without modification."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"spec/distribution/mir4-golden-four-target-baseline-v1.json"},
+    {"kind":"document","value":"spec/schemas/mir4-golden-four-target-baseline-v1.schema.json"}
+  ]
+}

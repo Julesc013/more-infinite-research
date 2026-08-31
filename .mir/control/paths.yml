@@ -47,6 +47,14 @@ paths:
   mir4.m41-f0-truth-reconciliation.receipt-schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
   mir4.m41-f0-truth-reconciliation.writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1
   mir4.m41-f0-truth-reconciliation.proof: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+  mir4.package-source.golden-four-target-baseline: spec/distribution/mir4-golden-four-target-baseline-v1.json
+  mir4.package-source.golden-four-target-baseline-schema: spec/schemas/mir4-golden-four-target-baseline-v1.schema.json
+  mir4.package-source.golden-four-target-baseline-application: tools/mir/application/package/GoldenTargetBaselines.ps1
+  mir4.package-source.cli: tools/mir/cli/Invoke-MIR4PackageSource.ps1
+  mir4.package-source.golden-four-target-baseline-proof: validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+  mir4.package-source.golden-four-target-baseline-authority-evolution: releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json
+  mir4.package-source.golden-four-target-baseline-authority-evolution-schema: contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json
+  mir4.package-source.golden-four-target-baseline-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

@@ -221,6 +221,26 @@ if([string]$truthReconciliation.kind-cne'MIR4M41F0TruthReconciliationAuthorityEv
    @($truthReconciliation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f0-truth-reconciliation-authority]'
 }
+$goldenBaseline=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$goldenBaseline.kind-cne'MIR4M41F1GoldenFourTargetBaselineAuthorityEvolutionV1'-or
+   [string]$goldenBaseline.status-cne'M41-F1-GOLDEN-FOUR-TARGET-ARCHIVE-BASELINE-COMPLETE-RUNTIME-REPLAY-PENDING'-or
+   [string]$goldenBaseline.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json'-or
+   [string]$goldenBaseline.predecessor_receipt.sha256-cne'0CED3F46BFEEBD48F96E169B4591DC6E3894EC8226C19CEE71D3269809A8568C'-or
+   @($goldenBaseline.evolved_bindings).Count-lt8-or
+   @($goldenBaseline.current_authorities).Count-lt6-or
+   [int]$goldenBaseline.baseline_proof.target_count-ne4-or
+   [int]$goldenBaseline.baseline_proof.common_files-ne89-or
+   [int]$goldenBaseline.baseline_proof.modern_family_files-ne202-or
+   [int]$goldenBaseline.baseline_proof.legacy_family_files-ne81-or
+   @($goldenBaseline.baseline_proof.archives).Count-ne4-or
+   [string]$goldenBaseline.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$goldenBaseline.root_readme_sha256-or
+   -not[bool]$goldenBaseline.invariants.four_archives_exact-or
+   -not[bool]$goldenBaseline.invariants.reconstruction_byte_exact-or
+   -not[bool]$goldenBaseline.invariants.runtime_replay_pending-or
+   @($goldenBaseline.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-f1-golden-four-target-baseline-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

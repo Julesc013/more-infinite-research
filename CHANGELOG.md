@@ -17,6 +17,10 @@
 - Established canonical change fragments and deterministic release narratives as package-excluded repository authority. [MIR4-CHG-2026-0001]
   - One accepted change inventory now renders source, target, GitHub, Mod Portal, technical, and manifest views.
   - Historical MIR 4.0.0 and synthetic patch and multi-target corpora prove filtering, redaction, formatting, and determinism.
+- Bound the four published MIR 4.0 target packages as exact golden baselines and derived a minimal deterministic common/family/target overlay model. [MIR4-CHG-2026-0004]
+  - The generated authority inventories every F210, F200, F110, and F100 package path and byte hash together with metadata, lifecycle, setting, locale, asset, migration, runtime, stream, technology, and state-namespace surfaces.
+  - Exact reconstruction uses 89 all-target common files, 202 modern-family files, 81 legacy-family files, and target overlays of 14, 12, 4, and 4 files without copying a full target tree.
+  - Fresh load, reload, and upgrade replay remains mandatory before package-authority cutover; the baseline grants no source move, version allocation, tagging, signing, sealing, or publication authority.
 
 ## [4.0.0] - 2026-08-30
 

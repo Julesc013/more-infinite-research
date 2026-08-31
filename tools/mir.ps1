@@ -47,6 +47,7 @@ Usage:
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check> [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
@@ -687,6 +688,15 @@ switch ($area) {
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
+      }
+      "package-source" {
+        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline or baseline-check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('baseline','baseline-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+        $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PackageSource.ps1") @packageSourceArguments
       }
       "canonicalization-migration" {
         if ($Args.Count -lt 3) { throw "mir4 canonicalization-migration requires generate, check, or show." }
