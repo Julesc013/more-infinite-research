@@ -1,0 +1,415 @@
+{
+  "schema": 1,
+  "kind": "MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1",
+  "recorded_at": "2026-08-31T18:20:00+10:00",
+  "programme_id": "M41-00-POST-RELEASE-RECONCILIATION",
+  "change_id": "MIR4-POST-RELEASE-PACKAGE-BASELINE-2026-08-31",
+  "predecessor_receipt": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json",
+    "sha256": "008BA8DE50BF4DC1AD2A3E5190E932B62AAD247BB84E9934A28C2813B79422FB"
+  },
+  "baseline_authority": {
+    "path": "spec/distribution/mir4-package-presentation-baseline-v1.json",
+    "bytes": 1814,
+    "sha256": "9E30907A2D6B8AE949FA0FA64CD28A4246B504177187FC22AB064989388AA0A8"
+  },
+  "evolved_bindings": [
+    {
+      "path": "README.md",
+      "previous_sha256": "655AB983C174FDCE8BEC84BC6123ED496FD589839E7B4A3133298E9584C927D2",
+      "current_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+      "reason": "Record the exact post-release CI badge presentation delta already merged through PR #203.",
+      "scope": "package-presentation",
+      "package_visible": true,
+      "release_authority": false
+    },
+    {
+      "path": ".github/workflows/branch-policy.yml",
+      "previous_sha256": "EC1EA6C483609750E6BBC84D767A38FC0B886A3A533E669A7969DC51E5E1F46D",
+      "current_sha256": "459789C089D48B5D738ECA79FB01B5B1640011CD80E0B744B4D190B6191B0448",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".github/workflows/validate.yml",
+      "previous_sha256": "9E58EDD9596C7B1FF940EE18BAA9155C1BFF88982F125762136A81A462B9BBD7",
+      "current_sha256": "8DBA08A244874D099D402DDD968FC789DE7F87F5985ED77C65E5679A81F60ED2",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "477E59EA63BE954735A8C58B3F618924BBE240B74556FE3AABD2122C73F9C380",
+      "current_sha256": "E1389EE10ED40C8F21406E018FF09F4220CC3880CC1A3E861D8D4196AEE24A8F",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "482A7D6EF000B23FD85E0D1EA34CF928C5DC3D4DE4F229432498237C22620770",
+      "current_sha256": "007768C27FA5A371B5F555D614EA34DEB751B0D54B0DECA6BAB0707C38803403",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "1D652443D94550190E61451691E98CC8BD476CDB0CCF79C1D25BFEE698D6EBD6",
+      "current_sha256": "4F296ABD829AF1398878263B37A4C60EDB821C9A7A5B05F30AFF64AC0BD097FF",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "E0FFA7EE6F6B716A9840A5F31692C504A3AA288ECEB21E6ED1F5265239691E22",
+      "current_sha256": "C1F76023D3F3D1A647E0A5B567DE5F55ABB2284E0A090ADF09D30F7496026610",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "AGENTS.md",
+      "previous_sha256": "47214FE77890D8CE2732870BE60E9865332FD10B084BAE314D0507B3A91D5FCE",
+      "current_sha256": "ADE50F2DCE7881BCAAE56A71EE02502B9E61BB8F70E689DC1C16A3303BDFA889",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "previous_sha256": "6463858C6FF24207CD8CE995F54E98D6E148AA99FCB04BF4BA2BC96E5D768632",
+      "current_sha256": "56876867585EB3A0FDCE6BBE4218B86283A996B5F5968D6700CAB1A134C13B71",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "GOVERNANCE.md",
+      "previous_sha256": "437A04A7F489C8E6C33F1E9F49DC887BC6AE4E405A951EDAE19B191ED99913C4",
+      "current_sha256": "B272E951266F566E2FD8762788604EDB8CE598582D952E5191035D7B1BD86AC2",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "B7A56ACCAB00E60F81DCB88E6A319B380399B4A379A1FB88D00FB6567F9562DF",
+      "current_sha256": "84F3E5A43A0BDF715282988422120A304976E06B219F16929759E74E8B72D08A",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/maintainer/mir4-release-operations.md",
+      "previous_sha256": "9C715234F575BFB87F527D3D30867DDF2A99C56960018AEEEFA33EEA30BEB532",
+      "current_sha256": "42E967AAEA95B1B2D364F9743E5C816CA8A8D54D1B143B6E6D469E5F9A0807CE",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "50267CDB79CEE2A8FD954AC461880580F26CB9244DBACEDB1003D9ACFDA6FBFF",
+      "current_sha256": "25BEB0EEB4BA8C7291FBC86E369FEB22B902A01B12370F91559F134BC2E70DB0",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "1EAF6A485E600BC36C2224B0CE8020FF73FBD787E721B2765731259158EA8D90",
+      "current_sha256": "80460CAD521A34EA2B760E9DBA7C74282A0845862DCD289E0AD08E50599A9C7A",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "5C0394CF3FB2EF12DAB7724192C50B1DEE05DD05B353CDE2C6617EC2E4F5808E",
+      "current_sha256": "CE8DDA134F8E669B32E883C9D6C7B000D3F30D2E4A17508CDBE391E87EA3736B",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "28946361CEFB5786DE38B998228910CE4D0103B1F6021DAB667FDDA6658D4125",
+      "current_sha256": "CDDA86522FB9BD937E535ADAE3242336A8B1CCAF6C71465E5FD9B944DAB15969",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "DB576B5DDB3690A8BCD7560628A7B4A25179620356CAEFFC24DAEEBE7811C888",
+      "current_sha256": "94D983E3F23CB30BAD06358C9911C6D7F6E974A43E4BD1C819DA2018D21A9F61",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "mir.lock",
+      "previous_sha256": "945FC7C55571895C616923D8ADE1A38E8F51561BD0ABC4A5718D769029381169",
+      "current_sha256": "9FF06BE7E8BBE859BE5B30C86C26AD50EA09C66974FFB033FC5A977EF1F64697",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "0C9DBD3192232F1A9F585B709901175F73799999C21E89376CFD612F5566C66F",
+      "current_sha256": "240AB0713907E8BFB7391C0157D9B613C00421B9C3CFC317F1928594AE3B7A5D",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/continuity-bundle-template.json",
+      "previous_sha256": "AE95C3C01E6A7F8D3268121F95F9D18B0C22AFC2B990404F6F39AA6D225C3EDC",
+      "current_sha256": "37516F8D427AC8E6E4E7D15CA718D0C846AD192B17CFDE0531C007B41D982352",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "354EBFC37B41A1DDC7012DFD15F4E31FEA515A567E97243895D5B164BD5731F1",
+      "current_sha256": "54F1E229632C648BEBF2280EACFDC28FC97BF94206F47DA17310236F47597DDB",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "A35CF15113D580A9BA3942A3C349D1227B1CB56A210B90B1046A43986BACC5B6",
+      "current_sha256": "02B778037E131C1F7A899E61BF50E84E1D1077C1F0E3F558AA30F77102D1AFF3",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/merge-law-catalogue.json",
+      "previous_sha256": "9F7710A3C34571DDD835F26B0A0BE884F0E9290F007BFCAB486D0ED4F48817B1",
+      "current_sha256": "EC717111C5FE63EF90A9035DB8F91773676DE84910861E1FEDCD7329F3271BD8",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/migration-graph-matrix.json",
+      "previous_sha256": "86ADAEB35B81AB4969A842D76BA5D80048CE6D2EAABCB9278D84AD2E40135EB1",
+      "current_sha256": "AC9AF55B9395E9642E85C6FBBF501D7A3E7991597EE148F36A912286B0757F46",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "16A564E1F842B028BC9D5DBBBBBE4CC9D092598463E3BF87F8CA5DDB612E60E9",
+      "current_sha256": "ABBE38C41C363A17B0331EC18C23E1E267D172BB0B2F72BEA5E628B38A4E2AC9",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PackagePresentation.ps1",
+      "previous_sha256": "1CB07E806A995631B72E4A29CF0AA777216A9A5EE2911530C01A5ED2E5D95207",
+      "current_sha256": "DC11E2A3D85390780C76C02385BADF1FD0B4C8CABDA6A09FB79B449B90E26767",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "A8556B7E91C3A1A45A5D11137F330B64CEB68E37F8D52B5F79F5D636137BD851",
+      "current_sha256": "0B5F5DEE3FC6E46C0F0B55CE17BC3CE6D144A411D346DE7DBC4FD0F4CF24EF98",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "00891FC8048E67FF2FAA81EADD81F33F7C3D3FAC2723D27CEBB8071E699F1969",
+      "current_sha256": "0F90A0B6C0829377F1027E01135BA581882AEE25CDEB2B1436163BA6C1FECA07",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/assurance/Evidence.ps1",
+      "previous_sha256": "3C3417D62D52E2C3C175B8C39024A29077F7FED04F36C799377DDF0C2E2A9928",
+      "current_sha256": "6B89D95E60A5D23D8112F1BC8DC4DA3A58365A8A0F0782C16855C7E916C0740F",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/assurance/Release.ps1",
+      "previous_sha256": "C2AE178CDC1C89B8D94BC75612B6505B1522438ADB5416CA9A0A66866A9EE498",
+      "current_sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",
+      "previous_sha256": "CFA1D7F4FF4D47B6C70693ED9F83F610AC2CD24FEF4ED9C7D6F877A8C8010EFB",
+      "current_sha256": "8B31CBF786F7B463A5BC78565B6997F05985A872B8FAA8F7C38CC76965A7234D",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "BC888D6DC3AFC48BD3D5086D12676C44307D5D552B272B792210B2A333B816F2",
+      "current_sha256": "2179A2F11459E2318D967D034F9AD55ABC60C17F97840837DB946AFFA9774BA0",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "BDCBB512DD4DE7A1256AC009D2B461DBC60AF72B6EB1154B5FB5642DD609F68B",
+      "current_sha256": "F54D62F3654E448A1E1AA6DF9224D756B9E1F85915E76370AADF4FB5D04C58DC",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1",
+      "previous_sha256": "3524A943EB67AC2D8CF843A7F2D230C98CC47B3456B809DA7AF2B3B05FD301C5",
+      "current_sha256": "CD51223171C10B95CD494D284CF5B548E78152DE5C422FD8E6C7F48420D2E9F9",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+      "previous_sha256": "6D79B7DF84F62D93803F3A64A60D7FB2A30EADC4C38267C5B09A5529AE783B3A",
+      "current_sha256": "6AF3D2A4482316F8E07257246FA2B29EC56C23137B4150D68AD4F55DB40B36D2",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1",
+      "previous_sha256": "63733AD842F9CBCEE8DCBB907496A5D2ACBB1C017B23BACA06008B861D548C9A",
+      "current_sha256": "539B560CC8AEA71C6C65A61F9D82A34D332249806C5811BB33215D0508940DCE",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1",
+      "previous_sha256": "B48146567A9A63559B721CF7E7E26168A2707683C76AB8CA9EB89C4897D2E8D9",
+      "current_sha256": "53B57ED2E62787850C7790DE774A1D9AA708094384708B612A76D65F0EFAAA2E",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1",
+      "previous_sha256": "404C83E7ACA86BBBF685C8FB445AD8703D5F2CFAF7E1620FD684805F1491A169",
+      "current_sha256": "CED9FF0BB32D21B2F2CEA8188F5C132145A48D18D2037052AAF798C0BA87040C",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "6345322FA54ADE7AAF484D7BEA7711BE02D3A4E90A707DA7CD01D14C338BB7A1",
+      "current_sha256": "BB252BD5FC72828C188C6E2A66B83538FB6ECC8A15DA8D32C7EC31384307C36F",
+      "reason": "Admit the package-presentation successor authority and regenerate its package-excluded readers, checks, and projections.",
+      "scope": "package-excluded-control-plane",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "spec/distribution/mir4-package-presentation-baseline-v1.json",
+      "sha256": "9E30907A2D6B8AE949FA0FA64CD28A4246B504177187FC22AB064989388AA0A8",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-package-presentation-baseline"
+    },
+    {
+      "path": "spec/schemas/mir4-package-presentation-baseline-v1.schema.json",
+      "sha256": "7FD30C1140F7A71E3497DCA76A16E8FF2E3E296BC4153DED73574922C8929CE3",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-package-presentation-baseline-schema"
+    },
+    {
+      "path": "spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json",
+      "sha256": "73AAE399E2DC64026A825DF081A1278674FE272E98D0D790D55377B1E9137798",
+      "hash_mode": "canonical-text-v1",
+      "role": "post-release-package-baseline-evolution-schema"
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1",
+      "sha256": "4AEF852ABCE116F7C773FF87FC7D257EBBFBE19AD8BB71172E0341BE40224C69",
+      "hash_mode": "canonical-text-v1",
+      "role": "post-release-package-baseline-evolution-writer"
+    }
+  ],
+  "historical_package_source_sha256": "F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E",
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "package_visible_delta": [
+    "README.md"
+  ],
+  "invariants": {
+    "player_executable_sources_unchanged": true,
+    "one_emitter_preserved": true,
+    "gameplay_difference_authorized": false
+  },
+  "transition_gate": {
+    "source_freeze": false,
+    "candidate_allocation": false,
+    "production_signing": false,
+    "production_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "status": "POST-RELEASE-PACKAGE-PRESENTATION-BASELINE-RECORDED-NO-RELEASE-TRANSITION"
+}

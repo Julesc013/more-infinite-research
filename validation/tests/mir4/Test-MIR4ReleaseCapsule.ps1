@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $repo 'tools/lib/mir4/ReleaseCapsule.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4ReleaseCapsuleTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Diagnostic)
@@ -227,7 +228,7 @@ try {
     $receiptText -cnotmatch '(?i)(?:OPENSSH PRIVATE KEY|passphrase|private_key_path|mod_portal_token|github_token)'
   ) 'mir4-release-capsule-private-path-and-secret-leak'
   Assert-MIR4ReleaseCapsuleTest (
-    (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
+    (Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)
   ) 'mir4-release-capsule-package-non-interference'
 
   [pscustomobject][ordered]@{

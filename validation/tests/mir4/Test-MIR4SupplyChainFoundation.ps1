@@ -6,6 +6,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SupplyChain.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4SupplyChainTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Diagnostic)
@@ -118,7 +119,7 @@ Assert-MIR4SupplyChainTest (
 ) 'mir4-supply-chain-public-path-secret-leak'
 $packageFingerprint = Get-MIRPackageSourceFingerprint -RepoRoot $repo
 Assert-MIR4SupplyChainTest (
-  $packageFingerprint -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
+  $packageFingerprint -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)
 ) 'mir4-supply-chain-package-non-interference'
 
 [pscustomobject][ordered]@{

@@ -90,7 +90,7 @@ if(@($t13.evolved_bindings).Count-lt10-or@($t13.current_authorities).Count-lt25-
 $t14=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T14-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if(@($t14.evolved_bindings).Count-lt15-or@($t14.current_authorities).Count-lt25-or
    [string]$t14.turn-cne'T14'-or[string]$t14.status-cne'T14-DOCUMENTATION-CONTINUITY-PASSED-T15-NEXT-PRODUCTION-UNAUTHORIZED'-or
-   [string]$t14.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t14.player_package_source_sha256-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'-or
    [int]$t14.conformance.document_count-lt425-or[int]$t14.conformance.source_of_truth_count-lt341-or
    [int]$t14.conformance.generated_projection_count-ne6-or[int]$t14.conformance.root_document_count-ne11-or
    [int]$t14.conformance.developer_document_count-ne13-or-not[bool]$t14.conformance.clean_extracted_preview_tutorial_passed-or
@@ -104,7 +104,7 @@ $t15Machine=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/
 $t15Acceptance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json')|ConvertFrom-Json -Depth 100
 if(@($t15.evolved_bindings).Count-lt20-or@($t15.current_authorities).Count-lt20-or
    [string]$t15.turn-cne'T15'-or[string]$t15.status-cne'T15-SUPPLY-CHAIN-PRESERVATION-PASSED-T16-T17-HUMAN-GATES-NEXT-PRODUCTION-UNAUTHORIZED'-or
-   [string]$t15.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t15.player_package_source_sha256-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'-or
    [string]$t15Machine.status-cne'T15-MACHINE-WORK-COMPLETE-INDEPENDENT-AUDIT-PASSED-HUMAN-GATES-REMAIN'-or
    [string]$t15Acceptance.verdict-cne'ACCEPTED-T15-MACHINE-SCOPE'-or
    [bool]$t15Acceptance.reviewer.human_reviewer_claimed-or[bool]$t15Acceptance.reviewer.human_acceptance_inferred-or
@@ -123,7 +123,7 @@ if([string]$t17.turn-cne'T17'-or
    [bool]$t17.human_gate.acceptance_inferred-or[bool]$t17.human_gate.decision_template_is_evidence-or
    -not[bool](@($t17.target_handoff|Where-Object target -ceq 'F200')[0].exact_engine_custody_ready)-or
    [bool](@($t17.target_handoff|Where-Object target -ceq 'F210')[0].exact_engine_custody_ready)-or
-   [string]$t17.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$t17.player_package_source_sha256-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'-or
    @($t17.package_visible_delta).Count-ne0-or
    @($t17.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-t17-machine-preparation-authority-evolution]'
@@ -131,7 +131,7 @@ if([string]$t17.turn-cne'T17'-or
 $closure=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if([string]$closure.kind-cne'MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'-or
    [string]$closure.status-cne'FINAL-RELEASE-AUTHORIZATION-IMPORTED-EXACT-PLAYTEST-SESSIONS-PREPARED-HUMAN-EVIDENCE-AND-CUSTODY-GATES-REMAIN'-or
-   [string]$closure.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$closure.player_package_source_sha256-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'-or
    -not[bool]$closure.readme.exact_candidate_copy_preserved-or-not[bool]$closure.readme.post_release_update_deferred-or
    [bool]$closure.portal_copy.live_portal_mutation_authorized-or
    [string]$closure.branch_topology.legacy_role-cne'previous-major-alias'-or
@@ -139,12 +139,21 @@ if([string]$closure.kind-cne'MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'
    @($closure.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-final-release-closure-authority-evolution]'
 }
+$postReleaseBaseline=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
+if([string]$postReleaseBaseline.kind-cne'MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1'-or
+   [string]$postReleaseBaseline.status-cne'POST-RELEASE-PACKAGE-PRESENTATION-BASELINE-RECORDED-NO-RELEASE-TRANSITION'-or
+   [string]$postReleaseBaseline.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (@($postReleaseBaseline.package_visible_delta)-join'|')-cne'README.md'-or
+   -not[bool]$postReleaseBaseline.invariants.player_executable_sources_unchanged-or
+   @($postReleaseBaseline.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-post-release-package-baseline-authority-evolution]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne21){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
 $plan=Get-Content -Raw -LiteralPath (Join-Path $repo $planPath)|ConvertFrom-Json -Depth 100
 if([string]$plan.source_baseline.package_source_sha256-cne[string]$t13.player_package_source_sha256-or
-   (Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne[string]$t14.player_package_source_sha256){throw '[mir4-prefreeze-package-diff]'}
+   [string]$t14.player_package_source_sha256-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'){throw '[mir4-prefreeze-package-diff]'}
 if([int]$plan.verification_plan.invalid-ne0-or[int]$plan.verification_plan.passed-ne30-or
    @($plan.targets|Where-Object{$_.release_role-cne'mandatory'-or$_.development_package.release_identity-or[string]::IsNullOrWhiteSpace([string]$_.engine.sha256)}).Count-ne0){
   throw '[mir4-prefreeze-zero-invalid-plan]'

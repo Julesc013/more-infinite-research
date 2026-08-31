@@ -349,7 +349,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeReleaseToolingMigration,
     [switch]$IncludeF210QualificationPolicyEvolution,
     [switch]$IncludeFinalMileToolingEvolution,
-    [switch]$IncludeFinalReleaseClosureEvolution
+    [switch]$IncludeFinalReleaseClosureEvolution,
+    [switch]$IncludePostReleasePackageBaselineEvolution
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -452,6 +453,10 @@ function Get-MIR4PreFreezeAuthorityState {
     if (-not $IncludeFinalMileToolingEvolution) { throw '[mir4-prefreeze-final-release-closure-evolution-requires-final-mile-tooling-evolution]' }
     $links += @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'}
   }
+  if ($IncludePostReleasePackageBaselineEvolution) {
+    if (-not $IncludeFinalReleaseClosureEvolution) { throw '[mir4-prefreeze-post-release-package-baseline-evolution-requires-final-release-closure-evolution]' }
+    $links += @{path='.mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json';kind='MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1'}
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -461,8 +466,10 @@ function Get-MIR4PreFreezeAuthorityState {
     $evolvedPaths = @{}
     foreach ($binding in @($evolution.evolved_bindings)) {
       $path = [string]$binding.path
+      $allowedPackageVisibleSuccessor = [string]$evolution.kind -ceq 'MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1' -and
+        $path -ceq 'README.md' -and [bool]$binding.package_visible
       if (-not $authorityHashes.ContainsKey($path) -or [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
-          [bool]$binding.package_visible -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
+          ([bool]$binding.package_visible -and -not $allowedPackageVisibleSuccessor) -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
         throw "[mir4-prefreeze-evolution-binding] $path"
       }
       $authorityHashes[$path] = [string]$binding.current_sha256
@@ -524,6 +531,7 @@ function Test-MIR4PreFreezeAuthorities {
     '.mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json'
+    '.mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json' = 'spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -589,6 +597,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='.mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json';kind='MIR4F210QualificationPolicyAuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalMileToolingAuthorityEvolutionReceiptV1'}
     @{path='.mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json';kind='MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'}
+    @{path='.mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json';kind='MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -598,8 +607,10 @@ function Test-MIR4PreFreezeAuthorities {
     $evolvedPaths = @{}
     foreach ($binding in @($evolution.evolved_bindings)) {
       $path = [string]$binding.path
+      $allowedPackageVisibleSuccessor = [string]$evolution.kind -ceq 'MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1' -and
+        $path -ceq 'README.md' -and [bool]$binding.package_visible
       if (-not $authorityHashes.ContainsKey($path) -or [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
-          [bool]$binding.package_visible -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
+          ([bool]$binding.package_visible -and -not $allowedPackageVisibleSuccessor) -or [bool]$binding.release_authority -or $evolvedPaths.ContainsKey($path)) {
         throw "[mir4-prefreeze-evolution-binding] $path"
       }
       $authorityHashes[$path] = [string]$binding.current_sha256

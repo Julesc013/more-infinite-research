@@ -132,6 +132,11 @@ package_excluded_modules:
     stability: stable-governance-contract-blocked-human-secret-input
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
+    current_package_presentation_authority: spec/distribution/mir4-package-presentation-baseline-v1.json
+    current_package_presentation_schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
+    current_package_presentation_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
+    current_package_presentation_evolution_schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
+    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
     completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
@@ -139,6 +144,7 @@ package_excluded_modules:
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
     runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
+    package_presentation_compatibility_reader: tools/lib/mir4/PackagePresentation.ps1
     command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1
     capsule_command: tools/commands/mir4/Invoke-MIR4ReleaseCapsule.ps1
     runner_confinement_command: tools/commands/mir4/Invoke-MIR4RunnerPublisherConfinement.ps1
@@ -157,6 +163,8 @@ package_excluded_modules:
       - spec/schemas/mir4-supply-chain-preservation-t15-v1.schema.json
       - spec/schemas/mir4-t15-independent-machine-acceptance-v1.schema.json
       - spec/schemas/mir4-t15-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-package-presentation-baseline-v1.schema.json
+      - spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
     tests:
       - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
@@ -164,7 +172,7 @@ package_excluded_modules:
       - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
       - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
-    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, and publisher confinement only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
+    boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, publisher confinement, and append-only current package-presentation baseline only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
     stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
   research_cost_v2_preview:
     authority: spec/schemas/experimental/mir4-research-cost-model-v2.schema.json
@@ -577,6 +585,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
+      - .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json
       - .mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json
@@ -634,6 +643,7 @@ package_excluded_modules:
       - spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json
       - spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json
       - spec/schemas/mir4-final-release-closure-authority-evolution-receipt-v1.schema.json
+      - spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-playtest-evidence-v1.schema.json
       - spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
       - spec/schemas/mir4-release-workflow-contract-v1.schema.json

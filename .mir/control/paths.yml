@@ -3,6 +3,12 @@ authority: mir-repository-paths-v1
 
 paths:
   package.root: .
+  mir4.package-presentation.current: spec/distribution/mir4-package-presentation-baseline-v1.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
+  mir4.package-presentation.compatibility-reader: tools/lib/mir4/PackagePresentation.ps1
+  mir4.package-presentation.evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
+  mir4.package-presentation.evolution-schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
+  mir4.package-presentation.evolution-writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
   mir4.repository-fixed-point: .mir/control/repository-fixed-point.json
   mir4.repository-migration.authority: governance/repository/migrations/fixed-point-tooling-v1.json
   mir4.repository-migration.proof: assurance/repository/fixed-point-tooling-v1.json
@@ -434,6 +440,7 @@ paths:
   releases.waves.mir4-r0-maintainer-final-github-release-authorization: .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
   releases.waves.mir4-r0-final-mile-playtest-candidate-authority: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json
   releases.waves.mir4-r0-final-release-closure-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Release-Closure-Authority-Evolution-ReceiptV1.json
+  releases.waves.mir4-r0-post-release-package-baseline-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-release-workflow-contract: .mir/releases/waves/mir4-r0/MIR4-Release-Workflow-ContractV1.json
   releases.waves.mir4-r0-pre-freeze-execution-programme: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json
   releases.waves.mir4-r0-supply-chain-preservation-t15: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
