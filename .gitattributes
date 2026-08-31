@@ -22,6 +22,7 @@
 .mir/releases/terminal/MIR3TerminalSuccessorBootstrapPolicyV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json text eol=lf
+.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json text eol=lf
 .mir/evidence/mir4-r0/**/*.json text eol=lf
 .mir/targets.json text eol=lf
 .mir/releases/waves/mir4-r0/**/*.json text eol=lf

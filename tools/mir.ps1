@@ -667,13 +667,16 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1") @rehearsalArguments
       }
       "release-narratives" {
-        if ($Args.Count -lt 3) { throw "mir4 release-narratives requires render or check." }
+        if ($Args.Count -lt 3) { throw "mir4 release-narratives requires render, check, source-render, or source-check." }
         $subcommand = $Args[2]
-        if ($subcommand -notin @('render','check')) { throw "Unknown mir4 release-narratives command: $subcommand" }
+        if ($subcommand -notin @('render','check','source-render','source-check')) { throw "Unknown mir4 release-narratives command: $subcommand" }
         $planIndex = [Array]::IndexOf($Args, '--plan')
         $outputIndex = [Array]::IndexOf($Args, '--output')
-        if ($planIndex -lt 0 -or $planIndex + 1 -ge $Args.Count -or $outputIndex -lt 0 -or $outputIndex + 1 -ge $Args.Count) { throw 'mir4 release-narratives requires --plan and --output.' }
-        & (Join-Path $PSScriptRoot 'mir/cli/Invoke-MIR4ReleaseNarratives.ps1') -Command $subcommand -Plan $Args[$planIndex + 1] -Output $Args[$outputIndex + 1] -RepoRoot $repo.Path
+        if ($planIndex -lt 0 -or $planIndex + 1 -ge $Args.Count) { throw 'mir4 release-narratives requires --plan.' }
+        if ($subcommand -in @('render','check') -and ($outputIndex -lt 0 -or $outputIndex + 1 -ge $Args.Count)) { throw 'mir4 release-narratives render and check require --output.' }
+        $narrativeArguments = @{Command=$subcommand;Plan=$Args[$planIndex + 1];RepoRoot=$repo.Path}
+        if ($outputIndex -ge 0 -and $outputIndex + 1 -lt $Args.Count) { $narrativeArguments.Output = $Args[$outputIndex + 1] }
+        & (Join-Path $PSScriptRoot 'mir/cli/Invoke-MIR4ReleaseNarratives.ps1') @narrativeArguments
         return
       }
       "repository" {

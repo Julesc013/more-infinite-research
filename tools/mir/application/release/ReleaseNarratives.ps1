@@ -99,3 +99,39 @@ function Invoke-MIR4ReleaseNarrativesV1 {
   } else { [IO.File]::WriteAllText($resultPath, $resultJson, [Text.UTF8Encoding]::new($false)) }
   return [pscustomobject]$record
 }
+
+function Update-MIR4SourceChangelogV1 {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$PlanPath,
+    [switch]$Check
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $packageBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  $material = Get-MIR4ReleaseNarrativeMaterialV1 -RepoRoot $repo -PlanPath $PlanPath
+  $text = [string]$material.outputs['CHANGELOG.md'].text
+  $path = Join-Path $repo 'CHANGELOG.md'
+  if ($Check) {
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf) -or [IO.File]::ReadAllText($path) -cne $text) {
+      throw '[mir4-source-changelog-drift]'
+    }
+  } else {
+    [IO.File]::WriteAllText($path, $text, [Text.UTF8Encoding]::new($false))
+  }
+  if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne $packageBefore) {
+    throw '[mir4-source-changelog-package-source-mutation]'
+  }
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  return [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR4SourceChangelogProjectionV1'
+    status = if ($Check) { 'current' } else { 'rendered' }
+    path = 'CHANGELOG.md'
+    plan = [string]$PlanPath
+    sha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+    bytes = $bytes.Length
+    package_source_sha256 = $packageBefore
+    publication_authorized = $false
+  }
+}

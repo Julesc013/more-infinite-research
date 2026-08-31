@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "kind": "MIR3Dot9ModPortalVisibilityCanonicalizationReconciliationV1",
+  "status": "accepted-historical-canonicalization-reconciliation",
+  "recorded_at": "2026-09-01T12:00:00+10:00",
+  "historical_record": {
+    "path": ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
+    "raw_sha256": "AE47F7D195AE1D940F388D3CFDCDDC057B2E26A493C7E7B456408C57EE8100A3",
+    "stored_record_sha256": "40F97C184A982EC17512ABB24564A9B78CDB248D0A1F68A2B47EAC0111DB9CCF",
+    "legacy_timestamp_normalized_sha256": "40F97C184A982EC17512ABB24564A9B78CDB248D0A1F68A2B47EAC0111DB9CCF",
+    "lexical_rfc3339_sha256": "7C715CC37FA86AEA10CB5392A4B3B9E4B1F10E92C9B9159FF9444005905F815B",
+    "normalized_field": "sources[0].matched_rows[1].released_at:.140Z-to-.14Z"
+  },
+  "classification": "inherited-self-hash-canonicalization-interpretation-contradiction",
+  "disposition": "preserve-original-bytes-validate-legacy-hash-and-bind-corrected-lexical-digest",
+  "package_visible": false,
+  "current_portal_claim_authorized": false,
+  "authority": {
+    "semantic": false,
+    "build": false,
+    "upload": false,
+    "tag": false,
+    "allocation": false,
+    "publication": false,
+    "history_rewrite": false
+  },
+  "record_sha256": "DC42E600F6FD8F8606533EBBB425091F458307D38AAD34D80EE57D18855CBA46"
+}

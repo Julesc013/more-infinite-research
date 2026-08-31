@@ -43,6 +43,10 @@ paths:
   mir4.repository-characterization.authority-evolution: releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json
   mir4.repository-characterization.authority-evolution-schema: contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json
   mir4.repository-characterization.authority-evolution-writer: tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1
+  mir4.m41-f0-truth-reconciliation.receipt: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
+  mir4.m41-f0-truth-reconciliation.receipt-schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
+  mir4.m41-f0-truth-reconciliation.writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1
+  mir4.m41-f0-truth-reconciliation.proof: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
@@ -505,6 +509,7 @@ paths:
   evidence.root: .mir/evidence
   evidence.mir4-r0-engine-availability: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
   evidence.mir3-dot9-mod-portal-visibility-recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
+  evidence.mir3-dot9-mod-portal-visibility-canonicalization-reconciliation: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json
   evidence.manifests: .mir/evidence/manifests
   evidence.attestations: .mir/evidence/attestations
   evidence.seals: .mir/evidence/seals

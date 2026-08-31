@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 433 pages as of 2026-08-31.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 434 pages as of 2026-09-01.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -60,7 +60,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/decisions/0004-mir3-eol-mir4-entry-gate.md | ADR 0004: MIR 3 EOL and MIR 4 Entry Gate | current | maintainer | adr | mir-maintainers | 2026-08-16 |
 | docs/architecture/decisions/0005-mir4-local-beta-candidate-boundary.md | ADR 0005: MIR 4 Local Beta Candidate Boundary | current | release-manager | adr | mir-maintainers | 2026-08-16 |
 | docs/architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md | ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities | current | maintainer | adr | mir-maintainers | 2026-08-17 |
-| docs/architecture/decisions/README.md | Architecture Decision Records | current | maintainer | reference | mir-maintainers | 2026-08-16 |
+| docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md | ADR 0007: MIR 4.1 Foundation Completion Boundary | current | maintainer | adr | mir-maintainers | 2026-09-01 |
+| docs/architecture/decisions/README.md | Architecture Decision Records | current | maintainer | reference | mir-maintainers | 2026-09-01 |
 | docs/architecture/factorio-lifecycle.md | Factorio Lifecycle Boundaries | current | maintainer | explanation | mir-maintainers | 2026-07-08 |
 | docs/architecture/mir-extension-protocol-v1.md | MIR Extension Protocol v1 Roadmap | archived | developer | archive | mir-maintainers | 2026-08-08 |
 | docs/architecture/mir4-assurance-scale.md | MIR 4 Assurance Scale and Offline Drill | current | maintainer | explanation | mir-maintainers | 2026-08-26 |
@@ -373,7 +374,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-08-31 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-01 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

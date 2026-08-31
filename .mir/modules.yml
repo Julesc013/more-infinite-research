@@ -54,6 +54,15 @@ package_excluded_modules:
     package_visible: false
     deletion_authority: false
     package_cutover_authority: false
+  mir4_m41_f0_truth_reconciliation_v1:
+    predecessor: releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json
+    receipt: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
+    receipt_schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
+    writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1
+    proof: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1
@@ -593,6 +602,8 @@ package_excluded_modules:
   mir4_change_and_release_authority_v1:
     authority: changes/unreleased
     historical_corpus: changes/history/4.0.0
+    source_changelog_plan: releases/governance/MIR4-Source-Changelog-PlanV1.json
+    source_changelog_projection: CHANGELOG.md
     contracts:
       - contracts/release/mir4-change-fragment-v2.schema.json
       - contracts/release/mir4-defect-record-v1.schema.json
@@ -603,7 +614,7 @@ package_excluded_modules:
     command: tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1
     documentation: docs/architecture/mir4-change-and-release-authority.md
     test: validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
-    boundary: accepted typed changes render deterministic package-excluded narrative views; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
+    boundary: accepted typed changes render deterministic package-excluded narrative views and the generated root source-family changelog; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
     stability: stable-package-excluded-change-and-narrative-authority-v1
   mir4_full_platform_closeout_v1:
     implementation: tools/lib/mir4/FullPlatformCloseout.ps1
@@ -1645,6 +1656,8 @@ validation_tooling:
     mir4_bootstrap_target_readiness_gate: validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1
     mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
+    mir3_dot9_mod_portal_visibility_canonicalization_reconciliation: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json
+    mir3_dot9_mod_portal_visibility_canonicalization_reconciliation_schema: spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
     mir4_offline_candidate_custody_compatibility: tools/lib/mir4/OfflineCandidateCustody.ps1

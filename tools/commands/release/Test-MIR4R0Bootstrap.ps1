@@ -263,10 +263,13 @@ if ([string]$targetReadiness.kind -cne "MIR4BootstrapTargetReadinessV1" -or
 $portalVisibilityPath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
 Assert-Schema $portalVisibilityPath "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json"
 $portalVisibility = Read-Json $portalVisibilityPath
+$portalReconciliationPath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json"
+Assert-Schema $portalReconciliationPath "spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json"
+$portalReconciliation = Read-Json $portalReconciliationPath
 if ([string]$portalVisibility.kind -cne "MIR3Dot9ModPortalVisibilityRecheckV1" -or
     [string]$portalVisibility.status -cne "api-and-rendered-table-two-visible-sha1-matched-redownloads-pending" -or
     [bool]$portalVisibility.package_visible -or
-    -not (Test-MIR4BootstrapRecordHash -Record $portalVisibility) -or
+    -not (Test-MIR3Dot9PortalVisibilityHashReconciliation -HistoricalRecord $portalVisibility -Reconciliation $portalReconciliation -HistoricalRecordPath (Join-Path $RepoRoot $portalVisibilityPath)) -or
     @($portalVisibility.releases | Where-Object { -not [bool]$_.api_visible -or -not [bool]$_.rendered_table_visible -or -not [bool]$_.sha1_matches_sealed }).Count -ne 0 -or
     [int]$portalVisibility.custody_state.authenticated_redownloads_complete -ne 0 -or
     -not [bool]$portalVisibility.custody_state.mir3_eol_blocked -or

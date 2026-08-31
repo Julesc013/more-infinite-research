@@ -20,12 +20,18 @@ if (-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) {
 $recordRelativePath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json"
 $recordPath = Join-Path $RepoRoot $recordRelativePath
 $schemaPath = Join-Path $RepoRoot "spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json"
+$reconciliationRelativePath = ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json"
+$reconciliationPath = Join-Path $RepoRoot $reconciliationRelativePath
+$reconciliationSchemaPath = Join-Path $RepoRoot "spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json"
 $recordText = Get-Content -Raw -LiteralPath $recordPath
 $record = $recordText | ConvertFrom-Json -DateKind String
+$reconciliationText = Get-Content -Raw -LiteralPath $reconciliationPath
+$reconciliation = $reconciliationText | ConvertFrom-Json -DateKind String
 
 Assert-True ($record.observed_at -is [string]) "Governed portal timestamps must remain lexical strings during canonical hash validation."
 Assert-True ($recordText | Test-Json -SchemaFile $schemaPath) "MIR 3 .9 Mod Portal visibility recheck schema validation failed."
-Assert-True (Test-MIR4BootstrapRecordHash -Record $record) "MIR 3 .9 Mod Portal visibility recheck self-hash is stale."
+Assert-True ($reconciliationText | Test-Json -SchemaFile $reconciliationSchemaPath) "MIR 3 .9 Mod Portal canonicalization reconciliation schema validation failed."
+Assert-True (Test-MIR3Dot9PortalVisibilityHashReconciliation -HistoricalRecord $record -Reconciliation $reconciliation -HistoricalRecordPath $recordPath) "The historical and corrected portal self-hash interpretations are not reconciled exactly."
 
 $priorPath = Join-Path $RepoRoot ([string]$record.prior_custody_observation.path)
 Assert-True (Test-Path -LiteralPath $priorPath -PathType Leaf) "The prior custody observation bound by the visibility recheck is absent."

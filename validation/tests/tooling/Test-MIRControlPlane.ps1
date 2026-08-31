@@ -132,6 +132,12 @@ try {
 
 $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
+$todoText = Get-Content -Raw -LiteralPath (Join-Path $repo 'todo.md')
+if ($todoText -notmatch '(?m)^## Active MIR 4\.x operating programme$' -or
+    $todoText -notmatch '(?m)^## Historical MIR 4\.0 pre-freeze execution record$' -or
+    $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `active` \|') {
+  throw 'Generated maintainer queue does not distinguish live MIR 4.x authority from the historical pre-freeze execution record.'
+}
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo
 if ([int]$calibration.false_negative_budget -ne 0) { throw "Impact mutation calibration permits false negatives." }
 $planA = New-MIRCPPlan -Mode changed -ChangedPath @("tools/lib/control/Planner.ps1") -RepoRoot $repo
