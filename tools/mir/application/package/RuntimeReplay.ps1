@@ -105,19 +105,43 @@ function Invoke-MIR4TargetRuntimeReplay {
     $candidate = [string]$materialization.archive_path
     $predecessor = Join-Path $repo "dist/more-infinite-research_$([string]$baseline[0].predecessor).zip"
     if (-not (Test-Path -LiteralPath $predecessor -PathType Leaf)) { throw "F2D predecessor is missing: $predecessor" }
-    $freshRoot = Join-Path $work 'fresh-load-userdata'
-    $freshResult = Join-Path $evidence 'fresh-load-result.json'
-    Invoke-MIR4RuntimeReplayChild -Label 'runtime.exact-zip' -Arguments @('-NoProfile','-File',(Join-Path $repo 'scripts/Invoke-MIRValidation.ps1'),'-FactorioBin',$factorio,'-UserDataDir',$freshRoot,'-CandidateZip',$candidate,'-Tier','smoke','-MaxParallel','1','-ValidationSummaryPath',$freshResult)
     $redactionPaths = @($work,$factorio,$factorioInstall,$repo)
-    $freshText = ConvertTo-MIR4RuntimeReplayRedactedText -Text (Get-Content -Raw -LiteralPath $freshResult) -Paths $redactionPaths
-    [IO.File]::WriteAllText($freshResult,$freshText,[Text.UTF8Encoding]::new($false))
-    $fresh = $freshText | ConvertFrom-Json
-    if ([string]$fresh.status -ne 'passed') { throw 'F2D fresh-load runtime matrix did not pass.' }
-    $freshLog = @(Get-ChildItem -LiteralPath $freshRoot -Recurse -File -Filter 'factorio-current.log' -ErrorAction SilentlyContinue | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1)
-    if ($freshLog.Count -eq 1) {
-      $logText = ConvertTo-MIR4RuntimeReplayRedactedText -Text (Get-Content -Raw -LiteralPath $freshLog[0].FullName) -Paths $redactionPaths
-      [IO.File]::WriteAllText((Join-Path $evidence 'fresh-load-factorio.log'),$logText,[Text.UTF8Encoding]::new($false))
+    $freshRoot = Join-Path $work 'fresh-load-userdata'
+    $freshSummaryRoot = Join-Path $work 'fresh-load-summaries'
+    New-Item -ItemType Directory -Force -Path $freshSummaryRoot | Out-Null
+    $runtimeRegistry = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/scenarios/runtime.json') | ConvertFrom-Json -Depth 100
+    $profileProperty = $runtimeRegistry.profiles.PSObject.Properties[[string]$baseline[0].factorio_line]
+    if ($null -eq $profileProperty) { throw 'F2D runtime.exact-zip profile is missing from the scenario registry.' }
+    $freshDeclarations = @($profileProperty.Value | Where-Object { $_.kind -ne 'gate' -and $_.tags -contains 'smoke' } | Sort-Object name)
+    if ($freshDeclarations.Count -eq 0) { throw 'F2D runtime.exact-zip selected no smoke scenarios.' }
+    $freshRows = [Collections.Generic.List[object]]::new()
+    foreach ($declaration in $freshDeclarations) {
+      $scenarioName = [string]$declaration.name
+      $scenarioSlug = $scenarioName -replace '[^A-Za-z0-9._-]','-'
+      $workerRoot = Join-Path $freshRoot $scenarioSlug
+      $workerResult = Join-Path $freshSummaryRoot "$scenarioSlug.json"
+      Invoke-MIR4RuntimeReplayChild -Label "runtime.exact-zip/$scenarioName" -Arguments @('-NoProfile','-File',(Join-Path $repo 'scripts/Invoke-MIRValidation.ps1'),'-ScenarioWorker','-Scenario',$scenarioName,'-FactorioBin',$factorio,'-UserDataDir',$workerRoot,'-CandidateZip',$candidate,'-MaxParallel','1','-ValidationSummaryPath',$workerResult)
+      $workerText = ConvertTo-MIR4RuntimeReplayRedactedText -Text (Get-Content -Raw -LiteralPath $workerResult) -Paths $redactionPaths
+      [IO.File]::WriteAllText($workerResult,$workerText,[Text.UTF8Encoding]::new($false))
+      $workerFresh = $workerText | ConvertFrom-Json
+      if ([string]$workerFresh.status -ne 'passed' -or
+          [string]$workerFresh.validation_package_sha256 -ne [string]$materialization.archive_sha256 -or
+          [string]$workerFresh.validation_package_content_sha256 -ne [string]$materialization.content_sha256 -or
+          @($workerFresh.scenarios).Count -ne 1) {
+        throw "F2D exact-package scenario did not produce exact passing evidence: $scenarioName"
+      }
+      $freshRows.Add([ordered]@{name=$scenarioName;kind=[string]$declaration.kind;group=[string]$declaration.group;surface=[string]$declaration.surface;status='passed';assertions_executed=[int]$workerFresh.assertions_executed;duration_seconds=[double]$workerFresh.duration_seconds;worker_result_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($workerText)))})
     }
+    $freshResult = Join-Path $evidence 'fresh-load-result.json'
+    $fresh = [ordered]@{schema=1;kind='MIR4F2DExactZipFreshLoadMatrixV1';status='passed';target=$Target;factorio_version=$factorioVersion;factorio_binary_sha256=(Get-FileHash -LiteralPath $factorio -Algorithm SHA256).Hash;validation_package_sha256=[string]$materialization.archive_sha256;validation_package_content_sha256=[string]$materialization.content_sha256;scenarios=@($freshRows | ForEach-Object name);rows=@($freshRows);factorio_process_concurrency=1}
+    Write-MIR4RuntimeReplayJson -Value $fresh -Path $freshResult
+    $freshLogs = @(Get-ChildItem -LiteralPath $freshRoot -Recurse -File -Filter 'factorio-current.log' -ErrorAction SilentlyContinue | Sort-Object FullName)
+    if ($freshLogs.Count -ne $freshDeclarations.Count) { throw 'F2D fresh-load log cardinality does not match the exact-zip scenario matrix.' }
+    $logSections = [Collections.Generic.List[string]]::new()
+    foreach ($freshLog in $freshLogs) {
+      $logSections.Add((ConvertTo-MIR4RuntimeReplayRedactedText -Text (Get-Content -Raw -LiteralPath $freshLog.FullName) -Paths $redactionPaths))
+    }
+    [IO.File]::WriteAllText((Join-Path $evidence 'fresh-load-factorio.log'),(($logSections -join "`n") + "`n"),[Text.UTF8Encoding]::new($false))
     $upgradeOutput = Join-Path $evidence 'upgrade-matrix.json'
     Invoke-MIR4RuntimeReplayChild -Label 'upgrade matrix' -Arguments @('-NoProfile','-File',(Join-Path $repo 'validation/tests/runtime/Test-MIRUpgradeMatrix.ps1'),'-RepoRoot',$repo,'-FactorioBin',$factorio,'-FromZip',$predecessor,'-ToZip',$candidate,'-FromVersion',([string]$baseline[0].predecessor),'-ToVersion',([string]$baseline[0].distribution_version),'-FixtureName',([string]$profile.upgrade.fixture),'-OutputPath',$upgradeOutput,'-WorkRoot',(Join-Path $work 'upgrade-rows'),'-Retention',$Retention)
     $upgrade = Get-Content -Raw -LiteralPath $upgradeOutput | ConvertFrom-Json

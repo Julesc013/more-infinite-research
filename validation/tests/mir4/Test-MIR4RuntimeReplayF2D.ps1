@@ -38,5 +38,6 @@ $schema = Join-Path $RepoRoot 'spec/schemas/mir4-f2d-runtime-replay-evidence-v1.
 Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $schema | ConvertFrom-Json) -ne $null) 'mir4-f2d-evidence-schema-json'
 $coordinator = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/package/RuntimeReplay.ps1')
 foreach ($required in @('TargetMaterializer.ps1','Invoke-MIRValidation.ps1','Test-MIRUpgradeMatrix.ps1','RuntimeReplayVerifier.ps1','custody-precleanup.json','resource-receipt.json')) { Assert-MIR4F2D ($coordinator.Contains($required)) "mir4-f2d-compose-$required" }
+Assert-MIR4F2D ($coordinator.Contains("'-ScenarioWorker'") -and $coordinator.Contains("runtime.exact-zip/`$scenarioName") -and -not $coordinator.Contains("'-Tier','smoke'")) 'mir4-f2d-exact-zip-worker-composition'
 foreach ($forbidden in @('git clean','package_cutover=$true','publication=$true','signing=$true','sealing=$true')) { Assert-MIR4F2D (-not $coordinator.Contains($forbidden)) "mir4-f2d-forbidden-$forbidden" }
 Write-Host '[ok] MIR 4 F2D runtime replay harness contract'
