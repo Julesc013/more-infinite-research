@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "MIR4TargetSupportPolicyV1",
+  "policy_id": "mir4-four-target-source-fixed-point-v1",
+  "targets": [
+    {
+      "target": "f210",
+      "support_tier": "current",
+      "release_role": "mandatory",
+      "qualification": "independent-exact-engine-required"
+    },
+    {
+      "target": "f200",
+      "support_tier": "maintained",
+      "release_role": "mandatory",
+      "qualification": "independent-exact-engine-required"
+    },
+    {
+      "target": "f110",
+      "support_tier": "supplemental-lts",
+      "release_role": "supplemental",
+      "qualification": "independent-exact-engine-required"
+    },
+    {
+      "target": "f100",
+      "support_tier": "supplemental-lts",
+      "release_role": "supplemental",
+      "qualification": "independent-exact-engine-required"
+    }
+  ],
+  "invariants": {
+    "no_cross_target_proof_substitution": true,
+    "all_packages_self_contained": true,
+    "publication_authority": false
+  },
+  "record_sha256": "295AEE9AA10A44A807D28D4F3B688D0AF92AAD9EC8E62553D7A14D8FF9808467"
+}

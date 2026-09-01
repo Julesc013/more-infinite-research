@@ -1,0 +1,11 @@
+{
+  "name": "more-infinite-research",
+  "version": "4.0.10000",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Adds configurable infinite research for Factorio 1.0 logistics, combat, laboratory, and character bonuses.",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0"
+  ]
+}

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-01
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -859,3 +859,11 @@ The shadow materializer is a bootstrap bridge, not current package authority. Hi
 `tools/mir/application/package/ShadowSourceModel.ps1` is the sole M41-F2B semantic source-model application. It refines the accepted byte layers into common semantic source, common asset/locale, generated metadata, generated lifecycle entrypoint, family or target overlay, target replacement, target omission, target compatibility shim, migration, and package-documentation classes. Every binding names its historical comparison fixture, proposed future editable authority, exact identity, materialization mode, target scope, and proof obligations. Every target also receives an explicit collision-free overlay and omission ledger.
 
 The F2B model is still observational and package-excluded. `src/mod`, target overlay authorities, and the production materializer paths are declared future destinations, not created current writers. Historical ZIPs remain comparison fixtures only. The model grants no source move, editable-source authority, package cutover, old-writer retirement, tag, signature, seal, or publication transition; those require later bounded receipts and fresh exact-engine proof.
+
+## MIR 4 editable source and target materializer boundary
+
+`src/mod/package-source.json` is the M41-F2C manifest for the editable, package-excluded shadow source. Its bindings select exact bytes from the common source, modern or legacy family source, generated lifecycle templates, and explicit target files. `targets/registry.json` owns target identity, `targets/support-policy.json` owns the current support disposition, and each `targets/f*/overlay.json` owns that target's replacements and omissions. The source and overlay records are independently hashed and schema validated; no target contains a complete source copy.
+
+`tools/mir/application/package/TargetMaterializer.ps1` is the sole implementation that composes those authorities into a complete self-contained target tree. It has no historical-package input and verifies every source and output byte before writing only under ignored build roots. `materialize-check` performs independent A/B builds for F210, F200, F110, and F100 and rejects a missing or stale proof. The immutable 4.0 archives remain comparison fixtures used only by assurance, never by the production materializer.
+
+F2C creates editable shadow source authority but does not cut over the player-package writer. Root package files, package membership, release construction, runtime qualification, migrations, signing, sealing, tagging, and publication remain unchanged. A later succession receipt must prove exact-engine fresh load, reload, direct upgrade, second reload, rollback, and package-source cutover before the legacy writer can become read-only or retire.

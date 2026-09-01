@@ -1,0 +1,3475 @@
+{
+  "schema": 1,
+  "kind": "MIR4TargetOverlayV1",
+  "target": "f100",
+  "family": "legacy",
+  "materializer_abi": "mir4-target-materializer/1",
+  "base_layers": [
+    "common",
+    "families.legacy"
+  ],
+  "operations": [
+    {
+      "path": "changelog.txt",
+      "operation": "generate",
+      "semantic_class": "package-documentation",
+      "source_path": "targets/f100/generation/changelog.txt.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed targets.f100 source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 51374,
+      "expected_sha256": "90154DC0C5039738D7B117BF998A020F3FE90E9A762C6D18287628D22BCAAF24",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "info.json",
+      "operation": "generate",
+      "semantic_class": "generated-metadata",
+      "source_path": "targets/f100/generation/info.json.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed targets.f100 source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 326,
+      "expected_sha256": "452DF65FD62C4C8C0F4BB182F5EF765FD2F3DE95A671D6EF43A4A736DD69B81C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/af/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ar/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/be/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/bg/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ca/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/cs/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/da/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/de/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/de/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44013,
+      "expected_sha256": "CBE3E1ECD40C8B5463A2650D5E98AFEEAFC7DF5256A982203E5CD3B19A40F2F0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/el/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/en/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/en/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44282,
+      "expected_sha256": "AA8DF0E6D70335D4DA40E1D4BED0082E868A8E7A67B9CADAB920EA63C39BBA26",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/eo/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/es-ES/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/es-ES/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44385,
+      "expected_sha256": "43817829A20D467A289204F9A574ED444B200DA3D608B3E80CA5CC8810E93BD9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/et/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/eu/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fa/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fi/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fil/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fr/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/fr/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44366,
+      "expected_sha256": "76ADADB1CB82FB773C42F81E00AF206134FB4BA8728C6B8812684764A8EF41CB",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/fy-NL/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ga-IE/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/he/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/hr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/hu/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/id/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/is/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/it/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/it/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44358,
+      "expected_sha256": "B4C10C283C00AB01F0066AD0DE1B68DD07909362B2D1481C804858BDECD7E367",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ja/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ka/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/kk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ko/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/lt/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/lv/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/nl/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/no/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pl/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/pl/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44268,
+      "expected_sha256": "3FC258597B7B28F132237D812A7D9E678C9147A1A0F80340CE2B8237BF516B05",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pt-BR/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/pt-BR/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 44295,
+      "expected_sha256": "C070307BD39182BC4442C03804D0AD0734E2CE0C386EA72E5770483B34D5EC5F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/pt-PT/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ro/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/ru/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/ru/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 46340,
+      "expected_sha256": "2E77FACE4713BDF0E21117D9A42F20B1FE6C52F4821191DF3101BF021FC3D089",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sl/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sq/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/sv-SE/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/th/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/tr/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/uk/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/vi/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/zh-CN/more-infinite-research.cfg",
+      "operation": "add",
+      "semantic_class": "common-asset-locale",
+      "source_path": "src/mod/families/legacy/locale/zh-CN/more-infinite-research.cfg",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 43114,
+      "expected_sha256": "F829585E04C8C8C52227704AEA538FC2741F568FEFBF4A83741978D27332E220",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "locale/zh-TW/more-infinite-research.cfg",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/planner.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/recipe_productivity/planner.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 826,
+      "expected_sha256": "A215E1A16EE768B279401A353883F633060E5BADB3657F9D1FB59A1E7D8C9D12",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8753,
+      "expected_sha256": "E0BCF297838223F375598F93611E291654A31FE6826A938D929BAF0A1C97EF0F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 17620,
+      "expected_sha256": "72F22891411836A3E22DBAA45B301A2A47E7A3D0A3DBB9678741E124E4DBD22C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4703,
+      "expected_sha256": "A01B944F0A0BA10C06D5350B738F09EE4158979E11003E861B22F7A2E80FB5A9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3652,
+      "expected_sha256": "0FB14B0A5BDAFF98A8F1CE707567669EFE3D5BE9356FD4CF2FA073E8072F590E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/pack_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/pack_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2921,
+      "expected_sha256": "D966A60C6B615AF7DE53360346E50B323BE495CFE657C86251F61602BC735F7F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2281,
+      "expected_sha256": "41E8AB9D63AA6A414CBFE2CB4A2236AEAE00C6E12102AB9CC48C31722FDAAD5A",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/science_packs.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3035,
+      "expected_sha256": "10D93B791F3BD27D004D538B62E21D2DCD0927B99D89C061A48EF2896998A181",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8304,
+      "expected_sha256": "D3693F0E7C5B85473EB229C31FCBBD1E4388C3A0161887125970BFB2466B6BE9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9445,
+      "expected_sha256": "D869F76ED923EBB771F1C0B526FD6AEE0B9FFEE6D1899281978767BC90239C09",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4568,
+      "expected_sha256": "66A7367A598A3092F495FB008C4098106FAEC17E6BB4DC7067280E4D69E78905",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/claim_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "src/mod/families/legacy/prototypes/mir/compatibility/claim_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8222,
+      "expected_sha256": "2BB704453EE412ACD52CEABE09F4A9B3C5BD0A94C6B203C5E1742AC9B2554503",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "src/mod/families/legacy/prototypes/mir/compatibility/packs/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9099,
+      "expected_sha256": "317CE229C29F83FA487C6F982F9BE7CE52D620D167CDF3075C831A600762E63E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/packs/schema.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "src/mod/families/legacy/prototypes/mir/compatibility/packs/schema.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9168,
+      "expected_sha256": "B03A393A1F3E636801444AA8C719025A7D92C949C1F551F3C40B0EFC682C3A27",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/policy_authority.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/compatibility/profiles.lua",
+      "operation": "add",
+      "semantic_class": "target-compatibility-shim",
+      "source_path": "src/mod/families/legacy/prototypes/mir/compatibility/profiles.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5569,
+      "expected_sha256": "1F098B659D41B9C21C5D569D999522D4FDC503AB4ADD2626438EB940D22C9080",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/fingerprint.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/core/fingerprint.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1645,
+      "expected_sha256": "1A74DFDC3F0CDFBFDFC63959D165FB56972670B99EB951D883236DF2249DB910",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/schema.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/core/schema.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 539,
+      "expected_sha256": "F89E596A736BC0A7339415EB08EA3423A6B5CDBD0745AE87208E8168356C6D3A",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/structural_equal.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/core/trusted_record.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compilation_snapshot.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_input.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/compiler_result.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/execution_mode.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/mutation_journal.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/policy_snapshot.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/public_artifact_budget.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_operation.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/compiler/transformation_plan.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/generated_target_contracts.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/metadata.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/domain/effects/metadata.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1760,
+      "expected_sha256": "F70E6290A590693D9FBF31D779D88F365DA78D0B79FDEE43CACD3103AF5F29A1",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/environment_identity.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/evidence/compiler_evidence.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/facts/generated_technology_registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/domain/facts/generated_technology_registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 725,
+      "expected_sha256": "4E050546FF1D5EC3D9BF29513214DA3D8E9C4D8D5B5B855F9D5FA5292A914DB7",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/qualification_environment_identity.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/research_cost/compatibility_slice.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/streams/descriptor.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/domain/streams/descriptor.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9595,
+      "expected_sha256": "9CA7C7CC9D1618C9FBB8F5CE16521EDB7599D527BC3444DD1A9EFA4AAA0FC63E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/streams/stream_spec.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/domain/streams/stream_spec.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1155,
+      "expected_sha256": "305CB1537863946177A4EF47A6FA4E017103BA2F453292D94FF87E6EB6503043",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/applicability_envelope.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/design_assessment.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/effect_safety_policy.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/gate.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_hard_gate_authority.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_promotion_registry.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/generated_quality_profiles.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/hard_gate_authority.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_authorization.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/promotion_registry.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/safety_qualification.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_approval.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_candidate.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_design.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_migration.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_promotion.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_qualification.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_quality_assessment.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/technology/technology_risk.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_continuation_executor.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_extension_builder.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 21454,
+      "expected_sha256": "9CFB4811BFD71A73FABFCA7A576FFAEAC5C7EF5F76332271F82B1D98C4E79200",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/compiler_evidence_adapter.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/effect_safety.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1896,
+      "expected_sha256": "11013AF5487243157F1A1D43C0ECC1BE7A3DBC1A85721D5048337813EA14789B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/icon_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/icon_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10021,
+      "expected_sha256": "E5EC5C6DDF0E3113D6753A09E166BF3FAF0D89B989A4EF5E0EAEA1F7EA7DA9C9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/mod_data.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1041,
+      "expected_sha256": "D585ED81A87D17C8249FD742B0DC11614DADD23EE44848ADBC5F2DAD78873731",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/research_cost_compatibility_adapter.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/stream_executor.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/stream_spec_adapter.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/stream_spec_adapter.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1119,
+      "expected_sha256": "014A241C6C17283F2A56A0F24CFB2899636050109B6AF32D11BA4FA0418C1FFD",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/technology_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1369,
+      "expected_sha256": "08EDF7DBE7443CA823FAE94DA1DF3771DF585A45E08FBFE015425A3E9F13A0E4",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_design_adapter.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_graph_safety.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/technology_graph_safety.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5835,
+      "expected_sha256": "9C88FC59A619032B7FBAF522242205B156F9E18E21C772A8309E232A3DFD2F57",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_operation_executor.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/technology_replacement.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/technology_replacement.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3898,
+      "expected_sha256": "94EB1DB483D86FF002FBA88E1C8C973BCAE00E752BDD895153C88F50FFCBAD33",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4408,
+      "expected_sha256": "96284174D74C0C652F0332D1EF22499F9D3F96FF5BE48D9CB8D2C1F142C4BC0C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/operator_dsl.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/families/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4144,
+      "expected_sha256": "9C4844BE00F0943C87E8C1B5B30F1E4F3D1A84A35F16A5628652D07094F74D82",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/families/resolver.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/families/resolver.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11879,
+      "expected_sha256": "F608A2E2EDC175D986BD0D59B653B261DBD091CCA75B1518ADA62BCC9FB50B8F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/condensation.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/diff.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/evidence.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/qualification.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/reachability.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/researchability_index.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/researchability.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/scc.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/graph/snapshot.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/item_prototype_facts.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/productivity_owners.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/index/productivity_owners.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5903,
+      "expected_sha256": "B98CBAB2C23E9514CD87B656B627534419EFD72CA11EDDFE4948A736CD68FC47",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/recipe_facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/index/recipe_facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 14316,
+      "expected_sha256": "5E77DB04252CC073999554B15D41B3C21CD227D1ABB2952B27611ED3BDCCB334",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/recipe_risk_facts.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/registry_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/index/registry_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 15262,
+      "expected_sha256": "716A49B5751CACFB0BC5D5DB3F0B593170E7A29DC4ABB48B3FE221F700D0F1C8",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/index/relationships.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/index/relationships.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5102,
+      "expected_sha256": "D47BC42920473AF54091942365AEB848ED6996F12FFC8DF076B3EE5520085251",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/effect_contracts.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/technology_effects.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/pipeline/commands.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9257,
+      "expected_sha256": "58AFED365E35EF47AC47D30A10F2E94B43ED6608AAD767C373A8A03B5F44C377",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compilation_snapshot_adapter.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_context.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 994,
+      "expected_sha256": "933C61EBFFF340D60040742F4316AA915CC1FB2EE0D6A182E199209AFE2F01E0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/competing_productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/pipeline/mutations/competing_productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1000,
+      "expected_sha256": "46F83179765C523DF27835AA6F550E6543040DC5CA85F294B6C0000E58EE86A0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/policy_snapshot_adapter.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuation_builder.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/compilation_plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9865,
+      "expected_sha256": "1FDD328EF37A17E914D2E9A993AB00E29FBB38FFB6CB8C75048E70F2E7C32540",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compiler.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/compiler.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6156,
+      "expected_sha256": "062B246D5A82C9FFB98A11DDD84799C37BC41F086429A6B8B0BF4B00C347C586",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/direct_effects.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/direct_effects.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1244,
+      "expected_sha256": "B01E0858C6C7F022D26608F1623441EDCC1DF2025388CB6F4FDEC67E973DCE4E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/effect_ownership.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5590,
+      "expected_sha256": "D75E281DC7530D1B5D44F007CFFE237F93156A90AB4628A2A4F58354375B3BB8",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/generation_plan.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/generation_plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8701,
+      "expected_sha256": "69AB5E0B9E6739AE2D9253F23F4DD6D5143A3F3E9BC34C28CFCCE37B45475E90",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/native_owner_binding.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/native_owner_binding.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8758,
+      "expected_sha256": "1B8F599203300A79596A82420BD6B1558FF907AD09B5E71A8A7A8D75C6B3CEF5",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/output_validator.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/output_validator.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7007,
+      "expected_sha256": "7C794C4D8DC01F7B9009439D29B6E3E838BE964E726A918320D9904985CDA6AB",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/prerequisites.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/prerequisites.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2858,
+      "expected_sha256": "CA178A6ADCBB8EAD26DC75A6EA91DD5C97CB87CCDF02984D2516537BAB4E0E07",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/science.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/science.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 451,
+      "expected_sha256": "0A74EF22DB9D67E53860C6B56C2EEC25D07374ACDC7FD723CFBF335A72CE04DE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/planner/stream_compiler.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 18275,
+      "expected_sha256": "7AE984B4646975D247F53911BBB0D1407FDD83523F7E105DEBFA051E0F990EF4",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_graph.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_selection_policy.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/effect_target_inventory.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/environment_identity.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1638,
+      "expected_sha256": "CA79E3284393D8879024933870BE185192C419D6AFC9D4BBADE92728C915D8EC",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f100/files/prototypes/mir/platform/factorio/target_profiles.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed targets.f100 source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 16028,
+      "expected_sha256": "066043908B013FB218FEB3F964514218A99EEB1522768856B686718899E8E963",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/competing_base_extensions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/policy/competing_base_extensions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3780,
+      "expected_sha256": "0864808FBACE4A06CE48F7470655E23B8560C356A6BAC354CBAD9CF8373535AA",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/competing_productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/policy/competing_productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6803,
+      "expected_sha256": "22D1B9CEA9BED21F7D608AB2510FB979B399AB23221F2FCAC8E701F1A24781DE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/policy/max_level.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/policy/max_level.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 773,
+      "expected_sha256": "A34D2BC6205205673C818E17CAF7B93F6360FE6E2EC61EA253B1D7D99D7BC35C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/presentation/icon_builder.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/builtins.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/providers/builtins.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4812,
+      "expected_sha256": "41EB11C733128B3B7DD53B6FFFF2CE9155A13B2EADEF66462CEDA4C379CC7480",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/contract.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/providers/contract.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3751,
+      "expected_sha256": "C1E9EF4A538B59D7E0D93264EE3169FB9C57E850A87B67D3F04984A00097C750",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/budget.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/classification.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/decision.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/discovery.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/hazard_policy.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/normalization.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/owner_arbitration.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/pack_policy.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/pipeline/provider_claim.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/providers/provider_metrics.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/compiler_diagnostics.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/compiler_telemetry.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/coverage.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/report/coverage.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8951,
+      "expected_sha256": "B56C6C11C395A6FA6C337EDCAAE63F1A2FD8734D3601025A8B3185064C7B854E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/diagnostics_sink.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/report/diagnostics_sink.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11535,
+      "expected_sha256": "E876DECBC81E78FAB53BA32A477813893DA44CC4B5BF3871C268CAC490D02BCF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/report/public_compiler_artifacts.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/maximum_level_control.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/planet_discovery_recovery.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/runtime/productivity_family_adoption.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4217,
+      "expected_sha256": "13C00B21862357F0F5AE6434328F2AA8692326C131858E005F4F2C048CA8D20B",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/scripted_techs.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/runtime/scripted_techs.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2534,
+      "expected_sha256": "27B6EC3183F9F36158D214A32C3CEF7C3F9DB70C71FA6A3A7BF4FCEE0903BA1C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_profile.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/runtime/settings_profile.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5393,
+      "expected_sha256": "3A9252B3D9088E9AB9A552FF218D16D9C39815072E07E64F5AB2D7D641A579C2",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/settings_resolver.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/runtime/settings_resolver.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1108,
+      "expected_sha256": "838AA3E1C3B033A4DF86BC0603833B3CCDDBEA5AC2833F2F42A1E218F3A56776",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/startup_settings.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/automatic_compiler_contract.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/settings/automatic_compiler_contract.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 10945,
+      "expected_sha256": "3C8FD361345B4D114DBA21B6B4A744C32FEB2476806EBB6860E83000265DBB22",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/defaults.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/settings/defaults.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4254,
+      "expected_sha256": "8457C7FEB271FE25C896BF9E0A84D350BE1B105BD10835AA001CF61DD0281D0F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/effective.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/settings/effective.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1971,
+      "expected_sha256": "A0BC5D97A3DBD65DA4C0199F5663A1B30FA116543917E673165E5B0150BDDC1A",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/pipeline_extent.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/settings/pipeline_extent.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1185,
+      "expected_sha256": "772B3D4EE933706BB8E20B3548A01743FCFA0816417A2CCC0F31E65A4AA24013",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/settings/stage_builder.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/settings/stage_builder.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9040,
+      "expected_sha256": "C261A314860FFD24A24AC93DB63559B36BEA5D5DFF64E972059A5D4880E0E49E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes_steps.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/stage/data_final_fixes_steps.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1363,
+      "expected_sha256": "4C8F8814159B55912E704BA540758B32DBE81D9FE1AC0C8BF8320EED4737384F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/stage/data_final_fixes.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/stage/data_final_fixes.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 127,
+      "expected_sha256": "338E986392713E9CE858271164664AAB26A874122433E57174E0A51BC4F66727",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/generated_continuation_manifest.json",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f100 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/generated_stream_manifest.json",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/streams/generated_stream_manifest.json",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 37458,
+      "expected_sha256": "3FD9206C2B6F3C2A0590C553E3CC794C0227F171165F3AC5CEF9435D58FF24D1",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/registry.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/mir/streams/registry.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1003,
+      "expected_sha256": "D9905364612FFAC5FEC2C0035E4861F80334009CBFEC094C17E0DC59A7536E23",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/streams/direct-effects.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/streams/direct-effects.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5297,
+      "expected_sha256": "BAD39BF32CC508DDF763D5B284D4B372B23F39440DE8BDE175CF76A1E15F05A0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/streams/productivity.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/legacy/prototypes/streams/productivity.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.legacy source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 22776,
+      "expected_sha256": "0DFE2171604C92517C8F39421D4D13428B6CAFE19BF41AF248002B99D594FD25",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    },
+    {
+      "path": "README.md",
+      "operation": "generate",
+      "semantic_class": "package-documentation",
+      "source_path": "targets/f100/generation/README.md.template",
+      "transform": "exact-template-v1",
+      "reason": "Materialize the governed targets.f100 source for f100.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4155,
+      "expected_sha256": "9AFF4782A47FA1E56CDD2A355C737C239FD2D46FFD36A6FEBBF4B2B493581E01",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "no-package-authority-before-cutover",
+        "fresh-runtime-replay-before-cutover"
+      ]
+    }
+  ],
+  "invariants": {
+    "all_target_differences_explicit": true,
+    "no_full_target_source_copy": true,
+    "independent_target_proof_required": true
+  },
+  "record_sha256": "73DAD8BF0D9EFDCBB63B85F4DCDBD464EC31C21F32CC244244AEF214D3EAE5F4"
+}

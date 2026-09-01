@@ -1,0 +1,47 @@
+-- Generated from .mir/technology-hard-gates.json. Do not edit by hand.
+return {
+  authority = "mir-technology-hard-gates-v1",
+  gates = {
+    {
+      id = "target_supported",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "effect_valid",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "owner_conflict_free",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "science_compatible",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "lab_compatible",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "prerequisites_acyclic",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "loop_safe",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "progression_safe",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "migration_safe",
+      not_applicable_requires_predicate = true
+    },
+    {
+      id = "output_identity_safe",
+      not_applicable_requires_predicate = true
+    }
+  },
+  schema = 1
+}

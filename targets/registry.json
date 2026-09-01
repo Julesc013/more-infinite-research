@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "kind": "MIR4TargetRegistryV1",
+  "materializer_abi": "mir4-target-materializer/1",
+  "targets": [
+    {
+      "target": "f210",
+      "target_id": "factorio-2.1",
+      "factorio_line": "2.1",
+      "family": "modern",
+      "distribution_version": "4.0.21000",
+      "distribution_root": "more-infinite-research_4.0.21000",
+      "predecessor": "3.2.11",
+      "overlay": "targets/f210/overlay.json",
+      "support_policy": "targets/support-policy.json"
+    },
+    {
+      "target": "f200",
+      "target_id": "factorio-2.0",
+      "factorio_line": "2.0",
+      "family": "modern",
+      "distribution_version": "4.0.20000",
+      "distribution_root": "more-infinite-research_4.0.20000",
+      "predecessor": "2.5.11",
+      "overlay": "targets/f200/overlay.json",
+      "support_policy": "targets/support-policy.json"
+    },
+    {
+      "target": "f110",
+      "target_id": "factorio-1.1",
+      "factorio_line": "1.1",
+      "family": "legacy",
+      "distribution_version": "4.0.11000",
+      "distribution_root": "more-infinite-research_4.0.11000",
+      "predecessor": "1.9.9",
+      "overlay": "targets/f110/overlay.json",
+      "support_policy": "targets/support-policy.json"
+    },
+    {
+      "target": "f100",
+      "target_id": "factorio-1.0",
+      "factorio_line": "1.0",
+      "family": "legacy",
+      "distribution_version": "4.0.10000",
+      "distribution_root": "more-infinite-research_4.0.10000",
+      "predecessor": "1.8.9",
+      "overlay": "targets/f100/overlay.json",
+      "support_policy": "targets/support-policy.json"
+    }
+  ],
+  "record_sha256": "B6873253543C50D985AFB85CF706E7E428A21B43E3EF6D9188EA5B162F126C00"
+}

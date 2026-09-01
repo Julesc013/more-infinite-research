@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0007",
+  "status": "accepted",
+  "change_type": "added",
+  "summary": "Established editable canonical MIR package source and one deterministic materializer for all four public targets.",
+  "details": [
+    "The governed source manifest selects 406 unique editable sources across common, family, generated, and explicit target layers without retaining a full target-specific source copy.",
+    "The production materializer reads no historical package archive, verifies every source and output hash, and reconstructs F210, F200, F110, and F100 with exact normalized byte-tree parity to their accepted 4.0 baselines.",
+    "Independent A/B builds prove deterministic archive construction for every target while the existing root package writer remains unchanged pending exact-engine replay, rollback, and a separate cutover receipt."
+  ],
+  "semantic_domains": ["package-boundary", "repository-authority", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The editable source reconstructs the exact accepted F210 byte tree without changing the current package writer."},
+    {"target":"F200","disposition":"unaffected","reason":"The editable source reconstructs the exact accepted F200 byte tree without changing the current package writer."},
+    {"target":"F110","disposition":"unaffected","reason":"The editable source independently reconstructs the exact accepted F110 byte tree without changing the current package writer."},
+    {"target":"F100","disposition":"unaffected","reason":"The editable source independently reconstructs the exact accepted F100 byte tree without changing the current package writer."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"src/mod/package-source.json"},
+    {"kind":"document","value":"tools/mir/application/package/TargetMaterializer.ps1"}
+  ]
+}

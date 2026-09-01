@@ -289,6 +289,34 @@ if([string]$shadowSourceModel.kind-cne'MIR4M41F2BShadowSourceModelAuthorityEvolu
    @($shadowSourceModel.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f2b-shadow-source-model-authority]'
 }
+$editableSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$editableSource.kind-cne'MIR4M41F2CEditableSourceMaterializerAuthorityEvolutionV1'-or
+   [string]$editableSource.status-cne'M41-F2C-EDITABLE-SOURCE-MATERIALIZER-PARITY-COMPLETE-NO-PACKAGE-CUTOVER'-or
+   [string]$editableSource.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json'-or
+   [string]$editableSource.predecessor_receipt.sha256-cne'3E990A1951F665183254ED1F0D9132A55E050B8F402274C49AC8F85BBA6ACB15'-or
+   @($editableSource.evolved_bindings).Count-lt8-or
+   @($editableSource.current_authorities).Count-lt12-or
+   [string]$editableSource.materializer_proof.source_manifest_sha256-cne'0A291BA7EC59857BB3663A69D30FBCD62BE864B2829D37506C294B0D5B62DE33'-or
+   [string]$editableSource.materializer_proof.proof_record_sha256-cne'258E530AA8877D21D06762654FB5402CB6EC73B38AD3886C2B359C9526314AF4'-or
+   [int]$editableSource.materializer_proof.binding_count-ne406-or
+   [int]$editableSource.materializer_proof.source_file_count-ne406-or
+   [int]$editableSource.materializer_proof.target_count-ne4-or
+   @($editableSource.materializer_proof.target_compositions).Count-ne4-or
+   @($editableSource.materializer_proof.target_compositions|Where-Object{-not[bool]$_.deterministic_archive_bytes-or-not[bool]$_.exact_golden_tree_parity}).Count-ne0-or
+   [string]$editableSource.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$editableSource.root_readme_sha256-or
+   -not[bool]$editableSource.invariants.editable_shadow_source_established-or
+   -not[bool]$editableSource.invariants.all_source_hashes_verified-or
+   -not[bool]$editableSource.invariants.four_target_tree_parity-or
+   -not[bool]$editableSource.invariants.four_target_deterministic_archives-or
+   -not[bool]$editableSource.invariants.no_target_full_source_copy-or
+   -not[bool]$editableSource.invariants.production_materializer_has_no_archive_input-or
+   -not[bool]$editableSource.invariants.bootstrap_importer_retired-or
+   -not[bool]$editableSource.invariants.current_writer_unchanged-or
+   -not[bool]$editableSource.invariants.runtime_replay_pending-or
+   @($editableSource.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-f2c-editable-source-materializer-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

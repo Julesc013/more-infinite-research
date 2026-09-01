@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/targets/mir4-target-registry-v1.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "kind", "materializer_abi", "targets", "record_sha256"],
+  "properties": {"schema": {"const": 1}, "kind": {"const": "MIR4TargetRegistryV1"}, "materializer_abi": {"const": "mir4-target-materializer/1"}, "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["target", "target_id", "factorio_line", "family", "distribution_version", "distribution_root", "predecessor", "overlay", "support_policy"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "target_id": {"pattern": "^factorio-(?:2[.]1|2[.]0|1[.]1|1[.]0)$"}, "factorio_line": {"enum": ["2.1", "2.0", "1.1", "1.0"]}, "family": {"enum": ["modern", "legacy"]}, "distribution_version": {"enum": ["4.0.21000", "4.0.20000", "4.0.11000", "4.0.10000"]}, "distribution_root": {"pattern": "^more-infinite-research_4[.]0[.](?:21000|20000|11000|10000)$"}, "predecessor": {"enum": ["3.2.11", "2.5.11", "1.9.9", "1.8.9"]}, "overlay": {"pattern": "^targets/f(?:210|200|110|100)/overlay[.]json$"}, "support_policy": {"const": "targets/support-policy.json"}}}}, "record_sha256": {"$ref": "#/$defs/sha256"}},
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

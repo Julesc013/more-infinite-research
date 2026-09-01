@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "materializer_proof", "player_package_source_sha256", "root_readme_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41F2CEditableSourceMaterializerAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-F2C-EDITABLE-SOURCE-MATERIALIZER"},
+    "change_id": {"const": "MIR4-CHG-2026-0007"},
+    "predecessor_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {
+      "path": {"const": "releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json"},
+      "sha256": {"const": "3E990A1951F665183254ED1F0D9132A55E050B8F402274C49AC8F85BBA6ACB15"}
+    }},
+    "base": {"type": "object", "additionalProperties": false, "required": ["branch", "commit", "tree"], "properties": {"branch": {"const": "dev"}, "commit": {"const": "8bd70a1858a95e3863e5edcc5be5847b04144dfd"}, "tree": {"const": "4b986dff60ba4e7087359015538253d6ddcd6a54"}}},
+    "evolved_bindings": {"type": "array", "minItems": 8, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 12, "items": {"$ref": "#/$defs/current"}},
+    "materializer_proof": {"type": "object", "additionalProperties": false, "required": ["source_manifest_sha256", "proof_record_sha256", "binding_count", "source_file_count", "target_count", "target_compositions", "physical_files", "unknown_paths", "package_files"], "properties": {
+      "source_manifest_sha256": {"const": "0A291BA7EC59857BB3663A69D30FBCD62BE864B2829D37506C294B0D5B62DE33"},
+      "proof_record_sha256": {"const": "258E530AA8877D21D06762654FB5402CB6EC73B38AD3886C2B359C9526314AF4"},
+      "binding_count": {"const": 406},
+      "source_file_count": {"const": 406},
+      "target_count": {"const": 4},
+      "target_compositions": {"type": "array", "minItems": 4, "maxItems": 4, "prefixItems": [
+        {"$ref": "#/$defs/f210"}, {"$ref": "#/$defs/f200"}, {"$ref": "#/$defs/f110"}, {"$ref": "#/$defs/f100"}
+      ], "items": false},
+      "physical_files": {"type": "integer", "minimum": 4300},
+      "unknown_paths": {"const": 0},
+      "package_files": {"const": 307}
+    }},
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "root_readme_sha256": {"const": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947"},
+    "package_visible_delta": {"const": []},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["editable_shadow_source_established", "all_source_hashes_verified", "four_target_tree_parity", "four_target_deterministic_archives", "no_target_full_source_copy", "production_materializer_has_no_archive_input", "bootstrap_importer_retired", "historical_archives_are_comparison_fixtures_only", "current_writer_unchanged", "runtime_replay_pending", "package_source_unchanged", "root_readme_byte_stable"], "properties": {
+      "editable_shadow_source_established": {"const": true}, "all_source_hashes_verified": {"const": true}, "four_target_tree_parity": {"const": true}, "four_target_deterministic_archives": {"const": true}, "no_target_full_source_copy": {"const": true}, "production_materializer_has_no_archive_input": {"const": true}, "bootstrap_importer_retired": {"const": true}, "historical_archives_are_comparison_fixtures_only": {"const": true}, "current_writer_unchanged": {"const": true}, "runtime_replay_pending": {"const": true}, "package_source_unchanged": {"const": true}, "root_readme_byte_stable": {"const": true}
+    }},
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"const": "M41-F2C-EDITABLE-SOURCE-MATERIALIZER-PARITY-COMPLETE-NO-PACKAGE-CUTOVER"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "reason": {"type": "string", "minLength": 8}, "scope": {"const": "package-excluded-editable-source-materializer"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "current": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "role"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "role": {"type": "string", "minLength": 8}}},
+    "composition": {"type": "object", "additionalProperties": false, "required": ["target", "distribution_version", "binding_count", "omission_count", "entry_count", "content_sha256", "archive_sha256", "deterministic_archive_bytes", "exact_golden_tree_parity"], "properties": {"target": {"type": "string"}, "distribution_version": {"type": "string"}, "binding_count": {"type": "integer"}, "omission_count": {"type": "integer"}, "entry_count": {"type": "integer"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "archive_sha256": {"$ref": "#/$defs/sha256"}, "deterministic_archive_bytes": {"const": true}, "exact_golden_tree_parity": {"const": true}}},
+    "f210": {"allOf": [{"$ref": "#/$defs/composition"}, {"properties": {"target": {"const": "f210"}, "distribution_version": {"const": "4.0.21000"}, "binding_count": {"const": 305}, "omission_count": {"const": 0}, "entry_count": {"const": 305}, "content_sha256": {"const": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED"}, "archive_sha256": {"const": "4DE721FFCD6BECBA34ED110EE1BEE59ADDE3E6BBF13E993C339FC7729862E41A"}}}]},
+    "f200": {"allOf": [{"$ref": "#/$defs/composition"}, {"properties": {"target": {"const": "f200"}, "distribution_version": {"const": "4.0.20000"}, "binding_count": {"const": 303}, "omission_count": {"const": 2}, "entry_count": {"const": 303}, "content_sha256": {"const": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F"}, "archive_sha256": {"const": "0744FDC11B8095C6B9D9543E02A26CE89CDBD02477CDBD20A26FE8EAADA31AC6"}}}]},
+    "f110": {"allOf": [{"$ref": "#/$defs/composition"}, {"properties": {"target": {"const": "f110"}, "distribution_version": {"const": "4.0.11000"}, "binding_count": {"const": 174}, "omission_count": {"const": 131}, "entry_count": {"const": 174}, "content_sha256": {"const": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682"}, "archive_sha256": {"const": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C"}}}]},
+    "f100": {"allOf": [{"$ref": "#/$defs/composition"}, {"properties": {"target": {"const": "f100"}, "distribution_version": {"const": "4.0.10000"}, "binding_count": {"const": 174}, "omission_count": {"const": 131}, "entry_count": {"const": 174}, "content_sha256": {"const": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2"}, "archive_sha256": {"const": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35"}}}]},
+    "falseTransitions": {"type": "object", "additionalProperties": false, "required": ["merge", "source_move", "package_cutover", "readme_rewrite", "bridge_retirement", "old_writer_retirement", "tagging", "signing", "sealing", "version_allocation", "publication", "remote_write"], "properties": {"merge": {"const": false}, "source_move": {"const": false}, "package_cutover": {"const": false}, "readme_rewrite": {"const": false}, "bridge_retirement": {"const": false}, "old_writer_retirement": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "version_allocation": {"const": false}, "publication": {"const": false}, "remote_write": {"const": false}}}
+  }
+}

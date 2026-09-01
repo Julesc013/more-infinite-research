@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/targets/mir4-target-support-policy-v1.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema", "kind", "policy_id", "targets", "invariants", "record_sha256"],
+  "properties": {"schema": {"const": 1}, "kind": {"const": "MIR4TargetSupportPolicyV1"}, "policy_id": {"const": "mir4-four-target-source-fixed-point-v1"}, "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["target", "support_tier", "release_role", "qualification"], "properties": {"target": {"enum": ["f210", "f200", "f110", "f100"]}, "support_tier": {"enum": ["current", "maintained", "supplemental-lts"]}, "release_role": {"enum": ["mandatory", "supplemental"]}, "qualification": {"const": "independent-exact-engine-required"}}}}, "invariants": {"type": "object", "additionalProperties": false, "required": ["no_cross_target_proof_substitution", "all_packages_self_contained", "publication_authority"], "properties": {"no_cross_target_proof_substitution": {"const": true}, "all_packages_self_contained": {"const": true}, "publication_authority": {"const": false}}}, "record_sha256": {"$ref": "#/$defs/sha256"}},
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

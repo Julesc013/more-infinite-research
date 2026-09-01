@@ -2907,6 +2907,37 @@
       ]
     },
     {
+      "id": "static.mir4-editable-source-materializer-m41-f2c",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".gitattributes",
+        "src/mod/**",
+        "targets/registry.json",
+        "targets/support-policy.json",
+        "targets/f210/**",
+        "targets/f200/**",
+        "targets/f110/**",
+        "targets/f100/**",
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+        "spec/schemas/mir4-target-registry-v1.schema.json",
+        "spec/schemas/mir4-target-support-policy-v1.schema.json",
+        "spec/schemas/mir4-target-overlay-v1.schema.json",
+        "spec/schemas/mir4-package-composition-result-v1.schema.json",
+        "spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/GoldenTargetBaselines.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
