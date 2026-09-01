@@ -45,5 +45,8 @@ Require-MIR4F2D ($absolutePathLeaks.Count -eq 0) 'mir4-f2d-absolute-path-redacti
 $result = [ordered]@{schema=1;kind='MIR4F2DIndependentVerificationV1';status='passed';target=$Target;proof_status=[string]$proof.status;package_content_sha256=[string]$proof.package.content_sha256;engine_version=[string]$proof.engine.version;engine_binary_sha256=[string]$proof.engine.binary_sha256;fresh_scenarios=@($fresh.scenarios).Count;upgrade_archetypes=@($upgrade.required_archetypes);custody_files=@($custody.files).Count;transition_gates=$proof.transition_gates}
 $schema = Join-Path $repo 'spec/schemas/mir4-f2d-runtime-replay-evidence-v1.schema.json'
 Require-MIR4F2D (($result | ConvertTo-Json -Depth 20) | Test-Json -SchemaFile $schema) 'mir4-f2d-independent-schema'
-[IO.File]::WriteAllText([IO.Path]::GetFullPath($OutputPath),(($result|ConvertTo-Json -Depth 20)+"`n"),[Text.UTF8Encoding]::new($false))
+$resolvedOutput = [IO.Path]::GetFullPath($OutputPath)
+$outputParent = Split-Path -Parent $resolvedOutput
+if (-not (Test-Path -LiteralPath $outputParent -PathType Container)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
+[IO.File]::WriteAllText($resolvedOutput,(($result|ConvertTo-Json -Depth 20)+"`n"),[Text.UTF8Encoding]::new($false))
 Write-Host "[ok] independent F2D verifier: $OutputPath"

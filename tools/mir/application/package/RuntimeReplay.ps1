@@ -48,7 +48,7 @@ function ConvertTo-MIR4RuntimeReplayRedactedText {
 function Invoke-MIR4RuntimeReplayChild {
   param([Parameter(Mandatory)][string[]]$Arguments,[Parameter(Mandatory)][string]$Label)
   $pwsh = (Get-Command pwsh -ErrorAction Stop).Source
-  & $pwsh @Arguments
+  & $pwsh @Arguments | Out-Host
   if ($LASTEXITCODE -ne 0) { throw "$Label failed with exit code $LASTEXITCODE." }
 }
 
