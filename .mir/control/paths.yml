@@ -67,6 +67,20 @@ paths:
   mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
   mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
+  mir4.package-source.editable-source-manifest: src/mod/package-source.json
+  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+  mir4.package-source.target-registry: targets/registry.json
+  mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v1.schema.json
+  mir4.package-source.target-support-policy: targets/support-policy.json
+  mir4.package-source.target-support-policy-schema: spec/schemas/mir4-target-support-policy-v1.schema.json
+  mir4.package-source.target-overlay-schema: spec/schemas/mir4-target-overlay-v1.schema.json
+  mir4.package-source.target-materializer: tools/mir/application/package/TargetMaterializer.ps1
+  mir4.package-source.target-composition-schema: spec/schemas/mir4-package-composition-result-v1.schema.json
+  mir4.package-source.editable-source-materializer-proof-schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
+  mir4.package-source.editable-source-materializer-proof: validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
+  mir4.package-source.editable-source-materializer-authority-evolution: releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json
+  mir4.package-source.editable-source-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json
+  mir4.package-source.editable-source-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

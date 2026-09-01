@@ -1,0 +1,369 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2CEditableSourceMaterializerAuthorityEvolutionV1",
+  "recorded_at": "09/01/2026 13:00:56",
+  "programme_id": "M41-F2C-EDITABLE-SOURCE-MATERIALIZER",
+  "change_id": "MIR4-CHG-2026-0007",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json",
+    "sha256": "3E990A1951F665183254ED1F0D9132A55E050B8F402274C49AC8F85BBA6ACB15"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "8bd70a1858a95e3863e5edcc5be5847b04144dfd",
+    "tree": "4b986dff60ba4e7087359015538253d6ddcd6a54"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".gitattributes",
+      "previous_sha256": "C9AF7CBFF77103170140189790A117509CA28478445767E81EDCA2A1807C3B07",
+      "current_sha256": "AD6A309D3116F5C06B6A38A093BFBB9FC3A31BE07891F4B210032D7F311FA900",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "0CB711AA8EFF4147FFD94916C65FCF0336254F87B201C7B742F53AFCCAB13B91",
+      "current_sha256": "189D929AFD2C72F7E194AAD0C5A5B5CD90A319EEE4D08B75DD465B686BB30120",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control-plane/ownership.json",
+      "previous_sha256": "75B2EAC188965540DE0CC3CB68A59E8969ED7B3F2351EADC5D1688543C940F20",
+      "current_sha256": "DC79E1FA705F3B91F9D02608D99D6D01508C9518613143DEB737570B16DE091B",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "E2A68FD45C07051263E78764B60A1FB17E4D8FD2A0AC12C1503CAD1A87AF8591",
+      "current_sha256": "A7BC4032FD36196173B0D5CB3470DC149F80308A698426F6E0D780DC022C90DC",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "EAE17AEA20914C89B85D2B5FE9BAE7D28A95C8482A9E4E2A0348859B4FFADD36",
+      "current_sha256": "F6F744CE1C0DA808D4DC4876773223F4F0567259F227EB978C305CBDC4507ED2",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "6F8ACA65241391AD9C8B7FAF675BFCA850731DC1420DFE340C14F6C20F919505",
+      "current_sha256": "3B2938107EA9689777DF98BC8A688B2936538F3879F3CA141E3360B3F871A4A5",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "5156242E15FDF1131A3DFD3344ECCE60578906DA0554F842FFA2E5A17D3D4B4C",
+      "current_sha256": "50985A853B56E41FC7A6902F98F5694EF67BC8E510FC2562F05FBE4E30D05B8F",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "72CCD0B8A5A8460477EB28BBBE84D57FCFF14595F6FA45FC882980169F33D29B",
+      "current_sha256": "7AE1CAE77CFADD0EC537469C39521F93A7E6BF40151F44A170016CCDDB36A9F5",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "8683DBCD0BEC1A7632555C81F762018C9B62418DBBC6D4BFD21065464E046E70",
+      "current_sha256": "88DB0D940D3DBB5426ED3B957773F245B409192D485DEF086C4DE103BA852E7F",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "EB1379DB85F371DD1D31246D3D5F128D02BE7AC469CE6DFF1D1A559684A69B5D",
+      "current_sha256": "D67378B529E91EC51889C666DB9D0A12BE540CEDDDC3DB5A0E8BB41C6EE551A5",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "F4920B163C2B2533357749977BDD85B84004C9EC3317B48EB496DE06C3453503",
+      "current_sha256": "EC581EA8B4EF25E7B843EB4D40CF298E0ADBA8FBC7D9BC87307752C77BE8D87C",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "CC65479A74E03C65B0168835FB4463BA16614565B875E102C60C040F32BD4EC0",
+      "current_sha256": "E5E6E8603131E2C4085021F1B7B8F82E8347B4881B1EEE5095D31FF8F1EA62A0",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "1B6EDD36BDCD2903068AB2939015A32A67D9055D683D7E816C99B9A6F7D48AA2",
+      "current_sha256": "B5B849D5CC0EB635794AB3694B3FA38246EAC1666041AD2CCD733EFA30B75604",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "A994AE2CC2CADA12DC678C01F7AB5AC75D9CED0455D3889410A3BDB27E0CADE8",
+      "current_sha256": "5D131CF39EA5A838A16725C8D65B493D4AF50068FCDF1C59F6CE54756853CB4A",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "CD69D34C2E95AA4AA59D95327286A6E930A098285652C3D544165F7AD79D6CC3",
+      "current_sha256": "EE641E56C56313C01528015C468E7366288F07840546217DA7C081D62C49D221",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+      "previous_sha256": "8FDC708DB47E6D2A905B9F5D04C233622C325461868A595E0CF3A9EBE73EFCD9",
+      "current_sha256": "BAEE06B8F189B03186E5D48C67602EEB2567AC4CC74EBA684925BCB3B94C5AC7",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+      "previous_sha256": "E0E64FDA2E9F83E5D38377FE42C90DA7EFB3F1B2D969B7D729EB6A04F9910F72",
+      "current_sha256": "5D157B0961E4C5CB25FC97639872AA57AF8238A367210F1AC47FF0116F123634",
+      "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
+      "scope": "package-excluded-editable-source-materializer",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0007.json",
+      "sha256": "A1BBB56C50208C16F6E3DDF4B7AF26DE5361BCBE79106B8020C989B4B12BE4CE",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json",
+      "sha256": "004413C5E3213995E577C0E96D09250C5642EEBC6082EE7781F61DEE8EAF5538",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+      "sha256": "1E727FD13A348E2F15570301CB757D3BA145C1F87B9FFD815BED7C34E754150F",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-target-registry-v1.schema.json",
+      "sha256": "01069F4C1C6365FB9C583171FF9321292E72B83B63A0CFEF8E889C6C7B3EA6DA",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-target-support-policy-v1.schema.json",
+      "sha256": "507224EEE41094F76C6D8E9ADF2F2C47865A0AE2EDF9C6138DBBA1F895B651AD",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-target-overlay-v1.schema.json",
+      "sha256": "686A5468B1FFAD884147C51B0DE6D143FE15EFFDA2D6C81174C53E42F69ADA4B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-package-composition-result-v1.schema.json",
+      "sha256": "BBA1ED5BF1E6EE7DB057836C384BB7BFAD866D40C8743B4E4357BE4BB8C69D34",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json",
+      "sha256": "19F67262260CEBE4BA687800FB27741BC8A1A9735A9FA64EB091A1D2C55C549B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "src/mod/package-source.json",
+      "sha256": "3F320DAC4A361872702B340329D1DBF5088FA702ECB20741DE316C8D8D8C84BC",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/registry.json",
+      "sha256": "D03CFED985D262D0B9C94C0A2C4DC5D97308EAC0F913117539A8A3D447CB7252",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/support-policy.json",
+      "sha256": "28C6FD7A48331472352C86BB8AC835B89229C45F232400CFB1DB395D63CA675A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/f210/overlay.json",
+      "sha256": "8FED7D017E06F2D02634C492DC8042ED57AB9C766A868E18BCE967E160BE88DF",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/f200/overlay.json",
+      "sha256": "8D1957B13177E67841DC6E4B943C45338CDA30AD21A23AB258CC05452FE87989",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/f110/overlay.json",
+      "sha256": "D28EB96E2A1C11A2653BC5E5D057F8311F47C83CBA0055D495A14840B98A232A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "targets/f100/overlay.json",
+      "sha256": "7B99E7B3E16BA7A761F41CA6B3097D155ED6A7C53A223D3E5F808C0FBEC16FA2",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1",
+      "sha256": "3CD99A13D6FA9D4EE554121562F5F6B50EFAEF61144B416CF612D6762B423E46",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "tools/mir/application/package/TargetMaterializer.ps1",
+      "sha256": "CF5A13ADDF1730D04A28F1D8ECD91821FC2688104A6D0C1B97CAB50612AEB17E",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "sha256": "66F6BF6F2EED37DDDA235BC1EA3BAFB404B35E431C009800E9FF4039E775CD08",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded editable source, target composition, materializer, contract, or proof authority."
+    }
+  ],
+  "materializer_proof": {
+    "source_manifest_sha256": "0A291BA7EC59857BB3663A69D30FBCD62BE864B2829D37506C294B0D5B62DE33",
+    "proof_record_sha256": "258E530AA8877D21D06762654FB5402CB6EC73B38AD3886C2B359C9526314AF4",
+    "binding_count": 406,
+    "source_file_count": 406,
+    "target_count": 4,
+    "target_compositions": [
+      {
+        "target": "f210",
+        "distribution_version": "4.0.21000",
+        "binding_count": 305,
+        "omission_count": 0,
+        "entry_count": 305,
+        "content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+        "archive_sha256": "4DE721FFCD6BECBA34ED110EE1BEE59ADDE3E6BBF13E993C339FC7729862E41A",
+        "deterministic_archive_bytes": true,
+        "exact_golden_tree_parity": true
+      },
+      {
+        "target": "f200",
+        "distribution_version": "4.0.20000",
+        "binding_count": 303,
+        "omission_count": 2,
+        "entry_count": 303,
+        "content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+        "archive_sha256": "0744FDC11B8095C6B9D9543E02A26CE89CDBD02477CDBD20A26FE8EAADA31AC6",
+        "deterministic_archive_bytes": true,
+        "exact_golden_tree_parity": true
+      },
+      {
+        "target": "f110",
+        "distribution_version": "4.0.11000",
+        "binding_count": 174,
+        "omission_count": 131,
+        "entry_count": 174,
+        "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+        "archive_sha256": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+        "deterministic_archive_bytes": true,
+        "exact_golden_tree_parity": true
+      },
+      {
+        "target": "f100",
+        "distribution_version": "4.0.10000",
+        "binding_count": 174,
+        "omission_count": 131,
+        "entry_count": 174,
+        "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+        "archive_sha256": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+        "deterministic_archive_bytes": true,
+        "exact_golden_tree_parity": true
+      }
+    ],
+    "physical_files": 4360,
+    "unknown_paths": 0,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "editable_shadow_source_established": true,
+    "all_source_hashes_verified": true,
+    "four_target_tree_parity": true,
+    "four_target_deterministic_archives": true,
+    "no_target_full_source_copy": true,
+    "production_materializer_has_no_archive_input": true,
+    "bootstrap_importer_retired": true,
+    "historical_archives_are_comparison_fixtures_only": true,
+    "current_writer_unchanged": true,
+    "runtime_replay_pending": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "old_writer_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F2C-EDITABLE-SOURCE-MATERIALIZER-PARITY-COMPLETE-NO-PACKAGE-CUTOVER"
+}

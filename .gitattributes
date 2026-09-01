@@ -152,3 +152,5 @@ tests/platform/** text eol=lf
 tests/technology/** text eol=lf
 tests/release-tooling/** text eol=lf
 tools/mir/** text eol=lf
+src/mod/** text eol=lf
+targets/**/*.json text eol=lf

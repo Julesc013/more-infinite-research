@@ -62,6 +62,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check> [--target <f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -690,9 +691,9 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
       }
       "package-source" {
-        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, or model-check." }
+        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, or materialize-check." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check')) { throw "Unknown mir4 package-source command: $subcommand" }
         $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }

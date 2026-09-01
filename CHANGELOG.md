@@ -29,6 +29,10 @@
   - All 406 accepted package-layer bindings now have an explicit semantic class, historical comparison source, future editable authority, materialization rule, and proof obligation.
   - All 264 target-specific absences are explicit overlay omissions rather than inferred differences, including independent F110 and F100 dispositions.
   - The model names the future src/mod, target registry, support policy, per-target overlay, and target materializer authorities while deliberately creating no editable package source and changing no current package writer.
+- Established editable canonical MIR package source and one deterministic materializer for all four public targets. [MIR4-CHG-2026-0007]
+  - The governed source manifest selects 406 unique editable sources across common, family, generated, and explicit target layers without retaining a full target-specific source copy.
+  - The production materializer reads no historical package archive, verifies every source and output hash, and reconstructs F210, F200, F110, and F100 with exact normalized byte-tree parity to their accepted 4.0 baselines.
+  - Independent A/B builds prove deterministic archive construction for every target while the existing root package writer remains unchanged pending exact-engine replay, rollback, and a separate cutover receipt.
 
 ## [4.0.0] - 2026-08-30
 

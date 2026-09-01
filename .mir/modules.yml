@@ -145,6 +145,31 @@ package_excluded_modules:
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
+  mir4_editable_source_materializer_v1:
+    predecessor: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
+    source_manifest: src/mod/package-source.json
+    source_manifest_schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+    target_registry: targets/registry.json
+    target_support_policy: targets/support-policy.json
+    target_overlays:
+      - targets/f210/overlay.json
+      - targets/f200/overlay.json
+      - targets/f110/overlay.json
+      - targets/f100/overlay.json
+    implementation: tools/mir/application/package/TargetMaterializer.ps1
+    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
+    public_facade: tools/mir.ps1
+    proof: validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
+    proof_schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
+    output: build/packages
+    algorithm: canonical-common-family-target-overlay-materializer-v1
+    package_visible: false
+    editable_source_authority: true
+    package_cutover_authority: false
+    release_transition_authority: false
+    current_writer_unchanged: true
+    historical_archives_are_comparison_fixtures_only: true
+    runtime_replay_required_before_cutover: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1

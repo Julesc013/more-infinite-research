@@ -78,7 +78,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-08-31 |
+| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-01 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |

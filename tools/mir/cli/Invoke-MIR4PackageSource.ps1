@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('baseline','baseline-check','shadow','shadow-check','model','model-check')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check')][string]$Command,
   [Parameter(Mandatory)][string]$RepoRoot,
   [string]$OutputPath,
   [ValidateSet('f210','f200','f110','f100')][string]$Target='f210'
@@ -25,6 +25,17 @@ if ($Command -in @('model','model-check')) {
     output=$OutputPath
     record_sha256=[string]$model.record_sha256
   } | ConvertTo-Json -Depth 6
+  return
+}
+if ($Command -in @('materialize','materialize-check')) {
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  if ($Command -ceq 'materialize') {
+    if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/packages' }
+    New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId 'M41-EDITABLE-SOURCE' -OutputRoot $OutputPath | ConvertTo-Json -Depth 12
+    return
+  }
+  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-editable-source-materializer-v1.json' }
+  Invoke-MIR4TargetMaterializerParity -RepoRoot $repo -ReportPath $OutputPath -Check | ConvertTo-Json -Depth 12
   return
 }
 . (Join-Path $repo 'tools/mir/application/package/ShadowTargetMaterializer.ps1')

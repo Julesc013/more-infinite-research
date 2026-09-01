@@ -1,0 +1,160 @@
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+
+local M = {}
+local REQUIRED_COUNTERS = {
+  "recipes",
+  "technologies",
+  "effects",
+  "graph_edges",
+  "graph_components",
+  "cyclic_components",
+  "recipe_index_scans",
+  "recipe_fact_copies",
+  "item_prototype_index_builds",
+  "entity_prototype_index_rows",
+  "entity_prototype_index_lookups",
+  "item_prototype_index_rows",
+  "placeable_item_index_rows",
+  "placeable_item_index_lookups",
+  "module_tier_index_rows",
+  "module_tier_index_lookups",
+  "stream_match_cache_hits",
+  "stream_match_cache_misses",
+  "stream_match_max_computations_per_identity",
+  "candidate_operations",
+  "accepted_operations",
+  "rejected_operations",
+  "diagnostic_rows",
+  "generation_plan_rows",
+  "generation_plan_public_bytes",
+  "generation_plan_internal_bytes",
+  "technology_design_count",
+  "technology_design_canonical_bytes",
+  "coverage_rows",
+  "coverage_public_bytes",
+  "coverage_internal_bytes",
+  "context_state_keys",
+  "context_snapshot_bytes",
+  "technology_closure_cache_entries",
+  "technology_closure_cached_nodes",
+  "sanitation_scanned_technologies",
+  "sanitation_scanned_effects",
+  "recipe_risk_facts",
+  "recipe_hard_risk_count",
+  "recipe_review_risk_count",
+  "provider_candidates",
+  "provider_cardinality_review_required",
+  "provider_review_required",
+  "family_members",
+  "stream_rows",
+  "technology_catalog_candidates",
+  "technology_catalog_alternatives",
+  "technology_catalog_canonical_bytes",
+  "technology_catalog_public_bytes",
+  "technology_catalog_internal_bytes",
+  "compiler_evidence_public_bytes",
+  "technology_graph_parity_rows",
+  "snapshot_prototype_bytes",
+  "snapshot_deep_copies",
+  "snapshot_canonicalization_passes",
+  "snapshot_construction_milliseconds",
+  "snapshot_peak_memory_bytes",
+  "input_snapshot_bytes",
+  "qualification_snapshot_bytes",
+  "snapshot_reused_domains",
+  "snapshot_copied_domains",
+  "qualification_snapshot_construction_milliseconds",
+  "qualification_peak_memory_bytes",
+  "compiler_total_milliseconds",
+  "public_artifact_total_bytes",
+  "fingerprint_calls",
+  "canonicalization_calls",
+  "canonical_bytes_total",
+  "canonical_serializations_over_one_mib",
+  "maximum_canonical_bytes",
+  "trusted_record_registrations",
+  "trusted_untrusted_verifications",
+  "trusted_assertions",
+  "trusted_rejected_assertions",
+  "trusted_assertion_canonicalizations",
+  "catalog_snapshot_count",
+  "full_record_copy_count",
+  "technology_design_full_copies",
+  "gate_deep_verifications",
+  "technology_design_deep_verifications",
+  "safety_qualification_deep_verifications",
+  "technology_candidate_deep_verifications",
+  "technology_catalog_deep_verifications",
+  "compilation_snapshot_deep_verifications",
+  "policy_snapshot_deep_verifications",
+  "compiler_input_deep_verifications",
+  "runtime_environment_deep_verifications",
+  "transformation_operation_deep_verifications",
+  "transformation_plan_deep_verifications"
+}
+local REQUIRED_PHASES = {
+  "snapshot", "recipe_risk_facts", "provider_discovery", "stream_compiler",
+  "graph", "planning", "postconditions"
+}
+local WITNESS_LIMIT = 64
+
+local function state()
+  return compiler_context.current():state_view("compiler_telemetry", function()
+    local counters, phases = {}, {}
+    for _, name in ipairs(REQUIRED_COUNTERS) do counters[name] = 0 end
+    for _, name in ipairs(REQUIRED_PHASES) do phases[name] = {runs = 0, seconds = 0} end
+    return {counters = counters, phases = phases, witnesses = {}}
+  end)
+end
+
+local function now()
+  if os and type(os.clock) == "function" then return os.clock() end
+  return 0
+end
+
+function M.count(name, amount)
+  local counters = state().counters
+  counters[name] = (counters[name] or 0) + (amount or 1)
+  return counters[name]
+end
+
+function M.observe_max(name, value)
+  local counters = state().counters
+  value = tonumber(value) or 0
+  counters[name] = math.max(counters[name] or 0, value)
+end
+
+function M.start_phase(name)
+  local phases = state().phases
+  phases[name] = phases[name] or {runs = 0, seconds = 0}
+  phases[name].started_at = now()
+end
+
+function M.finish_phase(name)
+  local phases = state().phases
+  local phase = phases[name] or {runs = 0, seconds = 0}
+  phase.runs = phase.runs + 1
+  if phase.started_at then phase.seconds = phase.seconds + math.max(0, now() - phase.started_at) end
+  phase.started_at = nil
+  phases[name] = phase
+end
+
+function M.witness(kind, value)
+  local witnesses = state().witnesses
+  witnesses[kind] = witnesses[kind] or {}
+  if #witnesses[kind] < WITNESS_LIMIT then table.insert(witnesses[kind], tostring(value)) end
+end
+
+function M.snapshot()
+  local current = state()
+  return deepcopy({
+    schema = 1,
+    counters = current.counters,
+    phases = current.phases,
+    witnesses = current.witnesses,
+    witness_limit = WITNESS_LIMIT
+  })
+end
+
+return M
