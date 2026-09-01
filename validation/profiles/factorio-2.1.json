@@ -10,6 +10,9 @@
   "release_authority_mode": "candidate-programme",
   "release_authority": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
   "qualification_factorio_version": "2.1.14",
+  "qualification_factorio_version_role": "historical-active-campaign-compatibility-only",
+  "qualification_factorio_version_mode": "latest-installed-experimental",
+  "qualification_factorio_channel_authority": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
   "minimum_factorio_version": "2.1.8",
   "upgrade": {
     "from_version": "3.2.11",

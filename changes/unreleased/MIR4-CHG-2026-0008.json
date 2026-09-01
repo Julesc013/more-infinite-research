@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0008",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Adopted the rolling Factorio 2.1 experimental channel and passed the first F2D exact-runtime target replay.",
+  "details": [
+    "F210 now selects the latest installed official Factorio 2.1 experimental engine while every execution binds the exact patch, executable, runtime API, prototype API, and changelog identities.",
+    "Every observed 2.1 engine or API identity change materializes twelve review tasks covering new APIs, implementation and functionality opportunities, compatibility, fixtures, performance, documentation, and the eventual stable transition.",
+    "The newly materialized 4.0.21000 F210 package passed fourteen exact-zip runtime scenarios and all five 3.2.11 upgrade archetypes, including first and second reloads, without authorizing package cutover."
+  ],
+  "semantic_domains": ["engine-channel", "package-boundary", "runtime-validation", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Exact Factorio 2.1.17 replay proved the newly materialized accepted 4.0.21000 product without a player-package change."},
+    {"target":"F200","disposition":"unaffected","reason":"The rolling 2.1 selector is F210-only and the package-excluded replay harness does not change F200 bytes; independent replay remains pending."},
+    {"target":"F110","disposition":"unaffected","reason":"The rolling 2.1 selector is F210-only and the package-excluded replay harness does not change F110 bytes; independent replay remains pending."},
+    {"target":"F100","disposition":"unaffected","reason":"The rolling 2.1 selector is F210-only and the package-excluded replay harness does not change F100 bytes; independent replay remains pending."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"docs/maintainer/factorio-2.1-experimental-channel.md"},
+    {"kind":"release-record","value":"releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json"}
+  ]
+}

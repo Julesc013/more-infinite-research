@@ -2938,6 +2938,49 @@
       ]
     },
     {
+      "id": "static.mir4-factorio-2.1-experimental-channel",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".github/workflows/assurance-scheduled.yml",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v1.schema.json",
+        "validation/profiles/factorio-2.1.json",
+        "tools/lib/validation/FactorioVersionPolicy.ps1",
+        "tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1",
+        "tools/lib/assurance/Core.ps1",
+        "tools/lib/control/Context.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
+        "docs/maintainer/factorio-2.1-experimental-channel.md",
+        "RELEASE-RUNBOOK.md",
+        "repository"
+      ]
+    },
+    {
+      "id": "static.mir4-f2d-runtime-replay",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/schemas/mir4-f2d-runtime-replay-evidence-v1.schema.json",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/mir/application/package/RuntimeReplay.ps1",
+        "tools/mir/application/package/RuntimeReplayVerifier.ps1",
+        "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+        "validation/tests/runtime/Test-MIRUpgrade.ps1",
+        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+        "docs/maintainer/mir4-f2d-runtime-replay.md",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",

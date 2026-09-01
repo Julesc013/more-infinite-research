@@ -25,6 +25,11 @@ jobs:
           key: mir-ledger-${{ runner.os }}-2.1-${{ github.run_id }}
           restore-keys: |
             mir-ledger-${{ runner.os }}-2.1-
+      - name: Inspect current 2.1 experimental identity and materialize review tasks
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./tools/mir.ps1 mir4 factorio-2.1-channel inspect --factorio $env:FACTORIO_BIN --output build/results/engine-channel/factorio-2.1-review.json
       - name: Build exact candidate
         shell: pwsh
         run: ./tools/mir.ps1 assurance build --target 2.1
@@ -45,6 +50,7 @@ jobs:
           name: mir-scheduled-plan-and-candidate
           path: |
             build/results/assurance/verification-plan.json
+            build/results/engine-channel/factorio-2.1-review.json
             dist/*.zip
           if-no-files-found: error
 

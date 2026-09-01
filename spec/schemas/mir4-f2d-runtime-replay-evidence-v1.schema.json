@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-f2d-runtime-replay-evidence-v1.schema.json",
+  "title": "MIR 4 F2D runtime replay evidence V1",
+  "oneOf": [
+    {"$ref": "#/$defs/targetProof"},
+    {"$ref": "#/$defs/resourceReceipt"},
+    {"$ref": "#/$defs/custodyManifest"},
+    {"$ref": "#/$defs/independentVerification"}
+  ],
+  "$defs": {
+    "transitionGates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_cutover", "old_writer_retirement", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "package_cutover": {"const": false}, "old_writer_retirement": {"const": false}, "version_allocation": {"const": false},
+        "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}
+      }
+    },
+    "targetProof": {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "candidate_id", "source", "engine", "package", "predecessor", "runtime", "governed_comparisons", "transition_gates"],
+      "properties": {
+        "schema": {"const": 1}, "kind": {"const": "MIR4F2DTargetRuntimeReplayProofV1"},
+        "status": {"pattern": "^M41-F2D-(210|200|110|100)-PASSED-NO-CUTOVER$"}, "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "candidate_id": {"pattern": "^[A-Z0-9][A-Z0-9.-]*$"},
+        "source": {"type": "object"},
+        "engine": {"type": "object", "required": ["selection", "version", "file_version", "binary_sha256"]},
+        "package": {"type": "object", "required": ["distribution_version", "archive_sha256", "content_sha256", "entry_count", "expected_content_sha256", "expected_entry_count"]},
+        "predecessor": {"type": "object", "required": ["version", "archive_sha256"]},
+        "runtime": {"type": "object", "required": ["fresh_load", "scenario_count", "upgrade", "required_archetypes", "first_reload", "second_reload"]},
+        "governed_comparisons": {"type": "array", "minItems": 10, "uniqueItems": true},
+        "transition_gates": {"$ref": "#/$defs/transitionGates"}
+      },
+      "additionalProperties": false
+    },
+    "resourceReceipt": {
+      "type": "object",
+      "required": ["schema", "kind", "target", "retention", "work_root_status", "expanded_files", "expanded_bytes", "free_bytes_before", "free_bytes_after", "duration_seconds", "factorio_process_concurrency", "materialization_concurrency"],
+      "properties": {"schema": {"const": 1}, "kind": {"const": "MIR4F2DResourceReceiptV1"}, "target": {"type": "string"}, "retention": {"enum": ["OnFailure", "Always", "Never"]}, "work_root_status": {"enum": ["removed", "retained"]}, "expanded_files": {"type": "integer", "minimum": 0}, "expanded_bytes": {"type": "integer", "minimum": 0}, "free_bytes_before": {"type": "integer", "minimum": 0}, "free_bytes_after": {"type": "integer", "minimum": 0}, "duration_seconds": {"type": "number", "minimum": 0}, "factorio_process_concurrency": {"const": 1}, "materialization_concurrency": {"const": 1}},
+      "additionalProperties": false
+    },
+    "custodyManifest": {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "source_commit", "files", "transition_gates"],
+      "properties": {"schema": {"const": 1}, "kind": {"const": "MIR4F2DExternalCustodyManifestV1"}, "status": {"enum": ["verified-before-cleanup", "verified"]}, "target": {"type": "string"}, "source_commit": {"pattern": "^[0-9a-f]{40}$"}, "files": {"type": "array", "minItems": 3, "items": {"type": "object", "required": ["path", "bytes", "sha256"], "properties": {"path": {"pattern": "^[^/\\\\]+$"}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"pattern": "^[0-9A-F]{64}$"}}, "additionalProperties": false}}, "transition_gates": {"$ref": "#/$defs/transitionGates"}},
+      "additionalProperties": false
+    },
+    "independentVerification": {
+      "type": "object",
+      "required": ["schema", "kind", "status", "target", "proof_status", "package_content_sha256", "engine_version", "engine_binary_sha256", "fresh_scenarios", "upgrade_archetypes", "custody_files", "transition_gates"],
+      "properties": {"schema": {"const": 1}, "kind": {"const": "MIR4F2DIndependentVerificationV1"}, "status": {"const": "passed"}, "target": {"type": "string"}, "proof_status": {"type": "string"}, "package_content_sha256": {"pattern": "^[0-9A-F]{64}$"}, "engine_version": {"type": "string"}, "engine_binary_sha256": {"pattern": "^[0-9A-F]{64}$"}, "fresh_scenarios": {"type": "integer", "minimum": 1}, "upgrade_archetypes": {"type": "array", "minItems": 1}, "custody_files": {"type": "integer", "minimum": 3}, "transition_gates": {"$ref": "#/$defs/transitionGates"}},
+      "additionalProperties": false
+    }
+  }
+}

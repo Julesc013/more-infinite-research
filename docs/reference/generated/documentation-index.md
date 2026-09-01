@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 434 pages as of 2026-09-01.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 436 pages as of 2026-09-01.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -123,7 +123,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/capabilities/tile-surfaces.md | Tile Surfaces Capability | draft | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/compatibility/backport-ledger.md | 3.0.5 Backport Behavior Ledger | current | maintainer | reference | mir-maintainers | 2026-07-11 |
 | docs/compatibility/campaigns/factorio-2.0-lane.md | Factorio 2.0 Lane | draft | release-manager | release-plan | mir-maintainers | 2026-07-07 |
-| docs/compatibility/campaigns/factorio-2.1-lane.md | Factorio 2.1 Lane | current | release-manager | release-plan | mir-maintainers | 2026-07-07 |
+| docs/compatibility/campaigns/factorio-2.1-lane.md | Factorio 2.1 Lane | current | release-manager | release-plan | mir-maintainers | 2026-09-01 |
 | docs/compatibility/campaigns/README.md | Compatibility Campaigns | current | release-manager | release-plan | mir-maintainers | 2026-07-07 |
 | docs/compatibility/claim-levels.md | Compatibility Claims | current | modpack-author | explanation | mir-maintainers | 2026-07-23 |
 | docs/compatibility/compatibility-matrix.md | MIR Compatibility Matrix | current | modpack-author | explanation | mir-maintainers | 2026-07-07 |
@@ -161,7 +161,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/developer/processir.md | MIR 4 ProcessIR Preview | current | developer | explanation | mir-maintainers | 2026-08-26 |
 | docs/developer/publishing-an-extension.md | Publishing a MIR 4 Extension | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/developer/README.md | MIR 4 Developer Documentation | current | developer | reference | mir-maintainers | 2026-08-26 |
-| docs/developer/testing-against-factorio.md | Testing MIR Extensions Against Factorio | current | developer | how-to | mir-maintainers | 2026-08-26 |
+| docs/developer/testing-against-factorio.md | Testing MIR Extensions Against Factorio | current | developer | how-to | mir-maintainers | 2026-09-01 |
 | docs/developer/v0-to-v1-migration.md | Migrating MEP V0 to V1 | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/explanation/README.md | MIR 4 explanation | current | developer | explanation | mir-maintainers | 2026-08-31 |
 | docs/how-to/README.md | MIR 4 how-to guides | current | maintainer | how-to | mir-maintainers | 2026-08-31 |
@@ -178,12 +178,14 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/build-and-package.md | Build And Package | current | maintainer | how-to | mir-maintainers | 2026-07-20 |
 | docs/maintainer/developer-tools.md | Developer Tools | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/documentation-governance.md | Documentation Governance | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
+| docs/maintainer/factorio-2.1-experimental-channel.md | Factorio 2.1 Experimental Channel Policy | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
 | docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
 | docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
+| docs/maintainer/mir4-f2d-runtime-replay.md | MIR 4.1 F2D Runtime Replay | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-29 |
@@ -209,7 +211,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |
 | docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/compiler-diagnostics.md | Compiler Diagnostic Codes | current | developer | reference | mir-maintainers | 2026-07-13 |
-| docs/reference/factorio-api-proof-points.md | API Proof Points | current | developer | reference | mir-maintainers | 2026-07-20 |
+| docs/reference/factorio-api-proof-points.md | API Proof Points | current | developer | reference | mir-maintainers | 2026-09-01 |
 | docs/reference/factorio-integration-reference.md | Factorio Integration Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/generated-id-reference.md | Generated ID Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/generated/compiler-schema-registry.md | Compiler Schema Registry | current | developer | reference | mir-maintainers | 2026-08-18 |

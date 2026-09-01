@@ -65,6 +65,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | documentation-governance | [Documentation Governance](../../maintainer/documentation-governance.md) | current |
 | dual-parent-backport-integration | [Deterministic Backport Reconstruction](../../maintainer/backport-reconstruction.md) | current |
 | environment-identity-schema | [Compiler Runtime Contracts](../../reference/schemas/compiler-runtime-contracts.md) | current |
+| factorio-2.1-experimental-channel-operator-guidance | [Factorio 2.1 Experimental Channel Policy](../../maintainer/factorio-2.1-experimental-channel.md) | current |
 | factorio-lifecycle-boundaries | [Factorio Lifecycle Boundaries](../../architecture/factorio-lifecycle.md) | current |
 | family-operator-dsl-schema | [Family Operator DSL](../../reference/schemas/family-operator-dsl.md) | current |
 | family-rule-schema | [FamilyRule Schema](../../reference/schemas/family-rule.md) | current |
@@ -231,6 +232,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-f200-k2so-custody-closure | [MIR 4 Exact Release Compatibility Canaries](../../compatibility/mir4-release-canaries.md) | current |
 | mir4-f210-engine-selection-and-freeze-lock | [MIR 4 Pre-Freeze Hardening](../../maintainer/mir4-pre-freeze-hardening.md) | current |
 | mir4-f210-extension-owned-mod-data-discovery | [MIR 4 F210 Read-Only MEP Discovery](../../reference/mir4-f210-mep-discovery.md) | current |
+| mir4-f2d-runtime-replay-operator-guidance | [MIR 4.1 F2D Runtime Replay](../../maintainer/mir4-f2d-runtime-replay.md) | current |
 | mir4-feature-setting-cutover | [MIR 4 Semantic Compiler Shadow](../../architecture/mir4-semantic-compiler.md) | current |
 | mir4-first-extension-tutorial | [Your First MIR 4 Extension](../../reference/mir4-first-extension.md) | current |
 | mir4-four-stage-proof-identities | [MIR 4 Assurance Scale and Offline Drill](../../architecture/mir4-assurance-scale.md) | current |

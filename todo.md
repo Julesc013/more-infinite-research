@@ -27,6 +27,12 @@ Status: `active`. MIR 4.1 completes the repository, package, tooling, test, docu
 | `M45-00` | `4.4.0+` | `blocked-dependency` | M44-00 | Allocate a coherent external product outcome only when evidence supports it |
 | `M46-00` | `4.4.0+` | `blocked-dependency` | M45-00 | Retain later MIR 4 work as unallocated evidence-led evolution |
 
+## Moving engine-channel obligations
+
+| Target | Selector | State | Recurring obligation |
+| --- | --- | --- | --- |
+| `f210` | `latest-installed-official-2.1-experimental` | `active-until-first-official-2.1-stable` | Every observed version, binary, runtime API, prototype API, or changelog identity change materializes API, compatibility, implementation, functionality, fixture, performance, documentation, and stable-transition review tasks. |
+
 ## Historical MIR 4.0 pre-freeze execution record
 
 Status: `T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED`. Candidate state: `pre-freeze-unallocated`. Next dependency-ready turn: `pending`.

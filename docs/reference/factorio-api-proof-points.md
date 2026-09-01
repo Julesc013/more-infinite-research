@@ -5,19 +5,19 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-20
+last_reviewed: 2026-09-01
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-20
+Updated: 2026-09-01
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
-Official Factorio API references should be rechecked before a release if the local Factorio version changes.
+F210 follows the latest official experimental Factorio 2.1 installation. Every engine, executable, runtime API, prototype API, or changelog identity change materializes a required review packet; see [Factorio 2.1 Experimental Channel Policy](../maintainer/factorio-2.1-experimental-channel.md).
 
-Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validation evidence in `docs/releases/archive/2.2.0-validation-record.md` now includes Factorio `2.1.9`.
+The current review covers installed Factorio `2.1.17` and the changes from `2.1.14`. New 2.1.15 surfaces include `LuaEntity.potential_effects`, `LuaSpacePlatform.completed_trips`, `on_next_day_started`, `EntityPrototype.ghost_build_sound`, and circuit-connector field movement. MIR has no current dependency on the removed fields. `LuaEntity.potential_effects` is retained as a future Inspector/effect-observability opportunity. The 2.1.15 Space Age prerequisite change and 2.1.17 lab research-state correction reinforce F2D prerequisite and current-research replay coverage.
 
 ## Verified Or Locally Proven
 

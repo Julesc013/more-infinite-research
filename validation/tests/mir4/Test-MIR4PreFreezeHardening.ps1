@@ -317,6 +317,25 @@ if([string]$editableSource.kind-cne'MIR4M41F2CEditableSourceMaterializerAuthorit
    @($editableSource.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f2c-editable-source-materializer-authority]'
 }
+$f2dHarness=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f2dHarness.kind-cne'MIR4M41F2DRuntimeReplayHarnessAuthorityEvolutionV1'-or
+   [string]$f2dHarness.status-cne'M41-F2D-HARNESS-READY-RUNTIME-REPLAY-PENDING-NO-CUTOVER'-or
+   -not[bool]$f2dHarness.invariants.latest_experimental_2_1_selector-or
+   -not[bool]$f2dHarness.invariants.exact_execution_identity_required-or
+   -not[bool]$f2dHarness.invariants.failure_retained_until_classified-or
+   [bool]$f2dHarness.invariants.runtime_replay_complete-or
+   [string]$f2dHarness.first_attempt.phase-cne'pre-runtime-static-authority-check'-or
+   @($f2dHarness.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-harness-authority]'}
+$f210Replay=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f210Replay.kind-cne'MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1'-or
+   [string]$f210Replay.status-cne'M41-F2D-210-PASSED-NO-CUTOVER'-or
+   [string]$f210Replay.replay_proof.engine.version-cne'2.1.17'-or
+   [int]$f210Replay.replay_proof.fresh_load.scenario_count-ne14-or
+   [int]$f210Replay.replay_proof.upgrade.archetype_count-ne5-or
+   -not[bool]$f210Replay.replay_proof.upgrade.first_reload-or-not[bool]$f210Replay.replay_proof.upgrade.second_reload-or
+   -not[bool]$f210Replay.invariants.f210_runtime_replay_complete-or[bool]$f210Replay.invariants.f2d_four_target_complete-or
+   -not[bool]$f210Replay.invariants.expanded_work_released_after_verified_custody-or
+   @($f210Replay.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-f210-runtime-replay-authority]'}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

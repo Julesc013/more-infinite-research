@@ -20,6 +20,7 @@ $evidenceSchema = 4
 $buildReceiptSchema = 3
 $assuranceRunnerVersion = "4"
 
+. (Join-Path $repo "tools/lib/validation/FactorioVersionPolicy.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Domains.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Evidence.ps1")

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-f2d-f210-runtime-replay-authority-evolution-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "attempts", "replay_proof", "player_package_source_sha256", "root_readme_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-F2D-F210-RUNTIME-REPLAY"},
+    "change_id": {"const": "MIR4-CHG-2026-0008"},
+    "predecessor_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {
+      "path": {"const": "releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json"},
+      "sha256": {"const": "24E4132E93D0010E86CCDE7E3F45D1E4440EFB1CA0028EE1B40D036BC96D82BC"}
+    }},
+    "base": {"type": "object", "additionalProperties": false, "required": ["branch", "f2c_commit", "harness_authority_commit", "replay_commit", "replay_tree"], "properties": {
+      "branch": {"const": "dev"}, "f2c_commit": {"const": "12c714a358a88c73705c525bce289649fc2fed7b"}, "harness_authority_commit": {"const": "04586270430d5d742e86135b7904e66f023779b0"}, "replay_commit": {"const": "67b3695a6fbc65931cb1e75b74b16f2fc9ee4973"}, "replay_tree": {"const": "243755895d62fd62453adb75d54bcea0e28a6db0"}
+    }},
+    "evolved_bindings": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 3, "items": {"$ref": "#/$defs/current"}},
+    "attempts": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["source_commit", "status", "phase", "classification", "factorio_started", "retention", "expanded_files", "expanded_bytes"], "properties": {
+      "source_commit": {"pattern": "^[0-9a-f]{40}$"}, "status": {"const": "classified-integration-failure"}, "phase": {"const": "pre-runtime-static-authority-check"}, "classification": {"enum": ["missing-f2d-successor-authority-receipt", "unrelated-external-evidence-required-by-broad-smoke-preamble"]}, "factorio_started": {"const": false}, "retention": {"const": "OnFailure"}, "expanded_files": {"const": 306}, "expanded_bytes": {"const": 5390830}
+    }}},
+    "replay_proof": {"type": "object", "additionalProperties": false, "required": ["status", "target", "candidate_id", "engine", "package", "predecessor", "fresh_load", "upgrade", "evidence", "resource"], "properties": {
+      "status": {"const": "M41-F2D-210-PASSED-NO-CUTOVER"}, "target": {"const": "f210"}, "candidate_id": {"const": "M41-F2D-67B3695A-F210"},
+      "engine": {"type": "object", "additionalProperties": false, "required": ["selector", "version", "file_version", "binary_sha256"], "properties": {"selector": {"const": "latest-installed-official-2.1-experimental"}, "version": {"const": "2.1.17"}, "file_version": {"const": "2.1.17.87315"}, "binary_sha256": {"const": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"}}},
+      "package": {"type": "object", "additionalProperties": false, "required": ["distribution_version", "archive_sha256", "content_sha256", "entry_count"], "properties": {"distribution_version": {"const": "4.0.21000"}, "archive_sha256": {"const": "4DE721FFCD6BECBA34ED110EE1BEE59ADDE3E6BBF13E993C339FC7729862E41A"}, "content_sha256": {"const": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED"}, "entry_count": {"const": 305}}},
+      "predecessor": {"type": "object", "additionalProperties": false, "required": ["version", "archive_sha256"], "properties": {"version": {"const": "3.2.11"}, "archive_sha256": {"const": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"}}},
+      "fresh_load": {"type": "object", "additionalProperties": false, "required": ["status", "scenario_count", "result_sha256"], "properties": {"status": {"const": "passed"}, "scenario_count": {"const": 14}, "result_sha256": {"const": "EDF42E0825D5C9C4DD46FE8CB8EE97DF45FAE8C4D8953F50670AF657548AD6D2"}}},
+      "upgrade": {"type": "object", "additionalProperties": false, "required": ["status", "archetype_count", "first_reload", "second_reload", "result_sha256"], "properties": {"status": {"const": "passed"}, "archetype_count": {"const": 5}, "first_reload": {"const": true}, "second_reload": {"const": true}, "result_sha256": {"const": "40FA4AA0C09FEE0EDB33F11F387C18A52D1EC6B95831917B960B42B49B7D2D4D"}}},
+      "evidence": {"type": "object", "additionalProperties": false, "required": ["logical_root", "target_proof_sha256", "independent_verification_sha256", "custody_manifest_sha256", "custody_file_count", "evidence_file_count", "evidence_bytes"], "properties": {"logical_root": {"const": "MIR_EVIDENCE_HOME/m41-f2d/67b3695a6fbc65931cb1e75b74b16f2fc9ee4973/f210"}, "target_proof_sha256": {"const": "B0113BD090B3737A88400F0C4E7BEB544F9BB41482C77E9CEE6740A5F255439E"}, "independent_verification_sha256": {"const": "349E963704525D6B7DA5F356C4E8164E3CE2A8CF0D5D16C0EB28A98DFFB4D622"}, "custody_manifest_sha256": {"const": "A163B27A950AA280D81632953284D5919CC28BDF7D1E3D8D4FF5E2E8DB6547FC"}, "custody_file_count": {"const": 38}, "evidence_file_count": {"const": 39}, "evidence_bytes": {"const": 40021171}}},
+      "resource": {"type": "object", "additionalProperties": false, "required": ["retention", "work_root_status", "expanded_files", "expanded_bytes", "duration_seconds", "receipt_sha256"], "properties": {"retention": {"const": "OnFailure"}, "work_root_status": {"const": "removed"}, "expanded_files": {"const": 440}, "expanded_bytes": {"const": 70485018}, "duration_seconds": {"const": 252.038}, "receipt_sha256": {"const": "FBE24D705E4EB6754BEA4170B3FD02966020824EFDEDB6309B262C00BF20D74F"}}}
+    }},
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "root_readme_sha256": {"const": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947"},
+    "package_visible_delta": {"const": []},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["latest_experimental_2_1_selector", "exact_execution_identity_required", "cross_version_evidence_reuse_forbidden", "f210_runtime_replay_complete", "f2d_four_target_complete", "f200_runtime_replay_pending", "f110_runtime_replay_pending", "f100_runtime_replay_pending", "expanded_work_released_after_verified_custody", "package_source_unchanged", "root_readme_byte_stable", "old_writer_remains_authoritative"], "properties": {
+      "latest_experimental_2_1_selector": {"const": true}, "exact_execution_identity_required": {"const": true}, "cross_version_evidence_reuse_forbidden": {"const": true}, "f210_runtime_replay_complete": {"const": true}, "f2d_four_target_complete": {"const": false}, "f200_runtime_replay_pending": {"const": true}, "f110_runtime_replay_pending": {"const": true}, "f100_runtime_replay_pending": {"const": true}, "expanded_work_released_after_verified_custody": {"const": true}, "package_source_unchanged": {"const": true}, "root_readme_byte_stable": {"const": true}, "old_writer_remains_authoritative": {"const": true}
+    }},
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"const": "M41-F2D-210-PASSED-NO-CUTOVER"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "reason": {"type": "string", "minLength": 8}, "scope": {"const": "package-excluded-f210-runtime-replay"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "current": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "role"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "role": {"type": "string", "minLength": 8}}},
+    "falseTransitions": {"type": "object", "additionalProperties": false, "required": ["merge", "source_move", "package_cutover", "readme_rewrite", "bridge_retirement", "old_writer_retirement", "tagging", "signing", "sealing", "version_allocation", "publication", "remote_write"], "properties": {"merge": {"const": false}, "source_move": {"const": false}, "package_cutover": {"const": false}, "readme_rewrite": {"const": false}, "bridge_retirement": {"const": false}, "old_writer_retirement": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "version_allocation": {"const": false}, "publication": {"const": false}, "remote_write": {"const": false}}}
+  }
+}

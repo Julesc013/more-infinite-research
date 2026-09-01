@@ -1266,6 +1266,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - documentation-governance
+  - path: docs/maintainer/factorio-2.1-experimental-channel.md
+    title: "Factorio 2.1 Experimental Channel Policy"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - factorio-2.1-experimental-channel-operator-guidance
   - path: docs/maintainer/fixture-workflow.md
     title: "Fixture Workflow"
     status: current
@@ -1315,6 +1323,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir4-continuity-incident-successor-runbook
+  - path: docs/maintainer/mir4-f2d-runtime-replay.md
+    title: "MIR 4.1 F2D Runtime Replay"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-f2d-runtime-replay-operator-guidance
   - path: docs/maintainer/mir4-full-platform-closeout.md
     title: "MIR 4 Full-Platform Private Closeout"
     status: current

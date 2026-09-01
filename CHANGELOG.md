@@ -11,6 +11,10 @@
   - The live programme now includes package, tooling, test, documentation, maintainability, and behavior-preserving decomposition outcomes in the MIR 4.1 completion boundary.
   - Completed pre-freeze records remain immutable history while generated current-state views route first to the live MIR 4.x programme.
   - An append-only reconciliation preserves the dated MIR 3 portal observation bytes while binding its legacy and lexical timestamp self-hash interpretations.
+- Adopted the rolling Factorio 2.1 experimental channel and passed the first F2D exact-runtime target replay. [MIR4-CHG-2026-0008]
+  - F210 now selects the latest installed official Factorio 2.1 experimental engine while every execution binds the exact patch, executable, runtime API, prototype API, and changelog identities.
+  - Every observed 2.1 engine or API identity change materializes twelve review tasks covering new APIs, implementation and functionality opportunities, compatibility, fixtures, performance, documentation, and the eventual stable transition.
+  - The newly materialized 4.0.21000 F210 package passed fourteen exact-zip runtime scenarios and all five 3.2.11 upgrade archetypes, including first and second reloads, without authorizing package cutover.
 
 ### Features
 

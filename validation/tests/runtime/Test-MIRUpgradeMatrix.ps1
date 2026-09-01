@@ -6,7 +6,9 @@ param(
   [Parameter(Mandatory)][string]$FromVersion,
   [Parameter(Mandatory)][string]$ToVersion,
   [string]$FixtureName = "assert-upgrade-3-2-3-to-3-2-5",
-  [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json"
+  [string]$OutputPath = "build/results/assurance/3.2.5-upgrade-proof.json",
+  [string]$WorkRoot = "",
+  [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'Always'
 )
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
@@ -58,6 +60,8 @@ foreach ($case in $cases) {
     Archetype = [string]$case.id
     SourceOnlyFixtureNames = @($case.source_only)
     OutputPath = $rowOutput
+    WorkRoot = $WorkRoot
+    Retention = $Retention
   }
   & $runner @arguments
   if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $rowOutput -PathType Leaf)) {
@@ -71,19 +75,29 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
-  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10") + $privateLocalPlaytestFixtures) -and
+  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000") + $privateLocalPlaytestFixtures) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
        "upgraded-save-second-reload-passed" -notin $assertions -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log_sha256))) {
     throw "Upgrade matrix row lacks exact first/second reload evidence: $($case.id)"
   }
-  $relative = [IO.Path]::GetRelativePath($RepoRoot, (Resolve-Path -LiteralPath $rowOutput).Path).Replace('\', '/')
+  $cleanupPath = Join-Path $outputParent "$ToVersion-upgrade-$($case.id)-cleanup.json"
+  if (-not (Test-Path -LiteralPath $cleanupPath -PathType Leaf)) { throw "Upgrade matrix row lacks a cleanup receipt: $($case.id)" }
+  $cleanup = Get-Content -Raw -LiteralPath $cleanupPath | ConvertFrom-Json
+  $expectedCleanupStatus = if ($Retention -eq 'Always') { 'retained' } else { 'removed' }
+  if ([string]$cleanup.status -ne $expectedCleanupStatus -or [string]$cleanup.run_status -ne 'passed' -or -not [bool]$cleanup.contained) {
+    throw "Upgrade matrix row cleanup receipt is invalid: $($case.id)"
+  }
   $rows += [ordered]@{
     id = [string]$case.id
     status = "passed"
-    result = $relative
+    result = Split-Path -Leaf $rowOutput
     result_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $rowOutput).Hash
+    cleanup = Split-Path -Leaf $cleanupPath
+    cleanup_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $cleanupPath).Hash
+    expanded_root_disposition = [string]$cleanup.status
+    expanded_root_bytes = [int64]$cleanup.bytes
     assertions = $assertions
   }
 }
@@ -114,6 +128,9 @@ $factorioVersion = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
     archive_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash
   }
   required_archetypes = @($cases | ForEach-Object { [string]$_.id })
+  retention = $Retention
+  expanded_roots_removed = @($rows | Where-Object expanded_root_disposition -eq 'removed').Count
+  expanded_roots_retained = @($rows | Where-Object expanded_root_disposition -eq 'retained').Count
   rows = $rows
 } | ConvertTo-Json -Depth 12 | Set-Content -LiteralPath $output -Encoding UTF8
 
