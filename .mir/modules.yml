@@ -91,6 +91,32 @@ package_excluded_modules:
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
+  mir4_shadow_target_materializer_v1:
+    predecessor: spec/distribution/mir4-golden-four-target-baseline-v1.json
+    implementation: tools/mir/application/package/ShadowTargetMaterializer.ps1
+    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
+    public_facade: tools/mir.ps1
+    proof: validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
+    proof_schema: spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json
+    output: build/mir4/package-source/shadow-materializer-v1
+    algorithm: golden-archive-byte-bootstrap-common-family-target-overlay-v1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    current_writer_unchanged: true
+    runtime_replay_required_before_cutover: true
+  mir4_m41_f2a_shadow_target_materializer_authority_evolution_v1:
+    predecessor: releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json
+    receipt: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
+    receipt_schema: contracts/repository/mir4-m41-f2a-shadow-target-materializer-authority-evolution-v1.schema.json
+    writer: tools/commands/mir4/Update-MIR4M41F2AShadowMaterializerAuthority.ps1
+    proof:
+      - validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
+      - validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    runtime_replay_required_before_cutover: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1

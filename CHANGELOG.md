@@ -21,6 +21,10 @@
   - The generated authority inventories every F210, F200, F110, and F100 package path and byte hash together with metadata, lifecycle, setting, locale, asset, migration, runtime, stream, technology, and state-namespace surfaces.
   - Exact reconstruction uses 89 all-target common files, 202 modern-family files, 81 legacy-family files, and target overlays of 14, 12, 4, and 4 files without copying a full target tree.
   - Fresh load, reload, and upgrade replay remains mandatory before package-authority cutover; the baseline grants no source move, version allocation, tagging, signing, sealing, or publication authority.
+- Added the deterministic four-target shadow materializer and proved exact package-tree parity without changing package authority. [MIR4-CHG-2026-0005]
+  - The supported package-source command now reconstructs F210, F200, F110, and F100 from the accepted 89-file common layer, modern or legacy family layer, and minimal target overlay.
+  - Two independent constructions per target produce byte-identical deterministic archives while every normalized path and raw file byte matches its immutable MIR 4.0 baseline.
+  - Historical ZIP container bytes remain immutable bootstrap inputs and are deliberately distinguished from newly deterministic container bytes; runtime replay and a separate authority cutover remain mandatory.
 
 ## [4.0.0] - 2026-08-30
 

@@ -1,0 +1,237 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2AShadowTargetMaterializerAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T18:00:00+10:00",
+  "programme_id": "M41-F2A-SHADOW-TARGET-MATERIALIZER",
+  "change_id": "MIR4-CHG-2026-0005",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json",
+    "sha256": "B6365CE4015BCFAF5A0CE4EBCBE2D4DE0062D6BE42EF53FA2BBF231C5D3FD49C"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "6f6321b4c656792e73b9aad1384b148b7dd2b373",
+    "tree": "f889e36ac51115c1fe5aac29ff982598ea06e1fa"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "4A73D9FFC80B38DC16FD713ABB239E33AE721EA213F10138CAAC160467E1E2DD",
+      "current_sha256": "C368D6B9370A20E1FD88FAC81564FFEF646F9C0A70E43683F3FE9D16F25AAC64",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "35226F77837FBFB2CC682DE7B431F6D67057AA295F4A893ECA86E572F34321EB",
+      "current_sha256": "820C10EAD35E7E48445088613D5F2208335D0E5AAAEEED788DC89C2AD4A04094",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "B75CC4CD846F9823EE5B9449EBA39B11DA35D35C7012EB07AD518A14AEB5C19E",
+      "current_sha256": "4AC8A1E0A235DA7F3EA411AF1D0174A7772A2F192A6F253233D7E97B9BB188C9",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "CBEB0BD5122DEBA7530472522B821380D319E9678CB7E2C35FA510F365FC3C57",
+      "current_sha256": "9C6DB39F963110DEDCD385C70F500D5C27C65E615472FB0CFD65E7DE541FD83F",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "390EE008806FE31B606F749812AA23FA0016D10254C2F7804BCCE98103D47E97",
+      "current_sha256": "3AC8931FCF7775DCB648F586EC761EBB4DFEB8F17079084F62469332CB8ABECE",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "E128343F89222A0CA3DDD5C4E2D22D915E8B257CA89EC91BCFC5B59B94DFC2C8",
+      "current_sha256": "BE6333085F96FAD044355FA96BBC46AEEF3B9CA82A68EDCBE337B5220D4E266A",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "D3CF9F04142F0E535A3E7AA51A17A802720A8E58AA8E73B57BE2B4E6500A1462",
+      "current_sha256": "A72A45BB98BCB550FC59960F75E061FBA26107BC5942DE2B26EBEF5DCC3B9913",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "6E4685D764D644BDF198CF9FD63DCB8E0FA3568844AED499139B6E0C913CC493",
+      "current_sha256": "0B38EFB9351C36E481F6D43A652CE26917C6BD70EAD44BF34E45F75F763CC8D8",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "510B1C222B170828FA4B7544D0D298FFEB888C8D0A1932F81E69C58E97D4A1C1",
+      "current_sha256": "027AA931A4A51D0C9D86F3997D93743CB97A6E1BA4A64281EC951890DF264B28",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "25254E03C5C26C45C40244CCF9C4E1C9158D82502FFA0D3D36E823CB9CFF70A1",
+      "current_sha256": "75DA015B600F366AFB7378AF082348EE5F2B10709BD70A48F47D45573F2ED1E6",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+      "previous_sha256": "9FAD48F7EF8F48C4C1485047A37197210C19861476299C22CFC69464350E8F8C",
+      "current_sha256": "5B6CF3F5E027410F14D9073441390CACFDA3A066021C90433A8EE2BC210BF409",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "1A7E57FA2A922D11CBD2404F13E84EA0D5A509A809FF58C819EA6BD8AE9E75FA",
+      "current_sha256": "12E7527AA9F5C48F1993C06D6B0ABDE92D96B26F3F51E655D8665B77580E8766",
+      "reason": "Register the package-excluded four-target shadow materializer and exact tree parity proof.",
+      "scope": "package-excluded-shadow-materializer",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0005.json",
+      "sha256": "E61B35D5F27AB9DD4DB05EB83011A3DBD2C29DB7BAA432F918722365D036A565",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2a-shadow-target-materializer-authority-evolution-v1.schema.json",
+      "sha256": "693FF6A5871B4850AD0920851BC3783AC8F368E3941640E7C6DEF49DA4B6F319",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    },
+    {
+      "path": "spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json",
+      "sha256": "177CBF57E868AEB2C9CA54BA70D534711EA125E3AC07007F8E82DA9CA97EC24D",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F2AShadowMaterializerAuthority.ps1",
+      "sha256": "75AA0C8672D082EBC3FFDAFCC5ACB3095D9CF6362FC76DCDFC20F5CAFC2872F4",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    },
+    {
+      "path": "tools/mir/application/package/ShadowTargetMaterializer.ps1",
+      "sha256": "F5B2CBC752816C4680CC9AB829DA8AB8878AF24402CF808FC59DAF6732FB7807",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
+      "sha256": "60234919A1404846F93AEF07B494F3AF7836EAC91113616F209F9688DD0990ED",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow target materializer implementation, contract, or proof."
+    }
+  ],
+  "materializer_proof": {
+    "baseline_record_sha256": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A",
+    "proof_record_sha256": "C322F53D8EA547FBADDE8AAA01A11D66DA7586210C0B0EBF7D67B482CAFA0080",
+    "target_count": 4,
+    "materialization_count": 8,
+    "all_exact_tree_parity": true,
+    "all_deterministic_archive_bytes": true,
+    "historical_archive_byte_parity_count": 0,
+    "content_identities": [
+      {
+        "target": "f210",
+        "content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+        "entry_count": 305,
+        "common_files": 89,
+        "family_files": 202,
+        "target_files": 14
+      },
+      {
+        "target": "f200",
+        "content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+        "entry_count": 303,
+        "common_files": 89,
+        "family_files": 202,
+        "target_files": 12
+      },
+      {
+        "target": "f110",
+        "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+        "entry_count": 174,
+        "common_files": 89,
+        "family_files": 81,
+        "target_files": 4
+      },
+      {
+        "target": "f100",
+        "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+        "entry_count": 174,
+        "common_files": 89,
+        "family_files": 81,
+        "target_files": 4
+      }
+    ],
+    "physical_files": 3928,
+    "unknown_paths": 0,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "four_target_tree_parity": true,
+    "two_construction_determinism": true,
+    "historical_archives_are_bootstrap_inputs": true,
+    "historical_container_difference_explained": true,
+    "current_writer_unchanged": true,
+    "runtime_replay_pending": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F2A-SHADOW-TARGET-MATERIALIZER-PARITY-COMPLETE-NO-CUTOVER"
+}

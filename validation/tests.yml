@@ -2869,6 +2869,27 @@
       ]
     },
     {
+      "id": "static.mir4-shadow-target-materializer-m41-f2a",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "dist/more-infinite-research_4.0.10000.zip",
+        "dist/more-infinite-research_4.0.11000.zip",
+        "dist/more-infinite-research_4.0.20000.zip",
+        "dist/more-infinite-research_4.0.21000.zip",
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/ShadowTargetMaterializer.ps1",
+        "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
