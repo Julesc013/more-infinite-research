@@ -1,0 +1,386 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2DRuntimeReplayHarnessAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T23:40:18.1566540+10:00",
+  "programme_id": "M41-F2D-RUNTIME-REPLAY-HARNESS",
+  "change_id": "MIR4-CHG-2026-0008",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json",
+    "sha256": "E1D7F216EEC6226B13769432E10F9765C7B0DAC2B9A1C910913847DDA0F835BD"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "12c714a358a88c73705c525bce289649fc2fed7b",
+    "tree": "c1e0026843124d59365b5158e80c2972e22404bc",
+    "implementation_commit": "f3416e80c822b9a0cdc945347760d4f2fb1cccef"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "2DC9E2A3781177650E85CF97AC9506AC5C9BADEEB4BC043E1DD6CB58047BF825",
+      "current_sha256": "36757482428B198AFB57123D0BDD3A70B029FAC77EB97D9E73DD0D2F11AA465E",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "50985A853B56E41FC7A6902F98F5694EF67BC8E510FC2562F05FBE4E30D05B8F",
+      "current_sha256": "55A8F956883DECF4D48F22EF107EDD458F3244E939DE26157C9D0EDA621B7782",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "7AE1CAE77CFADD0EC537469C39521F93A7E6BF40151F44A170016CCDDB36A9F5",
+      "current_sha256": "9361A5DF9BD74A6C8C76BDE1279BFCF89143A943C7147295E50439BF0840345E",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "178B932C8046E22DA2690DF465ECE04496A1B0CB5AB16DEA9BE21B3F71FD308C",
+      "current_sha256": "43EACFEC646A32262A2D4B91E48F56BD4452B33C7821E23F58034A451C835ED7",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "186855E2489D089C5C50A85568B466F2128D8DE0166EEA993C10DD0EBF11BB88",
+      "current_sha256": "7B818CBFC8DABD945D4A8E6615B06829C18966DB1D7A31CD3CEA6035AA118B36",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "65E5B1E155D2F0944F86D292366E65042616CEB9839C22522999CAEAAC4C5757",
+      "current_sha256": "47F4AEFF007718BE501A8110E1AA2CF3BCF101B32D7EB9C1A2078EC224E0DCCD",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "88DB0D940D3DBB5426ED3B957773F245B409192D485DEF086C4DE103BA852E7F",
+      "current_sha256": "F2C7C871A318ED28DFBCA4F1ACA1E4A7277CEAD63322EC9880D389704F86B0A1",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "F5F2FAC497B404DA410F0750AF97DBF334D6E1AEFB2584EFB7918FBFE88A3DEE",
+      "current_sha256": "D7C26DEE7B98BC38EA82A5C4D51B8653561DD32887DD697FB681CAC8D7D40D9D",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "RELEASE-RUNBOOK.md",
+      "previous_sha256": "C80C42E7DF84C3DD975CB275528BD7766ACA0AC744F801CC6D3AD280949E4F02",
+      "current_sha256": "5590764BEABBC61C85AF6B060E7E3F2CED66977AAC588237BE2C2495859B6464",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "scripts/Invoke-MIRAssurance.ps1",
+      "previous_sha256": "E60EC2B1794245948852A235DBCAED4ED1FBDE90DD1F99A9D14AFE42EA22E091",
+      "current_sha256": "898B1FABD4E027FE367E44E2D22F4AE44FBBA9DE102DDAECD4F485C8324D9AEF",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "8DACEF7821D71B527C89E8EC0D7CBD37C52C35943476EEE64F0107082A7618D6",
+      "current_sha256": "7CCC94D90780B5DE764C5F3A8064C75D26BE5E80D061FE41BE68BC81F1491A8D",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
+      "previous_sha256": "8786C87364BE3C7F6F99F310DE49A8275A895020BEEE242CE05C6AC4A31E72DB",
+      "current_sha256": "DA615E347D43FA72494B6A347B5D1F34C8CA35367D412A2A1F75748CBB77E4AD",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "previous_sha256": "718A29A2E16DADF489290E86AF03A8AFC5B75259C54634CB0D38F088F1FD5903",
+      "current_sha256": "4D899F68720DD2228432D0AFFFB18617314CAF3D2A943CB6EF30006107F77B86",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/assurance/Core.ps1",
+      "previous_sha256": "D0DD92018078DE8839B9846DF43FB48BD81A97D5EEE82E5B1D196AD48A53EB59",
+      "current_sha256": "97B9DBBA908FAC5CC2A3918E5729496BAB9DC51A57ACF76C1B9B95A21141E560",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/control/Views.ps1",
+      "previous_sha256": "DED3B5A1F29EE6888FEFA97611A9444DB0FB98DE466CD47346ABEBC387E22478",
+      "current_sha256": "8396CDAB349D11C3A48E991DD248F98C860A4CE06184ED3E459A509A32CB42C4",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "EC581EA8B4EF25E7B843EB4D40CF298E0ADBA8FBC7D9BC87307752C77BE8D87C",
+      "current_sha256": "DF3645DD9D06821F4940ED40D9270DDB34058CB22281717F860CFF58117A9D1F",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "E5E6E8603131E2C4085021F1B7B8F82E8347B4881B1EEE5095D31FF8F1EA62A0",
+      "current_sha256": "E43ABB13E0D6E6FBDA2A4B633C45FCFA855F5D5A4F460FB91AA6B0305D5BB0B7",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+      "previous_sha256": "BAEE06B8F189B03186E5D48C67602EEB2567AC4CC74EBA684925BCB3B94C5AC7",
+      "current_sha256": "3718599189115243C82F66CEB7C99660B7079C38B0C2BFBAA0390F8AF50276F1",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "A81C9E5F684481365072653E2CBCB2C6F0B8EE35119474B863ECFB140EE3B38F",
+      "current_sha256": "42E52FADF3D7BB0BFFA0A6748AB4CE3694547813EC2B24B0638F87AAB4E8FCDA",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "5D131CF39EA5A838A16725C8D65B493D4AF50068FCDF1C59F6CE54756853CB4A",
+      "current_sha256": "FE3EA6F9AFF8541D43AFA389FBE1FCE5E12B148E52CD8249E4DFD1F1628D7E20",
+      "reason": "Adopt the rolling 2.1 policy and resource-bounded F2D runtime replay harness.",
+      "scope": "package-excluded-f2d-runtime-replay-harness",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": ".github/workflows/assurance-scheduled.yml",
+      "sha256": "744AB438F612D5396B843895755F2BD7820CF9EB493A8922D88ADE5E7925CB1B",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2d-runtime-replay-harness-authority-evolution-v1.schema.json",
+      "sha256": "4240677FE76D0D2ABBE374F1FC4FB6BFB6538AFF6DAE5203AA80035F2CDFDFDC",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "docs/compatibility/campaigns/factorio-2.1-lane.md",
+      "sha256": "E3D44ADA1037CAA791DB630FAAE3D5A8BD36F3276B47CD07EFADE72CBEC7503D",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "docs/developer/testing-against-factorio.md",
+      "sha256": "8C2E1C30A189F73EAA74CF2108241BE92DD891F75CF9E1BC34DB22DE564D8B9C",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "docs/maintainer/factorio-2.1-experimental-channel.md",
+      "sha256": "FFB7E7E6C5883447C60FF7967172172021EF1A42F68321FCDB693F92FFB0A7FB",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "docs/maintainer/mir4-f2d-runtime-replay.md",
+      "sha256": "D741A5C724BCC2C559F08F1928EA7B8716141A9CB72EEC046A6DBF2B447CBE6A",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "docs/reference/factorio-api-proof-points.md",
+      "sha256": "EE6B56E8FE3CE7971566B574C1FA62EBC314603333305AC9519416717881C4C3",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
+      "sha256": "482D5B2B1C55F3BED1BE1145588CDD8845E5FDF08B37EA88B460801F9A6DCA13",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "spec/schemas/mir4-f2d-runtime-replay-evidence-v1.schema.json",
+      "sha256": "C9136EDD0CDA4C7B88C2BFDA879FC77E0379A5814141E7A29FD75325FC63815C",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "spec/schemas/mir4-factorio-2.1-experimental-channel-v1.schema.json",
+      "sha256": "7F5BE4DF8ECDC6E8EDC1E753CD9E14C2E8B8FE06015657651FADC86F39C44355",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F2DHarnessAuthority.ps1",
+      "sha256": "E33F5E82A724D196E2774C62011191E31870A2B2E5F9CA776EFA9A70206C2948",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/lib/control/Context.ps1",
+      "sha256": "89EC50AFFED507BF96ADB8493A9E3AC9191755C1F10D52B051859AF4E664CC57",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/lib/validation/FactorioVersionPolicy.ps1",
+      "sha256": "1922C1723A25E0FF309ADCF9537871CD2714B4B1D7498022A88D1C4742721E7E",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/mir/application/package/RuntimeReplay.ps1",
+      "sha256": "7699514F0F8359C5576457AFA3D591E5638BEF0548DE304BFD9D72A3599A4714",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/mir/application/package/RuntimeReplayVerifier.ps1",
+      "sha256": "17FE6F654739E22AB0540247F2089E43236C81A4937B63D0589CA5304EEBFFB4",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1",
+      "sha256": "890DA02963EACC6FA5D961D68C99358C01ED6FD2E172DB660EDD2F8811279C28",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "validation/profiles/factorio-2.1.json",
+      "sha256": "C79C3FE1D1CAF7371803AA6561467E3077B606535DA404C525B8D2C0F74B111D",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
+      "sha256": "66C2A8D5208E7200D44C63095DEAD1DAD7E912015400AE2E0BF65F9162F7F32F",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "sha256": "3DD36DB8E544080D57875D0A7570B9BB6B9F55831D1DB76EF67E1CF3A5D5A499",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "validation/tests/runtime/Test-MIRUpgrade.ps1",
+      "sha256": "9428AE2AD0F86534852AB5714BAE0A160B58E937DE363E188A576479FAF41448",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    },
+    {
+      "path": "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+      "sha256": "AAC76C6AF0DADE3AF2B3EFEA5A0EC4E63E3A63B506D40347C6B221B0FA6783FB",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current rolling-engine policy, F2D harness, evidence contract, test, workflow, or documentation authority."
+    }
+  ],
+  "engine_channel": {
+    "selector": "latest-installed-official-2.1-experimental",
+    "patch_pinned": false,
+    "reviewed_version": "2.1.17",
+    "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+    "runtime_api_sha256": "2E1FD436404B712AF6FE7B6C53E21A8F5688092A9E132FD2A5571327A96E5211",
+    "prototype_api_sha256": "156F33CB4BC7EE2C538BB93F291F5270F2CDC45BE654BBE6F226E402BF8F5368",
+    "change_task_count": 12
+  },
+  "harness": {
+    "candidate_id_supported": true,
+    "external_work_root": true,
+    "external_evidence_root": true,
+    "retention_modes": [
+      "OnFailure",
+      "Always",
+      "Never"
+    ],
+    "independent_verifier": true,
+    "one_factorio_process": true,
+    "one_materialization": true
+  },
+  "first_attempt": {
+    "status": "classified-integration-failure",
+    "phase": "pre-runtime-static-authority-check",
+    "classification": "missing-f2d-successor-authority-receipt",
+    "factorio_started": false,
+    "failure_retained_until_classified": true,
+    "expanded_files": 306,
+    "expanded_bytes": 5390830
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "latest_experimental_2_1_selector": true,
+    "exact_execution_identity_required": true,
+    "cross_version_evidence_reuse_forbidden": true,
+    "failure_retained_until_classified": true,
+    "runtime_replay_complete": false,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true,
+    "old_writer_remains_authoritative": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "old_writer_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F2D-HARNESS-READY-RUNTIME-REPLAY-PENDING-NO-CUTOVER"
+}

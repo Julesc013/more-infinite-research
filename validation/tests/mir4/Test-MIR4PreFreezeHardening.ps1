@@ -317,6 +317,15 @@ if([string]$editableSource.kind-cne'MIR4M41F2CEditableSourceMaterializerAuthorit
    @($editableSource.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f2c-editable-source-materializer-authority]'
 }
+$f2dHarness=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f2dHarness.kind-cne'MIR4M41F2DRuntimeReplayHarnessAuthorityEvolutionV1'-or
+   [string]$f2dHarness.status-cne'M41-F2D-HARNESS-READY-RUNTIME-REPLAY-PENDING-NO-CUTOVER'-or
+   -not[bool]$f2dHarness.invariants.latest_experimental_2_1_selector-or
+   -not[bool]$f2dHarness.invariants.exact_execution_identity_required-or
+   -not[bool]$f2dHarness.invariants.failure_retained_until_classified-or
+   [bool]$f2dHarness.invariants.runtime_replay_complete-or
+   [string]$f2dHarness.first_attempt.phase-cne'pre-runtime-static-authority-check'-or
+   @($f2dHarness.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-harness-authority]'}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
