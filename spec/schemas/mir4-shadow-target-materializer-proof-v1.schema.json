@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/distribution/mir4-shadow-target-materializer-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "baseline_record_sha256", "algorithm", "targets", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ShadowTargetMaterializerProofV1"},
+    "status": {"const": "passed-shadow-bootstrap-parity-no-cutover"},
+    "baseline_record_sha256": {"const": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A"},
+    "algorithm": {"const": "golden-archive-byte-bootstrap-common-family-target-overlay-v1"},
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "distribution_version", "family", "layer_counts", "archive_a", "archive_b", "content_sha256", "entry_count", "exact_tree_parity", "deterministic_archive_bytes", "historical_archive_byte_parity"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "distribution_version": {"pattern": "^4[.]0[.](?:21000|20000|11000|10000)$"},
+          "family": {"enum": ["modern", "legacy"]},
+          "layer_counts": {"type": "object", "additionalProperties": false, "required": ["common", "family", "target"], "properties": {"common": {"const": 89}, "family": {"type": "integer", "enum": [202, 81]}, "target": {"type": "integer", "enum": [14, 12, 4]}}},
+          "archive_a": {"$ref": "#/$defs/sha256"},
+          "archive_b": {"$ref": "#/$defs/sha256"},
+          "content_sha256": {"$ref": "#/$defs/sha256"},
+          "entry_count": {"type": "integer", "enum": [305, 303, 174]},
+          "exact_tree_parity": {"const": true},
+          "deterministic_archive_bytes": {"const": true},
+          "historical_archive_byte_parity": {"type": "boolean"}
+        }
+      }
+    },
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["exact_tree_parity", "deterministic_archive_bytes", "package_source_unchanged", "current_writer_unchanged", "runtime_replay_required_before_cutover"], "properties": {"exact_tree_parity": {"const": true}, "deterministic_archive_bytes": {"const": true}, "package_source_unchanged": {"const": true}, "current_writer_unchanged": {"const": true}, "runtime_replay_required_before_cutover": {"const": true}}},
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "falseTransitions": {"type": "object", "additionalProperties": false, "required": ["source_move", "package_cutover", "old_writer_retirement", "tagging", "signing", "sealing", "publication"], "properties": {"source_move": {"const": false}, "package_cutover": {"const": false}, "old_writer_retirement": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}

@@ -241,6 +241,26 @@ if([string]$goldenBaseline.kind-cne'MIR4M41F1GoldenFourTargetBaselineAuthorityEv
    @($goldenBaseline.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f1-golden-four-target-baseline-authority]'
 }
+$shadowMaterializer=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$shadowMaterializer.kind-cne'MIR4M41F2AShadowTargetMaterializerAuthorityEvolutionV1'-or
+   [string]$shadowMaterializer.status-cne'M41-F2A-SHADOW-TARGET-MATERIALIZER-PARITY-COMPLETE-NO-CUTOVER'-or
+   [string]$shadowMaterializer.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json'-or
+   [string]$shadowMaterializer.predecessor_receipt.sha256-cne'B6365CE4015BCFAF5A0CE4EBCBE2D4DE0062D6BE42EF53FA2BBF231C5D3FD49C'-or
+   @($shadowMaterializer.evolved_bindings).Count-lt8-or
+   @($shadowMaterializer.current_authorities).Count-lt6-or
+   [int]$shadowMaterializer.materializer_proof.target_count-ne4-or
+   [int]$shadowMaterializer.materializer_proof.materialization_count-ne8-or
+   -not[bool]$shadowMaterializer.materializer_proof.all_exact_tree_parity-or
+   -not[bool]$shadowMaterializer.materializer_proof.all_deterministic_archive_bytes-or
+   @($shadowMaterializer.materializer_proof.content_identities).Count-ne4-or
+   [string]$shadowMaterializer.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$shadowMaterializer.root_readme_sha256-or
+   -not[bool]$shadowMaterializer.invariants.four_target_tree_parity-or
+   -not[bool]$shadowMaterializer.invariants.current_writer_unchanged-or
+   -not[bool]$shadowMaterializer.invariants.runtime_replay_pending-or
+   @($shadowMaterializer.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-f2a-shadow-target-materializer-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

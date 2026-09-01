@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0005",
+  "status": "accepted",
+  "change_type": "added",
+  "summary": "Added the deterministic four-target shadow materializer and proved exact package-tree parity without changing package authority.",
+  "details": [
+    "The supported package-source command now reconstructs F210, F200, F110, and F100 from the accepted 89-file common layer, modern or legacy family layer, and minimal target overlay.",
+    "Two independent constructions per target produce byte-identical deterministic archives while every normalized path and raw file byte matches its immutable MIR 4.0 baseline.",
+    "Historical ZIP container bytes remain immutable bootstrap inputs and are deliberately distinguished from newly deterministic container bytes; runtime replay and a separate authority cutover remain mandatory."
+  ],
+  "semantic_domains": ["package-boundary", "repository-authority", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The shadow materializer reproduces the immutable 4.0.21000 tree without changing current package authority."},
+    {"target":"F200","disposition":"unaffected","reason":"The shadow materializer reproduces the immutable 4.0.20000 tree without changing current package authority."},
+    {"target":"F110","disposition":"unaffected","reason":"The shadow materializer independently reproduces the immutable 4.0.11000 tree without changing current package authority."},
+    {"target":"F100","disposition":"unaffected","reason":"The shadow materializer independently reproduces the immutable 4.0.10000 tree without changing current package authority."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"tools/mir/application/package/ShadowTargetMaterializer.ps1"},
+    {"kind":"document","value":"spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json"}
+  ]
+}
