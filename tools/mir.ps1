@@ -47,7 +47,7 @@ Usage:
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check> [--target <f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
@@ -690,9 +690,9 @@ switch ($area) {
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
       }
       "package-source" {
-        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, or shadow-check." }
+        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, or model-check." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check')) { throw "Unknown mir4 package-source command: $subcommand" }
         $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }

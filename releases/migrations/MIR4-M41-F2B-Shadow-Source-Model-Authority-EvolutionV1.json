@@ -1,0 +1,219 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2BShadowSourceModelAuthorityEvolutionV1",
+  "recorded_at": "2026-09-01T23:15:00+10:00",
+  "programme_id": "M41-F2B-SHADOW-SOURCE-MODEL",
+  "change_id": "MIR4-CHG-2026-0006",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json",
+    "sha256": "84209EA8150D0E2C93164E6A2667F9FD4CD347B031171CE0F55901D483664A48"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "d71138424f71e1c9ed43fffec210610953972043",
+    "tree": "f5dde3ae849aea6cb0afc4b854fdd7ccbd95e4d0"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "C368D6B9370A20E1FD88FAC81564FFEF646F9C0A70E43683F3FE9D16F25AAC64",
+      "current_sha256": "0CB711AA8EFF4147FFD94916C65FCF0336254F87B201C7B742F53AFCCAB13B91",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "820C10EAD35E7E48445088613D5F2208335D0E5AAAEEED788DC89C2AD4A04094",
+      "current_sha256": "E2A68FD45C07051263E78764B60A1FB17E4D8FD2A0AC12C1503CAD1A87AF8591",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "4AC8A1E0A235DA7F3EA411AF1D0174A7772A2F192A6F253233D7E97B9BB188C9",
+      "current_sha256": "EAE17AEA20914C89B85D2B5FE9BAE7D28A95C8482A9E4E2A0348859B4FFADD36",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "9C6DB39F963110DEDCD385C70F500D5C27C65E615472FB0CFD65E7DE541FD83F",
+      "current_sha256": "6F8ACA65241391AD9C8B7FAF675BFCA850731DC1420DFE340C14F6C20F919505",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "3AC8931FCF7775DCB648F586EC761EBB4DFEB8F17079084F62469332CB8ABECE",
+      "current_sha256": "5156242E15FDF1131A3DFD3344ECCE60578906DA0554F842FFA2E5A17D3D4B4C",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "BE6333085F96FAD044355FA96BBC46AEEF3B9CA82A68EDCBE337B5220D4E266A",
+      "current_sha256": "EB1379DB85F371DD1D31246D3D5F128D02BE7AC469CE6DFF1D1A559684A69B5D",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "A72A45BB98BCB550FC59960F75E061FBA26107BC5942DE2B26EBEF5DCC3B9913",
+      "current_sha256": "F4920B163C2B2533357749977BDD85B84004C9EC3317B48EB496DE06C3453503",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir.ps1",
+      "previous_sha256": "0B38EFB9351C36E481F6D43A652CE26917C6BD70EAD44BF34E45F75F763CC8D8",
+      "current_sha256": "CC65479A74E03C65B0168835FB4463BA16614565B875E102C60C040F32BD4EC0",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "027AA931A4A51D0C9D86F3997D93743CB97A6E1BA4A64281EC951890DF264B28",
+      "current_sha256": "1B6EDD36BDCD2903068AB2939015A32A67D9055D683D7E816C99B9A6F7D48AA2",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "75DA015B600F366AFB7378AF082348EE5F2B10709BD70A48F47D45573F2ED1E6",
+      "current_sha256": "A994AE2CC2CADA12DC678C01F7AB5AC75D9CED0455D3889410A3BDB27E0CADE8",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+      "previous_sha256": "5B6CF3F5E027410F14D9073441390CACFDA3A066021C90433A8EE2BC210BF409",
+      "current_sha256": "8FDC708DB47E6D2A905B9F5D04C233622C325461868A595E0CF3A9EBE73EFCD9",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "12E7527AA9F5C48F1993C06D6B0ABDE92D96B26F3F51E655D8665B77580E8766",
+      "current_sha256": "CD69D34C2E95AA4AA59D95327286A6E930A098285652C3D544165F7AD79D6CC3",
+      "reason": "Register the package-excluded semantic source and target-overlay model and its fail-closed proof.",
+      "scope": "package-excluded-shadow-source-model",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0006.json",
+      "sha256": "8779E53F607A757ABBAF3D86F0682AD6920C03A6368E4162C95ED50CC4012316",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json",
+      "sha256": "5EA71A143209F4AB10865494D09BBEFA94B4C2BA27ECFDDF763A6108E6CBCCCE",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    },
+    {
+      "path": "spec/schemas/mir4-shadow-source-model-proof-v1.schema.json",
+      "sha256": "D5F9DB6E6AF10B1B81BA5D1EA98A6DFF301C05FB0450556542E83979F9436CE5",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1",
+      "sha256": "1A1B752D0192234BD12FBD193A575EA9A91CFD11C36B9ADDEEC636D15C031C42",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    },
+    {
+      "path": "tools/mir/application/package/ShadowSourceModel.ps1",
+      "sha256": "34984B514E937491408709DCC29FB543E3C84069BB49434B4014F50E05B352BC",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+      "sha256": "E0E64FDA2E9F83E5D38377FE42C90DA7EFB3F1B2D969B7D729EB6A04F9910F72",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current package-excluded shadow semantic source-model implementation, contract, or proof."
+    }
+  ],
+  "source_model_proof": {
+    "baseline_record_sha256": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A",
+    "proof_record_sha256": "077E0387E0610645A1B81C7805AC360595DE861891C8A3CBF8F05C4FAE42F4D6",
+    "binding_count": 406,
+    "target_count": 4,
+    "omission_count": 264,
+    "classification_counts": {
+      "common-semantic-source": 81,
+      "common-asset-locale": 60,
+      "generated-metadata": 4,
+      "generated-lifecycle-entrypoint": 5,
+      "target-overlay": 217,
+      "target-replacement": 18,
+      "target-omission": 264,
+      "target-compatibility-shim": 11,
+      "migration": 2,
+      "package-documentation": 8
+    },
+    "declaration_order_probe_sha256": "2ED8CE49051A7F3709B8E6F5C1C3D5697CDA73D5FEBDDDA1EAA2530EB43A7129",
+    "physical_files": 3935,
+    "unknown_paths": 0,
+    "package_files": 307
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "all_paths_classified": true,
+    "no_path_collision": true,
+    "no_unowned_path": true,
+    "declaration_order_independent": true,
+    "no_target_policy_in_common_domain_code": true,
+    "historical_archives_are_comparison_fixtures_only": true,
+    "current_writer_unchanged": true,
+    "no_editable_source_created": true,
+    "runtime_replay_pending": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "editable_source": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "old_writer_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F2B-SHADOW-SOURCE-MODEL-COMPLETE-NO-EDITABLE-SOURCE-NO-CUTOVER"
+}

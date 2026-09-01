@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0006",
+  "status": "accepted",
+  "change_type": "added",
+  "summary": "Added the governed semantic source and target-overlay model for the four-target MIR 4.1 package-source cutover.",
+  "details": [
+    "All 406 accepted package-layer bindings now have an explicit semantic class, historical comparison source, future editable authority, materialization rule, and proof obligation.",
+    "All 264 target-specific absences are explicit overlay omissions rather than inferred differences, including independent F110 and F100 dispositions.",
+    "The model names the future src/mod, target registry, support policy, per-target overlay, and target materializer authorities while deliberately creating no editable package source and changing no current package writer."
+  ],
+  "semantic_domains": ["package-boundary", "repository-authority", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"F210 paths and omissions are classified without changing the current package source or writer."},
+    {"target":"F200","disposition":"unaffected","reason":"F200 paths and omissions are classified without changing the current package source or writer."},
+    {"target":"F110","disposition":"unaffected","reason":"F110 paths and omissions are independently classified without changing the current package source or writer."},
+    {"target":"F100","disposition":"unaffected","reason":"F100 paths and omissions are independently classified without changing the current package source or writer."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"tools/mir/application/package/ShadowSourceModel.ps1"},
+    {"kind":"document","value":"spec/schemas/mir4-shadow-source-model-proof-v1.schema.json"}
+  ]
+}

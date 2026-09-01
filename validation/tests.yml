@@ -2890,6 +2890,23 @@
       ]
     },
     {
+      "id": "static.mir4-shadow-source-model-m41-f2b",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/schemas/mir4-shadow-source-model-proof-v1.schema.json",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/ShadowSourceModel.ps1",
+        "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
+        "tools/mir.ps1",
+        "validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
