@@ -378,6 +378,15 @@ function New-MIRCPTodoLines {
     $lines.Add("| $(Format-MIRCPCode $workPackage.id) | $(Format-MIRCPCode $workPackage.completion_boundary) | $(Format-MIRCPCode $workPackage.state) | $(@($workPackage.depends_on) -join ', ') | $($workPackage.outcome) |")
   }
   foreach ($line in @(
+    "", "## M42-00 package fixed point", "",
+    "Phase: $(Format-MIRCPCode $MIR4OperatingProgramme.package_fixed_point.phase). Aggregate: $(Format-MIRCPCode $MIR4OperatingProgramme.package_fixed_point.aggregate). Next target: $(Format-MIRCPCode $MIR4OperatingProgramme.package_fixed_point.next_target). Package cutover: $(Format-MIRCPCode $MIR4OperatingProgramme.package_fixed_point.package_cutover).", "",
+    "| Target | Runtime replay | Receipt |", "| --- | --- | --- |"
+  )) { $lines.Add($line) }
+  foreach ($targetResult in @($MIR4OperatingProgramme.package_fixed_point.target_results)) {
+    $receipt = if ($null -eq $targetResult.receipt) { 'pending' } else { Format-MIRCPCode $targetResult.receipt }
+    $lines.Add("| $(Format-MIRCPCode $targetResult.target) | $(Format-MIRCPCode $targetResult.state) | $receipt |")
+  }
+  foreach ($line in @(
     "", "## Moving engine-channel obligations", "",
     "| Target | Selector | State | Recurring obligation |", "| --- | --- | --- | --- |"
   )) { $lines.Add($line) }

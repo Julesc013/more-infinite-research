@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0009",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Passed the exact Factorio 2.0 F2D runtime replay and enforced fixed historical-engine locks.",
+  "details": [
+    "F200 now rejects any Factorio executable whose product version, governed file version, or SHA-256 differs from the exact target authority; the independent verifier repeats that check.",
+    "The newly materialized 4.0.20000 F200 package passed its exact-package smoke scenario and the 2.5.11 base-default upgrade through first and second reloads.",
+    "The reusable target receipt writer records F200 and can advance F110 and F100 without cloning target-specific implementations; package cutover and every release gate remain false."
+  ],
+  "semantic_domains": ["engine-lock", "package-boundary", "runtime-validation", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The accepted F210 replay receipt remains byte-stable and its moving experimental-channel policy is unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"Exact Factorio 2.0.77 replay proved the newly materialized accepted 4.0.20000 product without a player-package change."},
+    {"target":"F110","disposition":"unaffected","reason":"The generic lock and receipt machinery is package-excluded; independent F110 replay remains pending."},
+    {"target":"F100","disposition":"unaffected","reason":"The generic lock and receipt machinery is package-excluded; independent F100 replay remains pending."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"docs/maintainer/mir4-f2d-runtime-replay.md"},
+    {"kind":"release-record","value":"releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json"}
+  ]
+}

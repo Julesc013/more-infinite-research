@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-01T12:00:00+10:00",
+  "recorded_at": "2026-09-02T02:18:26+10:00",
   "objective": "Complete MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
   "permanent_invariants": [
     "one semantic source",
@@ -34,6 +34,19 @@
     {"id": "M45-00", "outcome": "Allocate a coherent external product outcome only when evidence supports it", "completion_boundary": "4.4.0+", "depends_on": ["M44-00"], "state": "blocked-dependency"},
     {"id": "M46-00", "outcome": "Retain later MIR 4 work as unallocated evidence-led evolution", "completion_boundary": "4.4.0+", "depends_on": ["M45-00"], "state": "blocked-dependency"}
   ],
+  "package_fixed_point": {
+    "work_package": "M42-00",
+    "phase": "M41-F2D",
+    "target_results": [
+      {"target": "f210", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json"},
+      {"target": "f200", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json"},
+      {"target": "f110", "state": "pending", "receipt": null},
+      {"target": "f100", "state": "pending", "receipt": null}
+    ],
+    "aggregate": "pending",
+    "next_target": "f110",
+    "package_cutover": "blocked"
+  },
   "outcome_trains": [
     {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},
     {"candidate": "4.1.0", "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets", "release_required": false},

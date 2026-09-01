@@ -56,6 +56,11 @@ $f210Profile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/pr
 $resolvedF210 = Resolve-MIR4FactorioQualificationProfile -Profile $f210Profile -RepoRoot $RepoRoot
 Assert-MIR4F2D ([string]$resolvedF210.qualification_factorio_selection -ceq 'latest-installed-official-2.1-experimental') 'mir4-f2d-f210-moving-channel-unchanged'
 $targetWriter = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1')
-foreach ($required in @("ValidateSet('f200','f110','f100')",'mir4-m41-f2d-target-wrong-target-evidence','mir4-m41-f2d-target-stale-replay-commit','mir4-m41-f2d-target-missing-reload','mir4-m41-f2d-target-wrong-fixed-engine','package_visible_delta=@()','$acceptedF210Sha256')) { Assert-MIR4F2D ($targetWriter.Contains([string]$required)) "mir4-f2d-target-writer-$required" }
+foreach ($required in @("ValidateSet('f200','f110','f100')",'mir4-m41-f2d-target-wrong-target-evidence','mir4-m41-f2d-target-upgrade-binding','mir4-m41-f2d-target-stale-replay-commit','mir4-m41-f2d-target-missing-reload','mir4-m41-f2d-target-wrong-fixed-engine','package_visible_delta=@()','$acceptedF210Sha256')) { Assert-MIR4F2D ($targetWriter.Contains([string]$required)) "mir4-f2d-target-writer-$required" }
+$programmePath = Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json'
+Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $programmePath) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-f2d-programme-schema'
+$programme = Get-Content -Raw -LiteralPath $programmePath | ConvertFrom-Json -Depth 40
+Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:pending|f100:pending' -and [string]$programme.package_fixed_point.next_target -ceq 'f110' -and [string]$programme.package_fixed_point.aggregate -ceq 'pending' -and [string]$programme.package_fixed_point.package_cutover -ceq 'blocked') 'mir4-f2d-programme-target-state'
+& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1') -RepoRoot $RepoRoot -Target f200 -Check | Out-Null
 foreach ($forbidden in @('git clean','package_cutover=$true','publication=$true','signing=$true','sealing=$true')) { Assert-MIR4F2D (-not $coordinator.Contains($forbidden)) "mir4-f2d-forbidden-$forbidden" }
 Write-Host '[ok] MIR 4 F2D runtime replay harness contract'

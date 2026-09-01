@@ -135,7 +135,10 @@ if ([string]$views.status -ne "current") { throw "Control-plane generated views 
 $todoText = Get-Content -Raw -LiteralPath (Join-Path $repo 'todo.md')
 if ($todoText -notmatch '(?m)^## Active MIR 4\.x operating programme$' -or
     $todoText -notmatch '(?m)^## Historical MIR 4\.0 pre-freeze execution record$' -or
-    $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `active` \|') {
+    $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `active` \|' -or
+    $todoText -notmatch '(?m)^## M42-00 package fixed point$' -or
+    $todoText -notmatch '\| `f200` \| `complete` \| `releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1\.json` \|' -or
+    $todoText -notmatch 'Next target: `f110`\. Package cutover: `blocked`\.') {
   throw 'Generated maintainer queue does not distinguish live MIR 4.x authority from the historical pre-freeze execution record.'
 }
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo
