@@ -2913,6 +2913,7 @@
       "command": "./validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".gitattributes",
         "src/mod/**",
         "targets/registry.json",
         "targets/support-policy.json",

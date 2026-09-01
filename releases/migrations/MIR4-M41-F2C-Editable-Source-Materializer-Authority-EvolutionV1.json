@@ -17,7 +17,7 @@
     {
       "path": ".gitattributes",
       "previous_sha256": "C9AF7CBFF77103170140189790A117509CA28478445767E81EDCA2A1807C3B07",
-      "current_sha256": "AD6A309D3116F5C06B6A38A093BFBB9FC3A31BE07891F4B210032D7F311FA900",
+      "current_sha256": "444892C1EC08BCA829F28E520718E9C932E2B12E862C33EBB518306BAAB56649",
       "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
       "scope": "package-excluded-editable-source-materializer",
       "package_visible": false,
@@ -125,7 +125,7 @@
     {
       "path": "validation/tests.yml",
       "previous_sha256": "1B6EDD36BDCD2903068AB2939015A32A67D9055D683D7E816C99B9A6F7D48AA2",
-      "current_sha256": "B5B849D5CC0EB635794AB3694B3FA38246EAC1666041AD2CCD733EFA30B75604",
+      "current_sha256": "A81C9E5F684481365072653E2CBCB2C6F0B8EE35119474B863ECFB140EE3B38F",
       "reason": "Establish the package-excluded editable source and deterministic four-target materializer proof.",
       "scope": "package-excluded-editable-source-materializer",
       "package_visible": false,
