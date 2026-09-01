@@ -21,6 +21,7 @@ $proof = Read-MIR4F2D 'target-proof.json'
 $fresh = Read-MIR4F2D 'fresh-load-result.json'
 $upgrade = Read-MIR4F2D 'upgrade-matrix.json'
 $custody = Read-MIR4F2D 'custody-precleanup.json'
+. (Join-Path $repo 'tools/lib/validation/FactorioVersionPolicy.ps1')
 $golden = Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/distribution/mir4-golden-four-target-baseline-v1.json') | ConvertFrom-Json
 $baseline = @($golden.targets | Where-Object target -eq $Target)
 Require-MIR4F2D ($baseline.Count -eq 1) 'mir4-f2d-baseline'
@@ -28,6 +29,10 @@ $code = $Target.Substring(1)
 Require-MIR4F2D ([string]$proof.status -eq "M41-F2D-$code-PASSED-NO-CUTOVER") 'mir4-f2d-status'
 Require-MIR4F2D ([string]$proof.package.content_sha256 -eq [string]$baseline[0].archive.content_sha256 -and [int]$proof.package.entry_count -eq [int]$baseline[0].archive.entry_count) 'mir4-f2d-package-identity'
 Require-MIR4F2D ([string]$fresh.status -eq 'passed' -and [string]$fresh.validation_package_sha256 -eq [string]$proof.package.archive_sha256 -and [string]$fresh.validation_package_content_sha256 -eq [string]$proof.package.content_sha256) 'mir4-f2d-fresh-load'
+Require-MIR4F2D ([string]$fresh.factorio_version -eq [string]$proof.engine.version -and [string]$fresh.factorio_binary_sha256 -eq [string]$proof.engine.binary_sha256) 'mir4-f2d-fresh-engine-identity'
+if ($Target -ne 'f210') {
+  Require-MIR4F2D (Test-MIR4FixedFactorioEngineIdentity -Target $Target -ObservedIdentity $proof.engine -RepoRoot $repo) 'mir4-f2d-fixed-engine-lock'
+}
 Require-MIR4F2D ([string]$upgrade.status -eq 'passed' -and [string]$upgrade.factorio.binary_sha256 -eq [string]$proof.engine.binary_sha256 -and [string]$upgrade.candidate.archive_sha256 -eq [string]$proof.package.archive_sha256 -and [string]$upgrade.baseline.archive_sha256 -eq [string]$proof.predecessor.archive_sha256) 'mir4-f2d-upgrade-identity'
 $expectedArchetypes = if ($Target -eq 'f210') { @('base-default','space-age-native-owner','automatic-family-creation','base-continuations','mod-set-configuration-change') } else { @('base-default') }
 Require-MIR4F2D (@(Compare-Object -ReferenceObject @($expectedArchetypes|Sort-Object) -DifferenceObject @(@($upgrade.required_archetypes)|Sort-Object)).Count -eq 0) 'mir4-f2d-archetypes'

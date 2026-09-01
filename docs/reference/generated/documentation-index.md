@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 436 pages as of 2026-09-01.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 436 pages as of 2026-09-02.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -185,7 +185,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
 | docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
-| docs/maintainer/mir4-f2d-runtime-replay.md | MIR 4.1 F2D Runtime Replay | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
+| docs/maintainer/mir4-f2d-runtime-replay.md | MIR 4.1 F2D Runtime Replay | current | maintainer | how-to | mir-maintainers | 2026-09-02 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-08-29 |

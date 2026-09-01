@@ -162,6 +162,77 @@ function Resolve-MIR4FactorioQualificationProfile {
   return $copy
 }
 
+function Get-MIR4FixedFactorioEngineLock {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f200','f110','f100')][string]$Target,
+    [string]$RepoRoot = ""
+  )
+  Set-StrictMode -Version Latest
+  $repo = if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path
+  } else {
+    (Resolve-Path -LiteralPath $RepoRoot).Path
+  }
+  $baselinePath = Join-Path $repo 'spec/distribution/mir4-golden-four-target-baseline-v1.json'
+  $golden = Get-Content -Raw -LiteralPath $baselinePath | ConvertFrom-Json -Depth 100
+  $baseline = @($golden.targets | Where-Object target -eq $Target)
+  if ($baseline.Count -ne 1) { throw "Fixed Factorio target baseline is not unique: $Target" }
+  $targetRow = $baseline[0]
+  $profilePath = Join-Path $repo "validation/profiles/factorio-$([string]$targetRow.factorio_line).json"
+  $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json -Depth 40
+  $expectedVersion = [string]$profile.qualification_factorio_version
+  $baselineVersion = [string]$targetRow.exact_engine.version
+  if ($baselineVersion -cne $expectedVersion -and $baselineVersion -cne "$expectedVersion-only") {
+    throw "Fixed Factorio version authorities disagree for $Target."
+  }
+  $expectedSha256 = [string]$targetRow.exact_engine.executable_sha256
+  if ($expectedSha256 -notmatch '^[A-F0-9]{64}$') { throw "Fixed Factorio executable lock is invalid for $Target." }
+  $fileVersion = ''
+  $authorityPaths = [Collections.Generic.List[string]]::new()
+  $authorityPaths.Add('spec/distribution/mir4-golden-four-target-baseline-v1.json')
+  $authorityPaths.Add("validation/profiles/factorio-$([string]$targetRow.factorio_line).json")
+  $releaseRelative = ".mir/releases/records/$([string]$targetRow.predecessor).json"
+  $releasePath = Join-Path $repo $releaseRelative
+  if (Test-Path -LiteralPath $releasePath -PathType Leaf) {
+    $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json -Depth 100
+    $releaseEngine = [string]$release.package.factorio_engine
+    $releaseBuild = [string]$release.package.factorio_engine_build
+    $releaseSha256 = [string]$release.package.factorio_engine_sha256
+    if (-not [string]::IsNullOrWhiteSpace($releaseEngine) -or
+        -not [string]::IsNullOrWhiteSpace($releaseBuild) -or
+        -not [string]::IsNullOrWhiteSpace($releaseSha256)) {
+      if ($releaseEngine -cne $expectedVersion -or $releaseSha256 -cne $expectedSha256 -or [string]::IsNullOrWhiteSpace($releaseBuild)) {
+        throw "Fixed Factorio release and target authorities disagree for $Target."
+      }
+      $fileVersion = $releaseBuild
+      $authorityPaths.Add($releaseRelative.Replace('\\','/'))
+    }
+  }
+  return [pscustomobject][ordered]@{
+    target = $Target
+    selection = 'exact-profile'
+    version = $expectedVersion
+    file_version = $fileVersion
+    binary_sha256 = $expectedSha256
+    authority_paths = @($authorityPaths)
+  }
+}
+
+function Test-MIR4FixedFactorioEngineIdentity {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f200','f110','f100')][string]$Target,
+    [Parameter(Mandatory)]$ObservedIdentity,
+    [string]$RepoRoot = ""
+  )
+  Set-StrictMode -Version Latest
+  $lock = Get-MIR4FixedFactorioEngineLock -Target $Target -RepoRoot $RepoRoot
+  if ([string]$ObservedIdentity.version -cne [string]$lock.version -or
+      [string]$ObservedIdentity.binary_sha256 -cne [string]$lock.binary_sha256) { return $false }
+  if (-not [string]::IsNullOrWhiteSpace([string]$lock.file_version) -and
+      [string]$ObservedIdentity.file_version -cne [string]$lock.file_version) { return $false }
+  return $true
+}
+
 function Write-MIR4Factorio21ChannelReview {
   param(
     [Parameter(Mandatory)]$Review,

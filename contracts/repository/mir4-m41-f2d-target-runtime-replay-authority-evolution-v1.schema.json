@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "target", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "attempts", "replay_proof", "player_package_source_sha256", "root_readme_sha256", "package_visible_delta", "target_results", "f2d_aggregate", "f2e", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"type": "string", "pattern": "^M41-F2D-F(200|110|100)-RUNTIME-REPLAY$"},
+    "change_id": {"type": "string", "pattern": "^MIR4-CHG-[0-9]{4}-[0-9]{4}$"},
+    "target": {"enum": ["f200", "f110", "f100"]},
+    "predecessor_receipt": {"$ref": "#/$defs/receiptRef"},
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "authority_base_commit", "authority_base_tree", "replay_commit", "replay_tree"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "authority_base_commit": {"$ref": "#/$defs/commit"},
+        "authority_base_tree": {"$ref": "#/$defs/commit"},
+        "replay_commit": {"$ref": "#/$defs/commit"},
+        "replay_tree": {"$ref": "#/$defs/commit"}
+      }
+    },
+    "evolved_bindings": {"type": "array", "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/current"}},
+    "attempts": {"type": "array", "items": {"type": "object"}},
+    "replay_proof": {"$ref": "#/$defs/replayProof"},
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "root_readme_sha256": {"const": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947"},
+    "package_visible_delta": {"const": []},
+    "target_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["f210", "f200", "f110", "f100"],
+      "properties": {
+        "f210": {"const": "complete"},
+        "f200": {"enum": ["complete", "pending"]},
+        "f110": {"enum": ["complete", "pending"]},
+        "f100": {"enum": ["complete", "pending"]}
+      }
+    },
+    "f2d_aggregate": {"const": "pending"},
+    "f2e": {"const": "blocked"},
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_fixed_engine_lock", "cross_target_evidence_substitution_forbidden", "f210_receipt_byte_stable", "expanded_work_released_after_verified_custody", "package_source_unchanged", "root_readme_byte_stable", "old_writer_remains_authoritative"],
+      "properties": {
+        "exact_fixed_engine_lock": {"const": true},
+        "cross_target_evidence_substitution_forbidden": {"const": true},
+        "f210_receipt_byte_stable": {"const": true},
+        "expanded_work_released_after_verified_custody": {"const": true},
+        "package_source_unchanged": {"const": true},
+        "root_readme_byte_stable": {"const": true},
+        "old_writer_remains_authoritative": {"const": true}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"type": "string", "pattern": "^M41-F2D-(200|110|100)-PASSED-NO-CUTOVER$"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "receiptRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "reason": {"type": "string", "minLength": 8},
+        "scope": {"const": "package-excluded-target-runtime-replay"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "role"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "role": {"type": "string", "minLength": 8}
+      }
+    },
+    "replayProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "target", "candidate_id", "engine", "package", "predecessor", "fresh_load", "upgrade", "evidence", "resource"],
+      "properties": {
+        "status": {"type": "string", "pattern": "^M41-F2D-(200|110|100)-PASSED-NO-CUTOVER$"},
+        "target": {"enum": ["f200", "f110", "f100"]},
+        "candidate_id": {"type": "string", "pattern": "^M41-F2D-[A-F0-9]{8}-F(200|110|100)$"},
+        "engine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["selector", "version", "file_version", "binary_sha256", "authority_paths"],
+          "properties": {
+            "selector": {"const": "exact-profile"},
+            "version": {"type": "string", "minLength": 3},
+            "file_version": {"type": "string"},
+            "binary_sha256": {"$ref": "#/$defs/sha256"},
+            "authority_paths": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        },
+        "package": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["distribution_version", "archive_sha256", "content_sha256", "entry_count"],
+          "properties": {
+            "distribution_version": {"type": "string", "pattern": "^4\\.0\\.(20000|11000|10000)$"},
+            "archive_sha256": {"$ref": "#/$defs/sha256"},
+            "content_sha256": {"$ref": "#/$defs/sha256"},
+            "entry_count": {"type": "integer", "minimum": 1}
+          }
+        },
+        "predecessor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "archive_sha256"],
+          "properties": {"version": {"type": "string", "minLength": 3}, "archive_sha256": {"$ref": "#/$defs/sha256"}}
+        },
+        "fresh_load": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "scenario_count", "scenarios", "result_sha256"],
+          "properties": {
+            "status": {"const": "passed"},
+            "scenario_count": {"type": "integer", "minimum": 1},
+            "scenarios": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "result_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "upgrade": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "archetypes", "first_reload", "second_reload", "result_sha256"],
+          "properties": {
+            "status": {"const": "passed"},
+            "archetypes": {"const": ["base-default"]},
+            "first_reload": {"const": true},
+            "second_reload": {"const": true},
+            "result_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logical_root", "target_proof_sha256", "independent_verification_sha256", "custody_manifest_sha256", "custody_file_count", "evidence_file_count", "evidence_bytes"],
+          "properties": {
+            "logical_root": {"type": "string", "pattern": "^MIR_EVIDENCE_HOME/m41-f2d/[0-9a-f]{40}/f(200|110|100)$"},
+            "target_proof_sha256": {"$ref": "#/$defs/sha256"},
+            "independent_verification_sha256": {"$ref": "#/$defs/sha256"},
+            "custody_manifest_sha256": {"$ref": "#/$defs/sha256"},
+            "custody_file_count": {"type": "integer", "minimum": 1},
+            "evidence_file_count": {"type": "integer", "minimum": 2},
+            "evidence_bytes": {"type": "integer", "minimum": 1}
+          }
+        },
+        "resource": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["retention", "work_root_status", "expanded_files", "expanded_bytes", "duration_seconds", "receipt_sha256"],
+          "properties": {
+            "retention": {"const": "OnFailure"},
+            "work_root_status": {"const": "removed"},
+            "expanded_files": {"type": "integer", "minimum": 1},
+            "expanded_bytes": {"type": "integer", "minimum": 1},
+            "duration_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "receipt_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        }
+      }
+    },
+    "falseTransitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["merge", "source_move", "package_cutover", "readme_rewrite", "bridge_retirement", "old_writer_retirement", "tagging", "signing", "sealing", "version_allocation", "publication", "remote_write"],
+      "properties": {
+        "merge": {"const": false}, "source_move": {"const": false}, "package_cutover": {"const": false}, "readme_rewrite": {"const": false}, "bridge_retirement": {"const": false}, "old_writer_retirement": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "version_allocation": {"const": false}, "publication": {"const": false}, "remote_write": {"const": false}
+      }
+    }
+  }
+}
