@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-01
+last_reviewed: 2026-09-02
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -58,11 +58,13 @@ The governance and characterization foundation is complete, so MIR 4.1 now owns 
 | M41-04 | Prove protected stable-to-`dev` exact-tree convergence during branch transition | Complete |
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Route documentation by reader need, then separate repository and package landing pages | Active: M41-05A routing complete; M41-05B waits for the package-documentation cutover |
-| M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Active: M42-00A characterization complete; materializer, parity, cutover, and rollback remain |
+| M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Active: F1/F2A/F2B/F2C complete; F2D F210 and F200 complete; F110 is next and F100 remains pending; the F2D aggregate is pending and F2E remains blocked |
 | M42-01 | Converge PowerShell behind one supported CLI, one implementation per command, and one release engine inside the 4.1 completion boundary | Blocked on M42-00 |
 | M42-02 | Perform only reviewable behavior-preserving Lua decomposition needed for the 4.1 maintainability fixed point | Blocked on M42-00 |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
+
+The accepted F2D chain is now F210 complete, F200 complete, F110 pending, and F100 pending. F200 passed against the exact governed Factorio 2.0.77 executable and the 2.5.11 predecessor, including the selected exact-package load, first upgraded-save reload, and second reload. This is a package-excluded replay result: the old writer remains authoritative, the four-target aggregate remains pending, and package cutover is still blocked.
 
 The current package-source boundary still includes `README.md` in every player ZIP. M41-05A therefore routes package-excluded documentation while leaving that root file byte-stable. M42-00A records exact package membership, authorities, readers, writers, bridges, and physical files. After the independent materializer proves parity, M41-05B will separate a concise repository landing page from generated package documentation as an intentional, target-qualified cutover. Incidental README edits remain forbidden.
 

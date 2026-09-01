@@ -78,6 +78,11 @@ function Invoke-MIR4TargetRuntimeReplay {
   $factorioItem = Get-Item -LiteralPath $factorio
   $factorioVersion = [string]$factorioItem.VersionInfo.ProductVersion
   if ($factorioVersion -match '^([0-9]+\.[0-9]+\.[0-9]+)') { $factorioVersion = [string]$Matches[1] }
+  $factorioIdentity = [pscustomobject][ordered]@{
+    version = $factorioVersion
+    file_version = [string]$factorioItem.VersionInfo.FileVersion
+    binary_sha256 = (Get-FileHash -LiteralPath $factorio -Algorithm SHA256).Hash
+  }
   $factorioInstall = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorio))
   $started = [DateTime]::UtcNow
   $startFree = (Get-PSDrive -Name ([IO.Path]::GetPathRoot($work).Substring(0,1))).Free
@@ -98,6 +103,8 @@ function Invoke-MIR4TargetRuntimeReplay {
       $channelReview = Get-MIR4Factorio21ChannelReview -FactorioBin $factorio -RepoRoot $repo
       if ([string]$channelReview.status -eq 'invalid-engine-channel-input') { throw 'Installed Factorio is outside the governed 2.1 experimental channel.' }
       Write-MIR4RuntimeReplayJson -Value $channelReview -Path (Join-Path $evidence 'engine-channel-review.json')
+    } elseif (-not (Test-MIR4FixedFactorioEngineIdentity -Target $Target -ObservedIdentity $factorioIdentity -RepoRoot $repo)) {
+      throw "Selected Factorio identity does not match the fixed $Target engine lock."
     }
     $packageRoot = Join-Path $work 'packages'
     $materialization = New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId $CandidateId -OutputRoot $packageRoot
@@ -133,7 +140,7 @@ function Invoke-MIR4TargetRuntimeReplay {
       $freshRows.Add([ordered]@{name=$scenarioName;kind=[string]$declaration.kind;group=[string]$declaration.group;surface=[string]$declaration.surface;status='passed';assertions_executed=[int]$workerFresh.assertions_executed;duration_seconds=[double]$workerFresh.duration_seconds;worker_result_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($workerText)))})
     }
     $freshResult = Join-Path $evidence 'fresh-load-result.json'
-    $fresh = [ordered]@{schema=1;kind='MIR4F2DExactZipFreshLoadMatrixV1';status='passed';target=$Target;factorio_version=$factorioVersion;factorio_binary_sha256=(Get-FileHash -LiteralPath $factorio -Algorithm SHA256).Hash;validation_package_sha256=[string]$materialization.archive_sha256;validation_package_content_sha256=[string]$materialization.content_sha256;scenarios=@($freshRows | ForEach-Object name);rows=@($freshRows);factorio_process_concurrency=1}
+    $fresh = [ordered]@{schema=1;kind='MIR4F2DExactZipFreshLoadMatrixV1';status='passed';target=$Target;factorio_version=$factorioVersion;factorio_binary_sha256=[string]$factorioIdentity.binary_sha256;validation_package_sha256=[string]$materialization.archive_sha256;validation_package_content_sha256=[string]$materialization.content_sha256;scenarios=@($freshRows | ForEach-Object name);rows=@($freshRows);factorio_process_concurrency=1}
     Write-MIR4RuntimeReplayJson -Value $fresh -Path $freshResult
     $freshLogs = @(Get-ChildItem -LiteralPath $freshRoot -Recurse -File -Filter 'factorio-current.log' -ErrorAction SilentlyContinue | Sort-Object FullName)
     if ($freshLogs.Count -ne $freshDeclarations.Count) { throw 'F2D fresh-load log cardinality does not match the exact-zip scenario matrix.' }
@@ -152,7 +159,7 @@ function Invoke-MIR4TargetRuntimeReplay {
     $proof = [ordered]@{
       schema=1;kind='MIR4F2DTargetRuntimeReplayProofV1';status="M41-F2D-$targetCode-PASSED-NO-CUTOVER";target=$Target;candidate_id=$CandidateId
       source=[ordered]@{commit=$head;tree=$tree;manifest_sha256=[string]$materialization.source_manifest_sha256;overlay_sha256=[string]$materialization.target_overlay_sha256}
-      engine=[ordered]@{selection=if($Target-eq'f210'){'latest-installed-official-2.1-experimental'}else{'exact-profile'};version=$factorioVersion;file_version=[string]$factorioItem.VersionInfo.FileVersion;binary_sha256=(Get-FileHash -LiteralPath $factorio -Algorithm SHA256).Hash}
+      engine=[ordered]@{selection=if($Target-eq'f210'){'latest-installed-official-2.1-experimental'}else{'exact-profile'};version=$factorioVersion;file_version=[string]$factorioIdentity.file_version;binary_sha256=[string]$factorioIdentity.binary_sha256}
       package=[ordered]@{distribution_version=[string]$materialization.distribution_version;archive_sha256=[string]$materialization.archive_sha256;content_sha256=[string]$materialization.content_sha256;entry_count=[int]$materialization.entry_count;expected_content_sha256=[string]$baseline[0].archive.content_sha256;expected_entry_count=[int]$baseline[0].archive.entry_count}
       predecessor=[ordered]@{version=[string]$baseline[0].predecessor;archive_sha256=(Get-FileHash -LiteralPath $predecessor -Algorithm SHA256).Hash}
       runtime=[ordered]@{fresh_load='passed';scenario_count=@($fresh.scenarios).Count;upgrade='passed';required_archetypes=@($upgrade.required_archetypes);first_reload=$true;second_reload=$true}

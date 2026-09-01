@@ -336,6 +336,22 @@ if([string]$f210Replay.kind-cne'MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1'
    -not[bool]$f210Replay.invariants.f210_runtime_replay_complete-or[bool]$f210Replay.invariants.f2d_four_target_complete-or
    -not[bool]$f210Replay.invariants.expanded_work_released_after_verified_custody-or
    @($f210Replay.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-f210-runtime-replay-authority]'}
+$f200Replay=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f200Replay.kind-cne'MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'-or
+   [string]$f200Replay.status-cne'M41-F2D-200-PASSED-NO-CUTOVER'-or
+   [string]$f200Replay.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json'-or
+   [string]$f200Replay.predecessor_receipt.sha256-cne'A690D41B0B37D4BAF78B615BB3042F51D97E3A9E552723DBCA3EE717943FBA8C'-or
+   [string]$f200Replay.replay_proof.engine.version-cne'2.0.77'-or
+   [string]$f200Replay.replay_proof.engine.file_version-cne'2.0.77.84539'-or
+   [string]$f200Replay.replay_proof.engine.binary_sha256-cne'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'-or
+   [int]$f200Replay.replay_proof.fresh_load.scenario_count-ne1-or
+   @($f200Replay.replay_proof.upgrade.archetypes).Count-ne1-or
+   -not[bool]$f200Replay.replay_proof.upgrade.first_reload-or-not[bool]$f200Replay.replay_proof.upgrade.second_reload-or
+   [string]$f200Replay.target_results.f210-cne'complete'-or[string]$f200Replay.target_results.f200-cne'complete'-or
+   [string]$f200Replay.target_results.f110-cne'pending'-or[string]$f200Replay.target_results.f100-cne'pending'-or
+   [string]$f200Replay.f2d_aggregate-cne'pending'-or[string]$f200Replay.f2e-cne'blocked'-or
+   @($f200Replay.package_visible_delta).Count-ne0-or
+   @($f200Replay.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-f200-runtime-replay-authority]'}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

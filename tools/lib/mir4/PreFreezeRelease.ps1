@@ -362,7 +362,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeM41F2BShadowSourceModelAuthority,
     [switch]$IncludeM41F2CEditableSourceMaterializerAuthority,
     [switch]$IncludeM41F2DHarnessAuthority,
-    [switch]$IncludeM41F2DF210RuntimeReplayAuthority
+    [switch]$IncludeM41F2DF210RuntimeReplayAuthority,
+    [string[]]$M41F2DTargetRuntimeReplayTargets = @()
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -517,6 +518,19 @@ function Get-MIR4PreFreezeAuthorityState {
     if (-not $IncludeM41F2DHarnessAuthority) { throw '[mir4-prefreeze-m41-f2d-f210-requires-f2d-harness]' }
     $links += @{path='releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json';kind='MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1'}
   }
+  $orderedF2DTargets = @('f200','f110','f100')
+  $requestedF2DTargets = @($M41F2DTargetRuntimeReplayTargets | ForEach-Object { ([string]$_).ToLowerInvariant() } | Sort-Object -Unique)
+  if (@($requestedF2DTargets | Where-Object { $_ -notin $orderedF2DTargets }).Count -ne 0) { throw '[mir4-prefreeze-m41-f2d-target-unsupported]' }
+  $acceptedF2DTargets = [Collections.Generic.List[string]]::new()
+  foreach ($target in $orderedF2DTargets) {
+    if ($target -notin $requestedF2DTargets) { continue }
+    if ($target -eq 'f200' -and -not $IncludeM41F2DF210RuntimeReplayAuthority) { throw '[mir4-prefreeze-m41-f2d-f200-requires-f210]' }
+    if ($target -eq 'f110' -and 'f200' -notin $acceptedF2DTargets) { throw '[mir4-prefreeze-m41-f2d-f110-requires-f200]' }
+    if ($target -eq 'f100' -and 'f110' -notin $acceptedF2DTargets) { throw '[mir4-prefreeze-m41-f2d-f100-requires-f110]' }
+    $code = $target.Substring(1).ToUpperInvariant()
+    $links += @{path="releases/migrations/MIR4-M41-F2D-F$code-Runtime-Replay-Authority-EvolutionV1.json";kind='MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'}
+    $acceptedF2DTargets.Add($target)
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -619,6 +633,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-runtime-replay-harness-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-f210-runtime-replay-authority-evolution-v1.schema.json'
+    'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -697,6 +712,7 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json';kind='MIR4M41F2CEditableSourceMaterializerAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json';kind='MIR4M41F2DRuntimeReplayHarnessAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json';kind='MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1'}
+    @{path='releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json';kind='MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'}
   )) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or

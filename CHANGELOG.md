@@ -15,6 +15,10 @@
   - F210 now selects the latest installed official Factorio 2.1 experimental engine while every execution binds the exact patch, executable, runtime API, prototype API, and changelog identities.
   - Every observed 2.1 engine or API identity change materializes twelve review tasks covering new APIs, implementation and functionality opportunities, compatibility, fixtures, performance, documentation, and the eventual stable transition.
   - The newly materialized 4.0.21000 F210 package passed fourteen exact-zip runtime scenarios and all five 3.2.11 upgrade archetypes, including first and second reloads, without authorizing package cutover.
+- Passed the exact Factorio 2.0 F2D runtime replay and enforced fixed historical-engine locks. [MIR4-CHG-2026-0009]
+  - F200 now rejects any Factorio executable whose product version, governed file version, or SHA-256 differs from the exact target authority; the independent verifier repeats that check.
+  - The newly materialized 4.0.20000 F200 package passed its exact-package smoke scenario and the 2.5.11 base-default upgrade through first and second reloads.
+  - The reusable target receipt writer records F200 and can advance F110 and F100 without cloning target-specific implementations; package cutover and every release gate remain false.
 
 ### Features
 
