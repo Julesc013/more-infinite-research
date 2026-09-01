@@ -25,6 +25,10 @@
   - The supported package-source command now reconstructs F210, F200, F110, and F100 from the accepted 89-file common layer, modern or legacy family layer, and minimal target overlay.
   - Two independent constructions per target produce byte-identical deterministic archives while every normalized path and raw file byte matches its immutable MIR 4.0 baseline.
   - Historical ZIP container bytes remain immutable bootstrap inputs and are deliberately distinguished from newly deterministic container bytes; runtime replay and a separate authority cutover remain mandatory.
+- Added the governed semantic source and target-overlay model for the four-target MIR 4.1 package-source cutover. [MIR4-CHG-2026-0006]
+  - All 406 accepted package-layer bindings now have an explicit semantic class, historical comparison source, future editable authority, materialization rule, and proof obligation.
+  - All 264 target-specific absences are explicit overlay omissions rather than inferred differences, including independent F110 and F100 dispositions.
+  - The model names the future src/mod, target registry, support policy, per-target overlay, and target materializer authorities while deliberately creating no editable package source and changing no current package writer.
 
 ## [4.0.0] - 2026-08-30
 

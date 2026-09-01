@@ -261,6 +261,34 @@ if([string]$shadowMaterializer.kind-cne'MIR4M41F2AShadowTargetMaterializerAuthor
    @($shadowMaterializer.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
   throw '[mir4-prefreeze-m41-f2a-shadow-target-materializer-authority]'
 }
+$shadowSourceModel=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$shadowSourceModel.kind-cne'MIR4M41F2BShadowSourceModelAuthorityEvolutionV1'-or
+   [string]$shadowSourceModel.status-cne'M41-F2B-SHADOW-SOURCE-MODEL-COMPLETE-NO-EDITABLE-SOURCE-NO-CUTOVER'-or
+   [string]$shadowSourceModel.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json'-or
+   [string]$shadowSourceModel.predecessor_receipt.sha256-cne'84209EA8150D0E2C93164E6A2667F9FD4CD347B031171CE0F55901D483664A48'-or
+   @($shadowSourceModel.evolved_bindings).Count-lt8-or
+   @($shadowSourceModel.current_authorities).Count-lt6-or
+   [int]$shadowSourceModel.source_model_proof.binding_count-ne406-or
+   [int]$shadowSourceModel.source_model_proof.target_count-ne4-or
+   [int]$shadowSourceModel.source_model_proof.omission_count-ne264-or
+   [int]$shadowSourceModel.source_model_proof.classification_counts.'common-semantic-source'-ne81-or
+   [int]$shadowSourceModel.source_model_proof.classification_counts.'common-asset-locale'-ne60-or
+   [int]$shadowSourceModel.source_model_proof.classification_counts.'target-overlay'-ne217-or
+   [int]$shadowSourceModel.source_model_proof.classification_counts.'target-replacement'-ne18-or
+   [int]$shadowSourceModel.source_model_proof.classification_counts.'target-compatibility-shim'-ne11-or
+   [string]$shadowSourceModel.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$shadowSourceModel.root_readme_sha256-or
+   -not[bool]$shadowSourceModel.invariants.all_paths_classified-or
+   -not[bool]$shadowSourceModel.invariants.no_path_collision-or
+   -not[bool]$shadowSourceModel.invariants.no_unowned_path-or
+   -not[bool]$shadowSourceModel.invariants.declaration_order_independent-or
+   -not[bool]$shadowSourceModel.invariants.no_target_policy_in_common_domain_code-or
+   -not[bool]$shadowSourceModel.invariants.current_writer_unchanged-or
+   -not[bool]$shadowSourceModel.invariants.no_editable_source_created-or
+   -not[bool]$shadowSourceModel.invariants.runtime_replay_pending-or
+   @($shadowSourceModel.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
+  throw '[mir4-prefreeze-m41-f2b-shadow-source-model-authority]'
+}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'

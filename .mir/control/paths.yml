@@ -61,6 +61,12 @@ paths:
   mir4.package-source.shadow-target-materializer-authority-evolution: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
   mir4.package-source.shadow-target-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2a-shadow-target-materializer-authority-evolution-v1.schema.json
   mir4.package-source.shadow-target-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2AShadowMaterializerAuthority.ps1
+  mir4.package-source.shadow-source-model-application: tools/mir/application/package/ShadowSourceModel.ps1
+  mir4.package-source.shadow-source-model-proof-schema: spec/schemas/mir4-shadow-source-model-proof-v1.schema.json
+  mir4.package-source.shadow-source-model-proof: validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1
+  mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
+  mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
+  mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

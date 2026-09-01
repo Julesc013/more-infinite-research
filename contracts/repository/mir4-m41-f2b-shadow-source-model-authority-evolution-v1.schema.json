@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "programme_id", "change_id", "predecessor_receipt", "base", "evolved_bindings", "current_authorities", "source_model_proof", "player_package_source_sha256", "root_readme_sha256", "package_visible_delta", "invariants", "transition_gate", "status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41F2BShadowSourceModelAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-F2B-SHADOW-SOURCE-MODEL"},
+    "change_id": {"const": "MIR4-CHG-2026-0006"},
+    "predecessor_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {
+      "path": {"const": "releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json"},
+      "sha256": {"const": "84209EA8150D0E2C93164E6A2667F9FD4CD347B031171CE0F55901D483664A48"}
+    }},
+    "base": {"type": "object", "additionalProperties": false, "required": ["branch", "commit", "tree"], "properties": {"branch": {"const": "dev"}, "commit": {"const": "d71138424f71e1c9ed43fffec210610953972043"}, "tree": {"const": "f5dde3ae849aea6cb0afc4b854fdd7ccbd95e4d0"}}},
+    "evolved_bindings": {"type": "array", "minItems": 8, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 6, "items": {"$ref": "#/$defs/current"}},
+    "source_model_proof": {"type": "object", "additionalProperties": false, "required": ["baseline_record_sha256", "proof_record_sha256", "binding_count", "target_count", "omission_count", "classification_counts", "declaration_order_probe_sha256", "physical_files", "unknown_paths", "package_files"], "properties": {
+      "baseline_record_sha256": {"const": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A"},
+      "proof_record_sha256": {"const": "077E0387E0610645A1B81C7805AC360595DE861891C8A3CBF8F05C4FAE42F4D6"},
+      "binding_count": {"const": 406},
+      "target_count": {"const": 4},
+      "omission_count": {"const": 264},
+      "classification_counts": {"type": "object", "additionalProperties": false, "required": ["common-semantic-source", "common-asset-locale", "generated-metadata", "generated-lifecycle-entrypoint", "target-overlay", "target-replacement", "target-omission", "target-compatibility-shim", "migration", "package-documentation"], "properties": {"common-semantic-source": {"const": 81}, "common-asset-locale": {"const": 60}, "generated-metadata": {"const": 4}, "generated-lifecycle-entrypoint": {"const": 5}, "target-overlay": {"const": 217}, "target-replacement": {"const": 18}, "target-omission": {"const": 264}, "target-compatibility-shim": {"const": 11}, "migration": {"const": 2}, "package-documentation": {"const": 8}}},
+      "declaration_order_probe_sha256": {"$ref": "#/$defs/sha256"},
+      "physical_files": {"type": "integer", "minimum": 1},
+      "unknown_paths": {"const": 0},
+      "package_files": {"const": 307}
+    }},
+    "player_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+    "root_readme_sha256": {"const": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947"},
+    "package_visible_delta": {"const": []},
+    "invariants": {"type": "object", "additionalProperties": false, "required": ["all_paths_classified", "no_path_collision", "no_unowned_path", "declaration_order_independent", "no_target_policy_in_common_domain_code", "historical_archives_are_comparison_fixtures_only", "current_writer_unchanged", "no_editable_source_created", "runtime_replay_pending", "package_source_unchanged", "root_readme_byte_stable"], "properties": {"all_paths_classified": {"const": true}, "no_path_collision": {"const": true}, "no_unowned_path": {"const": true}, "declaration_order_independent": {"const": true}, "no_target_policy_in_common_domain_code": {"const": true}, "historical_archives_are_comparison_fixtures_only": {"const": true}, "current_writer_unchanged": {"const": true}, "no_editable_source_created": {"const": true}, "runtime_replay_pending": {"const": true}, "package_source_unchanged": {"const": true}, "root_readme_byte_stable": {"const": true}}},
+    "transition_gate": {"$ref": "#/$defs/falseTransitions"},
+    "status": {"const": "M41-F2B-SHADOW-SOURCE-MODEL-COMPLETE-NO-EDITABLE-SOURCE-NO-CUTOVER"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "evolved": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "reason", "scope", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "reason": {"type": "string", "minLength": 8}, "scope": {"const": "package-excluded-shadow-source-model"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "current": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "role"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "role": {"type": "string", "minLength": 8}}},
+    "falseTransitions": {"type": "object", "additionalProperties": false, "required": ["merge", "source_move", "editable_source", "package_cutover", "readme_rewrite", "bridge_retirement", "old_writer_retirement", "tagging", "signing", "sealing", "version_allocation", "publication", "remote_write"], "properties": {"merge": {"const": false}, "source_move": {"const": false}, "editable_source": {"const": false}, "package_cutover": {"const": false}, "readme_rewrite": {"const": false}, "bridge_retirement": {"const": false}, "old_writer_retirement": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "version_allocation": {"const": false}, "publication": {"const": false}, "remote_write": {"const": false}}}
+  }
+}
