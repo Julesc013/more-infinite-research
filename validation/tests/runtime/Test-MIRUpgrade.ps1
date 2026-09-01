@@ -9,7 +9,9 @@ param(
   [ValidateSet("", "base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change", "affected-planet-discovery")]
   [string]$Archetype = "",
   [string[]]$SourceOnlyFixtureNames = @(),
-  [string]$OutputPath = ""
+  [string]$OutputPath = "",
+  [string]$WorkRoot = "",
+  [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'Always'
 )
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
@@ -70,7 +72,9 @@ function Copy-MIRUpgradeLogEvidence {
   param(
     [Parameter(Mandatory)][string]$Source,
     [Parameter(Mandatory)][string]$Destination,
-    [string]$FactorioBinaryPath = ""
+    [string]$FactorioBinaryPath = "",
+    [string]$ExpandedWorkPath = "",
+    [string]$RepositoryRootPath = ""
   )
   $factorioPaths = if ([string]::IsNullOrWhiteSpace($FactorioBinaryPath)) {
     @()
@@ -93,6 +97,16 @@ function Copy-MIRUpgradeLogEvidence {
         }
         foreach ($factorioInstallPath in $factorioInstallPaths) {
           $line = $line -replace [regex]::Escape($factorioInstallPath), '<factorio-install>'
+        }
+        if (-not [string]::IsNullOrWhiteSpace($ExpandedWorkPath)) {
+          foreach ($workPath in @($ExpandedWorkPath, $ExpandedWorkPath.Replace('\', '/'))) {
+            $line = $line -replace [regex]::Escape($workPath), '<upgrade-root>'
+          }
+        }
+        if (-not [string]::IsNullOrWhiteSpace($RepositoryRootPath)) {
+          foreach ($repoPath in @($RepositoryRootPath, $RepositoryRootPath.Replace('\', '/'))) {
+            $line = $line -replace [regex]::Escape($repoPath), '<repository-root>'
+          }
         }
         $line `
           -replace '(?i)[A-Z]:\\Program Files\\Steam\\steamapps\\common\\Factorio', '<factorio-install>' `
@@ -145,14 +159,28 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else 
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
-$generatedUpgradeRoot = Join-Path $RepoRoot "build\validation-upgrades"
+$generatedUpgradeRoot = if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
+  Join-Path $RepoRoot "build\validation-upgrades"
+} else {
+  if (-not [IO.Path]::IsPathRooted($WorkRoot)) { throw 'Upgrade -WorkRoot must be an absolute controlled path.' }
+  [IO.Path]::GetFullPath($WorkRoot)
+}
 New-Item -ItemType Directory -Force -Path $generatedUpgradeRoot | Out-Null
-$resolvedRepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path.TrimEnd("\") + "\"
 $resolvedUpgradeRoot = (Resolve-Path -LiteralPath $generatedUpgradeRoot).Path
-if (-not $resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)) {
-  throw "Generated upgrade root escapes the repository: $resolvedUpgradeRoot"
+if ([string]::IsNullOrWhiteSpace($WorkRoot)) {
+  $resolvedRepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path.TrimEnd("\") + "\"
+  if (-not $resolvedUpgradeRoot.StartsWith($resolvedRepoRoot, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Generated upgrade root escapes the repository: $resolvedUpgradeRoot"
+  }
 }
 $root = Join-Path $resolvedUpgradeRoot ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 16))
+$resolvedRoot = [IO.Path]::GetFullPath($root)
+$containmentPrefix = $resolvedUpgradeRoot.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+if (-not $resolvedRoot.StartsWith($containmentPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+  throw "Upgrade row root escapes the admitted work root: $resolvedRoot"
+}
+$runSucceeded = $false
+try {
 Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log") -Context "Upgrade Factorio log path"
 $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
@@ -250,7 +278,7 @@ if (-not $createText.Contains($sourceMarker)) {
   throw "MIR $FromVersion upgrade source proof marker is missing: $sourceMarker. Temporary root: $root"
 }
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
-Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
@@ -306,7 +334,7 @@ if (-not $loadText.Contains($loadMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-load.txt"
-Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence -FactorioBinaryPath $factorio
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
 $reloadEvidence = ""
 $secondReloadEvidence = ""
@@ -324,7 +352,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
   $reloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-reload.txt"
-  Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio
+  Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
   $secondReloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
   if ($secondReloadExitCode -ne 0) {
@@ -335,7 +363,7 @@ if ($requiresReloadProof) {
     throw "MIR $ToVersion upgraded-save second-reload proof marker is missing: $reloadMarker. Temporary root: $root"
   }
   $secondReloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-second-reload.txt"
-  Copy-MIRUpgradeLogEvidence -Source $log -Destination $secondReloadEvidence -FactorioBinaryPath $factorio
+  Copy-MIRUpgradeLogEvidence -Source $log -Destination $secondReloadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 }
 
 $assertions = if ($Archetype) {
@@ -408,8 +436,8 @@ $result = [ordered]@{
   archetype = if ($Archetype) { $Archetype } else { "default" }
   factorio_binary_version = $factorioVersionInfo.FileVersion
   factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
-  from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
-  to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
+  from = [ordered]@{ version = $FromVersion; path = (Split-Path -Leaf $from); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
+  to = [ordered]@{ version = $ToVersion; path = (Split-Path -Leaf $to); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   source_only_fixtures = @($SourceOnlyFixtureNames)
   assertions = $assertions
   create_log = (Split-Path -Leaf $createEvidence)
@@ -427,4 +455,37 @@ if ($secondReloadEvidence) {
 }
 $result | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
+$runSucceeded = $true
 Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $output"
+} finally {
+  $retained = $Retention -eq 'Always' -or (-not $runSucceeded -and $Retention -eq 'OnFailure')
+  $fileCount = 0
+  [int64]$bytes = 0
+  if (Test-Path -LiteralPath $resolvedRoot -PathType Container) {
+    foreach ($file in @(Get-ChildItem -LiteralPath $resolvedRoot -Recurse -File -Force -ErrorAction SilentlyContinue)) {
+      $fileCount++
+      $bytes += [int64]$file.Length
+    }
+    if (-not $retained) {
+      $verifiedRoot = [IO.Path]::GetFullPath((Resolve-Path -LiteralPath $resolvedRoot).Path)
+      if (-not $verifiedRoot.StartsWith($containmentPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing upgrade cleanup outside admitted work root: $verifiedRoot"
+      }
+      Remove-Item -LiteralPath $verifiedRoot -Recurse -Force
+    }
+  }
+  $cleanupReceipt = [ordered]@{
+    schema = 1
+    kind = 'MIRUpgradeExpandedRootCleanupV1'
+    status = if ($retained) { 'retained' } else { 'removed' }
+    retention = $Retention
+    run_status = if ($runSucceeded) { 'passed' } else { 'failed' }
+    admitted_work_root_sha256 = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($resolvedUpgradeRoot.ToLowerInvariant())))
+    expanded_root = Split-Path -Leaf $resolvedRoot
+    file_count = $fileCount
+    bytes = $bytes
+    contained = $true
+  }
+  $cleanupPath = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-cleanup.json"
+  [IO.File]::WriteAllText($cleanupPath, (($cleanupReceipt | ConvertTo-Json -Depth 8) + "`n"), [Text.UTF8Encoding]::new($false))
+}

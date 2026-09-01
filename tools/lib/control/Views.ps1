@@ -378,6 +378,13 @@ function New-MIRCPTodoLines {
     $lines.Add("| $(Format-MIRCPCode $workPackage.id) | $(Format-MIRCPCode $workPackage.completion_boundary) | $(Format-MIRCPCode $workPackage.state) | $(@($workPackage.depends_on) -join ', ') | $($workPackage.outcome) |")
   }
   foreach ($line in @(
+    "", "## Moving engine-channel obligations", "",
+    "| Target | Selector | State | Recurring obligation |", "| --- | --- | --- | --- |"
+  )) { $lines.Add($line) }
+  foreach ($channel in @($MIR4OperatingProgramme.engine_channels)) {
+    $lines.Add("| $(Format-MIRCPCode $channel.target) | $(Format-MIRCPCode $channel.selector) | $(Format-MIRCPCode $channel.state) | $($channel.recurring_obligation) |")
+  }
+  foreach ($line in @(
     "", "## Historical MIR 4.0 pre-freeze execution record", "",
     "Status: $(Format-MIRCPCode $MIR4ExecutionProgramme.status). Candidate state: $(Format-MIRCPCode $MIR4ExecutionProgramme.release_cut.candidate_state). Next dependency-ready turn: $(Format-MIRCPCode $MIR4ExecutionProgramme.next_dependency_ready_turn).", "",
     "| Turn | Work package | State | Dependencies | Human gate |", "| --- | --- | --- | --- | --- |"

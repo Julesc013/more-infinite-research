@@ -867,3 +867,15 @@ The F2B model is still observational and package-excluded. `src/mod`, target ove
 `tools/mir/application/package/TargetMaterializer.ps1` is the sole implementation that composes those authorities into a complete self-contained target tree. It has no historical-package input and verifies every source and output byte before writing only under ignored build roots. `materialize-check` performs independent A/B builds for F210, F200, F110, and F100 and rejects a missing or stale proof. The immutable 4.0 archives remain comparison fixtures used only by assurance, never by the production materializer.
 
 F2C creates editable shadow source authority but does not cut over the player-package writer. Root package files, package membership, release construction, runtime qualification, migrations, signing, sealing, tagging, and publication remain unchanged. A later succession receipt must prove exact-engine fresh load, reload, direct upgrade, second reload, rollback, and package-source cutover before the legacy writer can become read-only or retire.
+
+## Factorio 2.1 experimental-channel boundary
+
+`spec/engines/mir4-factorio-2.1-experimental-channel-v1.json` owns the live F210 engine selector until the first official 2.1 stable release. `tools/lib/validation/FactorioVersionPolicy.ps1` is the single resolver and review-packet implementation, and `tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1` is its thin public-CLI adapter. The selector follows the latest installed official Steam experimental build; it does not grant authority to download, replace, or mutate an engine installation.
+
+Selection is moving, while execution evidence is exact. The resolver chooses one admitted 2.1 patch before context materialization, after which the existing assurance and Control Plane checks compare the exact selected version and binary identity. Cross-version evidence reuse is forbidden. Detected binary or API drift creates package-excluded review tasks and opportunity candidates; it does not mutate player source, raise a support claim, change a compatibility floor, allocate a version, or authorize release activity by itself. Historical engine receipts remain immutable.
+
+## MIR 4 F2D runtime replay boundary
+
+`tools/mir/application/package/RuntimeReplay.ps1` is the M41-F2D coordinator. It composes the accepted `TargetMaterializer`, runtime validation facade, and upgrade matrix with external-root admission, evidence redaction, resource accounting, custody, and contained cleanup. `RuntimeReplayVerifier.ps1` is the separate-process verifier. Neither application owns package semantics, runtime assertions, upgrade fixtures, or target policy, and neither may cut over or retire a package writer.
+
+An F2D target proof is exact to its source manifest, target overlay, generated archive content, predecessor, engine executable, fresh-load matrix, upgrade archetypes, first reload, and second reload. Passing work is removed only after pre-cleanup custody and independent verification; failed or ambiguous `OnFailure` work remains for classification. Every F2D transition gate remains false until a later four-target aggregate explicitly unlocks F2E.

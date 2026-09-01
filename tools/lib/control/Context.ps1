@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot "../validation/FactorioVersionPolicy.ps1")
+
 function Get-MIRCPReleaseTransitionForContext {
   param(
     [Parameter(Mandatory)][string]$Release,
@@ -445,6 +447,7 @@ function New-MIRCPVerificationContext {
   $targetProfilePath = Join-Path $repo "validation/profiles/factorio-$Target.json"
   $baseTargetProfile = Get-Content -Raw -LiteralPath $targetProfilePath | ConvertFrom-Json
   $targetProfile = Resolve-MIRCPTargetProfileForRelease -BaseProfile $baseTargetProfile -ReleaseRecord $releaseRecord -RepoRoot $repo
+  $targetProfile = Resolve-MIR4FactorioQualificationProfile -Profile $targetProfile -FactorioBin $FactorioBin -RepoRoot $repo
   $targetProfileContent = (($targetProfile | ConvertTo-Json -Depth 40) + "`n").Replace("`r`n", "`n")
   $targetProfileSha256 = Get-MIRCPSha256Text -Value $targetProfileContent
   $factorioIdentity = if ([string]::IsNullOrWhiteSpace($FactorioBin)) { $null } else { Get-MIRCPFactorioIdentity -FactorioBin $FactorioBin }

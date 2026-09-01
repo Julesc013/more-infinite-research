@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-factorio-2.1-experimental-channel-v1.schema.json",
+  "title": "MIR 4 Factorio 2.1 experimental channel policy V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "target", "selection", "execution_evidence", "change_review", "current_review"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4Factorio21ExperimentalChannelV1"},
+    "status": {"const": "active-until-first-official-2.1-stable"},
+    "target": {"const": "f210"},
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factorio_line", "channel", "source", "patch_pinned", "minimum_version", "rule", "stable_transition"],
+      "properties": {
+        "factorio_line": {"const": "2.1"},
+        "channel": {"const": "latest-experimental"},
+        "source": {"const": "official-steam-current-installation"},
+        "patch_pinned": {"const": false},
+        "minimum_version": {"pattern": "^2\\.1\\.[0-9]+$"},
+        "rule": {"const": "select-latest-installed-official-2.1-experimental"},
+        "stable_transition": {"const": "stop-and-reopen-policy-when-official-2.1-stable-appears"}
+      }
+    },
+    "execution_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_version_required", "binary_sha256_required", "api_document_sha256_required", "cross_version_reuse"],
+      "properties": {
+        "exact_version_required": {"const": true},
+        "binary_sha256_required": {"const": true},
+        "api_document_sha256_required": {"const": true},
+        "cross_version_reuse": {"const": false}
+      }
+    },
+    "change_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trigger", "workflow", "required_tasks"],
+      "properties": {
+        "trigger": {"const": "version-binary-or-api-identity-change"},
+        "workflow": {"const": ".github/workflows/assurance-scheduled.yml#factorio-2-1-channel-review"},
+        "required_tasks": {"type": "array", "minItems": 8, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"}}
+      }
+    },
+    "current_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reviewed_at", "previous_version", "version", "file_version", "binary_sha256", "runtime_api", "prototype_api", "changelog_sha256", "review_tasks", "findings"],
+      "properties": {
+        "status": {"const": "reviewed-current-observation"},
+        "reviewed_at": {"type": "string", "format": "date"},
+        "previous_version": {"pattern": "^2\\.1\\.[0-9]+$"},
+        "version": {"pattern": "^2\\.1\\.[0-9]+$"},
+        "file_version": {"pattern": "^2\\.1\\.[0-9]+(?:\\.[0-9]+)?$"},
+        "binary_sha256": {"pattern": "^[0-9A-F]{64}$"},
+        "runtime_api": {"$ref": "#/$defs/apiIdentity"},
+        "prototype_api": {"$ref": "#/$defs/apiIdentity"},
+        "changelog_sha256": {"pattern": "^[0-9A-F]{64}$"},
+        "review_tasks": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "status", "disposition"],
+            "properties": {"id": {"type": "string"}, "status": {"const": "complete"}, "disposition": {"type": "string", "minLength": 8}}
+          }
+        },
+        "findings": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "apiIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["application_version", "sha256", "surface_count"],
+      "properties": {
+        "application_version": {"pattern": "^2\\.1\\.[0-9]+$"},
+        "sha256": {"pattern": "^[0-9A-F]{64}$"},
+        "surface_count": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "kind": "MIR4Factorio21ExperimentalChannelV1",
+  "status": "active-until-first-official-2.1-stable",
+  "target": "f210",
+  "selection": {
+    "factorio_line": "2.1",
+    "channel": "latest-experimental",
+    "source": "official-steam-current-installation",
+    "patch_pinned": false,
+    "minimum_version": "2.1.8",
+    "rule": "select-latest-installed-official-2.1-experimental",
+    "stable_transition": "stop-and-reopen-policy-when-official-2.1-stable-appears"
+  },
+  "execution_evidence": {
+    "exact_version_required": true,
+    "binary_sha256_required": true,
+    "api_document_sha256_required": true,
+    "cross_version_reuse": false
+  },
+  "change_review": {
+    "trigger": "version-binary-or-api-identity-change",
+    "workflow": ".github/workflows/assurance-scheduled.yml#factorio-2-1-channel-review",
+    "required_tasks": [
+      "capture-exact-engine-identity",
+      "diff-release-notes",
+      "diff-runtime-api",
+      "diff-prototype-api",
+      "review-removals-and-deprecations",
+      "review-implementation-opportunities",
+      "review-functionality-opportunities",
+      "review-fixture-and-test-impact",
+      "review-runtime-upgrade-and-performance-impact",
+      "review-documentation-locale-and-ui-impact",
+      "review-minimum-mod-compatibility",
+      "check-official-stable-transition"
+    ]
+  },
+  "current_review": {
+    "status": "reviewed-current-observation",
+    "reviewed_at": "2026-09-01",
+    "previous_version": "2.1.14",
+    "version": "2.1.17",
+    "file_version": "2.1.17.87315",
+    "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+    "runtime_api": {"application_version": "2.1.17", "sha256": "2E1FD436404B712AF6FE7B6C53E21A8F5688092A9E132FD2A5571327A96E5211", "surface_count": 382},
+    "prototype_api": {"application_version": "2.1.17", "sha256": "156F33CB4BC7EE2C538BB93F291F5270F2CDC45BE654BBE6F226E402BF8F5368", "surface_count": 982},
+    "changelog_sha256": "10CC3B613AD653B11FBDA0A6D9D9CE2FD9D7EA334B5240707AE4F5FA58EFE07C",
+    "review_tasks": [
+      {"id": "capture-exact-engine-identity", "status": "complete", "disposition": "Recorded 2.1.17.87315 and the exact executable and API-document digests."},
+      {"id": "diff-release-notes", "status": "complete", "disposition": "Reviewed the installed 2.1.15, 2.1.16, and 2.1.17 entries relative to 2.1.14."},
+      {"id": "diff-runtime-api", "status": "complete", "disposition": "Reviewed the 2.1.15 scripting additions and replacements; no current MIR call site requires an immediate compatibility edit."},
+      {"id": "diff-prototype-api", "status": "complete", "disposition": "Reviewed new ghost and rocket-silo fields plus circuit-connector moves; MIR has no current references to the removed fields."},
+      {"id": "review-removals-and-deprecations", "status": "complete", "disposition": "Repository search found no LuaGroup, LuaSimulation widget, or removed circuit-connector field dependency."},
+      {"id": "review-implementation-opportunities", "status": "complete", "disposition": "LuaEntity potential_effects is retained as a future Inspector and effect-observability opportunity, not an F2D semantic change."},
+      {"id": "review-functionality-opportunities", "status": "complete", "disposition": "LuaControl opened, completed platform trips, and on_next_day_started do not improve the current package fixed-point scope; reconsider in integration work."},
+      {"id": "review-fixture-and-test-impact", "status": "complete", "disposition": "F210 replay must retain prerequisite and current-research assertions because 2.1.15 changed a Space Age technology prerequisite and 2.1.17 fixed lab-set research state."},
+      {"id": "review-runtime-upgrade-and-performance-impact", "status": "complete", "disposition": "No direct API migration is required; exact 2.1.17 fresh-load, upgrade, two-reload, and performance evidence cannot reuse 2.1.14 execution proof."},
+      {"id": "review-documentation-locale-and-ui-impact", "status": "complete", "disposition": "No immediate player-facing text change is required; new GUI-opening support remains a future read-only Inspector candidate."},
+      {"id": "review-minimum-mod-compatibility", "status": "complete", "disposition": "The 2.1.8 floor remains valid for the reproduced 4.0.21000 product; future use of newer APIs may raise the declared floor through a qualified change."},
+      {"id": "check-official-stable-transition", "status": "complete", "disposition": "The governing decision remains latest experimental until a separately confirmed official 2.1 stable transition triggers maintainer review."}
+    ],
+    "findings": [
+      "2.1.15 added EntityPrototype.ghost_build_sound and broadened RocketSiloPrototype.rocket_parts_storage_cap.",
+      "2.1.15 moved circuit-connector render-layer fields and removed their older type-specific locations.",
+      "2.1.15 added LuaEntity.potential_effects, LuaSpacePlatform.completed_trips, and on_next_day_started, and replaced LuaGroup with LuaItemGroup and LuaItemSubGroup.",
+      "2.1.15 changed a Space Age technology prerequisite; 2.1.17 fixed lab-set active-research state, both of which reinforce F2D prerequisite and research-state replay coverage.",
+      "No reviewed 2.1.15-2.1.17 API change requires an immediate MIR package semantic change. Opportunity candidates remain explicit and deferred rather than silently ignored."
+    ]
+  }
+}

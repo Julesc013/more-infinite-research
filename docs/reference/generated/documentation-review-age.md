@@ -123,7 +123,7 @@ Ages are measured against the newest governed review date, 2026-09-01, so checko
 | docs/capabilities/tile-surfaces.md | draft | 2026-07-07 | 56 | current-window |
 | docs/compatibility/backport-ledger.md | current | 2026-07-11 | 52 | current-window |
 | docs/compatibility/campaigns/factorio-2.0-lane.md | draft | 2026-07-07 | 56 | current-window |
-| docs/compatibility/campaigns/factorio-2.1-lane.md | current | 2026-07-07 | 56 | current-window |
+| docs/compatibility/campaigns/factorio-2.1-lane.md | current | 2026-09-01 | 0 | current-window |
 | docs/compatibility/campaigns/README.md | current | 2026-07-07 | 56 | current-window |
 | docs/compatibility/claim-levels.md | current | 2026-07-23 | 40 | current-window |
 | docs/compatibility/compatibility-matrix.md | current | 2026-07-07 | 56 | current-window |
@@ -161,7 +161,7 @@ Ages are measured against the newest governed review date, 2026-09-01, so checko
 | docs/developer/processir.md | current | 2026-08-26 | 6 | current-window |
 | docs/developer/publishing-an-extension.md | current | 2026-08-26 | 6 | current-window |
 | docs/developer/README.md | current | 2026-08-26 | 6 | current-window |
-| docs/developer/testing-against-factorio.md | current | 2026-08-26 | 6 | current-window |
+| docs/developer/testing-against-factorio.md | current | 2026-09-01 | 0 | current-window |
 | docs/developer/v0-to-v1-migration.md | current | 2026-08-26 | 6 | current-window |
 | docs/explanation/README.md | current | 2026-08-31 | 1 | current-window |
 | docs/how-to/README.md | current | 2026-08-31 | 1 | current-window |
@@ -178,12 +178,14 @@ Ages are measured against the newest governed review date, 2026-09-01, so checko
 | docs/maintainer/build-and-package.md | current | 2026-07-20 | 43 | current-window |
 | docs/maintainer/developer-tools.md | current | 2026-08-03 | 29 | current-window |
 | docs/maintainer/documentation-governance.md | current | 2026-08-26 | 6 | current-window |
+| docs/maintainer/factorio-2.1-experimental-channel.md | current | 2026-09-01 | 0 | current-window |
 | docs/maintainer/fixture-workflow.md | current | 2026-07-07 | 56 | current-window |
 | docs/maintainer/localization.md | current | 2026-08-03 | 29 | current-window |
 | docs/maintainer/manual-test-plan.md | current | 2026-07-21 | 42 | current-window |
 | docs/maintainer/mir3-terminal-repository-protections.md | current | 2026-08-15 | 17 | current-window |
 | docs/maintainer/mir4-authority-map.md | current | 2026-08-31 | 1 | current-window |
 | docs/maintainer/mir4-continuity.md | current | 2026-08-26 | 6 | current-window |
+| docs/maintainer/mir4-f2d-runtime-replay.md | current | 2026-09-01 | 0 | current-window |
 | docs/maintainer/mir4-full-platform-closeout.md | current | 2026-08-24 | 8 | current-window |
 | docs/maintainer/mir4-m4c01-runbook.md | current | 2026-08-18 | 14 | current-window |
 | docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-08-29 | 3 | current-window |
@@ -209,7 +211,7 @@ Ages are measured against the newest governed review date, 2026-09-01, so checko
 | docs/reference/asset-sources.md | current | 2026-07-23 | 40 | current-window |
 | docs/reference/compiler-authority-table.md | current | 2026-08-03 | 29 | current-window |
 | docs/reference/compiler-diagnostics.md | current | 2026-07-13 | 50 | current-window |
-| docs/reference/factorio-api-proof-points.md | current | 2026-07-20 | 43 | current-window |
+| docs/reference/factorio-api-proof-points.md | current | 2026-09-01 | 0 | current-window |
 | docs/reference/factorio-integration-reference.md | current | 2026-07-07 | 56 | current-window |
 | docs/reference/generated-id-reference.md | current | 2026-07-07 | 56 | current-window |
 | docs/reference/generated/compiler-schema-registry.md | current | 2026-08-18 | 14 | current-window |

@@ -409,6 +409,7 @@ function Get-MIRAssuranceContext {
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }
   $candidate = Resolve-MIRAssurancePath -Path $candidateOption
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
+  $verificationProfile = Resolve-MIR4FactorioQualificationProfile -Profile $verificationProfile -FactorioBin $factorio -RepoRoot $repo
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")
   $mods = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--mods" -Default ([string]$env:MIR_MOD_LIBRARY))

@@ -47,6 +47,7 @@ Usage:
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
+  .\tools\mir.ps1 mir4 factorio-2.1-channel <inspect|check> [--factorio <path>] [--output <path>]
   .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
@@ -62,7 +63,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check> [--target <f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -690,15 +691,32 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($output)) { $repositoryArguments.OutputPath = $output }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1") @repositoryArguments
       }
-      "package-source" {
-        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, or materialize-check." }
+      "factorio-2.1-channel" {
+        if ($Args.Count -lt 3) { throw "mir4 factorio-2.1-channel requires inspect or check." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+        if ($subcommand -notin @('inspect','check')) { throw "Unknown mir4 factorio-2.1-channel command: $subcommand" }
+        $channelArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
+        $factorio = Get-MIRArgValue -Items $Args -Name '--factorio'
+        $output = Get-MIRArgValue -Items $Args -Name '--output'
+        if (-not [string]::IsNullOrWhiteSpace($factorio)) { $channelArguments.FactorioBin = $factorio }
+        if (-not [string]::IsNullOrWhiteSpace($output)) { $channelArguments.OutputPath = $output }
+        & (Join-Path $repo "tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1") @channelArguments
+      }
+      "package-source" {
+        if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, materialize-check, runtime-replay, or runtime-replay-check." }
+        $subcommand = [string]$Args[2]
+        if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')) { throw "Unknown mir4 package-source command: $subcommand" }
         $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
         $output = Get-MIRArgValue -Items $Args -Name '--output'
         if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }
         $target = Get-MIRArgValue -Items $Args -Name '--target'
         if (-not [string]::IsNullOrWhiteSpace($target)) { $packageSourceArguments.Target = $target }
+        $candidateId = Get-MIRArgValue -Items $Args -Name '--candidate-id'
+        if (-not [string]::IsNullOrWhiteSpace($candidateId)) { $packageSourceArguments.CandidateId = $candidateId }
+        foreach ($option in @(@{name='--factorio';property='FactorioBin'},@{name='--work-root';property='WorkRoot'},@{name='--evidence-root';property='EvidenceRoot'},@{name='--retention';property='Retention'})) {
+          $value = Get-MIRArgValue -Items $Args -Name $option.name
+          if (-not [string]::IsNullOrWhiteSpace($value)) { $packageSourceArguments[$option.property] = $value }
+        }
         & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PackageSource.ps1") @packageSourceArguments
       }
       "canonicalization-migration" {
