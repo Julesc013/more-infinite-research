@@ -71,10 +71,12 @@ $currentRoles = [ordered]@{
   'tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1'='stream-default-writer'
   'tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1'='documentation-cutover-receipt-writer'
   'tools/lib/mir4/PreFreezeRelease.ps1'='append-only-authority-validator'
+  'tools/mir/application/repository/RepositoryCharacterization.ps1'='current-repository-characterization'
   'validation/tests.yml'='executable-test-catalogue'
   'validation/tests/compiler/Test-MIRSettingsVisibility.ps1'='stream-default-conformance'
   'validation/tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1'='documentation-cutover-conformance'
   'validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1'='historical-custody-and-current-succession-conformance'
+  'validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1'='current-repository-characterization-conformance'
 }
 $currentAuthorities = @(
   foreach ($entry in $currentRoles.GetEnumerator()) {

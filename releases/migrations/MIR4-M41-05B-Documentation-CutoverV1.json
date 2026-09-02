@@ -305,7 +305,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1",
-      "sha256": "C1236D7002C2B726757A2820C386A5DE7BA7287D16A82C035656FA06303A16FF",
+      "sha256": "F7B22A4E64C57CE468701051A25A512F7ECC627959872E79957D7F101BF40BDE",
       "hash_mode": "canonical-text-v1",
       "role": "documentation-cutover-receipt-writer",
       "package_visible": false,
@@ -316,6 +316,14 @@
       "sha256": "1A0E3AB6A717CCC6BE32FE4360D7612ACA28BA97016EA13AD9E7C7E5F19E5FA8",
       "hash_mode": "canonical-text-v1",
       "role": "append-only-authority-validator",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "sha256": "3A2301D8C2EAA4FCD64AF1A7B616D31184FE08170E4AE01A506DA2AFB901B465",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-repository-characterization",
       "package_visible": false,
       "release_authority": false
     },
@@ -350,6 +358,14 @@
       "role": "historical-custody-and-current-succession-conformance",
       "package_visible": false,
       "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "sha256": "13D151E0712CF4DBD8CED99AB69402C89A88747453EE6A9C4921D11C19F808CB",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-repository-characterization-conformance",
+      "package_visible": false,
+      "release_authority": false
     }
   ],
   "invariants": {
@@ -368,5 +384,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE",
-  "record_sha256": "E9355EB3754485AE9CD536FD19241499634232F0BC8B1193D591AC4DAD41E930"
+  "record_sha256": "41DA3E5346D719AB36279EDA535ACD9E193E03F4C9DC64B7903B6594654B3C5B"
 }

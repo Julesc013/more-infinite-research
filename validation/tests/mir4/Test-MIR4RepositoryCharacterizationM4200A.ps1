@@ -10,7 +10,7 @@ function Assert-MIR4CharacterizationV1 {
 }
 
 $expectedPackage='632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'
-$expectedReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
+$expectedReadme='403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20'
 $output='build/reports/repository-characterization'
 
 $authority=Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo
@@ -41,14 +41,14 @@ Assert-MIR4CharacterizationV1 (@($manifest.transition_gate.PSObject.Properties|W
 
 $package=Get-Content -Raw -LiteralPath (Join-Path $repo "$output/package-membership.json")|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 (@($package.files|Where-Object{[string]$_.path -ceq 'README.md'}).Count -eq 0) 'mir4-characterization-readme-membership'
-Assert-MIR4CharacterizationV1 (-not [bool]$package.root_readme.package_visible -and [string]$package.root_readme.disposition -ceq 'repository-documentation-package-excluded-awaiting-m41-05b-rewrite') 'mir4-characterization-readme-disposition'
+Assert-MIR4CharacterizationV1 (-not [bool]$package.root_readme.package_visible -and [string]$package.root_readme.disposition -ceq 'repository-documentation-package-excluded-m41-05b-complete') 'mir4-characterization-readme-disposition'
 
 $bridge=Get-Content -Raw -LiteralPath (Join-Path $repo "$output/bridge-expiry.json")|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 (@($bridge.bridges|Where-Object{[bool]$_.deletion_authorized}).Count -eq 0) 'mir4-characterization-bridge-deletion'
 Assert-MIR4CharacterizationV1 ([int]$bridge.summary.retirement_ready -eq 0) 'mir4-characterization-bridge-retirement'
 
 $programme=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/mir4-4x-operating-programme-v1.json')|ConvertFrom-Json
-Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -eq 'M41-05' -and $_.state -eq 'active'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-00' -and $_.state -eq 'complete'}).Count -eq 1) 'mir4-characterization-programme-subpackages'
+Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -eq 'M41-05' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-00' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-01' -and $_.state -eq 'active'}).Count -eq 1) 'mir4-characterization-programme-subpackages'
 Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M42-00','M42-01','M42-02') -and $_.completion_boundary -eq '4.1.0'}).Count -eq 3) 'mir4-41-physical-fixed-point-boundary'
 Assert-MIR4CharacterizationV1 ([string]@($programme.outcome_trains|Where-Object candidate -eq '4.2.0')[0].outcome -match 'Integration kernel') 'mir4-42-integration-boundary'
 
