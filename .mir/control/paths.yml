@@ -91,6 +91,10 @@ paths:
   mir4.package-source.f2e-receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
   mir4.package-source.f2e-receipt-schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
   mir4.package-source.f2e-proof: tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
+  mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
+  mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
+  mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1
+  mir4.m42-02.stream-compiler.test: tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

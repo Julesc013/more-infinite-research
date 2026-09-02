@@ -1058,6 +1058,53 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $baseContinuationsReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $streamCompilerReceiptPath = 'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $streamCompilerReceiptPath) -PathType Leaf) {
+    $streamCompiler = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $streamCompilerReceiptPath -Kind 'MIR4M4202StreamCompilerDecompositionV1'
+    if ([string]$streamCompiler.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$streamCompiler.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$streamCompiler.predecessor.record_sha256 -cne [string]$baseContinuations.record_sha256 -or
+        [string]$streamCompiler.predecessor.package_source_sha256 -cne [string]$baseContinuations.package_authority.package_source_sha256) {
+      throw '[mir4-prefreeze-m42-02-l3-predecessor]'
+    }
+    $streamCompilerEvolvedPaths = @{}
+    $streamCompilerEnrollmentBaselines = @{
+      'spec/schemas/mir4-package-source-manifest-v1.schema.json' = 'A8B04D8ADE76EF2718F88EF7E0B47ABA4B3699377B8FB054C99C43BA1C4358E8'
+      'tests/repository/Test-MIR4RepositoryFixedPoint.ps1' = 'B3A535D84A910E776F4F76F5D1DB3E97381EED817A439AF90C7D2AF16BF92254'
+    }
+    foreach ($binding in @($streamCompiler.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $streamCompilerEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$streamCompilerEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-l3-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if (-not $authorityHashes.ContainsKey($path) -or
+          [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $streamCompilerEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-l3-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $streamCompilerEvolvedPaths[$path] = $true
+    }
+    if ($streamCompilerEvolvedPaths.Count -ne 12 -or
+        [string]$streamCompiler.responsibility -cne 'stream-compiler' -or
+        [string]$streamCompiler.status -cne 'M42-02-L3-STREAM-COMPILER-DECOMPOSED') {
+      throw '[mir4-prefreeze-m42-02-l3-scope]'
+    }
+    foreach ($property in $streamCompiler.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l3-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $streamCompilerReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

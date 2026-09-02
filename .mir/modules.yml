@@ -1123,6 +1123,11 @@ modules:
     - prototypes/mir/planner/base_continuations.lua
     - prototypes/mir/planner/base_continuation_builder.lua
     - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/planner/stream_compiler/compile.lua
+    - prototypes/mir/planner/stream_compiler/diagnostics.lua
+    - prototypes/mir/planner/stream_compiler/discover.lua
+    - prototypes/mir/planner/stream_compiler/ownership.lua
+    - prototypes/mir/planner/stream_compiler/qualify.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
