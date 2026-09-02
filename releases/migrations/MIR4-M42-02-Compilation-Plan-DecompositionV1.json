@@ -9,8 +9,59 @@
   "predecessor": {
     "work_package": "M42-01",
     "receipt": "releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json",
+    "receipt_sha256": "A27ABD652775F39E5F880A3A65D3EE4D006BFAC6352473C3B87D629450A0C3C5",
     "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"
   },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "A9305CBC2FF8F92D1A797C6035C6DE150F71EF3D28F04B0F2D696F2B12EE6A40",
+      "current_sha256": "43148BD64301B2A1F3CDEBAD2AB6AE8C3FEE5721E7C3AD4E9F8CC162AC1948B9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "EDEAE7E1E4AE226E58A8CA66CDC241D2EA51DDD48C7CB73531D5D28DEBF448E7",
+      "current_sha256": "2EF3DA41982B4A327AEC5B9F8C8F3BCE534287C07A2E8ADEF8A0C9C5F8160A63",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "previous_sha256": "D36D0BCBC2E880982DBE978E56C2BF62DF7DDCC8AF08EBCF3CF2B44F5A60E732",
+      "current_sha256": "9C772D2D310EF3C1EE57DC80E88A58AFB5F37C3EB32A97AA2AD05F21DBAFD0AD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "A02635793012FF06F82A3056C9851D4500935DFC9126782747D1D727A0B8645D",
+      "current_sha256": "2D7EA6EB31F13F50F9B01E8090AA474B64D9FB44368DEF60582F4590CFCB6D2E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
+      "current_sha256": "B954AE3C880EC13113F7D60ED49033E30796298254FACE62E5013587289F517A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "514D66D65F55F9F8FA95832285DE34BC110952202AEBA87223C6812E04BED1D1",
+      "current_sha256": "6C1FCE904525AEF1E9F2D6477E7157F2ADB3DF720D7D29A548890127F400DF08",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
   "responsibility": "compilation-plan",
   "facade": "prototypes/mir/planner/compilation_plan.lua",
   "modules": [
@@ -222,5 +273,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-L2-BASE-CONTINUATIONS",
-  "record_sha256": "EB6972F9C3E00374C5AEF5DEDFF8B014D1E39B48DCFD0B2FE330E01C0CDF3830"
+  "record_sha256": "9929C3E42B40511947A9E14D6C3AB831A0DECB89B31F3ADC8C9105BF10A73869"
 }

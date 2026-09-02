@@ -20,6 +20,11 @@ function Get-MIR4M4202FileIdentity {
   return [pscustomobject][ordered]@{path=$RelativePath;bytes=[int64]$bytes.Length;sha256=(Get-MIR4Sha256Bytes -Bytes $bytes);lines=@([IO.File]::ReadAllLines($path)).Count}
 }
 
+function Get-MIR4M4202TextSha256 {
+  param([Parameter(Mandatory)][string]$RelativePath)
+  return Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $RelativePath)
+}
+
 function ConvertTo-MIR4M4202Json {
   param([Parameter(Mandatory)]$Record)
   return (($Record|ConvertTo-Json -Depth 100).Replace("`r`n","`n")+"`n")
@@ -151,7 +156,15 @@ $receipt=[pscustomobject][ordered]@{
   kind='MIR4M4202CompilationPlanDecompositionV1'
   status='M42-02-L1-COMPILATION-PLAN-DECOMPOSED'
   starting_dev=[pscustomobject][ordered]@{commit='9ad319d5dc48e27c61a7a6c92f1f0d70f832cb56';tree='b445deca9973a377d2b42d2ba7cdbfe6706fd384'}
-  predecessor=[pscustomobject][ordered]@{work_package='M42-01';receipt='releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json';package_source_sha256='632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'}
+  predecessor=[pscustomobject][ordered]@{work_package='M42-01';receipt='releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json';receipt_sha256='A27ABD652775F39E5F880A3A65D3EE4D006BFAC6352473C3B87D629450A0C3C5';package_source_sha256='632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'}
+  evolved_bindings=@(
+    [pscustomobject][ordered]@{path='.mir/assurance.json';previous_sha256='A9305CBC2FF8F92D1A797C6035C6DE150F71EF3D28F04B0F2D696F2B12EE6A40';current_sha256=(Get-MIR4M4202TextSha256 '.mir/assurance.json');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+    [pscustomobject][ordered]@{path='assurance/catalog/tests.json';previous_sha256='EDEAE7E1E4AE226E58A8CA66CDC241D2EA51DDD48C7CB73531D5D28DEBF448E7';current_sha256=(Get-MIR4M4202TextSha256 'assurance/catalog/tests.json');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+    [pscustomobject][ordered]@{path='tests/mir4/Test-MIR4EditableSourceMaterializer.ps1';previous_sha256='D36D0BCBC2E880982DBE978E56C2BF62DF7DDCC8AF08EBCF3CF2B44F5A60E732';current_sha256=(Get-MIR4M4202TextSha256 'tests/mir4/Test-MIR4EditableSourceMaterializer.ps1');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+    [pscustomobject][ordered]@{path='tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1';previous_sha256='A02635793012FF06F82A3056C9851D4500935DFC9126782747D1D727A0B8645D';current_sha256=(Get-MIR4M4202TextSha256 'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+    [pscustomobject][ordered]@{path='tools/lib/mir4/PreFreezeRelease.ps1';previous_sha256='B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A';current_sha256=(Get-MIR4M4202TextSha256 'tools/lib/mir4/PreFreezeRelease.ps1');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+    [pscustomobject][ordered]@{path='validation/tests.yml';previous_sha256='514D66D65F55F9F8FA95832285DE34BC110952202AEBA87223C6812E04BED1D1';current_sha256=(Get-MIR4M4202TextSha256 'validation/tests.yml');hash_mode='canonical-text-v1';package_visible=$false;release_authority=$false}
+  )
   responsibility='compilation-plan'
   facade='prototypes/mir/planner/compilation_plan.lua'
   modules=$moduleRows

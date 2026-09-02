@@ -80,7 +80,18 @@ foreach ($path in @($migrationPaths + @($authority.visible_roots | ForEach-Objec
 $currentPackageSourceSha256 = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 Assert-MIR4RepositoryMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $currentPackageSourceSha256) 'mir4-repository-migration-package-fingerprint'
 $f2eReceipt = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json'
-Assert-MIR4RepositoryMigrationV1 ([string]$f2eReceipt.verification.package_source_sha256 -ceq $currentPackageSourceSha256) 'mir4-repository-migration-f2e-successor-fingerprint'
+$f2ePackageSourceSha256=[string]$f2eReceipt.verification.package_source_sha256
+if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
+  $m4202Path='releases/migrations/MIR4-M42-02-Compilation-Plan-DecompositionV1.json'
+  $m4202SchemaPath='contracts/repository/mir4-m42-02-compilation-plan-decomposition-v1.schema.json'
+  $m4202Raw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202Path)
+  Assert-MIR4RepositoryMigrationV1 ($m4202Raw|Test-Json -SchemaFile (Join-Path $repo $m4202SchemaPath)) 'mir4-repository-migration-m42-02-successor-schema'
+  $m4202=$m4202Raw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202) 'mir4-repository-migration-m42-02-successor-record'
+  Assert-MIR4RepositoryMigrationV1 ([string]$m4202.predecessor.package_source_sha256-ceq$f2ePackageSourceSha256-and[string]$m4202.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-successor-fingerprint'
+  Assert-MIR4RepositoryMigrationV1 ([string]$m4202.status-ceq'M42-02-L1-COMPILATION-PLAN-DECOMPOSED'-and[string]$m4202.responsibility-ceq'compilation-plan') 'mir4-repository-migration-m42-02-successor-scope'
+  Assert-MIR4RepositoryMigrationV1 (@($m4202.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-release-firewall'
+}
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-historical-package-fingerprint'
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest
