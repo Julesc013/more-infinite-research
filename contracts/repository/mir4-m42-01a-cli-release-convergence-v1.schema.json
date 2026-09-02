@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-m42-01a-cli-release-convergence-v1.schema.json",
   "type": "object",
-  "required": ["schema","kind","status","recorded_at","programme_id","change_id","predecessor_receipt","base","command_inventory","release_application_dag","package_source_sha256","invariants","transition_gate","next_fixed_point","record_sha256"],
+  "required": ["schema","kind","status","recorded_at","programme_id","change_id","predecessor_receipt","base","command_inventory","release_application_dag","package_source_sha256","evolved_bindings","current_authorities","invariants","transition_gate","next_fixed_point","record_sha256"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4M4201ACliReleaseConvergenceV1"},

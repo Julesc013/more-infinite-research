@@ -2287,8 +2287,8 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4201ACliReleaseConvergenceAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "E13AFBA20B0D368D03AA70F162096EFE08170B219791CE6893080E8B015BCB07",
-      "lines": 68,
+      "sha256": "8B48D34E0B1E0A97833858769A44044902491460EF0BC8F9A3A501400DAE9300",
+      "lines": 80,
       "package_visible": false
     },
     {
@@ -2980,8 +2980,8 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "1A0E3AB6A717CCC6BE32FE4360D7612ACA28BA97016EA13AD9E7C7E5F19E5FA8",
-      "lines": 1685,
+      "sha256": "66CB0BD604F12F341F85194A7E1AE7D8682C68DBAFB3741DF507A5E77A8F8464",
+      "lines": 1731,
       "package_visible": false
     },
     {
@@ -4003,5 +4003,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:43198a45623ff96f2ee7fdd942617e5c48e3f7490991c9671eb217936588318a"
+  "digest": "sha256:22dc9088515e350a6eb1bd05ffce36f8918eb401cf0aad8a8b8523b81abc7bcb"
 }
