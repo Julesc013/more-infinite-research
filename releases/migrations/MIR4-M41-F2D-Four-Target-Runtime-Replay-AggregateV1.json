@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4M41F2DFourTargetRuntimeReplayAggregateV1",
-  "recorded_at": "2026-09-02T15:10:04.5213027+10:00",
+  "recorded_at": "2026-09-02T15:32:52.8923050+10:00",
   "programme_id": "M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-AGGREGATE",
   "change_id": "MIR4-CHG-2026-0012",
   "predecessor_receipt": {
@@ -12,8 +12,8 @@
     "branch": "dev",
     "authority_base_commit": "f6cef04f90affb0acec8a82808fa57c412358976",
     "authority_base_tree": "0b4ac7a6ca2aac7b299ab8a10cfc84b3d0a7da67",
-    "aggregation_commit": "4c9b7a871333b3ab8842f08ebb9e20420e6cef8a",
-    "aggregation_tree": "b69691c9ab6814f3dc47f555bccf04138e32dcb2"
+    "aggregation_commit": "48329773e9dd406d1ad0d9603e6870cf4a82a188",
+    "aggregation_tree": "af4b0333ca564245ef38e5eae288db33f364d9a5"
   },
   "evolved_bindings": [
     {
@@ -92,6 +92,15 @@
       "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
       "previous_sha256": "A503DA9CADBE00CAC222548B21AF0771A5150A0837A0B54CF9A67FBDB7C9450C",
       "current_sha256": "126A514013382ACDCEB7EADEB89157C81D72670FC2F1274AE299879A842F3E40",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "EE641E56C56313C01528015C468E7366288F07840546217DA7C081D62C49D221",
+      "current_sha256": "AE418FC320CECF2FD589E10F7DB39674A37105DB258C0C705F421E6CA6275A08",
       "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
       "scope": "package-excluded-four-target-runtime-aggregate",
       "package_visible": false,
