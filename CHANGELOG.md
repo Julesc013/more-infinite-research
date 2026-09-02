@@ -23,6 +23,10 @@
   - The shared fixed-engine resolver now treats optional fields in older release records explicitly and binds F110 to the accepted 1.1.110.62357 availability observation without weakening its executable digest lock.
   - The newly materialized 4.0.11000 F110 package passed its exact-package smoke scenario and the 1.9.9 base-default upgrade through first and second reloads.
   - Independent verification and external custody passed before expanded work was released; F100 and the four-target aggregate remain pending and every cutover and release gate remains false.
+- Passed exact Factorio 1.0 F2D replay, completing all target lanes. [MIR4-CHG-2026-0011]
+  - The materialized 4.0.10000 package matched the accepted 174-entry tree under exact Factorio 1.0.0.54889.
+  - Its exact-package smoke and 1.8.9 base-default upgrade passed through two reloads, independent verification, and custody.
+  - Expanded success work was released; four target lanes are complete while aggregate, cutover, allocation, and release gates remain closed.
 
 ### Features
 
