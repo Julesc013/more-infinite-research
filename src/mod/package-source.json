@@ -5165,10 +5165,55 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership.lua",
       "transform": "copy-exact-bytes",
-      "source_bytes": 15564,
-      "source_sha256": "FA2E3571659F896D244BFFF7C40534ECDE875C6A5487CF8A188A81CF75AE9DC7",
-      "output_bytes": 15564,
-      "output_sha256": "FA2E3571659F896D244BFFF7C40534ECDE875C6A5487CF8A188A81CF75AE9DC7"
+      "source_bytes": 284,
+      "source_sha256": "4B3496EBDF62489D5324D354B239B0557995A2CF969836E2427387EC1AF10C61",
+      "output_bytes": 284,
+      "output_sha256": "4B3496EBDF62489D5324D354B239B0557995A2CF969836E2427387EC1AF10C61"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/effect_ownership/facts.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/facts.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4805,
+      "source_sha256": "16E62371B676F11918EC009DC5FF552A40C4C6F73769C124D826F2236A3A660E",
+      "output_bytes": 4805,
+      "output_sha256": "16E62371B676F11918EC009DC5FF552A40C4C6F73769C124D826F2236A3A660E"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/effect_ownership/resolution.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/resolution.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 3986,
+      "source_sha256": "E33118C4BADBF5549A59FB045046E2C8E973772CA600E28AA35D228FF7827EB0",
+      "output_bytes": 3986,
+      "output_sha256": "E33118C4BADBF5549A59FB045046E2C8E973772CA600E28AA35D228FF7827EB0"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 7260,
+      "source_sha256": "56CCB43B63147E977CB1519545A4920FB1DF963296E20FC6F00184ACA8953AB8",
+      "output_bytes": 7260,
+      "output_sha256": "56CCB43B63147E977CB1519545A4920FB1DF963296E20FC6F00184ACA8953AB8"
     },
     {
       "layer": "families.modern",
@@ -6655,5 +6700,5 @@
     "no_target_full_source_copy": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "5E1313F5E080612F88A12D988DBFA0ED3DD2C79D1FC377A38F3C4CEA7BDFDD91"
+  "record_sha256": "1FD5CF248AC2B25FAA46CB68AB8A4A80D0A5C8A053775691B73B1277EB0FD427"
 }

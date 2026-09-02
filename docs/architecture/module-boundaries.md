@@ -891,3 +891,9 @@ Selection is moving, while execution evidence is exact. The resolver chooses one
 An F2D target proof is exact to its source manifest, target overlay, generated archive content, predecessor, engine executable, fresh-load matrix, upgrade archetypes, first reload, and second reload. Passing work is removed only after pre-cleanup custody and independent verification; failed or ambiguous `OnFailure` work remains for classification. Every F2D transition gate remains false until a later four-target aggregate explicitly unlocks F2E.
 
 F210 continues to resolve through the reviewed moving experimental-channel authority. F200, F110, and F100 instead resolve their fixed version and executable digest from the golden target baseline, with a predecessor release record supplying an exact file/build version when that record governs one. Both the coordinator and the independent verifier enforce the resulting identity. `Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1` is the one package-excluded writer for new F200/F110/F100 target receipts; the accepted F210 writer and receipt remain immutable compatibility history.
+
+## MIR 4 effect-ownership decomposition boundary
+
+`prototypes/mir/planner/effect_ownership.lua` remains the stable public planner facade for modern targets. Its `facts` module owns immutable row and operation facts, ordering, gate derivation, and effect identities; `resolution` owns row-level owner conflict resolution; and `planned_operations` owns conflict resolution across an assembled compilation plan. The facade delegates only `resolve` and `resolve_operations` and owns no independent planning behavior.
+
+This M42-02 L5 split is behavior preserving and applies only to F210 and F200. F110 and F100 packages remain byte-identical to their accepted baselines. The decomposition grants no new prototype mutation, gameplay, compatibility, package, release, version-allocation, signing, sealing, or publication authority.

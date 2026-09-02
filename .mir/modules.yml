@@ -1133,6 +1133,9 @@ modules:
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/effect_ownership.lua
+    - prototypes/mir/planner/effect_ownership/facts.lua
+    - prototypes/mir/planner/effect_ownership/resolution.lua
+    - prototypes/mir/planner/effect_ownership/planned_operations.lua
     - prototypes/mir/planner/native_modifiers.lua
     - prototypes/mir/planner/native_owner_binding.lua
     - prototypes/mir/planner/prerequisites.lua

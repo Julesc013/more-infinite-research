@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "starting_dev", "predecessor", "evolved_bindings", "responsibility", "facade", "modules", "package_authority", "target_proof", "runtime_proof", "exact_package_delta", "preservation", "size_disposition", "remaining", "transition_gate", "next_fixed_point", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4202EffectOwnershipDecompositionV1"},
+    "status": {"const": "M42-02-L5-EFFECT-OWNERSHIP-DECOMPOSED"},
+    "starting_dev": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {"commit": {"const": "798f8408d689b7574377109e9d4aad3c0b47273b"}, "tree": {"const": "43ef895d022f44e3073b674c7c38acfb139b4231"}}},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["work_package", "receipt", "receipt_sha256", "record_sha256", "package_source_sha256"], "properties": {"work_package": {"const": "M42-02-L4"}, "receipt": {"const": "releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json"}, "receipt_sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}}},
+    "evolved_bindings": {"type": "array", "minItems": 15, "maxItems": 15, "items": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "package_visible", "release_authority"], "properties": {"path": {"enum": [".mir/assurance.json", ".mir/control/paths.yml", ".mir/modules.yml", "assurance/catalog/tests.json", "governance/automation/mir4-command-inventory-v1.json", "spec/schemas/mir4-package-source-manifest-v1.schema.json", "tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1", "tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202.ps1", "tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1", "tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1", "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1", "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1", "tests/repository/Test-MIR4RepositoryFixedPoint.ps1", "tools/lib/mir4/PreFreezeRelease.ps1", "validation/tests.yml"]}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "package_visible": {"const": false}, "release_authority": {"const": false}}}},
+    "responsibility": {"const": "effect-ownership"},
+    "facade": {"const": "prototypes/mir/planner/effect_ownership.lua"},
+    "modules": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "object", "additionalProperties": false, "required": ["output_path", "source_path", "bytes", "lines", "sha256"], "properties": {"output_path": {"type": "string", "pattern": "^prototypes/mir/planner/effect_ownership(?:/[^/]+)?[.]lua$"}, "source_path": {"type": "string", "pattern": "^src/mod/families/modern/prototypes/mir/planner/effect_ownership(?:/[^/]+)?[.]lua$"}, "bytes": {"type": "integer", "minimum": 1}, "lines": {"type": "integer", "minimum": 1}, "sha256": {"$ref": "#/$defs/sha256"}}}},
+    "package_authority": {"type": "object", "additionalProperties": false, "required": ["source_manifest_sha256", "package_authority_sha256", "package_source_sha256"], "properties": {"source_manifest_sha256": {"$ref": "#/$defs/sha256"}, "package_authority_sha256": {"$ref": "#/$defs/sha256"}, "package_source_sha256": {"$ref": "#/$defs/sha256"}}},
+    "target_proof": {"type": "array", "minItems": 4, "maxItems": 4},
+    "runtime_proof": {"type": "object", "additionalProperties": false, "required": ["schema", "kind", "source", "engine", "candidate", "scenario", "custody", "cross_patch_reuse", "transition_gate"], "properties": {
+      "schema": {"const": 1},
+      "kind": {"const": "MIR4M4202EffectOwnershipRuntimeProofV1"},
+      "source": {"type": "object"},
+      "engine": {"type": "object", "required": ["selection", "version", "file_version", "binary_sha256", "runtime_api_sha256", "prototype_api_sha256", "changelog_sha256", "review_status"], "properties": {"selection": {"const": "latest-installed-official-2.1-experimental"}, "version": {"type": "string", "pattern": "^2[.]1[.]"}, "file_version": {"type": "string", "minLength": 1}, "binary_sha256": {"$ref": "#/$defs/sha256"}, "runtime_api_sha256": {"$ref": "#/$defs/sha256"}, "prototype_api_sha256": {"$ref": "#/$defs/sha256"}, "changelog_sha256": {"$ref": "#/$defs/sha256"}, "review_status": {"const": "current-reviewed"}}},
+      "candidate": {"type": "object", "required": ["target", "distribution_version", "archive_sha256", "content_sha256", "entries", "package_source_sha256"], "properties": {"target": {"const": "f210"}, "distribution_version": {"const": "4.0.21000"}, "archive_sha256": {"$ref": "#/$defs/sha256"}, "content_sha256": {"$ref": "#/$defs/sha256"}, "entries": {"const": 327}, "package_source_sha256": {"$ref": "#/$defs/sha256"}}},
+      "scenario": {"type": "object", "required": ["name", "status", "assertions_executed", "summary_sha256", "redacted_log_sha256", "raw_log_sha256"], "properties": {"name": {"const": "compiler-contracts"}, "status": {"const": "passed"}, "assertions_executed": {"type": "integer", "minimum": 1}, "summary_sha256": {"$ref": "#/$defs/sha256"}, "redacted_log_sha256": {"$ref": "#/$defs/sha256"}, "raw_log_sha256": {"$ref": "#/$defs/sha256"}}},
+      "custody": {"type": "object", "required": ["logical_root", "manifest_sha256", "evidence_files", "evidence_bytes", "raw_log_retained"], "properties": {"logical_root": {"type": "string", "pattern": "^MIR_EVIDENCE_HOME/"}, "manifest_sha256": {"$ref": "#/$defs/sha256"}, "evidence_files": {"const": 4}, "evidence_bytes": {"type": "integer", "minimum": 1}, "raw_log_retained": {"const": false}}},
+      "cross_patch_reuse": {"const": false},
+      "transition_gate": {"$ref": "#/$defs/transitionGate"}
+    }},
+    "exact_package_delta": {"type": "object", "additionalProperties": false, "required": ["f210", "f200", "f110", "f100"], "properties": {"f210": {"type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true}, "f200": {"type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true}, "f110": {"const": []}, "f100": {"const": []}}},
+    "preservation": {"type": "object", "additionalProperties": false, "required": ["semantics", "plans", "mutation_journals", "diagnostics", "stable_ids", "settings", "migrations", "saves", "compatibility_claims", "legacy_targets", "historical_4_0_baseline"], "properties": {"semantics": {"const": true}, "plans": {"const": true}, "mutation_journals": {"const": true}, "diagnostics": {"const": true}, "stable_ids": {"const": true}, "settings": {"const": true}, "migrations": {"const": true}, "saves": {"const": true}, "compatibility_claims": {"const": true}, "legacy_targets": {"const": true}, "historical_4_0_baseline": {"const": true}}},
+    "size_disposition": {"type": "object", "additionalProperties": false, "required": ["former_lines", "facade_lines", "facts_lines", "resolution_lines", "planned_operations_lines", "state"], "properties": {"former_lines": {"const": 409}, "facade_lines": {"type": "integer", "maximum": 15}, "facts_lines": {"type": "integer", "maximum": 160}, "resolution_lines": {"type": "integer", "maximum": 140}, "planned_operations_lines": {"type": "integer", "maximum": 220}, "state": {"const": "bounded-facts-row-resolution-planned-operation-resolution"}}},
+    "remaining": {"type": "object", "additionalProperties": false, "required": ["lua", "powershell"], "properties": {"lua": {"const": ["compiler-orchestrator"]}, "powershell": {"const": "pending-bounded-characterization"}}},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "next_fixed_point": {"const": "M42-02-L6-COMPILER-ORCHESTRATOR"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "transitionGate": {"type": "object", "additionalProperties": false, "required": ["version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}
