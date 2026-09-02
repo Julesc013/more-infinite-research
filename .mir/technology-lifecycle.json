@@ -59,10 +59,10 @@
     "catalog_export": "tools/commands/technology/Export-MIRTechnologyCatalog.ps1",
     "quality_assessment": "tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1",
     "review_dossier": "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1",
-    "promotion_admission": "validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1",
+    "promotion_admission": "tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1",
     "quality_profiles": ".mir/technology-quality-profiles.json",
     "design_diff": "tools/commands/technology/Compare-MIRTechnologyDesigns.ps1",
     "lifecycle_record": "tools/commands/technology/New-MIRTechnologyLifecycleRecord.ps1",
-    "validation": "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"
+    "validation": "tests/compiler/Test-MIRTechnologyLifecycle.ps1"
   }
 }

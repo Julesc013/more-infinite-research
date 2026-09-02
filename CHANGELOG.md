@@ -43,6 +43,10 @@
   - tools/mir.ps1 is now a thin sole public facade over one package-excluded command router and a generated command inventory classifies every PowerShell implementation without unknown entries.
   - One non-production release application DAG now owns intent, freeze, target impact, build, qualification, acceptance, rehearsal, readback, restore, and reporting while preserving the existing idempotent phase engine.
   - The historical release workflow command is a bounded compatibility wrapper, the publisher cannot build or check out source, and all version, signing, tag, seal, promotion, and publication gates remain false.
+- Converged executable tests, proof catalogues, and workflow purposes behind one governed authority. [MIR4-CHG-2026-0016]
+  - Canonical executable PowerShell tests now live under tests/, while validation/tests retains only three bounded historical compatibility forwarders.
+  - The public CLI deterministically regenerates and checks current test-authority projections, the executable proof catalogue, the workflow-purpose catalogue, and the command inventory.
+  - Release workflows route through the release application entry point, stable required-check names are retained, the publisher still cannot build, and all release-transition gates remain false.
 
 ### Features
 

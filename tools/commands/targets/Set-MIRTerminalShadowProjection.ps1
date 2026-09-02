@@ -1152,7 +1152,7 @@ $startMarker
     assertion_path: $fixtureRoot
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "$preDot5Version"
     target_candidate: not-assigned
     archetypes:

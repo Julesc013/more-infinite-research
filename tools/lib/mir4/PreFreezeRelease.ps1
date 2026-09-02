@@ -642,6 +642,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json' = 'contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json'
     'releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json' = 'contracts/repository/mir4-m41-05b-documentation-cutover-v1.schema.json'
     'releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json' = 'contracts/repository/mir4-m42-01a-cli-release-convergence-v1.schema.json'
+    'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json' = 'contracts/repository/mir4-m42-01b-test-workflow-convergence-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -915,6 +916,64 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-01a-transition] $($property.Name)" }
     }
     $priorReceiptPath = $cliReleaseReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $testWorkflowReceiptPath = 'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $testWorkflowReceiptPath) -PathType Leaf) {
+    $testWorkflow = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $testWorkflowReceiptPath -Kind 'MIR4M4201BTestWorkflowConvergenceV1'
+    if ([string]$testWorkflow.predecessor_receipt.path -cne $priorReceiptPath -or
+        [string]$testWorkflow.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
+      throw '[mir4-prefreeze-m42-01b-predecessor]'
+    }
+    foreach ($binding in @($testWorkflow.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256) -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority) {
+        throw "[mir4-prefreeze-m42-01b-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+    }
+    foreach ($binding in @($testWorkflow.projection_bindings)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256) {
+        throw "[mir4-prefreeze-m42-01b-projection-binding] $path"
+      }
+      if ([bool]$binding.package_visible -or [bool]$binding.release_authority) { throw "[mir4-prefreeze-m42-01b-projection-boundary] $path" }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+    }
+    foreach ($binding in @($testWorkflow.relocated_bindings)) {
+      $fromPath = [string]$binding.from_path
+      $toPath = [string]$binding.to_path
+      if ($fromPath -notmatch '^validation/tests/.+\.ps1$' -or $toPath -notmatch '^tests/.+\.ps1$' -or
+          (Test-Path -LiteralPath (Join-Path $repo $fromPath)) -or
+          -not (Test-Path -LiteralPath (Join-Path $repo $toPath) -PathType Leaf) -or
+          (Get-MIR4PreFreezeFileSha256 -Path (Join-Path $repo $toPath) -Mode ([string]$binding.hash_mode)) -cne [string]$binding.current_sha256 -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority) {
+        throw "[mir4-prefreeze-m42-01b-relocation] $fromPath"
+      }
+      if ($authorityHashes.ContainsKey($fromPath)) {
+        [void]$authorityHashes.Remove($fromPath)
+        [void]$authorityHashModes.Remove($fromPath)
+        $authorityHashes[$toPath] = [string]$binding.current_sha256
+        $authorityHashModes[$toPath] = [string]$binding.hash_mode
+      }
+    }
+    foreach ($binding in @($testWorkflow.current_authorities)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.sha256) {
+        throw "[mir4-prefreeze-m42-01b-current-authority-evolution-missing] $path"
+      }
+      if ([bool]$binding.package_visible -or [bool]$binding.release_authority) { throw "[mir4-prefreeze-m42-01b-current-authority-boundary] $path" }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+    }
+    if (@($testWorkflow.invariants.PSObject.Properties | Where-Object { -not [bool]$_.Value }).Count -ne 0) { throw '[mir4-prefreeze-m42-01b-invariants]' }
+    foreach ($property in $testWorkflow.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-01b-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $testWorkflowReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()

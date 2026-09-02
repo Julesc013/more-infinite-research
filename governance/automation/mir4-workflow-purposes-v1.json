@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "kind": "MIR4WorkflowPurposeCatalogueV1",
+  "state": "M42-01-CANONICAL",
+  "public_purposes": [
+    "ci",
+    "qualification",
+    "release",
+    "nightly",
+    "governance"
+  ],
+  "workflow_count": 22,
+  "workflows": [
+    {
+      "file": ".github/workflows/action-transport-smoke.yml",
+      "name": "Action Transport Smoke",
+      "purpose": "ci",
+      "surface": "public",
+      "invocation": "github-action-contract",
+      "sha256": "7EA72BCE49CA2946AC477BCCFD4EAF9D40D4AE8CD8490EB6601F183F4E4BA0B2"
+    },
+    {
+      "file": ".github/workflows/assurance-backport.yml",
+      "name": "Assurance Backport Matrix",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "E27E6D01A083AF7A46FEEE11F754B8E095296DBE1840DC28BFAA178D27D9F0B5"
+    },
+    {
+      "file": ".github/workflows/assurance-full.yml",
+      "name": "Assurance Full Qualification",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "reusable-workflow",
+      "sha256": "60C1E09BB20D624E45906C0AC0AF1CB1FF7993C4491665ABBB56F00F088610F1"
+    },
+    {
+      "file": ".github/workflows/assurance-promotion.yml",
+      "name": "Assurance Promotion Check",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "F3DDD9608FD2659FA6B9C04883425BB9AC0FDB1AF6515047A717C2BC8E94240E"
+    },
+    {
+      "file": ".github/workflows/assurance-scheduled.yml",
+      "name": "Assurance Scheduled Breadth",
+      "purpose": "nightly",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "744AB438F612D5396B843895755F2BD7820CF9EB493A8922D88ADE5E7925CB1B"
+    },
+    {
+      "file": ".github/workflows/assurance-targeted.yml",
+      "name": "Assurance Targeted Runtime",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "A7C432B94B46B81490052DF05A4903BDB9158B382D0E3C0FA1A83D090B3AFA42"
+    },
+    {
+      "file": ".github/workflows/branch-policy.yml",
+      "name": "Branch Policy",
+      "purpose": "governance",
+      "surface": "public",
+      "invocation": "canonical-governance-test",
+      "sha256": "86E70DC5C06959A2C2716DC842DB32C69B78A273756A089368157C8A61C7A3B8"
+    },
+    {
+      "file": ".github/workflows/control-plane-v5.yml",
+      "name": "MIR Control Plane v5",
+      "purpose": "qualification",
+      "surface": "private-reusable",
+      "invocation": "private-reusable-workflow",
+      "sha256": "F45594DA81F08FB57745040B14F5F738FE4816A66BA175BE445762839FF1234F"
+    },
+    {
+      "file": ".github/workflows/emergency-package.yml",
+      "name": "MIR Emergency Package",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "AF3B982EE58208149F3E4B737CFEAA0BEC8CC3B1E206DA7A741D4E3DDAEF4E49"
+    },
+    {
+      "file": ".github/workflows/extended-compat-audit.yml",
+      "name": "Extended Factorio Compatibility Audit",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "compatibility-audit-adapter",
+      "sha256": "BA5E6D74DA4B414036F1D2F2E9D1BF10F529FA88E39B7897CAA38A4D4A99D58F"
+    },
+    {
+      "file": ".github/workflows/mir4-independent-verification.yml",
+      "name": "MIR4 Independent Verification",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "4F4BB35F7A52E281DF96DAB49CE4706A0B09BE7FDE3F95990EE5D45F1CA01F94"
+    },
+    {
+      "file": ".github/workflows/mir4-preview-assets.yml",
+      "name": "MIR4 Preview Assets",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "FCBDC1C22A5EDD09A7457D01E8465356265057491177206244FA221988423345"
+    },
+    {
+      "file": ".github/workflows/mir4-promotion.yml",
+      "name": "MIR4 Promotion",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "D4EC7D09FA55A577F0B4220785B1EFA32A4B15BB99CB96B2016142927AB2789E"
+    },
+    {
+      "file": ".github/workflows/mir4-public-readback.yml",
+      "name": "MIR4 Public Readback",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "A238E9EC51DE4F1E01EF692AFC79EAA90AD6BA65B451BBA2092A2701479054FB"
+    },
+    {
+      "file": ".github/workflows/mir4-release-seal.yml",
+      "name": "MIR4 Release Seal",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "ADA2D2E774656D70277F884FE8F845E02CA3B372C6CFD6441CB469AE521E65B8"
+    },
+    {
+      "file": ".github/workflows/mir4-restore-drill.yml",
+      "name": "MIR4 Restore Drill",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "DABDF1615033DF45098D0A67FE59A3EABAA78CF78762B10BD8AA31790E39BC01"
+    },
+    {
+      "file": ".github/workflows/mir4-source-freeze.yml",
+      "name": "MIR4 Source Freeze",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "BE2066BE450A537F56D38DC2B37F2AAAE222D323E4F4D524B17585A1761D2859"
+    },
+    {
+      "file": ".github/workflows/mir4-target-build.yml",
+      "name": "MIR4 Target Build",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "7EBEB8A49F9D68E33F8A04739621CBF3EE9EAA163EE5B3CD17AD1F9A9751BB83"
+    },
+    {
+      "file": ".github/workflows/mir4-target-publication.yml",
+      "name": "MIR4 Target Publication",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "confined-publisher-client",
+      "sha256": "D8259EDDA2C8B01D2FBD4DC53E2AD841D028A5FC610BB2396E6A236F55D1891A"
+    },
+    {
+      "file": ".github/workflows/mir4-target-qualification.yml",
+      "name": "MIR4 Target Qualification",
+      "purpose": "qualification",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "E86FED992B7E0C94F10B6508A276A2390D4D322CB61AF6D7D468DA244A0EFC8E"
+    },
+    {
+      "file": ".github/workflows/release-candidate.yml",
+      "name": "Release Candidate Gate",
+      "purpose": "release",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "E8D63D687601D1889CAB08619FF08897E92416BF57B56FD87A7268F2B99D49DC"
+    },
+    {
+      "file": ".github/workflows/validate.yml",
+      "name": "MIR",
+      "purpose": "ci",
+      "surface": "public",
+      "invocation": "public-mir-cli",
+      "sha256": "5A6FB2CD13CE97420018908D9707B5D0C068AD7203BD12ADC107B1B8630315FC"
+    }
+  ],
+  "summary": {
+    "purposes": {
+      "ci": 2,
+      "qualification": 8,
+      "release": 10,
+      "nightly": 1,
+      "governance": 1
+    },
+    "unclassified": 0,
+    "stable_required_checks": [
+      "MIR",
+      "Branch Policy"
+    ],
+    "publisher_can_build": false,
+    "release_phase_public_cli_routes": 9
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "digest": "sha256:a3b35dd6bdee9a86644a2a81bb77b67a2640e10429fe6efdf98cf63896202336"
+}

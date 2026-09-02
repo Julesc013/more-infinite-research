@@ -45,7 +45,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 release-engine <show|check|phase> [--phase <id>] [release identity options]
-  .\tools\mir.ps1 mir4 tooling <inventory|inventory-check>
+  .\tools\mir.ps1 mir4 tooling <inventory|inventory-check|test-authority|test-authority-check|tests|tests-check|workflows|workflows-check>
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
@@ -608,7 +608,7 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($factorioBin)) { $runtimeArguments.FactorioBin = $factorioBin }
         if (-not [string]::IsNullOrWhiteSpace($candidate)) { $runtimeArguments.CandidateZip = $candidate }
         if (-not [string]::IsNullOrWhiteSpace($evidence)) { $runtimeArguments.EvidenceRoot = $evidence }
-        & (Join-Path $repo "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
+        & (Join-Path $repo "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1") @runtimeArguments
       }
       { $_ -in @("api", "sdk") } {
         if ($Args.Count -lt 3) { throw "mir4 $verb requires a subcommand." }
@@ -687,9 +687,9 @@ switch ($area) {
         & (Join-Path $repo 'tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1') @releaseArguments
       }
       "tooling" {
-        if ($Args.Count -lt 3) { throw "mir4 tooling requires inventory or inventory-check." }
+        if ($Args.Count -lt 3) { throw "mir4 tooling requires inventory, inventory-check, test-authority, test-authority-check, tests, tests-check, workflows, or workflows-check." }
         $subcommand = [string]$Args[2]
-        if ($subcommand -notin @('inventory','inventory-check')) { throw "Unknown mir4 tooling command: $subcommand" }
+        if ($subcommand -notin @('inventory','inventory-check','test-authority','test-authority-check','tests','tests-check','workflows','workflows-check')) { throw "Unknown mir4 tooling command: $subcommand" }
         & (Join-Path $repo 'tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1') -Command $subcommand -RepoRoot $repo.Path
       }
       "patch-rehearsal" {

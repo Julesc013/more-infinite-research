@@ -49,7 +49,7 @@ package_excluded_modules:
     implementation: tools/mir/application/repository/RepositoryCharacterization.ps1
     command: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
     public_facade: tools/mir.ps1
-    proof: validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1
+    proof: tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1
     output: build/reports/repository-characterization
     package_visible: false
     deletion_authority: false
@@ -59,7 +59,7 @@ package_excluded_modules:
     receipt: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
     receipt_schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
     writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1
-    proof: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+    proof: tests/mir4/Test-MIR4PreFreezeHardening.ps1
     package_visible: false
     package_cutover_authority: false
     release_transition_authority: false
@@ -69,7 +69,7 @@ package_excluded_modules:
     implementation: tools/mir/application/package/GoldenTargetBaselines.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
-    proof: validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+    proof: tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
     immutable_archives:
       - dist/more-infinite-research_4.0.21000.zip
       - dist/more-infinite-research_4.0.20000.zip
@@ -85,8 +85,8 @@ package_excluded_modules:
     receipt_schema: contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json
     writer: tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority.ps1
     proof:
-      - validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
-      - validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+      - tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+      - tests/mir4/Test-MIR4PreFreezeHardening.ps1
     package_visible: false
     package_cutover_authority: false
     release_transition_authority: false
@@ -96,7 +96,7 @@ package_excluded_modules:
     implementation: tools/mir/application/package/ShadowTargetMaterializer.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
-    proof: validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
+    proof: tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
     proof_schema: spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json
     output: build/mir4/package-source/shadow-materializer-v1
     algorithm: golden-archive-byte-bootstrap-common-family-target-overlay-v1
@@ -111,8 +111,8 @@ package_excluded_modules:
     receipt_schema: contracts/repository/mir4-m41-f2a-shadow-target-materializer-authority-evolution-v1.schema.json
     writer: tools/commands/mir4/Update-MIR4M41F2AShadowMaterializerAuthority.ps1
     proof:
-      - validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
-      - validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+      - tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
+      - tests/mir4/Test-MIR4PreFreezeHardening.ps1
     package_visible: false
     package_cutover_authority: false
     release_transition_authority: false
@@ -122,7 +122,7 @@ package_excluded_modules:
     implementation: tools/mir/application/package/ShadowSourceModel.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
-    proof: validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1
+    proof: tests/mir4/Test-MIR4ShadowSourceModel.ps1
     proof_schema: spec/schemas/mir4-shadow-source-model-proof-v1.schema.json
     output: build/reports/package-source/mir4-shadow-source-model-v1.json
     algorithm: semantic-common-family-target-overlay-and-omission-model-v1
@@ -138,8 +138,8 @@ package_excluded_modules:
     receipt_schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
     writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
     proof:
-      - validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1
-      - validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+      - tests/mir4/Test-MIR4ShadowSourceModel.ps1
+      - tests/mir4/Test-MIR4PreFreezeHardening.ps1
     package_visible: false
     editable_source_authority: false
     package_cutover_authority: false
@@ -162,8 +162,8 @@ package_excluded_modules:
     implementation: tools/mir/application/package/TargetMaterializer.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
-    proof: validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
-    cutover_proof: validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
+    proof: tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
+    cutover_proof: tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
     cutover_verifier: tools/mir/application/package/PackageAuthorityVerifier.ps1
     cutover_receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
     cutover_receipt_schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
@@ -276,7 +276,7 @@ package_excluded_modules:
     application: tools/mir/application/release/PatchLaneRehearsal.ps1
     command: tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1
     receipt: releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json
-    test: validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
+    test: tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
     authority_evolution_receipt: releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json
     authority_evolution_schema: contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json
     authority_evolution_writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
@@ -327,11 +327,11 @@ package_excluded_modules:
       - spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
       - contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     tests:
-      - validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
-      - validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
-      - validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
-      - validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
+      - tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+      - tests/mir4/Test-MIR4SupplyChainAttestation.ps1
+      - tests/mir4/Test-MIR4ReleaseCapsule.ps1
+      - tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+      - tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
     documentation: docs/maintainer/mir4-supply-chain-preservation.md
     boundary: package-excluded component inventory, SBOM, provenance, verified attestation, content-addressed public capsule, private-custody index, offline restoration, workflow runner isolation, publisher confinement, and append-only current package-presentation baseline only; no player prototype mutation, source freeze, candidate allocation, production key generation, production signing, sealing, promotion, tagging, or publication
     stability: stable-t15-machine-scope-complete-human-release-gates-unchanged
@@ -446,7 +446,7 @@ package_excluded_modules:
     verification:
       - tests/targets/Test-MIR4TargetCompiler.ps1
       - tests/targets/Test-MIR4TargetCompilerMigration.ps1
-      - validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
+      - tests/mir4/Test-MIR4TargetCompilerW02.ps1
     boundary: package-excluded target contracts, provider projections, and provider-law evidence only; no prototype mutation, support-claim transfer, source freeze, signing, sealing, promotion, tagging, publication, or maintainer-decision authority
     stability: stable-v1-application-authority-migrated-compatibility-reader-retained
   mir4_semantic_compiler_v1:
@@ -474,7 +474,7 @@ package_excluded_modules:
     verification:
       - tests/compiler/Test-MIR4SemanticCompiler.ps1
       - tests/compiler/Test-MIR4SemanticCompilerMigration.ps1
-      - validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
+      - tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     boundary: package-excluded safety decisions, policy dispositions, normalized target projections, semantic reference compilation runs, and deterministic record export only; no prototype or runtime mutation, compatibility-policy mutation, support-claim transfer, source freeze, signing, sealing, promotion, tagging, publication, or maintainer-decision authority
     stability: stable-v1-domain-and-application-authority-migrated-compatibility-readers-retained
   mir4_module_ecosystem_v1:
@@ -520,7 +520,7 @@ package_excluded_modules:
     verification:
       - tests/extensions/Test-MIR4ModuleEcosystem.ps1
       - tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1
-      - validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1
+      - tests/mir4/Test-MIR4ModuleEcosystemW05.ps1
     boundary: typed data-only fragments, deterministic extension closure, copied bounded APIs, package-excluded SDK tooling, and read-only F210 mod-data snapshot discovery; no callbacks, mutable compiler context, prototype writes, emitter admission, migration execution, W06 semantic ownership, or public support authority
     stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-blocked-independent-production-consumer
   mir4_processir_synthesis_v1:
@@ -556,8 +556,8 @@ package_excluded_modules:
     verification:
       - tests/processir/Test-MIR4ProcessIRExact.ps1
       - tests/processir/Test-MIR4ProcessIRExactMigration.ps1
-      - validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1
-      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
+      - tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1
+      - tests/mir4/Test-MIR4ExactProcessIRT12.ps1
     boundary: package-excluded exact post-finalizer observation, copied-fact ProcessIR certificates, effect owner references, bounded offline comparisons, and descriptive proposal classification only; the observer cannot write prototypes and the preview has no risk-heuristic duplication, SafetyKernel override, planner/emitter/runtime/migration admission, player mutation, or public compatibility claim
     stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-exact-reference-read-only
   mir4_release_compatibility_canaries_t13:
@@ -573,7 +573,7 @@ package_excluded_modules:
       - spec/schemas/preview/mir4-t13-receipt-v1.schema.json
     reference_root: sdk/preview/mir4/reference/t13
     documentation: docs/compatibility/mir4-release-canaries.md
-    validator: validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+    validator: tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     boundary: exact locked F210 and F200 release-canary input with clean load, two byte-preserving reloads, target-shared direct-predecessor upgrade proof, bounded performance, claim limitations, and expiry; no blanket ecosystem claim, automatic synthesis, player or prototype mutation, source freeze, signing, sealing, promotion, or publication authority
     stability: pre-freeze-release-canary-exact-eleven-captures-eight-bounded-subjects
   mir4_documentation_continuity_t14:
@@ -582,7 +582,7 @@ package_excluded_modules:
     immutable_source_truth_schema: spec/schemas/mir-immutable-documentation-source-truth-v1.schema.json
     schema: spec/schemas/mir4-documentation-continuity-t14-v1.schema.json
     writer: tools/commands/docs/Update-MIRDocumentationIndex.ps1
-    validator: validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1
+    validator: tests/mir4/Test-MIR4DocumentationContinuityT14.ps1
     documentation: docs/developer/README.md
     boundary: MIR4-first root, developer, maintainer, generated metadata, and continuity documentation with one declared README-only package-visible delta; no player executable, emitter, source-freeze, signing, sealing, promotion, or publication authority
     stability: stable-documentation-and-package-excluded-developer-preview
@@ -619,8 +619,8 @@ package_excluded_modules:
     verification:
       - tests/inspection/Test-MIR4InspectorCompatibility.ps1
       - tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1
-      - validation/tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+      - tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1
+      - tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
     stability: developer-preview-canonical-application-cli-migrated-compatibility-readers-retained-with-exact-processir-comparison-blocked-independent-production-consumer-and-exact-profile-claim-transfer
   mir4_environment_evidence_v1:
     implementation: tools/mir/application/assurance/EnvironmentEvidence.ps1
@@ -666,9 +666,9 @@ package_excluded_modules:
     verification:
       - tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1
       - tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1
-      - validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1
-      - validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1
-      - validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
+      - tests/mir4/Test-MIR4AssuranceScaleW08.ps1
+      - tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1
+      - tests/release/Test-MIR4OfflineCandidateCustody.ps1
     stability: developer-preview-canonical-assurance-and-custody-applications-migrated-compatibility-readers-retained-blocked-trusted-timing-capacity-and-human-secret-evidence
   mir4_historical_succession_v1:
     migration_authority: governance/repository/migrations/historical-tooling-v1.json
@@ -695,7 +695,7 @@ package_excluded_modules:
     tests:
       - tests/history/Test-MIR4HistoricalTooling.ps1
       - tests/history/Test-MIR4HistoricalToolingMigration.ps1
-      - validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1
+      - tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1
     boundary: read-only composition of historical, museum, W02 provider, W04 continuity, W05 extension, W08 evidence, and immutable predecessor identities; synthetic offline host and reconstruction evidence only; no upstream policy write, rights or custody decision, prototype or runtime mutation, source freeze, signing, sealing, promotion, tag, upload, publication, or public support claim
     stability: developer-preview-shadow-partial-with-bounded-blockers
   mir4_release_tooling_v1:
@@ -711,7 +711,7 @@ package_excluded_modules:
     tests:
       - tests/release-tooling/Test-MIR4ReleaseTooling.ps1
       - tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1
-      - validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+      - tests/mir4/Test-MIR4PlatformPreview.ps1
     boundary: read-only validation of the stable release DAG contract; no phase execution, candidate allocation, prototype or runtime mutation, source freeze, production signing, sealing, promotion, tag, upload, publication, or public support authority
     stability: stable-canonical-release-dag-application-migrated-compatibility-reader-retained
   mir4_change_and_release_authority_v1:
@@ -728,7 +728,7 @@ package_excluded_modules:
     implementation: tools/mir/application/release/ReleaseNarratives.ps1
     command: tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1
     documentation: docs/architecture/mir4-change-and-release-authority.md
-    test: validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
+    test: tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1
     boundary: accepted typed changes render deterministic package-excluded narrative views and the generated root source-family changelog; renderers do not discover changes, infer target support, write player packages, allocate versions, or grant merge, signing, sealing, tagging, or publication authority
     stability: stable-package-excluded-change-and-narrative-authority-v1
   mir4_full_platform_closeout_v1:
@@ -748,7 +748,7 @@ package_excluded_modules:
       - .mir/releases/waves/mir4-r0/dashboard.json
       - .mir/releases/waves/mir4-r0/queue.json
       - todo.md
-    validator: validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
+    validator: tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority
     stability: stable-t15-complete-t16-t17-human-blocked-release-blocked
@@ -861,21 +861,21 @@ package_excluded_modules:
       - contracts/repository/mir-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
     supporting_validators:
-      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
+      - tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
+      - tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
+      - tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
+      - tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
       - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
       - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
-      - validation/tests/mir4/Test-MIR4SdkV1T08.ps1
-      - validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1
-      - validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1
-      - validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
-      - validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
-      - validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
-      - validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
-      - validation/tests/release/Test-MIRTerminalGovernance.ps1
-    validator: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+      - tests/mir4/Test-MIR4SdkV1T08.ps1
+      - tests/mir4/Test-MIR4MepDiscoveryT11.ps1
+      - tests/mir4/Test-MIR4ExactProcessIRT12.ps1
+      - tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1
+      - tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
+      - tests/mir4/Test-MIR4F210QualificationPolicy.ps1
+      - tests/release/Test-MIR4LocalPlaytestShadow.ps1
+      - tests/release/Test-MIRTerminalGovernance.ps1
+    validator: tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
     boundary: package-excluded release preparation, exact-input validation, pre-freeze F210 Steam experimental selection, future stable minimum/latest lane policy, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
     stability: stable-pre-freeze-control-plane-with-exact-f210-execution-locks-t03-t06-non-production-rehearsal-and-human-and-freeze-blockers
@@ -1539,7 +1539,7 @@ validation_tooling:
     repository_authority_command_migrator: tools/maintenance/Move-MIRAuthorityCommands.ps1
     repository_compatibility_command_migrator: tools/maintenance/Move-MIRCompatibilityCommands.ps1
     repository_museum_command_migrator: tools/maintenance/Move-MIRMuseumCommands.ps1
-    repository_layout_gate: validation/tests/tooling/Test-MIRLayout.ps1
+    repository_layout_gate: tests/tooling/Test-MIRLayout.ps1
     maintainer_cli: tools/mir.ps1
     maintainer_cli_support: tools/lib/cli
     control_plane_policy: .mir/control-plane/control-plane.json
@@ -1574,53 +1574,53 @@ validation_tooling:
     control_plane_executor: tools/lib/control/Executor.ps1
     control_plane_calibration: tools/lib/control/Calibration.ps1
     control_plane_shadow: tools/lib/control/Shadow.ps1
-    control_plane_shadow_gate: validation/tests/tooling/Test-MIRControlPlaneShadow.ps1
-    control_plane_gate: validation/tests/tooling/Test-MIRControlPlane.ps1
+    control_plane_shadow_gate: tests/tooling/Test-MIRControlPlaneShadow.ps1
+    control_plane_gate: tests/tooling/Test-MIRControlPlane.ps1
     control_plane_release: tools/lib/control/Release.ps1
-    control_plane_release_gate: validation/tests/tooling/Test-MIRControlPlaneRelease.ps1
+    control_plane_release_gate: tests/tooling/Test-MIRControlPlaneRelease.ps1
     control_plane_execution_registry_generator: tools/commands/control/Update-MIRExecutionRegistry.ps1
-    control_plane_execution_registry_gate: validation/tests/tooling/Test-MIRExecutionRegistry.ps1
+    control_plane_execution_registry_gate: tests/tooling/Test-MIRExecutionRegistry.ps1
     control_plane_observation_replay_generator: tools/commands/control/Update-MIRObservationReplay.ps1
-    control_plane_observation_gate: validation/tests/tooling/Test-MIRObservationEvaluation.ps1
+    control_plane_observation_gate: tests/tooling/Test-MIRObservationEvaluation.ps1
     control_plane_context_builder: tools/commands/control/New-MIRVerificationContext.ps1
-    control_plane_context_gate: validation/tests/tooling/Test-MIRVerificationContext.ps1
-    control_plane_evidence_gate: validation/tests/tooling/Test-MIREvidenceStore.ps1
+    control_plane_context_gate: tests/tooling/Test-MIRVerificationContext.ps1
+    control_plane_evidence_gate: tests/tooling/Test-MIREvidenceStore.ps1
     control_plane_work_entrypoint: tools/commands/control/Invoke-MIRControlPlaneWork.ps1
-    control_plane_executor_gate: validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1
-    control_plane_context_package_gate: validation/tests/package/Test-MIRContextPackage.ps1
-    control_plane_context_registry_gate: validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1
-    control_plane_release_obligation_gate: validation/tests/release/Test-MIRReleaseObligation.ps1
+    control_plane_executor_gate: tests/tooling/Test-MIRControlPlaneExecutor.ps1
+    control_plane_context_package_gate: tests/package/Test-MIRContextPackage.ps1
+    control_plane_context_registry_gate: tests/tooling/Test-MIRContextExecutionRegistry.ps1
+    control_plane_release_obligation_gate: tests/release/Test-MIRReleaseObligation.ps1
     control_plane_shadow_baseline_generator: tools/commands/control/Update-MIRShadowBaselines.ps1
     control_plane_shadow_analysis_generator: tools/commands/control/Update-MIRShadowAnalysis.ps1
     control_plane_workflow: .github/workflows/control-plane-v5.yml
-    control_plane_workflow_gate: validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1
+    control_plane_workflow_gate: tests/tooling/Test-MIRControlPlaneWorkflow.ps1
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_core: tools/lib/assurance/Core.ps1
     assurance_domains: tools/lib/assurance/Domains.ps1
     assurance_evidence: tools/lib/assurance/Evidence.ps1
     assurance_hashing: tools/lib/assurance/Hashing.ps1
     assurance_release: tools/lib/assurance/Release.ps1
-    assurance_tests: validation/tests/tooling/Test-MIRAssurance.ps1
-    release_authority: validation/tests/release/Test-MIRReleaseAuthority.ps1
-    native_owner_balance_tests: validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1
-    research_cost_model_tests: validation/tests/compiler/Test-MIRResearchCostModels.ps1
+    assurance_tests: tests/tooling/Test-MIRAssurance.ps1
+    release_authority: tests/release/Test-MIRReleaseAuthority.ps1
+    native_owner_balance_tests: tests/compiler/Test-MIRNativeOwnerCostModels.ps1
+    research_cost_model_tests: tests/compiler/Test-MIRResearchCostModels.ps1
     research_cost_release_contract: .mir/research-cost-contract-3.2.5.json
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
     museum_synthetic_installation: fixtures/museum/synthetic-installation
     museum_compiler: tools/lib/museum/MuseumCompiler.psm1
     museum_build: tools/commands/museum/Build-MIRMuseumTarget.ps1
-    museum_static_gate: validation/tests/runtime/Test-MIRMuseumCompiler.ps1
-    museum_exact_runtime_gate: validation/tests/runtime/Test-MIRMuseumExact.ps1
-    museum_runtime_gate: validation/tests/runtime/Test-MIRMuseumRuntime.ps1
+    museum_static_gate: tests/runtime/Test-MIRMuseumCompiler.ps1
+    museum_exact_runtime_gate: tests/runtime/Test-MIRMuseumExact.ps1
+    museum_runtime_gate: tests/runtime/Test-MIRMuseumRuntime.ps1
     museum_qualification: tools/commands/museum/New-MIRMuseumQualification.ps1
     museum_seal_writer: tools/commands/museum/New-MIRMuseumSeal.ps1
-    museum_seal_check: validation/tests/runtime/Test-MIRMuseumSeal.ps1
-    backport_source_lock: validation/tests/release/Test-MIRBackportSourceLock.ps1
+    museum_seal_check: tests/runtime/Test-MIRMuseumSeal.ps1
+    backport_source_lock: tests/release/Test-MIRBackportSourceLock.ps1
     backport_reconstruction_contract: path:releases.backports/2.5.0.json
-    backport_reconstruction_gate: validation/tests/release/Test-MIRBackportManifest.ps1
+    backport_reconstruction_gate: tests/release/Test-MIRBackportManifest.ps1
     backport_materializer: scripts/Materialize-MIRBackport.ps1
-    backport_reconstruction_evidence_gate: validation/tests/release/Test-MIRBackportReconstruction.ps1
+    backport_reconstruction_evidence_gate: tests/release/Test-MIRBackportReconstruction.ps1
     terminal_shadow_projection_profiles: .mir/releases/terminal/MIR3-Terminal-Shadow-ProjectionProfilesV1.json
     terminal_shadow_projection_profiles_schema: spec/schemas/mir3-terminal-shadow-projection-profiles.schema.json
     terminal_shadow_source_publication: .mir/releases/terminal/MIR3-Terminal-Shadow-Source-PublicationV1.json
@@ -1652,7 +1652,7 @@ validation_tooling:
     mir4_r0_codec_vectors: .mir/releases/waves/mir4-r0/MIR4-Distribution-Version-Codec-VectorsV2.json
     mir4_r0_codec_vectors_schema: spec/schemas/mir4-distribution-version-codec-vectors-v2.schema.json
     mir4_distribution_identity: tools/lib/validation/MIR4DistributionIdentity.ps1
-    mir4_distribution_identity_gate: validation/tests/release/Test-MIR4R0Identity.ps1
+    mir4_distribution_identity_gate: tests/release/Test-MIR4R0Identity.ps1
     mir4_r0_bootstrap_root_set: .mir/releases/waves/mir4-r0/bootstrap-root-set.json
     mir4_r0_bootstrap_root_set_schema: spec/schemas/mir4-bootstrap-root-set.schema.json
     mir4_r0_bootstrap_root_set_generator: tools/commands/release/New-MIR4BootstrapRootSet.ps1
@@ -1676,7 +1676,7 @@ validation_tooling:
     mir4_local_artifact_lane_authorization: .mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json
     mir4_local_artifact_lane_authorization_schema: spec/schemas/mir4-private-lane-authorization-v3.schema.json
     mir4_local_playtest_candidate_manifest_schema: spec/schemas/mir4-local-playtest-candidate-manifest.schema.json
-    mir4_local_artifact_lane_gate: validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1
+    mir4_local_artifact_lane_gate: tests/release/Test-MIR4LocalPlaytestShadow.ps1
     mir4_bootstrap_candidate_manifest_schema: spec/schemas/mir4-bootstrap-local-candidate-manifest.schema.json
     mir4_bootstrap_source_capsule_schema: spec/schemas/mir4-bootstrap-source-capsule.schema.json
     mir4_bootstrap_capsule_manifest_schema: spec/schemas/mir4-bootstrap-capsule-manifest.schema.json
@@ -1695,14 +1695,14 @@ validation_tooling:
     mir4_target_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json
     mir4_target_registry_v6_schema: spec/schemas/mir4-target-registry-v6.schema.json
     mir4_target_product_builder: tools/commands/mir4/New-MIR4TargetProductSet.ps1
-    mir4_target_compiler_gate: validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1
+    mir4_target_compiler_gate: tests/mir4/Test-MIR4TargetCompilerW02.ps1
     mir4_semantic_compiler: tools/mir/application/compiler/CompilationRun.ps1
     mir4_semantic_compiler_authority: .mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json
     mir4_compilation_run_v1_schema: spec/schemas/mir4-compilation-run-v1.schema.json
     mir4_semantic_compiler_exporter: tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1
     mir4_semantic_compiler_test: tests/compiler/Test-MIR4SemanticCompiler.ps1
     mir4_semantic_compiler_migration_test: tests/compiler/Test-MIR4SemanticCompilerMigration.ps1
-    mir4_semantic_compiler_gate: validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1
+    mir4_semantic_compiler_gate: tests/mir4/Test-MIR4SemanticCompilationW03.ps1
     mir4_runtime_state_model: tools/mir/application/runtime/RuntimeStateModel.ps1
     mir4_runtime_continuity_authority: .mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json
     mir4_runtime_continuity_migration_authority: governance/repository/migrations/runtime-continuity-tooling-v1.json
@@ -1717,7 +1717,7 @@ validation_tooling:
     mir4_runtime_continuity_exporter: tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1
     mir4_runtime_continuity_functional_test: tests/runtime/Test-MIR4RuntimeContinuity.ps1
     mir4_runtime_continuity_migration_test: tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1
-    mir4_runtime_continuity_gate: validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1
+    mir4_runtime_continuity_gate: tests/mir4/Test-MIR4RuntimeContinuityW04.ps1
     mir4_process_ir: tools/mir/application/processir/ProcessIR.ps1
     mir4_release_dag: tools/mir/application/release/ReleaseDag.ps1
     mir4_release_governance: tools/lib/mir4/ReleaseGovernance.ps1
@@ -1726,11 +1726,11 @@ validation_tooling:
     mir4_signing_ceremony_preparation: tools/lib/mir4/SigningCeremonyPreparation.ps1
     mir4_signing_ceremony_preparation_authority: .mir/releases/governance/mir4/signing-ceremony-preparation.json
     mir4_signing_ceremony_preparation_command: tools/commands/mir4/Invoke-MIR4SigningCeremonyPreparation.ps1
-    mir4_signing_ceremony_preparation_gate: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+    mir4_signing_ceremony_preparation_gate: tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
     mir4_github_actions_lock_current: governance/automation/github-actions-lock.json
     mir4_github_actions_lock_historical: .mir/releases/governance/mir4/github-actions-lock-v2.json
     mir4_release_governance_command: tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1
-    mir4_release_governance_gate: validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
+    mir4_release_governance_gate: tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1
     mir4_repository_fixed_point: tools/mir/application/repository/RepositoryFixedPoint.ps1
     mir4_repository_fixed_point_authority: .mir/control/repository-fixed-point.json
     mir4_repository_migration_authority: governance/repository/migrations/fixed-point-tooling-v1.json
@@ -1742,7 +1742,7 @@ validation_tooling:
     mir4_release_dag_spec: spec/platform/mir4-preview-v0/release-dag.json
     mir4_platform_preview_command: tools/commands/mir4/Invoke-MIR4PlatformPreview.ps1
     mir4_m4c01_handoff_exporter: tools/commands/mir4/Export-MIR4M4C01Handoff.ps1
-    mir4_platform_preview_gate: validation/tests/mir4/Test-MIR4PlatformPreview.ps1
+    mir4_platform_preview_gate: tests/mir4/Test-MIR4PlatformPreview.ps1
     mir4_platform_preview_authority_historical_v1: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json
     mir4_platform_preview_authority: .mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV2.json
     mir4_candidate_wave_authority: .mir/releases/waves/mir4-r0/MIR4-Candidate-Wave-ProgrammeV1.json
@@ -1751,7 +1751,7 @@ validation_tooling:
     mir4_target_registry_current: .mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json
     mir4_hybrid_platform_authority_schema: spec/schemas/mir4-hybrid-platform-authority.schema.json
     mir4_m4c01_authority_schema: spec/schemas/mir4-m4c01-implementation-authorization.schema.json
-    mir4_hybrid_platform_authority_gate: validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1
+    mir4_hybrid_platform_authority_gate: tests/release/Test-MIR4HybridPlatformAuthority.ps1
     mir4_historical_private_candidate_authority: .mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json
     mir4_historical_private_candidate_authority_schema: spec/schemas/mir4-historical-private-candidate-authorization.schema.json
     mir4_historical_private_candidate_builder: tools/commands/release/New-MIR4HistoricalPrivateCandidate.ps1
@@ -1760,20 +1760,20 @@ validation_tooling:
     mir4_m4c01_player_candidate_builder: tools/commands/release/New-MIR4M4C01PlayerCandidateSet.ps1
     mir4_bootstrap_materializer_command: tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1
     mir4_bootstrap_capsule_runner: tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1
-    mir4_bootstrap_materializer_gate: validation/tests/release/Test-MIR4BootstrapMaterialization.ps1
+    mir4_bootstrap_materializer_gate: tests/release/Test-MIR4BootstrapMaterialization.ps1
     mir4_final_programme_reconciliation: .mir/releases/waves/mir4-r0/MIR4-Final-Programme-ReconciliationV1.json
     mir4_final_programme_reconciliation_schema: spec/schemas/mir4-final-programme-reconciliation.schema.json
-    mir4_final_programme_reconciliation_gate: validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1
+    mir4_final_programme_reconciliation_gate: tests/release/Test-MIR4FinalProgrammeReconciliation.ps1
     mir4_bootstrap_engine_availability_observation: .mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json
     mir4_bootstrap_engine_availability_schema: spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json
     mir4_bootstrap_target_readiness: .mir/releases/waves/mir4-r0/MIR4-Bootstrap-Target-ReadinessV1.json
     mir4_bootstrap_target_readiness_schema: spec/schemas/mir4-bootstrap-target-readiness.schema.json
-    mir4_bootstrap_target_readiness_gate: validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1
+    mir4_bootstrap_target_readiness_gate: tests/release/Test-MIR4BootstrapTargetReadiness.ps1
     mir3_dot9_mod_portal_visibility_recheck: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json
     mir3_dot9_mod_portal_visibility_recheck_schema: spec/schemas/mir3-dot9-mod-portal-visibility-recheck.schema.json
     mir3_dot9_mod_portal_visibility_canonicalization_reconciliation: .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json
     mir3_dot9_mod_portal_visibility_canonicalization_reconciliation_schema: spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json
-    mir3_dot9_mod_portal_visibility_recheck_gate: validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
+    mir3_dot9_mod_portal_visibility_recheck_gate: tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
     mir4_offline_candidate_custody_compatibility: tools/lib/mir4/OfflineCandidateCustody.ps1
     mir4_assurance_offline_custody_migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
@@ -1793,13 +1793,13 @@ validation_tooling:
     mir4_offline_seal_schema: spec/schemas/mir4-offline-seal.schema.json
     mir4_restoration_receipt_schema: spec/schemas/mir4-restoration-receipt.schema.json
     mir4_emergency_lane_completion_schema: spec/schemas/mir4-emergency-lane-completion-record.schema.json
-    mir4_offline_candidate_custody_gate: validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody_gate: tests/release/Test-MIR4OfflineCandidateCustody.ps1
     terminal_shadow_materializer: tools/commands/targets/Set-MIRTerminalShadowProjection.ps1
-    terminal_shadow_materializer_gate: validation/tests/release/Test-MIRTerminalShadowProjection.ps1
+    terminal_shadow_materializer_gate: tests/release/Test-MIRTerminalShadowProjection.ps1
     package_identity: tools/lib/validation/PackageIdentity.ps1
     package_builder: tools/commands/package/Build-MIRPackage.ps1
     package_composition: tools/commands/package/Measure-MIRPackageComposition.ps1
-    package_composition_gate: validation/tests/package/Test-MIRPackageComposition.ps1
+    package_composition_gate: tests/package/Test-MIRPackageComposition.ps1
     target_metadata: tools/lib/validation/TargetProfiles.ps1
     target_profile_generator: tools/commands/targets/Sync-MIRTargetProfiles.ps1
     runtime_scenario_authority_generator: tools/commands/targets/Sync-MIRRuntimeScenarioAuthority.ps1
@@ -1808,11 +1808,11 @@ validation_tooling:
     factorio_process: tools/lib/validation/FactorioProcess.ps1
     settings_overrides: tools/lib/validation/SettingsOverrides.ps1
     scenario_registry: tools/lib/validation/ScenarioRegistry.ps1
-    golden_plans: validation/tests/tooling/Test-MIRGoldenPlans.ps1
-    campaign_scenarios: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
-    sanitation_budgets: validation/tests/release/Test-MIRSanitationBudgets.ps1
-    evidence_hygiene: validation/tests/release/Test-MIREvidenceHygiene.ps1
-    planner_artifacts: validation/tests/tooling/Test-MIRPlannerTools.ps1
+    golden_plans: tests/tooling/Test-MIRGoldenPlans.ps1
+    campaign_scenarios: tests/compatibility/Test-MIRScenarioManifests.ps1
+    sanitation_budgets: tests/release/Test-MIRSanitationBudgets.ps1
+    evidence_hygiene: tests/release/Test-MIREvidenceHygiene.ps1
+    planner_artifacts: tests/tooling/Test-MIRPlannerTools.ps1
     planner_report_diff: tools/commands/planner/Compare-MIRPlannerReports.ps1
     planner_snapshot_diff: tools/commands/planner/Compare-MIRPlannerSnapshots.ps1
     planner_snapshot_export: tools/commands/planner/Export-MIRPlannerSnapshot.ps1
@@ -1825,7 +1825,7 @@ validation_tooling:
     candidate_archive_delta: scripts/Export-MIRCandidateDelta.ps1
     technology_catalog_export: tools/commands/technology/Export-MIRTechnologyCatalog.ps1
     compiler_preview_export: tools/commands/technology/Export-MIRCompilerPreview.ps1
-    compiler_preview_export_gate: validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1
+    compiler_preview_export_gate: tests/compiler/Test-MIRCompilerPreviewExport.ps1
     technology_quality_profiles: .mir/technology-quality-profiles.json
     technology_governance_source: .mir/technology-governance.json
     technology_governance_generator: tools/commands/technology/Update-MIRTechnologyGovernance.ps1
@@ -1833,29 +1833,29 @@ validation_tooling:
     technology_lifecycle_record: tools/commands/technology/New-MIRTechnologyLifecycleRecord.ps1
     technology_quality_assessment: tools/commands/technology/New-MIRTechnologyQualityAssessment.ps1
     technology_review_dossier: tools/commands/technology/New-MIRTechnologyReviewDossier.ps1
-    technology_promotion_admission: validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
-    technology_lifecycle_gate: validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1
+    technology_promotion_admission: tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1
+    technology_lifecycle_gate: tests/compiler/Test-MIRTechnologyLifecycle.ps1
     offline_rule_synthesis: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
-    offline_rule_synthesis_gate: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
+    offline_rule_synthesis_gate: tests/compiler/Test-MIRRuleSynthesis.ps1
     mod_interaction_graph: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
-    mod_interaction_gate: validation/tests/compatibility/Test-MIRModInteractions.ps1
+    mod_interaction_gate: tests/compatibility/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
-    approved_delta_gate: validation/tests/release/Test-MIRApprovedDelta.ps1
+    approved_delta_gate: tests/release/Test-MIRApprovedDelta.ps1
     control_plane_approved_delta_policy: .mir/control-plane/approved-delta-policies.json
     control_plane_performance_campaigns: .mir/performance-campaigns
     mir4_m4c01_f210_performance_campaign: .mir/performance-campaigns/4.0.21000-M4C01.json
     mir4_m4c01_f200_performance_campaign: .mir/performance-campaigns/4.0.20000-M4C01.json
-    runtime_performance_gate: validation/tests/release/Test-MIRPerformanceRegression.ps1
-    manual_release_review_gate: validation/tests/release/Test-MIRManualReleaseReview.ps1
+    runtime_performance_gate: tests/release/Test-MIRPerformanceRegression.ps1
+    manual_release_review_gate: tests/release/Test-MIRManualReleaseReview.ps1
     localization_policy: .mir/locales/manifest.json
     localization_overrides: .mir/locales/overrides.json
     localization_generator: tools/commands/localization/Update-MIRLocales.ps1
-    localization_gate: validation/tests/docs/Test-MIRLocales.ps1
+    localization_gate: tests/docs/Test-MIRLocales.ps1
     localization_core: tools/lib/localization/MIRLocalization.psm1
     release_attestations: tools/lib/validation/ReleaseAttestations.ps1
     runtime_performance_evidence_schema: spec/schemas/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: spec/schemas/manual-release-attestation.schema.json
-    compiler_schema_drift: validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1
+    compiler_schema_drift: tests/compiler/Test-MIRCompilerSchemaDrift.ps1
     documentation_formatter: tools/commands/docs/Format-MIRMarkdown.ps1
     documentation_index: tools/commands/docs/Update-MIRDocumentationIndex.ps1
     documentation_metadata_authority: markdown-frontmatter
@@ -1866,9 +1866,9 @@ validation_tooling:
     readme_stream_defaults: tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1
     technology_effect_target_contracts: .mir/technology-effect-targets.json
     compiler_authority_generator: tools/commands/compiler/Update-MIRCompilerAuthorities.ps1
-    compiler_gate: validation/tests/compiler/Test-MIRCompiler.ps1
+    compiler_gate: tests/compiler/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
-    mir4_historical_private_runtime: validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1
+    mir4_historical_private_runtime: tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1
     verification_domains: validation/domains.yml
     verification_profiles: validation/profiles
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1

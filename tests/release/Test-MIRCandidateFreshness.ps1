@@ -1,0 +1,845 @@
+# MIR4-CANONICAL-EXECUTABLE-TEST
+param(
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
+)
+# Canonical validation scripts live three levels below the repository root.
+# Keep the former scripts/ base explicit while tooling internals complete L5.
+$MirRepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
+$MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
+
+$ErrorActionPreference = "Stop"
+$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
+. (Join-Path $repo "tools\lib\control\Core.ps1")
+. (Join-Path $repo "tools\lib\control\Records.ps1")
+
+function Get-MIRCandidateFields {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $match = [regex]::Match(
+    $Text,
+    '(?ms)^candidate:\r?\n(?<body>(?:^  [^\r\n]*\r?\n?)*)'
+  )
+  if (-not $match.Success) {
+    throw ".mir/convergence.yml must define a top-level candidate block."
+  }
+
+  $fields = @{}
+  foreach ($line in $match.Groups["body"].Value -split "\r?\n") {
+    if ($line -match '^  ([a-z0-9_]+):\s*(.*?)\s*$') {
+      $fields[$matches[1]] = $matches[2].Trim().Trim('"')
+    }
+  }
+  return $fields
+}
+
+function Get-MIRRequiredCandidateField {
+  param(
+    [Parameter(Mandatory)]$Fields,
+    [Parameter(Mandatory)][string]$Name
+  )
+
+  if (-not $Fields.ContainsKey($Name) -or [string]::IsNullOrWhiteSpace([string]$Fields[$Name])) {
+    throw "Active release candidate is missing $Name."
+  }
+  return [string]$Fields[$Name]
+}
+
+function Get-MIRCandidateEvidenceJson {
+  param(
+    [Parameter(Mandatory)]$Fields,
+    [Parameter(Mandatory)][string]$Field,
+    [Parameter(Mandatory)][string]$Label
+  )
+
+  $relative = Get-MIRRequiredCandidateField -Fields $Fields -Name $Field
+  $path = Join-Path $repo $relative
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "$Label evidence is missing: $relative"
+  }
+  try {
+    return Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+  } catch {
+    throw "$Label evidence is not valid JSON: $relative"
+  }
+}
+
+function Get-MIRCandidateCaptureSha256 {
+  param([Parameter(Mandatory)][string]$Path, [string]$DigestPolicy = "raw")
+  if ($DigestPolicy -eq "utf8-lf") {
+    $text = (Get-Content -Raw -LiteralPath $Path).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($text)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+  }
+  if ($DigestPolicy -ne "raw") { throw "Unsupported interactive review capture digest policy: $DigestPolicy" }
+  return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash
+}
+
+function Assert-MIRCandidateBoundEvidence {
+  param(
+    [Parameter(Mandatory)]$Fields,
+    [Parameter(Mandatory)][string]$PackageSourceCommit,
+    [Parameter(Mandatory)][string]$ArchiveSha256,
+    [Parameter(Mandatory)][string]$PackageContentSha256,
+    [Parameter(Mandatory)][string]$PackageSourceSha256,
+    [Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][ValidateSet("pending", "passed")][string]$InteractiveStatus
+  )
+
+  $upgrade = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "upgrade_evidence_path" -Label "Upgrade"
+  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.kind -ne "mir-upgrade-matrix" -or [string]$upgrade.status -ne "passed") {
+    throw "Upgrade evidence must be a passing schema-1 mir-upgrade-matrix."
+  }
+  if ([string]$upgrade.candidate.version -ne $Version -or [string]$upgrade.candidate.archive_sha256 -ne $ArchiveSha256) {
+    throw "Upgrade matrix is not bound to the active candidate version and archive."
+  }
+  $requiredArchetypes = @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")
+  $declaredArchetypes = @($upgrade.required_archetypes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $passingArchetypes = @($upgrade.rows | Where-Object status -eq "passed" | ForEach-Object { [string]$_.id } | Sort-Object -Unique)
+  if (@(Compare-Object $requiredArchetypes $declaredArchetypes).Count -ne 0 -or
+      @(Compare-Object $requiredArchetypes $passingArchetypes).Count -ne 0) {
+    throw "Upgrade matrix does not contain exactly the five required passing archetypes."
+  }
+  $upgradeCommit = [string]$upgrade.source_commit
+  if ($upgradeCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "Upgrade evidence must identify the full harness commit that produced it."
+  }
+  & git -C $repo cat-file -e "$upgradeCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Upgrade evidence commit is unavailable: $upgradeCommit"
+  }
+  & git -C $repo merge-base --is-ancestor $PackageSourceCommit $upgradeCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Upgrade evidence was produced before the active package source commit."
+  }
+
+  $campaign = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "ecosystem_evidence_path" -Label "Ecosystem campaign"
+  if ([int]$campaign.schema -ne 1 -or [string]$campaign.kind -ne "mir-modpack-campaign-evidence") {
+    throw "Ecosystem campaign evidence must be schema 1 mir-modpack-campaign-evidence."
+  }
+  if ([string]$campaign.mir_archive.source_commit -ne $PackageSourceCommit -or [string]$campaign.mir_archive.sha256 -ne $ArchiveSha256) {
+    throw "Ecosystem campaign evidence is not bound to the active candidate source and archive."
+  }
+  $failedCampaignRows = @($campaign.scenarios | Where-Object {
+    [string]$_.result -ne "passed" -or [int]$_.dependency_failure_count -ne 0 -or
+    [string]$_.sanitation_result -ne "passed" -or @($_.missing_expected_prunes).Count -ne 0 -or
+    @($_.unreviewed_external_prunes).Count -ne 0 -or
+    [string]$_.claim_level -notin @("loads", "observed", "cooperates", "diagnostic-only", "partial-support", "full-family-support", "full-pack-support")
+  })
+  if (@($campaign.scenarios).Count -eq 0 -or $failedCampaignRows.Count -gt 0) {
+    throw "Ecosystem campaign evidence contains no scenarios or a non-passing/malformed scenario."
+  }
+
+  $interactive = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "interactive_evidence_path" -Label "Interactive review"
+  if ([int]$interactive.schema -ne 1 -or [string]$interactive.kind -ne "mir-interactive-review") {
+    throw "Interactive review evidence must be schema 1 mir-interactive-review."
+  }
+  foreach ($binding in ([ordered]@{
+    status = $InteractiveStatus
+    version = $Version
+    source_commit = $PackageSourceCommit
+    archive_sha256 = $ArchiveSha256
+    package_content_sha256 = $PackageContentSha256
+    package_source_sha256 = $PackageSourceSha256
+  }).GetEnumerator()) {
+    if ([string]$interactive.($binding.Key) -ne [string]$binding.Value) {
+      throw "Interactive review $($binding.Key) is stale: expected $($binding.Value), current $($interactive.($binding.Key))."
+    }
+  }
+  if ($InteractiveStatus -eq "passed") {
+    if ([string]::IsNullOrWhiteSpace([string]$interactive.reviewer) -or [string]::IsNullOrWhiteSpace([string]$interactive.reviewed_at)) {
+      throw "Passed interactive review evidence must identify the reviewer and review time."
+    }
+    $captures = @($interactive.captures)
+    if ($captures.Count -lt 3) {
+      throw "Passed interactive review evidence requires at least three bound captures."
+    }
+    foreach ($capture in $captures) {
+      $capturePath = Join-Path $repo ([string]$capture.path)
+      if (-not (Test-Path -LiteralPath $capturePath -PathType Leaf)) {
+        throw "Interactive review capture is missing: $($capture.path)"
+      }
+      $digestPolicy = if ($null -ne $capture.PSObject.Properties["digest_policy"]) { [string]$capture.digest_policy } else { "raw" }
+      if ((Get-MIRCandidateCaptureSha256 -Path $capturePath -DigestPolicy $digestPolicy) -ne [string]$capture.sha256) {
+        throw "Interactive review capture hash is stale: $($capture.path)"
+      }
+    }
+  }
+}
+
+$sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
+if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
+  & (Join-Path $repo "tests\release\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+  $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
+  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  if ([string]$currentInfo.version -eq [string]$sourceLock.mir_version -and
+      [string]$currentInfo.factorio_version -eq [string]$sourceLock.target) {
+    Write-Host "[ok] MIR target-line freshness is governed by the validated backport source lock."
+    exit 0
+  }
+  Write-Host "[check] historical backport source lock is valid; continuing with the current-line candidate freshness gate."
+}
+
+$activeInfo = Get-Content -Raw -LiteralPath (Join-Path $repo 'info.json') | ConvertFrom-Json
+$activeProfilePath = Join-Path $repo "validation\profiles\factorio-$([string]$activeInfo.factorio_version).json"
+$activeProfile = Get-Content -Raw -LiteralPath $activeProfilePath | ConvertFrom-Json
+if ([string]$activeProfile.release_authority_mode -eq 'candidate-programme') {
+  $authorityRelative = ([string]$activeProfile.release_authority).Replace('\', '/')
+  if ($authorityRelative -notmatch '^\.mir/releases/waves/mir4-r0/[A-Za-z0-9._-]+\.json$') {
+    throw 'MIR 4 candidate-programme freshness authority path is unsafe.'
+  }
+  $authorityPath = Join-Path $repo $authorityRelative
+  $closeoutPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json'
+  $candidateManifestPath = Join-Path $repo 'build/results/mir4-sol/sol08/target-candidates/MIR4_AFFECTED_TARGET_CANDIDATES.json'
+  foreach ($requiredPath in @($authorityPath, $closeoutPath, $candidateManifestPath)) {
+    if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
+      throw "MIR 4 candidate-programme freshness input is absent: $requiredPath"
+    }
+  }
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
+  $closeout = Get-Content -Raw -LiteralPath $closeoutPath | ConvertFrom-Json -Depth 100
+  $candidateManifest = Get-Content -Raw -LiteralPath $candidateManifestPath | ConvertFrom-Json -Depth 100
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      [string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
+      [string]$authority.status -ne 'authorized-in-progress' -or
+      @($authority.not_authorized) -notcontains 'production-seal' -or
+      @($authority.not_authorized) -notcontains 'github-release-publication' -or
+      @($authority.not_authorized) -notcontains 'mod-portal-mir4-upload' -or
+      [string]$closeout.kind -ne 'MIR4M4C01CloseoutSOL09V1' -or
+      [string]$closeout.status -ne 'PASS' -or
+      -not $closeout.completion_boundary.m4c01_development_closeout_complete -or
+      $closeout.completion_boundary.release_candidate_ready -or
+      $closeout.completion_boundary.source_freeze_authorized -or
+      $closeout.completion_boundary.commit_authorized -or
+      $closeout.completion_boundary.publication_authorized -or
+      [string]$candidateManifest.kind -ne 'MIR4AffectedTargetCandidateSetSOL08V1' -or
+      [string]$candidateManifest.status -ne 'built-unqualified-local-development-candidates' -or
+      @($candidateManifest.targets).Count -ne 2 -or
+      (@($candidateManifest.targets.target_key | Sort-Object) -join ',') -ne 'f200,f210' -or
+      $candidateManifest.public_output_authorized -or $candidateManifest.publication_authorized) {
+    throw 'MIR 4 candidate-programme freshness boundary is incomplete or overclaims release readiness.'
+  }
+  Write-Host '[ok] MIR 4 candidate-programme evidence is current, explicitly unfrozen, and blocked from release actions pending fresh source-bound qualification.'
+  exit 0
+}
+
+$manifestPath = Join-Path $repo ".mir\convergence.yml"
+$manifestText = Get-Content -Raw -LiteralPath $manifestPath
+$candidate = Get-MIRCandidateFields -Text $manifestText
+$status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
+$allowedStatuses = @(
+  "rebuilding-after-package-visible-change",
+  "requalifying-after-validation-harness-change",
+  "source-frozen",
+  "package-built",
+  "maintainer-accepted-emergency",
+  "release-candidate-awaiting-external-qualification",
+  "release-candidate-awaiting-manual-review",
+  "release-candidate-accepted",
+  "published"
+)
+if ($status -notin $allowedStatuses) {
+  throw "Unsupported MIR release candidate status: $status"
+}
+
+if ($status -eq "rebuilding-after-package-visible-change") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit") -ne "pending") {
+    throw "A rebuilding candidate must use source_commit: pending."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending") {
+    throw "A rebuilding candidate must use automated_gate: pending."
+  }
+  $allowedRebuildingFields = @("artifact", "source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedRebuildingFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A rebuilding candidate must not retain obsolete pass/hash fields: $($staleFields -join ', ')."
+  }
+  Write-Host "[ok] MIR release evidence is explicitly rebuilding; stale candidate bytes cannot be promoted."
+  exit 0
+}
+
+if ($status -eq "requalifying-after-validation-harness-change") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit") -ne "pending") {
+    throw "A harness-requalifying candidate must use source_commit: pending."
+  }
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "A harness-requalifying candidate must retain a full package_source_commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Harness-requalifying package source commit is unavailable: $packageSourceCommit"
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-requalification") {
+    throw "A harness-requalifying candidate must use automated_gate: pending-requalification."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A harness-requalifying candidate must not retain obsolete pass/hash fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
+    throw "Package-visible working-tree changes are not allowed during harness-only requalification."
+  }
+  Write-Host "[ok] MIR release evidence is explicitly requalifying after a validation-harness change; stale evidence cannot be promoted."
+  exit 0
+}
+
+function Get-MIRCandidateJsonSha256 {
+  param([Parameter(Mandatory)]$Value)
+  $json = $Value | ConvertTo-Json -Depth 100 -Compress
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes($json)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+}
+
+if ($status -eq "source-frozen") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "A source-frozen candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Source-frozen package commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-package-build" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending-exact-candidate-review") {
+    throw "A source-frozen candidate must keep package build and exact manual review explicitly pending."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A source-frozen candidate contains unsupported fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after source freeze." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after source freeze: $($changedPackagePaths -join ', ')"
+  }
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.5.json") | ConvertFrom-Json
+  if ([string]$release.state -ne "source-frozen" -or [string]$release.candidate_id -ne "C32" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit) {
+    throw "Source-frozen candidate descriptor differs from the typed ReleaseRecord."
+  }
+  $freeze = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json") | ConvertFrom-Json
+  if ([string]$freeze.status -ne "admitted" -or [string]$freeze.candidate_id -ne "C32" -or
+      [string]$freeze.source.package_source_commit -ne $packageSourceCommit) {
+    throw "Source-frozen candidate descriptor differs from the admitted D1 packet."
+  }
+  Write-Host "[ok] MIR candidate source is frozen while deterministic package construction remains pending."
+  exit 0
+}
+
+if ($status -eq "package-built") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "A package-built candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Package-built source commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-qualification" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending-exact-candidate-review") {
+    throw "A package-built candidate must keep automated and exact manual qualification explicitly pending."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A package-built candidate must not retain qualification evidence fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after the package-built freeze." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0 -or $changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after the package-built freeze: $($changedPackagePaths -join ', ')"
+  }
+  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if ([string]$release.state -ne "package-built" -or [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive -ne $artifactRelative -or -not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256) {
+    throw "Package-built candidate bytes do not match the typed ReleaseRecord."
+  }
+  Write-Host "[ok] MIR candidate package bytes are frozen while automated and exact manual qualification remain pending."
+  exit 0
+}
+
+if ($status -eq "maintainer-accepted-emergency") {
+  $sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $packageSourceCommit -ne $sourceCommit) {
+    throw "The emergency accepted candidate must bind one full package source commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Emergency package source commit is unavailable: $packageSourceCommit" }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed-local-2.1.14-release-exception" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "accepted-for-publication") {
+    throw "The emergency candidate must retain the exact local-qualification exception and maintainer acceptance."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $unsupportedFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($unsupportedFields.Count -gt 0) {
+    throw "The emergency candidate contains unsupported fields: $($unsupportedFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) { throw "Package-visible source is dirty after emergency acceptance." }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0) {
+    throw "Package-visible paths changed after emergency acceptance: $($changedPackagePaths -join ', ')"
+  }
+  if ($changedPackagePaths.Count -gt 0) {
+    try {
+      $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo
+    } catch {
+      throw "Package-visible paths changed after emergency acceptance outside the exact MIR 4 composite: $($changedPackagePaths -join ', '): $($_.Exception.Message)"
+    }
+    if ([string]$freeze.lock_id -cne "mir-3.2.10-c34") {
+      throw "The exact MIR 4 composite did not resolve against the immutable 3.2.10/C34 package lock."
+    }
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  $currentInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $admittedEmergencyStates = @(
+    "manually-accepted",
+    "protected-qualified",
+    "sealed",
+    "promoted",
+    "tagged",
+    "published",
+    "publicly-verified"
+  )
+  if ([string]$currentInfo.version -eq "3.2.11") {
+    $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.11.json") | ConvertFrom-Json
+    $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV2.json") | ConvertFrom-Json
+    $authorization = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixAuthorizationV2.json") | ConvertFrom-Json
+    $qualification = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixLocalQualificationV2.json") | ConvertFrom-Json
+    if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+        $admittedEmergencyStates -notcontains [string]$release.state -or [string]$release.candidate_id -ne "C35" -or
+        [string]$release.package.source_commit -ne $packageSourceCommit -or
+        [string]$release.package.archive -ne $artifactRelative -or
+        (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+        (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256 -or
+        [string]$override.status -ne "accepted-for-immediate-promotion" -or
+        [string]$override.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
+        [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
+        [string]$authorization.status -ne "authorized-subject-to-release-gates" -or
+        [string]$qualification.status -ne "exact-engine-and-governed-upgrades-passed" -or
+        [int]$qualification.governed_upgrades.passed -ne 15 -or
+        [int]$qualification.governed_upgrades.required -ne 15) {
+      throw "The C35 emergency candidate, V2 release record, qualification, override, or frozen ZIP identity disagrees."
+    }
+    Write-Host "[ok] exact C35 bytes remain frozen in emergency release state '$($release.state)' under the Factorio 2.1.14 V2 authorization."
+    exit 0
+  }
+
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/records/3.2.10.json") | ConvertFrom-Json
+  $override = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json") | ConvertFrom-Json
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf) -or
+      $admittedEmergencyStates -notcontains [string]$release.state -or [string]$release.candidate_id -ne "C34" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive -ne $artifactRelative -or
+      (Get-MIRFileSha256 -Path $artifactPath) -ne [string]$release.package.archive_sha256 -or
+      (Get-MIRZipContentFingerprint -Path $artifactPath) -ne [string]$release.package.content_sha256 -or
+      [string]$override.status -ne "accepted-for-immediate-promotion" -or
+      [string]$override.candidate.archive_sha256 -ne [string]$release.package.archive_sha256 -or
+      [string]$override.maintainer_decision.accepted_factorio.version -ne "2.1.14" -or
+      [string]$override.maintainer_decision.factorio_2_1_13_gate -ne "waived and superseded for 3.2.10 only") {
+    throw "The C34 emergency accepted candidate, release record, override, or frozen ZIP identity disagrees."
+  }
+  Write-Host "[ok] exact C34 bytes remain frozen in emergency release state '$($release.state)' under the explicit Factorio 2.1.14 exception."
+  exit 0
+}
+
+if ($status -eq "release-candidate-awaiting-external-qualification") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit") -ne "pending") {
+    throw "A candidate awaiting external qualification must use source_commit: pending until protected evidence is committed."
+  }
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "A candidate awaiting external qualification must record a full package_source_commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Candidate package source commit is unavailable: $packageSourceCommit"
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-external-qualification") {
+    throw "A candidate awaiting external qualification must use automated_gate: pending-external-qualification."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending") {
+    throw "A candidate awaiting external qualification must use manual_gate: pending."
+  }
+  $allowedFields = @(
+    "artifact",
+    "source_commit",
+    "package_source_commit",
+    "sha256",
+    "package_content_sha256",
+    "approved_delta_evidence_path",
+    "approved_delta_sha256",
+    "upgrade_evidence_path",
+    "upgrade_evidence_sha256",
+    "automated_gate",
+    "manual_gate",
+    "status"
+  )
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A candidate awaiting external qualification contains unsupported fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
+    throw "Package-visible working-tree changes make the externally awaiting candidate stale."
+  }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0) {
+    throw "Unable to compare the candidate package source commit with HEAD."
+  }
+  if ($changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after the candidate package source commit: $($changedPackagePaths -join ', ')"
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Candidate artifact is missing: $artifactRelative"
+  }
+  $archiveSha256 = Get-MIRFileSha256 -Path $artifactPath
+  $packageContentSha256 = Get-MIRZipContentFingerprint -Path $artifactPath
+  if ($archiveSha256 -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") -or
+      $packageContentSha256 -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256")) {
+    throw "Candidate artifact bytes or normalized content changed after local qualification."
+  }
+
+  $approvedDeltaRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_evidence_path"
+  $approvedDeltaPath = Join-Path $repo $approvedDeltaRelative
+  if (-not (Test-Path -LiteralPath $approvedDeltaPath -PathType Leaf) -or
+      (Get-MIRFileContentSha256 -Path $approvedDeltaPath -RelativePath $approvedDeltaRelative) -ne
+        (Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_sha256")) {
+    throw "Approved-delta evidence is missing or its recorded hash is stale."
+  }
+  $approvedDelta = Get-Content -Raw -LiteralPath $approvedDeltaPath | ConvertFrom-Json
+  $legacyApprovedDelta = (
+    [int]$approvedDelta.schema -eq 1 -and [string]$approvedDelta.kind -eq "mir-approved-delta" -and
+    [string]$approvedDelta.summary.status -eq "approved" -and [int]$approvedDelta.summary.unapproved_count -eq 0 -and
+    [string]$approvedDelta.current.source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.current.archive_sha256 -eq $archiveSha256 -and
+    [string]$approvedDelta.current.package_content_sha256 -eq $packageContentSha256
+  )
+  $nativeApprovedDelta = (
+    [int]$approvedDelta.schema -eq 1 -and [string]$approvedDelta.kind -eq "mir-control-plane-v5-approved-patch-delta" -and
+    [string]$approvedDelta.evaluation.status -eq "approved" -and [int]$approvedDelta.evaluation.unapproved_count -eq 0 -and
+    [string]$approvedDelta.observation.current.source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.observation.current.qualification_source_commit -eq $packageSourceCommit -and
+    [string]$approvedDelta.observation.current.archive_sha256 -eq $archiveSha256 -and
+    [string]$approvedDelta.observation.current.content_sha256 -eq $packageContentSha256
+  )
+  if (-not $legacyApprovedDelta -and -not $nativeApprovedDelta) {
+    throw "Approved-delta evidence is not an exact passing binding for the candidate."
+  }
+
+  $upgradeRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_path"
+  $upgradePath = Join-Path $repo $upgradeRelative
+  if (-not (Test-Path -LiteralPath $upgradePath -PathType Leaf) -or
+      (Get-MIRFileContentSha256 -Path $upgradePath -RelativePath $upgradeRelative) -ne
+        (Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_sha256")) {
+    throw "Upgrade-matrix evidence is missing or its recorded hash is stale."
+  }
+  $upgrade = Get-Content -Raw -LiteralPath $upgradePath | ConvertFrom-Json
+  $requiredArchetypes = @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")
+  $declaredArchetypes = @($upgrade.required_archetypes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $passingArchetypes = @($upgrade.rows | Where-Object status -eq "passed" | ForEach-Object { [string]$_.id } | Sort-Object -Unique)
+  $upgradeCommit = [string]$upgrade.source_commit
+  $upgradeCommitIsBound = $false
+  if ($upgradeCommit -match '^[0-9a-f]{40}$') {
+    & git -C $repo cat-file -e "$upgradeCommit^{commit}" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      & git -C $repo merge-base --is-ancestor $packageSourceCommit $upgradeCommit
+      $upgradeCommitIsBound = ($LASTEXITCODE -eq 0)
+    }
+  }
+  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.kind -ne "mir-upgrade-matrix" -or
+      [string]$upgrade.status -ne "passed" -or -not $upgradeCommitIsBound -or
+      [string]$upgrade.candidate.archive_sha256 -ne $archiveSha256 -or
+      @(Compare-Object $requiredArchetypes $declaredArchetypes).Count -ne 0 -or
+      @(Compare-Object $requiredArchetypes $passingArchetypes).Count -ne 0) {
+    throw "Upgrade-matrix evidence is not an exact five-archetype passing binding for the candidate."
+  }
+
+  $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $releaseRecordRoot = Resolve-MIRCPPathId -RepoRoot $repo -Id "releases.records"
+  $release = Get-Content -Raw -LiteralPath (Join-Path $repo (Join-Path $releaseRecordRoot "$($packageInfo.version).json")) | ConvertFrom-Json
+  if ([string]$release.state -ne "focused-qualified" -or [string]$release.candidate_id -ne "C32" -or
+      [string]$release.package.source_commit -ne $packageSourceCommit -or
+      [string]$release.package.archive_sha256 -ne $archiveSha256 -or
+      [string]$release.package.content_sha256 -ne $packageContentSha256) {
+    throw "Focused-qualified candidate descriptor differs from the typed ReleaseRecord."
+  }
+
+  Write-Host "[ok] MIR candidate bytes, approved delta, and upgrade matrix are fixed while external qualification remains pending."
+  exit 0
+}
+
+$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$profile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion ([string]$info.factorio_version)
+$requiredGroups = @($profile.required_validation_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+
+$sourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit"
+if ($sourceCommit -notmatch '^[0-9a-f]{40}$') {
+  throw "Active release candidate source_commit must be a full lowercase Git object ID."
+}
+& git -C $repo cat-file -e "$sourceCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) {
+  throw "Active release candidate source commit is not available locally: $sourceCommit"
+}
+$packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+  throw "Active release candidate package_source_commit must be a full lowercase Git object ID."
+}
+& git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) {
+  throw "Active release candidate package source commit is not available locally: $packageSourceCommit"
+}
+
+if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
+  throw "Package-visible working-tree changes make the active release candidate stale."
+}
+if (Test-MIRRepositoryGitDirty -RepoRoot $repo) {
+  throw "The entire repository working tree must be clean before candidate promotion."
+}
+
+if ($status -eq "published") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed") {
+    throw "A published candidate must retain automated_gate: passed."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "accepted-for-publication") {
+    throw "A published candidate must record manual_gate: accepted-for-publication."
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Published release artifact is missing: $artifactRelative"
+  }
+  foreach ($field in @("sha256", "package_content_sha256")) {
+    $actual = if ($field -eq "sha256") {
+      Get-MIRFileSha256 -Path $artifactPath
+    } else {
+      Get-MIRZipContentFingerprint -Path $artifactPath
+    }
+    $expected = Get-MIRRequiredCandidateField -Fields $candidate -Name $field
+    if ($actual -ne $expected) {
+      throw "Published release artifact $field changed: expected $expected, current $actual."
+    }
+  }
+  Assert-MIRCandidateBoundEvidence `
+    -Fields $candidate `
+    -PackageSourceCommit $packageSourceCommit `
+    -ArchiveSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") `
+    -PackageContentSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256") `
+    -PackageSourceSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_sha256") `
+    -Version ([string]$info.version) `
+    -InteractiveStatus "passed"
+
+  $summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
+  $summaryPath = Join-Path $repo $summaryRelative
+  if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+    throw "Published candidate structured summary is missing: $summaryRelative"
+  }
+  if ((Get-MIRFileContentSha256 -Path $summaryPath -RelativePath $summaryRelative) -ne
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_sha256")) {
+    throw "Published candidate structured summary hash is stale."
+  }
+  $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+  $publishedSummaryExpectations = [ordered]@{
+    schema = 2
+    status = "passed"
+    run_id = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_run_id"
+    git_commit = $sourceCommit
+    target_profile_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "target_profile_sha256"
+    required_groups_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "required_groups_sha256"
+    package_source_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_sha256"
+    validation_package_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_sha256"
+    validation_package_content_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_content_sha256"
+    validation_harness_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_harness_sha256"
+    expected_scenarios_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "expected_scenarios_sha256"
+  }
+  foreach ($field in $publishedSummaryExpectations.Keys) {
+    if ([string]$summary.$field -ne [string]$publishedSummaryExpectations[$field]) {
+      throw "Published structured summary $field does not match recorded candidate evidence."
+    }
+  }
+  if ([bool]$summary.package_source_git_dirty -or [bool]$summary.validation_harness_git_dirty) {
+    throw "Published structured summary must come from clean package-source and validation-harness state."
+  }
+  $failedRequiredGroups = @($summary.groups | Where-Object { [bool]$_.required -and $_.status -ne "passed" })
+  if ($failedRequiredGroups.Count -gt 0) {
+    throw "Published structured summary contains a required group that did not pass."
+  }
+
+  $releaseCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "release_commit"
+  $releaseTag = Get-MIRRequiredCandidateField -Fields $candidate -Name "release_tag"
+  & git -C $repo cat-file -e "$releaseCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Published release commit is not available locally: $releaseCommit" }
+  $tagCommit = (& git -C $repo rev-parse "$releaseTag^{commit}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or ([string]$tagCommit).Trim() -ne $releaseCommit) {
+    throw "Published release tag $releaseTag does not resolve to $releaseCommit."
+  }
+  & git -C $repo merge-base --is-ancestor $sourceCommit $releaseCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Published release commit does not contain the validated source commit."
+  }
+  & git -C $repo merge-base --is-ancestor $packageSourceCommit $releaseCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Published release commit does not contain the package source commit."
+  }
+
+  Write-Host "[ok] MIR published release archive, tag, and recorded validation evidence are immutable and consistent."
+  exit 0
+}
+
+$packageRoots = @(Get-MIRPackageSourceRoots)
+$changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+if ($LASTEXITCODE -ne 0) {
+  throw "Unable to compare active candidate source against HEAD."
+}
+if ($changedPackagePaths.Count -gt 0) {
+  throw "Package-visible paths changed after the active candidate package source commit: $($changedPackagePaths -join ', ')"
+}
+
+$artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+$artifactPath = Join-Path $repo $artifactRelative
+if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+  throw "Active release candidate artifact is missing: $artifactRelative"
+}
+
+$summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
+$summaryPath = Join-Path $repo $summaryRelative
+if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+  throw "Active release candidate structured summary is missing: $summaryRelative"
+}
+if ((Get-MIRFileContentSha256 -Path $summaryPath -RelativePath $summaryRelative) -ne
+    (Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_sha256")) {
+  throw "Active release candidate structured summary hash is stale."
+}
+$summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+$nativeAssuranceSummary = ([string]$summary.kind -eq "mir-assurance-candidate-qualification")
+
+$checks = [ordered]@{
+  sha256 = Get-MIRFileSha256 -Path $artifactPath
+  package_content_sha256 = Get-MIRZipContentFingerprint -Path $artifactPath
+  package_source_sha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  target_profile_sha256 = Get-MIRTargetProfileFingerprint -Profile $profile
+  required_groups_sha256 = Get-MIRRequiredGroupsFingerprint -RequiredGroups $requiredGroups
+  validation_harness_sha256 = if ($nativeAssuranceSummary) {
+    [string]$summary.validation_harness_sha256
+  } else {
+    Get-MIRValidationHarnessFingerprint -RepoRoot $repo
+  }
+  expected_scenarios_sha256 = Get-MIRFileContentSha256 `
+    -Path (Join-Path $repo "validation\scenarios\runtime.json") `
+    -RelativePath "validation/scenarios/runtime.json"
+}
+foreach ($field in $checks.Keys) {
+  $expected = Get-MIRRequiredCandidateField -Fields $candidate -Name $field
+  if ($expected -ne $checks[$field]) {
+    throw "Active release candidate $field is stale: expected $expected, current $($checks[$field])."
+  }
+}
+
+$expectedManualGate = if ($status -eq "release-candidate-accepted") { "accepted-for-publication" } else { "pending" }
+if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed") {
+  throw "An active release candidate must record automated_gate: passed."
+}
+if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne $expectedManualGate) {
+  throw "Candidate status $status requires manual_gate: $expectedManualGate."
+}
+Assert-MIRCandidateBoundEvidence `
+  -Fields $candidate `
+  -PackageSourceCommit $packageSourceCommit `
+  -ArchiveSha256 $checks.sha256 `
+  -PackageContentSha256 $checks.package_content_sha256 `
+  -PackageSourceSha256 $checks.package_source_sha256 `
+  -Version ([string]$info.version) `
+  -InteractiveStatus $(if ($status -eq "release-candidate-accepted") { "passed" } else { "pending" })
+
+$summaryExpectations = [ordered]@{
+  schema = 2
+  status = "passed"
+  run_id = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_run_id"
+  mir_version = [string]$info.version
+  factorio_version = [string]$info.factorio_version
+  git_commit = $sourceCommit
+  target_profile_sha256 = $checks.target_profile_sha256
+  required_groups_sha256 = $checks.required_groups_sha256
+  package_source_sha256 = $checks.package_source_sha256
+  validation_package_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_sha256"
+  validation_package_content_sha256 = $checks.package_content_sha256
+  validation_harness_sha256 = $checks.validation_harness_sha256
+  expected_scenarios_sha256 = $checks.expected_scenarios_sha256
+}
+foreach ($field in $summaryExpectations.Keys) {
+  if ([string]$summary.$field -ne [string]$summaryExpectations[$field]) {
+    throw "Structured summary $field does not match active candidate evidence."
+  }
+}
+if ([bool]$summary.package_source_git_dirty) {
+  throw "Structured summary was produced from a package-visible dirty tree."
+}
+if ([bool]$summary.validation_harness_git_dirty) {
+  throw "Structured summary was produced from a dirty validation harness."
+}
+
+if ($nativeAssuranceSummary) {
+  $qualification = $summary.qualification
+  $qualificationRows = @($qualification.rows)
+  $expectedIds = @($qualification.expected_test_ids | ForEach-Object { [string]$_ })
+  $rowIds = @($qualificationRows | ForEach-Object { [string]$_.test_id })
+  $sourceTree = (& git -C $repo show -s --format=%T $sourceCommit).Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]$summary.git_tree -ne $sourceTree -or
+      [string]$summary.package_source_commit -ne $packageSourceCommit -or
+      [string]$summary.candidate.archive -ne $artifactRelative -or
+      [string]$summary.candidate.archive_sha256 -ne $checks.sha256 -or
+      [string]$summary.candidate.content_sha256 -ne $checks.package_content_sha256 -or
+      [int64]$summary.candidate.bytes -ne (Get-Item -LiteralPath $artifactPath).Length -or
+      [string]$qualification.profile -ne "development-breadth" -or
+      [string]$qualification.plan_material_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$qualification.required_test_set_sha256 -ne (Get-MIRCandidateJsonSha256 -Value $expectedIds) -or
+      [int]$qualification.expected -ne 135 -or [int]$qualification.executed -ne 135 -or
+      [int]$qualification.reused -ne 0 -or [int]$qualification.failed -ne 0 -or
+      [int]$qualification.incomplete -ne 0 -or [int]$qualification.unexpected -ne 0 -or
+      $qualificationRows.Count -ne 135 -or @($rowIds | Sort-Object -Unique).Count -ne 135 -or
+      @(Compare-Object ($expectedIds | Sort-Object) ($rowIds | Sort-Object)).Count -ne 0 -or
+      @($qualificationRows | Where-Object {
+        [string]$_.status -ne "passed" -or [string]$_.disposition -ne "RUN" -or
+        [string]$_.fingerprint_sha256 -notmatch '^[A-F0-9]{64}$' -or
+        [string]$_.result_digest -notmatch '^[A-F0-9]{64}$'
+      }).Count -ne 0) {
+    throw "Native assurance candidate summary is not an exact fresh 135-row passing proof."
+  }
+  $freeze = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir/releases/freezes/3.2.5-D1.json") | ConvertFrom-Json
+  if ([string]$summary.environment.factorio_binary.sha256 -ne [string]$freeze.qualification_authority.factorio.binary_sha256 -or
+      [string]$summary.environment.official_data.sha256 -ne [string]$freeze.qualification_authority.factorio.official_data_sha256 -or
+      [string]$summary.environment.installation_sha256 -ne [string]$freeze.qualification_authority.factorio.installation_sha256) {
+    throw "Native assurance candidate summary does not bind the frozen Factorio environment."
+  }
+}
+
+$summaryRequired = @($summary.required_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+if (@(Compare-Object -ReferenceObject $requiredGroups -DifferenceObject $summaryRequired).Count -gt 0) {
+  throw "Structured summary required-group snapshot differs from the current target profile."
+}
+foreach ($requiredGroup in $requiredGroups) {
+  $group = @($summary.groups | Where-Object { $_.name -eq $requiredGroup })
+  if ($group.Count -ne 1 -or $group[0].status -ne "passed" -or -not [bool]$group[0].required) {
+    throw "Structured summary does not prove required group $requiredGroup."
+  }
+}
+
+Write-Host "[ok] MIR release candidate evidence matches source, package, validation, upgrade, ecosystem, and interactive-review state."

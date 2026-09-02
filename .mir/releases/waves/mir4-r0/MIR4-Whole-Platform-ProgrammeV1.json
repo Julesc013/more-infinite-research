@@ -33,7 +33,7 @@
       "completion_state": "implemented-private",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json", ".mir/releases/waves/mir4-r0/MIR4-Platform-Maturity-and-Publication-ContractV1.json"],
       "implementations": ["tools/lib/validation/MIR4DistributionIdentity.ps1", "tools/lib/mir4/BootstrapMaterialization.ps1"],
-      "verification": ["validation/tests/release/Test-MIR4R0Identity.ps1", "validation/tests/release/Test-MIR4BootstrapMaterialization.ps1"],
+      "verification": ["tests/release/Test-MIR4R0Identity.ps1", "tests/release/Test-MIR4BootstrapMaterialization.ps1"],
       "cutover": "private-candidate-only-until-source-freeze-and-release-authorization",
       "blockers": ["BLOCKED-HUMAN-SECRET-INPUT", "MAINTAINER-MANUAL-PLAYTEST"]
     },
@@ -57,7 +57,7 @@
       "completion_state": "implemented-private-provider-abi",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json", ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"],
       "implementations": ["tools/mir/application/targets/TargetCompiler.ps1", "tools/commands/mir4/New-MIR4TargetProductSet.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1"],
+      "verification": ["tests/mir4/Test-MIR4TargetCompilerW02.ps1"],
       "cutover": "provider-by-provider-after-target-law-and-package-parity",
       "blockers": ["BLOCKED-F018-EXACT-ENGINE", "BLOCKED-MUSEUM-CUSTODY"]
     },
@@ -69,7 +69,7 @@
       "completion_state": "implemented-reference-aggregate",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json"],
       "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "tools/mir/application/compiler/NormalizedCompiler.ps1", "tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
-      "verification": ["tests/compiler/Test-MIR4SemanticCompiler.ps1", "tests/compiler/Test-MIR4SemanticCompilerMigration.ps1", "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
+      "verification": ["tests/compiler/Test-MIR4SemanticCompiler.ps1", "tests/compiler/Test-MIR4SemanticCompilerMigration.ps1", "tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
       "cutover": "bounded-family-after-old-new-target-migration-package-parity",
       "blockers": []
     },
@@ -81,7 +81,7 @@
       "completion_state": "implemented-reference-aggregate",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json", ".mir/streams.yml"],
       "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "prototypes/mir/settings/registry.lua"],
-      "verification": ["validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1", "validation/tests/compiler/Test-MIRSettingsVisibility.ps1"],
+      "verification": ["tests/mir4/Test-MIR4SemanticCompilationW03.ps1", "tests/compiler/Test-MIRSettingsVisibility.ps1"],
       "cutover": "feature-and-setting-owner-by-owner-with-generated-parity",
       "blockers": []
     },
@@ -93,7 +93,7 @@
       "completion_state": "implemented-non-authoritative",
       "authorities": ["spec/platform/mir4-preview-v0/platform.json", ".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json"],
       "implementations": ["tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4PlatformPreview.ps1", "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
+      "verification": ["tests/mir4/Test-MIR4PlatformPreview.ps1", "tests/mir4/Test-MIR4SemanticCompilationW03.ps1"],
       "cutover": "law-by-law-with-safety-monotonicity-and-differential-proof",
       "blockers": []
     },
@@ -105,7 +105,7 @@
       "completion_state": "stable-terminal-authority-plus-shadow-aggregate",
       "authorities": [".mir/technology-lifecycle.json", ".mir/modules.yml"],
       "implementations": ["prototypes/mir/planner/compiler.lua", "prototypes/mir/emit/technology_operation_executor.lua", "tools/mir/application/compiler/CompilationRun.ps1"],
-      "verification": ["validation/tests/compiler/Test-MIRCompiler.ps1", "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
+      "verification": ["tests/compiler/Test-MIRCompiler.ps1", "tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
       "cutover": "terminal-player-executors-remain-authoritative-until-bounded-parity",
       "blockers": []
     },
@@ -117,7 +117,7 @@
       "completion_state": "stable-terminal-runtime-plus-shadow-contracts",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"],
       "implementations": ["prototypes/mir/stage/control.lua", "tools/mir/application/runtime/RuntimeStateModel.ps1"],
-      "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1", "validation/tests/runtime/Test-MIRUpgrade.ps1"],
+      "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1", "tests/runtime/Test-MIRUpgrade.ps1"],
       "cutover": "runtime-feature-by-runtime-feature-after-reload-and-state-parity",
       "blockers": ["MAINTAINER-MANUAL-PLAYTEST"]
     },
@@ -129,7 +129,7 @@
       "completion_state": "implemented-private-contracts",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"],
       "implementations": ["tools/mir/application/runtime/RuntimeStateModel.ps1", "migrations"],
-      "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1"],
+      "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1"],
       "cutover": "edge-by-edge-after-continuous-reload-equivalence",
       "blockers": ["MAINTAINER-MANUAL-PLAYTEST"]
     },
@@ -141,7 +141,7 @@
       "completion_state": "implemented-data-only-preview-canonical-application-cli-and-test-cutover",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json", "governance/repository/migrations/module-sdk-mep-tooling-v1.json"],
       "implementations": ["tools/mir/application/extensions/ModuleEcosystem.ps1", "tools/mir/application/extensions/ExperimentalApiSdk.ps1", "tools/mir/application/extensions/ExtensionDeveloperExperience.ps1", "tools/mir/application/extensions/MepDiscovery.ps1", "tools/mir/application/extensions/SdkV1.ps1", "tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1", "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1", "tools/mir/cli/Invoke-MIR4Extension.ps1"],
-      "verification": ["tests/extensions/Test-MIR4ModuleEcosystem.ps1", "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1", "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1"],
+      "verification": ["tests/extensions/Test-MIR4ModuleEcosystem.ps1", "tests/extensions/Test-MIR4ModuleSdkMepMigration.ps1", "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1"],
       "cutover": "api-contract-by-contract-after-independent-consumer",
       "blockers": ["BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER"]
     },
@@ -153,7 +153,7 @@
       "completion_state": "implemented-generated-preview",
       "authorities": ["spec/api/mir4-v0/contracts.json", "spec/api/mir4-v1/contracts.json"],
       "implementations": ["tools/lib/mir4/ExperimentalApiSdk.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1", "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1"],
+      "verification": ["tests/mir4/Test-MIR4ExperimentalApiSdk.ps1", "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1"],
       "cutover": "surface-by-surface-after-compatibility-window-and-independent-consumer",
       "blockers": ["BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER"]
     },
@@ -165,7 +165,7 @@
       "completion_state": "implemented-synthetic-and-exact-target-parity-preview-canonical-application-cli-and-test-cutover",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json", ".mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json", "governance/repository/migrations/processir-exact-tooling-v1.json"],
       "implementations": ["tools/mir/application/processir/ProcessIR.ps1", "tools/mir/application/processir/ExactProcessIR.ps1", "tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1", "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1"],
-      "verification": ["tests/processir/Test-MIR4ProcessIRExact.ps1", "tests/processir/Test-MIR4ProcessIRExactMigration.ps1", "validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1", "validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1"],
+      "verification": ["tests/processir/Test-MIR4ProcessIRExact.ps1", "tests/processir/Test-MIR4ProcessIRExactMigration.ps1", "tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1", "tests/mir4/Test-MIR4ExactProcessIRT12.ps1"],
       "cutover": "process-shape-by-process-shape-after-exact-target-snapshot",
       "blockers": ["BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO"]
     },
@@ -177,7 +177,7 @@
       "completion_state": "implemented-diagnose-conservative-experimental-canonical-application-cli-and-test-cutover",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-ProcessIR-Synthesis-ProgrammeV1.json", "governance/repository/migrations/processir-exact-tooling-v1.json"],
       "implementations": ["tools/mir/application/processir/ProcessIR.ps1", "tools/mir/domain/safety/SafetyKernel.ps1", "tools/mir/domain/policy/PolicyEngine.ps1"],
-      "verification": ["tests/processir/Test-MIR4ProcessIRExact.ps1", "tests/processir/Test-MIR4ProcessIRExactMigration.ps1", "validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1"],
+      "verification": ["tests/processir/Test-MIR4ProcessIRExact.ps1", "tests/processir/Test-MIR4ProcessIRExactMigration.ps1", "tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1"],
       "cutover": "candidate-by-candidate-after-complete-certificate-and-technology-acceptance",
       "blockers": ["BLOCKED-EXACT-ARCHIVE-CUSTODY-F200-K2SO", "MAINTAINER-TECHNOLOGY-ACCEPTANCE"]
     },
@@ -189,7 +189,7 @@
       "completion_state": "implemented-offline-preview-canonical-application-cli-and-test-cutover",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json", "governance/repository/migrations/inspector-compatibility-tooling-v1.json"],
       "implementations": ["tools/mir/application/inspection/Inspector.ps1", "tools/mir/application/inspection/CompatibilityIndex.ps1"],
-      "verification": ["tests/inspection/Test-MIR4InspectorCompatibility.ps1", "tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1", "validation/tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1"],
+      "verification": ["tests/inspection/Test-MIR4InspectorCompatibility.ps1", "tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1", "tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1"],
       "cutover": "remain-package-excluded-until-accessibility-and-consumer-review",
       "blockers": ["BLOCKED-INDEPENDENT-PRODUCTION-CONSUMER"]
     },
@@ -201,7 +201,7 @@
       "completion_state": "implemented-data-only-preview-canonical-application-cli-and-test-cutover",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json", ".mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json", ".mir/compatibility.yml", "governance/repository/migrations/inspector-compatibility-tooling-v1.json"],
       "implementations": ["tools/mir/application/inspection/CompatibilityFactory.ps1", "tools/mir/application/inspection/SupportAssessment.ps1", "tools/mir/application/inspection/CompatibilityCanary.ps1"],
-      "verification": ["tests/inspection/Test-MIR4InspectorCompatibility.ps1", "tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1", "validation/tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1", "validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1"],
+      "verification": ["tests/inspection/Test-MIR4InspectorCompatibility.ps1", "tests/inspection/Test-MIR4InspectorCompatibilityMigration.ps1", "tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1", "tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1"],
       "cutover": "subject-by-subject-with-exact-evidence-no-blanket-pack-boolean",
       "blockers": []
     },
@@ -213,7 +213,7 @@
       "completion_state": "implemented-proposal-and-offline-drill",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Assurance-Scale-ProgrammeV1.json", ".mir/assurance.json"],
       "implementations": ["tools/mir/application/assurance/AssuranceScale.ps1", "tools/mir/application/assurance/ReleaseBudget.ps1", "tools/mir/application/assurance/OfflineDrill.ps1", "tools/mir/application/assurance/EnvironmentEvidence.ps1", "tools/mir/application/custody/OfflineCandidateCustody.ps1"],
-      "verification": ["validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1"],
+      "verification": ["tests/mir4/Test-MIR4AssuranceScaleW08.ps1"],
       "cutover": "proof-class-by-proof-class-with-zero-selector-false-negatives",
       "blockers": ["BLOCKED-TRUSTED-TIMING-CAPACITY-EVIDENCE"]
     },
@@ -225,7 +225,7 @@
       "completion_state": "private-historical-plus-blocked-museum-plus-synthetic-host-canonical-tooling-migrated",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Historical-Succession-ProgrammeV1.json", "governance/repository/migrations/historical-tooling-v1.json", "assurance/repository/historical-tooling-v1.json", "releases/migrations/MIR4-Historical-Tooling-MigrationV1.json", ".mir/museum-targets.json"],
       "implementations": ["tools/mir/application/history/HistoricalSuccession.ps1", "tools/mir/application/history/SuccessorHost.ps1", "tools/mir/application/history/HistoricalToolingMigration.ps1", "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1"],
-      "verification": ["tests/history/Test-MIR4HistoricalTooling.ps1", "tests/history/Test-MIR4HistoricalToolingMigration.ps1", "validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1"],
+      "verification": ["tests/history/Test-MIR4HistoricalTooling.ps1", "tests/history/Test-MIR4HistoricalToolingMigration.ps1", "tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1"],
       "cutover": "target-by-target-after-exact-engine-custody-and-rights-proof",
       "blockers": ["BLOCKED-MUSEUM-CUSTODY", "BLOCKED-FUTURE-INDEPENDENT-PRODUCTION-HOST"]
     },
@@ -237,7 +237,7 @@
       "completion_state": "implemented-queue-canonical-application-migrated-compatibility-reader-retained",
       "authorities": [".mir/technology-lifecycle.json", ".mir/technology-governance.json", ".mir/compatibility.yml", ".mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json"],
       "implementations": ["tools/mir/application/technology/TechnologyAcceptance.ps1", "tools/lib/mir4/TechnologyAcceptance.ps1", "tools/commands/mir4/New-MIR4TechnologyAcceptanceQueue.ps1", "tools/commands/technology/New-MIRTechnologyReviewDossier.ps1"],
-      "verification": ["tests/technology/Test-MIR4TechnologyAcceptance.ps1", "tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1", "tests/platform/Test-MIR4WholePlatform.ps1", "validation/tests/mir4/Test-MIR4WholePlatform.ps1", "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
+      "verification": ["tests/technology/Test-MIR4TechnologyAcceptance.ps1", "tests/technology/Test-MIR4TechnologyAcceptanceMigration.ps1", "tests/platform/Test-MIR4WholePlatform.ps1", "validation/tests/mir4/Test-MIR4WholePlatform.ps1", "tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
       "cutover": "one-exact-technology-at-a-time-after-quality-review-approval-promotion-and-migration-admission",
       "blockers": ["MAINTAINER-TECHNOLOGY-ACCEPTANCE"]
     }

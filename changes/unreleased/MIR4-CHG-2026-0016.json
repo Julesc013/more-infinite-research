@@ -1,0 +1,30 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0016",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Converged executable tests, proof catalogues, and workflow purposes behind one governed authority.",
+  "details": [
+    "Canonical executable PowerShell tests now live under tests/, while validation/tests retains only three bounded historical compatibility forwarders.",
+    "The public CLI deterministically regenerates and checks current test-authority projections, the executable proof catalogue, the workflow-purpose catalogue, and the command inventory.",
+    "Release workflows route through the release application entry point, stable required-check names are retained, the publisher still cannot build, and all release-transition gates remain false."
+  ],
+  "semantic_domains": ["tooling", "tests", "workflows", "governance", "assurance"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F110","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json"},
+    {"kind":"document","value":"assurance/catalog/tests.json"},
+    {"kind":"document","value":"governance/automation/mir4-workflow-purposes-v1.json"}
+  ]
+}

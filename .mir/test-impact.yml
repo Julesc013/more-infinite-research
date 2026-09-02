@@ -61,7 +61,7 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
+      "pattern": "tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -103,19 +103,19 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
+      "pattern": "tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/tooling/Test-MIRVerificationContext.ps1",
+      "pattern": "tests/tooling/Test-MIRVerificationContext.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIRCandidateFreshness.ps1",
+      "pattern": "tests/release/Test-MIRCandidateFreshness.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -175,7 +175,7 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/mir4/**",
+      "pattern": "tests/mir4/**",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -187,43 +187,43 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4R0Identity.ps1",
+      "pattern": "tests/release/Test-MIR4R0Identity.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4BootstrapMaterialization.ps1",
+      "pattern": "tests/release/Test-MIR4BootstrapMaterialization.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+      "pattern": "tests/release/Test-MIR4OfflineCandidateCustody.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
+      "pattern": "tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
+      "pattern": "tests/release/Test-MIR4LocalPlaytestShadow.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
+      "pattern": "tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "pattern": "tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -259,7 +259,7 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+      "pattern": "tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
@@ -295,43 +295,43 @@
       "tags": []
     },
     {
-      "pattern": "validation/tests/tooling/Test-MIRAssurance.ps1",
+      "pattern": "tests/tooling/Test-MIRAssurance.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/tooling/Test-MIRLayout.ps1",
+      "pattern": "tests/tooling/Test-MIRLayout.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+      "pattern": "tests/tooling/Test-MIRControlPlane.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+      "pattern": "tests/docs/Test-MIRMarkdownFormatting.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/package/Test-MIRArtifactCleanup.ps1",
+      "pattern": "tests/package/Test-MIRArtifactCleanup.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+      "pattern": "tests/release/Test-MIRReleaseAuthority.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []
     },
     {
-      "pattern": "validation/tests/release/Test-MIRGitHubAdministration.ps1",
+      "pattern": "tests/release/Test-MIRGitHubAdministration.ps1",
       "groups": [],
       "scenarios": [],
       "tags": []

@@ -180,7 +180,7 @@ mod_interactions:
   narrow_delta_policies: .mir/interaction-delta-policies.json
   campaigns: .mir/combination-campaigns.json
   generator: tools/commands/compatibility/New-MIRModInteractionGraph.ps1
-  validator: validation/tests/compatibility/Test-MIRModInteractions.ps1
+  validator: tests/compatibility/Test-MIRModInteractions.ps1
   rules:
     - single-mod qualification never proves a combination
     - independent pairs require composition smoke evidence

@@ -1,0 +1,2068 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4201BTestWorkflowConvergenceV1",
+  "status": "M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE-COMPLETE",
+  "recorded_at": "2026-09-02T21:00:00+10:00",
+  "programme_id": "M42-01B-TEST-WORKFLOW-CONVERGENCE",
+  "change_id": "MIR4-CHG-2026-0016",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json",
+    "sha256": "D832B1BB0CE7459D24FCA6F6EE75ED43C7397051B1D1E53B3FCC9CF029D7AC12"
+  },
+  "base": {
+    "commit": "36c0f510ef09f5489df7ac5c5f6eb6f5fa9b93cc",
+    "tree": "b13d310630cf1932a3870fcef3982b5f309155cc"
+  },
+  "test_catalogue": {
+    "path": "assurance/catalog/tests.json",
+    "sha256": "EDEAE7E1E4AE226E58A8CA66CDC241D2EA51DDD48C7CB73531D5D28DEBF448E7",
+    "digest": "sha256:e06d72368d786f75a12d85c29b1932ca857f45bbb8948ab6e6f2f3e5e876e7b3",
+    "test_count": 118,
+    "compatibility_selected": 0
+  },
+  "workflow_catalogue": {
+    "path": "governance/automation/mir4-workflow-purposes-v1.json",
+    "sha256": "5B521DC7FF4BF98039E67F8117F05733F4740D45409481838C604D090567B4A1",
+    "digest": "sha256:a3b35dd6bdee9a86644a2a81bb77b67a2640e10429fe6efdf98cf63896202336",
+    "workflow_count": 22,
+    "public_purposes": [
+      "ci",
+      "qualification",
+      "release",
+      "nightly",
+      "governance"
+    ],
+    "publisher_can_build": false
+  },
+  "command_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "005B22E457A01BA918FF6490416D5D914AA9A81FBBD7DE1156444794E4BA46EB",
+    "digest": "sha256:d08a13e49f61e4ab7824d54cd98fd5c3d036b12c24da533a1ceb7f01e1dfc2eb",
+    "command_count": 85,
+    "unknown_count": 0,
+    "duplicate_command_keys": 0
+  },
+  "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",
+  "evolved_bindings": [
+    {
+      "path": ".mir/control/aliases.yml",
+      "previous_sha256": "93C8BBB5A38FE5EAC6B3B544F36E136851A4D21337B8FB5B6398F0864D03F2CB",
+      "current_sha256": "F4147177E7138E5512C3A5F285DB5A10B64CAF6AB2C58F1E8C409ABE1AD8BC31",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "E98D810D1233F177992FBEAED6D954AEB43B9FB4000891AC22F92C3E7A1B838D",
+      "current_sha256": "F2A95E8D9C474C10241BEABBADEF11A0F8270381499A2869123EADF5BBF75267",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "19C7DF9EA5B2AE3090A7875AF90D70D6564E10BC0BD6762F7BB0B84D318F9204",
+      "current_sha256": "24E6D2555808C1C940102FAF56C22F71CEDEECE84BED18C4E7177FECF9D6C8D4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "AA396EC5EE4AB221F6E3B3CFE2814B0558D5C16E77348010779E804626A16035",
+      "current_sha256": "005B22E457A01BA918FF6490416D5D914AA9A81FBBD7DE1156444794E4BA46EB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "B08718951822C97FC30F88460002C390B1F7CD137C46818473C2EC4424E15F7E",
+      "current_sha256": "5543BDCCAC361DADB185447A3648369C63AA49F75A7450EF2E8E145097C722AF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "scripts/Invoke-MIRAssurance.ps1",
+      "previous_sha256": "898B1FABD4E027FE367E44E2D22F4AE44FBBA9DE102DDAECD4F485C8324D9AEF",
+      "current_sha256": "FAB4B763803218D33E584958BA92403FB3631B6BB3B1A893BEC5DC3F59D52600",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "1634C7E29CC039E665C5105E799651EB1F7FDED568C2FF6C09CA148861441245",
+      "current_sha256": "15197FD8F9A6A47224C491B1AFAF9A334F380BB4A96F5301DB68D627E950F846",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/assurance/Test-MIR4AssuranceOfflineCustodyMigration.ps1",
+      "previous_sha256": "F06C83421666D74E9F35CC0E7E27309C1645C7C1D258028E8980F39EE137A65E",
+      "current_sha256": "9CC1BF737175518FEEF67DC063A0AF574A9D9BA590D535C1EE1D2AFD39F11E3E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/history/Test-MIR4HistoricalToolingMigration.ps1",
+      "previous_sha256": "7085545EAC6C78708B12258B885A4661281D4AE2FD5582C19FB90435B6548A01",
+      "current_sha256": "1CB08A35AA96B828893B098C5AB2F3B0AFE8AE5D190CAFD2D1DE9BE1BE2CAA74",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/release-tooling/Test-MIR4ReleaseToolingMigration.ps1",
+      "previous_sha256": "3817A7382CD5C44BCBF1A29CAF6E5B5966A239133350510019EC997D23252A60",
+      "current_sha256": "384E611BEFD3F14D15DEB2E63E74DB83FC44E4115DC2481904534025662CB249",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "previous_sha256": "AE702557F98917E7455DF803CF73C7049FFC0147CBD271B4BE95505F33FCB550",
+      "current_sha256": "D70A5B24BB7CEB42D3F541920E7DC4BE2C4095B263CC6FD25C72EAF692BA3BE2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "66CB0BD604F12F341F85194A7E1AE7D8682C68DBAFB3741DF507A5E77A8F8464",
+      "current_sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/package/RuntimeReplay.ps1",
+      "previous_sha256": "BA102D867A67DE0AE9EB9DBA04B198BA76C987C31CD656027761484A334B5FD1",
+      "current_sha256": "3EEE17C70E26F187C62548132651F62C636531DE4922B197BBA29A6A1527372D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
+      "previous_sha256": "8452761605C5088AF60A4EFE8BBFDA950FD22E66BF5FF5DF93B1EF7337016326",
+      "current_sha256": "FCF59DACB3C3C871EA844B256D48F54576229FE2AEF948003BE442CAA339B463",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "previous_sha256": "2C35CE376A05EBD89E87347B54BA22F0BD5D577BDE7DC63E6D89767F425826EC",
+      "current_sha256": "AA50E7DF8CD41C756B3270A47A23E13F4F8B911F9ED89B05813D4B99376E7E25",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "13D11E533DB4FD8FE21CA188415E0CCA217FCFFF94260FF05832F45D5C9B904F",
+      "current_sha256": "514D66D65F55F9F8FA95832285DE34BC110952202AEBA87223C6812E04BED1D1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "projection_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "F5EE8CAD242039E71887CBF620E082D3130D49EDCF65A8F421FD4F0948360A4F",
+      "current_sha256": "A9305CBC2FF8F92D1A797C6035C6DE150F71EF3D28F04B0F2D696F2B12EE6A40",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/compatibility.yml",
+      "previous_sha256": "54C226D32D092BD521AD016089944ED282AF2806FE7ED26A6F61197B731B0EE2",
+      "current_sha256": "5DA81B9C5D99F2C17695A10511A73263F61792A07A90D926C076F9A851EC0B77",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "CC74D8C4CE9646385FE2DF3292DE8CC85993DF590E5CD47DB71BE76390FBB98A",
+      "current_sha256": "E03CF1923D31F56894371A5A9AB30578B008DC548F6BAB292A80E904C595E82A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control-plane/ownership.json",
+      "previous_sha256": "2A727098DC33581BFDB8525069FD3900C74AE0CA12BC37673A1279ADA180A21A",
+      "current_sha256": "DFE138642EAD05A4C1B964426C444FBDB444484F3063185E5E6B2B931DF3BC8F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/fixtures.yml",
+      "previous_sha256": "3B4249362F276F2389A7F30DC50F2FF2DF61E25DE5EC19A178B9CABB6DF6EDAE",
+      "current_sha256": "38CC2CD10358F86515023F5AAF7222063D24E3B7579B98F0887D2B0CC767241B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "A637ED70B089AD1C0D2745DDBAA4B6C460A262932E9828DCAF0AFFAC4915C9D2",
+      "current_sha256": "07C77BFF44E237B0E548FB8A563271109EF7533111678DC25811033258E88FF3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "ECB2BA41850088E167197E85894EB83BF78586E52533D5ACF09B201F052D9B87",
+      "current_sha256": "F2CFC663E06DD6283538A4ECD78916F51947675E4F7DA9DFB79E0AB774A57B74",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/technology-lifecycle.json",
+      "previous_sha256": "54CF3FA2AEA8F477526C1292EA26994927CEABDC5A15CC929F3E003EFBEE0AC2",
+      "current_sha256": "535EFCBC7DBD7844BA9450B2F5C1C6D99A12CD501424831883D11E026F57A40B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json",
+      "previous_sha256": "87C270BD1A61D1CCC072B8D9F23E1C6C25E99075EBEB29560079B89DB7DBAFFA",
+      "current_sha256": "6CE38FE3BCA8EF8DEA54B83073B0A5A53CF88790A2CB629F6A79DC79D9F55998",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json",
+      "previous_sha256": "F25FCBB38C682D4A108E871F46166FDF4E5321CE02335FFD6120D0081C6F5BEB",
+      "current_sha256": "9FAE6B12902048F7CB92BA69EC5AFFECB37CEA994AB1ECFFE3BF68A2A01D00DE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/approved-delta.measurement.json",
+      "previous_sha256": "637814CA8DBB66A2567F7E619FA320C19DC2E0D0F86EFB55202E2138127EB29F",
+      "current_sha256": "AC72F791E5EC1F9755F17B4F25D5D91802DDB102A229360DE4B02DF416E34ABB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/architecture.dependencies.json",
+      "previous_sha256": "44E2892E50CE404B266BA1E55A9BFA8E2900894B2FD980364AD8FB53AD1F1D1F",
+      "current_sha256": "0B9AC83EF2A14E03469BAE1C29C2ADB4E6C8FB98A938AF56724DE6FC8C5071F6",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/architecture.files.json",
+      "previous_sha256": "0913E2F1D9BFCFFE2C144C6AD26A8F8D7BC3E5198D9BD1039BB7C3EEC4542E39",
+      "current_sha256": "BB1A816CCE5458A99330DE798D6BA0C5B0EEF1F9C2DB0AB2AAE674387A8D9E6E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/architecture.layout.json",
+      "previous_sha256": "D069A5F36A8B0BCF509FEA92223671C52940F8671103AC16585BFB15508AAA37",
+      "current_sha256": "45C78EF0DBE09407E52DC7756A663B4137BB2A39CAE308355271A51C19E9A003",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/assurance.self-test.json",
+      "previous_sha256": "1C656CC204B3AE863679E3B027AEBDD01CEA69AD1671607CA66EAD087B4ED86C",
+      "current_sha256": "006DB368CCC94370878897DE8293CAEAD48D85473A30D1763EBA0B2736DC706B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/backport.contract.json",
+      "previous_sha256": "A0FAC85AF7D0DC22D27E9E03ADBEF859CDADD9342E97C9BCD77C2988C0D88CCC",
+      "current_sha256": "2BA91035DD0AB947B06679705EBB28CA4B04608FB6414B983755964E2BBBD401",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/backport.reconstruction.json",
+      "previous_sha256": "BD252027A9EF5CDF0C3376F04F9FDE597DA6FE45105267E65E21235F86FCC269",
+      "current_sha256": "B0D34CD03BAFE8A6A04CEF8B35D9B7E13B3A0A836D669F762CC4DC13591021BD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/balance.contract.json",
+      "previous_sha256": "863ACBD2FD31DBDE3B6D2D09ECA0F3D2B4E425503B056A4B80940BEC9EC2B497",
+      "current_sha256": "863ACBD2FD31DBDE3B6D2D09ECA0F3D2B4E425503B056A4B80940BEC9EC2B497",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/ci.workflow.json",
+      "previous_sha256": "DF7B8122C84D522D993D74B6CBB106397E4E3FB7A865CAC430A64E21C98733FE",
+      "current_sha256": "E945B17617BC887FD0CC70EF8AC1D0368B6FEB1A44C662935C86994902F2C347",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/compiler.contract.json",
+      "previous_sha256": "06F0C010DD77EA05D3AADBD38FAFD6FEC40D82ED426852428A1C97F5DDE290BC",
+      "current_sha256": "19E50F68307BB55BBFFF768643723DF4AA8909C296383256030EFD241616A71D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/compiler.schema.json",
+      "previous_sha256": "C2105F0DB77427C2125198FDA4CF640EBBD1C1D28D07081983DB6BB140C79324",
+      "current_sha256": "8DAFF57349DE9CAB7923CFFF6C0CB274CA83E5615E47B176179493D09D328498",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/control-plane.records.json",
+      "previous_sha256": "2869F7095BF819C480010D15632A033300E2BB4650DCD5B71BD015C0ED0DCE2C",
+      "current_sha256": "2563E4FB2D9B277FB549C761D1F6B5EF46D35E27D38BB2C8FD5A3C0A73E54CCC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/docs.generated.json",
+      "previous_sha256": "AFA7762988B95EAE2F51B57524340BE2EAB0001E7D2681E9946923F21BEEF475",
+      "current_sha256": "AFA7762988B95EAE2F51B57524340BE2EAB0001E7D2681E9946923F21BEEF475",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/docs.schema.json",
+      "previous_sha256": "00FA1E7B5D50C6D483037D083FC838D53D43253194DF58CE496FC2F51AE93045",
+      "current_sha256": "9548249702938A0A7782E160E970F4CBAB94C90087A43FFBE8B917E182CF866C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/ecosystem.measurement.json",
+      "previous_sha256": "C5F5E59004C7F6E1C140CA314EDB1262F761387E83A48433F4ACABC96F7659FD",
+      "current_sha256": "C5F5E59004C7F6E1C140CA314EDB1262F761387E83A48433F4ACABC96F7659FD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/evidence.store.json",
+      "previous_sha256": "186B464C8705655D38E06EC5989ABA510465E0DC324F1EB25CA0639663B0F719",
+      "current_sha256": "23A4C15D4081DB22577A98DA275222DA02723C5EE8A6A233680E4D4ED95770C3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/executor.contract.json",
+      "previous_sha256": "7768CA9F02DA17CD65A050A11D813CBBAFB148BF8C384B37C4559BBCFA4F8BCD",
+      "current_sha256": "3C74BCE0413BA0B17E1AF7F34700BA7DFA47D8EA9748F0C4B87C9A927467713C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/harness.quality.json",
+      "previous_sha256": "331E73DCD5976FB7997BD90B7A3D3E499DB1EEFAAD142253129B9D9BD6EAC2E5",
+      "current_sha256": "C8E5975BCC4E1219D4712E209176C39CD6A28CADC26E394D1E3D0C0764564762",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/harness.schemas.json",
+      "previous_sha256": "7EF82157594C4F93BE279DF635BAB1EACD5F5D8DA9FDE6DCBE36FBEAB246EE57",
+      "current_sha256": "5CAF7F15ABF2FE7D3C3D97BEA981C47BE89DDB70107CC82FD31E156194611B9B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/locale.contract.json",
+      "previous_sha256": "F0F232EBBC95376EFCF95D0E33F10833892AC2F72519016BD223C4DD11203CFA",
+      "current_sha256": "3050D0357C369557B51647379EB4E5DC249C627567E6B917DB5A74300E6D67F4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/manual.acceptance.json",
+      "previous_sha256": "FE54BF051E5796C7F15C3E85E3D44E93800A8F5789299B93ACB33E318B782198",
+      "current_sha256": "A4FDEE608CD8B0F9E334CCA12D4DB055F99F0D3DE3B61DE37E183F620FBBDCED",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/museum.compiler.json",
+      "previous_sha256": "142151E6915EADD1897ECB0632EC114AD611C2EEB34038E6BBB7A5663BE7537F",
+      "current_sha256": "72F307C19A7B51CA945D90DB94B936A87F5238FF1BC40AD6B0259688CD57D240",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/observation.evaluation.json",
+      "previous_sha256": "0510F6512A79DE834009645640DCDAFADEB20B9FF057DA0FCCCD4A30F2E9E5C9",
+      "current_sha256": "FA182563A80DA61ADB1DA01860A3A15D076F7E930D6B0E34E56F71F895078475",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/package.composition.json",
+      "previous_sha256": "99261E68C6C78DC198B0B656AB23AE9A5A848E192D39C10BEF38564D3933FABF",
+      "current_sha256": "5C38245A5A5BF4B1117FEFF19CF42C186A50BBCF4FABF3996EF37AAD86883142",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/package.determinism.json",
+      "previous_sha256": "BA44AAEAA170403FC35484E88A5C63E63395174BDADC10C589D64D74DB76D347",
+      "current_sha256": "DB24B4C4ED59C99211C9F6573B6CAF8B05DCEB96C19F20415BA7033F9C77FEDC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/package.identity.json",
+      "previous_sha256": "952F157F1C7186CAC94DEA9F147DEB9BDB66F4D12E23F7853B7504A5FEADF78A",
+      "current_sha256": "BE532D90369B3E3DCA64732695CA785A3DE7EE949EBD81A9E1FC7C9F11D8228F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/performance.contract.json",
+      "previous_sha256": "FF6069CC2EC6E3A43E9812B074DF001BBB09A2585FC8EA24A06AF9A1DE0E1601",
+      "current_sha256": "197CDED0EF9C7AAAFDD6B17815378C785DF6DEE934375DE114C286F3A9EFA534",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/performance.measurement.json",
+      "previous_sha256": "87B50B9DD22B28AADEF93F1FE9602EA2DC2CBA41CABFAB59BEC42978915C50AD",
+      "current_sha256": "6BE052CD8712FF252D8251FE1C3FD5CE78278EE5DF178623FBAA9A38A15F426D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/promotion.json",
+      "previous_sha256": "AF95AA6BE37BB7CBBD07A43D7A88CBB4C85B37A0EC2938C650216033A700BF5F",
+      "current_sha256": "CEB3BDF4880C56DAC844FA41C18B32679056F3E28BD16F5AA94BF09877D4A254",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/protected.qualification.json",
+      "previous_sha256": "01E6E04E419A7D3776B77D1CC84220CDD6C954A839D12B247E0B5B3EF4376EEF",
+      "current_sha256": "B6D88F0C53D6B58B41EA6E5751167225D7A0331585BCA642566F28D8D36DC5B7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/public-byte-verification.json",
+      "previous_sha256": "70992612AED0D1465DA96451021CC9EA97295F671FB980BB0B1C33B5CDB34CFD",
+      "current_sha256": "877EDF1995BE601892671CAB26AC1E710239E237EAB40960E071185AE511CD02",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/publication.json",
+      "previous_sha256": "6E76094AEF0F1A8E2052DF467028E7011084678253FC6A942F0580398116512E",
+      "current_sha256": "8A6D9099769A528A0E5E9118F1CA8326B9D644C3FBC0BC85DF1F5C4DD0C5934C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/qualification.full.json",
+      "previous_sha256": "52670E3274F277E0EA8A71960D30168CA70A0736CF110B5CDD05D42B241EF622",
+      "current_sha256": "52670E3274F277E0EA8A71960D30168CA70A0736CF110B5CDD05D42B241EF622",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/release-history.integrity.json",
+      "previous_sha256": "8C1C64FDC2B4C65E8F6E5AFAD163543CB1286636DE15BB38D5FA7A04A16A87B8",
+      "current_sha256": "153ADD547B3671D21F42B5171DC63E1E1ED643C01BFADEE30D319F55CC96167F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/release.authority.json",
+      "previous_sha256": "4DAF38A969BD3FDA28D8F2896D8CF8CAB6239BB1BAF261C00A234EC9257EA3BD",
+      "current_sha256": "4EE5281A2D605C90D71581DEAF606C3A276B59C5C85DA5EC6B251A138CD1259F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/release.controller.json",
+      "previous_sha256": "F4E8B115E73C7BA5E3D94B2508B80E9C015FA61FDDBD0489A945EE7BB401C219",
+      "current_sha256": "D784ED8E9CD1DE135B2C315BBEBC2AEEE292B08C01E16FD1B6C444E584E631D9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/scenario.registry.json",
+      "previous_sha256": "FA345F98D86D1E13D9512DE48BD13F047F28313FFB9FC078946859EC1CEAAFE2",
+      "current_sha256": "72AE805D6EA995C74E527DE4A56D8883904A27130C5AE65E763CCF2E71518606",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/seal.json",
+      "previous_sha256": "BC39539390CE0E051FD7266DED3311C598AD0B95CBEA82187B6ACE38A0FB6F48",
+      "current_sha256": "CCF74984C1255DDCD12EC2A4A5C33FDCCAFAF81B0169BA5E1DDB1E127AF7E7C2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/settings.contract.json",
+      "previous_sha256": "CB121EFF81C0C3A66087DFDDD5EC8944B03DA0E36DB7D64F28066F62F1E061B5",
+      "current_sha256": "A44B282CA441A18F2841469B27DACC50374D5D2EBE4652B3AEA7AB480E042573",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/shadow.equivalence.json",
+      "previous_sha256": "8B88C93F83884029871F60A94E921FB02C454985F8F53BE95B9B9912A56BE35A",
+      "current_sha256": "73252E78353D4F82824FCE9E4D9721BEB44C26CDD6BB32FB7C75E07FE5DB10EB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/shadow.structural.json",
+      "previous_sha256": "DAC74B0841254EC9F72445A425581366E548D523B4602B0A98DC17E47E0147A6",
+      "current_sha256": "32318319ADDB461AFE64EFB13E9437EA58845687F2C9B3A32589F425477E963F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/static.full.json",
+      "previous_sha256": "743DE94152ED8225353B964270167BF073BE083EAEAB6F39F665E534B6BCCEE4",
+      "current_sha256": "743DE94152ED8225353B964270167BF073BE083EAEAB6F39F665E534B6BCCEE4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/tag.json",
+      "previous_sha256": "02F9284D5D2CA309E51426676E6B65EDBCBCD74B1BD6072007877C37BB8AAB4F",
+      "current_sha256": "EBB97F3EB372E7E3351F66EC3A1582E4506A9824D98C3527A6B89F74F3CA6DE4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/upgrade.measurement.json",
+      "previous_sha256": "F9B01C47E0B706E8C6F2A46E8179232252EFA7EC67087BF2D05F3EE0C4DA2127",
+      "current_sha256": "8DE9AC568F31135326F78C16106ED2F1FAA05FCDA983E2787DBE25BD90F935B3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/lifecycle/tasks/verification.context.json",
+      "previous_sha256": "04104297E4A9B2B8D9AD8B9FA3B6AE82642F0D27E281D2B793C048F4C1115836",
+      "current_sha256": "2C75D27AB5CC241F96F7AF5A71FEAFEB0ADED2181479E7F03AE7227231DB9423",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "relocated_bindings": [
+    {
+      "from_path": "validation/tests/architecture/Test-MIRArchitecture.ps1",
+      "to_path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_git_blob": "81ee93040e4e6015df35212e363d4c7536c53476",
+      "previous_sha256": "D7DF02CCC2979598FF2DF7077F077D8CC7DF8457958798A894169F80F7D9562A",
+      "current_sha256": "CE837FC4E3793C1EC5F287ACA81E8DA3F030CA9D34E04F544966ADC34E60DFBE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/architecture/Test-MIRModuleDependencies.ps1",
+      "to_path": "tests/architecture/Test-MIRModuleDependencies.ps1",
+      "previous_git_blob": "522246460791c3bbf9c7f99e9a2d197de0e1e837",
+      "previous_sha256": "32B2FE4D6B57971887C03DDF3142430CADD4F76A4AA9EA066A7518A02BF39DCB",
+      "current_sha256": "543EDAADC5FF3FD041CC5B5F92C5ACFBD99D937BE9511F4584C8AECDA346EF5F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compatibility/Test-MIRDependencyResolver.ps1",
+      "to_path": "tests/compatibility/Test-MIRDependencyResolver.ps1",
+      "previous_git_blob": "ed881319b651b662240786ca0b2cb35558ae841d",
+      "previous_sha256": "47B139FB7AFF1A19EF422AAF129C7FA27536653C0D9AFDC7EC54E03DC1E9D359",
+      "current_sha256": "92408F92599325B22CABA23C127D65541E187C793951060E8A0D3E86D3305FCE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compatibility/Test-MIRLocalModLibraryCatalog.ps1",
+      "to_path": "tests/compatibility/Test-MIRLocalModLibraryCatalog.ps1",
+      "previous_git_blob": "a58348c1340d74cdf6303d1f34d4eaf8dc93957b",
+      "previous_sha256": "EE0AF62DFEB82E1835ED8DB61C1704B6032E2034DBFE2071C6425535557E7CBB",
+      "current_sha256": "9F4FD423312E81FF2A4A4867B49E064E0A20C188D20781C18EC8B0BF07FA3825",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compatibility/Test-MIRModInteractions.ps1",
+      "to_path": "tests/compatibility/Test-MIRModInteractions.ps1",
+      "previous_git_blob": "a1c2bd44b8f2a718d6f89c0115c5ffb2535543af",
+      "previous_sha256": "9308A932B528EDD0C3D4E471869240246F7D63B11E1AD95D192427D962AF7D90",
+      "current_sha256": "C30AD9FFD4B894A53C2119F5B6976AD8E3AC0FCD34AD6C403F8A9A491CBF8883",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compatibility/Test-MIRScenarioManifests.ps1",
+      "to_path": "tests/compatibility/Test-MIRScenarioManifests.ps1",
+      "previous_git_blob": "e56d6400aae150bfa275632f4570b8cb3734310a",
+      "previous_sha256": "FBCBC6855B81F5FED3A248A0A9CCBFB60C5C290C16ADA0996A07278E6866E55D",
+      "current_sha256": "AF917005C6C4CA4AB4A3B42BF5F1C7729860D381239C12BB18DB26EB44254444",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRCompiler.ps1",
+      "to_path": "tests/compiler/Test-MIRCompiler.ps1",
+      "previous_git_blob": "42245fc0e623f1306a40c3bae3566831741b9452",
+      "previous_sha256": "B413589A46E9AAB9C40B5E2EFAA3778B79E28BA33B9D287A15B1F5FE1FC73F3D",
+      "current_sha256": "A07DC6E6D09D3A1C5298BC5CFBD82AF0C64F0BA56FC34AED8C2F4F260F9190D5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1",
+      "to_path": "tests/compiler/Test-MIRCompilerContractCoverage.ps1",
+      "previous_git_blob": "7c940ffd8b2095188d296a1e9670bf2d5375c262",
+      "previous_sha256": "907D5B3EA2B996E96BAF3B890DC9313806847202316351EBE58ECC3DAA5C67EB",
+      "current_sha256": "87A0AAE441767C40897751E0CFCA4F2F42CF4C9F97F5D3B244797E57FB25C1CD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRCompilerPreviewExport.ps1",
+      "to_path": "tests/compiler/Test-MIRCompilerPreviewExport.ps1",
+      "previous_git_blob": "9e717a6022d95a2fe4627d03a64619ca20af9d98",
+      "previous_sha256": "0902EA7E789B1F60288DC6498D66A823B37B25A9E3B6874DEC569C7EE68153E9",
+      "current_sha256": "EA36458B0B54F6E7BE9F67CF8FE8B7DA43F914FF16D23D3ED44DA1EC26E53388",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
+      "to_path": "tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
+      "previous_git_blob": "5f89eae674b6027f2f166ae63770a6d23e00a0e5",
+      "previous_sha256": "B9E6489B43354C6AD57CBE14C10DDC02BD601039752D72FA8E6ADC0D09E8F47F",
+      "current_sha256": "852DB1A0D6342CE8E0E8581348FCFE1D54F6A1EA089ED932BF782C6CF4AA62BE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+      "to_path": "tests/compiler/Test-MIRNativeOwnerCostModels.ps1",
+      "previous_git_blob": "adc8dc810ed11bcbe60afdd2e93163215cea4dd0",
+      "previous_sha256": "A4C16B7657F7F04907FF2689FE2F181524909C1E41467054538E77D8F0C14F4B",
+      "current_sha256": "780A727E51209117C4C47C6A82AE59FEA7942B326921CB30012B74F6865F1631",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRResearchCostModels.ps1",
+      "to_path": "tests/compiler/Test-MIRResearchCostModels.ps1",
+      "previous_git_blob": "2794cf3dfa17c6d086633f6e8e12a4efe07256a4",
+      "previous_sha256": "9E610B3693F2D636CED4EADE33AF6A5D6604A0F8F74D8E0CBCEB9AA0DD0B9B67",
+      "current_sha256": "A2E2489C747EEF2E5BB07E01D35D961537395B94D2F64F6907E259149B943442",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRRuleSynthesis.ps1",
+      "to_path": "tests/compiler/Test-MIRRuleSynthesis.ps1",
+      "previous_git_blob": "4824a7a74fc11120f812121c0fbd986b723d49c7",
+      "previous_sha256": "A2F606B303D16BB0E67C94EB40E86D330912BC4C565C4D30CBCB82D47418DDD3",
+      "current_sha256": "27DAFEB806DB5B874EBFA78D922DE83CBCAF8412D653F1660B2FFE6704120D10",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRSettingsVisibility.ps1",
+      "to_path": "tests/compiler/Test-MIRSettingsVisibility.ps1",
+      "previous_git_blob": "4a737d6d7f6e394a56d7a268c4f5283aaa16efcc",
+      "previous_sha256": "EA8029F778A9071FEEC4EC2BE0611B4C1D857702AB00C909190F80BDAA105409",
+      "current_sha256": "F0623BD9D0F20135B9AF67D9A660D02D6F4771F42974A66476621F8923D2A43F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1",
+      "to_path": "tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1",
+      "previous_git_blob": "adeb978e5dc835fefeb3bfe78e2e2aa3da255660",
+      "previous_sha256": "7B51539E0B04120712641F2266F7A0ADBA1B6A0F9E5EEB726B83F0F6193355E2",
+      "current_sha256": "3622B933489E84A3F7DF0B34AA5ABA8CD757C730800A7D44FE101C5FEA6D2FAE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRTechnologyLifecycle.ps1",
+      "to_path": "tests/compiler/Test-MIRTechnologyLifecycle.ps1",
+      "previous_git_blob": "7206672bbece2d655700ffcd358313f92fee1203",
+      "previous_sha256": "CAE995CB247EBEF25A3150176A498196DE48ADFC50361063D47166797D698BA1",
+      "current_sha256": "D0C59978B7DC03E0FFFDC93C1116CFDA01AE943D8A2A77F06A83012702538097",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRTechnologyPolicy.ps1",
+      "to_path": "tests/compiler/Test-MIRTechnologyPolicy.ps1",
+      "previous_git_blob": "9efbba71aea5ea7f3606da48099786a8dfe163f6",
+      "previous_sha256": "F3098924765E009A82C9FA7C658A3E1BCAC07894B381F30F6F74726D56D22D0D",
+      "current_sha256": "CA11FE947619DC1D3A0B99742612A7B648FB0F627FCCC997DF9258A78D610780",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1",
+      "to_path": "tests/compiler/Test-MIRTechnologyPromotionAdmission.ps1",
+      "previous_git_blob": "22bdeb1fd8cdda89f77490c02fdbda3763c75091",
+      "previous_sha256": "33BDBF3C510FE7EAA9B1DD0A3595B6CEF68877025DF31B69CEC86C3824F49A1C",
+      "current_sha256": "0340CE2B9F89466F6D3E5524CAB798B8E83908F358F98F5D6746D3EE93B81AD8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/docs/Test-MIRLocales.ps1",
+      "to_path": "tests/docs/Test-MIRLocales.ps1",
+      "previous_git_blob": "14294a5cef586ab88ceee03894a1e0e261f12540",
+      "previous_sha256": "7F8CF0A379981B4FB4AC9A60DB808E633EA582FFA362E340F87C823D3E5BEF42",
+      "current_sha256": "C5EF171129341EA55C55929BAB77069A467A9F9052CB403B04E81C02E183A9F5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/docs/Test-MIRMarkdownFormatting.ps1",
+      "to_path": "tests/docs/Test-MIRMarkdownFormatting.ps1",
+      "previous_git_blob": "fd8d0237ee570f5ec7b115dd6adac680aa78d985",
+      "previous_sha256": "9346E21F9953D83515CE421709711698FDADC89476C93A4EA95154A091906278",
+      "current_sha256": "A4093F47E801ED83547B8F96064F7A65C1BD182AEA92D4EF587B0E2ACDFAEB5A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/MIR4ReceiptTestSupport.ps1",
+      "to_path": "tests/mir4/MIR4ReceiptTestSupport.ps1",
+      "previous_git_blob": "b582f1ef39ae958e0a0e9dee86b31abc8c35a5da",
+      "previous_sha256": "FBE9C63B5202EC1DA0881C35E1D1B4B3F971D52066A6636FC05BEBA61593E32F",
+      "current_sha256": "B7F4915AAF4BC505F29E89795241EDDF3976871F4C0BEEAE4453E60F78EF5937",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4AffectedProofSOL08.ps1",
+      "to_path": "tests/mir4/Test-MIR4AffectedProofSOL08.ps1",
+      "previous_git_blob": "bb8076e4d8aacc64b056817cda92261741f30610",
+      "previous_sha256": "CC63D5251315467E452C1F87AC2F0B9A0E6EBD2445CB6E4902C945D87D818896",
+      "current_sha256": "A21BC9232C036E31AF914A782E7A526A521BABE9E543FF68AA8652F5081112EA",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4AssuranceScaleW08.ps1",
+      "to_path": "tests/mir4/Test-MIR4AssuranceScaleW08.ps1",
+      "previous_git_blob": "a953f8562203bd840228705452176d4f62312a3f",
+      "previous_sha256": "79414BC9FEE09CC7F6871BAA3BE864D306C2EB961EF96135F54B422DCC276615",
+      "current_sha256": "07D36D2533596C44165726F509CFE15EBD46AF0CB4B89ADE1F700E260935C529",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4CompatibilityCampaignSOL07.ps1",
+      "to_path": "tests/mir4/Test-MIR4CompatibilityCampaignSOL07.ps1",
+      "previous_git_blob": "f5ca9a92d83dcd319fbf44ceea512083ace47c2c",
+      "previous_sha256": "2CF4DCC09E468588EAD83327C1DA7B4BA547400A2EDF376C666D7EB8E4EE4220",
+      "current_sha256": "03A4459657C40F33ABDCDA25C89F2329642F297E4676D4F8AC6CBAAF371DC0F6",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1",
+      "to_path": "tests/mir4/Test-MIR4DocumentationContinuityT14.ps1",
+      "previous_git_blob": "fd1850358ecc3bb995cf5871675aacb53c8a0c39",
+      "previous_sha256": "798F6BFBF4FE91EF2A1D097A7B0C9E3F307C26797B23656B3831030D36BE5680",
+      "current_sha256": "D87950BF3E4C077752D336DBE437BB0E640F3765985FD675C67EF4DB2B8A83E2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
+      "to_path": "tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
+      "previous_git_blob": "8b34d9b3e486e881f3aa822543f7e00a55c76ce1",
+      "previous_sha256": "D831267A0E367348BC7D8FDAE95F13CCD65D15964CD4F96499664C439ED68158",
+      "current_sha256": "A0C89C08D07235D1A9161A4B509863BBFFCACCDA87737BE280E8777A20474143",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "to_path": "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "previous_git_blob": "5053a6a89d99c6ec22798f6074c5ad6bd84a86fd",
+      "previous_sha256": "F457919F1A161A6FC84E1333C3C65FA2758AE916580D89B89803E3CA4881C734",
+      "current_sha256": "D36D0BCBC2E880982DBE978E56C2BF62DF7DDCC8AF08EBCF3CF2B44F5A60E732",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1",
+      "to_path": "tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1",
+      "previous_git_blob": "0e19605ad19389ccf771d2866826fe7aba0e025e",
+      "previous_sha256": "A0B9D78303F7AB404440CF6CCC1BFC0F56F32B3E54B5315AFB4C9DE20879C8A5",
+      "current_sha256": "33AFE070BD4814155E136F062A8B7DD6CF6153047B1E499992FA2CEA13197FB4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ExactProcessIRT12.ps1",
+      "to_path": "tests/mir4/Test-MIR4ExactProcessIRT12.ps1",
+      "previous_git_blob": "71d97d896c1796684f5f4b64b9a259d0e0e6eac4",
+      "previous_sha256": "1FBC2233C52297E64415E98C52B1D908A4C581EF9D17BD6CD02EF68AD01820AB",
+      "current_sha256": "9F82BCD7AF908CCDB317731DB72430CF9B6E377C3829E6EB06384DF849BD1228",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+      "to_path": "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
+      "previous_git_blob": "e31830e12bd5bffce26f90f52ee20c65541d8dc5",
+      "previous_sha256": "691C37806CF565FF6DDC2D9AE24892751C2EFD723A0837C842E9ED4BACCAE05A",
+      "current_sha256": "62886BB18F9D5C16DA72967F9BEEA066C44532629E3BCF93956C6C234618ED71",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+      "to_path": "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
+      "previous_git_blob": "58e7b540688500a77a0af8829cb1543afb66ac94",
+      "previous_sha256": "872AA67AF4DA1EA3923196F9699F6804E4114F2F8BF13FDA2E19ABA4AE82C782",
+      "current_sha256": "22C2F020B4F01779D2D903F626BDB4DE204568C171D4191FA9A6A054E01EEF7C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
+      "to_path": "tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
+      "previous_git_blob": "73ba7f4212d10e79a21b3450c43079b8bb4e536d",
+      "previous_sha256": "5BDD0FA0986D80538887953FEF8B015546AD410CD011F6C1BBB3393E36C7E183",
+      "current_sha256": "42EA12DDF5274B9167C15B5016119FC7C2075DF0E662B586105D4BFFB3CBE541",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
+      "to_path": "tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
+      "previous_git_blob": "e2fc640577985a8ca1a44370459cb402aabf93d8",
+      "previous_sha256": "66C2A8D5208E7200D44C63095DEAD1DAD7E912015400AE2E0BF65F9162F7F32F",
+      "current_sha256": "A6E0968213A96DBA1BD4415F3983309FBF0261655A0CA20622AB6275C560CC7C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4FullPlatformCloseout.ps1",
+      "to_path": "tests/mir4/Test-MIR4FullPlatformCloseout.ps1",
+      "previous_git_blob": "9a64c204de0948c92b3fe69dbb2c2ee86b6fc723",
+      "previous_sha256": "8778AE467641E54C5A612D5D69792B395B861469DDA71895AF6E857A610D80EB",
+      "current_sha256": "6538C8E3E4B93D3E476C2A9710F71E30A9C0E45EC44960B17A6A3DD4ED6D15D5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
+      "to_path": "tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
+      "previous_git_blob": "9de6dbe9db15db4fe1b256119a48a56fa2e2c619",
+      "previous_sha256": "AECB158989891C5B0BD005A51885A2D4C7DF0046049C17ED1F3F40852B7C62AE",
+      "current_sha256": "490002965AF690AA21FED6673242AC81BD8CF8FF30089C386F2B56EF90DDE89F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1",
+      "to_path": "tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1",
+      "previous_git_blob": "84599c698a874a508a023fb0430745fc4e867b2e",
+      "previous_sha256": "D36B1A62CED9554F455921B78F2EB4871BEB5E7CF23B70029E35A58D4B9B0B84",
+      "current_sha256": "428BEAC62A1BAD72D4F99D77A5BB9054C5A6F007F326A5ADB1F1B63E08C17F5B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1",
+      "to_path": "tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1",
+      "previous_git_blob": "1cd765506f857688f3632c336aa09eac202d4bdf",
+      "previous_sha256": "A101CB639347C20E1AE73D5E675AD6A0BF5C1C35CB1CF9553205CEA09ABDD140",
+      "current_sha256": "DCC2EA871B6CEF6E9463C0553C16E9723F8E7AD3C8B9D7C4A5C930F5720F4446",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4K2ScienceSOL06.ps1",
+      "to_path": "tests/mir4/Test-MIR4K2ScienceSOL06.ps1",
+      "previous_git_blob": "ebe526d85433470c0ff1e5109d4fb6d928dcf4eb",
+      "previous_sha256": "C1EDBB65B2B7708584A4F7901E1A473073872B835E2EF388132DFF0A3CB7DE87",
+      "current_sha256": "1D783E34D4081CE7D875D0EECB98D7AB6EF8CE671BF9BEA5D7F19D09F613A449",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4M4C01CloseoutSOL09.ps1",
+      "to_path": "tests/mir4/Test-MIR4M4C01CloseoutSOL09.ps1",
+      "previous_git_blob": "a6f35b4ee8248ef9dc59dc1e77dab65cea06a4dd",
+      "previous_sha256": "5C98AF453E2517433152F2E1C185FC655ED0E57CAA27FF9B0885141C369A1F7F",
+      "current_sha256": "9EC14E41D49015850564E1A6B476979BCA6E02EF5F05F470892A37F613D0BF6C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4MaximumLevelSOL03.ps1",
+      "to_path": "tests/mir4/Test-MIR4MaximumLevelSOL03.ps1",
+      "previous_git_blob": "999cdc84060d25bf78a4190aab39870040d269c5",
+      "previous_sha256": "7A98F4B555A4E47DBE1C4F53B2B2335CC173068F8CD798BB296FFA8AA2CF3328",
+      "current_sha256": "F74BD6C5687074B30A9FEA28FEF90D1F826516EB40948B850FBB3CBBAFF7C708",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+      "to_path": "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
+      "previous_git_blob": "97d9bc75b7d95234555ad87b81d55296178471d4",
+      "previous_sha256": "E90C334379F663EA306566FED974D3B4F90E9975CFC46D7A1336E565635A2CE3",
+      "current_sha256": "D150F5F9212C2668141FED8FDB3C7CF2005C608C49B2D84BF0547441FC8F64C7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+      "to_path": "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
+      "previous_git_blob": "3ffa8c2a2f1c1c6bfe9eed1bc8f8b7b8574a8135",
+      "previous_sha256": "BCA03F1A34F4A3098277A8F83B789FD373B7E86F7F41FE653DA77DFCD9BC2AB7",
+      "current_sha256": "B5FD024AA4B09C2DBA3803083D049970D4C3559602A2F5FA392DC103B5D3AC09",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+      "to_path": "tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+      "previous_git_blob": "2b9e905279719a9dd17ac6377e33d5dabff28170",
+      "previous_sha256": "B639A283D7C972C931EACAA9F28076D8FD4AFF060004F9F29E645BEAFA94AA44",
+      "current_sha256": "859A6364721B044A153B3E7A5AE5562ADEF3B147D73746781F5E612D417430BA",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1",
+      "to_path": "tests/mir4/Test-MIR4PatchLaneRehearsal.ps1",
+      "previous_git_blob": "8a70153be293f87146e39f4c7775a1739959e1db",
+      "previous_sha256": "65C36B5685BF15D342FFE05BC255D388674C7065864D8F0E1B3FD7FCAC1ACDC7",
+      "current_sha256": "6E7AD3063DDEBA610BF130CEBE0DEE1193ED40976119584C64FDEA5BA4FBDD30",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PlatformPreview.ps1",
+      "to_path": "tests/mir4/Test-MIR4PlatformPreview.ps1",
+      "previous_git_blob": "d7ba21a169d1462f1cd1ea1adf5dd8d57730fa2c",
+      "previous_sha256": "1697DA1C663D1CF0757A08BE515B9521FB26FFEF7510EAD81C55FA7A2526F359",
+      "current_sha256": "B4BBC518A052CAFB6E4FF1E8738D93AAA880FDDE3D2452B85F0DC088A2B97AF9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
+      "to_path": "tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
+      "previous_git_blob": "b8bedd7b3f4afa4e70c51774927831ee8309c97f",
+      "previous_sha256": "0911D2C1ACBCD99733B98FC2C3DB750051FE98DA1763AED007B23B360F418D9D",
+      "current_sha256": "D551668F591029F1781C5EC00CFCDB3979189F7BFCD095590AD2529FE197FB8B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "to_path": "tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_git_blob": "b383e00cafe0bb46140b7e1fd37faa1653755d06",
+      "previous_sha256": "DFC24964F549F830622FB3ADCFF2BD3E9D176525E1168B2C213CF13E3D51CE91",
+      "current_sha256": "AA0ABEE40FEBF50D4ED1D2CFBADB6C5D3824738B80F450D3A010E8638888FDA4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1",
+      "to_path": "tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1",
+      "previous_git_blob": "06e8381fc56bb1c82f0ba2af143f677ff99ba27a",
+      "previous_sha256": "EE2DD62D4520BFA4C188E6CF05A92670E926723E86C1A2296874084594F9FFEF",
+      "current_sha256": "ED7B6D1107FD3C5889D007B3ED18E3100D7C669F4067389A7C13C1C3CD275A12",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ProductionRouteSOL04.ps1",
+      "to_path": "tests/mir4/Test-MIR4ProductionRouteSOL04.ps1",
+      "previous_git_blob": "7869b0836fec21dad15cd49d080359634ffa35c4",
+      "previous_sha256": "3C8286F36442FEC9BF5E4CD73ACD54B971D4E6BC30BAB17E897757C30E20BB8D",
+      "current_sha256": "1834ACC58EBAA2167F83412953476F328FFA9713076CCF1A5E35928C9A68ED22",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4PublicFeedbackIntake.ps1",
+      "to_path": "tests/mir4/Test-MIR4PublicFeedbackIntake.ps1",
+      "previous_git_blob": "9af2557268040cc6ce73cfd474752461dcac0f46",
+      "previous_sha256": "FC5595777CCA5F685187E69191E94563C8BC29407E25FE01A2EEC23A58B241DE",
+      "current_sha256": "7B74503BC6ABB97B4FC192C367143EF218F06124AF9A3784128934D8E5567698",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1",
+      "previous_git_blob": "f8cc54125cd331e5190be0905db9a0436794b61f",
+      "previous_sha256": "C8D729C555FF6E49BD96B4A987B8A667667167C80E52E5BC97D3EFD8FDA958B8",
+      "current_sha256": "319060667FF7DB328106A14CC12EB1CBABDE605635479F8E3CF5103F8E166C17",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1",
+      "previous_git_blob": "2fb7633e7ef73eb8eed3745fcf8f02e14906f9ce",
+      "previous_sha256": "096F0B1866D2D3135885FE5C24306219651176D2EC625F847D053BB546FE6B82",
+      "current_sha256": "7BEF2BEF656D64F588CAF18DFC04E5FE8B14A676F6BE0D61D96881E322BA62C4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_git_blob": "ef10e3e85aa25f9678dd454f5820b842f6969f2e",
+      "previous_sha256": "AE418FC320CECF2FD589E10F7DB39674A37105DB258C0C705F421E6CA6275A08",
+      "current_sha256": "A02635793012FF06F82A3056C9851D4500935DFC9126782747D1D727A0B8645D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseCapsule.ps1",
+      "previous_git_blob": "8c77dd694b60efc44683bbc2f6729e3a7796a335",
+      "previous_sha256": "CD51223171C10B95CD494D284CF5B548E78152DE5C422FD8E6C7F48420D2E9F9",
+      "current_sha256": "EFFF8A24C4772B8B1D64EAFEACC693CE6AFB0BE8BB513AAF4B4157417746BCC3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseCompatibilityCanariesT13.ps1",
+      "previous_git_blob": "89d810d74b3ed02589ecc82803d7bd6aa1919f23",
+      "previous_sha256": "00B0150AE2D6F4CA3954DE6F6392CB253647C2FCC45CE73CEA6B19AB87C9508A",
+      "current_sha256": "A34348A7EC26AEAED149A76B9F65DD84CF229797BF78436A3D693AFA440FCBB5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseDoctorT06.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseDoctorT06.ps1",
+      "previous_git_blob": "a72f4a9a9b3d11c9384526a3fc2f41f14bbde9e3",
+      "previous_sha256": "0F1F7504B49DF460456354C15AF1FA2C822E3685E101AEC21BE61D3E3EA9A126",
+      "current_sha256": "D377503007BBEB362BBFA590D64B0318881614DF9A42F3D76159F595DE45B65F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseGovernanceW00.ps1",
+      "previous_git_blob": "e4dc47ee956f32e1145a98b38e239c0e363d9617",
+      "previous_sha256": "4C73145534F4846705F84F66EDC043E6BBE8E7F5EFEAF982931E1C397A4DBC4B",
+      "current_sha256": "60F22E14FC3F34464BDD0346EB339D210C1D36C4165DBBE4624AB6F60932CC7D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+      "previous_git_blob": "b9de3f90c2067fe30d5857aedd2cd1f1740e38f9",
+      "previous_sha256": "A55DA3056550A589E57B07D5AEC3A9069BCF411BBF408F9AF17343633297CB74",
+      "current_sha256": "B8F637C84A242DCA2E05E76E8415873AB578E17596A8B4D26F18C9F860F57741",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleasePhaseEngine.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleasePhaseEngine.ps1",
+      "previous_git_blob": "5f84323b0fc67c555b09cba4e512ba889b013a8d",
+      "previous_sha256": "4EC37B710A1A185F89FC45F66A6E65315416829A35F6C65F3711EF0FE266B120",
+      "current_sha256": "3B134EA02ABD4EA4F5CDE0506C0DBB876BA1745CAE85AE1BA05A59BF837E9A01",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1",
+      "to_path": "tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1",
+      "previous_git_blob": "3ef0e52e073055e4ad691f71c060f8ec8e91e85a",
+      "previous_sha256": "3FD411DFD4B9C404CBA89BFAD406070962BAC2DD56F4F5A3FE10D9FCA4D7032E",
+      "current_sha256": "2AE3E9076418F2EDF8CA3395EECDA3BAC556ADA722FD311703B6EDA6A1CDFA16",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "to_path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_git_blob": "11096a9fe8d1356f8773b168935744deb50daaed",
+      "previous_sha256": "13D151E0712CF4DBD8CED99AB69402C89A88747453EE6A9C4921D11C19F808CB",
+      "current_sha256": "1345901D18D05757AFC76042484EEF8173E4ACBF2E90BA7B66EB1455B9059567",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ResearchCostV2SOL05.ps1",
+      "to_path": "tests/mir4/Test-MIR4ResearchCostV2SOL05.ps1",
+      "previous_git_blob": "9e9d584a45e4ed19c84b8e573bb4f971c21bc148",
+      "previous_sha256": "7D8007989D0BEF9937211FE5337215D006F0D37D99319B442AEE98E9BF00CEA9",
+      "current_sha256": "9936A8C6F9768EDAC063B4C436CBB7443F2368AE736A772DAC3FDE70BBEF67D4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+      "to_path": "tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1",
+      "previous_git_blob": "41177b08b461b9d57f876fae02843448a815ca02",
+      "previous_sha256": "0B670F0D50AC89F369784E8AEAFBB9BF10D4C62BC28DC00DE8CEE47C46A39855",
+      "current_sha256": "F7A280AE51AC9AE26176FAB32272C0BBA4B0743C833CD0AF072F893D0BAB21D8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+      "to_path": "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
+      "previous_git_blob": "9cbab59727a1dee30f0ff7ffa89cb474a46bff07",
+      "previous_sha256": "F0E40601E0054037ADEAF1666E5544AB9EFC7914811926EE31401D0A5DCF5D1A",
+      "current_sha256": "35010751C0BD7B553ADB13DBE2C151FFC5427AA07DC060CB09B55899BB41DE27",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "to_path": "tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "previous_git_blob": "c856f937bcdf82d102e1d9681a3c186bbe504ee4",
+      "previous_sha256": "36C08314DFDD85A9A3E2D8973606EB688D07C7F1EB1D1D48AC3F51650A62BFA3",
+      "current_sha256": "BE6A61CE18202734A09E45F091D88D162310FD864AE1843B34335C5C8B73BA7B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SdkV1T08.ps1",
+      "to_path": "tests/mir4/Test-MIR4SdkV1T08.ps1",
+      "previous_git_blob": "885cb7dfd2a57b2bfa2f2c7f4126f64fef855e90",
+      "previous_sha256": "7949ABD1A225C2422293F1B1E7D4A416087BFB5D2CB0603ED4CA89DB161349FA",
+      "current_sha256": "5C859E61EC6B9ABD6DBF52BE46487985DCACA9837A35B1501037869622BA6E6C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
+      "to_path": "tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
+      "previous_git_blob": "881322f8ddf772825f847152ad7a4bcc1cc743a0",
+      "previous_sha256": "94037096EEF45F8C6165F5223AEAEAD25EF22C9A9AD11FB975C643A97DD97A23",
+      "current_sha256": "C27D9CD38708562494E45FD63579D14F67DCC556613B06F8665874207D172349",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+      "to_path": "tests/mir4/Test-MIR4ShadowSourceModel.ps1",
+      "previous_git_blob": "64fd75ebbba17cb2c44c3915213626e4f4657a46",
+      "previous_sha256": "5D157B0961E4C5CB25FC97639872AA57AF8238A367210F1AC47FF0116F123634",
+      "current_sha256": "3FDA7DFEB89A3352DE770FD663B46D56FECD8576B907B4831DF350107570098B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
+      "to_path": "tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
+      "previous_git_blob": "83ab63395081d58f8422daed17954b1205eddadb",
+      "previous_sha256": "60234919A1404846F93AEF07B494F3AF7836EAC91113616F209F9688DD0990ED",
+      "current_sha256": "643C3E8945F519FE801910B85DE078C9E8048CD29B58C825880C5454D9312C86",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1",
+      "to_path": "tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1",
+      "previous_git_blob": "74333f041307f0afdc9ca693336ffc39019fd4fa",
+      "previous_sha256": "539B560CC8AEA71C6C65A61F9D82A34D332249806C5811BB33215D0508940DCE",
+      "current_sha256": "8C996AFBF4E89D2C3E9B6E00E309821D1B7997F4ABAA1F31D96A52A82832B173",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1",
+      "to_path": "tests/mir4/Test-MIR4SupplyChainAttestation.ps1",
+      "previous_git_blob": "012967750fa208405915cee262cf852f24587b65",
+      "previous_sha256": "53B57ED2E62787850C7790DE774A1D9AA708094384708B612A76D65F0EFAAA2E",
+      "current_sha256": "3FFCEEDB8245D168B2207F9857762A41802B73D9F1CA8F2925348E1C252BE2A4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1",
+      "to_path": "tests/mir4/Test-MIR4SupplyChainFoundation.ps1",
+      "previous_git_blob": "47b9c42c60a8bd50bea09ad5223ad067048a2918",
+      "previous_sha256": "CED9FF0BB32D21B2F2CEA8188F5C132145A48D18D2037052AAF798C0BA87040C",
+      "current_sha256": "8C7CD42AE379151239234E61790DF0616F8579FB6035EF1C75E57125D8A57294",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1",
+      "to_path": "tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1",
+      "previous_git_blob": "86f3e497901c5d5c26ec358f8b5be72e15cf1a4c",
+      "previous_sha256": "9B8611732FDC7CA4CFAE14D8B50B4055106FEB8ACEAD1EF7DF1EAC1590DE31FB",
+      "current_sha256": "1DB58B47CF9712026584082ACC8DFA5F81E95C846A3CB56B51E1DA0273CCA65A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/mir4/Test-MIR4TargetCompilerW02.ps1",
+      "to_path": "tests/mir4/Test-MIR4TargetCompilerW02.ps1",
+      "previous_git_blob": "c00f3299ef4f0930f8886089f586822cd853bca8",
+      "previous_sha256": "556DC5CFD80DD81A9D3CD823BCB81CA52C535360C1CADD454DB8011D60A4DA00",
+      "current_sha256": "464EE0C9C1DAE78B280607D7F8980568E69FDC54F17206E639807EEE1AB79F73",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRArtifactCleanup.ps1",
+      "to_path": "tests/package/Test-MIRArtifactCleanup.ps1",
+      "previous_git_blob": "c858cf09dcda833da0c832bacd79d1f0db80d9f5",
+      "previous_sha256": "34E8F5790A0819A4C80E0A36550FA35DB0676979A22FB96CB2A52A11F2E4ADDE",
+      "current_sha256": "6D85258676BF6C1E4E0A8000B4929D9A2B9896C42BC610140A1F001B57846075",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRCandidateRetention.ps1",
+      "to_path": "tests/package/Test-MIRCandidateRetention.ps1",
+      "previous_git_blob": "da5133556d218a891d22cfd410e3befbfc463792",
+      "previous_sha256": "788BC26FE767E5934AAD6DC9EE3ED9725A8C43CD4EE783A09C56E081D6EFA4E7",
+      "current_sha256": "38B32336B193E7DA9B86F0DB3FB4B4B4B566E5C732B7B421D81E5571F06CC79E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRContextPackage.ps1",
+      "to_path": "tests/package/Test-MIRContextPackage.ps1",
+      "previous_git_blob": "e345f3544768f196f6e03b7a9b4db6edfd0a6669",
+      "previous_sha256": "EF4D913CE235830A002BC59A6D091F8E5C6A82DE4614A038ED46EFD936AB14B7",
+      "current_sha256": "133CB8A6D32B222AC3F5A9515F4D67B253170D27F3FD899E8CC29768D7E00231",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRDeterministicPackage.ps1",
+      "to_path": "tests/package/Test-MIRDeterministicPackage.ps1",
+      "previous_git_blob": "2df76e0c337f3244aefef2921250a69b75997b28",
+      "previous_sha256": "E031DB5C07FF9157C07CC482C27689B9103E97BE1F2A31D6FE26DD7E414497A7",
+      "current_sha256": "C4A51888BF685462650F503EA7FE35AF9FFDDC86856D7FA661A295EE5B1D0007",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRPackageComposition.ps1",
+      "to_path": "tests/package/Test-MIRPackageComposition.ps1",
+      "previous_git_blob": "7d3076b857aec950530eb5c124d96e4b6cbe2d7e",
+      "previous_sha256": "1D2CDF967B499C65B0FBF6B9D4A7CA3964F29E6EDD77A3E6C46EF0C9BE583C2B",
+      "current_sha256": "DB4C19C7FCF417AC806CCB3B52735207D7383ABB39963A96EC4AF96A573B25AF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/package/Test-MIRPackageIdentity.ps1",
+      "to_path": "tests/package/Test-MIRPackageIdentity.ps1",
+      "previous_git_blob": "2608ea2bff3dca2f958ae37d908711c696d8ae9c",
+      "previous_sha256": "6419912190D646F04F22B22B0133302BCB3D2EA381DF6EB6C955D5703014DEF3",
+      "current_sha256": "C2CE3B55A040F8193ECB39D1BB0D6EDAD9029194EAA884F5F2A0655E93919EF8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
+      "to_path": "tests/release/Test-MIR3Dot5WaveAuthorization.ps1",
+      "previous_git_blob": "c2e2680e0c53b2211ff562d8154952f2934ca4b2",
+      "previous_sha256": "3C86BEA3E23F48F556BE23571D223DF798C1FB27C1EB8A9C4AF6D4A48C6DCFFE",
+      "current_sha256": "63B60AA5CB2E71DB0556B9E7130B315DE129A9708DEFD2EA3D17143E8CB408C7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "to_path": "tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1",
+      "previous_git_blob": "36f35a4b64d68dbf732d7a770ff1701684c1c21e",
+      "previous_sha256": "AF9151A0AE4FB19196A01C9AC4184B9C201F07722EB06F255F083B8AE5260834",
+      "current_sha256": "B7D5A226C42E871DE87EA8C87183999734C7DA5C6AF57ECFB08D0EFB246F6D07",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4BootstrapMaterialization.ps1",
+      "to_path": "tests/release/Test-MIR4BootstrapMaterialization.ps1",
+      "previous_git_blob": "8d635d884d405a12d37ca7b94278d599f8a3e6b0",
+      "previous_sha256": "26E0D28A3FE6947364933746322A926F6FB263E3413871E6EA46A06C2558DB89",
+      "current_sha256": "95EC28D8588CE3598269777358D28CA91F13AA8AD8AC4B6FF3B1F3F1920C55C7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
+      "to_path": "tests/release/Test-MIR4BootstrapTargetReadiness.ps1",
+      "previous_git_blob": "2b5d1fa59ddd24dfca29936b131c6d22b358ac3e",
+      "previous_sha256": "EC83C71AD5475E738D4CC8B486607BA3C59657F2DB9E1D97408F16854684B8BF",
+      "current_sha256": "7375EA45DB3D7AA9D7D7FF6056210CF431D609B5979DCE6238D851C829BA456A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
+      "to_path": "tests/release/Test-MIR4FinalProgrammeReconciliation.ps1",
+      "previous_git_blob": "3b2af32b4b8800c7fc85b4ef4e1f7a889af37513",
+      "previous_sha256": "82E73990F5BEB74784F7700A1778633ADA4C9916BD30DEC802DC760264215ED0",
+      "current_sha256": "617BA5D2C05805449EF7853BEB1F6EE2A8206FDB5DB533685C5C3FB98AD48B8F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+      "to_path": "tests/release/Test-MIR4HybridPlatformAuthority.ps1",
+      "previous_git_blob": "7cab6ef24493b6958fe0205708a88c63bd17c2aa",
+      "previous_sha256": "6D78469F5744AC73A0755CE7A346BC4DCDDEBF636CC56AE29D7BC2BB03109C08",
+      "current_sha256": "AB23711BB569E51D72204E009C1487F2FED0EE99301DF8C9A2EF90C886AD3D9E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4LocalPlaytestShadow.ps1",
+      "to_path": "tests/release/Test-MIR4LocalPlaytestShadow.ps1",
+      "previous_git_blob": "23b185210fc77374da2be6c99125cd518cd3ecce",
+      "previous_sha256": "6F386A32FEF04A62987F4F9F3F6C3576EF0F476657ED9B1878E9D1D5D0C7E462",
+      "current_sha256": "D3A683F30EDBC1DE9118FE2FC585239E1E9337F7CA7AA5D3AB74C845D9E0CE30",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+      "to_path": "tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+      "previous_git_blob": "04ebaa54ee8f6761f8ec08c9c2cc754b928cb09b",
+      "previous_sha256": "6997A910661C5CF5DCE5266FAA0C05AE5749272CDC2A2EF5AEC7471761AC4942",
+      "current_sha256": "331546D4E39EBB2AD9AAF44E1E5FBA468F8CB7F124132587178B671921672494",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIR4R0Identity.ps1",
+      "to_path": "tests/release/Test-MIR4R0Identity.ps1",
+      "previous_git_blob": "2c07887f3df76577cb4d66b72885341404cc2914",
+      "previous_sha256": "29CABEA193D21756D3EB10B2B9A9758D4853F63694483B13A9BE21429E2BA310",
+      "current_sha256": "5607708E074AB7B90CC5A3A46CE1E05CBE2D3BA67C1C776057355A17B1D0F5E8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRApprovedDelta.ps1",
+      "to_path": "tests/release/Test-MIRApprovedDelta.ps1",
+      "previous_git_blob": "4398e4b944d4e6f96cdab96f0fc028ac25f077ba",
+      "previous_sha256": "71AECA9349B8BCA1D98C57549BE208DF9EDD54AF937EEACC07366AB616E28336",
+      "current_sha256": "84A0B9B8FAFBC0A5F4C8DD048D8424FA88472F81B07EF01EFA9B1A40D161F0BD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRApprovedPatchDelta.ps1",
+      "to_path": "tests/release/Test-MIRApprovedPatchDelta.ps1",
+      "previous_git_blob": "5eec2877bdaeb9ba7e252fd326a4f3aaf86de26d",
+      "previous_sha256": "2DBF254255A9D15C259839EE2CE6408A51D3B9812108041FD06D14F943F1084D",
+      "current_sha256": "81C51452AB7D8921451EB7637A39E2EFACE3EE15078767F1DCEBB03A5F88E26A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRBackportManifest.ps1",
+      "to_path": "tests/release/Test-MIRBackportManifest.ps1",
+      "previous_git_blob": "b3be44feffac7e0d85f52d180c3a5d3b57e1dde5",
+      "previous_sha256": "63A58C71EE32A375FE4D632E7FE0FDC471237328BB052EC0FF1356D61F9B7FC7",
+      "current_sha256": "7801F8B78C055573C05CD07FBD347BAF42BDBE76BB6D82DBB9209C9EEDA3A0BC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRBackportReconstruction.ps1",
+      "to_path": "tests/release/Test-MIRBackportReconstruction.ps1",
+      "previous_git_blob": "726e946150a4e348fa0d0929d6261b123d03c2d5",
+      "previous_sha256": "9136454554304852E5BE672211FDF7EB3308CA299922070CE1DFB3506DD45216",
+      "current_sha256": "568CFA2D38754B48A067304C301676BABF26AA3E83B90B39AA34A2F06F4C698F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRBackportSourceLock.ps1",
+      "to_path": "tests/release/Test-MIRBackportSourceLock.ps1",
+      "previous_git_blob": "3f1f3f21b8f261e88b6322e2821a72472efebebe",
+      "previous_sha256": "CB7D020DC238B70EFD5B134B22498F524A58DD692AB5F15FC4B24E99EE66AC8A",
+      "current_sha256": "1AD3776DE67CABCBDB3C69B26382622234FE29E2434F7C61F79AB3AF9EFA9105",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRBranchPolicy.ps1",
+      "to_path": "tests/release/Test-MIRBranchPolicy.ps1",
+      "previous_git_blob": "853d087564ee339177754f68ba86856ccf6ca3fb",
+      "previous_sha256": "84C71FB6B1DAD4AD149BE7CDA1211C82E1A427DEB3329F3439339016FF3780EC",
+      "current_sha256": "2961D8D78CA324F95541DE7672496CE9DCA871523BF61BAE3B79F777B209F875",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRCandidateFreshness.ps1",
+      "to_path": "tests/release/Test-MIRCandidateFreshness.ps1",
+      "previous_git_blob": "55fb1419639a00860788256e939f20042b4e417b",
+      "previous_sha256": "F087586640A8AA665C480301B4620BAF89C1643DFDA542984F26CA8A512B26EF",
+      "current_sha256": "DC6A5DCAEB50C65E4C5C8FC8972A75D34B28AEBAA75E989CBF6B26EC8C9BC4B0",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIREvidenceHygiene.ps1",
+      "to_path": "tests/release/Test-MIREvidenceHygiene.ps1",
+      "previous_git_blob": "95e835b7e94ed16082ddb02832d41eb88fba20d3",
+      "previous_sha256": "E082E7BF6669C696E4C821D52E74791FDCC3D456BA47382AEFC4405651976FA8",
+      "current_sha256": "485F1A1B26415942FE53194714947287122D30022B784354FD04236D06A3E887",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRGitHubAdministration.ps1",
+      "to_path": "tests/release/Test-MIRGitHubAdministration.ps1",
+      "previous_git_blob": "bb54d2f14b5ac0d627140488ec3ec943bdfad13e",
+      "previous_sha256": "0FF76C4C86BBED039716F3F181803BBE6DAE7A0CDB4F039BA06BD99F8DE2ECE3",
+      "current_sha256": "CF5B583897C40AE4FC29128FB14CBAD45A073EC069FF80E40EC90039195FD53A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRManualReleaseReview.ps1",
+      "to_path": "tests/release/Test-MIRManualReleaseReview.ps1",
+      "previous_git_blob": "33a3d00f66a6ea9ac165fbe2c6cb4916fa7c9506",
+      "previous_sha256": "0790EF4B8A29E674092CF637F282BBE38069DCA62A17B8B2DDF41A5ABBA15CF1",
+      "current_sha256": "1BE25B74BF73B1C83578D1CE29FF1B10579C8120723FCF2B2BBA595D8ACDE38C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRPerformanceBudgets.ps1",
+      "to_path": "tests/release/Test-MIRPerformanceBudgets.ps1",
+      "previous_git_blob": "50f735fadbfaa536f33175d4fbaae5e52fef76d1",
+      "previous_sha256": "D83DA4EA21F22750130618FD37A5FC5F502CBB09C76E65E09B8E2742833053C5",
+      "current_sha256": "F80A084A5709B2210467F302A40C1CEE8CE61D2E9443C4A87DB16D38E12480C4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRPerformanceRegression.ps1",
+      "to_path": "tests/release/Test-MIRPerformanceRegression.ps1",
+      "previous_git_blob": "00dbab09808fd388ed62a1673bfd125bee69410f",
+      "previous_sha256": "5B1D971E6EE895090948A97A699BF4CF5E3FC4B2CBA23FF1D8A9D72DC35CB454",
+      "current_sha256": "7D7CD38140922E30D981FF629831947FB7C88DD8F1A0B7F66B0154F5FF8346A7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+      "to_path": "tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+      "previous_git_blob": "3755220e7950bcdf7743d7c4928b765f89ab198b",
+      "previous_sha256": "F7108EC24FFFCCBCB38EA50B1F11B38DB4BFFCFB52E4C1CBCBB7D6BB2EFC294E",
+      "current_sha256": "F4F42B6C76A6695129F6F6511A7C151EAF13311AB0B90B8000827486ED01D138",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRReleaseAuthority.ps1",
+      "to_path": "tests/release/Test-MIRReleaseAuthority.ps1",
+      "previous_git_blob": "7d45a341b58dd06f146440d2e80d036b6614b6b6",
+      "previous_sha256": "E10F5D4C7595FBBD688741FE2EE78BBD8DB5D64C10738201C1049164613EA554",
+      "current_sha256": "1E6244DED064C40246AC9584368FDCDB8DED19ADAABDF83287C1E5E6655CE27D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRReleaseObligation.ps1",
+      "to_path": "tests/release/Test-MIRReleaseObligation.ps1",
+      "previous_git_blob": "370787058b8a74b18f708243487a00a6db5f71e2",
+      "previous_sha256": "DAA3F8E4FAD405E0B1CB863EAF27143DC5A9573F01483BFC68C73F204482F6C6",
+      "current_sha256": "9C6F481F54DFFA18F9714FDA1DA0FF14C16958AEA0F036CF23802D8AAE98C841",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRReleaseWorkReconciliation.ps1",
+      "to_path": "tests/release/Test-MIRReleaseWorkReconciliation.ps1",
+      "previous_git_blob": "83fe58e5615feecb339f8b5c064fe9f8c722d9fd",
+      "previous_sha256": "C1754496434547F29930D6D99DB49D16C53BF3E797D7EAA1F7DFFE6F2EA7AB48",
+      "current_sha256": "80F0112E74C0D5EC61634C3EA6DB8157646DC3E06826F381AEDCE9D4AC17D276",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRSanitationBudgets.ps1",
+      "to_path": "tests/release/Test-MIRSanitationBudgets.ps1",
+      "previous_git_blob": "0db9635d66e8db23dc79eea6a20cdf8488517db1",
+      "previous_sha256": "F5FE411FDF6BBE7D54BBA3C23D75A633F673992B05E5E15D69D48F622C6F69B6",
+      "current_sha256": "2E7851964290F2C6BA725D15FA56EEAA18A14CD2C221FBD218BDD263AAC4313B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRSourceFreezePacket.ps1",
+      "to_path": "tests/release/Test-MIRSourceFreezePacket.ps1",
+      "previous_git_blob": "1c99ec7b6e55341f5cae8cb1dfc9ddc679cd8523",
+      "previous_sha256": "A491DE25C77DAA8F234D1B0911C715A2E3A76A35CF3C2225BDA35D0C669FA2CA",
+      "current_sha256": "DBDD434CA78D0A926F0DAFE16D96D6F0E9863AF9ECA0BC7170175BCAA0D70C94",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRTerminalBaselineCapture.ps1",
+      "to_path": "tests/release/Test-MIRTerminalBaselineCapture.ps1",
+      "previous_git_blob": "ad989844e30a997e0f0878c250e9d38ee8685fff",
+      "previous_sha256": "41D8F966F346B62F1CAAD861E63D131DD66CA5D816B2DFDFEF57CC628C1CB5CF",
+      "current_sha256": "7A141ECE42F14240D711E64C95C7A505B87792F008B6DE628F5F92A746BA6130",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRTerminalEngineObservation.ps1",
+      "to_path": "tests/release/Test-MIRTerminalEngineObservation.ps1",
+      "previous_git_blob": "a9c3af7a7ffb46a6f8fe282d31af1368c0d26881",
+      "previous_sha256": "3281FC470B0D776DC14A52481E43E704234332028DCE7867D5BC89FBAA2FECDC",
+      "current_sha256": "23B8E750ECED840C0D485A0A9EBE7A6483A73EFAE1DDE584010E06B2438FA25B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRTerminalGovernance.ps1",
+      "to_path": "tests/release/Test-MIRTerminalGovernance.ps1",
+      "previous_git_blob": "13f409fe963ccd3c4e9d2851b4b438a53976b0f7",
+      "previous_sha256": "C8C1FC2ADBA0A4BAA32675BAF7D889826367844B7C33753AB492102911FBA722",
+      "current_sha256": "B68607A8FE128DD7137F96E0F198B907336592C86F18CF85DA48231FF1E9E432",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/release/Test-MIRTerminalShadowProjection.ps1",
+      "to_path": "tests/release/Test-MIRTerminalShadowProjection.ps1",
+      "previous_git_blob": "30c8395a7bc3ee10fcdd1f353535405513752392",
+      "previous_sha256": "38DFE70CC4ED68C763332CB7529334FB30DEFE9670617CA4760AA0CCD1789898",
+      "current_sha256": "CF41963BE93A172CDC3E1F3654340745EDC4FAE709826111D8ECAF2E73D393FD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+      "to_path": "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1",
+      "previous_git_blob": "05bcad71d9c8dbbea2ec77cb8cebd12ec4e66446",
+      "previous_sha256": "D77BF3B88F2BD5191D0E600B42D1C2D5561DAC257B8B7452C6F7FEC01B820681",
+      "current_sha256": "A7968E833E450A97B235F31D8B1BADCE94A9B1484139A258A56A5403885300A5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRMuseumCompiler.ps1",
+      "to_path": "tests/runtime/Test-MIRMuseumCompiler.ps1",
+      "previous_git_blob": "ea691b4b2b95362cf234aaff3ecd5a774bac62f4",
+      "previous_sha256": "B08AFFF033A67BF3359C6AF396083B1BA00E0213EF033C233380EF83C50ED1E4",
+      "current_sha256": "3CAF0097C9CF6A011CEE2C3ADA44ED775F257104A4DCAD1731409FE214B9C4C2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRMuseumExact.ps1",
+      "to_path": "tests/runtime/Test-MIRMuseumExact.ps1",
+      "previous_git_blob": "8de75130c0c0bd460e1c8c0dc0514784391fdbd5",
+      "previous_sha256": "8CF7D137DA93C357BEDB6EDB1B06DE76D42204D3A96F46D8D3AD48878507AEB5",
+      "current_sha256": "680B8D6B22E3E2338F447944AC14BCB2922A62E4A87FFEEA7FF45FE3C9E9261F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRMuseumRuntime.ps1",
+      "to_path": "tests/runtime/Test-MIRMuseumRuntime.ps1",
+      "previous_git_blob": "ae4e08fc090b871554e96fd0f66704351a727afb",
+      "previous_sha256": "93A29E5E2F1BA76E62E3261B284DE6F64B1556F85C6708322F34BB97EDD3E773",
+      "current_sha256": "E30CDB998C2339A55481E9742E62D88226582E295E240541163AFAFE819A8C04",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRMuseumSeal.ps1",
+      "to_path": "tests/runtime/Test-MIRMuseumSeal.ps1",
+      "previous_git_blob": "373f24ce50b39f0f36230841bf327d5a6639fbfd",
+      "previous_sha256": "AD7A991B01C0C66907274C746BD4800F700E438C93EE07C0AEB8AA6EA1BE8E61",
+      "current_sha256": "B8E9902543CDFA2D8F416CAAF9A9B5D0299EDF0759E75B149460DA63987BBA69",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRUpgrade.ps1",
+      "to_path": "tests/runtime/Test-MIRUpgrade.ps1",
+      "previous_git_blob": "db8a24de8adc6d5a9c9e5c2856428ff1df6c1dca",
+      "previous_sha256": "9428AE2AD0F86534852AB5714BAE0A160B58E937DE363E188A576479FAF41448",
+      "current_sha256": "2CBC1CD23C42E060BAD21B5636543CD3470D47E9F072A9FDF8662B838588DA75",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+      "to_path": "tests/runtime/Test-MIRUpgradeMatrix.ps1",
+      "previous_git_blob": "8e998681ee93c859867f748392a72861a43197f4",
+      "previous_sha256": "AAC76C6AF0DADE3AF2B3EFEA5A0EC4E63E3A63B506D40347C6B221B0FA6783FB",
+      "current_sha256": "E39F942E33F40EC9F1C35F37001FF34474BC9B599CB69700C4714A6A292C2D07",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRAssurance.ps1",
+      "to_path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_git_blob": "76857c0efe15a0a58dd6a1349cb95cb22a2bfb91",
+      "previous_sha256": "2A4E74332E4539C627E0912FAD65112EBD7F7DBCD665EBC573936D1492B83314",
+      "current_sha256": "7E6C860FB364052EF0ED8852D8DF2AAB9131DFBEB6A23CB45E43BB3A86403603",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRContextExecutionRegistry.ps1",
+      "to_path": "tests/tooling/Test-MIRContextExecutionRegistry.ps1",
+      "previous_git_blob": "0749bf33bf37a5ec788f4aff0be44aae7dd26a14",
+      "previous_sha256": "9C189B088670D44BF32C17F4797E249317415D6F834F835E522D87D84A79F1C4",
+      "current_sha256": "EB1B2A6BFE91B51B0F9216AEFC2E64F8A12D8927F7D6A23021E460C45FDAE0A7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRControlPlane.ps1",
+      "to_path": "tests/tooling/Test-MIRControlPlane.ps1",
+      "previous_git_blob": "d2c36a4ef8133c24608706aaf0b49b123447620e",
+      "previous_sha256": "112CD5A048712E310521FB08EAFF1AC227BE18858A074B78B1B99AD109AA74F7",
+      "current_sha256": "B2C803B997FCA4C790DCFD26333C44C6B7C34C09A0B040ECC9EF914C24AF4769",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1",
+      "to_path": "tests/tooling/Test-MIRControlPlaneExecutor.ps1",
+      "previous_git_blob": "c4590f9eef93e0615e0d2019579e8d248dff6f26",
+      "previous_sha256": "2D1268590C604E2EFEE21E81110762B4CDF8D831C3A523AEAF42FA7A00B8CB67",
+      "current_sha256": "501506F3FBA2C217626EF2C6E016F88F6F121061EE1828146CF18CBF30F60D2D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRControlPlaneRelease.ps1",
+      "to_path": "tests/tooling/Test-MIRControlPlaneRelease.ps1",
+      "previous_git_blob": "4cd41a768cb6f74a9eeaa7be714c10faabb2753f",
+      "previous_sha256": "3FCEF5278CD20C1AD35E57AF574459CFF406BA625E86C098585981A2FCBF4B4A",
+      "current_sha256": "2F929FAC827BD031C8542A68DAE6602029912B98B169BDEC91E9144B6975D759",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRControlPlaneShadow.ps1",
+      "to_path": "tests/tooling/Test-MIRControlPlaneShadow.ps1",
+      "previous_git_blob": "dca5ce6974cdd9e8c323ba6d475db56cb17546a5",
+      "previous_sha256": "31522F8FB63057BC2B1C79BBD1C0EB2AD69A05D946E173ED9CDDDB549219E99A",
+      "current_sha256": "22A385CEC0BF4735431159B45AD95513D90CD47EF9DD5223683D2A8322F0F089",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
+      "to_path": "tests/tooling/Test-MIRControlPlaneWorkflow.ps1",
+      "previous_git_blob": "467dad17423a9adfa74fe9b358fd17ca735b9b1d",
+      "previous_sha256": "3921A795400B98DB8550270852748C2C2DF01D8C3CDE5C8064F1DE9ED546AD71",
+      "current_sha256": "3ABF149BABBF75C4701C8011E5BA796C2DD70C9D97E44C3AF599F56A053113D3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIREvidenceStore.ps1",
+      "to_path": "tests/tooling/Test-MIREvidenceStore.ps1",
+      "previous_git_blob": "bc6108313879ef72ec1b6fe9dde188223fa4d5b8",
+      "previous_sha256": "4B1453756CD8071DB18D05A469ADF4C4CB6D0E5FF54AFFBDCA74BC0B5B0CB01F",
+      "current_sha256": "E6064EF07AA7BA80B13FBCF2AAD63B6DE370D0A20F922EB788DDB49DDFEF0A8F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRExecutionRegistry.ps1",
+      "to_path": "tests/tooling/Test-MIRExecutionRegistry.ps1",
+      "previous_git_blob": "532135ab42146bd26ead72a4c750fa758d071486",
+      "previous_sha256": "B48E7F046D74BCB0EBB2BC54A8771C4179EFA976B053BE53C8CA083ED5C4193A",
+      "current_sha256": "9BFFB88E4C4A9790E1FC7FCCBC86DD3F2329B233FE8DA8A653D70215D6B6E2E1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRGoldenPlans.ps1",
+      "to_path": "tests/tooling/Test-MIRGoldenPlans.ps1",
+      "previous_git_blob": "a0ae1af030dde1aaebe971fde1fcf554c4a4b285",
+      "previous_sha256": "71506459235339DE13070E2B4A6E1F859F2463E075471685133012C435384C6F",
+      "current_sha256": "AF0CDDF36082D95406A3476A3FBD6FFB0E965AF9FA7521C4AF218EF8B37BB899",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRGovernance.ps1",
+      "to_path": "tests/tooling/Test-MIRGovernance.ps1",
+      "previous_git_blob": "f302fc92d0cf1c9646875c77aba837699855da92",
+      "previous_sha256": "BAD8689ED704B7BC36D811BB4AA455E7842B0C6DBA2F515D160B4F9F9B3F9E11",
+      "current_sha256": "E8ABC31FDB4CF68EB7E8DA7A9F8AF342DE170782B15CAA271D0DCCCB3955E52B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRLayout.ps1",
+      "to_path": "tests/tooling/Test-MIRLayout.ps1",
+      "previous_git_blob": "c2e95fece8e00da64426f47e7aece4a11f344449",
+      "previous_sha256": "FCE1BB0C629357E54BF17301E3C2D78B1CB8412ABDABB0EEF0FD9E68F9C461B4",
+      "current_sha256": "F5487AD3F6C70751DA589598FF41E83C8017D297F29D04082F72843E54AB6F9C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRObservationEvaluation.ps1",
+      "to_path": "tests/tooling/Test-MIRObservationEvaluation.ps1",
+      "previous_git_blob": "5119da1869242f6aea082ab1c2430c768a4588ba",
+      "previous_sha256": "5C869BEADBD4D5BFA9A05D6A27D8360CC0C97A51FE4CBF4D31997B26AA9CBE41",
+      "current_sha256": "03F494B56CF09141CAB0E842BE38A741ACBCBFE793071756E2304323928FFF60",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRPlannerTools.ps1",
+      "to_path": "tests/tooling/Test-MIRPlannerTools.ps1",
+      "previous_git_blob": "edda3bb28c7e4476ffad14470b4071bcd102227d",
+      "previous_sha256": "8FDA22FAB6EAFE55ED47737AACFD06C2C60FBAF8DD0581CF313291700A063DDA",
+      "current_sha256": "E7E60E01CC9DCF4D75FA965E47D4D76C38FF155D4C53E4FDFFF0D90A4BBAA9C6",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRPolicyLints.ps1",
+      "to_path": "tests/tooling/Test-MIRPolicyLints.ps1",
+      "previous_git_blob": "76b79748fa9640444908755b85488ecfa0e5955b",
+      "previous_sha256": "13DC6CAF1E4C305E221AEE76194B3CE7B32829EFEBD6D3A9A25446AFFB739444",
+      "current_sha256": "2173826D479B7D7BCC1D9ED3F90B8096D18B41E52587C39F40630F121E53AD8B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRPowerShellQuality.ps1",
+      "to_path": "tests/tooling/Test-MIRPowerShellQuality.ps1",
+      "previous_git_blob": "73cc794d55d2b8296f698e5b8a3756ba3c15edef",
+      "previous_sha256": "42B51B4C8A7E693D84F410233E61F8F175AF2832676951C34DACE56A6BDF5179",
+      "current_sha256": "82C882CAEA6A3F831660750D34BB33038F5F56903751EF82FD979177D2A76838",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRValidationResults.ps1",
+      "to_path": "tests/tooling/Test-MIRValidationResults.ps1",
+      "previous_git_blob": "0a9930207c1b8761aabf73e26d29b2aa59dd770e",
+      "previous_sha256": "199B910E08E6984CDA540A1FF96DB4B911DF134902562DD46A6F8E8D4C63DD9B",
+      "current_sha256": "3B5815EC5663399F99ADEBE2E7373B3824471901B9F859137F797601E53C2468",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRVerificationContext.ps1",
+      "to_path": "tests/tooling/Test-MIRVerificationContext.ps1",
+      "previous_git_blob": "828ef36541c68d1a8a703c0a5f801469d8fa39f1",
+      "previous_sha256": "4739C0799F3AE73F5087DB47940331128878C2351ECB5AEB84677BAA2DDB6C0F",
+      "current_sha256": "37529CBFAB5C4EB57977AA650A505B772CA148F3F313DA58E30D651ABC8837D2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "from_path": "validation/tests/tooling/Test-MIRVerificationSchemas.ps1",
+      "to_path": "tests/tooling/Test-MIRVerificationSchemas.ps1",
+      "previous_git_blob": "d2024519ab066d112c62f31506769976ab78134a",
+      "previous_sha256": "5FD6B38047FB7CA00398EDE20E84B67DCC5CD8772AB1C7C08A6F558FC8B9AE09",
+      "current_sha256": "B01D23C94046A084959DEB7307F9B20C0623F910A36CEBBFCDEB46D3BD53EA65",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "tools/mir/application/tooling/ExecutableTestAuthority.ps1",
+      "sha256": "568894BB1E5512DD3B8FA32F0991CAC071ED0D32A7308AA9774AF519998D67A5",
+      "hash_mode": "canonical-text-v1",
+      "role": "test-authority-projection-generator",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/tooling/TestWorkflowCatalogues.ps1",
+      "sha256": "CD1187C09AB2A559DEC25ABB9E21D5C5B2E58A77BC9A01474B9A40CACA4A8E2C",
+      "hash_mode": "canonical-text-v1",
+      "role": "test-and-workflow-catalogue-generator",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "sha256": "EDEAE7E1E4AE226E58A8CA66CDC241D2EA51DDD48C7CB73531D5D28DEBF448E7",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-executable-proof-catalogue",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-workflow-purposes-v1.json",
+      "sha256": "5B521DC7FF4BF98039E67F8117F05733F4740D45409481838C604D090567B4A1",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-workflow-purpose-catalogue",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+      "sha256": "9331B3C1A140A533C8876E2EA14E7484010F19EB6A81AD6F7A4971CB61E6E18F",
+      "hash_mode": "canonical-text-v1",
+      "role": "canonical-convergence-proof",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4201BTestWorkflowConvergenceAuthority.ps1",
+      "sha256": "CC5B0377266628EC89EEB364AD732B1F12D9E70A23E0D0B7E127A051A85B159C",
+      "hash_mode": "canonical-text-v1",
+      "role": "successor-receipt-writer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "contracts/repository/mir4-m42-01b-test-workflow-convergence-v1.schema.json",
+      "sha256": "2CF152BF53B6444F609D9DD7A427E22CC45C6CBC9C5849E7967306E360739FC6",
+      "hash_mode": "canonical-text-v1",
+      "role": "successor-receipt-schema",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "invariants": {
+    "one_public_cli": true,
+    "one_executable_test_authority": true,
+    "one_generated_proof_catalogue": true,
+    "five_public_workflow_purposes": true,
+    "stable_required_checks_retained": true,
+    "publisher_cannot_build": true,
+    "three_bounded_compatibility_forwarders": true,
+    "player_executable_sources_unchanged": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "promotion": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-BOUNDED-IMPLEMENTATION-DECOMPOSITION",
+  "record_sha256": "9008FF708C0C7CA4404F53B7D8D5B272EDAF03A8F57B06A46B7FFF1DB7A537FF"
+}

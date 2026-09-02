@@ -2,6 +2,11 @@ schema: 1
 authority: mir-repository-path-aliases-v1
 
 aliases:
+  - from: validation/tests/
+    to: final.tests
+    mode: historical-read-only
+    introduced: 4.1.0
+    sunset: 4.2.0
   - from: .mir/candidate-closures/
     to: releases.closures
     mode: read-only

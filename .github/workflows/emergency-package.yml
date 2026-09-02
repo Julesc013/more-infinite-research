@@ -10,7 +10,7 @@ on:
       - "info.json"
       - "changelog.txt"
       - "prototypes/**"
-      - "validation/tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1"
+      - "tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1"
       - "docs/releases/**"
   pull_request:
     branches:
@@ -22,7 +22,7 @@ on:
       - "info.json"
       - "changelog.txt"
       - "prototypes/**"
-      - "validation/tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1"
+      - "tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1"
       - "docs/releases/**"
   workflow_dispatch:
 
@@ -63,7 +63,7 @@ jobs:
 
       - name: Verify planet target contract
         shell: pwsh
-        run: ./validation/tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1
+        run: ./tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1
 
       - name: Build twice and require deterministic bytes
         id: package
@@ -100,7 +100,7 @@ jobs:
             archive_entries = $entries
             archive_sha256 = $second
             package_content_sha256 = Get-MIRZipContentFingerprint -Path $candidate
-            focused_test = 'validation/tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1'
+            focused_test = 'tests/compiler/Test-MIRSpaceLocationTargetInventory.ps1'
             status = 'focused-emergency-build-passed-full-release-qualification-pending'
           }
           $identityPath = "dist/$([string]$info.name)_$([string]$info.version).identity.json"

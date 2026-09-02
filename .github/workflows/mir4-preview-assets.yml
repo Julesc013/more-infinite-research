@@ -30,7 +30,12 @@ jobs:
         shell: pwsh
         run: |
           $p=@{Phase='preview-assets';Operation='Execute';SourceReleaseRecord=$env:MIR4_SOURCE_RELEASE_RECORD;CandidateId=$env:MIR4_CANDIDATE_ID;SourceCommit=$env:MIR4_SOURCE_COMMIT;SourceTree=$env:MIR4_SOURCE_TREE;TargetDistributionRecordSet=$env:MIR4_TARGET_RECORD_SET;ReleasePlanDigest=$env:MIR4_RELEASE_PLAN_DIGEST;ProofRoot=$env:MIR4_PROOF_ROOT;SealRoot=$env:MIR4_SEAL_ROOT;OutputRoot='build/mir4/release-phase-engine/hosted-preview';OutputPath='build/results/mir4-preview-assets/request.json'}
-          ./tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1 @p
+          ./tools/mir.ps1 mir4 release-engine phase `
+            --phase $p.Phase --operation $p.Operation `
+            --source-release-record $p.SourceReleaseRecord --candidate-id $p.CandidateId `
+            --source-commit $p.SourceCommit --source-tree $p.SourceTree `
+            --target-record-set $p.TargetDistributionRecordSet --release-plan-digest $p.ReleasePlanDigest `
+            --proof-root $p.ProofRoot --seal-root $p.SealRoot --output $p.OutputPath
       - name: Preserve exact preview bytes
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:

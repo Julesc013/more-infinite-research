@@ -192,8 +192,8 @@
     {"id":"event.tower-planted-seed","registration":"defines.events.on_tower_planted_seed","filter":"valid-plant-before-dispatch","subscribers":["runtime.agricultural-growth-speed:on_tower_planted_seed"]}
   ],
   "migration_edges": [
-    {"id":"migration.same-target","kind":"same-target-source-upgrade","from":"mir3-predecessor","to":"mir4-private-target","status":"existing-runtime-and-fixture-evidence","precedence":100,"evidence":["validation/tests/runtime/Test-MIRUpgrade.ps1"]},
-    {"id":"migration.skipped-patch","kind":"skipped-source-patches","from":"older-supported-predecessor","to":"mir4-private-target","status":"fixture-evidence-runtime-qualification-required","precedence":100,"evidence":["validation/tests/runtime/Test-MIRUpgradeMatrix.ps1"]},
+    {"id":"migration.same-target","kind":"same-target-source-upgrade","from":"mir3-predecessor","to":"mir4-private-target","status":"existing-runtime-and-fixture-evidence","precedence":100,"evidence":["tests/runtime/Test-MIRUpgrade.ps1"]},
+    {"id":"migration.skipped-patch","kind":"skipped-source-patches","from":"older-supported-predecessor","to":"mir4-private-target","status":"fixture-evidence-runtime-qualification-required","precedence":100,"evidence":["tests/runtime/Test-MIRUpgradeMatrix.ps1"]},
     {"id":"migration.cross-target","kind":"cross-target-transition","from":"source-target","to":"different-target","status":"private-contract-only-runtime-proof-required","precedence":50,"evidence":[".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json"]},
     {"id":"migration.extension-install-remove","kind":"extension-install-remove","from":"extension-closure-a","to":"extension-closure-b","status":"deferred-W05","precedence":50,"evidence":["spec/api/mir4-v0/contracts.json"]},
     {"id":"migration.ownership-transfer","kind":"ownership-transfer","from":"generated-family","to":"reviewed-native-owner","status":"existing-f210-runtime-adapter","precedence":100,"evidence":["prototypes/mir/runtime/productivity_family_adoption.lua"]},

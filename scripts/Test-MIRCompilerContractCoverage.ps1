@@ -1,5 +1,5 @@
 param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")))
 
 # MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.
-$canonicalTest = Join-Path $PSScriptRoot "../validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1"
+$canonicalTest = Join-Path $PSScriptRoot "../tests/compiler/Test-MIRCompilerContractCoverage.ps1"
 & $canonicalTest @PSBoundParameters
