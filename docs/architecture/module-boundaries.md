@@ -771,6 +771,8 @@ Append-only composite correction records may import an earlier exact delta and b
 
 Base continuations are planned in `planner/base_continuations.lua`, executed in `emit/base_continuation_executor.lua`, and recorded as accepted or rejected catalog candidates. Streams, continuations, and native-owner patches produce common `TransformationOperation` envelopes. `emit/technology_operation_executor.lua` owns all technology create/patch mutation and can write exact before/after evidence to `MutationJournal`.
 
+M42-02 L1 preserves the public `planner/compilation_plan.lua` require path as a thin facade while assigning compilation-plan model, build, validation, fingerprint, and serialization responsibilities to the corresponding modules under `planner/compilation_plan/`. `build.lua` remains the cohesive construction owner pending the separately proved compiler-orchestrator split. This decomposition applies only to F210 and F200, changes no planning or mutation semantics, grants no emitter, runtime, migration, release, or publication authority, and is bound by `MIR4-M42-02-Compilation-Plan-DecompositionV1.json` plus deterministic current-source package proof. F110 and F100 remain byte-identical to their accepted package baselines.
+
 Provider identities are provenance, not a tie-breaker. `ProviderClaim` fingerprints the subject, semantic partition, stream, effect, policy, evidence, and risk. Identical claims collapse with every provider identity and evidence row preserved; any same-stream semantic disagreement is review-required.
 
 All cross-layer imports are declared in `.mir/module-dependencies.json`. The matrix is exhaustive: every allowed edge must occur, every observed edge must be allowed, and exceptions are forbidden.

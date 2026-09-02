@@ -5045,10 +5045,85 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan.lua",
       "transform": "copy-exact-bytes",
-      "source_bytes": 42880,
-      "source_sha256": "A1FFEB52014D910E5761945B9555291AE7C6E5E7CFE0564FCDA2C6D96493D566",
-      "output_bytes": 42880,
-      "output_sha256": "A1FFEB52014D910E5761945B9555291AE7C6E5E7CFE0564FCDA2C6D96493D566"
+      "source_bytes": 111,
+      "source_sha256": "96D4982DF9B953E1CA01BC9223637B3C993B5160E679B9BA5DB7670A9466B286",
+      "output_bytes": 111,
+      "output_sha256": "96D4982DF9B953E1CA01BC9223637B3C993B5160E679B9BA5DB7670A9466B286"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/compilation_plan/model.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/model.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 5461,
+      "source_sha256": "86AA8D0509BA5BE80E536569077A8E478FC0662B45717C2FA7E2123C334059D6",
+      "output_bytes": 5461,
+      "output_sha256": "86AA8D0509BA5BE80E536569077A8E478FC0662B45717C2FA7E2123C334059D6"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/compilation_plan/build.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/build.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 31900,
+      "source_sha256": "D02D09B54451F02E3F9CE54A508043B36F116B98C5521D899EE93020542D73EE",
+      "output_bytes": 31900,
+      "output_sha256": "D02D09B54451F02E3F9CE54A508043B36F116B98C5521D899EE93020542D73EE"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/compilation_plan/validate.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/validate.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 3410,
+      "source_sha256": "9074C0BF2696D9F69260FC6E24A1A0E1FF2555DF275E97C1E72FD285ADE98D23",
+      "output_bytes": 3410,
+      "output_sha256": "9074C0BF2696D9F69260FC6E24A1A0E1FF2555DF275E97C1E72FD285ADE98D23"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 1260,
+      "source_sha256": "13463F103C31AE733E3635C66384233DE10EACEE2CCDFB485D4070D741FA4C1D",
+      "output_bytes": 1260,
+      "output_sha256": "13463F103C31AE733E3635C66384233DE10EACEE2CCDFB485D4070D741FA4C1D"
+    },
+    {
+      "layer": "families.modern",
+      "target_scope": [
+        "f210",
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/compilation_plan/serialize.lua",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/serialize.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 2736,
+      "source_sha256": "C884E194F01993D9D90C14270C746A355B6E6278A9A85C2E98378C34AE30654E",
+      "output_bytes": 2736,
+      "output_sha256": "C884E194F01993D9D90C14270C746A355B6E6278A9A85C2E98378C34AE30654E"
     },
     {
       "layer": "families.modern",
@@ -6253,5 +6328,5 @@
     "no_target_full_source_copy": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "573296B0952C831FCD6D0BD4D59E9B4614147C72231F024897B331079D6F1FA8"
+  "record_sha256": "D461E1B0CD23F6CCAFB13E3CCB5C5507E4EB1D876863705E2937E3EE00D578EE"
 }

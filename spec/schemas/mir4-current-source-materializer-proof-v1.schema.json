@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/package/mir4-current-source-materializer-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "materializer_abi", "package_authority_sha256", "package_source_sha256", "source_manifest_sha256", "targets", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CurrentSourceMaterializerProofV1"},
+    "status": {"const": "passed-four-target-current-source-determinism"},
+    "materializer_abi": {"const": "mir4-target-materializer/1"},
+    "package_authority_sha256": {"$ref": "#/$defs/sha256"},
+    "package_source_sha256": {"$ref": "#/$defs/sha256"},
+    "source_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "distribution_version", "source_binding_count", "omission_count", "archive_a", "archive_b", "content_sha256", "entry_count", "baseline_content_sha256", "baseline_entry_count", "baseline_match", "entry_count_delta", "deterministic_archive_bytes", "composition_record_a", "composition_record_b"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "distribution_version": {"type": "string", "pattern": "^4[.]0[.](?:21000|20000|11000|10000)$"},
+          "source_binding_count": {"type": "integer", "minimum": 1},
+          "omission_count": {"type": "integer", "minimum": 0},
+          "archive_a": {"$ref": "#/$defs/sha256"},
+          "archive_b": {"$ref": "#/$defs/sha256"},
+          "content_sha256": {"$ref": "#/$defs/sha256"},
+          "entry_count": {"type": "integer", "minimum": 1},
+          "baseline_content_sha256": {"$ref": "#/$defs/sha256"},
+          "baseline_entry_count": {"type": "integer", "minimum": 1},
+          "baseline_match": {"type": "boolean"},
+          "entry_count_delta": {"type": "integer"},
+          "deterministic_archive_bytes": {"const": true},
+          "composition_record_a": {"$ref": "#/$defs/sha256"},
+          "composition_record_b": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["four_target_determinism", "historical_baseline_authority_immutable", "production_materializer_has_no_archive_input", "current_source_differences_explicit", "package_cutover_complete"],
+      "properties": {
+        "four_target_determinism": {"const": true},
+        "historical_baseline_authority_immutable": {"const": true},
+        "production_materializer_has_no_archive_input": {"const": true},
+        "current_source_differences_explicit": {"const": true},
+        "package_cutover_complete": {"const": true}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/transitions"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "transitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_cutover", "old_writer_retirement", "tagging", "signing", "sealing", "version_allocation", "publication"],
+      "properties": {
+        "package_cutover": {"const": true},
+        "old_writer_retirement": {"const": true},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "version_allocation": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}
