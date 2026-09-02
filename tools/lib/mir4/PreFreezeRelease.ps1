@@ -1047,7 +1047,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $baseContinuationEvolvedPaths[$path] = $true
     }
-    if ($baseContinuationEvolvedPaths.Count -ne 5 -or
+    if ($baseContinuationEvolvedPaths.Count -ne 6 -or
         [string]$baseContinuations.responsibility -cne 'base-continuations' -or
         [string]$baseContinuations.status -cne 'M42-02-L2-BASE-CONTINUATIONS-DECOMPOSED') {
       throw '[mir4-prefreeze-m42-02-l2-scope]'

@@ -39,9 +39,17 @@
       "release_authority": false
     },
     {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "2D7EA6EB31F13F50F9B01E8090AA474B64D9FB44368DEF60582F4590CFCB6D2E",
+      "current_sha256": "CAFE44A138E004FE4E77AE6A60072E1D334CC9472FAE85133B7A0EE46421DFDE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "4CD8F5FDF0A228A0E21C430F87813485B5A33A9E091DED405C45F02EF39B120F",
-      "current_sha256": "EC701BB443277D107361DC3E07C2D3CC148256E8428B7EB97AB1593ADB2E47E1",
+      "current_sha256": "78F019B38306C287226769EDBF6B08E39B6A041386B9FA722B3B8A9A941A38AE",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -321,5 +329,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-L3-STREAM-COMPILER",
-  "record_sha256": "3ABF4BAEAA54B1A5957E8623C19E13C4582DD7D107C565D97824A057F18CB340"
+  "record_sha256": "2B45F0F7070335CC129FED3DBD0684B299AD4DD786A0F51E401327F1D734B42B"
 }
