@@ -150,7 +150,7 @@ function Invoke-MIR4TargetRuntimeReplay {
     }
     [IO.File]::WriteAllText((Join-Path $evidence 'fresh-load-factorio.log'),(($logSections -join "`n") + "`n"),[Text.UTF8Encoding]::new($false))
     $upgradeOutput = Join-Path $evidence 'upgrade-matrix.json'
-    Invoke-MIR4RuntimeReplayChild -Label 'upgrade matrix' -Arguments @('-NoProfile','-File',(Join-Path $repo 'validation/tests/runtime/Test-MIRUpgradeMatrix.ps1'),'-RepoRoot',$repo,'-FactorioBin',$factorio,'-FromZip',$predecessor,'-ToZip',$candidate,'-FromVersion',([string]$baseline[0].predecessor),'-ToVersion',([string]$baseline[0].distribution_version),'-FixtureName',([string]$profile.upgrade.fixture),'-OutputPath',$upgradeOutput,'-WorkRoot',(Join-Path $work 'upgrade-rows'),'-Retention',$Retention)
+    Invoke-MIR4RuntimeReplayChild -Label 'upgrade matrix' -Arguments @('-NoProfile','-File',(Join-Path $repo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),'-RepoRoot',$repo,'-FactorioBin',$factorio,'-FromZip',$predecessor,'-ToZip',$candidate,'-FromVersion',([string]$baseline[0].predecessor),'-ToVersion',([string]$baseline[0].distribution_version),'-FixtureName',([string]$profile.upgrade.fixture),'-OutputPath',$upgradeOutput,'-WorkRoot',(Join-Path $work 'upgrade-rows'),'-Retention',$Retention)
     $upgrade = Get-Content -Raw -LiteralPath $upgradeOutput | ConvertFrom-Json
     if ([string]$upgrade.status -ne 'passed') { throw 'F2D upgrade matrix did not pass.' }
     $head = (& git -C $repo rev-parse HEAD).Trim()

@@ -59,8 +59,8 @@ The governance and characterization foundation is complete, so MIR 4.1 now owns 
 | M41-06 | Establish `main` as latest stable and `dev` as the next-minor or next-major integration line | Complete |
 | M41-05 | Route documentation by reader need, then separate repository and package landing pages | Active: M41-05A routing complete; M41-05B waits for the package-documentation cutover |
 | M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Complete: F1 through F2E accepted; `src/mod`, `targets`, and `TargetMaterializer` are current package authority |
-| M42-01 | Converge PowerShell behind one supported CLI, one implementation per command, and one release engine inside the 4.1 completion boundary | Dependency-ready after documentation cutover |
-| M42-02 | Perform only reviewable behavior-preserving Lua decomposition needed for the 4.1 maintainability fixed point | Dependency-ready; remains sequenced after M42-01 |
+| M42-01 | Converge PowerShell, executable tests, proof catalogues, workflows, and release orchestration behind one supported public surface | Complete |
+| M42-02 | Perform only reviewable behavior-preserving Lua and PowerShell decomposition needed for the 4.1 maintainability fixed point | Active after M42-01 |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
 

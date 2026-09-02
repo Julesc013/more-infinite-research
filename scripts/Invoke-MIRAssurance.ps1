@@ -220,13 +220,13 @@ switch ($command) {
   "seal" { Invoke-MIRAssuranceSeal -Context $context }
   "check-seal" { Invoke-MIRAssuranceCheckSeal -Context $context }
   "locale" {
-    & (Join-Path $repo "validation\tests\docs\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
+    & (Join-Path $repo "tests\docs\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
     if ($LASTEXITCODE -ne 0) { throw "Locale assurance failed." }
   }
   "balance" {
-    & (Join-Path $repo "validation\tests\compiler\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
+    & (Join-Path $repo "tests\compiler\Test-MIRResearchCostModels.ps1") -RepoRoot $repo
     if ($LASTEXITCODE -ne 0) { throw "Research-cost model validation failed." }
-    & (Join-Path $repo "validation\tests\compiler\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
+    & (Join-Path $repo "tests\compiler\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
     if ($LASTEXITCODE -ne 0) { throw "Native-owner balance contract validation failed." }
     $snapshot = [ordered]@{
       schema=1

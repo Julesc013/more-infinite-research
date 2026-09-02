@@ -488,7 +488,7 @@
     },
     {
       "key": "mir4 tooling",
-      "public_syntax": ".\\tools\\mir.ps1 mir4 tooling <inventory|inventory-check>",
+      "public_syntax": ".\\tools\\mir.ps1 mir4 tooling <inventory|inventory-check|test-authority|test-authority-check|tests|tests-check|workflows|workflows-check>",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -810,7 +810,7 @@
     {
       "path": "scripts/Invoke-MIRAssurance.ps1",
       "classification": "canonical-internal",
-      "sha256": "898B1FABD4E027FE367E44E2D22F4AE44FBBA9DE102DDAECD4F485C8324D9AEF",
+      "sha256": "FAB4B763803218D33E584958BA92403FB3631B6BB3B1A893BEC5DC3F59D52600",
       "lines": 258,
       "package_visible": false
     },
@@ -873,14 +873,14 @@
     {
       "path": "scripts/Invoke-MIRValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "49624C5905B921BC0F4C75BC6A12AE28CF82E68A4C1B1D7C278853214D221FAA",
+      "sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
       "lines": 5159,
       "package_visible": false
     },
     {
       "path": "scripts/Materialize-MIRBackport.ps1",
       "classification": "canonical-internal",
-      "sha256": "B0CA006CA6FA3EA408121996DC539990FBFFF3B07EC0103DD527FFBA4AA8AB86",
+      "sha256": "7A5B3565DFD7E45EB43698AA82151D345A749848137A8536DC6950C4E5ADF4E6",
       "lines": 143,
       "package_visible": false
     },
@@ -1153,7 +1153,7 @@
     {
       "path": "scripts/New-MIRInteractiveReviewPacket.ps1",
       "classification": "canonical-internal",
-      "sha256": "A9EC1E861297BF3C1E76621EF05291C54185077E44F6BA9B076A2406EB1706DD",
+      "sha256": "FAA866EEDE63285F987A73C30EDD38AB756AFEDC8DA43F49FEAC97C94D03C731",
       "lines": 400,
       "package_visible": false
     },
@@ -1244,455 +1244,455 @@
     {
       "path": "scripts/Test-MIRApprovedDelta.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "313F11FE7AE8C7A5C04D4BE16F77B382EA65CD2C4D98E3855701F6EDA345EEC6",
+      "sha256": "CFAAB6F9FDF46C1DC69EC702453E405FDBB6C998D1E98615D8889A04B50D1C96",
       "lines": 11,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRApprovedPatchDelta.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "24487F312678DB86D51B6321D57BED60CAE9127F04AEE6CEEEC6CDE2196C5797",
+      "sha256": "D5459F0CF384F34BA091DD456EB7BDC6DD97300B5895591B52D40D72477C96F5",
       "lines": 11,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRArchitecture.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "074342D44E4B2A02C0293E6958090F37675450EBBC277362C0900F9E2E213933",
+      "sha256": "534BFF4212FD0894ED706F34053F6BF0BDC521383D6E01826BD48220541D87F1",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRArtifactCleanup.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "F5840D5168BBD0AFF409172EDCB1589E870F5B2767753072C4F6ACD248EECCCC",
+      "sha256": "6315C2AF3BAEFEBC1614866B017EB32AA7DC19B27964BC64AD000A57158BA50D",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRAssurance.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "E6D9AAA04DA36EC8F8ABA0DBBCDEF79B21AC7111EB983BC8F43E34A67A5C1990",
+      "sha256": "5D12404D49AF5951000BC4410BCC325A3B281C58C0F675CF0FD64DC1EA72D53B",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRBackportManifest.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "B277731E994A7D3EC0F759E2F65834FA4B0CE0F986A512941E5792DC75B6F571",
+      "sha256": "7B71D7AF90CD6AE5CF2A9E51C56488A10A438EF7C36A69C4FCC4BB232201391F",
       "lines": 9,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRBackportReconstruction.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "1EEC0B651AB6B0A714EE1940C01AB7E9AC2515D6BAD44ACB328599F34D528628",
+      "sha256": "3CB196DEC3976EA2D58E4F6431A3F27995CD4E02AC15BE1884CC9B3D91A00744",
       "lines": 10,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRBackportSourceLock.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "03B8E2D84F90B117963702258D11981F6BCB33E54CE362ABAF0FFBDBCCA564A0",
+      "sha256": "06B93712C6DE156E34AE9BC45E29522D00219D7A6DF7BEA2C56CEAD95E082189",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRBranchPolicy.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "2B803F884DAEAA478FFC390F425B20B90A08C9A4D1F6C1A8A1B8B03415C3F456",
+      "sha256": "788B20D73F4BEBD7ABDDCFA513949E1613393B00E978AEA7E37023C5FF357D4E",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCandidateFreshness.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "4F3B2A75C904871FA9156D3266D550073002CB6F24C27D792C345A78413E9816",
+      "sha256": "0D14A6ED36EB78726E2EAE5515C394F3D28C6B83C68E1B53E229FD10C5D2EB38",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCandidateRetention.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "AF5A93DD1B966403216141A86DE8A0CBCC40C47B6198EEDBBFE44AA992D3041F",
+      "sha256": "305AB97A8A0FD98E95539B601026E79E8B7FB1DE6DB7686CDC7717747F564B54",
       "lines": 11,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCompiler.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "34A718C5558B108813D19D9BFC9187CF062237BD9D7BD202AA9A0554C3969FCC",
+      "sha256": "5DEEB0618A712B60A5453806EDC1603546220E7AD6CA2CA9B1FD115A627E752D",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCompilerContractCoverage.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "06C9E9B92AD16DEE177C00CF25E20143F8D5469E6D483CDCA8024AB11BDBD7C5",
+      "sha256": "6AC17C41CF92258E29645561CE5199FD7271F2EAE68FD8A02BDDDC0565DD4E0B",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCompilerPreviewExport.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "6D3D7CAA83DC8D257B5AEB746980C6EBB2C8D06E4EEF3A1B59981E996C18CE9C",
+      "sha256": "A316A6DC6930594EB8B4C089A87CC0538B35BB474137A3C2EDDB6ECC4E3D9A20",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRCompilerSchemaDrift.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "7D2D4E1EB481DE91C646F63D6A01850186F3621E0BA6B15B84D453DF434B84A1",
+      "sha256": "D9F0C8927948DC0D0BE8DC65B4318368DA22461CDD6C20E31DA16FF04E9D0755",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRContextExecutionRegistry.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "18F9390838B5EA17663CD3BEAF9EF18E8D26B10387C271B41B60D7BB821B5523",
+      "sha256": "CD1C2E9CE4EC00C4782BFA217F20339041458D9E51D279C2D9F39B1A81F43CEE",
       "lines": 9,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRContextPackage.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "89BC43B677FCA9ADF951BEAFD297FF1ED7E81D9ABA0F2B897AD993B210233AD1",
+      "sha256": "21BD188F576061584A35123F53479C45AB4CB970E65FDA74A23BEF974E3E2294",
       "lines": 10,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRControlPlane.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "D8C4C14DFD6C9FFCDC3675C3FC530EB47391CEAFCB304684FC654DD415F05B4D",
+      "sha256": "931997556D635ED124ED5061E1C67E72A9E0CF1A47C4DA46602B77A274D32008",
       "lines": 8,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRControlPlaneExecutor.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "EFABAD896D1A7A3FB0CB07122A63B31A26CDB5BF51EC92D481303D4E5AA3347C",
+      "sha256": "CA07673E2804199160410E65E3D69873C7C4EDA3E87B33B3D425BB83E7AE5CF2",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRControlPlaneRelease.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "CCE8AA273D79E7A3B7F88E48D2DECCE1D627728BF0E39CF1E4C25ECD632315A1",
+      "sha256": "18380879BACEC721699E2AE6FBF520FCE30F3208D591332B61BC9C31913B9373",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRControlPlaneShadow.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "1716143B20E2E034F884B7B0527B45BD28828F5E912BF0F4AF6849488794DC3F",
+      "sha256": "0E1517F4AB72D79EAD6AB78A0C08477A41AAA33B5EA49BB257C4CF308088B4F2",
       "lines": 12,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRControlPlaneWorkflow.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "2571ECB7CC83C66AC8FB0536D5CCC1F66E5902D9E6A36B4FC24E9FDE44180085",
+      "sha256": "60D2682CDC8C8948C9FD97998FF5345DA4922BEAD422668CF0449DFE8782B29C",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRDependencyResolver.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "AF141CD9A07AB095490ED4FA2B0BC005EAC1939C8DD05F98CF1BFF0C7C3CFA97",
+      "sha256": "68939C67C4968F23457E5C77BC3B72E6349E8FE1144BC5242BA09DA7EB48EF0F",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRDeterministicPackage.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "6C277ACD72A313B9AC43F86E8772A272ABC84CAD925BFF6E3B0A4EED30CFE1F6",
+      "sha256": "085BCA9AF75AB32EB47672BE4931ABBDB16988492920227349B65266D1DEE151",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIREvidenceHygiene.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "B5513370237B3AF90A8EF2F831C578F8D7E874E49766D07C11D639475A9595FA",
+      "sha256": "A64FAD0FD2353F21AD84C70FA9CB634C4D851E514F012D7B32D324BAECE2FFE9",
       "lines": 9,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIREvidenceStore.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "9BEBC72B001232E7D3F15D1981A953BEE695AC7A2177D79FFBE1CF4FFE51F12F",
+      "sha256": "54709D7BB024E67F06F01F16F1B98EA35D88160CA8FCE6BBB768E5B4291E57CB",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRExecutionRegistry.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "3AABE83025ADA6FF4D6009C49D91A8ADBB032CAAAD8E55E9FE490FD5E9352DC1",
+      "sha256": "4F4E4DF9F52802306153AEC0E332EB89D7120639E0E7D754C67A31BA9C577A78",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRGoldenPlans.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "E6DF629CBB29C39F61F98AEB2EAE609E07C70723B4EF590863D9C202AE6F9CE3",
+      "sha256": "867370AC1844989FC6DF3E297FE5F83CA1C7070AA08B2242BE16C0BD94949FD0",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRGovernance.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "37CF3D04DDDC0F4426F8F0FFE102957D8E18D9FF85968446302E2F29D5619D21",
+      "sha256": "538B2A6B716369696765C3E5666C13F119E49BEFBDE4250E95CB9CD4D130A1B0",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRLocales.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "D2C7BCDF74BDFBDFFD5F63856E3C7DAE942AC294F6DF233B3EDD2FC2D79ADCBB",
+      "sha256": "A371ECD4C63F2BAB78DAAE623AE30B2E9D2F88ED6E351A575D5181141C7F3F84",
       "lines": 10,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRLocalModLibraryCatalog.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "EB91BF501EAF32F019BAFB4C0F62B6606AFBDF64515B7C0D996F234CCE0CD1FC",
+      "sha256": "35A73DCA6521288B0A7679A8286666727EA2EDEC8A20619FD47A4079854B1A6C",
       "lines": 13,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRManualReleaseReview.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "B9DC2182403EFD50001B7D72F002EECE21707F856BCDF678A390B8B0291CA17C",
+      "sha256": "9795374E27009E3684D0EC5BF8067FF6FE568FE1D1E960FDF7F9A58EAE392EE3",
       "lines": 12,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRMarkdownFormatting.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "2C200FF073CA84DA680FD03775767CE48AB91C79C7BBCE9DCA0F1B0ACC012C61",
+      "sha256": "9846FDDD2830489FD4CFC0B1645400DEE41AC4A2CB15C95CAA059FB6F061D77C",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRModInteractions.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "ACB0D01A1F5B543934C98BE65B2CD45E78F28F42A5961CEF8AEB237953751079",
+      "sha256": "22570DCDAB0C42CC3A51905C08646D83602177F8E2E408522F2A287B63E44C19",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRModuleDependencies.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "351F7D9304F59E63084E2B6D130EEF2AC64405E1F190BE2886D16647819525E2",
+      "sha256": "D63EC1838B600B27A5BD2396FAE8EDAD7C461DDE6879DEB280264C1BA5640414",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRMuseumCompiler.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "E1F6595A8762718EAB5C77239C53B4213CF6909FFB5FC9A1D4A6B86505DFC5ED",
+      "sha256": "3B7A80BEFF02B45A0F2DCD36CB88EB4C2BAA393EF663BB9F1BEB4A0F9EC33719",
       "lines": 9,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRMuseumExact.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "E6BF1DE91C60C557E6AE4907255A4AE4688916109604C397F975B3A51D4A084C",
+      "sha256": "E75701B272A38C1747F27EC38707143F8DA24C7B8C348BD51E047295B07C7D0A",
       "lines": 11,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRMuseumRuntime.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "F3D26D81F25388D5900F07541B7592CFED354EE85AC5D6C1EBCADEF2DC8755DB",
+      "sha256": "B20663BF8B1DFF31BA9A8256E967D7684708A690D63958AE452DCFD9C6A43EC9",
       "lines": 18,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRMuseumSeal.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "1FD293F30ED7340E00C9C5D194939730A92432745CF1805BBE4686827071FE31",
+      "sha256": "2CCB3E8E4392B8550DB559F60F50C3280748C9C15EFA05526E93FB488697201B",
       "lines": 12,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRNativeOwnerCostModels.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "9B016F8E19B399D2CC5357AB1693B6B853884C22752EA19ABE792562EA8D0044",
+      "sha256": "BA5013A8C44A48C99BA2F1EEFE7F0CDE2FA87666D9180DC3B6130E04006CE94A",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRObservationEvaluation.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "C0E82BC7EBB8CE669CA68E6DF080AD55FDAF3B8E836F9A3A2AC2DCC96DC6FFB0",
+      "sha256": "DBFFA3910C57DF7EF4DD85D04A9C50379CEB819F56994FA62287D6EBE51D3F8E",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPackageComposition.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "7E019769F58C29C2A639AD8FC05E92AF718A801C1A9025CA4A6E4094C373A790",
+      "sha256": "0DEE738C4FA7CD0B7A76D35B78A1B37BA024A9C369C1FD0A30A938D925CE1C07",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPackageIdentity.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "573AEBA20564BBA025A3AE2A4B774B6F5CEFB489A6D1DA637E3457936BF948F3",
+      "sha256": "2BE085FE00224234D1BB9A0D57725A8ABD1A80DC9AEA1702F43A316928C5C52F",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPerformanceBudgets.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "B8E1A1E64026028AA0255C236A949EF90D92D2C1D983214031DEE9F0E55FE367",
+      "sha256": "48D226A4EF1619F1F8CA1322412BFFC6322C1B1EEFB3D895031E2B87C42936B4",
       "lines": 14,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPerformanceRegression.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "7E9856E82FA4CA4EB1DD4A6D2304D4EEC364043CE4C681AC9E1E9F8C67F31DD4",
+      "sha256": "EC99B791DF98972BD539AADFD95A7D93ABE393BE946AA145A22BB32C47C4FB77",
       "lines": 16,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPlannerTools.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "09D8E675EF38742999BBAFBF8D3316C8AC92AB06BD99CC5EA20F42D1F295A89B",
+      "sha256": "4A1E70E08276A05680F2865A5732C9169A0EA08B0EBBFB6C7C54C630CFDBC852",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPolicyLints.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "176F5C644D8FF97649889267FDE9784EF346E5EAA342A3E0C89061F4D74FB02C",
+      "sha256": "5C550AE147DA8230C0C764CEEF4B76E48E0A8996224F6EF5923EC9D0FBEB28D8",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPowerShellQuality.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "181B50E9393ED5B15E7CCFF65B59C2FA307D7EACCFFBC94FA9151D0A1A307CE9",
+      "sha256": "2F31D5F34C03775D631CE990101AFF4C2F89F88ABD222A62C7B74386D7B76AED",
       "lines": 8,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRPublishedSnapshotIntegrity.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "75423F6BCCE5AAA1404E877FD7B39D409351CEC08033487EAE2314CBCFA3A1DD",
+      "sha256": "9CA76D941192B8B2655D00E0701CE55B78BF5889E7BEAF9C9D5EBE95F2B46D2A",
       "lines": 8,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRReleaseAuthority.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "4ECAB30FC00E23BE15AB3AA0165889E10BC91942730C30B2BA6D8F172E1CD6BA",
+      "sha256": "936D83EF5E6756144010C26F49C65D64D0DA176CB3BB918D0351370BF1197DE6",
       "lines": 4,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRReleaseObligation.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "D38155DD9042797473D7CDD8927179DF7CE158AB63E2EFDD76FA42C07A6B3F5A",
+      "sha256": "345D8163066FCA1842F5A3C05819B2B6C0090FD74AA5F53092355FEDC55C5225",
       "lines": 10,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRResearchCostModels.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "147A2D5EB5CBE6A5DF4F0B8476BD0D756B9959DF3094C55D6D48C7775DA5D689",
+      "sha256": "D60229122BA3EBAAA64A08C1EE57F9D02164C2F5074D84AA01F892E5799EC66D",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRRuleSynthesis.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "DA771F54365D4190BD82D5D9576A520CCD9DBA1C92A96AB73CB140C4E09FB156",
+      "sha256": "CA0E4BA77476806A320A7C50ACAD871CB1A897CD43B5334A09F13F0A8CB0B8FD",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRSanitationBudgets.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "7DB3CACBFA64D31342D5DC2F9FA3D60990D820CD159F4C124274A526760236B6",
+      "sha256": "B08B080BE84A0B8FF097E3E744CA9229006F059BE6E0CAAA97559A8CC2DF481C",
       "lines": 8,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRScenarioManifests.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "C2F3591C28A70C92C9EF8B0BB5FD39006882CBB89405C351F63CDB7BA943AD6C",
+      "sha256": "2FD16AFDC5A46CBDFD70BE83FEAEBF946C4F3363CC4AB3C0E20FF9E3FC56D669",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRSettingsVisibility.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "ACE926DE26352A206CE01E030C284094751E2ED07E3BCAC29E3771E93BDC1CBA",
+      "sha256": "46CB32F0A2070BC09B1B7A1C8CC4954F058C0A8ACC6A6B4ECFFD5E5CB0C8BD78",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRSpaceLocationTargetInventory.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "919D5991045DEFEE1686795293851B395AD678AE30372094323E0E2FFA1FB8EE",
+      "sha256": "5AB33163C3AFF53AFFF86C9CC3BDCDC5DD95F5DEF08563C8C234BCE754F685CC",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRTechnologyLifecycle.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "5F60ACE3EE27DAE91203D897B8AF88B50065C61805CCA9FC54C95FEA27FA0C74",
+      "sha256": "B5093A9134E722ED74BDBF361D9D8130AF67FE54DF5398286D3668C24554B5E8",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRTechnologyPolicy.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "CD71DDFE118FAFB5B5BFB500E808734FD66F78E7437AFD4BD6E0CA4A23751E2B",
+      "sha256": "2B684372BEE62B9DF27B1CE149DC79ED8351EC60158F1711BF964FD0E74D33A0",
       "lines": 5,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRTechnologyPromotionAdmission.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "029DA37BAD7D1C53AB20014E9759F9B442F4A89DD151E0F864694789F676F117",
+      "sha256": "B63C01CB3132609985F395EAC7AD392ED4E9712A73A8946EDC96BD3C7B46568C",
       "lines": 13,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRUpgrade.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "809132048BF67DD552A34D7317CF4DACDDEB46A19429972E6528AE0DF3F4B366",
+      "sha256": "9BBD8FA66ABA3F3EB3F7A36D876BE1D3871816FC30CA3CAD74238B828FFC4E89",
       "lines": 17,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRUpgradeMatrix.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "11B3A130BA15533FB6117269B736E34F4799C2B6E8E52F1A9720C616796F9F32",
+      "sha256": "BB0B7E63DDC2C6B71563B85F135E94A529E8724A140DCA6A92139EE459B14AF2",
       "lines": 14,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRValidationResults.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "2E3E8968D9154483D727883D703AEF7BC3AA5EBA8FA7756B73C3727F87A520C7",
+      "sha256": "4F22A00C3F9E51E7DA0F6BCE55FB65E0285DE3D08C4AA8E3267EB4FCAD340314",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRVerificationContext.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "7EE001B40812B43EFB148195A737E5F5B727E12E3329004F38C661C1B9580147",
+      "sha256": "E432DCC2483FA68D987E5052E963C04AE888EC22DC342598788D8585114A8DC7",
       "lines": 7,
       "package_visible": false
     },
     {
       "path": "scripts/Test-MIRVerificationSchemas.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "4C119E85168D8C41A5B12EBC0508D0E2B9508E7062FF47F4F210F79D7407C712",
+      "sha256": "4BC1B4F8F55C3E33F53C67825B2D176872B245BE256964A30EC0784D55EA7CE9",
       "lines": 7,
       "package_visible": false
     },
@@ -2292,6 +2292,13 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M4201BTestWorkflowConvergenceAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "CC5B0377266628EC89EEB364AD732B1F12D9E70A23E0D0B7E127A051A85B159C",
+      "lines": 148,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1",
       "classification": "migration-only",
       "sha256": "0B7CCC8A7D4ED085B14F286EBBDE7D0BC1F25BA79EE4514D168DDD6A82E0F4D0",
@@ -2336,7 +2343,7 @@
     {
       "path": "tools/commands/museum/New-MIRMuseumSeal.ps1",
       "classification": "historical",
-      "sha256": "3F883D5CABBFFB228501BB52D5D52B7A238FE1496197D80D245316362E5A5771",
+      "sha256": "11C800A09B36BACE8FDD70C7DC37C00F132BEA905BD11E10B5E26BEE7E28FA8B",
       "lines": 91,
       "package_visible": false
     },
@@ -2497,7 +2504,7 @@
     {
       "path": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
       "classification": "historical",
-      "sha256": "65719768D10FDBFF080B7BA0C9EC8F5EFA5A7113811E5A04A8C7AC7C0F8BA606",
+      "sha256": "5C36E0C13CA7C468963813CBA9D5CD42B33B06FBDA6D1C77FC85CAEC8A92EF07",
       "lines": 1596,
       "package_visible": false
     },
@@ -2616,7 +2623,7 @@
     {
       "path": "tools/lib/assurance/Evidence.ps1",
       "classification": "canonical-internal",
-      "sha256": "1C552F8C2BC0AEB520DA0C4A14F9506B201F4B7EE6D9C8601553B61DCE2B0241",
+      "sha256": "1464AD8A30778F2E768FBE363DF107F1D7E10E7671A7E583F3B4A25584B19D6A",
       "lines": 2650,
       "package_visible": false
     },
@@ -2763,7 +2770,7 @@
     {
       "path": "tools/lib/control/Executor.ps1",
       "classification": "canonical-internal",
-      "sha256": "43D9F533B7290AAC6B51769EB57D810470D2A93F55C6F6CBB826B318BDBE8DCF",
+      "sha256": "0DE88F7E2E2BB1FE90E3823D52880C5E54CC772BEEFB783BCD2FD87595600A3E",
       "lines": 1217,
       "package_visible": false
     },
@@ -2980,8 +2987,8 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "66CB0BD604F12F341F85194A7E1AE7D8682C68DBAFB3741DF507A5E77A8F8464",
-      "lines": 1731,
+      "sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
+      "lines": 1790,
       "package_visible": false
     },
     {
@@ -3463,7 +3470,7 @@
     {
       "path": "tools/mir/application/package/RuntimeReplay.ps1",
       "classification": "canonical-internal",
-      "sha256": "BA102D867A67DE0AE9EB9DBA04B198BA76C987C31CD656027761484A334B5FD1",
+      "sha256": "3EEE17C70E26F187C62548132651F62C636531DE4922B197BBA29A6A1527372D",
       "lines": 205,
       "package_visible": false
     },
@@ -3699,6 +3706,20 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/application/tooling/ExecutableTestAuthority.ps1",
+      "classification": "canonical-internal",
+      "sha256": "568894BB1E5512DD3B8FA32F0991CAC071ED0D32A7308AA9774AF519998D67A5",
+      "lines": 85,
+      "package_visible": false
+    },
+    {
+      "path": "tools/mir/application/tooling/TestWorkflowCatalogues.ps1",
+      "classification": "compatibility-wrapper",
+      "sha256": "CD1187C09AB2A559DEC25ABB9E21D5C5B2E58A77BC9A01474B9A40CACA4A8E2C",
+      "lines": 184,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1",
       "classification": "canonical-internal",
       "sha256": "1B6DCE6E22838A162E540B3B7C1D9685D929D9B7652C412AE3221A52757F963F",
@@ -3918,8 +3939,8 @@
     {
       "path": "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
       "classification": "canonical-internal",
-      "sha256": "8452761605C5088AF60A4EFE8BBFDA950FD22E66BF5FF5DF93B1EF7337016326",
-      "lines": 10,
+      "sha256": "FCF59DACB3C3C871EA844B256D48F54576229FE2AEF948003BE442CAA339B463",
+      "lines": 21,
       "package_visible": false
     },
     {
@@ -3932,7 +3953,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "2C35CE376A05EBD89E87347B54BA22F0BD5D577BDE7DC63E6D89767F425826EC",
+      "sha256": "AA50E7DF8CD41C756B3270A47A23E13F4F8B911F9ED89B05813D4B99376E7E25",
       "lines": 1321,
       "package_visible": false
     },
@@ -3988,9 +4009,9 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 262,
-    "compatibility_wrapper": 167,
-    "migration_only": 25,
+    "canonical_internal": 263,
+    "compatibility_wrapper": 168,
+    "migration_only": 26,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4003,5 +4024,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:22dc9088515e350a6eb1bd05ffce36f8918eb401cf0aad8a8b8523b81abc7bcb"
+  "digest": "sha256:d08a13e49f61e4ab7824d54cd98fd5c3d036b12c24da533a1ceb7f01e1dfc2eb"
 }

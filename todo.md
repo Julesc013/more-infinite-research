@@ -20,8 +20,8 @@ Status: `active`. MIR 4.1 completes the repository, package, tooling, test, docu
 | `M41-06` | `4.1.0` | `complete` | M41-04 | Establish main as latest stable and dev as the next-minor-or-major integration line |
 | `M41-05` | `4.1.0` | `complete` | M41-03 | Route package-excluded documentation, then separate repository and package landing pages after package characterization |
 | `M42-00` | `4.1.0` | `complete` | M41-03, M41-06 | Establish one package source, deterministic overlays, one materializer, and four independently generated targets |
-| `M42-01` | `4.1.0` | `active` | M42-00 | Converge PowerShell behind one public CLI, one implementation per command, and one release engine |
-| `M42-02` | `4.1.0` | `queued` | M42-00 | Perform only reviewable behavior-preserving Lua decomposition behind characterized mutation boundaries |
+| `M42-01` | `4.1.0` | `complete` | M42-00 | Converge PowerShell behind one public CLI, one implementation per command, one release engine, one executable test authority, one proof catalogue, and five workflow purposes |
+| `M42-02` | `4.1.0` | `active` | M42-00, M42-01 | Perform only reviewable behavior-preserving Lua and PowerShell decomposition behind characterized mutation boundaries |
 | `M43-00` | `4.2.0` | `blocked-dependency` | M42-01, M42-02 | Admit integration-kernel and built-in ecosystem capabilities through exact contracts |
 | `M44-00` | `4.3.0` | `blocked-dependency` | M43-00 | Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation |
 | `M45-00` | `4.4.0+` | `blocked-dependency` | M44-00 | Allocate a coherent external product outcome only when evidence supports it |

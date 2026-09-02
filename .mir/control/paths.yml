@@ -19,7 +19,7 @@ paths:
   mir4.patch-rehearsal.application: tools/mir/application/release/PatchLaneRehearsal.ps1
   mir4.patch-rehearsal.cli: tools/mir/cli/Invoke-MIR4PatchLaneRehearsal.ps1
   mir4.patch-rehearsal.receipt: releases/rehearsals/MIR4-M40-01-Patch-Lane-Rehearsal-2026-08-31.json
-  mir4.patch-rehearsal.test: validation/tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
+  mir4.patch-rehearsal.test: tests/mir4/Test-MIR4PatchLaneRehearsal.ps1
   mir4.patch-rehearsal.authority-evolution: releases/migrations/MIR4-Patch-Lane-Rehearsal-Authority-EvolutionV1.json
   mir4.patch-rehearsal.authority-evolution-schema: contracts/repository/mir4-patch-lane-rehearsal-authority-evolution-v1.schema.json
   mir4.patch-rehearsal.authority-evolution-writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
@@ -41,31 +41,31 @@ paths:
   mir4.repository-characterization.application: tools/mir/application/repository/RepositoryCharacterization.ps1
   mir4.repository-characterization.cli: tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1
   mir4.repository-characterization.output: build/reports/repository-characterization
-  mir4.repository-characterization.test: validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1
+  mir4.repository-characterization.test: tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1
   mir4.repository-characterization.authority-evolution: releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json
   mir4.repository-characterization.authority-evolution-schema: contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json
   mir4.repository-characterization.authority-evolution-writer: tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1
   mir4.m41-f0-truth-reconciliation.receipt: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
   mir4.m41-f0-truth-reconciliation.receipt-schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
   mir4.m41-f0-truth-reconciliation.writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1
-  mir4.m41-f0-truth-reconciliation.proof: validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1
+  mir4.m41-f0-truth-reconciliation.proof: tests/mir4/Test-MIR4PreFreezeHardening.ps1
   mir4.package-source.golden-four-target-baseline: spec/distribution/mir4-golden-four-target-baseline-v1.json
   mir4.package-source.golden-four-target-baseline-schema: spec/schemas/mir4-golden-four-target-baseline-v1.schema.json
   mir4.package-source.golden-four-target-baseline-application: tools/mir/application/package/GoldenTargetBaselines.ps1
   mir4.package-source.cli: tools/mir/cli/Invoke-MIR4PackageSource.ps1
-  mir4.package-source.golden-four-target-baseline-proof: validation/tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+  mir4.package-source.golden-four-target-baseline-proof: tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
   mir4.package-source.golden-four-target-baseline-authority-evolution: releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json
   mir4.package-source.golden-four-target-baseline-authority-evolution-schema: contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1.schema.json
   mir4.package-source.golden-four-target-baseline-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority.ps1
   mir4.package-source.shadow-target-materializer-application: tools/mir/application/package/ShadowTargetMaterializer.ps1
   mir4.package-source.shadow-target-materializer-proof-schema: spec/schemas/mir4-shadow-target-materializer-proof-v1.schema.json
-  mir4.package-source.shadow-target-materializer-proof: validation/tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
+  mir4.package-source.shadow-target-materializer-proof: tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1
   mir4.package-source.shadow-target-materializer-authority-evolution: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
   mir4.package-source.shadow-target-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2a-shadow-target-materializer-authority-evolution-v1.schema.json
   mir4.package-source.shadow-target-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2AShadowMaterializerAuthority.ps1
   mir4.package-source.shadow-source-model-application: tools/mir/application/package/ShadowSourceModel.ps1
   mir4.package-source.shadow-source-model-proof-schema: spec/schemas/mir4-shadow-source-model-proof-v1.schema.json
-  mir4.package-source.shadow-source-model-proof: validation/tests/mir4/Test-MIR4ShadowSourceModel.ps1
+  mir4.package-source.shadow-source-model-proof: tests/mir4/Test-MIR4ShadowSourceModel.ps1
   mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
   mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
@@ -82,7 +82,7 @@ paths:
   mir4.package-source.target-materializer: tools/mir/application/package/TargetMaterializer.ps1
   mir4.package-source.target-composition-schema: spec/schemas/mir4-package-composition-result-v1.schema.json
   mir4.package-source.editable-source-materializer-proof-schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
-  mir4.package-source.editable-source-materializer-proof: validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
+  mir4.package-source.editable-source-materializer-proof: tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
   mir4.package-source.editable-source-materializer-authority-evolution: releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json
   mir4.package-source.editable-source-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json
   mir4.package-source.editable-source-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1
@@ -90,7 +90,7 @@ paths:
   mir4.package-source.f2e-verifier: tools/mir/application/package/PackageAuthorityVerifier.ps1
   mir4.package-source.f2e-receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
   mir4.package-source.f2e-receipt-schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
-  mir4.package-source.f2e-proof: validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
+  mir4.package-source.f2e-proof: tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
@@ -274,14 +274,14 @@ paths:
   validation.scenarios.local-2.0: validation/scenarios/local-2.0.json
   validation.scenarios.local-2.1: validation/scenarios/local-2.1.json
   validation.tests: validation/tests
-  validation.tests.mir4.supply-chain-foundation: validation/tests/mir4/Test-MIR4SupplyChainFoundation.ps1
-  validation.tests.mir4.supply-chain-attestation: validation/tests/mir4/Test-MIR4SupplyChainAttestation.ps1
-  validation.tests.mir4.release-capsule: validation/tests/mir4/Test-MIR4ReleaseCapsule.ps1
-  validation.tests.mir4.runner-publisher-confinement: validation/tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
-  validation.tests.mir4.signing-ceremony-preparation: validation/tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
-  validation.tests.mir4.supply-chain-preservation-t15: validation/tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
-  validation.tests.mir4.playtest-handoff-t17: validation/tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
-  validation.tests.mir4.f210-qualification-policy: validation/tests/mir4/Test-MIR4F210QualificationPolicy.ps1
+  validation.tests.mir4.supply-chain-foundation: tests/mir4/Test-MIR4SupplyChainFoundation.ps1
+  validation.tests.mir4.supply-chain-attestation: tests/mir4/Test-MIR4SupplyChainAttestation.ps1
+  validation.tests.mir4.release-capsule: tests/mir4/Test-MIR4ReleaseCapsule.ps1
+  validation.tests.mir4.runner-publisher-confinement: tests/mir4/Test-MIR4RunnerPublisherConfinement.ps1
+  validation.tests.mir4.signing-ceremony-preparation: tests/mir4/Test-MIR4SigningCeremonyPreparation.ps1
+  validation.tests.mir4.supply-chain-preservation-t15: tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1
+  validation.tests.mir4.playtest-handoff-t17: tests/mir4/Test-MIR4PlaytestHandoffT17.ps1
+  validation.tests.mir4.f210-qualification-policy: tests/mir4/Test-MIR4F210QualificationPolicy.ps1
   validation.profiles: validation/profiles
   validation.baselines: validation/baselines
   validation.baselines.control: validation/baselines/control

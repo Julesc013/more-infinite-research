@@ -303,10 +303,10 @@ function Get-MIRAssuranceInputFingerprint {
         "tests/release-tooling",
         "tests/targets",
         "tests/technology",
-        "validation/tests/mir4",
-        "validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
-        "validation/tests/release/Test-MIR4OfflineCandidateCustody.ps1",
-        "validation/tests/tooling/Test-MIRAssurance.ps1",
+        "tests/mir4",
+        "tests/release/Test-MIRPublishedSnapshotIntegrity.ps1",
+        "tests/release/Test-MIR4OfflineCandidateCustody.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
         "docs/architecture",
         "docs/compatibility",
         "docs/developer/environment-locks.md",
@@ -406,8 +406,8 @@ function Get-MIRAssuranceInputFingerprint {
       return Get-MIRAssurancePatternFingerprint -Patterns @(
         "fixtures/$fixture/**",
         "fixtures/upgrade-modset-source/**",
-        "validation/tests/runtime/Test-MIRUpgrade.ps1",
-        "validation/tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/runtime/Test-MIRUpgradeMatrix.ps1",
         "spec/schemas/upgrade-matrix.schema.json"
       )
     }

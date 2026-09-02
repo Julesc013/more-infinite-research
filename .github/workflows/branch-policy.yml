@@ -67,7 +67,7 @@ jobs:
           fetch-depth: 0
       - name: Validate permanent branch policy
         shell: pwsh
-        run: .\validation\tests\release\Test-MIRBranchPolicy.ps1
+        run: .\tests\release\Test-MIRBranchPolicy.ps1
 
   terminal-promotion:
     name: promotion-verification

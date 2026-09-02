@@ -6,5 +6,5 @@ param(
 )
 
 # MIR-L4-LEGACY-TEST-WRAPPER: retained for historical commands only.
-$canonicalTest = Join-Path $PSScriptRoot "../validation/tests/docs/Test-MIRLocales.ps1"
+$canonicalTest = Join-Path $PSScriptRoot "../tests/docs/Test-MIRLocales.ps1"
 & $canonicalTest @PSBoundParameters

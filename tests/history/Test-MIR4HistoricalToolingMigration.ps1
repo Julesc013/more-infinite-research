@@ -49,7 +49,7 @@ foreach($field in @('transition_gate','release_transition_authority')){$tampered
 Test-MIR4PreFreezeAuthorities -RepoRoot $repo|Out-Null
 $latest=Get-MIR4PreFreezeAuthorityState -RepoRoot $repo -IncludeT17MachinePreparation -IncludeRepositoryMigration -IncludeCanonicalizationMigration -IncludeDiagnosticsMigration -IncludeTargetKeyMigration -IncludeWholePlatformMigration -IncludeTechnologyAcceptanceMigration -IncludeTargetCompilerMigration -IncludeSemanticCompilerPolicyMigration -IncludeRuntimeContinuityMigration -IncludeModuleSdkMepMigration -IncludeProcessIRExactMigration -IncludeInspectorCompatibilityMigration -IncludeAssuranceOfflineCustodyMigration -IncludeHistoricalToolingMigration
 Assert-MIR4HistoricalToolingMigrationV1 ([string]$latest.prior_receipt_path-ceq$script:MIR4HistoricalToolingMigrationReceiptPath) 'mir4-historical-tooling-migration-prefreeze-chain'
-$releaseHistoryOutput=(& pwsh -NoProfile -File (Join-Path $repo 'validation/tests/release/Test-MIRPublishedSnapshotIntegrity.ps1') 2>&1|Out-String).Trim()
+$releaseHistoryOutput=(& pwsh -NoProfile -File (Join-Path $repo 'tests/release/Test-MIRPublishedSnapshotIntegrity.ps1') 2>&1|Out-String).Trim()
 Assert-MIR4HistoricalToolingMigrationV1 ($LASTEXITCODE-eq0-and$releaseHistoryOutput-match'append-only-release-tooling-successor') 'mir4-historical-tooling-migration-release-history-successor' $releaseHistoryOutput
 
 function Invoke-MIR4HistoricalToolingMigrationCommandProbeV1([string]$Command){$output=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir/cli/Invoke-MIR4HistoricalToolingMigration.ps1') -Command $Command -RepoRoot $repo 2>&1|Out-String).Trim();if($LASTEXITCODE-ne0){throw "[mir4-historical-tooling-migration-cli] $Command $output"};return $output|ConvertFrom-Json -Depth 100}

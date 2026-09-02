@@ -62,14 +62,14 @@ verification_manifests:
 compiler_contract_coverage:
   path: .mir/compiler-contract-coverage.yml
   schema: 1
-  validator: validation/tests/compiler/Test-MIRCompilerContractCoverage.ps1
+  validator: tests/compiler/Test-MIRCompilerContractCoverage.ps1
 
 offline_rule_synthesis:
   authority: .mir/rule-synthesis.json
   corpus: .mir/technology-review-corpus.json
   snapshots: .mir/technology-review-snapshots.json
   synthesizer: tools/commands/technology/Invoke-MIRRuleSynthesis.ps1
-  validator: validation/tests/compiler/Test-MIRRuleSynthesis.ps1
+  validator: tests/compiler/Test-MIRRuleSynthesis.ps1
   validates:
     - all-positive-coverage
     - all-negative-rejection
@@ -82,7 +82,7 @@ mod_interaction_campaigns:
   policy: .mir/mod-interaction-policy.json
   graph: .mir/mod-interaction-graph.json
   campaigns: .mir/combination-campaigns.json
-  validator: validation/tests/compatibility/Test-MIRModInteractions.ps1
+  validator: tests/compatibility/Test-MIRModInteractions.ps1
   runtime_scenarios:
     - combination-atan-ash-big-mining-drill
     - combination-space-age-big-mining-drill
@@ -99,7 +99,7 @@ local_campaign_manifest:
   factorio_2_0_path: validation/scenarios/local-2.0.json
   shared_manual_path: validation/scenarios/manual.json
   schema: 2
-  validator: validation/tests/compatibility/Test-MIRScenarioManifests.ps1
+  validator: tests/compatibility/Test-MIRScenarioManifests.ps1
   record_owns:
     - targets
     - kind
@@ -114,7 +114,7 @@ local_campaign_manifest:
   sanitation_budget:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
-    validator: validation/tests/release/Test-MIRSanitationBudgets.ps1
+    validator: tests/release/Test-MIRSanitationBudgets.ps1
     scopes:
       manifest_scenarios: campaigns
       release_targeted_repair_smokes: local_mod_zips
@@ -130,18 +130,18 @@ golden_plans:
     path: fixtures/golden-plans/stable-technology-ids.json
     baseline: published-3.0.5
     expected_count: 70
-    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
+    validator: tests/tooling/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
     release: "3.1.0"
     expected_count: 2
-    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
+    validator: tests/tooling/Test-MIRGoldenPlans.ps1
   release_3_2_technology_ids:
     path: fixtures/golden-plans/3.2.0-technology-ids.json
     release: "3.2.0"
     identity_state: stable-unreleased
     expected_count: 1
-    validator: validation/tests/tooling/Test-MIRGoldenPlans.ps1
+    validator: tests/tooling/Test-MIRGoldenPlans.ps1
 
 fixture_roots:
   synthetic: fixtures
@@ -592,7 +592,7 @@ fixtures:
   upgrade-2-5-9-to-4-0-20000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-2-5-9-to-4-0-20000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.9"
     archetypes:
       - base-default
@@ -612,7 +612,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-2-5-10-to-2-5-11
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.10"
     additional_source_versions: ["2.5.9", "2.5.5"]
     target_candidate: "2.5.11"
@@ -640,7 +640,7 @@ fixtures:
   upgrade-3-2-11-to-4-0-21000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-3-2-11-to-4-0-21000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "3.2.11"
     archetypes:
       - base-default
@@ -664,7 +664,7 @@ fixtures:
   upgrade-2-5-11-to-4-0-20000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-2-5-11-to-4-0-20000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.11"
     archetypes:
       - base-default
@@ -681,7 +681,7 @@ fixtures:
   upgrade-2-5-10-to-4-0-20000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-2-5-10-to-4-0-20000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "2.5.10"
     archetypes:
       - base-default
@@ -698,7 +698,7 @@ fixtures:
   upgrade-1-9-9-to-4-0-11000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-1-9-9-to-4-0-11000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "1.9.9"
     archetypes:
       - base-default
@@ -715,7 +715,7 @@ fixtures:
   upgrade-1-8-9-to-4-0-10000:
     requires_features: []
     assertion_path: fixtures/assert-upgrade-1-8-9-to-4-0-10000
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "1.8.9"
     archetypes:
       - base-default
@@ -808,7 +808,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-0
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     archetypes:
       - base-default
       - space-age-native-owner
@@ -833,7 +833,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-1
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     archetypes:
       - base-default
       - space-age-native-owner
@@ -858,7 +858,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-0-to-3-2-1
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     archetypes:
       - base-default
       - space-age-native-owner
@@ -883,7 +883,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-1-to-3-2-2
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "3.2.1"
     additional_recovery_source_versions: ["3.2.0"]
     archetypes:
@@ -914,7 +914,7 @@ fixtures:
   upgrade-3-2-2-to-3-2-3:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-upgrade-3-2-2-to-3-2-3
-    harness: validation/tests/runtime/Test-MIRUpgrade.ps1
+    harness: tests/runtime/Test-MIRUpgrade.ps1
     primary_source_version: "3.2.2"
     target_candidate: C30
     archetypes:
@@ -932,7 +932,7 @@ fixtures:
   upgrade-3-2-3-to-3-2-4:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-4
-    harness: validation/tests/runtime/Test-MIRUpgrade.ps1
+    harness: tests/runtime/Test-MIRUpgrade.ps1
     primary_source_version: "3.2.3"
     target_candidate: C31
     archetypes:
@@ -952,7 +952,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-3-to-3-2-5
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "3.2.3"
     target_candidate: not-assigned
     archetypes:
@@ -984,7 +984,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-5-to-3-2-9
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "3.2.5"
     target_candidate: not-assigned
     archetypes:
@@ -1011,7 +1011,7 @@ fixtures:
     assertion_path: fixtures/assert-upgrade-3-2-9-to-3-2-10
     supplemental_paths:
       - fixtures/upgrade-modset-source
-    harness: validation/tests/runtime/Test-MIRUpgradeMatrix.ps1
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
     primary_source_version: "3.2.9"
     target_candidate: C34
     archetypes:
@@ -1302,7 +1302,7 @@ fixtures:
     path: fixtures/export-approved-delta
     artifact: .mir/releases/deltas/3.1.9-to-3.2.0.json
     producer: scripts/Export-MIRApprovedDelta.ps1
-    validator: validation/tests/release/Test-MIRApprovedDelta.ps1
+    validator: tests/release/Test-MIRApprovedDelta.ps1
     exact_baseline_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
     validates:
       - base-normalized-technology-parity

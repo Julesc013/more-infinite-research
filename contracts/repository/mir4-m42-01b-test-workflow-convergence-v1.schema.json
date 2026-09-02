@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-m42-01b-test-workflow-convergence-v1.schema.json",
+  "type": "object",
+  "required": ["schema","kind","status","recorded_at","programme_id","change_id","predecessor_receipt","base","test_catalogue","workflow_catalogue","command_inventory","package_source_sha256","evolved_bindings","projection_bindings","relocated_bindings","current_authorities","invariants","transition_gate","next_fixed_point","record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4201BTestWorkflowConvergenceV1"},
+    "status": {"const": "M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE-COMPLETE"},
+    "programme_id": {"const": "M42-01B-TEST-WORKFLOW-CONVERGENCE"},
+    "change_id": {"const": "MIR4-CHG-2026-0016"},
+    "package_source_sha256": {"const": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"},
+    "relocated_bindings": {"type":"array","minItems":1},
+    "invariants": {"type":"object","additionalProperties":{"const":true}},
+    "transition_gate": {"type":"object","additionalProperties":{"const":false}},
+    "next_fixed_point": {"const": "M42-02-BOUNDED-IMPLEMENTATION-DECOMPOSITION"},
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": true
+}

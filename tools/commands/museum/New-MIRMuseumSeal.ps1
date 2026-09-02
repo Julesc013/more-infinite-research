@@ -51,11 +51,11 @@ $harnessPaths = @(
   ".mir\museum-targets.json",
   "tools\lib\museum\MuseumCompiler.psm1",
   "tools\commands\museum\Build-MIRMuseumTarget.ps1",
-  "validation\tests\runtime\Test-MIRMuseumCompiler.ps1",
-  "validation\tests\runtime\Test-MIRMuseumRuntime.ps1",
+  "tests\runtime\Test-MIRMuseumCompiler.ps1",
+  "tests\runtime\Test-MIRMuseumRuntime.ps1",
   "tools\commands\museum\New-MIRMuseumQualification.ps1",
   "tools\commands\museum\New-MIRMuseumSeal.ps1",
-  "validation\tests\runtime\Test-MIRMuseumSeal.ps1"
+  "tests\runtime\Test-MIRMuseumSeal.ps1"
 )
 $sourcePaths = @("info.json", "config.lua", "data.lua", "locale\en\more-infinite-research.cfg", ".mir\museum\stream-manifest.json", ".mir\museum\balance.json")
 $record = [ordered]@{

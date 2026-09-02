@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR4 workflow purpose catalogue v1",
+  "type": "object",
+  "required": ["schema", "kind", "state", "public_purposes", "workflow_count", "workflows", "summary", "transition_gate", "digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4WorkflowPurposeCatalogueV1"},
+    "state": {"const": "M42-01-CANONICAL"},
+    "public_purposes": {"type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": {"enum": ["ci", "qualification", "release", "nightly", "governance"]}},
+    "workflow_count": {"type": "integer", "minimum": 5},
+    "workflows": {"type": "array", "minItems": 5, "items": {"type": "object", "required": ["file", "name", "purpose", "surface", "invocation", "sha256"]}},
+    "summary": {"type": "object", "required": ["purposes", "unclassified", "stable_required_checks", "publisher_can_build", "release_phase_public_cli_routes"]},
+    "transition_gate": {"type": "object", "required": ["version_allocation", "tagging", "signing", "sealing", "publication"]},
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}
