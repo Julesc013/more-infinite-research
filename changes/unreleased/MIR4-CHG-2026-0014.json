@@ -1,0 +1,30 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0014",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Separated repository and player-package documentation authorities.",
+  "details": [
+    "The root README is now a concise package-excluded repository landing page with current target, support, installation, diagnostic, developer, and rolling Factorio 2.1 policy routing.",
+    "Generated runtime-pipeline and stream-default references moved under docs/reference/generated and remain checked against their executable authorities.",
+    "The four target-owned README and changelog templates remain exact immutable 4.0 reconstruction inputs while release narratives retain sole authority for future source and target changelog projections."
+  ],
+  "semantic_domains": ["documentation", "package-boundary", "tooling", "governance"],
+  "audiences": ["players", "contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The accepted 4.0.21000 target documentation bytes and package content root remain unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"The accepted 4.0.20000 target documentation bytes and package content root remain unchanged."},
+    {"target":"F110","disposition":"unaffected","reason":"The accepted 4.0.11000 target documentation bytes and package content root remain unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"The accepted 4.0.10000 target documentation bytes and package content root remain unchanged."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"README.md"},
+    {"kind":"document","value":"docs/maintainer/documentation-governance.md"},
+    {"kind":"release-record","value":"releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json"}
+  ]
+}

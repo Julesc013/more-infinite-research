@@ -225,6 +225,8 @@ Ages are measured against the newest governed review date, 2026-09-02, so checko
 | docs/reference/generated/mir4-platform-component-matrix.md | current | 2026-08-24 | 9 | current-window |
 | docs/reference/generated/mir4-whole-platform-matrix.md | current | 2026-08-27 | 6 | current-window |
 | docs/reference/generated/README.md | current | 2026-08-03 | 30 | current-window |
+| docs/reference/generated/runtime-pipeline.md | current | 2026-09-02 | 0 | current-window |
+| docs/reference/generated/stream-defaults.md | current | 2026-09-02 | 0 | current-window |
 | docs/reference/generated/technology-quality-and-promotion.md | current | 2026-08-18 | 15 | current-window |
 | docs/reference/glossary.md | draft | 2026-07-07 | 57 | current-window |
 | docs/reference/maximum-level-binding.md | current | 2026-08-21 | 12 | current-window |

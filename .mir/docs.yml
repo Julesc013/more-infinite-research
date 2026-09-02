@@ -1661,6 +1661,20 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/reference/generated/runtime-pipeline.md
+    title: "Generated Runtime Pipeline"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/generated/stream-defaults.md
+    title: "Generated Stream Defaults"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/reference/generated/technology-quality-and-promotion.md
     title: "Technology Quality And Promotion Inventory"
     status: current

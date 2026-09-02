@@ -209,6 +209,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-02.
 - [Generated Documentation Reference Matrix](../../reference/generated/documentation-reference-matrix.md)
 - [Generated Documentation Review Age](../../reference/generated/documentation-review-age.md)
 - [Generated Reference Views](../../reference/generated/README.md)
+- [Generated Runtime Pipeline](../../reference/generated/runtime-pipeline.md)
 - [MIR 4 Exact Release Compatibility Canaries](../../compatibility/mir4-release-canaries.md)
 - [MIR 4 maintainer authority map](../../maintainer/mir4-authority-map.md)
 - [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md)
@@ -278,6 +279,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-02.
 
 ### reference
 
+- [Generated Stream Defaults](../../reference/generated/stream-defaults.md)
 - [MIR 4.0 Mod Portal Extended Description](../../releases/mir4-4.0-mod-portal-extended-description.md)
 - [More Infinite Research Mod Portal Page](../../releases/mod-portal-page.md)
 - [Release Notes](../../releases/notes/README.md)

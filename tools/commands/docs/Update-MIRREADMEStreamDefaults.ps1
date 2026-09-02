@@ -6,9 +6,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $defaultsPath = Join-Path $RepoRoot "prototypes\mir\settings\defaults.lua"
-$readmePath = Join-Path $RepoRoot "README.md"
+$documentPath = Join-Path $RepoRoot "docs\reference\generated\stream-defaults.md"
 $defaultsText = Get-Content -Raw -LiteralPath $defaultsPath
-$readmeText = Get-Content -Raw -LiteralPath $readmePath
 
 function Get-MIRLuaScalar {
   param(
@@ -83,8 +82,22 @@ function Format-MIRMaximum {
 }
 
 $lines = [System.Collections.Generic.List[string]]::new()
+$lines.Add('---')
+$lines.Add('title: "Generated Stream Defaults"')
+$lines.Add('status: current')
+$lines.Add('applies_to: "4.0.0+"')
+$lines.Add('audience: player')
+$lines.Add('doc_type: reference')
+$lines.Add('owner: mir-maintainers')
+$lines.Add('last_reviewed: 2026-09-02')
+$lines.Add('supersedes: []')
+$lines.Add('superseded_by: []')
+$lines.Add('---')
+$lines.Add('')
+$lines.Add('# Generated Stream Defaults')
+$lines.Add('')
 $lines.Add('<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->')
-$lines.Add('This effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
+$lines.Add('This package-excluded effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
 $lines.Add('')
 $lines.Add('| Stream | Enabled | Base cost | Growth | Time | Max |')
 $lines.Add('| --- | --- | ---: | ---: | ---: | --- |')
@@ -93,24 +106,19 @@ foreach ($row in $rows) {
   $lines.Add("| ``$($row.key)`` | $(Format-MIREnabled -Value $row.enabled) | ``$($row.base_cost)`` | ``$($row.growth_factor)`` | ``$($row.research_time)`` | $(Format-MIRMaximum -Value $row.max_level) |")
 }
 $lines.Add('<!-- END GENERATED MIR STREAM DEFAULTS -->')
-$generated = $lines -join [Environment]::NewLine
-
-$markerPattern = '(?s)<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->.*?<!-- END GENERATED MIR STREAM DEFAULTS -->'
-if (-not [regex]::IsMatch($readmeText, $markerPattern)) { throw "README stream-default markers are missing." }
-$updated = [regex]::Replace(
-  $readmeText,
-  $markerPattern,
-  [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $generated },
-  1
-)
+$generated = ($lines -join "`n") + "`n"
 
 if ($Check) {
-  if ($updated -cne $readmeText) {
-    throw "README stream-default table is stale; run tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1."
+  if (-not (Test-Path -LiteralPath $documentPath -PathType Leaf)) {
+    throw "Generated stream-default reference is missing; run tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1."
   }
-  Write-Host "[ok] README effective stream defaults match defaults.lua."
+  $current = [IO.File]::ReadAllText($documentPath).Replace("`r`n", "`n")
+  if ($current -cne $generated) {
+    throw "Generated stream-default reference is stale; run tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1."
+  }
+  Write-Host "[ok] generated effective stream defaults match defaults.lua."
   return
 }
 
-[System.IO.File]::WriteAllText($readmePath, $updated, [System.Text.UTF8Encoding]::new($false))
-Write-Host "Updated $readmePath"
+[System.IO.File]::WriteAllText($documentPath, $generated, [System.Text.UTF8Encoding]::new($false))
+Write-Host "Updated $documentPath"
