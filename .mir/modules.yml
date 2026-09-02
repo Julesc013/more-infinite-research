@@ -986,6 +986,10 @@ modules:
     - prototypes/mir/pipeline/commands.lua
     - prototypes/mir/pipeline/compiler_context.lua
     - prototypes/mir/pipeline/compiler_orchestrator.lua
+    - prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua
+    - prototypes/mir/pipeline/compiler_orchestrator/phase_invocation.lua
+    - prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua
+    - prototypes/mir/pipeline/compiler_orchestrator/publication.lua
     - prototypes/mir/pipeline/compilation_snapshot_adapter.lua
     - prototypes/mir/pipeline/policy_snapshot_adapter.lua
     - prototypes/mir/pipeline/extent.lua
