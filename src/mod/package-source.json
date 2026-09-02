@@ -6008,10 +6008,66 @@
       "semantic_class": "target-replacement",
       "source_path": "targets/f200/files/prototypes/mir/planner/base_continuations.lua",
       "transform": "copy-exact-bytes",
-      "source_bytes": 27535,
-      "source_sha256": "C3868374ECD145B48640A97ACA9A257FF8CA91303A3C0869DF88F78C2A08F20A",
-      "output_bytes": 27535,
-      "output_sha256": "C3868374ECD145B48640A97ACA9A257FF8CA91303A3C0869DF88F78C2A08F20A"
+      "source_bytes": 65,
+      "source_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1",
+      "output_bytes": 65,
+      "output_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1"
+    },
+    {
+      "layer": "targets.f200",
+      "target_scope": [
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/classify.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/classify.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 2522,
+      "source_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C",
+      "output_bytes": 2522,
+      "output_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C"
+    },
+    {
+      "layer": "targets.f200",
+      "target_scope": [
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/discover.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/discover.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4280,
+      "source_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681",
+      "output_bytes": 4280,
+      "output_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681"
+    },
+    {
+      "layer": "targets.f200",
+      "target_scope": [
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/qualify.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 5005,
+      "source_sha256": "FC1DFDF46554D21DE0AFE497F47C5301458CB716D6346DB2640FCCD8B358FB10",
+      "output_bytes": 5005,
+      "output_sha256": "FC1DFDF46554D21DE0AFE497F47C5301458CB716D6346DB2640FCCD8B358FB10"
+    },
+    {
+      "layer": "targets.f200",
+      "target_scope": [
+        "f200"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/plan.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 16712,
+      "source_sha256": "23F8B4E2DCF0E20F65E4E77F444BC8F95316AAB60E21BAE72B4887676F4FAF93",
+      "output_bytes": 16712,
+      "output_sha256": "23F8B4E2DCF0E20F65E4E77F444BC8F95316AAB60E21BAE72B4887676F4FAF93"
     },
     {
       "layer": "targets.f200",
@@ -6190,10 +6246,66 @@
       "semantic_class": "target-replacement",
       "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations.lua",
       "transform": "copy-exact-bytes",
-      "source_bytes": 27451,
-      "source_sha256": "9442B8AB69D4395D1C6C6231F0185AFEE31D27778B01492C4BB54E7D88A444ED",
-      "output_bytes": 27451,
-      "output_sha256": "9442B8AB69D4395D1C6C6231F0185AFEE31D27778B01492C4BB54E7D88A444ED"
+      "source_bytes": 65,
+      "source_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1",
+      "output_bytes": 65,
+      "output_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1"
+    },
+    {
+      "layer": "targets.f210",
+      "target_scope": [
+        "f210"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/classify.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/classify.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 2522,
+      "source_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C",
+      "output_bytes": 2522,
+      "output_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C"
+    },
+    {
+      "layer": "targets.f210",
+      "target_scope": [
+        "f210"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/discover.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/discover.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4280,
+      "source_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681",
+      "output_bytes": 4280,
+      "output_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681"
+    },
+    {
+      "layer": "targets.f210",
+      "target_scope": [
+        "f210"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/qualify.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 5232,
+      "source_sha256": "61F7E4BB4587A627A442EF7922D7DEE4CAF5367C7C2714C8214947A6372C63D9",
+      "output_bytes": 5232,
+      "output_sha256": "61F7E4BB4587A627A442EF7922D7DEE4CAF5367C7C2714C8214947A6372C63D9"
+    },
+    {
+      "layer": "targets.f210",
+      "target_scope": [
+        "f210"
+      ],
+      "output_path": "prototypes/mir/planner/base_continuations/plan.lua",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/plan.lua",
+      "transform": "copy-exact-bytes",
+      "source_bytes": 16422,
+      "source_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
+      "output_bytes": 16422,
+      "output_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6"
     },
     {
       "layer": "targets.f210",
@@ -6328,5 +6440,5 @@
     "no_target_full_source_copy": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "D461E1B0CD23F6CCAFB13E3CCB5C5507E4EB1D876863705E2937E3EE00D578EE"
+  "record_sha256": "42474510AA3F9D7BC81C8DED5E07366FE2D32678E7EC6BBE786D8B25C6967EE4"
 }

@@ -16,7 +16,17 @@ $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202CompilationPlan ($raw|Test-Json -SchemaFile $schemaPath) 'receipt-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
-Assert-MIR4M4202CompilationPlan ([string]$receipt.package_authority.package_source_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'package-source-fingerprint'
+$currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
+  $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1.json'
+  $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-base-continuations-decomposition-v1.schema.json'
+  Assert-MIR4M4202CompilationPlan (Test-Path -LiteralPath $successorPath -PathType Leaf) 'package-source-successor-receipt'
+  $successorRaw=Get-Content -Raw -LiteralPath $successorPath
+  Assert-MIR4M4202CompilationPlan ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
+  $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
+  Assert-MIR4M4202CompilationPlan ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
+}
 
 $sourceRoot='src/mod/families/modern/prototypes/mir/planner'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/compilation_plan.lua")
