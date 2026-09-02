@@ -18,7 +18,7 @@ if((@($receipt.verification.targets.target)-join'|')-cne'f210|f200|f110|f100'-or
 $superseded=@($receipt.superseded_pre_cutover_bindings)
 $supersededPaths=@($superseded|ForEach-Object{[string]$_.path})
 $packageOutputs=@(Get-MIRPackageOutputPaths -RepoRoot $repo)
-if($superseded.Count-ne32-or
+if($superseded.Count-ne35-or
    @($supersededPaths|Sort-Object -Unique).Count-ne$superseded.Count-or
    @($superseded|Where-Object{[string]$_.historical_sha256-notmatch'^[A-F0-9]{64}$'-or[string]$_.hash_mode-cne'canonical-text-v1'}).Count-ne0-or
    @($supersededPaths|Where-Object{$_-in$packageOutputs}).Count-ne0-or

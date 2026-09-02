@@ -638,15 +638,17 @@ try {
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
 $candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
-$candidateRelease = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/records/$([string]$candidateInfo.version).json") | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
-$candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree).Replace("\", "/")
-$candidatePathIdentity = if ([string]$candidateRelease.state -eq "planned") { "unassigned" } else { [regex]::Escape([string]$candidateRelease.candidate_id) }
-$candidateVersionPattern = [regex]::Escape([string]$candidateInfo.version)
-$expectedCandidatePattern = "/build/candidates/$candidateVersionPattern/$candidatePathIdentity/[0-9a-f]{40}/more-infinite-research_$candidateVersionPattern\.zip$"
+$candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree -Target '2.1').Replace("\", "/")
+. (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
+$candidateAuthority = Get-MIR4CanonicalPackageAuthority -RepoRoot $RepoRoot
+$candidateTarget = @($candidateAuthority.targets | Where-Object { [string]$_.target -ceq 'f210' })
+if ($candidateTarget.Count -ne 1) { throw 'F210 is absent from canonical package authority.' }
+$candidateIdentity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target f210 -SourceVersion ([string]$candidateTarget[0].baseline_source_version)
+$expectedCandidatePattern = "/build/packages/assurance/f210/MIR4-ASSURANCE-[A-F0-9]{40}/$([regex]::Escape([string]$candidateIdentity.package_name))$"
 if ($candidatePath -notmatch $expectedCandidatePattern -or
     $candidatePath -match "/dist/") {
-  throw "Default assurance candidates must be release/candidate/source-tree addressed outside immutable dist."
+  throw "Default MIR 4 assurance candidates must be target/source-tree addressed below canonical build/packages authority."
 }
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
@@ -885,13 +887,17 @@ foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "che
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
-foreach ($bootstrapAuthorityBinding in @(
-  '[string]$verificationProfile.release_authority_mode -eq "candidate-programme"',
-  '[string]$info.version -eq [string]$verificationProfile.upgrade.from_version'
+foreach ($canonicalPackageBinding in @(
+  'targets/package-authority.json',
+  'baseline_source_version',
+  'build\packages\assurance'
 )) {
-  if (-not $assuranceCore.Contains($bootstrapAuthorityBinding)) {
-    throw "MIR 4 assurance bootstrap selection is not bound to the current candidate-programme predecessor: $bootstrapAuthorityBinding"
+  if (-not $assuranceCore.Contains($canonicalPackageBinding)) {
+    throw "MIR 4 assurance selection is not bound to canonical package authority: $canonicalPackageBinding"
   }
+}
+if ($assuranceCore.Contains('build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip')) {
+  throw 'Current MIR 4 assurance selection still names the retired emergency-lane package writer.'
 }
 $bootstrapBuilder = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\release\New-MIR4BootstrapLocalCandidate.ps1")
 if (-not $bootstrapBuilder.Contains("foreach (`$targetPlan in `$targets) {`r`n  `$correction = Get-MIR4PlanCorrection -PlanTarget `$targetPlan") -and

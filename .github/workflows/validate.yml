@@ -70,7 +70,8 @@ jobs:
         if: ${{ steps.mode.outputs.mir4_bootstrap == 'true' }}
         shell: pwsh
         run: |
-          $candidate = Join-Path $PWD 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip'
+          $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+          $candidate = Join-Path $PWD "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
           if (Test-Path -LiteralPath $candidate) { throw 'Hosted MIR 4 static planning must not fabricate or import a candidate.' }
           "MIR_DEVELOPMENT_CANDIDATE=$candidate" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Materialize content-addressed verification plan
@@ -162,8 +163,10 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+          $expectedCandidate = "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
           if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
-              [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
+              [string]$plan.candidate_descriptor.path -cne $expectedCandidate) {
             throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
           }
           $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)
@@ -269,8 +272,10 @@ jobs:
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
+          $sourceTree = (& git rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant()
+          $expectedCandidate = "build/packages/assurance/f210/MIR4-ASSURANCE-$sourceTree/more-infinite-research_4.0.21000.zip"
           if ([string]$plan.candidate_descriptor.state -ne 'missing' -or
-              [string]$plan.candidate_descriptor.path -ne 'build/mir4/emergency-lane/distributions/more-infinite-research_4.0.21000.zip') {
+              [string]$plan.candidate_descriptor.path -cne $expectedCandidate) {
             throw 'Hosted MIR 4 plan does not preserve the exact absent-candidate boundary.'
           }
           $candidate = Join-Path $PWD ([string]$plan.candidate_descriptor.path)

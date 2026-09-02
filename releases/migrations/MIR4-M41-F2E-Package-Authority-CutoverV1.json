@@ -43,6 +43,8 @@
     {"path":"targets/registry.json","historical_sha256":"D03CFED985D262D0B9C94C0A2C4DC5D97308EAC0F913117539A8A3D447CB7252","hash_mode":"canonical-text-v1"},
     {"path":"tests/repository/Test-MIR4RepositoryFixedPoint.ps1","historical_sha256":"75447C32E56F83C8F401C3CD9F72393E0B66B1BDB0AC68635B7D502583CB6180","hash_mode":"canonical-text-v1"},
     {"path":"todo.md","historical_sha256":"24177C81CB9CFAE65A13DB1F34D50D4F13EF161271B709D97C902CA33AC5141B","hash_mode":"canonical-text-v1"},
+    {"path":"tools/lib/assurance/Core.ps1","historical_sha256":"97B9DBBA908FAC5CC2A3918E5729496BAB9DC51A57ACF76C1B9B95A21141E560","hash_mode":"canonical-text-v1"},
+    {"path":"tools/lib/assurance/Evidence.ps1","historical_sha256":"6B89D95E60A5D23D8112F1BC8DC4DA3A58365A8A0F0782C16855C7E916C0740F","hash_mode":"canonical-text-v1"},
     {"path":"tools/lib/mir4/PreFreezeRelease.ps1","historical_sha256":"6525971E714CF7701486C4D487006B660E9F2C3C34F4063DDA420B128595B0D4","hash_mode":"canonical-text-v1"},
     {"path":"tools/mir.ps1","historical_sha256":"E43ABB13E0D6E6FBDA2A4B633C45FCFA855F5D5A4F460FB91AA6B0305D5BB0B7","hash_mode":"canonical-text-v1"},
     {"path":"tools/mir/application/package/TargetMaterializer.ps1","historical_sha256":"CF5A13ADDF1730D04A28F1D8ECD91821FC2688104A6D0C1B97CAB50612AEB17E","hash_mode":"canonical-text-v1"},
@@ -50,7 +52,8 @@
     {"path":"validation/tests.yml","historical_sha256":"55BAB987E9EC6AB9EFBB01A41A8A691D7A366C84D48FBE4E7BB777A43838551D","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1","historical_sha256":"66F6BF6F2EED37DDDA235BC1EA3BAFB404B35E431C009800E9FF4039E775CD08","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1","historical_sha256":"126A514013382ACDCEB7EADEB89157C81D72670FC2F1274AE299879A842F3E40","hash_mode":"canonical-text-v1"},
-    {"path":"validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1","historical_sha256":"7256C5DF723256F685D429589D4C23BC0056CE4E36D19DC117E67CACBBCB6EF2","hash_mode":"canonical-text-v1"}
+    {"path":"validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1","historical_sha256":"7256C5DF723256F685D429589D4C23BC0056CE4E36D19DC117E67CACBBCB6EF2","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests/tooling/Test-MIRAssurance.ps1","historical_sha256":"39ACB943D76BDE55437FF5B43B742E3F5E31B42685ED43AA8E41B7112C758C46","hash_mode":"canonical-text-v1"}
   ],
   "verification": {
     "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",

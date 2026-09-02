@@ -364,12 +364,27 @@ function Resolve-MIRAssurancePath {
 function Get-MIRAssuranceDevelopmentCandidatePath {
   param(
     [Parameter(Mandatory)]$Info,
-    [Parameter(Mandatory)][string]$SourceTree
+    [Parameter(Mandatory)][string]$SourceTree,
+    [Parameter(Mandatory)][string]$Target
   )
 
   if ($SourceTree -notmatch '^[0-9a-f]{40}$') { throw "Development candidate source tree is invalid: $SourceTree" }
   $release = [string]$Info.version
   if ($release -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') { throw "Development candidate release is invalid: $release" }
+  if (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf) {
+    . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+    $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+    $targetRow = @($authority.targets | Where-Object { [string]$_.target_id -ceq "factorio-$Target" })
+    if ($targetRow.Count -ne 1) { throw "MIR 4 assurance target is not canonical: $Target" }
+    $sourceVersion = if ($release.StartsWith('4.', [StringComparison]::Ordinal)) {
+      $release
+    } else {
+      [string]$targetRow[0].baseline_source_version
+    }
+    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target ([string]$targetRow[0].target) -SourceVersion $sourceVersion
+    $candidateId = 'MIR4-ASSURANCE-' + $SourceTree.ToUpperInvariant()
+    return Join-Path $repo "build\packages\assurance\$([string]$targetRow[0].target)\$candidateId\$([string]$identity.package_name)"
+  }
   $allocation = "unassigned"
   $recordPath = Join-Path $repo ".mir\releases\records\$release.json"
   if (Test-Path -LiteralPath $recordPath -PathType Leaf) {
@@ -397,15 +412,8 @@ function Get-MIRAssuranceContext {
   $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   $sourceTree = @(& git -C $repo rev-parse "HEAD^{tree}" 2>$null)
   if ($LASTEXITCODE -ne 0 -or $sourceTree.Count -ne 1) { throw "Unable to resolve the development source tree." }
-  $defaultCandidate = Get-MIRAssuranceDevelopmentCandidatePath -Info $info -SourceTree ([string]$sourceTree[0])
+  $defaultCandidate = Get-MIRAssuranceDevelopmentCandidatePath -Info $info -SourceTree ([string]$sourceTree[0]) -Target $target
   $candidateOption = Get-MIRAssuranceOption -Name "--candidate"
-  if ([string]::IsNullOrWhiteSpace([string]$candidateOption) -and
-      [string]$target -eq "2.1" -and
-      [string]$verificationProfile.release_authority_mode -eq "candidate-programme" -and
-      [string]$info.version -eq [string]$verificationProfile.upgrade.from_version -and
-      (Test-Path -LiteralPath (Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json") -PathType Leaf)) {
-    $candidateOption = Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"
-  }
   if ([string]::IsNullOrWhiteSpace([string]$candidateOption)) { $candidateOption = $defaultCandidate }
   $candidate = Resolve-MIRAssurancePath -Path $candidateOption
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
