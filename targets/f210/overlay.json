@@ -2415,14 +2415,78 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed families.modern source for f210.",
+      "reason": "Materialize the governed compiler-orchestrator facade for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 22860,
-      "expected_sha256": "E795109CA7A3197DE397FE3096893E46CFF094667D750FA8DC491CE795CCF7EB",
+      "expected_bytes": 906,
+      "expected_sha256": "A5C2C918C774CDB1292DEBA2D623BD3E4CDCF926002A59A6A87F7EF5FEE3C271",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compiler-orchestrator context_construction responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9488,
+      "expected_sha256": "C4353BE60937B718AABE0E04F201E23C371555CC02041E58C62609C9A8A607D0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/phase_invocation.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/phase_invocation.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compiler-orchestrator phase_invocation responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1203,
+      "expected_sha256": "0100D0CF7598320FCDA302CD97F67AC020F8842F2F1A2DD7C7DC4AE112E41691",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compiler-orchestrator contract_checks responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4997,
+      "expected_sha256": "3D1B64E9FAEF3A4566740982CDD9C743CA2EBB30B865FD127140142CFA0EB740",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compiler-orchestrator publication responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 8436,
+      "expected_sha256": "2D4B8DC16966F8AC98EAED33D00BE0DCD82619DA952497BB20549BB7E84731FF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3823,5 +3887,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "7340A87864F7CAF4DCE93F5C62C75D0505E9343B818250CED381584296550C77"
+  "record_sha256": "1E53C4B790B58B311851CA5E9EF6D2370A3A284FAF616FF4FEB8C915391FC7CD"
 }

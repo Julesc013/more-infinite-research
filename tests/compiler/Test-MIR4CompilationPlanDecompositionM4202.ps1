@@ -52,7 +52,19 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
         Assert-MIR4M4202CompilationPlan ($l5Raw|Test-Json -SchemaFile $l5SchemaPath) 'package-source-l5-successor-schema'
         $l5=$l5Raw|ConvertFrom-Json -Depth 100 -DateKind String
         Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $l5) 'package-source-l5-successor-hash'
-        Assert-MIR4M4202CompilationPlan ([string]$l5.predecessor.package_source_sha256-ceq[string]$l4.package_authority.package_source_sha256-and[string]$l5.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l5-successor-chain'
+        Assert-MIR4M4202CompilationPlan ([string]$l5.predecessor.package_source_sha256-ceq[string]$l4.package_authority.package_source_sha256) 'package-source-l5-successor-predecessor'
+        if([string]$l5.package_authority.package_source_sha256-cne$currentPackageSource){
+          $l6Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json'
+          $l6SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json'
+          Assert-MIR4M4202CompilationPlan (Test-Path -LiteralPath $l6Path -PathType Leaf) 'package-source-l6-successor-receipt'
+          $l6Raw=Get-Content -Raw -LiteralPath $l6Path
+          Assert-MIR4M4202CompilationPlan ($l6Raw|Test-Json -SchemaFile $l6SchemaPath) 'package-source-l6-successor-schema'
+          $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
+          Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
+          Assert-MIR4M4202CompilationPlan ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and[string]$l6.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l6-successor-chain'
+        }else{
+          Assert-MIR4M4202CompilationPlan ([string]$l5.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l5-successor-chain'
+        }
       }else{
         Assert-MIR4M4202CompilationPlan ([string]$l4.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l4-successor-chain'
       }

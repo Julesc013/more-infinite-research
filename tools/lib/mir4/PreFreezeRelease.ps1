@@ -648,6 +648,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1199,6 +1200,51 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l5-transition] $($property.Name)" }
     }
     $priorReceiptPath = $effectOwnershipReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $compilerOrchestratorReceiptPath = 'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $compilerOrchestratorReceiptPath) -PathType Leaf) {
+    $compilerOrchestrator = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $compilerOrchestratorReceiptPath -Kind 'MIR4M4202CompilerOrchestratorDecompositionV1'
+    if ([string]$compilerOrchestrator.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$compilerOrchestrator.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$compilerOrchestrator.predecessor.record_sha256 -cne [string]$effectOwnership.record_sha256 -or
+        [string]$compilerOrchestrator.predecessor.package_source_sha256 -cne [string]$effectOwnership.package_authority.package_source_sha256) {
+      throw '[mir4-prefreeze-m42-02-l6-predecessor]'
+    }
+    $compilerOrchestratorEvolvedPaths = @{}
+    $compilerOrchestratorEnrollmentBaselines = @{
+      'tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1' = 'E761F5D6F931A3F9FECCEB34DAA979D5630CA1804659F46C210A7371CEFE7808'
+    }
+    foreach ($binding in @($compilerOrchestrator.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $compilerOrchestratorEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$compilerOrchestratorEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-l6-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $compilerOrchestratorEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-l6-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $compilerOrchestratorEvolvedPaths[$path] = $true
+    }
+    if ($compilerOrchestratorEvolvedPaths.Count -ne 16 -or
+        [string]$compilerOrchestrator.responsibility -cne 'compiler-orchestrator' -or
+        [string]$compilerOrchestrator.status -cne 'M42-02-L6-COMPILER-ORCHESTRATOR-DECOMPOSED') {
+      throw '[mir4-prefreeze-m42-02-l6-scope]'
+    }
+    foreach ($property in $compilerOrchestrator.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l6-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $compilerOrchestratorReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()

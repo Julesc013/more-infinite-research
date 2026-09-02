@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 123,
+  "test_count": 124,
   "tests": [
     {
       "id": "docs.check",
@@ -1015,6 +1015,43 @@
         "tools/commands/mir4/Update-MIR4M4202CompilationPlanDecompositionAuthority.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-compiler-orchestrator-decomposition-m42-02-l6",
+      "proposition": "The governed test 'static.mir4-compiler-orchestrator-decomposition-m42-02-l6' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/**",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        "docs/architecture/module-boundaries.md",
+        "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json",
+        "contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
         "assurance/catalog/tests.json",
         "package-source"
       ],
@@ -4371,10 +4408,10 @@
       "package-repository": 49,
       "tooling-release": 32,
       "runtime-upgrade": 13,
-      "compiler-static": 18,
+      "compiler-static": 19,
       "compatibility-historical": 11
     },
-    "canonical_test_commands": 111,
+    "canonical_test_commands": 112,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -4387,5 +4424,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f2a11b87b2c56376386d997bea50eabf5178f5a80d12e7c4f248462b76d3a2c3"
+  "digest": "sha256:5be5390cb5094f2ead713e707dba7b2891d9c45ea89fad1a2b18a40f1fbd72ad"
 }

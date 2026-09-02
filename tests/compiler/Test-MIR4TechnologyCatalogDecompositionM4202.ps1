@@ -26,8 +26,18 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   Assert-MIR4M4202TechnologyCatalog ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
   $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-MIR4M4202TechnologyCatalog (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
-  Assert-MIR4M4202TechnologyCatalog ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
-  $expectedManifestBindings=437
+  Assert-MIR4M4202TechnologyCatalog ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256) 'package-source-successor-predecessor'
+  if([string]$successor.package_authority.package_source_sha256-cne$currentPackageSource){
+    $l6Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json'
+    $l6SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json'
+    Assert-MIR4M4202TechnologyCatalog (Test-Path -LiteralPath $l6Path -PathType Leaf) 'package-source-l6-successor-receipt'
+    $l6Raw=Get-Content -Raw -LiteralPath $l6Path
+    Assert-MIR4M4202TechnologyCatalog ($l6Raw|Test-Json -SchemaFile $l6SchemaPath) 'package-source-l6-successor-schema'
+    $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202TechnologyCatalog (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
+    Assert-MIR4M4202TechnologyCatalog ([string]$l6.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l6.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l6-successor-chain'
+    $expectedManifestBindings=441
+  }else{$expectedManifestBindings=437}
 }
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202TechnologyCatalog ($evolvedPaths.Count-eq14-and@($evolvedPaths|Sort-Object -Unique).Count-eq14-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
