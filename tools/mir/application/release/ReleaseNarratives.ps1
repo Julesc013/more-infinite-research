@@ -61,7 +61,7 @@ function Invoke-MIR4ReleaseNarrativesV1 {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)][string]$PlanPath, [Parameter(Mandatory)][string]$OutputRoot, [ValidateSet('render','check')][string]$Command = 'render')
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $packageBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
-  if ($packageBefore -cne '8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336') { throw '[mir4-release-narrative-package-source-baseline]' }
+  if ($packageBefore -cne '632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E') { throw '[mir4-release-narrative-package-source-baseline]' }
   $first = Get-MIR4ReleaseNarrativeMaterialV1 -RepoRoot $repo -PlanPath $PlanPath
   $second = Get-MIR4ReleaseNarrativeMaterialV1 -RepoRoot $repo -PlanPath $PlanPath
   foreach ($key in $first.outputs.Keys) {
