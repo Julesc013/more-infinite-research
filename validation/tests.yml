@@ -3276,6 +3276,30 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-powershell-characterization-m42-02",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/automation/mir4-command-inventory-v1.json",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/control/paths.yml",
+        "src/mod/package-source.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "tools/commands/mir4/Update-MIR4M4202PowerShellCharacterizationAuthority.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ]
     }
   ]
 }

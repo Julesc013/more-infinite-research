@@ -107,6 +107,10 @@ paths:
   mir4.m42-02.compiler-orchestrator.receipt-schema: contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json
   mir4.m42-02.compiler-orchestrator.writer: tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1
   mir4.m42-02.compiler-orchestrator.test: tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1
+  mir4.m42-02.powershell-characterization.receipt: releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json
+  mir4.m42-02.powershell-characterization.receipt-schema: contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json
+  mir4.m42-02.powershell-characterization.writer: tools/commands/mir4/Update-MIR4M4202PowerShellCharacterizationAuthority.ps1
+  mir4.m42-02.powershell-characterization.test: tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

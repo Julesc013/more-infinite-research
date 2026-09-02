@@ -16,6 +16,20 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Assert-MIRModuleManifestSemantics {
   $manifestPath = Join-Path $repo ".mir\modules.yml"
+  $packageSourcePath = Join-Path $repo "src\mod\package-source.json"
+  if (-not (Test-Path -LiteralPath $packageSourcePath -PathType Leaf)) {
+    throw "Missing canonical package-source authority: src/mod/package-source.json"
+  }
+  $packageSource = Get-Content -Raw -LiteralPath $packageSourcePath | ConvertFrom-Json -Depth 100
+  $canonicalLua = @(
+    $packageSource.bindings |
+      ForEach-Object { [string]$_.output_path } |
+      Where-Object { $_ -match '^prototypes/(?:mir/.+|streams/.+)[.]lua$' } |
+      Sort-Object -Unique
+  )
+  if ($canonicalLua.Count -eq 0) {
+    throw "Canonical package-source authority contains no shipped MIR Lua module paths."
+  }
   $lines = Get-Content -LiteralPath $manifestPath
   $insideModules = $false
   $currentGroup = ""
@@ -44,8 +58,8 @@ function Assert-MIRModuleManifestSemantics {
       if ($relative -notmatch '^prototypes/[A-Za-z0-9_./-]+\.lua$' -or $relative -match '\s-\s') {
         throw "Invalid module path scalar in .mir/modules.yml: $relative"
       }
-      if (-not (Test-Path -LiteralPath (Join-Path $repo $relative) -PathType Leaf)) {
-        throw "Module manifest path does not exist: $relative"
+      if ($canonicalLua -notcontains $relative) {
+        throw "Module manifest path is not a canonical package output: $relative"
       }
       if ($listed.ContainsKey($relative)) {
         throw "Module is assigned more than once: $relative ($($listed[$relative]), $currentGroup)"
@@ -58,12 +72,8 @@ function Assert-MIRModuleManifestSemantics {
   }
 
   if ($groups.Count -eq 0) { throw ".mir/modules.yml contains no module groups." }
-  $shippedLua = @(
-    Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\mir") -Recurse -File -Filter "*.lua"
-    Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\streams") -File -Filter "*.lua"
-  ) | ForEach-Object { [IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") } | Sort-Object -Unique
-  $missing = @($shippedLua | Where-Object { -not $listed.ContainsKey($_) })
-  $extra = @($listed.Keys | Where-Object { $shippedLua -notcontains $_ })
+  $missing = @($canonicalLua | Where-Object { -not $listed.ContainsKey($_) })
+  $extra = @($listed.Keys | Where-Object { $canonicalLua -notcontains $_ })
   if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
     throw "Module manifest must assign every shipped Lua file exactly once. Missing: $($missing -join ', '). Extra: $($extra -join ', ')."
   }

@@ -146,6 +146,18 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
             Assert-MIR4RepositoryMigrationV1 ([string]$m4202L6.predecessor.package_source_sha256-ceq[string]$m4202L5.package_authority.package_source_sha256-and[string]$m4202L6.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l6-successor-fingerprint'
             Assert-MIR4RepositoryMigrationV1 ([string]$m4202L6.status-ceq'M42-02-L6-COMPILER-ORCHESTRATOR-DECOMPOSED'-and[string]$m4202L6.responsibility-ceq'compiler-orchestrator') 'mir4-repository-migration-m42-02-l6-successor-scope'
             Assert-MIR4RepositoryMigrationV1 (@($m4202L6.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-l6-release-firewall'
+            $m4202PowerShellPath='releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json'
+            if(Test-Path -LiteralPath (Join-Path $repo $m4202PowerShellPath) -PathType Leaf){
+              $m4202PowerShellSchemaPath='contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json'
+              $m4202PowerShellRaw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202PowerShellPath)
+              Assert-MIR4RepositoryMigrationV1 ($m4202PowerShellRaw|Test-Json -SchemaFile (Join-Path $repo $m4202PowerShellSchemaPath)) 'mir4-repository-migration-m42-02-powershell-characterization-schema'
+              $m4202PowerShell=$m4202PowerShellRaw|ConvertFrom-Json -Depth 100 -DateKind String
+              Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202PowerShell) 'mir4-repository-migration-m42-02-powershell-characterization-record'
+              Assert-MIR4RepositoryMigrationV1 ((Get-MIR4RepositoryFileSha256V1 -Path (Join-Path $repo $m4202L6Path))-ceq[string]$m4202PowerShell.predecessor.receipt_sha256-and[string]$m4202PowerShell.predecessor.record_sha256-ceq[string]$m4202L6.record_sha256) 'mir4-repository-migration-m42-02-powershell-characterization-predecessor'
+              Assert-MIR4RepositoryMigrationV1 ([string]$m4202PowerShell.status-ceq'M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED'-and[string]$m4202PowerShell.next_fixed_point-ceq'M42-02-PS1-COMMAND-ROUTER') 'mir4-repository-migration-m42-02-powershell-characterization-scope'
+              Assert-MIR4RepositoryMigrationV1 ([string]$m4202PowerShell.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202PowerShell.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-powershell-characterization-package-firewall'
+              Assert-MIR4RepositoryMigrationV1 (@($m4202PowerShell.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-powershell-characterization-release-firewall'
+            }
           }else{
             Assert-MIR4RepositoryMigrationV1 ([string]$m4202L5.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l5-successor-fingerprint'
           }

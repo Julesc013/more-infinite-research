@@ -901,3 +901,9 @@ F210 continues to resolve through the reviewed moving experimental-channel autho
 `prototypes/mir/planner/effect_ownership.lua` remains the stable public planner facade for modern targets. Its `facts` module owns immutable row and operation facts, ordering, gate derivation, and effect identities; `resolution` owns row-level owner conflict resolution; and `planned_operations` owns conflict resolution across an assembled compilation plan. The facade delegates only `resolve` and `resolve_operations` and owns no independent planning behavior.
 
 This M42-02 L5 split is behavior preserving and applies only to F210 and F200. F110 and F100 packages remain byte-identical to their accepted baselines. The decomposition grants no new prototype mutation, gameplay, compatibility, package, release, version-allocation, signing, sealing, or publication authority.
+
+## MIR 4 residual PowerShell characterization boundary
+
+`MIR4-M42-02-PowerShell-CharacterizationV1.json` is the generated M42-02 residual maintainability decision record. It consumes the canonical command inventory and PowerShell AST, covers every canonical internal implementation at or above 600 lines, and gives each file exactly one finite decomposition node or explicit bounded waiver. A characterization is not itself a refactor: each admitted split still requires its own behavior-preserving proof and protected merge.
+
+Architecture module coverage is evaluated against the unique MIR Lua output paths in `src/mod/package-source.json`, not the read-only historical repository-root package projection. `.mir/modules.yml` assigns every canonical output exactly once. This package-excluded reconciliation changes no target package bytes and grants no gameplay, compatibility, release, signing, sealing, or publication authority.

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "starting_dev", "predecessor", "inventory", "threshold_policy", "tracked_files", "decomposition_sequence", "waivers", "architecture_reconciliation", "authority_bindings", "preservation", "transition_gate", "next_fixed_point", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4202PowerShellCharacterizationV1"},
+    "status": {"const": "M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED"},
+    "starting_dev": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {"commit": {"$ref": "#/$defs/gitObject"}, "tree": {"$ref": "#/$defs/gitObject"}}},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["work_package", "receipt", "receipt_sha256", "record_sha256", "status"], "properties": {"work_package": {"const": "M42-02-L6"}, "receipt": {"const": "releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json"}, "receipt_sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "status": {"const": "M42-02-L6-COMPILER-ORCHESTRATOR-DECOMPOSED"}}},
+    "inventory": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "digest", "canonical_internal", "unknown", "reviewed_file_count"], "properties": {"path": {"const": "governance/automation/mir4-command-inventory-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}, "canonical_internal": {"type": "integer", "minimum": 1}, "unknown": {"const": 0}, "reviewed_file_count": {"const": 20}}},
+    "threshold_policy": {"type": "object", "additionalProperties": false, "required": ["normal_maximum_lines", "review_maximum_lines", "split_normally_maximum_lines", "explicit_disposition_minimum_lines", "decompose_count", "waiver_count"], "properties": {"normal_maximum_lines": {"const": 400}, "review_maximum_lines": {"const": 600}, "split_normally_maximum_lines": {"const": 1000}, "explicit_disposition_minimum_lines": {"const": 1001}, "decompose_count": {"const": 11}, "waiver_count": {"const": 9}}},
+    "tracked_files": {"type": "array", "minItems": 20, "maxItems": 20, "items": {"$ref": "#/$defs/fileDisposition"}},
+    "decomposition_sequence": {"type": "array", "minItems": 11, "maxItems": 11, "items": {"type": "object", "additionalProperties": false, "required": ["sequence", "node", "path"], "properties": {"sequence": {"type": "integer", "minimum": 1, "maximum": 11}, "node": {"type": "string", "pattern": "^M42-02-PS[0-9]+-"}, "path": {"type": "string", "pattern": "[.]ps1$"}}}},
+    "waivers": {"type": "array", "minItems": 9, "maxItems": 9, "uniqueItems": true, "items": {"type": "string", "pattern": "[.]ps1$"}},
+    "architecture_reconciliation": {"type": "object", "additionalProperties": false, "required": ["authority", "canonical_output_count", "assigned_output_count", "added_assignments", "removed_stale_assignments", "module_manifest_sha256", "architecture_test"], "properties": {"authority": {"const": "src/mod/package-source.json#bindings[].output_path"}, "canonical_output_count": {"const": 267}, "assigned_output_count": {"const": 267}, "added_assignments": {"const": 9}, "removed_stale_assignments": {"const": 2}, "module_manifest_sha256": {"$ref": "#/$defs/sha256"}, "architecture_test": {"const": "tests/architecture/Test-MIRArchitecture.ps1"}}},
+    "authority_bindings": {"type": "array", "minItems": 11, "maxItems": 11, "items": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "package_visible"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "package_visible": {"const": false}}}},
+    "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims"], "properties": {"package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_visible_delta": {"const": []}, "gameplay": {"const": false}, "saves": {"const": true}, "settings": {"const": true}, "migrations": {"const": true}, "compatibility_claims": {"const": true}}},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "next_fixed_point": {"const": "M42-02-PS1-COMMAND-ROUTER"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "fileDisposition": {"type": "object", "additionalProperties": false, "required": ["path", "classification", "sha256", "lines", "function_count", "parse_errors", "threshold_band", "decision", "sequence", "next_node", "responsibilities", "rationale"], "properties": {"path": {"type": "string", "pattern": "[.]ps1$"}, "classification": {"const": "canonical-internal"}, "sha256": {"$ref": "#/$defs/sha256"}, "lines": {"type": "integer", "minimum": 600}, "function_count": {"type": "integer", "minimum": 0}, "parse_errors": {"const": 0}, "threshold_band": {"enum": ["split-or-explicit-waiver", "explicit-disposition-required"]}, "decision": {"enum": ["decompose", "retain-with-explicit-waiver"]}, "sequence": {"type": "integer", "minimum": 0, "maximum": 11}, "next_node": {"type": ["string", "null"]}, "responsibilities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}, "rationale": {"type": "string", "minLength": 20}}},
+    "transitionGate": {"type": "object", "additionalProperties": false, "required": ["version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}
