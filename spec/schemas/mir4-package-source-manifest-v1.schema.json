@@ -11,7 +11,7 @@
     "source_state": {"const": "canonical-editable-package-source"},
     "baseline_record_sha256": {"const": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A"},
     "source_roots": {"const": ["src/mod/common", "src/mod/families", "src/mod/generation", "targets/<target>/files", "targets/<target>/generation"]},
-    "bindings": {"type": "array", "minItems": 434, "maxItems": 434, "items": {"$ref": "#/$defs/binding"}},
+    "bindings": {"type": "array", "minItems": 437, "maxItems": 437, "items": {"$ref": "#/$defs/binding"}},
     "invariants": {"type": "object", "additionalProperties": false, "required": ["one_binding_per_layer_path", "historical_archives_not_production_inputs", "no_target_full_source_copy", "package_cutover_complete"], "properties": {"one_binding_per_layer_path": {"const": true}, "historical_archives_not_production_inputs": {"const": true}, "no_target_full_source_copy": {"const": true}, "package_cutover_complete": {"const": true}}},
     "record_sha256": {"$ref": "#/$defs/sha256"}
   },

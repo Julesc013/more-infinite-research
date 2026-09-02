@@ -647,6 +647,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-base-continuations-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1153,6 +1154,51 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l4-transition] $($property.Name)" }
     }
     $priorReceiptPath = $technologyCatalogReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $effectOwnershipReceiptPath = 'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $effectOwnershipReceiptPath) -PathType Leaf) {
+    $effectOwnership = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $effectOwnershipReceiptPath -Kind 'MIR4M4202EffectOwnershipDecompositionV1'
+    if ([string]$effectOwnership.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$effectOwnership.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$effectOwnership.predecessor.record_sha256 -cne [string]$technologyCatalog.record_sha256 -or
+        [string]$effectOwnership.predecessor.package_source_sha256 -cne [string]$technologyCatalog.package_authority.package_source_sha256) {
+      throw '[mir4-prefreeze-m42-02-l5-predecessor]'
+    }
+    $effectOwnershipEvolvedPaths = @{}
+    $effectOwnershipEnrollmentBaselines = @{
+      'tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1' = '5177840DC386C2075D96F7A86EC679874E091001273C1F3211B81A1334428902'
+    }
+    foreach ($binding in @($effectOwnership.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $effectOwnershipEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$effectOwnershipEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-l5-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $effectOwnershipEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-l5-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $effectOwnershipEvolvedPaths[$path] = $true
+    }
+    if ($effectOwnershipEvolvedPaths.Count -ne 15 -or
+        [string]$effectOwnership.responsibility -cne 'effect-ownership' -or
+        [string]$effectOwnership.status -cne 'M42-02-L5-EFFECT-OWNERSHIP-DECOMPOSED') {
+      throw '[mir4-prefreeze-m42-02-l5-scope]'
+    }
+    foreach ($property in $effectOwnership.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l5-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $effectOwnershipReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()

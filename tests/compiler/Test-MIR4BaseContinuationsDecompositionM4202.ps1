@@ -35,8 +35,20 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
     Assert-MIR4M4202BaseContinuations ($l4Raw|Test-Json -SchemaFile $l4SchemaPath) 'package-source-l4-successor-schema'
     $l4=$l4Raw|ConvertFrom-Json -Depth 100 -DateKind String
     Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $l4) 'package-source-l4-successor-hash'
-    Assert-MIR4M4202BaseContinuations ([string]$l4.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l4.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l4-successor-chain'
-    $expectedManifestBindings=434
+    Assert-MIR4M4202BaseContinuations ([string]$l4.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256) 'package-source-l4-successor-predecessor'
+    if([string]$l4.package_authority.package_source_sha256-cne$currentPackageSource){
+      $l5Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json'
+      $l5SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
+      Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath $l5Path -PathType Leaf) 'package-source-l5-successor-receipt'
+      $l5Raw=Get-Content -Raw -LiteralPath $l5Path
+      Assert-MIR4M4202BaseContinuations ($l5Raw|Test-Json -SchemaFile $l5SchemaPath) 'package-source-l5-successor-schema'
+      $l5=$l5Raw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $l5) 'package-source-l5-successor-hash'
+      Assert-MIR4M4202BaseContinuations ([string]$l5.predecessor.package_source_sha256-ceq[string]$l4.package_authority.package_source_sha256-and[string]$l5.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l5-successor-chain'
+      $expectedManifestBindings=437
+    }else{
+      $expectedManifestBindings=434
+    }
   }else{
     $expectedManifestBindings=429
   }

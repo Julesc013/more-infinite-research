@@ -99,6 +99,10 @@ paths:
   mir4.m42-02.technology-catalog.receipt-schema: contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json
   mir4.m42-02.technology-catalog.writer: tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1
   mir4.m42-02.technology-catalog.test: tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1
+  mir4.m42-02.effect-ownership.receipt: releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json
+  mir4.m42-02.effect-ownership.receipt-schema: contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json
+  mir4.m42-02.effect-ownership.writer: tools/commands/mir4/Update-MIR4M4202EffectOwnershipDecompositionAuthority.ps1
+  mir4.m42-02.effect-ownership.test: tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

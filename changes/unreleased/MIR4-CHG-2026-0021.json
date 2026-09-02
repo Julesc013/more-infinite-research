@@ -1,0 +1,32 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0021",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Split modern effect ownership into explicit fact, row-resolution, and planned-operation owners.",
+  "details": [
+    "The stable effect-ownership require path is now a thin facade over three bounded responsibility modules.",
+    "Immutable row and operation facts, row-level owner resolution, and assembled-plan operation resolution now have separate owners without changing the public resolve or resolve_operations contracts.",
+    "F210 and F200 gain three internal effect-ownership module paths; F110 and F100 remain byte-identical to their accepted package baselines.",
+    "The fresh F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.",
+    "No technology identity, effect, cost, science, prerequisite, ownership outcome, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes."
+  ],
+  "semantic_domains": ["compiler", "architecture", "package-source", "assurance"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The modern package gains three internal effect-ownership responsibility modules behind its stable facade."},
+    {"target":"F200","disposition":"affected","reason":"The modern package gains three internal effect-ownership responsibility modules behind its stable facade."},
+    {"target":"F110","disposition":"unaffected","reason":"The legacy effect-ownership implementation and package tree are unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"The legacy effect-ownership implementation and package tree are unchanged."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"},
+    {"kind":"finding","value":"MIR_EVIDENCE_HOME/mir4-4.1-ultimate/20260902T141633+1000-f6cef04f/evidence/U05-L5-effect-ownership/custody-manifest.json#B3130B20E2DA78662A2ACD6BF644CE7B18C95D93A3CAC71CA572037460B5CA13"}
+  ]
+}

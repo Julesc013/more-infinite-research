@@ -2735,14 +2735,62 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed families.modern source for f200.",
+      "reason": "Materialize the governed effect-ownership facade for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 15564,
-      "expected_sha256": "FA2E3571659F896D244BFFF7C40534ECDE875C6A5487CF8A188A81CF75AE9DC7",
+      "expected_bytes": 284,
+      "expected_sha256": "4B3496EBDF62489D5324D354B239B0557995A2CF969836E2427387EC1AF10C61",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/facts.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/facts.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed effect-ownership facts responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4805,
+      "expected_sha256": "16E62371B676F11918EC009DC5FF552A40C4C6F73769C124D826F2236A3A660E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/resolution.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/resolution.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed effect-ownership resolution responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3986,
+      "expected_sha256": "E33118C4BADBF5549A59FB045046E2C8E973772CA600E28AA35D228FF7827EB0",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/effect_ownership/planned_operations.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed effect-ownership planned_operations responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7260,
+      "expected_sha256": "56CCB43B63147E977CB1519545A4920FB1DF963296E20FC6F00184ACA8953AB8",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3775,5 +3823,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "4C7C8097DC1F099F2C23BAE2C07374A9A43FF730A84640F790124A3EC5013E14"
+  "record_sha256": "B5FD47A9C95C0AB5FD077A2654D24C5B7AD6D4C4277AE722C1386E4395C6DB2F"
 }

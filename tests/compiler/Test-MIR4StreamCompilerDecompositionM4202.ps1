@@ -26,8 +26,20 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   Assert-MIR4M4202StreamCompiler ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
   $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-MIR4M4202StreamCompiler (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
-  Assert-MIR4M4202StreamCompiler ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
-  $expectedManifestBindings=434
+  Assert-MIR4M4202StreamCompiler ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256) 'package-source-successor-predecessor'
+  if([string]$successor.package_authority.package_source_sha256-cne$currentPackageSource){
+    $l5Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json'
+    $l5SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
+    Assert-MIR4M4202StreamCompiler (Test-Path -LiteralPath $l5Path -PathType Leaf) 'package-source-l5-successor-receipt'
+    $l5Raw=Get-Content -Raw -LiteralPath $l5Path
+    Assert-MIR4M4202StreamCompiler ($l5Raw|Test-Json -SchemaFile $l5SchemaPath) 'package-source-l5-successor-schema'
+    $l5=$l5Raw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202StreamCompiler (Test-MIR4BootstrapRecordHash -Record $l5) 'package-source-l5-successor-hash'
+    Assert-MIR4M4202StreamCompiler ([string]$l5.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l5.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l5-successor-chain'
+    $expectedManifestBindings=437
+  }else{
+    $expectedManifestBindings=434
+  }
 }
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202StreamCompiler ($evolvedPaths.Count-eq12-and@($evolvedPaths|Sort-Object -Unique).Count-eq12-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths-and'tests/tooling/Test-MIR4TestWorkflowConvergence.ps1'-in$evolvedPaths) 'evolved-authority-bindings'
