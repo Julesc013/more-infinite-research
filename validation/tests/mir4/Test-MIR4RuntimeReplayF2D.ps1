@@ -52,6 +52,23 @@ $correctF200 = [pscustomobject]@{version='2.0.77';file_version='2.0.77.84539';bi
 Assert-MIR4F2D (Test-MIR4FixedFactorioEngineIdentity -Target f200 -ObservedIdentity $correctF200 -RepoRoot $RepoRoot) 'mir4-f2d-f200-fixed-lock-positive'
 Assert-MIR4F2D (-not (Test-MIR4FixedFactorioEngineIdentity -Target f200 -ObservedIdentity ([pscustomobject]@{version='2.0.77';file_version='2.0.77.84539';binary_sha256=('0'*64)}) -RepoRoot $RepoRoot)) 'mir4-f2d-f200-fixed-lock-wrong-hash'
 Assert-MIR4F2D (-not (Test-MIR4FixedFactorioEngineIdentity -Target f200 -ObservedIdentity ([pscustomobject]@{version='2.0.76';file_version='2.0.76.0';binary_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'}) -RepoRoot $RepoRoot)) 'mir4-f2d-f200-fixed-lock-wrong-version'
+$availabilityObservation = '.mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json'
+$f110Lock = Get-MIR4FixedFactorioEngineLock -Target f110 -RepoRoot $RepoRoot
+Assert-MIR4F2D ([string]$f110Lock.version -ceq '1.1.110' -and
+  [string]$f110Lock.file_version -ceq '1.1.110.62357' -and
+  [string]$f110Lock.binary_sha256 -ceq 'B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1' -and
+  $availabilityObservation -in @($f110Lock.authority_paths)) 'mir4-f2d-f110-fixed-lock'
+$correctF110 = [pscustomobject]@{version='1.1.110';file_version='1.1.110.62357';binary_sha256='B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1'}
+Assert-MIR4F2D (Test-MIR4FixedFactorioEngineIdentity -Target f110 -ObservedIdentity $correctF110 -RepoRoot $RepoRoot) 'mir4-f2d-f110-fixed-lock-positive'
+Assert-MIR4F2D (-not (Test-MIR4FixedFactorioEngineIdentity -Target f110 -ObservedIdentity ([pscustomobject]@{version='1.1.110';file_version='1.1.110.62358';binary_sha256='B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1'}) -RepoRoot $RepoRoot)) 'mir4-f2d-f110-fixed-lock-wrong-build'
+$f100Lock = Get-MIR4FixedFactorioEngineLock -Target f100 -RepoRoot $RepoRoot
+Assert-MIR4F2D ([string]$f100Lock.version -ceq '1.0.0' -and
+  [string]$f100Lock.file_version -ceq '1.0.0.54889' -and
+  [string]$f100Lock.binary_sha256 -ceq '99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70' -and
+  $availabilityObservation -in @($f100Lock.authority_paths)) 'mir4-f2d-f100-fixed-lock-alias-normalized'
+$correctF100 = [pscustomobject]@{version='1.0.0';file_version='1.0.0.54889';binary_sha256='99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70'}
+Assert-MIR4F2D (Test-MIR4FixedFactorioEngineIdentity -Target f100 -ObservedIdentity $correctF100 -RepoRoot $RepoRoot) 'mir4-f2d-f100-fixed-lock-positive'
+Assert-MIR4F2D (-not (Test-MIR4FixedFactorioEngineIdentity -Target f100 -ObservedIdentity ([pscustomobject]@{version='1.0.0-only';file_version='1.0.0.54889';binary_sha256='99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70'}) -RepoRoot $RepoRoot)) 'mir4-f2d-f100-authority-alias-not-product-version'
 $f210Profile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/profiles/factorio-2.1.json') | ConvertFrom-Json
 $resolvedF210 = Resolve-MIR4FactorioQualificationProfile -Profile $f210Profile -RepoRoot $RepoRoot
 Assert-MIR4F2D ([string]$resolvedF210.qualification_factorio_selection -ceq 'latest-installed-official-2.1-experimental') 'mir4-f2d-f210-moving-channel-unchanged'
@@ -61,6 +78,7 @@ $programmePath = Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programm
 Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $programmePath) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-f2d-programme-schema'
 $programme = Get-Content -Raw -LiteralPath $programmePath | ConvertFrom-Json -Depth 40
 Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:pending|f100:pending' -and [string]$programme.package_fixed_point.next_target -ceq 'f110' -and [string]$programme.package_fixed_point.aggregate -ceq 'pending' -and [string]$programme.package_fixed_point.package_cutover -ceq 'blocked') 'mir4-f2d-programme-target-state'
-& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1') -RepoRoot $RepoRoot -Target f200 -Check | Out-Null
+$acceptedF200Receipt = Join-Path $RepoRoot 'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json'
+Assert-MIR4F2D ((Get-FileHash -LiteralPath $acceptedF200Receipt -Algorithm SHA256).Hash -ceq '079CCD4FC9B61A0D4CAB53F1DBE633D5FD142AC81441E95A3FF7D379E7086C9F') 'mir4-f2d-f200-accepted-receipt-byte-stable'
 foreach ($forbidden in @('git clean','package_cutover=$true','publication=$true','signing=$true','sealing=$true')) { Assert-MIR4F2D (-not $coordinator.Contains($forbidden)) "mir4-f2d-forbidden-$forbidden" }
 Write-Host '[ok] MIR 4 F2D runtime replay harness contract'
