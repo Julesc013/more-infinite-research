@@ -19,6 +19,10 @@
   - F200 now rejects any Factorio executable whose product version, governed file version, or SHA-256 differs from the exact target authority; the independent verifier repeats that check.
   - The newly materialized 4.0.20000 F200 package passed its exact-package smoke scenario and the 2.5.11 base-default upgrade through first and second reloads.
   - The reusable target receipt writer records F200 and can advance F110 and F100 without cloning target-specific implementations; package cutover and every release gate remain false.
+- Passed the exact Factorio 1.1 F2D runtime replay and bound the historical build observation. [MIR4-CHG-2026-0010]
+  - The shared fixed-engine resolver now treats optional fields in older release records explicitly and binds F110 to the accepted 1.1.110.62357 availability observation without weakening its executable digest lock.
+  - The newly materialized 4.0.11000 F110 package passed its exact-package smoke scenario and the 1.9.9 base-default upgrade through first and second reloads.
+  - Independent verification and external custody passed before expanded work was released; F100 and the four-target aggregate remain pending and every cutover and release gate remains false.
 
 ### Features
 

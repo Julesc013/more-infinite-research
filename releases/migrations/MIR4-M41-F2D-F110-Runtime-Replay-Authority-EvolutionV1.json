@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1",
+  "recorded_at": "2026-09-02T14:34:46.3846313+10:00",
+  "programme_id": "M41-F2D-F110-RUNTIME-REPLAY",
+  "change_id": "MIR4-CHG-2026-0010",
+  "target": "f110",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json",
+    "sha256": "079CCD4FC9B61A0D4CAB53F1DBE633D5FD142AC81441E95A3FF7D379E7086C9F"
+  },
+  "base": {
+    "branch": "dev",
+    "authority_base_commit": "f6cef04f90affb0acec8a82808fa57c412358976",
+    "authority_base_tree": "0b4ac7a6ca2aac7b299ab8a10cfc84b3d0a7da67",
+    "replay_commit": "e744857ad542a1d07b09079b8a5b90b84d4fdf44",
+    "replay_tree": "2062f3042bdedf101708c79a98a627d463da6845"
+  },
+  "evolved_bindings": [
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "D61B113907FB75E2E5057AFA969AC2F02DBCB0263950B25CACC33B7B25140B39",
+      "current_sha256": "80E83E8332A1083865DDAC38EA181A46E105F621CD325BBFA4D95A1BD46A55DB",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json",
+      "previous_sha256": "ACC9B49C9CD0854687D231A6AC9B72E5293CB850FB9A46218B0D954946BC2B1A",
+      "current_sha256": "2F49E2AF1217A73A3B6284C82BA31B27561FA8DA9B56588C6BB449511843E023",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "0FF33DB07FB8D5FAE10DA4CD812326C015610805A7445165D90F82369A5E08D0",
+      "current_sha256": "A3E3655064E765047EE7393527D132B6D479598F9E1E1ADC11E91ADA6EC60A65",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "7C95F281568E993ED87EF298A6C94719A5690BA55B86DFF54993EB3B8B9DC21B",
+      "current_sha256": "2C89BCA474BCAB4692EA1520988E301F0DF4454DB88B3A1464D270D574F004E7",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "1F524E03872A7E3488BFB6DE3599F5F199D16A32BE8FAEE00318408A0A255D9E",
+      "current_sha256": "C12EB174CF4331FFC19595D3E7B868956C1603CD255A2B05FAAE7865D2C9BB27",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "previous_sha256": "B4C350761429BA1670270107B8CA8D07B92F8565485A44A3A411A2B04F6C519F",
+      "current_sha256": "9CB30172FA29CB1505AC2F74CDA27796848CDA47E4CB05F73B06B6AB38FF8681",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "7C684C6E14A689757AFB641155E25B47EF5B99ABB6ABCAD28ABA72229FD30BF6",
+      "current_sha256": "ADC14F2EB82C8B172F58FAD14712EDAFEE8B5C2EAB7C4B4CBFCD2EE5C95BD0A4",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/validation/FactorioVersionPolicy.ps1",
+      "previous_sha256": "34A3D12F95BEBDC83091E6A08E6817269A06327B22F2E61EAEB6FF101B298D87",
+      "current_sha256": "37EB17FBD60D449390D2A052375CC9941E348F422C7277F2264A8AF13D96C7DE",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "D1B2BAC3AEA2B258F9FE07FBCA41FE5ACC44A80CE40A2B7D5D08D33D0C8BC49E",
+      "current_sha256": "0C7DE382D4D132D08283EA38E01544D6202272473EE35200928926DF7BEF8DDC",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "previous_sha256": "44DB83DD23AC77030DB18F214E86855E8D34B4FDA483C4C5CE088107C702377B",
+      "current_sha256": "4FBF968F47F07D12FE42A9F458E934BF4ADDB1A232D13F6DF43E2BB8391ADDDA",
+      "reason": "Accept exact f110 runtime and transition replay with compact external custody.",
+      "scope": "package-excluded-target-runtime-replay",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0010.json",
+      "sha256": "FA5DA8EE4500B56F3585E779E152C904BBC20DE784875228EFFE405C60A41409",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current fixed-target runtime replay result, compact custody reference, schema, generator, or verification authority."
+    }
+  ],
+  "attempts": [],
+  "replay_proof": {
+    "status": "M41-F2D-110-PASSED-NO-CUTOVER",
+    "target": "f110",
+    "candidate_id": "M41-F2D-E744857A-F110",
+    "engine": {
+      "selector": "exact-profile",
+      "version": "1.1.110",
+      "file_version": "1.1.110.62357",
+      "binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "authority_paths": [
+        "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "validation/profiles/factorio-1.1.json",
+        ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
+        "spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json"
+      ]
+    },
+    "package": {
+      "distribution_version": "4.0.11000",
+      "archive_sha256": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+      "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "entry_count": 174
+    },
+    "predecessor": {
+      "version": "1.9.9",
+      "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843"
+    },
+    "fresh_load": {
+      "status": "passed",
+      "scenario_count": 1,
+      "scenarios": [
+        "package-zip-base"
+      ],
+      "result_sha256": "3AFB06B72F7014708AD19575E212513A3F3C39D599BC6356F88D9F97F58E66BB"
+    },
+    "upgrade": {
+      "status": "passed",
+      "archetypes": [
+        "base-default"
+      ],
+      "first_reload": true,
+      "second_reload": true,
+      "result_sha256": "6FDB22E763E9EAE065F54D4EDE42472B7D06E3D98AD8DF5B85E52D606FAFE4C1"
+    },
+    "evidence": {
+      "logical_root": "MIR_EVIDENCE_HOME/m41-f2d/e744857ad542a1d07b09079b8a5b90b84d4fdf44/f110",
+      "target_proof_sha256": "E21A19CC77C74D90F3B230A85A0E9D4F8AD8D19E6C1462DF65879FBAFFEFCD3F",
+      "independent_verification_sha256": "D8345A0450FD8621CA605C22CC6996C9813ABA6BDA2A83785EACACFA0CBEE83F",
+      "custody_manifest_sha256": "89E140FB46E49EA2CC1E3990D24C6028579E0B9F9FEE8A5EE31C48D26E423DDC",
+      "custody_file_count": 13,
+      "evidence_file_count": 14,
+      "evidence_bytes": 28305
+    },
+    "resource": {
+      "retention": "OnFailure",
+      "work_root_status": "removed",
+      "expanded_files": 183,
+      "expanded_bytes": 2700375,
+      "duration_seconds": 25.703,
+      "receipt_sha256": "2FF7A982958A28084CC8413E836A824372E88A9776AAE3ECC22919F3C4EB8E3C"
+    }
+  },
+  "player_package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "target_results": {
+    "f210": "complete",
+    "f200": "complete",
+    "f110": "complete",
+    "f100": "pending"
+  },
+  "f2d_aggregate": "pending",
+  "f2e": "blocked",
+  "invariants": {
+    "exact_fixed_engine_lock": true,
+    "cross_target_evidence_substitution_forbidden": true,
+    "f210_receipt_byte_stable": true,
+    "expanded_work_released_after_verified_custody": true,
+    "package_source_unchanged": true,
+    "root_readme_byte_stable": true,
+    "old_writer_remains_authoritative": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "source_move": false,
+    "package_cutover": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "old_writer_retirement": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "version_allocation": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "status": "M41-F2D-110-PASSED-NO-CUTOVER"
+}

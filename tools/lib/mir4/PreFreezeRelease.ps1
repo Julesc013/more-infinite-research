@@ -652,6 +652,22 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-Historical-Tooling-MigrationV1.json' = 'contracts/repository/mir4-historical-tooling-migration-receipt-v1.schema.json'
     'releases/migrations/MIR4-Release-Tooling-MigrationV1.json' = 'contracts/repository/mir4-release-tooling-migration-receipt-v1.schema.json'
   }
+  $lowerTargetReceiptPaths = [ordered]@{
+    f110 = 'releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json'
+    f100 = 'releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json'
+  }
+  $lowerTargetReceiptPresence = @{}
+  foreach ($target in $lowerTargetReceiptPaths.Keys) {
+    $relativePath = [string]$lowerTargetReceiptPaths[$target]
+    $present = Test-Path -LiteralPath (Join-Path $repo $relativePath) -PathType Leaf
+    $lowerTargetReceiptPresence[$target] = $present
+    if ($present) {
+      $schemas[$relativePath] = 'contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json'
+    }
+  }
+  if ($lowerTargetReceiptPresence.f100 -and -not $lowerTargetReceiptPresence.f110) {
+    throw '[mir4-prefreeze-lower-target-receipt-order] f100 requires f110'
+  }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
     if (-not ($json | Test-Json -SchemaFile (Join-Path $repo $entry.Value))) { throw "[mir4-prefreeze-schema] $($entry.Key)" }
@@ -665,7 +681,7 @@ function Test-MIR4PreFreezeAuthorities {
   }
   $priorReceiptPath = '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json'
   $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
-  foreach ($link in @(
+  $evolutionLinks = @(
     @{path='.mir/releases/waves/mir4-r0/MIR4-T02-Authority-Evolution-ReceiptV1.json';kind='MIR4T02AuthorityEvolutionReceiptV1'},
     @{path='.mir/releases/waves/mir4-r0/MIR4-T03-Authority-Evolution-ReceiptV1.json';kind='MIR4T03AuthorityEvolutionReceiptV1'},
     @{path='.mir/releases/waves/mir4-r0/MIR4-T04-Authority-Evolution-ReceiptV1.json';kind='MIR4T04AuthorityEvolutionReceiptV1'},
@@ -713,7 +729,16 @@ function Test-MIR4PreFreezeAuthorities {
     @{path='releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json';kind='MIR4M41F2DRuntimeReplayHarnessAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json';kind='MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1'}
     @{path='releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json';kind='MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'}
-  )) {
+  )
+  foreach ($target in $lowerTargetReceiptPaths.Keys) {
+    if ($lowerTargetReceiptPresence[$target]) {
+      $evolutionLinks += @{
+        path = [string]$lowerTargetReceiptPaths[$target]
+        kind = 'MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'
+      }
+    }
+  }
+  foreach ($link in $evolutionLinks) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
         [string]$evolution.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
