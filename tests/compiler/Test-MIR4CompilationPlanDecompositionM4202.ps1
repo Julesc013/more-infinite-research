@@ -34,7 +34,19 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
     Assert-MIR4M4202CompilationPlan ($l3Raw|Test-Json -SchemaFile $l3SchemaPath) 'package-source-l3-successor-schema'
     $l3=$l3Raw|ConvertFrom-Json -Depth 100 -DateKind String
     Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $l3) 'package-source-l3-successor-hash'
-    Assert-MIR4M4202CompilationPlan ([string]$l3.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l3.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l3-successor-chain'
+    Assert-MIR4M4202CompilationPlan ([string]$l3.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256) 'package-source-l3-successor-predecessor'
+    if([string]$l3.package_authority.package_source_sha256-cne$currentPackageSource){
+      $l4Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json'
+      $l4SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
+      Assert-MIR4M4202CompilationPlan (Test-Path -LiteralPath $l4Path -PathType Leaf) 'package-source-l4-successor-receipt'
+      $l4Raw=Get-Content -Raw -LiteralPath $l4Path
+      Assert-MIR4M4202CompilationPlan ($l4Raw|Test-Json -SchemaFile $l4SchemaPath) 'package-source-l4-successor-schema'
+      $l4=$l4Raw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $l4) 'package-source-l4-successor-hash'
+      Assert-MIR4M4202CompilationPlan ([string]$l4.predecessor.package_source_sha256-ceq[string]$l3.package_authority.package_source_sha256-and[string]$l4.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l4-successor-chain'
+    }else{
+      Assert-MIR4M4202CompilationPlan ([string]$l3.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l3-successor-chain'
+    }
   }else{
     Assert-MIR4M4202CompilationPlan ([string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
   }

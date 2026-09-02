@@ -2320,6 +2320,13 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "8795436E800CAE09EE4053F6F1E8000D12711905909E773245E9EC55C9BBC307",
+      "lines": 211,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1",
       "classification": "migration-only",
       "sha256": "0B7CCC8A7D4ED085B14F286EBBDE7D0BC1F25BA79EE4514D168DDD6A82E0F4D0",
@@ -3008,8 +3015,8 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "FB2A961DFED0D024286E76932A4AF990A66E55C2650815DE71E1C511AFA9F944",
-      "lines": 1919,
+      "sha256": "E8332EC2A1266B21047DA8A81AF81FB7FB89F5A002B50690DB5EB2912F9A86FA",
+      "lines": 1969,
       "package_visible": false
     },
     {
@@ -4032,7 +4039,7 @@
     "canonical_public": 1,
     "canonical_internal": 263,
     "compatibility_wrapper": 168,
-    "migration_only": 29,
+    "migration_only": 30,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4045,5 +4052,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c30d0bdfa22a036129c0b773c665a4746f80823d5e1d6a4c491db6460c6d1759"
+  "digest": "sha256:2fe27ae596bca75396c263d1cf4b998b41c9230e6e8b33210a45b5bc625e85a1"
 }

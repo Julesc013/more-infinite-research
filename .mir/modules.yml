@@ -1139,6 +1139,11 @@ modules:
     - prototypes/mir/planner/requirements.lua
     - prototypes/mir/planner/technology_requirements.lua
     - prototypes/mir/planner/technology_catalog.lua
+    - prototypes/mir/planner/technology_catalog/model.lua
+    - prototypes/mir/planner/technology_catalog/index.lua
+    - prototypes/mir/planner/technology_catalog/query.lua
+    - prototypes/mir/planner/technology_catalog/build.lua
+    - prototypes/mir/planner/technology_catalog/validate.lua
     - prototypes/mir/planner/technology_selection_policy.lua
     - prototypes/mir/planner/technology_graph.lua
     - prototypes/mir/planner/science.lua
