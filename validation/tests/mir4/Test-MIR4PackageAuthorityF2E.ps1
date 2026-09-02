@@ -18,11 +18,11 @@ if((@($receipt.verification.targets.target)-join'|')-cne'f210|f200|f110|f100'-or
 $superseded=@($receipt.superseded_pre_cutover_bindings)
 $supersededPaths=@($superseded|ForEach-Object{[string]$_.path})
 $packageOutputs=@(Get-MIRPackageOutputPaths -RepoRoot $repo)
-if($superseded.Count-ne37-or
+if($superseded.Count-ne39-or
    @($supersededPaths|Sort-Object -Unique).Count-ne$superseded.Count-or
    @($superseded|Where-Object{[string]$_.historical_sha256-notmatch'^[A-F0-9]{64}$'-or[string]$_.hash_mode-cne'canonical-text-v1'}).Count-ne0-or
    @($supersededPaths|Where-Object{$_-in$packageOutputs}).Count-ne0-or
-   @('contracts/release/mir4-release-narrative-result-v1.schema.json','scripts/Invoke-MIRReleaseTargetedGate.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/mir/application/package/TargetMaterializer.ps1','tools/mir/application/release/ReleaseNarratives.ps1'|Where-Object{$_-notin$supersededPaths}).Count-ne0){
+   @('contracts/release/mir4-release-narrative-result-v1.schema.json','scripts/Invoke-MIRReleaseTargetedGate.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/mir/application/package/TargetMaterializer.ps1','tools/mir/application/release/ReleaseNarratives.ps1','tools/mir/application/repository/RepositoryCharacterization.ps1','validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1'|Where-Object{$_-notin$supersededPaths}).Count-ne0){
   throw '[mir4-f2e-superseded-pre-cutover-bindings]'
 }
 $compositionSchema=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/schemas/mir4-package-composition-result-v1.schema.json')

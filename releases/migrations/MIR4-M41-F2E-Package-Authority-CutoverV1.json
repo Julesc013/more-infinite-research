@@ -50,10 +50,12 @@
     {"path":"tools/mir.ps1","historical_sha256":"E43ABB13E0D6E6FBDA2A4B633C45FCFA855F5D5A4F460FB91AA6B0305D5BB0B7","hash_mode":"canonical-text-v1"},
     {"path":"tools/mir/application/package/TargetMaterializer.ps1","historical_sha256":"CF5A13ADDF1730D04A28F1D8ECD91821FC2688104A6D0C1B97CAB50612AEB17E","hash_mode":"canonical-text-v1"},
     {"path":"tools/mir/application/release/ReleaseNarratives.ps1","historical_sha256":"FEA7488D4625BD4FBF3A8D86AC1D25A5B9709EE1125EA20CAAF156358E98B9A3","hash_mode":"canonical-text-v1"},
+    {"path":"tools/mir/application/repository/RepositoryCharacterization.ps1","historical_sha256":"60C45DA03F9C9BAD5B4311D62360AF384FF03E297F328CB6966908CCF7ECB46A","hash_mode":"canonical-text-v1"},
     {"path":"tools/mir/cli/Invoke-MIR4PackageSource.ps1","historical_sha256":"3718599189115243C82F66CEB7C99660B7079C38B0C2BFBAA0390F8AF50276F1","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests.yml","historical_sha256":"55BAB987E9EC6AB9EFBB01A41A8A691D7A366C84D48FBE4E7BB777A43838551D","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1","historical_sha256":"66F6BF6F2EED37DDDA235BC1EA3BAFB404B35E431C009800E9FF4039E775CD08","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1","historical_sha256":"126A514013382ACDCEB7EADEB89157C81D72670FC2F1274AE299879A842F3E40","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1","historical_sha256":"E43A16DB598605F967252BB2A8BFE0153E689E1715225001619AA2C373608506","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1","historical_sha256":"7256C5DF723256F685D429589D4C23BC0056CE4E36D19DC117E67CACBBCB6EF2","hash_mode":"canonical-text-v1"},
     {"path":"validation/tests/tooling/Test-MIRAssurance.ps1","historical_sha256":"39ACB943D76BDE55437FF5B43B742E3F5E31B42685ED43AA8E41B7112C758C46","hash_mode":"canonical-text-v1"}
   ],

@@ -5,7 +5,7 @@ $script:MIR4RepositoryCharacterizationAuthorityPath = 'governance/repository/mig
 $script:MIR4RepositoryCharacterizationAuthoritySchemaPath = 'contracts/repository/mir4-repository-characterization-authority-v1.schema.json'
 $script:MIR4RepositoryCharacterizationBundleSchemaPath = 'contracts/repository/mir4-repository-characterization-bundle-v1.schema.json'
 $script:MIR4RepositoryCharacterizationDefaultOutput = 'build/reports/repository-characterization'
-$script:MIR4RepositoryCharacterizationExpectedPackageSource = '8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'
+$script:MIR4RepositoryCharacterizationExpectedPackageSource = '632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'
 $script:MIR4RepositoryCharacterizationExpectedReadme = 'DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
 
 function ConvertTo-MIR4RepositoryCharacterizationJsonV1 {
@@ -170,7 +170,7 @@ function New-MIR4RepositoryCharacterizationBundleV1 {
     'reader-writer-graph.json'=[ordered]@{schema=1;kind='MIR4ReaderWriterGraphV1';nodes=@($nodes.GetEnumerator() | Sort-Object Name | ForEach-Object { $_.Value });edges=@($edges | Sort-Object from,to,relation);inferred_from_source=$false;deletion_authorized=$false}
     'bridge-expiry.json'=[ordered]@{schema=1;kind='MIR4BridgeExpiryReportV1';bridges=@($bridges | Sort-Object migration_id,path);summary=[ordered]@{declared=$bridges.Count;retained=$bridges.Count;retirement_ready=0};deletion_authorized=$false}
     'physical-file-inventory.json'=[ordered]@{schema=1;kind='MIR4PhysicalFileInventoryV1';files=@($physicalRows);summary=[ordered]@{files=$physicalRows.Count;unknown=$unknownPaths.Count;package_visible=@($physicalRows | Where-Object package_visible).Count};ignored_outputs_excluded=$true;deletion_authorized=$false}
-    'package-membership.json'=[ordered]@{schema=1;kind='MIR4PackageMembershipInventoryV1';source_roots=@(Get-MIRPackageSourceRoots);files=@($packageRows);package_source_sha256=$packageSourceSha;expected_package_source_sha256=$script:MIR4RepositoryCharacterizationExpectedPackageSource;root_readme=[ordered]@{path='README.md';sha256=$readmeSha;expected_sha256=$script:MIR4RepositoryCharacterizationExpectedReadme;package_visible=$true;disposition='byte-stable-pending-m41-05b-package-documentation-separation'};repository_docs_package_excluded=$true;package_mutation_authorized=$false}
+    'package-membership.json'=[ordered]@{schema=1;kind='MIR4PackageMembershipInventoryV1';source_roots=@(Get-MIRPackageSourceRoots);files=@($packageRows);package_source_sha256=$packageSourceSha;expected_package_source_sha256=$script:MIR4RepositoryCharacterizationExpectedPackageSource;root_readme=[ordered]@{path='README.md';sha256=$readmeSha;expected_sha256=$script:MIR4RepositoryCharacterizationExpectedReadme;package_visible=$false;disposition='repository-documentation-package-excluded-awaiting-m41-05b-rewrite'};repository_docs_package_excluded=$true;package_mutation_authorized=$false}
     'documentation-routing.json'=[ordered]@{schema=1;kind='MIR4DocumentationRoutingInventoryV1';routes=[ordered]@{tutorials='docs/tutorials/README.md';how_to='docs/how-to/README.md';reference='docs/reference/README.md';explanation='docs/explanation/README.md'};markdown_files=$documentationRows.Count;front_matter_status_counts=$statusCounts;root_readme_sha256=$readmeSha;root_readme_byte_stable=($readmeSha -ceq $script:MIR4RepositoryCharacterizationExpectedReadme);root_readme_changed=$false;package_visible_delta=@()}
   }
 
