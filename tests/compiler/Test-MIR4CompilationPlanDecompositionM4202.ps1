@@ -25,7 +25,19 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   Assert-MIR4M4202CompilationPlan ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
   $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
-  Assert-MIR4M4202CompilationPlan ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
+  Assert-MIR4M4202CompilationPlan ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256) 'package-source-successor-predecessor'
+  if([string]$successor.package_authority.package_source_sha256-cne$currentPackageSource){
+    $l3Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
+    $l3SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
+    Assert-MIR4M4202CompilationPlan (Test-Path -LiteralPath $l3Path -PathType Leaf) 'package-source-l3-successor-receipt'
+    $l3Raw=Get-Content -Raw -LiteralPath $l3Path
+    Assert-MIR4M4202CompilationPlan ($l3Raw|Test-Json -SchemaFile $l3SchemaPath) 'package-source-l3-successor-schema'
+    $l3=$l3Raw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202CompilationPlan (Test-MIR4BootstrapRecordHash -Record $l3) 'package-source-l3-successor-hash'
+    Assert-MIR4M4202CompilationPlan ([string]$l3.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l3.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l3-successor-chain'
+  }else{
+    Assert-MIR4M4202CompilationPlan ([string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
+  }
 }
 
 $sourceRoot='src/mod/families/modern/prototypes/mir/planner'

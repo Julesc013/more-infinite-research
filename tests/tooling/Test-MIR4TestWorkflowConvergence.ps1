@@ -27,7 +27,8 @@ Assert-MIR4TestWorkflowConvergenceV1 ([int]$inventory.summary.unknown -eq 0 -and
 $canonicalMoved = @(Get-ChildItem -LiteralPath (Join-Path $repo 'tests') -File -Filter '*.ps1' -Recurse | Where-Object {
   (Get-Content -LiteralPath $_.FullName -TotalCount 1) -ceq '# MIR4-CANONICAL-EXECUTABLE-TEST'
 })
-Assert-MIR4TestWorkflowConvergenceV1 ($canonicalMoved.Count -eq 137) 'mir4-m42-01b-relocation-count'
+$postConvergenceDecompositions = @(Get-ChildItem -LiteralPath (Join-Path $repo 'releases/migrations') -File -Filter 'MIR4-M42-02-*-DecompositionV1.json')
+Assert-MIR4TestWorkflowConvergenceV1 ($canonicalMoved.Count -eq (137 + $postConvergenceDecompositions.Count)) 'mir4-m42-01b-relocation-count'
 Assert-MIR4TestWorkflowConvergenceV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-01b-package-mutation'
 
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json'

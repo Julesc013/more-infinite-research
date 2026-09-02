@@ -2161,7 +2161,7 @@
     {
       "path": "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
       "classification": "canonical-internal",
-      "sha256": "CD04868A8E133DF84CDA2BA099833A6022C56C4161972A672D0CFB5D223B4D49",
+      "sha256": "D0FC1A28D037E116A2660A8DCB269BA6FBBB334D2CC8CF642C0740BF3AD8E3B8",
       "lines": 70,
       "package_visible": false
     },
@@ -2296,6 +2296,27 @@
       "classification": "migration-only",
       "sha256": "CC5B0377266628EC89EEB364AD732B1F12D9E70A23E0D0B7E127A051A85B159C",
       "lines": 148,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4202BaseContinuationsDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "7E7670735A3EF0E940A500B519B5A7E9C59365D908858CBC2124A08C7DA6E7F9",
+      "lines": 219,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4202CompilationPlanDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "CE1979550734ED94075174E700F67487EB6595F8022C651BCD6CA60B127C5E9B",
+      "lines": 205,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "87364A6B6801638B0690235AE1DB72638A5CEE5DE35CEF3C020FC3B0D3118ECA",
+      "lines": 196,
       "package_visible": false
     },
     {
@@ -2987,8 +3008,8 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
-      "lines": 1790,
+      "sha256": "FB2A961DFED0D024286E76932A4AF990A66E55C2650815DE71E1C511AFA9F944",
+      "lines": 1919,
       "package_visible": false
     },
     {
@@ -3183,7 +3204,7 @@
     {
       "path": "tools/lib/validation/PackageIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "1961326C0D61A9DAEF7C9C83EE69FE723DAB79A71C23F320E78B961A7B427EB5",
+      "sha256": "D6E1D917EE8106A78C8FC7352C22926BF268C75C752F3FE1C05B73758BB1DDF6",
       "lines": 369,
       "package_visible": false
     },
@@ -3505,8 +3526,8 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "80698DA9E19197776CCABB205D0A21F3C48C2782801253B2BD3DC599B68E7BA2",
-      "lines": 202,
+      "sha256": "538F426AA72120D0E5C116CC5E0175AFED815F2F7D441776FFE1D3A10269BA86",
+      "lines": 291,
       "package_visible": false
     },
     {
@@ -3610,8 +3631,8 @@
     {
       "path": "tools/mir/application/release/ReleaseNarratives.ps1",
       "classification": "canonical-internal",
-      "sha256": "C829AC2916B85E4EB41DC295F6CF9A008BF71C90204CE3A5BB0E9AD445597266",
-      "lines": 138,
+      "sha256": "F6247CEDC697AF54C4C1C87CEFECCEED31329EF595101BDC9873C1382965926B",
+      "lines": 137,
       "package_visible": false
     },
     {
@@ -3638,7 +3659,7 @@
     {
       "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
       "classification": "canonical-internal",
-      "sha256": "3A2301D8C2EAA4FCD64AF1A7B616D31184FE08170E4AE01A506DA2AFB901B465",
+      "sha256": "BB3B325149D52CB14DBA0478B1D070155936BDA760800445EE7A85526D25F689",
       "lines": 228,
       "package_visible": false
     },
@@ -3855,7 +3876,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
       "classification": "canonical-internal",
-      "sha256": "814C0A0E3A4D3752F552DC8A90265506EE1DAC60E7E5006347C2D623D1488669",
+      "sha256": "E8EC27AE95157E5095452090615F9C573517994B9E41E6CBE45AE00E17C34DCE",
       "lines": 73,
       "package_visible": false
     },
@@ -4011,7 +4032,7 @@
     "canonical_public": 1,
     "canonical_internal": 263,
     "compatibility_wrapper": 168,
-    "migration_only": 26,
+    "migration_only": 29,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4024,5 +4045,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d08a13e49f61e4ab7824d54cd98fd5c3d036b12c24da533a1ceb7f01e1dfc2eb"
+  "digest": "sha256:c30d0bdfa22a036129c0b773c665a4746f80823d5e1d6a4c491db6460c6d1759"
 }

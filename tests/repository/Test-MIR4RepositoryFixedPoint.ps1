@@ -98,9 +98,22 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
     Assert-MIR4RepositoryMigrationV1 ($m4202L2Raw|Test-Json -SchemaFile (Join-Path $repo $m4202L2SchemaPath)) 'mir4-repository-migration-m42-02-l2-successor-schema'
     $m4202L2=$m4202L2Raw|ConvertFrom-Json -Depth 100 -DateKind String
     Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202L2) 'mir4-repository-migration-m42-02-l2-successor-record'
-    Assert-MIR4RepositoryMigrationV1 ([string]$m4202L2.predecessor.package_source_sha256-ceq[string]$m4202.package_authority.package_source_sha256-and[string]$m4202L2.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l2-successor-fingerprint'
+    Assert-MIR4RepositoryMigrationV1 ([string]$m4202L2.predecessor.package_source_sha256-ceq[string]$m4202.package_authority.package_source_sha256) 'mir4-repository-migration-m42-02-l2-successor-predecessor-fingerprint'
     Assert-MIR4RepositoryMigrationV1 ([string]$m4202L2.status-ceq'M42-02-L2-BASE-CONTINUATIONS-DECOMPOSED'-and[string]$m4202L2.responsibility-ceq'base-continuations') 'mir4-repository-migration-m42-02-l2-successor-scope'
     Assert-MIR4RepositoryMigrationV1 (@($m4202L2.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-l2-release-firewall'
+    $m4202L3Path='releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
+    if(Test-Path -LiteralPath (Join-Path $repo $m4202L3Path) -PathType Leaf){
+      $m4202L3SchemaPath='contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
+      $m4202L3Raw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202L3Path)
+      Assert-MIR4RepositoryMigrationV1 ($m4202L3Raw|Test-Json -SchemaFile (Join-Path $repo $m4202L3SchemaPath)) 'mir4-repository-migration-m42-02-l3-successor-schema'
+      $m4202L3=$m4202L3Raw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202L3) 'mir4-repository-migration-m42-02-l3-successor-record'
+      Assert-MIR4RepositoryMigrationV1 ([string]$m4202L3.predecessor.package_source_sha256-ceq[string]$m4202L2.package_authority.package_source_sha256-and[string]$m4202L3.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l3-successor-fingerprint'
+      Assert-MIR4RepositoryMigrationV1 ([string]$m4202L3.status-ceq'M42-02-L3-STREAM-COMPILER-DECOMPOSED'-and[string]$m4202L3.responsibility-ceq'stream-compiler') 'mir4-repository-migration-m42-02-l3-successor-scope'
+      Assert-MIR4RepositoryMigrationV1 (@($m4202L3.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-l3-release-firewall'
+    }else{
+      Assert-MIR4RepositoryMigrationV1 ([string]$m4202L2.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l2-current-successor'
+    }
   }else{
     Assert-MIR4RepositoryMigrationV1 ([string]$m4202.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-current-successor'
   }

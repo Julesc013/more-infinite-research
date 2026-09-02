@@ -16,11 +16,23 @@ $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202BaseContinuations ($raw|Test-Json -SchemaFile $schemaPath) 'receipt-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
-Assert-MIR4M4202BaseContinuations ([string]$receipt.package_authority.package_source_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'package-source-fingerprint'
+$currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+$expectedManifestBindings=419
+if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
+  $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
+  $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
+  Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath $successorPath -PathType Leaf) 'package-source-successor-receipt'
+  $successorRaw=Get-Content -Raw -LiteralPath $successorPath
+  Assert-MIR4M4202BaseContinuations ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
+  $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
+  Assert-MIR4M4202BaseContinuations ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
+  $expectedManifestBindings=429
+}
 
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
-Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq419) 'manifest-binding-count'
-Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq419) 'manifest-binding-uniqueness'
+Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
+Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
 
 $outputs=@('prototypes/mir/planner/base_continuations.lua','prototypes/mir/planner/base_continuations/classify.lua','prototypes/mir/planner/base_continuations/discover.lua','prototypes/mir/planner/base_continuations/qualify.lua','prototypes/mir/planner/base_continuations/plan.lua')
 foreach($target in @('f210','f200')){

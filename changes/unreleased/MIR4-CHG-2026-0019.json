@@ -1,0 +1,32 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0019",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Split modern stream compilation into explicit discovery, ownership, qualification, compilation, and diagnostics owners.",
+  "details": [
+    "The stable stream-compiler require path is now a thin facade over five bounded target-owned responsibility modules.",
+    "F210 and F200 retain independent qualification authorities and the governed F210 science-phase evidence difference; the other four responsibility implementations remain byte-identical.",
+    "Each modern target gains five internal Lua module paths, while F110 and F100 remain byte-identical to their accepted package baselines.",
+    "The materialized F210 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.",
+    "No stream identity, effect, cost, science, prerequisite, ownership, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes."
+  ],
+  "semantic_domains": ["compiler", "architecture", "package-source", "assurance"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"The modern package gains five internal stream-compiler responsibility modules behind its stable target-owned facade."},
+    {"target":"F200","disposition":"affected","reason":"The modern package gains five internal stream-compiler responsibility modules behind its stable target-owned facade."},
+    {"target":"F110","disposition":"unaffected","reason":"The legacy stream-compiler implementation and package tree are unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"The legacy stream-compiler implementation and package tree are unchanged."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"},
+    {"kind":"finding","value":"MIR_EVIDENCE_HOME/mir4-4.1-ultimate/20260902T141633+1000-f6cef04f/evidence/U05-L3-stream-compiler/custody-manifest.json#FF6A75106A8A10219301122840D36FDDC5D247D49CFB8758F35B70114FC0AE43"}
+  ]
+}

@@ -2831,14 +2831,94 @@
       "semantic_class": "target-replacement",
       "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed targets.f200 source for f200.",
+      "reason": "Materialize the governed stream-compiler facade for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 21357,
-      "expected_sha256": "C0AF049BAF5955D0837E5B467C3F6299549812A53B1E8162906DFBE4D03DA31F",
+      "expected_bytes": 65,
+      "expected_sha256": "F575B7117740549CF3F2547C23F708FEC982247A8A254AF46DF3D0DA93335572",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/compile.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler/compile.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed stream-compiler compile responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4145,
+      "expected_sha256": "6303BD8BACEFFF0F986575FA2FEB3EBCC85A335D4C2B1CA76F46AE3D8BF2D892",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/diagnostics.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler/diagnostics.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed stream-compiler diagnostics responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5078,
+      "expected_sha256": "64404C3B5920D9368ADDF7B505C44B0A8E7BC76FB7BD768554256302959FC60E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/discover.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler/discover.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed stream-compiler discover responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2273,
+      "expected_sha256": "5D4AEEFDF6E22F7AC8DF0E60F548DC8748FBF07F408960E5DC176A78F9B862F1",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/ownership.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler/ownership.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed stream-compiler ownership responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2178,
+      "expected_sha256": "A49CCA3200EDDDC9BCFBADDB431D331D7A691C3BEAA7DB7B3518EA737524C448",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/stream_compiler/qualify.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f200/files/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed stream-compiler qualify responsibility for f200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 9227,
+      "expected_sha256": "945478BFE554FC4F6512F39CF7C3DD392A3BCD8CA3BEB254F7BE841FCC6F4BFC",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3615,5 +3695,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "0D7EB2D4CF7D357EC708B85A4FC269AF920FB9604710490DF77C59090E86D468"
+  "record_sha256": "B82DEC47809FAC1B6BD4BD6EC9E0D241A3464CDEA9361E4F2780FAD6FC618A6B"
 }
