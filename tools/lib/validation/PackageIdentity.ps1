@@ -1,4 +1,4 @@
-function Get-MIRPackageSourceRoots {
+function Get-MIRLegacyRootPackageSourceRoots {
   return @(
     "changelog.txt",
     "control.lua",
@@ -13,6 +13,33 @@ function Get-MIRPackageSourceRoots {
     "locale",
     "migrations",
     "prototypes"
+  )
+}
+
+function Get-MIRPackageSourceRoots {
+  return @('src/mod', 'targets')
+}
+
+function Get-MIRPackageOutputPaths {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateSet('f210','f200','f110','f100')][string]$Target = ''
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $manifestPath = Join-Path $repo 'src/mod/package-source.json'
+  if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+    return @(Get-MIRLegacyRootPackageSourceFiles -RepoRoot $repo)
+  }
+  $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
+  return @(
+    $manifest.bindings |
+      Where-Object {
+        [string]::IsNullOrWhiteSpace($Target) -or
+        @($_.target_scope) -ccontains $Target
+      } |
+      ForEach-Object { [string]$_.output_path } |
+      Sort-Object -Unique
   )
 }
 
@@ -50,6 +77,24 @@ function Get-MIRPackageSourceFiles {
     }
   }
 
+  return @($files | Sort-Object -Unique)
+}
+
+function Get-MIRLegacyRootPackageSourceFiles {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $files = @()
+  foreach ($relative in Get-MIRLegacyRootPackageSourceRoots) {
+    $path = Join-Path $repo $relative
+    if (Test-Path -LiteralPath $path -PathType Leaf) {
+      $files += $relative.Replace('\', '/')
+    } elseif (Test-Path -LiteralPath $path -PathType Container) {
+      $files += @(Get-ChildItem -LiteralPath $path -Recurse -File | ForEach-Object {
+        [IO.Path]::GetRelativePath($repo, $_.FullName).Replace('\', '/')
+      })
+    }
+  }
   return @($files | Sort-Object -Unique)
 }
 
@@ -167,6 +212,20 @@ function Get-MIRPackageSourceFingerprint {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $rows = @(
     foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo) {
+      $path = Join-Path $repo $relative
+      $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
+      "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
+    }
+  )
+  return Get-MIRStringSha256 -Value ($rows -join "`n")
+}
+
+function Get-MIRLegacyRootPackageSourceFingerprint {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $rows = @(
+    foreach ($relative in Get-MIRLegacyRootPackageSourceFiles -RepoRoot $repo) {
       $path = Join-Path $repo $relative
       $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
       "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256

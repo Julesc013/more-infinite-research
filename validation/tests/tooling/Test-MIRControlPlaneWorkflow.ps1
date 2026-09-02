@@ -18,7 +18,7 @@ foreach ($token in @(
   "-Operation ecosystem", "-Operation approved-delta", "-Operation performance", "-Operation aggregate",
   "-SourceRepoRoot source", "-Stage release", "-ExcludeTask shadow.equivalence", "-Kind manual", "-AggregateTaskId qualification.full",
   "proof.integration_commit", "Qualification-source commit mismatch",
-  "Build-MIRPackage.ps1 -OutputDir ../build/results/candidate", '$candidate = Join-Path "build/results/candidate"',
+  "Build-MIRPackage.ps1 -RepoRoot source -Target `$targetKey -CandidateId MIR4-CONTROL-PLANE -OutputDir build/packages/control-plane", "steps.package-build.outputs.archive",
   "Isolate nested source checkout from controller status", 'git rev-parse --git-path info/exclude', '-Value "/source/"',
   "Invoke-MIRControlPlane.ps1 backport", "Invoke-MIRControlPlane.ps1 seal", "-TaskId shadow.equivalence", "Invoke-MIRControlPlane.ps1 promotion",
   "MIR_PROTECTED_ENVIRONMENT: release-candidate", "MIR_TRUSTED_RUNNER: self-hosted-windows", "-TrustClass protected-release", "cancel-in-progress: false",

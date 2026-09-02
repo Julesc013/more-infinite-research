@@ -352,8 +352,9 @@ if ($requiresCrossTargetAuthorization) {
 $script:resolvedLocalModDir = ""
 $script:packageOutputDir = $PackageOutputDir
 if ([string]::IsNullOrWhiteSpace($script:packageOutputDir)) {
-  $script:packageOutputDir = "dist"
+  $script:packageOutputDir = "build/packages/release-targeted-gate"
 }
+$script:builtPackageArchive = ''
 $script:resolvedManualScenariosPath = Resolve-MIRReleaseGatePath -Path $ManualScenariosPath
 if (-not (Test-Path -LiteralPath $script:resolvedManualScenariosPath)) {
   throw "Manual scenarios file does not exist: $script:resolvedManualScenariosPath"
@@ -479,7 +480,9 @@ try {
 
   if (-not $SkipBuild) {
     Invoke-MIRReleaseGateStep -Name "package-build" -Action {
-      & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
+      $targetKey = switch ($FactorioLine) { '2.1' {'f210'} '2.0' {'f200'} '1.1' {'f110'} '1.0' {'f100'} default { throw "Unsupported package target: $FactorioLine" } }
+      $packageResult = & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -Target $targetKey -CandidateId MIR4-RELEASE-GATE -OutputDir $script:packageOutputDir
+      $script:builtPackageArchive = [string]$packageResult.archive_path
       & git -C $repo diff --check
     }
   }
@@ -506,6 +509,6 @@ Write-Host "[release] targeted release checks passed: $script:resolvedOutputRoot
 $packageCandidate = if ($script:resolvedCandidateZip) {
   $script:resolvedCandidateZip
 } else {
-  Join-Path $script:packageOutputDir ("{0}_{1}.zip" -f $modName, $modVersion)
+  $script:builtPackageArchive
 }
 Write-Host "[release] package candidate: $packageCandidate"

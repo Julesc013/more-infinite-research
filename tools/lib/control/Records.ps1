@@ -155,11 +155,24 @@ function Get-MIRCPCommitPackageSourceHash {
   $source = Join-Path $temporaryRoot "source"
   try {
     [void](New-Item -ItemType Directory -Force -Path $temporaryRoot)
-    $roots = @(Get-MIRPackageSourceRoots)
+    $trackedPaths = @(& git -C $repo ls-tree -r --name-only $Commit)
+    if ($LASTEXITCODE -ne 0) { throw "Unable to inspect package-source layout at commit $Commit." }
+    $canonicalLayout = (
+      $trackedPaths -ccontains 'src/mod/package-source.json' -and
+      $trackedPaths -ccontains 'targets/package-authority.json'
+    )
+    $roots = if ($canonicalLayout) {
+      @(Get-MIRPackageSourceRoots)
+    } else {
+      @(Get-MIRLegacyRootPackageSourceRoots)
+    }
     & git -C $repo archive --format=zip --output=$archive $Commit -- @roots 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract package roots at commit $Commit." }
     Expand-Archive -LiteralPath $archive -DestinationPath $source
-    return Get-MIRPackageSourceFingerprint -RepoRoot $source
+    if ($canonicalLayout) {
+      return Get-MIRPackageSourceFingerprint -RepoRoot $source
+    }
+    return Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $source
   } finally {
     if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
       Remove-Item -LiteralPath $temporaryRoot -Recurse -Force

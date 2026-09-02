@@ -8,8 +8,8 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/mir/application/package/ShadowTargetMaterializer.ps1')
 
-$expectedPackage='8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'
-$expectedReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
+$historicalPackage='8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'
+$historicalReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
 $schemaPairs=[ordered]@{
   'src/mod/package-source.json'='spec/schemas/mir4-package-source-manifest-v1.schema.json'
   'targets/registry.json'='spec/schemas/mir4-target-registry-v1.schema.json'
@@ -55,13 +55,12 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $registryRow=@($registry.targets|Where-Object{[string]$_.target-ceq$target})
-  if($expected.Count-ne1-or$actualRow.Count-ne1-or$registryRow.Count-ne1-or[string]$actualRow[0].content_sha256-cne[string]$expected[0].archive.content_sha256-or[int]$actualRow[0].entry_count-ne[int]$expected[0].archive.entry_count-or[string]$actualRow[0].archive_a-cne[string]$actualRow[0].archive_b-or-not[bool]$actualRow[0].deterministic_archive_bytes){throw "[mir4-editable-source-target-parity] $target"}
-  $archive=Join-Path $repo "build/packages/$target/M41-F2C-A/more-infinite-research_$([string]$registryRow[0].distribution_version).zip"
-  Assert-MIR4ShadowInventoryParity -Expected $expected[0] -Actual (Get-MIR4ArchiveInventory -Path $archive) -Target $target
+  if($expected.Count-ne1-or$actualRow.Count-ne1-or[string]$actualRow[0].content_sha256-cne[string]$expected[0].archive.content_sha256-or[int]$actualRow[0].entry_count-ne[int]$expected[0].archive.entry_count-or[string]$actualRow[0].archive_a-cne[string]$actualRow[0].archive_b-or-not[bool]$actualRow[0].deterministic_archive_bytes){throw "[mir4-editable-source-target-parity] $target"}
 }
-if((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-cne$expectedPackage){throw '[mir4-editable-source-current-package-source]'}
-if((Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne$expectedReadme){throw '[mir4-editable-source-root-readme]'}
-if(@($proof.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-editable-source-transition-authority]'}
+$f2e=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f2e.verification.legacy_root_projection_sha256-cne$historicalPackage-or
+   [string](Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json')|ConvertFrom-Json -Depth 100).root_readme_sha256-cne$historicalReadme){throw '[mir4-editable-source-historical-boundary]'}
+if(-not[bool]$proof.transition_gate.package_cutover-or-not[bool]$proof.transition_gate.old_writer_retirement-or
+   @($proof.transition_gate.PSObject.Properties|Where-Object{$_.Name-notin@('package_cutover','old_writer_retirement')-and[bool]$_.Value}).Count-ne0){throw '[mir4-editable-source-transition-authority]'}
 
-[pscustomobject][ordered]@{status='passed';test_id='static.mir4-editable-source-materializer-m41-f2c';bindings=@($manifest.bindings).Count;source_files=$declared.Count;targets=@($proof.targets).Count;content_roots=@($proof.targets|ForEach-Object{[ordered]@{target=[string]$_.target;content_sha256=[string]$_.content_sha256;entries=[int]$_.entry_count}});package_source_sha256=$expectedPackage;root_readme_sha256=$expectedReadme;production_archive_input=$false;package_cutover=$false;record_sha256=[string]$proof.record_sha256}|ConvertTo-Json -Depth 20
+[pscustomobject][ordered]@{status='passed';test_id='static.mir4-editable-source-materializer-m41-f2c';historical_fixed_point_preserved=$true;bindings=@($manifest.bindings).Count;source_files=$declared.Count;targets=@($proof.targets).Count;content_roots=@($proof.targets|ForEach-Object{[ordered]@{target=[string]$_.target;content_sha256=[string]$_.content_sha256;entries=[int]$_.entry_count}});package_source_sha256=(Get-MIRPackageSourceFingerprint -RepoRoot $repo);historical_root_package_source_sha256=$historicalPackage;historical_root_readme_sha256=$historicalReadme;production_archive_input=$false;package_cutover=$true;record_sha256=[string]$proof.record_sha256}|ConvertTo-Json -Depth 20

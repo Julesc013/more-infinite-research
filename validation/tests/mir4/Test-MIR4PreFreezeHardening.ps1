@@ -3,6 +3,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/PreFreezeRelease.ps1')
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
+$legacyRootPackageSourceSha256=Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $repo
 
 $receipt=Test-MIR4PreFreezeAuthorities -RepoRoot $repo
 $rulesets=Test-MIR4RulesetSnapshot -RepoRoot $repo
@@ -142,7 +143,7 @@ if([string]$closure.kind-cne'MIR4FinalReleaseClosureAuthorityEvolutionReceiptV1'
 $postReleaseBaseline=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json')|ConvertFrom-Json -Depth 100
 if([string]$postReleaseBaseline.kind-cne'MIR4PostReleasePackageBaselineAuthorityEvolutionReceiptV1'-or
    [string]$postReleaseBaseline.status-cne'POST-RELEASE-PACKAGE-PRESENTATION-BASELINE-RECORDED-NO-RELEASE-TRANSITION'-or
-   [string]$postReleaseBaseline.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$postReleaseBaseline.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (@($postReleaseBaseline.package_visible_delta)-join'|')-cne'README.md'-or
    -not[bool]$postReleaseBaseline.invariants.player_executable_sources_unchanged-or
    @($postReleaseBaseline.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){
@@ -162,7 +163,7 @@ if([string]$branchOperatingModel.kind-cne'MIR4BranchOperatingModelAuthorityEvolu
    [string]$branchOperatingModel.status-cne'BRANCH-OPERATING-MODEL-APPLIED-NO-RELEASE-TRANSITION'-or
    @($branchOperatingModel.evolved_bindings).Count-ne3-or
    @($branchOperatingModel.current_authorities).Count-ne8-or
-   [string]$branchOperatingModel.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$branchOperatingModel.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    -not[bool]$branchOperatingModel.invariants.main_latest_stable-or
    -not[bool]$branchOperatingModel.invariants.dev_next_release_integration-or
    [int]$branchOperatingModel.invariants.ordinary_bypass_actor_count-ne0-or
@@ -174,7 +175,7 @@ if([string]$patchLaneRehearsal.kind-cne'MIR4PatchLaneRehearsalAuthorityEvolution
    [string]$patchLaneRehearsal.status-cne'PATCH-LANE-REHEARSAL-PROVED-NO-RELEASE-TRANSITION'-or
    @($patchLaneRehearsal.evolved_bindings).Count-ne5-or
    @($patchLaneRehearsal.current_authorities).Count-lt21-or
-   [string]$patchLaneRehearsal.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$patchLaneRehearsal.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    -not[bool]$patchLaneRehearsal.invariants.release_4_0_base_exact-or
    -not[bool]$patchLaneRehearsal.invariants.disposable_branch_removed-or
    -not[bool]$patchLaneRehearsal.invariants.remote_refs_unchanged-or
@@ -186,7 +187,7 @@ if([string]$m4103.kind-cne'MIR4M4103ChangeAndReleaseAuthorityEvolutionV1'-or
    [string]$m4103.status-cne'M41-03-CHANGE-AND-RELEASE-AUTHORITY-COMPLETE-NO-RELEASE-TRANSITION'-or
    @($m4103.evolved_bindings).Count-lt10-or
    @($m4103.current_authorities).Count-lt20-or
-   [string]$m4103.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$m4103.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    -not[bool]$m4103.invariants.six_views_from_one_inventory-or
    -not[bool]$m4103.invariants.historical_4_0_0_shadow_only-or
    -not[bool]$m4103.invariants.selective_target_filtering-or
@@ -198,7 +199,7 @@ if([string]$characterization.kind-cne'MIR4M4105AM4200ARepositoryCharacterization
    [string]$characterization.status-cne'M41-05A-M42-00A-CHARACTERIZATION-COMPLETE-NO-PACKAGE-CUTOVER'-or
    @($characterization.evolved_bindings).Count-lt10-or
    @($characterization.current_authorities).Count-lt8-or
-   [string]$characterization.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$characterization.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$characterization.root_readme_sha256-or
    -not[bool]$characterization.invariants.deterministic_reports-or
    -not[bool]$characterization.invariants.all_bridges_retained-or
@@ -212,7 +213,7 @@ if([string]$truthReconciliation.kind-cne'MIR4M41F0TruthReconciliationAuthorityEv
    [string]$truthReconciliation.predecessor_receipt.sha256-cne'1D5F3F67701DB9F1281B6FA376D031AD7513118259FACF25DEAC82DD66CD8FBF'-or
    @($truthReconciliation.evolved_bindings).Count-lt20-or
    @($truthReconciliation.current_authorities).Count-lt10-or
-   [string]$truthReconciliation.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$truthReconciliation.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$truthReconciliation.root_readme_sha256-or
    -not[bool]$truthReconciliation.invariants.live_programme_is_current-or
    -not[bool]$truthReconciliation.invariants.mutable_candidate_state_removed-or
@@ -233,7 +234,7 @@ if([string]$goldenBaseline.kind-cne'MIR4M41F1GoldenFourTargetBaselineAuthorityEv
    [int]$goldenBaseline.baseline_proof.modern_family_files-ne202-or
    [int]$goldenBaseline.baseline_proof.legacy_family_files-ne81-or
    @($goldenBaseline.baseline_proof.archives).Count-ne4-or
-   [string]$goldenBaseline.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$goldenBaseline.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$goldenBaseline.root_readme_sha256-or
    -not[bool]$goldenBaseline.invariants.four_archives_exact-or
    -not[bool]$goldenBaseline.invariants.reconstruction_byte_exact-or
@@ -253,7 +254,7 @@ if([string]$shadowMaterializer.kind-cne'MIR4M41F2AShadowTargetMaterializerAuthor
    -not[bool]$shadowMaterializer.materializer_proof.all_exact_tree_parity-or
    -not[bool]$shadowMaterializer.materializer_proof.all_deterministic_archive_bytes-or
    @($shadowMaterializer.materializer_proof.content_identities).Count-ne4-or
-   [string]$shadowMaterializer.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$shadowMaterializer.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$shadowMaterializer.root_readme_sha256-or
    -not[bool]$shadowMaterializer.invariants.four_target_tree_parity-or
    -not[bool]$shadowMaterializer.invariants.current_writer_unchanged-or
@@ -276,7 +277,7 @@ if([string]$shadowSourceModel.kind-cne'MIR4M41F2BShadowSourceModelAuthorityEvolu
    [int]$shadowSourceModel.source_model_proof.classification_counts.'target-overlay'-ne217-or
    [int]$shadowSourceModel.source_model_proof.classification_counts.'target-replacement'-ne18-or
    [int]$shadowSourceModel.source_model_proof.classification_counts.'target-compatibility-shim'-ne11-or
-   [string]$shadowSourceModel.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$shadowSourceModel.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$shadowSourceModel.root_readme_sha256-or
    -not[bool]$shadowSourceModel.invariants.all_paths_classified-or
    -not[bool]$shadowSourceModel.invariants.no_path_collision-or
@@ -303,7 +304,7 @@ if([string]$editableSource.kind-cne'MIR4M41F2CEditableSourceMaterializerAuthorit
    [int]$editableSource.materializer_proof.target_count-ne4-or
    @($editableSource.materializer_proof.target_compositions).Count-ne4-or
    @($editableSource.materializer_proof.target_compositions|Where-Object{-not[bool]$_.deterministic_archive_bytes-or-not[bool]$_.exact_golden_tree_parity}).Count-ne0-or
-   [string]$editableSource.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$editableSource.player_package_source_sha256-cne$legacyRootPackageSourceSha256-or
    (Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md')-cne[string]$editableSource.root_readme_sha256-or
    -not[bool]$editableSource.invariants.editable_shadow_source_established-or
    -not[bool]$editableSource.invariants.all_source_hashes_verified-or

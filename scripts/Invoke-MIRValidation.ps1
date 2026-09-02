@@ -2348,12 +2348,11 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     return $fileName -in @("LICENSE")
   }
 
-  $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
-  $packageName = "$($info.name)_$($info.version)"
   if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    $validationOutputDir = "build/validation-dist"
-    & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
-    $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
+    $validationOutputDir = "build/packages/validation-dist"
+    $packageResult = & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -Target f210 -CandidateId MIR4-VALIDATION -OutputDir $validationOutputDir
+    $zipPath = [string]$packageResult.archive_path
+    $packageName = "more-infinite-research_$([string]$packageResult.distribution_version)"
   } else {
     $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
     if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
@@ -2361,6 +2360,13 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
     $zipPath = (Resolve-Path -LiteralPath $candidatePath).Path
     Write-Host "[check] validating exact candidate package $zipPath"
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $candidateArchive = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+      $roots = @($candidateArchive.Entries | ForEach-Object { ([string]$_.FullName -split '/')[0] } | Where-Object { $_ } | Sort-Object -Unique)
+      if ($roots.Count -ne 1) { throw "Candidate package does not contain one package root: $zipPath" }
+      $packageName = [string]$roots[0]
+    } finally { $candidateArchive.Dispose() }
   }
   if (-not (Test-Path -LiteralPath $zipPath)) {
     throw "Validation package not found: $zipPath"

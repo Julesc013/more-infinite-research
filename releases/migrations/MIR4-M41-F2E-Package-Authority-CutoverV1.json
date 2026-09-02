@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2EPackageAuthorityCutoverV1",
+  "recorded_at": "2026-09-02T16:33:43.9911770+10:00",
+  "programme_id": "M41-F2E-PACKAGE-AUTHORITY-CUTOVER",
+  "change_id": "MIR4-CHG-2026-0013",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json",
+    "sha256": "5F903C65AC56D3BD715F2F624A0C8D39B93BD2227066C403085609CF1405D7B8"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "cc211688e247a439baaf92466a628cba7dcb0b55",
+    "tree": "7f5647c2c304d34c9278738d234753c229a98572"
+  },
+  "canonical_authority": {
+    "path": "targets/package-authority.json",
+    "schema": "spec/schemas/mir4-canonical-package-authority-v1.schema.json",
+    "record_sha256": "68B877DEA44243A665A14FF417ED8469FC6EF340D2A32A8C12D83E44C12E7472"
+  },
+  "superseded_pre_cutover_bindings": [
+    {"path":".mir/assurance.json","historical_sha256":"D954093615638F0AD80D0D0750222CA2596BEABCF66C2CDB2DCB7357E1BC3C85","hash_mode":"canonical-text-v1"},
+    {"path":".mir/control-plane/ownership.json","historical_sha256":"DC79E1FA705F3B91F9D02608D99D6D01508C9518613143DEB737570B16DE091B","hash_mode":"canonical-text-v1"},
+    {"path":".mir/control/paths.yml","historical_sha256":"A7BC4032FD36196173B0D5CB3470DC149F80308A698426F6E0D780DC022C90DC","hash_mode":"canonical-text-v1"},
+    {"path":".mir/modules.yml","historical_sha256":"F6F744CE1C0DA808D4DC4876773223F4F0567259F227EB978C305CBDC4507ED2","hash_mode":"canonical-text-v1"},
+    {"path":"CHANGELOG.md","historical_sha256":"383E05313D70F970904637E899C71805BD366FC737BEF20DED429F0E2B4FFE5A","hash_mode":"canonical-text-v1"},
+    {"path":"docs/architecture/module-boundaries.md","historical_sha256":"4BCCFC1AF2117E67D79CCD46426D657840D1735C5C44C7B2E13CD2F35C49A1EB","hash_mode":"canonical-text-v1"},
+    {"path":"docs/releases/mir4-post-4.0-roadmap.md","historical_sha256":"2838A3CBD49330E5AACB6EF33128E34D8FA03ACF491BFD556B2ABECC18DA391C","hash_mode":"canonical-text-v1"},
+    {"path":"releases/governance/MIR4-Source-Changelog-PlanV1.json","historical_sha256":"C622EAC6C29CCC6C2F2F9AC02D699E83ABD3184671DE4AA0C4B98499A1033AD9","hash_mode":"canonical-text-v1"},
+    {"path":"scripts/Invoke-MIRReleaseTargetedGate.ps1","historical_sha256":"11E3BF18749F1832580A39BC4CE67ED8319E1A5A98C851DADDF759FF2481F569","hash_mode":"canonical-text-v1"},
+    {"path":"scripts/Invoke-MIRValidation.ps1","historical_sha256":"1557245C4F005B16A7A70921AD8EE31EF8B963D45E5619DB8D6CA8E86F21130A","hash_mode":"canonical-text-v1"},
+    {"path":"spec/programmes/mir4-4x-operating-programme-v1.json","historical_sha256":"D7DEA468CEA134AF3BBA1A60D25E195FE51F060679BD0787F379E1C5C55A149A","hash_mode":"canonical-text-v1"},
+    {"path":"spec/schemas/mir4-4x-operating-programme-v1.schema.json","historical_sha256":"52BF1DBE20184E6F633A414585EBE251A5A44B69716679107ABD8535B6DF8A0C","hash_mode":"canonical-text-v1"},
+    {"path":"spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json","historical_sha256":"19F67262260CEBE4BA687800FB27741BC8A1A9735A9FA64EB091A1D2C55C549B","hash_mode":"canonical-text-v1"},
+    {"path":"spec/schemas/mir4-package-composition-result-v1.schema.json","historical_sha256":"BBA1ED5BF1E6EE7DB057836C384BB7BFAD866D40C8743B4E4357BE4BB8C69D34","hash_mode":"canonical-text-v1"},
+    {"path":"spec/schemas/mir4-package-source-manifest-v1.schema.json","historical_sha256":"1E727FD13A348E2F15570301CB757D3BA145C1F87B9FFD815BED7C34E754150F","hash_mode":"canonical-text-v1"},
+    {"path":"spec/schemas/mir4-target-registry-v1.schema.json","historical_sha256":"01069F4C1C6365FB9C583171FF9321292E72B83B63A0CFEF8E889C6C7B3EA6DA","hash_mode":"canonical-text-v1"},
+    {"path":"src/mod/package-source.json","historical_sha256":"3F320DAC4A361872702B340329D1DBF5088FA702ECB20741DE316C8D8D8C84BC","hash_mode":"canonical-text-v1"},
+    {"path":"targets/f100/overlay.json","historical_sha256":"7B99E7B3E16BA7A761F41CA6B3097D155ED6A7C53A223D3E5F808C0FBEC16FA2","hash_mode":"canonical-text-v1"},
+    {"path":"targets/f110/overlay.json","historical_sha256":"D28EB96E2A1C11A2653BC5E5D057F8311F47C83CBA0055D495A14840B98A232A","hash_mode":"canonical-text-v1"},
+    {"path":"targets/f200/overlay.json","historical_sha256":"8D1957B13177E67841DC6E4B943C45338CDA30AD21A23AB258CC05452FE87989","hash_mode":"canonical-text-v1"},
+    {"path":"targets/f210/overlay.json","historical_sha256":"8FED7D017E06F2D02634C492DC8042ED57AB9C766A868E18BCE967E160BE88DF","hash_mode":"canonical-text-v1"},
+    {"path":"targets/registry.json","historical_sha256":"D03CFED985D262D0B9C94C0A2C4DC5D97308EAC0F913117539A8A3D447CB7252","hash_mode":"canonical-text-v1"},
+    {"path":"tests/repository/Test-MIR4RepositoryFixedPoint.ps1","historical_sha256":"75447C32E56F83C8F401C3CD9F72393E0B66B1BDB0AC68635B7D502583CB6180","hash_mode":"canonical-text-v1"},
+    {"path":"todo.md","historical_sha256":"24177C81CB9CFAE65A13DB1F34D50D4F13EF161271B709D97C902CA33AC5141B","hash_mode":"canonical-text-v1"},
+    {"path":"tools/lib/mir4/PreFreezeRelease.ps1","historical_sha256":"6525971E714CF7701486C4D487006B660E9F2C3C34F4063DDA420B128595B0D4","hash_mode":"canonical-text-v1"},
+    {"path":"tools/mir.ps1","historical_sha256":"E43ABB13E0D6E6FBDA2A4B633C45FCFA855F5D5A4F460FB91AA6B0305D5BB0B7","hash_mode":"canonical-text-v1"},
+    {"path":"tools/mir/application/package/TargetMaterializer.ps1","historical_sha256":"CF5A13ADDF1730D04A28F1D8ECD91821FC2688104A6D0C1B97CAB50612AEB17E","hash_mode":"canonical-text-v1"},
+    {"path":"tools/mir/cli/Invoke-MIR4PackageSource.ps1","historical_sha256":"3718599189115243C82F66CEB7C99660B7079C38B0C2BFBAA0390F8AF50276F1","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests.yml","historical_sha256":"55BAB987E9EC6AB9EFBB01A41A8A691D7A366C84D48FBE4E7BB777A43838551D","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests/mir4/Test-MIR4EditableSourceMaterializer.ps1","historical_sha256":"66F6BF6F2EED37DDDA235BC1EA3BAFB404B35E431C009800E9FF4039E775CD08","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1","historical_sha256":"126A514013382ACDCEB7EADEB89157C81D72670FC2F1274AE299879A842F3E40","hash_mode":"canonical-text-v1"},
+    {"path":"validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1","historical_sha256":"7256C5DF723256F685D429589D4C23BC0056CE4E36D19DC117E67CACBBCB6EF2","hash_mode":"canonical-text-v1"}
+  ],
+  "verification": {
+    "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",
+    "legacy_root_projection_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+    "four_target_parity": {
+      "record_sha256": "4BFB9208F643851E6AE0D76B751370C62749106E1646A7D7DE23E06F8C972430",
+      "file_sha256": "30F5622BCAD4E1B2342239BDA5EB884B3111D43BA701C87838774460297ED842",
+      "external_path": "mir4/m41-f2e/cc211688e247a439baaf92466a628cba7dcb0b55/four-target-parity.json",
+      "custody_manifest_sha256": "BCFBE0827D48007FB703474CA226E86FBA0BAC6455EE22AD9AF774A6B2154888"
+    },
+    "targets": [
+      {"target":"f210","distribution_version":"4.0.21000","content_sha256":"CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED","entry_count":305},
+      {"target":"f200","distribution_version":"4.0.20000","content_sha256":"5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F","entry_count":303},
+      {"target":"f110","distribution_version":"4.0.11000","content_sha256":"B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682","entry_count":174},
+      {"target":"f100","distribution_version":"4.0.10000","content_sha256":"1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2","entry_count":174}
+    ],
+    "writer_inventory": {"sole_current_writer":"tools/mir/application/package/TargetMaterializer.ps1","ordinary_facade":"tools/commands/package/Build-MIRPackage.ps1","bootstrap_writer":"historical-compatibility-only"},
+    "reader_inventory": {"generic_package_identity":"canonical-src-mod-plus-targets","legacy_root_projection":"explicit-read-only-compatibility"},
+    "rollback": {"state":"ready","commit":"cc211688e247a439baaf92466a628cba7dcb0b55","tree":"7f5647c2c304d34c9278738d234753c229a98572"}
+  },
+  "invariants": {
+    "one_current_writer": true,
+    "four_target_baseline_reconstruction": true,
+    "runtime_replay_precedes_cutover": true,
+    "target_identity_separated_from_candidate_version": true,
+    "generated_packages_below_build_packages": true,
+    "root_projection_writer_authority": false,
+    "root_projection_retirement_pending": true,
+    "public_release_bytes_immutable": true
+  },
+  "transition_gate": {
+    "package_cutover": true,
+    "old_writer_retirement": true,
+    "documentation_cutover": false,
+    "bridge_retirement": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M41-05B-DOCUMENTATION-CUTOVER",
+  "status": "M41-F2E-PACKAGE-SOURCE-CUTOVER-COMPLETE"
+}

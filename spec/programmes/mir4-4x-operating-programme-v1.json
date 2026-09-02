@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-02T15:02:00+10:00",
+  "recorded_at": "2026-09-02T16:40:00+10:00",
   "objective": "Complete MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
   "permanent_invariants": [
     "one semantic source",
@@ -26,9 +26,9 @@
     {"id": "M41-04", "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition", "completion_boundary": "4.1.0", "depends_on": ["M41-02"], "state": "complete"},
     {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "completion_boundary": "4.1.0", "depends_on": ["M41-04"], "state": "complete"},
     {"id": "M41-05", "outcome": "Route package-excluded documentation, then separate repository and package landing pages after package characterization", "completion_boundary": "4.1.0", "depends_on": ["M41-03"], "state": "active"},
-    {"id": "M42-00", "outcome": "Establish one package source, deterministic overlays, one materializer, and four independently generated targets", "completion_boundary": "4.1.0", "depends_on": ["M41-03", "M41-06"], "state": "active"},
-    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI, one implementation per command, and one release engine", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "blocked-dependency"},
-    {"id": "M42-02", "outcome": "Perform only reviewable behavior-preserving Lua decomposition behind characterized mutation boundaries", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "blocked-dependency"},
+    {"id": "M42-00", "outcome": "Establish one package source, deterministic overlays, one materializer, and four independently generated targets", "completion_boundary": "4.1.0", "depends_on": ["M41-03", "M41-06"], "state": "complete"},
+    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI, one implementation per command, and one release engine", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "queued"},
+    {"id": "M42-02", "outcome": "Perform only reviewable behavior-preserving Lua decomposition behind characterized mutation boundaries", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "queued"},
     {"id": "M43-00", "outcome": "Admit integration-kernel and built-in ecosystem capabilities through exact contracts", "completion_boundary": "4.2.0", "depends_on": ["M42-01", "M42-02"], "state": "blocked-dependency"},
     {"id": "M44-00", "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation", "completion_boundary": "4.3.0", "depends_on": ["M43-00"], "state": "blocked-dependency"},
     {"id": "M45-00", "outcome": "Allocate a coherent external product outcome only when evidence supports it", "completion_boundary": "4.4.0+", "depends_on": ["M44-00"], "state": "blocked-dependency"},
@@ -36,7 +36,7 @@
   ],
   "package_fixed_point": {
     "work_package": "M42-00",
-    "phase": "M41-F2D",
+    "phase": "M41-F2E",
     "target_results": [
       {"target": "f210", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json"},
       {"target": "f200", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json"},
@@ -45,7 +45,8 @@
     ],
     "aggregate": "complete",
     "next_target": null,
-    "package_cutover": "ready"
+    "package_cutover": "complete",
+    "cutover_receipt": "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json"
   },
   "outcome_trains": [
     {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},

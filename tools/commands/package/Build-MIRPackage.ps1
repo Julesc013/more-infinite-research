@@ -1,95 +1,37 @@
 param(
-  [string]$OutputDir = "dist",
-  [ValidateSet("Fastest", "NoCompression", "Optimal")]
-  [string]$CompressionLevel = "Optimal"
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
+  [ValidateSet('f210','f200','f110','f100')]
+  [string]$Target = 'f210',
+  [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')]
+  [string]$CandidateId = 'MIR4-ORDINARY-BUILD',
+  [string]$SourceVersion,
+  [string]$DistributionVersion,
+  [string]$OutputDir = 'build/packages/ordinary',
+  [ValidateSet('Optimal')]
+  [string]$CompressionLevel = 'Optimal'
 )
 
-$ErrorActionPreference = "Stop"
-
-$repo = Resolve-Path (Join-Path $PSScriptRoot "../../..")
-. (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
-$infoPath = Join-Path $repo "info.json"
-$info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
-
-$packageName = "$($info.name)_$($info.version)"
-$buildRoot = Join-Path $repo "build\package"
-$packageRoot = Join-Path $buildRoot $packageName
-$outputRoot = Join-Path $repo $OutputDir
-$zipPath = Join-Path $outputRoot "$packageName.zip"
-$tempZipPath = Join-Path $buildRoot "$packageName.new.zip"
-
-Add-Type -AssemblyName System.IO.Compression
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-
-$fixedTimestamp = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
-$compression = [System.IO.Compression.CompressionLevel]::$CompressionLevel
-
-if (Test-Path -LiteralPath $packageRoot) {
-  Remove-Item -LiteralPath $packageRoot -Recurse -Force
+$ErrorActionPreference = 'Stop'
+$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+$allowedRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build/packages'))
+$outputRoot = if ([IO.Path]::IsPathRooted($OutputDir)) {
+  [IO.Path]::GetFullPath($OutputDir)
+} else {
+  [IO.Path]::GetFullPath((Join-Path $repo $OutputDir))
 }
-New-Item -ItemType Directory -Force -Path $packageRoot | Out-Null
-New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
-
-foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo) {
-  $source = Join-Path $repo $relative
-  $destination = Join-Path $packageRoot $relative
-  $parent = Split-Path -Parent $destination
-  if (-not (Test-Path -LiteralPath $parent)) {
-    New-Item -ItemType Directory -Force -Path $parent | Out-Null
-  }
-  Copy-Item -LiteralPath $source -Destination $destination
+$prefix = $allowedRoot.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+if ($outputRoot -cne $allowedRoot -and -not $outputRoot.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase)) {
+  throw "[mir4-package-output-authority] Package output must remain below build/packages: $outputRoot"
 }
 
-if (Test-Path -LiteralPath $tempZipPath) {
-  Remove-Item -LiteralPath $tempZipPath -Force
-}
+. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+$result = New-MIR4TargetPackage `
+  -RepoRoot $repo `
+  -Target $Target `
+  -CandidateId $CandidateId `
+  -SourceVersion $SourceVersion `
+  -DistributionVersion $DistributionVersion `
+  -OutputRoot $outputRoot
 
-$fileStream = [System.IO.File]::Open($tempZipPath, [System.IO.FileMode]::CreateNew)
-$archive = [System.IO.Compression.ZipArchive]::new(
-  $fileStream,
-  [System.IO.Compression.ZipArchiveMode]::Create,
-  $false
-)
-try {
-  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $repo | Sort-Object)) {
-    $entryName = ($packageName + "/" + $relative.Replace("\", "/"))
-    $entry = $archive.CreateEntry($entryName, $compression)
-    $entry.LastWriteTime = $fixedTimestamp
-    $entry.ExternalAttributes = 0
-    $output = $entry.Open()
-    try {
-      $sourcePath = Join-Path $repo $relative
-      if (Test-MIRTextFingerprintPath -RelativePath $relative) {
-        $text = [System.IO.File]::ReadAllText($sourcePath).Replace("`r`n", "`n").Replace("`r", "`n")
-        $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($text)
-        $output.Write($bytes, 0, $bytes.Length)
-      } else {
-        $input = [System.IO.File]::OpenRead($sourcePath)
-        try {
-          $input.CopyTo($output)
-        } finally {
-          $input.Dispose()
-        }
-      }
-    } finally {
-      $output.Dispose()
-    }
-  }
-} finally {
-  $archive.Dispose()
-  $fileStream.Dispose()
-}
-
-if ((Test-Path -LiteralPath $zipPath) -and
-  (Get-MIRFileSha256 -Path $zipPath) -eq (Get-MIRFileSha256 -Path $tempZipPath)) {
-  Remove-Item -LiteralPath $tempZipPath -Force
-  Write-Host "Built $zipPath (unchanged)"
-  return
-}
-
-if (Test-Path -LiteralPath $zipPath) {
-  Remove-Item -LiteralPath $zipPath -Force
-}
-Move-Item -LiteralPath $tempZipPath -Destination $zipPath
-
-Write-Host "Built $zipPath"
+Write-Host "Built $([string]$result.archive_path)"
+$result

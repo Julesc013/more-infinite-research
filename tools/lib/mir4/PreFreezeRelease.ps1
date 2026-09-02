@@ -639,6 +639,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-runtime-replay-harness-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-f210-runtime-replay-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json'
+    'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json' = 'contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -800,13 +801,52 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = [string]$link.path
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $f2eReceiptPath = 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $f2eReceiptPath) -PathType Leaf) {
+    $f2e = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $f2eReceiptPath -Kind 'MIR4M41F2EPackageAuthorityCutoverV1'
+    if ([string]$f2e.predecessor_receipt.path -cne $priorReceiptPath -or
+        [string]$f2e.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
+      throw '[mir4-prefreeze-f2e-predecessor]'
+    }
+    $supersededPaths = @{}
+    foreach ($binding in @($f2e.superseded_pre_cutover_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or
+          [string]$authorityHashes[$path] -cne [string]$binding.historical_sha256 -or
+          [string]$binding.hash_mode -cne [string]$authorityHashModes[$path] -or
+          $supersededPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-f2e-superseded-binding] $path"
+      }
+      [void]$authorityHashes.Remove($path)
+      [void]$authorityHashModes.Remove($path)
+      $supersededPaths[$path] = $true
+    }
+    if (-not [bool]$f2e.transition_gate.package_cutover -or
+        -not [bool]$f2e.transition_gate.old_writer_retirement -or
+        @($f2e.transition_gate.PSObject.Properties | Where-Object {
+          $_.Name -notin @('package_cutover','old_writer_retirement') -and [bool]$_.Value
+        }).Count -ne 0) {
+      throw '[mir4-prefreeze-f2e-transition-boundary]'
+    }
+    $priorReceiptPath = $f2eReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)
     $hashMode = if($authorityHashModes.ContainsKey([string]$binding.Key)){[string]$authorityHashModes[[string]$binding.Key]}else{'raw-bytes'}
     if (-not (Test-Path -LiteralPath $full -PathType Leaf) -or
         (Get-MIR4PreFreezeFileSha256 -Path $full -Mode $hashMode) -cne [string]$binding.Value) {
-      throw "[mir4-prefreeze-current-authority-binding] $($binding.Key)"
+      $currentBindingSha256 = if (Test-Path -LiteralPath $full -PathType Leaf) {
+        Get-MIR4PreFreezeFileSha256 -Path $full -Mode $hashMode
+      } else {
+        'ABSENT'
+      }
+      $staleAuthorityBindings += "$([string]$binding.Key)|$([string]$binding.Value)|$currentBindingSha256|$hashMode"
     }
+  }
+  if ($staleAuthorityBindings.Count -ne 0) {
+    throw "[mir4-prefreeze-current-authority-binding] $(@($staleAuthorityBindings | Sort-Object) -join ',')"
   }
   $review = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json' -Kind 'MIR4IndependentReadinessAcceptanceLunaV1'
   if ([string]$review.verdict -cne 'ACCEPTED-RELEASE-READINESS' -or [bool]$review.maintainer_acceptance) {

@@ -2994,6 +2994,34 @@
       ]
     },
     {
+      "id": "static.mir4-package-authority-m41-f2e",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "src/mod/**",
+        "targets/**",
+        "spec/schemas/mir4-canonical-package-authority-v1.schema.json",
+        "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+        "spec/schemas/mir4-target-registry-v1.schema.json",
+        "spec/schemas/mir4-target-overlay-v1.schema.json",
+        "spec/schemas/mir4-package-composition-result-v1.schema.json",
+        "spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json",
+        "contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json",
+        "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "tools/mir/application/package/PackageAuthorityVerifier.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/commands/package/Build-MIRPackage.ps1",
+        "tools/commands/mir4/New-MIR4TargetProductSet.ps1",
+        "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
+        "validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",

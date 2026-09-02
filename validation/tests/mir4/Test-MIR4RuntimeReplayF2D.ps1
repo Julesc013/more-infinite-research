@@ -80,7 +80,12 @@ foreach ($required in @("ValidateSet('f200','f110','f100')",'mir4-m41-f2d-target
 $programmePath = Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json'
 Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $programmePath) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-f2d-programme-schema'
 $programme = Get-Content -Raw -LiteralPath $programmePath | ConvertFrom-Json -Depth 40
-Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:complete|f100:complete' -and $null -eq $programme.package_fixed_point.next_target -and [string]$programme.package_fixed_point.aggregate -ceq 'complete' -and [string]$programme.package_fixed_point.package_cutover -ceq 'ready') 'mir4-f2d-programme-target-state'
+Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:complete|f100:complete' -and
+  $null -eq $programme.package_fixed_point.next_target -and
+  [string]$programme.package_fixed_point.aggregate -ceq 'complete' -and
+  [string]$programme.package_fixed_point.phase -ceq 'M41-F2E' -and
+  [string]$programme.package_fixed_point.package_cutover -ceq 'complete' -and
+  [string]$programme.package_fixed_point.cutover_receipt -ceq 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json') 'mir4-f2d-programme-target-state'
 $aggregateWriter = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1')
 $aggregateVerifier = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1')
 foreach ($required in @('M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-PASSED-NO-CUTOVER','M41F2DTargetRuntimeReplayTargets','RuntimeReplayAggregateVerifier.ps1','package_cutover=$false','publication=$false')) { Assert-MIR4F2D ($aggregateWriter.Contains($required)) "mir4-f2d-aggregate-writer-$required" }

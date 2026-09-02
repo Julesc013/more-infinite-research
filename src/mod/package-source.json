@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4PackageSourceManifestV1",
   "materializer_abi": "mir4-target-materializer/1",
-  "source_state": "editable-shadow-source-no-package-cutover",
+  "source_state": "canonical-editable-package-source",
   "baseline_record_sha256": "A9CFA8C4F8E799BD1B543EB8F2EC7DACF136730A098CC71D8206A9F83AB6AB8A",
   "source_roots": [
     "src/mod/common",
@@ -6251,7 +6251,7 @@
     "one_binding_per_layer_path": true,
     "historical_archives_not_production_inputs": true,
     "no_target_full_source_copy": true,
-    "package_cutover_pending": true
+    "package_cutover_complete": true
   },
-  "record_sha256": "0A291BA7EC59857BB3663A69D30FBCD62BE864B2829D37506C294B0D5B62DE33"
+  "record_sha256": "573296B0952C831FCD6D0BD4D59E9B4614147C72231F024897B331079D6F1FA8"
 }

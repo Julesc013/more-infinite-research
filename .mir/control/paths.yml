@@ -2,7 +2,9 @@ schema: 1
 authority: mir-repository-paths-v1
 
 paths:
-  package.root: .
+  package.root: src/mod
+  package.targets: targets
+  package.generated: build/packages
   mir4.package-presentation.current: spec/distribution/mir4-package-presentation-baseline-v1.json
   mir4.package-presentation.current-schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
   mir4.package-presentation.compatibility-reader: tools/lib/mir4/PackagePresentation.ps1
@@ -69,6 +71,9 @@ paths:
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
   mir4.package-source.editable-source-manifest: src/mod/package-source.json
   mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+  mir4.package-source.canonical-authority: targets/package-authority.json
+  mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v1.schema.json
+  mir4.package-source.canonical-authority-application: tools/mir/application/package/PackageAuthority.ps1
   mir4.package-source.target-registry: targets/registry.json
   mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v1.schema.json
   mir4.package-source.target-support-policy: targets/support-policy.json
@@ -81,6 +86,11 @@ paths:
   mir4.package-source.editable-source-materializer-authority-evolution: releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json
   mir4.package-source.editable-source-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json
   mir4.package-source.editable-source-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1
+  mir4.package-source.f2e-authority: targets/package-authority.json
+  mir4.package-source.f2e-verifier: tools/mir/application/package/PackageAuthorityVerifier.ps1
+  mir4.package-source.f2e-receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
+  mir4.package-source.f2e-receipt-schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
+  mir4.package-source.f2e-proof: validation/tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

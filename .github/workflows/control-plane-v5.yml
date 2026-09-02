@@ -110,9 +110,13 @@ jobs:
           if ($expectedSource -ne $env:MIR_CP_SOURCE_REF) { throw "Qualification-source commit mismatch." }
           if ((git -C source rev-parse HEAD).Trim() -ne $env:MIR_CP_SOURCE_REF) { throw "Source checkout mismatch." }
           ./tools/commands/control/Invoke-MIRControlPlane.ps1 package-freeze -AllLocks | Out-Host
-      - name: Build exact candidate from immutable package source
+      - id: package-build
+        name: Build exact candidate from immutable package source
         shell: pwsh
-        run: ./source/tools/commands/package/Build-MIRPackage.ps1 -OutputDir ../build/results/candidate
+        run: |
+          $targetKey = switch ('${{ inputs.target }}') { '2.1' {'f210'} '2.0' {'f200'} '1.1' {'f110'} '1.0' {'f100'} default { throw 'Unsupported target.' } }
+          $result = ./source/tools/commands/package/Build-MIRPackage.ps1 -RepoRoot source -Target $targetKey -CandidateId MIR4-CONTROL-PLANE -OutputDir build/packages/control-plane
+          "archive=$([string]$result.archive_path)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - id: export
         name: Materialize context and exact environment matrix
         shell: pwsh
@@ -123,7 +127,7 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
           $record = Get-Content -Raw -LiteralPath ".mir/releases/records/$env:MIR_CP_RELEASE.json" | ConvertFrom-Json
-          $candidate = Join-Path "build/results/candidate" (Split-Path -Leaf ([string]$record.package.archive))
+          $candidate = '${{ steps.package-build.outputs.archive }}'
           $result = ./tools/commands/control/New-MIRVerificationContext.ps1 -Mode $env:MIR_CP_MODE -Target $env:MIR_CP_TARGET `
             -Release $env:MIR_CP_RELEASE -Stage release -CandidatePath $candidate -SourceRepoRoot source -FactorioBin $env:FACTORIO_BIN -OutputRoot build/results/verification-context |
             ConvertFrom-Json

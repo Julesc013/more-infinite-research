@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "kind": "MIR4CanonicalPackageAuthorityV1",
+  "status": "current-f2e-package-source-cutover",
+  "materializer_abi": "mir4-target-materializer/1",
+  "editable_source_root": "src/mod",
+  "target_authority_root": "targets",
+  "generated_output_root": "build/packages",
+  "source_manifest": {
+    "path": "src/mod/package-source.json",
+    "record_sha256": "573296B0952C831FCD6D0BD4D59E9B4614147C72231F024897B331079D6F1FA8"
+  },
+  "target_registry": {
+    "path": "targets/registry.json",
+    "record_sha256": "9470BC8F42783B27D97CD6098D5B727ACFF77AC145DE6C5E38AD046C9EFDD614"
+  },
+  "support_policy": {
+    "path": "targets/support-policy.json",
+    "record_sha256": "295AEE9AA10A44A807D28D4F3B688D0AF92AAD9EC8E62553D7A14D8FF9808467"
+  },
+  "versioning_authority": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-Versioning-and-Distribution-Identity-ADRv2.json",
+    "file_sha256": "6D77470A74595442782742E0CB86B1F6CE8715D642DB6AFE68703B25AFBB37A5"
+  },
+  "targets": [
+    {
+      "target": "f210",
+      "target_id": "factorio-2.1",
+      "distribution_target_code": "210",
+      "baseline_source_version": "4.0.0",
+      "baseline_distribution_version": "4.0.21000",
+      "baseline_content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+      "baseline_entry_count": 305
+    },
+    {
+      "target": "f200",
+      "target_id": "factorio-2.0",
+      "distribution_target_code": "200",
+      "baseline_source_version": "4.0.0",
+      "baseline_distribution_version": "4.0.20000",
+      "baseline_content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+      "baseline_entry_count": 303
+    },
+    {
+      "target": "f110",
+      "target_id": "factorio-1.1",
+      "distribution_target_code": "110",
+      "baseline_source_version": "4.0.0",
+      "baseline_distribution_version": "4.0.11000",
+      "baseline_content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "baseline_entry_count": 174
+    },
+    {
+      "target": "f100",
+      "target_id": "factorio-1.0",
+      "distribution_target_code": "100",
+      "baseline_source_version": "4.0.0",
+      "baseline_distribution_version": "4.0.10000",
+      "baseline_content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "baseline_entry_count": 174
+    }
+  ],
+  "writer": {
+    "implementation": "tools/mir/application/package/TargetMaterializer.ps1",
+    "public_facade": "tools/mir.ps1 mir4 package-source materialize",
+    "ordinary_build_facade": "tools/commands/package/Build-MIRPackage.ps1",
+    "sole_current_writer": true
+  },
+  "legacy_root_projection": {
+    "writer_authority": false,
+    "official_package_authority": false,
+    "compatibility_state": "read-only-controlled-transition",
+    "retirement_required": true
+  },
+  "transition_gate": {
+    "package_cutover": true,
+    "old_writer_retirement": true,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "record_sha256": "68B877DEA44243A665A14FF417ED8469FC6EF340D2A32A8C12D83E44C12E7472"
+}
