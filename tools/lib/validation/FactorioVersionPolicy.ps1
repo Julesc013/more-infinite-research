@@ -195,18 +195,46 @@ function Get-MIR4FixedFactorioEngineLock {
   $releasePath = Join-Path $repo $releaseRelative
   if (Test-Path -LiteralPath $releasePath -PathType Leaf) {
     $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json -Depth 100
-    $releaseEngine = [string]$release.package.factorio_engine
-    $releaseBuild = [string]$release.package.factorio_engine_build
-    $releaseSha256 = [string]$release.package.factorio_engine_sha256
-    if (-not [string]::IsNullOrWhiteSpace($releaseEngine) -or
-        -not [string]::IsNullOrWhiteSpace($releaseBuild) -or
-        -not [string]::IsNullOrWhiteSpace($releaseSha256)) {
+    $packageProperties = $release.package.PSObject.Properties
+    $releaseEngine = if ($null -ne $packageProperties['factorio_engine']) { [string]$packageProperties['factorio_engine'].Value } else { '' }
+    $releaseBuild = if ($null -ne $packageProperties['factorio_engine_build']) { [string]$packageProperties['factorio_engine_build'].Value } else { '' }
+    $releaseSha256 = if ($null -ne $packageProperties['factorio_engine_sha256']) { [string]$packageProperties['factorio_engine_sha256'].Value } else { '' }
+    $releaseEngineFields = @($releaseEngine,$releaseBuild,$releaseSha256 | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+    if ($releaseEngineFields.Count -gt 0) {
+      if ($releaseEngineFields.Count -ne 3) { throw "Fixed Factorio release engine identity is incomplete for $Target." }
       if ($releaseEngine -cne $expectedVersion -or $releaseSha256 -cne $expectedSha256 -or [string]::IsNullOrWhiteSpace($releaseBuild)) {
         throw "Fixed Factorio release and target authorities disagree for $Target."
       }
       $fileVersion = $releaseBuild
       $authorityPaths.Add($releaseRelative.Replace('\\','/'))
     }
+  }
+  if ([string]::IsNullOrWhiteSpace($fileVersion)) {
+    $observationRelative = '.mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json'
+    $observationSchemaRelative = 'spec/schemas/mir4-bootstrap-engine-availability-observation.schema.json'
+    $observationPath = Join-Path $repo $observationRelative
+    $observationSchemaPath = Join-Path $repo $observationSchemaRelative
+    if (-not (Test-Path -LiteralPath $observationPath -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $observationSchemaPath -PathType Leaf) -or
+        -not ((Get-Content -Raw -LiteralPath $observationPath) | Test-Json -SchemaFile $observationSchemaPath)) {
+      throw "Fixed Factorio engine availability observation is invalid for $Target."
+    }
+    $observation = Get-Content -Raw -LiteralPath $observationPath | ConvertFrom-Json -Depth 100
+    $observationTarget = @($observation.targets | Where-Object target_key -eq $Target)
+    if ($observationTarget.Count -ne 1) { throw "Fixed Factorio engine availability observation is not unique for $Target." }
+    $observationTarget = $observationTarget[0]
+    $build = [int]$observationTarget.required_engine.build
+    if ([string]$observationTarget.lock_label -cne $baselineVersion -or
+        [string]$observationTarget.required_engine.version -cne $expectedVersion -or
+        [string]$observationTarget.required_engine.executable_sha256 -cne $expectedSha256 -or
+        -not [bool]$observationTarget.comparison.exact_lock_match -or
+        [string]$observationTarget.lock_state -cne 'exact-lock-match' -or
+        $build -le 0) {
+      throw "Fixed Factorio availability observation and target authorities disagree for $Target."
+    }
+    $fileVersion = "$expectedVersion.$build"
+    $authorityPaths.Add($observationRelative)
+    $authorityPaths.Add($observationSchemaRelative)
   }
   return [pscustomobject][ordered]@{
     target = $Target

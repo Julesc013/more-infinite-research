@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0010",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Passed the exact Factorio 1.1 F2D runtime replay and bound the historical build observation.",
+  "details": [
+    "The shared fixed-engine resolver now treats optional fields in older release records explicitly and binds F110 to the accepted 1.1.110.62357 availability observation without weakening its executable digest lock.",
+    "The newly materialized 4.0.11000 F110 package passed its exact-package smoke scenario and the 1.9.9 base-default upgrade through first and second reloads.",
+    "Independent verification and external custody passed before expanded work was released; F100 and the four-target aggregate remain pending and every cutover and release gate remains false."
+  ],
+  "semantic_domains": ["engine-lock", "package-boundary", "runtime-validation", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The accepted F210 replay receipt remains byte-stable and its moving experimental-channel policy is unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"The accepted F200 replay receipt remains byte-stable."},
+    {"target":"F110","disposition":"unaffected","reason":"Exact Factorio 1.1.110 replay proved the newly materialized accepted 4.0.11000 product without a player-package change."},
+    {"target":"F100","disposition":"unaffected","reason":"The package-excluded engine-lock correction is generic; independent F100 replay remains pending."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"include","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"docs/maintainer/mir4-f2d-runtime-replay.md"},
+    {"kind":"release-record","value":"releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json"}
+  ]
+}

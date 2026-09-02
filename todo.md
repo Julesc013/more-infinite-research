@@ -29,14 +29,14 @@ Status: `active`. MIR 4.1 completes the repository, package, tooling, test, docu
 
 ## M42-00 package fixed point
 
-Phase: `M41-F2D`. Aggregate: `pending`. Next target: `f110`. Package cutover: `blocked`.
+Phase: `M41-F2D`. Aggregate: `complete`. Next target: `pending`. Package cutover: `ready`.
 
 | Target | Runtime replay | Receipt |
 | --- | --- | --- |
 | `f210` | `complete` | `releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json` |
 | `f200` | `complete` | `releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json` |
-| `f110` | `pending` | pending |
-| `f100` | `pending` | pending |
+| `f110` | `complete` | `releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json` |
+| `f100` | `complete` | `releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json` |
 
 ## Moving engine-channel obligations
 
