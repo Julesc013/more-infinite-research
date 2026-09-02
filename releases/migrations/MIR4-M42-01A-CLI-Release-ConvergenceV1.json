@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4201ACliReleaseConvergenceV1",
+  "status": "M42-01A-CLI-RELEASE-CONVERGENCE-COMPLETE",
+  "recorded_at": "2026-09-02T20:00:00+10:00",
+  "programme_id": "M42-01A-CLI-RELEASE-CONVERGENCE",
+  "change_id": "MIR4-CHG-2026-0015",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+    "sha256": "C96002AD0596DF72589FC7516D82C84CBC86ADF5A043CE33BB0462BF24E1CB98"
+  },
+  "base": {
+    "commit": "c4597569a3a5499172d39ef814a80bbb0a9d8978",
+    "tree": "d8f10537f5655c53565374eb14f02ea213df4271"
+  },
+  "command_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "0382F863FC3849A3C737F6B6201FAF9F841150FCA77A930B92C8DFC65801FB0A",
+    "digest": "sha256:43198a45623ff96f2ee7fdd942617e5c48e3f7490991c9671eb217936588318a",
+    "command_count": 85,
+    "implementation_file_count": 471,
+    "unknown_count": 0,
+    "duplicate_command_keys": 0
+  },
+  "release_application_dag": {
+    "path": "governance/release/mir4-release-application-dag-v1.json",
+    "sha256": "75E3C4F3366FD07D4EBA6492F2ED2477EE85AC065C5340BA8AD761ACCED40F86",
+    "status": "M42-01-RELEASE-APPLICATION-DAG-PASSED",
+    "node_count": 16,
+    "publisher_can_build": false,
+    "production_authorized": false
+  },
+  "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",
+  "authorities": [
+    {
+      "path": "tools/mir.ps1",
+      "sha256": "7FB9CD18BB557ABA66FBA301637660A012F085A9574CC059C6677041367AE0CA",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "sha256": "2C35CE376A05EBD89E87347B54BA22F0BD5D577BDE7DC63E6D89767F425826EC",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
+      "sha256": "D39BE21798E36E53AB3736D8FBB391711CF206559147A437897225954DCEB5DC",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
+      "sha256": "8452761605C5088AF60A4EFE8BBFDA950FD22E66BF5FF5DF93B1EF7337016326",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseApplicationDag.ps1",
+      "sha256": "6B5238280D91FE3E5CB98EE9D77DCD984E314DCD07962F468643BF833184BE94",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/tooling/CommandInventory.ps1",
+      "sha256": "B29A081BC21EC057B22D3A1E61946D3BA7BBC5DCFA5D14B973E9A94D895DD01E",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1",
+      "sha256": "37810F66B1023D162A955B05516AA093AC66341D1CDC200A3F7AD56ECB6817A4",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+      "sha256": "FECB62355A5E37EA3CA33F9D52F3B36F99BD01011FA7E7C0E341156479BB101A",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "sha256": "13D11E533DB4FD8FE21CA188415E0CCA217FCFFF94260FF05832F45D5C9B904F",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "invariants": {
+    "one_public_cli": true,
+    "one_command_route_per_key": true,
+    "one_release_application_dag": true,
+    "publisher_cannot_build": true,
+    "independent_verifier_separate": true,
+    "player_executable_sources_unchanged": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "promotion": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-01B-TEST-WORKFLOW-CONVERGENCE",
+  "record_sha256": "CB0585DC96B18D19A86E457B338A8A41D28962D478ED1E6C743506538F5BE642"
+}

@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "kind": "MIR4ReleaseApplicationDagV1",
+  "status": "M42-01-NON-PRODUCTION-CANONICAL",
+  "engine": {
+    "contract": ".mir/releases/waves/mir4-r0/MIR4-Release-Phase-Engine-ContractV1.json",
+    "implementation": "tools/lib/mir4/ReleasePhaseEngine.ps1",
+    "application": "tools/mir/application/release/ReleaseApplicationDag.ps1",
+    "production_capable": false,
+    "production_authorized": false
+  },
+  "nodes": [
+    {"id":"release-intent","depends_on":[],"executor":"application","phase":null,"mutation":"none"},
+    {"id":"source-freeze","depends_on":["release-intent"],"executor":"phase-engine","phase":"source-freeze","mutation":"rehearsal-only"},
+    {"id":"affected-targets","depends_on":["source-freeze"],"executor":"application","phase":null,"mutation":"none"},
+    {"id":"target-build","depends_on":["affected-targets"],"executor":"phase-engine","phase":"target-build","mutation":"attempt-root-only"},
+    {"id":"focused-qualification","depends_on":["target-build"],"executor":"phase-engine","phase":"target-qualification","mutation":"attempt-root-only"},
+    {"id":"preview-assets","depends_on":["target-build"],"executor":"phase-engine","phase":"preview-assets","mutation":"attempt-root-only"},
+    {"id":"candidate-qualification","depends_on":["focused-qualification","preview-assets"],"executor":"application","phase":null,"mutation":"none"},
+    {"id":"manual-acceptance","depends_on":["candidate-qualification"],"executor":"application","phase":null,"mutation":"none"},
+    {"id":"protected-qualification","depends_on":["manual-acceptance"],"executor":"phase-engine","phase":"independent-verification","mutation":"attempt-root-only"},
+    {"id":"seal-rehearsal","depends_on":["protected-qualification"],"executor":"phase-engine","phase":"release-seal","mutation":"rehearsal-only"},
+    {"id":"promotion-rehearsal","depends_on":["seal-rehearsal"],"executor":"phase-engine","phase":"promotion","mutation":"rehearsal-only"},
+    {"id":"tag-rehearsal","depends_on":["promotion-rehearsal"],"executor":"application","phase":null,"mutation":"none"},
+    {"id":"publication-rehearsal","depends_on":["tag-rehearsal"],"executor":"phase-engine","phase":"target-publication","mutation":"rehearsal-only"},
+    {"id":"public-readback-rehearsal","depends_on":["publication-rehearsal"],"executor":"phase-engine","phase":"public-readback","mutation":"rehearsal-only"},
+    {"id":"restore","depends_on":["public-readback-rehearsal"],"executor":"phase-engine","phase":"restore-drill","mutation":"attempt-root-only"},
+    {"id":"reporting","depends_on":["restore"],"executor":"application","phase":null,"mutation":"none"}
+  ],
+  "publisher": {
+    "node": "publication-rehearsal",
+    "allowed_capabilities": ["verify-sealed-input","rehearse-publication","emit-attempt-local-receipt"],
+    "forbidden_capabilities": ["build","source-checkout","package-compose","sign","tag","publish-production"]
+  },
+  "independent_verifier": {
+    "node": "protected-qualification",
+    "implementation": "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",
+    "dependency_minimal": true,
+    "separate_from_build": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "promotion": false,
+    "publication": false
+  }
+}

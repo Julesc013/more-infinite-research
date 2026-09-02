@@ -1510,7 +1510,10 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
   $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1")
-  $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\mir.ps1")
+  $mirCliText = @(
+    Get-Content -Raw -LiteralPath (Join-Path $repo "tools\mir.ps1")
+    Get-Content -Raw -LiteralPath (Join-Path $repo "tools\mir\cli\Invoke-MIRCommandRouter.ps1")
+  ) -join "`n"
   $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\Console.ps1")
   $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\RunContext.ps1")
   $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\cli\EventLog.ps1")

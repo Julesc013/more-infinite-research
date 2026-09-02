@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-command-inventory-v1.schema.json",
+  "type": "object",
+  "required": ["schema","kind","state","public_entrypoint","command_count","commands","implementation_files","summary","digest"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CommandInventoryV1"},
+    "state": {"const": "M42-01-CANONICAL"},
+    "public_entrypoint": {"const": "tools/mir.ps1"},
+    "command_count": {"type": "integer","minimum": 1},
+    "commands": {"type": "array","minItems": 1},
+    "implementation_files": {"type": "array","minItems": 1},
+    "summary": {
+      "type": "object",
+      "required": ["canonical_public","unknown","duplicate_command_keys"],
+      "properties": {
+        "canonical_public": {"const": 1},
+        "unknown": {"const": 0},
+        "duplicate_command_keys": {"const": 0}
+      }
+    },
+    "digest": {"type": "string","pattern": "^sha256:[0-9a-f]{64}$"}
+  },
+  "additionalProperties": true
+}
