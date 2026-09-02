@@ -3022,6 +3022,30 @@
       ]
     },
     {
+      "id": "static.mir4-documentation-cutover-m41-05b",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./validation/tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "README.md",
+        ".mir/docs.yml",
+        "docs/reference/generated/**",
+        "targets/*/generation/README.md.template",
+        "targets/*/generation/changelog.txt.template",
+        "changes/unreleased/MIR4-CHG-2026-0014.json",
+        "contracts/repository/mir4-m41-05b-documentation-cutover-v1.schema.json",
+        "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "tools/commands/docs/Update-MIRPipelineDocumentation.ps1",
+        "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
+        "tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "validation/tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",

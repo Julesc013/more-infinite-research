@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 436 pages as of 2026-09-02.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 438 pages as of 2026-09-02.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -225,6 +225,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/generated/mir4-platform-component-matrix.md | MIR 4 Platform Component Matrix | current | developer | reference | mir-maintainers | 2026-08-24 |
 | docs/reference/generated/mir4-whole-platform-matrix.md | MIR 4 Whole Platform Matrix | current | developer | reference | mir-maintainers | 2026-08-27 |
 | docs/reference/generated/README.md | Generated Reference Views | current | maintainer | reference | mir-maintainers | 2026-08-03 |
+| docs/reference/generated/runtime-pipeline.md | Generated Runtime Pipeline | current | maintainer | reference | mir-maintainers | 2026-09-02 |
+| docs/reference/generated/stream-defaults.md | Generated Stream Defaults | current | player | reference | mir-maintainers | 2026-09-02 |
 | docs/reference/generated/technology-quality-and-promotion.md | Technology Quality And Promotion Inventory | current | maintainer | reference | mir-maintainers | 2026-08-18 |
 | docs/reference/glossary.md | Glossary | draft | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | current | developer | reference | mir-maintainers | 2026-08-21 |

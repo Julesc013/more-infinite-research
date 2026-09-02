@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4105BDocumentationCutoverV1",
+  "status": "M41-05B-DOCUMENTATION-CUTOVER-COMPLETE",
+  "recorded_at": "2026-09-02T18:20:00+10:00",
+  "programme_id": "M41-05B-DOCUMENTATION-CUTOVER",
+  "change_id": "MIR4-CHG-2026-0014",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json",
+    "sha256": "C78618600A8185DB774D480932F34A444112155C11B7209C5F9ABFB1A1BC54C9"
+  },
+  "base": {
+    "commit": "fed9ae76cdb99b1dcfacfaf263f612d9c6f01a31",
+    "tree": "15b2df204cac33121000c36b741738ebfc611237"
+  },
+  "repository_landing": {
+    "path": "README.md",
+    "sha256": "403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20",
+    "bytes": 7676,
+    "maximum_bytes": 12288,
+    "package_visible": false
+  },
+  "generated_references": [
+    {
+      "path": "docs/reference/generated/runtime-pipeline.md",
+      "source": "prototypes/mir/pipeline/commands.lua",
+      "sha256": "E66A0C30D06E46C0E833FC8FDE77E51F6B16CA798BDB4AB22FC8EA7CB21F9594",
+      "package_visible": false
+    },
+    {
+      "path": "docs/reference/generated/stream-defaults.md",
+      "source": "prototypes/mir/settings/defaults.lua",
+      "sha256": "9A9A1594D1D4A81E42E95D53997483BABFA76006E8C2E98F0F86547373573FF9",
+      "package_visible": false
+    }
+  ],
+  "baseline_package_documents": [
+    {
+      "target": "f210",
+      "readme_path": "targets/f210/generation/README.md.template",
+      "readme_sha256": "1CB4566E6786977E6042C3A66047E2B654B95C8613585346CB19D7A195FA5DF0",
+      "changelog_path": "targets/f210/generation/changelog.txt.template",
+      "changelog_sha256": "26C3119272C8A368FF1B506635DBE8DC13C3965050FB57C965BA30AA1F0AB0CF",
+      "baseline_bytes_preserved": true
+    },
+    {
+      "target": "f200",
+      "readme_path": "targets/f200/generation/README.md.template",
+      "readme_sha256": "EC844A3599F5FBE1506DE5B884FE8A34AC0F8CE0C3614CA1EA0F00FCE0591E79",
+      "changelog_path": "targets/f200/generation/changelog.txt.template",
+      "changelog_sha256": "BCFE0627871B7BE3F05605754D8FF83A76B85B5562B458C154FF45950745192F",
+      "baseline_bytes_preserved": true
+    },
+    {
+      "target": "f110",
+      "readme_path": "targets/f110/generation/README.md.template",
+      "readme_sha256": "4C5C1D26928192E53F2C46A5E1976F2CF49CFFBC47D5F05749C859F0F3B6DC58",
+      "changelog_path": "targets/f110/generation/changelog.txt.template",
+      "changelog_sha256": "09E3AB61A906F8A4B096E8D84EA877C7CBE21A9B8DF48C1C19082969F0CB3051",
+      "baseline_bytes_preserved": true
+    },
+    {
+      "target": "f100",
+      "readme_path": "targets/f100/generation/README.md.template",
+      "readme_sha256": "9AFF4782A47FA1E56CDD2A355C737C239FD2D46FFD36A6FEBBF4B2B493581E01",
+      "changelog_path": "targets/f100/generation/changelog.txt.template",
+      "changelog_sha256": "90154DC0C5039738D7B117BF998A020F3FE90E9A762C6D18287628D22BCAAF24",
+      "baseline_bytes_preserved": true
+    }
+  ],
+  "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",
+  "programme_sha256": "1634C7E29CC039E665C5105E799651EB1F7FDED568C2FF6C09CA148861441245",
+  "evolved_bindings": [
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "36757482428B198AFB57123D0BDD3A70B029FAC77EB97D9E73DD0D2F11AA465E",
+      "current_sha256": "82BC08A0E8A0B06C0FDFCD1EBDADEB3883149A930F5BD7D8D921B042D0E977FF",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "F88C15D1D3022B2240F3604EA789BB587F510FFF2B967D3B0A682A078F2A129B",
+      "current_sha256": "1E19FA6C644D4F576729DC11477193C462707004A9180CB965C06DB3BF5AE4D9",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "5851012CC5E3310A20284A2202487D1B0CF30155DA19281EF708DDA1BE6A35DC",
+      "current_sha256": "BD031D46ED4EE2DF79A8301F9D7DFA48CE41C57C9C70456D2CEBCF9F58C5013B",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "DD826426801B1E7291326F931FBC31E7814B6D11E5FFDE536C0C44902EF44108",
+      "current_sha256": "B390C41747349BBD8C199605E9300E62B263222105C8A9DBDF47BE8440559C2B",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "2E4CF8F92C6B067E4922ABCF80599966C5AC99535C26D5AF0A7759550BBB6519",
+      "current_sha256": "FFBD2651E2F27B0CA386C5591A611AD276416A6E9C760664E753E601CF48046B",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "mir.lock",
+      "previous_sha256": "654BB1A91D33825C5308B77892EC1BFA9E4148278075C397492140BE802932F3",
+      "current_sha256": "267782F1F3FBD4C792E9C45850B334953CB02951637E5FE214831EE87F4AFE3A",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "README.md",
+      "previous_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+      "current_sha256": "403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "AFEC35742C22691BB6C1E1407193FC97E1CF270B406AF8F33BA9112BFD1DD6FE",
+      "current_sha256": "D5E4AD6468B97E79A603CC3326D7B9D07E94AA411C22805609A43FD804A0AE10",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/continuity-bundle-template.json",
+      "previous_sha256": "37516F8D427AC8E6E4E7D15CA718D0C846AD192B17CFDE0531C007B41D982352",
+      "current_sha256": "5BC2B8398F4DC754B3DC59AECF2060687A7379257678E1B6C4681C25BD53A450",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "A9C78929B862FF3E3E6268CA494B5702ABC4BB4EF5839204F5599F66DD42D6FD",
+      "current_sha256": "1C24278BA48A7B7170B6F2A4348EAA3A4EF8028F8B84693DE5BA9B8FBAF7EED8",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "E1CB65E48286ADC0B59E0A2CC77320BEBD6F17C19297570616E3F37033D678D8",
+      "current_sha256": "2C4188D2D843D9D96F0CB5A0074B761A8E88442D59689AB340A51134938EADE2",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/merge-law-catalogue.json",
+      "previous_sha256": "EC717111C5FE63EF90A9035DB8F91773676DE84910861E1FEDCD7329F3271BD8",
+      "current_sha256": "7DD6C44528EDCDC60F8531141AFC3C1E18B5CBBD8FF022C9BCC8FC8E9B851628",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/migration-graph-matrix.json",
+      "previous_sha256": "AC9AF55B9395E9642E85C6FBBF501D7A3E7991597EE148F36A912286B0757F46",
+      "current_sha256": "6D06895B1E27E380D8998DA844B3CEAA198AB3C64F9321D387BA12BFB5B40E8A",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "729F62D339ABD5E384DDAA633491AB2203733EB160E45795196114C2AE552F79",
+      "current_sha256": "36FDDB8CFC0327CCC80DB25A8492775E857FF90022F6B2D26875A6A24C09F503",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1",
+      "previous_sha256": "005E124D7D156F61D2252A392E52484F59AE550454D40CEC6C86AB1BF66D2428",
+      "current_sha256": "798F6BFBF4FE91EF2A1D097A7B0C9E3F307C26797B23656B3831030D36BE5680",
+      "hash_mode": "canonical-text-v1",
+      "reason": "Advance the current package-excluded documentation and preview projections through the M41-05B fixed point.",
+      "scope": "package-excluded-documentation-cutover",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "1EDC7B9794DFD6B5A0BFE9579E099260EC2850FA96F7CEF4D167D19C41DCD7EF",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-source-changelog",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0014.json",
+      "sha256": "3584C6AE8FFC4F54C44A3382283CC858F2B09FCE61C7629231583D8EAF6AC979",
+      "hash_mode": "canonical-text-v1",
+      "role": "documentation-cutover-change-fact",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "contracts/repository/mir4-m41-05b-documentation-cutover-v1.schema.json",
+      "sha256": "16EEE94142F876376F4B9BDDED1D506D66630E130105B75B19850BB74F9C3729",
+      "hash_mode": "canonical-text-v1",
+      "role": "documentation-cutover-schema",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/runtime-pipeline.md",
+      "sha256": "E66A0C30D06E46C0E833FC8FDE77E51F6B16CA798BDB4AB22FC8EA7CB21F9594",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-runtime-pipeline",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/reference/generated/stream-defaults.md",
+      "sha256": "9A9A1594D1D4A81E42E95D53997483BABFA76006E8C2E98F0F86547373573FF9",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-stream-defaults",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "sha256": "EAA05C2CF9F34E365D03C3658035F920255DCEE83C0E6E94078A54AEBC4CEE3F",
+      "hash_mode": "canonical-text-v1",
+      "role": "source-changelog-plan",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "sha256": "1634C7E29CC039E665C5105E799651EB1F7FDED568C2FF6C09CA148861441245",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-operating-programme",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "sha256": "AE702557F98917E7455DF803CF73C7049FFC0147CBD271B4BE95505F33FCB550",
+      "hash_mode": "canonical-text-v1",
+      "role": "generated-operating-queue",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/docs/Update-MIRPipelineDocumentation.ps1",
+      "sha256": "3BE18CF5DC739D893B654E5306D7A9CF842C0963AC42B6E7ECD5BA99C05079BD",
+      "hash_mode": "canonical-text-v1",
+      "role": "runtime-pipeline-writer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
+      "sha256": "87922202A809FA95A8FFE3AFDB94BC8943D68F36E7BD4D7CD68363A78255BC04",
+      "hash_mode": "canonical-text-v1",
+      "role": "stream-default-writer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1",
+      "sha256": "F7B22A4E64C57CE468701051A25A512F7ECC627959872E79957D7F101BF40BDE",
+      "hash_mode": "canonical-text-v1",
+      "role": "documentation-cutover-receipt-writer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "sha256": "1A0E3AB6A717CCC6BE32FE4360D7612ACA28BA97016EA13AD9E7C7E5F19E5FA8",
+      "hash_mode": "canonical-text-v1",
+      "role": "append-only-authority-validator",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "sha256": "3A2301D8C2EAA4FCD64AF1A7B616D31184FE08170E4AE01A506DA2AFB901B465",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-repository-characterization",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "sha256": "A107658ADC6D31978276C160D54D369BEEAD990991A5C9202F0503BB827230B3",
+      "hash_mode": "canonical-text-v1",
+      "role": "executable-test-catalogue",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/compiler/Test-MIRSettingsVisibility.ps1",
+      "sha256": "EA8029F778A9071FEEC4EC2BE0611B4C1D857702AB00C909190F80BDAA105409",
+      "hash_mode": "canonical-text-v1",
+      "role": "stream-default-conformance",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
+      "sha256": "D831267A0E367348BC7D8FDAE95F13CCD65D15964CD4F96499664C439ED68158",
+      "hash_mode": "canonical-text-v1",
+      "role": "documentation-cutover-conformance",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "sha256": "7FF1200F98D0E9E972E25CF69F3E828A2CC3B599FD0B7DB53399AE0258E38225",
+      "hash_mode": "canonical-text-v1",
+      "role": "historical-custody-and-current-succession-conformance",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "sha256": "13D151E0712CF4DBD8CED99AB69402C89A88747453EE6A9C4921D11C19F808CB",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-repository-characterization-conformance",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "invariants": {
+    "root_readme_package_excluded": true,
+    "repository_and_package_docs_separate": true,
+    "historical_4_0_package_docs_preserved": true,
+    "source_changelog_generated": true,
+    "target_changelog_generated_from_release_inventory": true,
+    "player_executable_sources_unchanged": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE",
+  "record_sha256": "41DA3E5346D719AB36279EDA535ACD9E193E03F4C9DC64B7903B6594654B3C5B"
+}

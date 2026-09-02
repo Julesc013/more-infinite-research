@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/mir4/m41-05b-documentation-cutover-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","status","recorded_at","programme_id","change_id","predecessor_receipt","base","repository_landing","generated_references","baseline_package_documents","package_source_sha256","programme_sha256","evolved_bindings","current_authorities","invariants","transition_gate","next_fixed_point","record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4105BDocumentationCutoverV1"},
+    "status": {"const": "M41-05B-DOCUMENTATION-CUTOVER-COMPLETE"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-05B-DOCUMENTATION-CUTOVER"},
+    "change_id": {"const": "MIR4-CHG-2026-0014"},
+    "predecessor_receipt": {
+      "type":"object","additionalProperties":false,"required":["path","sha256"],
+      "properties":{"path":{"const":"releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json"},"sha256":{"pattern":"^[A-F0-9]{64}$"}}
+    },
+    "base": {
+      "type": "object", "additionalProperties": false, "required": ["commit","tree"],
+      "properties": {"commit":{"pattern":"^[a-f0-9]{40}$"},"tree":{"pattern":"^[a-f0-9]{40}$"}}
+    },
+    "repository_landing": {
+      "type": "object", "additionalProperties": false, "required": ["path","sha256","bytes","maximum_bytes","package_visible"],
+      "properties": {"path":{"const":"README.md"},"sha256":{"pattern":"^[A-F0-9]{64}$"},"bytes":{"type":"integer","minimum":1,"maximum":12288},"maximum_bytes":{"const":12288},"package_visible":{"const":false}}
+    },
+    "generated_references": {
+      "type":"array","minItems":2,"maxItems":2,
+      "items":{"type":"object","additionalProperties":false,"required":["path","source","sha256","package_visible"],"properties":{
+        "path":{"enum":["docs/reference/generated/runtime-pipeline.md","docs/reference/generated/stream-defaults.md"]},
+        "source":{"enum":["prototypes/mir/pipeline/commands.lua","prototypes/mir/settings/defaults.lua"]},
+        "sha256":{"pattern":"^[A-F0-9]{64}$"},"package_visible":{"const":false}
+      }}
+    },
+    "baseline_package_documents": {
+      "type":"array","minItems":4,"maxItems":4,
+      "items":{"type":"object","additionalProperties":false,"required":["target","readme_path","readme_sha256","changelog_path","changelog_sha256","baseline_bytes_preserved"],"properties":{
+        "target":{"enum":["f210","f200","f110","f100"]},"readme_path":{"type":"string"},"readme_sha256":{"pattern":"^[A-F0-9]{64}$"},
+        "changelog_path":{"type":"string"},"changelog_sha256":{"pattern":"^[A-F0-9]{64}$"},"baseline_bytes_preserved":{"const":true}
+      }}
+    },
+    "package_source_sha256":{"const":"632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"},
+    "programme_sha256":{"pattern":"^[A-F0-9]{64}$"},
+    "evolved_bindings":{
+      "type":"array","minItems":15,"items":{"type":"object","additionalProperties":false,"required":["path","previous_sha256","current_sha256","hash_mode","reason","scope","package_visible","release_authority"],"properties":{
+        "path":{"type":"string"},"previous_sha256":{"pattern":"^[A-F0-9]{64}$"},"current_sha256":{"pattern":"^[A-F0-9]{64}$"},"hash_mode":{"const":"canonical-text-v1"},
+        "reason":{"type":"string","minLength":8},"scope":{"const":"package-excluded-documentation-cutover"},"package_visible":{"const":false},"release_authority":{"const":false}
+      }}
+    },
+    "current_authorities":{
+      "type":"array","minItems":10,"items":{"type":"object","additionalProperties":false,"required":["path","sha256","hash_mode","role","package_visible","release_authority"],"properties":{
+        "path":{"type":"string"},"sha256":{"pattern":"^[A-F0-9]{64}$"},"hash_mode":{"const":"canonical-text-v1"},"role":{"type":"string","minLength":4},
+        "package_visible":{"const":false},"release_authority":{"const":false}
+      }}
+    },
+    "invariants":{
+      "type":"object","additionalProperties":false,"required":["root_readme_package_excluded","repository_and_package_docs_separate","historical_4_0_package_docs_preserved","source_changelog_generated","target_changelog_generated_from_release_inventory","player_executable_sources_unchanged"],
+      "properties":{"root_readme_package_excluded":{"const":true},"repository_and_package_docs_separate":{"const":true},"historical_4_0_package_docs_preserved":{"const":true},"source_changelog_generated":{"const":true},"target_changelog_generated_from_release_inventory":{"const":true},"player_executable_sources_unchanged":{"const":true}}
+    },
+    "transition_gate":{
+      "type":"object","additionalProperties":false,"required":["version_allocation","tagging","signing","sealing","publication"],
+      "properties":{"version_allocation":{"const":false},"tagging":{"const":false},"signing":{"const":false},"sealing":{"const":false},"publication":{"const":false}}
+    },
+    "next_fixed_point":{"const":"M42-01-TOOLING-TEST-WORKFLOW-CONVERGENCE"},
+    "record_sha256":{"pattern":"^[A-F0-9]{64}$"}
+  }
+}

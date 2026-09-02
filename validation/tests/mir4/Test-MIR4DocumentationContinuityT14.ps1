@@ -3,13 +3,12 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 
-$before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authorityPath=Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json'
 $authorityText=Get-Content -Raw -LiteralPath $authorityPath
 if(-not($authorityText|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'))){throw '[mir4-t14-authority-schema]'}
 $authority=$authorityText|ConvertFrom-Json -Depth 100
 if([string]$authority.package_source_fingerprint_before-cne'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'-or
-  [string]$authority.package_source_fingerprint_after-cne$before-or(@($authority.package_visible_delta)-join'|')-cne'README.md'-or
+  [string]$authority.package_source_fingerprint_after-cne'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'-or(@($authority.package_visible_delta)-join'|')-cne'README.md'-or
   -not$authority.player_executable_sources_unchanged-or-not$authority.one_emitter_preserved-or
   $authority.source_freeze_authorized-or$authority.signing_or_sealing_authorized-or$authority.promotion_authorized-or$authority.publication_authorized){
   throw '[mir4-t14-package-and-authority-boundary]'
@@ -39,7 +38,7 @@ foreach($term in @('MIR 4.0 Whole-Platform Genesis','4.0.21000','4.0.20000','sta
   if($readme-notmatch[regex]::Escape($term)){throw "[mir4-t14-readme-contract] $term"}
 }
 $agents=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'AGENTS.md')
-if($agents-notmatch'dev.*origin/dev'-or$agents-notmatch'one emitter'-or$agents-notmatch'package-source parity'){throw '[mir4-t14-agent-continuity]'}
+if($agents-notmatch'main.*dev'-or$agents-notmatch'one emitter'-or$agents-notmatch'package-source parity'){throw '[mir4-t14-agent-continuity]'}
 $runbook=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'RELEASE-RUNBOOK.md')
 foreach($phase in @('source freeze','target build','target qualification','preview assets','independent verification','release seal','promotion','target publication','public readback','restore drill')){
   if($runbook-notmatch[regex]::Escape($phase)){throw "[mir4-t14-release-phase] $phase"}

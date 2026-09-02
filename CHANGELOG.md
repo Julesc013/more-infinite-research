@@ -35,6 +35,10 @@
   - src/mod and targets now own editable source, stable target identity, overlays, and target policy; mutable distribution versions are projected at construction time.
   - TargetMaterializer is the sole current writer, ordinary builds remain below build/packages, and the prior bootstrap writer is fenced as explicit historical compatibility.
   - All four accepted 4.0 content trees reconstruct deterministically after the independent F2D runtime replay; rollback remains bound to the exact pre-cutover dev commit and tree.
+- Separated repository and player-package documentation authorities. [MIR4-CHG-2026-0014]
+  - The root README is now a concise package-excluded repository landing page with current target, support, installation, diagnostic, developer, and rolling Factorio 2.1 policy routing.
+  - Generated runtime-pipeline and stream-default references moved under docs/reference/generated and remain checked against their executable authorities.
+  - The four target-owned README and changelog templates remain exact immutable 4.0 reconstruction inputs while release narratives retain sole authority for future source and target changelog projections.
 
 ### Features
 
