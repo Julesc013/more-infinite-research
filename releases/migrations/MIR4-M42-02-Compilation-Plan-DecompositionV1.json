@@ -46,9 +46,25 @@
       "release_authority": false
     },
     {
+      "path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "BD3374A8F0900403FD9F0774CAA088E0E1C8A9523E6EE30ACE75356A58AE75D7",
+      "current_sha256": "1FC1FBA23DA656051DBDEBF4492275B22F06B496C3A63F7CBDAF745BA3EF30A1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
-      "current_sha256": "B954AE3C880EC13113F7D60ED49033E30796298254FACE62E5013587289F517A",
+      "current_sha256": "4CD8F5FDF0A228A0E21C430F87813485B5A33A9E091DED405C45F02EF39B120F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "previous_sha256": "3A2301D8C2EAA4FCD64AF1A7B616D31184FE08170E4AE01A506DA2AFB901B465",
+      "current_sha256": "BB3B325149D52CB14DBA0478B1D070155936BDA760800445EE7A85526D25F689",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -58,6 +74,24 @@
       "previous_sha256": "514D66D65F55F9F8FA95832285DE34BC110952202AEBA87223C6812E04BED1D1",
       "current_sha256": "6C1FCE904525AEF1E9F2D6477E7157F2ADB3DF720D7D29A548890127F400DF08",
       "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "contracts/release/mir4-release-narrative-result-v1.schema.json",
+      "sha256": "4BB57FCA89D5DE38372D622D2E6C10F3AF19DCDFC8E41F3ADCB8AC71D16EFB8F",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-release-narrative-result-contract",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseNarratives.ps1",
+      "sha256": "F6247CEDC697AF54C4C1C87CEFECCEED31329EF595101BDC9873C1382965926B",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-release-narrative-application-service",
       "package_visible": false,
       "release_authority": false
     }
@@ -273,5 +307,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-L2-BASE-CONTINUATIONS",
-  "record_sha256": "9929C3E42B40511947A9E14D6C3AB831A0DECB89B31F3ADC8C9105BF10A73869"
+  "record_sha256": "68200C8D0C286FEDD645E043306147520F9EA5D0236DBC2B0BEB594592EBD50D"
 }

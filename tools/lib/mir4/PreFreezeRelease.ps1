@@ -997,11 +997,27 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $evolvedPaths[$path] = $true
     }
-    if ($evolvedPaths.Count -ne 6 -or
+    if ($evolvedPaths.Count -ne 8 -or
         [string]$compilationPlan.responsibility -cne 'compilation-plan' -or
         [string]$compilationPlan.status -cne 'M42-02-L1-COMPILATION-PLAN-DECOMPOSED') {
       throw '[mir4-prefreeze-m42-02-scope]'
     }
+    $currentPaths = @{}
+    foreach ($binding in @($compilationPlan.current_authorities)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and
+          [string]$authorityHashes[$path] -cne [string]$binding.sha256 -and
+          -not $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-current-authority-evolution-missing] $path"
+      }
+      if ([bool]$binding.package_visible -or [bool]$binding.release_authority -or $currentPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-current-authority-boundary] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $currentPaths[$path] = $true
+    }
+    if ($currentPaths.Count -ne 2) { throw '[mir4-prefreeze-m42-02-current-authority-count]' }
     foreach ($property in $compilationPlan.transition_gate.PSObject.Properties) {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-transition] $($property.Name)" }
     }

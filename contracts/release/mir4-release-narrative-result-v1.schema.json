@@ -19,7 +19,7 @@
     "checks": {"type": "object", "additionalProperties": false, "required": ["authority", "determinism", "target_filtering", "public_copy", "factorio_format", "package_non_interference", "unknown_dispositions"], "properties": {
       "authority": {"const": "passed"}, "determinism": {"const": "passed"}, "target_filtering": {"const": "passed"}, "public_copy": {"const": "passed"}, "factorio_format": {"const": "passed"}, "package_non_interference": {"const": "passed"}, "unknown_dispositions": {"const": 0}
     }},
-    "package_source_sha256": {"const": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"},
+    "package_source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "package_visible_delta": {"const": []},
     "transition_gate": {"type": "object", "additionalProperties": false, "required": ["merge", "tagging", "signing", "sealing", "version_allocation", "publication"], "properties": {"merge": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "version_allocation": {"const": false}, "publication": {"const": false}}},
     "result_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
