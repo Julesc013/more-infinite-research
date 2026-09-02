@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-02T14:41:14+10:00",
+  "recorded_at": "2026-09-02T15:02:00+10:00",
   "objective": "Complete MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
   "permanent_invariants": [
     "one semantic source",
@@ -43,9 +43,9 @@
       {"target": "f110", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json"},
       {"target": "f100", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json"}
     ],
-    "aggregate": "pending",
+    "aggregate": "complete",
     "next_target": null,
-    "package_cutover": "blocked"
+    "package_cutover": "ready"
   },
   "outcome_trains": [
     {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},

@@ -29,7 +29,7 @@ Status: `active`. MIR 4.1 completes the repository, package, tooling, test, docu
 
 ## M42-00 package fixed point
 
-Phase: `M41-F2D`. Aggregate: `pending`. Next target: `pending`. Package cutover: `blocked`.
+Phase: `M41-F2D`. Aggregate: `complete`. Next target: `pending`. Package cutover: `ready`.
 
 | Target | Runtime replay | Receipt |
 | --- | --- | --- |

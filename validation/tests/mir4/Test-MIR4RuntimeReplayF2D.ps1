@@ -5,7 +5,7 @@ function Assert-MIR4F2D([bool]$Condition,[string]$Code) { if (-not $Condition) {
 $files = @(
   'tools/mir/application/package/RuntimeReplay.ps1','tools/mir/application/package/RuntimeReplayVerifier.ps1',
   'tools/mir/cli/Invoke-MIR4PackageSource.ps1','validation/tests/runtime/Test-MIRUpgrade.ps1',
-  'validation/tests/runtime/Test-MIRUpgradeMatrix.ps1','tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1','tools/mir.ps1'
+  'validation/tests/runtime/Test-MIRUpgradeMatrix.ps1','tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1','tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1','tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1','tools/mir.ps1'
 )
 foreach ($relative in $files) {
   $tokens=$null;$errors=$null
@@ -39,6 +39,8 @@ Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $schema | ConvertFrom-Json) -ne $
 $targetReceiptSchema = Join-Path $RepoRoot 'contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json'
 $targetReceiptSchemaRecord = Get-Content -Raw -LiteralPath $targetReceiptSchema | ConvertFrom-Json
 Assert-MIR4F2D ($targetReceiptSchemaRecord -ne $null -and [int]$targetReceiptSchemaRecord.properties.current_authorities.minItems -eq 1) 'mir4-f2d-target-receipt-schema-json'
+$aggregateReceiptSchema = Join-Path $RepoRoot 'contracts/repository/mir4-m41-f2d-four-target-runtime-replay-aggregate-v1.schema.json'
+Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $aggregateReceiptSchema | ConvertFrom-Json) -ne $null) 'mir4-f2d-aggregate-receipt-schema-json'
 $coordinator = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/package/RuntimeReplay.ps1')
 foreach ($required in @('TargetMaterializer.ps1','Invoke-MIRValidation.ps1','Test-MIRUpgradeMatrix.ps1','RuntimeReplayVerifier.ps1','custody-precleanup.json','resource-receipt.json')) { Assert-MIR4F2D ($coordinator.Contains($required)) "mir4-f2d-compose-$required" }
 Assert-MIR4F2D ($coordinator.Contains("'-ScenarioWorker'") -and $coordinator.Contains("runtime.exact-zip/`$scenarioName") -and -not $coordinator.Contains("'-Tier','smoke'")) 'mir4-f2d-exact-zip-worker-composition'
@@ -78,7 +80,15 @@ foreach ($required in @("ValidateSet('f200','f110','f100')",'mir4-m41-f2d-target
 $programmePath = Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json'
 Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $programmePath) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-f2d-programme-schema'
 $programme = Get-Content -Raw -LiteralPath $programmePath | ConvertFrom-Json -Depth 40
-Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:complete|f100:complete' -and $null -eq $programme.package_fixed_point.next_target -and [string]$programme.package_fixed_point.aggregate -ceq 'pending' -and [string]$programme.package_fixed_point.package_cutover -ceq 'blocked') 'mir4-f2d-programme-target-state'
+Assert-MIR4F2D ((@($programme.package_fixed_point.target_results | ForEach-Object { "$($_.target):$($_.state)" }) -join '|') -ceq 'f210:complete|f200:complete|f110:complete|f100:complete' -and $null -eq $programme.package_fixed_point.next_target -and [string]$programme.package_fixed_point.aggregate -ceq 'complete' -and [string]$programme.package_fixed_point.package_cutover -ceq 'ready') 'mir4-f2d-programme-target-state'
+$aggregateWriter = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1')
+$aggregateVerifier = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1')
+foreach ($required in @('M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-PASSED-NO-CUTOVER','M41F2DTargetRuntimeReplayTargets','RuntimeReplayAggregateVerifier.ps1','package_cutover=$false','publication=$false')) { Assert-MIR4F2D ($aggregateWriter.Contains($required)) "mir4-f2d-aggregate-writer-$required" }
+foreach ($required in @('f210','f200','f110','f100','mir4-f2d-aggregate-receipt-chain','mir4-f2d-aggregate-evidence-redaction','mir4-f2d-aggregate-cross-target-substitution','old_writer_authoritative')) { Assert-MIR4F2D ($aggregateVerifier.Contains($required)) "mir4-f2d-aggregate-verifier-$required" }
+$aggregateReceiptPath = Join-Path $RepoRoot 'releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json'
+Assert-MIR4F2D ((Get-Content -Raw -LiteralPath $aggregateReceiptPath) | Test-Json -SchemaFile $aggregateReceiptSchema) 'mir4-f2d-aggregate-receipt-schema'
+$aggregateReceipt = Get-Content -Raw -LiteralPath $aggregateReceiptPath | ConvertFrom-Json -Depth 100
+Assert-MIR4F2D ([string]$aggregateReceipt.status -ceq 'M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-PASSED-NO-CUTOVER' -and (@($aggregateReceipt.verification.targets.target) -join '|') -ceq 'f210|f200|f110|f100' -and [string]$aggregateReceipt.verification.external_custody -ceq 'verified' -and @($aggregateReceipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-f2d-aggregate-receipt-result'
 $acceptedF200Receipt = Join-Path $RepoRoot 'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json'
 Assert-MIR4F2D ((Get-FileHash -LiteralPath $acceptedF200Receipt -Algorithm SHA256).Hash -ceq '079CCD4FC9B61A0D4CAB53F1DBE633D5FD142AC81441E95A3FF7D379E7086C9F') 'mir4-f2d-f200-accepted-receipt-byte-stable'
 foreach ($forbidden in @('git clean','package_cutover=$true','publication=$true','signing=$true','sealing=$true')) { Assert-MIR4F2D (-not $coordinator.Contains($forbidden)) "mir4-f2d-forbidden-$forbidden" }

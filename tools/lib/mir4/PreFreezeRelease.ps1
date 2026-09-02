@@ -363,7 +363,8 @@ function Get-MIR4PreFreezeAuthorityState {
     [switch]$IncludeM41F2CEditableSourceMaterializerAuthority,
     [switch]$IncludeM41F2DHarnessAuthority,
     [switch]$IncludeM41F2DF210RuntimeReplayAuthority,
-    [string[]]$M41F2DTargetRuntimeReplayTargets = @()
+    [string[]]$M41F2DTargetRuntimeReplayTargets = @(),
+    [switch]$IncludeM41F2DAggregateAuthority
   )
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
   $receipt = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' -Kind 'MIR4PostReadinessMergeReceiptSOL15V1'
@@ -531,6 +532,10 @@ function Get-MIR4PreFreezeAuthorityState {
     $links += @{path="releases/migrations/MIR4-M41-F2D-F$code-Runtime-Replay-Authority-EvolutionV1.json";kind='MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'}
     $acceptedF2DTargets.Add($target)
   }
+  if ($IncludeM41F2DAggregateAuthority) {
+    if ((@($acceptedF2DTargets) -join '|') -cne 'f200|f110|f100') { throw '[mir4-prefreeze-m41-f2d-aggregate-requires-four-targets]' }
+    $links += @{path='releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json';kind='MIR4M41F2DFourTargetRuntimeReplayAggregateV1'}
+  }
   foreach ($link in $links) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind
     if ([string]$evolution.predecessor_receipt.path -cne $priorReceiptPath -or
@@ -668,6 +673,12 @@ function Test-MIR4PreFreezeAuthorities {
   if ($lowerTargetReceiptPresence.f100 -and -not $lowerTargetReceiptPresence.f110) {
     throw '[mir4-prefreeze-lower-target-receipt-order] f100 requires f110'
   }
+  $aggregateReceiptPath = 'releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json'
+  $aggregateReceiptPresent = Test-Path -LiteralPath (Join-Path $repo $aggregateReceiptPath) -PathType Leaf
+  if ($aggregateReceiptPresent) {
+    if (-not $lowerTargetReceiptPresence.f100) { throw '[mir4-prefreeze-f2d-aggregate-requires-f100]' }
+    $schemas[$aggregateReceiptPath] = 'contracts/repository/mir4-m41-f2d-four-target-runtime-replay-aggregate-v1.schema.json'
+  }
   foreach ($entry in $schemas.GetEnumerator()) {
     $json = Get-Content -Raw -LiteralPath (Join-Path $repo $entry.Key)
     if (-not ($json | Test-Json -SchemaFile (Join-Path $repo $entry.Value))) { throw "[mir4-prefreeze-schema] $($entry.Key)" }
@@ -737,6 +748,9 @@ function Test-MIR4PreFreezeAuthorities {
         kind = 'MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1'
       }
     }
+  }
+  if ($aggregateReceiptPresent) {
+    $evolutionLinks += @{path=$aggregateReceiptPath;kind='MIR4M41F2DFourTargetRuntimeReplayAggregateV1'}
   }
   foreach ($link in $evolutionLinks) {
     $evolution = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $link.path -Kind $link.kind

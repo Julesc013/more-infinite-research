@@ -1,0 +1,389 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41F2DFourTargetRuntimeReplayAggregateV1",
+  "recorded_at": "2026-09-02T14:59:57.6834313+10:00",
+  "programme_id": "M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-AGGREGATE",
+  "change_id": "MIR4-CHG-2026-0012",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json",
+    "sha256": "03F214C9F0ED630D497D450C64B0E1000299E6763D18EBE3D1F64CE81936CE54"
+  },
+  "base": {
+    "branch": "dev",
+    "authority_base_commit": "f6cef04f90affb0acec8a82808fa57c412358976",
+    "authority_base_tree": "0b4ac7a6ca2aac7b299ab8a10cfc84b3d0a7da67",
+    "aggregation_commit": "bda137e5799696945ab9f1e59f548f7e781be469",
+    "aggregation_tree": "713bd61319444675e33e742af7071f9131e02834"
+  },
+  "evolved_bindings": [
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "7475DF19462911E0E6F962903FE8AB3F39AEB0CF595F2F5DA25DCD9D46B78C32",
+      "current_sha256": "383E05313D70F970904637E899C71805BD366FC737BEF20DED429F0E2B4FFE5A",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "ED7AD1B7A624FA8D16F0FFA7DF9CA8AA90DC90252D4BFD0C3AA89E88446B00E3",
+      "current_sha256": "2838A3CBD49330E5AACB6EF33128E34D8FA03ACF491BFD556B2ABECC18DA391C",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "79F29E2241447D31A085D7291AB7B0EB1B165E087E81D3A04F063EE3D72CDF84",
+      "current_sha256": "C622EAC6C29CCC6C2F2F9AC02D699E83ABD3184671DE4AA0C4B98499A1033AD9",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "0F5749438484ED4F2818E68C5DB0428A5F47EFCCED81D7E0DB765AC8AD2778D1",
+      "current_sha256": "D7DEA468CEA134AF3BBA1A60D25E195FE51F060679BD0787F379E1C5C55A149A",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "todo.md",
+      "previous_sha256": "A600AA91088D889E91EA08E0415888673D256EB8D85EE8E3566E895CB5619264",
+      "current_sha256": "24177C81CB9CFAE65A13DB1F34D50D4F13EF161271B709D97C902CA33AC5141B",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "ADC14F2EB82C8B172F58FAD14712EDAFEE8B5C2EAB7C4B4CBFCD2EE5C95BD0A4",
+      "current_sha256": "6525971E714CF7701486C4D487006B660E9F2C3C34F4063DDA420B128595B0D4",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "A503DA9CADBE00CAC222548B21AF0771A5150A0837A0B54CF9A67FBDB7C9450C",
+      "current_sha256": "126A514013382ACDCEB7EADEB89157C81D72670FC2F1274AE299879A842F3E40",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1",
+      "previous_sha256": "7D89514DBB134A9FE32C82938A6B4727C722CFE01877DF658948932F824D8838",
+      "current_sha256": "7256C5DF723256F685D429589D4C23BC0056CE4E36D19DC117E67CACBBCB6EF2",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0012.json",
+      "sha256": "CB393ADAE2AC171A904CC9004F9BE62D45C99ED95A31649C82C1956D47F72586",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current four-target runtime aggregate contract, implementation, proof, programme, or verification authority."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-f2d-four-target-runtime-replay-aggregate-v1.schema.json",
+      "sha256": "319B44963CDA09D16D2D4C6EFB8E8DBD7144DD67BC38339247887AF3F6B053BD",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current four-target runtime aggregate contract, implementation, proof, programme, or verification authority."
+    },
+    {
+      "path": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json",
+      "sha256": "03F214C9F0ED630D497D450C64B0E1000299E6763D18EBE3D1F64CE81936CE54",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current four-target runtime aggregate contract, implementation, proof, programme, or verification authority."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41F2DFourTargetRuntimeReplayAggregate.ps1",
+      "sha256": "128A308C266D597AAF87F345887F7BC1B1FEDB1A9969F75C27D98E19A0882AEF",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current four-target runtime aggregate contract, implementation, proof, programme, or verification authority."
+    },
+    {
+      "path": "tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1",
+      "sha256": "579B20FE52DAAD02D0D6B556D87957164E6C28769F7E3DA6384F2C9B5E514732",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current four-target runtime aggregate contract, implementation, proof, programme, or verification authority."
+    }
+  ],
+  "verification": {
+    "abi": "mir4-f2d-four-target-aggregate/1",
+    "target_order": [
+      "f210",
+      "f200",
+      "f110",
+      "f100"
+    ],
+    "targets": [
+      {
+        "target": "f210",
+        "receipt": {
+          "path": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json",
+          "sha256": "A690D41B0B37D4BAF78B615BB3042F51D97E3A9E552723DBCA3EE717943FBA8C",
+          "kind": "MIR4M41F2DF210RuntimeReplayAuthorityEvolutionV1",
+          "status": "M41-F2D-210-PASSED-NO-CUTOVER",
+          "predecessor_path": "releases/migrations/MIR4-M41-F2D-Runtime-Replay-Harness-Authority-EvolutionV1.json",
+          "predecessor_sha256": "24E4132E93D0010E86CCDE7E3F45D1E4440EFB1CA0028EE1B40D036BC96D82BC"
+        },
+        "replay": {
+          "commit": "67b3695a6fbc65931cb1e75b74b16f2fc9ee4973",
+          "tree": "243755895d62fd62453adb75d54bcea0e28a6db0",
+          "candidate_id": "M41-F2D-67B3695A-F210"
+        },
+        "engine": {
+          "selector": "latest-installed-official-2.1-experimental",
+          "version": "2.1.17",
+          "file_version": "2.1.17.87315",
+          "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+        },
+        "package": {
+          "distribution_version": "4.0.21000",
+          "archive_sha256": "4DE721FFCD6BECBA34ED110EE1BEE59ADDE3E6BBF13E993C339FC7729862E41A",
+          "content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+          "entry_count": 305
+        },
+        "predecessor": {
+          "version": "3.2.11",
+          "archive_sha256": "5B0252C3E1B8A20FF8E31F408F0217DDC77D2DF0D1C15F59653E948472870A5A"
+        },
+        "runtime": {
+          "fresh_load_result_sha256": "EDF42E0825D5C9C4DD46FE8CB8EE97DF45FAE8C4D8953F50670AF657548AD6D2",
+          "fresh_scenario_count": 14,
+          "upgrade_result_sha256": "40FA4AA0C09FEE0EDB33F11F387C18A52D1EC6B95831917B960B42B49B7D2D4D",
+          "upgrade_archetype_count": 5,
+          "first_reload": true,
+          "second_reload": true
+        },
+        "evidence": {
+          "logical_root": "MIR_EVIDENCE_HOME/m41-f2d/67b3695a6fbc65931cb1e75b74b16f2fc9ee4973/f210",
+          "target_proof_sha256": "B0113BD090B3737A88400F0C4E7BEB544F9BB41482C77E9CEE6740A5F255439E",
+          "independent_verification_sha256": "349E963704525D6B7DA5F356C4E8164E3CE2A8CF0D5D16C0EB28A98DFFB4D622",
+          "resource_receipt_sha256": "FBE24D705E4EB6754BEA4170B3FD02966020824EFDEDB6309B262C00BF20D74F",
+          "custody_manifest_sha256": "A163B27A950AA280D81632953284D5919CC28BDF7D1E3D8D4FF5E2E8DB6547FC",
+          "custody_file_count": 38,
+          "evidence_file_count": 39,
+          "evidence_bytes": 40021171,
+          "redacted": true,
+          "verified": true,
+          "work_root_status": "removed"
+        }
+      },
+      {
+        "target": "f200",
+        "receipt": {
+          "path": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json",
+          "sha256": "079CCD4FC9B61A0D4CAB53F1DBE633D5FD142AC81441E95A3FF7D379E7086C9F",
+          "kind": "MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1",
+          "status": "M41-F2D-200-PASSED-NO-CUTOVER",
+          "predecessor_path": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json",
+          "predecessor_sha256": "A690D41B0B37D4BAF78B615BB3042F51D97E3A9E552723DBCA3EE717943FBA8C"
+        },
+        "replay": {
+          "commit": "5d71b9772fbbaf907c439dfc497a19940b4a85c9",
+          "tree": "6a443215a0ccf4090c1a72cdb022daaa6859ccc3",
+          "candidate_id": "M41-F2D-5D71B977-F200"
+        },
+        "engine": {
+          "selector": "exact-profile",
+          "version": "2.0.77",
+          "file_version": "2.0.77.84539",
+          "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+        },
+        "package": {
+          "distribution_version": "4.0.20000",
+          "archive_sha256": "0744FDC11B8095C6B9D9543E02A26CE89CDBD02477CDBD20A26FE8EAADA31AC6",
+          "content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+          "entry_count": 303
+        },
+        "predecessor": {
+          "version": "2.5.11",
+          "archive_sha256": "4AE3DA83C4F8CB7D084891065387B78032BB25B8E4ED3948058D9B773070847C"
+        },
+        "runtime": {
+          "fresh_load_result_sha256": "84731CB09F8D79CDFF5BAADA9842D6030AFDB9EB96634E78BDD8A1CA8FC5C210",
+          "fresh_scenario_count": 1,
+          "upgrade_result_sha256": "C37DF99CDDC559E289D92D1A0FCF0A6FDDAE897820F0A9A8EDA806690F65E18A",
+          "upgrade_archetype_count": 1,
+          "first_reload": true,
+          "second_reload": true
+        },
+        "evidence": {
+          "logical_root": "MIR_EVIDENCE_HOME/m41-f2d/5d71b9772fbbaf907c439dfc497a19940b4a85c9/f200",
+          "target_proof_sha256": "1791632634D7FAAF8BE683EF60289571C577D238C1C83C08A4905724A6B4FD18",
+          "independent_verification_sha256": "FAF9EBA06C22809F4B7B5CA08618B40E0FEAF7BB21E75201E37A25629426516C",
+          "resource_receipt_sha256": "9E1985FA54A97D4E0BCE99CB620301CC426374BD5DE2388E3FA706AE90290EFA",
+          "custody_manifest_sha256": "9AE05D6040FA3DD6BDB30AACE3845B4CF8A684CC20067BA09BB5B732E2000F9F",
+          "custody_file_count": 13,
+          "evidence_file_count": 14,
+          "evidence_bytes": 117381,
+          "redacted": true,
+          "verified": true,
+          "work_root_status": "removed"
+        }
+      },
+      {
+        "target": "f110",
+        "receipt": {
+          "path": "releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json",
+          "sha256": "28E355521A5921F4021F358E044B64895643152A6BD1D37721E382AF2580C31F",
+          "kind": "MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1",
+          "status": "M41-F2D-110-PASSED-NO-CUTOVER",
+          "predecessor_path": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json",
+          "predecessor_sha256": "079CCD4FC9B61A0D4CAB53F1DBE633D5FD142AC81441E95A3FF7D379E7086C9F"
+        },
+        "replay": {
+          "commit": "e744857ad542a1d07b09079b8a5b90b84d4fdf44",
+          "tree": "2062f3042bdedf101708c79a98a627d463da6845",
+          "candidate_id": "M41-F2D-E744857A-F110"
+        },
+        "engine": {
+          "selector": "exact-profile",
+          "version": "1.1.110",
+          "file_version": "1.1.110.62357",
+          "binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+        },
+        "package": {
+          "distribution_version": "4.0.11000",
+          "archive_sha256": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+          "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+          "entry_count": 174
+        },
+        "predecessor": {
+          "version": "1.9.9",
+          "archive_sha256": "E250F85BE20DE647112F7D2F96209CEA00774AEE7DCADE262291F1123B2F6843"
+        },
+        "runtime": {
+          "fresh_load_result_sha256": "3AFB06B72F7014708AD19575E212513A3F3C39D599BC6356F88D9F97F58E66BB",
+          "fresh_scenario_count": 1,
+          "upgrade_result_sha256": "6FDB22E763E9EAE065F54D4EDE42472B7D06E3D98AD8DF5B85E52D606FAFE4C1",
+          "upgrade_archetype_count": 1,
+          "first_reload": true,
+          "second_reload": true
+        },
+        "evidence": {
+          "logical_root": "MIR_EVIDENCE_HOME/m41-f2d/e744857ad542a1d07b09079b8a5b90b84d4fdf44/f110",
+          "target_proof_sha256": "E21A19CC77C74D90F3B230A85A0E9D4F8AD8D19E6C1462DF65879FBAFFEFCD3F",
+          "independent_verification_sha256": "D8345A0450FD8621CA605C22CC6996C9813ABA6BDA2A83785EACACFA0CBEE83F",
+          "resource_receipt_sha256": "2FF7A982958A28084CC8413E836A824372E88A9776AAE3ECC22919F3C4EB8E3C",
+          "custody_manifest_sha256": "89E140FB46E49EA2CC1E3990D24C6028579E0B9F9FEE8A5EE31C48D26E423DDC",
+          "custody_file_count": 13,
+          "evidence_file_count": 14,
+          "evidence_bytes": 28305,
+          "redacted": true,
+          "verified": true,
+          "work_root_status": "removed"
+        }
+      },
+      {
+        "target": "f100",
+        "receipt": {
+          "path": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json",
+          "sha256": "03F214C9F0ED630D497D450C64B0E1000299E6763D18EBE3D1F64CE81936CE54",
+          "kind": "MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV1",
+          "status": "M41-F2D-100-PASSED-NO-CUTOVER",
+          "predecessor_path": "releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json",
+          "predecessor_sha256": "28E355521A5921F4021F358E044B64895643152A6BD1D37721E382AF2580C31F"
+        },
+        "replay": {
+          "commit": "0a3a13a3cd26902d01bc30d63d8d8c91d0657682",
+          "tree": "c771d7e6464b952efeeb9d786a2db322fd87a26e",
+          "candidate_id": "M41-F2D-0A3A13A3-F100"
+        },
+        "engine": {
+          "selector": "exact-profile",
+          "version": "1.0.0",
+          "file_version": "1.0.0.54889",
+          "binary_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+        },
+        "package": {
+          "distribution_version": "4.0.10000",
+          "archive_sha256": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+          "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+          "entry_count": 174
+        },
+        "predecessor": {
+          "version": "1.8.9",
+          "archive_sha256": "F9A7C245A12763362FB4A838FD9560C3AFE29FE0166E7E575617A26CB7F8B51A"
+        },
+        "runtime": {
+          "fresh_load_result_sha256": "F578AB8E595B2C3103B2E8113202246EAB44DE400C99EE8FA2FFB822AEB193D7",
+          "fresh_scenario_count": 1,
+          "upgrade_result_sha256": "1430B3122843CC2C347146A9BBAA1D45EB3674192DA25CFE29F74086AB8ED7F0",
+          "upgrade_archetype_count": 1,
+          "first_reload": true,
+          "second_reload": true
+        },
+        "evidence": {
+          "logical_root": "MIR_EVIDENCE_HOME/m41-f2d/0a3a13a3cd26902d01bc30d63d8d8c91d0657682/f100",
+          "target_proof_sha256": "9C5105D22F67517139739A32CBCA4E2CB6CDAB809BFE790FE55347AC90F49638",
+          "independent_verification_sha256": "9F73BDECD4A6F04886E5A5BEC201E8CA4A8B462B70B3900E9647E5524BAD94D4",
+          "resource_receipt_sha256": "05CCF7C29037011B16A46C893457DCF6AEC9C01B85A2AC70D03C37EDBBA72C71",
+          "custody_manifest_sha256": "A7A20940CA0FC0AD4F1BD9A6644811A701089746D70465A3DC2BFC782BCDD35C",
+          "custody_file_count": 13,
+          "evidence_file_count": 14,
+          "evidence_bytes": 27773,
+          "redacted": true,
+          "verified": true,
+          "work_root_status": "removed"
+        }
+      }
+    ],
+    "receipt_chain": "verified",
+    "replay_commits_and_trees": "verified",
+    "engine_identities": "verified",
+    "package_and_transition_results": "verified",
+    "external_custody": "verified",
+    "evidence_path_redaction": "verified",
+    "cross_target_substitution": "rejected",
+    "package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+    "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+    "old_writer_authoritative": true,
+    "verifier_path": "tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1",
+    "verifier_sha256": "579B20FE52DAAD02D0D6B556D87957164E6C28769F7E3DA6384F2C9B5E514732"
+  },
+  "package_source_sha256": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336",
+  "root_readme_sha256": "DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947",
+  "package_visible_delta": [],
+  "invariants": {
+    "four_receipts_verified": true,
+    "predecessor_chain_verified": true,
+    "four_independent_engines_verified": true,
+    "four_package_trees_verified": true,
+    "four_upgrade_and_reload_results_verified": true,
+    "four_external_custody_roots_verified": true,
+    "package_source_unchanged": true,
+    "root_readme_unchanged": true,
+    "old_writer_remains_authoritative": true,
+    "aggregate_grants_no_cutover_or_release_authority": true
+  },
+  "transition_gate": {
+    "merge": false,
+    "package_cutover": false,
+    "old_writer_retirement": false,
+    "readme_rewrite": false,
+    "bridge_retirement": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false,
+    "remote_write": false
+  },
+  "next_fixed_point": "M41-F2E-PACKAGE-AUTHORITY-CUTOVER",
+  "status": "M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-PASSED-NO-CUTOVER"
+}

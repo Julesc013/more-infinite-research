@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0012",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Accepted the independent four-target F2D runtime aggregate without package cutover.",
+  "details": [
+    "One verifier bound all four receipt chains, replay commits and trees, engines, package identities, predecessor archives, fresh loads, upgrades, reloads, and independent verifier results.",
+    "All four external custody manifests and resource receipts were rechecked, evidence remained path-redacted, and cross-target proof substitution was rejected.",
+    "The package source and root README remain unchanged, the old writer stays authoritative, and only F2E package-authority cutover becomes dependency-ready."
+  ],
+  "semantic_domains": ["package-boundary", "runtime-validation", "tooling"],
+  "audiences": ["contributors", "maintainers", "mod-authors"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The accepted F210 result is independently bound into the aggregate without changing its package or moving-channel policy."},
+    {"target":"F200","disposition":"unaffected","reason":"The accepted F200 result is independently bound into the aggregate without changing its package."},
+    {"target":"F110","disposition":"unaffected","reason":"The accepted F110 result is independently bound into the aggregate without changing its package."},
+    {"target":"F100","disposition":"unaffected","reason":"The accepted F100 result is independently bound into the aggregate without changing its package."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"changed","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"docs/maintainer/mir4-f2d-runtime-replay.md"},
+    {"kind":"release-record","value":"releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json"}
+  ]
+}

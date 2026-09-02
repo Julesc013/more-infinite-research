@@ -27,6 +27,10 @@
   - The materialized 4.0.10000 package matched the accepted 174-entry tree under exact Factorio 1.0.0.54889.
   - Its exact-package smoke and 1.8.9 base-default upgrade passed through two reloads, independent verification, and custody.
   - Expanded success work was released; four target lanes are complete while aggregate, cutover, allocation, and release gates remain closed.
+- Accepted the independent four-target F2D runtime aggregate without package cutover. [MIR4-CHG-2026-0012]
+  - One verifier bound all four receipt chains, replay commits and trees, engines, package identities, predecessor archives, fresh loads, upgrades, reloads, and independent verifier results.
+  - All four external custody manifests and resource receipts were rechecked, evidence remained path-redacted, and cross-target proof substitution was rejected.
+  - The package source and root README remain unchanged, the old writer stays authoritative, and only F2E package-authority cutover becomes dependency-ready.
 
 ### Features
 

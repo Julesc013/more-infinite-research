@@ -388,6 +388,18 @@ if([string]$f100Replay.kind-cne'MIR4M41F2DTargetRuntimeReplayAuthorityEvolutionV
    [string]$f100Replay.f2d_aggregate-cne'pending'-or[string]$f100Replay.f2e-cne'blocked'-or
    @($f100Replay.package_visible_delta).Count-ne0-or
    @($f100Replay.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-f100-runtime-replay-authority]'}
+$f2dAggregate=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2D-Four-Target-Runtime-Replay-AggregateV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
+if([string]$f2dAggregate.kind-cne'MIR4M41F2DFourTargetRuntimeReplayAggregateV1'-or
+   [string]$f2dAggregate.status-cne'M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-PASSED-NO-CUTOVER'-or
+   [string]$f2dAggregate.predecessor_receipt.path-cne'releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json'-or
+   [string]$f2dAggregate.predecessor_receipt.sha256-cne'03F214C9F0ED630D497D450C64B0E1000299E6763D18EBE3D1F64CE81936CE54'-or
+   (@($f2dAggregate.verification.targets.target)-join'|')-cne'f210|f200|f110|f100'-or
+   [string]$f2dAggregate.verification.receipt_chain-cne'verified'-or
+   [string]$f2dAggregate.verification.external_custody-cne'verified'-or
+   [string]$f2dAggregate.verification.evidence_path_redaction-cne'verified'-or
+   -not[bool]$f2dAggregate.invariants.old_writer_remains_authoritative-or
+   @($f2dAggregate.package_visible_delta).Count-ne0-or
+   @($f2dAggregate.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-prefreeze-f2d-four-target-aggregate-authority]'}
 if(@($rulesets.rulesets).Count-ne3-or@($actions.actions).Count-ne6-or@($actions.repository_workflows).Count-ne22){throw '[mir4-prefreeze-control-count]'}
 
 $planPath='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json'
