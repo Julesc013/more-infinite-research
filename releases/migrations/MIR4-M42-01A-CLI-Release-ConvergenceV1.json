@@ -1,0 +1,176 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4201ACliReleaseConvergenceV1",
+  "status": "M42-01A-CLI-RELEASE-CONVERGENCE-COMPLETE",
+  "recorded_at": "2026-09-02T20:00:00+10:00",
+  "programme_id": "M42-01A-CLI-RELEASE-CONVERGENCE",
+  "change_id": "MIR4-CHG-2026-0015",
+  "predecessor_receipt": {
+    "path": "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+    "sha256": "C96002AD0596DF72589FC7516D82C84CBC86ADF5A043CE33BB0462BF24E1CB98"
+  },
+  "base": {
+    "commit": "c4597569a3a5499172d39ef814a80bbb0a9d8978",
+    "tree": "d8f10537f5655c53565374eb14f02ea213df4271"
+  },
+  "command_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "AA396EC5EE4AB221F6E3B3CFE2814B0558D5C16E77348010779E804626A16035",
+    "digest": "sha256:22dc9088515e350a6eb1bd05ffce36f8918eb401cf0aad8a8b8523b81abc7bcb",
+    "command_count": 85,
+    "implementation_file_count": 471,
+    "unknown_count": 0,
+    "duplicate_command_keys": 0
+  },
+  "release_application_dag": {
+    "path": "governance/release/mir4-release-application-dag-v1.json",
+    "sha256": "75E3C4F3366FD07D4EBA6492F2ED2477EE85AC065C5340BA8AD761ACCED40F86",
+    "status": "M42-01-RELEASE-APPLICATION-DAG-PASSED",
+    "node_count": 16,
+    "publisher_can_build": false,
+    "production_authorized": false
+  },
+  "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E",
+  "evolved_bindings": [
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "1EDC7B9794DFD6B5A0BFE9579E099260EC2850FA96F7CEF4D167D19C41DCD7EF",
+      "current_sha256": "E98D810D1233F177992FBEAED6D954AEB43B9FB4000891AC22F92C3E7A1B838D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "EAA05C2CF9F34E365D03C3658035F920255DCEE83C0E6E94078A54AEBC4CEE3F",
+      "current_sha256": "B08718951822C97FC30F88460002C390B1F7CD137C46818473C2EC4424E15F7E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "1A0E3AB6A717CCC6BE32FE4360D7612ACA28BA97016EA13AD9E7C7E5F19E5FA8",
+      "current_sha256": "66CB0BD604F12F341F85194A7E1AE7D8682C68DBAFB3741DF507A5E77A8F8464",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "C9071BDA6349D92C371A810C8644A34BBFE83D29882627524103A2E8039383A1",
+      "current_sha256": "E33A3D0761FE92D03CC32000A033FF5C3C70FE7802982E796FBB2933B84F42C9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "A107658ADC6D31978276C160D54D369BEEAD990991A5C9202F0503BB827230B3",
+      "current_sha256": "13D11E533DB4FD8FE21CA188415E0CCA217FCFFF94260FF05832F45D5C9B904F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1",
+      "previous_sha256": "7FF1200F98D0E9E972E25CF69F3E828A2CC3B599FD0B7DB53399AE0258E38225",
+      "current_sha256": "DFC24964F549F830622FB3ADCFF2BD3E9D176525E1168B2C213CF13E3D51CE91",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "tools/mir.ps1",
+      "sha256": "7FB9CD18BB557ABA66FBA301637660A012F085A9574CC059C6677041367AE0CA",
+      "hash_mode": "canonical-text-v1",
+      "role": "sole-public-cli",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "sha256": "2C35CE376A05EBD89E87347B54BA22F0BD5D577BDE7DC63E6D89767F425826EC",
+      "hash_mode": "canonical-text-v1",
+      "role": "canonical-command-router",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
+      "sha256": "D39BE21798E36E53AB3736D8FBB391711CF206559147A437897225954DCEB5DC",
+      "hash_mode": "canonical-text-v1",
+      "role": "canonical-release-cli",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
+      "sha256": "8452761605C5088AF60A4EFE8BBFDA950FD22E66BF5FF5DF93B1EF7337016326",
+      "hash_mode": "canonical-text-v1",
+      "role": "canonical-tooling-cli",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseApplicationDag.ps1",
+      "sha256": "6B5238280D91FE3E5CB98EE9D77DCD984E314DCD07962F468643BF833184BE94",
+      "hash_mode": "canonical-text-v1",
+      "role": "sole-release-application-dag",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/tooling/CommandInventory.ps1",
+      "sha256": "B29A081BC21EC057B22D3A1E61946D3BA7BBC5DCFA5D14B973E9A94D895DD01E",
+      "hash_mode": "canonical-text-v1",
+      "role": "command-inventory-writer",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1",
+      "sha256": "37810F66B1023D162A955B05516AA093AC66341D1CDC200A3F7AD56ECB6817A4",
+      "hash_mode": "canonical-text-v1",
+      "role": "compatibility-wrapper",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+      "sha256": "FECB62355A5E37EA3CA33F9D52F3B36F99BD01011FA7E7C0E341156479BB101A",
+      "hash_mode": "canonical-text-v1",
+      "role": "canonical-convergence-proof",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "sha256": "13D11E533DB4FD8FE21CA188415E0CCA217FCFFF94260FF05832F45D5C9B904F",
+      "hash_mode": "canonical-text-v1",
+      "role": "executable-test-catalogue",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "invariants": {
+    "one_public_cli": true,
+    "one_command_route_per_key": true,
+    "one_release_application_dag": true,
+    "publisher_cannot_build": true,
+    "independent_verifier_separate": true,
+    "player_executable_sources_unchanged": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "promotion": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-01B-TEST-WORKFLOW-CONVERGENCE",
+  "record_sha256": "CF8ABE8487590B4E18C42E079CA21FE6EEE902D76D237D0A75615752F0DA2DD9"
+}

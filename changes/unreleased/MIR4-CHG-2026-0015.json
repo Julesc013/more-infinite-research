@@ -1,0 +1,30 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0015",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Converged the public CLI and release orchestration behind canonical application authorities.",
+  "details": [
+    "tools/mir.ps1 is now a thin sole public facade over one package-excluded command router and a generated command inventory classifies every PowerShell implementation without unknown entries.",
+    "One non-production release application DAG now owns intent, freeze, target impact, build, qualification, acceptance, rehearsal, readback, restore, and reporting while preserving the existing idempotent phase engine.",
+    "The historical release workflow command is a bounded compatibility wrapper, the publisher cannot build or check out source, and all version, signing, tag, seal, promotion, and publication gates remain false."
+  ],
+  "semantic_domains": ["tooling", "release-engine", "governance", "assurance"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F200","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F110","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"Package source and accepted target content are unchanged."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json"},
+    {"kind":"document","value":"governance/automation/mir4-command-inventory-v1.json"},
+    {"kind":"document","value":"governance/release/mir4-release-application-dag-v1.json"}
+  ]
+}

@@ -641,6 +641,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-f2d-target-runtime-replay-authority-evolution-v1.schema.json'
     'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json' = 'contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json'
     'releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json' = 'contracts/repository/mir4-m41-05b-documentation-cutover-v1.schema.json'
+    'releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json' = 'contracts/repository/mir4-m42-01a-cli-release-convergence-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -869,6 +870,51 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m41-05b-transition] $($property.Name)" }
     }
     $priorReceiptPath = $documentationReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $cliReleaseReceiptPath = 'releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $cliReleaseReceiptPath) -PathType Leaf) {
+    $cliRelease = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $cliReleaseReceiptPath -Kind 'MIR4M4201ACliReleaseConvergenceV1'
+    if ([string]$cliRelease.predecessor_receipt.path -cne $priorReceiptPath -or
+        [string]$cliRelease.predecessor_receipt.sha256 -cne $priorReceiptSha256) {
+      throw '[mir4-prefreeze-m42-01a-predecessor]'
+    }
+    $evolvedPaths = @{}
+    foreach ($binding in @($cliRelease.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or
+          [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-01a-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $evolvedPaths[$path] = $true
+    }
+    foreach ($binding in @($cliRelease.current_authorities)) {
+      $path = [string]$binding.path
+      if ($authorityHashes.ContainsKey($path) -and
+          [string]$authorityHashes[$path] -cne [string]$binding.sha256 -and
+          -not $evolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-01a-current-authority-evolution-missing] $path"
+      }
+      if ([bool]$binding.package_visible -or [bool]$binding.release_authority) {
+        throw "[mir4-prefreeze-m42-01a-current-authority-boundary] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+    }
+    if (-not [bool]$cliRelease.invariants.one_public_cli -or
+        -not [bool]$cliRelease.invariants.one_command_route_per_key -or
+        -not [bool]$cliRelease.invariants.one_release_application_dag -or
+        -not [bool]$cliRelease.invariants.publisher_cannot_build) {
+      throw '[mir4-prefreeze-m42-01a-invariants]'
+    }
+    foreach ($property in $cliRelease.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-01a-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $cliReleaseReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()

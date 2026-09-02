@@ -39,6 +39,10 @@
   - The root README is now a concise package-excluded repository landing page with current target, support, installation, diagnostic, developer, and rolling Factorio 2.1 policy routing.
   - Generated runtime-pipeline and stream-default references moved under docs/reference/generated and remain checked against their executable authorities.
   - The four target-owned README and changelog templates remain exact immutable 4.0 reconstruction inputs while release narratives retain sole authority for future source and target changelog projections.
+- Converged the public CLI and release orchestration behind canonical application authorities. [MIR4-CHG-2026-0015]
+  - tools/mir.ps1 is now a thin sole public facade over one package-excluded command router and a generated command inventory classifies every PowerShell implementation without unknown entries.
+  - One non-production release application DAG now owns intent, freeze, target impact, build, qualification, acceptance, rehearsal, readback, restore, and reporting while preserving the existing idempotent phase engine.
+  - The historical release workflow command is a bounded compatibility wrapper, the publisher cannot build or check out source, and all version, signing, tag, seal, promotion, and publication gates remain false.
 
 ### Features
 

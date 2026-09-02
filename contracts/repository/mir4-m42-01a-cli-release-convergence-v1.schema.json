@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-m42-01a-cli-release-convergence-v1.schema.json",
+  "type": "object",
+  "required": ["schema","kind","status","recorded_at","programme_id","change_id","predecessor_receipt","base","command_inventory","release_application_dag","package_source_sha256","evolved_bindings","current_authorities","invariants","transition_gate","next_fixed_point","record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4201ACliReleaseConvergenceV1"},
+    "status": {"const": "M42-01A-CLI-RELEASE-CONVERGENCE-COMPLETE"},
+    "programme_id": {"const": "M42-01A-CLI-RELEASE-CONVERGENCE"},
+    "change_id": {"const": "MIR4-CHG-2026-0015"},
+    "package_source_sha256": {"const": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"},
+    "invariants": {
+      "type": "object",
+      "required": ["one_public_cli","one_command_route_per_key","one_release_application_dag","publisher_cannot_build","independent_verifier_separate","player_executable_sources_unchanged"],
+      "additionalProperties": {"const": true}
+    },
+    "transition_gate": {"type": "object","additionalProperties":{"const":false}},
+    "next_fixed_point": {"const": "M42-01B-TEST-WORKFLOW-CONVERGENCE"},
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  },
+  "additionalProperties": true
+}

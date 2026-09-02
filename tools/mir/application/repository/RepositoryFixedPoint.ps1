@@ -52,8 +52,12 @@ function Test-MIR4RepositoryCompatibilityForwardersV1 {
       throw "[mir4-repository-compatibility-forwarder] $($contract.path)"
     }
   }
-  $cliText = [IO.File]::ReadAllText((Join-Path $repo 'tools/mir.ps1')).Replace('\','/')
-  if ($cliText -cnotmatch [regex]::Escape('tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1')) { throw '[mir4-repository-cli-canonical-route]' }
+  $facadeText = [IO.File]::ReadAllText((Join-Path $repo 'tools/mir.ps1')).Replace('\','/')
+  $routerText = [IO.File]::ReadAllText((Join-Path $repo 'tools/mir/cli/Invoke-MIRCommandRouter.ps1')).Replace('\','/')
+  if ($facadeText -cnotmatch [regex]::Escape('tools/mir/cli/Invoke-MIRCommandRouter.ps1') -or
+      $routerText -cnotmatch [regex]::Escape('tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1')) {
+    throw '[mir4-repository-cli-canonical-route]'
+  }
   return $true
 }
 

@@ -487,7 +487,10 @@ if(-not$blocked){throw '[mir4-prefreeze-source-freeze-accepted]'}
 $toml=Get-Content -Raw -LiteralPath (Join-Path $repo 'mir.toml')
 if($toml-notmatch'reference-extension-v1/extension\.json'-or$toml-match'--extension sdk/preview/mir4/reference-extension/extension\.json'){throw '[mir4-prefreeze-v1-default]'}
 
-$cli=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir.ps1')
+$cli=@(
+  Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir.ps1')
+  Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir/cli/Invoke-MIRCommandRouter.ps1')
+)-join"`n"
 foreach($command in @('release doctor','playtest prepare','playtest capture','playtest finalize','rulesets audit')){
   if($cli-notmatch[regex]::Escape($command)){throw "[mir4-prefreeze-cli] $command"}
 }

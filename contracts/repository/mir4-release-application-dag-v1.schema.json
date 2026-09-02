@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-release-application-dag-v1.schema.json",
+  "type": "object",
+  "required": ["schema","kind","status","engine","nodes","publisher","independent_verifier","transition_gate"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ReleaseApplicationDagV1"},
+    "status": {"const": "M42-01-NON-PRODUCTION-CANONICAL"},
+    "engine": {
+      "type": "object",
+      "required": ["contract","implementation","application","production_capable","production_authorized"],
+      "properties": {
+        "production_capable": {"const": false},
+        "production_authorized": {"const": false}
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 16,
+      "items": {
+        "type": "object",
+        "required": ["id","depends_on","executor","phase","mutation"],
+        "properties": {
+          "id": {"type": "string","pattern": "^[a-z][a-z0-9-]+$"},
+          "depends_on": {"type": "array","items": {"type": "string"}},
+          "executor": {"enum": ["application","phase-engine"]},
+          "phase": {"type": ["string","null"]},
+          "mutation": {"enum": ["none","attempt-root-only","rehearsal-only"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": {"const": false}
+    }
+  },
+  "additionalProperties": true
+}

@@ -542,14 +542,17 @@ foreach ($file in $activeAutomationFiles) {
 }
 $legacyCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts/mir.ps1")
 $publicCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/mir.ps1")
+$routerCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/mir/cli/Invoke-MIRCommandRouter.ps1")
 if ($legacyCliText -notmatch "MIR-L5-LEGACY-CLI-WRAPPER" -or
     $legacyCliText -notmatch 'tools[/\\]mir\.ps1' -or $legacyCliText.Split([char]10).Count -gt 15) {
   throw "Legacy CLI is not a thin forwarder to the public facade."
 }
 if ($publicCliText -match "MIR-L5-LEGACY-CLI-WRAPPER" -or
     $publicCliText -match 'Join-Path \$repo "scripts[/\\]mir\.ps1"' -or
-    -not $publicCliText.Contains("function Show-MIRHelp")) {
-  throw "Public CLI does not own the command dispatcher."
+    $publicCliText.Split([char]10).Count -gt 40 -or
+    $publicCliText -notmatch 'tools[/\\]mir[/\\]cli[/\\]Invoke-MIRCommandRouter\.ps1' -or
+    -not $routerCliText.Contains("function Show-MIRHelp")) {
+  throw "Public CLI is not a thin facade over the canonical command router."
 }
 
 function Invoke-MIRCliProbe {

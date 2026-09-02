@@ -3046,6 +3046,28 @@
       ]
     },
     {
+      "id": "static.mir4-cli-release-convergence-m42-01a",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir.ps1",
+        "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+        "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
+        "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
+        "tools/mir/application/tooling/CommandInventory.ps1",
+        "tools/mir/application/release/ReleaseApplicationDag.ps1",
+        "tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "governance/release/mir4-release-application-dag-v1.json",
+        "contracts/repository/mir4-command-inventory-v1.schema.json",
+        "contracts/repository/mir4-release-application-dag-v1.schema.json",
+        "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "seal.verify",
       "kind": "promotion",
       "layer": "F4",
