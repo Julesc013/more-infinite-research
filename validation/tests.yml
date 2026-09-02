@@ -3192,6 +3192,34 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-technology-catalog-decomposition-m42-02-l4",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "src/mod/families/modern/prototypes/mir/planner/technology_catalog.lua",
+        "src/mod/families/modern/prototypes/mir/planner/technology_catalog/**",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        "docs/architecture/module-boundaries.md",
+        "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json",
+        "contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ]
     }
   ]
 }

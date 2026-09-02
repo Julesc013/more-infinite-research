@@ -2687,10 +2687,10 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/serialize.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed compilation-plan serialize responsibility for f210.",
+      "reason": "Materialize the corrected eager dependency binding for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2736,
-      "expected_sha256": "C884E194F01993D9D90C14270C746A355B6E6278A9A85C2E98378C34AE30654E",
+      "expected_bytes": 2769,
+      "expected_sha256": "FB098DCBB6E8FA2B1A0D9A296C23DB0E5353CE0013B05CEEA3F512E84CE0EA6F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2927,14 +2927,94 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed families.modern source for f210.",
+      "reason": "Materialize the governed technology-catalog facade for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 19159,
-      "expected_sha256": "190C8AF83E767177B067E848543428D2600CC5F12E4B23FECC67B0A0EC7034B1",
+      "expected_bytes": 700,
+      "expected_sha256": "6EFFE39695549D2FFB52FEA96EE7AA9383F78C969CB8834528572A2DDE2BF34F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/model.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/model.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed technology-catalog model responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5126,
+      "expected_sha256": "720A88AE6653492933A731D9321F2D244BE68F34F6771E5AB2DEAC4F90CB4FDF",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/index.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/index.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed technology-catalog index responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 864,
+      "expected_sha256": "CBBD313BAD8AD1537C694DE95D68B046C923662217611D1E1D30522F90D87DAA",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/query.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/query.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed technology-catalog query responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1066,
+      "expected_sha256": "7A7711D1D16D65D32585AA3B5BFE99FD3B5AD51833A5CCC413F09294966FF78F",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/build.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/build.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed technology-catalog build responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 7354,
+      "expected_sha256": "0A2560165C8E0CC281ACC807A883D113429064EB43A11F5EADF1645AAD363D92",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/technology_catalog/validate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/validate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed technology-catalog validate responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6621,
+      "expected_sha256": "7F6B801C60819AA41278DA6DEA2BF45F8E329BCC3395DBCB1DFA035170D5ADBA",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3695,5 +3775,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "8829B1DB2D38EFC4BF0688CB799C2C5543A76D202E05F67E7605A962AAE77E0E"
+  "record_sha256": "C48E0A6F8E99CCA6B7015CA8C94C303BF70787CD5FBBC0E0D85F89769DB7E311"
 }

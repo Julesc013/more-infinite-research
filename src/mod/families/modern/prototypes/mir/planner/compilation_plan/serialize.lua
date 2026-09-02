@@ -1,3 +1,5 @@
+local fingerprint = require("prototypes.mir.core.fingerprint")
+
 local M = {}
 
 function M.operation(operation)
@@ -64,7 +66,7 @@ function M.qualification(artifact)
   return {
     schema = artifact.schema,
     compilation_fingerprint = artifact.compilation_fingerprint,
-    input_sanitation_fingerprint = require("prototypes.mir.core.fingerprint").of(artifact.input_sanitation_ledger or {}),
+    input_sanitation_fingerprint = fingerprint.of(artifact.input_sanitation_ledger or {}),
     stream_plan = {
       schema = artifact.stream_plan.schema,
       plan_fingerprint = artifact.stream_plan.plan_fingerprint

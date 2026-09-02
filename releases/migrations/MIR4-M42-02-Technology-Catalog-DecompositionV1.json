@@ -1,0 +1,366 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202TechnologyCatalogDecompositionV1",
+  "status": "M42-02-L4-TECHNOLOGY-CATALOG-DECOMPOSED",
+  "starting_dev": {
+    "commit": "00e31b33ae79f8d5a5022485a18aa0f968dd4b0c",
+    "tree": "b01fc70214bca98aeb252a55c5dd11e859ef5f2b"
+  },
+  "predecessor": {
+    "work_package": "M42-02-L3",
+    "receipt": "releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json",
+    "receipt_sha256": "CA5BF4A1CACA309E3DA1CEA279B6CB9928231184CDAE8DB39A8952E9E189E385",
+    "record_sha256": "42169B2298CCB597A87CD1F4ECDC5455BAD71DD1BF7A411C45293EF63CF09C42",
+    "package_source_sha256": "37AF7B292EEAD8A04DCF699B75B94619E1585570477060C4ED1CB2F936700379"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "B4F116DC8C8BE2C02BBC8973C873F506FF69F678F15381DAD6F7F4040ED21F07",
+      "current_sha256": "8A099D8170BA2475E93DB736A296A5A991BA1DA9791FD55F3DC059BEA0D61DFF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "B811D48C5E6ACF9B65BDACB5C02B620DD7F62BAF544111468FEC918D7039DC20",
+      "current_sha256": "8678D82BBDACC368FD81639081ABA188E84F839C5F4113364D1BE8BFD0B1030D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "82286F74BE6BBE8CE0E073AA2666562155158EDD8F318547879DAD349BE461D6",
+      "current_sha256": "AEF4B629F0FBC63F7F928B85C71B5A467AAE9B5BC1A21E58FFF0545AE8B39C35",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "F4C1D3116774856095EAF2A8412C9DE5962FF8C6E052B4A5C5D531C685F4C5BF",
+      "current_sha256": "291822E5B1A07598ACEEFEC1194500CFA4D400AB0EBCCBE860C8157023AC320F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "1BF57B41E9FF323BA13DF037CDDF72C2344CEB9E03FE408F0834D35A6B07C4A5",
+      "current_sha256": "DA5BA8E09C52EBE85B6EB0EAE581E63D271462E04AE1D0C16F1F724D57F9CBC4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+      "previous_sha256": "580475E5F28E559935730574976B9F869D0D4A2AA2AB331CBBCDAC079CC90CEB",
+      "current_sha256": "85B8AC3089A367E034D18C12CCD7D663E7F0AA0317D99568D7E389ED2D6EB1ED",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1",
+      "previous_sha256": "A5326EA3FBE5941AD0FE86934306EC7267F8ABC25079235DBFE8349C845A03B5",
+      "current_sha256": "7840B1575A2AA958B0F1793014E562DA6BAA35A3B21A247BA19AE6A4F4A6B679",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202.ps1",
+      "previous_sha256": "C933AF6E213C5ABCF482FFF2CFC6375A053A7ADACA8847F98CF4E8AD50E870EF",
+      "current_sha256": "4214ED6C55E1D6519976D6BAC865B18DB38C5FB161796B3CFB1F8E228AA80212",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1",
+      "previous_sha256": "1D74336F21F11F6CBD1A11660615621993E75A9F1E98B421C271335502B5071D",
+      "current_sha256": "8093DBCF2326FA9E57DBBFE119EDFA5C0E2CE877BF127AACBE83ACF67FB15F8A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "previous_sha256": "0C17FBAF4B3465588B49E95A7A1CCD7C1001C6B010D7C53D1095C9C514F73ACA",
+      "current_sha256": "0ADFA0136CDE4060276291901942F46068476C75D251D2E05D93ABFB072B75D2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "32CBD12E2920F19A40B4DC1272584C219102FE63DBEA5D952173FA894E404AEA",
+      "current_sha256": "B4505D031691B2BAA1861925937F8DD7880872C45E6F6FD20234ED8F3743D5E4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "7CCE5280CFE01E9FE3D00A517A4103F6F8CDE86ABFA24D9F5E0E70BB6C39A09D",
+      "current_sha256": "83D2F5598BEFD0AF47816D0C615813E88D9C67940CF3F93A87007CF6B1068931",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "FB2A961DFED0D024286E76932A4AF990A66E55C2650815DE71E1C511AFA9F944",
+      "current_sha256": "E8332EC2A1266B21047DA8A81AF81FB7FB89F5A002B50690DB5EB2912F9A86FA",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "D27A12C68087C0E06DF30A31A277D982ADA109B4AF0DE3F490B82EFA298E3709",
+      "current_sha256": "349B8B683D08FDC9C044F2E86D8B7390A316F6671C6EADA293232408B09ECF57",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "responsibility": "technology-catalog",
+  "facade": "prototypes/mir/planner/technology_catalog.lua",
+  "modules": [
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog.lua",
+      "bytes": 700,
+      "lines": 17,
+      "sha256": "6EFFE39695549D2FFB52FEA96EE7AA9383F78C969CB8834528572A2DDE2BF34F"
+    },
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog/model.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/model.lua",
+      "bytes": 5126,
+      "lines": 139,
+      "sha256": "720A88AE6653492933A731D9321F2D244BE68F34F6771E5AB2DEAC4F90CB4FDF"
+    },
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog/index.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/index.lua",
+      "bytes": 864,
+      "lines": 31,
+      "sha256": "CBBD313BAD8AD1537C694DE95D68B046C923662217611D1E1D30522F90D87DAA"
+    },
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog/query.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/query.lua",
+      "bytes": 1066,
+      "lines": 27,
+      "sha256": "7A7711D1D16D65D32585AA3B5BFE99FD3B5AD51833A5CCC413F09294966FF78F"
+    },
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog/build.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/build.lua",
+      "bytes": 7354,
+      "lines": 152,
+      "sha256": "0A2560165C8E0CC281ACC807A883D113429064EB43A11F5EADF1645AAD363D92"
+    },
+    {
+      "output_path": "prototypes/mir/planner/technology_catalog/validate.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/technology_catalog/validate.lua",
+      "bytes": 6621,
+      "lines": 133,
+      "sha256": "7F6B801C60819AA41278DA6DEA2BF45F8E329BCC3395DBCB1DFA035170D5ADBA"
+    }
+  ],
+  "corrective_bindings": [
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/serialize.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/serialize.lua",
+      "reason": "Resolve the fingerprint dependency at MIR module load time so cross-mod fixture calls cannot retarget Lua require resolution."
+    }
+  ],
+  "package_authority": {
+    "source_manifest_sha256": "5E1313F5E080612F88A12D988DBFA0ED3DD2C79D1FC377A38F3C4CEA7BDFDD91",
+    "package_authority_sha256": "666760127B15045C0C80229C9EEEDDB2589580E229BFB950643BF61FFC117D90",
+    "package_source_sha256": "962F312C66EDA473FA4E0CBEF8E2ACEF01F4200831C198DD12A4E832420028F3"
+  },
+  "target_proof": [
+    {
+      "target": "f210",
+      "distribution_version": "4.0.21000",
+      "source_binding_count": 324,
+      "omission_count": 0,
+      "archive_a": "E01EEF3EF15A750E069CC79D407F8CA849E4005CBB35E088E5B64FA55142E16C",
+      "archive_b": "E01EEF3EF15A750E069CC79D407F8CA849E4005CBB35E088E5B64FA55142E16C",
+      "content_sha256": "45DC9CC86832B1585E6EC1F32156913BD65CB602A04474A9B15AB260A717FDDD",
+      "entry_count": 324,
+      "baseline_content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+      "baseline_entry_count": 305,
+      "baseline_match": false,
+      "entry_count_delta": 19,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "8DC09113E3FED550E314065184751B98A846D433E56E6CECFCDFEA316167C65B",
+      "composition_record_b": "DF577EE4577FC60E3E18EB9BFAAEEAEABC7CC98B35DE47EA521D7169515D8AB1"
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.0.20000",
+      "source_binding_count": 322,
+      "omission_count": 2,
+      "archive_a": "1425D42B957486ACA69153EB27B6920C6A1402472A90290BC6E0C68277898D35",
+      "archive_b": "1425D42B957486ACA69153EB27B6920C6A1402472A90290BC6E0C68277898D35",
+      "content_sha256": "9254232C83A956B69093B3EE358213082CD2EACC433556C4E8E3EE6BF9FEA0A8",
+      "entry_count": 322,
+      "baseline_content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+      "baseline_entry_count": 303,
+      "baseline_match": false,
+      "entry_count_delta": 19,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "C5E6DF3030AD66A0627137A2721F2C6328555A02370C23EAE45951C5920189CF",
+      "composition_record_b": "F006F71301F8609426176854C5E1725CD3FE1AE3B93A2AEF111F0D8A35CC2869"
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.0.11000",
+      "source_binding_count": 174,
+      "omission_count": 131,
+      "archive_a": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+      "archive_b": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+      "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "entry_count": 174,
+      "baseline_content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "baseline_entry_count": 174,
+      "baseline_match": true,
+      "entry_count_delta": 0,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "F1DDB302E2470B385D387470DF178F52E4EBD4B198AD027EAB8379677F58C9BC",
+      "composition_record_b": "3A9F19FB3CA139719229D80BE5A5F5B188E4FB7DB09CA08F94FAD16556578137"
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.0.10000",
+      "source_binding_count": 174,
+      "omission_count": 131,
+      "archive_a": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+      "archive_b": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+      "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "entry_count": 174,
+      "baseline_content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "baseline_entry_count": 174,
+      "baseline_match": true,
+      "entry_count_delta": 0,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "1A94B0067D09FAA899961954AA4B48D48A83CB7FE34B381647B551B52E02C33E",
+      "composition_record_b": "F87647232C941FC67B72012C555A3FBE6995EF6868FFAB08673F6BBA0BEC6E79"
+    }
+  ],
+  "runtime_proof": {
+    "schema": 1,
+    "kind": "MIR4M4202TechnologyCatalogRuntimeProofV1",
+    "source": {
+      "commit": "00e31b33ae79f8d5a5022485a18aa0f968dd4b0c",
+      "tree": "b01fc70214bca98aeb252a55c5dd11e859ef5f2b",
+      "package_source_git_dirty": true
+    },
+    "engine": {
+      "selection": "latest-installed-official-2.1-experimental",
+      "version": "2.1.17",
+      "file_version": "2.1.17.87315",
+      "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+      "runtime_api_sha256": "2E1FD436404B712AF6FE7B6C53E21A8F5688092A9E132FD2A5571327A96E5211",
+      "prototype_api_sha256": "156F33CB4BC7EE2C538BB93F291F5270F2CDC45BE654BBE6F226E402BF8F5368",
+      "changelog_sha256": "10CC3B613AD653B11FBDA0A6D9D9CE2FD9D7EA334B5240707AE4F5FA58EFE07C",
+      "review_status": "current-reviewed"
+    },
+    "candidate": {
+      "target": "f210",
+      "distribution_version": "4.0.21000",
+      "archive_sha256": "E01EEF3EF15A750E069CC79D407F8CA849E4005CBB35E088E5B64FA55142E16C",
+      "content_sha256": "45DC9CC86832B1585E6EC1F32156913BD65CB602A04474A9B15AB260A717FDDD",
+      "entries": 324,
+      "package_source_sha256": "962F312C66EDA473FA4E0CBEF8E2ACEF01F4200831C198DD12A4E832420028F3"
+    },
+    "scenario": {
+      "name": "compiler-contracts",
+      "status": "passed",
+      "assertions_executed": 1,
+      "summary_sha256": "950210C72D8C830B180EAE38213F95E60EBCED7828911337E6ABF2B1F1A33FED",
+      "redacted_log_sha256": "A8A9402537120AC639807B366CA47F8262421353E1161ED58EC2B5F238B2E8A7",
+      "raw_log_sha256": "A915BABF8FF0DE8FB7DDA65DC038431501ED66160D925D56414E9270FB0AFCE6"
+    },
+    "custody": {
+      "logical_root": "MIR_EVIDENCE_HOME/mir4-4.1-ultimate/20260902T141633+1000-f6cef04f/evidence/U05-L4-technology-catalog",
+      "manifest_sha256": "C363A2F09B321CA6634CA248B82D78DB89E48CF2844E65E4C0E5357943265DA8",
+      "evidence_files": 4,
+      "evidence_bytes": 10443.0,
+      "raw_log_retained": false
+    },
+    "cross_patch_reuse": false,
+    "transition_gate": {
+      "version_allocation": false,
+      "tagging": false,
+      "signing": false,
+      "sealing": false,
+      "publication": false
+    }
+  },
+  "exact_package_delta": {
+    "f210": [
+      "prototypes/mir/planner/technology_catalog.lua",
+      "prototypes/mir/planner/technology_catalog/model.lua",
+      "prototypes/mir/planner/technology_catalog/index.lua",
+      "prototypes/mir/planner/technology_catalog/query.lua",
+      "prototypes/mir/planner/technology_catalog/build.lua",
+      "prototypes/mir/planner/technology_catalog/validate.lua",
+      "prototypes/mir/planner/compilation_plan/serialize.lua"
+    ],
+    "f200": [
+      "prototypes/mir/planner/technology_catalog.lua",
+      "prototypes/mir/planner/technology_catalog/model.lua",
+      "prototypes/mir/planner/technology_catalog/index.lua",
+      "prototypes/mir/planner/technology_catalog/query.lua",
+      "prototypes/mir/planner/technology_catalog/build.lua",
+      "prototypes/mir/planner/technology_catalog/validate.lua",
+      "prototypes/mir/planner/compilation_plan/serialize.lua"
+    ],
+    "f110": [],
+    "f100": []
+  },
+  "preservation": {
+    "semantics": true,
+    "plans": true,
+    "mutation_journals": true,
+    "diagnostics": true,
+    "stable_ids": true,
+    "settings": true,
+    "migrations": true,
+    "saves": true,
+    "compatibility_claims": true,
+    "legacy_targets": true,
+    "historical_4_0_baseline": true
+  },
+  "size_disposition": {
+    "former_lines": 430,
+    "facade_lines": 17,
+    "build_lines": 152,
+    "validate_lines": 133,
+    "state": "bounded-common-model-index-query-build-validate"
+  },
+  "remaining": {
+    "lua": [
+      "effect-ownership",
+      "compiler-orchestrator"
+    ],
+    "powershell": "pending-bounded-characterization"
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-L5-EFFECT-OWNERSHIP",
+  "record_sha256": "C130C251BA2CEE83D593BDAD61C9C91DF9A1601E03C37D28BBF592E80D564916"
+}

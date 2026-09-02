@@ -26,8 +26,20 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   Assert-MIR4M4202BaseContinuations ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
   $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
-  Assert-MIR4M4202BaseContinuations ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
-  $expectedManifestBindings=429
+  Assert-MIR4M4202BaseContinuations ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256) 'package-source-successor-predecessor'
+  if([string]$successor.package_authority.package_source_sha256-cne$currentPackageSource){
+    $l4Path=Join-Path $repo 'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json'
+    $l4SchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
+    Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath $l4Path -PathType Leaf) 'package-source-l4-successor-receipt'
+    $l4Raw=Get-Content -Raw -LiteralPath $l4Path
+    Assert-MIR4M4202BaseContinuations ($l4Raw|Test-Json -SchemaFile $l4SchemaPath) 'package-source-l4-successor-schema'
+    $l4=$l4Raw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $l4) 'package-source-l4-successor-hash'
+    Assert-MIR4M4202BaseContinuations ([string]$l4.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and[string]$l4.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l4-successor-chain'
+    $expectedManifestBindings=434
+  }else{
+    $expectedManifestBindings=429
+  }
 }
 
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100

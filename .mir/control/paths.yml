@@ -95,6 +95,10 @@ paths:
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1
   mir4.m42-02.stream-compiler.test: tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1
+  mir4.m42-02.technology-catalog.receipt: releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json
+  mir4.m42-02.technology-catalog.receipt-schema: contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json
+  mir4.m42-02.technology-catalog.writer: tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1
+  mir4.m42-02.technology-catalog.test: tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

@@ -644,6 +644,9 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-01A-CLI-Release-ConvergenceV1.json' = 'contracts/repository/mir4-m42-01a-cli-release-convergence-v1.schema.json'
     'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json' = 'contracts/repository/mir4-m42-01b-test-workflow-convergence-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Compilation-Plan-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compilation-plan-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-base-continuations-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1103,6 +1106,53 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l3-transition] $($property.Name)" }
     }
     $priorReceiptPath = $streamCompilerReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $technologyCatalogReceiptPath = 'releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $technologyCatalogReceiptPath) -PathType Leaf) {
+    $technologyCatalog = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $technologyCatalogReceiptPath -Kind 'MIR4M4202TechnologyCatalogDecompositionV1'
+    if ([string]$technologyCatalog.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$technologyCatalog.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$technologyCatalog.predecessor.record_sha256 -cne [string]$streamCompiler.record_sha256 -or
+        [string]$technologyCatalog.predecessor.package_source_sha256 -cne [string]$streamCompiler.package_authority.package_source_sha256) {
+      throw '[mir4-prefreeze-m42-02-l4-predecessor]'
+    }
+    $technologyCatalogEvolvedPaths = @{}
+    $technologyCatalogEnrollmentBaselines = @{
+      'tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1' = 'A5326EA3FBE5941AD0FE86934306EC7267F8ABC25079235DBFE8349C845A03B5'
+      'tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202.ps1' = 'C933AF6E213C5ABCF482FFF2CFC6375A053A7ADACA8847F98CF4E8AD50E870EF'
+      'tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1' = '1D74336F21F11F6CBD1A11660615621993E75A9F1E98B421C271335502B5071D'
+    }
+    foreach ($binding in @($technologyCatalog.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $technologyCatalogEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$technologyCatalogEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-l4-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $technologyCatalogEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-l4-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $technologyCatalogEvolvedPaths[$path] = $true
+    }
+    if ($technologyCatalogEvolvedPaths.Count -ne 14 -or
+        [string]$technologyCatalog.responsibility -cne 'technology-catalog' -or
+        [string]$technologyCatalog.status -cne 'M42-02-L4-TECHNOLOGY-CATALOG-DECOMPOSED') {
+      throw '[mir4-prefreeze-m42-02-l4-scope]'
+    }
+    foreach ($property in $technologyCatalog.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l4-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $technologyCatalogReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()
