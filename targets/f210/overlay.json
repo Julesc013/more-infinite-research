@@ -2543,14 +2543,94 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed families.modern source for f210.",
+      "reason": "Materialize the governed compilation-plan facade for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 42880,
-      "expected_sha256": "A1FFEB52014D910E5761945B9555291AE7C6E5E7CFE0564FCDA2C6D96493D566",
+      "expected_bytes": 111,
+      "expected_sha256": "96D4982DF9B953E1CA01BC9223637B3C993B5160E679B9BA5DB7670A9466B286",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/model.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/model.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compilation-plan model responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5461,
+      "expected_sha256": "86AA8D0509BA5BE80E536569077A8E478FC0662B45717C2FA7E2123C334059D6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/build.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/build.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compilation-plan build responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 31900,
+      "expected_sha256": "D02D09B54451F02E3F9CE54A508043B36F116B98C5521D899EE93020542D73EE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/validate.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/validate.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compilation-plan validate responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 3410,
+      "expected_sha256": "9074C0BF2696D9F69260FC6E24A1A0E1FF2555DF275E97C1E72FD285ADE98D23",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compilation-plan fingerprint responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1260,
+      "expected_sha256": "13463F103C31AE733E3635C66384233DE10EACEE2CCDFB485D4070D741FA4C1D",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/compilation_plan/serialize.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/serialize.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed compilation-plan serialize responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2736,
+      "expected_sha256": "C884E194F01993D9D90C14270C746A355B6E6278A9A85C2E98378C34AE30654E",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3471,5 +3551,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "BEEB4E868E25E25926C7E32396984668220E9519D462D4DCA0F497A5FC304772"
+  "record_sha256": "6430EE23BD69DF4C883D4D09146210CE987EF4EFE03FE162ED6A30A7F4051D5C"
 }

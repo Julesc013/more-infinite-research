@@ -57,8 +57,8 @@ if ($Command -in @('materialize','materialize-check')) {
     New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId $CandidateId -SourceVersion $SourceVersion -DistributionVersion $DistributionVersion -OutputRoot $OutputPath | ConvertTo-Json -Depth 12
     return
   }
-  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-editable-source-materializer-v1.json' }
-  Invoke-MIR4TargetMaterializerParity -RepoRoot $repo -ReportPath $OutputPath -Check | ConvertTo-Json -Depth 12
+  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-current-source-materializer-v1.json' }
+  Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -ReportPath $OutputPath -Check | ConvertTo-Json -Depth 12
   return
 }
 . (Join-Path $repo 'tools/mir/application/package/ShadowTargetMaterializer.ps1')

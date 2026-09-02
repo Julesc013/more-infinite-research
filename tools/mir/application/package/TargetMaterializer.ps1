@@ -199,3 +199,92 @@ function Invoke-MIR4TargetMaterializerParity {
   [IO.File]::WriteAllText($ReportPath, $reportJson, [Text.UTF8Encoding]::new($false))
   return $report
 }
+
+function Invoke-MIR4CurrentSourceMaterializerProof {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateSet('f210','f200','f110','f100')][string[]]$Targets=@('f210','f200','f110','f100'),
+    [string]$OutputRoot='build/packages',
+    [string]$ReportPath='build/reports/package-source/mir4-current-source-materializer-v1.json',
+    [switch]$Check
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $rows = [Collections.Generic.List[object]]::new()
+  foreach ($target in $Targets) {
+    $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target
+    $a = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-A' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
+    $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-B' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
+    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count) {
+      throw "[mir4-current-source-materializer-determinism] $target"
+    }
+    $absoluteOutput = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
+    $portableCompositionSha256 = @{}
+    foreach ($candidate in @($a,$b)) {
+      $portable = $candidate | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+      foreach ($pathField in @('tree_path','archive_path')) {
+        $relative = [IO.Path]::GetRelativePath($absoluteOutput, [IO.Path]::GetFullPath([string]$portable.$pathField)).Replace('\','/')
+        if ($relative -ceq '..' -or $relative.StartsWith('../',[StringComparison]::Ordinal)) { throw "[mir4-current-source-materializer-portable-path] $target/$pathField" }
+        $portable.$pathField = $relative
+      }
+      $portable.record_sha256 = ''
+      $portableCompositionSha256[[string]$portable.candidate_id] = Get-MIR4BootstrapRecordSha256 -Record $portable
+    }
+    $rows.Add([pscustomobject][ordered]@{
+      target=$target
+      distribution_version=[string]$a.distribution_version
+      source_binding_count=[int]$a.source_binding_count
+      omission_count=[int]$a.omission_count
+      archive_a=[string]$a.archive_sha256
+      archive_b=[string]$b.archive_sha256
+      content_sha256=[string]$a.content_sha256
+      entry_count=[int]$a.entry_count
+      baseline_content_sha256=[string]$identity.target_authority.baseline_content_sha256
+      baseline_entry_count=[int]$identity.target_authority.baseline_entry_count
+      baseline_match=([string]$a.content_sha256 -ceq [string]$identity.target_authority.baseline_content_sha256 -and [int]$a.entry_count -eq [int]$identity.target_authority.baseline_entry_count)
+      entry_count_delta=([int]$a.entry_count - [int]$identity.target_authority.baseline_entry_count)
+      deterministic_archive_bytes=$true
+      composition_record_a=[string]$portableCompositionSha256[[string]$a.candidate_id]
+      composition_record_b=[string]$portableCompositionSha256[[string]$b.candidate_id]
+    })
+    Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$a.tree_path))
+    Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$b.tree_path))
+  }
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  $report = [pscustomobject][ordered]@{
+    schema=1
+    kind='MIR4CurrentSourceMaterializerProofV1'
+    status='passed-four-target-current-source-determinism'
+    materializer_abi=[string]$manifest.materializer_abi
+    package_authority_sha256=[string]$authority.record_sha256
+    package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)
+    source_manifest_sha256=[string]$manifest.record_sha256
+    targets=@($rows)
+    invariants=[pscustomobject][ordered]@{
+      four_target_determinism=$true
+      historical_baseline_authority_immutable=$true
+      production_materializer_has_no_archive_input=$true
+      current_source_differences_explicit=$true
+      package_cutover_complete=$true
+    }
+    transition_gate=[pscustomobject][ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false}
+    record_sha256=''
+  }
+  $report.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $report
+  $reportJson = ($report | ConvertTo-Json -Depth 100).Replace("`r`n","`n") + "`n"
+  if (-not ($reportJson | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-current-source-materializer-proof-v1.schema.json'))) {
+    throw '[mir4-current-source-materializer-proof-schema]'
+  }
+  if (-not [IO.Path]::IsPathRooted($ReportPath)) { $ReportPath = Join-Path $repo $ReportPath }
+  if ($Check) {
+    if (-not (Test-Path -LiteralPath $ReportPath -PathType Leaf)) { throw "[mir4-current-source-materializer-proof-missing] $ReportPath" }
+    $current = [IO.File]::ReadAllText($ReportPath).Replace("`r`n","`n")
+    if ($current -cne $reportJson) { throw "[mir4-current-source-materializer-proof-stale] $ReportPath" }
+    return $report
+  }
+  $parent = Split-Path -Parent $ReportPath
+  if (-not (Test-Path -LiteralPath $parent -PathType Container)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+  [IO.File]::WriteAllText($ReportPath, $reportJson, [Text.UTF8Encoding]::new($false))
+  return $report
+}

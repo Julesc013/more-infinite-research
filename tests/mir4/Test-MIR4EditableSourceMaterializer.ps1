@@ -26,7 +26,7 @@ foreach($pair in $schemaPairs.GetEnumerator()){
 $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
 $registry=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV1'
 $support=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
-if(@($manifest.bindings).Count-ne406-or@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-ne406-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne406){throw '[mir4-editable-source-binding-uniqueness]'}
+if(@($manifest.bindings).Count-ne411-or@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-ne411-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne411){throw '[mir4-editable-source-binding-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
 if(@($support.targets|Where-Object{[string]$_.qualification-cne'independent-exact-engine-required'}).Count-ne0-or-not[bool]$support.invariants.no_cross_target_proof_substitution){throw '[mir4-editable-source-independent-target-proof]'}
 
@@ -49,14 +49,22 @@ $productionText=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir/applic
 if($productionText-match'Read-MIR4ArchiveBytes|Get-MIR4Shadow|spec/distribution/mir4-golden|dist/more-infinite-research_4[.]0'){throw '[mir4-editable-source-production-archive-input]'}
 if(Test-Path -LiteralPath (Join-Path $repo 'tools/commands/mir4/Initialize-MIR4CanonicalSource.ps1')){throw '[mir4-editable-source-bootstrap-writer-not-retired]'}
 
-$proof=Invoke-MIR4TargetMaterializerParity -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-editable-source-materializer-v1.json'
-$proofPath=Join-Path $repo 'build/reports/package-source/mir4-editable-source-materializer-v1.json'
-if(-not((Get-Content -Raw -LiteralPath $proofPath)|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json'))){throw '[mir4-editable-source-proof-schema]'}
+$proof=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-current-source-materializer-v1.json'
+$proofPath=Join-Path $repo 'build/reports/package-source/mir4-current-source-materializer-v1.json'
+if(-not((Get-Content -Raw -LiteralPath $proofPath)|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-current-source-materializer-proof-v1.schema.json'))){throw '[mir4-editable-source-proof-schema]'}
 $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  if($expected.Count-ne1-or$actualRow.Count-ne1-or[string]$actualRow[0].content_sha256-cne[string]$expected[0].archive.content_sha256-or[int]$actualRow[0].entry_count-ne[int]$expected[0].archive.entry_count-or[string]$actualRow[0].archive_a-cne[string]$actualRow[0].archive_b-or-not[bool]$actualRow[0].deterministic_archive_bytes){throw "[mir4-editable-source-target-parity] $target"}
+  $modern=$target-in@('f210','f200')
+  $expectedDelta=if($modern){5}else{0}
+  if($expected.Count-ne1-or$actualRow.Count-ne1-or
+     [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
+     [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or
+     [int]$actualRow[0].entry_count_delta-ne$expectedDelta-or
+     [bool]$actualRow[0].baseline_match-ne(-not$modern)-or
+     [string]$actualRow[0].archive_a-cne[string]$actualRow[0].archive_b-or
+     -not[bool]$actualRow[0].deterministic_archive_bytes){throw "[mir4-editable-source-target-parity] $target"}
 }
 $f2e=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json')|ConvertFrom-Json -Depth 100 -DateKind String
 if([string]$f2e.verification.legacy_root_projection_sha256-cne$historicalPackage-or

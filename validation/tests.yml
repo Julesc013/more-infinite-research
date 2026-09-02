@@ -2928,6 +2928,7 @@
         "spec/schemas/mir4-target-overlay-v1.schema.json",
         "spec/schemas/mir4-package-composition-result-v1.schema.json",
         "spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/mir/application/package/GoldenTargetBaselines.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
@@ -3086,6 +3087,33 @@
         "tools/mir/application/tooling/**",
         "tools/mir/cli/Invoke-MIR4ToolingConvergence.ps1",
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+        "package-source"
+      ]
+    },
+    {
+      "id": "static.mir4-compilation-plan-decomposition-m42-02-l1",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "src/mod/families/modern/prototypes/mir/planner/compilation_plan.lua",
+        "src/mod/families/modern/prototypes/mir/planner/compilation_plan/**",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        "docs/architecture/module-boundaries.md",
+        "spec/schemas/mir4-package-source-manifest-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json",
+        "contracts/repository/mir4-m42-02-compilation-plan-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Compilation-Plan-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202CompilationPlanDecompositionAuthority.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1",
+        "assurance/catalog/tests.json",
         "package-source"
       ]
     },

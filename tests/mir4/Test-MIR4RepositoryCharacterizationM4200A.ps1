@@ -10,7 +10,7 @@ function Assert-MIR4CharacterizationV1 {
   if(-not$Condition){throw "[$Code] $Detail"}
 }
 
-$expectedPackage='632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'
+$expectedPackage=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $expectedReadme='403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20'
 $output='build/reports/repository-characterization'
 

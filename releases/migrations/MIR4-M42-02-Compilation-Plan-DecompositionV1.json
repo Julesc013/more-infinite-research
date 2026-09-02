@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202CompilationPlanDecompositionV1",
+  "status": "M42-02-L1-COMPILATION-PLAN-DECOMPOSED",
+  "starting_dev": {
+    "commit": "9ad319d5dc48e27c61a7a6c92f1f0d70f832cb56",
+    "tree": "b445deca9973a377d2b42d2ba7cdbfe6706fd384"
+  },
+  "predecessor": {
+    "work_package": "M42-01",
+    "receipt": "releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json",
+    "receipt_sha256": "A27ABD652775F39E5F880A3A65D3EE4D006BFAC6352473C3B87D629450A0C3C5",
+    "package_source_sha256": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "A9305CBC2FF8F92D1A797C6035C6DE150F71EF3D28F04B0F2D696F2B12EE6A40",
+      "current_sha256": "43148BD64301B2A1F3CDEBAD2AB6AE8C3FEE5721E7C3AD4E9F8CC162AC1948B9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "EDEAE7E1E4AE226E58A8CA66CDC241D2EA51DDD48C7CB73531D5D28DEBF448E7",
+      "current_sha256": "2EF3DA41982B4A327AEC5B9F8C8F3BCE534287C07A2E8ADEF8A0C9C5F8160A63",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
+      "previous_sha256": "D36D0BCBC2E880982DBE978E56C2BF62DF7DDCC8AF08EBCF3CF2B44F5A60E732",
+      "current_sha256": "9C772D2D310EF3C1EE57DC80E88A58AFB5F37C3EB32A97AA2AD05F21DBAFD0AD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "A02635793012FF06F82A3056C9851D4500935DFC9126782747D1D727A0B8645D",
+      "current_sha256": "2D7EA6EB31F13F50F9B01E8090AA474B64D9FB44368DEF60582F4590CFCB6D2E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "BD3374A8F0900403FD9F0774CAA088E0E1C8A9523E6EE30ACE75356A58AE75D7",
+      "current_sha256": "1FC1FBA23DA656051DBDEBF4492275B22F06B496C3A63F7CBDAF745BA3EF30A1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "B67ACC47B41E6C5706B8EA4AC5EDC110CB70FF203828CB3140D0A5B8E2D9818A",
+      "current_sha256": "4CD8F5FDF0A228A0E21C430F87813485B5A33A9E091DED405C45F02EF39B120F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "previous_sha256": "3A2301D8C2EAA4FCD64AF1A7B616D31184FE08170E4AE01A506DA2AFB901B465",
+      "current_sha256": "BB3B325149D52CB14DBA0478B1D070155936BDA760800445EE7A85526D25F689",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "514D66D65F55F9F8FA95832285DE34BC110952202AEBA87223C6812E04BED1D1",
+      "current_sha256": "6C1FCE904525AEF1E9F2D6477E7157F2ADB3DF720D7D29A548890127F400DF08",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "contracts/release/mir4-release-narrative-result-v1.schema.json",
+      "sha256": "4BB57FCA89D5DE38372D622D2E6C10F3AF19DCDFC8E41F3ADCB8AC71D16EFB8F",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-release-narrative-result-contract",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseNarratives.ps1",
+      "sha256": "F6247CEDC697AF54C4C1C87CEFECCEED31329EF595101BDC9873C1382965926B",
+      "hash_mode": "canonical-text-v1",
+      "role": "current-release-narrative-application-service",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "responsibility": "compilation-plan",
+  "facade": "prototypes/mir/planner/compilation_plan.lua",
+  "modules": [
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan.lua",
+      "bytes": 111,
+      "lines": 5,
+      "sha256": "96D4982DF9B953E1CA01BC9223637B3C993B5160E679B9BA5DB7670A9466B286"
+    },
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/model.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/model.lua",
+      "bytes": 5461,
+      "lines": 116,
+      "sha256": "86AA8D0509BA5BE80E536569077A8E478FC0662B45717C2FA7E2123C334059D6"
+    },
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/build.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/build.lua",
+      "bytes": 31900,
+      "lines": 674,
+      "sha256": "D02D09B54451F02E3F9CE54A508043B36F116B98C5521D899EE93020542D73EE"
+    },
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/validate.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/validate.lua",
+      "bytes": 3410,
+      "lines": 76,
+      "sha256": "9074C0BF2696D9F69260FC6E24A1A0E1FF2555DF275E97C1E72FD285ADE98D23"
+    },
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "bytes": 1260,
+      "lines": 41,
+      "sha256": "13463F103C31AE733E3635C66384233DE10EACEE2CCDFB485D4070D741FA4C1D"
+    },
+    {
+      "output_path": "prototypes/mir/planner/compilation_plan/serialize.lua",
+      "source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/serialize.lua",
+      "bytes": 2736,
+      "lines": 77,
+      "sha256": "C884E194F01993D9D90C14270C746A355B6E6278A9A85C2E98378C34AE30654E"
+    }
+  ],
+  "package_authority": {
+    "source_manifest_sha256": "D461E1B0CD23F6CCAFB13E3CCB5C5507E4EB1D876863705E2937E3EE00D578EE",
+    "package_authority_sha256": "5A4B129E21C8F80316B1D88D0028F9E4B6FE532F9CC76337509E96A993A8D47F",
+    "package_source_sha256": "D964D8A932B94489776CBC4A06345264AFA476B57FF7E198C96EF7E76EE10B20"
+  },
+  "target_proof": [
+    {
+      "target": "f210",
+      "distribution_version": "4.0.21000",
+      "source_binding_count": 310,
+      "omission_count": 0,
+      "archive_a": "85D3FBEA22064BEA382BF9DBC12F0937469A84BE51B0F3A7187266B6485CB524",
+      "archive_b": "85D3FBEA22064BEA382BF9DBC12F0937469A84BE51B0F3A7187266B6485CB524",
+      "content_sha256": "F7566232B36E355D5DC5F9F3E5CABD331FD1BF5DBB35E329B0CEA366EA222E86",
+      "entry_count": 310,
+      "baseline_content_sha256": "CA72A8045654FFDC8630D54567F6D04A1B40BA5682ED06E7FACCF2772A2660ED",
+      "baseline_entry_count": 305,
+      "baseline_match": false,
+      "entry_count_delta": 5,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "ED1ADB5123A1DF50FE00AB531B519B7B21E015AEEE2FAD46F641AC2DF7D72F0E",
+      "composition_record_b": "861D8099D41CED91E77F8D8FF80FC82E079004520078A1D810C1A49750264857"
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.0.20000",
+      "source_binding_count": 308,
+      "omission_count": 2,
+      "archive_a": "D6385DE9240AF60508315DF49BFC9D0549691D761CE5F59E0CD3B76E359A8D26",
+      "archive_b": "D6385DE9240AF60508315DF49BFC9D0549691D761CE5F59E0CD3B76E359A8D26",
+      "content_sha256": "BAB847DBF6F791565140A6DC2A85D1E729318C62FF2B71582C69690743CF7931",
+      "entry_count": 308,
+      "baseline_content_sha256": "5163E45530CB9B4DAEAC27166279809933750C605BA6E3EC785A0267B9428A1F",
+      "baseline_entry_count": 303,
+      "baseline_match": false,
+      "entry_count_delta": 5,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "A97592AFFF0E4C7EC84702CCDB6149ED005DBBE3C5E7976102C08B9EE5202F01",
+      "composition_record_b": "0C54AC256AC10DB2E5E8F8C1D18A7E4D9C33B54466BA4F7B5F91453A72552DFA"
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.0.11000",
+      "source_binding_count": 174,
+      "omission_count": 131,
+      "archive_a": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+      "archive_b": "85FC9DF06E0121B0D0230BAACEDBEAB32B6913C2F8C4E19093EBFB2C3E92440C",
+      "content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "entry_count": 174,
+      "baseline_content_sha256": "B3DAA35E6E72741D8054C4EC22435CC8216CB6A5E2566D10CF9E3B934E3FF682",
+      "baseline_entry_count": 174,
+      "baseline_match": true,
+      "entry_count_delta": 0,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "19A6FBDB66C9E65869152184F21A18E2DEAEFF194E059CB2B3950C9DF97597B7",
+      "composition_record_b": "CEF6CCF987481B63D6AF91D0C49C8A68DB175C4997824B94F88EE472C4C1A4D8"
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.0.10000",
+      "source_binding_count": 174,
+      "omission_count": 131,
+      "archive_a": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+      "archive_b": "4CFD694AD116B452D0235E562CF7B6B47C589BAC0E3283C3184767D087590F35",
+      "content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "entry_count": 174,
+      "baseline_content_sha256": "1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2",
+      "baseline_entry_count": 174,
+      "baseline_match": true,
+      "entry_count_delta": 0,
+      "deterministic_archive_bytes": true,
+      "composition_record_a": "4ACC2DF1A49E280328C329C3E79A99FD4834F5BFE034E5B8F2547266322C4881",
+      "composition_record_b": "BF336B72B0653253EE5A60A8D075B14136C09A3B4E5F23694464E656D2716D2B"
+    }
+  ],
+  "runtime_proof": {
+    "engine": {
+      "version": "2.1.17",
+      "file_version": "2.1.17.87315",
+      "binary_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+      "runtime_api_sha256": "2E1FD436404B712AF6FE7B6C53E21A8F5688092A9E132FD2A5571327A96E5211",
+      "prototype_api_sha256": "156F33CB4BC7EE2C538BB93F291F5270F2CDC45BE654BBE6F226E402BF8F5368",
+      "changelog_sha256": "10CC3B613AD653B11FBDA0A6D9D9CE2FD9D7EA334B5240707AE4F5FA58EFE07C",
+      "review_status": "current-reviewed"
+    },
+    "candidate": {
+      "target": "f210",
+      "distribution_version": "4.0.21000",
+      "archive_sha256": "85D3FBEA22064BEA382BF9DBC12F0937469A84BE51B0F3A7187266B6485CB524",
+      "content_sha256": "F7566232B36E355D5DC5F9F3E5CABD331FD1BF5DBB35E329B0CEA366EA222E86",
+      "entries": 310,
+      "package_source_sha256": "D964D8A932B94489776CBC4A06345264AFA476B57FF7E198C96EF7E76EE10B20"
+    },
+    "scenario": {
+      "name": "space-age-generation-integrity",
+      "status": "passed",
+      "assertions_executed": 1
+    },
+    "custody": {
+      "logical_root": "MIR_EVIDENCE_HOME/mir4-4.1-ultimate/20260902T141633+1000-f6cef04f/evidence/U05-L1-compilation-plan",
+      "manifest_sha256": "4AA386446D601974B8AC3DC09E5FE081373DF904B5A59888374E95266F724505",
+      "evidence_files": 4,
+      "evidence_bytes": 1078209,
+      "raw_log_retained": false,
+      "raw_log_sha256": "978158432E8124E81EB38464F8B252FA53298BBAC8C01B12E7E000B791025F21"
+    },
+    "cross_patch_reuse": false
+  },
+  "exact_package_delta": {
+    "f210": [
+      "prototypes/mir/planner/compilation_plan.lua",
+      "prototypes/mir/planner/compilation_plan/model.lua",
+      "prototypes/mir/planner/compilation_plan/build.lua",
+      "prototypes/mir/planner/compilation_plan/validate.lua",
+      "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "prototypes/mir/planner/compilation_plan/serialize.lua"
+    ],
+    "f200": [
+      "prototypes/mir/planner/compilation_plan.lua",
+      "prototypes/mir/planner/compilation_plan/model.lua",
+      "prototypes/mir/planner/compilation_plan/build.lua",
+      "prototypes/mir/planner/compilation_plan/validate.lua",
+      "prototypes/mir/planner/compilation_plan/fingerprint.lua",
+      "prototypes/mir/planner/compilation_plan/serialize.lua"
+    ],
+    "f110": [],
+    "f100": []
+  },
+  "preservation": {
+    "semantics": true,
+    "plans": true,
+    "mutation_journals": true,
+    "diagnostics": true,
+    "stable_ids": true,
+    "settings": true,
+    "migrations": true,
+    "saves": true,
+    "compatibility_claims": true,
+    "legacy_targets": true,
+    "historical_4_0_baseline": true
+  },
+  "size_disposition": {
+    "former_lines": 937,
+    "facade_lines": 5,
+    "build_lines": 674,
+    "state": "accepted-cohesive-build-owner-with-l6-orchestrator-follow-up"
+  },
+  "remaining": {
+    "lua": [
+      "base-continuations",
+      "stream-compiler",
+      "technology-catalog",
+      "effect-ownership",
+      "compiler-orchestrator"
+    ],
+    "powershell": "pending-bounded-characterization"
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-L2-BASE-CONTINUATIONS",
+  "record_sha256": "68200C8D0C286FEDD645E043306147520F9EA5D0236DBC2B0BEB594592EBD50D"
+}
