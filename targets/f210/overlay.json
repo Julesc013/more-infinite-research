@@ -21,8 +21,8 @@
       "expected_sha256": "26C3119272C8A368FF1B506635DBE8DC13C3965050FB57C965BA30AA1F0AB0CF",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -37,8 +37,8 @@
       "expected_sha256": "C2FD8677AD624DDDD5AD0B26C41C373381D77B65717DE4D808CC5DBDF8DA70DA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -53,8 +53,8 @@
       "expected_sha256": "E8D01029DFDB33D7F9C3A25713966D516551E5382D60EFF895F156D78770EC36",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -69,8 +69,8 @@
       "expected_sha256": "CAD7CCB56C4853156AA6D9D14FB9B6C7AD431967F44202BBCC1CC8574A4DB69B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -85,8 +85,8 @@
       "expected_sha256": "CF6FD26268D2EEE3035170F12E2C735281802DE4D7D8590625E11A660383BB4C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -101,8 +101,8 @@
       "expected_sha256": "AB48FB1BCC92FDBAAF9771F54B64628817D8B56ECBE0FDF914E56A6AFEAFEC16",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -117,8 +117,8 @@
       "expected_sha256": "ED9845FD31A8AC27B80B5BA809B59A522BB0B1D346A4B7BE5DD18E7EDCF2437F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -133,8 +133,8 @@
       "expected_sha256": "862D19310B7646B0C1EA82700C3EE3C0793A60839A811E6A95265C48FEE8A7DA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -149,8 +149,8 @@
       "expected_sha256": "B6DC72DDF3C351CFC954BEBF4A353D68F5DF542E5536357A998E4D652256B900",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -165,8 +165,8 @@
       "expected_sha256": "A06C5C5CB0EFB530386C2503A32D9738FB2D8C086BA0A57C684459042136A26C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -181,8 +181,8 @@
       "expected_sha256": "B97BD265FCF7B7E393296D9DDC589292E435D78A097B579A498EBDB90E94E65E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -197,8 +197,8 @@
       "expected_sha256": "41D3F4BAF69231A6DAF8E8A9A4CA2ADFD6EFF01B785ABC249B0DCDCD57D27C45",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -213,8 +213,8 @@
       "expected_sha256": "36CFAA838B19E477CC9505D8E2C1B289F5F86E2D9D91DB382DB3E1B2F5F569B4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -229,8 +229,8 @@
       "expected_sha256": "B26DDEE6684DAC6B9BBB59531C836843E796D373BC55541CF4F41B5EE30B98DC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -245,8 +245,8 @@
       "expected_sha256": "A27FFDC4B0E37239D1167F5C8D346FBA1735CC03BDCE0B2649A58428125971E3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -261,8 +261,8 @@
       "expected_sha256": "D446B1E924B5E3AD02BDB0E794D6447364531B2E117645BCE2F948D38184E9BA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -277,8 +277,8 @@
       "expected_sha256": "6C9DAC1BA2241A3510209E7009AC8A20A6171612AEF71076BB5F03F8C2B88F1F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -293,8 +293,8 @@
       "expected_sha256": "5E9895481F5C25AD69D6E89B58922CCDA2E6B67D1335FD856FC46984F1D71D5A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -309,8 +309,8 @@
       "expected_sha256": "413A5FA862D2853A72638653F4157D3D00AD3D3CD247821531CD15C46C1C3FF0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -325,8 +325,8 @@
       "expected_sha256": "08D33AF1FFDD70AB9BF3115D28B42D976A101B169F671C587D150A9B54D4B2A5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -341,8 +341,8 @@
       "expected_sha256": "DC05B173890142E34510AB4A176006553B04ECF1FACAFEA5A80C657D6E06E892",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -357,8 +357,8 @@
       "expected_sha256": "BEFC5C97D853BBF039B57A89B5F8910F21DCEA582631841E6528B9055E7002FB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -373,8 +373,8 @@
       "expected_sha256": "E7C67AF0109B892FFBCF2DEBDC7568F49537CB1B4AD32B3EABF91010480217C9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -389,8 +389,8 @@
       "expected_sha256": "0E4530E0ED2BB28EE05CA916329457BC752A38DFA8431416208338F94A3C2136",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -405,8 +405,8 @@
       "expected_sha256": "23F49D8133807D0675867383F542B5F25393C48CE43CA48B213B048D87C40D66",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -421,8 +421,8 @@
       "expected_sha256": "CB7CF0963D2A3ABE409AD718C21AAAB60E4DE76073C5FCFC04108B4A731F5F1C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -437,8 +437,8 @@
       "expected_sha256": "FCAB392D8ED3952F45676D9BAF5BCF5AD9543A786516CF2F3D55D4F3EB257B61",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -453,8 +453,8 @@
       "expected_sha256": "750807A19BFCC071F5FF2E6D92CDD535EF4F1F03BB1F86D399F010750A79476B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -469,8 +469,8 @@
       "expected_sha256": "8F8709FADD58DA2258FB278BCD954034F87CBEE0ECF16529C63842D86D2D4500",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -485,8 +485,8 @@
       "expected_sha256": "010AAE330C696F8F24F096B278351FA4059BCE5439A269E6BC060F01418DCBC6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -501,8 +501,8 @@
       "expected_sha256": "D1F169CF9A1A77CCC76A6F2BD8B2528533DF510CC2CD050D0ECF1CAFA29FA1C0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -517,8 +517,8 @@
       "expected_sha256": "3DFBB50D2499460CC1A4B4B5E088CACE02A1CAE91B60E19A0AB176844669E6E0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -533,8 +533,8 @@
       "expected_sha256": "ED7DFFD28AD526BAFE0673B24F3801D3FE0EA1708C6BD7FBF74E8A511EA8E196",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -549,8 +549,8 @@
       "expected_sha256": "703EE865749C8A85F136CF9E098784E7437030116303D46293DF3D6EFD868616",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -565,8 +565,8 @@
       "expected_sha256": "F72536BE312E5270B6EC59A3E60C5897CF74D0234D5ECE86F26FD0CD06BD69FC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -581,8 +581,8 @@
       "expected_sha256": "F2405886752EF66FDA07E7C12DF6138AE18D0FEC04A27C638FA239D0724DE355",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -597,8 +597,8 @@
       "expected_sha256": "C498751F3D9CD4968AC8978294128FEA0BEA9B58D8B645119F9FF6D5DB785977",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -613,8 +613,8 @@
       "expected_sha256": "FD4281E125D43889327866364C3DFFDF78D45F06A16BAC74EFF61E804A10078A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -629,8 +629,8 @@
       "expected_sha256": "CD8E7ABEF0B9559BADB8E17A4F012891D21940E5CDB53FDE45EFA39A8374486C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -645,8 +645,8 @@
       "expected_sha256": "735D706E030DB6C4AFC30CC56640D8AD36356550BD3C2039BC7FFC294AAE290B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -661,8 +661,8 @@
       "expected_sha256": "A69994D17F8B51F1C4306C836332D514B8849561B943A496220FE73105557A21",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -677,8 +677,8 @@
       "expected_sha256": "0CC91FD83830ECE28B873426195E615FD19C90BA597F211B8153E9C9D4F1C3AC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -693,8 +693,8 @@
       "expected_sha256": "4E6503A9A28A147D0AE1BF5608698FCF6EAF554108696768D9A3048FB4C62459",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -709,8 +709,8 @@
       "expected_sha256": "9537AD5F4745F187AF4E40AB9A22D3F9E27986AC920AEAEEA03415187B047EE6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -725,8 +725,8 @@
       "expected_sha256": "64F209E20FF4B74731DCB10722350D9E0A10F69C1306E7F51AEA678E5EFA6744",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -741,8 +741,8 @@
       "expected_sha256": "64A77B5D1FCF7A53755B48D80A78A9C963099BFF1CDFD002872B27A55697C7AB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -757,8 +757,8 @@
       "expected_sha256": "B5DDA081CB999DD4381102FFEAC5FCD39BE2936F2F4E064C902505008C872026",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -773,8 +773,8 @@
       "expected_sha256": "CF1586B5B00A083699B986C87400770F33107F3A29DE7EB1C566A2F7E2A0BBC6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -789,8 +789,8 @@
       "expected_sha256": "DE03C4AD19C04269CEF476FA30831DB1441842F8255486EA4A632505578681CF",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -805,8 +805,8 @@
       "expected_sha256": "D0C1A82D946DB3BB67043D97E92C3711A9AEB79664E392A80BA354B7CCBACF7A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -821,8 +821,8 @@
       "expected_sha256": "7E4FA8E69B31752FB757AEE171C896DE5CBCDEFE6C895BBA324CF78F4D03A021",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -837,8 +837,8 @@
       "expected_sha256": "EBD8A12BB436571D09B83E72E48F7DBEBED8F5BCD092B7EF3D9D8815E09CF91D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -853,8 +853,8 @@
       "expected_sha256": "12503B163878AFBC460C55B8151051217B9EB10BA6D09620A722ADA35E3D7635",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -869,8 +869,8 @@
       "expected_sha256": "31E3D3A25F9057C33ABEB27B4F95CA55F00505D47037D5817D6BDB39494E201E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -885,8 +885,8 @@
       "expected_sha256": "70DDA47669F47496F25CDC0707C4A206CD63D4A2204330CB890E73BDCE8981F5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -901,8 +901,8 @@
       "expected_sha256": "500D9F8111CE396283E2A004191C5391E6A49E1C71A28DA246F1812816F2DD2F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -917,8 +917,8 @@
       "expected_sha256": "724CD93A6B40CDF97830BBB49F3485AA0326DA0C6B8A6B1414C8BB4639B8F6BF",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -933,8 +933,8 @@
       "expected_sha256": "3CDC76982F45413E5589065E73AD3861B55AFC75A672C5E301F7DAFA953A3943",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -949,8 +949,8 @@
       "expected_sha256": "39E655B84B59976701C2DAB17ECE79ADEDC07A124D2E6C2AB7C2EC69155C4FAB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -965,8 +965,8 @@
       "expected_sha256": "B5C878D8820AA8D2CE5A437818AD43AAACA734141285320EA57A0481A4B8C7E6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -981,8 +981,8 @@
       "expected_sha256": "6A0443E1BE0268006194100EAED87024C36D0CFE95D5CBDFB0A5BFD4EC851B8E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -997,8 +997,8 @@
       "expected_sha256": "B0DF0F0E58EBB681242ECD9DF18EA50DA7C8C73DA3BEC2222893460D4CEB5CD4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1013,8 +1013,8 @@
       "expected_sha256": "BC8AB449769F4459A23A19BBEAEDC2878A3517E8E5DD875C78052CFA30321F55",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1029,8 +1029,8 @@
       "expected_sha256": "8BC07C597766C260B94E3D0E377C76401C66AA048926FD1EC6AF3202CCA666F2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1045,8 +1045,8 @@
       "expected_sha256": "D368CE73CB6D4FE0AA59D093A3A5580EE23756AFB7398B05EB85CF9070B94539",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1061,8 +1061,8 @@
       "expected_sha256": "0B5FDEFA417C710610E12D6CF68CE19C59D151569DB213D7E5F4425F7487048D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1077,8 +1077,8 @@
       "expected_sha256": "D580330701A300A038B490EB5E717423B817DF70D97F5D97048F1866A58280C9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1093,8 +1093,8 @@
       "expected_sha256": "FF317BC49E4FBB4F3BFF2FAC17B32A6407A75D2024EEB3C7E1D9544A8CF13710",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1109,8 +1109,8 @@
       "expected_sha256": "A4F62FE429E64D2DAD2F01580D2B6BFC88E2129D682FD64C1E1A564854FD5FF5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1125,8 +1125,8 @@
       "expected_sha256": "EC346717BF56D07563FD58DFC51415690015F7E22594B9FCA785A6540D548FE3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1141,8 +1141,8 @@
       "expected_sha256": "06AD153D035E80504448DA7B7140C6B4C9DA10A7F1419B62A7CE6B3F3C2A5CD8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1157,8 +1157,8 @@
       "expected_sha256": "D201F32A123AC1DC015C5C1CC62DCF5716659C9694EF620D3103CE4A84CF985E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1173,8 +1173,8 @@
       "expected_sha256": "ADCEC6CB0FCE47E4702CE7AEDBD776966F44565FCEF4137AA1E3260B110F2B14",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1189,8 +1189,8 @@
       "expected_sha256": "E7A7314E94758D8CC46D41292C96A096575962C968D3FF6E1D4F73C838722A4C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1205,8 +1205,8 @@
       "expected_sha256": "921F13B156F6B2CC158E08B2087F1F3CA767A04DACCD55327990D36ADC838780",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1221,8 +1221,8 @@
       "expected_sha256": "5AA29FB26A53A2FCBFB93A1F1C0EF7D15598C226D748301C2EAC12E28D2C96C5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1237,8 +1237,8 @@
       "expected_sha256": "524F42956863DA7F1D36CDDF195D0A3B6231B434CE6B55BC7B6CDF37B03A599B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1253,8 +1253,8 @@
       "expected_sha256": "ACCEB79BBEA388B90F568C8AB7E3BB1171472C0BCCB8274DE9779D004688B00D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1269,8 +1269,8 @@
       "expected_sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1285,8 +1285,8 @@
       "expected_sha256": "F93CC8AC2ABB9FDBDC139C88E434D77C57FE5B6B030A66AEB8B7C4594B61AE58",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1301,8 +1301,8 @@
       "expected_sha256": "9410BF22A036EF1AC6CC4290901B2262FF478152D47B49AA6422E58E962186FA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1317,8 +1317,8 @@
       "expected_sha256": "3DD80295518A8E40365BAD03279F4D72615CF223469162B7CA0EC37AB620FC9E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1333,8 +1333,8 @@
       "expected_sha256": "149C6082938987FB94E32B595A0E84048D92EAED5A0EB0E4179EECD03F3E1753",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1349,8 +1349,8 @@
       "expected_sha256": "2D23AE9A5E1D2AA4DCFC0D2BC580C97EF50BCD8741B4319817C40CEDE1F48B83",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1365,8 +1365,8 @@
       "expected_sha256": "88A0DB27C39231C1EC46F708D7286C4D6EFE3B12A62656465BB2F31A93F902A6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1381,8 +1381,8 @@
       "expected_sha256": "E86E24D3ABAC63F5388CFFB7FFB1E2D54E15F5768D1DA956D2648CD126F878F7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1397,8 +1397,8 @@
       "expected_sha256": "99573DCD020B953CD611263370783DCF852CAF11F2ABEE768FD0085AA4FF945E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1413,8 +1413,8 @@
       "expected_sha256": "9C0C1706A5C897C049C1B45500E533974ED59F5D495B9F6B233100935D84D1B8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1429,8 +1429,8 @@
       "expected_sha256": "C240F6E20E51ACA22A40EB8FC53CD7D8621D231BC9B5D1307AA1521D01A7BEA3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1445,8 +1445,8 @@
       "expected_sha256": "D92CC40BE19AE3F6128EC4A9EDA102325A7446E1AD0C1A16EBD961ACC4C5C1E2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1461,8 +1461,8 @@
       "expected_sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1477,8 +1477,8 @@
       "expected_sha256": "6FFC04BC7C1CB076D3677A9B0EEA6C738C330BD862AAA01A8A9DFF9F9193AE7E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1493,8 +1493,8 @@
       "expected_sha256": "31B16F0D7027A38BB14936AFFB004624F61BB07C414051F52D30B03E957D15C2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1509,8 +1509,8 @@
       "expected_sha256": "CB8BF299B555BCE3604C8D2CDC3F2697CEC76662029D328E7BBBDA7A56BA7482",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1525,8 +1525,8 @@
       "expected_sha256": "3EF11B84C35A587508A0FDF8394E82EAF76CCA7B6C60D9EA9011E7A8F857BA00",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1541,8 +1541,8 @@
       "expected_sha256": "E004FF72A468543BE5D13B110AFB8CF46BDEFBD9597DD583E6E5783BDD863AC3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1557,8 +1557,8 @@
       "expected_sha256": "6237C154D8E5AFC811603901508574D6CDAB6211D3F5D76B89FD390FCDF31A53",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1573,8 +1573,8 @@
       "expected_sha256": "E8962BC9E1839EB5922944CC67E04C333E57C54330CD0B3E9030130B5E2A60EE",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1589,8 +1589,8 @@
       "expected_sha256": "66578148236612993AAAF4C3B2D6DAA0A7075B2E5E068B807FB1EAFCCBD4568B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1605,8 +1605,8 @@
       "expected_sha256": "62CE23985C877595B08409F4AB9475DAC113D7C6A06753C9D22C680A85083907",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1621,8 +1621,8 @@
       "expected_sha256": "E932DF75C5B0CE20AE8E4C3AC9E5ABDE20061C7897FB06ECAFE68C74623467C9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1637,8 +1637,8 @@
       "expected_sha256": "99C1F7584F38982E7366C6365BB415B2C638C2E76BCD210AAD86D5CD13E385CD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1653,8 +1653,8 @@
       "expected_sha256": "BF5C3402DFCDD240485EDBAAE051C6B7075C04FE62749AB0CBA8B374C16FBF77",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1669,8 +1669,8 @@
       "expected_sha256": "2805B3AB21B401419020D9564A9CF41B7702C79277588D1D60E919D9BD318351",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1685,8 +1685,8 @@
       "expected_sha256": "A15FD8ED38E6E98DB66384FE189E7CCEA0990B777FE061431A80E4CFE40773DB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1701,8 +1701,8 @@
       "expected_sha256": "8BED9810A8282BE0B6BF172018E0852328FE246917CEE2FC0AD735270C1A8471",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1717,8 +1717,8 @@
       "expected_sha256": "F26A69F8B59A0836C14146009459B082AD94019C546AA0074303E424AA6F6A5A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1733,8 +1733,8 @@
       "expected_sha256": "BD9E34FFBFDE77DDE56181BF7FE4B7191F8AAAB179B6DBD5FB7179B6A58EF741",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1749,8 +1749,8 @@
       "expected_sha256": "724CDD0932CBBF488E4DE4417A3D84EFB254AC3B841C41FEC2842AC6706C41F0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1765,8 +1765,8 @@
       "expected_sha256": "59AE45146673E0044C67FD2EB3D8753AF194DE8D62EB9CB80FEE5A7A5A40FD26",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1781,8 +1781,8 @@
       "expected_sha256": "A8C1B7E1A9050050C7BF261B37410324B0B4C9D268C954302F1E1270B4416AEA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1797,8 +1797,8 @@
       "expected_sha256": "5AB80A7F8181CA4C85760DE9DE8C3DE4F1B17C6D350B72D3957C677358D8EE83",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1813,8 +1813,8 @@
       "expected_sha256": "32E4921CA0BC66FF4607364CEEB66C870614C7495C695183103345977A70DF4E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1829,8 +1829,8 @@
       "expected_sha256": "09AC3B1B1C2385F09B1005EF929EDCF81D93675A953E780DD60100A8F86C4407",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1845,8 +1845,8 @@
       "expected_sha256": "AD940680FBB5FCC57A17AFFE97B2A345F299D3368CC49B356D092D8FFAF5D06E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1861,8 +1861,8 @@
       "expected_sha256": "02EEE534CA59285EAE77D57071F3DF5E219C80270F195068A85DF41B497A363E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1877,8 +1877,8 @@
       "expected_sha256": "FD677AAAECC429CC3DF68750915C79EB026E627CD342B88F3CE938026DF4A1BC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1893,8 +1893,8 @@
       "expected_sha256": "8FA881F1A4E8A45817ECEA02978B5CE8FF841AA77B9871D6731E3E72E3E7B25C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1909,8 +1909,8 @@
       "expected_sha256": "25CFC1EACFD259C99EB559E1A2B2A8D68A9977EB02D80EF486F7ABAC1C42605E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1925,8 +1925,8 @@
       "expected_sha256": "87D241AB0B2ED9BD6DFD1B61D2AFDBCB04515373E196B72BF16D593E4AA7497F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1941,8 +1941,8 @@
       "expected_sha256": "8A68F60C6A8C9A50092EAD78E324D4D03BE966004713D183D2A341424B4644B6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1957,8 +1957,8 @@
       "expected_sha256": "892B80735867D3D9D4B20D790D18C71F2C915A384677D376A91C3199D95CB824",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1973,8 +1973,8 @@
       "expected_sha256": "6F18A48E6304828D4395AD8473A30BCA22CF4A50D4FA6C623F9A304AB8E76124",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -1989,8 +1989,8 @@
       "expected_sha256": "8467B375F695F1C20DE36EE75506F61F6127CA6545FA12FF0FF11D76E730A772",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2005,8 +2005,8 @@
       "expected_sha256": "F15C57DFF132DDBB059BD4D9BFAD1ADC8DA764D7B8FA037BC251F918190B9DEB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2021,8 +2021,8 @@
       "expected_sha256": "E57C46A978809AD0ACDFE954FF3986D9354DEADC10DF486F588D142D38CDCB4C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2037,8 +2037,8 @@
       "expected_sha256": "FAEDB7D11A8CA6B373119A295660FD1564EA5D1FB43E5EA06B0DB18E4CC9A311",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2053,8 +2053,8 @@
       "expected_sha256": "EA5C563450401522BE7EFCF3B104AAEE464C7D41AC2C62455B93C95B9E29809E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2069,8 +2069,8 @@
       "expected_sha256": "93F4216480286016952AAEB7AF422C19A07B318DFFC3F9A950D04F746E5B8F76",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2085,8 +2085,8 @@
       "expected_sha256": "40D31C0D940ABE7238AE759DDACE66BB9A512D5A230B933F577EF1752E32E028",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2101,8 +2101,8 @@
       "expected_sha256": "0F43A0BA7EC9AFA1D05A9B0791FC42A3D731BE91494894B3D716B55DB5468798",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2117,8 +2117,8 @@
       "expected_sha256": "8E2F034A62D35F153C9783BEE0F85004AB6784C1FC19056A4142519ECE61C90B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2133,8 +2133,8 @@
       "expected_sha256": "0D76065282F8417BA31BF76139ED8DB069AD63A5F79BBF3E69CA30948FA25B2D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2149,8 +2149,8 @@
       "expected_sha256": "542CBAE3C7CA39060806925F61628A4B8538872DE9ED33752C71DF70B2A667CA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2165,8 +2165,8 @@
       "expected_sha256": "677F2C4554A416A15EC3A4E11B785C2D1319B9E9877B53C609F5E85983EF061D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2181,8 +2181,8 @@
       "expected_sha256": "5CDC5962898E392C44452E92437F795B58F3C3C9C349749B8BF4F229118D399C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2197,8 +2197,8 @@
       "expected_sha256": "F91B8F2094CEDA38AF63BB91B435F39926344BAB742FD280A9F36BABEC43E53E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2213,8 +2213,8 @@
       "expected_sha256": "454D54C1B2F78A6C10776F45B0F9B1F0352FF9AB262866F6CE6EECD997E35E4E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2229,8 +2229,8 @@
       "expected_sha256": "95321E7261485B681CF673D0BBA7151EE3CFEF6AD3F569B0F87F9C72C9D3C5ED",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2245,8 +2245,8 @@
       "expected_sha256": "68B99EE3DFB0B98794A6D15DD3F87CD6E56DC49DCB31570DF251C1214EA457ED",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2261,8 +2261,8 @@
       "expected_sha256": "EC148F4ED6469FB6D598E86C5AEF5605B7A6B7C87E8C3D9C77D0FB1530953AD3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2277,8 +2277,8 @@
       "expected_sha256": "7E0888B17128D358B34ACE5D300802A8488A49653148D592D26CB8FB922FE081",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2293,8 +2293,8 @@
       "expected_sha256": "1472C81F2ADBDC7E234A151674F4E193C27244EECBC116FFC8173DC8F9EFEB2E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2309,8 +2309,8 @@
       "expected_sha256": "A8D5223E9EAEEDB787B8DB9A370EC9DACA936E19B21F0E97293BA4BE4FC54BA3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2325,8 +2325,8 @@
       "expected_sha256": "AF18027080397B8578F385B4C4EAE15054EC68F337F02E7C8A109805018AEA80",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2341,8 +2341,8 @@
       "expected_sha256": "925564AF2E3B66A805D99D5E65C8FA7B2AE74725572265B58A77D193D235B5A3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2357,8 +2357,8 @@
       "expected_sha256": "4CB4A2AD89F2549B66735570E6358ABEA21D2E945EFBEC11127CEA96A99C062A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2373,8 +2373,8 @@
       "expected_sha256": "1108CC1AB108BA5E7203E8BBA51C148B800BFA9DA397822A59057C07F85A421D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2389,8 +2389,8 @@
       "expected_sha256": "8A96F4149CA7E1B221BD61BF04324D246A72FA7FA54D9A00ED2F5582494C1705",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2405,8 +2405,8 @@
       "expected_sha256": "65490A92DAC0ED079EFE40211E16E5E331C050D3DE606E35D671219C2A30926E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2421,8 +2421,8 @@
       "expected_sha256": "E795109CA7A3197DE397FE3096893E46CFF094667D750FA8DC491CE795CCF7EB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2437,8 +2437,8 @@
       "expected_sha256": "F0E3BDD20EFCAD0E137732D94EDCDC0380D82DBDD654BC7E32743992CED9F15B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2453,8 +2453,8 @@
       "expected_sha256": "F676F64887A4DF8DC812FF8C76304FF7CE0C6AB12DC6ABF5CC8A090D2478D4C7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2469,8 +2469,8 @@
       "expected_sha256": "1E1D4CD95E2E7DAC105F6CF50DC73A5A48E179C495CAA8E1C100ECFE69BAC420",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2485,8 +2485,8 @@
       "expected_sha256": "21DBC44A2BC8326CF7B9ECF5D1283E0D3435D269B63C7557F7225E6F9C3E8695",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2501,8 +2501,8 @@
       "expected_sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2517,8 +2517,8 @@
       "expected_sha256": "FBFBA3D106AC3A957FE2169563AE95C032C6134B276508B84D43DCEBD50B2600",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2533,8 +2533,8 @@
       "expected_sha256": "9442B8AB69D4395D1C6C6231F0185AFEE31D27778B01492C4BB54E7D88A444ED",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2549,8 +2549,8 @@
       "expected_sha256": "A1FFEB52014D910E5761945B9555291AE7C6E5E7CFE0564FCDA2C6D96493D566",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2565,8 +2565,8 @@
       "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2581,8 +2581,8 @@
       "expected_sha256": "776F1017F68F02DB6BDBE8AE0B7F721F341465A70609D987D71881DA2D7B4176",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2597,8 +2597,8 @@
       "expected_sha256": "FA2E3571659F896D244BFFF7C40534ECDE875C6A5487CF8A188A81CF75AE9DC7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2613,8 +2613,8 @@
       "expected_sha256": "0F69C79BD291E9A7E46B9DAA3D04A314C4C3EB7EFA253B386D2E591C09F8EAD0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2629,8 +2629,8 @@
       "expected_sha256": "EE7B54804C2B32E50FC3FB589E1B2B998B0E7516F4DA676DE191643C46B83443",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2645,8 +2645,8 @@
       "expected_sha256": "9C742236169C72E51F838844B7FF3315E3AD2E9D61EC030AFD8CB0FE96E05A6B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2661,8 +2661,8 @@
       "expected_sha256": "36DFD9B135442C93D2722A6351FCF7A7F09117C31B8E687BF84D7CFE8D154AC0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2677,8 +2677,8 @@
       "expected_sha256": "BC29B8B31F6A0A6587B12B4DEF795309F036A8221F7972725C5C69D4C777EDF7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2693,8 +2693,8 @@
       "expected_sha256": "FD40E7D4665499E6ACD1FC618394A3CEA40C6BB502950E778A8DDCCE048108EC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2709,8 +2709,8 @@
       "expected_sha256": "190C8AF83E767177B067E848543428D2600CC5F12E4B23FECC67B0A0EC7034B1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2725,8 +2725,8 @@
       "expected_sha256": "EF22F7CDABDBAEDC41AF8BDBFC1160CA6B256D026CA358BDB52089ED1DD74128",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2741,8 +2741,8 @@
       "expected_sha256": "E101524BC57622E8DA1B0743379A14F5F0DA1BE9C2875EA7DE00449B9618FDF2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2757,8 +2757,8 @@
       "expected_sha256": "83EA60DF304EA94FEDAACF00490895556DB48D1C201E622A40E8373D241FA3EB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2773,8 +2773,8 @@
       "expected_sha256": "CCED615B4018E4D17B2D03E5B04B8EEE727078FB93CE0CEB6AE239724F2C7453",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2789,8 +2789,8 @@
       "expected_sha256": "4B72EA0396147277736FBA2F68CF0E09D19ED1996F129F8086B4DBE951FCB2D9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2805,8 +2805,8 @@
       "expected_sha256": "538FF5A84B35A332CEDC2645C6781627F021915C71931793707A4BB1F35DB124",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2821,8 +2821,8 @@
       "expected_sha256": "737B469DA4F13BDC14C914E2A0EA0BFE7DFF6F4C603404C78F3E31AEE88904AB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2837,8 +2837,8 @@
       "expected_sha256": "F5E853A553CEC1A11120A7EBF7E8D9C63CE3094D0397D1F49746CBE0FD2B2594",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2853,8 +2853,8 @@
       "expected_sha256": "ED0BDFEF709A96CA4715B0A799116132964FD417837CD5E95719DC366C1A3C7A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2869,8 +2869,8 @@
       "expected_sha256": "E5EC5C6DDF0E3113D6753A09E166BF3FAF0D89B989A4EF5E0EAEA1F7EA7DA9C9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2885,8 +2885,8 @@
       "expected_sha256": "91247E44C0DAE3EF7915ED4E1154C7CB106AEEAFE391128E483563DC3FDD396C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2901,8 +2901,8 @@
       "expected_sha256": "36887B283CEF3BD072D4ACC23B53551BB3E265CF792CD4FBE8D467B78841CEF2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2917,8 +2917,8 @@
       "expected_sha256": "EC19366CD511857F5EED0421BCB67864DA40FFBFB56C07ABD83501C5557ED5B4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2933,8 +2933,8 @@
       "expected_sha256": "4150F48DF2D24F4F93B8646A644A222AB7FA3B3807BFEDD8D2A86FD088BF7E1C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2949,8 +2949,8 @@
       "expected_sha256": "90E07EAB680A39D8DF02E1D69732595A6436F82529A2BED909ABEDA821EA210F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2965,8 +2965,8 @@
       "expected_sha256": "56F4CC3BF0DF338BD39EAA54D3F1DE4CE11DA8FF1C0EAD4D1152D763957DE3C1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2981,8 +2981,8 @@
       "expected_sha256": "CA88E07C92619F4DAD498E051EA791F91063A94CF03CE32142F86D77B6957773",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -2997,8 +2997,8 @@
       "expected_sha256": "609F4A9374A4BE61B7B67E59A4E4261B08D7A84AA6D24F111A34F55196372B18",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3013,8 +3013,8 @@
       "expected_sha256": "D1245FB0F47B4C94B9C3B0F9A954CB8FF8AE0B758778A58C765419C324F4CB1A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3029,8 +3029,8 @@
       "expected_sha256": "D5723AECDB4F205D007B0B325A8C36DBC26425573AA969055745C63340426633",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3045,8 +3045,8 @@
       "expected_sha256": "6EF54AC93F4EAF0AFABBB9BCE5B0D2744D771704CD3D3E72DD3FF6289BB5E2A8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3061,8 +3061,8 @@
       "expected_sha256": "723081DCAFDFAC60D59CFC3B4C115088E6FE9BC6190A798D930350BEAF9579C7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3077,8 +3077,8 @@
       "expected_sha256": "062B246D5A82C9FFB98A11DDD84799C37BC41F086429A6B8B0BF4B00C347C586",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3093,8 +3093,8 @@
       "expected_sha256": "0AE4E6F80423DED9C5073AF05EFCBCAD2423A58FA7CD04EE334A39110B953010",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3109,8 +3109,8 @@
       "expected_sha256": "2D6B6E00FD6522777E15A66BB4E481D91E4B1550B19968C07080F53C263A4272",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3125,8 +3125,8 @@
       "expected_sha256": "3D8688100F86FFBB99E1AFEEFB834A49CEBDED94229AEA4DE58918AD6848415E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3141,8 +3141,8 @@
       "expected_sha256": "839BC36FB377892D5DFDF5B076AABAAE5C620D4A7D5F2E6D5E756A32F1319B00",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3157,8 +3157,8 @@
       "expected_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3173,8 +3173,8 @@
       "expected_sha256": "0E2FC69B9338F9A4A1B2ED7DC4495D2EE08F0D02135CF07491BB352222BC1098",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3189,8 +3189,8 @@
       "expected_sha256": "15DDCEE63ACB65D52DD7E345DFEA2FC2C92B7266698BF14EC78B003C87AB7C15",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3205,8 +3205,8 @@
       "expected_sha256": "964849B4BCBE567E1165E943C26FED1B82840F160629E4613AE2DFF2F38A6A0F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3221,8 +3221,8 @@
       "expected_sha256": "03DFCAC8505D043A3BCC35473F0D31206318AD45CE664104F2ADB0CE9B9FFDB4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3237,8 +3237,8 @@
       "expected_sha256": "57122FB881A76C970ACE3591F5E418949FB8E3D4883CF386962CDC21F2EBB720",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3253,8 +3253,8 @@
       "expected_sha256": "77B04FB969BD146AA0A67FAE37E649435EC627788CB1BD7FD72967C43D7376A0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3269,8 +3269,8 @@
       "expected_sha256": "866D65F28BAB805BD7680CB090DD60E673A7949F7044C59A97C355AEE12C2E98",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3285,8 +3285,8 @@
       "expected_sha256": "7537E3792A07DE60C4591972925C65D208808C2329C432891FECE2528467AC63",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3301,8 +3301,8 @@
       "expected_sha256": "4A50344CF38C88A3C8D80BEE25956F99421C5BDDE5AD91D862145863FECFF495",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3317,8 +3317,8 @@
       "expected_sha256": "996B9F61FC61E9BCA14EB8F2D9AAEC7521CA72F40F369700903F38726204D09C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3333,8 +3333,8 @@
       "expected_sha256": "EFA724F34AC025E824781B429D1D11B803AEBA5066673FFDEE2AE9F86D15236D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3349,8 +3349,8 @@
       "expected_sha256": "97C3F63AEF2A44370CBA343A0B50BF703D00838F34595D4E35F15EFACB61658B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3365,8 +3365,8 @@
       "expected_sha256": "CD43DDECC7CCAFFCDA431830B5CAEBFA361393E4ED5D4836B228B652F2480998",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3381,8 +3381,8 @@
       "expected_sha256": "657A4C0E8E252AA759069FC7FD0CB69DB7B8BAC209D6752F719B3D7E099E6C48",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3397,8 +3397,8 @@
       "expected_sha256": "C39F12EC0177882B7574FFCED76D9F35C41E672BB0656532BD3A128E31625130",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3413,8 +3413,8 @@
       "expected_sha256": "98F9398FA7F1AE290868D424740007AE6DB73BA8539563950A0A04401555891E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3429,8 +3429,8 @@
       "expected_sha256": "5A333CB8F4D2DB9957D6C2A9B19EF4BDB84BCBF4321435B6418823073975BBC1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3445,8 +3445,8 @@
       "expected_sha256": "3F53C3C408BE8D1425E9C3AC44BBF6D5240556B2CED4AD8B4A2CCD382A6196EB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     },
     {
@@ -3461,8 +3461,8 @@
       "expected_sha256": "1CB4566E6786977E6042C3A66047E2B654B95C8613585346CB19D7A195FA5DF0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
-        "no-package-authority-before-cutover",
-        "fresh-runtime-replay-before-cutover"
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
       ]
     }
   ],
@@ -3471,5 +3471,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "36C1233C6135AF17A12D01CD33920CE30EB0DACF4F47921DDB9FD7E2816412E9"
+  "record_sha256": "BEEB4E868E25E25926C7E32396984668220E9519D462D4DCA0F497A5FC304772"
 }

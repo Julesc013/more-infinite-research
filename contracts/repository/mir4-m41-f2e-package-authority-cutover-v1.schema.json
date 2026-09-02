@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema","kind","recorded_at","programme_id","change_id","predecessor_receipt","base","canonical_authority","superseded_pre_cutover_bindings","verification","invariants","transition_gate","next_fixed_point","status"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41F2EPackageAuthorityCutoverV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "programme_id": {"const": "M41-F2E-PACKAGE-AUTHORITY-CUTOVER"},
+    "change_id": {"const": "MIR4-CHG-2026-0013"},
+    "predecessor_receipt": {"$ref": "#/$defs/binding"},
+    "base": {"type":"object","additionalProperties":false,"required":["branch","commit","tree"],"properties":{"branch":{"const":"dev"},"commit":{"$ref":"#/$defs/git"},"tree":{"$ref":"#/$defs/git"}}},
+    "canonical_authority": {"type":"object","additionalProperties":false,"required":["path","schema","record_sha256"],"properties":{"path":{"const":"targets/package-authority.json"},"schema":{"const":"spec/schemas/mir4-canonical-package-authority-v1.schema.json"},"record_sha256":{"$ref":"#/$defs/sha"}}},
+    "superseded_pre_cutover_bindings": {"type":"array","minItems":39,"uniqueItems":true,"items":{"type":"object","additionalProperties":false,"required":["path","historical_sha256","hash_mode"],"properties":{"path":{"type":"string","minLength":1},"historical_sha256":{"$ref":"#/$defs/sha"},"hash_mode":{"const":"canonical-text-v1"}}}},
+    "verification": {"type":"object"},
+    "invariants": {"type":"object"},
+    "transition_gate": {"type":"object"},
+    "next_fixed_point": {"const":"M41-05B-DOCUMENTATION-CUTOVER"},
+    "status": {"const":"M41-F2E-PACKAGE-SOURCE-CUTOVER-COMPLETE"}
+  },
+  "$defs": {
+    "sha": {"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "git": {"type":"string","pattern":"^[0-9a-f]{40}$"},
+    "binding": {"type":"object","additionalProperties":false,"required":["path","sha256"],"properties":{"path":{"type":"string","minLength":1},"sha256":{"$ref":"#/$defs/sha"}}}
+  }
+}

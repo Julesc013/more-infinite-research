@@ -8,6 +8,7 @@ param(
   [string]$OutputRoot = "build/mir4/emergency-lane",
   [ValidateRange(3, 3)]
   [int]$Repetitions = 3,
+  [switch]$HistoricalCompatibility,
   [switch]$Check
 )
 
@@ -17,6 +18,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
 } else {
   $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+if (-not $HistoricalCompatibility) {
+  throw '[mir4-package-authority-cutover] The bootstrap local candidate writer is historical compatibility only; use TargetMaterializer for current packages.'
 }
 if (-not [IO.Path]::IsPathRooted($PlanPath)) { $PlanPath = Join-Path $RepoRoot $PlanPath }
 if (-not [IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot = Join-Path $RepoRoot $OutputRoot }

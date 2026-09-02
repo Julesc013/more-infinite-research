@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/package/mir4-canonical-package-authority-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "materializer_abi",
+    "editable_source_root",
+    "target_authority_root",
+    "generated_output_root",
+    "source_manifest",
+    "target_registry",
+    "support_policy",
+    "versioning_authority",
+    "targets",
+    "writer",
+    "legacy_root_projection",
+    "transition_gate",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CanonicalPackageAuthorityV1"},
+    "status": {"const": "current-f2e-package-source-cutover"},
+    "materializer_abi": {"const": "mir4-target-materializer/1"},
+    "editable_source_root": {"const": "src/mod"},
+    "target_authority_root": {"const": "targets"},
+    "generated_output_root": {"const": "build/packages"},
+    "source_manifest": {"$ref": "#/$defs/binding"},
+    "target_registry": {"$ref": "#/$defs/binding"},
+    "support_policy": {"$ref": "#/$defs/binding"},
+    "versioning_authority": {"$ref": "#/$defs/fileBinding"},
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target",
+          "target_id",
+          "distribution_target_code",
+          "baseline_source_version",
+          "baseline_distribution_version",
+          "baseline_content_sha256",
+          "baseline_entry_count"
+        ],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "target_id": {"pattern": "^factorio-(?:2[.]1|2[.]0|1[.]1|1[.]0)$"},
+          "distribution_target_code": {"enum": ["210", "200", "110", "100"]},
+          "baseline_source_version": {"const": "4.0.0"},
+          "baseline_distribution_version": {"pattern": "^4[.]0[.](?:21000|20000|11000|10000)$"},
+          "baseline_content_sha256": {"$ref": "#/$defs/sha256"},
+          "baseline_entry_count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "writer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "public_facade", "ordinary_build_facade", "sole_current_writer"],
+      "properties": {
+        "implementation": {"const": "tools/mir/application/package/TargetMaterializer.ps1"},
+        "public_facade": {"const": "tools/mir.ps1 mir4 package-source materialize"},
+        "ordinary_build_facade": {"const": "tools/commands/package/Build-MIRPackage.ps1"},
+        "sole_current_writer": {"const": true}
+      }
+    },
+    "legacy_root_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["writer_authority", "official_package_authority", "compatibility_state", "retirement_required"],
+      "properties": {
+        "writer_authority": {"const": false},
+        "official_package_authority": {"const": false},
+        "compatibility_state": {"const": "read-only-controlled-transition"},
+        "retirement_required": {"const": true}
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_cutover", "old_writer_retirement", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "package_cutover": {"const": true},
+        "old_writer_retirement": {"const": true},
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "record_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "fileBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "file_sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

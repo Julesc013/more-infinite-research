@@ -31,10 +31,10 @@
     "package_fixed_point": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["work_package", "phase", "target_results", "aggregate", "next_target", "package_cutover"],
+      "required": ["work_package", "phase", "target_results", "aggregate", "next_target", "package_cutover", "cutover_receipt"],
       "properties": {
         "work_package": {"const": "M42-00"},
-        "phase": {"const": "M41-F2D"},
+        "phase": {"enum": ["M41-F2D", "M41-F2E"]},
         "target_results": {
           "type": "array",
           "minItems": 4,
@@ -52,7 +52,8 @@
         },
         "aggregate": {"enum": ["pending", "complete"]},
         "next_target": {"type": ["string", "null"], "enum": ["f210", "f200", "f110", "f100", null]},
-        "package_cutover": {"enum": ["blocked", "ready", "complete"]}
+        "package_cutover": {"enum": ["blocked", "ready", "complete"]},
+        "cutover_receipt": {"type": ["string", "null"]}
       }
     },
     "outcome_trains": {"type": "array", "minItems": 5, "items": {"type": "object"}},

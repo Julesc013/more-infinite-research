@@ -3,6 +3,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/repository/RepositoryFixedPoint.ps1')
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 function Assert-MIR4RepositoryMigrationV1 {
@@ -71,13 +72,15 @@ foreach ($path in @($assurancePaths | Sort-Object -Unique)) {
 }
 Assert-MIR4RepositoryMigrationV1 (@($repositoryMigrationClass[0].tests) -contains 'static.mir4-repository-fixed-point-v2') 'mir4-repository-migration-assurance-test'
 
-$packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $repo)
+$packageFiles = @(Get-MIRPackageOutputPaths -RepoRoot $repo)
 $migrationPaths = @($migration.path_map | ForEach-Object { [string]$_.final_path }) + @($migration.compatibility_entrypoints | ForEach-Object { [string]$_.path })
 foreach ($path in @($migrationPaths + @($authority.visible_roots | ForEach-Object { ([string]$_.path) + '/.mir-root.json' }) | Sort-Object -Unique)) {
   Assert-MIR4RepositoryMigrationV1 ($path -notin $packageFiles) 'mir4-repository-migration-package-visible' $path
 }
-$currentPackageSourceSha256 = Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo
+$currentPackageSourceSha256 = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 Assert-MIR4RepositoryMigrationV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $currentPackageSourceSha256) 'mir4-repository-migration-package-fingerprint'
+$f2eReceipt = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json'
+Assert-MIR4RepositoryMigrationV1 ([string]$f2eReceipt.verification.package_source_sha256 -ceq $currentPackageSourceSha256) 'mir4-repository-migration-f2e-successor-fingerprint'
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-historical-package-fingerprint'
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest

@@ -9,19 +9,20 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PlatformPreview.ps1')
+. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 $authority=Get-MIR4TargetCompilerAuthority -RepoRoot $repo
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 $output=Assert-MIR4DescendantPath -Root (Join-Path $repo 'build/mir4') -Path $output
 $selected=@($authority.target_groups.targets|ForEach-Object{$_}|Where-Object{$Target-eq'all'-or$_-eq$Target})
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$packageSourceSha256=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$packageSourceSha256=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 
 $modern=@($selected|Where-Object{$_-in@('f210','f200','f110','f100')})
+$modernResults=@{}
 foreach($key in $modern){
-  $lane=if($key-eq'f210'){'emergency'}else{'local-playtest-shadow'}
-  $sourceOutput=if($lane-eq'emergency'){'build/mir4/emergency-lane'}else{'build/mir4/local-playtest-shadow'}
-  & (Join-Path $repo 'tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1') -RepoRoot $repo -Target $key -Lane $lane -OutputRoot $sourceOutput -Repetitions 3 -Check:$Check
+  if($Check){continue}
+  $modernResults[$key]=New-MIR4TargetPackage -RepoRoot $repo -Target $key -CandidateId 'M4C02-09-24H' -OutputRoot 'build/packages/target-products'
 }
 $historical=@($selected|Where-Object{$_-in@('f018','f017','f016','f015','f014','f013')})
 foreach($key in $historical){
@@ -32,15 +33,15 @@ $contracts=New-MIR4TargetContractSet -RepoRoot $repo
 $rows=@()
 foreach($contract in @($contracts.targets|Where-Object{$Target-eq'all'-or$_.target-eq$Target})){
   $key=[string]$contract.target;$version=[string]$contract.identity.distribution_version
-  $sourceRoot=if($key-eq'f210'){'build/mir4/emergency-lane'}elseif($key-in@('f200','f110','f100')){'build/mir4/local-playtest-shadow'}elseif($key-in@('f018','f017','f016','f015','f014','f013')){'build/mir4/historical-private'}else{''}
+  $sourceRoot=if($key-in@('f210','f200','f110','f100')){'canonical-materializer'}elseif($key-in@('f018','f017','f016','f015','f014','f013')){'build/mir4/historical-private'}else{''}
   if(-not$sourceRoot){
     $rows+=[ordered]@{target=$key;version=$version;state='BLOCKED_WITH_EVIDENCE';maturity=[string]$contract.maturity;target_disposition=[string]$contract.support_policy.disposition;facility='unsupported-with-evidence';missing=@($contract.inputs.missing);package=$null;source_version='4.0.0';candidate_id='M4C02-09-24H';source_commit=$sourceCommit;source_tree=$sourceTree;publication_authorized=$false}
     continue
   }
-  $source=Join-Path $repo "$sourceRoot/distributions/more-infinite-research_$version.zip"
-  $destination=Join-Path $output "packages/more-infinite-research_$version.zip"
+  $source=if($sourceRoot-eq'canonical-materializer'){if($Check){Join-Path $repo "build/packages/target-products/$key/M4C02-09-24H/more-infinite-research_$version.zip"}else{[string]$modernResults[$key].archive_path}}else{Join-Path $repo "$sourceRoot/distributions/more-infinite-research_$version.zip"}
+  $destination=if($sourceRoot-eq'canonical-materializer'){$source}else{Join-Path $output "packages/more-infinite-research_$version.zip"}
   if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw "[mir4-target-product-source] ${key}:$source"}
-  if(-not$Check){New-Item -ItemType Directory -Force -Path (Split-Path $destination -Parent)|Out-Null;[IO.File]::Copy($source,$destination,$true)}
+  if(-not$Check-and$sourceRoot-ne'canonical-materializer'){New-Item -ItemType Directory -Force -Path (Split-Path $destination -Parent)|Out-Null;[IO.File]::Copy($source,$destination,$true)}
   if(-not(Test-Path -LiteralPath $destination -PathType Leaf)){throw "[mir4-target-product-missing] $key"}
   $sourceHash=(Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
   $destinationHash=(Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash

@@ -1,7 +1,10 @@
 param(
-  [string]$OutputDir = "dist",
-  [ValidateSet("Fastest", "NoCompression", "Optimal")]
-  [string]$CompressionLevel = "Optimal"
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
+  [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR4-ORDINARY-BUILD',
+  [string]$SourceVersion,
+  [string]$DistributionVersion,
+  [string]$OutputDir = 'build/packages/ordinary',
+  [ValidateSet('Optimal')][string]$CompressionLevel = 'Optimal'
 )
 
 # MIR-L5-LEGACY-COMMAND-WRAPPER: retained for historical command compatibility only.

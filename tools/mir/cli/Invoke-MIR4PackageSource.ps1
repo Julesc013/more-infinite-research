@@ -3,6 +3,8 @@ param(
   [Parameter(Mandatory)][string]$RepoRoot,
   [string]$OutputPath,
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'M41-EDITABLE-SOURCE',
+  [string]$SourceVersion,
+  [string]$DistributionVersion,
   [string]$FactorioBin,
   [string]$WorkRoot,
   [string]$EvidenceRoot,
@@ -52,7 +54,7 @@ if ($Command -in @('materialize','materialize-check')) {
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   if ($Command -ceq 'materialize') {
     if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/packages' }
-    New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId $CandidateId -OutputRoot $OutputPath | ConvertTo-Json -Depth 12
+    New-MIR4TargetPackage -RepoRoot $repo -Target $Target -CandidateId $CandidateId -SourceVersion $SourceVersion -DistributionVersion $DistributionVersion -OutputRoot $OutputPath | ConvertTo-Json -Depth 12
     return
   }
   if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-editable-source-materializer-v1.json' }

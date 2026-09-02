@@ -63,7 +63,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -87,7 +87,7 @@ Usage:
   .\tools\mir.ps1 overnight local [--profile <name>]
   .\tools\mir.ps1 audit local [--profile <name>]
   .\tools\mir.ps1 audit top25 --space-age
-  .\tools\mir.ps1 package build
+  .\tools\mir.ps1 package build [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--output <build/packages/...>]
   .\tools\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
   .\tools\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
   .\tools\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
@@ -713,6 +713,10 @@ switch ($area) {
         if (-not [string]::IsNullOrWhiteSpace($target)) { $packageSourceArguments.Target = $target }
         $candidateId = Get-MIRArgValue -Items $Args -Name '--candidate-id'
         if (-not [string]::IsNullOrWhiteSpace($candidateId)) { $packageSourceArguments.CandidateId = $candidateId }
+        foreach ($option in @(@{name='--source-version';property='SourceVersion'},@{name='--distribution-version';property='DistributionVersion'})) {
+          $value = Get-MIRArgValue -Items $Args -Name $option.name
+          if (-not [string]::IsNullOrWhiteSpace($value)) { $packageSourceArguments[$option.property] = $value }
+        }
         foreach ($option in @(@{name='--factorio';property='FactorioBin'},@{name='--work-root';property='WorkRoot'},@{name='--evidence-root';property='EvidenceRoot'},@{name='--retention';property='Retention'})) {
           $value = Get-MIRArgValue -Items $Args -Name $option.name
           if (-not [string]::IsNullOrWhiteSpace($value)) { $packageSourceArguments[$option.property] = $value }
@@ -1167,7 +1171,18 @@ switch ($area) {
   }
   "package" {
     if ($verb -ne "build") { throw "Unknown package command: $verb" }
-    & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1")
+    $parameters = @{}
+    foreach ($option in @(
+      @{name='--target';property='Target'},
+      @{name='--source-version';property='SourceVersion'},
+      @{name='--distribution-version';property='DistributionVersion'},
+      @{name='--candidate-id';property='CandidateId'},
+      @{name='--output';property='OutputDir'}
+    )) {
+      $value = Get-MIRArgValue -Items $Args -Name $option.name
+      if (-not [string]::IsNullOrWhiteSpace($value)) { $parameters[$option.property] = $value }
+    }
+    & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1") @parameters
   }
   "backport" {
     $manifest = Get-MIRArgValue -Items $Args -Name "--manifest" -Default ".mir/releases/backports/2.5.0.json"

@@ -31,6 +31,10 @@
   - One verifier bound all four receipt chains, replay commits and trees, engines, package identities, predecessor archives, fresh loads, upgrades, reloads, and independent verifier results.
   - All four external custody manifests and resource receipts were rechecked, evidence remained path-redacted, and cross-target proof substitution was rejected.
   - The package source and root README remain unchanged, the old writer stays authoritative, and only F2E package-authority cutover becomes dependency-ready.
+- Cut package authority over to the canonical four-target source and materializer. [MIR4-CHG-2026-0013]
+  - src/mod and targets now own editable source, stable target identity, overlays, and target policy; mutable distribution versions are projected at construction time.
+  - TargetMaterializer is the sole current writer, ordinary builds remain below build/packages, and the prior bootstrap writer is fenced as explicit historical compatibility.
+  - All four accepted 4.0 content trees reconstruct deterministically after the independent F2D runtime replay; rollback remains bound to the exact pre-cutover dev commit and tree.
 
 ### Features
 

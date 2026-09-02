@@ -2570,10 +2570,13 @@ function Invoke-MIRAssuranceBuild {
   if ($candidateFullPath.StartsWith($distRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Assurance builds may not write through immutable published dist authority: $candidateFullPath"
   }
-  $mir4BootstrapCandidate = [IO.Path]::GetFullPath((Join-Path $repo "build\mir4\emergency-lane\distributions\more-infinite-research_4.0.21000.zip"))
-  $isMir4BootstrapBuild = $candidateFullPath.Equals($mir4BootstrapCandidate, [StringComparison]::OrdinalIgnoreCase)
+  $canonicalAssuranceRoot = [IO.Path]::GetFullPath((Join-Path $repo 'build\packages\assurance'))
+  $isMir4CanonicalBuild = $candidateFullPath.StartsWith(
+    $canonicalAssuranceRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar,
+    [StringComparison]::OrdinalIgnoreCase
+  )
   $recordPath = Join-Path $repo ".mir\releases\records\$($Context.info.version).json"
-  if (-not $isMir4BootstrapBuild -and (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
+  if (-not $isMir4CanonicalBuild -and (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
     $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json
     if ([string]$record.state -in @("tagged", "published", "publicly-verified")) {
       $observedSource = Get-MIRAssurancePackageSourceHash
@@ -2582,31 +2585,30 @@ function Invoke-MIRAssuranceBuild {
       }
     }
   }
-  if ($isMir4BootstrapBuild) {
-    . (Join-Path $repo "tools\lib\mir4\BootstrapMaterialization.ps1")
-    $correctionPath = Join-Path $repo ".mir\releases\waves\mir4-r0\MIR4-Approved-Bootstrap-Correction-CompositeV2.json"
-    if (-not (Test-Path -LiteralPath $correctionPath -PathType Leaf)) {
-      throw "MIR 4 bootstrap assurance build requires the exact approved correction authority."
+  if ($isMir4CanonicalBuild) {
+    . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+    $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+    $targetRows = @($authority.targets | Where-Object { [string]$_.target_id -ceq "factorio-$([string]$Context.target)" })
+    if ($targetRows.Count -ne 1) { throw "Assurance target is not governed by canonical MIR 4 package authority: $($Context.target)" }
+    $candidateId = 'MIR4-ASSURANCE-' + ([string]$fingerprint.material.source_tree).ToUpperInvariant()
+    $sourceVersion = if ([string]$Context.info.version -match '^4[.]') {
+      [string]$Context.info.version
+    } else {
+      [string]$targetRows[0].baseline_source_version
     }
-    $correction = Get-Content -Raw -LiteralPath $correctionPath | ConvertFrom-Json
-    if (-not (Test-MIR4BootstrapRecordHash -Record $correction) -or
-        [string]$correction.kind -ne "MIR4ApprovedBootstrapCorrectionDeltaV2" -or
-        (@($correction.findings | Sort-Object) -join '+') -ne "MIR3-TERM-0032+MIR3-TERM-0033" -or
-        [string]$correction.target_key -ne "f210" -or
-        [bool]$correction.public_output_authorized -or
-        [bool]$correction.authority_scope.release_admission_authorized -or
-        [bool]$correction.authority_scope.signing_or_sealing_authorized -or
-        [bool]$correction.authority_scope.publication_authorized) {
-      throw "MIR 4 bootstrap assurance build correction authority is invalid or release-capable."
+    $buildArguments = @{
+      Target = [string]$targetRows[0].target
+      CandidateId = $candidateId
+      SourceVersion = $sourceVersion
+      OutputDir = 'build/packages/assurance'
     }
-    & (Join-Path $repo "tools\commands\release\New-MIR4BootstrapLocalCandidate.ps1") `
-      -Target f210 -Lane emergency -OutputRoot (Join-Path $repo "build\mir4\emergency-lane") -Repetitions 3 | Out-Host
+    $buildResult = & (Join-Path $repo 'tools/commands/package/Build-MIRPackage.ps1') @buildArguments
+    if ([IO.Path]::GetFullPath([string]$buildResult.archive_path) -cne $candidateFullPath) {
+      throw "Canonical assurance build produced an unexpected archive path: $([string]$buildResult.archive_path)"
+    }
   } else {
-    $candidateRoot = Split-Path -Parent $candidateFullPath
-    $candidateOutputDir = Get-MIRAssuranceRepoRelativePath -Path $candidateRoot
-    & (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1") -OutputDir $candidateOutputDir | Out-Host
+    throw "Current assurance builds must use canonical MIR 4 package authority below build/packages/assurance: $candidateFullPath"
   }
-  if ($LASTEXITCODE -ne 0) { throw "Candidate build failed." }
   if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) { throw "Candidate was not created: $($Context.candidate)" }
   $receipt = [ordered]@{
     schema=$buildReceiptSchema
