@@ -1024,6 +1024,40 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $compilationPlanReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $baseContinuationsReceiptPath = 'releases/migrations/MIR4-M42-02-Base-Continuations-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $baseContinuationsReceiptPath) -PathType Leaf) {
+    $baseContinuations = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $baseContinuationsReceiptPath -Kind 'MIR4M4202BaseContinuationsDecompositionV1'
+    if ([string]$baseContinuations.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$baseContinuations.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$baseContinuations.predecessor.record_sha256 -cne [string]$compilationPlan.record_sha256 -or
+        [string]$baseContinuations.predecessor.package_source_sha256 -cne [string]$compilationPlan.package_authority.package_source_sha256) {
+      throw '[mir4-prefreeze-m42-02-l2-predecessor]'
+    }
+    $baseContinuationEvolvedPaths = @{}
+    foreach ($binding in @($baseContinuations.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or
+          [string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $baseContinuationEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-l2-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $baseContinuationEvolvedPaths[$path] = $true
+    }
+    if ($baseContinuationEvolvedPaths.Count -ne 5 -or
+        [string]$baseContinuations.responsibility -cne 'base-continuations' -or
+        [string]$baseContinuations.status -cne 'M42-02-L2-BASE-CONTINUATIONS-DECOMPOSED') {
+      throw '[mir4-prefreeze-m42-02-l2-scope]'
+    }
+    foreach ($property in $baseContinuations.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l2-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $baseContinuationsReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

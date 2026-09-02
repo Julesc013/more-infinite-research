@@ -2527,14 +2527,78 @@
       "semantic_class": "target-replacement",
       "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations.lua",
       "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed targets.f210 source for f210.",
+      "reason": "Materialize the governed base-continuations facade for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 27451,
-      "expected_sha256": "9442B8AB69D4395D1C6C6231F0185AFEE31D27778B01492C4BB54E7D88A444ED",
+      "expected_bytes": 65,
+      "expected_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/classify.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/classify.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed base-continuations classify responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2522,
+      "expected_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/discover.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/discover.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed base-continuations discover responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 4280,
+      "expected_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/qualify.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/qualify.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed base-continuations qualify responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 5232,
+      "expected_sha256": "61F7E4BB4587A627A442EF7922D7DEE4CAF5367C7C2714C8214947A6372C63D9",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
+      ]
+    },
+    {
+      "path": "prototypes/mir/planner/base_continuations/plan.lua",
+      "operation": "add",
+      "semantic_class": "target-replacement",
+      "source_path": "targets/f210/files/prototypes/mir/planner/base_continuations/plan.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed base-continuations plan responsibility for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 16422,
+      "expected_sha256": "B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "behavior-preserving-decomposition",
+        "four-target-current-source-determinism"
       ]
     },
     {
@@ -3551,5 +3615,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "6430EE23BD69DF4C883D4D09146210CE987EF4EFE03FE162ED6A30A7F4051D5C"
+  "record_sha256": "16855C2A81DA9CB4981817EE238C131A076666E62FD7B667A58A3DDF0CDB74E6"
 }
