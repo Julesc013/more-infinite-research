@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4M41F2DFourTargetRuntimeReplayAggregateV1",
-  "recorded_at": "2026-09-02T14:59:57.6834313+10:00",
+  "recorded_at": "2026-09-02T15:10:04.5213027+10:00",
   "programme_id": "M41-F2D-FOUR-TARGET-RUNTIME-REPLAY-AGGREGATE",
   "change_id": "MIR4-CHG-2026-0012",
   "predecessor_receipt": {
@@ -12,10 +12,19 @@
     "branch": "dev",
     "authority_base_commit": "f6cef04f90affb0acec8a82808fa57c412358976",
     "authority_base_tree": "0b4ac7a6ca2aac7b299ab8a10cfc84b3d0a7da67",
-    "aggregation_commit": "bda137e5799696945ab9f1e59f548f7e781be469",
-    "aggregation_tree": "713bd61319444675e33e742af7071f9131e02834"
+    "aggregation_commit": "4c9b7a871333b3ab8842f08ebb9e20420e6cef8a",
+    "aggregation_tree": "b69691c9ab6814f3dc47f555bccf04138e32dcb2"
   },
   "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "189D929AFD2C72F7E194AAD0C5A5B5CD90A319EEE4D08B75DD465B686BB30120",
+      "current_sha256": "D954093615638F0AD80D0D0750222CA2596BEABCF66C2CDB2DCB7357E1BC3C85",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
     {
       "path": "CHANGELOG.md",
       "previous_sha256": "7475DF19462911E0E6F962903FE8AB3F39AEB0CF595F2F5DA25DCD9D46B78C32",
@@ -65,6 +74,15 @@
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "ADC14F2EB82C8B172F58FAD14712EDAFEE8B5C2EAB7C4B4CBFCD2EE5C95BD0A4",
       "current_sha256": "6525971E714CF7701486C4D487006B660E9F2C3C34F4063DDA420B128595B0D4",
+      "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
+      "scope": "package-excluded-four-target-runtime-aggregate",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "37B730BA8E60E49BB8705527C4DA18FA05031193CB34B3BD44650E6A6637E2A2",
+      "current_sha256": "55BAB987E9EC6AB9EFBB01A41A8A691D7A366C84D48FBE4E7BB777A43838551D",
       "reason": "Accept the independent four-target runtime and transition replay aggregate without package cutover.",
       "scope": "package-excluded-four-target-runtime-aggregate",
       "package_visible": false,
