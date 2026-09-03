@@ -1712,6 +1712,7 @@ validation_tooling:
     mir4_bootstrap_git_source_proof_schema: spec/schemas/mir4-bootstrap-git-source-proof.schema.json
     mir4_bootstrap_reconstruction_receipt_schema: spec/schemas/mir4-bootstrap-reconstruction-receipt.schema.json
     mir4_bootstrap_materializer: tools/lib/mir4/BootstrapMaterialization.ps1
+    mir4_bootstrap_materializer_modules: tools/lib/mir4/bootstrap-materialization
     mir4_platform_preview: tools/lib/mir4/PlatformPreview.ps1
     mir4_safety_kernel: tools/mir/domain/safety/SafetyKernel.ps1
     mir4_policy_engine: tools/mir/domain/policy/PolicyEngine.ps1
