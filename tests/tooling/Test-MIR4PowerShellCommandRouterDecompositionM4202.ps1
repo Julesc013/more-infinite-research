@@ -42,6 +42,10 @@ $projection=[pscustomobject][ordered]@{command_count=[int]$inventory.command_cou
 $projectionHash=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $projection)
 Assert-MIR4CommandRouterDecompositionV1 ($projectionHash-ceq[string]$receipt.public_contract.previous_sha256-and$projectionHash-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-command-router-public-contract'
 Assert-MIR4CommandRouterDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0) 'mir4-m42-02-command-router-inventory'
+foreach($implementation in @($inventory.implementation_files)){
+  $implementationPath=Join-Path $repo ([string]$implementation.path)
+  Assert-MIR4CommandRouterDecompositionV1 ([string]$implementation.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4CommandInventoryTextSha256V1 -Path $implementationPath)-ceq[string]$implementation.sha256) 'mir4-m42-02-command-router-inventory-file' ([string]$implementation.path)
+}
 
 $inventoryProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 tooling inventory-check 2>&1|Out-String).Trim()
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-eq0-and$inventoryProbe-match'command_count') 'mir4-m42-02-command-router-inventory-probe' $inventoryProbe

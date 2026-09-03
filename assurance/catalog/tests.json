@@ -2499,12 +2499,14 @@
         "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
         "tools/mir/cli/router/**",
         "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+        "tools/mir/application/tooling/CommandInventory.ps1",
         "governance/automation/mir4-command-inventory-v1.json",
         ".mir/assurance.json",
         ".mir/test-impact.yml",
         ".mir/control/paths.yml",
         "src/mod/package-source.json",
         "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "contracts/repository/mir4-command-inventory-v1.schema.json",
         "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
         "contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json",
         "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
@@ -4500,5 +4502,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:6c193d82fe7243ae4bf3086ff4c2ed50789178d5b403f82fbacb2ab2465370e0"
+  "digest": "sha256:a70551423d2f3d488bf565bdb1939f06e6b038029f9d8dd1690908842156403b"
 }
