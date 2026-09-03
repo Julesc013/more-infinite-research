@@ -2329,7 +2329,7 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202PowerShellCharacterizationAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "6773A42E52D885F480D0F4312454798BA205C783D69520FD90FEA177DA49642C",
+      "sha256": "CC4BEE80E07216CFB2F2DB57014FD94CCA4EFB3CCB2AF66018E79B3B1BEE7A4D",
       "lines": 111,
       "package_visible": false
     },
@@ -3036,7 +3036,7 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "125A63C938441B7D8AF36DBA2E6E0508F14140C26C046BBAA8381698578724ED",
+      "sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
       "lines": 2093,
       "package_visible": false
     },
@@ -4073,5 +4073,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8dc00d380c0bb2daad76f1ea53935344bc1732c89769d242022b18781f67aa65"
+  "digest": "sha256:8d10131bb8f60fbd788aae8a947ea43f1b5e86a929c1cf2cd81596b8f5cf69a6"
 }

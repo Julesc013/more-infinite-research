@@ -38,7 +38,7 @@ foreach($row in @($receipt.tracked_files)){
 }
 Assert-MIR4M4202PowerShell (@($receipt.tracked_files|Where-Object{[string]$_.decision-ceq'decompose'}).Count-eq11-and@($receipt.decomposition_sequence).Count-eq11) 'decomposition-count'
 Assert-MIR4M4202PowerShell (@($receipt.tracked_files|Where-Object{[string]$_.decision-ceq'retain-with-explicit-waiver'}).Count-eq9-and@($receipt.waivers).Count-eq9) 'waiver-count'
-Assert-MIR4M4202PowerShell (@($receipt.authority_bindings).Count-eq11-and@($receipt.authority_bindings|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'authority-binding-count'
+Assert-MIR4M4202PowerShell (@($receipt.authority_bindings).Count-eq12-and@($receipt.authority_bindings|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'authority-binding-count'
 foreach($binding in @($receipt.authority_bindings)){
   Assert-MIR4M4202PowerShell ([string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible) "authority-mode-$($binding.path)"
   Assert-MIR4M4202PowerShell ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$binding.sha256) "authority-hash-$($binding.path)"

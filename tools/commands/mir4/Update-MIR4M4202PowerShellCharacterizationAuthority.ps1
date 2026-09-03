@@ -87,7 +87,7 @@ if($canonicalOutputs.Count-ne267-or$moduleAssignments.Count-ne267-or@($canonical
 
 $l6Path='releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json'
 $l6=Get-Content -Raw -LiteralPath (Join-Path $repo $l6Path)|ConvertFrom-Json -Depth 100 -DateKind String
-$bindingPaths=@('.mir/assurance.json','.mir/control/paths.yml','.mir/modules.yml','.mir/test-impact.yml','assurance/catalog/tests.json','governance/automation/mir4-command-inventory-v1.json','tests/architecture/Test-MIRArchitecture.ps1','tests/repository/Test-MIR4RepositoryFixedPoint.ps1','tests/tooling/Test-MIR4TestWorkflowConvergence.ps1','validation/tests.yml','tools/lib/mir4/PreFreezeRelease.ps1')
+$bindingPaths=@('.mir/assurance.json','.mir/control/paths.yml','.mir/modules.yml','.mir/test-impact.yml','assurance/catalog/tests.json','governance/automation/mir4-command-inventory-v1.json','tests/architecture/Test-MIRArchitecture.ps1','tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1','tests/repository/Test-MIR4RepositoryFixedPoint.ps1','tests/tooling/Test-MIR4TestWorkflowConvergence.ps1','validation/tests.yml','tools/lib/mir4/PreFreezeRelease.ps1')
 $receipt=[pscustomobject][ordered]@{
   schema=1;kind='MIR4M4202PowerShellCharacterizationV1';status='M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED'
   starting_dev=[pscustomobject][ordered]@{commit='337d60ffe6e9dd1c5493b17c4d4b278c16881e2d';tree='9ac1d4541ff82b6b2dac37e1a25fb4f7146a7e90'}

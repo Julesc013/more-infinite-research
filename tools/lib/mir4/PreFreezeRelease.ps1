@@ -1268,7 +1268,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashes[$path] = [string]$binding.sha256
       $powerShellCharacterizationPaths[$path] = $true
     }
-    if ($powerShellCharacterizationPaths.Count -ne 11 -or
+    if ($powerShellCharacterizationPaths.Count -ne 12 -or
         [string]$powerShellCharacterization.status -cne 'M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED' -or
         [string]$powerShellCharacterization.next_fixed_point -cne 'M42-02-PS1-COMMAND-ROUTER') {
       throw '[mir4-prefreeze-m42-02-powershell-characterization-scope]'

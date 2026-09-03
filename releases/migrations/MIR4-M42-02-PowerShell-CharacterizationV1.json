@@ -15,8 +15,8 @@
   },
   "inventory": {
     "path": "governance/automation/mir4-command-inventory-v1.json",
-    "sha256": "9BDAAC2AF98A7500979204187ACAE97DC02FD07AAF8636373C9F64DFEC0A7CE0",
-    "digest": "sha256:8dc00d380c0bb2daad76f1ea53935344bc1732c89769d242022b18781f67aa65",
+    "sha256": "61809FD70396415C1D4BD77AD35A51A710C6F8E2998BFAAAB18E2151117B54E0",
+    "digest": "sha256:8d10131bb8f60fbd788aae8a947ea43f1b5e86a929c1cf2cd81596b8f5cf69a6",
     "canonical_internal": 263,
     "unknown": 0,
     "reviewed_file_count": 20
@@ -283,7 +283,7 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "125A63C938441B7D8AF36DBA2E6E0508F14140C26C046BBAA8381698578724ED",
+      "sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
       "lines": 2093,
       "function_count": 25,
       "parse_errors": 0,
@@ -504,13 +504,19 @@
     },
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
-      "sha256": "9BDAAC2AF98A7500979204187ACAE97DC02FD07AAF8636373C9F64DFEC0A7CE0",
+      "sha256": "61809FD70396415C1D4BD77AD35A51A710C6F8E2998BFAAAB18E2151117B54E0",
       "hash_mode": "canonical-text-v1",
       "package_visible": false
     },
     {
       "path": "tests/architecture/Test-MIRArchitecture.ps1",
       "sha256": "0E6A5E35DB8BF08843C46BFD18ECA5FD84FF289C1FCC68BF78483D466E504FF5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "sha256": "80B07603479FEB7B98A575A669BC890D2502CAD6D1A7E4A360B57E47C84B6317",
       "hash_mode": "canonical-text-v1",
       "package_visible": false
     },
@@ -534,7 +540,7 @@
     },
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
-      "sha256": "125A63C938441B7D8AF36DBA2E6E0508F14140C26C046BBAA8381698578724ED",
+      "sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
       "hash_mode": "canonical-text-v1",
       "package_visible": false
     }
@@ -556,5 +562,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-PS1-COMMAND-ROUTER",
-  "record_sha256": "90350831AA9ED8FD8DA1DEB2CE406B7D8FADCFEB28BCE5839E590F34E75C8E72"
+  "record_sha256": "1A60231EA45EA734F5DB345585AF1ADD347EE2D99795D60CD327185DB63A8C37"
 }
