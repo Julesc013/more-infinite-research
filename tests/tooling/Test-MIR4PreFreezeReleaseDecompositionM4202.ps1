@@ -67,6 +67,26 @@ if(Test-Path -LiteralPath $bootstrapSuccessorPath -PathType Leaf){
       }
     }
     $expectedInventoryDigest=[string]$assuranceReleaseSuccessor.tooling_inventory.digest
+    $compatibilityAuditSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
+    if(Test-Path -LiteralPath $compatibilityAuditSuccessorPath -PathType Leaf){
+      $compatibilityAuditSuccessorRaw=Get-Content -Raw -LiteralPath $compatibilityAuditSuccessorPath
+      Assert-MIR4PreFreezeReleaseDecompositionV1 ($compatibilityAuditSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-pre-freeze-release-compatibility-audit-successor-schema'
+      $compatibilityAuditSuccessor=$compatibilityAuditSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4PreFreezeReleaseDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $compatibilityAuditSuccessor) 'mir4-m42-02-pre-freeze-release-compatibility-audit-successor-record'
+      Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-FileHash -LiteralPath $assuranceReleaseSuccessorPath -Algorithm SHA256).Hash-ceq[string]$compatibilityAuditSuccessor.predecessor.receipt_sha256-and[string]$assuranceReleaseSuccessor.record_sha256-ceq[string]$compatibilityAuditSuccessor.predecessor.record_sha256) 'mir4-m42-02-pre-freeze-release-compatibility-audit-successor-predecessor'
+      foreach($binding in @($compatibilityAuditSuccessor.evolved_bindings)){
+        $path=[string]$binding.path
+        if($expectedBindingSha.ContainsKey($path)){
+          Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-pre-freeze-release-compatibility-audit-successor-binding' $path
+          $expectedBindingSha[$path]=[string]$binding.current_sha256
+        }
+        if($expectedModuleSha.ContainsKey($path)){
+          Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-pre-freeze-release-compatibility-audit-successor-module' $path
+          $expectedModuleSha[$path]=[string]$binding.current_sha256
+        }
+      }
+      $expectedInventoryDigest=[string]$compatibilityAuditSuccessor.tooling_inventory.digest
+    }
   }
 }
 

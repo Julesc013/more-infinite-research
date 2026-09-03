@@ -14,8 +14,11 @@ function Assert-MIR4M4202AssuranceRelease([bool]$Condition,[string]$Code,[string
 }
 
 $packageBefore=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202AssuranceReleaseDecompositionAuthority.ps1') -RepoRoot $repo -Check)
 $receiptPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+$successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
+if(-not(Test-Path -LiteralPath $successorPath -PathType Leaf)){
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202AssuranceReleaseDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202AssuranceRelease ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
@@ -23,13 +26,30 @@ Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $receipt)
 $predecessorPath=Join-Path $repo ([string]$receipt.predecessor.receipt)
 $predecessor=Get-Content -Raw -LiteralPath $predecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $predecessorPath -Algorithm SHA256).Hash-ceq[string]$receipt.predecessor.receipt_sha256-and[string]$predecessor.record_sha256-ceq[string]$receipt.predecessor.record_sha256) 'mir4-m42-02-assurance-release-predecessor'
+$expectedInventoryDigest=[string]$receipt.tooling_inventory.digest
+$expectedModuleSha=@{};foreach($module in @($receipt.decomposition.modules)){$expectedModuleSha[[string]$module.path]=[string]$module.sha256}
+if(Test-Path -LiteralPath $successorPath -PathType Leaf){
+  $successorRaw=Get-Content -Raw -LiteralPath $successorPath
+  Assert-MIR4M4202AssuranceRelease ($successorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-successor-schema'
+  $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $successor) 'mir4-m42-02-assurance-release-successor-record'
+  Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash-ceq[string]$successor.predecessor.receipt_sha256-and[string]$receipt.record_sha256-ceq[string]$successor.predecessor.record_sha256) 'mir4-m42-02-assurance-release-successor-predecessor'
+  foreach($binding in @($successor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedModuleSha.ContainsKey($path)){
+      Assert-MIR4M4202AssuranceRelease ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-assurance-release-successor-module-binding' $path
+      $expectedModuleSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$successor.tooling_inventory.digest
+}
 
 $functionNames=[Collections.Generic.List[string]]::new()
 Assert-MIR4M4202AssuranceRelease (@($receipt.decomposition.modules).Count-eq4-and@($receipt.decomposition.modules|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-assurance-release-module-count'
 foreach($module in @($receipt.decomposition.modules)){
   $path=Join-Path $repo ([string]$module.path);$tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
-  Assert-MIR4M4202AssuranceRelease (@($errors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$module.sha256-and[int]$module.lines-le400) 'mir4-m42-02-assurance-release-module' ([string]$module.path)
+  Assert-MIR4M4202AssuranceRelease (@($errors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[int]$module.lines-le400) 'mir4-m42-02-assurance-release-module' ([string]$module.path)
   foreach($function in @($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
 }
 $selfTestPath=Join-Path $repo ([string]$receipt.decomposition.self_test.path);$selfTokens=$null;$selfErrors=$null
@@ -48,7 +68,7 @@ $entrypointSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Invoke
 Assert-MIR4M4202AssuranceRelease ($entrypointSource.Contains('if ($command -ceq "self-test")')-and$entrypointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) 'mir4-m42-02-assurance-release-self-test-route'
 
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202AssuranceRelease ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq[string]$receipt.tooling_inventory.digest) 'mir4-m42-02-assurance-release-inventory'
+Assert-MIR4M4202AssuranceRelease ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-release-inventory'
 Assert-MIR4M4202AssuranceRelease ([bool]$receipt.semantic_contract.source_segments_exact-and[bool]$receipt.semantic_contract.candidate_planning_unchanged-and[bool]$receipt.semantic_contract.seal_creation_unchanged-and[bool]$receipt.semantic_contract.seal_verification_unchanged-and[bool]$receipt.semantic_contract.embedded_self_test_removed_from_release_authority) 'mir4-m42-02-assurance-release-semantic-contract'
 Assert-MIR4M4202AssuranceRelease (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-assurance-release-transition'
 Assert-MIR4M4202AssuranceRelease ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-assurance-release-package-firewall'

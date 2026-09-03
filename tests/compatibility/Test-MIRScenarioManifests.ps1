@@ -17,8 +17,12 @@ $manifestPaths = @(
 $allowedTargets = @("2.0", "2.1")
 $allowedClaims = @("loads", "observed", "cooperates", "diagnostic-only", "partial-support", "full-family-support", "full-pack-support")
 
-$compatAuditSource = Get-Content -Raw -LiteralPath (
-  Join-Path $RepoRoot "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+$compatAuditSource = @(
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+  Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools/commands/compatibility/compat-audit") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
 $factorioProcessIndex = $compatAuditSource.IndexOf("FactorioProcess.ps1", [StringComparison]::Ordinal)
 $settingsOverridesIndex = $compatAuditSource.IndexOf("SettingsOverrides.ps1", [StringComparison]::Ordinal)
 if ($factorioProcessIndex -lt 0 -or $settingsOverridesIndex -lt 0 -or

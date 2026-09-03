@@ -441,7 +441,12 @@ if ($qualificationSource -notmatch 'Copy-MIRPerformanceArtifactsVerified[\s\S]{0
   throw "Performance qualification must preserve independent raw artifact trees in content-addressed custody."
 }
 $compatRunnerSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\compatibility\FactorioRunner.ps1")
-$compatAuditSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+$compatAuditSource = @(
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+  Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\commands\compatibility\compat-audit") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
 $boundedRuntimeRequirements = @(
   '[string]$RuntimeRoot = $env:MIR_COMPAT_RUNTIME_ROOT',
   'function New-MIRCompatRuntimeCampaignRoot',

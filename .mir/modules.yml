@@ -1850,6 +1850,7 @@ validation_tooling:
     planner_snapshot_minimize: tools/commands/planner/Minimize-MIRPlannerSnapshot.ps1
     compatibility_pack_scaffold: tools/commands/compatibility/New-MIRCompatibilityPack.ps1
     compatibility_audit: tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+    compatibility_audit_modules: tools/commands/compatibility/compat-audit
     compatibility_audit_results: tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1
     compatibility_profile_stub: tools/commands/compatibility/New-MIRCompatProfileStub.ps1
     compatibility_line_adapter: tools/commands/compatibility/New-MIRFactorioLineTestAdapter.ps1

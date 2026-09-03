@@ -148,6 +148,12 @@ paths:
   mir4.m42-02.assurance-release.receipt-schema: contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json
   mir4.m42-02.assurance-release.writer: tools/commands/mir4/Update-MIR4M4202AssuranceReleaseDecompositionAuthority.ps1
   mir4.m42-02.assurance-release.test: tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1
+  mir4.m42-02.compatibility-audit.facade: tools/commands/compatibility/Invoke-MIRCompatAudit.ps1
+  mir4.m42-02.compatibility-audit.modules: tools/commands/compatibility/compat-audit
+  mir4.m42-02.compatibility-audit.receipt: releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json
+  mir4.m42-02.compatibility-audit.receipt-schema: contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json
+  mir4.m42-02.compatibility-audit.writer: tools/commands/mir4/Update-MIR4M4202CompatibilityAuditDecompositionAuthority.ps1
+  mir4.m42-02.compatibility-audit.test: tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

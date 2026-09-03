@@ -451,6 +451,12 @@ foreach ($assuranceReleaseModule in @("CandidatePlanning.ps1", "SealAuthority.ps
 }
 $null = Read-MIRFile -RelativePath "tests/tooling/support/MIRAssuranceSelfTest.ps1"
 if ($assuranceReleaseFacadeText.Contains('Invoke-MIRAssuranceSelfTest')) { throw '[mir-architecture-assurance-release-self-test-boundary]' }
+$compatibilityAuditFacadeText = Read-MIRFile -RelativePath "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1"
+foreach ($compatibilityAuditModule in @("Configuration.ps1", "InputDiscovery.ps1", "ScenarioDefinitions.ps1", "ScenarioResolution.ps1", "ScenarioSelection.ps1", "ResultCollation.ps1")) {
+  $relative = "tools/commands/compatibility/compat-audit/$compatibilityAuditModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" -Text $compatibilityAuditFacadeText -Needle "compat-audit/$compatibilityAuditModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
