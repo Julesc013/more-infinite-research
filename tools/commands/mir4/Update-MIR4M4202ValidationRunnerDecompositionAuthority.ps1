@@ -171,6 +171,7 @@ $evolvedPaths=@(
   '.mir/assurance.json','.mir/control/paths.yml','.mir/modules.yml','.mir/test-impact.yml','assurance/catalog/tests.json',
   'docs/architecture/module-boundaries.md','governance/automation/mir4-command-inventory-v1.json','scripts/Invoke-MIRValidation.ps1',
   'tests/architecture/Test-MIRArchitecture.ps1','tests/repository/Test-MIR4RepositoryFixedPoint.ps1',
+  'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1',
   'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1','tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1',
   'tests/tooling/Test-MIRAssurance.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/mir/application/repository/RepositoryFixedPoint.ps1','validation/tests.yml'
 )

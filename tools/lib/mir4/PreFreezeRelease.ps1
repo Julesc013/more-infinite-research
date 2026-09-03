@@ -1357,6 +1357,7 @@ function Test-MIR4PreFreezeAuthorities {
       'scripts/Invoke-MIRValidation.ps1'='29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB'
       'tests/architecture/Test-MIRArchitecture.ps1'='0E6A5E35DB8BF08843C46BFD18ECA5FD84FF289C1FCC68BF78483D466E504FF5'
       'tests/repository/Test-MIR4RepositoryFixedPoint.ps1'='302723E073CDD5E8360B6DF64B4E6C514F958ABD54E22A010A364609B74A4325'
+      'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='B53C546FA9199A46262513705E33BB0A8ED303432BB124EF6870E3704FAF7DFC'
       'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='5DE299D8848FF5DA115161AEF756D326A4A908841649E031C557684DC0C5EE5C'
       'tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1'='CD37C8F5A32AEFF9CC63CC700AFDB93C68D7139131C0237B9039B787FCABA943'
       'tests/tooling/Test-MIRAssurance.ps1'='9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5'
@@ -1386,7 +1387,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $validationRunnerEvolvedPaths[$path] = $true
     }
-    if ($validationRunnerEvolvedPaths.Count -ne 16 -or
+    if ($validationRunnerEvolvedPaths.Count -ne 17 -or
         [string]$validationRunner.status -cne 'M42-02-PS2-VALIDATION-RUNNER-DECOMPOSED' -or
         [string]$validationRunner.decomposition.responsibility -cne 'validation-runner' -or
         [string]$validationRunner.next_fixed_point -cne 'M42-02-PS3-ASSURANCE-EVIDENCE' -or

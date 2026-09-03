@@ -3373,6 +3373,7 @@
         "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
         "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
         "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
         "tests/architecture/Test-MIRArchitecture.ps1",
         "docs/architecture/module-boundaries.md",

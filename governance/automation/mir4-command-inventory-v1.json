@@ -2595,9 +2595,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202ValidationRunnerDecompositionAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "9A58EFE88C20329245C9ED3FFFBC3D2FA87D2DCF14E785A37CE9A7EFB2D03862",
+      "sha256": "35992FEA1C8517BFEE7FCC39A2CAE9C43275E5C54F0D3CA2F852A554249AD15E",
       "hash_mode": "canonical-text-v1",
-      "lines": 199,
+      "lines": 200,
       "package_visible": false
     },
     {
@@ -3387,9 +3387,9 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "342D7BFC831C23EBB7C7E0A409234F18B8E60CE591E10F5B6D44CEA8E1E34BEE",
+      "sha256": "96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9",
       "hash_mode": "canonical-text-v1",
-      "lines": 2216,
+      "lines": 2217,
       "package_visible": false
     },
     {
@@ -4842,5 +4842,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0b17a8252d17c3350335e6541da2b0295e3f6f8d22ebd9b7227f8847494dce20"
+  "digest": "sha256:354f00b04d790cd6f7f284b6ffdb7e93b7041e4a623f7704978cef97dd5f04da"
 }

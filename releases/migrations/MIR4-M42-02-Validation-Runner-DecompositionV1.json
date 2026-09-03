@@ -361,9 +361,9 @@
   },
   "tooling_inventory": {
     "path": "governance/automation/mir4-command-inventory-v1.json",
-    "sha256": "FFE5DA905D0C072BE6C6F55BF39BAFCD4E999BC816525C6D7356FA1798451A0C",
+    "sha256": "C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC",
     "hash_mode": "canonical-text-v1",
-    "digest": "sha256:0b17a8252d17c3350335e6541da2b0295e3f6f8d22ebd9b7227f8847494dce20",
+    "digest": "sha256:354f00b04d790cd6f7f284b6ffdb7e93b7041e4a623f7704978cef97dd5f04da",
     "command_count": 85,
     "unknown": 0,
     "duplicate_command_keys": 0
@@ -404,7 +404,7 @@
     {
       "path": "assurance/catalog/tests.json",
       "previous_sha256": "5EE78F1AB37240161CF56FC24A3E0237F823C7AD0BD5C26082D2F51A10AE1E40",
-      "current_sha256": "574E01AD1BF19B58C3C7E67AECE8230FBF9CC109B986636CA3170019E566427A",
+      "current_sha256": "FC1FFDDAD38370043049BBC6BA838163A9B568CD1446148D6D8385F72B6B1EF8",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -420,7 +420,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "E5463D974FC0B64C2EA9F9C49AD05A749DE4C892822F049861DC5EEE37CB5F35",
-      "current_sha256": "FFE5DA905D0C072BE6C6F55BF39BAFCD4E999BC816525C6D7356FA1798451A0C",
+      "current_sha256": "C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -445,6 +445,14 @@
       "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
       "previous_sha256": "302723E073CDD5E8360B6DF64B4E6C514F958ABD54E22A010A364609B74A4325",
       "current_sha256": "F81313D89D0FF8097652BDFC1EA0DBDC6CEA87FBF4A50501382739E84B49B4B9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "B53C546FA9199A46262513705E33BB0A8ED303432BB124EF6870E3704FAF7DFC",
+      "current_sha256": "BF9A86C8C72CF1F7F9A43CDE0B60E768835FF01218C96873071D2037C4392EB4",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -476,7 +484,7 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "DE1535857373D38F4DA508C8559CA7378470CDF325FEF09A86A33CC6D11D9D7E",
-      "current_sha256": "342D7BFC831C23EBB7C7E0A409234F18B8E60CE591E10F5B6D44CEA8E1E34BEE",
+      "current_sha256": "96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -492,7 +500,7 @@
     {
       "path": "validation/tests.yml",
       "previous_sha256": "B89B0CD861D87B12B3DA565EE26457E8B40AE150842FA8B8EFB490BBB9BF7B5A",
-      "current_sha256": "2312CCAEBBFD4A9DD8F1F96BE965EE83763CC5CE12E00E1BAC69AF50E6E88EE1",
+      "current_sha256": "165C08D736F83D9B4E05CB7FDAC4CF1A3D8F0E5FC4C36C230B0B4339B6750498",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -515,5 +523,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-PS3-ASSURANCE-EVIDENCE",
-  "record_sha256": "FA61C000D4AB5DA6A63E14060DE9D75F5A669DF3EA0B2010E3A1DBD16FDEF9F1"
+  "record_sha256": "7BBA8D1D347C55D4723E293FCCD0E928F99AE38FA7122A6988FE8FBAF4D178F1"
 }
