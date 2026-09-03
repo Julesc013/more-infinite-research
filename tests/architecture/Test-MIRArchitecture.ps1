@@ -443,6 +443,14 @@ foreach ($bootstrapMaterializationModule in @("DigestsAndRecords.ps1", "SafePath
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/lib/mir4/BootstrapMaterialization.ps1" -Text $bootstrapMaterializationFacadeText -Needle "bootstrap-materialization/$bootstrapMaterializationModule"
 }
+$assuranceReleaseFacadeText = Read-MIRFile -RelativePath "tools/lib/assurance/Release.ps1"
+foreach ($assuranceReleaseModule in @("CandidatePlanning.ps1", "SealAuthority.ps1", "SealCreation.ps1", "SealVerification.ps1")) {
+  $relative = "tools/lib/assurance/release/$assuranceReleaseModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/assurance/Release.ps1" -Text $assuranceReleaseFacadeText -Needle "release/$assuranceReleaseModule"
+}
+$null = Read-MIRFile -RelativePath "tests/tooling/support/MIRAssuranceSelfTest.ps1"
+if ($assuranceReleaseFacadeText.Contains('Invoke-MIRAssuranceSelfTest')) { throw '[mir-architecture-assurance-release-self-test-boundary]' }
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

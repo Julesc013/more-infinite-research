@@ -64,6 +64,9 @@ function Get-MIRAssuranceTimeBudgetSeconds {
 
 $context = Get-MIRAssuranceContext
 $command = if ($Args.Count -gt 0) { [string]$Args[0] } else { "help" }
+if ($command -ceq "self-test") {
+  . (Join-Path $repo "tests/tooling/support/MIRAssuranceSelfTest.ps1")
+}
 switch ($command) {
   "help" { Show-MIRAssuranceHelp }
   "doctor" {

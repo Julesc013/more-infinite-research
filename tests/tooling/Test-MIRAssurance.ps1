@@ -23,7 +23,15 @@ $trust = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\trust.js
 if ([int]$config.schema -ne 1 -or [int]$impact.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
   throw "Unsupported assurance manifest schema."
 }
-$releaseAssuranceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$releaseAssuranceFacadeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$releaseAssuranceSource = @(
+  $releaseAssuranceFacadeSource
+  Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\release") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
+$assuranceSelfTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tests\tooling\support\MIRAssuranceSelfTest.ps1")
+$assuranceEntryPointSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
 $assuranceEvidenceSource = @(
   Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
   Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\evidence") -File -Filter "*.ps1" |
@@ -35,11 +43,13 @@ foreach ($requiredTrustSelfTestSnippet in @(
   '{ "protected-integration" } else { "untrusted-pr" }',
   '$differentTrustCapsule.producer.trust_class = $differentTrustClass'
 )) {
-  if (-not $releaseAssuranceSource.Contains($requiredTrustSelfTestSnippet)) {
+  if (-not $assuranceSelfTestSource.Contains($requiredTrustSelfTestSnippet)) {
     throw "Assurance trust-class self-test does not guarantee a different decoy class: $requiredTrustSelfTestSnippet"
   }
 }
 
+if ($releaseAssuranceFacadeSource.Contains('function Invoke-MIRAssuranceSelfTest')) { throw 'Release authority still embeds assurance self-test implementation.' }
+if (-not $assuranceEntryPointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) { throw 'Assurance self-test command does not load canonical test support.' }
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
@@ -133,7 +143,7 @@ if ($releaseHistoryTest.Count -ne 1 -or
 }
 
 $assuranceEntryPoint = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
-$assuranceReleaseLibrary = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$assuranceReleaseLibrary = $releaseAssuranceSource
 foreach ($source in @($assuranceEntryPoint, $assuranceReleaseLibrary)) {
   if (-not $source.Contains('(@(& git -C $repo branch --show-current) -join "").Trim()') -or
       $source.Contains('([string](& git -C $repo branch --show-current)).Trim()')) {
@@ -433,7 +443,7 @@ foreach ($requiredUpgradeText in @(
   }
 }
 
-$releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$releaseAssurance = $releaseAssuranceSource
 foreach ($requiredSealField in @(
   "mir_version",
   "target",

@@ -96,7 +96,12 @@ $evidence = @(
 if ($evidence -notmatch 'schema="mir-test-result-v1"' -or $evidence -notmatch 'schema=2') {
   throw "Assurance result or bundle schema differs from the governed JSON schemas."
 }
-$release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$release = @(
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+  Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\release") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
 if ($release -notmatch 'schema=4') {
   throw "Assurance seal schema differs from seal.schema.json."
 }

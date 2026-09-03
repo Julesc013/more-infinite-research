@@ -57,6 +57,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -978,6 +979,58 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-bootstrap-materialization-transition] $($property.Name)" }
     }
     $priorReceiptPath = $bootstrapMaterializationReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $assuranceReleaseReceiptPath = 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $assuranceReleaseReceiptPath) -PathType Leaf) {
+    $assuranceRelease = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $assuranceReleaseReceiptPath -Kind 'MIR4M4202AssuranceReleaseDecompositionV1'
+    if ([string]$assuranceRelease.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$assuranceRelease.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$assuranceRelease.predecessor.record_sha256 -cne [string]$bootstrapMaterialization.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-assurance-release-predecessor]'
+    }
+    $assuranceReleaseEnrollmentBaselines = @{
+      'scripts/Invoke-MIRAssurance.ps1'='FAB4B763803218D33E584958BA92403FB3631B6BB3B1A893BEC5DC3F59D52600'
+      'tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1'='DE64AAA6E87D27C00B0AE01A71B2297805E10753F6101DE5AF8499A3A22807F7'
+      'tools/lib/assurance/Release.ps1'='B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9'
+    }
+    $assuranceReleaseEvolvedPaths = @{}
+    foreach ($binding in @($assuranceRelease.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $assuranceReleaseEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$assuranceReleaseEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-assurance-release-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $assuranceReleaseEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-assurance-release-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $assuranceReleaseEvolvedPaths[$path] = $true
+    }
+    if ($assuranceReleaseEvolvedPaths.Count -ne 23 -or
+        [string]$assuranceRelease.status -cne 'M42-02-PS6-ASSURANCE-RELEASE-DECOMPOSED' -or
+        [string]$assuranceRelease.decomposition.responsibility -cne 'assurance-release' -or
+        [string]$assuranceRelease.next_fixed_point -cne 'M42-02-PS7-COMPATIBILITY-AUDIT' -or
+        @($assuranceRelease.decomposition.modules).Count -ne 4 -or
+        [string]$assuranceRelease.decomposition.self_test.authority -cne 'canonical-executable-test-support' -or
+        -not [bool]$assuranceRelease.public_contract.unchanged -or
+        -not [bool]$assuranceRelease.semantic_contract.embedded_self_test_removed_from_release_authority -or
+        [string]$assuranceRelease.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-assurance-release-scope]'
+    }
+    foreach ($property in $assuranceRelease.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-assurance-release-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $assuranceReleaseReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
   $staleAuthorityBindings = @()
