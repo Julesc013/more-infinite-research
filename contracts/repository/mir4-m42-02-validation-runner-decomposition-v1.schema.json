@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "starting_dev", "predecessor", "characterization", "decomposition", "public_contract", "semantic_contract", "tooling_inventory", "evolved_bindings", "preservation", "transition_gate", "next_fixed_point", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4202ValidationRunnerDecompositionV1"},
+    "status": {"const": "M42-02-PS2-VALIDATION-RUNNER-DECOMPOSED"},
+    "starting_dev": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {"commit": {"const": "bb953b617c823a4834fc211735f8312cce1ef48e"}, "tree": {"const": "6946cf5125a8b21af46757164834d5583647098a"}}},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["work_package", "receipt", "receipt_sha256", "record_sha256", "status"], "properties": {
+      "work_package": {"const": "M42-02-PS1-COMMAND-ROUTER"},
+      "receipt": {"const": "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json"},
+      "receipt_sha256": {"$ref": "#/$defs/sha256"},
+      "record_sha256": {"$ref": "#/$defs/sha256"},
+      "status": {"const": "M42-02-PS1-COMMAND-ROUTER-DECOMPOSED"}
+    }},
+    "characterization": {"type": "object", "additionalProperties": false, "required": ["receipt", "record_sha256", "path", "sha256", "lines", "responsibilities"], "properties": {
+      "receipt": {"const": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json"},
+      "record_sha256": {"$ref": "#/$defs/sha256"},
+      "path": {"const": "scripts/Invoke-MIRValidation.ps1"},
+      "sha256": {"const": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB"},
+      "lines": {"const": 5159},
+      "responsibilities": {"type": "array", "minItems": 5, "maxItems": 5, "items": {"type": "string", "minLength": 1}}
+    }},
+    "decomposition": {"type": "object", "additionalProperties": false, "required": ["responsibility", "facade", "application", "module_root", "module_count", "module_maximum_lines", "modules", "segment_algorithm"], "properties": {
+      "responsibility": {"const": "validation-runner"},
+      "facade": {"$ref": "#/$defs/facade"},
+      "application": {"$ref": "#/$defs/application"},
+      "module_root": {"const": "tools/lib/validation/runner"},
+      "module_count": {"const": 21},
+      "module_maximum_lines": {"const": 600},
+      "modules": {"type": "array", "minItems": 21, "maxItems": 21, "items": {"$ref": "#/$defs/module"}},
+      "segment_algorithm": {"const": "exact-canonical-source-slices-with-explicit-early-completion-handoffs-v1"}
+    }},
+    "public_contract": {"type": "object", "additionalProperties": false, "required": ["parameter_projection_algorithm", "previous_sha256", "current_sha256", "unchanged", "parameter_count", "list_mode", "docs_only", "manifests_only", "architecture_only", "static_only", "scenario_worker"], "properties": {
+      "parameter_projection_algorithm": {"const": "powershell-param-block-canonical-text-v1"},
+      "previous_sha256": {"$ref": "#/$defs/sha256"},
+      "current_sha256": {"$ref": "#/$defs/sha256"},
+      "unchanged": {"const": true},
+      "parameter_count": {"const": 18},
+      "list_mode": {"const": true}, "docs_only": {"const": true}, "manifests_only": {"const": true}, "architecture_only": {"const": true}, "static_only": {"const": true}, "scenario_worker": {"const": true}
+    }},
+    "semantic_contract": {"type": "object", "additionalProperties": false, "required": ["runtime_registry", "selected_runtime_payload_sha256", "source_segments_exact", "scenario_names_and_groups_unchanged", "schema_2_result_contract_unchanged", "factorio_process_owner", "result_owner"], "properties": {
+      "runtime_registry": {"$ref": "#/$defs/runtimeRegistry"},
+      "selected_runtime_payload_sha256": {"$ref": "#/$defs/sha256"},
+      "source_segments_exact": {"const": true},
+      "scenario_names_and_groups_unchanged": {"const": true},
+      "schema_2_result_contract_unchanged": {"const": true},
+      "factorio_process_owner": {"const": "tools/lib/validation/FactorioProcess.ps1"},
+      "result_owner": {"const": "tools/lib/validation/ResultAggregation.ps1"}
+    }},
+    "tooling_inventory": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "digest", "command_count", "unknown", "duplicate_command_keys"], "properties": {
+      "path": {"const": "governance/automation/mir4-command-inventory-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}, "command_count": {"const": 85}, "unknown": {"const": 0}, "duplicate_command_keys": {"const": 0}
+    }},
+    "evolved_bindings": {"type": "array", "minItems": 17, "maxItems": 17, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims"], "properties": {"package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_visible_delta": {"const": []}, "gameplay": {"const": false}, "saves": {"const": true}, "settings": {"const": true}, "migrations": {"const": true}, "compatibility_claims": {"const": true}}},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "next_fixed_point": {"const": "M42-02-PS3-ASSURANCE-EVIDENCE"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "facade": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "previous_lines", "current_lines", "maximum_lines", "parameter_count"], "properties": {"path": {"const": "scripts/Invoke-MIRValidation.ps1"}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "previous_lines": {"const": 5159}, "current_lines": {"type": "integer", "minimum": 1, "maximum": 40}, "maximum_lines": {"const": 40}, "parameter_count": {"const": 18}}},
+    "application": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "lines", "maximum_lines", "parse_errors"], "properties": {"path": {"const": "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "lines": {"type": "integer", "minimum": 1, "maximum": 400}, "maximum_lines": {"const": 400}, "parse_errors": {"const": 0}}},
+    "module": {"type": "object", "additionalProperties": false, "required": ["path", "role", "source_lines", "sha256", "hash_mode", "lines", "function_count", "parse_errors"], "properties": {"path": {"type": "string", "pattern": "^tools/lib/validation/runner/[A-Za-z0-9]+[.]ps1$"}, "role": {"type": "string", "minLength": 1}, "source_lines": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "integer", "minimum": 1}, "end": {"type": "integer", "minimum": 1}}}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "lines": {"type": "integer", "minimum": 1, "maximum": 600}, "function_count": {"type": "integer", "minimum": 0}, "parse_errors": {"const": 0}}},
+    "runtimeRegistry": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "profile_counts"], "properties": {"path": {"const": "validation/scenarios/runtime.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "profile_counts": {"type": "object", "additionalProperties": false, "required": ["f210", "f200", "f110", "f100"], "properties": {"f210": {"const": 135}, "f200": {"const": 7}, "f110": {"const": 4}, "f100": {"const": 4}}}}},
+    "evolvedBinding": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "transitionGate": {"type": "object", "additionalProperties": false, "required": ["version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}

@@ -30,6 +30,7 @@ $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-PowerShell-Comma
 $hasSuccessor=Test-Path -LiteralPath $successorPath -PathType Leaf
 $expectedInventorySha=[string]$receipt.inventory.sha256
 $expectedInventoryDigest=[string]$receipt.inventory.digest
+$hasValidationSuccessor=$false
 if($hasSuccessor){
   $successorRaw=Get-Content -Raw -LiteralPath $successorPath
   Assert-MIR4M4202PowerShell ($successorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json')) 'successor-schema'
@@ -54,12 +55,38 @@ if($hasSuccessor){
   Assert-MIR4M4202PowerShell ($inventoryBinding.Count-eq1-and[string]$inventoryBinding[0].previous_sha256-ceq[string]$receipt.inventory.sha256) 'successor-inventory-predecessor'
   $expectedInventorySha=[string]$successor.public_contract.inventory.sha256
   $expectedInventoryDigest=[string]$successor.public_contract.inventory.digest
+
+  $validationSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json'
+  $hasValidationSuccessor=Test-Path -LiteralPath $validationSuccessorPath -PathType Leaf
+  if($hasValidationSuccessor){
+    $validationSuccessorRaw=Get-Content -Raw -LiteralPath $validationSuccessorPath
+    Assert-MIR4M4202PowerShell ($validationSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json')) 'validation-successor-schema'
+    $validationSuccessor=$validationSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202PowerShell (Test-MIR4BootstrapRecordHash -Record $validationSuccessor) 'validation-successor-record-hash'
+    Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $successorPath -Algorithm SHA256).Hash-ceq[string]$validationSuccessor.predecessor.receipt_sha256-and[string]$successor.record_sha256-ceq[string]$validationSuccessor.predecessor.record_sha256) 'validation-successor-predecessor'
+    Assert-MIR4M4202PowerShell ([string]$validationSuccessor.decomposition.facade.previous_sha256-ceq[string]$expectedTrackedSha['scripts/Invoke-MIRValidation.ps1']) 'validation-successor-source-predecessor'
+    $expectedTrackedSha['scripts/Invoke-MIRValidation.ps1']=[string]$validationSuccessor.decomposition.facade.current_sha256
+    $expectedTrackedFunctions['scripts/Invoke-MIRValidation.ps1']=0
+    foreach($binding in @($validationSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedTrackedSha.ContainsKey($path)-and$path-cne'scripts/Invoke-MIRValidation.ps1'){
+        Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedTrackedSha[$path]) "validation-successor-tracked-predecessor-$path"
+        $expectedTrackedSha[$path]=[string]$binding.current_sha256
+      }
+      if($expectedAuthoritySha.ContainsKey($path)){
+        Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedAuthoritySha[$path]) "validation-successor-authority-predecessor-$path"
+        $expectedAuthoritySha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventorySha=[string]$validationSuccessor.tooling_inventory.sha256
+    $expectedInventoryDigest=[string]$validationSuccessor.tooling_inventory.digest
+  }
 }
 $inventoryPath=Join-Path $repo ([string]$receipt.inventory.path)
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq$expectedInventorySha-and[string]$inventory.digest-ceq$expectedInventoryDigest-and[int]$inventory.summary.unknown-eq0) 'inventory'
 $threshold=@($inventory.implementation_files|Where-Object{[string]$_.classification-ceq'canonical-internal'-and[int]$_.lines-ge600}|Sort-Object path)
-$expectedThreshold=@($receipt.tracked_files|Where-Object{-not($hasSuccessor-and[string]$_.path-ceq'tools/mir/cli/Invoke-MIRCommandRouter.ps1')}|ForEach-Object{[string]$_.path}|Sort-Object)
+$expectedThreshold=@($receipt.tracked_files|Where-Object{-not($hasSuccessor-and[string]$_.path-ceq'tools/mir/cli/Invoke-MIRCommandRouter.ps1')-and-not($hasValidationSuccessor-and[string]$_.path-ceq'scripts/Invoke-MIRValidation.ps1')}|ForEach-Object{[string]$_.path}|Sort-Object)
 Assert-MIR4M4202PowerShell ($threshold.Count-eq$expectedThreshold.Count-and@($receipt.tracked_files).Count-eq20) 'threshold-count'
 Assert-MIR4M4202PowerShell ((@($threshold|ForEach-Object{[string]$_.path})-join'|')-ceq($expectedThreshold-join'|')) 'threshold-paths'
 foreach($row in @($receipt.tracked_files)){

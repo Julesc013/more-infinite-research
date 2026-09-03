@@ -1,0 +1,527 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202ValidationRunnerDecompositionV1",
+  "status": "M42-02-PS2-VALIDATION-RUNNER-DECOMPOSED",
+  "starting_dev": {
+    "commit": "bb953b617c823a4834fc211735f8312cce1ef48e",
+    "tree": "6946cf5125a8b21af46757164834d5583647098a"
+  },
+  "predecessor": {
+    "work_package": "M42-02-PS1-COMMAND-ROUTER",
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
+    "receipt_sha256": "212C816F3CDAB203361766CA38775D93C580B6856A75D5051A880724F314979A",
+    "record_sha256": "C6C9AD1E3BD3549AA8752F5EDCE71C8B4F7EEE94C516CC951E0C67C16AB056D4",
+    "status": "M42-02-PS1-COMMAND-ROUTER-DECOMPOSED"
+  },
+  "characterization": {
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+    "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0",
+    "path": "scripts/Invoke-MIRValidation.ps1",
+    "sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
+    "lines": 5159,
+    "responsibilities": [
+      "static selection",
+      "runtime scenario setup",
+      "runtime execution",
+      "log and report assertions",
+      "package smoke policy"
+    ]
+  },
+  "decomposition": {
+    "responsibility": "validation-runner",
+    "facade": {
+      "path": "scripts/Invoke-MIRValidation.ps1",
+      "previous_sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
+      "current_sha256": "04AE6C242F1C90794FF665FFA1BF67304D007F661F10FE71F66AA146C4B2EEE9",
+      "hash_mode": "canonical-text-v1",
+      "previous_lines": 5159,
+      "current_lines": 24,
+      "maximum_lines": 40,
+      "parameter_count": 18
+    },
+    "application": {
+      "path": "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1",
+      "sha256": "7C42D4140B7F349E9D5C1CBD783B6184BD96747303BD6DF6595AA1305B20B601",
+      "hash_mode": "canonical-text-v1",
+      "lines": 324,
+      "maximum_lines": 400,
+      "parse_errors": 0
+    },
+    "module_root": "tools/lib/validation/runner",
+    "module_count": 21,
+    "module_maximum_lines": 600,
+    "modules": [
+      {
+        "path": "tools/lib/validation/runner/Bootstrap.ps1",
+        "role": "target bootstrap and early modes",
+        "source_lines": {
+          "start": 34,
+          "end": 200
+        },
+        "sha256": "24618B9207B56283550D0A0F374EEA651673F6B5F3C4AA21EB37B651E2085224",
+        "hash_mode": "canonical-text-v1",
+        "lines": 170,
+        "function_count": 8,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticCore.ps1",
+        "role": "core repository static checks",
+        "source_lines": {
+          "start": 202,
+          "end": 713
+        },
+        "sha256": "6B82D988104BA5CD4D23B9354725514505B8D2E9A05D6C7563A1CC8CB0FDAAB2",
+        "hash_mode": "canonical-text-v1",
+        "lines": 512,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticFixtureMods.ps1",
+        "role": "fixture metadata checks",
+        "source_lines": {
+          "start": 714,
+          "end": 827
+        },
+        "sha256": "88771FFA08AC87C0138F2C420BE5D3E1BE4FC12600456A1C03E7B499948F3029",
+        "hash_mode": "canonical-text-v1",
+        "lines": 114,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticSciencePackSettings.ps1",
+        "role": "science and settings static checks",
+        "source_lines": {
+          "start": 828,
+          "end": 1381
+        },
+        "sha256": "02596B85691413DBAE84933F6AA6A10806BDB76797551DF09A4D3D3403334467",
+        "hash_mode": "canonical-text-v1",
+        "lines": 554,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticPrototypeLimits.ps1",
+        "role": "prototype-limit static checks",
+        "source_lines": {
+          "start": 1382,
+          "end": 1501
+        },
+        "sha256": "5847C4E764BC35902E0B98A86EA9A2E99403DAF002D9BBECB4C0B27EFF97AA37",
+        "hash_mode": "canonical-text-v1",
+        "lines": 120,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticCompatibilityTooling.ps1",
+        "role": "compatibility-tooling static checks",
+        "source_lines": {
+          "start": 1502,
+          "end": 1741
+        },
+        "sha256": "F0F7F15DA01F124AF6C58F95EBD877D5509C0AED067C09E85AB3EB57D4CE0D28",
+        "hash_mode": "canonical-text-v1",
+        "lines": 240,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticCompilerDiagnostics.ps1",
+        "role": "compiler and compatibility static checks",
+        "source_lines": {
+          "start": 1742,
+          "end": 2103
+        },
+        "sha256": "416348AF7D2F49AEB9D5325F41384AA2BB80B22D5C62AD9CFD773DAB7C5B28B1",
+        "hash_mode": "canonical-text-v1",
+        "lines": 362,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticPolicyAndDocs.ps1",
+        "role": "policy and release-document checks",
+        "source_lines": {
+          "start": 2104,
+          "end": 2289
+        },
+        "sha256": "28FBDA63DEBF44320EF8E5673C0321D441C645B59CAF9D9BC6A05B801751C8D9",
+        "hash_mode": "canonical-text-v1",
+        "lines": 186,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/StaticPackage.ps1",
+        "role": "package identity and determinism checks",
+        "source_lines": {
+          "start": 2290,
+          "end": 2506
+        },
+        "sha256": "F291A4120274D5789566F8EDC1CED57F6996A0284D8CC57E2912829707B53C76",
+        "hash_mode": "canonical-text-v1",
+        "lines": 217,
+        "function_count": 6,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/RuntimeSelection.ps1",
+        "role": "runtime scenario selection",
+        "source_lines": {
+          "start": 2508,
+          "end": 2637
+        },
+        "sha256": "8C6DEED1709D4394C43E60E49E55DA9BAEF0C26303DF14828585C7681B0D0476",
+        "hash_mode": "canonical-text-v1",
+        "lines": 130,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/RuntimeWorkspace.ps1",
+        "role": "runtime result and workspace setup",
+        "source_lines": {
+          "start": 2638,
+          "end": 2770
+        },
+        "sha256": "A7BF0E11A50884A92885A5DCF1653FA8F9FB13A0061FC3C27D079F4538FF7575",
+        "hash_mode": "canonical-text-v1",
+        "lines": 133,
+        "function_count": 2,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/RuntimeScenarioSetup.ps1",
+        "role": "runtime fixture and configuration setup",
+        "source_lines": {
+          "start": 2771,
+          "end": 2987
+        },
+        "sha256": "D6E88E114D4E17EECA75447D485005609242431205966A16DB8A7F1A8CA0E9E7",
+        "hash_mode": "canonical-text-v1",
+        "lines": 217,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/RuntimeExecution.ps1",
+        "role": "Factorio scenario execution",
+        "source_lines": {
+          "start": 2988,
+          "end": 3243
+        },
+        "sha256": "8CBD486ADDFAE573B4CB12FA7553B08B003AFD6E5AC18ACB0CEFB7431441DEE1",
+        "hash_mode": "canonical-text-v1",
+        "lines": 256,
+        "function_count": 4,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/RuntimeAssertions.ps1",
+        "role": "runtime log and report assertions",
+        "source_lines": {
+          "start": 3244,
+          "end": 3506
+        },
+        "sha256": "8321A2D1159A5896202B96577533F656CCEE5BCD6657BCE5AFBAA9A5039A1F60",
+        "hash_mode": "canonical-text-v1",
+        "lines": 263,
+        "function_count": 23,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/PackageSmoke.ps1",
+        "role": "exact package smoke policy",
+        "source_lines": {
+          "start": 3507,
+          "end": 3667
+        },
+        "sha256": "32B548153E1581759EC7CEDEAC1214199132516F4AE60FF532E44E94F641A2B2",
+        "hash_mode": "canonical-text-v1",
+        "lines": 161,
+        "function_count": 3,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/DefaultCampaign00.ps1",
+        "role": "package and reduced-target campaign",
+        "source_lines": {
+          "start": 3935,
+          "end": 4022
+        },
+        "sha256": "94F1E29AEEBEC0EDA6CB07B1043D08DFF5608BCC162B9BE94CC57CA1721A0C32",
+        "hash_mode": "canonical-text-v1",
+        "lines": 89,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/DefaultCampaign01.ps1",
+        "role": "base compiler campaign part one",
+        "source_lines": {
+          "start": 4024,
+          "end": 4338
+        },
+        "sha256": "7F91BE4AE4568CB6DB070D85E7C63942AADC8BD891A082C2099888A5996928D1",
+        "hash_mode": "canonical-text-v1",
+        "lines": 315,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/DefaultCampaign02.ps1",
+        "role": "base and settings campaign part two",
+        "source_lines": {
+          "start": 4339,
+          "end": 4632
+        },
+        "sha256": "F21CDC57793DC799211202ECDB1F9237C1B167228E8CD4B91A7A47172CADE0CA",
+        "hash_mode": "canonical-text-v1",
+        "lines": 294,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/DefaultCampaign03.ps1",
+        "role": "scripted and Space Age campaign",
+        "source_lines": {
+          "start": 4633,
+          "end": 4885
+        },
+        "sha256": "2547BDDFAF82A4A68523AB8B287F159B0827F68CD1C6FDAFD7806CD793B8289D",
+        "hash_mode": "canonical-text-v1",
+        "lines": 253,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/CheckpointCampaign.ps1",
+        "role": "checkpoint-resumable native-owner campaign",
+        "source_lines": {
+          "start": 4890,
+          "end": 4977
+        },
+        "sha256": "B851F5008A937BE70BCF6F234175EEBAE5B7310339D2631D121DD6FF055F0361",
+        "hash_mode": "canonical-text-v1",
+        "lines": 88,
+        "function_count": 0,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/validation/runner/FinalCampaign.ps1",
+        "role": "final policy and negative scenarios",
+        "source_lines": {
+          "start": 4979,
+          "end": 5148
+        },
+        "sha256": "4BEC2E0160395E1BC973B3244E03BBB6CE3AE2C002CE571C1CB99833A3316B76",
+        "hash_mode": "canonical-text-v1",
+        "lines": 170,
+        "function_count": 0,
+        "parse_errors": 0
+      }
+    ],
+    "segment_algorithm": "exact-canonical-source-slices-with-explicit-early-completion-handoffs-v1"
+  },
+  "public_contract": {
+    "parameter_projection_algorithm": "powershell-param-block-canonical-text-v1",
+    "previous_sha256": "DD96956EFD6D7357EF772CFFC7D5BB0A28FE3D6B0532D7A7C075FD39AF08DCEB",
+    "current_sha256": "DD96956EFD6D7357EF772CFFC7D5BB0A28FE3D6B0532D7A7C075FD39AF08DCEB",
+    "unchanged": true,
+    "parameter_count": 18,
+    "list_mode": true,
+    "docs_only": true,
+    "manifests_only": true,
+    "architecture_only": true,
+    "static_only": true,
+    "scenario_worker": true
+  },
+  "semantic_contract": {
+    "runtime_registry": {
+      "path": "validation/scenarios/runtime.json",
+      "sha256": "2E0FE9577697D0723D1EAD78856809DE6786D18903ADAF1C4ABC6C22384EB61A",
+      "hash_mode": "canonical-text-v1",
+      "profile_counts": {
+        "f210": 135,
+        "f200": 7,
+        "f110": 4,
+        "f100": 4
+      }
+    },
+    "selected_runtime_payload_sha256": "E0D3C58818471B58779632C69217853750C60848CE2D0737BA17267E10875C18",
+    "source_segments_exact": true,
+    "scenario_names_and_groups_unchanged": true,
+    "schema_2_result_contract_unchanged": true,
+    "factorio_process_owner": "tools/lib/validation/FactorioProcess.ps1",
+    "result_owner": "tools/lib/validation/ResultAggregation.ps1"
+  },
+  "tooling_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:354f00b04d790cd6f7f284b6ffdb7e93b7041e4a623f7704978cef97dd5f04da",
+    "command_count": 85,
+    "unknown": 0,
+    "duplicate_command_keys": 0
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "3AA87C735CE38E72E329B57CE18128E12F2EDC766AAB9C8B1E99D653D993F86A",
+      "current_sha256": "EAFF5A9CEB72E143F3054115E971E9FCB04D8EF1EF9B912B7DB8C2C8AD8F9DDC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "A1BEA739D39299E51074974F247E7365D042F6521B7AF671777D61905E47BB79",
+      "current_sha256": "17B027743B5F8114D3E339DD5502ADD421FB50C4F4340D832EB3F0078039C390",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "A283CC23AA08E3C0143F5F2DC2EBDFB0ECC84DDAF83596C18F01E7EA257EE7EE",
+      "current_sha256": "20A679746AEF6D9B1995FAD720DC31E493F3163EF5D0067EBCE5819C235B5B09",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "86F2CE6C8B7D2C3DDC814E28334AD38AEB9B74E95CB3BEDDAAB454E7C134EEC2",
+      "current_sha256": "C76E65B8B612F21C6C7F08D265787F1AE31E09E97DF4D9F2ACD811A3CA5B4399",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "5EE78F1AB37240161CF56FC24A3E0237F823C7AD0BD5C26082D2F51A10AE1E40",
+      "current_sha256": "FC1FFDDAD38370043049BBC6BA838163A9B568CD1446148D6D8385F72B6B1EF8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "62F4004A4F5BB77416F05041AD5584FED137EB128F1F7656A9DAADF297682E49",
+      "current_sha256": "DE0C8EF7A7D7E99C3C416893740F69CF3580607432303820B826A95D33D0F915",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "E5463D974FC0B64C2EA9F9C49AD05A749DE4C892822F049861DC5EEE37CB5F35",
+      "current_sha256": "C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "scripts/Invoke-MIRValidation.ps1",
+      "previous_sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
+      "current_sha256": "04AE6C242F1C90794FF665FFA1BF67304D007F661F10FE71F66AA146C4B2EEE9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_sha256": "0E6A5E35DB8BF08843C46BFD18ECA5FD84FF289C1FCC68BF78483D466E504FF5",
+      "current_sha256": "84E7CF5D35BB7CE2DB2820606EE1213486D7032CDCFE963DC80FA1BE5A505E07",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "302723E073CDD5E8360B6DF64B4E6C514F958ABD54E22A010A364609B74A4325",
+      "current_sha256": "F81313D89D0FF8097652BDFC1EA0DBDC6CEA87FBF4A50501382739E84B49B4B9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "B53C546FA9199A46262513705E33BB0A8ED303432BB124EF6870E3704FAF7DFC",
+      "current_sha256": "BF9A86C8C72CF1F7F9A43CDE0B60E768835FF01218C96873071D2037C4392EB4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "5DE299D8848FF5DA115161AEF756D326A4A908841649E031C557684DC0C5EE5C",
+      "current_sha256": "43B525DFE427559BCF7D0F34D819C4475A18348DB289B3063E9D883732620E8E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "CD37C8F5A32AEFF9CC63CC700AFDB93C68D7139131C0237B9039B787FCABA943",
+      "current_sha256": "2157159773AB3CD45391FE38FC4836492014952275B3CCBD0ACCF7BA58FBC4DC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_sha256": "9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5",
+      "current_sha256": "9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "DE1535857373D38F4DA508C8559CA7378470CDF325FEF09A86A33CC6D11D9D7E",
+      "current_sha256": "96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "current_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "B89B0CD861D87B12B3DA565EE26457E8B40AE150842FA8B8EFB490BBB9BF7B5A",
+      "current_sha256": "165C08D736F83D9B4E05CB7FDAC4CF1A3D8F0E5FC4C36C230B0B4339B6750498",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS3-ASSURANCE-EVIDENCE",
+  "record_sha256": "7BBA8D1D347C55D4723E293FCCD0E928F99AE38FA7122A6988FE8FBAF4D178F1"
+}

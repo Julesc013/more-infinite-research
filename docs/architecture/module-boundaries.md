@@ -663,7 +663,7 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 ## Validation Tooling Boundary
 
-`scripts/Invoke-MIRValidation.ps1` remains the stable validation facade. Reusable concerns live under `tools/lib/validation/`: package identity, target metadata, scenario grouping, structured evidence aggregation, and Factorio process/copied-mod handling. Extracted modules receive paths explicitly and must retain the facade's existing parameters, scenario names, group assignments, and schema-2 result contract.
+`scripts/Invoke-MIRValidation.ps1` remains the stable validation facade and contains only its public parameter contract plus delegation. The application runner and bounded static-selection, runtime-setup, runtime-execution, report-assertion, package-smoke, and scenario-campaign modules live under `tools/lib/validation/runner/`. Reusable package identity, target metadata, scenario grouping, structured evidence aggregation, settings override, and Factorio process/copied-mod concerns remain under `tools/lib/validation/`. Extracted modules share one runner scope, preserve the facade's parameters, scenario names, group assignments, early-completion behavior, and schema-2 result contract, and do not gain package, gameplay, release, or publication authority.
 
 Deterministic package construction and composition reporting are canonical commands under `tools/commands/package/`. Their former `scripts/` entrypoints are parameter-compatible wrappers only. Source reconstruction resolves the canonical command first and falls back to the historical path only when the selected source commit predates this migration; this fallback preserves old release reconstruction without making the alias a current write authority.
 
