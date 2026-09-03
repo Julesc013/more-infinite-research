@@ -18,7 +18,10 @@ function Assert-MIR4M4202CompatibilityAudit {
 }
 
 $packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202CompatibilityAuditDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+$successorPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json'
+if (-not (Test-Path -LiteralPath $successorPath -PathType Leaf)) {
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202CompatibilityAuditDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
 $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202CompatibilityAudit ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-compatibility-audit-schema'
@@ -66,8 +69,17 @@ try {
   }
 }
 
+$expectedInventoryDigest = [string]$receipt.tooling_inventory.digest
+if (Test-Path -LiteralPath $successorPath -PathType Leaf) {
+  $successorRaw = Get-Content -Raw -LiteralPath $successorPath
+  Assert-MIR4M4202CompatibilityAudit ($successorRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json')) 'mir4-m42-02-compatibility-audit-successor-schema'
+  $successor = $successorRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $successor) 'mir4-m42-02-compatibility-audit-successor-record'
+  Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$successor.predecessor.receipt_sha256 -and [string]$receipt.record_sha256 -ceq [string]$successor.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-successor-predecessor'
+  $expectedInventoryDigest = [string]$successor.tooling_inventory.digest
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq [string]$receipt.tooling_inventory.digest) 'mir4-m42-02-compatibility-audit-inventory'
+Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
 Assert-MIR4M4202CompatibilityAudit ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.command_root_semantics_preserved -and [bool]$receipt.semantic_contract.parameter_surface_unchanged -and [bool]$receipt.semantic_contract.scenario_execution_unchanged -and [bool]$receipt.semantic_contract.result_collation_unchanged -and [bool]$receipt.semantic_contract.compatibility_claims_unchanged -and [bool]$receipt.semantic_contract.stream_authority_unchanged) 'mir4-m42-02-compatibility-audit-semantic-contract'
 Assert-MIR4M4202CompatibilityAudit (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-compatibility-audit-transition'
 Assert-MIR4M4202CompatibilityAudit ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-compatibility-audit-package-firewall'

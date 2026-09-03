@@ -1806,6 +1806,7 @@ validation_tooling:
     mir3_dot9_mod_portal_visibility_canonicalization_reconciliation_schema: spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json
     mir3_dot9_mod_portal_visibility_recheck_gate: tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1
     mir4_offline_candidate_custody: tools/mir/application/custody/OfflineCandidateCustody.ps1
+    mir4_offline_candidate_custody_modules: tools/mir/application/custody/offline-candidate-custody
     mir4_offline_candidate_custody_compatibility: tools/lib/mir4/OfflineCandidateCustody.ps1
     mir4_assurance_offline_custody_migration_authority: governance/repository/migrations/assurance-offline-custody-tooling-v1.json
     mir4_assurance_offline_custody_migration_receipt: releases/migrations/MIR4-Assurance-Offline-Custody-Tooling-MigrationV1.json

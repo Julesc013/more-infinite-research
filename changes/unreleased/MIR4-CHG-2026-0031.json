@@ -1,0 +1,32 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0031",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Split offline candidate custody into bounded modules without changing admission, verification, sealing, restore, or emergency-completion behavior.",
+  "details": [
+    "The exact 1,380-line offline custody application becomes a small facade loading eight package-excluded modules in an explicit order.",
+    "Core records, custody admission, seal inputs, OpenSSH signatures, exact-engine evidence, publication dry runs, offline sealing, and restore and completion now have bounded owners.",
+    "All 26 existing function names retain their order and the application-root substitution preserves the original repository-relative path behavior.",
+    "The legacy emergency-lane reconstruction used only by the custody contract probe now opts into its explicit historical-compatibility gate, while current package creation remains exclusively routed through TargetMaterializer.",
+    "A contained post-cutover contract smoke proves facade loading, canonical immutable records, bindings, path guards, and fail-closed mode selection without reconstructing through the retired root-package writer.",
+    "No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change."
+  ],
+  "semantic_domains": ["tooling", "release", "custody", "maintainability"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Offline custody tooling is package-excluded and preserves exact rolling-channel evidence binding."},
+    {"target":"F200","disposition":"unaffected","reason":"Offline custody tooling is package-excluded."},
+    {"target":"F110","disposition":"unaffected","reason":"Offline custody tooling is package-excluded."},
+    {"target":"F100","disposition":"unaffected","reason":"Offline custody tooling is package-excluded."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

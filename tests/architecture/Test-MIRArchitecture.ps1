@@ -457,6 +457,12 @@ foreach ($compatibilityAuditModule in @("Configuration.ps1", "InputDiscovery.ps1
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" -Text $compatibilityAuditFacadeText -Needle "compat-audit/$compatibilityAuditModule"
 }
+$offlineCustodyFacadeText = Read-MIRFile -RelativePath "tools/mir/application/custody/OfflineCandidateCustody.ps1"
+foreach ($offlineCustodyModule in @("CoreRecords.ps1", "Admission.ps1", "SealInputs.ps1", "OpenSshSignatures.ps1", "ExactEngineEvidence.ps1", "PublicationDryRun.ps1", "OfflineSeal.ps1", "RestoreAndCompletion.ps1")) {
+  $relative = "tools/mir/application/custody/offline-candidate-custody/$offlineCustodyModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/mir/application/custody/OfflineCandidateCustody.ps1" -Text $offlineCustodyFacadeText -Needle "offline-candidate-custody/$offlineCustodyModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

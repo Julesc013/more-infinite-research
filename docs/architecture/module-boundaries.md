@@ -947,3 +947,11 @@ This PS6 split changes no candidate decision, seal construction, seal verificati
 The split binds the characterized 1,677-line implementation, preserves all 35 function names in order, and preserves the complete parameter block byte-for-byte. Three extracted path expressions use the facade-captured command root so their resolved repository and scenario-manifest paths remain unchanged after module extraction.
 
 This PS7 split changes no compatibility claim, stream identity, prototype, scenario selection, runtime assertion, evidence shape, package, gameplay, save, setting, migration, or release authority. It grants no version allocation, tagging, signing, sealing, promotion, publication, or package cutover.
+
+## MIR 4 offline candidate custody boundary
+
+`tools/mir/application/custody/OfflineCandidateCustody.ps1` remains the stable proof-only facade and loads eight bounded modules under `tools/mir/application/custody/offline-candidate-custody/` in one explicit order. Canonical records, custody admission, seal-input guards, OpenSSH signatures, exact-engine evidence, publication dry runs, offline seals, and restore/completion records have separate package-excluded owners.
+
+The split binds the characterized 1,380-line implementation and preserves all 26 function names and their order. Its setup and constants remain in the facade; the one repository-root lookup inside an extracted function uses the facade-captured application root so its resolution remains unchanged. The admission checker and its synthetic contract probe explicitly select the retired bootstrap writer's `HistoricalCompatibility` mode; current package construction remains solely owned by `TargetMaterializer`.
+
+This PS8 split changes no custody admission, signature, qualification-evidence, publication-rehearsal, seal, restore, package, gameplay, save, setting, migration, compatibility, or release behavior. It grants no production key, version allocation, tagging, signing, sealing, promotion, publication, or package cutover authority.

@@ -42,6 +42,22 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$successor.tooling_inventory.digest
+  $offlineCustodySuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json'
+  if(Test-Path -LiteralPath $offlineCustodySuccessorPath -PathType Leaf){
+    $offlineCustodySuccessorRaw=Get-Content -Raw -LiteralPath $offlineCustodySuccessorPath
+    Assert-MIR4M4202AssuranceRelease ($offlineCustodySuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-offline-custody-successor-schema'
+    $offlineCustodySuccessor=$offlineCustodySuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $offlineCustodySuccessor) 'mir4-m42-02-assurance-release-offline-custody-successor-record'
+    Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $successorPath -Algorithm SHA256).Hash-ceq[string]$offlineCustodySuccessor.predecessor.receipt_sha256-and[string]$successor.record_sha256-ceq[string]$offlineCustodySuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-release-offline-custody-successor-predecessor'
+    foreach($binding in @($offlineCustodySuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedModuleSha.ContainsKey($path)){
+        Assert-MIR4M4202AssuranceRelease ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-assurance-release-offline-custody-successor-module-binding' $path
+        $expectedModuleSha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventoryDigest=[string]$offlineCustodySuccessor.tooling_inventory.digest
+  }
 }
 
 $functionNames=[Collections.Generic.List[string]]::new()

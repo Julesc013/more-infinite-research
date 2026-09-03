@@ -59,6 +59,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1111,6 +1112,86 @@ function Test-MIR4PreFreezeAuthorities {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-compatibility-audit-transition] $($property.Name)" }
     }
     $priorReceiptPath = $compatibilityAuditReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+
+  $offlineCustodyReceiptPath = 'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $offlineCustodyReceiptPath) -PathType Leaf) {
+    $offlineCustody = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $offlineCustodyReceiptPath -Kind 'MIR4M4202OfflineCustodyDecompositionV1'
+    if ([string]$offlineCustody.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$offlineCustody.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$offlineCustody.predecessor.record_sha256 -cne [string]$compatibilityAudit.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-offline-custody-predecessor]'
+    }
+    $offlineCustodyEnrollmentBaselines = @{
+      '.mir/assurance.json'='0B749CDAEB870923403411F07B389FE6913A38ADDB063B9D3AA299C0AB10A36D'
+      '.mir/control/paths.yml'='BE26A4A7EC49C6D1D77746FB150082396975A12DFEBDB63EDBC8535301A4CF12'
+      '.mir/modules.yml'='A3A41A9D503E9AAE14239B614B77E8CA868C9E88D8B309A60C7C73FFC1C9AF5B'
+      '.mir/test-impact.yml'='D962D8EC56F71214CECB501824BFE505A053EDDFFEBE91C042142B3CEB56BFD3'
+      'assurance/catalog/tests.json'='2139F94C9C72AB47ABD90BFAC58893FBA49FE04483472EDDFA8A7BE8D617B473'
+      'docs/architecture/module-boundaries.md'='D00D962D9BEA93392A301082D9609D76453F0EF47A4748C98C0084B7CF6FE2D2'
+      'governance/automation/mir4-command-inventory-v1.json'='5728591A48C9FB7E8E5CD7DDA3F038EAD89747465BA6FA223ED0250B10DEA135'
+      'tests/architecture/Test-MIRArchitecture.ps1'='348D59F62EC68D2D6B9ECAF561BD2DB1C662C591207ED73E121A88EFF2E40BFA'
+      'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='8D577E9B5016BE52466F36E0731EF2F2ABFD0C124538DE4752F19228047C917E'
+      'tests/repository/Test-MIR4RepositoryFixedPoint.ps1'='50C4B51A9A727D4B27C3DBD24A3D36FA16773A8D7828D5DB0E13411E83821ABA'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='92D7BE9F26256A60B2536D634C78CE2667C152FAF58A915DE6F6254F17BD9A36'
+      'tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1'='D511D9B980973E68E3ACB7410547DAE1D25AC18E0F4AA7CC3592DE27C7B6AF99'
+      'tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1'='876AC1D2671A74D7D2F8EA5BD57879F3C789A0D2A45F527CF0A164FD04C6AE68'
+      'tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1'='0247BD182DEC78FC8CA3A1C5D372332169D76C23F2FA352CAFC76BB1125530A1'
+      'tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1'='270D14278253118BE76E2AAB91E57A83D03CD7D09719D3F7B26AD97D4F35674F'
+      'tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1'='8F6495AA860277E49796478464F9001DD77FE32BBE06766E191981BA2AA2E70D'
+      'tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1'='A54CFE0A1356C07493F4A603666B944A7AF75A358D86B03028B495C84196F0CD'
+      'tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1'='B10BAA98151FCDB16ED4CABDEF0459C76F68E2D506A3F26587C414261FDCD07E'
+      'tools/mir/application/custody/OfflineCandidateCustody.ps1'='4AA7219BC19A02895F7076DF92E923D64F7C4D440DC4CBC0E937FA8C1CFB5A15'
+      'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1'='DF91B0F2C0AD0B3DB7F01ADE3468F400583B36C6B646CE41395C16579DCA16E8'
+      'validation/tests.yml'='001F2A85C4883EEBA22CCF0C9112D613DB2DDE123B4C8475AC7BA77835F3E7B1'
+    }
+    $offlineCustodyEvolvedPaths = @{}
+    foreach ($binding in @($offlineCustody.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $offlineCustodyEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$offlineCustodyEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-offline-custody-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $offlineCustodyEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-offline-custody-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $offlineCustodyEvolvedPaths[$path] = $true
+    }
+    if ($offlineCustodyEvolvedPaths.Count -ne 21 -or
+        [string]$offlineCustody.status -cne 'M42-02-PS8-OFFLINE-CUSTODY-DECOMPOSED' -or
+        [string]$offlineCustody.decomposition.responsibility -cne 'offline-custody' -or
+        [string]$offlineCustody.next_fixed_point -cne 'M42-02-PS9-RELEASE-CAPSULE' -or
+        @($offlineCustody.decomposition.modules).Count -ne 8 -or
+        [int]$offlineCustody.public_contract.function_count -ne 26 -or
+        -not [bool]$offlineCustody.public_contract.unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.ordered_source_slices_preserved_with_declared_substitutions -or
+        -not [bool]$offlineCustody.semantic_contract.custody_admission_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.historical_compatibility_check_explicit -or
+        -not [bool]$offlineCustody.semantic_contract.seal_inputs_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.signature_verification_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.qualification_evidence_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.publication_dry_run_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.offline_seal_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.offline_restore_unchanged -or
+        -not [bool]$offlineCustody.semantic_contract.emergency_completion_unchanged -or
+        [string]$offlineCustody.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-offline-custody-scope]'
+    }
+    foreach ($property in $offlineCustody.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-offline-custody-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $offlineCustodyReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 
