@@ -53,6 +53,7 @@ $pathProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') path resol
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-eq0-and$pathProbe-match'src[\\/]mod') 'mir4-m42-02-command-router-path-probe' $pathProbe
 $unknownProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') nonsense 2>&1|Out-String).Trim()
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-ne0-and$unknownProbe-match'Unknown command area: nonsense') 'mir4-m42-02-command-router-negative-probe' $unknownProbe
+$global:LASTEXITCODE=0
 
 foreach($binding in @($receipt.evolved_bindings)){
   Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$binding.current_sha256-and[string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' ([string]$binding.path)
