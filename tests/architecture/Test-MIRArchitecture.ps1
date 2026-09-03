@@ -437,6 +437,12 @@ foreach ($preFreezeReleaseModule in @("Common.ps1", "PolicyLocks.ps1", "Authorit
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/lib/mir4/PreFreezeRelease.ps1" -Text $preFreezeReleaseFacadeText -Needle "pre-freeze-release/$preFreezeReleaseModule"
 }
+$bootstrapMaterializationFacadeText = Read-MIRFile -RelativePath "tools/lib/mir4/BootstrapMaterialization.ps1"
+foreach ($bootstrapMaterializationModule in @("DigestsAndRecords.ps1", "SafePaths.ps1", "ArchiveComparison.ps1", "GitSourceProof.ps1", "CapsuleContract.ps1", "CapsuleArtifacts.ps1")) {
+  $relative = "tools/lib/mir4/bootstrap-materialization/$bootstrapMaterializationModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/mir4/BootstrapMaterialization.ps1" -Text $bootstrapMaterializationFacadeText -Needle "bootstrap-materialization/$bootstrapMaterializationModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

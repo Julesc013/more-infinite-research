@@ -56,6 +56,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -927,7 +928,59 @@ function Test-MIR4PreFreezeAuthorities {
     }
     $priorReceiptPath = $preFreezeReleaseReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
-  }  $staleAuthorityBindings = @()
+  }  $bootstrapMaterializationReceiptPath = 'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $bootstrapMaterializationReceiptPath) -PathType Leaf) {
+    $bootstrapMaterialization = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $bootstrapMaterializationReceiptPath -Kind 'MIR4M4202BootstrapMaterializationDecompositionV1'
+    if ([string]$bootstrapMaterialization.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$bootstrapMaterialization.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$bootstrapMaterialization.predecessor.record_sha256 -cne [string]$preFreezeRelease.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-bootstrap-materialization-predecessor]'
+    }
+    $bootstrapMaterializationEnrollmentBaselines = @{
+      'tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1'='B382CC2260F41B89207C690642DE41A405D51F00C9B5E439B3A8F41BADC996EB'
+      'tools/lib/mir4/BootstrapMaterialization.ps1'='3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30'
+      'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1'='B3816A485BC68DB696598D2BAB637DE2EAD46DAE48ACA34DFAE6BAB904AA85C3'
+    }
+    $bootstrapMaterializationEvolvedPaths = @{}
+    foreach ($binding in @($bootstrapMaterialization.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $bootstrapMaterializationEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$bootstrapMaterializationEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-bootstrap-materialization-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $bootstrapMaterializationEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-bootstrap-materialization-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $bootstrapMaterializationEvolvedPaths[$path] = $true
+    }
+    if ($bootstrapMaterializationEvolvedPaths.Count -ne 21 -or
+        [string]$bootstrapMaterialization.status -cne 'M42-02-PS5-BOOTSTRAP-MATERIALIZATION-DECOMPOSED' -or
+        [string]$bootstrapMaterialization.decomposition.responsibility -cne 'bootstrap-materialization' -or
+        [string]$bootstrapMaterialization.next_fixed_point -cne 'M42-02-PS6-ASSURANCE-RELEASE' -or
+        @($bootstrapMaterialization.decomposition.modules).Count -ne 6 -or
+        -not [bool]$bootstrapMaterialization.public_contract.unchanged -or
+        [int]$bootstrapMaterialization.public_contract.function_count -ne 51 -or
+        -not [bool]$bootstrapMaterialization.semantic_contract.source_segments_exact -or
+        [string]$bootstrapMaterialization.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-bootstrap-materialization-scope]'
+    }
+    foreach ($property in $bootstrapMaterialization.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-bootstrap-materialization-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $bootstrapMaterializationReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+  $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)
     $hashMode = if($authorityHashModes.ContainsKey([string]$binding.Key)){[string]$authorityHashModes[[string]$binding.Key]}else{'raw-bytes'}

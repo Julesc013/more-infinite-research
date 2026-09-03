@@ -69,6 +69,22 @@ if(Test-Path -LiteralPath $preFreezeSuccessorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$preFreezeSuccessor.tooling_inventory.digest
+  $bootstrapMaterializationSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json'
+  if(Test-Path -LiteralPath $bootstrapMaterializationSuccessorPath -PathType Leaf){
+    $bootstrapMaterializationSuccessorRaw=Get-Content -Raw -LiteralPath $bootstrapMaterializationSuccessorPath
+    Assert-MIR4AssuranceEvidenceDecompositionV1 ($bootstrapMaterializationSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-evidence-bootstrap-materialization-successor-schema'
+    $bootstrapMaterializationSuccessor=$bootstrapMaterializationSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $bootstrapMaterializationSuccessor) 'mir4-m42-02-assurance-evidence-bootstrap-materialization-successor-record'
+    Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-FileHash -LiteralPath $preFreezeSuccessorPath -Algorithm SHA256).Hash-ceq[string]$bootstrapMaterializationSuccessor.predecessor.receipt_sha256-and[string]$preFreezeSuccessor.record_sha256-ceq[string]$bootstrapMaterializationSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-evidence-bootstrap-materialization-successor-predecessor'
+    foreach($binding in @($bootstrapMaterializationSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedBindingSha.ContainsKey($path)){
+        Assert-MIR4AssuranceEvidenceDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-assurance-evidence-bootstrap-materialization-successor-binding' $path
+        $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventoryDigest=[string]$bootstrapMaterializationSuccessor.tooling_inventory.digest
+  }
 }
 Assert-MIR4AssuranceEvidenceDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-evidence-inventory'
 foreach($binding in @($receipt.evolved_bindings)){

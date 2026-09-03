@@ -1,0 +1,352 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202BootstrapMaterializationDecompositionV1",
+  "status": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION-DECOMPOSED",
+  "starting_dev": {
+    "commit": "d21f1282d2c1f669b8ecca18bcb517a0f1cae18d",
+    "tree": "4d8646fd12034fbe5f38eadcd76150b77b0f19b5"
+  },
+  "predecessor": {
+    "work_package": "M42-02-PS4-PRE-FREEZE-RELEASE",
+    "receipt": "releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json",
+    "receipt_sha256": "02C6FAFA0B6E40EEA3EE2C5A2BD72228DDCBFEC92097C26854D5A9D725C3A933",
+    "record_sha256": "D607DC20A8510193860D37483C39BDF97F8895263F9C405627FB4591F9A52EDE",
+    "status": "M42-02-PS4-PRE-FREEZE-RELEASE-DECOMPOSED"
+  },
+  "characterization": {
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+    "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0",
+    "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+    "sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+    "lines": 1873,
+    "responsibilities": [
+      "digests and records",
+      "safe paths",
+      "archive comparison",
+      "git source proof",
+      "capsule closure"
+    ]
+  },
+  "current_source": {
+    "commit": "d21f1282d2c1f669b8ecca18bcb517a0f1cae18d",
+    "tree": "4d8646fd12034fbe5f38eadcd76150b77b0f19b5",
+    "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+    "sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+    "lines": 1872,
+    "function_count": 51,
+    "evolution_chain": []
+  },
+  "decomposition": {
+    "responsibility": "bootstrap-materialization",
+    "facade": {
+      "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+      "previous_sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+      "current_sha256": "212F305427BF74B16CC3FD83F79292B7E1D1F6CB3A17087495124F34A4603126",
+      "hash_mode": "canonical-text-v1",
+      "previous_lines": 1872,
+      "current_lines": 10,
+      "maximum_lines": 20,
+      "function_count": 0
+    },
+    "module_root": "tools/lib/mir4/bootstrap-materialization",
+    "module_count": 6,
+    "module_maximum_lines": 600,
+    "modules": [
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/DigestsAndRecords.ps1",
+        "role": "cryptographic digests, canonical records, and historical hash reconciliation",
+        "source_lines": {
+          "start": 5,
+          "end": 203
+        },
+        "sha256": "16E4EEB766A848DC9962D98A027CD67B6D4AC28FEB854663637C69CA6462571A",
+        "hash_mode": "canonical-text-v1",
+        "lines": 199,
+        "function_count": 14,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/SafePaths.ps1",
+        "role": "contained paths, build-tree cleanup, and portable source enumeration",
+        "source_lines": {
+          "start": 205,
+          "end": 390
+        },
+        "sha256": "575F731F8720D422F5646AF87275D5AEA731EF03622C2FF4C71363A697250535",
+        "hash_mode": "canonical-text-v1",
+        "lines": 186,
+        "function_count": 10,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/ArchiveComparison.ps1",
+        "role": "deterministic archive construction, bounded reads, comparison, and safe expansion",
+        "source_lines": {
+          "start": 392,
+          "end": 889
+        },
+        "sha256": "2DF527F1A4FCC4CAE43FA10C502FDA313E00DC1090DA07EBB4055A4C456D2553",
+        "hash_mode": "canonical-text-v1",
+        "lines": 498,
+        "function_count": 12,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/GitSourceProof.ps1",
+        "role": "Git tree transport, toolchain locks, and exact source proof",
+        "source_lines": {
+          "start": 891,
+          "end": 1229
+        },
+        "sha256": "2906F6CA456C299B6BE0F136E53548452A6B52E848328989DA16975EB009A997",
+        "hash_mode": "canonical-text-v1",
+        "lines": 339,
+        "function_count": 7,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/CapsuleContract.ps1",
+        "role": "capsule member roles, controller and authority closure, schemas, and controlled copies",
+        "source_lines": {
+          "start": 1231,
+          "end": 1421
+        },
+        "sha256": "40B8721A9FA640CF698C78BA3ACC23AB29D3D982A4EB1E32610FA842EF4549C2",
+        "hash_mode": "canonical-text-v1",
+        "lines": 191,
+        "function_count": 6,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/bootstrap-materialization/CapsuleArtifacts.ps1",
+        "role": "capsule artifact validation and deterministic source-capsule construction",
+        "source_lines": {
+          "start": 1423,
+          "end": 1872
+        },
+        "sha256": "7A40210A5C1E8072955BB68CA91D23E2341F631E8973D61F1DA907AD8F722978",
+        "hash_mode": "canonical-text-v1",
+        "lines": 450,
+        "function_count": 2,
+        "parse_errors": 0
+      }
+    ],
+    "segment_algorithm": "exact-current-function-source-slices-v1"
+  },
+  "public_contract": {
+    "projection_algorithm": "ordered-powershell-function-name-list-v1",
+    "previous_sha256": "C0A6806CDDE9CCDDBB44A03A92F7EFFCC422AE36CDCC3612D2949229E93601A2",
+    "current_sha256": "C0A6806CDDE9CCDDBB44A03A92F7EFFCC422AE36CDCC3612D2949229E93601A2",
+    "unchanged": true,
+    "function_count": 51
+  },
+  "semantic_contract": {
+    "source_segments_exact": true,
+    "function_names_and_order_unchanged": true,
+    "module_load_order_explicit": true,
+    "digests_and_records_unchanged": true,
+    "safe_paths_and_cleanup_unchanged": true,
+    "archive_construction_and_comparison_unchanged": true,
+    "git_source_proof_unchanged": true,
+    "capsule_contract_unchanged": true,
+    "capsule_artifacts_unchanged": true,
+    "pre_freeze_authority_chain_extended_for_ps5": true
+  },
+  "tooling_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "B8E1C5B9F4679EA3A8F3A92386AE3D7FB57D26BDA8AC85E6F596D451455C3E1D",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:79156b2a161910ff639e429b9c160a2e70425d2068d77051249dd9f29c2d5eed",
+    "command_count": 85,
+    "unknown": 0,
+    "duplicate_command_keys": 0
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "03A1CFFE7FBF3E3742424393F7818DA5F68735A8334B8FACFE4A5CC8E4C26133",
+      "current_sha256": "06CD8DB0CF1A4B0DAD6771A492C20CB7758D08B95DD469315D7A0EFBA5EBD4A8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "AEF423BA05E97D3D25C11A92807C013F561D4727A6ED98CD0A130A71A7711AA1",
+      "current_sha256": "C37CAFCA1B0EE810DD6F80C89B5328F231860550B3364439BD920E9E0037E7DF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "127C7C194097DFE6F12E5592BD22BF4D5EA62B49D3B2039ED35D57F2FE3952DC",
+      "current_sha256": "AA3C07F76DF4F9233681015A5E21A23545A10BE1D2B61A65B141AD33BF99CBD9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "FDD98A6A8419E58D80DABE566F23F0B3B3FF0585F451CB4CC089C5A6560BF60D",
+      "current_sha256": "D33B44DE2E0AC2EB0EDE76A58EEA6E62896FAACE703F9A92BFB55A1A4900AC5E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "57D2C61376CB92B504820514F938D9019E496E7419F11AC7C73F58CC0E7C311C",
+      "current_sha256": "2AFFC2B0C2DC692F5D82807710251F8B7ED884F8E0E8C1570695B4A05418694F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "E9FE70920643142B597C01ED86392E7E420E65F825D247B2B7549529B422040E",
+      "current_sha256": "A89ED460B12207BF914D3FC8A919481F18689385794641CB89E6CE8DD821493B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "7EAFF78112B8BBEF2D8AE8953142A8C5CD9C87C53EA96DFC21E8568C3CB422D1",
+      "current_sha256": "B8E1C5B9F4679EA3A8F3A92386AE3D7FB57D26BDA8AC85E6F596D451455C3E1D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_sha256": "0965AFA02686D2876B7C2C90F086B2478EAD602E83E20BE1E7C200F8BB057C96",
+      "current_sha256": "653167B38F60EAEA55E8948A711F1A2A36C4BFEFC6E171588CA7B6A5B74E0FFF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "3220CDFB2F5C1A2C23D6F8AE6A7FC0A39CE187E6E750B859525EE4DC0BC67AB9",
+      "current_sha256": "B34F783FB5B543CE9B01243EFF79AA8738FD38681848383F24DC6D2FCBB8EBD4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "989D3E017DD16C7F35A5BF8752620ACF5FBA627E21C72DCBAA0EBD194627D408",
+      "current_sha256": "FC304A4E9B921DE175415B00DEF1FF3609BA9E6917A1DFDC818E8450BB42DD37",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "B082FC8DEF4021C154FFAB54690898C46B6B9C7A0054E0DE737111FBCD00E5A3",
+      "current_sha256": "B938EE1D1C432273A7BA450AF63931B4FCBDBCB37775FA0289CD8D117F794C1C",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "E682CC8AE27B0DA7A55B116B2DBE721E39ABB6EF32CA0748135E091422618CF5",
+      "current_sha256": "E80BE3C11B6881FFC4BBE997A85687CBF74877AAC62D015909EA6F6467FC40C0",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+      "previous_sha256": "EAD65D34DBDB42E72A39F9A5B109CCFE70241EE83F67052EC9B2C215CD714E9E",
+      "current_sha256": "5896B7EB38114FBDB0017ECD2DF0A58AA3741B6208BC70DEEA4BFC4DCF038625",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "previous_sha256": "71A07595D712219E719CAA1FA2F40DB349C8DDAB05CC315E0C263CC4C75B0CFC",
+      "current_sha256": "2F7138D48A4B630757D5B8767DB2B119AD0EA1B43A4FDAAE33F304C9BDFE5C82",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "previous_sha256": "B382CC2260F41B89207C690642DE41A405D51F00C9B5E439B3A8F41BADC996EB",
+      "current_sha256": "C27796E298DA33AE1EC5032D10551FF0E876A3BCD7C5D35D3AD4AAE01112CDE7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_sha256": "0C486B4C7AFDE15DB19D123A7A7EA18333462B7864DC82475FD2CC73D5576550",
+      "current_sha256": "0C486B4C7AFDE15DB19D123A7A7EA18333462B7864DC82475FD2CC73D5576550",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRVerificationSchemas.ps1",
+      "previous_sha256": "836866D7DE05E9278710549B1270F818DD0ABD34EEB20B61E474AEB3F4A46191",
+      "current_sha256": "836866D7DE05E9278710549B1270F818DD0ABD34EEB20B61E474AEB3F4A46191",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+      "previous_sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+      "current_sha256": "212F305427BF74B16CC3FD83F79292B7E1D1F6CB3A17087495124F34A4603126",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+      "previous_sha256": "B3816A485BC68DB696598D2BAB637DE2EAD46DAE48ACA34DFAE6BAB904AA85C3",
+      "current_sha256": "9EF3E5A2632CA85150BD53BE831837EBD7F84FE69B5CCCB8D0F15E95B57DF969",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "current_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "FCB318D4B9A2489204B553CAEF6CEB45E38E8670FFFC4531C1DBE0599B552DEB",
+      "current_sha256": "655335E66A3E7DD879A3F06682B3492E345E9DDD61C23CD40FD4DBDF547F30D0",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS6-ASSURANCE-RELEASE",
+  "record_sha256": "8D46EDCB8F0C37763FB2326673EFE2FEAC2F7D566068414ABF1C2B0191EA4B50"
+}

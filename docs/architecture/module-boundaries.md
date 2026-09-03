@@ -925,3 +925,9 @@ The split preserves all 62 characterized functions as exact canonical source seg
 `tools/lib/mir4/PreFreezeRelease.ps1` remains the stable facade and loads the bounded modules under `tools/lib/mir4/pre-freeze-release/` in one explicit order. Shared authority primitives, policy locks, authority-state construction, authority-chain validation, release doctor and workflow checks, and playtest-session operations have separate package-excluded owners.
 
 The split binds both the original 2,093-line characterization and the exact 2,283-line post-PS3 starting source. All 25 function names and their order are preserved; source segments remain exact except for the declared PS4 self-succession binding needed to advance the authority chain. This decomposition grants no package, candidate, release, signing, sealing, publication, gameplay, save, setting, migration, or compatibility authority.
+
+## MIR 4 bootstrap materialization boundary
+
+`tools/lib/mir4/BootstrapMaterialization.ps1` remains the stable bootstrap facade and loads the bounded modules under `tools/lib/mir4/bootstrap-materialization/` in one explicit order. Cryptographic digests and canonical records, contained paths and cleanup, deterministic archive construction and comparison, Git source proof, capsule closure contracts, and capsule artifact construction have separate package-excluded owners.
+
+The split binds the exact 1,872-line PS4-merge source and preserves all 51 function names, their order, and their exact source segments. It changes no digest, record, path-containment, cleanup, archive, comparison, Git, toolchain-lock, source-proof, capsule, or reconstruction behavior and grants no package, candidate, release, signing, sealing, publication, gameplay, save, setting, migration, or compatibility authority.

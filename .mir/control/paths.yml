@@ -135,6 +135,12 @@ paths:
   mir4.m42-02.pre-freeze-release.receipt-schema: contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json
   mir4.m42-02.pre-freeze-release.writer: tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1
   mir4.m42-02.pre-freeze-release.test: tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1
+  mir4.m42-02.bootstrap-materialization.facade: tools/lib/mir4/BootstrapMaterialization.ps1
+  mir4.m42-02.bootstrap-materialization.modules: tools/lib/mir4/bootstrap-materialization
+  mir4.m42-02.bootstrap-materialization.receipt: releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json
+  mir4.m42-02.bootstrap-materialization.receipt-schema: contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json
+  mir4.m42-02.bootstrap-materialization.writer: tools/commands/mir4/Update-MIR4M4202BootstrapMaterializationDecompositionAuthority.ps1
+  mir4.m42-02.bootstrap-materialization.test: tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
