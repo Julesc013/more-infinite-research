@@ -43,6 +43,24 @@
       "tags": []
     },
     {
+      "pattern": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/mir/cli/router/**",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
       "groups": [],
       "scenarios": [],

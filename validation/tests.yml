@@ -3300,6 +3300,37 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-powershell-command-router-decomposition-m42-02-ps1",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir.ps1",
+        "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+        "tools/mir/cli/router/**",
+        "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+        "governance/automation/mir4-command-inventory-v1.json",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/control/paths.yml",
+        "src/mod/package-source.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+        "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ]
     }
   ]
 }

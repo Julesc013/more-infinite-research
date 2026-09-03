@@ -14,11 +14,16 @@ function Assert-MIR4CliReleaseConvergenceV1 {
 $packageBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $facadePath = Join-Path $repo 'tools/mir.ps1'
 $routerPath = Join-Path $repo 'tools/mir/cli/Invoke-MIRCommandRouter.ps1'
+$dispatcherPath = Join-Path $repo 'tools/mir/cli/router/CommandDispatcher.ps1'
+$mir4DispatcherPath = Join-Path $repo 'tools/mir/cli/router/MIR4CommandDispatcher.ps1'
 $facade = Get-Content -Raw -LiteralPath $facadePath
 $router = Get-Content -Raw -LiteralPath $routerPath
+$dispatcher = Get-Content -Raw -LiteralPath $dispatcherPath
+$mir4Dispatcher = Get-Content -Raw -LiteralPath $mir4DispatcherPath
 Assert-MIR4CliReleaseConvergenceV1 (($facade -split ([string][char]10)).Count -le 40) 'mir4-m42-01-public-cli-size'
 Assert-MIR4CliReleaseConvergenceV1 ($facade -match 'Invoke-MIRCommandRouter\.ps1' -and $facade -notmatch 'function Show-MIRHelp|switch \(\$area\)') 'mir4-m42-01-public-cli-thin'
-Assert-MIR4CliReleaseConvergenceV1 ($router -match 'function Show-MIRHelp' -and $router -match '"release-engine"' -and $router -match '"tooling"') 'mir4-m42-01-command-router'
+Assert-MIR4CliReleaseConvergenceV1 (($router -split ([string][char]10)).Count -le 200 -and $router -match 'function Show-MIRHelp' -and $router -match 'Invoke-MIRCommandDispatch' -and $router -notmatch 'switch ($area)') 'mir4-m42-01-command-router'
+Assert-MIR4CliReleaseConvergenceV1 ($dispatcher -match 'Invoke-MIR4CommandDispatch' -and $dispatcher -match 'Invoke-MIRCoreCommandGroup' -and $mir4Dispatcher -match 'Invoke-MIR4ApplicationCommandGroup' -and $mir4Dispatcher -match 'Invoke-MIR4PlatformCommandGroup') 'mir4-m42-01-command-dispatch'
 
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4CliReleaseConvergenceV1 ([string]$inventory.public_entrypoint -ceq 'tools/mir.ps1') 'mir4-m42-01-public-entrypoint'
