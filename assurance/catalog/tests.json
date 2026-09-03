@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 128,
+  "test_count": 129,
   "tests": [
     {
       "id": "docs.check",
@@ -2657,6 +2657,50 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-pre-freeze-release-decomposition-m42-02-ps4",
+      "proposition": "The governed test 'static.mir4-pre-freeze-release-decomposition-m42-02-ps4' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/mir4/pre-freeze-release/**",
+        "src/mod/package-source.json",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1",
+        "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-processir-exact-migration-v1",
       "proposition": "The governed test 'static.mir4-processir-exact-migration-v1' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -4591,12 +4635,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 49,
-      "tooling-release": 36,
+      "tooling-release": 37,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 11
     },
-    "canonical_test_commands": 116,
+    "canonical_test_commands": 117,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -4609,5 +4653,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:08a15efaee18af00fbd932f32cc699deb0d80ba97b0cc4f6a7883d71e62d58bd"
+  "digest": "sha256:c3a5b694baf01dd2a91b111efa3feed00c7b275073a732307a6b4ecabfa14670"
 }

@@ -72,6 +72,22 @@ if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$assuranceSuccessor.tooling_inventory.digest
+  $preFreezeSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json'
+  if(Test-Path -LiteralPath $preFreezeSuccessorPath -PathType Leaf){
+    $preFreezeSuccessorRaw=Get-Content -Raw -LiteralPath $preFreezeSuccessorPath
+    Assert-MIR4ValidationRunnerDecompositionV1 ($preFreezeSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json')) 'mir4-m42-02-validation-runner-pre-freeze-successor-schema'
+    $preFreezeSuccessor=$preFreezeSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $preFreezeSuccessor) 'mir4-m42-02-validation-runner-pre-freeze-successor-record'
+    Assert-MIR4ValidationRunnerDecompositionV1 ((Get-FileHash -LiteralPath $assuranceSuccessorPath -Algorithm SHA256).Hash-ceq[string]$preFreezeSuccessor.predecessor.receipt_sha256-and[string]$assuranceSuccessor.record_sha256-ceq[string]$preFreezeSuccessor.predecessor.record_sha256) 'mir4-m42-02-validation-runner-pre-freeze-successor-predecessor'
+    foreach($binding in @($preFreezeSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedBindingSha.ContainsKey($path)){
+        Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-pre-freeze-successor-binding' $path
+        $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventoryDigest=[string]$preFreezeSuccessor.tooling_inventory.digest
+  }
 }
 Assert-MIR4ValidationRunnerDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-validation-runner-inventory'
 foreach($binding in @($receipt.evolved_bindings)){

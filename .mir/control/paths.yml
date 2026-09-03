@@ -129,6 +129,12 @@ paths:
   mir4.m42-02.assurance-evidence.receipt-schema: contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json
   mir4.m42-02.assurance-evidence.writer: tools/commands/mir4/Update-MIR4M4202AssuranceEvidenceDecompositionAuthority.ps1
   mir4.m42-02.assurance-evidence.test: tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1
+  mir4.m42-02.pre-freeze-release.facade: tools/lib/mir4/PreFreezeRelease.ps1
+  mir4.m42-02.pre-freeze-release.modules: tools/lib/mir4/pre-freeze-release
+  mir4.m42-02.pre-freeze-release.receipt: releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json
+  mir4.m42-02.pre-freeze-release.receipt-schema: contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json
+  mir4.m42-02.pre-freeze-release.writer: tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1
+  mir4.m42-02.pre-freeze-release.test: tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

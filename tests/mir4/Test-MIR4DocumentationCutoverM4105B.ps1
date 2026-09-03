@@ -13,7 +13,20 @@ function Assert-MIR4DocumentationCutover([bool]$Condition,[string]$Code) {
 & (Join-Path $RepoRoot 'tools/commands/docs/Update-MIRPipelineDocumentation.ps1') -RepoRoot $RepoRoot -Check
 & (Join-Path $RepoRoot 'tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1') -RepoRoot $RepoRoot -Check
 & (Join-Path $RepoRoot 'tools/commands/docs/Update-MIRDocumentationIndex.ps1') -RepoRoot $RepoRoot -Check | Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1') -RepoRoot $RepoRoot -Check | Out-Null
+$workflowConvergencePath = Join-Path $RepoRoot 'releases/migrations/MIR4-M42-01B-Test-Workflow-ConvergenceV1.json'
+if (Test-Path -LiteralPath $workflowConvergencePath -PathType Leaf) {
+  $workflowConvergenceText = Get-Content -Raw -LiteralPath $workflowConvergencePath
+  Assert-MIR4DocumentationCutover ($workflowConvergenceText | Test-Json -SchemaFile (Join-Path $RepoRoot 'contracts/repository/mir4-m42-01b-test-workflow-convergence-v1.schema.json')) 'mir4-m41-05b-workflow-successor-schema'
+  $workflowConvergence = $workflowConvergenceText | ConvertFrom-Json -Depth 100
+  Assert-MIR4DocumentationCutover (Test-MIR4BootstrapRecordHash -Record $workflowConvergence) 'mir4-m41-05b-workflow-successor-record'
+  $documentationTestRelocation = @($workflowConvergence.relocated_bindings | Where-Object {
+    [string]$_.from_path -ceq 'validation/tests/mir4/Test-MIR4DocumentationContinuityT14.ps1' -and
+    [string]$_.to_path -ceq 'tests/mir4/Test-MIR4DocumentationContinuityT14.ps1'
+  })
+  Assert-MIR4DocumentationCutover ($documentationTestRelocation.Count -eq 1) 'mir4-m41-05b-workflow-successor-relocation'
+} else {
+  & (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1') -RepoRoot $RepoRoot -Check | Out-Null
+}
 
 $readmePath = Join-Path $RepoRoot 'README.md'
 $readme = [IO.File]::ReadAllText($readmePath)
@@ -33,13 +46,27 @@ foreach ($target in @('f210','f200','f110','f100')) {
   Assert-MIR4DocumentationCutover ("targets/$target/generation/README.md.template" -in $files) 'mir4-m41-05b-target-readme-membership'
   Assert-MIR4DocumentationCutover ("targets/$target/generation/changelog.txt.template" -in $files) 'mir4-m41-05b-target-changelog-membership'
 }
-Assert-MIR4DocumentationCutover ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot) -ceq '632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E') 'mir4-m41-05b-package-source-stability'
+$expectedPackageSourceSha256 = '632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E'
+$powerShellCharacterizationPath = Join-Path $RepoRoot 'releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json'
+if (Test-Path -LiteralPath $powerShellCharacterizationPath -PathType Leaf) {
+  $powerShellCharacterizationText = Get-Content -Raw -LiteralPath $powerShellCharacterizationPath
+  Assert-MIR4DocumentationCutover ($powerShellCharacterizationText | Test-Json -SchemaFile (Join-Path $RepoRoot 'contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json')) 'mir4-m41-05b-powershell-successor-schema'
+  $powerShellCharacterization = $powerShellCharacterizationText | ConvertFrom-Json -Depth 100
+  Assert-MIR4DocumentationCutover (Test-MIR4BootstrapRecordHash -Record $powerShellCharacterization) 'mir4-m41-05b-powershell-successor-record'
+  $expectedPackageSourceSha256 = [string]$powerShellCharacterization.preservation.package_source_sha256
+}
+Assert-MIR4DocumentationCutover ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot) -ceq $expectedPackageSourceSha256) 'mir4-m41-05b-package-source-stability'
 
 $programmeText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json')
 Assert-MIR4DocumentationCutover ($programmeText | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json')) 'mir4-m41-05b-programme-schema'
 $programme = $programmeText | ConvertFrom-Json -Depth 30
 Assert-MIR4DocumentationCutover (@($programme.work_packages | Where-Object { $_.id -eq 'M41-05' -and $_.state -eq 'complete' }).Count -eq 1) 'mir4-m41-05b-programme-complete'
-Assert-MIR4DocumentationCutover (@($programme.work_packages | Where-Object { $_.id -eq 'M42-01' -and $_.state -eq 'active' }).Count -eq 1) 'mir4-m42-01-programme-active'
+if (Test-Path -LiteralPath $workflowConvergencePath -PathType Leaf) {
+  Assert-MIR4DocumentationCutover (@($programme.work_packages | Where-Object { $_.id -eq 'M42-01' -and $_.state -eq 'complete' }).Count -eq 1) 'mir4-m42-01-programme-complete'
+  Assert-MIR4DocumentationCutover (@($programme.work_packages | Where-Object { $_.id -eq 'M42-02' -and $_.state -eq 'active' }).Count -eq 1) 'mir4-m42-02-programme-active'
+} else {
+  Assert-MIR4DocumentationCutover (@($programme.work_packages | Where-Object { $_.id -eq 'M42-01' -and $_.state -eq 'active' }).Count -eq 1) 'mir4-m42-01-programme-active'
+}
 
 $receiptPath = Join-Path $RepoRoot 'releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json'
 $receiptText = Get-Content -Raw -LiteralPath $receiptPath
