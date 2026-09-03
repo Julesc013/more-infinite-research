@@ -1,5 +1,10 @@
 Invoke-RepoCheck "compat audit automation tooling is wired" {
-  $compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+  $compatAuditText = @(
+    Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+    Get-ChildItem -LiteralPath (Join-Path $repo "tools\commands\compatibility\compat-audit") -File -Filter "*.ps1" |
+      Sort-Object Name |
+      ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+  ) -join "`n"
   $extendedTestsText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1")
   $modPortalText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\lib\compatibility\ModPortal.ps1")
@@ -237,4 +242,3 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     throw "The movable legacy terminal alias must use the Factorio 2.1 validation role; only tmp/2.0 selects Factorio 2.0."
   }
 }
-

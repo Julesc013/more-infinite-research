@@ -58,6 +58,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1033,6 +1034,86 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $assuranceReleaseReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $compatibilityAuditReceiptPath = 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $compatibilityAuditReceiptPath) -PathType Leaf) {
+    $compatibilityAudit = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $compatibilityAuditReceiptPath -Kind 'MIR4M4202CompatibilityAuditDecompositionV1'
+    if ([string]$compatibilityAudit.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$compatibilityAudit.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$compatibilityAudit.predecessor.record_sha256 -cne [string]$assuranceRelease.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-compatibility-audit-predecessor]'
+    }
+    $compatibilityAuditEnrollmentBaselines = @{
+      '.mir/assurance.json'='FFA6C939C2CF591512E54CFB41CA6A38838DDF2B1A4DEFDDC6E9FE5D2D33CAC1'
+      '.mir/control/paths.yml'='427E544638FE65F65F2FDB3B167F0626A841572BA9CB5AE3D27EFDC77EE6C8CD'
+      '.mir/modules.yml'='B41DB3EDD41D3B5F2174E3BF60BBF802AB16E92F30EDE2F3B670D74F81A4FBF1'
+      '.mir/test-impact.yml'='ADB4D4567E5F2193BBEFA6D84A2E6106D77C47BB6A5E11B190DCA0D98B87A834'
+      'assurance/catalog/tests.json'='D91884182E68AAD4C96209B746DFF8433563B59CA9C703A28E0A253C7A00BC3B'
+      'docs/architecture/module-boundaries.md'='AC8ED63B44A1BFEA3309ACC67184CBD73E77BDFB5F4A3200EAA087AF992B47DB'
+      'governance/automation/mir4-command-inventory-v1.json'='2FAF910B6A14771560E681A13563BE9CA232F19CB3217D259CDAE9B0355FDB55'
+      'tests/architecture/Test-MIRArchitecture.ps1'='1256814BF49DF197E283FBAEE418E4B72056FFE20C53A8EA44B705CE3E1AFC95'
+      'tests/compatibility/Test-MIRScenarioManifests.ps1'='AF917005C6C4CA4AB4A3B42BF5F1C7729860D381239C12BB18DB26EB44254444'
+      'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='1F6C581BDED30F3C78FCE5F72FF9FF512C0C044662E83B9DB649D9745124C5CF'
+      'tests/release/Test-MIRPerformanceBudgets.ps1'='F80A084A5709B2210467F302A40C1CEE8CE61D2E9443C4A87DB16D38E12480C4'
+      'tests/release/Test-MIRSanitationBudgets.ps1'='2E7851964290F2C6BA725D15FA56EEAA18A14CD2C221FBD218BDD263AAC4313B'
+      'tests/repository/Test-MIR4RepositoryFixedPoint.ps1'='46BB7E373F0D4D553B459C34B83A524626AE7E6E913E38A2A1CC3DB75485CDA3'
+      'tests/tooling/Test-MIRControlPlaneExecutor.ps1'='501506F3FBA2C217626EF2C6E016F88F6F121061EE1828146CF18CBF30F60D2D'
+      'tests/tooling/Test-MIRVerificationSchemas.ps1'='A3B9C57E29ACE6EC402059F31CAF0C255147FC9DD3B95D7861FA0E38DE5E50BB'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='4A985AB9AA38C43612310D149D36C93BC1E0079580AD5559662B4148A7AFF12D'
+      'tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1'='84BAA21F2DC5C1C9E054BD8A83C0621F9487204A726AAA175CAA049F939C8FF1'
+      'tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1'='AB360BF6F9371A0E9542E0FDCD7878AFEF406E9F7986DA0DD782FF6B768E87A5'
+      'tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1'='7E332E69C58185DDB4BA0E482452616E6F32BF57373E99D17D84B1FFB0FD6335'
+      'tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1'='618844C65187D827D9FA5AC8A89927619D9BC73750AF3E9B30220070EFF0C017'
+      'tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1'='C601A98894C258624FA96D135B2570AE6931F91AA40B588E0EB6E8156DE8D2FF'
+      'tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1'='71A7870E50BCB41BCC3E04327F48A2F41AA9E9FA550BDA0FB956E60D2F9C1D79'
+      'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1'='A6776583D9C3D03D001D3E38AFFE66BEC61E307B16077D1F8D63C47E02CEC664'
+      'tools/lib/control/Executor.ps1'='0DE88F7E2E2BB1FE90E3823D52880C5E54CC772BEEFB783BCD2FD87595600A3E'
+      'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1'='C3F5A139EB4E5247D7ADF4D9A5A07155A0718EA5F9D687CB10B959789C9FD4F3'
+      'tools/lib/validation/runner/StaticCompatibilityTooling.ps1'='F0F7F15DA01F124AF6C58F95EBD877D5509C0AED067C09E85AB3EB57D4CE0D28'
+      'tools/lib/validation/runner/StaticCompilerDiagnostics.ps1'='416348AF7D2F49AEB9D5325F41384AA2BB80B22D5C62AD9CFD773DAB7C5B28B1'
+      'tools/mir/application/repository/RepositoryFixedPoint.ps1'='4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A'
+      'validation/tests.yml'='DEBEC2826D9B9E99577743F69CCB19195D2CB593696637EDB562D79225D86DE4'
+    }
+    $compatibilityAuditEvolvedPaths = @{}
+    foreach ($binding in @($compatibilityAudit.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $compatibilityAuditEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$compatibilityAuditEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-compatibility-audit-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $compatibilityAuditEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-compatibility-audit-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $compatibilityAuditEvolvedPaths[$path] = $true
+    }
+    if ($compatibilityAuditEvolvedPaths.Count -ne 29 -or
+        [string]$compatibilityAudit.status -cne 'M42-02-PS7-COMPATIBILITY-AUDIT-DECOMPOSED' -or
+        [string]$compatibilityAudit.decomposition.responsibility -cne 'compatibility-audit' -or
+        [string]$compatibilityAudit.next_fixed_point -cne 'M42-02-PS8-OFFLINE-CUSTODY' -or
+        @($compatibilityAudit.decomposition.modules).Count -ne 6 -or
+        [int]$compatibilityAudit.public_contract.function_count -ne 35 -or
+        -not [bool]$compatibilityAudit.public_contract.unchanged -or
+        -not [bool]$compatibilityAudit.semantic_contract.compatibility_claims_unchanged -or
+        -not [bool]$compatibilityAudit.semantic_contract.stream_authority_unchanged -or
+        [string]$compatibilityAudit.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-compatibility-audit-scope]'
+    }
+    foreach ($property in $compatibilityAudit.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-compatibility-audit-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $compatibilityAuditReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

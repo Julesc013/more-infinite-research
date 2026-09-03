@@ -130,9 +130,15 @@ $compatAuditWrapperManifestRows = @($overlay.manifest.files | Where-Object { [st
 $controllerCompatAuditWrapperSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "scripts/Invoke-MIRCompatAudit.ps1")
 $compatAuditManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" })
 $controllerCompatAuditSha256 = Get-MIRCPSha256File -Path (Join-Path $repo "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+$compatAuditModuleManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -like "tools/commands/compatibility/compat-audit/*.ps1" })
 $performanceLibraryManifestRows = @($overlay.manifest.files | Where-Object { [string]$_.path -eq "tools/lib/validation/PerformanceCampaign.ps1" })
 $controllerPerformanceLibrarySha256 = Get-MIRCPSha256File -Path (Join-Path $repo "tools/lib/validation/PerformanceCampaign.ps1")
-$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+$compatAuditText = @(
+  Get-Content -Raw -LiteralPath (Join-Path $repo "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1")
+  Get-ChildItem -LiteralPath (Join-Path $repo "tools/commands/compatibility/compat-audit") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
 $compatOutputResolveIndex = $compatAuditText.IndexOf('$resolvedOutputDir = [IO.Path]::GetFullPath($OutputDir)', [StringComparison]::Ordinal)
 $compatOutputMaterializeIndex = $compatAuditText.IndexOf('$resolvedOutputDir = New-MIRDirectory -Path $resolvedOutputDir', [StringComparison]::Ordinal)
 $compatLockIndex = $compatAuditText.IndexOf('$lockPath = Join-Path $resolvedOutputDir "compat-candidates.lock.json"', [StringComparison]::Ordinal)
@@ -142,22 +148,33 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     $probeBytes -contains [byte]13 -or
     [string]$overlay.manifest_sha256 -notmatch '^[0-9A-F]{64}$' -or
     [string]$overlay.harness_sha256 -notmatch '^[0-9A-F]{64}$' -or
-    @($overlay.manifest.files).Count -ne 23 -or
+    @($overlay.manifest.files).Count -ne 29 -or
     $compatAuditWrapperManifestRows.Count -ne 1 -or
     [string]$compatAuditWrapperManifestRows[0].sha256 -ne $controllerCompatAuditWrapperSha256 -or
     [string]$compatAuditWrapperManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
     $compatAuditManifestRows.Count -ne 1 -or
     [string]$compatAuditManifestRows[0].sha256 -ne $controllerCompatAuditSha256 -or
     [string]$compatAuditManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
+    $compatAuditModuleManifestRows.Count -ne 6 -or
+    @($compatAuditModuleManifestRows | Where-Object {
+      [string]$_.materialization -cne "controller-exact-bytes-v1" -or
+      [string]$_.sha256 -cne (Get-MIRCPSha256File -Path (Join-Path $repo ([string]$_.path)))
+    }).Count -ne 0 -or
     $performanceLibraryManifestRows.Count -ne 1 -or
     [string]$performanceLibraryManifestRows[0].sha256 -ne $controllerPerformanceLibrarySha256 -or
     [string]$performanceLibraryManifestRows[0].materialization -ne "controller-exact-bytes-v1" -or
     $compatOutputResolveIndex -lt 0 -or $compatOutputMaterializeIndex -le $compatOutputResolveIndex -or $compatLockIndex -le $compatOutputMaterializeIndex -or
-    $overlayStatus.Count -ne 23 -or
+    $overlayStatus.Count -ne 29 -or
     $overlayStatus -notcontains " M .mir/performance-campaign.json" -or
     $overlayStatus -notcontains " M fixtures/performance-regression-probe/data-final-fixes.lua" -or
     $overlayStatus -notcontains " M scripts/Invoke-MIRCompatAudit.ps1" -or
     $overlayStatus -notcontains "?? tools/commands/compatibility/Invoke-MIRCompatAudit.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/Configuration.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/InputDiscovery.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/ScenarioDefinitions.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/ScenarioResolution.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/ScenarioSelection.ps1" -or
+    $overlayStatus -notcontains "?? tools/commands/compatibility/compat-audit/ResultCollation.ps1" -or
     $overlayStatus -notcontains " M scripts/MIRCompatAudit/FactorioRunner.ps1" -or
     $overlayStatus -notcontains " M scripts/validation/PerformanceCampaign.ps1" -or
     $overlayStatus -notcontains "?? tools/lib/compatibility/FactorioRunner.ps1" -or

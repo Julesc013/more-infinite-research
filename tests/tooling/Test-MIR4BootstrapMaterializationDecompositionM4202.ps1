@@ -70,6 +70,22 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$successor.tooling_inventory.digest
+  $compatibilityAuditSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
+  if(Test-Path -LiteralPath $compatibilityAuditSuccessorPath -PathType Leaf){
+    $compatibilityAuditSuccessorRaw=Get-Content -Raw -LiteralPath $compatibilityAuditSuccessorPath
+    Assert-MIR4BootstrapMaterializationDecompositionV1 ($compatibilityAuditSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-bootstrap-materialization-compatibility-audit-successor-schema'
+    $compatibilityAuditSuccessor=$compatibilityAuditSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4BootstrapMaterializationDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $compatibilityAuditSuccessor) 'mir4-m42-02-bootstrap-materialization-compatibility-audit-successor-record'
+    Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-FileHash -LiteralPath $successorPath -Algorithm SHA256).Hash-ceq[string]$compatibilityAuditSuccessor.predecessor.receipt_sha256-and[string]$successor.record_sha256-ceq[string]$compatibilityAuditSuccessor.predecessor.record_sha256) 'mir4-m42-02-bootstrap-materialization-compatibility-audit-successor-predecessor'
+    foreach($binding in @($compatibilityAuditSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedBindingSha.ContainsKey($path)){
+        Assert-MIR4BootstrapMaterializationDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-bootstrap-materialization-compatibility-audit-successor-binding' $path
+        $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventoryDigest=[string]$compatibilityAuditSuccessor.tooling_inventory.digest
+  }
 }
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4BootstrapMaterializationDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-bootstrap-materialization-inventory'

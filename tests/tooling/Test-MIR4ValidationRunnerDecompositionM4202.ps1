@@ -36,12 +36,13 @@ Assert-MIR4ValidationRunnerDecompositionV1 (@($facadeErrors).Count-eq0-and$facad
 Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path $facadePath)-ceq[string]$receipt.decomposition.facade.current_sha256) 'mir4-m42-02-validation-runner-facade-hash'
 
 $files=@($receipt.decomposition.modules)+@($receipt.decomposition.application)
+$expectedFileSha=@{};foreach($file in $files){$expectedFileSha[[string]$file.path]=[string]$file.sha256}
 Assert-MIR4ValidationRunnerDecompositionV1 (@($receipt.decomposition.modules).Count-eq21-and@($files|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-validation-runner-module-count'
 foreach($file in $files){
   $path=Join-Path $repo ([string]$file.path)
   $tokens=$null;$parseErrors=$null
   $null=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$parseErrors)
-  Assert-MIR4ValidationRunnerDecompositionV1 (@($parseErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$file.sha256) 'mir4-m42-02-validation-runner-module' ([string]$file.path)
+  Assert-MIR4ValidationRunnerDecompositionV1 (@($parseErrors).Count-eq0) 'mir4-m42-02-validation-runner-module-parse' ([string]$file.path)
 }
 Assert-MIR4ValidationRunnerDecompositionV1 (@($receipt.decomposition.modules|Where-Object{[int]$_.lines-gt600}).Count-eq0-and[int]$receipt.decomposition.application.lines-le400) 'mir4-m42-02-validation-runner-bounds'
 
@@ -70,6 +71,10 @@ if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
       Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-successor-binding' $path
       $expectedBindingSha[$path]=[string]$binding.current_sha256
     }
+    if($expectedFileSha.ContainsKey($path)){
+      Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-successor-file-binding' $path
+      $expectedFileSha[$path]=[string]$binding.current_sha256
+    }
   }
   $expectedInventoryDigest=[string]$assuranceSuccessor.tooling_inventory.digest
   $preFreezeSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json'
@@ -84,6 +89,10 @@ if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
       if($expectedBindingSha.ContainsKey($path)){
         Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-pre-freeze-successor-binding' $path
         $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+      if($expectedFileSha.ContainsKey($path)){
+        Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-pre-freeze-successor-file-binding' $path
+        $expectedFileSha[$path]=[string]$binding.current_sha256
       }
     }
     $expectedInventoryDigest=[string]$preFreezeSuccessor.tooling_inventory.digest
@@ -100,6 +109,10 @@ if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
           Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-bootstrap-materialization-successor-binding' $path
           $expectedBindingSha[$path]=[string]$binding.current_sha256
         }
+        if($expectedFileSha.ContainsKey($path)){
+          Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-bootstrap-materialization-successor-file-binding' $path
+          $expectedFileSha[$path]=[string]$binding.current_sha256
+        }
       }
       $expectedInventoryDigest=[string]$bootstrapMaterializationSuccessor.tooling_inventory.digest
       $assuranceReleaseSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
@@ -115,13 +128,41 @@ if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
             Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-assurance-release-successor-binding' $path
             $expectedBindingSha[$path]=[string]$binding.current_sha256
           }
+          if($expectedFileSha.ContainsKey($path)){
+            Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-assurance-release-successor-file-binding' $path
+            $expectedFileSha[$path]=[string]$binding.current_sha256
+          }
         }
         $expectedInventoryDigest=[string]$assuranceReleaseSuccessor.tooling_inventory.digest
+        $compatibilityAuditSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json'
+        if(Test-Path -LiteralPath $compatibilityAuditSuccessorPath -PathType Leaf){
+          $compatibilityAuditSuccessorRaw=Get-Content -Raw -LiteralPath $compatibilityAuditSuccessorPath
+          Assert-MIR4ValidationRunnerDecompositionV1 ($compatibilityAuditSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-validation-runner-compatibility-audit-successor-schema'
+          $compatibilityAuditSuccessor=$compatibilityAuditSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+          Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $compatibilityAuditSuccessor) 'mir4-m42-02-validation-runner-compatibility-audit-successor-record'
+          Assert-MIR4ValidationRunnerDecompositionV1 ((Get-FileHash -LiteralPath $assuranceReleaseSuccessorPath -Algorithm SHA256).Hash-ceq[string]$compatibilityAuditSuccessor.predecessor.receipt_sha256-and[string]$assuranceReleaseSuccessor.record_sha256-ceq[string]$compatibilityAuditSuccessor.predecessor.record_sha256) 'mir4-m42-02-validation-runner-compatibility-audit-successor-predecessor'
+          foreach($binding in @($compatibilityAuditSuccessor.evolved_bindings)){
+            $path=[string]$binding.path
+              if($expectedBindingSha.ContainsKey($path)){
+                Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-validation-runner-compatibility-audit-successor-binding' $path
+                $expectedBindingSha[$path]=[string]$binding.current_sha256
+              }
+              if($expectedFileSha.ContainsKey($path)){
+                Assert-MIR4ValidationRunnerDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-compatibility-audit-successor-file-binding' $path
+                $expectedFileSha[$path]=[string]$binding.current_sha256
+              }
+          }
+          $expectedInventoryDigest=[string]$compatibilityAuditSuccessor.tooling_inventory.digest
+        }
       }
     }
   }
 }
 Assert-MIR4ValidationRunnerDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-validation-runner-inventory'
+foreach($file in $files){
+  $path=[string]$file.path
+  Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedFileSha[$path]) 'mir4-m42-02-validation-runner-module' $path
+}
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path
   Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-validation-runner-evolved-binding' $path

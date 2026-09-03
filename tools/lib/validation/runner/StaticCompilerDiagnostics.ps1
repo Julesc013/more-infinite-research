@@ -246,7 +246,12 @@ Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded 
   $scenarioText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\scenarios\local-2.1.json")
   $testImpactText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\test-impact.yml")
   $sanitationBudgetText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\sanitation-budgets.json")
-  $compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+  $compatAuditText = @(
+    Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
+    Get-ChildItem -LiteralPath (Join-Path $repo "tools\commands\compatibility\compat-audit") -File -Filter "*.ps1" |
+      Sort-Object Name |
+      ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+  ) -join "`n"
   foreach ($check in @(
     @{ File = "registry.lua"; Text = $registryText; Snippet = 'require("prototypes.mir.compatibility.repairs.factorio_2_1_ambient_sound_schema").apply()' },
     @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = '["1.0.47"] = true' },
@@ -359,4 +364,3 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
     }
   }
 }
-

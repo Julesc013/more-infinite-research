@@ -939,3 +939,11 @@ The split binds the exact 1,872-line PS4-merge source and preserves all 51 funct
 The former embedded `Invoke-MIRAssuranceSelfTest` implementation lives unchanged under `tests/tooling/support/` and is loaded only when the existing `assurance self-test` command is selected. Production release and seal commands neither load nor own executable self-test behavior. Across the production modules and canonical test support, all 11 characterized function names, their order, and their exact source segments are preserved.
 
 This PS6 split changes no candidate decision, seal construction, seal verification, evidence, package, gameplay, save, setting, migration, or compatibility behavior and grants no version-allocation, tagging, signing, sealing, promotion, or publication authority.
+
+## MIR 4 compatibility audit boundary
+
+`tools/commands/compatibility/Invoke-MIRCompatAudit.ps1` remains the stable parameter facade and loads six bounded modules under `tools/commands/compatibility/compat-audit/` in one explicit order. Configuration and shared records, local input discovery, scenario definitions, scenario resolution and execution, scenario selection and lock construction, and result collation now have separate package-excluded owners.
+
+The split binds the characterized 1,677-line implementation, preserves all 35 function names in order, and preserves the complete parameter block byte-for-byte. Three extracted path expressions use the facade-captured command root so their resolved repository and scenario-manifest paths remain unchanged after module extraction.
+
+This PS7 split changes no compatibility claim, stream identity, prototype, scenario selection, runtime assertion, evidence shape, package, gameplay, save, setting, migration, or release authority. It grants no version allocation, tagging, signing, sealing, promotion, publication, or package cutover.

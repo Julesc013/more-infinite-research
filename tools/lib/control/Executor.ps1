@@ -527,6 +527,12 @@ function New-MIRCPPerformanceSourceOverlay {
   $controllerOverlayRelativePaths = @(
     "scripts/Invoke-MIRCompatAudit.ps1",
     "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
+    "tools/commands/compatibility/compat-audit/Configuration.ps1",
+    "tools/commands/compatibility/compat-audit/InputDiscovery.ps1",
+    "tools/commands/compatibility/compat-audit/ScenarioDefinitions.ps1",
+    "tools/commands/compatibility/compat-audit/ScenarioResolution.ps1",
+    "tools/commands/compatibility/compat-audit/ScenarioSelection.ps1",
+    "tools/commands/compatibility/compat-audit/ResultCollation.ps1",
     "scripts/MIRCompatAudit/DependencyResolver.ps1",
     "scripts/MIRCompatAudit/DiagnosticsParser.ps1",
     "scripts/MIRCompatAudit/FactorioRunner.ps1",
@@ -579,7 +585,15 @@ function New-MIRCPPerformanceSourceOverlay {
     $allowedPaths -notcontains $statusPath
   })
   if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
-  $packageSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $destination
+  $canonicalPackageLayout = (
+    (Test-Path -LiteralPath (Join-Path $destination 'src/mod/package-source.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $destination 'targets/package-authority.json') -PathType Leaf)
+  )
+  $packageSha256 = if ($canonicalPackageLayout) {
+    Get-MIRPackageSourceFingerprint -RepoRoot $destination
+  } else {
+    Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $destination
+  }
   if ($packageSha256 -ne [string]$Descriptor.source_sha256) { throw "Performance authority overlay changed package-visible source." }
   $harnessSha256 = & {
     param([string]$Root)
