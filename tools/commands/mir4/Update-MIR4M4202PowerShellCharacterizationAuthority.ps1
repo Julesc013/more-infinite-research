@@ -71,7 +71,7 @@ $tracked=@(
     $rawSha=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
     if($rawSha-cne[string]$inventoryRow.sha256){throw "[mir4-m42-02-powershell-inventory-drift] $($inventoryRow.path)"}
     [pscustomobject][ordered]@{
-      path=[string]$inventoryRow.path;classification='canonical-internal';sha256=$rawSha;lines=[int]$inventoryRow.lines
+      path=[string]$inventoryRow.path;classification='canonical-internal';sha256=(Get-MIR4BootstrapTextSha256 -Path $path);hash_mode='canonical-text-v1';lines=[int]$inventoryRow.lines
       function_count=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count
       parse_errors=0;threshold_band=if([int]$inventoryRow.lines-gt1000){'explicit-disposition-required'}else{'split-or-explicit-waiver'}
       decision=[string]$spec.decision;sequence=[int]$spec.sequence;next_node=$spec.node;responsibilities=@($spec.responsibilities);rationale=[string]$spec.rationale
@@ -92,7 +92,7 @@ $receipt=[pscustomobject][ordered]@{
   schema=1;kind='MIR4M4202PowerShellCharacterizationV1';status='M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED'
   starting_dev=[pscustomobject][ordered]@{commit='337d60ffe6e9dd1c5493b17c4d4b278c16881e2d';tree='9ac1d4541ff82b6b2dac37e1a25fb4f7146a7e90'}
   predecessor=[pscustomobject][ordered]@{work_package='M42-02-L6';receipt=$l6Path;receipt_sha256=(Get-MIR4M4202PowerShellRawSha256 $l6Path);record_sha256=[string]$l6.record_sha256;status=[string]$l6.status}
-  inventory=[pscustomobject][ordered]@{path='governance/automation/mir4-command-inventory-v1.json';sha256=(Get-MIR4M4202PowerShellRawSha256 'governance/automation/mir4-command-inventory-v1.json');digest=[string]$inventory.digest;canonical_internal=[int]$inventory.summary.canonical_internal;unknown=[int]$inventory.summary.unknown;reviewed_file_count=$tracked.Count}
+  inventory=[pscustomobject][ordered]@{path='governance/automation/mir4-command-inventory-v1.json';sha256=(Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo 'governance/automation/mir4-command-inventory-v1.json'));hash_mode='canonical-text-v1';digest=[string]$inventory.digest;canonical_internal=[int]$inventory.summary.canonical_internal;unknown=[int]$inventory.summary.unknown;reviewed_file_count=$tracked.Count}
   threshold_policy=[pscustomobject][ordered]@{normal_maximum_lines=400;review_maximum_lines=600;split_normally_maximum_lines=1000;explicit_disposition_minimum_lines=1001;decompose_count=11;waiver_count=9}
   tracked_files=$tracked
   decomposition_sequence=@($tracked|Where-Object{[string]$_.decision-ceq'decompose'}|Sort-Object sequence|ForEach-Object{[pscustomobject][ordered]@{sequence=[int]$_.sequence;node=[string]$_.next_node;path=[string]$_.path}})

@@ -24,7 +24,7 @@ Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $l6Path -Algorithm SHA256
 
 $inventoryPath=Join-Path $repo ([string]$receipt.inventory.path)
 $inventory=Get-Content -Raw -LiteralPath $inventoryPath|ConvertFrom-Json -Depth 100 -DateKind String
-Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $inventoryPath -Algorithm SHA256).Hash-ceq[string]$receipt.inventory.sha256-and[string]$inventory.digest-ceq[string]$receipt.inventory.digest-and[int]$inventory.summary.unknown-eq0) 'inventory'
+Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq[string]$receipt.inventory.sha256-and[string]$inventory.digest-ceq[string]$receipt.inventory.digest-and[int]$inventory.summary.unknown-eq0) 'inventory'
 $threshold=@($inventory.implementation_files|Where-Object{[string]$_.classification-ceq'canonical-internal'-and[int]$_.lines-ge600}|Sort-Object path)
 Assert-MIR4M4202PowerShell ($threshold.Count-eq20-and@($receipt.tracked_files).Count-eq20) 'threshold-count'
 Assert-MIR4M4202PowerShell ((@($threshold|ForEach-Object{[string]$_.path})-join'|')-ceq(@($receipt.tracked_files|ForEach-Object{[string]$_.path})-join'|')) 'threshold-paths'
@@ -33,7 +33,7 @@ foreach($row in @($receipt.tracked_files)){
   $tokens=$null;$parseErrors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$parseErrors)
   Assert-MIR4M4202PowerShell (@($parseErrors).Count-eq0) "parse-$($row.path)"
-  Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash-ceq[string]$row.sha256) "hash-$($row.path)"
+  Assert-MIR4M4202PowerShell ([string]$row.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$row.sha256) "hash-$($row.path)"
   Assert-MIR4M4202PowerShell (@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq[int]$row.function_count) "functions-$($row.path)"
 }
 Assert-MIR4M4202PowerShell (@($receipt.tracked_files|Where-Object{[string]$_.decision-ceq'decompose'}).Count-eq11-and@($receipt.decomposition_sequence).Count-eq11) 'decomposition-count'

@@ -2329,7 +2329,7 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202PowerShellCharacterizationAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "CC4BEE80E07216CFB2F2DB57014FD94CCA4EFB3CCB2AF66018E79B3B1BEE7A4D",
+      "sha256": "DD15D4BA43D301CD9A682788EAA2B2F3EFCBB96F06A02FC10595DB5033E97F08",
       "lines": 111,
       "package_visible": false
     },
@@ -4073,5 +4073,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8d10131bb8f60fbd788aae8a947ea43f1b5e86a929c1cf2cd81596b8f5cf69a6"
+  "digest": "sha256:5f76227ace3fd7c8d88c6aa4fc94c4991696b7cd75287183d35bae141d915a3c"
 }
