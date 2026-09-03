@@ -1279,6 +1279,65 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $powerShellCharacterizationReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $commandRouterReceiptPath = 'releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $commandRouterReceiptPath) -PathType Leaf) {
+    if (-not (Get-Command Get-MIR4CanonicalPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+      . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+    }
+    $commandRouter = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $commandRouterReceiptPath -Kind 'MIR4M4202PowerShellCommandRouterDecompositionV1'
+    if ([string]$commandRouter.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$commandRouter.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$commandRouter.predecessor.record_sha256 -cne [string]$powerShellCharacterization.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-command-router-predecessor]'
+    }
+    $commandRouterEnrollmentBaselines = @{
+      'contracts/repository/mir4-command-inventory-v1.schema.json'='790EE7D6CA662D8A4E7A51DEEEBC6BF9A14754D4FF828204DFE8DACA034BF099'
+      'docs/architecture/module-boundaries.md'='24D5CB06F955FC6189D5CA02B4B0769547F16069D20692B4D7F909AB07824F6F'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='5BE01F0320FDC1074CD7524B951CE5D56C624AF4BAE07C77362B9444483CD2AD'
+      'tests/tooling/Test-MIRAssurance.ps1'='7E6C860FB364052EF0ED8852D8DF2AAB9131DFBEB6A23CB45E43BB3A86403603'
+      'tests/tooling/Test-MIR4CliReleaseConvergence.ps1'='FECB62355A5E37EA3CA33F9D52F3B36F99BD01011FA7E7C0E341156479BB101A'
+      'tools/mir/application/repository/RepositoryFixedPoint.ps1'='E33A3D0761FE92D03CC32000A033FF5C3C70FE7802982E796FBB2933B84F42C9'
+      'tools/mir/application/tooling/CommandInventory.ps1'='B29A081BC21EC057B22D3A1E61946D3BA7BBC5DCFA5D14B973E9A94D895DD01E'
+      'tools/mir/cli/Invoke-MIRCommandRouter.ps1'='AA50E7DF8CD41C756B3270A47A23E13F4F8B911F9ED89B05813D4B99376E7E25'
+    }
+    $commandRouterEvolvedPaths = @{}
+    foreach ($binding in @($commandRouter.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $commandRouterEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$commandRouterEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-command-router-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $commandRouterEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-command-router-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $commandRouterEvolvedPaths[$path] = $true
+    }
+    if ($commandRouterEvolvedPaths.Count -ne 17 -or
+        [string]$commandRouter.status -cne 'M42-02-PS1-COMMAND-ROUTER-DECOMPOSED' -or
+        [string]$commandRouter.decomposition.responsibility -cne 'command-router' -or
+        [string]$commandRouter.next_fixed_point -cne 'M42-02-PS2-VALIDATION-RUNNER' -or
+        @($commandRouter.decomposition.modules).Count -ne 12 -or
+        -not [bool]$commandRouter.public_contract.unchanged -or
+        [int]$commandRouter.public_contract.command_count -ne 85 -or
+        [string]$commandRouter.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-command-router-scope]'
+    }
+    foreach ($property in $commandRouter.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-command-router-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $commandRouterReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

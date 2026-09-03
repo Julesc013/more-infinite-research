@@ -10,6 +10,15 @@ function Get-MIR4CommandInventoryDigestV1 {
   return 'sha256:' + [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
 }
 
+function Get-MIR4CommandInventoryTextSha256V1 {
+  param([Parameter(Mandatory)][string]$Path)
+  $utf8 = [Text.UTF8Encoding]::new($false,$true)
+  $text = $utf8.GetString([IO.File]::ReadAllBytes((Resolve-Path -LiteralPath $Path).Path))
+  if ($text.Length -gt 0 -and $text[0] -eq [char]0xFEFF) { $text = $text.Substring(1) }
+  $canonical = $text.Replace("`r`n","`n").Replace("`r","`n").Normalize([Text.NormalizationForm]::FormC)
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($utf8.GetBytes($canonical)))
+}
+
 function Get-MIR4CommandImplementationClassificationV1 {
   param([Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Text)
   if ($RelativePath -ceq 'tools/mir.ps1') { return 'canonical-public' }
@@ -62,7 +71,8 @@ function Get-MIR4CommandInventoryV1 {
       $files += [pscustomobject][ordered]@{
         path = $relative
         classification = Get-MIR4CommandImplementationClassificationV1 -RelativePath $relative -Text $text
-        sha256 = (Get-FileHash -LiteralPath $item.FullName -Algorithm SHA256).Hash.ToUpperInvariant()
+        sha256 = Get-MIR4CommandInventoryTextSha256V1 -Path $item.FullName
+        hash_mode = 'canonical-text-v1'
         lines = ($text -split ([string][char]10)).Count
         package_visible = $false
       }

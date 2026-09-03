@@ -157,6 +157,19 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
               Assert-MIR4RepositoryMigrationV1 ([string]$m4202PowerShell.status-ceq'M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED'-and[string]$m4202PowerShell.next_fixed_point-ceq'M42-02-PS1-COMMAND-ROUTER') 'mir4-repository-migration-m42-02-powershell-characterization-scope'
               Assert-MIR4RepositoryMigrationV1 ([string]$m4202PowerShell.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202PowerShell.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-powershell-characterization-package-firewall'
               Assert-MIR4RepositoryMigrationV1 (@($m4202PowerShell.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-powershell-characterization-release-firewall'
+              $m4202CommandRouterPath='releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json'
+              if(Test-Path -LiteralPath (Join-Path $repo $m4202CommandRouterPath) -PathType Leaf){
+                $m4202CommandRouterSchemaPath='contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json'
+                $m4202CommandRouterRaw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202CommandRouterPath)
+                Assert-MIR4RepositoryMigrationV1 ($m4202CommandRouterRaw|Test-Json -SchemaFile (Join-Path $repo $m4202CommandRouterSchemaPath)) 'mir4-repository-migration-m42-02-command-router-schema'
+                $m4202CommandRouter=$m4202CommandRouterRaw|ConvertFrom-Json -Depth 100 -DateKind String
+                Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202CommandRouter) 'mir4-repository-migration-m42-02-command-router-record'
+                Assert-MIR4RepositoryMigrationV1 ((Get-MIR4RepositoryFileSha256V1 -Path (Join-Path $repo $m4202PowerShellPath))-ceq[string]$m4202CommandRouter.predecessor.receipt_sha256-and[string]$m4202CommandRouter.predecessor.record_sha256-ceq[string]$m4202PowerShell.record_sha256) 'mir4-repository-migration-m42-02-command-router-predecessor'
+                Assert-MIR4RepositoryMigrationV1 ([string]$m4202CommandRouter.status-ceq'M42-02-PS1-COMMAND-ROUTER-DECOMPOSED'-and[string]$m4202CommandRouter.decomposition.responsibility-ceq'command-router'-and[string]$m4202CommandRouter.next_fixed_point-ceq'M42-02-PS2-VALIDATION-RUNNER') 'mir4-repository-migration-m42-02-command-router-scope'
+                Assert-MIR4RepositoryMigrationV1 ([bool]$m4202CommandRouter.public_contract.unchanged-and[int]$m4202CommandRouter.public_contract.command_count-eq85-and@($m4202CommandRouter.decomposition.modules).Count-eq12) 'mir4-repository-migration-m42-02-command-router-contract'
+                Assert-MIR4RepositoryMigrationV1 ([string]$m4202CommandRouter.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202CommandRouter.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-command-router-package-firewall'
+                Assert-MIR4RepositoryMigrationV1 (@($m4202CommandRouter.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-command-router-release-firewall'
+              }
             }
           }else{
             Assert-MIR4RepositoryMigrationV1 ([string]$m4202L5.package_authority.package_source_sha256-ceq$currentPackageSourceSha256) 'mir4-repository-migration-m42-02-l5-successor-fingerprint'

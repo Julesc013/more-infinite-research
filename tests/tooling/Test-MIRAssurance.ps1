@@ -247,7 +247,10 @@ if ($ecosystemTest.Count -ne 1 -or
     [string]$ecosystemTest[0].command -notmatch '--skip-clean-git-status(?:\s|$)') {
   throw "runtime.ecosystem must bind the exact candidate ZIP, package source, and planned mod closure and must not rebuild distribution bytes."
 }
-$mirCliText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir\cli\Invoke-MIRCommandRouter.ps1")
+$mirCliText = @(
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir\cli\Invoke-MIRCommandRouter.ps1")
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\mir\cli\router\RunProfiles.ps1")
+) -join "`n"
 foreach ($sourceBindingSnippet in @(
   'Get-MIRArgValue -Items $Items -Name "--candidate-source"',
   '$overrides.candidate_source_commit = $candidateSource',

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "starting_dev", "predecessor", "decomposition", "public_contract", "evolved_bindings", "preservation", "transition_gate", "next_fixed_point", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4202PowerShellCommandRouterDecompositionV1"},
+    "status": {"const": "M42-02-PS1-COMMAND-ROUTER-DECOMPOSED"},
+    "starting_dev": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {"commit": {"$ref": "#/$defs/gitObject"}, "tree": {"$ref": "#/$defs/gitObject"}}},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["work_package", "receipt", "receipt_sha256", "record_sha256", "status", "router_sha256"], "properties": {
+      "work_package": {"const": "M42-02-POWERSHELL-CHARACTERIZATION"},
+      "receipt": {"const": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json"},
+      "receipt_sha256": {"$ref": "#/$defs/sha256"},
+      "record_sha256": {"$ref": "#/$defs/sha256"},
+      "status": {"const": "M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED"},
+      "router_sha256": {"$ref": "#/$defs/sha256"}
+    }},
+    "decomposition": {"type": "object", "additionalProperties": false, "required": ["responsibility", "facade", "previous_lines", "current_lines", "facade_maximum_lines", "facade_function_count", "module_root", "module_count", "module_maximum_lines", "modules"], "properties": {
+      "responsibility": {"const": "command-router"},
+      "facade": {"$ref": "#/$defs/fileIdentity"},
+      "previous_lines": {"const": 1321},
+      "current_lines": {"type": "integer", "minimum": 1, "maximum": 200},
+      "facade_maximum_lines": {"const": 200},
+      "facade_function_count": {"const": 1},
+      "module_root": {"const": "tools/mir/cli/router"},
+      "module_count": {"const": 12},
+      "module_maximum_lines": {"const": 400},
+      "modules": {"type": "array", "minItems": 12, "maxItems": 12, "items": {"$ref": "#/$defs/moduleIdentity"}}
+    }},
+    "public_contract": {"type": "object", "additionalProperties": false, "required": ["projection_algorithm", "previous_sha256", "current_sha256", "unchanged", "command_count", "canonical_internal", "unknown", "duplicate_command_keys", "inventory"], "properties": {
+      "projection_algorithm": {"const": "canonical-json-v1(command_count,commands)"},
+      "previous_sha256": {"const": "0D3D39A0FDC988F18B218766797991BBF6BEEA86DCD38AF53387C30BFC0A0389"},
+      "current_sha256": {"const": "0D3D39A0FDC988F18B218766797991BBF6BEEA86DCD38AF53387C30BFC0A0389"},
+      "unchanged": {"const": true},
+      "command_count": {"const": 85},
+      "canonical_internal": {"type": "integer", "minimum": 275},
+      "unknown": {"const": 0},
+      "duplicate_command_keys": {"const": 0},
+      "inventory": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "digest"], "properties": {"path": {"const": "governance/automation/mir4-command-inventory-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}}
+    }},
+    "evolved_bindings": {"type": "array", "minItems": 17, "maxItems": 17, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims"], "properties": {
+      "package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_visible_delta": {"const": []}, "gameplay": {"const": false}, "saves": {"const": true}, "settings": {"const": true}, "migrations": {"const": true}, "compatibility_claims": {"const": true}
+    }},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "next_fixed_point": {"const": "M42-02-PS2-VALIDATION-RUNNER"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "gitObject": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "fileIdentity": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode"], "properties": {"path": {"const": "tools/mir/cli/Invoke-MIRCommandRouter.ps1"}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}}},
+    "moduleIdentity": {"type": "object", "additionalProperties": false, "required": ["path", "role", "sha256", "hash_mode", "lines", "function_count", "parse_errors"], "properties": {"path": {"type": "string", "pattern": "^tools/mir/cli/router/[A-Za-z0-9]+[.]ps1$"}, "role": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "lines": {"type": "integer", "minimum": 1, "maximum": 400}, "function_count": {"type": "integer", "minimum": 1}, "parse_errors": {"const": 0}}},
+    "evolvedBinding": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "package_visible", "release_authority"], "properties": {"path": {"type": "string", "minLength": 1}, "previous_sha256": {"$ref": "#/$defs/sha256"}, "current_sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "package_visible": {"const": false}, "release_authority": {"const": false}}},
+    "transitionGate": {"type": "object", "additionalProperties": false, "required": ["version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}
