@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "starting_dev", "predecessor", "characterization", "current_source", "decomposition", "public_contract", "semantic_contract", "tooling_inventory", "evolved_bindings", "preservation", "transition_gate", "next_fixed_point", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M4202PreFreezeReleaseDecompositionV1"},
+    "status": {"const": "M42-02-PS4-PRE-FREEZE-RELEASE-DECOMPOSED"},
+    "starting_dev": {"type": "object", "additionalProperties": false, "required": ["commit", "tree"], "properties": {
+      "commit": {"const": "dc3a02302e5091010b8369ab314299b65522187e"},
+      "tree": {"const": "e95dc0118a475edd273c5a58accd462918faa8c6"}
+    }},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["work_package", "receipt", "receipt_sha256", "record_sha256", "status"], "properties": {
+      "work_package": {"const": "M42-02-PS3-ASSURANCE-EVIDENCE"},
+      "receipt": {"const": "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json"},
+      "receipt_sha256": {"$ref": "#/$defs/sha256"},
+      "record_sha256": {"$ref": "#/$defs/sha256"},
+      "status": {"const": "M42-02-PS3-ASSURANCE-EVIDENCE-DECOMPOSED"}
+    }},
+    "characterization": {"type": "object", "additionalProperties": false, "required": ["receipt", "record_sha256", "path", "sha256", "lines", "responsibilities"], "properties": {
+      "receipt": {"const": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json"},
+      "record_sha256": {"$ref": "#/$defs/sha256"},
+      "path": {"const": "tools/lib/mir4/PreFreezeRelease.ps1"},
+      "sha256": {"const": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181"},
+      "lines": {"const": 2093},
+      "responsibilities": {"type": "array", "minItems": 5, "maxItems": 5, "items": {"type": "string", "minLength": 1}}
+    }},
+    "current_source": {"type": "object", "additionalProperties": false, "required": ["commit", "tree", "path", "sha256", "lines", "function_count", "evolution_chain"], "properties": {
+      "commit": {"const": "dc3a02302e5091010b8369ab314299b65522187e"},
+      "tree": {"const": "e95dc0118a475edd273c5a58accd462918faa8c6"},
+      "path": {"const": "tools/lib/mir4/PreFreezeRelease.ps1"},
+      "sha256": {"const": "EF715051266F0984B7A57C1F61497E0FB614E2AB28F80EFE5A56D2350CB9C89E"},
+      "lines": {"const": 2283},
+      "function_count": {"const": 25},
+      "evolution_chain": {"const": ["M42-02-PS1", "M42-02-PS2", "M42-02-PS3"]}
+    }},
+    "decomposition": {"type": "object", "additionalProperties": false, "required": ["responsibility", "facade", "module_root", "module_count", "module_maximum_lines", "modules", "segment_algorithm"], "properties": {
+      "responsibility": {"const": "pre-freeze-release"},
+      "facade": {"$ref": "#/$defs/facade"},
+      "module_root": {"const": "tools/lib/mir4/pre-freeze-release"},
+      "module_count": {"const": 6},
+      "module_maximum_lines": {"const": 1000},
+      "modules": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"$ref": "#/$defs/module"}},
+      "segment_algorithm": {"const": "exact-current-function-source-slices-with-declared-ps4-successor-v1"}
+    }},
+    "public_contract": {"type": "object", "additionalProperties": false, "required": ["projection_algorithm", "previous_sha256", "current_sha256", "unchanged", "function_count"], "properties": {
+      "projection_algorithm": {"const": "ordered-powershell-function-name-list-v1"},
+      "previous_sha256": {"const": "17F619F2A06E7D74956DE3E1DA2CD58ED630755AFB44E414C0F057F490F11430"},
+      "current_sha256": {"const": "17F619F2A06E7D74956DE3E1DA2CD58ED630755AFB44E414C0F057F490F11430"},
+      "unchanged": {"const": true},
+      "function_count": {"const": 25}
+    }},
+    "semantic_contract": {"type": "object", "additionalProperties": false, "required": ["source_segments_exact_except_declared_self_successor", "declared_self_successor_extension", "function_names_and_order_unchanged", "module_load_order_explicit", "authority_locks_unchanged", "pre_freeze_state_unchanged", "authority_chain_validation_unchanged_except_self_successor", "release_doctor_unchanged", "workflow_maturity_unchanged", "playtest_sessions_unchanged"], "properties": {
+      "source_segments_exact_except_declared_self_successor": {"const": true},
+      "declared_self_successor_extension": {"const": true},
+      "function_names_and_order_unchanged": {"const": true},
+      "module_load_order_explicit": {"const": true},
+      "authority_locks_unchanged": {"const": true},
+      "pre_freeze_state_unchanged": {"const": true},
+      "authority_chain_validation_unchanged_except_self_successor": {"const": true},
+      "release_doctor_unchanged": {"const": true},
+      "workflow_maturity_unchanged": {"const": true},
+      "playtest_sessions_unchanged": {"const": true}
+    }},
+    "tooling_inventory": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "digest", "command_count", "unknown", "duplicate_command_keys"], "properties": {
+      "path": {"const": "governance/automation/mir4-command-inventory-v1.json"},
+      "sha256": {"$ref": "#/$defs/sha256"},
+      "hash_mode": {"const": "canonical-text-v1"},
+      "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+      "command_count": {"const": 85},
+      "unknown": {"const": 0},
+      "duplicate_command_keys": {"const": 0}
+    }},
+    "evolved_bindings": {"type": "array", "minItems": 20, "maxItems": 20, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims"], "properties": {
+      "package_source_sha256": {"$ref": "#/$defs/sha256"},
+      "package_visible_delta": {"const": []},
+      "gameplay": {"const": false},
+      "saves": {"const": true},
+      "settings": {"const": true},
+      "migrations": {"const": true},
+      "compatibility_claims": {"const": true}
+    }},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "next_fixed_point": {"const": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "facade": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "previous_lines", "current_lines", "maximum_lines", "function_count"], "properties": {
+      "path": {"const": "tools/lib/mir4/PreFreezeRelease.ps1"},
+      "previous_sha256": {"const": "EF715051266F0984B7A57C1F61497E0FB614E2AB28F80EFE5A56D2350CB9C89E"},
+      "current_sha256": {"$ref": "#/$defs/sha256"},
+      "hash_mode": {"const": "canonical-text-v1"},
+      "previous_lines": {"const": 2283},
+      "current_lines": {"type": "integer", "minimum": 1, "maximum": 20},
+      "maximum_lines": {"const": 20},
+      "function_count": {"const": 0}
+    }},
+    "module": {"type": "object", "additionalProperties": false, "required": ["path", "role", "source_lines", "sha256", "hash_mode", "lines", "function_count", "parse_errors"], "properties": {
+      "path": {"type": "string", "pattern": "^tools/lib/mir4/pre-freeze-release/[A-Za-z0-9]+[.]ps1$"},
+      "role": {"type": "string", "minLength": 1},
+      "source_lines": {"type": "object", "additionalProperties": false, "required": ["start", "end"], "properties": {"start": {"type": "integer", "minimum": 1}, "end": {"type": "integer", "minimum": 1}}},
+      "sha256": {"$ref": "#/$defs/sha256"},
+      "hash_mode": {"const": "canonical-text-v1"},
+      "lines": {"type": "integer", "minimum": 1, "maximum": 1000},
+      "function_count": {"type": "integer", "minimum": 1},
+      "parse_errors": {"const": 0}
+    }},
+    "evolvedBinding": {"type": "object", "additionalProperties": false, "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "package_visible", "release_authority"], "properties": {
+      "path": {"type": "string", "minLength": 1},
+      "previous_sha256": {"$ref": "#/$defs/sha256"},
+      "current_sha256": {"$ref": "#/$defs/sha256"},
+      "hash_mode": {"const": "canonical-text-v1"},
+      "package_visible": {"const": false},
+      "release_authority": {"const": false}
+    }},
+    "transitionGate": {"type": "object", "additionalProperties": false, "required": ["version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {
+      "version_allocation": {"const": false},
+      "tagging": {"const": false},
+      "signing": {"const": false},
+      "sealing": {"const": false},
+      "publication": {"const": false}
+    }}
+  }
+}

@@ -14,7 +14,6 @@ function Assert-MIR4AssuranceEvidenceDecompositionV1([bool]$Condition,[string]$C
 }
 
 $packageBefore=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-$receipt=& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202AssuranceEvidenceDecompositionAuthority.ps1') -RepoRoot $repo -Check
 $receiptPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json'
 $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4AssuranceEvidenceDecompositionV1 ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-evidence-schema'
@@ -52,9 +51,28 @@ foreach($requiredFunction in @('Get-MIRAssuranceTestFingerprint','Test-MIRAssura
 Assert-MIR4AssuranceEvidenceDecompositionV1 ([bool]$receipt.semantic_contract.source_segments_exact-and[bool]$receipt.semantic_contract.fingerprints_unchanged-and[bool]$receipt.semantic_contract.producer_trust_unchanged-and[bool]$receipt.semantic_contract.worker_ingestion_unchanged-and[bool]$receipt.semantic_contract.plans_and_gates_unchanged) 'mir4-m42-02-assurance-evidence-semantic-contract'
 
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4AssuranceEvidenceDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq[string]$receipt.tooling_inventory.digest) 'mir4-m42-02-assurance-evidence-inventory'
+$expectedInventoryDigest=[string]$receipt.tooling_inventory.digest
+$expectedBindingSha=@{}
+foreach($binding in @($receipt.evolved_bindings)){$expectedBindingSha[[string]$binding.path]=[string]$binding.current_sha256}
+$preFreezeSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json'
+if(Test-Path -LiteralPath $preFreezeSuccessorPath -PathType Leaf){
+  $preFreezeSuccessorRaw=Get-Content -Raw -LiteralPath $preFreezeSuccessorPath
+  Assert-MIR4AssuranceEvidenceDecompositionV1 ($preFreezeSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-evidence-successor-schema'
+  $preFreezeSuccessor=$preFreezeSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $preFreezeSuccessor) 'mir4-m42-02-assurance-evidence-successor-record'
+  Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash-ceq[string]$preFreezeSuccessor.predecessor.receipt_sha256-and[string]$receipt.record_sha256-ceq[string]$preFreezeSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-evidence-successor-predecessor'
+  foreach($binding in @($preFreezeSuccessor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4AssuranceEvidenceDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-assurance-evidence-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$preFreezeSuccessor.tooling_inventory.digest
+}
+Assert-MIR4AssuranceEvidenceDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-evidence-inventory'
 foreach($binding in @($receipt.evolved_bindings)){
-  Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$binding.current_sha256-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-assurance-evidence-evolved-binding' ([string]$binding.path)
+  Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$expectedBindingSha[[string]$binding.path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-assurance-evidence-evolved-binding' ([string]$binding.path)
 }
 Assert-MIR4AssuranceEvidenceDecompositionV1 ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-assurance-evidence-package-firewall'
 Assert-MIR4AssuranceEvidenceDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-assurance-evidence-release-firewall'

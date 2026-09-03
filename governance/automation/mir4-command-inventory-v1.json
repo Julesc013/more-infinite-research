@@ -2585,6 +2585,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "32D2305B980F96BBEA55DBAAF6B7DD4E5060D7ED4F149F7E2C9399568ED9879D",
+      "hash_mode": "canonical-text-v1",
+      "lines": 182,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1",
       "classification": "migration-only",
       "sha256": "87364A6B6801638B0690235AE1DB72638A5CEE5DE35CEF3C020FC3B0D3118ECA",
@@ -3465,11 +3473,59 @@
       "package_visible": false
     },
     {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityState.ps1",
+      "classification": "canonical-internal",
+      "sha256": "DFCFA047B3B1BD4C5EE3C5C7E97B412E0875E8587FB3DE44F38A30083370B9E9",
+      "hash_mode": "canonical-text-v1",
+      "lines": 264,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B3816A485BC68DB696598D2BAB637DE2EAD46DAE48ACA34DFAE6BAB904AA85C3",
+      "hash_mode": "canonical-text-v1",
+      "lines": 960,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/Common.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A29FA909CE7AAC16D27EE30E3AA773BCED4D25DC2775A413C90400384E91D6E5",
+      "hash_mode": "canonical-text-v1",
+      "lines": 199,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/PlaytestSessions.ps1",
+      "classification": "canonical-internal",
+      "sha256": "346D4AF679891A4660E8EC6D63EF89966971B5CDF0AE230ED70F5C640584E012",
+      "hash_mode": "canonical-text-v1",
+      "lines": 475,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/PolicyLocks.ps1",
+      "classification": "canonical-internal",
+      "sha256": "2B75F48877403416C39311E27D74A393272DE7F63ED347DFC2E39BC898B620A5",
+      "hash_mode": "canonical-text-v1",
+      "lines": 127,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1",
+      "classification": "canonical-internal",
+      "sha256": "68B7621F6382186D5A40C1AAAB9775CF33AB380AC29B250A25468F6BECBF7089",
+      "hash_mode": "canonical-text-v1",
+      "lines": 306,
+      "package_visible": false
+    },
+    {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "EF715051266F0984B7A57C1F61497E0FB614E2AB28F80EFE5A56D2350CB9C89E",
+      "sha256": "E474230D617EC2C7849A7C02A88924B3EAF53923858427E16758A8A839F2ADE8",
       "hash_mode": "canonical-text-v1",
-      "lines": 2284,
+      "lines": 10,
       "package_visible": false
     },
     {
@@ -4907,9 +4963,9 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 306,
+    "canonical_internal": 312,
     "compatibility_wrapper": 168,
-    "migration_only": 36,
+    "migration_only": 37,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4922,5 +4978,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5712aea61dd279a4c6d6ac9021eb8af1b9303d5e24255862e32ec6f8e0699c5c"
+  "digest": "sha256:c8cd250c8cc5a3540a03cfdc06abf002280784c3467420f14f2b90bc08ef6310"
 }

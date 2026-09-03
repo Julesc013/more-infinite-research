@@ -191,6 +191,18 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
                     Assert-MIR4RepositoryMigrationV1 ([bool]$m4202AssuranceEvidence.public_contract.unchanged-and[int]$m4202AssuranceEvidence.public_contract.function_count-eq62-and@($m4202AssuranceEvidence.decomposition.modules).Count-eq9-and[bool]$m4202AssuranceEvidence.semantic_contract.source_segments_exact) 'mir4-repository-migration-m42-02-assurance-evidence-contract'
                     Assert-MIR4RepositoryMigrationV1 ([string]$m4202AssuranceEvidence.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202AssuranceEvidence.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-assurance-evidence-package-firewall'
                     Assert-MIR4RepositoryMigrationV1 (@($m4202AssuranceEvidence.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-assurance-evidence-release-firewall'
+                    $m4202PreFreezeReleasePath='releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json'
+                    if(Test-Path -LiteralPath (Join-Path $repo $m4202PreFreezeReleasePath) -PathType Leaf){
+                      $m4202PreFreezeReleaseRaw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202PreFreezeReleasePath)
+                      Assert-MIR4RepositoryMigrationV1 ($m4202PreFreezeReleaseRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json')) 'mir4-repository-migration-m42-02-pre-freeze-release-schema'
+                      $m4202PreFreezeRelease=$m4202PreFreezeReleaseRaw|ConvertFrom-Json -Depth 100 -DateKind String
+                      Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202PreFreezeRelease) 'mir4-repository-migration-m42-02-pre-freeze-release-record'
+                      Assert-MIR4RepositoryMigrationV1 ((Get-MIR4RepositoryFileSha256V1 -Path (Join-Path $repo $m4202AssuranceEvidencePath))-ceq[string]$m4202PreFreezeRelease.predecessor.receipt_sha256-and[string]$m4202PreFreezeRelease.predecessor.record_sha256-ceq[string]$m4202AssuranceEvidence.record_sha256) 'mir4-repository-migration-m42-02-pre-freeze-release-predecessor'
+                      Assert-MIR4RepositoryMigrationV1 ([string]$m4202PreFreezeRelease.status-ceq'M42-02-PS4-PRE-FREEZE-RELEASE-DECOMPOSED'-and[string]$m4202PreFreezeRelease.decomposition.responsibility-ceq'pre-freeze-release'-and[string]$m4202PreFreezeRelease.next_fixed_point-ceq'M42-02-PS5-BOOTSTRAP-MATERIALIZATION') 'mir4-repository-migration-m42-02-pre-freeze-release-scope'
+                      Assert-MIR4RepositoryMigrationV1 ([bool]$m4202PreFreezeRelease.public_contract.unchanged-and[int]$m4202PreFreezeRelease.public_contract.function_count-eq25-and@($m4202PreFreezeRelease.decomposition.modules).Count-eq6-and[bool]$m4202PreFreezeRelease.semantic_contract.source_segments_exact_except_declared_self_successor) 'mir4-repository-migration-m42-02-pre-freeze-release-contract'
+                      Assert-MIR4RepositoryMigrationV1 ([string]$m4202PreFreezeRelease.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202PreFreezeRelease.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-pre-freeze-release-package-firewall'
+                      Assert-MIR4RepositoryMigrationV1 (@($m4202PreFreezeRelease.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-pre-freeze-release-release-firewall'
+                    }
                   }
                 }
               }

@@ -431,6 +431,12 @@ foreach ($assuranceEvidenceModule in @(
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/lib/assurance/Evidence.ps1" -Text $assuranceEvidenceFacadeText -Needle "evidence/$assuranceEvidenceModule"
 }
+$preFreezeReleaseFacadeText = Read-MIRFile -RelativePath "tools/lib/mir4/PreFreezeRelease.ps1"
+foreach ($preFreezeReleaseModule in @("Common.ps1", "PolicyLocks.ps1", "AuthorityState.ps1", "AuthorityValidation.ps1", "ReleaseDoctor.ps1", "PlaytestSessions.ps1")) {
+  $relative = "tools/lib/mir4/pre-freeze-release/$preFreezeReleaseModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/mir4/PreFreezeRelease.ps1" -Text $preFreezeReleaseFacadeText -Needle "pre-freeze-release/$preFreezeReleaseModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

@@ -3425,6 +3425,41 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-pre-freeze-release-decomposition-m42-02-ps4",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/mir4/pre-freeze-release/**",
+        "src/mod/package-source.json",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Pre-Freeze-Release-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1",
+        "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ]
     }
   ]
 }

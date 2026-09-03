@@ -790,6 +790,7 @@ package_excluded_modules:
       - governance/automation/github-actions-lock.json
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
+    implementation_modules: tools/lib/mir4/pre-freeze-release
     f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
     f210_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
     final_mile_tooling_authority_writer: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1

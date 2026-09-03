@@ -919,3 +919,9 @@ The split preserves the exact canonical 85-command public projection. Internal m
 `tools/lib/assurance/Evidence.ps1` remains the stable assurance evidence facade and loads the bounded modules under `tools/lib/assurance/evidence/` in one explicit order. Fingerprints, producer trust, worker-artifact validation, worker import, evidence decisions, attempt state, command execution, plans, and aggregate execution/gates retain their existing function names and one shared assurance scope.
 
 The split preserves all 62 characterized functions as exact canonical source segments. It changes no fingerprint, producer-trust, reuse, worker-ingestion, execution, plan, result, or gate semantics and grants no package, candidate, release, signing, sealing, or publication authority.
+
+## MIR 4 pre-freeze and release-readiness boundary
+
+`tools/lib/mir4/PreFreezeRelease.ps1` remains the stable facade and loads the bounded modules under `tools/lib/mir4/pre-freeze-release/` in one explicit order. Shared authority primitives, policy locks, authority-state construction, authority-chain validation, release doctor and workflow checks, and playtest-session operations have separate package-excluded owners.
+
+The split binds both the original 2,093-line characterization and the exact 2,283-line post-PS3 starting source. All 25 function names and their order are preserved; source segments remain exact except for the declared PS4 self-succession binding needed to advance the authority chain. This decomposition grants no package, candidate, release, signing, sealing, publication, gameplay, save, setting, migration, or compatibility authority.
