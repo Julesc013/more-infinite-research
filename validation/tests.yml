@@ -3326,6 +3326,8 @@
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
         "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
         "docs/architecture/module-boundaries.md",
         "assurance/catalog/tests.json",

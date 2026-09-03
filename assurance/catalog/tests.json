@@ -2513,6 +2513,8 @@
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
         "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
         "docs/architecture/module-boundaries.md",
         "assurance/catalog/tests.json",
@@ -4497,5 +4499,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f3d719e1c4f5aa0c44e217c13ac3f3ab7e41bb32f85d66bee589f34bc0e41a7e"
+  "digest": "sha256:3306d034d48080110a2ccd9dbe379e3b0e290bd6577ad8b0bfa0f5736ae02632"
 }

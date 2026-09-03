@@ -40,7 +40,7 @@
       "duplicate_command_keys": {"const": 0},
       "inventory": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "digest"], "properties": {"path": {"const": "governance/automation/mir4-command-inventory-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}}}
     }},
-    "evolved_bindings": {"type": "array", "minItems": 12, "maxItems": 12, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "evolved_bindings": {"type": "array", "minItems": 14, "maxItems": 14, "items": {"$ref": "#/$defs/evolvedBinding"}},
     "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims"], "properties": {
       "package_source_sha256": {"$ref": "#/$defs/sha256"}, "package_visible_delta": {"const": []}, "gameplay": {"const": false}, "saves": {"const": true}, "settings": {"const": true}, "migrations": {"const": true}, "compatibility_claims": {"const": true}
     }},

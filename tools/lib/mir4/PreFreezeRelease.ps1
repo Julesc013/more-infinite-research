@@ -1289,6 +1289,7 @@ function Test-MIR4PreFreezeAuthorities {
     }
     $commandRouterEnrollmentBaselines = @{
       'docs/architecture/module-boundaries.md'='24D5CB06F955FC6189D5CA02B4B0769547F16069D20692B4D7F909AB07824F6F'
+      'tests/tooling/Test-MIRAssurance.ps1'='7E6C860FB364052EF0ED8852D8DF2AAB9131DFBEB6A23CB45E43BB3A86403603'
       'tests/tooling/Test-MIR4CliReleaseConvergence.ps1'='FECB62355A5E37EA3CA33F9D52F3B36F99BD01011FA7E7C0E341156479BB101A'
       'tools/mir/application/repository/RepositoryFixedPoint.ps1'='E33A3D0761FE92D03CC32000A033FF5C3C70FE7802982E796FBB2933B84F42C9'
       'tools/mir/cli/Invoke-MIRCommandRouter.ps1'='AA50E7DF8CD41C756B3270A47A23E13F4F8B911F9ED89B05813D4B99376E7E25'
@@ -1315,7 +1316,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $commandRouterEvolvedPaths[$path] = $true
     }
-    if ($commandRouterEvolvedPaths.Count -ne 12 -or
+    if ($commandRouterEvolvedPaths.Count -ne 14 -or
         [string]$commandRouter.status -cne 'M42-02-PS1-COMMAND-ROUTER-DECOMPOSED' -or
         [string]$commandRouter.decomposition.responsibility -cne 'command-router' -or
         [string]$commandRouter.next_fixed_point -cne 'M42-02-PS2-VALIDATION-RUNNER' -or

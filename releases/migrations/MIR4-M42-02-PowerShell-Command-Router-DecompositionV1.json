@@ -151,16 +151,16 @@
     "duplicate_command_keys": 0,
     "inventory": {
       "path": "governance/automation/mir4-command-inventory-v1.json",
-      "sha256": "32873F4F0D91D0820ACCB68A55C898D5B2E4158CDF9CF9EE036D59BC5EAA75F4",
+      "sha256": "842F09C168888AD3A9AA16CF3F85AD8B50F674C0B006754B2D4551D119FB8213",
       "hash_mode": "canonical-text-v1",
-      "digest": "sha256:dd61529aef222b2651d1ee988754bc2a0ef71df33360dddb6ccedaaebd2f5cd2"
+      "digest": "sha256:8ca75b66845c8a1fa35613554850710ce133e287ebc531b4a4482c9dc6256c9c"
     }
   },
   "evolved_bindings": [
     {
       "path": ".mir/assurance.json",
       "previous_sha256": "F4F215B6767CC432B941328F05005146AC70775909051B5C20E466ECEFA5A9A0",
-      "current_sha256": "32E98E5DAFF565C4826898ADCD143200D4898C8A17E89913DA162A66BCE69E6B",
+      "current_sha256": "C2699BEDF69835EF6A183681E4F74873A88324A72F88D76D77907F5115BCFEFD",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -184,7 +184,7 @@
     {
       "path": "assurance/catalog/tests.json",
       "previous_sha256": "3BA3A2AA1A77D96B0C168FE3656B913252A382272CBAFDFF7F3AB17A8D41899D",
-      "current_sha256": "C54874EE9601DEB6EDA7EC4CABC572DC24B22804D92FB54909E81BFA425B6954",
+      "current_sha256": "72F8C5C7538DBAE2AB80F4B971FE0A8581A840EE46B7BA4E6821E00D5C7A0E84",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -200,7 +200,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "632430B0872685347F07008F5ECA429954D16596D6A0B305D1D0FB4E476D640F",
-      "current_sha256": "32873F4F0D91D0820ACCB68A55C898D5B2E4158CDF9CF9EE036D59BC5EAA75F4",
+      "current_sha256": "842F09C168888AD3A9AA16CF3F85AD8B50F674C0B006754B2D4551D119FB8213",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -209,6 +209,22 @@
       "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
       "previous_sha256": "7AEBCF60258BD9FC48514C2FB15415552EFBA89D84F865F8E59DEC81C86F57A9",
       "current_sha256": "302723E073CDD5E8360B6DF64B4E6C514F958ABD54E22A010A364609B74A4325",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "80B07603479FEB7B98A575A669BC890D2502CAD6D1A7E4A360B57E47C84B6317",
+      "current_sha256": "B53C546FA9199A46262513705E33BB0A8ED303432BB124EF6870E3704FAF7DFC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_sha256": "7E6C860FB364052EF0ED8852D8DF2AAB9131DFBEB6A23CB45E43BB3A86403603",
+      "current_sha256": "9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -224,7 +240,7 @@
     {
       "path": "validation/tests.yml",
       "previous_sha256": "78182123F3417E7BE6284165439F7FE55209D7AEAED827B0FCAB12FC35D88846",
-      "current_sha256": "DE645FBBAB695E1B3E0C23DEFA5F14D10B7E6881F697D34153B6A4C627811952",
+      "current_sha256": "B34FC0E4D7B3CB693696BE12B5CA7536139A5457DD0156BEE6AC801545B7A4C7",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -232,7 +248,7 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "previous_sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
-      "current_sha256": "3BEF6740EFAA1D8A8F78D8774C370890698014B8573A3C08C7566CA12529230E",
+      "current_sha256": "2BE6A93D0CC3A3157821252C752B0C85A90D4E5371F9466C0867E5A6CED4E926",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -271,5 +287,5 @@
     "publication": false
   },
   "next_fixed_point": "M42-02-PS2-VALIDATION-RUNNER",
-  "record_sha256": "87EC74F68A8120593E9529A6E2BB17977DBAC5B88A41EB88F0FED60D6D60AB51"
+  "record_sha256": "6F713148331D76F0C8F7BAB20D896912D592E24B327F95D3BA87C85ADF22D45F"
 }
