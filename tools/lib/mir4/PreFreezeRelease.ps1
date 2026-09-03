@@ -1247,6 +1247,38 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $compilerOrchestratorReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $powerShellCharacterizationReceiptPath = 'releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $powerShellCharacterizationReceiptPath) -PathType Leaf) {
+    $powerShellCharacterization = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $powerShellCharacterizationReceiptPath -Kind 'MIR4M4202PowerShellCharacterizationV1'
+    if ([string]$powerShellCharacterization.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$powerShellCharacterization.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$powerShellCharacterization.predecessor.record_sha256 -cne [string]$compilerOrchestrator.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-powershell-characterization-predecessor]'
+    }
+    $powerShellCharacterizationPaths = @{}
+    foreach ($binding in @($powerShellCharacterization.authority_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path) -or
+          [string]$binding.hash_mode -cne 'canonical-text-v1' -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or
+          $powerShellCharacterizationPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-powershell-characterization-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $powerShellCharacterizationPaths[$path] = $true
+    }
+    if ($powerShellCharacterizationPaths.Count -ne 12 -or
+        [string]$powerShellCharacterization.status -cne 'M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED' -or
+        [string]$powerShellCharacterization.next_fixed_point -cne 'M42-02-PS1-COMMAND-ROUTER') {
+      throw '[mir4-prefreeze-m42-02-powershell-characterization-scope]'
+    }
+    foreach ($property in $powerShellCharacterization.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-powershell-characterization-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $powerShellCharacterizationReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

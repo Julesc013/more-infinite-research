@@ -25,6 +25,30 @@
       "tags": []
     },
     {
+      "pattern": "tests/architecture/Test-MIRArchitecture.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": ".mir/views/**",
       "groups": [],
       "scenarios": [],

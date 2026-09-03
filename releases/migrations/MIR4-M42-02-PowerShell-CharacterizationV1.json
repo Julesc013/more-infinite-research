@@ -1,0 +1,587 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202PowerShellCharacterizationV1",
+  "status": "M42-02-RESIDUAL-POWERSHELL-CHARACTERIZED",
+  "starting_dev": {
+    "commit": "337d60ffe6e9dd1c5493b17c4d4b278c16881e2d",
+    "tree": "9ac1d4541ff82b6b2dac37e1a25fb4f7146a7e90"
+  },
+  "predecessor": {
+    "work_package": "M42-02-L6",
+    "receipt": "releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json",
+    "receipt_sha256": "EA318E3015160A7F14A00C7C0AF379C23900E18C48501197A5F14D4AA9F6522D",
+    "record_sha256": "8308B4B0A1F44DC48A9A1AD5F84D3BEF761FB1A8CABE4DB7FEA7F55C1C1F93B4",
+    "status": "M42-02-L6-COMPILER-ORCHESTRATOR-DECOMPOSED"
+  },
+  "inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "632430B0872685347F07008F5ECA429954D16596D6A0B305D1D0FB4E476D640F",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:5f76227ace3fd7c8d88c6aa4fc94c4991696b7cd75287183d35bae141d915a3c",
+    "canonical_internal": 263,
+    "unknown": 0,
+    "reviewed_file_count": 20
+  },
+  "threshold_policy": {
+    "normal_maximum_lines": 400,
+    "review_maximum_lines": 600,
+    "split_normally_maximum_lines": 1000,
+    "explicit_disposition_minimum_lines": 1001,
+    "decompose_count": 11,
+    "waiver_count": 9
+  },
+  "tracked_files": [
+    {
+      "path": "scripts/Export-MIRApprovedDelta.ps1",
+      "classification": "canonical-internal",
+      "sha256": "18302AD257936927631CDE97784E681C33F703B0712D2E7BE4A1115971EC1A0D",
+      "hash_mode": "canonical-text-v1",
+      "lines": 745,
+      "function_count": 23,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "one approved-delta export transaction"
+      ],
+      "rationale": "The exporter has one bounded output contract and no authority to approve or apply the delta it renders."
+    },
+    {
+      "path": "scripts/Invoke-MIRValidation.ps1",
+      "classification": "canonical-internal",
+      "sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
+      "hash_mode": "canonical-text-v1",
+      "lines": 5159,
+      "function_count": 49,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 2,
+      "next_node": "M42-02-PS2-VALIDATION-RUNNER",
+      "responsibilities": [
+        "static selection",
+        "runtime scenario setup",
+        "runtime execution",
+        "log and report assertions",
+        "package smoke policy"
+      ],
+      "rationale": "The executable test authority currently mixes portable selection, runtime execution, and result evaluation."
+    },
+    {
+      "path": "scripts/Measure-MIRPerformanceRegression.ps1",
+      "classification": "canonical-internal",
+      "sha256": "67B1DD7C0971B2647C6DB2E0C2F5493DF1F14FD8CF489BF43B4A2EA106E80725",
+      "hash_mode": "canonical-text-v1",
+      "lines": 836,
+      "function_count": 13,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "one performance regression measurement transaction"
+      ],
+      "rationale": "The script is an isolated measurement transaction whose process and report lifecycle must remain atomic."
+    },
+    {
+      "path": "tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1",
+      "classification": "canonical-internal",
+      "sha256": "DE0C80AEAFC4F2D56E67EEE9A9F7181D750B66CBB27BC8FD798E0D45D466A78B",
+      "hash_mode": "canonical-text-v1",
+      "lines": 609,
+      "function_count": 9,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "compatibility result conversion"
+      ],
+      "rationale": "The converter owns one deterministic result projection and cannot run scenarios or raise compatibility claims."
+    },
+    {
+      "path": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A6776583D9C3D03D001D3E38AFFE66BEC61E307B16077D1F8D63C47E02CEC664",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1678,
+      "function_count": 35,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 7,
+      "next_node": "M42-02-PS7-COMPATIBILITY-AUDIT",
+      "responsibilities": [
+        "configuration",
+        "input discovery",
+        "scenario execution",
+        "result collation"
+      ],
+      "rationale": "Compatibility audit configuration, discovery, execution, and collation are separable without changing claims."
+    },
+    {
+      "path": "tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A513FCE26C7CB2D42772F43CCF5C7804C63E73A750F658C5C866782DB1B4E0D5",
+      "hash_mode": "canonical-text-v1",
+      "lines": 623,
+      "function_count": 14,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "single bootstrap capsule command"
+      ],
+      "rationale": "The command is a thin transactional adapter over capsule libraries and must retain one fail-closed exit boundary."
+    },
+    {
+      "path": "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
+      "classification": "canonical-internal",
+      "sha256": "C0CCDBC646B9C964490A1D5E6F78ADB5C0891C05E2FBAF979F7B7FAD16714222",
+      "hash_mode": "canonical-text-v1",
+      "lines": 989,
+      "function_count": 7,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "single bootstrap candidate command"
+      ],
+      "rationale": "The command is a single fail-closed bootstrap transaction; splitting it before source freeze would widen rollback risk."
+    },
+    {
+      "path": "tools/lib/assurance/Core.ps1",
+      "classification": "canonical-internal",
+      "sha256": "38A41D77ED01DDE51D4458AB396A6C28A89E536BE2A18C81A6FFA2B4309F9DF5",
+      "hash_mode": "canonical-text-v1",
+      "lines": 681,
+      "function_count": 37,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "assurance foundational primitives"
+      ],
+      "rationale": "The core contains stable low-level assurance primitives and does not own worker execution or release transitions."
+    },
+    {
+      "path": "tools/lib/assurance/Evidence.ps1",
+      "classification": "canonical-internal",
+      "sha256": "1464AD8A30778F2E768FBE363DF107F1D7E10E7671A7E583F3B4A25584B19D6A",
+      "hash_mode": "canonical-text-v1",
+      "lines": 2650,
+      "function_count": 62,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 3,
+      "next_node": "M42-02-PS3-ASSURANCE-EVIDENCE",
+      "responsibilities": [
+        "fingerprints",
+        "producer trust",
+        "worker import",
+        "evidence decisions",
+        "attempt state",
+        "command execution",
+        "plans",
+        "gates"
+      ],
+      "rationale": "Evidence construction, trust, execution, and aggregation are independently reviewable assurance responsibilities."
+    },
+    {
+      "path": "tools/lib/assurance/Release.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1811,
+      "function_count": 11,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 6,
+      "next_node": "M42-02-PS6-ASSURANCE-RELEASE",
+      "responsibilities": [
+        "release planning",
+        "candidate authority",
+        "seal authority",
+        "seal verification",
+        "self-test"
+      ],
+      "rationale": "Release planning and sealing are production-sensitive, and the embedded self-test must move to executable test authority."
+    },
+    {
+      "path": "tools/lib/control/Executor.ps1",
+      "classification": "canonical-internal",
+      "sha256": "0DE88F7E2E2BB1FE90E3823D52880C5E54CC772BEEFB783BCD2FD87595600A3E",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1217,
+      "function_count": 27,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 10,
+      "next_node": "M42-02-PS10-CONTROL-EXECUTOR",
+      "responsibilities": [
+        "execution state",
+        "environment",
+        "runtime jobs",
+        "performance jobs",
+        "aggregate gates"
+      ],
+      "rationale": "The control executor combines state, environment, heterogeneous workers, and final gate aggregation."
+    },
+    {
+      "path": "tools/lib/control/Views.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A8CEE9DC2844840E158A2967C120691FE05133E4E43CAA53B1986FAD00F4F965",
+      "hash_mode": "canonical-text-v1",
+      "lines": 639,
+      "function_count": 19,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "deterministic control-plane views"
+      ],
+      "rationale": "The file is a cohesive read-only rendering boundary over canonical control-plane records."
+    },
+    {
+      "path": "tools/lib/mir4/BootstrapMaterialization.ps1",
+      "classification": "canonical-internal",
+      "sha256": "3B496E1D8DA0A772E4B1856761EBB3C40921742D0161D59811E360256901FB30",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1873,
+      "function_count": 51,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 5,
+      "next_node": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION",
+      "responsibilities": [
+        "digests and records",
+        "safe paths",
+        "archive comparison",
+        "git source proof",
+        "capsule closure"
+      ],
+      "rationale": "Bootstrap identity, safe extraction, comparison, source proof, and capsule closure require bounded internal modules."
+    },
+    {
+      "path": "tools/lib/mir4/PlatformPreview.ps1",
+      "classification": "canonical-internal",
+      "sha256": "855B8284592EFA76C01C9F88DEB3C54333E4FCED792F77F9FB815D7D9C45A885",
+      "hash_mode": "canonical-text-v1",
+      "lines": 922,
+      "function_count": 27,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "read-only platform preview composition"
+      ],
+      "rationale": "The file is a read-only preview composer with no package, mutation, release, or publication authority."
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "classification": "canonical-internal",
+      "sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
+      "hash_mode": "canonical-text-v1",
+      "lines": 2093,
+      "function_count": 25,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 4,
+      "next_node": "M42-02-PS4-PRE-FREEZE-RELEASE",
+      "responsibilities": [
+        "authority locks",
+        "pre-freeze state",
+        "release doctor",
+        "workflow maturity",
+        "playtest sessions"
+      ],
+      "rationale": "The private 4.1 candidate path requires separately reviewable pre-freeze, doctor, workflow, and playtest owners."
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseAdapters.ps1",
+      "classification": "canonical-internal",
+      "sha256": "D8901D91026B4E315B5DC08B57C338E48EEA75A759B062E551E628F1EBCB5ABC",
+      "hash_mode": "canonical-text-v1",
+      "lines": 741,
+      "function_count": 26,
+      "parse_errors": 0,
+      "threshold_band": "split-or-explicit-waiver",
+      "decision": "retain-with-explicit-waiver",
+      "sequence": 0,
+      "next_node": null,
+      "responsibilities": [
+        "release adapter registry"
+      ],
+      "rationale": "The adapter registry is cohesive and already delegates phase behavior to the canonical release application engine."
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseCapsule.ps1",
+      "classification": "canonical-internal",
+      "sha256": "6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1357,
+      "function_count": 19,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 9,
+      "next_node": "M42-02-PS9-RELEASE-CAPSULE",
+      "responsibilities": [
+        "inventory",
+        "capsule construction",
+        "capsule verification",
+        "restore"
+      ],
+      "rationale": "Release capsule inventory, construction, verification, and restore are distinct supply-chain review boundaries."
+    },
+    {
+      "path": "tools/lib/mir4/SupplyChain.ps1",
+      "classification": "canonical-internal",
+      "sha256": "3D1CAF10F2EA14B21743BA3E8B1018930695816B7181D26A8B704B63152DC1D4",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1104,
+      "function_count": 28,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 11,
+      "next_node": "M42-02-PS11-SUPPLY-CHAIN",
+      "responsibilities": [
+        "inventory",
+        "attestation",
+        "policy verification",
+        "custody projection"
+      ],
+      "rationale": "Supply-chain inventory, attestation, policy verification, and custody projections need bounded owners."
+    },
+    {
+      "path": "tools/mir/application/custody/OfflineCandidateCustody.ps1",
+      "classification": "canonical-internal",
+      "sha256": "4AA7219BC19A02895F7076DF92E923D64F7C4D440DC4CBC0E937FA8C1CFB5A15",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1381,
+      "function_count": 26,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 8,
+      "next_node": "M42-02-PS8-OFFLINE-CUSTODY",
+      "responsibilities": [
+        "custody admission",
+        "seal inputs",
+        "signature verification",
+        "qualification evidence",
+        "offline restore"
+      ],
+      "rationale": "Offline custody and restore must expose bounded admission, verification, evidence, and recovery responsibilities."
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "classification": "canonical-internal",
+      "sha256": "AA50E7DF8CD41C756B3270A47A23E13F4F8B911F9ED89B05813D4B99376E7E25",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1321,
+      "function_count": 18,
+      "parse_errors": 0,
+      "threshold_band": "explicit-disposition-required",
+      "decision": "decompose",
+      "sequence": 1,
+      "next_node": "M42-02-PS1-COMMAND-ROUTER",
+      "responsibilities": [
+        "argument parsing",
+        "command lookup",
+        "application invocation",
+        "result rendering"
+      ],
+      "rationale": "The sole public command router must remain a thin facade with bounded routing responsibilities."
+    }
+  ],
+  "decomposition_sequence": [
+    {
+      "sequence": 1,
+      "node": "M42-02-PS1-COMMAND-ROUTER",
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1"
+    },
+    {
+      "sequence": 2,
+      "node": "M42-02-PS2-VALIDATION-RUNNER",
+      "path": "scripts/Invoke-MIRValidation.ps1"
+    },
+    {
+      "sequence": 3,
+      "node": "M42-02-PS3-ASSURANCE-EVIDENCE",
+      "path": "tools/lib/assurance/Evidence.ps1"
+    },
+    {
+      "sequence": 4,
+      "node": "M42-02-PS4-PRE-FREEZE-RELEASE",
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1"
+    },
+    {
+      "sequence": 5,
+      "node": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION",
+      "path": "tools/lib/mir4/BootstrapMaterialization.ps1"
+    },
+    {
+      "sequence": 6,
+      "node": "M42-02-PS6-ASSURANCE-RELEASE",
+      "path": "tools/lib/assurance/Release.ps1"
+    },
+    {
+      "sequence": 7,
+      "node": "M42-02-PS7-COMPATIBILITY-AUDIT",
+      "path": "tools/commands/compatibility/Invoke-MIRCompatAudit.ps1"
+    },
+    {
+      "sequence": 8,
+      "node": "M42-02-PS8-OFFLINE-CUSTODY",
+      "path": "tools/mir/application/custody/OfflineCandidateCustody.ps1"
+    },
+    {
+      "sequence": 9,
+      "node": "M42-02-PS9-RELEASE-CAPSULE",
+      "path": "tools/lib/mir4/ReleaseCapsule.ps1"
+    },
+    {
+      "sequence": 10,
+      "node": "M42-02-PS10-CONTROL-EXECUTOR",
+      "path": "tools/lib/control/Executor.ps1"
+    },
+    {
+      "sequence": 11,
+      "node": "M42-02-PS11-SUPPLY-CHAIN",
+      "path": "tools/lib/mir4/SupplyChain.ps1"
+    }
+  ],
+  "waivers": [
+    "scripts/Export-MIRApprovedDelta.ps1",
+    "scripts/Measure-MIRPerformanceRegression.ps1",
+    "tools/commands/compatibility/Convert-MIRCompatAuditResults.ps1",
+    "tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1",
+    "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
+    "tools/lib/assurance/Core.ps1",
+    "tools/lib/control/Views.ps1",
+    "tools/lib/mir4/PlatformPreview.ps1",
+    "tools/lib/mir4/ReleaseAdapters.ps1"
+  ],
+  "architecture_reconciliation": {
+    "authority": "src/mod/package-source.json#bindings[].output_path",
+    "canonical_output_count": 267,
+    "assigned_output_count": 267,
+    "added_assignments": 9,
+    "removed_stale_assignments": 2,
+    "module_manifest_sha256": "A283CC23AA08E3C0143F5F2DC2EBDFB0ECC84DDAF83596C18F01E7EA257EE7EE",
+    "architecture_test": "tests/architecture/Test-MIRArchitecture.ps1"
+  },
+  "authority_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "sha256": "F4F215B6767CC432B941328F05005146AC70775909051B5C20E466ECEFA5A9A0",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "sha256": "FEE112A1C40E61DE7D4657D612EE14F23BBE696EB4F22462D7FADB423BA9EF32",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "sha256": "A283CC23AA08E3C0143F5F2DC2EBDFB0ECC84DDAF83596C18F01E7EA257EE7EE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "sha256": "2D6B4B9C5CBCAA0A7F819AD2207241D6AA203AB81A7568FFD4E3A10A64C155EB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "sha256": "3BA3A2AA1A77D96B0C168FE3656B913252A382272CBAFDFF7F3AB17A8D41899D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "sha256": "632430B0872685347F07008F5ECA429954D16596D6A0B305D1D0FB4E476D640F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "sha256": "0E6A5E35DB8BF08843C46BFD18ECA5FD84FF289C1FCC68BF78483D466E504FF5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "sha256": "80B07603479FEB7B98A575A669BC890D2502CAD6D1A7E4A360B57E47C84B6317",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "sha256": "7AEBCF60258BD9FC48514C2FB15415552EFBA89D84F865F8E59DEC81C86F57A9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+      "sha256": "CBE7E446A714C8011244FAF53C4FC78E31D7BF08210F2A47268A4C43093C7CBF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "sha256": "78182123F3417E7BE6284165439F7FE55209D7AEAED827B0FCAB12FC35D88846",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "sha256": "1D21940B53412C4878B2E984C4C54F5BE81FDEC2FCD8E734D388FE8B966F2181",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS1-COMMAND-ROUTER",
+  "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0"
+}
