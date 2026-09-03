@@ -73,6 +73,21 @@ if(Test-Path -LiteralPath $validationSuccessorPath -PathType Leaf){
       $expectedBindingSha[$path]=[string]$binding.current_sha256
     }
   }
+  $assuranceSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json'
+  if(Test-Path -LiteralPath $assuranceSuccessorPath -PathType Leaf){
+    $assuranceSuccessorRaw=Get-Content -Raw -LiteralPath $assuranceSuccessorPath
+    Assert-MIR4CommandRouterDecompositionV1 ($assuranceSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json')) 'mir4-m42-02-command-router-assurance-successor-schema'
+    $assuranceSuccessor=$assuranceSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4CommandRouterDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $assuranceSuccessor) 'mir4-m42-02-command-router-assurance-successor-record'
+    Assert-MIR4CommandRouterDecompositionV1 ((Get-FileHash -LiteralPath $validationSuccessorPath -Algorithm SHA256).Hash-ceq[string]$assuranceSuccessor.predecessor.receipt_sha256-and[string]$validationSuccessor.record_sha256-ceq[string]$assuranceSuccessor.predecessor.record_sha256) 'mir4-m42-02-command-router-assurance-successor-predecessor'
+    foreach($binding in @($assuranceSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedBindingSha.ContainsKey($path)){
+        Assert-MIR4CommandRouterDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-command-router-assurance-successor-binding' $path
+        $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+    }
+  }
 }
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path

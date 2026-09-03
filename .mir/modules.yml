@@ -1624,6 +1624,7 @@ validation_tooling:
     assurance_core: tools/lib/assurance/Core.ps1
     assurance_domains: tools/lib/assurance/Domains.ps1
     assurance_evidence: tools/lib/assurance/Evidence.ps1
+    assurance_evidence_modules: tools/lib/assurance/evidence
     assurance_hashing: tools/lib/assurance/Hashing.ps1
     assurance_release: tools/lib/assurance/Release.ps1
     assurance_tests: tests/tooling/Test-MIRAssurance.ps1

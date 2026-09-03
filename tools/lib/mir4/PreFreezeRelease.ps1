@@ -1403,6 +1403,73 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $validationRunnerReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+  $assuranceEvidenceReceiptPath = 'releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $assuranceEvidenceReceiptPath) -PathType Leaf) {
+    $assuranceEvidence = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $assuranceEvidenceReceiptPath -Kind 'MIR4M4202AssuranceEvidenceDecompositionV1'
+    if ([string]$assuranceEvidence.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$assuranceEvidence.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$assuranceEvidence.predecessor.record_sha256 -cne [string]$validationRunner.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-assurance-evidence-predecessor]'
+    }
+    $assuranceEvidenceEnrollmentBaselines = @{
+      '.mir/assurance.json'='EAFF5A9CEB72E143F3054115E971E9FCB04D8EF1EF9B912B7DB8C2C8AD8F9DDC'
+      '.mir/control/paths.yml'='17B027743B5F8114D3E339DD5502ADD421FB50C4F4340D832EB3F0078039C390'
+      '.mir/modules.yml'='20A679746AEF6D9B1995FAD720DC31E493F3163EF5D0067EBCE5819C235B5B09'
+      '.mir/test-impact.yml'='C76E65B8B612F21C6C7F08D265787F1AE31E09E97DF4D9F2ACD811A3CA5B4399'
+      'assurance/catalog/tests.json'='FC1FFDDAD38370043049BBC6BA838163A9B568CD1446148D6D8385F72B6B1EF8'
+      'docs/architecture/module-boundaries.md'='DE0C8EF7A7D7E99C3C416893740F69CF3580607432303820B826A95D33D0F915'
+      'governance/automation/mir4-command-inventory-v1.json'='C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC'
+      'tests/architecture/Test-MIRArchitecture.ps1'='84E7CF5D35BB7CE2DB2820606EE1213486D7032CDCFE963DC80FA1BE5A505E07'
+      'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='BF9A86C8C72CF1F7F9A43CDE0B60E768835FF01218C96873071D2037C4392EB4'
+      'tests/repository/Test-MIR4RepositoryFixedPoint.ps1'='F81313D89D0FF8097652BDFC1EA0DBDC6CEA87FBF4A50501382739E84B49B4B9'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='43B525DFE427559BCF7D0F34D819C4475A18348DB289B3063E9D883732620E8E'
+      'tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1'='2157159773AB3CD45391FE38FC4836492014952275B3CCBD0ACCF7BA58FBC4DC'
+      'tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1'='D29666D2CA1291017EC06652707C5EC185D3AD974767DBE8B1F47C2B2AA92451'
+      'tests/tooling/Test-MIRAssurance.ps1'='9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5'
+      'tests/tooling/Test-MIRVerificationSchemas.ps1'='B01D23C94046A084959DEB7307F9B20C0623F910A36CEBBFCDEB46D3BD53EA65'
+      'tools/lib/mir4/PreFreezeRelease.ps1'='96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9'
+      'tools/mir/application/repository/RepositoryFixedPoint.ps1'='4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A'
+      'validation/tests.yml'='165C08D736F83D9B4E05CB7FDAC4CF1A3D8F0E5FC4C36C230B0B4339B6750498'
+    }
+    $assuranceEvidenceEvolvedPaths = @{}
+    foreach ($binding in @($assuranceEvidence.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $assuranceEvidenceEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$assuranceEvidenceEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-assurance-evidence-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $assuranceEvidenceEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-assurance-evidence-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $assuranceEvidenceEvolvedPaths[$path] = $true
+    }
+    if ($assuranceEvidenceEvolvedPaths.Count -ne 18 -or
+        [string]$assuranceEvidence.status -cne 'M42-02-PS3-ASSURANCE-EVIDENCE-DECOMPOSED' -or
+        [string]$assuranceEvidence.decomposition.responsibility -cne 'assurance-evidence' -or
+        [string]$assuranceEvidence.next_fixed_point -cne 'M42-02-PS4-PRE-FREEZE-RELEASE' -or
+        @($assuranceEvidence.decomposition.modules).Count -ne 9 -or
+        -not [bool]$assuranceEvidence.public_contract.unchanged -or
+        [int]$assuranceEvidence.public_contract.function_count -ne 62 -or
+        -not [bool]$assuranceEvidence.semantic_contract.source_segments_exact -or
+        [string]$assuranceEvidence.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-assurance-evidence-scope]'
+    }
+    foreach ($property in $assuranceEvidence.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-assurance-evidence-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $assuranceEvidenceReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

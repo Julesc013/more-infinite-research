@@ -913,3 +913,9 @@ Architecture module coverage is evaluated against the unique MIR Lua output path
 `tools/mir/cli/Invoke-MIRCommandRouter.ps1` remains the single public command-router facade behind `tools/mir.ps1`. It owns help rendering, loads the bounded files under `tools/mir/cli/router`, and delegates one request to `CommandDispatcher.ps1`. Argument parsing, run-profile execution, documentation-only checks, MIR4 command families, core/product/repository command families, and command lookup now have separate package-excluded owners.
 
 The split preserves the exact canonical 85-command public projection. Internal module placement grants no independent public entrypoint, package writer, runtime, migration, release, signing, sealing, or publication authority. New public commands still require command-inventory and CLI-contract evolution; adding a function to a router module does not expose it automatically. Implementation-file identities in the command inventory use `canonical-text-v1`, so LF and CRLF checkouts prove the same PowerShell content while every semantic byte change still invalidates the inventory.
+
+## MIR 4 assurance-evidence boundary
+
+`tools/lib/assurance/Evidence.ps1` remains the stable assurance evidence facade and loads the bounded modules under `tools/lib/assurance/evidence/` in one explicit order. Fingerprints, producer trust, worker-artifact validation, worker import, evidence decisions, attempt state, command execution, plans, and aggregate execution/gates retain their existing function names and one shared assurance scope.
+
+The split preserves all 62 characterized functions as exact canonical source segments. It changes no fingerprint, producer-trust, reuse, worker-ingestion, execution, plan, result, or gate semantics and grants no package, candidate, release, signing, sealing, or publication authority.

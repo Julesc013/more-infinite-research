@@ -1,0 +1,362 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202AssuranceEvidenceDecompositionV1",
+  "status": "M42-02-PS3-ASSURANCE-EVIDENCE-DECOMPOSED",
+  "starting_dev": {
+    "commit": "0af660065bd238a506b7c77d55fff9a04d64fa4e",
+    "tree": "a214cf26600cee0bfd64128f4bd80e2749572f6a"
+  },
+  "predecessor": {
+    "work_package": "M42-02-PS2-VALIDATION-RUNNER",
+    "receipt": "releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json",
+    "receipt_sha256": "032C678B755EF6AB951B24512C455D2103B33D04814CE2D8619A81E1A28CC56A",
+    "record_sha256": "7BBA8D1D347C55D4723E293FCCD0E928F99AE38FA7122A6988FE8FBAF4D178F1",
+    "status": "M42-02-PS2-VALIDATION-RUNNER-DECOMPOSED"
+  },
+  "characterization": {
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+    "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0",
+    "path": "tools/lib/assurance/Evidence.ps1",
+    "sha256": "1464AD8A30778F2E768FBE363DF107F1D7E10E7671A7E583F3B4A25584B19D6A",
+    "lines": 2650,
+    "responsibilities": [
+      "fingerprints",
+      "producer trust",
+      "worker import",
+      "evidence decisions",
+      "attempt state",
+      "command execution",
+      "plans",
+      "gates"
+    ]
+  },
+  "decomposition": {
+    "responsibility": "assurance-evidence",
+    "facade": {
+      "path": "tools/lib/assurance/Evidence.ps1",
+      "previous_sha256": "1464AD8A30778F2E768FBE363DF107F1D7E10E7671A7E583F3B4A25584B19D6A",
+      "current_sha256": "3AC374898D2F9AB6EBBE7B99583375A79B5315BB866942595D479D52D170545B",
+      "hash_mode": "canonical-text-v1",
+      "previous_lines": 2650,
+      "current_lines": 9,
+      "maximum_lines": 20,
+      "function_count": 0
+    },
+    "module_root": "tools/lib/assurance/evidence",
+    "module_count": 9,
+    "module_maximum_lines": 600,
+    "modules": [
+      {
+        "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
+        "role": "input and test fingerprints",
+        "source_lines": {
+          "start": 1,
+          "end": 564
+        },
+        "sha256": "4797FE3AE848339B8B20754369D7B5060CEFE5AD4D3BB8F4E0A9EC28A67AB79C",
+        "hash_mode": "canonical-text-v1",
+        "lines": 564,
+        "function_count": 8,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/ProducerTrust.ps1",
+        "role": "repository identity, producers, trust, and capsule digest",
+        "source_lines": {
+          "start": 566,
+          "end": 768
+        },
+        "sha256": "33B0436A4AAA79BD8093E2E4199FC6A552541E59E42932D4D1FAB52347028043",
+        "hash_mode": "canonical-text-v1",
+        "lines": 203,
+        "function_count": 12,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/WorkerArtifactValidation.ps1",
+        "role": "capsule, pointer, path, and artifact-tree validation",
+        "source_lines": {
+          "start": 770,
+          "end": 1037
+        },
+        "sha256": "E13B8CC2FE0F9A8017DCCBA2892EB0CB821B82F4EDF8022313108C9132804B2F",
+        "hash_mode": "canonical-text-v1",
+        "lines": 268,
+        "function_count": 8,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
+        "role": "worker receipts, content-addressed objects, and deterministic import",
+        "source_lines": {
+          "start": 1039,
+          "end": 1518
+        },
+        "sha256": "F7DBFB0ADBAA7475565F5CF3B4D65D4E6950B5894C7A6A86AB6B1B3452FC8537",
+        "hash_mode": "canonical-text-v1",
+        "lines": 480,
+        "function_count": 3,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
+        "role": "reusable, checkpoint, running, and disposition decisions",
+        "source_lines": {
+          "start": 1520,
+          "end": 1700
+        },
+        "sha256": "AE7C83E9287F7336D8A4E2B42701C534757C48BF5173D7F3CBE0360E071C606F",
+        "hash_mode": "canonical-text-v1",
+        "lines": 181,
+        "function_count": 5,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/AttemptState.ps1",
+        "role": "running markers and append-only attempts",
+        "source_lines": {
+          "start": 1702,
+          "end": 1775
+        },
+        "sha256": "8165A25D94443F55243927DA3A8D990748373EE92A8BA45CB45A3F921B2C88DC",
+        "hash_mode": "canonical-text-v1",
+        "lines": 74,
+        "function_count": 3,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/CommandExecution.ps1",
+        "role": "command reconstruction and execution",
+        "source_lines": {
+          "start": 1777,
+          "end": 1884
+        },
+        "sha256": "E375096CBB0B669D67EE0BEFF51CA922C5F6257CD275C98D6DA2799C8FA37AE0",
+        "hash_mode": "canonical-text-v1",
+        "lines": 108,
+        "function_count": 4,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/Plans.ps1",
+        "role": "plan decisions, material, completion, reconstruction, and freshness",
+        "source_lines": {
+          "start": 1886,
+          "end": 2123
+        },
+        "sha256": "A64F9A75629512D923ABD0AE39DC4A81F126E79F21441BF46B430303458A4027",
+        "hash_mode": "canonical-text-v1",
+        "lines": 238,
+        "function_count": 9,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
+        "role": "waiting, artifacts, test and plan execution, aggregate gate, and build results",
+        "source_lines": {
+          "start": 2125,
+          "end": 2649
+        },
+        "sha256": "DFE45F47286CBF2657F6304FA8DBB67B01A282E8E82134C483D63553D2A4EDAD",
+        "hash_mode": "canonical-text-v1",
+        "lines": 525,
+        "function_count": 10,
+        "parse_errors": 0
+      }
+    ],
+    "segment_algorithm": "exact-canonical-function-source-slices-v1"
+  },
+  "public_contract": {
+    "projection_algorithm": "ordered-powershell-function-name-list-v1",
+    "previous_sha256": "8FEBE7D835F1061C10A29DF496036B8221B4756E6548603AF7A98A0FE90525EB",
+    "current_sha256": "8FEBE7D835F1061C10A29DF496036B8221B4756E6548603AF7A98A0FE90525EB",
+    "unchanged": true,
+    "function_count": 62
+  },
+  "semantic_contract": {
+    "source_segments_exact": true,
+    "function_names_and_order_unchanged": true,
+    "module_load_order_explicit": true,
+    "fingerprints_unchanged": true,
+    "producer_trust_unchanged": true,
+    "worker_ingestion_unchanged": true,
+    "reuse_and_attempt_state_unchanged": true,
+    "command_execution_unchanged": true,
+    "plans_and_gates_unchanged": true,
+    "result_schema": "mir-test-result-v1",
+    "worker_receipt_schema": "mir-assurance-worker-receipt-v3"
+  },
+  "tooling_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "74D8828EFB2B47D7760696A312F868CDA1BA20E92093437A1A7BB37979514793",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:5712aea61dd279a4c6d6ac9021eb8af1b9303d5e24255862e32ec6f8e0699c5c",
+    "command_count": 85,
+    "unknown": 0,
+    "duplicate_command_keys": 0
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "EAFF5A9CEB72E143F3054115E971E9FCB04D8EF1EF9B912B7DB8C2C8AD8F9DDC",
+      "current_sha256": "53642C50E0938C8A29E8AEA03899F8AE595C36B7A5051E41A07F01818E463B94",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "17B027743B5F8114D3E339DD5502ADD421FB50C4F4340D832EB3F0078039C390",
+      "current_sha256": "AD414A5B13A04F142F01186990E372BA9833EB1ED803D0B069DF75C90E219F62",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "20A679746AEF6D9B1995FAD720DC31E493F3163EF5D0067EBCE5819C235B5B09",
+      "current_sha256": "D943FF3641D8B2B15EE32BA1E129FC76AAD5CE55A671C135AA250A3186749C9A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "C76E65B8B612F21C6C7F08D265787F1AE31E09E97DF4D9F2ACD811A3CA5B4399",
+      "current_sha256": "5EC7EE3F092D7CE2C0862F7D4CFEF05B1813501E0B574A66E746C4A79BBE892F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "FC1FFDDAD38370043049BBC6BA838163A9B568CD1446148D6D8385F72B6B1EF8",
+      "current_sha256": "049DB748735DAE33BF8DE079799EE4C28EBC8B9E238E55F4C1F77328D3FBFC11",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "DE0C8EF7A7D7E99C3C416893740F69CF3580607432303820B826A95D33D0F915",
+      "current_sha256": "4BA7E7EBF1AEA60AD85527C9D6CC5D59B5FB639A36F1D1A5189A02A088401684",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "C4B5BCC28CEBF3695C7EB682CF9650FF269C2B5C77B80A6807BBC61FA1131FBC",
+      "current_sha256": "74D8828EFB2B47D7760696A312F868CDA1BA20E92093437A1A7BB37979514793",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_sha256": "84E7CF5D35BB7CE2DB2820606EE1213486D7032CDCFE963DC80FA1BE5A505E07",
+      "current_sha256": "E20857FAEAC7E1390BA7DF7998628EC2BEEDED31E73040D57B39CAA849C90756",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "BF9A86C8C72CF1F7F9A43CDE0B60E768835FF01218C96873071D2037C4392EB4",
+      "current_sha256": "DD3619E27F9704EF4C154A1DB0D66B31E2B216D12C45CF48CEDF26A4C7A5444E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "F81313D89D0FF8097652BDFC1EA0DBDC6CEA87FBF4A50501382739E84B49B4B9",
+      "current_sha256": "B264A571221CC1620A60AC30F91364D1B206A04365DC74A83487BBD95D29BBF9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "43B525DFE427559BCF7D0F34D819C4475A18348DB289B3063E9D883732620E8E",
+      "current_sha256": "5973EE8C557D9F39F15489AC32AD7DAF0BB5C98BE86912847336F702404FA361",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "2157159773AB3CD45391FE38FC4836492014952275B3CCBD0ACCF7BA58FBC4DC",
+      "current_sha256": "582850AC521D67F9BCAEDEBA1B3B98B77D19BE3E3305130626E19B8C53DBF198",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+      "previous_sha256": "D29666D2CA1291017EC06652707C5EC185D3AD974767DBE8B1F47C2B2AA92451",
+      "current_sha256": "91C7A2116891933E70B27646CCA4C9C0348E6C2DA105E22B90D6C78E9E808D80",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_sha256": "9D6D27B80DC9E6A8A40810868D8BC9195CCF4A2F919CA836790A1B4DA24707B5",
+      "current_sha256": "0C486B4C7AFDE15DB19D123A7A7EA18333462B7864DC82475FD2CC73D5576550",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRVerificationSchemas.ps1",
+      "previous_sha256": "B01D23C94046A084959DEB7307F9B20C0623F910A36CEBBFCDEB46D3BD53EA65",
+      "current_sha256": "836866D7DE05E9278710549B1270F818DD0ABD34EEB20B61E474AEB3F4A46191",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/PreFreezeRelease.ps1",
+      "previous_sha256": "96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9",
+      "current_sha256": "EF715051266F0984B7A57C1F61497E0FB614E2AB28F80EFE5A56D2350CB9C89E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "current_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "165C08D736F83D9B4E05CB7FDAC4CF1A3D8F0E5FC4C36C230B0B4339B6750498",
+      "current_sha256": "6A611A3703EEAD0AACCFF0701CE0FD347F8ACFEE7AE5E05530AA28CD4290C3D3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS4-PRE-FREEZE-RELEASE",
+  "record_sha256": "0DE2CCDB8F32F30B411C7057CCC64A61FE8AA14BF39C7525A9FAEF094FB3455A"
+}

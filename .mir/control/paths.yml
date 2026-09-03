@@ -123,6 +123,12 @@ paths:
   mir4.m42-02.validation-runner.receipt-schema: contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json
   mir4.m42-02.validation-runner.writer: tools/commands/mir4/Update-MIR4M4202ValidationRunnerDecompositionAuthority.ps1
   mir4.m42-02.validation-runner.test: tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1
+  mir4.m42-02.assurance-evidence.facade: tools/lib/assurance/Evidence.ps1
+  mir4.m42-02.assurance-evidence.modules: tools/lib/assurance/evidence
+  mir4.m42-02.assurance-evidence.receipt: releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json
+  mir4.m42-02.assurance-evidence.receipt-schema: contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json
+  mir4.m42-02.assurance-evidence.writer: tools/commands/mir4/Update-MIR4M4202AssuranceEvidenceDecompositionAuthority.ps1
+  mir4.m42-02.assurance-evidence.test: tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json
