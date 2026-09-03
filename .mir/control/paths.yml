@@ -141,6 +141,13 @@ paths:
   mir4.m42-02.bootstrap-materialization.receipt-schema: contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json
   mir4.m42-02.bootstrap-materialization.writer: tools/commands/mir4/Update-MIR4M4202BootstrapMaterializationDecompositionAuthority.ps1
   mir4.m42-02.bootstrap-materialization.test: tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1
+  mir4.m42-02.assurance-release.facade: tools/lib/assurance/Release.ps1
+  mir4.m42-02.assurance-release.modules: tools/lib/assurance/release
+  mir4.m42-02.assurance-release.self-test-support: tests/tooling/support/MIRAssuranceSelfTest.ps1
+  mir4.m42-02.assurance-release.receipt: releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json
+  mir4.m42-02.assurance-release.receipt-schema: contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json
+  mir4.m42-02.assurance-release.writer: tools/commands/mir4/Update-MIR4M4202AssuranceReleaseDecompositionAuthority.ps1
+  mir4.m42-02.assurance-release.test: tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

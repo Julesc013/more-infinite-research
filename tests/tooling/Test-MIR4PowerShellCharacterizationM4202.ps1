@@ -34,8 +34,10 @@ $hasValidationSuccessor=$false
 $hasAssuranceSuccessor=$false
 $hasPreFreezeReleaseSuccessor=$false
 $hasBootstrapMaterializationSuccessor=$false
+$hasAssuranceReleaseSuccessor=$false
 $preFreezeReleaseThresholdPaths=@()
 $bootstrapMaterializationThresholdPaths=@()
+$assuranceReleaseThresholdPaths=@()
 if($hasSuccessor){
   $successorRaw=Get-Content -Raw -LiteralPath $successorPath
   Assert-MIR4M4202PowerShell ($successorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json')) 'successor-schema'
@@ -161,6 +163,33 @@ if($hasSuccessor){
           }
           $expectedInventorySha=[string]$bootstrapMaterializationSuccessor.tooling_inventory.sha256
           $expectedInventoryDigest=[string]$bootstrapMaterializationSuccessor.tooling_inventory.digest
+
+          $assuranceReleaseSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+          $hasAssuranceReleaseSuccessor=Test-Path -LiteralPath $assuranceReleaseSuccessorPath -PathType Leaf
+          if($hasAssuranceReleaseSuccessor){
+            $assuranceReleaseSuccessorRaw=Get-Content -Raw -LiteralPath $assuranceReleaseSuccessorPath
+            Assert-MIR4M4202PowerShell ($assuranceReleaseSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'assurance-release-successor-schema'
+            $assuranceReleaseSuccessor=$assuranceReleaseSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+            Assert-MIR4M4202PowerShell (Test-MIR4BootstrapRecordHash -Record $assuranceReleaseSuccessor) 'assurance-release-successor-record-hash'
+            $assuranceReleaseThresholdPaths=@($assuranceReleaseSuccessor.decomposition.modules|Where-Object{[int]$_.lines-ge600}|ForEach-Object{[string]$_.path})
+            Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $bootstrapMaterializationSuccessorPath -Algorithm SHA256).Hash-ceq[string]$assuranceReleaseSuccessor.predecessor.receipt_sha256-and[string]$bootstrapMaterializationSuccessor.record_sha256-ceq[string]$assuranceReleaseSuccessor.predecessor.record_sha256) 'assurance-release-successor-predecessor'
+            Assert-MIR4M4202PowerShell ([string]$assuranceReleaseSuccessor.current_source.sha256-ceq[string]$expectedTrackedSha['tools/lib/assurance/Release.ps1']) 'assurance-release-successor-source-predecessor'
+            $expectedTrackedSha['tools/lib/assurance/Release.ps1']=[string]$assuranceReleaseSuccessor.decomposition.facade.current_sha256
+            $expectedTrackedFunctions['tools/lib/assurance/Release.ps1']=0
+            foreach($binding in @($assuranceReleaseSuccessor.evolved_bindings)){
+              $path=[string]$binding.path
+              if($expectedTrackedSha.ContainsKey($path)-and$path-cne'tools/lib/assurance/Release.ps1'){
+                Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedTrackedSha[$path]) "assurance-release-successor-tracked-predecessor-$path"
+                $expectedTrackedSha[$path]=[string]$binding.current_sha256
+              }
+              if($expectedAuthoritySha.ContainsKey($path)){
+                Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedAuthoritySha[$path]) "assurance-release-successor-authority-predecessor-$path"
+                $expectedAuthoritySha[$path]=[string]$binding.current_sha256
+              }
+            }
+            $expectedInventorySha=[string]$assuranceReleaseSuccessor.tooling_inventory.sha256
+            $expectedInventoryDigest=[string]$assuranceReleaseSuccessor.tooling_inventory.digest
+          }
         }
       }
     }
@@ -171,9 +200,10 @@ $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq$expectedInventorySha-and[string]$inventory.digest-ceq$expectedInventoryDigest-and[int]$inventory.summary.unknown-eq0) 'inventory'
 $threshold=@($inventory.implementation_files|Where-Object{[string]$_.classification-ceq'canonical-internal'-and[int]$_.lines-ge600}|Sort-Object path)
 $expectedThreshold=@(
-  @($receipt.tracked_files|Where-Object{-not($hasSuccessor-and[string]$_.path-ceq'tools/mir/cli/Invoke-MIRCommandRouter.ps1')-and-not($hasValidationSuccessor-and[string]$_.path-ceq'scripts/Invoke-MIRValidation.ps1')-and-not($hasAssuranceSuccessor-and[string]$_.path-ceq'tools/lib/assurance/Evidence.ps1')-and-not($hasPreFreezeReleaseSuccessor-and[string]$_.path-ceq'tools/lib/mir4/PreFreezeRelease.ps1')-and-not($hasBootstrapMaterializationSuccessor-and[string]$_.path-ceq'tools/lib/mir4/BootstrapMaterialization.ps1')}|ForEach-Object{[string]$_.path})
+  @($receipt.tracked_files|Where-Object{-not($hasSuccessor-and[string]$_.path-ceq'tools/mir/cli/Invoke-MIRCommandRouter.ps1')-and-not($hasValidationSuccessor-and[string]$_.path-ceq'scripts/Invoke-MIRValidation.ps1')-and-not($hasAssuranceSuccessor-and[string]$_.path-ceq'tools/lib/assurance/Evidence.ps1')-and-not($hasPreFreezeReleaseSuccessor-and[string]$_.path-ceq'tools/lib/mir4/PreFreezeRelease.ps1')-and-not($hasBootstrapMaterializationSuccessor-and[string]$_.path-ceq'tools/lib/mir4/BootstrapMaterialization.ps1')-and-not($hasAssuranceReleaseSuccessor-and[string]$_.path-ceq'tools/lib/assurance/Release.ps1')}|ForEach-Object{[string]$_.path})
   @($preFreezeReleaseThresholdPaths|Where-Object{-not($hasBootstrapMaterializationSuccessor-and[string]$_-ceq'tools/lib/mir4/BootstrapMaterialization.ps1')})
   @($bootstrapMaterializationThresholdPaths)
+  @($assuranceReleaseThresholdPaths)
 )|Sort-Object
 Assert-MIR4M4202PowerShell ($threshold.Count-eq$expectedThreshold.Count-and@($receipt.tracked_files).Count-eq20) 'threshold-count'
 Assert-MIR4M4202PowerShell ((@($threshold|ForEach-Object{[string]$_.path})-join'|')-ceq($expectedThreshold-join'|')) 'threshold-paths'

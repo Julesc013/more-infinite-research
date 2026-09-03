@@ -3497,6 +3497,48 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-assurance-release-decomposition-m42-02-ps6",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/assurance/Release.ps1",
+        "tools/lib/assurance/release/**",
+        "scripts/Invoke-MIRAssurance.ps1",
+        "tests/tooling/support/MIRAssuranceSelfTest.ps1",
+        "src/mod/package-source.json",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202AssuranceReleaseDecompositionAuthority.ps1",
+        "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+        "tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
+        "tests/tooling/Test-MIRVerificationSchemas.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ]
     }
   ]
 }

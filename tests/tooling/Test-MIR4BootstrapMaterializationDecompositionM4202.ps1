@@ -14,8 +14,13 @@ function Assert-MIR4BootstrapMaterializationDecompositionV1([bool]$Condition,[st
 }
 
 $packageBefore=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-$receipt=& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202BootstrapMaterializationDecompositionAuthority.ps1') -RepoRoot $repo -Check
 $receiptPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json'
+$successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+if(Test-Path -LiteralPath $successorPath -PathType Leaf){
+  $receipt=Get-Content -Raw -LiteralPath $receiptPath|ConvertFrom-Json -Depth 100 -DateKind String
+}else{
+  $receipt=& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202BootstrapMaterializationDecompositionAuthority.ps1') -RepoRoot $repo -Check
+}
 $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4BootstrapMaterializationDecompositionV1 ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-bootstrap-materialization-decomposition-v1.schema.json')) 'mir4-m42-02-bootstrap-materialization-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
@@ -49,10 +54,27 @@ foreach($requiredFunction in @('Get-MIR4Sha256Bytes','Write-MIR4BootstrapRecord'
   Assert-MIR4BootstrapMaterializationDecompositionV1 ($null-ne(Get-Command $requiredFunction -CommandType Function -ErrorAction SilentlyContinue)) 'mir4-m42-02-bootstrap-materialization-load' $requiredFunction
 }
 Assert-MIR4BootstrapMaterializationDecompositionV1 ([bool]$receipt.semantic_contract.source_segments_exact-and[bool]$receipt.semantic_contract.digests_and_records_unchanged-and[bool]$receipt.semantic_contract.safe_paths_and_cleanup_unchanged-and[bool]$receipt.semantic_contract.archive_construction_and_comparison_unchanged-and[bool]$receipt.semantic_contract.git_source_proof_unchanged-and[bool]$receipt.semantic_contract.capsule_contract_unchanged-and[bool]$receipt.semantic_contract.capsule_artifacts_unchanged-and[bool]$receipt.semantic_contract.pre_freeze_authority_chain_extended_for_ps5) 'mir4-m42-02-bootstrap-materialization-semantic-contract'
+$expectedInventoryDigest=[string]$receipt.tooling_inventory.digest
+$expectedBindingSha=@{};foreach($binding in @($receipt.evolved_bindings)){$expectedBindingSha[[string]$binding.path]=[string]$binding.current_sha256}
+if(Test-Path -LiteralPath $successorPath -PathType Leaf){
+  $successorRaw=Get-Content -Raw -LiteralPath $successorPath
+  Assert-MIR4BootstrapMaterializationDecompositionV1 ($successorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'mir4-m42-02-bootstrap-materialization-successor-schema'
+  $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4BootstrapMaterializationDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $successor) 'mir4-m42-02-bootstrap-materialization-successor-record'
+  Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash-ceq[string]$successor.predecessor.receipt_sha256-and[string]$receipt.record_sha256-ceq[string]$successor.predecessor.record_sha256) 'mir4-m42-02-bootstrap-materialization-successor-predecessor'
+  foreach($binding in @($successor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4BootstrapMaterializationDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-bootstrap-materialization-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$successor.tooling_inventory.digest
+}
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4BootstrapMaterializationDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq[string]$receipt.tooling_inventory.digest) 'mir4-m42-02-bootstrap-materialization-inventory'
+Assert-MIR4BootstrapMaterializationDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-bootstrap-materialization-inventory'
 foreach($binding in @($receipt.evolved_bindings)){
-  Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$binding.current_sha256-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-bootstrap-materialization-evolved-binding' ([string]$binding.path)
+  Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$expectedBindingSha[[string]$binding.path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-bootstrap-materialization-evolved-binding' ([string]$binding.path)
 }
 Assert-MIR4BootstrapMaterializationDecompositionV1 ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-bootstrap-materialization-package-firewall'
 Assert-MIR4BootstrapMaterializationDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-bootstrap-materialization-release-firewall'

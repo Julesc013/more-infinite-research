@@ -48,6 +48,26 @@ if(Test-Path -LiteralPath $bootstrapSuccessorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$bootstrapSuccessor.tooling_inventory.digest
+  $assuranceReleaseSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+  if(Test-Path -LiteralPath $assuranceReleaseSuccessorPath -PathType Leaf){
+    $assuranceReleaseSuccessorRaw=Get-Content -Raw -LiteralPath $assuranceReleaseSuccessorPath
+    Assert-MIR4PreFreezeReleaseDecompositionV1 ($assuranceReleaseSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'mir4-m42-02-pre-freeze-release-assurance-release-successor-schema'
+    $assuranceReleaseSuccessor=$assuranceReleaseSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4PreFreezeReleaseDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $assuranceReleaseSuccessor) 'mir4-m42-02-pre-freeze-release-assurance-release-successor-record'
+    Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-FileHash -LiteralPath $bootstrapSuccessorPath -Algorithm SHA256).Hash-ceq[string]$assuranceReleaseSuccessor.predecessor.receipt_sha256-and[string]$bootstrapSuccessor.record_sha256-ceq[string]$assuranceReleaseSuccessor.predecessor.record_sha256) 'mir4-m42-02-pre-freeze-release-assurance-release-successor-predecessor'
+    foreach($binding in @($assuranceReleaseSuccessor.evolved_bindings)){
+      $path=[string]$binding.path
+      if($expectedBindingSha.ContainsKey($path)){
+        Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-pre-freeze-release-assurance-release-successor-binding' $path
+        $expectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+      if($expectedModuleSha.ContainsKey($path)){
+        Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-pre-freeze-release-assurance-release-successor-module' $path
+        $expectedModuleSha[$path]=[string]$binding.current_sha256
+      }
+    }
+    $expectedInventoryDigest=[string]$assuranceReleaseSuccessor.tooling_inventory.digest
+  }
 }
 
 $facadePath=Join-Path $repo ([string]$receipt.decomposition.facade.path)

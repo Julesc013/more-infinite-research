@@ -1,0 +1,358 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202AssuranceReleaseDecompositionV1",
+  "status": "M42-02-PS6-ASSURANCE-RELEASE-DECOMPOSED",
+  "starting_dev": {
+    "commit": "221783fa112a76eefd74ccdf1c980f5e0ff18f5c",
+    "tree": "9fa0a053717a857350eac5e4b9de593ca054308e"
+  },
+  "predecessor": {
+    "work_package": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION",
+    "receipt": "releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json",
+    "receipt_sha256": "4861CF0686F262999E918BDDA2212A4E870AEF8706F24016C2EFA0E4856B7EA3",
+    "record_sha256": "8D46EDCB8F0C37763FB2326673EFE2FEAC2F7D566068414ABF1C2B0191EA4B50",
+    "status": "M42-02-PS5-BOOTSTRAP-MATERIALIZATION-DECOMPOSED"
+  },
+  "characterization": {
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+    "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0",
+    "path": "tools/lib/assurance/Release.ps1",
+    "sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+    "lines": 1811,
+    "responsibilities": [
+      "release planning",
+      "candidate authority",
+      "seal authority",
+      "seal verification",
+      "self-test"
+    ]
+  },
+  "current_source": {
+    "commit": "221783fa112a76eefd74ccdf1c980f5e0ff18f5c",
+    "tree": "9fa0a053717a857350eac5e4b9de593ca054308e",
+    "path": "tools/lib/assurance/Release.ps1",
+    "sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+    "lines": 1810,
+    "function_count": 11,
+    "evolution_chain": []
+  },
+  "decomposition": {
+    "responsibility": "assurance-release",
+    "facade": {
+      "path": "tools/lib/assurance/Release.ps1",
+      "previous_sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+      "current_sha256": "D660C5B3EFC322B462F3E27C5B8C8CCEE56DD12F5BB12DBA18CC6DBC8C0F5FA2",
+      "hash_mode": "canonical-text-v1",
+      "previous_lines": 1810,
+      "current_lines": 8,
+      "maximum_lines": 20,
+      "function_count": 0
+    },
+    "module_root": "tools/lib/assurance/release",
+    "module_count": 4,
+    "module_maximum_lines": 400,
+    "modules": [
+      {
+        "path": "tools/lib/assurance/release/CandidatePlanning.ps1",
+        "role": "candidate archive identity, local playtest planning, release planning, and candidate authority",
+        "source_lines": {
+          "start": 5,
+          "end": 344
+        },
+        "sha256": "18FCB792066AE5188848660BDCC52B7BF9CB90BD18453602389C043BBB3B52B1",
+        "hash_mode": "canonical-text-v1",
+        "lines": 340,
+        "function_count": 6,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/release/SealAuthority.ps1",
+        "role": "seal source authority and performance evidence identity",
+        "source_lines": {
+          "start": 346,
+          "end": 423
+        },
+        "sha256": "CAF22A15ACB131C77C1F0B0DADA05D5FD40AEF2D60007E5B0D3A2D4C904256B1",
+        "hash_mode": "canonical-text-v1",
+        "lines": 78,
+        "function_count": 2,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/release/SealCreation.ps1",
+        "role": "release seal construction and evidence closure",
+        "source_lines": {
+          "start": 425,
+          "end": 580
+        },
+        "sha256": "BB103282EC9C424173F1DB4B422170E50B8F3915B05E1F8AAADE276B62DCF534",
+        "hash_mode": "canonical-text-v1",
+        "lines": 156,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/assurance/release/SealVerification.ps1",
+        "role": "release seal verification and exact authority rejection",
+        "source_lines": {
+          "start": 582,
+          "end": 799
+        },
+        "sha256": "56C907358F00809F88C0582439E24B1845730048FA322D634210B1F2BE4B57E8",
+        "hash_mode": "canonical-text-v1",
+        "lines": 218,
+        "function_count": 1,
+        "parse_errors": 0
+      }
+    ],
+    "self_test": {
+      "path": "tests/tooling/support/MIRAssuranceSelfTest.ps1",
+      "authority": "canonical-executable-test-support",
+      "source_lines": {
+        "start": 801,
+        "end": 1810
+      },
+      "sha256": "C81041F923D408933901C08A65B5BC7C714EAE1C469C58E5BE06300B95021876",
+      "hash_mode": "canonical-text-v1",
+      "lines": 1010,
+      "function_count": 1,
+      "source_segment_exact": true
+    },
+    "segment_algorithm": "exact-current-function-source-slices-v1"
+  },
+  "public_contract": {
+    "projection_algorithm": "ordered-powershell-function-name-list-v1",
+    "previous_sha256": "CCD4EFDB5F4D773A3CDFF5D6D5D6E709D0A939E3E4B71E74BA715A74A085878F",
+    "current_sha256": "CCD4EFDB5F4D773A3CDFF5D6D5D6E709D0A939E3E4B71E74BA715A74A085878F",
+    "unchanged": true,
+    "function_count": 11,
+    "production_function_count": 10,
+    "self_test_function_count": 1,
+    "self_test_command_unchanged": true
+  },
+  "semantic_contract": {
+    "source_segments_exact": true,
+    "function_names_and_order_unchanged": true,
+    "module_load_order_explicit": true,
+    "candidate_planning_unchanged": true,
+    "candidate_authority_unchanged": true,
+    "seal_creation_unchanged": true,
+    "seal_verification_unchanged": true,
+    "embedded_self_test_removed_from_release_authority": true,
+    "self_test_loaded_only_for_self_test_command": true,
+    "pre_freeze_authority_chain_extended_for_ps6": true
+  },
+  "tooling_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "2FAF910B6A14771560E681A13563BE9CA232F19CB3217D259CDAE9B0355FDB55",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:7872750c667c14d58f24a83bfc45421c389b1c744e284b6e26f44051ff29145c",
+    "command_count": 85,
+    "unknown": 0,
+    "duplicate_command_keys": 0
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "06CD8DB0CF1A4B0DAD6771A492C20CB7758D08B95DD469315D7A0EFBA5EBD4A8",
+      "current_sha256": "FFA6C939C2CF591512E54CFB41CA6A38838DDF2B1A4DEFDDC6E9FE5D2D33CAC1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "C37CAFCA1B0EE810DD6F80C89B5328F231860550B3364439BD920E9E0037E7DF",
+      "current_sha256": "427E544638FE65F65F2FDB3B167F0626A841572BA9CB5AE3D27EFDC77EE6C8CD",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "AA3C07F76DF4F9233681015A5E21A23545A10BE1D2B61A65B141AD33BF99CBD9",
+      "current_sha256": "B41DB3EDD41D3B5F2174E3BF60BBF802AB16E92F30EDE2F3B670D74F81A4FBF1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "D33B44DE2E0AC2EB0EDE76A58EEA6E62896FAACE703F9A92BFB55A1A4900AC5E",
+      "current_sha256": "ADB4D4567E5F2193BBEFA6D84A2E6106D77C47BB6A5E11B190DCA0D98B87A834",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "2AFFC2B0C2DC692F5D82807710251F8B7ED884F8E0E8C1570695B4A05418694F",
+      "current_sha256": "D91884182E68AAD4C96209B746DFF8433563B59CA9C703A28E0A253C7A00BC3B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "A89ED460B12207BF914D3FC8A919481F18689385794641CB89E6CE8DD821493B",
+      "current_sha256": "AC8ED63B44A1BFEA3309ACC67184CBD73E77BDFB5F4A3200EAA087AF992B47DB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "B8E1C5B9F4679EA3A8F3A92386AE3D7FB57D26BDA8AC85E6F596D451455C3E1D",
+      "current_sha256": "2FAF910B6A14771560E681A13563BE9CA232F19CB3217D259CDAE9B0355FDB55",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "scripts/Invoke-MIRAssurance.ps1",
+      "previous_sha256": "FAB4B763803218D33E584958BA92403FB3631B6BB3B1A893BEC5DC3F59D52600",
+      "current_sha256": "23C24E6BAE71478B618A3ECA60C270621DCC7E9A9161787F786C08F951C682D4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_sha256": "653167B38F60EAEA55E8948A711F1A2A36C4BFEFC6E171588CA7B6A5B74E0FFF",
+      "current_sha256": "1256814BF49DF197E283FBAEE418E4B72056FFE20C53A8EA44B705CE3E1AFC95",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "B34F783FB5B543CE9B01243EFF79AA8738FD38681848383F24DC6D2FCBB8EBD4",
+      "current_sha256": "1F6C581BDED30F3C78FCE5F72FF9FF512C0C044662E83B9DB649D9745124C5CF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "FC304A4E9B921DE175415B00DEF1FF3609BA9E6917A1DFDC818E8450BB42DD37",
+      "current_sha256": "46BB7E373F0D4D553B459C34B83A524626AE7E6E913E38A2A1CC3DB75485CDA3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRAssurance.ps1",
+      "previous_sha256": "0C486B4C7AFDE15DB19D123A7A7EA18333462B7864DC82475FD2CC73D5576550",
+      "current_sha256": "5EED705810A8438872A83B1CC16D8A878040725FBF321EBC9B5BA41AAA7B8200",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIRVerificationSchemas.ps1",
+      "previous_sha256": "836866D7DE05E9278710549B1270F818DD0ABD34EEB20B61E474AEB3F4A46191",
+      "current_sha256": "A3B9C57E29ACE6EC402059F31CAF0C255147FC9DD3B95D7861FA0E38DE5E50BB",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "B938EE1D1C432273A7BA450AF63931B4FCBDBCB37775FA0289CD8D117F794C1C",
+      "current_sha256": "4A985AB9AA38C43612310D149D36C93BC1E0079580AD5559662B4148A7AFF12D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "E80BE3C11B6881FFC4BBE997A85687CBF74877AAC62D015909EA6F6467FC40C0",
+      "current_sha256": "84BAA21F2DC5C1C9E054BD8A83C0621F9487204A726AAA175CAA049F939C8FF1",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+      "previous_sha256": "5896B7EB38114FBDB0017ECD2DF0A58AA3741B6208BC70DEEA4BFC4DCF038625",
+      "current_sha256": "AB360BF6F9371A0E9542E0FDCD7878AFEF406E9F7986DA0DD782FF6B768E87A5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "previous_sha256": "2F7138D48A4B630757D5B8767DB2B119AD0EA1B43A4FDAAE33F304C9BDFE5C82",
+      "current_sha256": "7E332E69C58185DDB4BA0E482452616E6F32BF57373E99D17D84B1FFB0FD6335",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "previous_sha256": "C27796E298DA33AE1EC5032D10551FF0E876A3BCD7C5D35D3AD4AAE01112CDE7",
+      "current_sha256": "618844C65187D827D9FA5AC8A89927619D9BC73750AF3E9B30220070EFF0C017",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1",
+      "previous_sha256": "DE64AAA6E87D27C00B0AE01A71B2297805E10753F6101DE5AF8499A3A22807F7",
+      "current_sha256": "C601A98894C258624FA96D135B2570AE6931F91AA40B588E0EB6E8156DE8D2FF",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/assurance/Release.ps1",
+      "previous_sha256": "B9B0F07F385A59C000E3F5D627481A28DA6BE9522F34B08BAADCF1B1B48E9AB9",
+      "current_sha256": "D660C5B3EFC322B462F3E27C5B8C8CCEE56DD12F5BB12DBA18CC6DBC8C0F5FA2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+      "previous_sha256": "9EF3E5A2632CA85150BD53BE831837EBD7F84FE69B5CCCB8D0F15E95B57DF969",
+      "current_sha256": "C3F5A139EB4E5247D7ADF4D9A5A07155A0718EA5F9D687CB10B959789C9FD4F3",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+      "previous_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "current_sha256": "4E7EF5247D81FA5AC477FFF950B85D522FCFF18E0929B309E7E5E5F68ACE3B9A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "655335E66A3E7DD879A3F06682B3492E345E9DDD61C23CD40FD4DBDF547F30D0",
+      "current_sha256": "DEBEC2826D9B9E99577743F69CCB19195D2CB593696637EDB562D79225D86DE4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS7-COMPATIBILITY-AUDIT",
+  "record_sha256": "815D9D79CA81F81EAC53391731B67E9B58431E789150A832007D6ED4965A0D1F"
+}

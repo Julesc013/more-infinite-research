@@ -84,6 +84,22 @@ if(Test-Path -LiteralPath $preFreezeSuccessorPath -PathType Leaf){
       }
     }
     $expectedInventoryDigest=[string]$bootstrapMaterializationSuccessor.tooling_inventory.digest
+    $assuranceReleaseSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json'
+    if(Test-Path -LiteralPath $assuranceReleaseSuccessorPath -PathType Leaf){
+      $assuranceReleaseSuccessorRaw=Get-Content -Raw -LiteralPath $assuranceReleaseSuccessorPath
+      Assert-MIR4AssuranceEvidenceDecompositionV1 ($assuranceReleaseSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-evidence-assurance-release-successor-schema'
+      $assuranceReleaseSuccessor=$assuranceReleaseSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $assuranceReleaseSuccessor) 'mir4-m42-02-assurance-evidence-assurance-release-successor-record'
+      Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-FileHash -LiteralPath $bootstrapMaterializationSuccessorPath -Algorithm SHA256).Hash-ceq[string]$assuranceReleaseSuccessor.predecessor.receipt_sha256-and[string]$bootstrapMaterializationSuccessor.record_sha256-ceq[string]$assuranceReleaseSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-evidence-assurance-release-successor-predecessor'
+      foreach($binding in @($assuranceReleaseSuccessor.evolved_bindings)){
+        $path=[string]$binding.path
+        if($expectedBindingSha.ContainsKey($path)){
+          Assert-MIR4AssuranceEvidenceDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-assurance-evidence-assurance-release-successor-binding' $path
+          $expectedBindingSha[$path]=[string]$binding.current_sha256
+        }
+      }
+      $expectedInventoryDigest=[string]$assuranceReleaseSuccessor.tooling_inventory.digest
+    }
   }
 }
 Assert-MIR4AssuranceEvidenceDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-evidence-inventory'

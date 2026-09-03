@@ -1628,6 +1628,8 @@ validation_tooling:
     assurance_evidence_modules: tools/lib/assurance/evidence
     assurance_hashing: tools/lib/assurance/Hashing.ps1
     assurance_release: tools/lib/assurance/Release.ps1
+    assurance_release_modules: tools/lib/assurance/release
+    assurance_release_self_test_support: tests/tooling/support/MIRAssuranceSelfTest.ps1
     assurance_tests: tests/tooling/Test-MIRAssurance.ps1
     release_authority: tests/release/Test-MIRReleaseAuthority.ps1
     native_owner_balance_tests: tests/compiler/Test-MIRNativeOwnerCostModels.ps1

@@ -931,3 +931,11 @@ The split binds both the original 2,093-line characterization and the exact 2,28
 `tools/lib/mir4/BootstrapMaterialization.ps1` remains the stable bootstrap facade and loads the bounded modules under `tools/lib/mir4/bootstrap-materialization/` in one explicit order. Cryptographic digests and canonical records, contained paths and cleanup, deterministic archive construction and comparison, Git source proof, capsule closure contracts, and capsule artifact construction have separate package-excluded owners.
 
 The split binds the exact 1,872-line PS4-merge source and preserves all 51 function names, their order, and their exact source segments. It changes no digest, record, path-containment, cleanup, archive, comparison, Git, toolchain-lock, source-proof, capsule, or reconstruction behavior and grants no package, candidate, release, signing, sealing, publication, gameplay, save, setting, migration, or compatibility authority.
+
+## MIR 4 assurance release boundary
+
+`tools/lib/assurance/Release.ps1` remains the stable production facade and loads four bounded modules under `tools/lib/assurance/release/` in one explicit order. Candidate identity and planning, seal-source authority, seal creation, and seal verification have separate package-excluded production owners.
+
+The former embedded `Invoke-MIRAssuranceSelfTest` implementation lives unchanged under `tests/tooling/support/` and is loaded only when the existing `assurance self-test` command is selected. Production release and seal commands neither load nor own executable self-test behavior. Across the production modules and canonical test support, all 11 characterized function names, their order, and their exact source segments are preserved.
+
+This PS6 split changes no candidate decision, seal construction, seal verification, evidence, package, gameplay, save, setting, migration, or compatibility behavior and grants no version-allocation, tagging, signing, sealing, promotion, or publication authority.
