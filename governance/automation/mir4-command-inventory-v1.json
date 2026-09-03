@@ -2336,8 +2336,8 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "FDA0FDF735D124839E18F1FAEF3A0E78FD28B8302C2F8E2AC6314FF6E9EDC012",
-      "lines": 122,
+      "sha256": "4578594DBB5F56373BADDE13B7811FA3B8E5EC121EF52E391FF5106B08563896",
+      "lines": 123,
       "package_visible": false
     },
     {
@@ -3043,8 +3043,8 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "2BE6A93D0CC3A3157821252C752B0C85A90D4E5371F9466C0867E5A6CED4E926",
-      "lines": 2146,
+      "sha256": "BC4CDCFF5C379AD651DAE0931960F7BA2CF461F811AEEC28ED32E381B297A992",
+      "lines": 2150,
       "package_visible": false
     },
     {
@@ -4164,5 +4164,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8ca75b66845c8a1fa35613554850710ce133e287ebc531b4a4482c9dc6256c9c"
+  "digest": "sha256:0d17b156aa2a8e706906608950610a58ffddeecfd3cae5406cd1a3a3abc941ec"
 }

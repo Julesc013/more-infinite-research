@@ -2511,6 +2511,7 @@
         "tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
         "tests/tooling/Test-MIRAssurance.ps1",
@@ -4499,5 +4500,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3306d034d48080110a2ccd9dbe379e3b0e290bd6577ad8b0bfa0f5736ae02632"
+  "digest": "sha256:6c193d82fe7243ae4bf3086ff4c2ed50789178d5b403f82fbacb2ab2465370e0"
 }

@@ -3324,6 +3324,7 @@
         "tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
         "tests/tooling/Test-MIRAssurance.ps1",

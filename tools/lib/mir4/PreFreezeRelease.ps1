@@ -1281,6 +1281,9 @@ function Test-MIR4PreFreezeAuthorities {
   }
   $commandRouterReceiptPath = 'releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json'
   if (Test-Path -LiteralPath (Join-Path $repo $commandRouterReceiptPath) -PathType Leaf) {
+    if (-not (Get-Command Get-MIR4CanonicalPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+      . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+    }
     $commandRouter = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $commandRouterReceiptPath -Kind 'MIR4M4202PowerShellCommandRouterDecompositionV1'
     if ([string]$commandRouter.predecessor.receipt -cne $priorReceiptPath -or
         [string]$commandRouter.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
@@ -1289,6 +1292,7 @@ function Test-MIR4PreFreezeAuthorities {
     }
     $commandRouterEnrollmentBaselines = @{
       'docs/architecture/module-boundaries.md'='24D5CB06F955FC6189D5CA02B4B0769547F16069D20692B4D7F909AB07824F6F'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='5BE01F0320FDC1074CD7524B951CE5D56C624AF4BAE07C77362B9444483CD2AD'
       'tests/tooling/Test-MIRAssurance.ps1'='7E6C860FB364052EF0ED8852D8DF2AAB9131DFBEB6A23CB45E43BB3A86403603'
       'tests/tooling/Test-MIR4CliReleaseConvergence.ps1'='FECB62355A5E37EA3CA33F9D52F3B36F99BD01011FA7E7C0E341156479BB101A'
       'tools/mir/application/repository/RepositoryFixedPoint.ps1'='E33A3D0761FE92D03CC32000A033FF5C3C70FE7802982E796FBB2933B84F42C9'
@@ -1316,7 +1320,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $commandRouterEvolvedPaths[$path] = $true
     }
-    if ($commandRouterEvolvedPaths.Count -ne 14 -or
+    if ($commandRouterEvolvedPaths.Count -ne 15 -or
         [string]$commandRouter.status -cne 'M42-02-PS1-COMMAND-ROUTER-DECOMPOSED' -or
         [string]$commandRouter.decomposition.responsibility -cne 'command-router' -or
         [string]$commandRouter.next_fixed_point -cne 'M42-02-PS2-VALIDATION-RUNNER' -or
