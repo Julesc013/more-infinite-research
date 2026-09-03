@@ -12,8 +12,11 @@ function Assert-MIR4CommandRouterDecompositionV1([bool]$Condition,[string]$Code,
 }
 
 $packageBefore=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-$receipt=& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1') -RepoRoot $repo -Check
 $receiptPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json'
+$validationSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json'
+if(-not(Test-Path -LiteralPath $validationSuccessorPath -PathType Leaf)){
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4CommandRouterDecompositionV1 ($raw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-powershell-command-router-decomposition-v1.schema.json')) 'mir4-m42-02-command-router-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
@@ -55,8 +58,25 @@ $unknownProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') nonsens
 Assert-MIR4CommandRouterDecompositionV1 ($LASTEXITCODE-ne0-and$unknownProbe-match'Unknown command area: nonsense') 'mir4-m42-02-command-router-negative-probe' $unknownProbe
 $global:LASTEXITCODE=0
 
+$expectedBindingSha=@{}
+foreach($binding in @($receipt.evolved_bindings)){$expectedBindingSha[[string]$binding.path]=[string]$binding.current_sha256}
+if(Test-Path -LiteralPath $validationSuccessorPath -PathType Leaf){
+  $validationSuccessorRaw=Get-Content -Raw -LiteralPath $validationSuccessorPath
+  Assert-MIR4CommandRouterDecompositionV1 ($validationSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json')) 'mir4-m42-02-command-router-successor-schema'
+  $validationSuccessor=$validationSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4CommandRouterDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $validationSuccessor) 'mir4-m42-02-command-router-successor-record'
+  Assert-MIR4CommandRouterDecompositionV1 ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash-ceq[string]$validationSuccessor.predecessor.receipt_sha256-and[string]$receipt.record_sha256-ceq[string]$validationSuccessor.predecessor.record_sha256) 'mir4-m42-02-command-router-successor-predecessor'
+  foreach($binding in @($validationSuccessor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4CommandRouterDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-command-router-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+}
 foreach($binding in @($receipt.evolved_bindings)){
-  Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$binding.current_sha256-and[string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' ([string]$binding.path)
+  $path=[string]$binding.path
+  Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and[string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' $path
 }
 Assert-MIR4CommandRouterDecompositionV1 ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-command-router-package-firewall'
 Assert-MIR4CommandRouterDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-command-router-release-firewall'

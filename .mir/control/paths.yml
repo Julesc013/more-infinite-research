@@ -116,6 +116,13 @@ paths:
   mir4.m42-02.powershell-command-router.writer: tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1
   mir4.m42-02.powershell-command-router.test: tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1
   mir4.m42-02.powershell-command-router.modules: tools/mir/cli/router
+  mir4.m42-02.validation-runner.facade: scripts/Invoke-MIRValidation.ps1
+  mir4.m42-02.validation-runner.application: tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1
+  mir4.m42-02.validation-runner.modules: tools/lib/validation/runner
+  mir4.m42-02.validation-runner.receipt: releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json
+  mir4.m42-02.validation-runner.receipt-schema: contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json
+  mir4.m42-02.validation-runner.writer: tools/commands/mir4/Update-MIR4M4202ValidationRunnerDecompositionAuthority.ps1
+  mir4.m42-02.validation-runner.test: tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

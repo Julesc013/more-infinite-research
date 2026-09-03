@@ -169,6 +169,18 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
                 Assert-MIR4RepositoryMigrationV1 ([bool]$m4202CommandRouter.public_contract.unchanged-and[int]$m4202CommandRouter.public_contract.command_count-eq85-and@($m4202CommandRouter.decomposition.modules).Count-eq12) 'mir4-repository-migration-m42-02-command-router-contract'
                 Assert-MIR4RepositoryMigrationV1 ([string]$m4202CommandRouter.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202CommandRouter.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-command-router-package-firewall'
                 Assert-MIR4RepositoryMigrationV1 (@($m4202CommandRouter.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-command-router-release-firewall'
+                $m4202ValidationRunnerPath='releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json'
+                if(Test-Path -LiteralPath (Join-Path $repo $m4202ValidationRunnerPath) -PathType Leaf){
+                  $m4202ValidationRunnerRaw=Get-Content -Raw -LiteralPath (Join-Path $repo $m4202ValidationRunnerPath)
+                  Assert-MIR4RepositoryMigrationV1 ($m4202ValidationRunnerRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json')) 'mir4-repository-migration-m42-02-validation-runner-schema'
+                  $m4202ValidationRunner=$m4202ValidationRunnerRaw|ConvertFrom-Json -Depth 100 -DateKind String
+                  Assert-MIR4RepositoryMigrationV1 (Test-MIR4BootstrapRecordHash -Record $m4202ValidationRunner) 'mir4-repository-migration-m42-02-validation-runner-record'
+                  Assert-MIR4RepositoryMigrationV1 ((Get-MIR4RepositoryFileSha256V1 -Path (Join-Path $repo $m4202CommandRouterPath))-ceq[string]$m4202ValidationRunner.predecessor.receipt_sha256-and[string]$m4202ValidationRunner.predecessor.record_sha256-ceq[string]$m4202CommandRouter.record_sha256) 'mir4-repository-migration-m42-02-validation-runner-predecessor'
+                  Assert-MIR4RepositoryMigrationV1 ([string]$m4202ValidationRunner.status-ceq'M42-02-PS2-VALIDATION-RUNNER-DECOMPOSED'-and[string]$m4202ValidationRunner.decomposition.responsibility-ceq'validation-runner'-and[string]$m4202ValidationRunner.next_fixed_point-ceq'M42-02-PS3-ASSURANCE-EVIDENCE') 'mir4-repository-migration-m42-02-validation-runner-scope'
+                  Assert-MIR4RepositoryMigrationV1 ([bool]$m4202ValidationRunner.public_contract.unchanged-and@($m4202ValidationRunner.decomposition.modules).Count-eq21-and[bool]$m4202ValidationRunner.semantic_contract.source_segments_exact) 'mir4-repository-migration-m42-02-validation-runner-contract'
+                  Assert-MIR4RepositoryMigrationV1 ([string]$m4202ValidationRunner.preservation.package_source_sha256-ceq$currentPackageSourceSha256-and@($m4202ValidationRunner.preservation.package_visible_delta).Count-eq0) 'mir4-repository-migration-m42-02-validation-runner-package-firewall'
+                  Assert-MIR4RepositoryMigrationV1 (@($m4202ValidationRunner.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-m42-02-validation-runner-release-firewall'
+                }
               }
             }
           }else{

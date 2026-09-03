@@ -415,7 +415,9 @@ foreach ($validationModule in @(
 }
 
 $validationFacadeText = Read-MIRFile -RelativePath "scripts/Invoke-MIRValidation.ps1"
-Assert-MIRContains -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationFacadeText -Needle 'tools\lib\validation\FactorioProcess.ps1'
+Assert-MIRContains -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationFacadeText -Needle '../tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1'
+$validationRunnerText = Read-MIRFile -RelativePath "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1"
+Assert-MIRContains -RelativePath "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1" -Text $validationRunnerText -Needle 'tools\lib\validation\FactorioProcess.ps1'
 if ($validationFacadeText -match '(?m)^function\s+(Invoke-FactorioProcess|Remove-CopiedModDirectory|Copy-ModDirectory|Copy-RepositoryModDirectory)\b') {
   throw "Factorio process and copied-mod filesystem operations must live in tools/lib/validation/FactorioProcess.ps1."
 }

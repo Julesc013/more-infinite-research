@@ -899,9 +899,9 @@
     {
       "path": "scripts/Invoke-MIRValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "29961C5D5EFA6B241C2F4A4DDF3AC485867ACC7C6D17E312F30704DD04A2BEBB",
+      "sha256": "04AE6C242F1C90794FF665FFA1BF67304D007F661F10FE71F66AA146C4B2EEE9",
       "hash_mode": "canonical-text-v1",
-      "lines": 5159,
+      "lines": 25,
       "package_visible": false
     },
     {
@@ -2593,6 +2593,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M4202ValidationRunnerDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "9A58EFE88C20329245C9ED3FFFBC3D2FA87D2DCF14E785A37CE9A7EFB2D03862",
+      "hash_mode": "canonical-text-v1",
+      "lines": 199,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1",
       "classification": "migration-only",
       "sha256": "0B7CCC8A7D4ED085B14F286EBBDE7D0BC1F25BA79EE4514D168DDD6A82E0F4D0",
@@ -3379,9 +3387,9 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "DE1535857373D38F4DA508C8559CA7378470CDF325FEF09A86A33CC6D11D9D7E",
+      "sha256": "342D7BFC831C23EBB7C7E0A409234F18B8E60CE591E10F5B6D44CEA8E1E34BEE",
       "hash_mode": "canonical-text-v1",
-      "lines": 2152,
+      "lines": 2216,
       "package_visible": false
     },
     {
@@ -3630,6 +3638,182 @@
       "sha256": "0509AD6CF96A5DD2FA74E02B96919B57D577139267B1E0C5C2F74C1B71612E3D",
       "hash_mode": "canonical-text-v1",
       "lines": 266,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/Bootstrap.ps1",
+      "classification": "canonical-internal",
+      "sha256": "24618B9207B56283550D0A0F374EEA651673F6B5F3C4AA21EB37B651E2085224",
+      "hash_mode": "canonical-text-v1",
+      "lines": 171,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/CheckpointCampaign.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B851F5008A937BE70BCF6F234175EEBAE5B7310339D2631D121DD6FF055F0361",
+      "hash_mode": "canonical-text-v1",
+      "lines": 89,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/DefaultCampaign00.ps1",
+      "classification": "canonical-internal",
+      "sha256": "94F1E29AEEBEC0EDA6CB07B1043D08DFF5608BCC162B9BE94CC57CA1721A0C32",
+      "hash_mode": "canonical-text-v1",
+      "lines": 90,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/DefaultCampaign01.ps1",
+      "classification": "canonical-internal",
+      "sha256": "7F91BE4AE4568CB6DB070D85E7C63942AADC8BD891A082C2099888A5996928D1",
+      "hash_mode": "canonical-text-v1",
+      "lines": 316,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/DefaultCampaign02.ps1",
+      "classification": "canonical-internal",
+      "sha256": "F21CDC57793DC799211202ECDB1F9237C1B167228E8CD4B91A7A47172CADE0CA",
+      "hash_mode": "canonical-text-v1",
+      "lines": 295,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/DefaultCampaign03.ps1",
+      "classification": "canonical-internal",
+      "sha256": "2547BDDFAF82A4A68523AB8B287F159B0827F68CD1C6FDAFD7806CD793B8289D",
+      "hash_mode": "canonical-text-v1",
+      "lines": 254,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/FinalCampaign.ps1",
+      "classification": "canonical-internal",
+      "sha256": "4BEC2E0160395E1BC973B3244E03BBB6CE3AE2C002CE571C1CB99833A3316B76",
+      "hash_mode": "canonical-text-v1",
+      "lines": 171,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1",
+      "classification": "canonical-internal",
+      "sha256": "7C42D4140B7F349E9D5C1CBD783B6184BD96747303BD6DF6595AA1305B20B601",
+      "hash_mode": "canonical-text-v1",
+      "lines": 325,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/PackageSmoke.ps1",
+      "classification": "canonical-internal",
+      "sha256": "32B548153E1581759EC7CEDEAC1214199132516F4AE60FF532E44E94F641A2B2",
+      "hash_mode": "canonical-text-v1",
+      "lines": 162,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/RuntimeAssertions.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8321A2D1159A5896202B96577533F656CCEE5BCD6657BCE5AFBAA9A5039A1F60",
+      "hash_mode": "canonical-text-v1",
+      "lines": 264,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/RuntimeExecution.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8CBD486ADDFAE573B4CB12FA7553B08B003AFD6E5AC18ACB0CEFB7431441DEE1",
+      "hash_mode": "canonical-text-v1",
+      "lines": 257,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/RuntimeScenarioSetup.ps1",
+      "classification": "canonical-internal",
+      "sha256": "D6E88E114D4E17EECA75447D485005609242431205966A16DB8A7F1A8CA0E9E7",
+      "hash_mode": "canonical-text-v1",
+      "lines": 218,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/RuntimeSelection.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8C6DEED1709D4394C43E60E49E55DA9BAEF0C26303DF14828585C7681B0D0476",
+      "hash_mode": "canonical-text-v1",
+      "lines": 131,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/RuntimeWorkspace.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A7BF0E11A50884A92885A5DCF1653FA8F9FB13A0061FC3C27D079F4538FF7575",
+      "hash_mode": "canonical-text-v1",
+      "lines": 134,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticCompatibilityTooling.ps1",
+      "classification": "canonical-internal",
+      "sha256": "F0F7F15DA01F124AF6C58F95EBD877D5509C0AED067C09E85AB3EB57D4CE0D28",
+      "hash_mode": "canonical-text-v1",
+      "lines": 241,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticCompilerDiagnostics.ps1",
+      "classification": "canonical-internal",
+      "sha256": "416348AF7D2F49AEB9D5325F41384AA2BB80B22D5C62AD9CFD773DAB7C5B28B1",
+      "hash_mode": "canonical-text-v1",
+      "lines": 363,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticCore.ps1",
+      "classification": "canonical-internal",
+      "sha256": "6B82D988104BA5CD4D23B9354725514505B8D2E9A05D6C7563A1CC8CB0FDAAB2",
+      "hash_mode": "canonical-text-v1",
+      "lines": 513,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticFixtureMods.ps1",
+      "classification": "canonical-internal",
+      "sha256": "88771FFA08AC87C0138F2C420BE5D3E1BE4FC12600456A1C03E7B499948F3029",
+      "hash_mode": "canonical-text-v1",
+      "lines": 115,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticPackage.ps1",
+      "classification": "canonical-internal",
+      "sha256": "F291A4120274D5789566F8EDC1CED57F6996A0284D8CC57E2912829707B53C76",
+      "hash_mode": "canonical-text-v1",
+      "lines": 218,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticPolicyAndDocs.ps1",
+      "classification": "canonical-internal",
+      "sha256": "28FBDA63DEBF44320EF8E5673C0321D441C645B59CAF9D9BC6A05B801751C8D9",
+      "hash_mode": "canonical-text-v1",
+      "lines": 187,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticPrototypeLimits.ps1",
+      "classification": "canonical-internal",
+      "sha256": "5847C4E764BC35902E0B98A86EA9A2E99403DAF002D9BBECB4C0B27EFF97AA37",
+      "hash_mode": "canonical-text-v1",
+      "lines": 121,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/runner/StaticSciencePackSettings.ps1",
+      "classification": "canonical-internal",
+      "sha256": "02596B85691413DBAE84933F6AA6A10806BDB76797551DF09A4D3D3403334467",
+      "hash_mode": "canonical-text-v1",
+      "lines": 555,
       "package_visible": false
     },
     {
@@ -4643,9 +4827,9 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 275,
+    "canonical_internal": 297,
     "compatibility_wrapper": 168,
-    "migration_only": 34,
+    "migration_only": 35,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4658,5 +4842,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2cf829b1a7260fa2c025ce3568b613ea51f6a702e807117ea456e710a2740194"
+  "digest": "sha256:0b17a8252d17c3350335e6541da2b0295e3f6f8d22ebd9b7227f8847494dce20"
 }

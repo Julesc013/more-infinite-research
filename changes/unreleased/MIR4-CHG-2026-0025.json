@@ -1,0 +1,32 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0025",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Decompose the canonical PowerShell validation runner into a stable facade and bounded internal execution modules without changing scenario or result semantics.",
+  "details": [
+    "The 5,159-line validation entry point is now a 40-line-bounded public facade that retains its exact 18-parameter contract and delegates to one application runner.",
+    "Twenty-one package-excluded modules own target bootstrap, early modes, static check families, runtime selection and setup, Factorio execution, report assertions, package smoke policy, and resumable scenario campaigns.",
+    "Every extracted module is PowerShell-AST clean and below 600 lines; exact canonical source-slice checks bind the moved behavior to the characterized predecessor.",
+    "List, documentation-only, manifest-only, architecture-only, static, scenario-worker, checkpoint, result-schema, scenario-name, and group contracts remain unchanged.",
+    "Factorio process ownership and schema-2 result aggregation remain in their existing reusable validation libraries; the split creates no parallel test framework.",
+    "No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change."
+  ],
+  "semantic_domains": ["tooling", "testing", "assurance", "maintainability"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The validation-runner decomposition is package-excluded and preserves the rolling-channel evidence rules."},
+    {"target":"F200","disposition":"unaffected","reason":"The validation-runner decomposition is package-excluded."},
+    {"target":"F110","disposition":"unaffected","reason":"The validation-runner decomposition is package-excluded."},
+    {"target":"F100","disposition":"unaffected","reason":"The validation-runner decomposition is package-excluded."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

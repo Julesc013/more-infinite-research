@@ -1536,6 +1536,8 @@ compiler_context:
 
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
+  runner: tools/lib/validation/runner/Invoke-MIRValidationRunner.ps1
+  runner_modules: tools/lib/validation/runner
   modules:
     repository_path_catalog: .mir/control/paths.yml
     repository_alias_catalog: .mir/control/aliases.yml
