@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 127,
+  "test_count": 128,
   "tests": [
     {
       "id": "docs.check",
@@ -587,6 +587,54 @@
         "tools/lib/assurance/Release.ps1",
         "validation/scenarios/local-2.0.json",
         "tests/mir4/Test-MIR4AffectedProofSOL08.ps1"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-assurance-evidence-decomposition-m42-02-ps3",
+      "proposition": "The governed test 'static.mir4-assurance-evidence-decomposition-m42-02-ps3' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/assurance/Evidence.ps1",
+        "tools/lib/assurance/evidence/**",
+        "scripts/Invoke-MIRAssurance.ps1",
+        "src/mod/package-source.json",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202AssuranceEvidenceDecompositionAuthority.ps1",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+        "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
+        "tests/tooling/Test-MIRVerificationSchemas.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
+        "assurance/catalog/tests.json",
+        "package-source"
       ],
       "matrix": null
     },
@@ -2474,6 +2522,8 @@
         "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
         "contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json",
         "releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
         "tools/commands/mir4/Update-MIR4M4202PowerShellCharacterizationAuthority.ps1",
         "tests/architecture/Test-MIRArchitecture.ps1",
         "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
@@ -2516,6 +2566,8 @@
         "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
         "contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json",
         "releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
         "tools/commands/mir4/Update-MIR4M4202PowerShellCommandRouterDecompositionAuthority.ps1",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
@@ -4286,6 +4338,8 @@
         "releases/migrations/MIR4-M42-02-PowerShell-Command-Router-DecompositionV1.json",
         "contracts/repository/mir4-m42-02-validation-runner-decomposition-v1.schema.json",
         "releases/migrations/MIR4-M42-02-Validation-Runner-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-assurance-evidence-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Assurance-Evidence-DecompositionV1.json",
         "tools/commands/mir4/Update-MIR4M4202ValidationRunnerDecompositionAuthority.ps1",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
@@ -4537,12 +4591,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 49,
-      "tooling-release": 35,
+      "tooling-release": 36,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 11
     },
-    "canonical_test_commands": 115,
+    "canonical_test_commands": 116,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -4555,5 +4609,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7b5174b2329a4ee3eb1fb21ac13f00a057e0f18d416a02a9acea7fd212997fe4"
+  "digest": "sha256:08a15efaee18af00fbd932f32cc699deb0d80ba97b0cc4f6a7883d71e62d58bd"
 }

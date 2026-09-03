@@ -24,6 +24,12 @@ if ([int]$config.schema -ne 1 -or [int]$impact.schema -ne 1 -or [int]$catalog.sc
   throw "Unsupported assurance manifest schema."
 }
 $releaseAssuranceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Release.ps1")
+$assuranceEvidenceSource = @(
+  Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+  Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\evidence") -File -Filter "*.ps1" |
+    Sort-Object Name |
+    ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
+) -join "`n"
 foreach ($requiredTrustSelfTestSnippet in @(
   '$differentTrustClass = if ([string]$Context.trust_class -eq "untrusted-pr")',
   '{ "protected-integration" } else { "untrusted-pr" }',
@@ -273,7 +279,6 @@ if ($performanceTest.Count -ne 1 -or
     @($performanceTest[0].inputs) -contains ".mir/evidence/*-performance-regression.json") {
   throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
 }
-$assuranceEvidenceSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 foreach ($requiredPerformanceIsolationSnippet in @(
   '"<test-output>"=[string]$TestOutput',
   '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
@@ -866,7 +871,7 @@ if ($protectedWorkflow.Contains("merge-multiple: true")) {
   throw "Protected qualification still merges worker artifact trees by extraction order."
 }
 
-$assuranceEvidence = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+$assuranceEvidence = $assuranceEvidenceSource
 foreach ($requiredIngestionGuard in @(
   'mir-assurance-worker-receipt-v3',
   'adopted-exact-trusted-capsule',

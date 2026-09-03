@@ -55,6 +55,12 @@
       "tags": []
     },
     {
+      "pattern": "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/mir/cli/router/**",
       "groups": [],
       "scenarios": [],
@@ -314,6 +320,12 @@
     },
     {
       "pattern": "tools/lib/assurance/Evidence.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "tools/lib/assurance/evidence/**",
       "groups": [],
       "scenarios": [],
       "tags": []

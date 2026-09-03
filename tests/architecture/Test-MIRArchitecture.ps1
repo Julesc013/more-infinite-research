@@ -422,6 +422,16 @@ if ($validationFacadeText -match '(?m)^function\s+(Invoke-FactorioProcess|Remove
   throw "Factorio process and copied-mod filesystem operations must live in tools/lib/validation/FactorioProcess.ps1."
 }
 
+$assuranceEvidenceFacadeText = Read-MIRFile -RelativePath "tools/lib/assurance/Evidence.ps1"
+foreach ($assuranceEvidenceModule in @(
+  "Fingerprints.ps1", "ProducerTrust.ps1", "WorkerArtifactValidation.ps1", "WorkerImport.ps1",
+  "EvidenceDecisions.ps1", "AttemptState.ps1", "CommandExecution.ps1", "Plans.ps1", "ExecutionAndGate.ps1"
+)) {
+  $relative = "tools/lib/assurance/evidence/$assuranceEvidenceModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/assurance/Evidence.ps1" -Text $assuranceEvidenceFacadeText -Needle "evidence/$assuranceEvidenceModule"
+}
+
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
 }

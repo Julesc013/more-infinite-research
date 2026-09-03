@@ -2529,6 +2529,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M4202AssuranceEvidenceDecompositionAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "3C9595895F1BA1E0715A21FAA9553B831A04F7B58CD56220B64F089A2D92999F",
+      "hash_mode": "canonical-text-v1",
+      "lines": 143,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4M4202BaseContinuationsDecompositionAuthority.ps1",
       "classification": "migration-only",
       "sha256": "7E7670735A3EF0E940A500B519B5A7E9C59365D908858CBC2124A08C7DA6E7F9",
@@ -2971,9 +2979,81 @@
     {
       "path": "tools/lib/assurance/Evidence.ps1",
       "classification": "canonical-internal",
-      "sha256": "1464AD8A30778F2E768FBE363DF107F1D7E10E7671A7E583F3B4A25584B19D6A",
+      "sha256": "3AC374898D2F9AB6EBBE7B99583375A79B5315BB866942595D479D52D170545B",
       "hash_mode": "canonical-text-v1",
-      "lines": 2650,
+      "lines": 10,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/AttemptState.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8165A25D94443F55243927DA3A8D990748373EE92A8BA45CB45A3F921B2C88DC",
+      "hash_mode": "canonical-text-v1",
+      "lines": 75,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/CommandExecution.ps1",
+      "classification": "canonical-internal",
+      "sha256": "E375096CBB0B669D67EE0BEFF51CA922C5F6257CD275C98D6DA2799C8FA37AE0",
+      "hash_mode": "canonical-text-v1",
+      "lines": 109,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
+      "classification": "canonical-internal",
+      "sha256": "AE7C83E9287F7336D8A4E2B42701C534757C48BF5173D7F3CBE0360E071C606F",
+      "hash_mode": "canonical-text-v1",
+      "lines": 182,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
+      "classification": "canonical-internal",
+      "sha256": "DFE45F47286CBF2657F6304FA8DBB67B01A282E8E82134C483D63553D2A4EDAD",
+      "hash_mode": "canonical-text-v1",
+      "lines": 526,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
+      "classification": "canonical-internal",
+      "sha256": "4797FE3AE848339B8B20754369D7B5060CEFE5AD4D3BB8F4E0A9EC28A67AB79C",
+      "hash_mode": "canonical-text-v1",
+      "lines": 565,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/Plans.ps1",
+      "classification": "canonical-internal",
+      "sha256": "A64F9A75629512D923ABD0AE39DC4A81F126E79F21441BF46B430303458A4027",
+      "hash_mode": "canonical-text-v1",
+      "lines": 239,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/ProducerTrust.ps1",
+      "classification": "canonical-internal",
+      "sha256": "33B0436A4AAA79BD8093E2E4199FC6A552541E59E42932D4D1FAB52347028043",
+      "hash_mode": "canonical-text-v1",
+      "lines": 204,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/WorkerArtifactValidation.ps1",
+      "classification": "canonical-internal",
+      "sha256": "E13B8CC2FE0F9A8017DCCBA2892EB0CB821B82F4EDF8022313108C9132804B2F",
+      "hash_mode": "canonical-text-v1",
+      "lines": 269,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
+      "classification": "canonical-internal",
+      "sha256": "F7DBFB0ADBAA7475565F5CF3B4D65D4E6950B5894C7A6A86AB6B1B3452FC8537",
+      "hash_mode": "canonical-text-v1",
+      "lines": 481,
       "package_visible": false
     },
     {
@@ -3387,9 +3467,9 @@
     {
       "path": "tools/lib/mir4/PreFreezeRelease.ps1",
       "classification": "canonical-internal",
-      "sha256": "96FFA2284711537E22D4C7CCFB636A8DE285D6F646DEA37F154BDAF9A113AED9",
+      "sha256": "EF715051266F0984B7A57C1F61497E0FB614E2AB28F80EFE5A56D2350CB9C89E",
       "hash_mode": "canonical-text-v1",
-      "lines": 2217,
+      "lines": 2284,
       "package_visible": false
     },
     {
@@ -4827,9 +4907,9 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 297,
+    "canonical_internal": 306,
     "compatibility_wrapper": 168,
-    "migration_only": 35,
+    "migration_only": 36,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -4842,5 +4922,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:354f00b04d790cd6f7f284b6ffdb7e93b7041e4a623f7704978cef97dd5f04da"
+  "digest": "sha256:5712aea61dd279a4c6d6ac9021eb8af1b9303d5e24255862e32ec6f8e0699c5c"
 }
