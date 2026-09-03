@@ -85,6 +85,22 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
       }
     }
     $expectedInventoryDigest=[string]$compatibilityAuditSuccessor.tooling_inventory.digest
+    $offlineCustodySuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json'
+    if(Test-Path -LiteralPath $offlineCustodySuccessorPath -PathType Leaf){
+      $offlineCustodySuccessorRaw=Get-Content -Raw -LiteralPath $offlineCustodySuccessorPath
+      Assert-MIR4BootstrapMaterializationDecompositionV1 ($offlineCustodySuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json')) 'mir4-m42-02-bootstrap-materialization-offline-custody-successor-schema'
+      $offlineCustodySuccessor=$offlineCustodySuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+      Assert-MIR4BootstrapMaterializationDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $offlineCustodySuccessor) 'mir4-m42-02-bootstrap-materialization-offline-custody-successor-record'
+      Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-FileHash -LiteralPath $compatibilityAuditSuccessorPath -Algorithm SHA256).Hash-ceq[string]$offlineCustodySuccessor.predecessor.receipt_sha256-and[string]$compatibilityAuditSuccessor.record_sha256-ceq[string]$offlineCustodySuccessor.predecessor.record_sha256) 'mir4-m42-02-bootstrap-materialization-offline-custody-successor-predecessor'
+      foreach($binding in @($offlineCustodySuccessor.evolved_bindings)){
+        $path=[string]$binding.path
+        if($expectedBindingSha.ContainsKey($path)){
+          Assert-MIR4BootstrapMaterializationDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-bootstrap-materialization-offline-custody-successor-binding' $path
+          $expectedBindingSha[$path]=[string]$binding.current_sha256
+        }
+      }
+      $expectedInventoryDigest=[string]$offlineCustodySuccessor.tooling_inventory.digest
+    }
   }
 }
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check

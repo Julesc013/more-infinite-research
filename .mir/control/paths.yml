@@ -154,6 +154,12 @@ paths:
   mir4.m42-02.compatibility-audit.receipt-schema: contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json
   mir4.m42-02.compatibility-audit.writer: tools/commands/mir4/Update-MIR4M4202CompatibilityAuditDecompositionAuthority.ps1
   mir4.m42-02.compatibility-audit.test: tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1
+  mir4.m42-02.offline-custody.facade: tools/mir/application/custody/OfflineCandidateCustody.ps1
+  mir4.m42-02.offline-custody.modules: tools/mir/application/custody/offline-candidate-custody
+  mir4.m42-02.offline-custody.receipt: releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json
+  mir4.m42-02.offline-custody.receipt-schema: contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json
+  mir4.m42-02.offline-custody.writer: tools/commands/mir4/Update-MIR4M4202OfflineCustodyDecompositionAuthority.ps1
+  mir4.m42-02.offline-custody.test: tests/tooling/Test-MIR4OfflineCustodyDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

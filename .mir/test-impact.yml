@@ -85,6 +85,12 @@
       "tags": []
     },
     {
+      "pattern": "tests/tooling/Test-MIR4OfflineCustodyDecompositionM4202.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "tools/mir/cli/router/**",
       "groups": [],
       "scenarios": [],
