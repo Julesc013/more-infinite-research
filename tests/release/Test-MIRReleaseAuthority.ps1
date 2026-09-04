@@ -10,7 +10,10 @@ foreach ($module in @("Core", "Records", "Planner", "Views")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
 
-& (Join-Path $repo "tests/release/Test-MIRReleaseWorkReconciliation.ps1") -RepoRoot $repo
+$pwshCommand=@(Get-Command pwsh -CommandType Application -ErrorAction Stop|Select-Object -First 1)
+if($pwshCommand.Count-ne1){throw 'PowerShell 7 is required for contained release-work reconciliation.'}
+& ([string]$pwshCommand[0].Source) -NoProfile -File (Join-Path $repo 'tests/release/Test-MIRReleaseWorkReconciliation.ps1') -RepoRoot $repo
+if($LASTEXITCODE-ne0){throw "Release-work reconciliation failed in its contained process with exit code $LASTEXITCODE."}
 
 function Assert-MIRField($Object, [string]$Name, $Expected, [string]$Scope) {
   if ([string]$Object.$Name -ne [string]$Expected) {

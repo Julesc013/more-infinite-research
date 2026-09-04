@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 137,
+  "test_count": 138,
   "tests": [
     {
       "id": "docs.check",
@@ -3603,6 +3603,50 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-release-readiness-m41-08",
+      "proposition": "The governed test 'static.mir4-release-readiness-m41-08' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR441ReleaseReadiness.ps1",
+      "canonical_implementation": "tests/release/Test-MIR441ReleaseReadiness.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "README.md",
+        "RELEASE-RUNBOOK.md",
+        "CHANGELOG.md",
+        "changes/unreleased/MIR4-CHG-2026-0036.json",
+        "contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
+        "docs/maintainer/mir4-4.1-release-readiness.md",
+        "docs/maintainer/mir4-release-operations.md",
+        "docs/releases/mir4-post-4.0-roadmap.md",
+        "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/**",
+        "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/**",
+        "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/**",
+        "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/**",
+        "governance/release/mir4-4.1-release-readiness-v1.json",
+        "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "src/mod/package-source.json",
+        "targets/**",
+        "tests/release/Test-MIR441ReleaseReadiness.ps1",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/runtime/Test-MIRUpgradeMatrix.ps1",
+        "tools/commands/mir4/Update-MIR441PackagePresentationAuthority.ps1",
+        "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
+        "tools/mir/application/release/readiness/**",
+        "tools/mir/application/release/MIR441ReleaseReadiness.ps1",
+        "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-release-readiness-reconciliation",
       "proposition": "The governed test 'static.mir4-release-readiness-reconciliation' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -5049,12 +5093,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 50,
-      "tooling-release": 43,
+      "tooling-release": 44,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 12
     },
-    "canonical_test_commands": 125,
+    "canonical_test_commands": 126,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5067,5 +5111,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3c1c65d72c59015fb87b1a4dd1e158691c1f605cbf9eb8c7dce469c5aff0d708"
+  "digest": "sha256:71149f07fd042315bfd45fd998e8ad2be50392305bca9281bc1cdc0fd0320f96"
 }

@@ -344,6 +344,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-05.
 - [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md)
 - [MIR 4 Release Operations](../../maintainer/mir4-release-operations.md)
 - [MIR 4 Supply-Chain and Preservation](../../maintainer/mir4-supply-chain-preservation.md)
+- [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md)
 - [Modpack Campaigns](../../maintainer/modpack-campaigns.md)
 - [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md)
 - [Release Process](../../maintainer/release-process.md)

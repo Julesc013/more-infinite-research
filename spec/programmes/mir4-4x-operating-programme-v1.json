@@ -2,8 +2,8 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-05T01:10:52+10:00",
-  "objective": "Complete MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
+  "recorded_at": "2026-09-05T12:00:00+10:00",
+  "objective": "Complete and release MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
   "permanent_invariants": [
     "one semantic source",
     "one self-contained player ZIP per target",
@@ -52,7 +52,7 @@
   },
   "outcome_trains": [
     {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},
-    {"candidate": "4.1.0", "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets", "release_required": false},
+    {"candidate": "4.1.0", "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets", "release_required": true},
     {"candidate": "4.2.0", "outcome": "Integration kernel and rolling built-in ecosystem admissions", "release_required": false},
     {"candidate": "4.3.0", "outcome": "Industrialized semantic selection, evidence lifecycle, recovery, measured release lanes, offline operation, and preservation", "release_required": false},
     {"candidate": "4.4.0+", "outcome": "Unallocated until evidence supports a coherent external outcome", "release_required": false}

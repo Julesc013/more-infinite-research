@@ -27,6 +27,20 @@ function Get-MIR4ReleaseNarrativeMaterialV1 {
     $identities.Add((Get-MIR4NarrativeFileIdentityV1 -RepoRoot $RepoRoot -Path ([string]$path)))
   }
   $orderedFragments = @($fragments | Sort-Object change_id)
+  $historicalSections = [Collections.Generic.List[object]]::new()
+  $sourceHistory = if ($null -ne $plan.PSObject.Properties['source_history']) { @($plan.source_history) } else { @() }
+  foreach ($section in $sourceHistory) {
+    $historicalFragments = [Collections.Generic.List[object]]::new()
+    foreach ($path in @($section.change_fragments)) {
+      $fragment = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path ([string]$path) -SchemaPath 'contracts/release/mir4-change-fragment-v2.schema.json'
+      Assert-MIR4NarrativeFragmentV1 -Fragment $fragment
+      if ($ids.ContainsKey([string]$fragment.change_id)) { throw "[mir4-release-narrative-duplicate-change] $($fragment.change_id)" }
+      $ids[[string]$fragment.change_id] = $true
+      $historicalFragments.Add($fragment)
+      $identities.Add((Get-MIR4NarrativeFileIdentityV1 -RepoRoot $RepoRoot -Path ([string]$path)))
+    }
+    $historicalSections.Add([pscustomobject][ordered]@{source_version=[string]$section.source_version;date=[string]$section.date;fragments=@($historicalFragments|Sort-Object change_id)})
+  }
   foreach ($target in @($plan.targets)) {
     $affectedPlayerChanges = @($orderedFragments | Where-Object {
       [string]$_.package_visibility -ceq 'player-package' -and
@@ -37,7 +51,7 @@ function Get-MIR4ReleaseNarrativeMaterialV1 {
     if ([string]$target.package_action -cne 'build' -and $affectedPlayerChanges.Count -ne 0) { throw "[mir4-release-narrative-affected-target-without-package] $($target.target)" }
   }
   $outputs = [ordered]@{}
-  $outputs['CHANGELOG.md'] = [ordered]@{surface='source-changelog';target=$null;text=(Render-MIR4SourceChangelogV1 -Plan $plan -Fragments $orderedFragments)}
+  $outputs['CHANGELOG.md'] = [ordered]@{surface='source-changelog';target=$null;text=(Render-MIR4SourceChangelogV1 -Plan $plan -Fragments $orderedFragments -HistoricalSections @($historicalSections))}
   $outputs['github-release.md'] = [ordered]@{surface='github-release';target=$null;text=(Render-MIR4GitHubReleaseV1 -Plan $plan -Fragments $orderedFragments)}
   $outputs['technical-release.md'] = [ordered]@{surface='technical-release';target=$null;text=(Render-MIR4TechnicalReleaseV1 -Plan $plan -Fragments $orderedFragments)}
   $outputs['release-manifest.json'] = [ordered]@{surface='manifest-change-inventory';target=$null;text=(Render-MIR4ReleaseManifestChangesV1 -Plan $plan -Fragments $orderedFragments)}
@@ -46,7 +60,7 @@ function Get-MIR4ReleaseNarrativeMaterialV1 {
     $outputs["$targetName/changelog.txt"] = [ordered]@{surface='factorio-changelog';target=[string]$target.target;text=(Render-MIR4FactorioTargetChangelogV1 -Plan $plan -Target $target -Fragments $orderedFragments)}
     $outputs["$targetName/mod-portal.md"] = [ordered]@{surface='mod-portal';target=[string]$target.target;text=(Render-MIR4ModPortalV1 -Plan $plan -Target $target -Fragments $orderedFragments)}
   }
-  return [pscustomobject][ordered]@{plan=$plan;fragments=$orderedFragments;fragment_identities=@($identities);plan_identity=(Get-MIR4NarrativeFileIdentityV1 -RepoRoot $RepoRoot -Path $PlanPath);outputs=$outputs}
+  return [pscustomobject][ordered]@{plan=$plan;fragments=$orderedFragments;historical_sections=@($historicalSections);fragment_identities=@($identities);plan_identity=(Get-MIR4NarrativeFileIdentityV1 -RepoRoot $RepoRoot -Path $PlanPath);outputs=$outputs}
 }
 
 function Get-MIR4ReleaseNarrativeResultDigestV1 {

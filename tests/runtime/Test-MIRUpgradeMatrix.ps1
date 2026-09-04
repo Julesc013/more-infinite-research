@@ -35,7 +35,10 @@ $privateLocalPlaytestFixtures = @(
   'assert-upgrade-2-5-10-to-4-0-20000',
   'assert-upgrade-2-5-9-to-4-0-20000',
   'assert-upgrade-1-9-9-to-4-0-11000',
-  'assert-upgrade-1-8-9-to-4-0-10000'
+  'assert-upgrade-1-8-9-to-4-0-10000',
+  'assert-upgrade-4-0-20000-to-4-1-20000',
+  'assert-upgrade-4-0-11000-to-4-1-11000',
+  'assert-upgrade-4-0-10000-to-4-1-10000'
 )
 if ($FixtureName -in $privateLocalPlaytestFixtures) {
   # Legacy targets do not have Space Age or the modern automatic-family
@@ -76,7 +79,7 @@ foreach ($case in $cases) {
   if ($assertions.Count -eq 0) {
     throw "Upgrade matrix row published no named assertions: $($case.id)"
   }
-  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000") + $privateLocalPlaytestFixtures) -and
+  if ($FixtureName -in (@("assert-upgrade-3-2-3-to-3-2-5", "assert-upgrade-3-2-9-to-3-2-10", "assert-upgrade-3-2-11-to-4-0-21000", "assert-upgrade-4-0-21000-to-4-1-21000") + $privateLocalPlaytestFixtures) -and
       ("upgraded-save-reload-passed" -notin $assertions -or
        "upgraded-save-second-reload-passed" -notin $assertions -or
        [string]::IsNullOrWhiteSpace([string]$result.second_reload_log) -or

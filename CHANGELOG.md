@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [4.1.0] - 2026-09-05
 
 ### Changes
 
@@ -47,6 +47,122 @@
   - Canonical executable PowerShell tests now live under tests/, while validation/tests retains only three bounded historical compatibility forwarders.
   - The public CLI deterministically regenerates and checks current test-authority projections, the executable proof catalogue, the workflow-purpose catalogue, and the command inventory.
   - Release workflows route through the release application entry point, stable required-check names are retained, the publisher still cannot build, and all release-transition gates remain false.
+- Split modern compilation-plan construction into explicit model, build, validation, fingerprint, and serialization owners. [MIR4-CHG-2026-0017]
+  - The public compilation-plan module is now a five-line facade over one build owner and four bounded supporting responsibility modules.
+  - F210 and F200 gain five internal Lua module paths; F110 and F100 retain their independently governed legacy implementation.
+  - The four-target current-source materializer records exact deterministic structural deltas while immutable 4.0 baseline custody remains unchanged.
+  - The materialized F210 archive passed space-age generation-integrity loading on the exact reviewed Factorio 2.1.17 engine; compact evidence is retained under external hashed custody.
+  - No technology identity, plan disposition, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Split modern base-continuation planning into explicit discovery, classification, qualification, and plan owners. [MIR4-CHG-2026-0018]
+  - The stable base-continuations require path is now a thin facade over four bounded target-owned responsibility modules.
+  - F210 and F200 retain independent source authorities and their previously governed science-phase difference; common discovery and classification implementations remain byte-identical.
+  - Each modern target gains four internal Lua module paths, while F110 and F100 remain byte-identical to their accepted package baselines.
+  - The materialized F210 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
+  - No technology identity, cost, science, prerequisite, plan disposition, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Split modern stream compilation into explicit discovery, ownership, qualification, compilation, and diagnostics owners. [MIR4-CHG-2026-0019]
+  - The stable stream-compiler require path is now a thin facade over five bounded target-owned responsibility modules.
+  - F210 and F200 retain independent qualification authorities and the governed F210 science-phase evidence difference; the other four responsibility implementations remain byte-identical.
+  - Each modern target gains five internal Lua module paths, while F110 and F100 remain byte-identical to their accepted package baselines.
+  - The materialized F210 archive passed space-age generation-integrity on the exact currently reviewed rolling experimental engine, with compact redacted evidence under external hashed custody.
+  - No stream identity, effect, cost, science, prerequisite, ownership, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Split the modern technology catalogue into explicit model, index, query, build, and validation owners. [MIR4-CHG-2026-0020]
+  - The stable technology-catalogue require path is now a thin facade over five bounded common responsibility modules.
+  - The decomposition preserves the single trusted catalogue authority through Lua module caching and retains the complete public API.
+  - F210 and F200 gain five internal catalogue module paths; F110 and F100 remain byte-identical to their accepted package baselines.
+  - A lazy compilation-plan fingerprint import exposed by the exact compiler-contracts fixture now binds at MIR module load time so fixture callers cannot redirect resolution into their own mod namespace.
+  - The corrected F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with the failed attempt classified and compact passing evidence under external hashed custody.
+  - No technology identity, effect, cost, science, prerequisite, ownership, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Split modern effect ownership into explicit fact, row-resolution, and planned-operation owners. [MIR4-CHG-2026-0021]
+  - The stable effect-ownership require path is now a thin facade over three bounded responsibility modules.
+  - Immutable row and operation facts, row-level owner resolution, and assembled-plan operation resolution now have separate owners without changing the public resolve or resolve_operations contracts.
+  - F210 and F200 gain three internal effect-ownership module paths; F110 and F100 remain byte-identical to their accepted package baselines.
+  - The fresh F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
+  - No technology identity, effect, cost, science, prerequisite, ownership outcome, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Split the modern compiler orchestrator into bounded construction, invocation, contract, and publication owners. [MIR4-CHG-2026-0022]
+  - The stable compiler-orchestrator require path remains a six-function facade over four bounded responsibility modules.
+  - Run-context construction, admitted phase invocation, contract checking, and final artifact publication now have separate owners without changing the public compile, apply, snapshot, assertion, or publication contracts.
+  - F210 and F200 gain four internal compiler-orchestrator module paths; F110 and F100 remain byte-identical to their accepted package baselines.
+  - The fresh F210 archive passed compiler-contracts on the exact currently reviewed rolling experimental engine, with compact passing evidence under external hashed custody.
+  - No technology identity, effect, cost, science, prerequisite, ownership outcome, diagnostic, plan, mutation journal, setting, migration, save, compatibility claim, release gate, or publication authority changes.
+- Bind the residual PowerShell maintainability work to a finite generated characterization and reconcile architecture validation with canonical package outputs. [MIR4-CHG-2026-0023]
+  - The generated characterization classifies all 20 canonical internal PowerShell files at or above 600 lines, admitting 11 release-critical decompositions and recording nine explicit bounded waivers.
+  - The architecture gate now validates module assignments against src/mod/package-source.json output paths instead of the historical repository-root package projection.
+  - Nine existing generated planner modules gain module assignments and two stale root-only assignments are removed; all 267 canonical MIR Lua output paths are assigned exactly once.
+  - Package-excluded architecture, repository-succession, and characterization tests are explicitly mapped to no Factorio scenario impact, preventing an unrelated full runtime campaign.
+  - The live M42-01B convergence check now counts governed post-convergence characterization tests while preserving the immutable 137-test historical relocation receipt.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Decompose the public PowerShell command router into bounded internal command groups without changing its 85-command public contract. [MIR4-CHG-2026-0024]
+  - The 1,321-line command router is now a 200-line-bounded facade that owns help rendering, loads bounded modules, and delegates command lookup and invocation to one dispatcher.
+  - Twelve package-excluded router modules separately own argument parsing, run profiles, documentation-only release checks, MIR4 command families, core/product/repository command families, and top-level dispatch.
+  - Every module is PowerShell-AST clean and below the 400-line maintainability limit; the largest module is below 240 lines.
+  - The generated command inventory still exposes exactly 85 public commands with zero unknown implementations and zero duplicate command keys.
+  - The canonical public-command projection is byte-identical before and after the split, and positive plus negative public-CLI probes preserve routing behavior.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Decompose the canonical PowerShell validation runner into a stable facade and bounded internal execution modules without changing scenario or result semantics. [MIR4-CHG-2026-0025]
+  - The 5,159-line validation entry point is now a 40-line-bounded public facade that retains its exact 18-parameter contract and delegates to one application runner.
+  - Twenty-one package-excluded modules own target bootstrap, early modes, static check families, runtime selection and setup, Factorio execution, report assertions, package smoke policy, and resumable scenario campaigns.
+  - Every extracted module is PowerShell-AST clean and below 600 lines; exact canonical source-slice checks bind the moved behavior to the characterized predecessor.
+  - List, documentation-only, manifest-only, architecture-only, static, scenario-worker, checkpoint, result-schema, scenario-name, and group contracts remain unchanged.
+  - Factorio process ownership and schema-2 result aggregation remain in their existing reusable validation libraries; the split creates no parallel test framework.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Decompose the canonical assurance evidence implementation into a stable facade and bounded responsibility modules without changing proof semantics. [MIR4-CHG-2026-0026]
+  - The 2,650-line assurance evidence implementation is now a small compatibility facade that loads nine package-excluded modules in an explicit order.
+  - Fingerprints, producer trust, worker-artifact validation, worker import, evidence decisions, attempt state, command execution, plans, and aggregate execution/gates have separate bounded owners.
+  - All 62 functions retain their exact names, order, and characterized source bodies; each module is PowerShell-AST clean and below 600 lines.
+  - Fingerprinting, trust, reuse, worker ingestion, attempt, command, plan, result, and aggregate gate behavior remain unchanged.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Decompose pre-freeze and release-readiness tooling into a stable facade and bounded responsibility modules without changing release behavior. [MIR4-CHG-2026-0027]
+  - The evolved 2,283-line pre-freeze implementation is now a 10-line facade loading six package-excluded modules in an explicit order.
+  - Shared authority primitives, policy locks, authority-state construction, authority-chain validation, release doctor and workflow checks, and playtest sessions now have separate owners.
+  - All 25 existing functions retain their names and order; all characterized current source is exact except the declared PS4 self-succession receipt binding required to keep the authority chain current.
+  - The original 2,093-line characterization and the exact 2,283-line post-PS3 starting source are both bound so later decomposition cannot silently use stale bytes.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Decompose bootstrap materialization into a stable facade and bounded responsibility modules without changing construction, comparison, or capsule behavior. [MIR4-CHG-2026-0028]
+  - The exact 1,872-line bootstrap implementation becomes a small facade loading six package-excluded modules in an explicit order.
+  - Digests and records, safe paths, archive comparison, Git source proof, capsule contracts, and capsule artifact construction now have separate owners.
+  - All 51 existing functions retain their names, order, and exact source segments.
+  - The accepted characterization and exact PS4 merge source are both bound so later decomposition cannot silently use stale bytes.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Separate assurance release planning and sealing from executable self-test authority without changing either public command behavior or release decisions. [MIR4-CHG-2026-0029]
+  - The exact 1,810-line assurance release implementation becomes a small facade loading four bounded package-excluded production modules in an explicit order.
+  - Candidate planning, seal source authority, seal creation, and seal verification now have separate production owners.
+  - The embedded assurance self-test moves as one exact source segment beneath canonical tests and loads only for the existing self-test command.
+  - All eleven existing functions retain their names, order, and exact source segments across production and test authorities.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Split the compatibility audit coordinator into bounded modules without changing its command surface, claims, scenarios, or runtime evidence. [MIR4-CHG-2026-0030]
+  - The stable compatibility-audit command retains its exact parameter block and loads six package-excluded modules in an explicit order.
+  - Configuration, input discovery, scenario definitions, scenario resolution and execution, selection and lock construction, and result collation now have bounded owners.
+  - All 35 existing function names retain their order and the extracted command-root references preserve their original path meaning.
+  - An offline no-Factorio smoke proves empty-catalog execution and contained cleanup through the decomposed entry point.
+  - No player package bytes, compatibility claims, stream identities, gameplay, saves, settings, migrations, versions, tags, signatures, seals, or publication authority change.
+- Split offline candidate custody into bounded modules without changing admission, verification, sealing, restore, or emergency-completion behavior. [MIR4-CHG-2026-0031]
+  - The exact 1,380-line offline custody application becomes a small facade loading eight package-excluded modules in an explicit order.
+  - Core records, custody admission, seal inputs, OpenSSH signatures, exact-engine evidence, publication dry runs, offline sealing, and restore and completion now have bounded owners.
+  - All 26 existing function names retain their order and the application-root substitution preserves the original repository-relative path behavior.
+  - The legacy emergency-lane reconstruction used only by the custody contract probe now opts into its explicit historical-compatibility gate, while current package creation remains exclusively routed through TargetMaterializer.
+  - A contained post-cutover contract smoke proves facade loading, canonical immutable records, bindings, path guards, and fail-closed mode selection without reconstructing through the retired root-package writer.
+  - No player package bytes, gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority change.
+- Split release-capsule custody, construction, verification, publication admission, and restore behind the existing facade. [MIR4-CHG-2026-0032]
+  - Preserved all public PowerShell functions and their declaration order.
+  - Kept capsule inventory, content-addressed construction, verification, publisher admission, and offline restore behavior unchanged.
+  - Updated non-interference proof to compare the canonical post-cutover package fingerprint.
+  - Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority.
+- Split control-plane execution, runtime measurement, and aggregate gating behind the existing facade. [MIR4-CHG-2026-0033]
+  - Preserved all public PowerShell functions and their declaration order.
+  - Kept context locks, environment execution, runtime and performance measurements, approved-delta checks, and aggregate evidence behavior unchanged.
+  - Preserved the accepted compatibility-audit overlay and post-cutover package-fingerprint selection.
+  - Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority.
+- Split supply-chain inventory, attestation, policy verification, and custody projection behind the existing facade. [MIR4-CHG-2026-0034]
+  - Preserved all public PowerShell functions and their declaration order.
+  - Kept source identity, archive selection, component inventory, SPDX, SLSA provenance, policy verification, and custody-record behavior unchanged.
+  - Completed the bounded PowerShell decomposition sequence without reopening player behavior.
+  - Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority.
+- Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator. [MIR4-CHG-2026-0036]
+  - Allocated source version 4.1.0 and target distributions 4.1.21000, 4.1.20000, 4.1.11000, and 4.1.10000 for private qualification.
+  - Added direct 4.0-to-4.1 upgrade fixtures with first and second reload proof for every target.
+  - Reduced player READMEs to target-specific package guidance and generated every target changelog from the same accepted typed release inventory.
+  - Added streaming resource measurement, external work and evidence roots, one-heavy-process admission, and cleanup only after verified custody.
+  - Prepared technical sealing, exact dev-to-main promotion, and a constant-time human playtest handoff without authorizing tag or publication.
 
 ### Features
 
@@ -69,6 +185,14 @@
   - The governed source manifest selects 406 unique editable sources across common, family, generated, and explicit target layers without retaining a full target-specific source copy.
   - The production materializer reads no historical package archive, verifies every source and output hash, and reconstructs F210, F200, F110, and F100 with exact normalized byte-tree parity to their accepted 4.0 baselines.
   - Independent A/B builds prove deterministic archive construction for every target while the existing root package writer remains unchanged pending exact-engine replay, rollback, and a separate cutover receipt.
+
+### Removed
+
+- Retired every current-product authority bridge while retaining bounded historical compatibility readers. [MIR4-CHG-2026-0035]
+  - Made src/mod, targets, TargetMaterializer, and the MIR 4.1 development context the only current authorities for their facts.
+  - Classified former bridges as retired reassignment or read-only, package-excluded, owned, tested, expiry-bounded historical compatibility.
+  - Made unknown bridge state block deletion and release rather than silently inheriting authority.
+  - Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority.
 
 ## [4.0.0] - 2026-08-30
 

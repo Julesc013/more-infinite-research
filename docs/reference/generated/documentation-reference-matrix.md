@@ -187,6 +187,9 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-whole-platform-consolidation | [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md) | current |
 | mir4-4.0.0-candidate-release-notes | [More Infinite Research 4.0.0 Candidate Release Notes](../../releases/notes/release-notes-4.0.0-candidate.md) | current |
 | mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | current |
+| mir4-4.1-one-minute-playtest-gate | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
+| mir4-4.1-release-readiness | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
+| mir4-4.1-resource-bounded-release | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
 | mir4-api-sdk-v0-migration-policy | [MIR 4 API and SDK V0 Stability Policy](../../reference/mir4-api-sdk-v0-stability.md) | deprecated |
 | mir4-api-sdk-v1-preview | [MIR 4 Module Ecosystem](../../architecture/mir4-module-ecosystem.md) | current |
 | mir4-api-versioning-developer-policy | [MIR 4 API Versioning](../../developer/api-versioning.md) | current |

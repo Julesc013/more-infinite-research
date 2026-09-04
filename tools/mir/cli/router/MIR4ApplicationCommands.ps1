@@ -47,9 +47,9 @@ function Invoke-MIR4ApplicationCommandGroup {
             & (Join-Path $repo "tools/commands/mir4/Invoke-MIR4ReleaseGovernance.ps1") @governanceArguments
           }
           "release-engine" {
-            if ($Args.Count -lt 3) { throw "mir4 release-engine requires show, check, or phase." }
+            if ($Args.Count -lt 3) { throw "mir4 release-engine requires a declared application command." }
             $subcommand = [string]$Args[2]
-            if ($subcommand -notin @('show','check','phase')) { throw "Unknown mir4 release-engine command: $subcommand" }
+            if ($subcommand -notin @('show','check','phase','readiness-check','candidate-build','qualification','independent-verify','technical-seal','prepare-tag','promotion-plan','promote')) { throw "Unknown mir4 release-engine command: $subcommand" }
             $releaseArguments = @{Command=$subcommand;RepoRoot=$repo.Path}
             foreach ($binding in @(
               @{option='--phase';parameter='Phase'},
@@ -61,6 +61,9 @@ function Invoke-MIR4ApplicationCommandGroup {
               @{option='--release-plan-digest';parameter='ReleasePlanDigest'},
               @{option='--proof-root';parameter='ProofRoot'},
               @{option='--seal-root';parameter='SealRoot'},
+              @{option='--work-root';parameter='WorkRoot'},
+              @{option='--evidence-root';parameter='EvidenceRoot'},
+              @{option='--signing-key';parameter='SigningKey'},
               @{option='--operation';parameter='Operation'},
               @{option='--output-root';parameter='OutputRoot'},
               @{option='--output';parameter='OutputPath'}

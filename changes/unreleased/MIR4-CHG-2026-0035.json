@@ -1,17 +1,27 @@
 {
-  "schema": 1,
-  "id": "MIR4-CHG-2026-0035",
-  "kind": "maintainability",
-  "audience": ["maintainers"],
-  "summary": "Retire every current-product authority bridge while retaining bounded historical compatibility readers.",
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0035",
+  "status": "accepted",
+  "change_type": "removed",
+  "summary": "Retired every current-product authority bridge while retaining bounded historical compatibility readers.",
   "details": [
-    "Makes src/mod, targets, TargetMaterializer, and the MIR 4.1 development context the only current authorities for their facts.",
-    "Classifies 49 former bridges as one retired reassignment and 48 read-only, package-excluded, owned, tested, expiry-bounded historical compatibility paths.",
-    "Makes unknown bridge state block deletion and release instead of silently inheriting authority.",
-    "Regenerates repository characterization and append-only authority evolution around the final bridge state.",
-    "Changes no player package, gameplay, save, setting, migration, compatibility claim, version, tag, signature, seal, or publication gate."
+    "Made src/mod, targets, TargetMaterializer, and the MIR 4.1 development context the only current authorities for their facts.",
+    "Classified former bridges as retired reassignment or read-only, package-excluded, owned, tested, expiry-bounded historical compatibility.",
+    "Made unknown bridge state block deletion and release rather than silently inheriting authority.",
+    "Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority."
   ],
-  "targets": ["repository"],
-  "package_visible": false,
-  "release_authority": false
+  "semantic_domains": ["repository", "authority", "maintainability"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Bridge retirement is repository-only and behavior preserving."},
+    {"target":"F200","disposition":"unaffected","reason":"Bridge retirement is repository-only and behavior preserving."},
+    {"target":"F110","disposition":"unaffected","reason":"Bridge retirement is repository-only and behavior preserving."},
+    {"target":"F100","disposition":"unaffected","reason":"Bridge retirement is repository-only and behavior preserving."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [{"kind":"release-record","value":"governance/repository/migrations/current-product-bridge-retirement-v1.json"}]
 }

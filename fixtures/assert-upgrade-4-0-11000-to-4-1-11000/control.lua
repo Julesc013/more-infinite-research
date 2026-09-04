@@ -1,0 +1,60 @@
+local from_version = "4.0.11000"
+local to_version = "4.1.11000"
+local technology_name = "mining-productivity-4"
+local archetype = settings.startup["mir-upgrade-archetype"].value
+local expected_progress = 0.37
+local epsilon = 0.000001
+
+local function fail(message)
+  error("MIR " .. from_version .. " to " .. to_version .. " upgrade validation failed: " .. message)
+end
+
+local function technology()
+  local value = game.forces.player.technologies[technology_name]
+  if not value then fail("missing stable base technology " .. technology_name) end
+  return value
+end
+
+script.on_init(function()
+  if script.active_mods["more-infinite-research"] ~= from_version then fail("source mod version drifted") end
+  if archetype ~= "base-default" then fail("unexpected target-local archetype") end
+  game.forces.player.research_all_technologies()
+  local tech = technology()
+  tech.level = 5
+  if not game.forces.player.add_research(tech) then fail("could not queue stable base research") end
+  game.forces.player.research_progress = expected_progress
+  global.mir_local_playtest_upgrade = {
+    source_version = from_version,
+    archetype = archetype,
+    technology = technology_name,
+    level = tech.level,
+    progress = game.forces.player.research_progress
+  }
+  log("[mir-fixture] " .. from_version .. " upgrade source proof complete archetype=" .. archetype)
+end)
+
+script.on_configuration_changed(function()
+  if script.active_mods["more-infinite-research"] ~= to_version then fail("candidate mod version drifted") end
+  local state = global.mir_local_playtest_upgrade
+  if not state or state.source_version ~= from_version or state.archetype ~= archetype then fail("fixture state did not survive") end
+  local tech = technology()
+  if tech.level ~= state.level then fail("technology level changed") end
+  if not game.forces.player.current_research or game.forces.player.current_research.name ~= technology_name then fail("current research changed") end
+  if math.abs((game.forces.player.research_progress or 0) - state.progress) > epsilon then fail("fractional research progress changed") end
+  state.upgrade_complete = true
+  log("[mir-fixture] " .. from_version .. " to " .. to_version .. " upgrade proof complete archetype=" .. archetype)
+end)
+
+script.on_event(defines.events.on_tick, function()
+  local state = global.mir_local_playtest_upgrade
+  if state and state.upgrade_complete and not state.server_save_requested then
+    state.server_save_requested = true
+    game.server_save("mir-4111000-upgraded")
+  end
+end)
+
+script.on_load(function()
+  if global.mir_local_playtest_upgrade and global.mir_local_playtest_upgrade.upgrade_complete then
+    log("[mir-fixture] " .. to_version .. " upgraded save reload proof complete archetype=" .. archetype)
+  end
+end)

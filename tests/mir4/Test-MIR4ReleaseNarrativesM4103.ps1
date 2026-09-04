@@ -54,7 +54,7 @@ Assert-MIR4NarrativeTestV1 ($facade -match 'MIR4ReleaseNarrativeResultV1') 'mir4
 
 $sourceProjection = Update-MIR4SourceChangelogV1 -RepoRoot $repo -PlanPath 'releases/governance/MIR4-Source-Changelog-PlanV1.json' -Check
 $sourceText = [IO.File]::ReadAllText((Join-Path $repo 'CHANGELOG.md'))
-Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -match '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
+Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -notmatch '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.1\.0\] - 2026-09-05$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
 Assert-MIR4NarrativeTestV1 ($sourceText -match 'complete physical and executable foundation') 'mir4-source-changelog-accepted-inventory'
 $changelogEol = (& git -C $repo check-attr eol -- CHANGELOG.md 2>&1) -join "`n"
 Assert-MIR4NarrativeTestV1 ($LASTEXITCODE -eq 0 -and $changelogEol -cmatch 'CHANGELOG\.md:\s+eol:\s+lf$') 'mir4-source-changelog-eol'

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.1.10000
+Date: 2026-09-05
+  Changes:
+    - Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.
+---------------------------------------------------------------------------------------------------
 Version: 1.8.9
 Date: 2026-08-12
 
