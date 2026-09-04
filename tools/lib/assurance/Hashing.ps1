@@ -163,7 +163,8 @@ function Get-MIRAssuranceCommitPackageBlobs {
 
   $resolvedCommit = Resolve-MIRAssuranceCommit -Commit $Commit
   . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
-  $roots = @(Get-MIRPackageSourceRoots)
+  $layout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $resolvedCommit
+  $roots = @($layout.roots)
   $blobs = [ordered]@{}
   foreach ($line in @(& git -C $repo ls-tree -r $resolvedCommit -- @roots 2>$null)) {
     if ($line -notmatch '^\d+\s+blob\s+([0-9a-fA-F]+)\t(.+)$') { continue }
@@ -186,11 +187,15 @@ function Get-MIRAssuranceCommitPackageSourceHash {
   try {
     New-Item -ItemType Directory -Force -Path $temporaryRoot | Out-Null
     . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
-    $roots = @(Get-MIRPackageSourceRoots)
+    $layout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $resolvedCommit
+    $roots = @($layout.roots)
     & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @roots 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
     Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
-    return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot
+    if ([string]$layout.kind -ceq 'canonical-materializer-source') {
+      return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot
+    }
+    return Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $sourceRoot
   } finally {
     if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
       Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
@@ -245,7 +250,7 @@ function Get-MIRAssurancePackageAuthorityHash {
     throw "Package-source material descriptor has the wrong source parent."
   }
   . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
-  $roots = @(Get-MIRPackageSourceRoots)
+  $roots = @((Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $packageCommit).roots)
   $changedPaths = @(& git -C $repo diff --name-only $parent $packageCommit -- @roots 2>$null | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
   if ($LASTEXITCODE -ne 0) { throw "Unable to inspect the package-source commit delta." }
   $changed = @{}
@@ -301,7 +306,9 @@ function Test-MIRAssurancePackageRootsEqual {
   $reference = Resolve-MIRAssuranceCommit -Commit $ReferenceCommit
   $difference = Resolve-MIRAssuranceCommit -Commit $DifferenceCommit
   . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
-  $roots = @(Get-MIRPackageSourceRoots)
+  $referenceLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $reference
+  $differenceLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $difference
+  $roots = @(@($referenceLayout.roots) + @($differenceLayout.roots) | Sort-Object -Unique)
   & git -C $repo diff --quiet $reference $difference -- @roots
   return $LASTEXITCODE -eq 0
 }

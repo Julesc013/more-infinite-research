@@ -205,6 +205,11 @@
       "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
+      "id": "current-product-bridge-retirement",
+      "patterns": ["^governance/repository/migrations/current-product-bridge-retirement-v1\\.json$", "^contracts/repository/mir4-(?:current-product|m41-current-product)-bridge-retirement-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1\\.json$", "^spec/(?:execution/mir4-4\\.1-development-context-v1|schemas/mir4-development-execution-context-v1\\.schema)\\.json$", "^tools/(?:commands/mir4/Update-MIR4M41CurrentProductBridgeRetirement(?:Authority|Receipt)|mir/application/repository/(?:BridgeRetirement|RepositoryCharacterization)|lib/validation/PackageIdentity)\\.ps1$", "^tests/(?:repository/Test-MIR4(?:CurrentProductBridgeRetirement|RepositoryFixedPoint)|mir4/Test-MIR4(?:PackageAuthorityF2E|RepositoryCharacterizationM4200A))\\.ps1$", "^targets/package-authority\\.json$", "^src/mod/package-source\\.json$", "^\\.mir/(?:assurance\\.json|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json))$", "^spec/programmes/mir4-4x-operating-programme-v1\\.json$", "^docs/(?:architecture/(?:mir4-repository-fixed-point|module-boundaries)|maintainer/mir4-authority-map|releases/mir4-post-4\\.0-roadmap)\\.md$", "^changes/unreleased/MIR4-CHG-2026-0035\\.json$", "^validation/tests\\.yml$"],
+      "tests": ["docs.check", "tooling.self-test", "static.full", "static.package", "static.mir4-repository-fixed-point-v2", "static.mir4-repository-characterization-m42-00a", "static.mir4-package-authority-m41-f2e", "static.mir4-current-product-bridge-retirement-m41"]
+    },
+    {
       "id": "packaged-non-runtime",
       "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
       "tests": ["static.package", "runtime.exact-zip"]

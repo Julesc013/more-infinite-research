@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 438 pages as of 2026-09-02.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 438 pages as of 2026-09-05.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -74,11 +74,11 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
 | docs/architecture/mir4-repository-characterization.md | MIR 4 repository characterization | current | maintainer | explanation | mir-maintainers | 2026-08-31 |
-| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-08-28 |
+| docs/architecture/mir4-repository-fixed-point.md | MIR 4 Repository Fixed Point | current | developer | explanation | mir-maintainers | 2026-09-05 |
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-01 |
+| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-05 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -183,7 +183,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
-| docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-08-31 |
+| docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-09-05 |
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-f2d-runtime-replay.md | MIR 4.1 F2D Runtime Replay | current | maintainer | how-to | mir-maintainers | 2026-09-02 |
 | docs/maintainer/mir4-full-platform-closeout.md | MIR 4 Full-Platform Private Closeout | current | maintainer | how-to | mir-maintainers | 2026-08-24 |
@@ -378,7 +378,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-02 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-05 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

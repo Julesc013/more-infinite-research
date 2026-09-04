@@ -54,7 +54,7 @@ function New-MIR4M41F2EPackageAuthorityVerification {
     predecessor_sha256=$priorHash
     targets=$targets
     writer=[pscustomobject][ordered]@{implementation='tools/mir/application/package/TargetMaterializer.ps1';ordinary_facade='tools/commands/package/Build-MIRPackage.ps1';sole_current_writer=$true;bootstrap_writer_historical_only=$true}
-    reader=[pscustomobject][ordered]@{generic_package_identity='canonical-src-mod-plus-targets';legacy_root_reader='explicit-read-only-compatibility';generic_matches_canonical=$true}
+    reader=[pscustomobject][ordered]@{generic_package_identity='canonical-src-mod-plus-targets';legacy_root_reader='explicit-historical-reconstruction-only';generic_matches_canonical=$true;silent_fallback_blocked=$true}
     rollback=[pscustomobject][ordered]@{state='ready';commit=$rollbackCommit;tree=$rollbackTree}
   }
 }

@@ -96,8 +96,11 @@ if ([int]$lock.schema -eq 4 -and [int]$lock.projection_schema -eq 3) {
   }
 
   $adapted = @($lock.projection.adapted_package_paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  $portableLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $RepoRoot -Commit ([string]$lock.portable_source.commit)
+  $projectionLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $RepoRoot -Commit ([string]$lock.projection.package_source_commit)
+  $packageRoots = @(@($portableLayout.roots) + @($projectionLayout.roots) | Sort-Object -Unique)
   $actualAdapted = @(
-    & git -C $RepoRoot diff --name-only ([string]$lock.portable_source.commit) ([string]$lock.projection.package_source_commit) -- @(Get-MIRPackageSourceRoots) |
+    & git -C $RepoRoot diff --name-only ([string]$lock.portable_source.commit) ([string]$lock.projection.package_source_commit) -- @packageRoots |
       ForEach-Object { ([string]$_).Replace("\", "/") } |
       Sort-Object -Unique
   )

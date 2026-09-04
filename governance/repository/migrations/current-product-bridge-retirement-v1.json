@@ -1,0 +1,1042 @@
+{
+  "schema": 1,
+  "kind": "MIR4CurrentProductBridgeRetirementV1",
+  "migration_id": "M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1",
+  "state": "CURRENT-PRODUCT-BRIDGES-RETIRED-HISTORICAL-COMPATIBILITY-BOUNDED",
+  "scope": "Retire every current-product authority bridge while retaining only explicit read-only, package-excluded, owned, tested, and expiry-bounded historical compatibility paths.",
+  "predecessor": {
+    "branch": "dev",
+    "commit": "03737ccaefbda04001166e6b5e2fffe20ccadf96",
+    "tree": "9465304d732db746376e2e41f67cd2ff79766e67",
+    "receipt": "releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json",
+    "receipt_sha256": "92E7B18CDF7946C7389E17B4656BA25DD424C5730C160D53B95B7DA2F73E4B28",
+    "record_sha256": "816412E1BEE0505A1142863534583231078412B0D9D513A0CC334393E64612D2",
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813"
+  },
+  "writers": [
+    {
+      "fact_family": "current-product-bridge-retirement",
+      "path": "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1",
+      "command": "pwsh -NoProfile -File tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1"
+    }
+  ],
+  "path_map": [
+    {
+      "family": "bridge-retirement-authority",
+      "current_path": null,
+      "final_path": "governance/repository/migrations/current-product-bridge-retirement-v1.json",
+      "state": "canonical",
+      "package_visible": false
+    },
+    {
+      "family": "bridge-retirement-contract",
+      "current_path": null,
+      "final_path": "contracts/repository/mir4-current-product-bridge-retirement-v1.schema.json",
+      "state": "canonical",
+      "package_visible": false
+    },
+    {
+      "family": "bridge-retirement-application",
+      "current_path": null,
+      "final_path": "tools/mir/application/repository/BridgeRetirement.ps1",
+      "state": "canonical",
+      "package_visible": false
+    },
+    {
+      "family": "bridge-retirement-writer",
+      "current_path": null,
+      "final_path": "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1",
+      "state": "canonical",
+      "package_visible": false
+    },
+    {
+      "family": "bridge-retirement-proof",
+      "current_path": null,
+      "final_path": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "state": "canonical",
+      "package_visible": false
+    },
+    {
+      "family": "development-execution-context",
+      "current_path": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
+      "final_path": "spec/execution/mir4-4.1-development-context-v1.json",
+      "state": "current-development-context",
+      "package_visible": false
+    },
+    {
+      "family": "package-identity-reader",
+      "current_path": "tools/lib/validation/PackageIdentity.ps1",
+      "final_path": "tools/lib/validation/PackageIdentity.ps1",
+      "state": "canonical-fail-closed",
+      "package_visible": false
+    },
+    {
+      "family": "package-authority",
+      "current_path": "targets/package-authority.json",
+      "final_path": "targets/package-authority.json",
+      "state": "canonical-root-projection-retired",
+      "package_visible": false
+    },
+    {
+      "family": "repository-fixed-point",
+      "current_path": ".mir/control/repository-fixed-point.json",
+      "final_path": ".mir/control/repository-fixed-point.json",
+      "state": "append-only-successor",
+      "package_visible": false
+    },
+    {
+      "family": "repository-characterization",
+      "current_path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "final_path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "state": "canonical-current-dispositions",
+      "package_visible": false
+    }
+  ],
+  "compatibility_entrypoints": [],
+  "bridge_dispositions": [
+    {
+      "migration_id": "MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1",
+      "path": "tools/lib/mir4/RepositoryFixedPoint.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/adapters/repository/GitRepositoryInventory.ps1",
+        "tools/mir/application/repository/RepositoryFixedPoint.ps1",
+        "tools/mir/domain/repository/RepositoryFixedPoint.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-PROCESSIR-EXACT-TOOLING-V1",
+      "path": "tools/lib/mir4/ProcessIR.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/processir/ProcessIR.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-PROCESSIR-EXACT-TOOLING-V1",
+      "path": "tools/lib/mir4/ExactProcessIR.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/processir/ExactProcessIR.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-PROCESSIR-EXACT-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4ProcessIRSynthesisRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4ProcessIRSynthesisRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-PROCESSIR-EXACT-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4ExactProcessIRRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4ExactProcessIRRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/lib/mir4/SupportAssessment.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/inspection/SupportAssessment.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/lib/mir4/CompatibilityIndex.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/inspection/CompatibilityIndex.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/lib/mir4/CompatibilityFactory.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/inspection/CompatibilityFactory.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/lib/mir4/Inspector.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/inspection/Inspector.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/lib/mir4/CompatibilityCanary.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/inspection/CompatibilityCanary.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4InspectorCompatibilityRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4InspectorCompatibilityRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-INSPECTOR-COMPATIBILITY-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4CompatibilityCanaryRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4CompatibilityCanaryRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/lib/mir4/AssuranceScale.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/AssuranceScale.ps1",
+        "tools/mir/application/assurance/AssuranceScale.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/lib/mir4/ReleaseBudget.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/ReleaseBudget.ps1",
+        "tools/mir/application/assurance/ReleaseBudget.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/lib/mir4/OfflineDrill.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/OfflineDrill.ps1",
+        "tools/mir/application/assurance/OfflineDrill.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/lib/mir4/EnvironmentEvidence.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/EnvironmentEvidence.ps1",
+        "tools/mir/application/assurance/EnvironmentEvidence.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/lib/mir4/OfflineCandidateCustody.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/OfflineCandidateCustody.ps1",
+        "tools/mir/application/custody/OfflineCandidateCustody.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/commands/mir4/Export-MIR4AssuranceScaleRecords.ps1",
+        "tools/mir/cli/Export-MIR4AssuranceScaleRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-ASSURANCE-OFFLINE-CUSTODY-TOOLING-V1",
+      "path": "tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/commands/mir4/Invoke-MIR4EnvironmentEvidence.ps1",
+        "tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-HISTORICAL-TOOLING-V1",
+      "path": "tools/lib/mir4/HistoricalSuccession.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/HistoricalSuccession.ps1",
+        "tools/mir/application/history/HistoricalSuccession.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-HISTORICAL-TOOLING-V1",
+      "path": "tools/lib/mir4/SuccessorHost.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/SuccessorHost.ps1",
+        "tools/mir/application/history/SuccessorHost.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-HISTORICAL-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/commands/mir4/Export-MIR4HistoricalSuccessionRecords.ps1",
+        "tools/mir/cli/Export-MIR4HistoricalSuccessionRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/commands/mir4/Invoke-MIR4Extension.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Invoke-MIR4Extension.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-RELEASE-TOOLING-V1",
+      "path": "tools/lib/mir4/ReleaseDag.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/lib/mir4/ReleaseDag.ps1",
+        "tools/mir/application/release/ReleaseDag.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/commands/mir4/Invoke-MIR4ExperimentalApi.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Invoke-MIR4ExperimentalApi.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/lib/mir4/SdkV1.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/extensions/SdkV1.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1",
+      "path": "tools/commands/mir4/Invoke-MIR4RepositoryFixedPoint.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Invoke-MIR4RepositoryFixedPoint.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1",
+      "path": "validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1",
+      "role": "test-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-CANONICALIZATION-TOOLING-V1",
+      "path": "tools/lib/mir4/CanonicalJsonV1.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/domain/canonicalization/CanonicalJsonV1.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-CANONICALIZATION-TOOLING-V1",
+      "path": "validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1",
+      "role": "test-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-DIAGNOSTICS-TOOLING-V1",
+      "path": "tools/lib/mir4/DiagnosticsV1.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/domain/diagnostics/DiagnosticsV1.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-TARGET-KEY-TOOLING-V1",
+      "path": "tools/lib/mir4/TargetKey.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/domain/targets/TargetKey.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-WHOLE-PLATFORM-TOOLING-V1",
+      "path": "tools/lib/mir4/WholePlatform.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/platform/WholePlatform.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-WHOLE-PLATFORM-TOOLING-V1",
+      "path": "validation/tests/mir4/Test-MIR4WholePlatform.ps1",
+      "role": "test-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tests/platform/Test-MIR4WholePlatform.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-TECHNOLOGY-ACCEPTANCE-TOOLING-V1",
+      "path": "tools/lib/mir4/TechnologyAcceptance.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/technology/TechnologyAcceptance.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-TARGET-COMPILER-TOOLING-V1",
+      "path": "tools/lib/mir4/TargetCompiler.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/targets/TargetCompiler.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+      "path": "tools/lib/mir4/SafetyKernel.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/domain/safety/SafetyKernel.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+      "path": "tools/lib/mir4/PolicyEngine.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/domain/policy/PolicyEngine.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+      "path": "tools/lib/mir4/NormalizedCompiler.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/compiler/NormalizedCompiler.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+      "path": "tools/lib/mir4/CompilationRun.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/compiler/CompilationRun.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-SEMANTIC-COMPILER-POLICY-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4SemanticCompilerRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4SemanticCompilerRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-RUNTIME-CONTINUITY-TOOLING-V1",
+      "path": "tools/lib/mir4/RuntimeStateModel.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/runtime/RuntimeStateModel.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-RUNTIME-CONTINUITY-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4RuntimeContinuityRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4RuntimeContinuityRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/lib/mir4/ModuleEcosystem.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/extensions/ModuleEcosystem.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/lib/mir4/ExperimentalApiSdk.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/extensions/ExperimentalApiSdk.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/lib/mir4/ExtensionDeveloperExperience.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/extensions/ExtensionDeveloperExperience.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/lib/mir4/MepDiscovery.ps1",
+      "role": "library-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/application/extensions/MepDiscovery.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "MIR4-MODULE-SDK-MEP-TOOLING-V1",
+      "path": "tools/commands/mir4/Export-MIR4ModuleEcosystemRecords.ps1",
+      "role": "command-forwarder",
+      "disposition": "retained-historical-compatibility",
+      "canonical_replacements": [
+        "tools/mir/cli/Export-MIR4ModuleEcosystemRecords.ps1"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Review for removal at MIR-4.2-COMPATIBILITY-SUNSET-REVIEW; removal requires consumer absence, parity, and rollback proof.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    },
+    {
+      "migration_id": "M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1",
+      "path": "README.md",
+      "role": "package-visible-repository-documentation-bridge",
+      "disposition": "retired-reassigned",
+      "canonical_replacements": [
+        "README.md"
+      ],
+      "writable": false,
+      "package_visible": false,
+      "current_semantic_use": false,
+      "current_authority": false,
+      "owner": "repository-governance",
+      "proof": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "expiry_condition": "Repository README remains package-excluded and target READMEs remain materializer-generated.",
+      "rollback": "Revert the exact bridge-retirement work package without granting current authority to this path.",
+      "deletion_authorized": false
+    }
+  ],
+  "summary": {
+    "declared": 49,
+    "retired": 1,
+    "retained_historical": 48,
+    "current_product": 0,
+    "dual_write_authority": 0,
+    "package_authority_bridge": 0,
+    "release_current_state_authority_bridge": 0,
+    "runtime_state_migration_authority_bridge": 0,
+    "public_claim_authority_bridge": 0,
+    "unowned": 0,
+    "unbounded": 0
+  },
+  "package_source_authority": {
+    "path": "targets/package-authority.json",
+    "record_sha256": "325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB",
+    "legacy_root_state": "retired-historical-read-only",
+    "silent_fallback_blocked": true
+  },
+  "execution_context": {
+    "path": "spec/execution/mir4-4.1-development-context-v1.json",
+    "record_sha256": "45A9E1A5ED033FF26F86EA316DCEAFB2CE01717E13FDEF0281487359A3D92DFE",
+    "release_authority": false
+  },
+  "rollback": {
+    "mode": "revert-exact-merged-work-package",
+    "commit": "03737ccaefbda04001166e6b5e2fffe20ccadf96",
+    "tree": "9465304d732db746376e2e41f67cd2ff79766e67",
+    "root_writer_reactivation_authorized": false
+  },
+  "sunset": {
+    "state": "historical-compatibility-only",
+    "review_boundary": "MIR-4.2-COMPATIBILITY-SUNSET-REVIEW",
+    "removal_requires": [
+      "declared-consumer-absence",
+      "canonical-parity",
+      "rollback-proof"
+    ]
+  },
+  "transition_gate": {
+    "bridge_retirement": true,
+    "source_freeze": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "record_sha256": "8B92037CDDCA8D58874330E1BEF36604687A82413F6C438500E1918BCE699448"
+}

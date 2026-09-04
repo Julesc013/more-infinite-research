@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-09-01
+last_reviewed: 2026-09-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -979,3 +979,9 @@ tools/lib/mir4/SupplyChain.ps1 remains the stable internal facade and loads five
 The split binds the characterized 1,104-line implementation and preserves all 28 function names, their order, setup, archive and component identities, SPDX 3.0.1 and 2.3 construction, SLSA provenance, policy checks, and custody-record writing. This closes the eleven-node bounded PowerShell decomposition sequence; bridge retirement and private four-target qualification remain separate MIR 4.1 gates.
 
 This PS11 split is package-excluded and changes no inventory semantics, package, gameplay, save, setting, migration, compatibility claim, or release behavior. It grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.
+
+## MIR 4 current-product bridge-retirement boundary
+
+`governance/repository/migrations/current-product-bridge-retirement-v1.json` is the sole current bridge-disposition authority. `tools/mir/application/repository/BridgeRetirement.ps1` constructs and validates it, while the two governed writers own its authority and append-only receipt. The accepted state has zero current-product, dual-write, package-authority, release/current-state, runtime/state/migration, public-claim, unowned, or unbounded bridges.
+
+The former paths remain only where they are read-only, package-excluded, unused by current semantics, owned, proved, and bounded by an explicit expiry review. `src/mod` and `targets` own current package source and target facts; `TargetMaterializer` remains the sole current package writer. The MIR 4.1 development context replaces the historical M4C01 implementation authorization for current execution without itself granting source freeze, version allocation, signing, sealing, tagging, promotion, or publication authority.

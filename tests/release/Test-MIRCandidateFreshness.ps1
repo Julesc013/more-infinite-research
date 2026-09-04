@@ -184,44 +184,32 @@ if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
 $activeInfo = Get-Content -Raw -LiteralPath (Join-Path $repo 'info.json') | ConvertFrom-Json
 $activeProfilePath = Join-Path $repo "validation\profiles\factorio-$([string]$activeInfo.factorio_version).json"
 $activeProfile = Get-Content -Raw -LiteralPath $activeProfilePath | ConvertFrom-Json
-if ([string]$activeProfile.release_authority_mode -eq 'candidate-programme') {
-  $authorityRelative = ([string]$activeProfile.release_authority).Replace('\', '/')
-  if ($authorityRelative -notmatch '^\.mir/releases/waves/mir4-r0/[A-Za-z0-9._-]+\.json$') {
-    throw 'MIR 4 candidate-programme freshness authority path is unsafe.'
+if ([string]$activeProfile.execution_context_mode -eq 'development-context') {
+  $authorityRelative = ([string]$activeProfile.execution_context).Replace('\', '/')
+  if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
+    throw 'MIR 4 development freshness execution-context path is unsafe.'
   }
   $authorityPath = Join-Path $repo $authorityRelative
-  $closeoutPath = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-M4C01-Closeout-SOL09V1.json'
-  $candidateManifestPath = Join-Path $repo 'build/results/mir4-sol/sol08/target-candidates/MIR4_AFFECTED_TARGET_CANDIDATES.json'
-  foreach ($requiredPath in @($authorityPath, $closeoutPath, $candidateManifestPath)) {
-    if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
-      throw "MIR 4 candidate-programme freshness input is absent: $requiredPath"
-    }
+  if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
+    throw "MIR 4 development freshness input is absent: $authorityPath"
   }
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
-  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
-  $closeout = Get-Content -Raw -LiteralPath $closeoutPath | ConvertFrom-Json -Depth 100
-  $candidateManifest = Get-Content -Raw -LiteralPath $candidateManifestPath | ConvertFrom-Json -Depth 100
-  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
-      [string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
-      [string]$authority.status -ne 'authorized-in-progress' -or
-      @($authority.not_authorized) -notcontains 'production-seal' -or
-      @($authority.not_authorized) -notcontains 'github-release-publication' -or
-      @($authority.not_authorized) -notcontains 'mod-portal-mir4-upload' -or
-      [string]$closeout.kind -ne 'MIR4M4C01CloseoutSOL09V1' -or
-      [string]$closeout.status -ne 'PASS' -or
-      -not $closeout.completion_boundary.m4c01_development_closeout_complete -or
-      $closeout.completion_boundary.release_candidate_ready -or
-      $closeout.completion_boundary.source_freeze_authorized -or
-      $closeout.completion_boundary.commit_authorized -or
-      $closeout.completion_boundary.publication_authorized -or
-      [string]$candidateManifest.kind -ne 'MIR4AffectedTargetCandidateSetSOL08V1' -or
-      [string]$candidateManifest.status -ne 'built-unqualified-local-development-candidates' -or
-      @($candidateManifest.targets).Count -ne 2 -or
-      (@($candidateManifest.targets.target_key | Sort-Object) -join ',') -ne 'f200,f210' -or
-      $candidateManifest.public_output_authorized -or $candidateManifest.publication_authorized) {
-    throw 'MIR 4 candidate-programme freshness boundary is incomplete or overclaims release readiness.'
+  $authorityRaw = Get-Content -Raw -LiteralPath $authorityPath
+  if (-not ($authorityRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-development-execution-context-v1.schema.json'))) {
+    throw 'MIR 4 development freshness execution-context schema is invalid.'
   }
-  Write-Host '[ok] MIR 4 candidate-programme evidence is current, explicitly unfrozen, and blocked from release actions pending fresh source-bound qualification.'
+  $authority = $authorityRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      [string]$authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
+      [string]$authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
+      @($authority.allowed) -notcontains 'private-candidate-qualification' -or
+      @($authority.forbidden) -notcontains 'production-signing' -or
+      @($authority.forbidden) -notcontains 'tagging' -or
+      @($authority.forbidden) -notcontains 'publication' -or
+      @($authority.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+    throw 'MIR 4 development freshness boundary is incomplete or overclaims release readiness.'
+  }
+  Write-Host '[ok] MIR 4 development execution context is current, explicitly unfrozen, and grants no release, signing, tagging, sealing, or publication authority.'
   exit 0
 }
 

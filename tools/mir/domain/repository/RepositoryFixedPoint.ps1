@@ -29,11 +29,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4RepositoryFixedPointAuthorityPath
   if ([int]$authority.schema -ne 2 -or [string]$authority.kind -cne 'MIR4RepositoryFixedPointV2') { throw '[mir4-repository-authority-schema]' }
-  if ([string]$authority.state -cne 'PACKAGE-EXCLUDED-AUTHORITY-MIGRATION-ACTIVE' -or [bool]$authority.physical_cutover -or -not [bool]$authority.current_package_source_remains_authoritative) {
+  if ([string]$authority.state -cne 'MIR41-CURRENT-PRODUCT-BRIDGES-RETIRED' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
     throw '[mir4-repository-cutover-boundary]'
   }
   if ([string]$authority.migration_authority -cne $script:MIR4RepositoryMigrationAuthorityPath) { throw '[mir4-repository-migration-authority-binding]' }
-  if (@($authority.migration_sequence).Count -ne 17 -or
+  if (@($authority.migration_sequence).Count -ne 18 -or
       [string]$authority.migration_sequence[0].migration_id -cne 'MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1' -or
       [string]$authority.migration_sequence[0].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[1].migration_id -cne 'MIR4-CANONICALIZATION-TOOLING-V1' -or
@@ -67,7 +67,9 @@ function Get-MIR4RepositoryFixedPointAuthority {
       [string]$authority.migration_sequence[15].migration_id -cne 'M41-03-CHANGE-AND-RELEASE-AUTHORITY-V1' -or
       [string]$authority.migration_sequence[15].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[16].migration_id -cne 'M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1' -or
-      [string]$authority.migration_sequence[16].state -cne 'current-append-only-successor') {
+      [string]$authority.migration_sequence[16].state -cne 'accepted-immutable-predecessor' -or
+      [string]$authority.migration_sequence[17].migration_id -cne 'M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1' -or
+      [string]$authority.migration_sequence[17].state -cne 'current-append-only-successor') {
     throw '[mir4-repository-migration-sequence]'
   }
   $ids = @($authority.visible_roots | ForEach-Object { [string]$_.id })
@@ -79,7 +81,7 @@ function Get-MIR4RepositoryFixedPointAuthority {
   $expectedEnvironment = @('MIR_CACHE_HOME','MIR_STATE_HOME','MIR_TEMP_HOME','MIR_WORKTREE_HOME','MIR_ARCHIVE_HOME','MIR_EVIDENCE_HOME')
   if ((@($external.environment | Sort-Object) -join '|') -cne (@($expectedEnvironment | Sort-Object) -join '|')) { throw '[mir4-repository-external-roots]' }
   if (@($external | Where-Object { [string]$_.class -notin $script:MIR4RepositoryClasses }).Count -ne 0) { throw '[mir4-repository-external-class]' }
-  if ([string]$authority.unknown_policy -cne 'block-deletion-and-cutover') { throw '[mir4-repository-unknown-policy]' }
+  if ([string]$authority.unknown_policy -cne 'block-deletion-and-release') { throw '[mir4-repository-unknown-policy]' }
   return $authority
 }
 
@@ -118,7 +120,7 @@ function Get-MIR4RepositoryRootMarker {
     path=[string]$Root.path
     mode=[string]$Root.mode
     current_authorities=@($Root.current_authorities)
-    writable_authority=([string]$Root.mode -ceq 'active-change-authority')
+    writable_authority=([string]$Root.id -in @('changes','src','targets'))
     marker_is_writable_authority=$false
     package_visible=$false
     source=$script:MIR4RepositoryFixedPointAuthorityPath

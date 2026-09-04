@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 136,
+  "test_count": 137,
   "tests": [
     {
       "id": "docs.check",
@@ -1310,6 +1310,53 @@
         "tests/architecture/Test-MIRArchitecture.ps1",
         "docs/architecture/module-boundaries.md",
         "assurance/catalog/tests.json",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-current-product-bridge-retirement-m41",
+      "proposition": "The governed test 'static.mir4-current-product-bridge-retirement-m41' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "canonical_implementation": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/repository-fixed-point.json",
+        ".mir/control/paths.yml",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "governance/repository/migrations/current-product-bridge-retirement-v1.json",
+        "contracts/repository/mir4-current-product-bridge-retirement-v1.schema.json",
+        "contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json",
+        "spec/execution/mir4-4.1-development-context-v1.json",
+        "spec/schemas/mir4-development-execution-context-v1.schema.json",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/mir/application/repository/BridgeRetirement.ps1",
+        "tools/mir/application/repository/RepositoryCharacterization.ps1",
+        "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1",
+        "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementReceipt.ps1",
+        "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+        "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+        "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "docs/architecture/mir4-repository-fixed-point.md",
+        "docs/architecture/module-boundaries.md",
+        "docs/maintainer/mir4-authority-map.md",
+        "docs/releases/mir4-post-4.0-roadmap.md",
+        "validation/tests.yml",
+        "repository",
         "package-source"
       ],
       "matrix": null
@@ -5001,13 +5048,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 49,
+      "package-repository": 50,
       "tooling-release": 43,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 12
     },
-    "canonical_test_commands": 124,
+    "canonical_test_commands": 125,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5020,5 +5067,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:313e72dd8ce194989453c2b4c15c968db107554028b12af0e2ad532f9455a63b"
+  "digest": "sha256:3c1c65d72c59015fb87b1a4dd1e158691c1f605cbf9eb8c7dce469c5aff0d708"
 }

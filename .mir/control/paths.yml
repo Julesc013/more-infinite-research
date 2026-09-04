@@ -45,6 +45,16 @@ paths:
   mir4.repository-characterization.authority-evolution: releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json
   mir4.repository-characterization.authority-evolution-schema: contracts/repository/mir4-m41-05a-m42-00a-repository-characterization-authority-evolution-v1.schema.json
   mir4.repository-characterization.authority-evolution-writer: tools/commands/mir4/Update-MIR4M4105AM4200ACharacterizationAuthority.ps1
+  mir4.bridge-retirement.authority: governance/repository/migrations/current-product-bridge-retirement-v1.json
+  mir4.bridge-retirement.authority-schema: contracts/repository/mir4-current-product-bridge-retirement-v1.schema.json
+  mir4.bridge-retirement.application: tools/mir/application/repository/BridgeRetirement.ps1
+  mir4.bridge-retirement.authority-writer: tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1
+  mir4.bridge-retirement.receipt: releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json
+  mir4.bridge-retirement.receipt-schema: contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json
+  mir4.bridge-retirement.receipt-writer: tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementReceipt.ps1
+  mir4.bridge-retirement.proof: tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1
+  mir4.bridge-retirement.development-context: spec/execution/mir4-4.1-development-context-v1.json
+  mir4.bridge-retirement.development-context-schema: spec/schemas/mir4-development-execution-context-v1.schema.json
   mir4.m41-f0-truth-reconciliation.receipt: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
   mir4.m41-f0-truth-reconciliation.receipt-schema: contracts/repository/mir4-m41-f0-truth-reconciliation-authority-evolution-v1.schema.json
   mir4.m41-f0-truth-reconciliation.writer: tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1

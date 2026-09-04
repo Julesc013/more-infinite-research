@@ -2489,6 +2489,22 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1",
+      "classification": "migration-only",
+      "sha256": "50FFB200B41B7BB09470EB6240B43A5B380CCE5169EDC47B036C15C5F4837004",
+      "hash_mode": "canonical-text-v1",
+      "lines": 79,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementReceipt.ps1",
+      "classification": "canonical-internal",
+      "sha256": "7DC032057376CE9CE2605FC80B5925019F70D8C65AEAC4AF8E044478917044CD",
+      "hash_mode": "canonical-text-v1",
+      "lines": 78,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1",
       "classification": "migration-only",
       "sha256": "0DCB61EFA379C23AFE88044A327874A7106EC7EDAE544E7B9CDC807FE331027C",
@@ -3083,9 +3099,9 @@
     {
       "path": "tools/lib/assurance/Domains.ps1",
       "classification": "canonical-internal",
-      "sha256": "CF5163335DD15985F6B7A4879069C151E37BB529F835092F6E926A939B85E010",
+      "sha256": "862BF61D20D0D2F1689E18ACDB63741FF4F086A132B02D978CB9FD1274704A3B",
       "hash_mode": "canonical-text-v1",
-      "lines": 407,
+      "lines": 412,
       "package_visible": false
     },
     {
@@ -3131,9 +3147,9 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "4797FE3AE848339B8B20754369D7B5060CEFE5AD4D3BB8F4E0A9EC28A67AB79C",
+      "sha256": "4CB888C3A037F55C50B3FA9F301AF59865D00CA75DFA28BF2FD4EDF96B01C552",
       "hash_mode": "canonical-text-v1",
-      "lines": 565,
+      "lines": 560,
       "package_visible": false
     },
     {
@@ -3171,9 +3187,9 @@
     {
       "path": "tools/lib/assurance/Hashing.ps1",
       "classification": "canonical-internal",
-      "sha256": "08E131BE3849D6720BF160FDE3356C9EE1E7EBD2268E4E7DD314FD87245581F0",
+      "sha256": "10EF079C946E3AC7C7748923955BBE805BE715501994755510E137F39028BE0B",
       "hash_mode": "canonical-text-v1",
-      "lines": 308,
+      "lines": 315,
       "package_visible": false
     },
     {
@@ -3187,9 +3203,9 @@
     {
       "path": "tools/lib/assurance/release/CandidatePlanning.ps1",
       "classification": "canonical-internal",
-      "sha256": "18FCB792066AE5188848660BDCC52B7BF9CB90BD18453602389C043BBB3B52B1",
+      "sha256": "EAB3591C266B153FE01ADB890CBCFFAAE843C630B73DC624CD0DD220C8EF4597",
       "hash_mode": "canonical-text-v1",
-      "lines": 341,
+      "lines": 352,
       "package_visible": false
     },
     {
@@ -3435,9 +3451,9 @@
     {
       "path": "tools/lib/control/Records.ps1",
       "classification": "canonical-internal",
-      "sha256": "20CA0C386E82CBE122006007806122C48739225C31B92EC131E0D703263A5787",
+      "sha256": "7EA3D55799D293648A916304FA48A96D4E2BEFC382155628BFBC15AFEC04E94C",
       "hash_mode": "canonical-text-v1",
-      "lines": 420,
+      "lines": 416,
       "package_visible": false
     },
     {
@@ -3715,9 +3731,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "5E8184D026142D677C3066311A754C82F58302D75FCBEB50E16002B8B7879C5A",
+      "sha256": "E605925755F921626E4E747DC72DAFA7EA9E21FAECC7B29DEC76AA1F620518F3",
       "hash_mode": "canonical-text-v1",
-      "lines": 1506,
+      "lines": 1566,
       "package_visible": false
     },
     {
@@ -4083,9 +4099,9 @@
     {
       "path": "tools/lib/validation/PackageIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "D6E1D917EE8106A78C8FC7352C22926BF268C75C752F3FE1C05B73758BB1DDF6",
+      "sha256": "31AA71341CA004D5BFE318F8DC0F933F51535550FE4B49BF3ADEEC7E17ECA614",
       "hash_mode": "canonical-text-v1",
-      "lines": 369,
+      "lines": 425,
       "package_visible": false
     },
     {
@@ -4643,7 +4659,7 @@
     {
       "path": "tools/mir/application/package/PackageAuthorityVerifier.ps1",
       "classification": "canonical-internal",
-      "sha256": "8D737D5120E94B136CF841DD97FFAA6A06708562AD7FAC38FA39BE698E2C9467",
+      "sha256": "74BFC8AE92381352AE699430588856DE970287BC566A50CEA43D5ABF9A0AA282",
       "hash_mode": "canonical-text-v1",
       "lines": 61,
       "package_visible": false
@@ -4841,11 +4857,19 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/application/repository/BridgeRetirement.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8140C370301B516C27E873C88B2D8542425DD9E4F863939FF5AA18A7A75B0E82",
+      "hash_mode": "canonical-text-v1",
+      "lines": 37,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
       "classification": "canonical-internal",
-      "sha256": "BB3B325149D52CB14DBA0478B1D070155936BDA760800445EE7A85526D25F689",
+      "sha256": "CDBC39105162ADE026FBE99FEE9C7E0D979A1989642130B5AD4D2CC1C6E0C30F",
       "hash_mode": "canonical-text-v1",
-      "lines": 228,
+      "lines": 252,
       "package_visible": false
     },
     {
@@ -5331,9 +5355,9 @@
     {
       "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
       "classification": "canonical-internal",
-      "sha256": "210024F10A5594F450AC2BC1D4AA3D51BD4A3F58F96686155AB3F2E7472CD5F3",
+      "sha256": "20B38AF58E15FCEB2A59F2B55E2F83F1D72F92B8ACBC72C54134D8D7227093BE",
       "hash_mode": "canonical-text-v1",
-      "lines": 148,
+      "lines": 150,
       "package_visible": false
     },
     {
@@ -5363,9 +5387,9 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 355,
+    "canonical_internal": 357,
     "compatibility_wrapper": 168,
-    "migration_only": 44,
+    "migration_only": 45,
     "historical": 16,
     "obsolete": 0,
     "unknown": 0,
@@ -5378,5 +5402,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3d0c9d0cc0a68d1588c5fea6fd8bdb5142b8f9a4761867b3f9e58a4eab2280db"
+  "digest": "sha256:292806ab803a7c7b907d7dec0efedbc3cf9c147bea43f45b9c090da23785f33f"
 }

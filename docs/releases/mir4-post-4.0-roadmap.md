@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-02
+last_reviewed: 2026-09-05
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -61,10 +61,12 @@ The governance and characterization foundation is complete, so MIR 4.1 now owns 
 | M42-00 | Establish one package source, target overlays, one materializer, and four independently generated targets inside the 4.1 completion boundary | Complete: F1 through F2E accepted; `src/mod`, `targets`, and `TargetMaterializer` are current package authority |
 | M42-01 | Converge PowerShell, executable tests, proof catalogues, workflows, and release orchestration behind one supported public surface | Complete |
 | M42-02 | Perform only reviewable behavior-preserving Lua and PowerShell decomposition needed for the 4.1 maintainability fixed point | Complete: six Lua and eleven PowerShell responsibility splits accepted; bridge retirement and private four-target qualification remain separate MIR 4.1 gates |
+| M41-07 | Retire every current-product authority bridge and bound retained historical readers | Complete: zero current-product authority bridges; retained compatibility paths are read-only, owned, tested, package-excluded, and expiry-bounded |
+| M41-08 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate | Active: bridge closure accepted; private four-target release readiness follows |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
 
-The accepted F2D chain is complete for F210, F200, F110, and F100, including the independent four-target aggregate. F2E then bound stable target identity separately from version projection, promoted `src/mod` and `targets` as canonical editable source, routed ordinary and target-product construction through `TargetMaterializer`, and fenced the bootstrap writer as historical compatibility. Four fresh deterministic reconstructions matched the accepted 4.0 content roots and entry sets. The root package projection has no writer authority and remains a read-only bridge until its separately governed physical retirement.
+The accepted F2D chain is complete for F210, F200, F110, and F100, including the independent four-target aggregate. F2E then bound stable target identity separately from version projection, promoted `src/mod` and `targets` as canonical editable source, routed ordinary and target-product construction through `TargetMaterializer`, and fenced the bootstrap writer as historical compatibility. Four fresh deterministic reconstructions matched the accepted 4.0 content roots and entry sets. M41-07 completed the physical retirement: the repository root is not an editable Factorio package, and historical root-package bytes can be read only through explicit immutable-commit compatibility paths.
 
 M41-05B replaced the root README with a concise package-excluded repository landing page and made target player documentation a generated package projection. Repository and player narratives now have separate owned audiences and generated views.
 
