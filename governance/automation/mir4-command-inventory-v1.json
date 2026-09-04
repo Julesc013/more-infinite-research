@@ -3763,9 +3763,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "80525B0BA14AA00B71D19DDB849100F1AC8C572660D30913FAD31E8E8D7447B0",
+      "sha256": "185C81632E4CEF3998F0AEB2E9ECDF8595389B62A5A4E50E17E389135D06148C",
       "hash_mode": "canonical-text-v1",
-      "lines": 1630,
+      "lines": 1634,
       "package_visible": false
     },
     {
@@ -5514,5 +5514,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d0efcdac92ac2d9585a101061dafea5ec92051e4bc6b096adc35b2cdf0fd54fa"
+  "digest": "sha256:6f176db780c0d08429a36a018adfc5470b0ed049feab34dbd693d3a627d348c9"
 }

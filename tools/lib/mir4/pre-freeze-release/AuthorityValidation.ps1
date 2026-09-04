@@ -1539,16 +1539,20 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 
-  if ([string]$sourceFreeze.predecessor.path -cne $priorReceiptPath -or
-      [string]$sourceFreeze.predecessor.sha256 -cne $priorReceiptSha256 -or
-      [string]$sourceFreeze.predecessor.record_sha256 -cne [string]$bridgeRetirement.record_sha256 -or
-      [string]$sourceFreeze.base.branch -cne 'dev' -or
-      [string]$sourceFreeze.base.commit -cne '65bb11c1226a8160c27ab074ddb503c20df98c69' -or
-      [string]$sourceFreeze.base.tree -cne 'bebfd455f7f13d724eabb43c3ed48362d8d7901e' -or
-      [string]$sourceFreeze.record_sha256 -cne (Get-MIR4BootstrapRecordSha256 -Record $sourceFreeze) -or
-      [string]$sourceFreeze.package_source.current_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -or
-      [string]$sourceFreeze.package_source.authority_record_sha256 -cne [string](Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256) {
-    throw '[mir4-prefreeze-m41-source-freeze-chain]'
+  $sourceFreezeChainChecks=[ordered]@{
+    predecessor_path=([string]$sourceFreeze.predecessor.path -ceq $priorReceiptPath)
+    predecessor_sha256=([string]$sourceFreeze.predecessor.sha256 -ceq $priorReceiptSha256)
+    predecessor_record_sha256=([string]$sourceFreeze.predecessor.record_sha256 -ceq [string]$bridgeRetirement.record_sha256)
+    base_branch=([string]$sourceFreeze.base.branch -ceq 'dev')
+    base_commit=([string]$sourceFreeze.base.commit -ceq '65bb11c1226a8160c27ab074ddb503c20df98c69')
+    base_tree=([string]$sourceFreeze.base.tree -ceq 'bebfd455f7f13d724eabb43c3ed48362d8d7901e')
+    record_sha256=([string]$sourceFreeze.record_sha256 -ceq (Get-MIR4BootstrapRecordSha256 -Record $sourceFreeze))
+    package_source_sha256=([string]$sourceFreeze.package_source.current_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo))
+    package_authority_record_sha256=([string]$sourceFreeze.package_source.authority_record_sha256 -ceq [string](Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256)
+  }
+  $failedSourceFreezeChainChecks=@($sourceFreezeChainChecks.GetEnumerator()|Where-Object{-not[bool]$_.Value}|ForEach-Object{[string]$_.Key})
+  if ($failedSourceFreezeChainChecks.Count -ne 0) {
+    throw "[mir4-prefreeze-m41-source-freeze-chain] failed=$($failedSourceFreezeChainChecks-join',')"
   }
   $sourceFreezePaths = @{}
   foreach ($binding in @($sourceFreeze.evolved_bindings)) {

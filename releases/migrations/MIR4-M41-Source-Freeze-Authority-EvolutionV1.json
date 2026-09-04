@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4M41SourceFreezeAuthorityEvolutionV1",
-  "recorded_at": "2026-09-05T05:49:51.4238501+10:00",
+  "recorded_at": "2026-09-05T06:20:04.4664916+10:00",
   "status": "MIR41-RELEASE-READINESS-AUTHORITY-EVOLVED-SOURCE-FREEZE-PENDING",
   "programme_id": "MIR4-4.1-RELEASE-READINESS",
   "change_id": "MIR4-M41-SOURCE-FREEZE-AUTHORITY-2026-09-05",
@@ -190,7 +190,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "A0A4A7578288D6DAB557947A6D9A60B74C598F2C05A58E1CFBDD793AD411CE3C",
-      "current_sha256": "5D6477FF2FBBE606A7930BFE55EBC86E91ACBCF2A04A5113F9D776D3AA426F75",
+      "current_sha256": "9469023E1E94D732E8A8FF9C93DADB00551E828D37D5DF51AD3F451EE6166AFB",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -360,7 +360,7 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
       "previous_sha256": "E605925755F921626E4E747DC72DAFA7EA9E21FAECC7B29DEC76AA1F620518F3",
-      "current_sha256": "80525B0BA14AA00B71D19DDB849100F1AC8C572660D30913FAD31E8E8D7447B0",
+      "current_sha256": "185C81632E4CEF3998F0AEB2E9ECDF8595389B62A5A4E50E17E389135D06148C",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -858,5 +858,5 @@
     "tagging": false,
     "publication": false
   },
-  "record_sha256": "EBA51D0A17C5E1B6D339C6367DBF108D9B9EC47042C5B4FA78612F54A92ECA15"
+  "record_sha256": "AA745A63F963C73720ACC63603873612F75BA5AB742C87650BEBE7935201A3CD"
 }
