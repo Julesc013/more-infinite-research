@@ -5,6 +5,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4M4202ControlExecutor {
@@ -67,11 +68,12 @@ if (Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf) {
   Assert-MIR4M4202ControlExecutor ([string]$supplyChainSuccessor.current_source.sha256 -ceq '3D1CAF10F2EA14B21743BA3E8B1018930695816B7181D26A8B704B63152DC1D4' -and [bool]$supplyChainSuccessor.public_contract.unchanged -and [int]$supplyChainSuccessor.public_contract.function_count -eq 28) 'mir4-m42-02-control-executor-supply-chain-successor-contract'
   $expectedInventoryDigest = [string]$supplyChainSuccessor.tooling_inventory.digest
 }
+$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202ControlExecutor ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-control-executor-inventory'
 Assert-MIR4M4202ControlExecutor ([bool]$receipt.semantic_contract.ordered_current_source_slices_preserved -and [bool]$receipt.semantic_contract.context_execution_state_unchanged -and [bool]$receipt.semantic_contract.performance_source_and_artifact_custody_unchanged -and [bool]$receipt.semantic_contract.runtime_measurements_unchanged -and [bool]$receipt.semantic_contract.package_and_delta_measurements_unchanged -and [bool]$receipt.semantic_contract.aggregate_gate_unchanged -and [bool]$receipt.semantic_contract.ps7_source_evolution_preserved -and [bool]$receipt.semantic_contract.platform_projections_regenerated) 'mir4-m42-02-control-executor-semantic-contract'
 Assert-MIR4M4202ControlExecutor (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-control-executor-transition'
-Assert-MIR4M4202ControlExecutor ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-control-executor-package-firewall'
+Assert-MIR4M4202ControlExecutor ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-control-executor-package-firewall'
 
 [pscustomobject][ordered]@{
   status = 'M42-02-PS10-CONTROL-EXECUTOR-DECOMPOSITION-PASSED'

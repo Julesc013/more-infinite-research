@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4M4202AssuranceRelease([bool]$Condition,[string]$Code,[string]$Detail=''){
@@ -76,6 +77,7 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
   }
 }
 
+Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-release-module-bridge-retirement-successor'
 $functionNames=[Collections.Generic.List[string]]::new()
 Assert-MIR4M4202AssuranceRelease (@($receipt.decomposition.modules).Count-eq4-and@($receipt.decomposition.modules|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-assurance-release-module-count'
 foreach($module in @($receipt.decomposition.modules)){
@@ -86,7 +88,9 @@ foreach($module in @($receipt.decomposition.modules)){
 }
 $selfTestPath=Join-Path $repo ([string]$receipt.decomposition.self_test.path);$selfTokens=$null;$selfErrors=$null
 $selfAst=[Management.Automation.Language.Parser]::ParseFile($selfTestPath,[ref]$selfTokens,[ref]$selfErrors)
-Assert-MIR4M4202AssuranceRelease (@($selfErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $selfTestPath)-ceq[string]$receipt.decomposition.self_test.sha256-and@($selfAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq1) 'mir4-m42-02-assurance-release-self-test'
+$expectedSelfTestSha=@{([string]$receipt.decomposition.self_test.path)=[string]$receipt.decomposition.self_test.sha256}
+Assert-MIR4M4202AssuranceRelease (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedSelfTestSha) 'mir4-m42-02-assurance-release-self-test-bridge-retirement-successor'
+Assert-MIR4M4202AssuranceRelease (@($selfErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $selfTestPath)-ceq[string]$expectedSelfTestSha[[string]$receipt.decomposition.self_test.path]-and@($selfAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq1) 'mir4-m42-02-assurance-release-self-test'
 foreach($function in @($selfAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
 $projectionSha=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $functionNames.ToArray())
 Assert-MIR4M4202AssuranceRelease ($functionNames.Count-eq11-and$projectionSha-ceq[string]$receipt.public_contract.previous_sha256-and$projectionSha-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-assurance-release-public-contract'
@@ -122,11 +126,12 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
   $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
 
+$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202AssuranceRelease ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-release-inventory'
 Assert-MIR4M4202AssuranceRelease ([bool]$receipt.semantic_contract.source_segments_exact-and[bool]$receipt.semantic_contract.candidate_planning_unchanged-and[bool]$receipt.semantic_contract.seal_creation_unchanged-and[bool]$receipt.semantic_contract.seal_verification_unchanged-and[bool]$receipt.semantic_contract.embedded_self_test_removed_from_release_authority) 'mir4-m42-02-assurance-release-semantic-contract'
 Assert-MIR4M4202AssuranceRelease (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-assurance-release-transition'
-Assert-MIR4M4202AssuranceRelease ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-assurance-release-package-firewall'
+Assert-MIR4M4202AssuranceRelease ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-assurance-release-package-firewall'
 
 [pscustomobject][ordered]@{
   status='M42-02-PS6-ASSURANCE-RELEASE-DECOMPOSITION-PASSED'

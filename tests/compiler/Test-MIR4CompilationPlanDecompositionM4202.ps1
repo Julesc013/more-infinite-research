@@ -7,7 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
-. (Join-Path $repo 'tests/compiler/support/MIR4M4202PackageSuccession.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202CompilationPlan([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-compilation-plan-test] $Code"}}
 

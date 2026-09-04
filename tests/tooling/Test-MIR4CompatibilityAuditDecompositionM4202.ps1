@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4M4202CompatibilityAudit {
@@ -110,11 +111,12 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
   $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
 
+$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
 Assert-MIR4M4202CompatibilityAudit ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.command_root_semantics_preserved -and [bool]$receipt.semantic_contract.parameter_surface_unchanged -and [bool]$receipt.semantic_contract.scenario_execution_unchanged -and [bool]$receipt.semantic_contract.result_collation_unchanged -and [bool]$receipt.semantic_contract.compatibility_claims_unchanged -and [bool]$receipt.semantic_contract.stream_authority_unchanged) 'mir4-m42-02-compatibility-audit-semantic-contract'
 Assert-MIR4M4202CompatibilityAudit (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-compatibility-audit-transition'
-Assert-MIR4M4202CompatibilityAudit ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-compatibility-audit-package-firewall'
+Assert-MIR4M4202CompatibilityAudit ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-compatibility-audit-package-firewall'
 
 [pscustomobject][ordered]@{
   status = 'M42-02-PS7-COMPATIBILITY-AUDIT-DECOMPOSITION-PASSED'

@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4ValidationRunnerDecompositionV1([bool]$Condition,[string]$Code,[string]$Detail=''){
@@ -202,6 +203,7 @@ $controlExecutorDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Cont
 if(Test-Path -LiteralPath $controlExecutorDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $controlExecutorDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $supplyChainDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
 if(Test-Path -LiteralPath $supplyChainDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $supplyChainDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
+$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 Assert-MIR4ValidationRunnerDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-validation-runner-inventory'
 foreach($file in $files){
   $path=[string]$file.path
@@ -243,11 +245,12 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
   $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
 
+Assert-MIR4ValidationRunnerDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-validation-runner-bridge-retirement-successor'
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path
   Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-validation-runner-evolved-binding' $path
 }
-Assert-MIR4ValidationRunnerDecompositionV1 ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-validation-runner-package-firewall'
+Assert-MIR4ValidationRunnerDecompositionV1 ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-validation-runner-package-firewall'
 Assert-MIR4ValidationRunnerDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-validation-runner-release-firewall'
 Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-validation-runner-package-mutation'
 
