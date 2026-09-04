@@ -30,6 +30,7 @@ $expectedPaths=@(
   'changes/unreleased/MIR4-CHG-2026-0035.json',
   'changes/unreleased/MIR4-CHG-2026-0036.json',
   'changes/unreleased/MIR4-CHG-2026-0037.json',
+  'changes/unreleased/MIR4-CHG-2026-0038.json',
   'contracts/release/mir4-release-narrative-plan-v1.schema.json',
   'contracts/repository/mir4-4.1-release-readiness-v1.schema.json',
   'contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json',

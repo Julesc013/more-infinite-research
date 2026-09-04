@@ -16,7 +16,7 @@ data:extend({entity,{
 },{
   type="mod-data",name="more-infinite-research-compatibility-pack",data={packs={["mir-upgrade-automatic-family"]={
     schema=2,id="mir-upgrade-automatic-family",
-    applicability={mods={{id="mir-fixture-assert-upgrade-3-2-11-to-4-0-21000",version="= 0.1.0"}}},
+    applicability={mods={{id="mir-fixture-assert-upgrade-4-0-21000-to-4-1-21000",version="= 0.1.0"}}},
     aliases={},exact={includes={},excludes={}},family_hints={},science_roles={},owner_claims={},risk_overrides={},
     family_authorizations={{family="assembling-machine-manufacturing",stream="research_auto_assembling_machine",action="generate",evidence={"upgrade-matrix-automatic-family"},claim_boundary="fixture-only",promotion_authorization_id="mir.reviewed.upgrade-automatic-family-v1",trust_class="mir-reviewed",provider_version="family-rule-v3"}},
     candidate_seeds={{recipe="mir-upgrade-auto-assembler-recipe",item="mir-upgrade-auto-assembler",family="assembling-machine-manufacturing",stream="research_auto_assembling_machine",change=0.01,evidence={"upgrade-matrix-automatic-family"}}},
