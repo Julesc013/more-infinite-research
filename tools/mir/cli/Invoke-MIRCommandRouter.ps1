@@ -56,7 +56,7 @@ Usage:
   .\tools\mir.ps1 mir4 environment-evidence <lock|diff|bundle|minimize|verify|reference> [--input <path>] [--other <path>] [--output <path>]
   .\tools\mir.ps1 mir4 assurance-scale <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-governance <check|initialize> [--output <path>]
-  .\tools\mir.ps1 mir4 release-engine <show|check|phase> [--phase <id>] [release identity options]
+  .\tools\mir.ps1 mir4 release-engine <show|check|phase|readiness-check|candidate-build|qualification|independent-verify|technical-seal|prepare-tag|promotion-plan|promote> [--phase <id>] [--work-root <external path>] [--evidence-root <external path>] [--signing-key <protected path>] [release identity options]
   .\tools\mir.ps1 mir4 tooling <inventory|inventory-check|test-authority|test-authority-check|tests|tests-check|workflows|workflows-check>
   .\tools\mir.ps1 mir4 patch-rehearsal <run|check> [--output <path>]
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>

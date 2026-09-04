@@ -26,6 +26,11 @@
       "package_action": {"enum": ["build", "unchanged-no-package", "omitted"]}
     }}},
     "change_fragments": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^(changes|fixtures)/.+\\.json$"}},
+    "source_history": {"type": "array", "uniqueItems": true, "items": {"type": "object", "additionalProperties": false, "required": ["source_version", "date", "change_fragments"], "properties": {
+      "source_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+      "date": {"type": "string", "format": "date"},
+      "change_fragments": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^changes/history/.+\\.json$"}}
+    }}},
     "copy": {"type": "object", "additionalProperties": false, "required": ["outcome", "upgrade", "compatibility", "known_issues", "details_links"], "properties": {
       "outcome": {"type": "string", "minLength": 20, "maxLength": 320},
       "upgrade": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"type": "string", "minLength": 8, "maxLength": 320}},

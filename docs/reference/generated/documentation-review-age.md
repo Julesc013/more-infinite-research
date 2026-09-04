@@ -183,6 +183,7 @@ Ages are measured against the newest governed review date, 2026-09-05, so checko
 | docs/maintainer/localization.md | current | 2026-08-03 | 33 | current-window |
 | docs/maintainer/manual-test-plan.md | current | 2026-07-21 | 46 | current-window |
 | docs/maintainer/mir3-terminal-repository-protections.md | current | 2026-08-15 | 21 | current-window |
+| docs/maintainer/mir4-4.1-release-readiness.md | current | 2026-09-05 | 0 | current-window |
 | docs/maintainer/mir4-authority-map.md | current | 2026-09-05 | 0 | current-window |
 | docs/maintainer/mir4-continuity.md | current | 2026-08-26 | 10 | current-window |
 | docs/maintainer/mir4-f2d-runtime-replay.md | current | 2026-09-02 | 3 | current-window |
@@ -191,7 +192,7 @@ Ages are measured against the newest governed review date, 2026-09-05, so checko
 | docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-08-29 | 7 | current-window |
 | docs/maintainer/mir4-qualification-and-promotion.md | current | 2026-08-18 | 18 | current-window |
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-27 | 9 | current-window |
-| docs/maintainer/mir4-release-operations.md | current | 2026-08-31 | 5 | current-window |
+| docs/maintainer/mir4-release-operations.md | current | 2026-09-05 | 0 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 16 | current-window |
 | docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-31 | 5 | current-window |
 | docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-29 | 7 | current-window |

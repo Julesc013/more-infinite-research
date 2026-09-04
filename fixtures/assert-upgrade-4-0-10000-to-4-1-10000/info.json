@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-assert-upgrade-4-0-10000-to-4-1-10000",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert 4.0.10000 to 4.1.10000 Upgrade",
+  "author": "MIR maintainers",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0",
+    "more-infinite-research >= 4.0.10000"
+  ]
+}

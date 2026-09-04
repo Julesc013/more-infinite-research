@@ -47,6 +47,8 @@ if (Test-Path -LiteralPath $receiptPath -PathType Leaf) {
 
 $cliOutput = & (Join-Path $repo 'tools/mir.ps1') mir4 release-engine check 2>&1 | Out-String
 Assert-MIR4CliReleaseConvergenceV1 ($cliOutput -match 'M42-01-RELEASE-APPLICATION-DAG-PASSED') 'mir4-m42-01-public-release-command'
+$readinessOutput = & (Join-Path $repo 'tools/mir.ps1') mir4 release-engine readiness-check 2>&1 | Out-String
+Assert-MIR4CliReleaseConvergenceV1 ($readinessOutput -match 'MIR-4.1-RELEASE-READINESS-PASSED' -and $readinessOutput -match '"publication_authorized": false') 'mir4-m41-08-public-release-readiness-command'
 Assert-MIR4CliReleaseConvergenceV1 ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-01-package-mutation'
 
 [pscustomobject][ordered]@{

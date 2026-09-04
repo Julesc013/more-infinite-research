@@ -1,0 +1,31 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0036",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Prepared the four-target MIR 4.1 release through one resource-bounded production-readiness coordinator.",
+  "details": [
+    "Allocated source version 4.1.0 and target distributions 4.1.21000, 4.1.20000, 4.1.11000, and 4.1.10000 for private qualification.",
+    "Added direct 4.0-to-4.1 upgrade fixtures with first and second reload proof for every target.",
+    "Reduced player READMEs to target-specific package guidance and generated every target changelog from the same accepted typed release inventory.",
+    "Added streaming resource measurement, external work and evidence roots, one-heavy-process admission, and cleanup only after verified custody.",
+    "Prepared technical sealing, exact dev-to-main promotion, and a constant-time human playtest handoff without authorizing tag or publication."
+  ],
+  "semantic_domains": ["release", "distribution", "documentation", "assurance", "tooling"],
+  "audiences": ["players", "mod-authors", "contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Receives 4.1.21000 metadata, documentation, direct upgrade proof, and exact rolling-engine qualification."},
+    {"target":"F200","disposition":"affected","reason":"Receives 4.1.20000 metadata, documentation, direct upgrade proof, and exact fixed-engine qualification."},
+    {"target":"F110","disposition":"affected","reason":"Receives 4.1.11000 metadata, documentation, direct upgrade proof, and independent exact-engine qualification."},
+    {"target":"F100","disposition":"affected","reason":"Receives 4.1.10000 metadata, documentation, direct upgrade proof, and independent exact-engine qualification."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"compatible","settings":"compatible","migration":"none","compatibility":"compatible","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"release-record","value":"governance/release/mir4-4.1-release-readiness-v1.json"},
+    {"kind":"document","value":"docs/maintainer/mir4-4.1-release-readiness.md"}
+  ]
+}

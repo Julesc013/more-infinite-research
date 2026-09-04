@@ -1604,3 +1604,70 @@ fixtures:
       - single-technology-coverage-scan
       - complete-recipe-accounting
       - chunked-full-index-fingerprint
+
+# MIR441-DIRECT-UPGRADE-FIXTURES-BEGIN
+  upgrade-4-0-21000-to-4-1-21000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-4-0-21000-to-4-1-21000
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: 4.0.21000
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
+    validates:
+      - exact-4-0-source-archive
+      - stable-technology-and-setting-identity-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-1-candidate-normal-mod-directory-load
+
+  upgrade-4-0-20000-to-4-1-20000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-4-0-20000-to-4-1-20000
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: 4.0.20000
+    archetypes:
+      - base-default
+    validates:
+      - exact-4-0-source-archive
+      - stable-technology-and-setting-identity-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-1-candidate-normal-mod-directory-load
+
+  upgrade-4-0-11000-to-4-1-11000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-4-0-11000-to-4-1-11000
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: 4.0.11000
+    archetypes:
+      - base-default
+    validates:
+      - exact-4-0-source-archive
+      - stable-technology-and-setting-identity-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-1-candidate-normal-mod-directory-load
+
+  upgrade-4-0-10000-to-4-1-10000:
+    requires_features: []
+    assertion_path: fixtures/assert-upgrade-4-0-10000-to-4-1-10000
+    harness: tests/runtime/Test-MIRUpgradeMatrix.ps1
+    primary_source_version: 4.0.10000
+    archetypes:
+      - base-default
+    validates:
+      - exact-4-0-source-archive
+      - stable-technology-and-setting-identity-retention
+      - current-research-and-fractional-progress-retention
+      - fixture-state-retention
+      - upgraded-save-two-reload-proof
+      - exact-4-1-candidate-normal-mod-directory-load
+
+# MIR441-DIRECT-UPGRADE-FIXTURES-END

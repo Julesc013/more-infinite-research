@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "kind": "MIR441ReleaseReadinessV1",
+  "status": "authorized-private-candidate-production-readiness",
+  "release": {
+    "source_version": "4.1.0",
+    "tag": "v4.1.0",
+    "candidate_id": "MIR4-4.1.0-RC1",
+    "publication_state": "private-unpublished",
+    "release_window_relative_path": "releases/4.1.0/release-window"
+  },
+  "source": {
+    "branch": "dev",
+    "freeze_at_execution": true,
+    "post_freeze_tracked_changes": false,
+    "package_authority": ["src/mod", "targets", "tools/mir/application/package/TargetMaterializer.ps1"]
+  },
+  "package_source": {
+    "predecessor_sha256": "0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA",
+    "current_sha256": "0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA",
+    "authority_record_sha256": "325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB",
+    "succession": "mir41-bridge-retirement-to-4.1-release-metadata"
+  },
+  "targets": [
+    {"target":"f210","distribution_version":"4.1.21000","factorio_line":"2.1","engine_policy":"latest-installed-official-experimental-exact-lock","factorio_binary":"C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe","predecessor":"4.0.21000","upgrade_fixture":"assert-upgrade-4-0-21000-to-4-1-21000","qualification_role":"technical-required","publication_role":"primary"},
+    {"target":"f200","distribution_version":"4.1.20000","factorio_line":"2.0","engine_policy":"fixed-exact-lock","factorio_binary":"D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe","predecessor":"4.0.20000","upgrade_fixture":"assert-upgrade-4-0-20000-to-4-1-20000","qualification_role":"technical-required","publication_role":"primary"},
+    {"target":"f110","distribution_version":"4.1.11000","factorio_line":"1.1","engine_policy":"fixed-exact-lock","factorio_binary":"D:\\Programs\\Factorio\\1.1\\bin\\x64\\factorio.exe","predecessor":"4.0.11000","upgrade_fixture":"assert-upgrade-4-0-11000-to-4-1-11000","qualification_role":"technical-required","publication_role":"supplemental-lts"},
+    {"target":"f100","distribution_version":"4.1.10000","factorio_line":"1.0","engine_policy":"fixed-exact-lock","factorio_binary":"D:\\Programs\\Factorio\\1.0\\bin\\x64\\factorio.exe","predecessor":"4.0.10000","upgrade_fixture":"assert-upgrade-4-0-10000-to-4-1-10000","qualification_role":"technical-required","publication_role":"supplemental-lts"}
+  ],
+  "execution_order": ["release-intent", "source-freeze", "affected-targets", "target-build", "focused-qualification", "candidate-qualification", "protected-independent-verification", "technical-seal", "exact-main-promotion", "prepared-human-playtest", "human-decision", "tag", "github-publication", "public-readback", "mod-portal-publication", "restore", "reporting"],
+  "resource_policy": {
+    "heavy_processes": 1,
+    "materializations": 1,
+    "static_workers": 2,
+    "minimum_free_ram_gib": 4,
+    "hard_stop_free_ram_gib": 2,
+    "system_drive_target_free_gib": 20,
+    "system_drive_hard_stop_free_gib": 15,
+    "work_volume_reserve_gib": 30,
+    "admission": "free-space-at-least-twice-estimated-peak-plus-reserve",
+    "successful_expanded_work": "delete-after-verified-external-custody",
+    "failed_expanded_work": "retain-until-classified",
+    "measurement": "streaming-file-enumeration-and-periodic-process-sampling"
+  },
+  "promotion": {
+    "mode": "exact-dev-oid-to-main",
+    "required_remote_equality": true,
+    "force_push": false,
+    "post_promotion_tests": false,
+    "ruleset_change": "temporary-minimum-scoped-pull-request-rule-suspension-with-exact-finally-restore"
+  },
+  "human_gate": {
+    "position": "after-technical-seal-and-exact-main-promotion",
+    "automation_may_decide": false,
+    "go_action": "verify-exact-identities-create-governed-signed-annotated-tag-and-publish-sealed-bytes-without-build",
+    "no_go_action": "retain-sealed-candidate-and-publish-nothing"
+  },
+  "transition_gate": {
+    "version_allocation": true,
+    "private_build": true,
+    "qualification": true,
+    "technical_seal": true,
+    "promotion": true,
+    "tagging": false,
+    "publication": false
+  }
+}

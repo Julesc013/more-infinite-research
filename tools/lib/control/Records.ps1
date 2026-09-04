@@ -143,32 +143,15 @@ function Assert-MIRCPRecords {
   }
 }
 
+. (Join-Path $PSScriptRoot 'PackageSourceAtCommit.ps1')
+
 function Get-MIRCPCommitPackageSourceHash {
   param(
     [Parameter(Mandatory)][string]$Commit,
     [string]$RepoRoot = ""
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
-  . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
-  $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-cp-package-" + [guid]::NewGuid().ToString("N"))
-  $archive = Join-Path $temporaryRoot "source.zip"
-  $source = Join-Path $temporaryRoot "source"
-  try {
-    [void](New-Item -ItemType Directory -Force -Path $temporaryRoot)
-    $layout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $Commit
-    $roots = @($layout.roots)
-    & git -C $repo archive --format=zip --output=$archive $Commit -- @roots 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Unable to extract package roots at commit $Commit." }
-    Expand-Archive -LiteralPath $archive -DestinationPath $source
-    if ([string]$layout.kind -ceq 'canonical-materializer-source') {
-      return Get-MIRPackageSourceFingerprint -RepoRoot $source
-    }
-    return Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $source
-  } finally {
-    if (Test-Path -LiteralPath $temporaryRoot -PathType Container) {
-      Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
-    }
-  }
+  return Get-MIRCPCommitPackageSourceHashV2 -Commit $Commit -RepoRoot $repo
 }
 
 function Get-MIRCPGitOutputIdentity {

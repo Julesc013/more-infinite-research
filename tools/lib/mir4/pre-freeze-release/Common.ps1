@@ -87,7 +87,7 @@ function Read-MIR4PreFreezeJson {
   )
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-prefreeze-input] Missing $RelativePath" }
-  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
+  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String
   if ([string]$record.kind -cne $Kind) { throw "[mir4-prefreeze-kind] $RelativePath" }
   return $record
 }

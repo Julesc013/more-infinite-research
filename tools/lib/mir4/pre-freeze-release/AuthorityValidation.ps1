@@ -1,6 +1,9 @@
 function Test-MIR4PreFreezeAuthorities {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PreFreezeRepoRoot $RepoRoot
+  if (-not (Get-Command Get-MIR4BootstrapRecordSha256 -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  }
   $schemas = [ordered]@{
     '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' = 'spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' = 'spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json'
@@ -61,6 +64,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json' = 'contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json'
+    'releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json' = 'contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -1475,6 +1479,8 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 
+  $sourceFreezeReceiptPath = 'releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json'
+  $sourceFreeze = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $sourceFreezeReceiptPath -Kind 'MIR4M41SourceFreezeAuthorityEvolutionV1'
   $bridgeRetirementReceiptPath = 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
   if (Test-Path -LiteralPath (Join-Path $repo $bridgeRetirementReceiptPath) -PathType Leaf) {
     if ($priorReceiptPath -cne 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json') {
@@ -1521,7 +1527,7 @@ function Test-MIR4PreFreezeAuthorities {
     if ($bridgeRetirementPaths.Count -lt 1 -or
         [string]$bridgeRetirement.status -cne 'M41-CURRENT-PRODUCT-BRIDGES-RETIRED-PRIVATE-QUALIFICATION-PENDING' -or
         [string]$bridgeRetirement.package_source.predecessor_sha256 -cne $m4202PackageSourceSha256 -or
-        [string]$bridgeRetirement.package_source.current_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -or
+        [string]$bridgeRetirement.package_source.current_sha256 -cne [string]$sourceFreeze.package_source.predecessor_sha256 -or
         @($bridgeRetirement.package_visible_delta).Count -ne 0) {
       throw '[mir4-prefreeze-bridge-retirement-scope]'
     }
@@ -1532,6 +1538,68 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptPath = $bridgeRetirementReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
+
+  $sourceFreezeChainChecks=[ordered]@{
+    predecessor_path=([string]$sourceFreeze.predecessor.path -ceq $priorReceiptPath)
+    predecessor_sha256=([string]$sourceFreeze.predecessor.sha256 -ceq $priorReceiptSha256)
+    predecessor_record_sha256=([string]$sourceFreeze.predecessor.record_sha256 -ceq [string]$bridgeRetirement.record_sha256)
+    base_branch=([string]$sourceFreeze.base.branch -ceq 'dev')
+    base_commit=([string]$sourceFreeze.base.commit -ceq '65bb11c1226a8160c27ab074ddb503c20df98c69')
+    base_tree=([string]$sourceFreeze.base.tree -ceq 'bebfd455f7f13d724eabb43c3ed48362d8d7901e')
+    record_sha256=([string]$sourceFreeze.record_sha256 -ceq (Get-MIR4BootstrapRecordSha256 -Record $sourceFreeze))
+    package_source_sha256=([string]$sourceFreeze.package_source.current_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo))
+    package_authority_record_sha256=([string]$sourceFreeze.package_source.authority_record_sha256 -ceq [string](Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256)
+  }
+  $failedSourceFreezeChainChecks=@($sourceFreezeChainChecks.GetEnumerator()|Where-Object{-not[bool]$_.Value}|ForEach-Object{[string]$_.Key})
+  if ($failedSourceFreezeChainChecks.Count -ne 0) {
+    throw "[mir4-prefreeze-m41-source-freeze-chain] failed=$($failedSourceFreezeChainChecks-join',')"
+  }
+  $sourceFreezePaths = @{}
+  foreach ($binding in @($sourceFreeze.evolved_bindings)) {
+    $path = [string]$binding.path
+    if ($sourceFreezePaths.ContainsKey($path) -or [string]$binding.hash_mode -cne 'canonical-text-v1' -or [bool]$binding.package_visible) {
+      throw "[mir4-prefreeze-m41-source-freeze-evolved-binding] $path"
+    }
+    if ($authorityHashes.ContainsKey($path)) {
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode) {
+        throw "[mir4-prefreeze-m41-source-freeze-predecessor-binding] $path"
+      }
+    } else {
+      $baseSha = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit ([string]$sourceFreeze.base.commit) -RelativePath $path
+      if ([string]$binding.previous_sha256 -cne $baseSha) { throw "[mir4-prefreeze-m41-source-freeze-base-binding] $path" }
+    }
+    if ([bool]$binding.release_authority -ne ($path -ceq 'governance/release/mir4-4.1-release-readiness-v1.json')) {
+      throw "[mir4-prefreeze-m41-source-freeze-release-authority] $path"
+    }
+    $authorityHashes[$path]=[string]$binding.current_sha256;$authorityHashModes[$path]=[string]$binding.hash_mode;$sourceFreezePaths[$path]=$true
+  }
+  foreach ($binding in @($sourceFreeze.current_authorities)) {
+    $path=[string]$binding.path
+    if ($sourceFreezePaths.ContainsKey($path) -or $authorityHashes.ContainsKey($path) -or [string]$binding.hash_mode -cne 'canonical-text-v1' -or [bool]$binding.package_visible) {
+      throw "[mir4-prefreeze-m41-source-freeze-current-binding] $path"
+    }
+    & git -C $repo cat-file -e (([string]$sourceFreeze.base.commit)+':'+$path) 2>$null
+    if ($LASTEXITCODE -eq 0) { throw "[mir4-prefreeze-m41-source-freeze-new-path] $path" }
+    if ([bool]$binding.release_authority -ne ($path -ceq 'governance/release/mir4-4.1-release-readiness-v1.json')) {
+      throw "[mir4-prefreeze-m41-source-freeze-release-authority] $path"
+    }
+    $authorityHashes[$path]=[string]$binding.sha256;$authorityHashModes[$path]=[string]$binding.hash_mode;$sourceFreezePaths[$path]=$true
+  }
+  $trackedSourceFreezeChanges=@(& git -C $repo diff --name-only ([string]$sourceFreeze.base.commit) --)
+  if($LASTEXITCODE-ne0){throw '[mir4-prefreeze-m41-source-freeze-diff]'}
+  $untrackedSourceFreezeChanges=@(& git -C $repo ls-files --others --exclude-standard)
+  if($LASTEXITCODE-ne0){throw '[mir4-prefreeze-m41-source-freeze-untracked]'}
+  $actualSourceFreezePaths=@($trackedSourceFreezeChanges+$untrackedSourceFreezeChanges|ForEach-Object{([string]$_).Replace('\','/')}|Where-Object{$_-and$_-cne$sourceFreezeReceiptPath}|Sort-Object -Unique)
+  $boundSourceFreezePaths=@($sourceFreezePaths.Keys|Sort-Object)
+  if (($actualSourceFreezePaths-join"`n") -cne ($boundSourceFreezePaths-join"`n") -or
+      [int]$sourceFreeze.changed_path_count -ne $sourceFreezePaths.Count -or
+      [string]$sourceFreeze.status -cne 'MIR41-RELEASE-READINESS-AUTHORITY-EVOLVED-SOURCE-FREEZE-PENDING' -or
+      (@($sourceFreeze.package_visible_delta|ForEach-Object{[string]$_.target})-join'|') -cne 'f210|f200|f110|f100' -or
+      @($sourceFreeze.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value -ne ($_.Name-in@('version_allocation','private_build','qualification'))}).Count -ne 0) {
+    throw '[mir4-prefreeze-m41-source-freeze-scope]'
+  }
+  $priorReceiptPath=$sourceFreezeReceiptPath
+  $priorReceiptSha256=Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
 
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {

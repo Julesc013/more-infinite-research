@@ -4,18 +4,18 @@
 
 More Infinite Research (MIR) extends Factorio with configurable, compatibility-aware infinite research. MIR discovers eligible technologies and production families, builds stable research streams, preserves save progression across upgrades, and explains every admitted, preserved, omitted, or rejected result.
 
-The current stable product is **MIR 4.0 Whole-Platform Genesis**. The repository’s `main` branch preserves that stable line; `dev` is the protected integration line for MIR 4.1. Repository source archives are not player packages.
+The latest published product remains **MIR 4.0.0** until the signed `v4.1.0` tag and release exist. MIR 4.1.0 is the four-target repository and package fixed point; when `main` contains this source before publication it is the exact sealed, unpublished candidate awaiting the final maintainer playtest. Repository source archives are not player packages.
 
 ## Choose the right target
 
 Each target is generated independently from the canonical `src/mod` source and its target overlay. Use the release ZIP matching your Factorio line.
 
-| Target | Factorio line | MIR 4.0 distribution | Support role |
+| Target | Factorio line | MIR 4.1 distribution | Technical / publication role |
 | --- | --- | --- | --- |
-| F210 | 2.1 experimental | `4.0.21000` | current |
-| F200 | 2.0 | `4.0.20000` | maintained |
-| F110 | 1.1 | `4.0.11000` | supplemental LTS |
-| F100 | 1.0 | `4.0.10000` | supplemental LTS |
+| F210 | 2.1 experimental | `4.1.21000` | required / primary |
+| F200 | 2.0 | `4.1.20000` | required / primary |
+| F110 | 1.1 | `4.1.11000` | required / supplemental LTS |
+| F100 | 1.0 | `4.1.10000` | required / supplemental LTS |
 
 F210 follows the latest installed official Factorio 2.1 experimental build until the first official 2.1 stable release exists. Every qualification still records one exact executable, runtime API, prototype API, and changelog identity. When that identity changes, MIR opens fresh API, compatibility, implementation, functionality, fixture, performance, documentation, and stable-transition review work before reusing any claim.
 

@@ -1,0 +1,872 @@
+{
+  "schema": 1,
+  "kind": "MIR4M41SourceFreezeAuthorityEvolutionV1",
+  "recorded_at": "2026-09-05T06:34:56.3954979+10:00",
+  "status": "MIR41-RELEASE-READINESS-AUTHORITY-EVOLVED-SOURCE-FREEZE-PENDING",
+  "programme_id": "MIR4-4.1-RELEASE-READINESS",
+  "change_id": "MIR4-M41-SOURCE-FREEZE-AUTHORITY-2026-09-05",
+  "predecessor": {
+    "path": "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+    "sha256": "F10DE24BF64C59BA1EBACE314747034462AF66ABAFED0EB5B7D887139FA8A35F",
+    "record_sha256": "ACFDDFF41EB88505E8D4AFD1B37C3641E68DD13535EBBAF8149384338071AF79"
+  },
+  "base": {
+    "branch": "dev",
+    "commit": "65bb11c1226a8160c27ab074ddb503c20df98c69",
+    "tree": "bebfd455f7f13d724eabb43c3ed48362d8d7901e"
+  },
+  "readiness_contract": {
+    "path": "governance/release/mir4-4.1-release-readiness-v1.json",
+    "sha256": "5F8F79F36E6450F71F08CC1E3092B2927EB703D21952CA7CB85132252CF14EF5"
+  },
+  "package_source": {
+    "predecessor_sha256": "0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA",
+    "current_sha256": "0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA",
+    "authority_record_sha256": "325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB",
+    "writer": "tools/mir/application/package/TargetMaterializer.ps1"
+  },
+  "changed_path_count": 82,
+  "evolved_bindings": [
+    {
+      "path": ".mir/docs.yml",
+      "previous_sha256": "82BC08A0E8A0B06C0FDFCD1EBDADEB3883149A930F5BD7D8D921B042D0E977FF",
+      "current_sha256": "F3E3585395849CD52CEA014DFFF910F7F7499C88ECC9EE048911E59115F4DC2A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": ".mir/fixtures.yml",
+      "previous_sha256": "38CC2CD10358F86515023F5AAF7222063D24E3B7579B98F0887D2B0CC767241B",
+      "current_sha256": "2756A624149BB60C07FE9D2625BFDDDB312A3F9517252461A14A5DEE08146B33",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "0F387157720303023E755F9B18BEC46DAD3A5A916CAE1059BE3669A8AA2ECEA8",
+      "current_sha256": "0AAD6F171A47F7E5B69FDD325FAE4BAAE3A94C0C44616683416066D8A7C24699",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "CHANGELOG.md",
+      "previous_sha256": "F2A95E8D9C474C10241BEABBADEF11A0F8270381499A2869123EADF5BBF75267",
+      "current_sha256": "36E5D6182B12700F66C21E1028F9FDA946BE373B829AC582AAB1A771AAC05422",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0032.json",
+      "previous_sha256": "827B50E6B2EF05FA70751EC194AB926EF58CAA9F5A8C6F0B271547A595B9A96D",
+      "current_sha256": "17F5B624BDA7200732C6EAD5D96DDD68543DF8C430988D76ED325C4990CFF528",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0033.json",
+      "previous_sha256": "77172DBCBB20F54B8F674479F92DB97EB372F64B9B768026B66B7E2B0622B1F1",
+      "current_sha256": "7489B7642FCACC2690E9AB463A1F905192FEE6D2BFE7F958CDB4429392D85D0D",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0034.json",
+      "previous_sha256": "389C3218BD91937B208415B0552FA778FC231933144E87A71A9DEEF92049CC3C",
+      "current_sha256": "175EE34F92B17C342757B4F37C4209772A39D354509B972EF94B1272D9E63E74",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0035.json",
+      "previous_sha256": "722F946D978211CB9F580141C19B032D205E861F3FDEFBE37C91CEED19E67217",
+      "current_sha256": "E2FA1EE48568A3A5F61F0E16FFD47C2F035E40FBF0462C77D6A6D33C6F5F7F8B",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "contracts/release/mir4-release-narrative-plan-v1.schema.json",
+      "previous_sha256": "297A0EE90BEE7373864E6B9404CCA2F95E1943A8758924F28492C0C2B3B025F2",
+      "current_sha256": "FE8E830EE82670341BF7D4102BBD90EB5629C259048DD1EBE0BBC63D402210E9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "docs/maintainer/mir4-release-operations.md",
+      "previous_sha256": "4A57E9808777D86EFF2A8EDFE077242E417DC9CAF5EB180B0C0FCF7D8A7E5961",
+      "current_sha256": "8F8851D579DF51BFC57A6307D2388960A5EFBC9A6CDAC646F40E96131D65B29B",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/reference/generated/documentation-index.md",
+      "previous_sha256": "2DFEFABA9D55852D0569A8846E138B3A4378C6A0EDD945A5D65E0A1DDA98555B",
+      "current_sha256": "639DDB5382CC6892D89FF107FC5FEC60AD750A4B8BAAD7C437822AD750829C99",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/reference/generated/documentation-navigation.md",
+      "previous_sha256": "1070A39A0457D6327A37344061A82C15E3837635C413CB46DC57878E7032481D",
+      "current_sha256": "248F9C81E9D9C444BB1714F0E712629A6DBD6E2FB49EE23BEADB25EBBE3D2BB9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/reference/generated/documentation-owner-dashboard.md",
+      "previous_sha256": "6A0AD230152F084E1CD6B4786700A5FE7AAFBC836FFF1957AEBDB81FEE681EBD",
+      "current_sha256": "188400F0F877772CEADEFD653277B63B12B4EF645A3AA16C9A7FA0A8ADB14371",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/reference/generated/documentation-reference-matrix.md",
+      "previous_sha256": "B8479F8C0B7A7644785AAAD6347F73B87209FBD217EF1D5E817C8AB6AA92915F",
+      "current_sha256": "E563405EC059C492AD7B627DF3683C71036833E519BFF1AFE6E76567A4A649CD",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/reference/generated/documentation-review-age.md",
+      "previous_sha256": "571EF1152F4220B27CC7CEE824BADF24AD29AC4434A53BE04C694DF73ADF624D",
+      "current_sha256": "5F7E00F0539F7186B04E1EB9A9E1151721FC47BF4ADDE60661BB11FC1EE13EEC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "docs/releases/mir4-post-4.0-roadmap.md",
+      "previous_sha256": "4DCFD671AFE45EB25A9180A9878023FA57BA1620D708E7558320862538F25CF6",
+      "current_sha256": "447C90788F74567F000B112400911244DE064E6740D65C8C0799C36320A86778",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "A0A4A7578288D6DAB557947A6D9A60B74C598F2C05A58E1CFBDD793AD411CE3C",
+      "current_sha256": "8A9E3D205A791410421E9E51DFE30AAA4EA44A9D26593B300F626220D034258A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "README.md",
+      "previous_sha256": "403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20",
+      "current_sha256": "5E8C683E39E76B65487344221B947A0C9A0E04D463433C49C0DC4454F3CFA115",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "RELEASE-RUNBOOK.md",
+      "previous_sha256": "5590764BEABBC61C85AF6B060E7E3F2CED66977AAC588237BE2C2495859B6464",
+      "current_sha256": "25121D0BC889F3F6A5971A082D5083ADF4D9798E98AE88342FA69842C3DACAE0",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "releases/governance/MIR4-Source-Changelog-PlanV1.json",
+      "previous_sha256": "5543BDCCAC361DADB185447A3648369C63AA49F75A7450EF2E8E145097C722AF",
+      "current_sha256": "70FD120F8707E90D68731B42AB11C8A5B8128DE9790CECBE7EE82237B725849C",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "spec/programmes/mir4-4x-operating-programme-v1.json",
+      "previous_sha256": "161167135FC5B0292FC140138FB4E0935B7E94973CA97EDECF404A2AD98E671B",
+      "current_sha256": "00D5E2E7AC98A4ACCD49BAEFCC1FC31ABF39B571C70C3BBBB802598213497163",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
+      "previous_sha256": "B8F637C84A242DCA2E05E76E8415873AB578E17596A8B4D26F18C9F860F57741",
+      "current_sha256": "E1E3B332C74A65473A504EBCFA82CF758007E4429F46DBC3E907CA6F858982C3",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "4C703D10567AD015CC258D730F7F0CC1D3F361906A094EBD2F44EBF674638C64",
+      "current_sha256": "85AD954A62FCAE92F3CF9D813307C210001A97F33DF9E4FB16F75C9B2BB0AC0B",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/release/Test-MIRReleaseAuthority.ps1",
+      "previous_sha256": "C04716EBC499888D466C8BB50DBA731EAB2EA5083350E788DECDBC14CAD9B994",
+      "current_sha256": "92614DE16824D01BBE5280ED071BDEF81D1D2CE52979F8D6A44A80F75F1AEDAC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "8927E0D381FC1BA6561513CC5C2968BA60E656757FF10FC2762F7A398DE46335",
+      "current_sha256": "D51678A896BB76B8F26BDA7DDA0D31CEE44146C319D087F81510EFE7BDE98FC6",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/runtime/Test-MIRUpgrade.ps1",
+      "previous_sha256": "2CBC1CD23C42E060BAD21B5636543CD3470D47E9F072A9FDF8662B838588DA75",
+      "current_sha256": "EEAA5949651236B43B7883964B86B2485854B259523F7605C929AF4187C46ABC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/runtime/Test-MIRUpgradeMatrix.ps1",
+      "previous_sha256": "E39F942E33F40EC9F1C35F37001FF34474BC9B599CB69700C4714A6A292C2D07",
+      "current_sha256": "CCCF9098819CA80425238414414C273141CFCA5A6143792BB5F3AA2378397437",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/support/MIR4M4202PackageSuccession.ps1",
+      "previous_sha256": "751E3809B90C726D503DA467432B9B10FB8A700CCEC40E4C4E5997D3E3B0FB00",
+      "current_sha256": "8CA31DC219B4F32EFECA5184E593A377DBD3A4DD44EEEA36521CBD4B6AB66B89",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
+      "previous_sha256": "BFCD95B6C46B97661F2680C231F8817251FDB352566E7822DDC048C6EDA1920E",
+      "current_sha256": "BEC4F46F71525BC5B6CF601848B8DD4283F0A1720D2A06333FD6A8A5F455DA4B",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "37EF56155FE07501831110F95B1EE3746EE42548DDF804A45E25726874F10698",
+      "current_sha256": "3C6529D7C600FB6FED13F40BE1646832DC5F5F1C47468A570CB6E6789938753A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "7E7FE8CF8E3F91DA179565029ED5FE86DC8AEDABE29C0A6CF5AB88697A081275",
+      "current_sha256": "A42A3F737823AAA3D82F8EAF792EF6AB18397CB863FE2C4DBE066C97DDD98A8F",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
+      "previous_sha256": "CBE7E446A714C8011244FAF53C4FC78E31D7BF08210F2A47268A4C43093C7CBF",
+      "current_sha256": "58E7CE8653648A402B26EF802126EA194FC05B9A08507E74F1879749066BE4D7",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tools/lib/control/Records.ps1",
+      "previous_sha256": "7EA3D55799D293648A916304FA48A96D4E2BEFC382155628BFBC15AFEC04E94C",
+      "current_sha256": "05B153AC22634CEA1E1C6B2A95237A194B9335E31192248AC2C174BB7556094A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+      "previous_sha256": "E605925755F921626E4E747DC72DAFA7EA9E21FAECC7B29DEC76AA1F620518F3",
+      "current_sha256": "185C81632E4CEF3998F0AEB2E9ECDF8595389B62A5A4E50E17E389135D06148C",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/Common.ps1",
+      "previous_sha256": "A29FA909CE7AAC16D27EE30E3AA773BCED4D25DC2775A413C90400384E91D6E5",
+      "current_sha256": "D0B92CBE6DE604A39604DA895F2EE3495EA5AFA121E858BE76A6CC5FA9C1E511",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/package/TargetMaterializer.ps1",
+      "previous_sha256": "538F426AA72120D0E5C116CC5E0175AFED815F2F7D441776FFE1D3A10269BA86",
+      "current_sha256": "3D28074DE7F903990521133D906ADB9686743D41CEAC3AB5E268467615043A11",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/GitHubReleaseRenderer.ps1",
+      "previous_sha256": "864EA1D3DE4F25F30AC96098B495750F6D17B5D26785B248F6CEF59045813065",
+      "current_sha256": "8EE40B5FD8F7D6DCC4973C3DCC1CFEB8B88B646CAEECE15045465D084F401C1C",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseNarrativeModel.ps1",
+      "previous_sha256": "380FC14DE2C7E17B2CBEF5DC59779CD2791E03692CD2B9AF41A4E48370E77BEE",
+      "current_sha256": "BB33F4B1F33AACE52E734AF6AC70F2C2A6DCE878396052CB0D44A5A48D24C793",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/ReleaseNarratives.ps1",
+      "previous_sha256": "F6247CEDC697AF54C4C1C87CEFECCEED31329EF595101BDC9873C1382965926B",
+      "current_sha256": "3A1151F2F024B6DDD28799B0B12C2558509B3B19C4DBA634E2CECA6EE292361D",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/SourceChangelogRenderer.ps1",
+      "previous_sha256": "B69B4F18E5003F23846B2E27EEE3FCE1B082C3ADF3560870A02844ED187F0167",
+      "current_sha256": "ECF79F4AC32DD034715EB8BE63B5F6FBA94803FD830497B98CAA239BC79E3F7A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "previous_sha256": "CDBC39105162ADE026FBE99FEE9C7E0D979A1989642130B5AD4D2CC1C6E0C30F",
+      "current_sha256": "FBF0EBAFDEFB1B3FBDF47A5BBEF8F949DE852E7DA393B5B8AFD1F83B122716C9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
+      "previous_sha256": "D39BE21798E36E53AB3736D8FBB391711CF206559147A437897225954DCEB5DC",
+      "current_sha256": "AE363B2509E2D7A428C1E9AAF72184579F8C5D0CDDA7A091FBE0EC3A36F79CB8",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "previous_sha256": "5BAFF7A8EFF99C7E5ABAC995E4567ECBBDA48FA0EF95053B91780234A6561D8A",
+      "current_sha256": "EE7C16965914C97CA0C9867CC5648D44C22BFCA54F9AE072BD59F619084FA76C",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/cli/router/MIR4ApplicationCommands.ps1",
+      "previous_sha256": "C31901DAB733EE0AADD27AC4C251A5FFB1E0CDF20A6382966474137ECE471F6D",
+      "current_sha256": "B3C0C7B673FBEFA7D87E44BF4970758BA2F7861575148E345B8891839360C464",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "33CF8DE20EC379E7BE60EC1DC7FD71D71F1C8F349193032D4900793A57ADC83B",
+      "current_sha256": "CA25A4BCA78510C00C996B802CFE79CC2092248A591240BAD00797C6CAC1C421",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    }
+  ],
+  "current_authorities": [
+    {
+      "path": "changes/unreleased/MIR4-CHG-2026-0036.json",
+      "sha256": "A92F36A9206A219295336316305A8DAF8CBC04647D3C1EA51753AC2E27299421",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
+      "sha256": "7E0BDE9CE6BE5CF1AA6160392405A87494934F09830E27F80A965CAE77A81388",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json",
+      "sha256": "3740383875C0736FD054D0CF6451F0F8FD7D9C219E23E530E43A01189213D2BC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
+      "path": "docs/maintainer/mir4-4.1-release-readiness.md",
+      "sha256": "051EACD7C15569E6D391850A3ED63E83D932A2F29F33CA6F3B102ADEA3A9762C",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Repository or generated release documentation authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/control.lua",
+      "sha256": "16CCBA11AE4609F62022285F13BA3C605C6E67B83E851699C5147DC767158215",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/data.lua",
+      "sha256": "8C7D769D73C30D60719DA41458DD693F612E8E2FC365799F937741FCFE68C1C9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/info.json",
+      "sha256": "C1E677A80268DCAAAE33E340FE421AA95DFE54E1FA9B07A30DCBD218B6B1526F",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-10000-to-4-1-10000/settings.lua",
+      "sha256": "77D600178206D720D5E2B5FDCCEBBF21BE75305E70AF3F54AD7B199FF1875CEC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/control.lua",
+      "sha256": "67A70669289165708272415C64E361E76697F35E1FB867A87AB38E53A287E5EC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/data.lua",
+      "sha256": "8C7D769D73C30D60719DA41458DD693F612E8E2FC365799F937741FCFE68C1C9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/info.json",
+      "sha256": "1827FDC768B34262FA5D054FD64802445E2F54F9FFC19E124C737C19832D5832",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-11000-to-4-1-11000/settings.lua",
+      "sha256": "77D600178206D720D5E2B5FDCCEBBF21BE75305E70AF3F54AD7B199FF1875CEC",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/control.lua",
+      "sha256": "61C5C0DE3EC10B77370EE836483E4E140E322829C60A251680043F5DAF70BDC7",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/data.lua",
+      "sha256": "8C7D769D73C30D60719DA41458DD693F612E8E2FC365799F937741FCFE68C1C9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/info.json",
+      "sha256": "A05A262AC37525336A02C6EEA0082EE65D439142E040E96D0464B6383EF16328",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-20000-to-4-1-20000/settings.lua",
+      "sha256": "B03AEB2F0AF6EEDAFE84EEA2D09C1B63B3B044B60BFF2A72F3BEA538EEFCAF3F",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua",
+      "sha256": "CB6604770EE038C731BCE7E7704673E87EE076BDCEBE1DFFED9F398A22F35DE5",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/data.lua",
+      "sha256": "8A00BD874C956910695A2C960279ED80BD709AD9EEF3840C726897B2D093F22E",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/info.json",
+      "sha256": "811E1F127245380A643A8D18BBCA7CA3971708C4CC6EDE685B84C585A4718820",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings-updates.lua",
+      "sha256": "4BD7DD421CEE989430E460A0856DCED44C7DAB585648BBD03D850A3809AA7425",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings.lua",
+      "sha256": "1C1B61683D33A3350FDAFFF5FE069D2371E94F20E0B62962493602DA4A9754F7",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "governance/release/mir4-4.1-release-readiness-v1.json",
+      "sha256": "5F8F79F36E6450F71F08CC1E3092B2927EB703D21952CA7CB85132252CF14EF5",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": true,
+      "role": "Private release intent and transition authority."
+    },
+    {
+      "path": "tests/release/Test-MIR441ReleaseReadiness.ps1",
+      "sha256": "9212A6C24D2D5A6268F2C13E780292E6DEEF8DEC9A2CEE1F58512322218FBF23",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR441PackagePresentationAuthority.ps1",
+      "sha256": "D0112BBB09132D0EFE9403E342FA0397F6D5659BF117348A731F56C88C356801",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1",
+      "sha256": "03B2C7128974125A05EB28CB86F8F9EDDF57B4D7EF1C83EB5417DF435BB21718",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
+      "sha256": "D53C1C96D9721308A73CEDE95EDA298E4B4A38AA3EFB7A085870EFC2ED8CF577",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/lib/control/PackageSourceAtCommit.ps1",
+      "sha256": "2D1CEB6262128B4DA9173EE3A93ECC31E2F7BFB2A2DE7B073906EC50FF28FEB5",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/package/MIR441PackagePresentation.ps1",
+      "sha256": "FFE2D0EB2DEB23DF4B10E96FCAFA1B5893692A58A3DF75555091956DCCAC73F2",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/MIR441ReleaseReadiness.ps1",
+      "sha256": "A65E015ABDCDC8C3CEB9737E33A40C9CCF72D529737A61672834F62FC3802838",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/CandidateBuild.ps1",
+      "sha256": "1F9148FBF2A89310CD7CAC76D7F8F939F5F07D1F0CE18C63C826A71499553DE1",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/Common.ps1",
+      "sha256": "AB0F15B68B028E602CC08E1EEF70DC0FD28C2885048A86411F01F2743B1EE8D3",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/Contract.ps1",
+      "sha256": "77606B203B9A0698E9DEE80F591C734E849612C6AF19A31951AAF716DAB6A3BF",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/IndependentVerification.ps1",
+      "sha256": "368BA0780C2A1ED9F942C0C70DFB9FD245222885A58375EC5C1E6BCC4040D306",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/Promotion.ps1",
+      "sha256": "AD999796359FBDA4E9D60CB9F975E4EB4DEDEE2FC237B49E970C354A0FFF5E7F",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/Qualification.ps1",
+      "sha256": "D7C3D5E93BB1BC9D87FA01DC338024A4B9C67F45FD8B78497C8934B531211E92",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+      "sha256": "70CB20B0625BCA9E6AD9951BC587E28C92D1EC5481A57099138AC8019A1C2BD7",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/release/readiness/TechnicalSeal.ps1",
+      "sha256": "DF38EE7CA13B8BC6AC4865852723B8A511528F4F29ED77793A0634EF17E1FD01",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    }
+  ],
+  "package_visible_delta": [
+    {
+      "target": "f210",
+      "outputs": [
+        "README.md",
+        "changelog.txt",
+        "info.json"
+      ]
+    },
+    {
+      "target": "f200",
+      "outputs": [
+        "README.md",
+        "changelog.txt",
+        "info.json"
+      ]
+    },
+    {
+      "target": "f110",
+      "outputs": [
+        "README.md",
+        "changelog.txt",
+        "info.json"
+      ]
+    },
+    {
+      "target": "f100",
+      "outputs": [
+        "README.md",
+        "changelog.txt",
+        "info.json"
+      ]
+    }
+  ],
+  "invariants": {
+    "exact_changed_path_set": true,
+    "canonical_text_hashes": true,
+    "single_package_writer": true,
+    "baseline_info_template_preserved": true,
+    "candidate_version_materialized_from_release_intent": true,
+    "gameplay_semantics_added": false,
+    "tagging_authorized": false,
+    "publication_authorized": false
+  },
+  "transition_gate": {
+    "version_allocation": true,
+    "private_build": true,
+    "qualification": true,
+    "source_freeze": false,
+    "production_signing": false,
+    "technical_seal": false,
+    "promotion_to_main": false,
+    "tagging": false,
+    "publication": false
+  },
+  "record_sha256": "E4CC72CB5A049BA40C8CA6A143278781EA7440E02BED60C62B2BD7A91689577C"
+}

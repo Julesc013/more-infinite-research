@@ -11,7 +11,7 @@ function Assert-MIR4CharacterizationV1 {
 }
 
 $expectedPackage=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-$expectedReadme='403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20'
+$expectedReadme='5E8C683E39E76B65487344221B947A0C9A0E04D463433C49C0DC4454F3CFA115'
 $output='build/reports/repository-characterization'
 
 $authority=Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo

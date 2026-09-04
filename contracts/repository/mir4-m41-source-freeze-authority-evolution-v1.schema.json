@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json",
+  "title": "MIR4M41SourceFreezeAuthorityEvolutionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "status", "programme_id", "change_id", "predecessor", "base", "readiness_contract", "package_source", "changed_path_count", "evolved_bindings", "current_authorities", "package_visible_delta", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4M41SourceFreezeAuthorityEvolutionV1"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "status": {"const": "MIR41-RELEASE-READINESS-AUTHORITY-EVOLVED-SOURCE-FREEZE-PENDING"},
+    "programme_id": {"const": "MIR4-4.1-RELEASE-READINESS"},
+    "change_id": {"const": "MIR4-M41-SOURCE-FREEZE-AUTHORITY-2026-09-05"},
+    "predecessor": {"$ref": "#/$defs/reference"},
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["branch", "commit", "tree"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"const": "65bb11c1226a8160c27ab074ddb503c20df98c69"},
+        "tree": {"const": "bebfd455f7f13d724eabb43c3ed48362d8d7901e"}
+      }
+    },
+    "readiness_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"const": "governance/release/mir4-4.1-release-readiness-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "package_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["predecessor_sha256", "current_sha256", "authority_record_sha256", "writer"],
+      "properties": {
+        "predecessor_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "authority_record_sha256": {"$ref": "#/$defs/sha256"},
+        "writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}
+      }
+    },
+    "changed_path_count": {"type": "integer", "minimum": 70},
+    "evolved_bindings": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evolved"}},
+    "current_authorities": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/current"}},
+    "package_visible_delta": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "outputs"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "outputs": {"const": ["README.md", "changelog.txt", "info.json"]}
+        }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact_changed_path_set", "canonical_text_hashes", "single_package_writer", "baseline_info_template_preserved", "candidate_version_materialized_from_release_intent", "gameplay_semantics_added", "tagging_authorized", "publication_authorized"],
+      "properties": {
+        "exact_changed_path_set": {"const": true},
+        "canonical_text_hashes": {"const": true},
+        "single_package_writer": {"const": true},
+        "baseline_info_template_preserved": {"const": true},
+        "candidate_version_materialized_from_release_intent": {"const": true},
+        "gameplay_semantics_added": {"const": false},
+        "tagging_authorized": {"const": false},
+        "publication_authorized": {"const": false}
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version_allocation", "private_build", "qualification", "source_freeze", "production_signing", "technical_seal", "promotion_to_main", "tagging", "publication"],
+      "properties": {
+        "version_allocation": {"const": true},
+        "private_build": {"const": true},
+        "qualification": {"const": true},
+        "source_freeze": {"const": false},
+        "production_signing": {"const": false},
+        "technical_seal": {"const": false},
+        "promotion_to_main": {"const": false},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "path": {"type": "string", "minLength": 1, "pattern": "^[^\\\\]+(?:/[^\\\\]+)*$"},
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "record_sha256"],
+      "properties": {"path": {"$ref": "#/$defs/path"}, "sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "evolved": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "scope", "package_visible", "release_authority", "role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "scope": {"const": "mir4-4.1-release-readiness"},
+        "package_visible": {"const": false},
+        "release_authority": {"type": "boolean"},
+        "role": {"type": "string", "minLength": 12}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "scope", "package_visible", "release_authority", "role"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "scope": {"const": "mir4-4.1-release-readiness"},
+        "package_visible": {"const": false},
+        "release_authority": {"type": "boolean"},
+        "role": {"type": "string", "minLength": 12}
+      }
+    }
+  }
+}

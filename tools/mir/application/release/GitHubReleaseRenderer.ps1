@@ -6,7 +6,12 @@ function Render-MIR4GitHubReleaseV1 {
   $lines += @('','Install only the package matching the running Factorio line. A target-coded distribution is not an upgrade for a different Factorio line.','','## Changes','')
   foreach ($fragment in @($selected | Sort-Object change_id)) {
     $lines += "- $(Get-MIR4NarrativeSummaryV1 -Fragment $fragment -Surface 'github')"
-    if ((Get-MIR4NarrativeDispositionV1 -Fragment $fragment -Surface 'github') -ceq 'include') { foreach ($detail in @($fragment.details)) { $lines += "  - $detail" } }
+    # Production GitHub copy is a concise projection. The technical release and
+    # manifest retain every accepted detail, while historical/synthetic fixtures
+    # keep exercising the original detailed projection contract.
+    if ([string]$Plan.plan_id -notlike 'MIR4-REL-*' -and (Get-MIR4NarrativeDispositionV1 -Fragment $fragment -Surface 'github') -ceq 'include') {
+      foreach ($detail in @($fragment.details)) { $lines += "  - $detail" }
+    }
   }
   $lines += @('','## Upgrade','') + @($Plan.copy.upgrade | ForEach-Object { "- $_" })
   $lines += @('','## Compatibility','') + @($Plan.copy.compatibility | ForEach-Object { "- $_" })

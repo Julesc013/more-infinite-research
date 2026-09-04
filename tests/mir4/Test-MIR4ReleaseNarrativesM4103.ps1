@@ -44,7 +44,8 @@ $minorRoot = Join-Path $repo 'build/results/validation/m41-03/synthetic-minor'
 $minorGitHub = [IO.File]::ReadAllText((Join-Path $minorRoot 'github-release.md'))
 $minorManifest = [IO.File]::ReadAllText((Join-Path $minorRoot 'release-manifest.json'))
 Assert-MIR4NarrativeTestV1 ($minorGitHub -notmatch 'Reorganized synthetic contributor documentation' -and $minorGitHub -notmatch 'sensitive validation boundary|Sensitive reproducer') 'mir4-release-narrative-surface-filtering'
-Assert-MIR4NarrativeTestV1 ($minorGitHub -match [regex]::Escape($script:MIR4NarrativeRedaction) -and $minorManifest -match [regex]::Escape($script:MIR4NarrativeRedaction)) 'mir4-release-narrative-security-redaction'
+$redaction=Get-MIR4NarrativeRedactionV1
+Assert-MIR4NarrativeTestV1 ($minorGitHub -match [regex]::Escape($redaction) -and $minorManifest -match [regex]::Escape($redaction)) 'mir4-release-narrative-security-redaction'
 Assert-MIR4NarrativeTestV1 (-not (Test-Path -LiteralPath (Join-Path $minorRoot 'f100'))) 'mir4-release-narrative-no-omitted-package'
 Assert-MIR4NarrativeTestV1 (([IO.File]::ReadAllText((Join-Path $minorRoot 'CHANGELOG.md'))) -match 'Reorganized synthetic contributor documentation') 'mir4-release-narrative-repository-source-view'
 
@@ -54,7 +55,7 @@ Assert-MIR4NarrativeTestV1 ($facade -match 'MIR4ReleaseNarrativeResultV1') 'mir4
 
 $sourceProjection = Update-MIR4SourceChangelogV1 -RepoRoot $repo -PlanPath 'releases/governance/MIR4-Source-Changelog-PlanV1.json' -Check
 $sourceText = [IO.File]::ReadAllText((Join-Path $repo 'CHANGELOG.md'))
-Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -match '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
+Assert-MIR4NarrativeTestV1 ([string]$sourceProjection.status -ceq 'current' -and $sourceText -notmatch '(?m)^## Unreleased$' -and $sourceText -match '(?m)^## \[4\.1\.0\] - 2026-09-05$' -and $sourceText -match '(?m)^## \[4\.0\.0\] - 2026-08-30$') 'mir4-source-changelog-current'
 Assert-MIR4NarrativeTestV1 ($sourceText -match 'complete physical and executable foundation') 'mir4-source-changelog-accepted-inventory'
 $changelogEol = (& git -C $repo check-attr eol -- CHANGELOG.md 2>&1) -join "`n"
 Assert-MIR4NarrativeTestV1 ($LASTEXITCODE -eq 0 -and $changelogEol -cmatch 'CHANGELOG\.md:\s+eol:\s+lf$') 'mir4-source-changelog-eol'

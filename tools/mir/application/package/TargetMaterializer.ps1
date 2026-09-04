@@ -8,6 +8,9 @@ if (-not (Get-Command Test-MIR4BootstrapRecordHash -ErrorAction SilentlyContinue
 if (-not (Get-Command Get-MIR4CanonicalPackageAuthority -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir4TargetMaterializerRoot 'tools/mir/application/package/PackageAuthority.ps1')
 }
+if (-not (Get-Command Write-MIR441PackagePresentationV1 -ErrorAction SilentlyContinue)) {
+  . (Join-Path $mir4TargetMaterializerRoot 'tools/mir/application/package/MIR441PackagePresentation.ps1')
+}
 
 function Read-MIR4TargetMaterializerRecord {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Kind)
@@ -122,6 +125,9 @@ function New-MIR4TargetPackage {
     $info.version = [string]$identity.distribution_version
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
+  }
+  if ([string]$identity.source_version -ceq '4.1.0') {
+    [void](Write-MIR441PackagePresentationV1 -RepoRoot $repo -Target $Target -SourceVersion ([string]$identity.source_version) -PackageRoot $tree)
   }
   $archive = Join-Path $candidateRoot ([string]$identity.package_name)
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

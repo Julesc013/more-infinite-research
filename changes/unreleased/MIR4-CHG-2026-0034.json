@@ -1,17 +1,27 @@
 {
-  "schema": 1,
-  "id": "MIR4-CHG-2026-0034",
-  "kind": "maintainability",
-  "audience": ["maintainers"],
-  "summary": "Decompose supply-chain inventory, attestation, policy verification, and custody projection behind the existing facade.",
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0034",
+  "status": "accepted",
+  "change_type": "changed",
+  "summary": "Split supply-chain inventory, attestation, policy verification, and custody projection behind the existing facade.",
   "details": [
-    "Preserves all 28 public PowerShell function names and their declaration order.",
-    "Keeps source identity, archive selection, component inventory, SPDX, SLSA provenance, policy verification, and custody-record behavior unchanged.",
-    "Completes the bounded PowerShell decomposition sequence and leaves bridge retirement and private four-target MIR 4.1 qualification as separate required fixed points.",
-    "Regenerates the package-excluded platform lock and dependent reference projections after the module authority changes.",
-    "Changes no player package, gameplay, save, setting, migration, compatibility claim, version, tag, signature, seal, or publication gate."
+    "Preserved all public PowerShell functions and their declaration order.",
+    "Kept source identity, archive selection, component inventory, SPDX, SLSA provenance, policy verification, and custody-record behavior unchanged.",
+    "Completed the bounded PowerShell decomposition sequence without reopening player behavior.",
+    "Changed no gameplay, saves, settings, migrations, compatibility claims, versions, tags, signatures, seals, or publication authority."
   ],
-  "targets": ["repository"],
-  "package_visible": false,
-  "release_authority": false
+  "semantic_domains": ["tooling", "supply-chain", "custody", "maintainability"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"Supply-chain tooling is package-excluded."},
+    {"target":"F200","disposition":"unaffected","reason":"Supply-chain tooling is package-excluded."},
+    {"target":"F110","disposition":"unaffected","reason":"Supply-chain tooling is package-excluded."},
+    {"target":"F100","disposition":"unaffected","reason":"Supply-chain tooling is package-excluded."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [{"kind":"release-record","value":"releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json"}]
 }

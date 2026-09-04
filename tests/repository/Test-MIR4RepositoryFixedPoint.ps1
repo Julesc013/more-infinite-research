@@ -311,7 +311,10 @@ if($currentPackageSourceSha256-cne$f2ePackageSourceSha256){
 }
 $bridgeRetirementReceipt = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
 Assert-MIR4RepositoryMigrationV1 ([string]$bridgeRetirementReceipt.package_source.predecessor_sha256 -ceq $preBridgePackageSourceSha256) 'mir4-repository-migration-bridge-retirement-predecessor-fingerprint'
-Assert-MIR4RepositoryMigrationV1 ([string]$bridgeRetirementReceipt.package_source.current_sha256 -ceq $currentPackageSourceSha256 -and @($bridgeRetirementReceipt.package_visible_delta).Count -eq 0) 'mir4-repository-migration-bridge-retirement-successor-fingerprint'
+$releaseReadiness = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'governance/release/mir4-4.1-release-readiness-v1.json'
+$sourceFreezeCheck=& (Join-Path $repo 'tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1') -RepoRoot $repo -Check
+$sourceFreeze = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json'
+Assert-MIR4RepositoryMigrationV1 ([string]$sourceFreezeCheck.status-ceq'current'-and[string]$sourceFreeze.package_source.predecessor_sha256-ceq[string]$bridgeRetirementReceipt.package_source.current_sha256-and[string]$sourceFreeze.package_source.current_sha256-ceq$currentPackageSourceSha256-and[string]$sourceFreeze.package_source.authority_record_sha256-ceq[string](Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256-and[string]$releaseReadiness.package_source.predecessor_sha256-ceq[string]$sourceFreeze.package_source.predecessor_sha256-and[string]$releaseReadiness.package_source.current_sha256-ceq[string]$sourceFreeze.package_source.current_sha256-and@($bridgeRetirementReceipt.package_visible_delta).Count-eq0) 'mir4-repository-migration-bridge-retirement-successor-fingerprint'
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-historical-package-fingerprint'
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
+  "type": "object",
+  "required": ["schema", "kind", "status", "release", "source", "package_source", "targets", "execution_order", "resource_policy", "promotion", "human_gate", "transition_gate"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR441ReleaseReadinessV1"},
+    "status": {"const": "authorized-private-candidate-production-readiness"},
+    "release": {
+      "type": "object",
+      "required": ["source_version", "tag", "candidate_id", "publication_state"],
+      "properties": {
+        "source_version": {"const": "4.1.0"},
+        "tag": {"const": "v4.1.0"},
+        "candidate_id": {"const": "MIR4-4.1.0-RC1"},
+        "publication_state": {"const": "private-unpublished"}
+      },
+      "additionalProperties": true
+    },
+    "source": {
+      "type": "object",
+      "required": ["branch", "freeze_at_execution", "post_freeze_tracked_changes"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "freeze_at_execution": {"const": true},
+        "post_freeze_tracked_changes": {"const": false}
+      },
+      "additionalProperties": true
+    },
+    "package_source": {
+      "type": "object",
+      "required": ["predecessor_sha256", "current_sha256", "authority_record_sha256", "succession"],
+      "properties": {
+        "predecessor_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "current_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "authority_record_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "succession": {"const": "mir41-bridge-retirement-to-4.1-release-metadata"}
+      },
+      "additionalProperties": false
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["target", "distribution_version", "engine_policy", "factorio_line", "predecessor", "upgrade_fixture"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "distribution_version": {"pattern": "^4[.]1[.](21000|20000|11000|10000)$"},
+          "engine_policy": {"enum": ["latest-installed-official-experimental-exact-lock", "fixed-exact-lock"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "execution_order": {
+      "type": "array",
+      "const": ["release-intent", "source-freeze", "affected-targets", "target-build", "focused-qualification", "candidate-qualification", "protected-independent-verification", "technical-seal", "exact-main-promotion", "prepared-human-playtest", "human-decision", "tag", "github-publication", "public-readback", "mod-portal-publication", "restore", "reporting"]
+    },
+    "resource_policy": {
+      "type": "object",
+      "required": ["heavy_processes", "materializations", "static_workers", "minimum_free_ram_gib", "hard_stop_free_ram_gib", "system_drive_target_free_gib", "system_drive_hard_stop_free_gib", "work_volume_reserve_gib", "successful_expanded_work"],
+      "properties": {
+        "heavy_processes": {"const": 1},
+        "materializations": {"const": 1},
+        "static_workers": {"const": 2},
+        "minimum_free_ram_gib": {"type": "number", "minimum": 3},
+        "hard_stop_free_ram_gib": {"type": "number", "minimum": 1},
+        "successful_expanded_work": {"const": "delete-after-verified-external-custody"}
+      },
+      "additionalProperties": true
+    },
+    "promotion": {
+      "type": "object",
+      "required": ["mode", "required_remote_equality", "force_push", "post_promotion_tests"],
+      "properties": {
+        "mode": {"const": "exact-dev-oid-to-main"},
+        "required_remote_equality": {"const": true},
+        "force_push": {"const": false},
+        "post_promotion_tests": {"const": false}
+      },
+      "additionalProperties": true
+    },
+    "human_gate": {
+      "type": "object",
+      "required": ["position", "automation_may_decide", "go_action", "no_go_action"],
+      "properties": {
+        "position": {"const": "after-technical-seal-and-exact-main-promotion"},
+        "automation_may_decide": {"const": false}
+      },
+      "additionalProperties": true
+    },
+    "transition_gate": {
+      "type": "object",
+      "required": ["version_allocation", "private_build", "qualification", "technical_seal", "promotion", "tagging", "publication"],
+      "properties": {
+        "version_allocation": {"const": true},
+        "private_build": {"const": true},
+        "qualification": {"const": true},
+        "technical_seal": {"const": true},
+        "promotion": {"const": true},
+        "tagging": {"const": false},
+        "publication": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

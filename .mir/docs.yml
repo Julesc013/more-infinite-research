@@ -1307,6 +1307,16 @@ docs:
     source_of_truth_for:
       - terminal-repository-protection-handoff
       - github-administration-preflight
+  - path: docs/maintainer/mir4-4.1-release-readiness.md
+    title: "MIR 4.1 Release Readiness"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-4.1-release-readiness
+      - mir4-4.1-resource-bounded-release
+      - mir4-4.1-one-minute-playtest-gate
   - path: docs/maintainer/mir4-authority-map.md
     title: "MIR 4 maintainer authority map"
     status: current
