@@ -955,3 +955,11 @@ This PS7 split changes no compatibility claim, stream identity, prototype, scena
 The split binds the characterized 1,380-line implementation and preserves all 26 function names and their order. Its setup and constants remain in the facade; the one repository-root lookup inside an extracted function uses the facade-captured application root so its resolution remains unchanged. The admission checker and its synthetic contract probe explicitly select the retired bootstrap writer's `HistoricalCompatibility` mode; current package construction remains solely owned by `TargetMaterializer`.
 
 This PS8 split changes no custody admission, signature, qualification-evidence, publication-rehearsal, seal, restore, package, gameplay, save, setting, migration, compatibility, or release behavior. It grants no production key, version allocation, tagging, signing, sealing, promotion, publication, or package cutover authority.
+
+### M42-02 PS9 release-capsule decomposition
+
+tools/lib/mir4/ReleaseCapsule.ps1 remains the stable internal facade and loads eight ordered modules from tools/lib/mir4/release-capsule: core records, custody inventory, source archive and descriptors, support records, archive reading and role closure, capsule construction, capsule verification, and capsule restore.
+
+The split binds the characterized 1,356-line implementation and preserves all 19 function names and their order. The original setup, dependency loading, constants, validation rules, content-addressed object layout, construction behavior, verification behavior, publisher admission, and contained restore behavior remain unchanged.
+
+This PS9 split is package-excluded and grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.
