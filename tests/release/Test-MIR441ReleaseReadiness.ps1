@@ -28,12 +28,16 @@ $promotionText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/re
 $qualificationText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/readiness/Qualification.ps1'))
 $resumeText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/readiness/QualificationResume.ps1'))
 $compilerFixtureText=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-compiler-contracts/data-final-fixes.lua'))
+$f210UpgradeData=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/data.lua'))
+$f210UpgradeSettings=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings-updates.lua'))
 Assert-MIR441Test ($resourceText-match'EnumerateFiles'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'resource-hard-stop'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
 Assert-MIR441Test ($buildText-notmatch'ForEach-Object\s+-Parallel|Start-Job|Start-ThreadJob'-and$buildText-match'foreach\(\$target') 'mir441-serial-materializer'
 Assert-MIR441Test ($buildText-match"-SourceVersion '4[.]1[.]0'"-and$materializerText-match'\$info[.]version\s*=\s*\[string\]\$identity[.]distribution_version') 'mir441-candidate-version-materialized-from-intent'
 Assert-MIR441Test ($promotionText-match'fast_forward=\$true'-and$promotionText-match'finally\s*\{'-and$promotionText-match'post_promotion_tests=\$false'-and$promotionText-notmatch'--force|reset --hard') 'mir441-exact-promotion-boundary'
 Assert-MIR441Test ($qualificationText-match'fresh-\$slug[.]checkpoint[.]json'-and$qualificationText-match'Get-MIR441ValidatedTargetCheckpoint'-and$resumeText-match'MIR441FreshQualificationCheckpointV1'-and$resumeText-match'MIR441UpgradeQualificationCheckpointV1'-and$resumeText-match'mir441-qualification-resume'-and$resumeText-match'validation_harness_git_dirty') 'mir441-exact-resumable-qualification'
 Assert-MIR441Test ($compilerFixtureText-match'\^4%[.]\[01\]%[.]%d\+\$'-and$compilerFixtureText-notmatch'\^4%[.]0%[.]%d\+\$') 'mir441-compiler-contract-package-succession'
+Assert-MIR441Test ($f210UpgradeData-match'mir-fixture-assert-upgrade-4-0-21000-to-4-1-21000'-and$f210UpgradeData-notmatch'mir-fixture-assert-upgrade-3-2-11-to-4-0-21000') 'mir441-upgrade-fixture-current-applicability'
+Assert-MIR441Test ($f210UpgradeSettings-match'missing 4[.]0[.]21000 to 4[.]1[.]21000 upgrade setting'-and$f210UpgradeSettings-notmatch'missing 3[.]2[.]11 to 4[.]0[.]21000 upgrade setting') 'mir441-upgrade-fixture-current-diagnostic'
 
 $external=Assert-MIR441ExternalRoot -RepoRoot $repo -Path 'E:\MIR-READINESS-TEST' -Name test
 Assert-MIR441Test ($external-ceq'E:\MIR-READINESS-TEST') 'mir441-external-root-positive'

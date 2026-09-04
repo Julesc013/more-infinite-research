@@ -26,6 +26,6 @@ end
 
 for name, row in pairs(values) do
   local setting = data.raw[row.type] and data.raw[row.type][name]
-  if not setting then error("missing 3.2.11 to 4.0.21000 upgrade setting " .. name) end
+  if not setting then error("missing 4.0.21000 to 4.1.21000 upgrade setting " .. name) end
   setting.default_value = row.value
 end

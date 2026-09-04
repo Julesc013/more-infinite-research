@@ -19,6 +19,7 @@ function Get-MIR441DerivedFixtureFiles($Row){
   $files=[ordered]@{}
   foreach($item in Get-ChildItem -LiteralPath $sourceRoot -File|Sort-Object Name){
     $text=[IO.File]::ReadAllText($item.FullName).Replace([string][char]13,'')
+    $text=$text.Replace("mir-fixture-$($Row.source)","mir-fixture-$($Row.name)")
     if($item.Name-ceq'control.lua'){
       $fromRegex=[regex]'(from_version[ ]*=[ ]*")[^"]+(")'
       $toRegex=[regex]'(to_version[ ]*=[ ]*")[^"]+(")'
@@ -36,6 +37,9 @@ function Get-MIR441DerivedFixtureFiles($Row){
       $dependencies.Add("more-infinite-research >= $($Row.from)")
       $info.dependencies=@($dependencies)
       $text=($info|ConvertTo-Json -Depth 20).Replace([string][char]13,'')+$lf
+    }elseif($item.Name-ceq'settings-updates.lua'){
+      $transitionRegex=[regex]'missing [0-9]+(?:[.][0-9]+)+ to [0-9]+(?:[.][0-9]+)+ upgrade setting'
+      $text=$transitionRegex.Replace($text,"missing $($Row.from) to $($Row.to) upgrade setting")
     }
     $files[$item.Name]=$text
   }

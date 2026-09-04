@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4M41SourceFreezeAuthorityEvolutionV1",
-  "recorded_at": "2026-09-05T07:34:44.2678141+10:00",
+  "recorded_at": "2026-09-05T08:31:10.6089320+10:00",
   "status": "MIR41-RELEASE-READINESS-AUTHORITY-EVOLVED-SOURCE-FREEZE-PENDING",
   "programme_id": "MIR4-4.1-RELEASE-READINESS",
   "change_id": "MIR4-M41-SOURCE-FREEZE-AUTHORITY-2026-09-05",
@@ -25,7 +25,7 @@
     "authority_record_sha256": "325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB",
     "writer": "tools/mir/application/package/TargetMaterializer.ps1"
   },
-  "changed_path_count": 85,
+  "changed_path_count": 86,
   "evolved_bindings": [
     {
       "path": ".mir/docs.yml",
@@ -200,7 +200,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "A0A4A7578288D6DAB557947A6D9A60B74C598F2C05A58E1CFBDD793AD411CE3C",
-      "current_sha256": "D845E97014C53C92E4E34571E12CE8FB52E0EC20FA3329DF713EA80C1BE978CD",
+      "current_sha256": "B08DBE2CC6A76D909FF35772D6927F8049E814FE8E5CCD8C319D0E3A5BDC7CCE",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -508,6 +508,15 @@
       "role": "MIR 4.1 release-readiness governance or generated projection."
     },
     {
+      "path": "changes/unreleased/MIR4-CHG-2026-0038.json",
+      "sha256": "D4ABBFEAB4566E1237471D52AB6CEDF4DDEC442503DC880DF829D6F6308AF23A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "MIR 4.1 release-readiness governance or generated projection."
+    },
+    {
       "path": "contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
       "sha256": "7E0BDE9CE6BE5CF1AA6160392405A87494934F09830E27F80A965CAE77A81388",
       "hash_mode": "canonical-text-v1",
@@ -653,7 +662,7 @@
     },
     {
       "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/data.lua",
-      "sha256": "8A00BD874C956910695A2C960279ED80BD709AD9EEF3840C726897B2D093F22E",
+      "sha256": "EDB38359B3364BBB2D49EB140B2FD8D557053EBD69B1E44AE947B20B4AF998DB",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -671,7 +680,7 @@
     },
     {
       "path": "fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings-updates.lua",
-      "sha256": "4BD7DD421CEE989430E460A0856DCED44C7DAB585648BBD03D850A3809AA7425",
+      "sha256": "99EAA1A80E728F8984C0834195B16164652786EFED084B406D8BDE2C17B451FD",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -698,7 +707,7 @@
     },
     {
       "path": "tests/release/Test-MIR441ReleaseReadiness.ps1",
-      "sha256": "C948BF8D1D36B0C58B9AF679F5717DC7EF04823C94F20C472D7C96D4644A57E9",
+      "sha256": "FB44510E59D043F825B378F515620D35AFBD185990B560C4E57FDB0EB7B2E4F4",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -716,7 +725,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1",
-      "sha256": "C75004B6041F586E785F5ED581742CB56A537E915F73C98022D7995FE6363D80",
+      "sha256": "336A8C279149F1AAB95AFDE98B687DECCF2462125C1C6814D872E63C44E387E1",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -725,7 +734,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
-      "sha256": "D53C1C96D9721308A73CEDE95EDA298E4B4A38AA3EFB7A085870EFC2ED8CF577",
+      "sha256": "7A936BF362B769274260B7AF1CAFB358E8D64B658DF6FF1E1959EA19879C2E65",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -896,5 +905,5 @@
     "tagging": false,
     "publication": false
   },
-  "record_sha256": "BF945F1E211A09094C7ABF55C68BB9D32B9D92521B9D32AA57A5A7489509DD0D"
+  "record_sha256": "DE792569A258DF0C3ACCD48FECAC4A32BEA1E40A6058319377DE418C2BA48352"
 }

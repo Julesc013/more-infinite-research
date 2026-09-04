@@ -2443,17 +2443,17 @@
     {
       "path": "tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "C75004B6041F586E785F5ED581742CB56A537E915F73C98022D7995FE6363D80",
+      "sha256": "336A8C279149F1AAB95AFDE98B687DECCF2462125C1C6814D872E63C44E387E1",
       "hash_mode": "canonical-text-v1",
-      "lines": 173,
+      "lines": 174,
       "package_visible": false
     },
     {
       "path": "tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1",
       "classification": "canonical-internal",
-      "sha256": "D53C1C96D9721308A73CEDE95EDA298E4B4A38AA3EFB7A085870EFC2ED8CF577",
+      "sha256": "7A936BF362B769274260B7AF1CAFB358E8D64B658DF6FF1E1959EA19879C2E65",
       "hash_mode": "canonical-text-v1",
-      "lines": 95,
+      "lines": 99,
       "package_visible": false
     },
     {
@@ -5522,5 +5522,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1303e7a44c0702ab2e90eb09956f288a4fa74b11d3f5e94632188001fb992b42"
+  "digest": "sha256:222cc4cf04fdc3f795de486de85351d5b87195f4c00b54ebbda68f3b57d387c2"
 }
