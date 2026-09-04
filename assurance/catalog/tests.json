@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 134,
+  "test_count": 135,
   "tests": [
     {
       "id": "docs.check",
@@ -1260,6 +1260,55 @@
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
         "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-control-executor-decomposition-m42-02-ps10",
+      "proposition": "The governed test 'static.mir4-control-executor-decomposition-m42-02-ps10' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/control/Executor.ps1",
+        "tools/lib/control/executor/**",
+        "tools/lib/validation/PerformanceCampaign.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "tools/mir/application/tooling/CommandInventory.ps1",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-release-capsule-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202ControlExecutorDecompositionAuthority.ps1",
+        "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+        "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ReleaseCapsuleDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/tooling/Test-MIRControlPlaneExecutor.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
         "assurance/catalog/tests.json",
         "package-source"
       ],
@@ -4905,12 +4954,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 49,
-      "tooling-release": 41,
+      "tooling-release": 42,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 12
     },
-    "canonical_test_commands": 122,
+    "canonical_test_commands": 123,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -4923,5 +4972,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f5047c08ee8e4f0b0c888773f4022f0c0483b6d07cef1dd9a4852fd60f30efa8"
+  "digest": "sha256:07cece83d4d736637e7b6892e3b0d23ef3d0bf9e110cf2d2a2317c2384f3d245"
 }

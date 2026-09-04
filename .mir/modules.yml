@@ -1600,6 +1600,7 @@ validation_tooling:
     control_plane_views: tools/lib/control/Views.ps1
     control_plane_context: tools/lib/control/Context.ps1
     control_plane_executor: tools/lib/control/Executor.ps1
+    control_plane_executor_modules: tools/lib/control/executor
     control_plane_calibration: tools/lib/control/Calibration.ps1
     control_plane_shadow: tools/lib/control/Shadow.ps1
     control_plane_shadow_gate: tests/tooling/Test-MIRControlPlaneShadow.ps1

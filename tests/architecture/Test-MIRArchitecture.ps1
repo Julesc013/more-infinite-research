@@ -469,6 +469,12 @@ foreach ($releaseCapsuleModule in @("CoreRecords.ps1", "CustodyInventory.ps1", "
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/lib/mir4/ReleaseCapsule.ps1" -Text $releaseCapsuleFacadeText -Needle "release-capsule/$releaseCapsuleModule"
 }
+$controlExecutorFacadeText = Read-MIRFile -RelativePath "tools/lib/control/Executor.ps1"
+foreach ($controlExecutorModule in @("ContextAndTaskExecution.ps1", "EnvironmentExecution.ps1", "PerformanceSourceAndArtifacts.ps1", "RuntimeMeasurements.ps1", "PackageDeltaMeasurements.ps1", "AggregateGate.ps1")) {
+  $relative = "tools/lib/control/executor/$controlExecutorModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/control/Executor.ps1" -Text $controlExecutorFacadeText -Needle "executor/$controlExecutorModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

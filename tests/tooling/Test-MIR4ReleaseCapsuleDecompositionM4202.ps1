@@ -18,7 +18,10 @@ function Assert-MIR4M4202ReleaseCapsule {
 }
 
 $packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202ReleaseCapsuleDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+$controlExecutorPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
+if (-not (Test-Path -LiteralPath $controlExecutorPath -PathType Leaf)) {
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202ReleaseCapsuleDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json'
 $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202ReleaseCapsule ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-release-capsule-decomposition-v1.schema.json')) 'mir4-m42-02-release-capsule-schema'
@@ -68,8 +71,18 @@ try {
   $stream.Dispose()
 }
 
+$expectedInventoryDigest = [string]$receipt.tooling_inventory.digest
+if (Test-Path -LiteralPath $controlExecutorPath -PathType Leaf) {
+  $controlExecutorRaw = Get-Content -Raw -LiteralPath $controlExecutorPath
+  Assert-MIR4M4202ReleaseCapsule ($controlExecutorRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json')) 'mir4-m42-02-release-capsule-control-executor-schema'
+  $controlExecutor = $controlExecutorRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202ReleaseCapsule (Test-MIR4BootstrapRecordHash -Record $controlExecutor) 'mir4-m42-02-release-capsule-control-executor-record'
+  Assert-MIR4M4202ReleaseCapsule ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$controlExecutor.predecessor.receipt_sha256 -and [string]$controlExecutor.predecessor.record_sha256 -ceq [string]$receipt.record_sha256) 'mir4-m42-02-release-capsule-control-executor-predecessor'
+  Assert-MIR4M4202ReleaseCapsule ([string]$controlExecutor.current_source.sha256 -ceq '97EACF68C080CF9D38102A5BF26E96A42C015020F78DBA049461422E5673AF66' -and [bool]$controlExecutor.public_contract.unchanged -and [int]$controlExecutor.public_contract.function_count -eq 27) 'mir4-m42-02-release-capsule-control-executor-contract'
+  $expectedInventoryDigest = [string]$controlExecutor.tooling_inventory.digest
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202ReleaseCapsule ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq [string]$receipt.tooling_inventory.digest) 'mir4-m42-02-release-capsule-inventory'
+Assert-MIR4M4202ReleaseCapsule ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-release-capsule-inventory'
 Assert-MIR4M4202ReleaseCapsule ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.custody_inventory_unchanged -and [bool]$receipt.semantic_contract.source_archive_unchanged -and [bool]$receipt.semantic_contract.capsule_construction_unchanged -and [bool]$receipt.semantic_contract.capsule_verification_unchanged -and [bool]$receipt.semantic_contract.offline_restore_unchanged -and [bool]$receipt.semantic_contract.platform_projections_regenerated -and [bool]$receipt.semantic_contract.post_cutover_package_non_interference_assertion) 'mir4-m42-02-release-capsule-semantic-contract'
 Assert-MIR4M4202ReleaseCapsule (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-release-capsule-transition'
 Assert-MIR4M4202ReleaseCapsule ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-release-capsule-package-firewall'
