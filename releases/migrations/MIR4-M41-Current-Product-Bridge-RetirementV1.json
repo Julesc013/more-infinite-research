@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4M41CurrentProductBridgeRetirementReceiptV1",
-  "recorded_at": "2026-09-05T01:23:01.7001236+10:00",
+  "recorded_at": "2026-09-05T01:55:40.8772489+10:00",
   "status": "M41-CURRENT-PRODUCT-BRIDGES-RETIRED-PRIVATE-QUALIFICATION-PENDING",
   "predecessor": {
     "path": "releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json",
@@ -253,6 +253,60 @@
       "path": "targets/package-authority.json",
       "previous_sha256": "3B37329D1FB45D3C3A9B77340DD81724ABFC43A7581D04902035DBEC9DDA5F31",
       "current_sha256": "98E0BC0FEB4022C8ED7A1289AC3FE615D4FB0A65A4A2DAE04777EDD4B95E71C0",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4BaseContinuationsDecompositionM4202.ps1",
+      "previous_sha256": "B895A1ED14C93191F99B6B2766DD728ED004C9F35CB65052C2F411025065A134",
+      "current_sha256": "309904464F8E54265A216D3DCC9C1F23F0E3B0424973C8307AD3D20A4E46C5E3",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4CompilationPlanDecompositionM4202.ps1",
+      "previous_sha256": "C9C7B198506BAABC739EAFA947C7CD06B789D71B30A18DB87E42E18BB654AAE7",
+      "current_sha256": "35725BC8D6270A78175D0DBC51DFCD833F193483C8348CE841E55EC5B6510F59",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1",
+      "previous_sha256": "1475D48E11935FF47F165D4BF36AB59914A70193B19CDCFC888085A50E86F1A1",
+      "current_sha256": "53B5B7A0D732DC74A0F8B3C25DFCA925BE0D73BA296CECA0D22D101C6C2A5CB9",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1",
+      "previous_sha256": "59AF461A659C76332C446D1855F3016C49FC339EAEAB35EBE2EEDFC9EEBAAC51",
+      "current_sha256": "487A65434D841769D4F24DF055DBA04A4801B998F32D5472AA78DDD65B2D1438",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1",
+      "previous_sha256": "12DE2AAFB829984101C8D3E7C6C08783263F4CD87649A4A03BA05D90E15C8399",
+      "current_sha256": "56F0F4E2D35FB83AE753E0A913780C7E9CAC9C5A0C404CD5E15DF3158262BC0F",
+      "hash_mode": "canonical-text-v1",
+      "scope": "current-product-bridge-retirement",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1",
+      "previous_sha256": "096C577085747E7519803EE5350DB784BB72CD0E68379FAF27B77D3CB3160A68",
+      "current_sha256": "A681556E7F9E973A441B74A6BAE1AAF09469D3D5E189EDB2C4E9527EE2B7ED6C",
       "hash_mode": "canonical-text-v1",
       "scope": "current-product-bridge-retirement",
       "package_visible": false,
@@ -540,6 +594,12 @@
       "role": "Current bridge-retirement authority or proof."
     },
     {
+      "path": "tests/compiler/support/MIR4M4202PackageSuccession.ps1",
+      "sha256": "CE4560C5AE52984DCDC6337FC8A78C77C9C40B083E621292C31ADEBA582DBDFC",
+      "hash_mode": "canonical-text-v1",
+      "role": "Current bridge-retirement authority or proof."
+    },
+    {
       "path": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
       "sha256": "B07C8B2A3B7CDA81B8ED68F47D6E5FFA45522B6FF3EC26AB957A4BB5945EACEE",
       "hash_mode": "canonical-text-v1",
@@ -580,5 +640,5 @@
     "sealing": false,
     "publication": false
   },
-  "record_sha256": "C6D5FED97BEB6C91D82DF4369C4CA6F4CD3A9DB7C95577518F74591DC41AB42D"
+  "record_sha256": "AC243975641C8B2EB9E1BCDEA64BF46B890127C71210F7981E61EFEAF5251E07"
 }

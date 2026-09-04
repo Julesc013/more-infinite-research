@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/compiler/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202EffectOwnership([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-effect-ownership-test] $Code"}}
 
@@ -26,7 +27,7 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   Assert-MIR4M4202EffectOwnership ($successorRaw|Test-Json -SchemaFile $successorSchemaPath) 'package-source-successor-schema'
   $successor=$successorRaw|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-MIR4M4202EffectOwnership (Test-MIR4BootstrapRecordHash -Record $successor) 'package-source-successor-hash'
-  Assert-MIR4M4202EffectOwnership ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and[string]$successor.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-successor-chain'
+  Assert-MIR4M4202EffectOwnership ([string]$successor.predecessor.package_source_sha256-ceq[string]$receipt.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$successor.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-successor-chain'
   $expectedManifestBindings=441
 }
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
