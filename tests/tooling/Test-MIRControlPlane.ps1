@@ -17,8 +17,8 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 $records = Assert-MIRCPRecords -RepoRoot $repo
 $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
 $verificationProfile = Read-MIRCPJson -Path "validation/profiles/factorio-$([string]$info.factorio_version).json" -RepoRoot $repo
-$candidateProgramme = [string]$verificationProfile.release_authority_mode -eq 'candidate-programme'
-$freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks -AllowCandidateProgrammeWorkingTree:$candidateProgramme
+$developmentContext = [string]$verificationProfile.execution_context_mode -eq 'development-context'
+$freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks -AllowDevelopmentWorkingTree:$developmentContext
 foreach ($command in @("Invoke-MIRCPFreshCalibration", "New-MIRCPFreshCalibrationProof", "Get-MIRCPCalibrationProofState", "Resolve-MIRCPManifestTaskResult")) {
   if ($null -eq (Get-Command $command -CommandType Function -ErrorAction SilentlyContinue)) { throw "Control-plane calibration command is unavailable: $command" }
 }
@@ -136,10 +136,11 @@ if ([string]$views.status -ne "current") { throw "Control-plane generated views 
 $todoText = Get-Content -Raw -LiteralPath (Join-Path $repo 'todo.md')
 if ($todoText -notmatch '(?m)^## Active MIR 4\.x operating programme$' -or
     $todoText -notmatch '(?m)^## Historical MIR 4\.0 pre-freeze execution record$' -or
-    $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `active` \|' -or
+    $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `complete` \|' -or
     $todoText -notmatch '(?m)^## M42-00 package fixed point$' -or
     $todoText -notmatch '\| `f200` \| `complete` \| `releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1\.json` \|' -or
-    $todoText -notmatch 'Next target: `f110`\. Package cutover: `blocked`\.') {
+    $todoText -notmatch '\| `f100` \| `complete` \| `releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1\.json` \|' -or
+    $todoText -notmatch 'Phase: `M41-F2E`\. Aggregate: `complete`\. Next target: `pending`\. Package cutover: `complete`\.') {
   throw 'Generated maintainer queue does not distinguish live MIR 4.x authority from the historical pre-freeze execution record.'
 }
 $calibration = Assert-MIRCPMutationCalibration -RepoRoot $repo

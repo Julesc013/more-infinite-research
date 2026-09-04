@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202StreamCompiler([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-stream-compiler-test] $Code"}}
 
@@ -44,7 +45,7 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
       Assert-MIR4M4202StreamCompiler ($l6Raw|Test-Json -SchemaFile $l6SchemaPath) 'package-source-l6-successor-schema'
       $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
       Assert-MIR4M4202StreamCompiler (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
-      Assert-MIR4M4202StreamCompiler ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and[string]$l6.package_authority.package_source_sha256-ceq$currentPackageSource) 'package-source-l6-successor-chain'
+      Assert-MIR4M4202StreamCompiler ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-l6-successor-chain'
       $expectedManifestBindings=441
     }else{$expectedManifestBindings=437}
   }else{

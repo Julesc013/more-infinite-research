@@ -8,6 +8,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202PowerShell([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-powershell-test] $Code"}}
 
@@ -329,6 +330,29 @@ if($hasSuccessor){
     }
   }
 }
+$bridgeRetirementPath=Join-Path $repo 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
+if(Test-Path -LiteralPath $bridgeRetirementPath -PathType Leaf){
+  $bridgeRetirementRaw=Get-Content -Raw -LiteralPath $bridgeRetirementPath
+  Assert-MIR4M4202PowerShell ($bridgeRetirementRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json')) 'bridge-retirement-successor-schema'
+  $bridgeRetirement=$bridgeRetirementRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202PowerShell (Test-MIR4BootstrapRecordHash -Record $bridgeRetirement) 'bridge-retirement-successor-record-hash'
+  Assert-MIR4M4202PowerShell ($hasSupplyChainSuccessor-and[string]$bridgeRetirement.predecessor.path-ceq[IO.Path]::GetRelativePath($repo,$supplyChainSuccessorPath).Replace('\','/')-and[string]$bridgeRetirement.predecessor.sha256-ceq(Get-FileHash -LiteralPath $supplyChainSuccessorPath -Algorithm SHA256).Hash-and[string]$bridgeRetirement.predecessor.record_sha256-ceq[string]$supplyChainSuccessor.record_sha256) 'bridge-retirement-successor-predecessor'
+  foreach($binding in @($bridgeRetirement.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedTrackedSha.ContainsKey($path)){
+      Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedTrackedSha[$path]) "bridge-retirement-successor-tracked-predecessor-$path"
+      $expectedTrackedSha[$path]=[string]$binding.current_sha256
+    }
+    if($expectedAuthoritySha.ContainsKey($path)){
+      Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedAuthoritySha[$path]) "bridge-retirement-successor-authority-predecessor-$path"
+      $expectedAuthoritySha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $inventoryBinding=@($bridgeRetirement.evolved_bindings|Where-Object{[string]$_.path-ceq[string]$receipt.inventory.path})
+  Assert-MIR4M4202PowerShell ($inventoryBinding.Count-eq1-and[string]$inventoryBinding[0].previous_sha256-ceq$expectedInventorySha) 'bridge-retirement-successor-inventory-predecessor'
+  $expectedInventorySha=[string]$inventoryBinding[0].current_sha256
+  $expectedInventoryDigest=[string](Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$receipt.inventory.path))|ConvertFrom-Json -Depth 100).digest
+}
 $inventoryPath=Join-Path $repo ([string]$receipt.inventory.path)
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq$expectedInventorySha-and[string]$inventory.digest-ceq$expectedInventoryDigest-and[int]$inventory.summary.unknown-eq0) 'inventory'
@@ -363,7 +387,8 @@ foreach($binding in @($receipt.authority_bindings)){
 }
 Assert-MIR4M4202PowerShell ([string]$receipt.decomposition_sequence[0].node-ceq'M42-02-PS1-COMMAND-ROUTER'-and[string]$receipt.next_fixed_point-ceq'M42-02-PS1-COMMAND-ROUTER') 'next-node'
 Assert-MIR4M4202PowerShell ([int]$receipt.architecture_reconciliation.canonical_output_count-eq267-and[int]$receipt.architecture_reconciliation.assigned_output_count-eq267) 'architecture-reconciliation'
-Assert-MIR4M4202PowerShell ([string]$receipt.preservation.package_source_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'package-preservation'
+$currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+Assert-MIR4M4202PowerShell ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $currentPackageSource)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'package-preservation'
 Assert-MIR4M4202PowerShell (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'release-firewall'
 
 [pscustomobject][ordered]@{status='passed';test_id='static.mir4-powershell-characterization-m42-02';reviewed_files=20;decompose=11;waivers=9;next_fixed_point=[string]$receipt.next_fixed_point;package_source_sha256=[string]$receipt.preservation.package_source_sha256;record_sha256=[string]$receipt.record_sha256;publication=$false}|ConvertTo-Json -Depth 10

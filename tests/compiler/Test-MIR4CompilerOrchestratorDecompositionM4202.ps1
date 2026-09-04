@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202CompilerOrchestrator([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-compiler-orchestrator-test] $Code"}}
 
@@ -16,7 +17,8 @@ $raw=Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202CompilerOrchestrator ($raw|Test-Json -SchemaFile $schemaPath) 'receipt-schema'
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202CompilerOrchestrator (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
-Assert-MIR4M4202CompilerOrchestrator ([string]$receipt.package_authority.package_source_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'package-source-fingerprint'
+$currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+Assert-MIR4M4202CompilerOrchestrator (Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource) 'package-source-fingerprint'
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202CompilerOrchestrator ($evolvedPaths.Count-eq16-and@($evolvedPaths|Sort-Object -Unique).Count-eq16-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 

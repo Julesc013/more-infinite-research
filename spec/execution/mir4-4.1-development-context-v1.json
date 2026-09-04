@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "kind": "MIR4DevelopmentExecutionContextV1",
+  "status": "active-private-mir4.1-qualification-no-release-authority",
+  "programme": "MIR4-4.1",
+  "package_authority": "targets/package-authority.json",
+  "target_registry": "targets/registry.json",
+  "historical_context": {
+    "path": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json",
+    "role": "immutable-historical-development-context-only",
+    "current_authority": false
+  },
+  "targets": ["f210", "f200", "f110", "f100"],
+  "allowed": [
+    "repository-development",
+    "deterministic-materialization",
+    "exact-engine-development-proof",
+    "private-candidate-qualification"
+  ],
+  "forbidden": [
+    "public-release-authority",
+    "source-freeze",
+    "production-signing",
+    "tagging",
+    "sealing",
+    "publication"
+  ],
+  "transition_gate": {
+    "source_freeze": false,
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "record_sha256": "45A9E1A5ED033FF26F86EA316DCEAFB2CE01717E13FDEF0281487359A3D92DFE"
+}

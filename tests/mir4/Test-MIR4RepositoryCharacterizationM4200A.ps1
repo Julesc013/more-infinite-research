@@ -35,7 +35,7 @@ Assert-MIR4CharacterizationV1 ([bool]$check.invariants.root_readme_byte_stable) 
 $manifest=$firstManifest|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 ([string]$manifest.source.package_source_sha256 -ceq $expectedPackage) 'mir4-characterization-package-source'
 Assert-MIR4CharacterizationV1 ([string]$manifest.source.root_readme_sha256 -ceq $expectedReadme) 'mir4-characterization-readme'
-Assert-MIR4CharacterizationV1 ([int]$manifest.source.migration_count -eq 16) 'mir4-characterization-migration-import'
+Assert-MIR4CharacterizationV1 ([int]$manifest.source.migration_count -eq 17) 'mir4-characterization-migration-import'
 Assert-MIR4CharacterizationV1 ([int]$manifest.summary.package_files -gt 0) 'mir4-characterization-package-membership'
 Assert-MIR4CharacterizationV1 (-not[bool]$manifest.invariants.deletion_authorized) 'mir4-characterization-deletion-firewall'
 Assert-MIR4CharacterizationV1 (@($manifest.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count -eq 0) 'mir4-characterization-transition-firewall'
@@ -46,11 +46,20 @@ Assert-MIR4CharacterizationV1 (-not [bool]$package.root_readme.package_visible -
 
 $bridge=Get-Content -Raw -LiteralPath (Join-Path $repo "$output/bridge-expiry.json")|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 (@($bridge.bridges|Where-Object{[bool]$_.deletion_authorized}).Count -eq 0) 'mir4-characterization-bridge-deletion'
-Assert-MIR4CharacterizationV1 ([int]$bridge.summary.retirement_ready -eq 0) 'mir4-characterization-bridge-retirement'
+Assert-MIR4CharacterizationV1 ([int]$bridge.summary.current_product -eq 0 -and [int]$bridge.summary.dual_write_authority -eq 0 -and [int]$bridge.summary.package_authority_bridge -eq 0 -and [int]$bridge.summary.release_current_state_authority_bridge -eq 0 -and [int]$bridge.summary.runtime_state_migration_authority_bridge -eq 0 -and [int]$bridge.summary.public_claim_authority_bridge -eq 0 -and [int]$bridge.summary.unowned -eq 0 -and [int]$bridge.summary.unbounded -eq 0) 'mir4-characterization-bridge-retirement'
 
 $programme=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/mir4-4x-operating-programme-v1.json')|ConvertFrom-Json
-Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -eq 'M41-05' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-00' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-01' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M42-02' -and $_.state -eq 'complete'}).Count -eq 1 -and @($programme.work_packages|Where-Object{$_.id -eq 'M43-00' -and $_.state -eq 'queued'}).Count -eq 1) 'mir4-characterization-programme-successor-state'
-Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M42-00','M42-01','M42-02') -and $_.completion_boundary -eq '4.1.0'}).Count -eq 3) 'mir4-41-physical-fixed-point-boundary'
+$m43 = @($programme.work_packages | Where-Object id -eq 'M43-00')
+Assert-MIR4CharacterizationV1 (
+  @($programme.work_packages|Where-Object{$_.id -eq 'M41-05' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  @($programme.work_packages|Where-Object{$_.id -eq 'M42-00' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  @($programme.work_packages|Where-Object{$_.id -eq 'M42-01' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  @($programme.work_packages|Where-Object{$_.id -eq 'M42-02' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  @($programme.work_packages|Where-Object{$_.id -eq 'M41-07' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  @($programme.work_packages|Where-Object{$_.id -eq 'M41-08' -and $_.state -eq 'active'}).Count -eq 1 -and
+  $m43.Count -eq 1 -and [string]$m43[0].state -ceq 'blocked-dependency' -and 'M41-08' -in @($m43[0].depends_on)
+) 'mir4-characterization-programme-successor-state'
+Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M42-00','M42-01','M42-02','M41-07','M41-08') -and $_.completion_boundary -eq '4.1.0'}).Count -eq 5) 'mir4-41-physical-fixed-point-boundary'
 Assert-MIR4CharacterizationV1 ([string]@($programme.outcome_trains|Where-Object candidate -eq '4.2.0')[0].outcome -match 'Integration kernel') 'mir4-42-integration-boundary'
 
 $facade=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') mir4 repository characterization-check 2>&1|Out-String).Trim()

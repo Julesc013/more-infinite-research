@@ -74,12 +74,14 @@
     "legacy_root_projection": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["writer_authority", "official_package_authority", "compatibility_state", "retirement_required"],
+      "required": ["writer_authority", "official_package_authority", "compatibility_state", "retirement_required", "historical_reconstruction_only", "silent_reactivation_blocked"],
       "properties": {
         "writer_authority": {"const": false},
         "official_package_authority": {"const": false},
-        "compatibility_state": {"const": "read-only-controlled-transition"},
-        "retirement_required": {"const": true}
+        "compatibility_state": {"const": "retired-historical-read-only"},
+        "retirement_required": {"const": false},
+        "historical_reconstruction_only": {"const": true},
+        "silent_reactivation_blocked": {"const": true}
       }
     },
     "transition_gate": {

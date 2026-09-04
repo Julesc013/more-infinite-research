@@ -69,8 +69,10 @@
   "legacy_root_projection": {
     "writer_authority": false,
     "official_package_authority": false,
-    "compatibility_state": "read-only-controlled-transition",
-    "retirement_required": true
+    "compatibility_state": "retired-historical-read-only",
+    "retirement_required": false,
+    "historical_reconstruction_only": true,
+    "silent_reactivation_blocked": true
   },
   "transition_gate": {
     "package_cutover": true,
@@ -81,5 +83,5 @@
     "sealing": false,
     "publication": false
   },
-  "record_sha256": "1491A30932DAE2131CFB6B5E93718B9FDC669444A0A5F4155F5306D241CA22FE"
+  "record_sha256": "325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB"
 }

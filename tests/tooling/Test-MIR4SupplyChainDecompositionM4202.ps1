@@ -5,6 +5,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4M4202SupplyChain {
@@ -13,7 +14,10 @@ function Assert-MIR4M4202SupplyChain {
 }
 
 $packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202SupplyChainDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+$bridgeRetirementPath = Join-Path $repo 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
+if (-not (Test-Path -LiteralPath $bridgeRetirementPath -PathType Leaf)) {
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202SupplyChainDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
 $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202SupplyChain ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-supply-chain-schema'
@@ -56,11 +60,12 @@ foreach ($moduleName in $expectedModuleNames) {
 Assert-MIR4M4202SupplyChain (Test-MIR4SupplyChainMapKey -Map @{alpha = 1} -Key 'alpha') 'mir4-m42-02-supply-chain-map-key-smoke'
 Assert-MIR4M4202SupplyChain ((Get-MIR4SpdxElementToken -Value 'mir4-ps11') -cmatch '^[a-f0-9]{24}$') 'mir4-m42-02-supply-chain-spdx-token-smoke'
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202SupplyChain ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq [string]$receipt.tooling_inventory.digest) 'mir4-m42-02-supply-chain-inventory'
+$expectedInventoryDigest = Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest ([string]$receipt.tooling_inventory.digest)
+Assert-MIR4M4202SupplyChain ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-supply-chain-inventory'
 Assert-MIR4M4202SupplyChain ([bool]$receipt.semantic_contract.ordered_current_source_slices_preserved -and [bool]$receipt.semantic_contract.inventory_and_source_identity_unchanged -and [bool]$receipt.semantic_contract.archive_and_selection_unchanged -and [bool]$receipt.semantic_contract.component_inventory_unchanged -and [bool]$receipt.semantic_contract.spdx_attestation_unchanged -and [bool]$receipt.semantic_contract.slsa_provenance_unchanged -and [bool]$receipt.semantic_contract.policy_verification_unchanged -and [bool]$receipt.semantic_contract.custody_record_writing_unchanged -and [bool]$receipt.semantic_contract.platform_projections_regenerated -and [bool]$receipt.semantic_contract.powershell_decomposition_sequence_complete) 'mir4-m42-02-supply-chain-semantic-contract'
 Assert-MIR4M4202SupplyChain ([string]$receipt.programme_transition.work_package -ceq 'M42-02' -and [string]$receipt.programme_transition.current_state -ceq 'complete' -and [string]$receipt.programme_transition.next_programme_state -ceq 'queued' -and [bool]$receipt.programme_transition.mir41_qualification_still_required) 'mir4-m42-02-supply-chain-programme-transition'
 Assert-MIR4M4202SupplyChain (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-supply-chain-transition'
-Assert-MIR4M4202SupplyChain ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-supply-chain-package-firewall'
+Assert-MIR4M4202SupplyChain ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-supply-chain-package-firewall'
 
 [pscustomobject][ordered]@{
   status = 'M42-02-PS11-SUPPLY-CHAIN-DECOMPOSITION-PASSED'

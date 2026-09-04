@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-current-product-bridge-retirement-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "migration_id", "state", "scope", "predecessor", "writers", "path_map", "compatibility_entrypoints", "bridge_dispositions", "summary", "package_source_authority", "execution_context", "rollback", "sunset", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CurrentProductBridgeRetirementV1"},
+    "migration_id": {"const": "M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1"},
+    "state": {"const": "CURRENT-PRODUCT-BRIDGES-RETIRED-HISTORICAL-COMPATIBILITY-BOUNDED"},
+    "scope": {"type": "string", "minLength": 1},
+    "predecessor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["branch", "commit", "tree", "receipt", "receipt_sha256", "record_sha256", "package_source_sha256"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "tree": {"pattern": "^[a-f0-9]{40}$"},
+        "receipt": {"const": "releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json"},
+        "receipt_sha256": {"$ref": "#/$defs/sha256"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "writers": {
+      "type": "array", "minItems": 1, "maxItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["fact_family", "path", "command"],
+        "properties": {"fact_family": {"const": "current-product-bridge-retirement"}, "path": {"const": "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1"}, "command": {"type": "string", "minLength": 1}}
+      }
+    },
+    "path_map": {"type": "array", "minItems": 10, "items": {"$ref": "#/$defs/pathMap"}},
+    "compatibility_entrypoints": {"type": "array", "maxItems": 0},
+    "bridge_dispositions": {"type": "array", "minItems": 49, "maxItems": 49, "items": {"$ref": "#/$defs/bridge"}},
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["declared", "retired", "retained_historical", "current_product", "dual_write_authority", "package_authority_bridge", "release_current_state_authority_bridge", "runtime_state_migration_authority_bridge", "public_claim_authority_bridge", "unowned", "unbounded"],
+      "properties": {
+        "declared": {"const": 49}, "retired": {"const": 1}, "retained_historical": {"const": 48}, "current_product": {"const": 0},
+        "dual_write_authority": {"const": 0}, "package_authority_bridge": {"const": 0}, "release_current_state_authority_bridge": {"const": 0},
+        "runtime_state_migration_authority_bridge": {"const": 0}, "public_claim_authority_bridge": {"const": 0}, "unowned": {"const": 0}, "unbounded": {"const": 0}
+      }
+    },
+    "package_source_authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "record_sha256", "legacy_root_state", "silent_fallback_blocked"],
+      "properties": {"path": {"const": "targets/package-authority.json"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "legacy_root_state": {"const": "retired-historical-read-only"}, "silent_fallback_blocked": {"const": true}}
+    },
+    "execution_context": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "record_sha256", "release_authority"],
+      "properties": {"path": {"const": "spec/execution/mir4-4.1-development-context-v1.json"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "release_authority": {"const": false}}
+    },
+    "rollback": {"type": "object", "additionalProperties": false, "required": ["mode", "commit", "tree", "root_writer_reactivation_authorized"], "properties": {"mode": {"const": "revert-exact-merged-work-package"}, "commit": {"pattern": "^[a-f0-9]{40}$"}, "tree": {"pattern": "^[a-f0-9]{40}$"}, "root_writer_reactivation_authorized": {"const": false}}},
+    "sunset": {"type": "object", "additionalProperties": false, "required": ["state", "review_boundary", "removal_requires"], "properties": {"state": {"const": "historical-compatibility-only"}, "review_boundary": {"const": "MIR-4.2-COMPATIBILITY-SUNSET-REVIEW"}, "removal_requires": {"type": "array", "minItems": 3, "uniqueItems": true}}},
+    "transition_gate": {"$ref": "#/$defs/gates"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "pathMap": {"type": "object", "additionalProperties": false, "required": ["family", "current_path", "final_path", "state", "package_visible"], "properties": {"family": {"type": "string", "minLength": 1}, "current_path": {"type": ["string", "null"]}, "final_path": {"type": "string", "minLength": 1}, "state": {"type": "string", "minLength": 1}, "package_visible": {"const": false}}},
+    "bridge": {
+      "type": "object", "additionalProperties": false,
+      "required": ["migration_id", "path", "role", "disposition", "canonical_replacements", "writable", "package_visible", "current_semantic_use", "current_authority", "owner", "proof", "expiry_condition", "rollback", "deletion_authorized"],
+      "properties": {
+        "migration_id": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}, "role": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["retired-reassigned", "retained-historical-compatibility"]},
+        "canonical_replacements": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "writable": {"const": false}, "package_visible": {"const": false}, "current_semantic_use": {"const": false}, "current_authority": {"const": false},
+        "owner": {"const": "repository-governance"}, "proof": {"const": "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1"},
+        "expiry_condition": {"type": "string", "minLength": 1}, "rollback": {"type": "string", "minLength": 1}, "deletion_authorized": {"const": false}
+      }
+    },
+    "gates": {"type": "object", "additionalProperties": false, "required": ["bridge_retirement", "source_freeze", "version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"bridge_retirement": {"const": true}, "source_freeze": {"const": false}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}

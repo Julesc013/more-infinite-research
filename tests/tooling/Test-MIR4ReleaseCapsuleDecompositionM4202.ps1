@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4M4202ReleaseCapsule {
@@ -90,11 +91,12 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
   Assert-MIR4M4202ReleaseCapsule ((Get-FileHash -LiteralPath $controlExecutorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$controlExecutor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-release-capsule-supply-chain-successor-predecessor'
   $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
+$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202ReleaseCapsule ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-release-capsule-inventory'
 Assert-MIR4M4202ReleaseCapsule ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.custody_inventory_unchanged -and [bool]$receipt.semantic_contract.source_archive_unchanged -and [bool]$receipt.semantic_contract.capsule_construction_unchanged -and [bool]$receipt.semantic_contract.capsule_verification_unchanged -and [bool]$receipt.semantic_contract.offline_restore_unchanged -and [bool]$receipt.semantic_contract.platform_projections_regenerated -and [bool]$receipt.semantic_contract.post_cutover_package_non_interference_assertion) 'mir4-m42-02-release-capsule-semantic-contract'
 Assert-MIR4M4202ReleaseCapsule (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-release-capsule-transition'
-Assert-MIR4M4202ReleaseCapsule ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-release-capsule-package-firewall'
+Assert-MIR4M4202ReleaseCapsule ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-release-capsule-package-firewall'
 
 [pscustomobject][ordered]@{
   status = 'M42-02-PS9-RELEASE-CAPSULE-DECOMPOSITION-PASSED'

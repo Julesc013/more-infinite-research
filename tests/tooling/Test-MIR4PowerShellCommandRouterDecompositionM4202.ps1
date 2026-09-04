@@ -5,6 +5,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 
 function Assert-MIR4CommandRouterDecompositionV1([bool]$Condition,[string]$Code,[string]$Detail=''){
@@ -214,11 +215,12 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
   $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
 
+Assert-MIR4CommandRouterDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-command-router-bridge-retirement-successor'
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path
   Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and[string]$binding.hash_mode-ceq'canonical-text-v1'-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-command-router-evolved-binding' $path
 }
-Assert-MIR4CommandRouterDecompositionV1 ([string]$receipt.preservation.package_source_sha256-ceq$packageBefore-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-command-router-package-firewall'
+Assert-MIR4CommandRouterDecompositionV1 ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-command-router-package-firewall'
 Assert-MIR4CommandRouterDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-command-router-release-firewall'
 Assert-MIR4CommandRouterDecompositionV1 ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-command-router-package-mutation'
 

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "MIR4-CHG-2026-0035",
+  "kind": "maintainability",
+  "audience": ["maintainers"],
+  "summary": "Retire every current-product authority bridge while retaining bounded historical compatibility readers.",
+  "details": [
+    "Makes src/mod, targets, TargetMaterializer, and the MIR 4.1 development context the only current authorities for their facts.",
+    "Classifies 49 former bridges as one retired reassignment and 48 read-only, package-excluded, owned, tested, expiry-bounded historical compatibility paths.",
+    "Makes unknown bridge state block deletion and release instead of silently inheriting authority.",
+    "Regenerates repository characterization and append-only authority evolution around the final bridge state.",
+    "Changes no player package, gameplay, save, setting, migration, compatibility claim, version, tag, signature, seal, or publication gate."
+  ],
+  "targets": ["repository"],
+  "package_visible": false,
+  "release_authority": false
+}

@@ -3,12 +3,8 @@
   "kind": "MIR4VisibleRootProjectionV2",
   "id": "modules",
   "path": "modules",
-  "mode": "shadow-reader",
-  "current_authorities": [
-    ".mir/modules.yml",
-    "prototypes/mir/capabilities",
-    "prototypes/mir/domain"
-  ],
+  "mode": "historical-preview-package-excluded",
+  "current_authorities": [],
   "writable_authority": false,
   "marker_is_writable_authority": false,
   "package_visible": false,

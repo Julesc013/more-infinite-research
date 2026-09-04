@@ -3764,6 +3764,44 @@
         "assurance/catalog/tests.json",
         "package-source"
       ]
+    },
+    {
+      "id": "static.mir4-current-product-bridge-retirement-m41",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/control/repository-fixed-point.json",
+        ".mir/control/paths.yml",
+        ".mir/modules.yml",
+        ".mir/assurance.json",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "governance/repository/migrations/current-product-bridge-retirement-v1.json",
+        "contracts/repository/mir4-current-product-bridge-retirement-v1.schema.json",
+        "contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json",
+        "spec/execution/mir4-4.1-development-context-v1.json",
+        "spec/schemas/mir4-development-execution-context-v1.schema.json",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/mir/application/repository/BridgeRetirement.ps1",
+        "tools/mir/application/repository/RepositoryCharacterization.ps1",
+        "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1",
+        "tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementReceipt.ps1",
+        "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+        "tests/repository/Test-MIR4CurrentProductBridgeRetirement.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
+        "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "docs/architecture/mir4-repository-fixed-point.md",
+        "docs/architecture/module-boundaries.md",
+        "docs/maintainer/mir4-authority-map.md",
+        "docs/releases/mir4-post-4.0-roadmap.md",
+        "validation/tests.yml",
+        "repository",
+        "package-source"
+      ]
     }
   ]
 }

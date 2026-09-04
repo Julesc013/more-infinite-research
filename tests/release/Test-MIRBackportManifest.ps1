@@ -146,8 +146,11 @@ $script:repo = $RepoRoot
 . (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")
 . (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 . (Join-Path $RepoRoot "tools\lib\validation\PackageIdentity.ps1")
+$sourceLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $RepoRoot -Commit $sourcePackageCommit
+$targetLayout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $RepoRoot -Commit $targetPackageCommit
+$packageRoots = @(@($sourceLayout.roots) + @($targetLayout.roots) | Sort-Object -Unique)
 $actualChanged = @(
-  & git -C $RepoRoot diff --name-only $sourcePackageCommit $targetPackageCommit -- @(Get-MIRPackageSourceRoots) |
+  & git -C $RepoRoot diff --name-only $sourcePackageCommit $targetPackageCommit -- @packageRoots |
     ForEach-Object { ([string]$_).Replace("\", "/") } |
     Sort-Object -Unique
 )

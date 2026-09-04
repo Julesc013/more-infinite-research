@@ -60,6 +60,7 @@ function Test-MIR4PreFreezeAuthorities {
     'releases/migrations/MIR4-M42-02-Assurance-Release-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-assurance-release-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json'
     'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json' = 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json'
+    'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json' = 'contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json' = 'spec/schemas/mir4-maintainer-final-github-release-authorization-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json' = 'spec/schemas/mir4-final-mile-playtest-candidate-authority-v1.schema.json'
     'releases/migrations/MIR4-Repository-Fixed-Point-Tooling-MigrationV1.json' = 'contracts/repository/mir4-repository-migration-receipt-v1.schema.json'
@@ -655,6 +656,7 @@ function Test-MIR4PreFreezeAuthorities {
     foreach ($property in $compilerOrchestrator.transition_gate.PSObject.Properties) {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-l6-transition] $($property.Name)" }
     }
+    $m4202PackageSourceSha256 = [string]$compilerOrchestrator.package_authority.package_source_sha256
     $priorReceiptPath = $compilerOrchestratorReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
@@ -740,7 +742,7 @@ function Test-MIR4PreFreezeAuthorities {
         @($commandRouter.decomposition.modules).Count -ne 12 -or
         -not [bool]$commandRouter.public_contract.unchanged -or
         [int]$commandRouter.public_contract.command_count -ne 85 -or
-        [string]$commandRouter.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$commandRouter.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-command-router-scope]'
     }
     foreach ($property in $commandRouter.transition_gate.PSObject.Properties) {
@@ -805,7 +807,7 @@ function Test-MIR4PreFreezeAuthorities {
         @($validationRunner.decomposition.modules).Count -ne 21 -or
         -not [bool]$validationRunner.public_contract.unchanged -or
         -not [bool]$validationRunner.semantic_contract.source_segments_exact -or
-        [string]$validationRunner.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$validationRunner.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-validation-runner-scope]'
     }
     foreach ($property in $validationRunner.transition_gate.PSObject.Properties) {
@@ -872,7 +874,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$assuranceEvidence.public_contract.unchanged -or
         [int]$assuranceEvidence.public_contract.function_count -ne 62 -or
         -not [bool]$assuranceEvidence.semantic_contract.source_segments_exact -or
-        [string]$assuranceEvidence.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$assuranceEvidence.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-assurance-evidence-scope]'
     }
     foreach ($property in $assuranceEvidence.transition_gate.PSObject.Properties) {
@@ -923,7 +925,7 @@ function Test-MIR4PreFreezeAuthorities {
         [int]$preFreezeRelease.public_contract.function_count -ne 25 -or
         -not [bool]$preFreezeRelease.semantic_contract.source_segments_exact_except_declared_self_successor -or
         -not [bool]$preFreezeRelease.semantic_contract.declared_self_successor_extension -or
-        [string]$preFreezeRelease.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$preFreezeRelease.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-pre-freeze-release-scope]'
     }
     foreach ($property in $preFreezeRelease.transition_gate.PSObject.Properties) {
@@ -974,7 +976,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$bootstrapMaterialization.public_contract.unchanged -or
         [int]$bootstrapMaterialization.public_contract.function_count -ne 51 -or
         -not [bool]$bootstrapMaterialization.semantic_contract.source_segments_exact -or
-        [string]$bootstrapMaterialization.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$bootstrapMaterialization.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-bootstrap-materialization-scope]'
     }
     foreach ($property in $bootstrapMaterialization.transition_gate.PSObject.Properties) {
@@ -1026,7 +1028,7 @@ function Test-MIR4PreFreezeAuthorities {
         [string]$assuranceRelease.decomposition.self_test.authority -cne 'canonical-executable-test-support' -or
         -not [bool]$assuranceRelease.public_contract.unchanged -or
         -not [bool]$assuranceRelease.semantic_contract.embedded_self_test_removed_from_release_authority -or
-        [string]$assuranceRelease.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$assuranceRelease.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-assurance-release-scope]'
     }
     foreach ($property in $assuranceRelease.transition_gate.PSObject.Properties) {
@@ -1105,7 +1107,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$compatibilityAudit.public_contract.unchanged -or
         -not [bool]$compatibilityAudit.semantic_contract.compatibility_claims_unchanged -or
         -not [bool]$compatibilityAudit.semantic_contract.stream_authority_unchanged -or
-        [string]$compatibilityAudit.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$compatibilityAudit.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-compatibility-audit-scope]'
     }
     foreach ($property in $compatibilityAudit.transition_gate.PSObject.Properties) {
@@ -1185,7 +1187,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$offlineCustody.semantic_contract.offline_seal_unchanged -or
         -not [bool]$offlineCustody.semantic_contract.offline_restore_unchanged -or
         -not [bool]$offlineCustody.semantic_contract.emergency_completion_unchanged -or
-        [string]$offlineCustody.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$offlineCustody.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-offline-custody-scope]'
     }
     foreach ($property in $offlineCustody.transition_gate.PSObject.Properties) {
@@ -1290,7 +1292,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$releaseCapsule.semantic_contract.offline_restore_unchanged -or
         -not [bool]$releaseCapsule.semantic_contract.platform_projections_regenerated -or
         -not [bool]$releaseCapsule.semantic_contract.post_cutover_package_non_interference_assertion -or
-        [string]$releaseCapsule.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$releaseCapsule.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-release-capsule-scope]'
     }
     foreach ($property in $releaseCapsule.transition_gate.PSObject.Properties) {
@@ -1397,7 +1399,7 @@ function Test-MIR4PreFreezeAuthorities {
         -not [bool]$controlExecutor.semantic_contract.package_and_delta_measurements_unchanged -or
         -not [bool]$controlExecutor.semantic_contract.aggregate_gate_unchanged -or
         -not [bool]$controlExecutor.semantic_contract.ps7_source_evolution_preserved -or
-        [string]$controlExecutor.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$controlExecutor.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-control-executor-scope]'
     }
     foreach ($property in $controlExecutor.transition_gate.PSObject.Properties) {
@@ -1463,13 +1465,71 @@ function Test-MIR4PreFreezeAuthorities {
         [string]$supplyChain.programme_transition.current_state -cne 'complete' -or
         [string]$supplyChain.programme_transition.next_programme_state -cne 'queued' -or
         -not [bool]$supplyChain.programme_transition.mir41_qualification_still_required -or
-        [string]$supplyChain.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+        [string]$supplyChain.preservation.package_source_sha256 -cne $m4202PackageSourceSha256) {
       throw '[mir4-prefreeze-m42-02-supply-chain-scope]'
     }
     foreach ($property in $supplyChain.transition_gate.PSObject.Properties) {
       if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-supply-chain-transition] $($property.Name)" }
     }
     $priorReceiptPath = $supplyChainReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+
+  $bridgeRetirementReceiptPath = 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $bridgeRetirementReceiptPath) -PathType Leaf) {
+    if ($priorReceiptPath -cne 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json') {
+      throw '[mir4-prefreeze-bridge-retirement-requires-supply-chain]'
+    }
+    $bridgeRetirement = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $bridgeRetirementReceiptPath -Kind 'MIR4M41CurrentProductBridgeRetirementReceiptV1'
+    if ([string]$bridgeRetirement.predecessor.path -cne $priorReceiptPath -or
+        [string]$bridgeRetirement.predecessor.sha256 -cne $priorReceiptSha256 -or
+        [string]$bridgeRetirement.predecessor.record_sha256 -cne [string]$supplyChain.record_sha256) {
+      throw '[mir4-prefreeze-bridge-retirement-predecessor]'
+    }
+    $bridgeRetirementPaths = @{}
+    $bridgePredecessorCommit = '03737ccaefbda04001166e6b5e2fffe20ccadf96'
+    foreach ($binding in @($bridgeRetirement.evolved_bindings)) {
+      $path = [string]$binding.path
+      if ($bridgeRetirementPaths.ContainsKey($path)) { throw "[mir4-prefreeze-bridge-retirement-duplicate-binding] $path" }
+      if (-not $authorityHashes.ContainsKey($path)) {
+        $predecessorSha = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit $bridgePredecessorCommit -RelativePath $path
+        if ([string]$binding.previous_sha256 -cne $predecessorSha) {
+          throw "[mir4-prefreeze-bridge-retirement-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = $predecessorSha
+        $authorityHashModes[$path] = 'canonical-text-v1'
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority) {
+        throw "[mir4-prefreeze-bridge-retirement-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $bridgeRetirementPaths[$path] = $true
+    }
+    foreach ($binding in @($bridgeRetirement.current_authorities)) {
+      $path = [string]$binding.path
+      if ($bridgeRetirementPaths.ContainsKey($path) -or
+          ($authorityHashes.ContainsKey($path) -and [string]$authorityHashes[$path] -cne [string]$binding.sha256)) {
+        throw "[mir4-prefreeze-bridge-retirement-current-authority] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $bridgeRetirementPaths[$path] = $true
+    }
+    if ($bridgeRetirementPaths.Count -lt 1 -or
+        [string]$bridgeRetirement.status -cne 'M41-CURRENT-PRODUCT-BRIDGES-RETIRED-PRIVATE-QUALIFICATION-PENDING' -or
+        [string]$bridgeRetirement.package_source.predecessor_sha256 -cne $m4202PackageSourceSha256 -or
+        [string]$bridgeRetirement.package_source.current_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -or
+        @($bridgeRetirement.package_visible_delta).Count -ne 0) {
+      throw '[mir4-prefreeze-bridge-retirement-scope]'
+    }
+    foreach ($property in $bridgeRetirement.transition_gate.PSObject.Properties) {
+      $expected = $property.Name -ceq 'bridge_retirement'
+      if ([bool]$property.Value -ne $expected) { throw "[mir4-prefreeze-bridge-retirement-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $bridgeRetirementReceiptPath
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 

@@ -90,10 +90,16 @@ function Invoke-MIRAssuranceSelfTest {
       [string]$activeApprovedDeltaFingerprint.state -notin @("pending", "present")) {
     throw "Active approved-delta transition fingerprint is invalid: $activeApprovedDeltaPath"
   }
-  if ([string]$activeApprovedDeltaFingerprint.state -eq "pending" -and
-      ([string]$activeApprovedDeltaFingerprint.release_state -notin @("planned", "source-frozen", "package-built", "authorized-in-progress") -or
-       [string]$activeApprovedDeltaFingerprint.release_record_sha256 -notmatch '^[A-F0-9]{64}$')) {
-    throw "Pending approved-delta transition does not bind exact pre-qualification release authority."
+  if ([string]$activeApprovedDeltaFingerprint.state -eq "pending") {
+    $developmentContext = [string]$activeApprovedDeltaFingerprint.authority_class -ceq 'development-context-no-release-authority'
+    $validBoundary = if ($developmentContext) {
+      [string]$activeApprovedDeltaFingerprint.release_state -ceq 'active-private-mir4.1-qualification-no-release-authority'
+    } else {
+      [string]$activeApprovedDeltaFingerprint.release_state -in @("planned", "source-frozen", "package-built", "authorized-in-progress")
+    }
+    if (-not $validBoundary -or [string]$activeApprovedDeltaFingerprint.release_record_sha256 -notmatch '^[A-F0-9]{64}$') {
+      throw "Pending approved-delta transition does not bind its exact pre-qualification authority or no-release development context."
+    }
   }
   $alternateApprovedDeltaPath = Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile ([pscustomobject]@{
     upgrade=[pscustomobject]@{from_version="9.9.9"; to_version="9.9.10"}

@@ -3,12 +3,8 @@
   "kind": "MIR4VisibleRootProjectionV2",
   "id": "examples",
   "path": "examples",
-  "mode": "shadow-reader",
-  "current_authorities": [
-    "fixtures",
-    "sdk/preview/mir4/reference",
-    "sdk/preview/mir4/reference-extension"
-  ],
+  "mode": "historical-fixtures-package-excluded",
+  "current_authorities": [],
   "writable_authority": false,
   "marker_is_writable_authority": false,
   "package_visible": false,

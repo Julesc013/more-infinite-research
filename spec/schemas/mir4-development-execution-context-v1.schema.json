@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/execution/mir4-development-execution-context-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "programme", "package_authority", "target_registry", "historical_context", "targets", "allowed", "forbidden", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4DevelopmentExecutionContextV1"},
+    "status": {"const": "active-private-mir4.1-qualification-no-release-authority"},
+    "programme": {"const": "MIR4-4.1"},
+    "package_authority": {"const": "targets/package-authority.json"},
+    "target_registry": {"const": "targets/registry.json"},
+    "historical_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "role", "current_authority"],
+      "properties": {
+        "path": {"const": ".mir/releases/waves/mir4-r0/MIR4-M4C01-Implementation-AuthorizationV1.json"},
+        "role": {"const": "immutable-historical-development-context-only"},
+        "current_authority": {"const": false}
+      }
+    },
+    "targets": {
+      "type": "array",
+      "prefixItems": [
+        {"const": "f210"}, {"const": "f200"}, {"const": "f110"}, {"const": "f100"}
+      ],
+      "items": false,
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "allowed": {
+      "type": "array",
+      "contains": {"const": "exact-engine-development-proof"},
+      "minItems": 4,
+      "uniqueItems": true
+    },
+    "forbidden": {
+      "type": "array",
+      "allOf": [
+        {"contains": {"const": "production-signing"}},
+        {"contains": {"const": "tagging"}},
+        {"contains": {"const": "publication"}}
+      ],
+      "minItems": 6,
+      "uniqueItems": true
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_freeze", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "source_freeze": {"const": false},
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}
+  }
+}

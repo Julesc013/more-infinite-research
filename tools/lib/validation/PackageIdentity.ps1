@@ -20,6 +20,31 @@ function Get-MIRPackageSourceRoots {
   return @('src/mod', 'targets')
 }
 
+function Get-MIRPackageSourceLayoutAtCommit {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $trackedPaths = @(& git -C $repo ls-tree -r --name-only $Commit 2>$null)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to inspect package-source layout at commit $Commit." }
+  if ($trackedPaths -ccontains 'src/mod/package-source.json' -and
+      $trackedPaths -ccontains 'targets/package-authority.json') {
+    return [pscustomobject][ordered]@{
+      kind = 'canonical-materializer-source'
+      roots = @(Get-MIRPackageSourceRoots)
+    }
+  }
+  if ($trackedPaths -ccontains 'info.json' -and $trackedPaths -ccontains 'data.lua') {
+    return [pscustomobject][ordered]@{
+      kind = 'historical-legacy-root'
+      roots = @(Get-MIRLegacyRootPackageSourceRoots)
+    }
+  }
+  throw "Commit does not contain a recognized package-source layout: $Commit"
+}
+
 function Get-MIRPackageOutputPaths {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -29,7 +54,7 @@ function Get-MIRPackageOutputPaths {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $manifestPath = Join-Path $repo 'src/mod/package-source.json'
   if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
-    return @(Get-MIRLegacyRootPackageSourceFiles -RepoRoot $repo)
+    throw '[mir4-canonical-package-source-manifest-missing]'
   }
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100
   return @(
@@ -53,9 +78,7 @@ function Resolve-MIRPackageCommandPath {
   $name = if ($Command -eq "build") { "Build-MIRPackage.ps1" } else { "Measure-MIRPackageComposition.ps1" }
   $canonical = Join-Path $repo "tools/commands/package/$name"
   if (Test-Path -LiteralPath $canonical -PathType Leaf) { return $canonical }
-  $legacy = Join-Path $repo "scripts/$name"
-  if (Test-Path -LiteralPath $legacy -PathType Leaf) { return $legacy }
-  throw "Package command is absent from canonical and historical locations: $name"
+  throw "Canonical package command is absent: tools/commands/package/$name"
 }
 
 function Get-MIRPackageSourceFiles {
@@ -141,6 +164,39 @@ function Get-MIRNormalizedTextIdentity {
   } finally {
     $sha.Dispose()
   }
+}
+
+function Get-MIRGitTextAtCommitSha256 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $path = $RelativePath.Replace('\', '/')
+  $git = @(Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1)
+  if ($git.Count -ne 1) { throw '[mir-git-command-unavailable]' }
+  $processInfo = [Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = [string]$git[0].Source
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.RedirectStandardOutput = $true
+  $processInfo.RedirectStandardError = $true
+  $processInfo.StandardOutputEncoding = [Text.UTF8Encoding]::new($false, $true)
+  foreach ($argument in @('-C', $repo, 'show', ($Commit + ':' + $path))) {
+    [void]$processInfo.ArgumentList.Add($argument)
+  }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $processInfo
+  if (-not $process.Start()) { throw "Unable to inspect $path at $Commit." }
+  $text = $process.StandardOutput.ReadToEnd()
+  $errorText = $process.StandardError.ReadToEnd()
+  $process.WaitForExit()
+  $exitCode = $process.ExitCode
+  $process.Dispose()
+  if ($exitCode -ne 0) { throw "Unable to inspect $path at $($Commit): $errorText" }
+  return (Get-MIRNormalizedTextIdentity -Text $text).Sha256
 }
 
 function Get-MIRFileContentIdentity {

@@ -309,21 +309,32 @@ function Get-MIRAssuranceCommitCandidateIdentity {
     . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
     $canonicalBuilder = "tools/commands/package/Build-MIRPackage.ps1"
     $legacyBuilder = "scripts/Build-MIRPackage.ps1"
-    & git -C $repo cat-file -e "${resolvedCommit}:$canonicalBuilder" 2>$null
+    $layout = Get-MIRPackageSourceLayoutAtCommit -RepoRoot $repo -Commit $resolvedCommit
+    $builderObject = $resolvedCommit + ':' + $canonicalBuilder
+    & git -C $repo cat-file -e $builderObject 2>$null
     $builderPath = if ($LASTEXITCODE -eq 0) { $canonicalBuilder } else { $legacyBuilder }
     $archivePaths = @(
-      @(Get-MIRPackageSourceRoots)
+      @($layout.roots)
       $builderPath
       "tools/lib/validation/PackageIdentity.ps1"
     )
+    if ([string]$layout.kind -ceq 'canonical-materializer-source') {
+      $archivePaths += @(
+        'tools/mir/application/package'
+        'tools/lib/mir4'
+        'spec/schemas'
+      )
+    }
     & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @archivePaths 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
     Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
     $powerShell = (Get-Process -Id $PID).Path
-    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot $builderPath) -OutputDir "authority-dist" | Out-Null
+    $outputDir = if ([string]$layout.kind -ceq 'canonical-materializer-source') { 'build/packages/authority-dist' } else { 'authority-dist' }
+    & $powerShell -NoProfile -NonInteractive -File (Join-Path $sourceRoot $builderPath) -OutputDir $outputDir | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "Deterministic package reconstruction failed for $resolvedCommit." }
-    $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRoot "info.json") | ConvertFrom-Json
-    $candidate = Join-Path $sourceRoot "authority-dist\$($info.name)_$($info.version).zip"
+    $candidateFiles = @(Get-ChildItem -LiteralPath (Join-Path $sourceRoot $outputDir) -Filter '*.zip' -File -Recurse)
+    if ($candidateFiles.Count -ne 1) { throw "Commit reconstruction produced $($candidateFiles.Count) candidate archives for $resolvedCommit." }
+    $candidate = $candidateFiles[0].FullName
     $identity = Get-MIRAssuranceCandidateArchiveIdentity -Path $candidate
     return [pscustomobject]@{
       commit = $resolvedCommit

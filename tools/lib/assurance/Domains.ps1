@@ -17,30 +17,35 @@ function Get-MIRAssuranceVerificationProfile {
     throw "Verification profile is invalid for Factorio $Target`: $path"
   }
   $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-  $candidateProgramme = [string]$profile.release_authority_mode -eq 'candidate-programme'
-  if ($candidateProgramme) {
-    $authorityRelative = [string]$profile.release_authority
-    if ([string]::IsNullOrWhiteSpace($authorityRelative)) {
-      throw "Candidate-programme verification profile has no release authority: $path"
+  $developmentContext = [string]$profile.execution_context_mode -eq 'development-context'
+  if ($developmentContext) {
+    $authorityRelative = ([string]$profile.execution_context).Replace('\', '/')
+    if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
+      throw "Development verification profile has no exact execution context: $path"
     }
     $authorityPath = Join-Path $repo $authorityRelative
     if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf)) {
-      throw "Candidate-programme release authority is missing: $authorityRelative"
+      throw "Development execution context is missing: $authorityRelative"
     }
-    $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json
-    if ([string]$authority.kind -ne 'MIR4M4C01ImplementationAuthorizationV1' -or
-        [string]$authority.status -ne 'authorized-in-progress' -or
-        [string]$authority.baseline.commit -ne 'b460edd330dc19524bad97a2374c4c40c3b2ef36') {
-      throw "Candidate-programme release authority is invalid: $authorityRelative"
+    $authorityRaw = Get-Content -Raw -LiteralPath $authorityPath
+    if (-not ($authorityRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-development-execution-context-v1.schema.json'))) {
+      throw "Development execution context schema is invalid: $authorityRelative"
+    }
+    $authority = $authorityRaw | ConvertFrom-Json -Depth 100 -DateKind String
+    if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+        @($authority.allowed) -notcontains 'exact-engine-development-proof' -or
+        @($authority.forbidden) -notcontains 'publication' -or
+        @($authority.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
+      throw "Development execution context boundary is invalid: $authorityRelative"
     }
     $fixturePath = Join-Path $repo ("fixtures/" + [string]$profile.upgrade.fixture)
     if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
-      throw "Candidate-programme upgrade fixture is missing: $fixturePath"
+      throw "Development-context upgrade fixture is missing: $fixturePath"
     }
   }
   $releaseRoot = Resolve-MIRAssuranceRepoPathId -Id "releases.records"
   $releasePath = Join-Path $repo (Join-Path $releaseRoot "$($info.version).json")
-  if (-not $candidateProgramme -and (Test-Path -LiteralPath $releasePath -PathType Leaf)) {
+  if (-not $developmentContext -and (Test-Path -LiteralPath $releasePath -PathType Leaf)) {
     $release = Get-Content -Raw -LiteralPath $releasePath | ConvertFrom-Json
     if ([string]$release.release -eq [string]$info.version -and [string]$release.target -eq $Target) {
       foreach ($field in @("from_version", "to_version", "fixture")) {
