@@ -12,6 +12,7 @@ function New-MIR441FourTargetCandidate {
     [Parameter(Mandatory)][string]$EvidenceRoot
   )
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  Assert-MIR441CleanTrackedSource -RepoRoot $repo
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
   $work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot
   $evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot
