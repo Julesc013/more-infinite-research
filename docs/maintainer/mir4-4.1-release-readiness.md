@@ -48,7 +48,7 @@ The monitor appends samples to JSON Lines rather than retaining them in memory. 
 .\tools\mir.ps1 mir4 release-engine promote --evidence-root <external-evidence>
 ```
 
-Build and qualification commands resume only from exact verified receipts. Candidate A is summarized and its expanded tree removed before candidate B. Targets execute serially. Independent verification reopens every ZIP, recomputes archive and normalized content identities, checks package membership and metadata, re-observes each engine, hashes runtime and upgrade summaries, and streams every resource ledger.
+Build and qualification commands resume only from exact verified receipts. Every successful fresh-load scenario, upgrade matrix, and completed target has its own checkpoint bound to the exact source commit/tree, engine executable, candidate archive/content, and evidence digest. Missing checkpoints run; any present but mismatched checkpoint blocks as ambiguous instead of being silently reused. Candidate A is summarized and its expanded tree removed before candidate B. Targets execute serially. Independent verification reopens every ZIP, recomputes archive and normalized content identities, checks package membership and metadata, re-observes each engine, hashes runtime and upgrade summaries, and streams every resource ledger.
 
 ## Seal and promotion
 

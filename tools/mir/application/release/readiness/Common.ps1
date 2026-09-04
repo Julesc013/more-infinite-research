@@ -63,3 +63,10 @@ function Get-MIR441GitIdentity {
   if ($LASTEXITCODE -ne 0 -or $tree -notmatch '^[a-f0-9]{40}$') { throw '[mir441-git-tree]' }
   return [pscustomobject][ordered]@{commit=$commit;tree=$tree}
 }
+
+function Assert-MIR441CleanTrackedSource {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $dirty=@(& git -C $RepoRoot status --porcelain --untracked-files=all)
+  if($LASTEXITCODE-ne0){throw '[mir441-git-status]'}
+  if($dirty.Count-ne0){throw '[mir441-source-dirty]'}
+}

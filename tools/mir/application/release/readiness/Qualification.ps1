@@ -44,14 +44,13 @@ function Invoke-MIR441TargetQualification {
     [Parameter(Mandatory)][string]$EvidenceRoot
   )
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  Assert-MIR441CleanTrackedSource -RepoRoot $repo
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
   $targetRows=@($contract.targets|Where-Object{[string]$_.target-ceq$Target})
   if($targetRows.Count-ne1){throw "[mir441-qualification-target] $Target"};$targetRow=$targetRows[0]
   $work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot
   $evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot
   $targetWork=Join-Path $work $Target
-  if(Test-Path -LiteralPath $targetWork){Remove-MIR441ContainedTree -AdmittedRoot $work -Path $targetWork}
-  New-Item -ItemType Directory -Force -Path $targetWork|Out-Null
   $targetEvidence=Get-MIR441TargetEvidenceRoot -EvidenceRoot $evidence -Target $Target
   $candidateManifest=Get-Content -Raw -LiteralPath (Join-Path $evidence 'candidate-manifest.json')|ConvertFrom-Json -Depth 100
   $candidateRows=@($candidateManifest.targets|Where-Object{[string]$_.target-ceq$Target})
@@ -63,6 +62,13 @@ function Invoke-MIR441TargetQualification {
   $predecessor=Join-Path $repo "dist/more-infinite-research_$([string]$targetRow.predecessor).zip"
   if(-not(Test-Path -LiteralPath $predecessor -PathType Leaf)){throw "[mir441-qualification-predecessor] $Target"}
   $engine=Get-MIR441TargetEngineIdentity -RepoRoot $repo -Target $targetRow
+  $resultPath=Join-Path $targetEvidence 'target-qualification.json'
+  $completed=Get-MIR441ValidatedTargetCheckpoint -Path $resultPath -Source $source -Engine $engine -Candidate $candidateRow
+  if($null-ne$completed){
+    if(Test-Path -LiteralPath $targetWork){Remove-MIR441ContainedTree -AdmittedRoot $work -Path $targetWork}
+    return $completed
+  }
+  if(-not(Test-Path -LiteralPath $targetWork)){New-Item -ItemType Directory -Force -Path $targetWork|Out-Null}
   $admission=Assert-MIR441ResourceAdmission -Policy $contract.resource_policy -WorkRoot $work -EstimatedPeakBytes 4GB
   $ledger=Join-Path $targetEvidence 'resource-ledger.jsonl'
   $runtime=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/scenarios/runtime.json')|ConvertFrom-Json -Depth 100
@@ -74,29 +80,49 @@ function Invoke-MIR441TargetQualification {
   $pwsh=(Get-Command pwsh -ErrorAction Stop).Source
   foreach($declaration in $declarations){
     $name=[string]$declaration.name;$slug=$name-replace'[^A-Za-z0-9._-]','-'
-    $scenarioWork=Join-Path $targetWork "fresh/$slug";$summary=Join-Path $targetEvidence "fresh-$slug.json"
+    $scenarioWork=Join-Path $targetWork "fresh/$slug";$summary=Join-Path $targetEvidence "fresh-$slug.json";$checkpoint=Join-Path $targetEvidence "fresh-$slug.checkpoint.json"
+    $resumed=Get-MIR441ValidatedFreshCheckpoint -Path $checkpoint -SummaryPath $summary -Name $name -Source $source -Engine $engine -Candidate $candidateRow
+    if($null-ne$resumed){
+      $scenarioRows.Add($resumed.result)
+      if(Test-Path -LiteralPath $scenarioWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $scenarioWork}
+      continue
+    }
+    if(Test-Path -LiteralPath $scenarioWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $scenarioWork}
     $run=Invoke-MIR441MonitoredProcess -FilePath $pwsh -Arguments @('-NoProfile','-File',(Join-Path $repo 'scripts/Invoke-MIRValidation.ps1'),'-ScenarioWorker','-Scenario',$name,'-FactorioBin',([string]$engine.path),'-UserDataDir',$scenarioWork,'-CandidateZip',$candidate,'-MaxParallel','1','-ValidationSummaryPath',$summary) -WorkRoot $work -LedgerPath $ledger -Policy $contract.resource_policy
     $result=Get-Content -Raw -LiteralPath $summary|ConvertFrom-Json -Depth 100
     if([string]$result.status-cne'passed'-or[string]$result.validation_package_sha256-cne[string]$candidateRow.asset.sha256-or[string]$result.validation_package_content_sha256-cne[string]$candidateRow.content_sha256){throw "[mir441-qualification-runtime] $Target/$name"}
-    $scenarioRows.Add([pscustomobject][ordered]@{name=$name;status='passed';assertions=[int]$result.assertions_executed;duration_seconds=[double]$result.duration_seconds;process_peak_working_set_bytes=[int64]$run.peak_working_set_bytes;evidence=(Get-MIR441FileIdentity -Path $summary -RelativePath (Split-Path -Leaf $summary))})
+    $scenarioRow=[pscustomobject][ordered]@{name=$name;status='passed';assertions=[int]$result.assertions_executed;duration_seconds=[double]$result.duration_seconds;process_peak_working_set_bytes=[int64]$run.peak_working_set_bytes;evidence=(Get-MIR441FileIdentity -Path $summary -RelativePath (Split-Path -Leaf $summary))}
+    Write-MIR441FreshCheckpoint -Path $checkpoint -Name $name -Source $source -Engine $engine -Candidate $candidateRow -SummaryIdentity $scenarioRow.evidence -Result $scenarioRow|Out-Null
+    $scenarioRows.Add($scenarioRow)
     Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $scenarioWork
   }
-  $upgradeOutput=Join-Path $targetEvidence 'upgrade-matrix.json';$upgradeWork=Join-Path $targetWork 'upgrade'
-  $upgradeRun=Invoke-MIR441MonitoredProcess -FilePath $pwsh -Arguments @('-NoProfile','-File',(Join-Path $repo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),'-RepoRoot',$repo,'-FactorioBin',([string]$engine.path),'-FromZip',$predecessor,'-ToZip',$candidate,'-FromVersion',([string]$targetRow.predecessor),'-ToVersion',([string]$targetRow.distribution_version),'-FixtureName',([string]$targetRow.upgrade_fixture),'-OutputPath',$upgradeOutput,'-WorkRoot',$upgradeWork,'-Retention','OnFailure') -WorkRoot $work -LedgerPath $ledger -Policy $contract.resource_policy
-  $upgrade=Get-Content -Raw -LiteralPath $upgradeOutput|ConvertFrom-Json -Depth 100
-  if([string]$upgrade.status-cne'passed'-or@($upgrade.rows|Where-Object{$_.status-ne'passed'}).Count-ne0-or[int]$upgrade.expanded_roots_retained-ne0){throw "[mir441-qualification-upgrade] $Target"}
-  if(Test-Path -LiteralPath $upgradeWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $upgradeWork}
+  $upgradeOutput=Join-Path $targetEvidence 'upgrade-matrix.json';$upgradeWork=Join-Path $targetWork 'upgrade';$upgradeCheckpointPath=Join-Path $targetEvidence 'upgrade.checkpoint.json'
+  $predecessorSha256=(Get-FileHash -LiteralPath $predecessor -Algorithm SHA256).Hash.ToUpperInvariant()
+  $upgradeCheckpoint=Get-MIR441ValidatedUpgradeCheckpoint -Path $upgradeCheckpointPath -SummaryPath $upgradeOutput -Source $source -Engine $engine -Candidate $candidateRow -PredecessorSha256 $predecessorSha256
+  if($null-ne$upgradeCheckpoint){
+    $upgradeRow=$upgradeCheckpoint.result;$upgradeDuration=[double]$upgradeCheckpoint.duration_seconds
+    if(Test-Path -LiteralPath $upgradeWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $upgradeWork}
+  }else{
+    if(Test-Path -LiteralPath $upgradeWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $upgradeWork}
+    $upgradeRun=Invoke-MIR441MonitoredProcess -FilePath $pwsh -Arguments @('-NoProfile','-File',(Join-Path $repo 'tests/runtime/Test-MIRUpgradeMatrix.ps1'),'-RepoRoot',$repo,'-FactorioBin',([string]$engine.path),'-FromZip',$predecessor,'-ToZip',$candidate,'-FromVersion',([string]$targetRow.predecessor),'-ToVersion',([string]$targetRow.distribution_version),'-FixtureName',([string]$targetRow.upgrade_fixture),'-OutputPath',$upgradeOutput,'-WorkRoot',$upgradeWork,'-Retention','OnFailure') -WorkRoot $work -LedgerPath $ledger -Policy $contract.resource_policy
+    $upgrade=Get-Content -Raw -LiteralPath $upgradeOutput|ConvertFrom-Json -Depth 100
+    if([string]$upgrade.status-cne'passed'-or@($upgrade.rows|Where-Object{$_.status-ne'passed'}).Count-ne0-or[int]$upgrade.expanded_roots_retained-ne0){throw "[mir441-qualification-upgrade] $Target"}
+    $upgradeRow=[pscustomobject][ordered]@{fixture=[string]$targetRow.upgrade_fixture;archetypes=@($upgrade.required_archetypes);first_reload=$true;second_reload=$true;evidence=(Get-MIR441FileIdentity -Path $upgradeOutput -RelativePath 'upgrade-matrix.json');process_peak_working_set_bytes=[int64]$upgradeRun.peak_working_set_bytes}
+    $upgradeDuration=[double]$upgradeRun.duration_seconds
+    Write-MIR441UpgradeCheckpoint -Path $upgradeCheckpointPath -Source $source -Engine $engine -Candidate $candidateRow -PredecessorSha256 $predecessorSha256 -SummaryIdentity $upgradeRow.evidence -Result $upgradeRow -DurationSeconds $upgradeDuration|Out-Null
+    if(Test-Path -LiteralPath $upgradeWork){Remove-MIR441ContainedTree -AdmittedRoot $targetWork -Path $upgradeWork}
+  }
   $finalSnapshot=Get-MIR441ResourceSnapshot -WorkRoot $work
   $result=[pscustomobject][ordered]@{
     schema=1;kind='MIR441TargetQualificationV1';status='passed';target=$Target;source=$source;engine=$engine
     candidate=[ordered]@{distribution_version=[string]$targetRow.distribution_version;archive=$candidateRow.asset;content_sha256=[string]$candidateRow.content_sha256;entry_count=[int]$candidateRow.entry_count}
-    predecessor=[ordered]@{version=[string]$targetRow.predecessor;sha256=(Get-FileHash -LiteralPath $predecessor -Algorithm SHA256).Hash.ToUpperInvariant()}
-    fresh_loads=@($scenarioRows);upgrade=[ordered]@{fixture=[string]$targetRow.upgrade_fixture;archetypes=@($upgrade.required_archetypes);first_reload=$true;second_reload=$true;evidence=(Get-MIR441FileIdentity -Path $upgradeOutput -RelativePath 'upgrade-matrix.json');process_peak_working_set_bytes=[int64]$upgradeRun.peak_working_set_bytes}
-    performance=[ordered]@{method='observed-fresh-load-and-upgrade-process-telemetry';fresh_duration_seconds=[Math]::Round((@($scenarioRows|Measure-Object duration_seconds -Sum).Sum),3);upgrade_duration_seconds=[double]$upgradeRun.duration_seconds;regression='none-observed'}
+    predecessor=[ordered]@{version=[string]$targetRow.predecessor;sha256=$predecessorSha256}
+    fresh_loads=@($scenarioRows);upgrade=$upgradeRow
+    performance=[ordered]@{method='observed-fresh-load-and-upgrade-process-telemetry';fresh_duration_seconds=[Math]::Round((@($scenarioRows|Measure-Object duration_seconds -Sum).Sum),3);upgrade_duration_seconds=$upgradeDuration;regression='none-observed'}
     resources=[ordered]@{admission=$admission;final=$finalSnapshot;factorio_process_concurrency=1;materialization_concurrency=1;expanded_success_roots='removed'}
     independent_verification='pending';technical_seal='pending';publication_authorized=$false
   }
-  $resultPath=Join-Path $targetEvidence 'target-qualification.json';Write-MIR441Json -Value $result -Path $resultPath
+  Write-MIR441Json -Value $result -Path $resultPath
   Remove-MIR441ContainedTree -AdmittedRoot $work -Path $targetWork
   return $result
 }
