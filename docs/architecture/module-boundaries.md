@@ -963,3 +963,11 @@ tools/lib/mir4/ReleaseCapsule.ps1 remains the stable internal facade and loads e
 The split binds the characterized 1,356-line implementation and preserves all 19 function names and their order. The original setup, dependency loading, constants, validation rules, content-addressed object layout, construction behavior, verification behavior, publisher admission, and contained restore behavior remain unchanged.
 
 This PS9 split is package-excluded and grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.
+
+### M42-02 PS10 control-executor decomposition
+
+tools/lib/control/Executor.ps1 remains the stable internal facade and loads six ordered modules from tools/lib/control/executor: context and task execution, environment execution, performance source and artifact custody, runtime measurements, package and delta measurements, and aggregate gating.
+
+The split binds the current 1,230-line implementation and preserves all 27 function names and their order. It explicitly carries forward the accepted PS7 compatibility-audit overlay set and the historical-versus-canonical package fingerprint selection used by performance source overlays.
+
+This PS10 split changes no context lock, task dispatch, evidence, runtime, performance, upgrade, ecosystem, approved-delta, aggregate, package, gameplay, save, setting, migration, compatibility, or release behavior. It grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.

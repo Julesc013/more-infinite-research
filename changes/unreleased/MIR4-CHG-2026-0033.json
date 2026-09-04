@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "MIR4-CHG-2026-0033",
+  "kind": "maintainability",
+  "audience": ["maintainers"],
+  "summary": "Decompose control-plane execution, runtime measurement, and aggregate gating behind the existing facade.",
+  "details": [
+    "Preserves all 27 public PowerShell function names and their declaration order.",
+    "Keeps context locks, environment execution, performance staging, runtime measurements, approved-delta checks, and aggregate evidence behavior unchanged.",
+    "Preserves the accepted PS7 compatibility-audit overlay and post-cutover package-fingerprint selection.",
+    "Regenerates the package-excluded platform lock and dependent reference projections after the module authority changes.",
+    "Changes no player package, gameplay, save, setting, migration, compatibility claim, or release gate."
+  ],
+  "targets": ["repository"],
+  "package_visible": false,
+  "release_authority": false
+}

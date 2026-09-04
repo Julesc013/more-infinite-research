@@ -99,6 +99,18 @@ Assert-MIR4M4202AssuranceRelease (-not$facadeSource.Contains('function Invoke-MI
 $entrypointSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Invoke-MIRAssurance.ps1')
 Assert-MIR4M4202AssuranceRelease ($entrypointSource.Contains('if ($command -ceq "self-test")')-and$entrypointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) 'mir4-m42-02-assurance-release-self-test-route'
 
+$controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
+if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
+  $controlExecutorSuccessorRaw=Get-Content -Raw -LiteralPath $controlExecutorSuccessorPath
+  Assert-MIR4M4202AssuranceRelease ($controlExecutorSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-control-executor-successor-schema'
+  $controlExecutorSuccessor=$controlExecutorSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $controlExecutorSuccessor) 'mir4-m42-02-assurance-release-control-executor-successor-record'
+  $controlExecutorPredecessorPath=Join-Path $repo ([string]$controlExecutorSuccessor.predecessor.receipt)
+  $controlExecutorPredecessor=Get-Content -Raw -LiteralPath $controlExecutorPredecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $controlExecutorPredecessorPath -Algorithm SHA256).Hash-ceq[string]$controlExecutorSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorPredecessor.record_sha256-ceq[string]$controlExecutorSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-release-control-executor-successor-predecessor'
+  $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
+}
+
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202AssuranceRelease ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-release-inventory'
 Assert-MIR4M4202AssuranceRelease ([bool]$receipt.semantic_contract.source_segments_exact-and[bool]$receipt.semantic_contract.candidate_planning_unchanged-and[bool]$receipt.semantic_contract.seal_creation_unchanged-and[bool]$receipt.semantic_contract.seal_verification_unchanged-and[bool]$receipt.semantic_contract.embedded_self_test_removed_from_release_authority) 'mir4-m42-02-assurance-release-semantic-contract'

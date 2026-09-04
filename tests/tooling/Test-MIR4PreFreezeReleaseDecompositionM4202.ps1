@@ -130,6 +130,18 @@ if(Test-Path -LiteralPath $bootstrapSuccessorPath -PathType Leaf){
   }
 }
 
+$controlExecutorModulePath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
+if(Test-Path -LiteralPath $controlExecutorModulePath -PathType Leaf){
+  $controlExecutorModuleReceipt=Get-Content -Raw -LiteralPath $controlExecutorModulePath|ConvertFrom-Json -Depth 100 -DateKind String
+  foreach($binding in @($controlExecutorModuleReceipt.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedModuleSha.ContainsKey($path)){
+      Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-pre-freeze-release-control-executor-successor-module' $path
+      $expectedModuleSha[$path]=[string]$binding.current_sha256
+    }
+  }
+}
+
 $facadePath=Join-Path $repo ([string]$receipt.decomposition.facade.path)
 $facadeTokens=$null;$facadeErrors=$null
 $facadeAst=[Management.Automation.Language.Parser]::ParseFile($facadePath,[ref]$facadeTokens,[ref]$facadeErrors)
@@ -152,8 +164,29 @@ foreach($requiredFunction in @('Get-MIR4PreFreezeAuthorityState','Test-MIR4PreFr
   Assert-MIR4PreFreezeReleaseDecompositionV1 ($null-ne(Get-Command $requiredFunction -CommandType Function -ErrorAction SilentlyContinue)) 'mir4-m42-02-pre-freeze-release-load' $requiredFunction
 }
 Assert-MIR4PreFreezeReleaseDecompositionV1 ([bool]$receipt.semantic_contract.source_segments_exact_except_declared_self_successor-and[bool]$receipt.semantic_contract.declared_self_successor_extension-and[bool]$receipt.semantic_contract.authority_locks_unchanged-and[bool]$receipt.semantic_contract.release_doctor_unchanged-and[bool]$receipt.semantic_contract.playtest_sessions_unchanged) 'mir4-m42-02-pre-freeze-release-semantic-contract'
+$controlExecutorDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
+if(Test-Path -LiteralPath $controlExecutorDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $controlExecutorDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4PreFreezeReleaseDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-pre-freeze-release-inventory'
+$controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
+if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
+  $controlExecutorSuccessorRaw=Get-Content -Raw -LiteralPath $controlExecutorSuccessorPath
+  Assert-MIR4PreFreezeReleaseDecompositionV1 ($controlExecutorSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json')) 'mir4-m42-02-pre-freeze-release-control-executor-successor-schema'
+  $controlExecutorSuccessor=$controlExecutorSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4PreFreezeReleaseDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $controlExecutorSuccessor) 'mir4-m42-02-pre-freeze-release-control-executor-successor-record'
+  $controlExecutorPredecessorPath=Join-Path $repo ([string]$controlExecutorSuccessor.predecessor.receipt)
+  $controlExecutorPredecessor=Get-Content -Raw -LiteralPath $controlExecutorPredecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-FileHash -LiteralPath $controlExecutorPredecessorPath -Algorithm SHA256).Hash-ceq[string]$controlExecutorSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorPredecessor.record_sha256-ceq[string]$controlExecutorSuccessor.predecessor.record_sha256) 'mir4-m42-02-pre-freeze-release-control-executor-successor-predecessor'
+  foreach($binding in @($controlExecutorSuccessor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-pre-freeze-release-control-executor-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
+}
+
 foreach($binding in @($receipt.evolved_bindings)){
   Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$expectedBindingSha[[string]$binding.path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-pre-freeze-release-evolved-binding' ([string]$binding.path)
 }
