@@ -96,7 +96,7 @@
       "unknown": {"const": 0},
       "duplicate_command_keys": {"const": 0}
     }},
-    "evolved_bindings": {"type": "array", "minItems": 35, "maxItems": 35, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "evolved_bindings": {"type": "array", "minItems": 36, "maxItems": 36, "items": {"$ref": "#/$defs/evolvedBinding"}},
     "preservation": {"type": "object", "additionalProperties": false, "required": ["package_source_sha256", "package_visible_delta", "gameplay", "saves", "settings", "migrations", "compatibility_claims", "stream_identities"], "properties": {
       "package_source_sha256": {"$ref": "#/$defs/sha256"},
       "package_visible_delta": {"type": "array", "maxItems": 0},

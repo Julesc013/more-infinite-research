@@ -2699,7 +2699,7 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202SupplyChainDecompositionAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "FA88A476B120CC3FA4E31543CE03E7DDFFD83B24A11BDE6046240495C266F98E",
+      "sha256": "975720972CB957F39B8E41B7B164E7545E8C481F36DC41766C3DA8D2FBF338DC",
       "hash_mode": "canonical-text-v1",
       "lines": 146,
       "package_visible": false
@@ -3715,7 +3715,7 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "E398D0B03D2F1A0334B3C8816C485413DF30D95AAA118D37F6CD471FD2B35033",
+      "sha256": "5E8184D026142D677C3066311A754C82F58302D75FCBEB50E16002B8B7879C5A",
       "hash_mode": "canonical-text-v1",
       "lines": 1506,
       "package_visible": false
@@ -5378,5 +5378,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:34e4829bf8e68b4c1185ab36d1540ca07815aba88dc37fe22dcb0593ef7113bb"
+  "digest": "sha256:3d0c9d0cc0a68d1588c5fea6fd8bdb5142b8f9a4761867b3f9e58a4eab2280db"
 }

@@ -1444,7 +1444,7 @@ function Test-MIR4PreFreezeAuthorities {
       $authorityHashModes[$path] = [string]$binding.hash_mode
       $supplyChainEvolvedPaths[$path] = $true
     }
-    if ($supplyChainEvolvedPaths.Count -ne 35 -or
+    if ($supplyChainEvolvedPaths.Count -ne 36 -or
         [string]$supplyChain.status -cne 'M42-02-PS11-SUPPLY-CHAIN-DECOMPOSED-POWERSHELL-SEQUENCE-COMPLETE' -or
         [string]$supplyChain.decomposition.responsibility -cne 'supply-chain' -or
         [string]$supplyChain.next_fixed_point -cne 'M41-BRIDGE-RETIREMENT' -or

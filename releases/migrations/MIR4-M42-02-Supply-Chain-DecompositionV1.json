@@ -138,9 +138,9 @@
   },
   "tooling_inventory": {
     "path": "governance/automation/mir4-command-inventory-v1.json",
-    "sha256": "C5F96FA1506B2B8C4EDEA175F6AA5008D9AF2DE0AE8ABC66301463F5ADFF1400",
+    "sha256": "5CF86E95D49386D66BF443BC5C6F8D5462427DC7970278FB662430EA5FC36EE0",
     "hash_mode": "canonical-text-v1",
-    "digest": "sha256:34e4829bf8e68b4c1185ab36d1540ca07815aba88dc37fe22dcb0593ef7113bb",
+    "digest": "sha256:3d0c9d0cc0a68d1588c5fea6fd8bdb5142b8f9a4761867b3f9e58a4eab2280db",
     "command_count": 85,
     "unknown": 0,
     "duplicate_command_keys": 0
@@ -205,7 +205,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "20BD14119DCD7BB59BBDDF9442FBD5AB283E268DD662E50A4AB4400CC7E9D25C",
-      "current_sha256": "C5F96FA1506B2B8C4EDEA175F6AA5008D9AF2DE0AE8ABC66301463F5ADFF1400",
+      "current_sha256": "5CF86E95D49386D66BF443BC5C6F8D5462427DC7970278FB662430EA5FC36EE0",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -278,6 +278,14 @@
       "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
       "previous_sha256": "58621995A4D21797DA2E676E13FBEF6C75ABBACD0242B1688FBEE17E4615A73A",
       "current_sha256": "57F0F8E10EDECFFE274B8E79CFED750527957133AD24AF29895B27F893273F74",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "1FC1FBA23DA656051DBDEBF4492275B22F06B496C3A63F7CBDAF745BA3EF30A1",
+      "current_sha256": "3145117A0F02E1FED18520FFCC1BCDAB7EB3F281E46A36CF8A6CEB4ACEC443C1",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -413,7 +421,7 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
       "previous_sha256": "3309F479DD9BDA762F20C5708494529B18A19295518157D8A92131745C103658",
-      "current_sha256": "E398D0B03D2F1A0334B3C8816C485413DF30D95AAA118D37F6CD471FD2B35033",
+      "current_sha256": "5E8184D026142D677C3066311A754C82F58302D75FCBEB50E16002B8B7879C5A",
       "hash_mode": "canonical-text-v1",
       "package_visible": false,
       "release_authority": false
@@ -445,5 +453,5 @@
     "publication": false
   },
   "next_fixed_point": "M41-BRIDGE-RETIREMENT",
-  "record_sha256": "C36A309B23222DF6F7FF61950C74DF6F1AC42E2DF918075C0E6CF7485E981A77"
+  "record_sha256": "816412E1BEE0505A1142863534583231078412B0D9D513A0CC334393E64612D2"
 }
