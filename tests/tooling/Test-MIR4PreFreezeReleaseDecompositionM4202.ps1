@@ -105,6 +105,26 @@ if(Test-Path -LiteralPath $bootstrapSuccessorPath -PathType Leaf){
           }
         }
         $expectedInventoryDigest=[string]$offlineCustodySuccessor.tooling_inventory.digest
+        $releaseCapsuleSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json'
+        if(Test-Path -LiteralPath $releaseCapsuleSuccessorPath -PathType Leaf){
+          $releaseCapsuleSuccessorRaw=Get-Content -Raw -LiteralPath $releaseCapsuleSuccessorPath
+          Assert-MIR4PreFreezeReleaseDecompositionV1 ($releaseCapsuleSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-release-capsule-decomposition-v1.schema.json')) 'mir4-m42-02-pre-freeze-release-release-capsule-successor-schema'
+          $releaseCapsuleSuccessor=$releaseCapsuleSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+          Assert-MIR4PreFreezeReleaseDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $releaseCapsuleSuccessor) 'mir4-m42-02-pre-freeze-release-release-capsule-successor-record'
+          Assert-MIR4PreFreezeReleaseDecompositionV1 ((Get-FileHash -LiteralPath $offlineCustodySuccessorPath -Algorithm SHA256).Hash-ceq[string]$releaseCapsuleSuccessor.predecessor.receipt_sha256-and[string]$offlineCustodySuccessor.record_sha256-ceq[string]$releaseCapsuleSuccessor.predecessor.record_sha256) 'mir4-m42-02-pre-freeze-release-release-capsule-successor-predecessor'
+          foreach($binding in @($releaseCapsuleSuccessor.evolved_bindings)){
+            $path=[string]$binding.path
+            if($expectedBindingSha.ContainsKey($path)){
+              Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-pre-freeze-release-release-capsule-successor-binding' $path
+              $expectedBindingSha[$path]=[string]$binding.current_sha256
+            }
+            if($expectedModuleSha.ContainsKey($path)){
+              Assert-MIR4PreFreezeReleaseDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedModuleSha[$path]) 'mir4-m42-02-pre-freeze-release-release-capsule-successor-module' $path
+              $expectedModuleSha[$path]=[string]$binding.current_sha256
+            }
+          }
+          $expectedInventoryDigest=[string]$releaseCapsuleSuccessor.tooling_inventory.digest
+        }
       }
     }
   }

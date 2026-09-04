@@ -301,6 +301,7 @@ package_excluded_modules:
     implementation: tools/lib/mir4/SupplyChain.ps1
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
+    capsule_implementation_modules: tools/lib/mir4/release-capsule
     runner_confinement_implementation: tools/lib/mir4/RunnerPublisherConfinement.ps1
     package_presentation_compatibility_reader: tools/lib/mir4/PackagePresentation.ps1
     command: tools/commands/mir4/Invoke-MIR4SupplyChain.ps1

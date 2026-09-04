@@ -18,7 +18,10 @@ function Assert-MIR4M4202OfflineCustody {
 }
 
 $packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202OfflineCustodyDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+$releaseCapsulePath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json'
+if (-not (Test-Path -LiteralPath $releaseCapsulePath -PathType Leaf)) {
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202OfflineCustodyDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json'
 $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202OfflineCustody ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-offline-custody-decomposition-v1.schema.json')) 'mir4-m42-02-offline-custody-schema'
@@ -83,8 +86,18 @@ try {
   if (Test-Path -LiteralPath $probeRoot -PathType Container) { Remove-MIR4BuildTree -OutputRoot $buildTests -Path $probeRoot }
 }
 
+$expectedInventoryDigest = [string]$receipt.tooling_inventory.digest
+if (Test-Path -LiteralPath $releaseCapsulePath -PathType Leaf) {
+  $releaseCapsuleRaw = Get-Content -Raw -LiteralPath $releaseCapsulePath
+  Assert-MIR4M4202OfflineCustody ($releaseCapsuleRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-release-capsule-decomposition-v1.schema.json')) 'mir4-m42-02-offline-custody-release-capsule-schema'
+  $releaseCapsule = $releaseCapsuleRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202OfflineCustody (Test-MIR4BootstrapRecordHash -Record $releaseCapsule) 'mir4-m42-02-offline-custody-release-capsule-record'
+  Assert-MIR4M4202OfflineCustody ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$releaseCapsule.predecessor.receipt_sha256 -and [string]$releaseCapsule.predecessor.record_sha256 -ceq [string]$receipt.record_sha256) 'mir4-m42-02-offline-custody-release-capsule-predecessor'
+  Assert-MIR4M4202OfflineCustody ([string]$releaseCapsule.current_source.sha256 -ceq '6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D' -and [bool]$releaseCapsule.public_contract.unchanged -and [int]$releaseCapsule.public_contract.function_count -eq 19) 'mir4-m42-02-offline-custody-release-capsule-contract'
+  $expectedInventoryDigest = [string]$releaseCapsule.tooling_inventory.digest
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202OfflineCustody ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq [string]$receipt.tooling_inventory.digest) 'mir4-m42-02-offline-custody-inventory'
+Assert-MIR4M4202OfflineCustody ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-offline-custody-inventory'
 Assert-MIR4M4202OfflineCustody ([bool]$receipt.semantic_contract.ordered_source_slices_preserved_with_declared_substitutions -and [bool]$receipt.semantic_contract.application_root_semantics_preserved -and [bool]$receipt.semantic_contract.setup_unchanged -and [bool]$receipt.semantic_contract.custody_admission_unchanged -and [bool]$receipt.semantic_contract.historical_compatibility_check_explicit -and [bool]$receipt.semantic_contract.seal_inputs_unchanged -and [bool]$receipt.semantic_contract.signature_verification_unchanged -and [bool]$receipt.semantic_contract.qualification_evidence_unchanged -and [bool]$receipt.semantic_contract.publication_dry_run_unchanged -and [bool]$receipt.semantic_contract.offline_seal_unchanged -and [bool]$receipt.semantic_contract.offline_restore_unchanged -and [bool]$receipt.semantic_contract.emergency_completion_unchanged) 'mir4-m42-02-offline-custody-semantic-contract'
 Assert-MIR4M4202OfflineCustody (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-offline-custody-transition'
 Assert-MIR4M4202OfflineCustody ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-offline-custody-package-firewall'

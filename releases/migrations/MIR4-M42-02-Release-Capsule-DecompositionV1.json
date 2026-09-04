@@ -1,0 +1,603 @@
+{
+  "schema": 1,
+  "kind": "MIR4M4202ReleaseCapsuleDecompositionV1",
+  "status": "M42-02-PS9-RELEASE-CAPSULE-DECOMPOSED",
+  "starting_dev": {
+    "commit": "941844acfd7e9c8af40109a2cf7e9cab50c377cd",
+    "tree": "64bde62adf06dc3710ab1cb72b03e8309da258f0"
+  },
+  "predecessor": {
+    "work_package": "M42-02-PS8-OFFLINE-CUSTODY",
+    "receipt": "releases/migrations/MIR4-M42-02-Offline-Custody-DecompositionV1.json",
+    "receipt_sha256": "96C7CBC9510F4F9B5CD72EE06FBC4E0C2FBDDC425169D6F3797F77952019947A",
+    "record_sha256": "6A8C63FAD8CCA6426456065AF3E758C1A698075E317FBACDF76024CA464AA596",
+    "status": "M42-02-PS8-OFFLINE-CUSTODY-DECOMPOSED"
+  },
+  "characterization": {
+    "receipt": "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+    "record_sha256": "4024F3EAE0D97FA855E0546CF36B48320499F5B833140098069DD46E25DFC2C0",
+    "path": "tools/lib/mir4/ReleaseCapsule.ps1",
+    "sha256": "6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D",
+    "lines": 1357,
+    "responsibilities": [
+      "inventory",
+      "capsule construction",
+      "capsule verification",
+      "restore"
+    ]
+  },
+  "current_source": {
+    "commit": "941844acfd7e9c8af40109a2cf7e9cab50c377cd",
+    "tree": "64bde62adf06dc3710ab1cb72b03e8309da258f0",
+    "path": "tools/lib/mir4/ReleaseCapsule.ps1",
+    "sha256": "6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D",
+    "lines": 1356,
+    "function_count": 19,
+    "evolution_chain": []
+  },
+  "decomposition": {
+    "responsibility": "release-capsule",
+    "facade": {
+      "path": "tools/lib/mir4/ReleaseCapsule.ps1",
+      "previous_sha256": "6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D",
+      "current_sha256": "BDB804BBCF1CC0F4F6F6F26AB5CB6ED550E1F817D431FF0E95832D0996E76E1B",
+      "hash_mode": "canonical-text-v1",
+      "previous_lines": 1356,
+      "current_lines": 26,
+      "maximum_lines": 80,
+      "function_count": 0
+    },
+    "module_root": "tools/lib/mir4/release-capsule",
+    "module_count": 8,
+    "module_maximum_lines": 400,
+    "modules": [
+      {
+        "path": "tools/lib/mir4/release-capsule/CoreRecords.ps1",
+        "role": "repository resolution, immutable JSON records, object paths, and stream hashing",
+        "source_lines": {
+          "start": 19,
+          "end": 79
+        },
+        "sha256": "F1591867EABD4A389270E9854DD599CCDCE225AB8A72AA6A3A3253DE6AA0D2AE",
+        "hash_mode": "canonical-text-v1",
+        "lines": 61,
+        "function_count": 5,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/CustodyInventory.ps1",
+        "role": "private custody inventory construction and validation",
+        "source_lines": {
+          "start": 81,
+          "end": 217
+        },
+        "sha256": "3D5FA55528F489DB3F4B9D9BBC719D5990F2DF8B75FCF8680647D135E9AAE722",
+        "hash_mode": "canonical-text-v1",
+        "lines": 137,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/SourceArchiveAndDescriptors.ps1",
+        "role": "deterministic git source archives and capsule descriptor projection",
+        "source_lines": {
+          "start": 219,
+          "end": 334
+        },
+        "sha256": "A94644D783B473AC8BD6AAE9F3FF85220529001077F6AEA1BDA214D7F0DB2DDA",
+        "hash_mode": "canonical-text-v1",
+        "lines": 116,
+        "function_count": 2,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/SupportRecords.ps1",
+        "role": "support-record construction and archive inventory",
+        "source_lines": {
+          "start": 336,
+          "end": 488
+        },
+        "sha256": "AF4DC40BA7B874D56150A9A1CE1CEF6502AEBE1BD4E24C96D12BB54F85411748",
+        "hash_mode": "canonical-text-v1",
+        "lines": 153,
+        "function_count": 2,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/ArchiveReadingAndClosure.ps1",
+        "role": "bounded archive entry reading, manifest loading, and role closure",
+        "source_lines": {
+          "start": 490,
+          "end": 543
+        },
+        "sha256": "7B1396A7F9F8B928AAC24B724CC0002480A713D3D5E109D13B4C190722257ABF",
+        "hash_mode": "canonical-text-v1",
+        "lines": 54,
+        "function_count": 3,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/CapsuleConstruction.ps1",
+        "role": "content-addressed release capsule construction",
+        "source_lines": {
+          "start": 545,
+          "end": 891
+        },
+        "sha256": "5172B10BAD66359FE7A06F329E89E4BE8454568333A660EAE411FD8BF826EF52",
+        "hash_mode": "canonical-text-v1",
+        "lines": 347,
+        "function_count": 1,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/CapsuleVerification.ps1",
+        "role": "capsule, provenance, preview asset, and publisher-admission verification",
+        "source_lines": {
+          "start": 893,
+          "end": 1100
+        },
+        "sha256": "99391D1C7279262B9D1D762434668BB9C57AD8BD6C89C0A8E1373504D17706D8",
+        "hash_mode": "canonical-text-v1",
+        "lines": 208,
+        "function_count": 4,
+        "parse_errors": 0
+      },
+      {
+        "path": "tools/lib/mir4/release-capsule/CapsuleRestore.ps1",
+        "role": "contained offline capsule restoration and receipt construction",
+        "source_lines": {
+          "start": 1102,
+          "end": 1356
+        },
+        "sha256": "6543D3AF04D9789F8F47F96E2E56A32463034DF0B629570F1D5C8B2051FD49F7",
+        "hash_mode": "canonical-text-v1",
+        "lines": 255,
+        "function_count": 1,
+        "parse_errors": 0
+      }
+    ],
+    "segment_algorithm": "ordered-current-source-slices-v1"
+  },
+  "public_contract": {
+    "function_projection_algorithm": "ordered-powershell-function-name-list-v1",
+    "previous_function_sha256": "46E7375AF847AD76BF1686235787D1BD0BA4894D22B3A1572E201E548E6F9710",
+    "current_function_sha256": "46E7375AF847AD76BF1686235787D1BD0BA4894D22B3A1572E201E548E6F9710",
+    "setup_block_sha256": "DAB7FC38819795A3C023F3257856CCCA21238C906A24C21233F0784A18EA56DD",
+    "unchanged": true,
+    "function_count": 19
+  },
+  "semantic_contract": {
+    "ordered_source_slices_preserved": true,
+    "function_names_and_order_unchanged": true,
+    "setup_unchanged": true,
+    "module_load_order_explicit": true,
+    "custody_inventory_unchanged": true,
+    "source_archive_unchanged": true,
+    "descriptor_projection_unchanged": true,
+    "support_records_unchanged": true,
+    "role_closure_unchanged": true,
+    "capsule_construction_unchanged": true,
+    "capsule_verification_unchanged": true,
+    "provenance_binding_unchanged": true,
+    "preview_asset_verification_unchanged": true,
+    "publisher_admission_unchanged": true,
+    "offline_restore_unchanged": true,
+    "platform_projections_regenerated": true,
+    "post_cutover_package_non_interference_assertion": true,
+    "pre_freeze_authority_chain_extended_for_ps9": true
+  },
+  "tooling_inventory": {
+    "path": "governance/automation/mir4-command-inventory-v1.json",
+    "sha256": "E4A7CD40233C782F611EB9781539F2896E418CF0EBB2494ECB2766727ED023C8",
+    "hash_mode": "canonical-text-v1",
+    "digest": "sha256:d322d2ac0f04c93d21945b45ae6a285794fcdddcbd9fef5a8bc7cbc2f5f0e395",
+    "command_count": 85,
+    "unknown": 0,
+    "duplicate_command_keys": 0
+  },
+  "evolved_bindings": [
+    {
+      "path": ".mir/assurance.json",
+      "previous_sha256": "1CFEC2D544570DA8B014BA9BF551374841E43444123A9EB679F18EED0F5D8E83",
+      "current_sha256": "553F22FF847BEDE417BC06B633D4F3668C66F6EAFD61CB2DD52B010B2E311D54",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/control/paths.yml",
+      "previous_sha256": "421DE7110CB44D8A2A0127F8F198F3E75BE619091BEEAEF4E0445D4C2FEBD035",
+      "current_sha256": "14834D0DE9ECF66A19A09B1BF44DBDC0BE823A18D5CD3A402690BF519E16E09F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/modules.yml",
+      "previous_sha256": "1EBA10825236568CDEB9ACE1B7C767FA090B71DF362CBF7F17653D3FFDE5FCE2",
+      "current_sha256": "496E1464A7A894D2F1595F85DDB03506E140E3786847DF2A1CB549B6316F82EA",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": ".mir/test-impact.yml",
+      "previous_sha256": "9C574D442AB9154939F751B2D0C765C56E4304A0FCDF8C41592FA631D29E03ED",
+      "current_sha256": "715053A085F3CBADB91195FC5149F5A9D375EF5003599E0903AA333700169272",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "assurance/catalog/tests.json",
+      "previous_sha256": "7682E36C159AC0417DD89AAA5AB744B2C6B3B907D24BA7C47EFA31FF3C0A5661",
+      "current_sha256": "41EBA8CAE25B9A48A96F392BAED519EA05F4FD32083DFC86E44507732FAF77A4",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "docs/architecture/module-boundaries.md",
+      "previous_sha256": "4EFAA272FB40CCC3E1E0AF6B558DD3F5498FE3BCF1C1B412DFB4EF622B66DC38",
+      "current_sha256": "C4A1FAAC20FB532F94AC10BFA4BC200F4A203C887ED0A7B73D20235249D3A639",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-discovery-v1/negative/invalid-envelope.json",
+      "previous_sha256": "4086019A6D7D3B49B372A53CD379D16388F04ACD34C104AF38A9C278F2924731",
+      "current_sha256": "487BF819B10D8CB3B4EA2E1A273E15ED1B2F87CC59407BF7688F13CC49F8DF92",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-discovery-v1/positive/host-absent.json",
+      "previous_sha256": "D572197BE574778AE4F022B6B43A92D99F6139BDC1014F88286125AC9156F635",
+      "current_sha256": "7A9127D687E450D226C92CA03F725902493D32F24634356AEDE3EAD163EE7E8E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-discovery-v1/positive/order-a.json",
+      "previous_sha256": "F285B5BB86941B93CB0E4323C8F0A526898779A1BF45CB55FFEFC9C3667F30AE",
+      "current_sha256": "BBBBD855F0618D797352F3F14A66964BFDA02B057D7E9830577ED281FCD8C08A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-discovery-v1/positive/order-b.json",
+      "previous_sha256": "93AD01247A8E25DDF4FBB2C4718E09C151D64B5463D07E3101B34E2852690072",
+      "current_sha256": "69EE5AC03B3D21C35D8A1EDA6919365F8D75260A9B8EF8FB644556A86DE5F160",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-v1/negative/cycle-a.json",
+      "previous_sha256": "37F7A46FB88D3BB66AF81E2CB3B1F9A8779541DA8CD0B98C004F4C2A54361772",
+      "current_sha256": "DE051B6A777E316A7F30CA4FC17A3C2054C44455A3C17C15C29736400F55A2F6",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-v1/negative/cycle-b.json",
+      "previous_sha256": "8F7FAE575D2D3F0F87C53A5E90CB4D06EE2C0D8E3B0E785D053F5AE1BE4D02D3",
+      "current_sha256": "F59B79AA680B214C12358070FE7A52723FDE9D7EA8B915E5A0FA1B0A12331531",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-v1/negative/forbidden-callback.json",
+      "previous_sha256": "47630C59D5D38A56FE78D209009617A4514D43ADA00C190BA27049DC05D304FE",
+      "current_sha256": "FA0165D6EFB121A2407173E5E78A5E3A750A6B90DD2FE8E1D5A6076CC7F21253",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-v1/negative/missing-dependency.json",
+      "previous_sha256": "ACB9A706046F2B5C40AD6CDEDBD70FE4E4CA2EC181E02C8DD2B52DE5FD5C958D",
+      "current_sha256": "694B7CCF39D4EEDBF24CAF1960281C3C1605CC872BBDFD775B495EBC6206518B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "fixtures/mir4-mep-v1/positive/reference-extension.json",
+      "previous_sha256": "43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD",
+      "current_sha256": "0A96672A6E9C365E1B6A9FEE1E307636AFEB74AAFC88C8E7B89CD1D9436AE08D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "governance/automation/mir4-command-inventory-v1.json",
+      "previous_sha256": "D8334F5166C4300BD9CED2AAA6DCACDD68B23A3BA299E1B59C82B587F1408A41",
+      "current_sha256": "E4A7CD40233C782F611EB9781539F2896E418CF0EBB2494ECB2766727ED023C8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "mir.lock",
+      "previous_sha256": "267782F1F3FBD4C792E9C45850B334953CB02951637E5FE214831EE87F4AFE3A",
+      "current_sha256": "E4803065EDD8A1FA465ADEB4B9BD723B76DDC87E616C9CAE90FF2CB9636FEE00",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/mep-v1/templates/all-fragments/extension.json",
+      "previous_sha256": "43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD",
+      "current_sha256": "0A96672A6E9C365E1B6A9FEE1E307636AFEB74AAFC88C8E7B89CD1D9436AE08D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference-extension-v1/extension.json",
+      "previous_sha256": "43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD",
+      "current_sha256": "0A96672A6E9C365E1B6A9FEE1E307636AFEB74AAFC88C8E7B89CD1D9436AE08D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compatibility-factory-plan-v1.json",
+      "previous_sha256": "956B0C6A50103E3B51AC6E97AC0A96BF028CE2CCFEDAC3A4799C24F5666F9625",
+      "current_sha256": "BEED8DE3FC2DE9F0ADC5FD442DD2F0EA63B2B53812365A61C715491CA485386E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json",
+      "previous_sha256": "192FEEB48A5E296E0C43625D4D8B576422AA382E8C91DC9B4194A2315C632B86",
+      "current_sha256": "1EBEACD3E05A89F11824B0842A9F0FEC723C65F6D418D8FD387523952C0E0845",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/compilation-runs.json",
+      "previous_sha256": "D5E4AD6468B97E79A603CC3326D7B9D07E94AA411C22805609A43FD804A0AE10",
+      "current_sha256": "36296CBA4551DED4E5CDBF29D99BD4301874CF6C301C8F8E5000EFD897A45CF7",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/continuity-bundle-template.json",
+      "previous_sha256": "5BC2B8398F4DC754B3DC59AECF2060687A7379257678E1B6C4681C25BD53A450",
+      "current_sha256": "E1602E14FC2844505CF06527B2B58B488F6DA16F99E8DAB7AB5C868DDF36F42E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/extension-closure-v1.json",
+      "previous_sha256": "722A328F6E02DB5463F0EF8D379E45EB15CBB7244505D86978D2EF0A470BFCA0",
+      "current_sha256": "8C2217DAFFDF17AED798D2595BA45D011299BCB410E3E9CF742C1E9B6CE01E84",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/f210-mep-discovery-v1.json",
+      "previous_sha256": "A9DDFC2BC23A7123E3B2608E745F75C01FF444FB244E941CF822152D0E83F23E",
+      "current_sha256": "7B01ECF495F8D1CF5E5F27B460D4011EBB2831CE08CA9EE74F64B9D26C6BBBCE",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspection-bundle-v1.json",
+      "previous_sha256": "1C24278BA48A7B7170B6F2A4348EAA3A4EF8028F8B84693DE5BA9B8FBAF7EED8",
+      "current_sha256": "8D40D16709E25D47D83493C4D3BC8B8D5CB63B79BE12680CDDDE0C04BE8F700D",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/inspector-workbench-result-v1.json",
+      "previous_sha256": "2C4188D2D843D9D96F0CB5A0074B761A8E88442D59689AB340A51134938EADE2",
+      "current_sha256": "8AE814401627EB25B5583CED3854559DFD9EC8A89A938A65BE669C96DF2B8C33",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/merge-law-catalogue.json",
+      "previous_sha256": "7DD6C44528EDCDC60F8531141AFC3C1E18B5CBBD8FF022C9BCC8FC8E9B851628",
+      "current_sha256": "B91A737603C05AAB0B80F0881CFD23E4737B69BE1D883553896A9B636FC54A24",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/migration-graph-matrix.json",
+      "previous_sha256": "6D06895B1E27E380D8998DA844B3CEAA198AB3C64F9321D387BA12BFB5B40E8A",
+      "current_sha256": "14D5CBD11E27D1BBB6CEAF5FFE24E4C3337AFCBCBCBB87F89DF3673A08387037",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/query-snapshot-f210.json",
+      "previous_sha256": "36FDDB8CFC0327CCC80DB25A8492775E857FF90022F6B2D26875A6A24C09F503",
+      "current_sha256": "CFDC03A5F80C7F04B6131ACB060030A59C0D63942B22DCDC6838CD15985CA57F",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/shadow-extension-run-v1-f210.json",
+      "previous_sha256": "163AAB741E58B110C66C253D4FBA4DEC6B2F858A17CF76828DACA8933DA6F9F9",
+      "current_sha256": "004B471EEDFC5AF91DE2A24A90483BA9467E2ADD4A81CD393168086EBDB6100E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "sdk/preview/mir4/reference/support-bundle-v1.json",
+      "previous_sha256": "E7EF52B0D1E110DAB15D1E0F0BEB66A0CFAAFB30685ADFBF87C559C755C15D31",
+      "current_sha256": "164F10F035FD5E2866D89D0DE272B7F514377E64FE357F0DB4F896BDCF0A5B49",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/architecture/Test-MIRArchitecture.ps1",
+      "previous_sha256": "C622984802E0E91448181EE7CD88E789F0FC66978BF372686BA7912EDA1489D9",
+      "current_sha256": "8DBA2D29DCE7B93206E83ECC88E7916989C1C6CCFC257B3B3605BC2DBAC7308B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+      "previous_sha256": "A46D0613629A48C168DE8A007B7F54458D3D15F02BFDE55C41468E14EC198DA3",
+      "current_sha256": "E64E9BE9F47E89231E8238FC10AACE00F06E0C0FEE08E6118D7D3E43E9D369F2",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/mir4/Test-MIR4ReleaseCapsule.ps1",
+      "previous_sha256": "EFFF8A24C4772B8B1D64EAFEACC693CE6AFB0BE8BB513AAF4B4157417746BCC3",
+      "current_sha256": "436644E51F0C234CF9BD9ADE4D31E1754166827DBD9D96F8C8D4A90B5B453253",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+      "previous_sha256": "D86ACF1BA7E064F3A238B1AFE6D3E668248E37AA82DECAF67EF8FE6B1BF9AE5B",
+      "current_sha256": "AE636247B4108F5314F0426F00C192E5FA074D318C843CE03DD3F37B29B19511",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "1F26D831680A85505CC0AA7703D009BF812BBA4E06D68CD318FEC4D5BB88BC1E",
+      "current_sha256": "DF9F57E353512CA16B5D39FF1D74AD2224CB2286134FE38B8208F1FB43F4F614",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1",
+      "previous_sha256": "40D3799CECD8067849101B6001B103AFD161FAF44DC3FB953BAEB72875D292A5",
+      "current_sha256": "D7DCD4781F9CF6C6C533E6B980B552F5735C1DCA8C74A999B6A0D1D23CD6922A",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1",
+      "previous_sha256": "98D679A58447D0C39E1FA818C9A5AD3CC9C25F88053C41F3A2EEC68558A9C616",
+      "current_sha256": "2F57EA68ED12D690C6BB1204E4518A94D4F9F2A751DF4622AEA1D6F2A47F8BAC",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1",
+      "previous_sha256": "B70AFCE7D7DD75D507F7040E217FFF986135E622DB42E1EAB0F9B06D4E520CD2",
+      "current_sha256": "B598B433AB3ED32A2F4479C7A27F984318DA9FA3789E864031D0C6D57D38EB53",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1",
+      "previous_sha256": "901A4AD6DA490A05EEA7E9B32AD53F1F27A09216606210F3DE9D3AE736FF1706",
+      "current_sha256": "5C0220D190C96FA7BCFFF451A7F511627A9808EE488B2A865BEEBDF2B6C97C38",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1",
+      "previous_sha256": "922F735624BAE610B8375CDE0BA77715E8FDF298FBA48FE7CE32F47AF5381B33",
+      "current_sha256": "B5159AA4C74B43FF28A189B8B48C9A4D8B35537F5AEEE0A782077885B00CB990",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1",
+      "previous_sha256": "0026BFFB18547A4CF2D62C7E7DF691E8FE6A09E0127156CB5C86CDE749EDACAB",
+      "current_sha256": "E825ED9BB68A74FB1614489AF83B45D2123F78ABD87121AC77C5E90CA01697A5",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1",
+      "previous_sha256": "5C549D64EB1460AEC86D8A15C0FC66F9AB8A3965E9A5C03FBCF7C74699740FCC",
+      "current_sha256": "6ABCA4326A74760E8E63303F20AFF4298D198FE43CD53E6B09F9F29F62F0475E",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tests/tooling/Test-MIR4OfflineCustodyDecompositionM4202.ps1",
+      "previous_sha256": "B77F35E1FE0FBE861B27115562F6E6DF4C1B8EC6C9F682CCD3C43B28AD5A2159",
+      "current_sha256": "3553C812748A19608FE020628974872D874E5F708377B19E3B237595356154C8",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/ReleaseCapsule.ps1",
+      "previous_sha256": "6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D",
+      "current_sha256": "BDB804BBCF1CC0F4F6F6F26AB5CB6ED550E1F817D431FF0E95832D0996E76E1B",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+      "previous_sha256": "50BF2AE38E48B7A6F8829A38016BCCEE1D63975947033B87636D4AEDA8B2B707",
+      "current_sha256": "916092C4A10D4312C2943E6B715CE5122D2024723904F09ECD810B11C6C5ADF9",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    },
+    {
+      "path": "validation/tests.yml",
+      "previous_sha256": "EB048D1907D1693299257004C08AFB4F97F16D3DAA49B313A3A0EC7441075431",
+      "current_sha256": "898975509609396F25849763A9BA156B3358F66D51BD2A39D98246C96DAADF50",
+      "hash_mode": "canonical-text-v1",
+      "package_visible": false,
+      "release_authority": false
+    }
+  ],
+  "preservation": {
+    "package_source_sha256": "E56941E72695E08689ED828E3D46882DF53780909DB78A16FF83B4F482606813",
+    "package_visible_delta": [],
+    "gameplay": false,
+    "saves": true,
+    "settings": true,
+    "migrations": true,
+    "compatibility_claims": true,
+    "stream_identities": true
+  },
+  "transition_gate": {
+    "version_allocation": false,
+    "tagging": false,
+    "signing": false,
+    "sealing": false,
+    "publication": false
+  },
+  "next_fixed_point": "M42-02-PS10-CONTROL-EXECUTOR",
+  "record_sha256": "AC039DF2C52301D12694BC79901762F21BFB5E6B88729E6F3BA93F8A3691A974"
+}

@@ -1195,6 +1195,111 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 
+  $releaseCapsuleReceiptPath = 'releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $releaseCapsuleReceiptPath) -PathType Leaf) {
+    $releaseCapsule = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $releaseCapsuleReceiptPath -Kind 'MIR4M4202ReleaseCapsuleDecompositionV1'
+    if ([string]$releaseCapsule.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$releaseCapsule.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$releaseCapsule.predecessor.record_sha256 -cne [string]$offlineCustody.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-release-capsule-predecessor]'
+    }
+    $releaseCapsuleEnrollmentBaselines = @{
+      '.mir/assurance.json'='1CFEC2D544570DA8B014BA9BF551374841E43444123A9EB679F18EED0F5D8E83'
+      '.mir/control/paths.yml'='421DE7110CB44D8A2A0127F8F198F3E75BE619091BEEAEF4E0445D4C2FEBD035'
+      '.mir/modules.yml'='1EBA10825236568CDEB9ACE1B7C767FA090B71DF362CBF7F17653D3FFDE5FCE2'
+      '.mir/test-impact.yml'='9C574D442AB9154939F751B2D0C765C56E4304A0FCDF8C41592FA631D29E03ED'
+      'assurance/catalog/tests.json'='7682E36C159AC0417DD89AAA5AB744B2C6B3B907D24BA7C47EFA31FF3C0A5661'
+      'docs/architecture/module-boundaries.md'='4EFAA272FB40CCC3E1E0AF6B558DD3F5498FE3BCF1C1B412DFB4EF622B66DC38'
+      'fixtures/mir4-mep-discovery-v1/negative/invalid-envelope.json'='4086019A6D7D3B49B372A53CD379D16388F04ACD34C104AF38A9C278F2924731'
+      'fixtures/mir4-mep-discovery-v1/positive/host-absent.json'='D572197BE574778AE4F022B6B43A92D99F6139BDC1014F88286125AC9156F635'
+      'fixtures/mir4-mep-discovery-v1/positive/order-a.json'='F285B5BB86941B93CB0E4323C8F0A526898779A1BF45CB55FFEFC9C3667F30AE'
+      'fixtures/mir4-mep-discovery-v1/positive/order-b.json'='93AD01247A8E25DDF4FBB2C4718E09C151D64B5463D07E3101B34E2852690072'
+      'fixtures/mir4-mep-v1/negative/cycle-a.json'='37F7A46FB88D3BB66AF81E2CB3B1F9A8779541DA8CD0B98C004F4C2A54361772'
+      'fixtures/mir4-mep-v1/negative/cycle-b.json'='8F7FAE575D2D3F0F87C53A5E90CB4D06EE2C0D8E3B0E785D053F5AE1BE4D02D3'
+      'fixtures/mir4-mep-v1/negative/forbidden-callback.json'='47630C59D5D38A56FE78D209009617A4514D43ADA00C190BA27049DC05D304FE'
+      'fixtures/mir4-mep-v1/negative/missing-dependency.json'='ACB9A706046F2B5C40AD6CDEDBD70FE4E4CA2EC181E02C8DD2B52DE5FD5C958D'
+      'fixtures/mir4-mep-v1/positive/reference-extension.json'='43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD'
+      'governance/automation/mir4-command-inventory-v1.json'='D8334F5166C4300BD9CED2AAA6DCACDD68B23A3BA299E1B59C82B587F1408A41'
+      'mir.lock'='267782F1F3FBD4C792E9C45850B334953CB02951637E5FE214831EE87F4AFE3A'
+      'sdk/preview/mir4/mep-v1/templates/all-fragments/extension.json'='43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD'
+      'sdk/preview/mir4/reference-extension-v1/extension.json'='43CE13A4C6103FDDCFD834098AD5051D7083EA701A104A203B42392FD47A01FD'
+      'sdk/preview/mir4/reference/compatibility-factory-plan-v1.json'='956B0C6A50103E3B51AC6E97AC0A96BF028CE2CCFEDAC3A4799C24F5666F9625'
+      'sdk/preview/mir4/reference/compatibility-subject-ledger-v1.json'='192FEEB48A5E296E0C43625D4D8B576422AA382E8C91DC9B4194A2315C632B86'
+      'sdk/preview/mir4/reference/compilation-runs.json'='D5E4AD6468B97E79A603CC3326D7B9D07E94AA411C22805609A43FD804A0AE10'
+      'sdk/preview/mir4/reference/continuity-bundle-template.json'='5BC2B8398F4DC754B3DC59AECF2060687A7379257678E1B6C4681C25BD53A450'
+      'sdk/preview/mir4/reference/extension-closure-v1.json'='722A328F6E02DB5463F0EF8D379E45EB15CBB7244505D86978D2EF0A470BFCA0'
+      'sdk/preview/mir4/reference/f210-mep-discovery-v1.json'='A9DDFC2BC23A7123E3B2608E745F75C01FF444FB244E941CF822152D0E83F23E'
+      'sdk/preview/mir4/reference/inspection-bundle-v1.json'='1C24278BA48A7B7170B6F2A4348EAA3A4EF8028F8B84693DE5BA9B8FBAF7EED8'
+      'sdk/preview/mir4/reference/inspector-workbench-result-v1.json'='2C4188D2D843D9D96F0CB5A0074B761A8E88442D59689AB340A51134938EADE2'
+      'sdk/preview/mir4/reference/merge-law-catalogue.json'='7DD6C44528EDCDC60F8531141AFC3C1E18B5CBBD8FF022C9BCC8FC8E9B851628'
+      'sdk/preview/mir4/reference/migration-graph-matrix.json'='6D06895B1E27E380D8998DA844B3CEAA198AB3C64F9321D387BA12BFB5B40E8A'
+      'sdk/preview/mir4/reference/query-snapshot-f210.json'='36FDDB8CFC0327CCC80DB25A8492775E857FF90022F6B2D26875A6A24C09F503'
+      'sdk/preview/mir4/reference/shadow-extension-run-v1-f210.json'='163AAB741E58B110C66C253D4FBA4DEC6B2F858A17CF76828DACA8933DA6F9F9'
+      'sdk/preview/mir4/reference/support-bundle-v1.json'='E7EF52B0D1E110DAB15D1E0F0BEB66A0CFAAFB30685ADFBF87C559C755C15D31'
+      'tests/architecture/Test-MIRArchitecture.ps1'='C622984802E0E91448181EE7CD88E789F0FC66978BF372686BA7912EDA1489D9'
+      'tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1'='A46D0613629A48C168DE8A007B7F54458D3D15F02BFDE55C41468E14EC198DA3'
+      'tests/mir4/Test-MIR4ReleaseCapsule.ps1'='EFFF8A24C4772B8B1D64EAFEACC693CE6AFB0BE8BB513AAF4B4157417746BCC3'
+      'tests/repository/Test-MIR4RepositoryFixedPoint.ps1'='D86ACF1BA7E064F3A238B1AFE6D3E668248E37AA82DECAF67EF8FE6B1BF9AE5B'
+      'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'='1F26D831680A85505CC0AA7703D009BF812BBA4E06D68CD318FEC4D5BB88BC1E'
+      'tests/tooling/Test-MIR4PowerShellCommandRouterDecompositionM4202.ps1'='40D3799CECD8067849101B6001B103AFD161FAF44DC3FB953BAEB72875D292A5'
+      'tests/tooling/Test-MIR4ValidationRunnerDecompositionM4202.ps1'='98D679A58447D0C39E1FA818C9A5AD3CC9C25F88053C41F3A2EEC68558A9C616'
+      'tests/tooling/Test-MIR4AssuranceEvidenceDecompositionM4202.ps1'='B70AFCE7D7DD75D507F7040E217FFF986135E622DB42E1EAB0F9B06D4E520CD2'
+      'tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1'='901A4AD6DA490A05EEA7E9B32AD53F1F27A09216606210F3DE9D3AE736FF1706'
+      'tests/tooling/Test-MIR4BootstrapMaterializationDecompositionM4202.ps1'='922F735624BAE610B8375CDE0BA77715E8FDF298FBA48FE7CE32F47AF5381B33'
+      'tests/tooling/Test-MIR4AssuranceReleaseDecompositionM4202.ps1'='0026BFFB18547A4CF2D62C7E7DF691E8FE6A09E0127156CB5C86CDE749EDACAB'
+      'tests/tooling/Test-MIR4CompatibilityAuditDecompositionM4202.ps1'='5C549D64EB1460AEC86D8A15C0FC66F9AB8A3965E9A5C03FBCF7C74699740FCC'
+      'tests/tooling/Test-MIR4OfflineCustodyDecompositionM4202.ps1'='B77F35E1FE0FBE861B27115562F6E6DF4C1B8EC6C9F682CCD3C43B28AD5A2159'
+      'tools/lib/mir4/ReleaseCapsule.ps1'='6F35762B10F47084B71759E2A36B9163FF1B83CB336B325D67A48D426CCDB51D'
+      'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1'='50BF2AE38E48B7A6F8829A38016BCCEE1D63975947033B87636D4AEDA8B2B707'
+      'validation/tests.yml'='EB048D1907D1693299257004C08AFB4F97F16D3DAA49B313A3A0EC7441075431'
+    }
+    $releaseCapsuleEvolvedPaths = @{}
+    foreach ($binding in @($releaseCapsule.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $releaseCapsuleEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$releaseCapsuleEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-release-capsule-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $releaseCapsuleEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-release-capsule-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $releaseCapsuleEvolvedPaths[$path] = $true
+    }
+    if ($releaseCapsuleEvolvedPaths.Count -ne 48 -or
+        [string]$releaseCapsule.status -cne 'M42-02-PS9-RELEASE-CAPSULE-DECOMPOSED' -or
+        [string]$releaseCapsule.decomposition.responsibility -cne 'release-capsule' -or
+        [string]$releaseCapsule.next_fixed_point -cne 'M42-02-PS10-CONTROL-EXECUTOR' -or
+        @($releaseCapsule.decomposition.modules).Count -ne 8 -or
+        [int]$releaseCapsule.public_contract.function_count -ne 19 -or
+        -not [bool]$releaseCapsule.public_contract.unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.ordered_source_slices_preserved -or
+        -not [bool]$releaseCapsule.semantic_contract.custody_inventory_unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.source_archive_unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.capsule_construction_unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.capsule_verification_unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.offline_restore_unchanged -or
+        -not [bool]$releaseCapsule.semantic_contract.platform_projections_regenerated -or
+        -not [bool]$releaseCapsule.semantic_contract.post_cutover_package_non_interference_assertion -or
+        [string]$releaseCapsule.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-release-capsule-scope]'
+    }
+    foreach ($property in $releaseCapsule.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-release-capsule-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $releaseCapsuleReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

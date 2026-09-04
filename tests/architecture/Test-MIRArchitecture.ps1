@@ -463,6 +463,12 @@ foreach ($offlineCustodyModule in @("CoreRecords.ps1", "Admission.ps1", "SealInp
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/mir/application/custody/OfflineCandidateCustody.ps1" -Text $offlineCustodyFacadeText -Needle "offline-candidate-custody/$offlineCustodyModule"
 }
+$releaseCapsuleFacadeText = Read-MIRFile -RelativePath "tools/lib/mir4/ReleaseCapsule.ps1"
+foreach ($releaseCapsuleModule in @("CoreRecords.ps1", "CustodyInventory.ps1", "SourceArchiveAndDescriptors.ps1", "SupportRecords.ps1", "ArchiveReadingAndClosure.ps1", "CapsuleConstruction.ps1", "CapsuleVerification.ps1", "CapsuleRestore.ps1")) {
+  $relative = "tools/lib/mir4/release-capsule/$releaseCapsuleModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/mir4/ReleaseCapsule.ps1" -Text $releaseCapsuleFacadeText -Needle "release-capsule/$releaseCapsuleModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

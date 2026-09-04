@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "MIR4-CHG-2026-0032",
+  "kind": "maintainability",
+  "audience": ["maintainers"],
+  "summary": "Decompose release-capsule custody, construction, verification, and restore behind the existing facade.",
+  "details": [
+    "Preserves all 19 public PowerShell function names and their declaration order.",
+    "Keeps capsule inventory, content-addressed construction, verification, publisher admission, and offline restore behavior unchanged.",
+    "Updates the capsule non-interference proof to compare the canonical post-cutover package fingerprint before and after execution.",
+    "Regenerates the package-excluded platform lock and dependent reference projections after the module authority changes.",
+    "Changes no player package, gameplay, save, setting, migration, compatibility claim, or release gate."
+  ],
+  "targets": ["repository"],
+  "package_visible": false,
+  "release_authority": false
+}

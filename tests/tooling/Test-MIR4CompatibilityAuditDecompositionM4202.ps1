@@ -77,6 +77,15 @@ if (Test-Path -LiteralPath $successorPath -PathType Leaf) {
   Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $successor) 'mir4-m42-02-compatibility-audit-successor-record'
   Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$successor.predecessor.receipt_sha256 -and [string]$receipt.record_sha256 -ceq [string]$successor.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-successor-predecessor'
   $expectedInventoryDigest = [string]$successor.tooling_inventory.digest
+  $releaseCapsuleSuccessorPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Release-Capsule-DecompositionV1.json'
+  if (Test-Path -LiteralPath $releaseCapsuleSuccessorPath -PathType Leaf) {
+    $releaseCapsuleSuccessorRaw = Get-Content -Raw -LiteralPath $releaseCapsuleSuccessorPath
+    Assert-MIR4M4202CompatibilityAudit ($releaseCapsuleSuccessorRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-release-capsule-decomposition-v1.schema.json')) 'mir4-m42-02-compatibility-audit-release-capsule-successor-schema'
+    $releaseCapsuleSuccessor = $releaseCapsuleSuccessorRaw | ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $releaseCapsuleSuccessor) 'mir4-m42-02-compatibility-audit-release-capsule-successor-record'
+    Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $successorPath -Algorithm SHA256).Hash -ceq [string]$releaseCapsuleSuccessor.predecessor.receipt_sha256 -and [string]$successor.record_sha256 -ceq [string]$releaseCapsuleSuccessor.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-release-capsule-successor-predecessor'
+    $expectedInventoryDigest = [string]$releaseCapsuleSuccessor.tooling_inventory.digest
+  }
 }
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
