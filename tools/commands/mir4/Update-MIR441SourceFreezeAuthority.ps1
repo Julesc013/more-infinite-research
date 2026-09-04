@@ -77,6 +77,7 @@ $expectedPaths=@(
   'tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1',
   'tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1',
   'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1',
+  'tools/lib/mir4/pre-freeze-release/Common.ps1',
   'tools/lib/control/PackageSourceAtCommit.ps1',
   'tools/lib/control/Records.ps1',
   'tools/mir/application/package/MIR441PackagePresentation.ps1',
