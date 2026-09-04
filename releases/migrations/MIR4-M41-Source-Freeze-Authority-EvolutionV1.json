@@ -25,7 +25,7 @@
     "authority_record_sha256": "28B1DFDE943E3CF187AC8440D6A590A48303A0644A09083E90C47DA83C2B4A11",
     "writer": "tools/mir/application/package/TargetMaterializer.ps1"
   },
-  "changed_path_count": 87,
+  "changed_path_count": 89,
   "evolved_bindings": [
     {
       "path": ".mir/docs.yml",
@@ -388,6 +388,16 @@
       "role": "Executable release-readiness proof or fixture authority."
     },
     {
+      "path": "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
+      "previous_sha256": "4C703D10567AD015CC258D730F7F0CC1D3F361906A094EBD2F44EBF674638C64",
+      "current_sha256": "85AD954A62FCAE92F3CF9D813307C210001A97F33DF9E4FB16F75C9B2BB0AC0B",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Executable release-readiness proof or fixture authority."
+    },
+    {
       "path": "tests/release/Test-MIRReleaseAuthority.ps1",
       "previous_sha256": "C04716EBC499888D466C8BB50DBA731EAB2EA5083350E788DECDBC14CAD9B994",
       "current_sha256": "92614DE16824D01BBE5280ED071BDEF81D1D2CE52979F8D6A44A80F75F1AEDAC",
@@ -491,6 +501,16 @@
       "path": "tools/mir/application/release/SourceChangelogRenderer.ps1",
       "previous_sha256": "B69B4F18E5003F23846B2E27EEE3FCE1B082C3ADF3560870A02844ED187F0167",
       "current_sha256": "ECF79F4AC32DD034715EB8BE63B5F6FBA94803FD830497B98CAA239BC79E3F7A",
+      "hash_mode": "canonical-text-v1",
+      "scope": "mir4-4.1-release-readiness",
+      "package_visible": false,
+      "release_authority": false,
+      "role": "Bounded release-readiness application, generator, or validator."
+    },
+    {
+      "path": "tools/mir/application/repository/RepositoryCharacterization.ps1",
+      "previous_sha256": "CDBC39105162ADE026FBE99FEE9C7E0D979A1989642130B5AD4D2CC1C6E0C30F",
+      "current_sha256": "FBF0EBAFDEFB1B3FBDF47A5BBEF8F949DE852E7DA393B5B8AFD1F83B122716C9",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -757,7 +777,7 @@
     },
     {
       "path": "tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1",
-      "sha256": "EAF329869D3CCA4F0F229E754BC1E1142FA25ADA670E4FCE43B95236AF02DDFB",
+      "sha256": "46B6B5F6693149D4874B77EA4343507203A32F7822CCBE132962E4D429771F27",
       "hash_mode": "canonical-text-v1",
       "scope": "mir4-4.1-release-readiness",
       "package_visible": false,
@@ -919,5 +939,5 @@
     "tagging": false,
     "publication": false
   },
-  "record_sha256": "D59CEAE0A6EFA8526954BA4144E6CF6F1DA6A0EC846AFFF1580C5EBCE1A3CAF0"
+  "record_sha256": "EE5EEF4E0592AAD8640583B71F9FB984AEE5433A4AB78D8BFF31786DF7B5B3EC"
 }

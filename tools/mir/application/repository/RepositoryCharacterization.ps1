@@ -5,7 +5,7 @@ $script:MIR4RepositoryCharacterizationAuthorityPath = 'governance/repository/mig
 $script:MIR4RepositoryCharacterizationAuthoritySchemaPath = 'contracts/repository/mir4-repository-characterization-authority-v1.schema.json'
 $script:MIR4RepositoryCharacterizationBundleSchemaPath = 'contracts/repository/mir4-repository-characterization-bundle-v1.schema.json'
 $script:MIR4RepositoryCharacterizationDefaultOutput = 'build/reports/repository-characterization'
-$script:MIR4RepositoryCharacterizationExpectedReadme = '403B993FEF39C5DC99C4A1F641DFF9795A976B32D2C42D327A25488BAC492F20'
+$script:MIR4RepositoryCharacterizationExpectedReadme = '5E8C683E39E76B65487344221B947A0C9A0E04D463433C49C0DC4454F3CFA115'
 
 function ConvertTo-MIR4RepositoryCharacterizationJsonV1 {
   param([Parameter(Mandatory)]$Value)
