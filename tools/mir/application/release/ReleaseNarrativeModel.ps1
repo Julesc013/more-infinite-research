@@ -1,8 +1,8 @@
 Set-StrictMode -Version Latest
 
-$script:MIR4NarrativeAbi = 'mir4-release-narratives/1'
-$script:MIR4NarrativeTargets = @('F210', 'F200', 'F110', 'F100')
-$script:MIR4NarrativeRedaction = 'Security correction details withheld pending coordinated disclosure.'
+function Get-MIR4NarrativeAbiV1 { return 'mir4-release-narratives/1' }
+function Get-MIR4NarrativeTargetsV1 { return @('F210', 'F200', 'F110', 'F100') }
+function Get-MIR4NarrativeRedactionV1 { return 'Security correction details withheld pending coordinated disclosure.' }
 
 function Read-MIR4NarrativeJsonV1 {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$SchemaPath)
@@ -24,8 +24,9 @@ function Assert-MIR4NarrativeFragmentV1 {
   if ([string]$Fragment.status -notin @('accepted','released')) { throw "[mir4-release-narrative-change-not-accepted] $($Fragment.change_id)" }
   $rows = @($Fragment.target_dispositions)
   if ($rows.Count -ne 4 -or @($rows.target | Sort-Object -Unique).Count -ne 4) { throw "[mir4-release-narrative-target-closure] $($Fragment.change_id)" }
-  for ($i = 0; $i -lt $script:MIR4NarrativeTargets.Count; $i++) {
-    if ([string]$rows[$i].target -cne $script:MIR4NarrativeTargets[$i]) { throw "[mir4-release-narrative-target-order] $($Fragment.change_id)" }
+  $targets=@(Get-MIR4NarrativeTargetsV1)
+  for ($i = 0; $i -lt $targets.Count; $i++) {
+    if ([string]$rows[$i].target -cne $targets[$i]) { throw "[mir4-release-narrative-target-order] $($Fragment.change_id)" }
   }
   if (@($rows | Where-Object disposition -eq 'unknown').Count -ne 0) { throw "[mir4-release-narrative-unknown-target] $($Fragment.change_id)" }
   foreach ($impact in $Fragment.impacts.PSObject.Properties) {
@@ -41,7 +42,7 @@ function Get-MIR4NarrativeDispositionV1 {
 function Get-MIR4NarrativeSummaryV1 {
   param([Parameter(Mandatory)]$Fragment, [Parameter(Mandatory)][string]$Surface)
   $disposition = Get-MIR4NarrativeDispositionV1 -Fragment $Fragment -Surface $Surface
-  if ($disposition -ceq 'redact') { return $script:MIR4NarrativeRedaction }
+  if ($disposition -ceq 'redact') { return Get-MIR4NarrativeRedactionV1 }
   return [string]$Fragment.summary
 }
 

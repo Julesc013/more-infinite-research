@@ -44,7 +44,8 @@ $minorRoot = Join-Path $repo 'build/results/validation/m41-03/synthetic-minor'
 $minorGitHub = [IO.File]::ReadAllText((Join-Path $minorRoot 'github-release.md'))
 $minorManifest = [IO.File]::ReadAllText((Join-Path $minorRoot 'release-manifest.json'))
 Assert-MIR4NarrativeTestV1 ($minorGitHub -notmatch 'Reorganized synthetic contributor documentation' -and $minorGitHub -notmatch 'sensitive validation boundary|Sensitive reproducer') 'mir4-release-narrative-surface-filtering'
-Assert-MIR4NarrativeTestV1 ($minorGitHub -match [regex]::Escape($script:MIR4NarrativeRedaction) -and $minorManifest -match [regex]::Escape($script:MIR4NarrativeRedaction)) 'mir4-release-narrative-security-redaction'
+$redaction=Get-MIR4NarrativeRedactionV1
+Assert-MIR4NarrativeTestV1 ($minorGitHub -match [regex]::Escape($redaction) -and $minorManifest -match [regex]::Escape($redaction)) 'mir4-release-narrative-security-redaction'
 Assert-MIR4NarrativeTestV1 (-not (Test-Path -LiteralPath (Join-Path $minorRoot 'f100'))) 'mir4-release-narrative-no-omitted-package'
 Assert-MIR4NarrativeTestV1 (([IO.File]::ReadAllText((Join-Path $minorRoot 'CHANGELOG.md'))) -match 'Reorganized synthetic contributor documentation') 'mir4-release-narrative-repository-source-view'
 

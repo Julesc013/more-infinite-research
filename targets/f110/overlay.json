@@ -17,8 +17,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed targets.f110 source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 51613,
-      "expected_sha256": "6A632A605777E6E8568B0EEB813A7C44D390ACECED013D2D8CDDD4D6866B8292",
+      "expected_bytes": 51356,
+      "expected_sha256": "09E3AB61A906F8A4B096E8D84EA877C7CBE21A9B8DF48C1C19082969F0CB3051",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3457,8 +3457,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed targets.f110 source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1714,
-      "expected_sha256": "B964EE47AAEAEFF523E004D95DDD5B1FF5AF2EC1703CDF29970B253B13940A0F",
+      "expected_bytes": 4144,
+      "expected_sha256": "4C5C1D26928192E53F2C46A5E1976F2CF49CFFBC47D5F05749C859F0F3B6DC58",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3471,5 +3471,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "669226701E1AB4FD2B9FBC618C4FD757A0A684F41C2FCF17E216383F83DD5D50"
+  "record_sha256": "507F8A23696E94DD88479DB054548C8E66672FBE28849B3983AD2D059C107280"
 }

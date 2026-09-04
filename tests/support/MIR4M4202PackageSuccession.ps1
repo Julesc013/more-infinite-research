@@ -28,6 +28,28 @@ function Test-MIR4M4202PackageSourceSuccession {
   }catch{return $false}
 }
 
+function Get-MIR4M4202ReadinessSuccessionV1 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $receiptRelative='releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json'
+  $schemaRelative='contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json'
+  $receiptPath=Join-Path $RepoRoot $receiptRelative
+  $schemaPath=Join-Path $RepoRoot $schemaRelative
+  if(-not(Test-Path -LiteralPath $receiptPath -PathType Leaf)){return $null}
+  if(-not(Test-Path -LiteralPath $schemaPath -PathType Leaf)){throw '[mir4-m42-02-readiness-schema-missing]'}
+  $raw=Get-Content -Raw -LiteralPath $receiptPath
+  if(-not($raw|Test-Json -SchemaFile $schemaPath)){throw '[mir4-m42-02-readiness-schema]'}
+  $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+  if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)){throw '[mir4-m42-02-readiness-record]'}
+  $predecessorPath=Join-Path $RepoRoot ([string]$receipt.predecessor.path)
+  if(-not(Test-Path -LiteralPath $predecessorPath -PathType Leaf)-or
+     (Get-FileHash -LiteralPath $predecessorPath -Algorithm SHA256).Hash-cne[string]$receipt.predecessor.sha256){throw '[mir4-m42-02-readiness-predecessor-file]'}
+  $predecessor=Get-Content -Raw -LiteralPath $predecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
+  if([string]$predecessor.record_sha256-cne[string]$receipt.predecessor.record_sha256){throw '[mir4-m42-02-readiness-predecessor-record]'}
+  return $receipt
+}
+
 function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
   [CmdletBinding()]
   [OutputType([bool])]
@@ -50,6 +72,16 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
       if(-not$ExpectedBindingSha.ContainsKey($path)){continue}
       if([string]$binding.previous_sha256-cne[string]$ExpectedBindingSha[$path]){return $false}
       $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+    $readiness=Get-MIR4M4202ReadinessSuccessionV1 -RepoRoot $RepoRoot
+    if($null-ne$readiness){
+      if([string]$readiness.package_source.predecessor_sha256-cne[string]$receipt.package_source.current_sha256){return $false}
+      foreach($binding in @($readiness.evolved_bindings)){
+        $path=[string]$binding.path
+        if(-not$ExpectedBindingSha.ContainsKey($path)){continue}
+        if([string]$binding.previous_sha256-cne[string]$ExpectedBindingSha[$path]){return $false}
+        $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+      }
     }
     return $true
   }catch{return $false}
@@ -83,8 +115,16 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     $binding=@($receipt.evolved_bindings|Where-Object{[string]$_.path-ceq$inventoryRelativePath})
     if($binding.Count-ne1){return $null}
     if([string]$binding[0].previous_sha256-cne[string]$predecessor.tooling_inventory.sha256){return $null}
+    $expectedInventorySha=[string]$binding[0].current_sha256
+    $readiness=Get-MIR4M4202ReadinessSuccessionV1 -RepoRoot $RepoRoot
+    if($null-ne$readiness){
+      if([string]$readiness.package_source.predecessor_sha256-cne[string]$receipt.package_source.current_sha256){return $null}
+      $readinessBinding=@($readiness.evolved_bindings|Where-Object{[string]$_.path-ceq$inventoryRelativePath})
+      if($readinessBinding.Count-ne1-or[string]$readinessBinding[0].previous_sha256-cne$expectedInventorySha){return $null}
+      $expectedInventorySha=[string]$readinessBinding[0].current_sha256
+    }
     $inventoryPath=Join-Path $RepoRoot $inventoryRelativePath
-    if((Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-cne[string]$binding[0].current_sha256){return $null}
+    if((Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-cne$expectedInventorySha){return $null}
     return [string](Get-Content -Raw -LiteralPath $inventoryPath|ConvertFrom-Json -Depth 100 -DateKind String).digest
   }catch{return $null}
 }

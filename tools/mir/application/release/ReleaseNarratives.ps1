@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 function Get-MIR4ReleaseNarrativeMaterialV1 {
   param([Parameter(Mandatory)][string]$RepoRoot, [Parameter(Mandatory)][string]$PlanPath)
   $plan = Read-MIR4NarrativeJsonV1 -RepoRoot $RepoRoot -Path $PlanPath -SchemaPath 'contracts/release/mir4-release-narrative-plan-v1.schema.json'
-  if ([string]$plan.renderer_abi -cne $script:MIR4NarrativeAbi -or -not [bool]$plan.shadow_only -or [bool]$plan.publication_authorized) { throw '[mir4-release-narrative-plan-firewall]' }
+  if ([string]$plan.renderer_abi -cne (Get-MIR4NarrativeAbiV1) -or -not [bool]$plan.shadow_only -or [bool]$plan.publication_authorized) { throw '[mir4-release-narrative-plan-firewall]' }
   if (@($plan.targets.target | Sort-Object -Unique).Count -ne @($plan.targets).Count) { throw '[mir4-release-narrative-duplicate-plan-target]' }
 
   $fragments = [Collections.Generic.List[object]]::new()
@@ -98,7 +98,7 @@ function Invoke-MIR4ReleaseNarrativesV1 {
   }
   if ((Get-MIRPackageSourceFingerprint -RepoRoot $repo) -cne $packageBefore) { throw '[mir4-release-narrative-package-source-mutation]' }
   $record = [ordered]@{
-    schema=1;kind='MIR4ReleaseNarrativeResultV1';plan_id=[string]$first.plan.plan_id;renderer_abi=$script:MIR4NarrativeAbi
+    schema=1;kind='MIR4ReleaseNarrativeResultV1';plan_id=[string]$first.plan.plan_id;renderer_abi=(Get-MIR4NarrativeAbiV1)
     plan=$first.plan_identity;accepted_changes=@($first.fragment_identities);outputs=@($descriptors)
     checks=[ordered]@{authority='passed';determinism='passed';target_filtering='passed';public_copy='passed';factorio_format='passed';package_non_interference='passed';unknown_dispositions=0}
     package_source_sha256=$packageBefore;package_visible_delta=@();transition_gate=[ordered]@{merge=$false;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false};result_digest=''

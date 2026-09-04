@@ -353,6 +353,26 @@ if(Test-Path -LiteralPath $bridgeRetirementPath -PathType Leaf){
   $expectedInventorySha=[string]$inventoryBinding[0].current_sha256
   $expectedInventoryDigest=[string](Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$receipt.inventory.path))|ConvertFrom-Json -Depth 100).digest
 }
+$readiness=Get-MIR4M4202ReadinessSuccessionV1 -RepoRoot $repo
+if($null-ne$readiness){
+  Assert-MIR4M4202PowerShell (Test-Path -LiteralPath $bridgeRetirementPath -PathType Leaf) 'readiness-successor-requires-bridge-retirement'
+  Assert-MIR4M4202PowerShell ([string]$readiness.package_source.predecessor_sha256-ceq[string]$bridgeRetirement.package_source.current_sha256) 'readiness-successor-package-predecessor'
+  foreach($binding in @($readiness.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedTrackedSha.ContainsKey($path)){
+      Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedTrackedSha[$path]) "readiness-successor-tracked-predecessor-$path"
+      $expectedTrackedSha[$path]=[string]$binding.current_sha256
+    }
+    if($expectedAuthoritySha.ContainsKey($path)){
+      Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256-ceq[string]$expectedAuthoritySha[$path]) "readiness-successor-authority-predecessor-$path"
+      $expectedAuthoritySha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $inventoryBinding=@($readiness.evolved_bindings|Where-Object{[string]$_.path-ceq[string]$receipt.inventory.path})
+  Assert-MIR4M4202PowerShell ($inventoryBinding.Count-eq1-and[string]$inventoryBinding[0].previous_sha256-ceq$expectedInventorySha) 'readiness-successor-inventory-predecessor'
+  $expectedInventorySha=[string]$inventoryBinding[0].current_sha256
+  $expectedInventoryDigest=[string](Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$receipt.inventory.path))|ConvertFrom-Json -Depth 100).digest
+}
 $inventoryPath=Join-Path $repo ([string]$receipt.inventory.path)
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq$expectedInventorySha-and[string]$inventory.digest-ceq$expectedInventoryDigest-and[int]$inventory.summary.unknown-eq0) 'inventory'
