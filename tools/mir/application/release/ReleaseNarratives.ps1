@@ -1,6 +1,13 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+if (-not (Get-Command Get-MIRPackageSourceFingerprint -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot '../../../lib/validation/PackageIdentity.ps1')
+}
+if (-not (Get-Command Get-MIR4CanonicalDigestV1 -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot '../../domain/canonicalization/CanonicalJsonV1.ps1')
+}
+
 . (Join-Path $PSScriptRoot 'ReleaseNarrativeModel.ps1')
 . (Join-Path $PSScriptRoot 'SourceChangelogRenderer.ps1')
 . (Join-Path $PSScriptRoot 'FactorioTargetChangelogRenderer.ps1')

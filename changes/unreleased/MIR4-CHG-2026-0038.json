@@ -13,7 +13,7 @@
   "semantic_domains": ["assurance", "tooling", "maintainability"],
   "audiences": ["contributors", "maintainers"],
   "target_dispositions": [
-    {"target":"F210","disposition":"requalify","reason":"The package-excluded F210 direct-upgrade fixture now binds its own exact identity."},
+    {"target":"F210","disposition":"affected","reason":"The package-excluded F210 direct-upgrade fixture now binds its own exact identity and requires refreshed target evidence."},
     {"target":"F200","disposition":"unaffected","reason":"Its target-local base-default fixture has no automatic-family compatibility pack."},
     {"target":"F110","disposition":"unaffected","reason":"Its target-local base-default fixture has no automatic-family compatibility pack."},
     {"target":"F100","disposition":"unaffected","reason":"Its target-local base-default fixture has no automatic-family compatibility pack."}
@@ -23,7 +23,7 @@
   "security_visibility": "public-at-merge",
   "release_surfaces": {"source_changelog":"omit","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
   "references": [
-    {"kind":"fixture","value":"fixtures/assert-upgrade-4-0-21000-to-4-1-21000"},
-    {"kind":"test","value":"tests/release/Test-MIR441ReleaseReadiness.ps1"}
+    {"kind":"document","value":"fixtures/assert-upgrade-4-0-21000-to-4-1-21000"},
+    {"kind":"document","value":"tests/release/Test-MIR441ReleaseReadiness.ps1"}
   ]
 }

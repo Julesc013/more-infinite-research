@@ -1,0 +1,30 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0039",
+  "status": "accepted",
+  "change_type": "fixed",
+  "summary": "Narrowed independent package membership checks to repository-only top-level roots.",
+  "details": [
+    "Kept tests, scripts, documentation, evidence, governance, contracts, build, dist, and repository metadata forbidden as top-level player-package members.",
+    "Allowed legitimate nested runtime namespaces whose semantic directory names overlap repository-only root names.",
+    "Added fail-closed regression checks for both valid nested evidence modules and forbidden top-level repository content.",
+    "Changed no player package source, gameplay, saves, settings, migrations, compatibility claims, or publication authority."
+  ],
+  "semantic_domains": ["assurance", "tooling", "maintainability"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The change corrects only the package-excluded independent verifier."},
+    {"target":"F200","disposition":"unaffected","reason":"The change corrects only the package-excluded independent verifier."},
+    {"target":"F110","disposition":"unaffected","reason":"The change corrects only the package-excluded independent verifier."},
+    {"target":"F100","disposition":"unaffected","reason":"The change corrects only the package-excluded independent verifier."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"omit","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"document","value":"tools/mir/application/release/readiness/IndependentVerification.ps1"},
+    {"kind":"document","value":"tests/release/Test-MIR441ReleaseReadiness.ps1"}
+  ]
+}

@@ -4,6 +4,13 @@ if (-not (Get-Command Get-MIRZipContentFingerprint -ErrorAction SilentlyContinue
   . (Join-Path $PSScriptRoot '../../../../lib/validation/PackageIdentity.ps1')
 }
 
+function Test-MIR441ForbiddenPackageRelativePath {
+  param([Parameter(Mandatory)][string]$Path)
+  $normalized=$Path.Replace('\','/').TrimStart('/')
+  $top=($normalized.Split('/')[0])
+  return $top-match'(?i)^(?:\.git|\.github|\.mir|tests?|scripts?|docs?|build|dist|evidence|governance|contracts)$'
+}
+
 function Get-MIR441ZipObservation {
   param([Parameter(Mandatory)][string]$Path)
   Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -12,7 +19,11 @@ function Get-MIR441ZipObservation {
     $entries=@($zip.Entries|Where-Object{-not[string]::IsNullOrEmpty($_.Name)})
     $roots=@($entries|ForEach-Object{([string]$_.FullName).Split('/')[0]}|Sort-Object -Unique)
     if($roots.Count-ne1){throw '[mir441-independent-package-root]'}
-    $forbidden=@($entries|Where-Object{[string]$_.FullName-match'(?i)(^|/)(?:\.git|\.github|\.mir|tests?|scripts?|docs?|build|dist|evidence|governance|contracts)(?:/|$)'})
+    $rootPrefix="$($roots[0])/"
+    $forbidden=@($entries|Where-Object{
+      $relative=([string]$_.FullName).Substring($rootPrefix.Length)
+      Test-MIR441ForbiddenPackageRelativePath -Path $relative
+    })
     if($forbidden.Count-ne0){throw "[mir441-independent-package-membership] $([string]$forbidden[0].FullName)"}
     $info=@($entries|Where-Object{[string]$_.FullName-ceq"$($roots[0])/info.json"})
     if($info.Count-ne1){throw '[mir441-independent-info-json]'}
