@@ -475,6 +475,12 @@ foreach ($controlExecutorModule in @("ContextAndTaskExecution.ps1", "Environment
   $null = Read-MIRFile -RelativePath $relative
   Assert-MIRContains -RelativePath "tools/lib/control/Executor.ps1" -Text $controlExecutorFacadeText -Needle "executor/$controlExecutorModule"
 }
+$supplyChainFacadeText = Read-MIRFile -RelativePath "tools/lib/mir4/SupplyChain.ps1"
+foreach ($supplyChainModule in @("CoreAndRows.ps1", "ArchiveAndSelection.ps1", "ComponentInventory.ps1", "SpdxAttestation.ps1", "ProvenanceAndVerification.ps1")) {
+  $relative = "tools/lib/mir4/supply-chain/$supplyChainModule"
+  $null = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath "tools/lib/mir4/SupplyChain.ps1" -Text $supplyChainFacadeText -Needle "supply-chain/$supplyChainModule"
+}
 
 foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative

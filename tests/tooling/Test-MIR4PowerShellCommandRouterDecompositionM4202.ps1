@@ -197,6 +197,22 @@ if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   }
   $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
 }
+$supplyChainSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
+  $supplyChainSuccessorRaw=Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4CommandRouterDecompositionV1 ($supplyChainSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-command-router-supply-chain-successor-schema'
+  $supplyChainSuccessor=$supplyChainSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4CommandRouterDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-command-router-supply-chain-successor-record'
+  Assert-MIR4CommandRouterDecompositionV1 ((Get-FileHash -LiteralPath $controlExecutorSuccessorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorSuccessor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-command-router-supply-chain-successor-predecessor'
+  foreach($binding in @($supplyChainSuccessor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4CommandRouterDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-command-router-supply-chain-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
+}
 
 foreach($binding in @($receipt.evolved_bindings)){
   $path=[string]$binding.path

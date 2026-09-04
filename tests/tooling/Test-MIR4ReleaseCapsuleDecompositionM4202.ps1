@@ -81,6 +81,15 @@ if (Test-Path -LiteralPath $controlExecutorPath -PathType Leaf) {
   Assert-MIR4M4202ReleaseCapsule ([string]$controlExecutor.current_source.sha256 -ceq '97EACF68C080CF9D38102A5BF26E96A42C015020F78DBA049461422E5673AF66' -and [bool]$controlExecutor.public_contract.unchanged -and [int]$controlExecutor.public_contract.function_count -eq 27) 'mir4-m42-02-release-capsule-control-executor-contract'
   $expectedInventoryDigest = [string]$controlExecutor.tooling_inventory.digest
 }
+$supplyChainSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
+  $supplyChainSuccessorRaw=Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4M4202ReleaseCapsule ($supplyChainSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-release-capsule-supply-chain-successor-schema'
+  $supplyChainSuccessor=$supplyChainSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202ReleaseCapsule (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-release-capsule-supply-chain-successor-record'
+  Assert-MIR4M4202ReleaseCapsule ((Get-FileHash -LiteralPath $controlExecutorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$controlExecutor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-release-capsule-supply-chain-successor-predecessor'
+  $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202ReleaseCapsule ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-release-capsule-inventory'
 Assert-MIR4M4202ReleaseCapsule ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.custody_inventory_unchanged -and [bool]$receipt.semantic_contract.source_archive_unchanged -and [bool]$receipt.semantic_contract.capsule_construction_unchanged -and [bool]$receipt.semantic_contract.capsule_verification_unchanged -and [bool]$receipt.semantic_contract.offline_restore_unchanged -and [bool]$receipt.semantic_contract.platform_projections_regenerated -and [bool]$receipt.semantic_contract.post_cutover_package_non_interference_assertion) 'mir4-m42-02-release-capsule-semantic-contract'

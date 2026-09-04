@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "MIR4-CHG-2026-0034",
+  "kind": "maintainability",
+  "audience": ["maintainers"],
+  "summary": "Decompose supply-chain inventory, attestation, policy verification, and custody projection behind the existing facade.",
+  "details": [
+    "Preserves all 28 public PowerShell function names and their declaration order.",
+    "Keeps source identity, archive selection, component inventory, SPDX, SLSA provenance, policy verification, and custody-record behavior unchanged.",
+    "Completes the bounded PowerShell decomposition sequence and leaves bridge retirement and private four-target MIR 4.1 qualification as separate required fixed points.",
+    "Regenerates the package-excluded platform lock and dependent reference projections after the module authority changes.",
+    "Changes no player package, gameplay, save, setting, migration, compatibility claim, version, tag, signature, seal, or publication gate."
+  ],
+  "targets": ["repository"],
+  "package_visible": false,
+  "release_authority": false
+}

@@ -299,6 +299,7 @@ package_excluded_modules:
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json
     implementation: tools/lib/mir4/SupplyChain.ps1
+    implementation_modules: tools/lib/mir4/supply-chain
     attestation_implementation: tools/lib/mir4/SupplyChainAttestation.ps1
     capsule_implementation: tools/lib/mir4/ReleaseCapsule.ps1
     capsule_implementation_modules: tools/lib/mir4/release-capsule

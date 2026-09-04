@@ -98,6 +98,17 @@ if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $controlExecutorPredecessorPath -Algorithm SHA256).Hash-ceq[string]$controlExecutorSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorPredecessor.record_sha256-ceq[string]$controlExecutorSuccessor.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-control-executor-successor-predecessor'
   $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
 }
+$supplyChainSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
+  $supplyChainSuccessorRaw=Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4M4202CompatibilityAudit ($supplyChainSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-compatibility-audit-supply-chain-successor-schema'
+  $supplyChainSuccessor=$supplyChainSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-compatibility-audit-supply-chain-successor-record'
+  $supplyChainPredecessorPath=Join-Path $repo ([string]$supplyChainSuccessor.predecessor.receipt)
+  $supplyChainPredecessor=Get-Content -Raw -LiteralPath $supplyChainPredecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $supplyChainPredecessorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$supplyChainPredecessor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-supply-chain-successor-predecessor'
+  $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
+}
 
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'

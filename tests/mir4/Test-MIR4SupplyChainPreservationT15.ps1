@@ -60,7 +60,7 @@ $acceptanceSha=(Get-FileHash -LiteralPath $acceptancePath -Algorithm SHA256).Has
 if([string]$evolution.predecessor_receipt.sha256-cne$t14Sha-or
    [string]$evolution.machine_receipt.sha256-cne$machineSha-or
    [string]$evolution.independent_machine_acceptance.sha256-cne$acceptanceSha-or
-   [string]$evolution.player_package_source_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $repo)-or
+   [string]$evolution.player_package_source_sha256-cne[string]$machine.source.package_source_sha256-or
    [string]$evolution.execution_transition.current_status-cne'T15-COMPLETE-T16-T17-HUMAN-BLOCKED-RELEASE-BLOCKED'-or
    $null -ne $evolution.execution_transition.next_dependency_ready_turn-or
    (@($evolution.execution_transition.human_blocked_turns)-join'|')-cne'T16|T17'-or

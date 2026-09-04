@@ -172,6 +172,12 @@ paths:
   mir4.m42-02.control-executor.receipt-schema: contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json
   mir4.m42-02.control-executor.writer: tools/commands/mir4/Update-MIR4M4202ControlExecutorDecompositionAuthority.ps1
   mir4.m42-02.control-executor.test: tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1
+  mir4.m42-02.supply-chain.facade: tools/lib/mir4/SupplyChain.ps1
+  mir4.m42-02.supply-chain.modules: tools/lib/mir4/supply-chain
+  mir4.m42-02.supply-chain.receipt: releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json
+  mir4.m42-02.supply-chain.receipt-schema: contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json
+  mir4.m42-02.supply-chain.writer: tools/commands/mir4/Update-MIR4M4202SupplyChainDecompositionAuthority.ps1
+  mir4.m42-02.supply-chain.test: tests/tooling/Test-MIR4SupplyChainDecompositionM4202.ps1
   mir4.repository-migration.test: tests/repository/Test-MIR4RepositoryFixedPoint.ps1
   mir4.canonicalization-migration.authority: governance/repository/migrations/canonicalization-tooling-v1.json
   mir4.canonicalization-migration.proof: assurance/repository/canonicalization-tooling-v1.json

@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 135,
+  "test_count": 136,
   "tests": [
     {
       "id": "docs.check",
@@ -4253,6 +4253,54 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-supply-chain-decomposition-m42-02-ps11",
+      "proposition": "The governed test 'static.mir4-supply-chain-decomposition-m42-02-ps11' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIR4SupplyChainDecompositionM4202.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIR4SupplyChainDecompositionM4202.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/mir4/SupplyChain.ps1",
+        "tools/lib/mir4/supply-chain/**",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "tools/mir/application/tooling/CommandInventory.ps1",
+        ".mir/assurance.json",
+        ".mir/test-impact.yml",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        "governance/automation/mir4-command-inventory-v1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json",
+        "contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json",
+        "contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json",
+        "releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json",
+        "tools/commands/mir4/Update-MIR4M4202SupplyChainDecompositionAuthority.ps1",
+        "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
+        "tests/tooling/Test-MIR4SupplyChainDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1",
+        "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+        "tests/mir4/Test-MIR4SupplyChainPreservationT15.ps1",
+        "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
+        "tests/repository/Test-MIR4RepositoryFixedPoint.ps1",
+        "tests/architecture/Test-MIRArchitecture.ps1",
+        "docs/architecture/module-boundaries.md",
+        "docs/releases/mir4-post-4.0-roadmap.md",
+        "assurance/catalog/tests.json",
+        "package-source"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-supply-chain-foundation",
       "proposition": "The governed test 'static.mir4-supply-chain-foundation' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -4954,12 +5002,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 49,
-      "tooling-release": 42,
+      "tooling-release": 43,
       "runtime-upgrade": 13,
       "compiler-static": 19,
       "compatibility-historical": 12
     },
-    "canonical_test_commands": 123,
+    "canonical_test_commands": 124,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -4972,5 +5020,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:07cece83d4d736637e7b6892e3b0d23ef3d0bf9e110cf2d2a2317c2384f3d245"
+  "digest": "sha256:313e72dd8ce194989453c2b4c15c968db107554028b12af0e2ad532f9455a63b"
 }
