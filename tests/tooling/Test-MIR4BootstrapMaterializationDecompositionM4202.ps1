@@ -121,6 +121,8 @@ if(Test-Path -LiteralPath $successorPath -PathType Leaf){
 }
 $controlExecutorDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
 if(Test-Path -LiteralPath $controlExecutorDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $controlExecutorDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
+$supplyChainDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $supplyChainDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4BootstrapMaterializationDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-bootstrap-materialization-inventory'
 $controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
@@ -140,6 +142,22 @@ if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
     }
   }
   $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
+}
+$supplyChainSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
+  $supplyChainSuccessorRaw=Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4BootstrapMaterializationDecompositionV1 ($supplyChainSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-bootstrap-materialization-supply-chain-successor-schema'
+  $supplyChainSuccessor=$supplyChainSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4BootstrapMaterializationDecompositionV1 (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-bootstrap-materialization-supply-chain-successor-record'
+  Assert-MIR4BootstrapMaterializationDecompositionV1 ((Get-FileHash -LiteralPath $controlExecutorSuccessorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorSuccessor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-bootstrap-materialization-supply-chain-successor-predecessor'
+  foreach($binding in @($supplyChainSuccessor.evolved_bindings)){
+    $path=[string]$binding.path
+    if($expectedBindingSha.ContainsKey($path)){
+      Assert-MIR4BootstrapMaterializationDecompositionV1 ([string]$binding.previous_sha256-ceq[string]$expectedBindingSha[$path]) 'mir4-m42-02-bootstrap-materialization-supply-chain-successor-binding' $path
+      $expectedBindingSha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
 }
 
 foreach($binding in @($receipt.evolved_bindings)){

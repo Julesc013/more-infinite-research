@@ -8,6 +8,7 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SupplyChain.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 
 function Assert-MIR4SupplyChainTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Diagnostic)
@@ -21,6 +22,7 @@ function Assert-MIR4SupplyChainThrows {
   if (-not $threw) { throw "[$Diagnostic]" }
 }
 
+$packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 $authority = Get-MIR4SupplyChainAuthority -RepoRoot $repo
 Assert-MIR4SupplyChainTest (@($authority.components).Count -eq 9) 'mir4-supply-chain-component-count'
 Assert-MIR4SupplyChainTest (
@@ -118,9 +120,9 @@ $projectionText = (ConvertTo-MIR4BootstrapCanonicalJson -Value $spdx301) +
 Assert-MIR4SupplyChainTest (
   $projectionText -cnotmatch '(?i)(?:[A-Z]:\\|C:/Users/|D:/|private[_-]?key|passphrase|mod[_-]?portal[_-]?token)'
 ) 'mir4-supply-chain-public-path-secret-leak'
-$packageFingerprint = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$packageFingerprint = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 Assert-MIR4SupplyChainTest (
-  $packageFingerprint -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)
+  $packageFingerprint -ceq $packageBefore
 ) 'mir4-supply-chain-package-non-interference'
 
 [pscustomobject][ordered]@{

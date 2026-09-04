@@ -13,7 +13,10 @@ function Assert-MIR4M4202ControlExecutor {
 }
 
 $packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-[void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202ControlExecutorDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+$supplyChainSuccessorPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if (-not (Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf)) {
+  [void](& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202ControlExecutorDecompositionAuthority.ps1') -RepoRoot $repo -Check)
+}
 $receiptPath = Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
 $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202ControlExecutor ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-control-executor-decomposition-v1.schema.json')) 'mir4-m42-02-control-executor-schema'
@@ -54,8 +57,18 @@ foreach ($moduleName in $expectedModuleNames) {
 
 . $facadePath
 Assert-MIR4M4202ControlExecutor (Test-MIRCPExactPathSet -Expected @('a', 'b') -Actual @('b', 'a')) 'mir4-m42-02-control-executor-path-set-smoke'
+$expectedInventoryDigest = [string]$receipt.tooling_inventory.digest
+if (Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf) {
+  $supplyChainSuccessorRaw = Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4M4202ControlExecutor ($supplyChainSuccessorRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-control-executor-supply-chain-successor-schema'
+  $supplyChainSuccessor = $supplyChainSuccessorRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202ControlExecutor (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-control-executor-supply-chain-successor-record'
+  Assert-MIR4M4202ControlExecutor ((Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$supplyChainSuccessor.predecessor.receipt_sha256 -and [string]$receipt.record_sha256 -ceq [string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-control-executor-supply-chain-successor-predecessor'
+  Assert-MIR4M4202ControlExecutor ([string]$supplyChainSuccessor.current_source.sha256 -ceq '3D1CAF10F2EA14B21743BA3E8B1018930695816B7181D26A8B704B63152DC1D4' -and [bool]$supplyChainSuccessor.public_contract.unchanged -and [int]$supplyChainSuccessor.public_contract.function_count -eq 28) 'mir4-m42-02-control-executor-supply-chain-successor-contract'
+  $expectedInventoryDigest = [string]$supplyChainSuccessor.tooling_inventory.digest
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202ControlExecutor ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq [string]$receipt.tooling_inventory.digest) 'mir4-m42-02-control-executor-inventory'
+Assert-MIR4M4202ControlExecutor ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-control-executor-inventory'
 Assert-MIR4M4202ControlExecutor ([bool]$receipt.semantic_contract.ordered_current_source_slices_preserved -and [bool]$receipt.semantic_contract.context_execution_state_unchanged -and [bool]$receipt.semantic_contract.performance_source_and_artifact_custody_unchanged -and [bool]$receipt.semantic_contract.runtime_measurements_unchanged -and [bool]$receipt.semantic_contract.package_and_delta_measurements_unchanged -and [bool]$receipt.semantic_contract.aggregate_gate_unchanged -and [bool]$receipt.semantic_contract.ps7_source_evolution_preserved -and [bool]$receipt.semantic_contract.platform_projections_regenerated) 'mir4-m42-02-control-executor-semantic-contract'
 Assert-MIR4M4202ControlExecutor (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-control-executor-transition'
 Assert-MIR4M4202ControlExecutor ([string]$receipt.preservation.package_source_sha256 -ceq $packageBefore -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-control-executor-package-firewall'

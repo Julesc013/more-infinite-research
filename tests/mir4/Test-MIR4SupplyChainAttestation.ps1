@@ -8,12 +8,14 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/SupplyChainAttestation.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 
 function Assert-MIR4SupplyChainAttestationTest {
   param([Parameter(Mandatory)][bool]$Condition, [Parameter(Mandatory)][string]$Diagnostic)
   if (-not $Condition) { throw "[$Diagnostic]" }
 }
 
+$packageBefore = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 $testRoot = Join-Path $repo ('build/results/mir4-t15/tests/supply-chain-attestation-' + [guid]::NewGuid().ToString('N'))
 $privateKey = Join-Path $testRoot 'keys/proof'
 $publicKey = $privateKey + '.pub'
@@ -116,9 +118,9 @@ try {
     $attestationText -cnotmatch [regex]::Escape($privateKey) -and
     $attestationText -cnotmatch '(?i)(?:OPENSSH PRIVATE KEY|passphrase|private_key_path|mod_portal_token)'
   ) 'mir4-supply-chain-attestation-private-material-leak'
-  $packageFingerprint = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  $packageFingerprint = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
   Assert-MIR4SupplyChainAttestationTest (
-    $packageFingerprint -ceq (Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)
+    $packageFingerprint -ceq $packageBefore
   ) 'mir4-supply-chain-attestation-package-non-interference'
 
   [pscustomobject][ordered]@{

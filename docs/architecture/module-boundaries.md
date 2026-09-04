@@ -971,3 +971,11 @@ tools/lib/control/Executor.ps1 remains the stable internal facade and loads six 
 The split binds the current 1,230-line implementation and preserves all 27 function names and their order. It explicitly carries forward the accepted PS7 compatibility-audit overlay set and the historical-versus-canonical package fingerprint selection used by performance source overlays.
 
 This PS10 split changes no context lock, task dispatch, evidence, runtime, performance, upgrade, ecosystem, approved-delta, aggregate, package, gameplay, save, setting, migration, compatibility, or release behavior. It grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.
+
+### M42-02 PS11 supply-chain decomposition
+
+tools/lib/mir4/SupplyChain.ps1 remains the stable internal facade and loads five ordered modules from tools/lib/mir4/supply-chain: authority and file rows, archive selection, component inventory, SPDX attestation, and provenance and verification.
+
+The split binds the characterized 1,104-line implementation and preserves all 28 function names, their order, setup, archive and component identities, SPDX 3.0.1 and 2.3 construction, SLSA provenance, policy checks, and custody-record writing. This closes the eleven-node bounded PowerShell decomposition sequence; bridge retirement and private four-target qualification remain separate MIR 4.1 gates.
+
+This PS11 split is package-excluded and changes no inventory semantics, package, gameplay, save, setting, migration, compatibility claim, or release behavior. It grants no version allocation, production signing, sealing, promotion, tagging, publication, or package cutover authority.

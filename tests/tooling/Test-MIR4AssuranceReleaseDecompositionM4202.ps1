@@ -110,6 +110,17 @@ if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $controlExecutorPredecessorPath -Algorithm SHA256).Hash-ceq[string]$controlExecutorSuccessor.predecessor.receipt_sha256-and[string]$controlExecutorPredecessor.record_sha256-ceq[string]$controlExecutorSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-release-control-executor-successor-predecessor'
   $expectedInventoryDigest=[string]$controlExecutorSuccessor.tooling_inventory.digest
 }
+$supplyChainSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
+  $supplyChainSuccessorRaw=Get-Content -Raw -LiteralPath $supplyChainSuccessorPath
+  Assert-MIR4M4202AssuranceRelease ($supplyChainSuccessorRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-supply-chain-decomposition-v1.schema.json')) 'mir4-m42-02-assurance-release-supply-chain-successor-schema'
+  $supplyChainSuccessor=$supplyChainSuccessorRaw|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202AssuranceRelease (Test-MIR4BootstrapRecordHash -Record $supplyChainSuccessor) 'mir4-m42-02-assurance-release-supply-chain-successor-record'
+  $supplyChainPredecessorPath=Join-Path $repo ([string]$supplyChainSuccessor.predecessor.receipt)
+  $supplyChainPredecessor=Get-Content -Raw -LiteralPath $supplyChainPredecessorPath|ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202AssuranceRelease ((Get-FileHash -LiteralPath $supplyChainPredecessorPath -Algorithm SHA256).Hash-ceq[string]$supplyChainSuccessor.predecessor.receipt_sha256-and[string]$supplyChainPredecessor.record_sha256-ceq[string]$supplyChainSuccessor.predecessor.record_sha256) 'mir4-m42-02-assurance-release-supply-chain-successor-predecessor'
+  $expectedInventoryDigest=[string]$supplyChainSuccessor.tooling_inventory.digest
+}
 
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202AssuranceRelease ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-release-inventory'

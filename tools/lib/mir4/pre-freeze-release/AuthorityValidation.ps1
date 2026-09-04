@@ -1407,6 +1407,72 @@ function Test-MIR4PreFreezeAuthorities {
     $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
   }
 
+  $supplyChainReceiptPath = 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
+  if (Test-Path -LiteralPath (Join-Path $repo $supplyChainReceiptPath) -PathType Leaf) {
+    $supplyChain = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath $supplyChainReceiptPath -Kind 'MIR4M4202SupplyChainDecompositionV1'
+    if ([string]$supplyChain.predecessor.receipt -cne $priorReceiptPath -or
+        [string]$supplyChain.predecessor.receipt_sha256 -cne $priorReceiptSha256 -or
+        [string]$supplyChain.predecessor.record_sha256 -cne [string]$controlExecutor.record_sha256) {
+      throw '[mir4-prefreeze-m42-02-supply-chain-predecessor]'
+    }
+    $supplyChainEnrollmentBaselines = @{
+      'docs/releases/mir4-post-4.0-roadmap.md'='24E6D2555808C1C940102FAF56C22F71CEDEECE84BED18C4E7177FECF9D6C8D4'
+      'spec/programmes/mir4-4x-operating-programme-v1.json'='15197FD8F9A6A47224C491B1AFAF9A334F380BB4A96F5301DB68D627E950F846'
+      'todo.md'='D70A5B24BB7CEB42D3F541920E7DC4BE2C4095B263CC6FD25C72EAF692BA3BE2'
+      'tests/tooling/Test-MIR4ControlExecutorDecompositionM4202.ps1'='3C65D44E2A99D0455AD472AF90BFE28778A3F57C5B9DD5D59A7C8199623F5E91'
+      'tools/lib/mir4/SupplyChain.ps1'='3D1CAF10F2EA14B21743BA3E8B1018930695816B7181D26A8B704B63152DC1D4'
+    }
+    $supplyChainEvolvedPaths = @{}
+    foreach ($binding in @($supplyChain.evolved_bindings)) {
+      $path = [string]$binding.path
+      if (-not $authorityHashes.ContainsKey($path)) {
+        if (-not $supplyChainEnrollmentBaselines.ContainsKey($path) -or
+            [string]$binding.previous_sha256 -cne [string]$supplyChainEnrollmentBaselines[$path] -or
+            [string]$binding.hash_mode -cne 'canonical-text-v1') {
+          throw "[mir4-prefreeze-m42-02-supply-chain-enrollment-binding] $path"
+        }
+        $authorityHashes[$path] = [string]$binding.previous_sha256
+        $authorityHashModes[$path] = [string]$binding.hash_mode
+      }
+      if ([string]$authorityHashes[$path] -cne [string]$binding.previous_sha256 -or
+          [string]$authorityHashModes[$path] -cne [string]$binding.hash_mode -or
+          [bool]$binding.package_visible -or [bool]$binding.release_authority -or
+          $supplyChainEvolvedPaths.ContainsKey($path)) {
+        throw "[mir4-prefreeze-m42-02-supply-chain-evolved-binding] $path"
+      }
+      $authorityHashes[$path] = [string]$binding.current_sha256
+      $authorityHashModes[$path] = [string]$binding.hash_mode
+      $supplyChainEvolvedPaths[$path] = $true
+    }
+    if ($supplyChainEvolvedPaths.Count -ne 35 -or
+        [string]$supplyChain.status -cne 'M42-02-PS11-SUPPLY-CHAIN-DECOMPOSED-POWERSHELL-SEQUENCE-COMPLETE' -or
+        [string]$supplyChain.decomposition.responsibility -cne 'supply-chain' -or
+        [string]$supplyChain.next_fixed_point -cne 'M41-BRIDGE-RETIREMENT' -or
+        @($supplyChain.decomposition.modules).Count -ne 5 -or
+        [int]$supplyChain.public_contract.function_count -ne 28 -or
+        -not [bool]$supplyChain.public_contract.unchanged -or
+        -not [bool]$supplyChain.semantic_contract.ordered_current_source_slices_preserved -or
+        -not [bool]$supplyChain.semantic_contract.inventory_and_source_identity_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.archive_and_selection_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.component_inventory_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.spdx_attestation_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.slsa_provenance_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.policy_verification_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.custody_record_writing_unchanged -or
+        -not [bool]$supplyChain.semantic_contract.powershell_decomposition_sequence_complete -or
+        [string]$supplyChain.programme_transition.current_state -cne 'complete' -or
+        [string]$supplyChain.programme_transition.next_programme_state -cne 'queued' -or
+        -not [bool]$supplyChain.programme_transition.mir41_qualification_still_required -or
+        [string]$supplyChain.preservation.package_source_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) {
+      throw '[mir4-prefreeze-m42-02-supply-chain-scope]'
+    }
+    foreach ($property in $supplyChain.transition_gate.PSObject.Properties) {
+      if ([bool]$property.Value) { throw "[mir4-prefreeze-m42-02-supply-chain-transition] $($property.Name)" }
+    }
+    $priorReceiptPath = $supplyChainReceiptPath
+    $priorReceiptSha256 = Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
+  }
+
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)
