@@ -39,6 +39,7 @@ $acceptedChangePaths=@(Get-ChildItem -LiteralPath (Join-Path $repo 'changes/unre
 }|Sort-Object)
 Assert-MIR441Test ($resourceText-match'EnumerateFiles'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'resource-hard-stop'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
 Assert-MIR441Test ($buildText-notmatch'ForEach-Object\s+-Parallel|Start-Job|Start-ThreadJob'-and$buildText-match'foreach\(\$target') 'mir441-serial-materializer'
+Assert-MIR441Test ($commonText-match'merge-base --is-ancestor'-and$buildText-match'Assert-MIR441MainAncestor') 'mir441-main-ancestry-before-candidate-build'
 Assert-MIR441Test ($buildText-match"-SourceVersion '4[.]1[.]0'"-and$materializerText-match'\$info[.]version\s*=\s*\[string\]\$identity[.]distribution_version') 'mir441-candidate-version-materialized-from-intent'
 Assert-MIR441Test ($promotionText-match'fast_forward=\$true'-and$promotionText-match'finally\s*\{'-and$promotionText-match'post_promotion_tests=\$false'-and$promotionText-notmatch'--force|reset --hard') 'mir441-exact-promotion-boundary'
 Assert-MIR441Test ($qualificationText-match'fresh-\$slug[.]checkpoint[.]json'-and$qualificationText-match'Get-MIR441ValidatedTargetCheckpoint'-and$resumeText-match'MIR441FreshQualificationCheckpointV1'-and$resumeText-match'MIR441UpgradeQualificationCheckpointV1'-and$resumeText-match'mir441-qualification-resume'-and$resumeText-match'validation_harness_git_dirty') 'mir441-exact-resumable-qualification'
