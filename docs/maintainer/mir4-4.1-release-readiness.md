@@ -60,7 +60,7 @@ Build and qualification commands resume only from exact verified receipts. Every
 
 The technical seal keeps `human_playtest=pending` and `publication_authorized=false`. The release-window capsule passes an offline extraction and custody comparison before promotion. The signed annotated `v4.1.0` tag object is prepared locally or in protected signing custody but remains absent remotely.
 
-Promotion is a non-forced fast-forward from the exact sealed `origin/dev` object ID to `origin/main`. It temporarily removes only applicable pull-request rules, restores each complete ruleset payload in `finally`, reads the configuration back, and requires `origin/dev == origin/main == sealed source`. It runs no post-promotion tests because that would not change the sealed source or packages.
+Promotion is a non-forced fast-forward from the exact sealed `origin/dev` object ID to `origin/main`. It temporarily removes only applicable pull-request rules, restores each complete ruleset payload in `finally`, reads the configuration back, and requires `origin/dev == origin/main == sealed source`. Ruleset comparison canonicalizes rules by type because GitHub may normalize their array order without changing policy. It runs no post-promotion tests because that would not change the sealed source or packages.
 
 ## Human gate and publication
 

@@ -16,7 +16,7 @@ function Get-MIR441RemoteBranchOid {
 
 function ConvertTo-MIR441RulesetPayload {
   param([Parameter(Mandatory)]$Ruleset,[switch]$WithoutPullRequest)
-  $rules=@($Ruleset.rules)
+  $rules=@($Ruleset.rules|Sort-Object{[string]$_.type})
   if($WithoutPullRequest){$rules=@($rules|Where-Object{[string]$_.type-cne'pull_request'})}
   return [ordered]@{name=[string]$Ruleset.name;target=[string]$Ruleset.target;enforcement=[string]$Ruleset.enforcement;bypass_actors=@($Ruleset.bypass_actors);conditions=$Ruleset.conditions;rules=$rules}
 }

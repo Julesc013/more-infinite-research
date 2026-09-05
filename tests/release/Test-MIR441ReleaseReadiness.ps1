@@ -59,6 +59,10 @@ Assert-MIR441Test ($external-ceq'E:\MIR-READINESS-TEST') 'mir441-external-root-p
 try{Assert-MIR441ExternalRoot -RepoRoot $repo -Path (Join-Path $repo 'build/test') -Name invalid|Out-Null;throw '[mir441-external-root-negative-missed]'}catch{Assert-MIR441Test ($_.Exception.Message-match'mir441-external-root-repository') 'mir441-external-root-negative'}
 Assert-MIR441Test (Test-MIR441PathContained -Root 'E:\MIR-READINESS-TEST' -Path 'E:\MIR-READINESS-TEST\child') 'mir441-containment-positive'
 Assert-MIR441Test (-not(Test-MIR441PathContained -Root 'E:\MIR-READINESS-TEST' -Path 'E:\MIR-READINESS-TEST-OTHER\child')) 'mir441-containment-prefix-rejection'
+$rulesetA=[pscustomobject][ordered]@{name='synthetic';target='branch';enforcement='active';bypass_actors=@();conditions=[pscustomobject]@{ref_name=[pscustomobject]@{include=@('refs/heads/main');exclude=@()}};rules=@([pscustomobject]@{type='pull_request'},[pscustomobject]@{type='required_linear_history'})}
+$rulesetB=[pscustomobject][ordered]@{name=$rulesetA.name;target=$rulesetA.target;enforcement=$rulesetA.enforcement;bypass_actors=@();conditions=$rulesetA.conditions;rules=@($rulesetA.rules[1],$rulesetA.rules[0])}
+$rulesPayloadA=ConvertTo-MIR441CanonicalJson -Value (ConvertTo-MIR441RulesetPayload -Ruleset $rulesetA) -Compress;$rulesPayloadB=ConvertTo-MIR441CanonicalJson -Value (ConvertTo-MIR441RulesetPayload -Ruleset $rulesetB) -Compress
+Assert-MIR441Test ($rulesPayloadA-ceq$rulesPayloadB-and@((ConvertTo-MIR441RulesetPayload -Ruleset $rulesetA -WithoutPullRequest).rules).Count-eq1) 'mir441-ruleset-order-normalization'
 
 $resumeRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir441-resume-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $resumeRoot|Out-Null
