@@ -1,0 +1,29 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0044",
+  "status": "accepted",
+  "change_type": "fixed",
+  "summary": "Made protected-promotion ruleset restoration verification insensitive to GitHub rule-array normalization.",
+  "details": [
+    "Observed that GitHub preserves every restored rule and parameter while returning the rule array in a different order.",
+    "Canonicalized ruleset payloads by rule type so a successful exact promotion cannot false-fail after protection has already been restored.",
+    "Added executable order-permutation coverage while retaining fail-closed comparison of every rule and parameter."
+  ],
+  "semantic_domains": ["release", "assurance", "repository"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"unaffected","reason":"The verifier correction is package-excluded."},
+    {"target":"F200","disposition":"unaffected","reason":"The verifier correction is package-excluded."},
+    {"target":"F110","disposition":"unaffected","reason":"The verifier correction is package-excluded."},
+    {"target":"F100","disposition":"unaffected","reason":"The verifier correction is package-excluded."}
+  ],
+  "package_visibility": "repository-only",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"none","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"omit","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"github-ruleset-array-order-normalization"},
+    {"kind":"document","value":"tools/mir/application/release/readiness/Promotion.ps1"}
+  ]
+}
