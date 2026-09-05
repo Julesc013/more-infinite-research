@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4PostReleaseDocumentationV1",
-  "recorded_at": "2026-09-05T11:28:02.3990322+00:00",
+  "recorded_at": "2026-09-05T11:45:40.7038281+00:00",
   "authorization": "Maintainer requested restoration of the existing README detail and delivery into the primary checkout on 2026-09-05.",
   "base_commit": "3562377b520cccb071b97b3968946eae7024c950",
   "tag_object": "9e5e63ef45b9d583d3f463fbfa737eb2c3a6b69f",
@@ -26,7 +26,7 @@
     {
       "path": "contracts/repository/mir4-post-release-documentation-v1.schema.json",
       "previous_sha256": null,
-      "current_sha256": "E45125DA4678C4424E56E750434586C68395A4B2EBC212DF665D8C643BE6148F"
+      "current_sha256": "13F856798828490C2FE4066E78FF7CC452857C24C943742B48DEF81235A19C8C"
     },
     {
       "path": "docs/reference/generated/runtime-pipeline.md",
@@ -41,7 +41,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "E75BD8244F72CAC5E461B0ADAE0D5AB969B52D4F36330D670AA1387455A5EBBE",
-      "current_sha256": "ABF27C2596AA1C658E136DCE76E82E541B9AAD26E3D60D2086175ECBB05B3716"
+      "current_sha256": "CC28AA34B139C0B082BAF07E81829D797F4A2B303AA31A7C3A6FD3EC526F834A"
     },
     {
       "path": "README.md",
@@ -64,6 +64,11 @@
       "current_sha256": "30C78406535DD7938DF06E1D9876B7F44867D95D518014C7810557E7AB20B674"
     },
     {
+      "path": "tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1",
+      "previous_sha256": "3C6529D7C600FB6FED13F40BE1646832DC5F5F1C47468A570CB6E6789938753A",
+      "current_sha256": "FD41E4F5A38B3EF2D4EC2BFEAEF4527964151FD93C1BC8BDAA94D63690B962EE"
+    },
+    {
       "path": "tools/commands/docs/Update-MIRPipelineDocumentation.ps1",
       "previous_sha256": "3BE18CF5DC739D893B654E5306D7A9CF842C0963AC42B6E7ECD5BA99C05079BD",
       "current_sha256": "785945629C539C0DA4C1EE5325856BFC95003B61C09AEF096B5F2C072782D392"
@@ -81,7 +86,7 @@
     {
       "path": "tools/lib/mir4/PostReleaseDocumentation.ps1",
       "previous_sha256": null,
-      "current_sha256": "7844B557779CB820B5C55D222B351A246474335EEB86AE6D11736AA11A85D21F"
+      "current_sha256": "FA7F61976F4571F47A948CE6D19990C4B8BEAF7D51C23C498A3B56B4B8635F95"
     },
     {
       "path": "tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1",
@@ -94,5 +99,5 @@
       "current_sha256": "392A8E983D814921A10109FC8A6422F518EF755E652BB54EBF0D7816230FB8E9"
     }
   ],
-  "record_sha256": "2DA7199EF9F52FA0130E55FE698E991F9E46268E19CBFDEF04CDBD89E67B43C3"
+  "record_sha256": "C52586F08B9123B971171FC77CD020C401BEEE7252410B1952115D53DE9C8E38"
 }

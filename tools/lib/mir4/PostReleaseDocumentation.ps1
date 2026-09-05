@@ -11,6 +11,7 @@ function Get-MIR4PostReleaseDocumentationPaths {
     'tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1'
     'tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1'
     'tests/support/MIR4M4202PackageSuccession.ps1'
+    'tests/tooling/Test-MIR4PowerShellCharacterizationM4202.ps1'
     'tools/commands/docs/Update-MIRPipelineDocumentation.ps1'
     'tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1'
     'tools/commands/docs/Update-MIRPostReleaseDocumentation.ps1'
