@@ -11,7 +11,7 @@ function Assert-MIR4CharacterizationV1 {
 }
 
 $expectedPackage=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-$expectedReadme='5E8C683E39E76B65487344221B947A0C9A0E04D463433C49C0DC4454F3CFA115'
+$expectedReadme=Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md'
 $output='build/reports/repository-characterization'
 
 $authority=Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo

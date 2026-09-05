@@ -13,7 +13,7 @@ superseded_by: []
 # Generated Stream Defaults
 
 <!-- BEGIN GENERATED MIR STREAM DEFAULTS -->
-This package-excluded effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
+This package-excluded effective-default table is generated from `src/mod/families/modern/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
 
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | ---: | ---: | ---: | --- |

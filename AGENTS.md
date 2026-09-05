@@ -23,6 +23,8 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 ## Non-negotiable rules
 
 - Keep docs, fixtures, scripts, tests, `.mir`, `.codex`, `.github`, `build`, `dist`, and repository guidance out of player ZIPs.
+- Update the existing README in place: preserve its badges, sections, research catalog, settings explanations, examples, and troubleshooting detail unless the maintainer explicitly requests their removal. Repository/package documentation separation does not authorize shortening the repository README.
+- Use the primary checkout as the completed-work handoff. Synchronize its active branch with the protected target, copy accepted or published packages into its `dist` with hash verification, and make the matching release notes and upload text available there. External custody and temporary worktrees do not replace local delivery. Remove disposable clean worktrees after completion; retain dirty or unique material with an explicit reason and a discoverable location in the primary checkout.
 - Compatibility policy never mutates prototypes. Only admitted emission code may create or mutate generated technology prototypes.
 - Every generated technology needs a stable stream manifest row; every public claim needs named exact evidence.
 - Preserve one emitter and package-source parity unless a separately authorized cutover changes them.
