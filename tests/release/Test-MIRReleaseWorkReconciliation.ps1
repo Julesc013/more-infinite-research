@@ -219,7 +219,11 @@ if ([string]$c31Closure.disposition -ne "superseded-unpublished" -or
   throw "C31 must remain superseded-unpublished in favor of 3.2.5."
 }
 $distributions = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/distributions.json") | ConvertFrom-Json
-$trackedArchives = @(Get-ChildItem -LiteralPath (Join-Path $RepoRoot "dist") -Filter "*.zip" -File)
+# Local delivery may include newer untracked public assets. The historical
+# projection owns Git-tracked root archives, not the entire working directory.
+$trackedArchivePaths = @(& git -C $RepoRoot ls-files -- 'dist/*.zip' | Where-Object { $_ -match '^dist/[^/]+[.]zip$' })
+if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect tracked distribution paths.' }
+$trackedArchives = @($trackedArchivePaths | ForEach-Object { Get-Item -LiteralPath (Join-Path $RepoRoot $_) -ErrorAction Stop })
 if ([int]$distributions.distribution_count -ne @($distributions.distributions).Count -or
     [int]$distributions.distribution_count -ne $trackedArchives.Count -or
     @($distributions.distributions | Where-Object { [string]$_.version -eq "3.2.4" }).Count -ne 0 -or

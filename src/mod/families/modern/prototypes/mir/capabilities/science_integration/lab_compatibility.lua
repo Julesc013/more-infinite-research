@@ -72,8 +72,18 @@ local function contains_required(ingredients, required)
   return true
 end
 
-function M.best_lab_compatible_ingredients(ingredients, context, required_packs)
+local function contains_phase_trigger(ingredients, alternatives)
+  if not alternatives or #alternatives == 0 then return true end
+  local acceptable = required_set(alternatives)
+  for _, ingredient in ipairs(ingredients or {}) do
+    if acceptable[M.ingredient_name(ingredient)] then return true end
+  end
+  return false
+end
+
+function M.best_lab_compatible_ingredients(ingredients, context, required_packs, required_any_packs)
   local required = required_set(required_packs)
+  if not contains_phase_trigger(ingredients, required_any_packs) then return nil, "missing-phase-trigger" end
   local source_has_required, missing_required = contains_required(ingredients, required)
   if not source_has_required then
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
@@ -108,6 +118,7 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs)
     end
   end
   if #source == 0 then return nil, "empty" end
+  if not contains_phase_trigger(source, required_any_packs) then return nil, "phase-trigger-unreachable" end
   local reachable_has_required, unreachable_required = contains_required(source, required)
   if not reachable_has_required then
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
@@ -134,7 +145,8 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs)
       if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
     end
     local candidate_has_required = contains_required(candidate, required)
-    if candidate_has_required and #candidate > 0 and M.valid_research_ingredients(candidate)
+    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
+      and #candidate > 0 and M.valid_research_ingredients(candidate)
       and (not best or #candidate > #best) then
       best, best_lab = candidate, entry.name
     end

@@ -122,9 +122,9 @@ function Invoke-MIR4ApplicationCommandGroup {
             & (Join-Path $repo "tools/mir/cli/Invoke-MIR4Factorio21Channel.ps1") @channelArguments
           }
           "package-source" {
-            if ($Args.Count -lt 3) { throw "mir4 package-source requires baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, materialize-check, runtime-replay, or runtime-replay-check." }
+            if ($Args.Count -lt 3) { throw "mir4 package-source requires refresh, refresh-check, baseline, baseline-check, shadow, shadow-check, model, model-check, materialize, materialize-check, runtime-replay, or runtime-replay-check." }
             $subcommand = [string]$Args[2]
-            if ($subcommand -notin @('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')) { throw "Unknown mir4 package-source command: $subcommand" }
+            if ($subcommand -notin @('refresh','refresh-check','baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')) { throw "Unknown mir4 package-source command: $subcommand" }
             $packageSourceArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
             $output = Get-MIRArgValue -Items $Args -Name '--output'
             if (-not [string]::IsNullOrWhiteSpace($output)) { $packageSourceArguments.OutputPath = $output }

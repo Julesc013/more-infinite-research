@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-05.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-06.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -248,6 +248,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-independent-production-consumer-blocker-w07 | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-inspector-developer-guide | [MIR 4 Inspector Preview](../../developer/inspector.md) | current |
 | mir4-inspector-v1-preview | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
+| mir4-integration-and-delivery-plan | [MIR 4 Integration and Delivery Plan](../../releases/mir4-integration-and-delivery-plan.md) | current |
 | mir4-key-recovery-and-revocation | [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md) | current |
 | mir4-local-playtest-shadow-boundary | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
 | mir4-m4c01-execution-order | [MIR 4 M4C01 Candidate Runbook](../../maintainer/mir4-m4c01-runbook.md) | current |

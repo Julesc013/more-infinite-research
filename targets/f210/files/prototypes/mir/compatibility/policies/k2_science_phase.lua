@@ -69,6 +69,14 @@ function M.normalize(ingredients, active_mods)
     for name in pairs(EARLY_PACKS) do remove[name] = true end
   end
 
+  -- Preserve phase intent before a planner can discard ingredients. At least
+  -- one selected trigger must survive lab reduction in the intended phase.
+  decision.required_any_packs = {}
+  local triggers = phase_two and PHASE_TWO_TRIGGERS or (phase_one and PHASE_ONE_TRIGGERS or {})
+  for name in pairs(present) do
+    if triggers[name] then decision.required_any_packs[#decision.required_any_packs + 1] = name end
+  end
+  table.sort(decision.required_any_packs)
   local normalized, removed_seen = {}, {}
   for _, ingredient in ipairs(original) do
     local name = ingredient_name(ingredient)

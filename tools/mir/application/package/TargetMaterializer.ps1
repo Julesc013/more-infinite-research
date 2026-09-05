@@ -294,3 +294,74 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
   [IO.File]::WriteAllText($ReportPath, $reportJson, [Text.UTF8Encoding]::new($false))
   return $report
 }
+
+function Update-MIR4CurrentSourceBindings {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  # Refresh only existing, admitted paths. Membership, target scope, transforms,
+  # versioning and support remain separately reviewed authorities.
+  $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
+  $authority=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/package-authority.json' -Kind 'MIR4CanonicalPackageAuthorityV1'
+  $records=[ordered]@{}
+  $identities=@{}
+  $changed=[Collections.Generic.List[string]]::new()
+  foreach($binding in @($manifest.bindings)) {
+    $relative=[string]$binding.source_path
+    Assert-MIR4PortableArchivePath -Path $relative
+    if($relative -notmatch '^(?:src/mod/|targets/f(?:210|200|110|100)/(?:files|generation)/)') { throw "[mir4-source-refresh-boundary] $relative" }
+    $full=[IO.Path]::GetFullPath((Join-Path $repo $relative))
+    if(-not $full.StartsWith($repo+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-source-refresh-path]' }
+    $source=[IO.File]::ReadAllBytes($full)
+    $sha=Get-MIR4Sha256Bytes -Bytes $source
+    if([string]$binding.source_sha256 -cne $sha) { $changed.Add($relative) }
+    $output=switch([string]$binding.transform) {
+      'copy-exact-bytes' { $source; break }
+      'exact-template-v1' { $source; break }
+      'decode-base64-v1' { [Convert]::FromBase64String([Text.UTF8Encoding]::new($false).GetString($source).Trim()); break }
+      default { throw "[mir4-source-refresh-transform] $relative" }
+    }
+    $binding.source_bytes=[int64]$source.Length
+    $binding.source_sha256=$sha
+    $binding.output_bytes=[int64]$output.Length
+    $binding.output_sha256=Get-MIR4Sha256Bytes -Bytes $output
+    $identities[$relative]=$sha
+  }
+  $manifest.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $manifest
+  $records['src/mod/package-source.json']=@{record=$manifest;schema='mir4-package-source-manifest-v1.schema.json'}
+  foreach($target in @('f210','f200','f110','f100')) {
+    $path="targets/$target/overlay.json"
+    $overlay=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $path -Kind 'MIR4TargetOverlayV1'
+    foreach($operation in @($overlay.operations)) {
+      if([string]$operation.operation -ceq 'omit') { continue }
+      $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$operation.path -and [string]$_.source_path -ceq [string]$operation.source_path -and $target -in @($_.target_scope) })
+      if($rows.Count -ne 1 -or [string]$rows[0].transform -cne [string]$operation.transform) { throw "[mir4-source-refresh-overlay] $target/$($operation.path)" }
+      $operation.expected_bytes=[int64]$rows[0].output_bytes
+      $operation.expected_sha256=[string]$rows[0].output_sha256
+    }
+    $overlay.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $overlay
+    $records[$path]=@{record=$overlay;schema='mir4-target-overlay-v1.schema.json'}
+  }
+  $authority.source_manifest.record_sha256=[string]$manifest.record_sha256
+  $authority.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $authority
+  $records['targets/package-authority.json']=@{record=$authority;schema='mir4-canonical-package-authority-v1.schema.json'}
+  $writes=[ordered]@{}
+  foreach($entry in $records.GetEnumerator()) {
+    $json=($entry.Value.record | ConvertTo-Json -Depth 100).Replace("`r`n","`n")+"`n"
+    if(-not($json | Test-Json -SchemaFile (Join-Path $repo "spec/schemas/$($entry.Value.schema)"))) { throw "[mir4-source-refresh-schema] $($entry.Key)" }
+    if([IO.File]::ReadAllText((Join-Path $repo $entry.Key)).Replace("`r`n","`n") -cne $json) { $writes[$entry.Key]=$json }
+  }
+  if($Check -and $writes.Count -gt 0) { throw "[mir4-source-refresh-stale] $($writes.Keys -join ', ')" }
+  foreach($entry in $identities.GetEnumerator()) {
+    if((Get-MIR4Sha256Bytes -Bytes ([IO.File]::ReadAllBytes((Join-Path $repo $entry.Key)))) -cne [string]$entry.Value) { throw "[mir4-source-refresh-input-drift] $($entry.Key)" }
+  }
+  if(-not $Check) {
+    foreach($entry in $writes.GetEnumerator()) {
+      $path=Join-Path $repo $entry.Key
+      $temporary=$path+'.refresh-tmp'
+      [IO.File]::WriteAllText($temporary,[string]$entry.Value,[Text.UTF8Encoding]::new($false))
+      [IO.File]::Move($temporary,$path,$true)
+    }
+  }
+  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);projections=@($writes.Keys);membership_changed=$false;publication_authorized=$false}
+}

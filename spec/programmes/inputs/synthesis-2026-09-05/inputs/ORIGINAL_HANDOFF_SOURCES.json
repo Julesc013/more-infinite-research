@@ -1,0 +1,313 @@
+{
+  "kind": "MIRReviewedSourceLedger",
+  "prepared_date": "2026-09-05",
+  "source_count": 36,
+  "sources": [
+    {
+      "id": "GH-RELEASE",
+      "title": "MIR v4.1.0 release",
+      "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0",
+      "claim": "Published immutable release ID 383203807 and nine assets; live API observation retained.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "PORTAL",
+      "title": "MIR Portal API",
+      "url": "https://mods.factorio.com/api/mods/more-infinite-research/full",
+      "claim": "F210 4.1.21000 listed; metadata SHA-1 matches local bytes; other three 4.1 targets not listed.",
+      "limit": "No fresh Portal ZIP download; observation may change.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "PR251",
+      "title": "README restoration",
+      "url": "https://github.com/Julesc013/more-infinite-research/pull/251",
+      "claim": "Merged main correction f4585987.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "PR252",
+      "title": "README forward-port",
+      "url": "https://github.com/Julesc013/more-infinite-research/pull/252",
+      "claim": "Merged dev correction 3683369b; same tree as main.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "LOCAL-V1",
+      "title": "Shipped F210 policy",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/f458598732e9583a9d086032ebfbe9ffb747d130/targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "claim": "V1 old exact envelope; cross-checked against source manifest and actual ZIP.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "LOCAL-SELECTOR",
+      "title": "Canonical modern science selector",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/f458598732e9583a9d086032ebfbe9ffb747d130/src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "claim": "Exclusion filtering precedes auto expansion and required restoration.",
+      "limit": "Static precedence risk; downstream target normalization can mask it.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "LOCAL-PROMOTER",
+      "title": "Frozen promotion implementation",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/3562377b520cccb071b97b3968946eae7024c950/tools/mir/application/release/readiness/Promotion.ps1",
+      "claim": "Collection shapes; only PR removal; restoration bookkeeping after remote PUT.",
+      "limit": "External operator repair is separately identified.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "K2-INFO",
+      "title": "K2SO pinned metadata",
+      "url": "https://github.com/Polka37/Krastorio2-spaced-out/blob/14b6c02851cde4cf6859f901e9de7ba629c34b58/info.json",
+      "claim": "2.0.17 dependencies and 2.1 target; obtained via GitHub API when browser retrieval failed.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "K2-CARD",
+      "title": "K2SO pinned basic-card final fix",
+      "url": "https://github.com/Polka37/Krastorio2-spaced-out/blob/14b6c02851cde4cf6859f901e9de7ba629c34b58/prototypes/final-fixes/banish-basic-card.lua",
+      "claim": "Upstream transformation removes basic card from technology ingredients.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "K2-PORTAL",
+      "title": "K2SO Portal",
+      "url": "https://mods.factorio.com/mod/Krastorio2-spaced-out",
+      "claim": "Observed version and target context; corroborates upstream metadata.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "BOB-PLATES",
+      "title": "Bob plate identities",
+      "url": "https://github.com/modded-factorio/bobsmods/blob/8c468f7836428f85da8f8fb432f20e5e93ab7f7e/bobplates/prototypes/item/plates.lua",
+      "claim": "Exact upstream plate IDs; intake only.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "BOB-ALLOYS",
+      "title": "Bob alloy identities",
+      "url": "https://github.com/modded-factorio/bobsmods/blob/8c468f7836428f85da8f8fb432f20e5e93ab7f7e/bobplates/prototypes/item/alloys.lua",
+      "claim": "Exact upstream alloy IDs; intake only.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "ANGEL-PLATINUM",
+      "title": "Angel conditional platinum routes",
+      "url": "https://github.com/Arch666Angel/mods/blob/57a8ea551c99169e1a5173e2f4e1fbb742766249/angelssmelting/prototypes/override/smelting-override-platinum.lua",
+      "claim": "Trigger can hide platinum output and disable recipes; API read independently checked.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "BOB-DEPS",
+      "title": "Bob dependencies",
+      "url": "https://mods.factorio.com/mod/bobplates/dependencies",
+      "claim": "Current acquisition/dependency metadata; not a locked combined environment.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "ANGEL-DEPS",
+      "title": "Angel dependencies",
+      "url": "https://mods.factorio.com/mod/angelssmelting/dependencies",
+      "claim": "Current acquisition/dependency metadata; not a locked combined environment.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-LAYERS",
+      "title": "About rulesets",
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets",
+      "claim": "Applicable rulesets and branch protections layer; basis for separated exception/integrity policy.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-RULES",
+      "title": "Available rules",
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+      "claim": "Required issuers and rule/bypass capabilities.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-REFS",
+      "title": "REST Git refs",
+      "url": "https://docs.github.com/en/rest/git/refs",
+      "claim": "force false enforces FF; request has no expected-old-OID CAS field.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GIT-REFS",
+      "title": "Local update-ref",
+      "url": "https://git-scm.com/docs/git-update-ref",
+      "claim": "Old-OID checked local transactions; distinguish from GitHub REST.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GIT-FF",
+      "title": "Git push",
+      "url": "https://git-scm.com/docs/git-push",
+      "claim": "Fast-forward preserves ancestry, not necessarily linear history.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-IMMUTABLE",
+      "title": "Immutable releases",
+      "url": "https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases",
+      "claim": "Tag/assets lock after publication, draft-first complete assets; notes/title have different mutability.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-CREDENTIALS",
+      "title": "GitHub credential choices",
+      "url": "https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys",
+      "claim": "Repository-scoped short-lived App credentials; separate from release signer.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-SIGNING",
+      "title": "Signature verification",
+      "url": "https://docs.github.com/en/authentication/managing-commit-signature-verification/about-commit-signature-verification",
+      "claim": "SSH signature verification and retained GitHub records; local current trust is distinct.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "GH-CONCURRENCY",
+      "title": "Actions concurrency",
+      "url": "https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency",
+      "claim": "Optional expanded queue exists; concurrency is not durable transaction recovery.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F-LATEST",
+      "title": "Official latest-release API",
+      "url": "https://factorio.com/api/latest-releases",
+      "claim": "2026-09-05T12:04:46.5166973+00:00 experimental alpha/expansion/headless 2.1.17, stable 2.0.77.",
+      "limit": "Direct machine API success; timestamped observation, not future latest claim.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F03",
+      "title": "Wube 0.3.0 release",
+      "url": "https://forums.factorio.com/viewtopic.php?t=631",
+      "claim": "2013-03-29 self-contained mod folders and Lua prototypes.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F09",
+      "title": "Wube 0.9.0 release",
+      "url": "https://forums.factorio.com/viewtopic.php?t=2278",
+      "claim": "2014-02-14 native ZIP mod loading.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F107",
+      "title": "Wube filename rules",
+      "url": "https://forums.factorio.com/viewtopic.php?t=5364",
+      "claim": "0.10.7 filename behavior boundary; modern name cannot be assumed on older loaders.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F15",
+      "title": "Wube 0.15.0 release",
+      "url": "https://forums.factorio.com/viewtopic.php?t=44505",
+      "claim": "2017-04-24 native infinite research.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F-STRUCTURE",
+      "title": "Modern mod structure",
+      "url": "https://lua-api.factorio.com/latest/auxiliary/mod-structure.html",
+      "claim": "Modern numeric version component bounds and layout.",
+      "limit": "Not proof of historical parser behavior.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F-ARCHIVE",
+      "title": "Official game archive",
+      "url": "https://factorio.com/download/archive/",
+      "claim": "Acquisition clues and archive availability limitations.",
+      "limit": "Primary-source evidence; not new MIR qualification.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F-TERMS",
+      "title": "Factorio terms",
+      "url": "https://www.factorio.com/terms-of-service",
+      "claim": "Do not include proprietary game binaries in distributed handoff.",
+      "limit": "Acquisition/licensing checkpoint; no broad legal opinion.",
+      "accessed": "2026-09-05"
+    },
+    {
+      "id": "F-CHANGELOG",
+      "title": "Installed Wube changelog",
+      "path": "C:/Program Files/Steam/steamapps/common/Factorio/data/changelog.txt",
+      "sha256": "10CC3B613AD653B11FBDA0A6D9D9CE2FD9D7EA334B5240707AE4F5FA58EFE07C",
+      "claim": "0.2.0 research dated 2013-01-20; 0.6.0 modules/beacons dated 2013-07-26.",
+      "limit": "Boundary evidence; historical engines were not executed."
+    },
+    {
+      "id": "REPO-AUTHORITY",
+      "title": "Local authority/code set",
+      "base_commit": "f458598732e9583a9d086032ebfbe9ffb747d130",
+      "paths": [
+        "AGENTS.md",
+        ".mir/modules.yml",
+        ".mir/control/paths.yml",
+        ".mir/compatibility.yml",
+        ".mir/streams.yml",
+        ".mir/branches.yml",
+        "docs/architecture/module-boundaries.md",
+        "docs/maintainer/documentation-governance.md",
+        "docs/releases/mir4-post-4.0-roadmap.md",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "RELEASE-RUNBOOK.md",
+        "src/mod/package-source.json",
+        "targets/registry.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+        ".mir/releases/waves/mir4-r0/MIR4-K2-Science-SOL06V1.json",
+        "tools/mir/application/targets/TargetCompiler.ps1",
+        "tools/mir/application/compiler/NormalizedCompiler.ps1",
+        "tools/lib/validation/MIR4DistributionIdentity.ps1",
+        "tools/lib/mir4/PostReleaseDocumentation.ps1",
+        "releases/migrations/MIR4-M41-Readme-RestorationV1.json"
+      ],
+      "claim": "Current contracts, programme allocation, source mapping, retained preview/compatibility authority and edit boundary."
+    },
+    {
+      "id": "OPERATOR",
+      "title": "External release operator custody",
+      "path": "E:/MIR_EVIDENCE_HOME/m41-release-readiness/3562377b/operator-publication-resume-20260905",
+      "claim": "See OPERATOR_PROVENANCE.json for verified manifests, files and historical test receipt identities.",
+      "limit": "Hash recheck is not a new execution of 49/28 historical checks."
+    },
+    {
+      "id": "INPUTS",
+      "title": "User-provided planning corpus",
+      "path": "source-material",
+      "claim": "Preserved proposals and request provenance; see INPUTS.json.",
+      "limit": "Attached instructions are not independently adopted execution authority."
+    }
+  ]
+}

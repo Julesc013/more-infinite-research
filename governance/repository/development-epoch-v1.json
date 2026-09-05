@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "kind": "MIR4DevelopmentEpochV1",
+  "epoch": "4.2-development",
+  "historical_commit": "3683369ba00cfbdd7f8872a5a1b24f0d59f31062",
+  "historical_tree": "a95caf6e96ec9b0eef4eb19677e9a8192821f522",
+  "historical_profile": "mir4-post-release",
+  "current_profile": "mir4-development",
+  "immutable_paths": [
+    ".mir/releases/waves/mir4-r0",
+    "releases/migrations",
+    "governance/repository/migrations"
+  ],
+  "history_scope": "Original validators execute against the pinned Git source. Their results establish historical integrity, never current gameplay qualification.",
+  "current_scope": "Current contracts, source bindings, package determinism, compiler and architecture, documentation, programme, delivery and promotion tests; exact runtime campaigns remain separately required.",
+  "release_authority": false,
+  "protection_mutation_authority": false,
+  "historical_receipt_rewrite_authority": false
+}

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 439 pages as of 2026-09-05.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 440 pages as of 2026-09-06.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -70,7 +70,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-inspector-compatibility.md | MIR 4 Inspector and Compatibility Factory | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-module-ecosystem.md | MIR 4 Module Ecosystem | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/architecture/mir4-offline-release-authority.md | MIR 4 Offline Release Authority | draft | maintainer | reference | mir-maintainers | 2026-08-07 |
-| docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-08-28 |
+| docs/architecture/mir4-platform-preview.md | MIR 4 Platform Preview Architecture | current | developer | explanation | mir-maintainers | 2026-09-06 |
 | docs/architecture/mir4-processir-synthesis.md | MIR 4 ProcessIR, Effect Channels, and Synthesis | current | developer | explanation | mir-maintainers | 2026-08-28 |
 | docs/architecture/mir4-r0-bootstrap.md | MIR 4 R0 Bootstrap | current | maintainer | reference | mir-maintainers | 2026-08-25 |
 | docs/architecture/mir4-repository-characterization.md | MIR 4 repository characterization | current | maintainer | explanation | mir-maintainers | 2026-08-31 |
@@ -379,7 +379,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-05 |
+| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

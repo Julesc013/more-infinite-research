@@ -232,7 +232,14 @@ function M.pick_science_for_stream(spec, key)
       table.insert(out, {name, 1})
     end
   end
-  local selected = M.apply_science_pack_ingredient_policy(out)
+  -- Expansion is a preference inside the compatibility contract. Reapply
+  -- exclusions to added packs; hard progression requirements still win.
+  local selected = {}
+  for _, ingredient in ipairs(M.apply_science_pack_ingredient_policy(out)) do
+    if not denied[ingredient_name(ingredient)] then
+      selected[#selected + 1] = ingredient
+    end
+  end
   local selected_names = {}
   for _, ingredient in ipairs(selected or {}) do
     selected_names[ingredient_name(ingredient)] = true

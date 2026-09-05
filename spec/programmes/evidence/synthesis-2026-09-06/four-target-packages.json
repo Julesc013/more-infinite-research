@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "scope": "current-source-and-four-target-determinism",
+  "packages": [
+    {
+      "target": "f210",
+      "content_sha256": "1FBE1612EA77AE1AC1BC10CB4028466343B13302806F4B10B886A3A87DF46713",
+      "archive": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\development-contracts\\8d518dee43d24f09bbaaf775cb11279a\\f210\\DEVELOPMENT-A\\more-infinite-research_4.2.21000.zip",
+      "entry_count": 331
+    },
+    {
+      "target": "f200",
+      "content_sha256": "A1DA2689B34877D06920163ABC16729B4E579D471ADE856F58965E846049DAE4",
+      "archive": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\development-contracts\\8d518dee43d24f09bbaaf775cb11279a\\f200\\DEVELOPMENT-A\\more-infinite-research_4.2.20000.zip",
+      "entry_count": 329
+    },
+    {
+      "target": "f110",
+      "content_sha256": "7BD80A879D510EB821D692DC8FF5463EEFB81EAE2FBC70290065D1CBC5438A18",
+      "archive": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\development-contracts\\8d518dee43d24f09bbaaf775cb11279a\\f110\\DEVELOPMENT-A\\more-infinite-research_4.2.11000.zip",
+      "entry_count": 174
+    },
+    {
+      "target": "f100",
+      "content_sha256": "C06CDC39E705D6A914E42E225268AF609E5E2D487FCD2C382617FEE5DCEE5D0A",
+      "archive": "C:\\Projects\\Factorio\\more-infinite-research\\build\\packages\\development-contracts\\8d518dee43d24f09bbaaf775cb11279a\\f100\\DEVELOPMENT-A\\more-infinite-research_4.2.10000.zip",
+      "entry_count": 174
+    }
+  ],
+  "release_authority": false
+}

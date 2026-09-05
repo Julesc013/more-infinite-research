@@ -215,7 +215,11 @@ function M.pick_science_for_stream(spec, key)
       table.insert(out, {name, 1})
     end
   end
-  return M.apply_science_pack_ingredient_policy(out)
+  local selected = {}
+  for _, ingredient in ipairs(M.apply_science_pack_ingredient_policy(out)) do
+    if not denied[ingredient_name(ingredient)] then selected[#selected + 1] = ingredient end
+  end
+  return selected
 end
 
 return M

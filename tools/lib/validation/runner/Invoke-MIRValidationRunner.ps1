@@ -14,6 +14,14 @@ $validationRunnerCompleted = $false
 . (Join-Path $runnerModuleRoot "Bootstrap.ps1")
 if ($validationRunnerCompleted) { return }
 
+# A development epoch has a separate current contract profile. Frozen release
+# validators remain unchanged and replay against their pinned historical source.
+if ($StaticOnly -and (Test-Path -LiteralPath (Join-Path $repo 'governance/repository/development-epoch-v1.json'))) {
+  . (Join-Path $repo 'tools/mir/application/assurance/DevelopmentValidation.ps1')
+  Invoke-MIR4DevelopmentStaticChecks -RepoRoot $repo.Path
+  return
+}
+
 $moduleSequence = @(
   "StaticCore.ps1",
   "StaticFixtureMods.ps1",

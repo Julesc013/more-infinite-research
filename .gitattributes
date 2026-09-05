@@ -157,3 +157,11 @@ src/mod/** text eol=lf
 # materializer. Pin every textual target source, including *.template and
 # target-specific Lua overlays, so Windows and hosted checkouts are identical.
 targets/** text eol=lf
+
+# Preserve imported review and generated evidence bytes, including sealed CRLF.
+spec/programmes/inputs/synthesis-2026-09-05/** -text whitespace=cr-at-eol
+spec/programmes/evidence/synthesis-2026-09-06/** -text whitespace=cr-at-eol
+tests/compiler/science_planning.lua text eol=lf
+tests/compiler/Test-MIRSciencePlanning.ps1 text eol=lf
+tests/release/Test-MIR4LocalDelivery.ps1 text eol=lf
+tests/release/Test-MIR4PromotionRecovery.ps1 text eol=lf

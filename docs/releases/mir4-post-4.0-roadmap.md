@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-05
+last_reviewed: 2026-09-06
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -17,6 +17,8 @@ source_of_truth_for:
 MIR 4.0.0 proved that the project can produce a multi-target, proof-governed product line. MIR 4.x now has two simultaneous duties: keep the released 4.0 line repairable and make future development physically coherent. The programme therefore runs a stable patch lane and one development lane under shared findings, shared semantic intent, independently qualified target packages, and immutable published bytes.
 
 The objective is not another platform layer. It is one semantic source, one obvious repository structure, one public command surface, one authority per mutable fact, one generated release narrative, independently generated target packages, and detailed evidence that never clutters or enters the player package.
+
+MIR 4.1.0 is published at source `3562377b520cccb071b97b3968946eae7024c950` with four player ZIPs and five supporting assets. F200 direct verification and the release-specific F210 direct-playtest waiver retain their original classifications. The [integration and delivery plan](mir4-integration-and-delivery-plan.md) now orders the eight audit findings, 23 player requests, 34 component destinations, and historical target inventory.
 
 The machine-readable programme is `spec/programmes/mir4-4x-operating-programme-v1.json`. The self-contained package promise is `spec/distribution/mir4-deployment-contract-v1.json`; patch semantics are in `spec/releases/mir4-patch-policy-v1.json`; proof applicability is in `spec/assurance/mir4-proof-applicability-v1.json`.
 
@@ -62,15 +64,15 @@ The governance and characterization foundation is complete, so MIR 4.1 now owns 
 | M42-01 | Converge PowerShell, executable tests, proof catalogues, workflows, and release orchestration behind one supported public surface | Complete |
 | M42-02 | Perform only reviewable behavior-preserving Lua and PowerShell decomposition needed for the 4.1 maintainability fixed point | Complete: six Lua and eleven PowerShell responsibility splits accepted; bridge retirement and private four-target qualification remain separate MIR 4.1 gates |
 | M41-07 | Retire every current-product authority bridge and bound retained historical readers | Complete: zero current-product authority bridges; retained compatibility paths are read-only, owned, tested, package-excluded, and expiry-bounded |
-| M41-08 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate | Active: production-readiness implementation and release surfaces are prepared; completion is recorded by the external exact-source release-window receipt |
+| M41-08 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate | Complete: published v4.1.0 release 383203807 and exact-source closure; future releases require fresh acceptance |
 
 Only one authority migration, one feature train, and one stable patch may be in flight at once. A stable player defect can pre-empt the feature train, but it does not broaden patch scope. No implementation decomposition starts before M42-00 proves source/package characterization, deterministic target builds, upgrade continuity, and rollback. A split that cannot be reviewed and proved safely remains unchanged with an explicit disposition.
 
 The accepted F2D chain is complete for F210, F200, F110, and F100, including the independent four-target aggregate. F2E then bound stable target identity separately from version projection, promoted `src/mod` and `targets` as canonical editable source, routed ordinary and target-product construction through `TargetMaterializer`, and fenced the bootstrap writer as historical compatibility. Four fresh deterministic reconstructions matched the accepted 4.0 content roots and entry sets. M41-07 completed the physical retirement: the repository root is not an editable Factorio package, and historical root-package bytes can be read only through explicit immutable-commit compatibility paths.
 
-M41-05B replaced the root README with a concise package-excluded repository landing page and made target player documentation a generated package projection. Repository and player narratives now have separate owned audiences and generated views.
+M41-05B separated repository documentation from generated target player documentation. The detailed repository README was subsequently restored in PRs #251 and #252, preserving badges, catalog, settings, examples, and troubleshooting. Both audiences retain their owned surfaces; separation does not authorize shortening the repository README.
 
-MIR 4.1 separates technical completion from publication. All four targets are required for the `GO-4TARGET` technical result. F210/F200 are primary publication assets; F110/F100 are independently publishable supplemental LTS assets, without permitting cross-target proof substitution. The final order is frozen-source build, four-target qualification, independent verification, technical seal, signed-tag preparation, exact `dev`-to-`main` promotion, maintainer playtest, then tag and publication of the already sealed bytes. A playtest `NO-GO` publishes nothing and advances only through a new forward candidate.
+The completed MIR 4.1 release separated technical completion from publication. Its historical sequence is retained below; it is not a command to rerun publication. All four targets are required for the `GO-4TARGET` technical result. F210/F200 are primary publication assets; F110/F100 are independently publishable supplemental LTS assets, without permitting cross-target proof substitution. The final order is frozen-source build, four-target qualification, independent verification, technical seal, signed-tag preparation, exact `dev`-to-`main` promotion, maintainer playtest, then tag and publication of the already sealed bytes. A playtest `NO-GO` publishes nothing and advances only through a new forward candidate.
 
 ## Preserved 4.0.0 baseline
 

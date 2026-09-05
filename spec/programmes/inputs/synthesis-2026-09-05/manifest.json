@@ -1,0 +1,47 @@
+{
+  "classification": "external-review-evidence-not-execution-authority",
+  "archive_name": "MIR4_SYNTHESIS_AUDIT_2026-09-05.zip",
+  "archive_sha256": "0db18b0c37b44dbd310e06668108f62069b7cb16323d71125472f977ddd51dbc",
+  "files": [
+    {
+      "path": "REQUEST_LEDGER.json",
+      "bytes": 30684,
+      "sha256": "940085bff15ca90e8a99219dc309f7e52e67aa23d2ff6adf3063bac28fc3dfee"
+    },
+    {
+      "path": "HISTORICAL_TARGET_MATRIX.json",
+      "bytes": 20026,
+      "sha256": "35b5ff3ad09b115cdda7f8f53b9de7e834c2c4b7c2d94e858054b28ac515a51b"
+    },
+    {
+      "path": "COMPONENT_DELIVERY.json",
+      "bytes": 10025,
+      "sha256": "c37cfd03ebe922164111e5a7b895c82a25f1f4f073d9ba02f4d7087c4789cb63"
+    },
+    {
+      "path": "EXECUTION_PLAN.json",
+      "bytes": 12843,
+      "sha256": "442ed76dd21eda052ca66e1d743ccd04b498686a85dcda3464c5ae8a7b0dc35a"
+    },
+    {
+      "path": "FINDINGS.json",
+      "bytes": 3899,
+      "sha256": "9fab7651f90bb3481f8775d668bb9ff85b2023a0c4ab0e8b164589f0d1128fce"
+    },
+    {
+      "path": "SOURCES.json",
+      "bytes": 14724,
+      "sha256": "7f1919d477be933e007ad3f1e254bb0fdbffe8603d9b40d056bbc463ca8ff877"
+    },
+    {
+      "path": "inputs/ORIGINAL_HANDOFF_SOURCES.json",
+      "bytes": 14542,
+      "sha256": "1a38384280eed0a51a0f3b1651dafd679f9cf9b1e0f0f7c6f77a053138a10cdf"
+    },
+    {
+      "path": "inputs/COPIED_RECORD_PROVENANCE.json",
+      "bytes": 744,
+      "sha256": "ef56233842fb46466a29b8a8677243c1765c2ef29edcb013ec705f8429f6901a"
+    }
+  ]
+}

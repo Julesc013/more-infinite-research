@@ -63,6 +63,15 @@ function Invoke-MIRProductCommandGroup {
       }
       "release" {
         switch ($verb) {
+          "deliver" {
+            $manifestPath = Get-MIRArgValue -Items $Args -Name '--manifest'
+            $sourceRoot = Get-MIRArgValue -Items $Args -Name '--source-root'
+            if ([string]::IsNullOrWhiteSpace($manifestPath) -or [string]::IsNullOrWhiteSpace($sourceRoot)) { throw 'release deliver requires --manifest and --source-root.' }
+            $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 20
+            if ([int]$manifest.schema -ne 1) { throw 'Unsupported local delivery manifest schema.' }
+            . (Join-Path $repo 'tools/mir/application/release/LocalDelivery.ps1')
+            Invoke-MIR4LocalDelivery -RepoRoot $repo.Path -SourceRoot $sourceRoot -Files @($manifest.files) -ReleaseId ([string]$manifest.release_id) | ConvertTo-Json -Depth 20
+          }
           "doctor" {
             $parameters = @{
               Command='release-doctor';RepoRoot=$repo.Path

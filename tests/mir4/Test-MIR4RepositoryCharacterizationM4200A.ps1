@@ -56,8 +56,8 @@ Assert-MIR4CharacterizationV1 (
   @($programme.work_packages|Where-Object{$_.id -eq 'M42-01' -and $_.state -eq 'complete'}).Count -eq 1 -and
   @($programme.work_packages|Where-Object{$_.id -eq 'M42-02' -and $_.state -eq 'complete'}).Count -eq 1 -and
   @($programme.work_packages|Where-Object{$_.id -eq 'M41-07' -and $_.state -eq 'complete'}).Count -eq 1 -and
-  @($programme.work_packages|Where-Object{$_.id -eq 'M41-08' -and $_.state -eq 'active'}).Count -eq 1 -and
-  $m43.Count -eq 1 -and [string]$m43[0].state -ceq 'blocked-dependency' -and 'M41-08' -in @($m43[0].depends_on)
+  @($programme.work_packages|Where-Object{$_.id -eq 'M41-08' -and $_.state -eq 'complete'}).Count -eq 1 -and
+  $m43.Count -eq 1 -and [string]$m43[0].state -ceq 'active' -and 'M41-08' -in @($m43[0].depends_on)
 ) 'mir4-characterization-programme-successor-state'
 Assert-MIR4CharacterizationV1 (@($programme.work_packages|Where-Object{$_.id -in @('M42-00','M42-01','M42-02','M41-07','M41-08') -and $_.completion_boundary -eq '4.1.0'}).Count -eq 5) 'mir4-41-physical-fixed-point-boundary'
 Assert-MIR4CharacterizationV1 ([string]@($programme.outcome_trains|Where-Object candidate -eq '4.2.0')[0].outcome -match 'Integration kernel') 'mir4-42-integration-boundary'

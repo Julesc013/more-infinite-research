@@ -4,37 +4,109 @@
   "title": "MIR 4.x operating programme V1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "recorded_at", "objective", "permanent_invariants", "work_packages", "package_fixed_point", "outcome_trains", "engine_channels", "wip_limits"],
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "recorded_at",
+    "objective",
+    "permanent_invariants",
+    "work_packages",
+    "package_fixed_point",
+    "outcome_trains",
+    "engine_channels",
+    "wip_limits"
+  ],
   "properties": {
-    "schema": {"const": 1},
-    "kind": {"const": "MIR4XOperatingProgrammeV1"},
-    "status": {"const": "active"},
-    "recorded_at": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{2}:[0-9]{2})$"},
-    "objective": {"type": "string", "minLength": 40},
-    "permanent_invariants": {"type": "array", "minItems": 6, "items": {"type": "string"}, "uniqueItems": true},
+    "schema": {
+      "const": 1
+    },
+    "kind": {
+      "const": "MIR4XOperatingProgrammeV1"
+    },
+    "status": {
+      "const": "active"
+    },
+    "recorded_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 40
+    },
+    "permanent_invariants": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "work_packages": {
       "type": "array",
       "minItems": 12,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "outcome", "completion_boundary", "depends_on", "state"],
+        "required": [
+          "id",
+          "outcome",
+          "completion_boundary",
+          "depends_on",
+          "state"
+        ],
         "properties": {
-          "id": {"pattern": "^M(40|41|42|43|44|45|46)-[0-9]{2}$"},
-          "outcome": {"type": "string", "minLength": 8},
-          "completion_boundary": {"pattern": "^4\\.(?:0\\.x|[1-9][0-9]*\\.0|[1-9][0-9]*\\.0\\+)$"},
-          "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
-          "state": {"enum": ["complete", "active", "queued", "blocked-dependency"]}
+          "id": {
+            "pattern": "^M(40|41|42|43|44|45|46)-[0-9]{2}$"
+          },
+          "outcome": {
+            "type": "string",
+            "minLength": 8
+          },
+          "completion_boundary": {
+            "pattern": "^4\\.(?:0\\.x|[1-9][0-9]*\\.0|[1-9][0-9]*\\.0\\+)$"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "state": {
+            "enum": [
+              "complete",
+              "active",
+              "queued",
+              "blocked-dependency"
+            ]
+          }
         }
       }
     },
     "package_fixed_point": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["work_package", "phase", "target_results", "aggregate", "next_target", "package_cutover", "cutover_receipt"],
+      "required": [
+        "work_package",
+        "phase",
+        "target_results",
+        "aggregate",
+        "next_target",
+        "package_cutover",
+        "cutover_receipt"
+      ],
       "properties": {
-        "work_package": {"const": "M42-00"},
-        "phase": {"enum": ["M41-F2D", "M41-F2E"]},
+        "work_package": {
+          "const": "M42-00"
+        },
+        "phase": {
+          "enum": [
+            "M41-F2D",
+            "M41-F2E"
+          ]
+        },
         "target_results": {
           "type": "array",
           "minItems": 4,
@@ -42,37 +114,248 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["target", "state", "receipt"],
+            "required": [
+              "target",
+              "state",
+              "receipt"
+            ],
             "properties": {
-              "target": {"enum": ["f210", "f200", "f110", "f100"]},
-              "state": {"enum": ["complete", "pending"]},
-              "receipt": {"type": ["string", "null"]}
+              "target": {
+                "enum": [
+                  "f210",
+                  "f200",
+                  "f110",
+                  "f100"
+                ]
+              },
+              "state": {
+                "enum": [
+                  "complete",
+                  "pending"
+                ]
+              },
+              "receipt": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
             }
           }
         },
-        "aggregate": {"enum": ["pending", "complete"]},
-        "next_target": {"type": ["string", "null"], "enum": ["f210", "f200", "f110", "f100", null]},
-        "package_cutover": {"enum": ["blocked", "ready", "complete"]},
-        "cutover_receipt": {"type": ["string", "null"]}
+        "aggregate": {
+          "enum": [
+            "pending",
+            "complete"
+          ]
+        },
+        "next_target": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "f210",
+            "f200",
+            "f110",
+            "f100",
+            null
+          ]
+        },
+        "package_cutover": {
+          "enum": [
+            "blocked",
+            "ready",
+            "complete"
+          ]
+        },
+        "cutover_receipt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-    "outcome_trains": {"type": "array", "minItems": 5, "items": {"type": "object"}},
+    "outcome_trains": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object"
+      }
+    },
     "engine_channels": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["target", "authority", "selector", "state", "recurring_obligation"],
+        "required": [
+          "target",
+          "authority",
+          "selector",
+          "state",
+          "recurring_obligation"
+        ],
         "properties": {
-          "target": {"const": "f210"},
-          "authority": {"const": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json"},
-          "selector": {"const": "latest-installed-official-2.1-experimental"},
-          "state": {"const": "active-until-first-official-2.1-stable"},
-          "recurring_obligation": {"type": "string", "minLength": 40}
+          "target": {
+            "const": "f210"
+          },
+          "authority": {
+            "const": "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json"
+          },
+          "selector": {
+            "const": "latest-installed-official-2.1-experimental"
+          },
+          "state": {
+            "const": "active-until-first-official-2.1-stable"
+          },
+          "recurring_obligation": {
+            "type": "string",
+            "minLength": 40
+          }
         }
       }
     },
-    "wip_limits": {"type": "object"}
+    "wip_limits": {
+      "type": "object"
+    },
+    "synthesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_manifest",
+        "plan_document",
+        "release_baseline",
+        "request_ledger",
+        "component_destinations",
+        "historical_inventory",
+        "completion_states",
+        "noncompletion_states",
+        "preparation_objectives_hours",
+        "objectives_measured",
+        "heavy_engine_concurrency",
+        "tasks"
+      ],
+      "properties": {
+        "input_manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan_document": {
+          "type": "string",
+          "minLength": 1
+        },
+        "release_baseline": {
+          "type": "object"
+        },
+        "request_ledger": {
+          "type": "string",
+          "minLength": 1
+        },
+        "component_destinations": {
+          "type": "string",
+          "minLength": 1
+        },
+        "historical_inventory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "completion_states": {
+          "type": "array"
+        },
+        "noncompletion_states": {
+          "type": "array"
+        },
+        "preparation_objectives_hours": {
+          "type": "object"
+        },
+        "objectives_measured": {
+          "type": "boolean"
+        },
+        "heavy_engine_concurrency": {
+          "type": "integer"
+        },
+        "tasks": {
+          "type": "array",
+          "minItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "title",
+              "programme_mapping",
+              "depends_on",
+              "owner_domain",
+              "requests",
+              "acceptance",
+              "state",
+              "evidence"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^A[0-9]{2}$"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 8
+              },
+              "programme_mapping": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "depends_on": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "owner_domain": {
+                "type": "string",
+                "minLength": 1
+              },
+              "requests": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^(K2|BA)-[0-9]{2}$"
+                }
+              },
+              "acceptance": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "state": {
+                "enum": [
+                  "queued",
+                  "active",
+                  "blocked",
+                  "complete"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

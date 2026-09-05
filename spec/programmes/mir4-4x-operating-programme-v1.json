@@ -2,8 +2,8 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-05T12:00:00+10:00",
-  "objective": "Complete and release MIR 4.1 as the repository, package, tooling, test, documentation, and maintainability fixed point while preserving published 4.0.0 bytes and keeping every supported target independently provable.",
+  "recorded_at": "2026-09-06T00:00:00+10:00",
+  "objective": "Preserve published MIR 4.1 and convert retained capabilities into qualified bundled integrations, recoverable delivery, and independently admitted historical products through the existing semantic source and emitter.",
   "permanent_invariants": [
     "one semantic source",
     "one self-contained player ZIP per target",
@@ -17,33 +17,195 @@
     "F210 follows the latest installed official 2.1 experimental engine until the first official 2.1 stable transition, with exact identity per proof and a review task set for every engine or API change"
   ],
   "work_packages": [
-    {"id": "M40-00", "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure", "completion_boundary": "4.0.x", "depends_on": [], "state": "complete"},
-    {"id": "M40-01", "outcome": "Operate the release/4.0 patch lane and cross-lane defect protocol", "completion_boundary": "4.0.x", "depends_on": ["M40-00"], "state": "active"},
-    {"id": "M41-00", "outcome": "Adopt the MIR 4.x operating, deployment, patch, and proof contracts", "completion_boundary": "4.1.0", "depends_on": ["M40-00"], "state": "complete"},
-    {"id": "M41-01", "outcome": "Make pull-request proof selection event, trust, and ref-topology aware", "completion_boundary": "4.1.0", "depends_on": ["M41-00"], "state": "complete"},
-    {"id": "M41-02", "outcome": "Converge GitHub rules, templates, security automation, and one required check", "completion_boundary": "4.1.0", "depends_on": ["M41-01"], "state": "complete"},
-    {"id": "M41-03", "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments", "completion_boundary": "4.1.0", "depends_on": ["M41-01"], "state": "complete"},
-    {"id": "M41-04", "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition", "completion_boundary": "4.1.0", "depends_on": ["M41-02"], "state": "complete"},
-    {"id": "M41-06", "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line", "completion_boundary": "4.1.0", "depends_on": ["M41-04"], "state": "complete"},
-    {"id": "M41-05", "outcome": "Route package-excluded documentation, then separate repository and package landing pages after package characterization", "completion_boundary": "4.1.0", "depends_on": ["M41-03"], "state": "complete"},
-    {"id": "M42-00", "outcome": "Establish one package source, deterministic overlays, one materializer, and four independently generated targets", "completion_boundary": "4.1.0", "depends_on": ["M41-03", "M41-06"], "state": "complete"},
-    {"id": "M42-01", "outcome": "Converge PowerShell behind one public CLI, one implementation per command, one release engine, one executable test authority, one proof catalogue, and five workflow purposes", "completion_boundary": "4.1.0", "depends_on": ["M42-00"], "state": "complete"},
-    {"id": "M42-02", "outcome": "Perform only reviewable behavior-preserving Lua and PowerShell decomposition behind characterized mutation boundaries", "completion_boundary": "4.1.0", "depends_on": ["M42-00", "M42-01"], "state": "complete"},
-    {"id": "M41-07", "outcome": "Retire every current-product authority bridge and retain only owned, tested, read-only, package-excluded historical compatibility paths", "completion_boundary": "4.1.0", "depends_on": ["M42-02"], "state": "complete"},
-    {"id": "M41-08", "outcome": "Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate to exact main readiness with only the human playtest gate remaining", "completion_boundary": "4.1.0", "depends_on": ["M41-07"], "state": "active"},
-    {"id": "M43-00", "outcome": "Admit integration-kernel and built-in ecosystem capabilities through exact contracts", "completion_boundary": "4.2.0", "depends_on": ["M41-08", "M42-01", "M42-02"], "state": "blocked-dependency"},
-    {"id": "M44-00", "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation", "completion_boundary": "4.3.0", "depends_on": ["M43-00"], "state": "blocked-dependency"},
-    {"id": "M45-00", "outcome": "Allocate a coherent external product outcome only when evidence supports it", "completion_boundary": "4.4.0+", "depends_on": ["M44-00"], "state": "blocked-dependency"},
-    {"id": "M46-00", "outcome": "Retain later MIR 4 work as unallocated evidence-led evolution", "completion_boundary": "4.4.0+", "depends_on": ["M45-00"], "state": "blocked-dependency"}
+    {
+      "id": "M40-00",
+      "outcome": "Preserve exact 4.0.0 refs, bytes, remote state, and restore closure",
+      "completion_boundary": "4.0.x",
+      "depends_on": [],
+      "state": "complete"
+    },
+    {
+      "id": "M40-01",
+      "outcome": "Operate the release/4.0 patch lane and cross-lane defect protocol",
+      "completion_boundary": "4.0.x",
+      "depends_on": [
+        "M40-00"
+      ],
+      "state": "active"
+    },
+    {
+      "id": "M41-00",
+      "outcome": "Adopt the MIR 4.x operating, deployment, patch, and proof contracts",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M40-00"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-01",
+      "outcome": "Make pull-request proof selection event, trust, and ref-topology aware",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-00"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-02",
+      "outcome": "Converge GitHub rules, templates, security automation, and one required check",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-01"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-03",
+      "outcome": "Generate source, target, GitHub, and Mod Portal narratives from change fragments",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-01"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-04",
+      "outcome": "Prove protected stable-to-dev exact-tree convergence during branch transition",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-02"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-06",
+      "outcome": "Establish main as latest stable and dev as the next-minor-or-major integration line",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-04"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-05",
+      "outcome": "Route package-excluded documentation, then separate repository and package landing pages after package characterization",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-03"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M42-00",
+      "outcome": "Establish one package source, deterministic overlays, one materializer, and four independently generated targets",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-03",
+        "M41-06"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M42-01",
+      "outcome": "Converge PowerShell behind one public CLI, one implementation per command, one release engine, one executable test authority, one proof catalogue, and five workflow purposes",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M42-00"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M42-02",
+      "outcome": "Perform only reviewable behavior-preserving Lua and PowerShell decomposition behind characterized mutation boundaries",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M42-00",
+        "M42-01"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-07",
+      "outcome": "Retire every current-product authority bridge and retain only owned, tested, read-only, package-excluded historical compatibility paths",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M42-02"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M41-08",
+      "outcome": "Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate to exact main readiness with only the human playtest gate remaining",
+      "completion_boundary": "4.1.0",
+      "depends_on": [
+        "M41-07"
+      ],
+      "state": "complete"
+    },
+    {
+      "id": "M43-00",
+      "outcome": "Integration kernel with qualified bundled K2 and Bob/Angel material slices and rolling dependency-valid ecosystem admissions",
+      "completion_boundary": "4.2.0",
+      "depends_on": [
+        "M41-08",
+        "M42-01",
+        "M42-02"
+      ],
+      "state": "active"
+    },
+    {
+      "id": "M44-00",
+      "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation",
+      "completion_boundary": "4.3.0",
+      "depends_on": [
+        "M43-00"
+      ],
+      "state": "blocked-dependency"
+    },
+    {
+      "id": "M45-00",
+      "outcome": "Allocate a coherent external product outcome only when evidence supports it",
+      "completion_boundary": "4.4.0+",
+      "depends_on": [
+        "M44-00"
+      ],
+      "state": "blocked-dependency"
+    },
+    {
+      "id": "M46-00",
+      "outcome": "Retain later MIR 4 work as unallocated evidence-led evolution",
+      "completion_boundary": "4.4.0+",
+      "depends_on": [
+        "M45-00"
+      ],
+      "state": "blocked-dependency"
+    }
   ],
   "package_fixed_point": {
     "work_package": "M42-00",
     "phase": "M41-F2E",
     "target_results": [
-      {"target": "f210", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json"},
-      {"target": "f200", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json"},
-      {"target": "f110", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json"},
-      {"target": "f100", "state": "complete", "receipt": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json"}
+      {
+        "target": "f210",
+        "state": "complete",
+        "receipt": "releases/migrations/MIR4-M41-F2D-F210-Runtime-Replay-Authority-EvolutionV1.json"
+      },
+      {
+        "target": "f200",
+        "state": "complete",
+        "receipt": "releases/migrations/MIR4-M41-F2D-F200-Runtime-Replay-Authority-EvolutionV1.json"
+      },
+      {
+        "target": "f110",
+        "state": "complete",
+        "receipt": "releases/migrations/MIR4-M41-F2D-F110-Runtime-Replay-Authority-EvolutionV1.json"
+      },
+      {
+        "target": "f100",
+        "state": "complete",
+        "receipt": "releases/migrations/MIR4-M41-F2D-F100-Runtime-Replay-Authority-EvolutionV1.json"
+      }
     ],
     "aggregate": "complete",
     "next_target": null,
@@ -51,11 +213,31 @@
     "cutover_receipt": "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json"
   },
   "outcome_trains": [
-    {"candidate": "4.0.x", "outcome": "Verified stable defects only", "release_required": false},
-    {"candidate": "4.1.0", "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets", "release_required": true},
-    {"candidate": "4.2.0", "outcome": "Integration kernel and rolling built-in ecosystem admissions", "release_required": false},
-    {"candidate": "4.3.0", "outcome": "Industrialized semantic selection, evidence lifecycle, recovery, measured release lanes, offline operation, and preservation", "release_required": false},
-    {"candidate": "4.4.0+", "outcome": "Unallocated until evidence supports a coherent external outcome", "release_required": false}
+    {
+      "candidate": "4.0.x",
+      "outcome": "Verified stable defects only",
+      "release_required": false
+    },
+    {
+      "candidate": "4.1.0",
+      "outcome": "Repository, package, tooling, test, documentation, and maintainability fixed point with four independently qualified targets",
+      "release_required": true
+    },
+    {
+      "candidate": "4.2.0",
+      "outcome": "Integration kernel and rolling built-in ecosystem admissions",
+      "release_required": false
+    },
+    {
+      "candidate": "4.3.0",
+      "outcome": "Industrialized semantic selection, evidence lifecycle, recovery, measured release lanes, offline operation, and preservation",
+      "release_required": false
+    },
+    {
+      "candidate": "4.4.0+",
+      "outcome": "Unallocated until evidence supports a coherent external outcome",
+      "release_required": false
+    }
   ],
   "engine_channels": [
     {
@@ -66,5 +248,424 @@
       "recurring_obligation": "Every observed version, binary, runtime API, prototype API, or changelog identity change materializes API, compatibility, implementation, functionality, fixture, performance, documentation, and stable-transition review tasks."
     }
   ],
-  "wip_limits": {"product_feature_trains": 1, "authority_migrations": 1, "stable_patch": 1, "broad_lua_refactor_before_M42_00": 0}
+  "wip_limits": {
+    "product_feature_trains": 1,
+    "authority_migrations": 1,
+    "stable_patch": 1,
+    "broad_lua_refactor_before_M42_00": 0
+  },
+  "synthesis": {
+    "input_manifest": "spec/programmes/inputs/synthesis-2026-09-05/manifest.json",
+    "plan_document": "docs/releases/mir4-integration-and-delivery-plan.md",
+    "release_baseline": {
+      "tag": "v4.1.0",
+      "release_id": 383203807,
+      "source": "3562377b520cccb071b97b3968946eae7024c950",
+      "published_at": "2026-09-05T09:55:54Z",
+      "human_acceptance": {
+        "f200": "direct-verification",
+        "f210": "release-specific-direct-playtest-waiver"
+      }
+    },
+    "request_ledger": "spec/programmes/inputs/synthesis-2026-09-05/REQUEST_LEDGER.json",
+    "component_destinations": "spec/programmes/inputs/synthesis-2026-09-05/COMPONENT_DELIVERY.json",
+    "historical_inventory": "spec/programmes/inputs/synthesis-2026-09-05/HISTORICAL_TARGET_MATRIX.json",
+    "completion_states": [
+      "implemented-and-qualified",
+      "native-owner-preserved-and-qualified"
+    ],
+    "noncompletion_states": [
+      "NOT_PRESENT",
+      "UNSUPPORTED",
+      "REVIEW_REQUIRED",
+      "ACQUISITION_BLOCKED",
+      "NOT_REPRODUCED_ON_LOCK"
+    ],
+    "preparation_objectives_hours": {
+      "minor": 24,
+      "patch": 6,
+      "hotfix": 1
+    },
+    "objectives_measured": false,
+    "heavy_engine_concurrency": 1,
+    "tasks": [
+      {
+        "id": "A00",
+        "title": "Reobserve baseline and obtain current task authority",
+        "programme_mapping": [
+          "M41-08"
+        ],
+        "depends_on": [],
+        "owner_domain": "release-state",
+        "requests": [],
+        "acceptance": [
+          "Preserve immutable 4.1",
+          "Observe current refs, channels and local custody",
+          "Keep F210 waiver classification"
+        ],
+        "state": "active",
+        "evidence": []
+      },
+      {
+        "id": "A01",
+        "title": "Reconcile current projections and bounded development epoch",
+        "programme_mapping": [
+          "M41-08",
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "repository-authority",
+        "requests": [],
+        "acceptance": [
+          "Historical receipts checked against historical objects",
+          "Current contracts permit bounded new edits",
+          "Resolve ProcessIR capture-status discrepancy",
+          "Preserve README and package authority"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-06/four-target-packages.json"
+        ]
+      },
+      {
+        "id": "A02",
+        "title": "Inventory retained code by product destination",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "component-inventory",
+        "requests": [],
+        "acceptance": [
+          "Every existing component gets a disposition",
+          "Trace source\u2192overlay\u2192ZIP",
+          "Compare retained branch deltas semantically",
+          "No blanket graduation"
+        ],
+        "state": "active",
+        "evidence": []
+      },
+      {
+        "id": "A03",
+        "title": "Capture exact K2/K2SO request locks",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "integration-intake",
+        "requests": [
+          "K2-01"
+        ],
+        "acceptance": [
+          "Exact engine/mod/settings/package identities",
+          "Native reference tech and reachable labs",
+          "Old admitted and current lineage kept separate"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A04",
+        "title": "Resolve science/phase/lab contract and real reproducer",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A01",
+          "A03"
+        ],
+        "owner_domain": "science-integration",
+        "requests": [
+          "K2-01"
+        ],
+        "acceptance": [
+          "Port controlled witnesses to repository test authority",
+          "Test configured, additive, required, reduce/skip/default cases",
+          "Verify final emission, early/late progression and nonzero-progress reload",
+          "Classify patch eligibility from actual reproduction"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-06/science-modules.json",
+          "spec/programmes/evidence/synthesis-2026-09-06/k2-campaign.json",
+          "spec/programmes/evidence/synthesis-2026-09-06/k2-science-reloads.json"
+        ]
+      },
+      {
+        "id": "A05",
+        "title": "K2 material route and ownership admissions",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A01",
+          "A02",
+          "A03"
+        ],
+        "owner_domain": "material-family",
+        "requests": [
+          "K2-02",
+          "K2-03",
+          "K2-04",
+          "K2-05",
+          "K2-06",
+          "K2-07"
+        ],
+        "acceptance": [
+          "Exact route mapping",
+          "Native imersite owner preserved where valid",
+          "No upstream denial override",
+          "Paving recoloring/returns analyzed",
+          "Packaged and qualified per request"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A06",
+        "title": "Bob/Angel acquisition and sixteen-family admissions",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A01",
+          "A02"
+        ],
+        "owner_domain": "material-family",
+        "requests": [
+          "BA-01",
+          "BA-02",
+          "BA-03",
+          "BA-04",
+          "BA-05",
+          "BA-06",
+          "BA-07",
+          "BA-08",
+          "BA-09",
+          "BA-10",
+          "BA-11",
+          "BA-12",
+          "BA-13",
+          "BA-14",
+          "BA-15",
+          "BA-16"
+        ],
+        "acceptance": [
+          "Intake can start read-only immediately after A00",
+          "Separate valid Bob/Angel/combined locks",
+          "Shared mechanism, individual recipe obligations",
+          "Absent subjects do not count as delivered",
+          "Ownership/progression/save proof"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A07",
+        "title": "Import permanent operator repair",
+        "programme_mapping": [
+          "maintenance",
+          "M44-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "release-operator",
+        "requests": [],
+        "acceptance": [
+          "Inspect supplied repaired files; do not execute historical controller",
+          "Consolidated preflight",
+          "Durable intent and recovery",
+          "Bound draft-ID/tag/seal/assets",
+          "Zero/one/many, timeout, kill and local-copy fault injection"
+        ],
+        "state": "active",
+        "evidence": []
+      },
+      {
+        "id": "A08",
+        "title": "Choose and rehearse exact promotion topology",
+        "programme_mapping": [
+          "maintenance",
+          "M44-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "release-policy",
+        "requests": [],
+        "acceptance": [
+          "Accepted policy resolves main/dev divergence",
+          "No routine ruleset suspension",
+          "Checks/no-force/no-delete isolated from any accepted workflow exception",
+          "Test ref drift and recovery"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A09",
+        "title": "Run scoped unattended implementation pilot",
+        "programme_mapping": [
+          "M43-00",
+          "M44-00"
+        ],
+        "depends_on": [
+          "A01",
+          "A02"
+        ],
+        "owner_domain": "automation",
+        "requests": [],
+        "acceptance": [
+          "One writer per domain",
+          "Existing verification planner selected first",
+          "No evaluator weakening or publisher secrets",
+          "Bounded retries and persistent checkpoints",
+          "Measure interventions on actual integrations"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A10",
+        "title": "Extend process certificates only for consumer-required routes",
+        "programme_mapping": [
+          "M43-00",
+          "M44-00"
+        ],
+        "depends_on": [
+          "A02"
+        ],
+        "owner_domain": "process-safety",
+        "requests": [],
+        "acceptance": [
+          "Exact model/bonus domain",
+          "Known-safe and known-unsafe controls",
+          "Evidence resolved independently",
+          "Unknown values not coerced to zero/safe",
+          "No second emitter"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A11",
+        "title": "Graduate consumer-used API/MEP/runtime/Inspector slices",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A02"
+        ],
+        "owner_domain": "public-contracts",
+        "requests": [],
+        "acceptance": [
+          "Real independent consumer",
+          "Negative/unknown-field and resource-bound tests",
+          "Target capability and migration tests",
+          "Read-only surfaces remain read-only",
+          "Not a universal prerequisite for data-only material changes"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A12",
+        "title": "Broaden dependency-valid ecosystem coverage",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A04",
+          "A05",
+          "A06"
+        ],
+        "owner_domain": "ecosystem-admission",
+        "requests": [],
+        "acceptance": [
+          "Scouting can start after A00; these dependencies concern reuse/integration",
+          "AAI/BZ/IR/SE/Py/planets/held-out corpus kept visible",
+          "Exact locks and scoped claims",
+          "No invalid mega-mod combination",
+          "Every deferment has actual blocker/next proof"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A13",
+        "title": "Calibrate impact selection and evidence reuse",
+        "programme_mapping": [
+          "M44-00"
+        ],
+        "depends_on": [
+          "A01"
+        ],
+        "owner_domain": "assurance",
+        "requests": [],
+        "acceptance": [
+          "Bound all semantic inputs and evaluator trust",
+          "Reuse unaffected propositions without cross-target runtime borrowing",
+          "Periodic broader hold-out comparison",
+          "Same-fingerprint contradiction quarantined",
+          "Report actual cold/reused times"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A14",
+        "title": "Prepare next coherent release or eligible stable correction",
+        "programme_mapping": [
+          "M43-00",
+          "maintenance"
+        ],
+        "depends_on": [
+          "A01",
+          "A07",
+          "A08"
+        ],
+        "owner_domain": "release-coordinator",
+        "requests": [],
+        "acceptance": [
+          "Declare actual feature/target commitment at freeze",
+          "Join every selected slice required proof, not every unrelated future feature",
+          "Exact source/package/operator identities",
+          "Current required acceptance; no recycled F210 waiver",
+          "Immutable publication only under authorization",
+          "Primary-checkout verified dist/notes/index"
+        ],
+        "state": "queued",
+        "evidence": []
+      },
+      {
+        "id": "A15",
+        "title": "Historical capability probes and independently admitted targets",
+        "programme_mapping": [
+          "M45-00"
+        ],
+        "depends_on": [
+          "A00",
+          "A02"
+        ],
+        "owner_domain": "historical-targets",
+        "requests": [],
+        "acceptance": [
+          "Preserve all 22 lines as inventory",
+          "Exact lawful engine custody",
+          "Loader/effect/version transport proof",
+          "Clean-install baseline where no published predecessor",
+          "No current-target release blockage"
+        ],
+        "state": "queued",
+        "evidence": []
+      }
+    ]
+  }
 }
