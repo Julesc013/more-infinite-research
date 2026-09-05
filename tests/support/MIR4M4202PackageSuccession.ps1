@@ -83,6 +83,16 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
         $ExpectedBindingSha[$path]=[string]$binding.current_sha256
       }
     }
+    . (Join-Path $RepoRoot 'tools/lib/mir4/PostReleaseDocumentation.ps1')
+    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot
+    if($null -ne $documentation){
+      foreach($binding in @($documentation.bindings)){
+        $path=[string]$binding.path
+        if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
+        if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path]){return $false}
+        $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+      }
+    }
     return $true
   }catch{return $false}
 }
@@ -122,6 +132,13 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
       $readinessBinding=@($readiness.evolved_bindings|Where-Object{[string]$_.path-ceq$inventoryRelativePath})
       if($readinessBinding.Count-ne1-or[string]$readinessBinding[0].previous_sha256-cne$expectedInventorySha){return $null}
       $expectedInventorySha=[string]$readinessBinding[0].current_sha256
+    }
+    . (Join-Path $RepoRoot 'tools/lib/mir4/PostReleaseDocumentation.ps1')
+    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot
+    if($null -ne $documentation){
+      $documentationBinding=@($documentation.bindings|Where-Object{[string]$_.path -ceq $inventoryRelativePath})
+      if($documentationBinding.Count -ne 1 -or [string]$documentationBinding[0].previous_sha256 -cne $expectedInventorySha){return $null}
+      $expectedInventorySha=[string]$documentationBinding[0].current_sha256
     }
     $inventoryPath=Join-Path $RepoRoot $inventoryRelativePath
     if((Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-cne$expectedInventorySha){return $null}

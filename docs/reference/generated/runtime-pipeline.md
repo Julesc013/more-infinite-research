@@ -13,7 +13,7 @@ superseded_by: []
 # Generated Runtime Pipeline
 
 <!-- BEGIN GENERATED MIR PIPELINE -->
-This package-excluded reference is generated from `prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+This package-excluded reference is generated from `src/mod/families/modern/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
 
 | Phase | Command | Kind | Implementation | Depends on |
 | ---: | --- | --- | --- | --- |

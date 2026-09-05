@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$defaultsPath = Join-Path $RepoRoot "prototypes\mir\settings\defaults.lua"
+$defaultsPath = Join-Path $RepoRoot "src\mod\families\modern\prototypes\mir\settings\defaults.lua"
 $documentPath = Join-Path $RepoRoot "docs\reference\generated\stream-defaults.md"
 $defaultsText = Get-Content -Raw -LiteralPath $defaultsPath
 
@@ -97,7 +97,7 @@ $lines.Add('')
 $lines.Add('# Generated Stream Defaults')
 $lines.Add('')
 $lines.Add('<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->')
-$lines.Add('This package-excluded effective-default table is generated from `prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
+$lines.Add('This package-excluded effective-default table is generated from `src/mod/families/modern/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
 $lines.Add('')
 $lines.Add('| Stream | Enabled | Base cost | Growth | Time | Max |')
 $lines.Add('| --- | --- | ---: | ---: | ---: | --- |')
@@ -108,6 +108,17 @@ foreach ($row in $rows) {
 $lines.Add('<!-- END GENERATED MIR STREAM DEFAULTS -->')
 $generated = ($lines -join "`n") + "`n"
 
+$readmePath = Join-Path $RepoRoot 'README.md'
+$readmeText = [IO.File]::ReadAllText($readmePath).Replace("`r`n", "`n")
+$projectionPattern = '(?s)<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->.*?<!-- END GENERATED MIR STREAM DEFAULTS -->'
+$projection = [regex]::Match($generated, $projectionPattern).Value
+if ([regex]::Matches($readmeText, $projectionPattern).Count -ne 1 -or -not $projection) { throw 'README must retain exactly one generated STREAM DEFAULTS reference.' }
+$projectedReadme = [regex]::Replace($readmeText, $projectionPattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($match) $projection })
+if ($Check) {
+  if ($readmeText -cne $projectedReadme) { throw 'README STREAM DEFAULTS reference is stale; run its documentation writer.' }
+} else {
+  [IO.File]::WriteAllText($readmePath, $projectedReadme, [Text.UTF8Encoding]::new($false))
+}
 if ($Check) {
   if (-not (Test-Path -LiteralPath $documentPath -PathType Leaf)) {
     throw "Generated stream-default reference is missing; run tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1."
