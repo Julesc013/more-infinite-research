@@ -241,7 +241,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^todo\\.md$", "^tools/commands/docs/Update-MIRDocumentationIndex\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$"],
+      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^todo\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
       "tests": ["docs.check"]
     },
     {

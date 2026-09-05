@@ -1585,9 +1585,18 @@ function Test-MIR4PreFreezeAuthorities {
     }
     $authorityHashes[$path]=[string]$binding.sha256;$authorityHashModes[$path]=[string]$binding.hash_mode;$sourceFreezePaths[$path]=$true
   }
-  $trackedSourceFreezeChanges=@(& git -C $repo diff --name-only ([string]$sourceFreeze.base.commit) --)
+  # The published freeze receipt authenticates its original source. An explicit,
+  # separately validated documentation successor binds every later changed path.
+  . (Join-Path $repo 'tools/lib/mir4/PostReleaseDocumentation.ps1')
+  $postReleaseDocumentation=Get-MIR4PostReleaseDocumentation -RepoRoot $repo
+  if($null -ne $postReleaseDocumentation){
+    $trackedSourceFreezeChanges=@(& git -C $repo diff --name-only ([string]$sourceFreeze.base.commit) ([string]$postReleaseDocumentation.base_commit) --)
+  }else{
+    $trackedSourceFreezeChanges=@(& git -C $repo diff --name-only ([string]$sourceFreeze.base.commit) --)
+  }
   if($LASTEXITCODE-ne0){throw '[mir4-prefreeze-m41-source-freeze-diff]'}
   $untrackedSourceFreezeChanges=@(& git -C $repo ls-files --others --exclude-standard)
+  if($null -ne $postReleaseDocumentation){$untrackedSourceFreezeChanges=@()} # Already checked against the exact successor scope.
   if($LASTEXITCODE-ne0){throw '[mir4-prefreeze-m41-source-freeze-untracked]'}
   $actualSourceFreezePaths=@($trackedSourceFreezeChanges+$untrackedSourceFreezeChanges|ForEach-Object{([string]$_).Replace('\','/')}|Where-Object{$_-and$_-cne$sourceFreezeReceiptPath}|Sort-Object -Unique)
   $boundSourceFreezePaths=@($sourceFreezePaths.Keys|Sort-Object)
@@ -1601,6 +1610,18 @@ function Test-MIR4PreFreezeAuthorities {
   $priorReceiptPath=$sourceFreezeReceiptPath
   $priorReceiptSha256=Get-MIR4PreFreezeFileSha256 (Join-Path $repo $priorReceiptPath)
 
+  if($null -ne $postReleaseDocumentation){
+    foreach($binding in @($postReleaseDocumentation.bindings)){
+      $path=[string]$binding.path
+      if($authorityHashes.ContainsKey($path)){
+        if([string]$authorityHashModes[$path] -cne 'canonical-text-v1' -or
+           [string]$binding.previous_sha256 -cne [string]$authorityHashes[$path]){
+          throw "[mir4-post-release-docs-authority-chain] $path"
+        }
+        $authorityHashes[$path]=[string]$binding.current_sha256
+      }
+    }
+  }
   $staleAuthorityBindings = @()
   foreach ($binding in $authorityHashes.GetEnumerator()) {
     $full = Join-Path $repo ([string]$binding.Key)

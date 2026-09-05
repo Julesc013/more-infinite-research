@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR4PostReleaseDocumentationV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "recorded_at",
+    "authorization",
+    "base_commit",
+    "tag_object",
+    "predecessor",
+    "package_source_sha256",
+    "package_visible_delta",
+    "release_transition_authority",
+    "bindings",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "kind": {
+      "const": "MIR4PostReleaseDocumentationV1"
+    },
+    "recorded_at": {
+      "type": "string"
+    },
+    "authorization": {
+      "const": "Maintainer requested restoration of the existing README detail and delivery into the primary checkout on 2026-09-05."
+    },
+    "base_commit": {
+      "const": "3562377b520cccb071b97b3968946eae7024c950"
+    },
+    "tag_object": {
+      "const": "9e5e63ef45b9d583d3f463fbfa737eb2c3a6b69f"
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "const": "releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[A-F0-9]{64}$"
+        }
+      }
+    },
+    "package_source_sha256": {
+      "const": "0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA"
+    },
+    "package_visible_delta": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "release_transition_authority": {
+      "const": false
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 17,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "previous_sha256",
+          "current_sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "previous_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-F0-9]{64}$"
+          },
+          "current_sha256": {
+            "type": "string",
+            "pattern": "^[A-F0-9]{64}$"
+          }
+        }
+      }
+    },
+    "record_sha256": {
+      "type": "string",
+      "pattern": "^[A-F0-9]{64}$"
+    }
+  },
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-post-release-documentation-v1.schema.json"
+}

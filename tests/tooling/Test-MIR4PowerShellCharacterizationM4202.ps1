@@ -373,6 +373,21 @@ if($null-ne$readiness){
   $expectedInventorySha=[string]$inventoryBinding[0].current_sha256
   $expectedInventoryDigest=[string](Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$receipt.inventory.path))|ConvertFrom-Json -Depth 100).digest
 }
+. (Join-Path $repo 'tools/lib/mir4/PostReleaseDocumentation.ps1')
+$documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $repo
+if($null -ne $documentation){
+  foreach($binding in @($documentation.bindings)){
+    $path=[string]$binding.path
+    if($expectedAuthoritySha.ContainsKey($path)){
+      Assert-MIR4M4202PowerShell ([string]$binding.previous_sha256 -ceq [string]$expectedAuthoritySha[$path]) "documentation-successor-authority-predecessor-$path"
+      $expectedAuthoritySha[$path]=[string]$binding.current_sha256
+    }
+  }
+  $inventoryBinding=@($documentation.bindings|Where-Object{[string]$_.path -ceq [string]$receipt.inventory.path})
+  Assert-MIR4M4202PowerShell ($inventoryBinding.Count -eq 1 -and [string]$inventoryBinding[0].previous_sha256 -ceq $expectedInventorySha) 'documentation-successor-inventory-predecessor'
+  $expectedInventorySha=[string]$inventoryBinding[0].current_sha256
+  $expectedInventoryDigest=[string](Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$receipt.inventory.path))|ConvertFrom-Json -Depth 100).digest
+}
 $inventoryPath=Join-Path $repo ([string]$receipt.inventory.path)
 $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 Assert-MIR4M4202PowerShell ([string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-ceq$expectedInventorySha-and[string]$inventory.digest-ceq$expectedInventoryDigest-and[int]$inventory.summary.unknown-eq0) 'inventory'

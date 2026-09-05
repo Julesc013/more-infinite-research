@@ -5,7 +5,6 @@ $script:MIR4RepositoryCharacterizationAuthorityPath = 'governance/repository/mig
 $script:MIR4RepositoryCharacterizationAuthoritySchemaPath = 'contracts/repository/mir4-repository-characterization-authority-v1.schema.json'
 $script:MIR4RepositoryCharacterizationBundleSchemaPath = 'contracts/repository/mir4-repository-characterization-bundle-v1.schema.json'
 $script:MIR4RepositoryCharacterizationDefaultOutput = 'build/reports/repository-characterization'
-$script:MIR4RepositoryCharacterizationExpectedReadme = '5E8C683E39E76B65487344221B947A0C9A0E04D463433C49C0DC4454F3CFA115'
 
 function ConvertTo-MIR4RepositoryCharacterizationJsonV1 {
   param([Parameter(Mandatory)]$Value)
@@ -58,6 +57,7 @@ function New-MIR4RepositoryCharacterizationBundleV1 {
   $authority = Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo
   $fixedPoint = Get-MIR4RepositoryFixedPointAuthority -RepoRoot $repo
   $packageSourceBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
+  $readmeBefore = Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md'
   $packageFiles = @(Get-MIRPackageSourceFiles -RepoRoot $repo)
   $packageSet = @{}; foreach ($path in $packageFiles) { $packageSet[[string]$path] = $true }
 
@@ -194,8 +194,8 @@ function New-MIR4RepositoryCharacterizationBundleV1 {
     'reader-writer-graph.json'=[ordered]@{schema=1;kind='MIR4ReaderWriterGraphV1';nodes=@($nodes.GetEnumerator() | Sort-Object Name | ForEach-Object { $_.Value });edges=@($edges | Sort-Object from,to,relation);inferred_from_source=$false;deletion_authorized=$false}
     'bridge-expiry.json'=[ordered]@{schema=1;kind='MIR4BridgeExpiryReportV1';bridges=@($bridges | Sort-Object migration_id,path);summary=[ordered]@{declared=$bridges.Count;retained_historical=@($bridges | Where-Object disposition -ceq 'retained-historical-compatibility').Count;retired=@($bridges | Where-Object disposition -ceq 'retired-reassigned').Count;current_product=@($bridges | Where-Object { [bool]$_['current_authority'] -or [bool]$_['current_semantic_use'] }).Count;dual_write_authority=@($bridges | Where-Object { [bool]$_['writable'] -and [bool]$_['current_authority'] }).Count;package_authority_bridge=@($bridges | Where-Object { [bool]$_['package_visible'] -or [string]$_['role'] -match 'package-authority' }).Count;release_current_state_authority_bridge=0;runtime_state_migration_authority_bridge=0;public_claim_authority_bridge=0;unowned=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['owner']) }).Count;unbounded=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['expiry_condition']) }).Count};deletion_authorized=$false}
     'physical-file-inventory.json'=[ordered]@{schema=1;kind='MIR4PhysicalFileInventoryV1';files=@($physicalRows);summary=[ordered]@{files=$physicalRows.Count;unknown=$unknownPaths.Count;package_visible=@($physicalRows | Where-Object package_visible).Count};ignored_outputs_excluded=$true;deletion_authorized=$false}
-    'package-membership.json'=[ordered]@{schema=1;kind='MIR4PackageMembershipInventoryV1';source_roots=@(Get-MIRPackageSourceRoots);files=@($packageRows);package_source_sha256=$packageSourceSha;expected_package_source_sha256=$packageSourceBefore;root_readme=[ordered]@{path='README.md';sha256=$readmeSha;expected_sha256=$script:MIR4RepositoryCharacterizationExpectedReadme;package_visible=$false;disposition='repository-documentation-package-excluded-m41-05b-complete'};repository_docs_package_excluded=$true;package_mutation_authorized=$false}
-    'documentation-routing.json'=[ordered]@{schema=1;kind='MIR4DocumentationRoutingInventoryV1';routes=[ordered]@{tutorials='docs/tutorials/README.md';how_to='docs/how-to/README.md';reference='docs/reference/README.md';explanation='docs/explanation/README.md'};markdown_files=$documentationRows.Count;front_matter_status_counts=$statusCounts;root_readme_sha256=$readmeSha;root_readme_byte_stable=($readmeSha -ceq $script:MIR4RepositoryCharacterizationExpectedReadme);root_readme_changed=$false;package_visible_delta=@()}
+    'package-membership.json'=[ordered]@{schema=1;kind='MIR4PackageMembershipInventoryV1';source_roots=@(Get-MIRPackageSourceRoots);files=@($packageRows);package_source_sha256=$packageSourceSha;expected_package_source_sha256=$packageSourceBefore;root_readme=[ordered]@{path='README.md';sha256=$readmeSha;expected_sha256=$readmeBefore;package_visible=$false;disposition='repository-documentation-package-excluded-m41-05b-complete'};repository_docs_package_excluded=$true;package_mutation_authorized=$false}
+    'documentation-routing.json'=[ordered]@{schema=1;kind='MIR4DocumentationRoutingInventoryV1';routes=[ordered]@{tutorials='docs/tutorials/README.md';how_to='docs/how-to/README.md';reference='docs/reference/README.md';explanation='docs/explanation/README.md'};markdown_files=$documentationRows.Count;front_matter_status_counts=$statusCounts;root_readme_sha256=$readmeSha;root_readme_byte_stable=($readmeSha -ceq $readmeBefore);root_readme_changed=$false;package_visible_delta=@()}
   }
 
   $reportDescriptors = @()
@@ -218,14 +218,14 @@ function New-MIR4RepositoryCharacterizationBundleV1 {
     source=[ordered]@{repository_fixed_point_sha256=(Get-MIRFileSha256 -Path (Join-Path $repo '.mir/control/repository-fixed-point.json'));migration_count=$migrations.Count;package_source_sha256=$packageSourceSha;root_readme_sha256=$readmeSha}
     reports=@($reportDescriptors)
     summary=[ordered]@{physical_files=$physicalRows.Count;authority_facts=$facts.Count;current_bindings=$currentBindings.Count;writers=$writers.Count;readers=$readers.Count;bridges=$bridges.Count;package_files=$packageRows.Count}
-    invariants=[ordered]@{unknown_paths=$unknownPaths.Count;duplicate_current_bindings=$duplicateCurrent.Count;invalid_current_writer_bindings=$invalidCurrentWriterBindings.Count;current_product_bridges=@($bridges | Where-Object { [bool]$_['current_authority'] -or [bool]$_['current_semantic_use'] }).Count;unowned_bridges=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['owner']) }).Count;unbounded_bridges=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['expiry_condition']) }).Count;package_source_unchanged=($packageSourceSha -ceq $packageSourceBefore);root_readme_byte_stable=($readmeSha -ceq $script:MIR4RepositoryCharacterizationExpectedReadme);deletion_authorized=$false}
+    invariants=[ordered]@{unknown_paths=$unknownPaths.Count;duplicate_current_bindings=$duplicateCurrent.Count;invalid_current_writer_bindings=$invalidCurrentWriterBindings.Count;current_product_bridges=@($bridges | Where-Object { [bool]$_['current_authority'] -or [bool]$_['current_semantic_use'] }).Count;unowned_bridges=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['owner']) }).Count;unbounded_bridges=@($bridges | Where-Object { [string]::IsNullOrWhiteSpace([string]$_['expiry_condition']) }).Count;package_source_unchanged=($packageSourceSha -ceq $packageSourceBefore);root_readme_byte_stable=($readmeSha -ceq $readmeBefore);deletion_authorized=$false}
     transition_gate=[ordered]@{source_move=$false;package_cutover=$false;readme_rewrite=$false;bridge_retirement=$false;version_allocation=$false;publication=$false}
   }
   if ($unknownPaths.Count -ne 0) { throw "[mir4-repository-characterization-unknown-paths] $($unknownPaths.path -join ',')" }
   if ($duplicateCurrent.Count -ne 0) { throw '[mir4-repository-characterization-duplicate-current-binding]' }
   if ($invalidCurrentWriterBindings.Count -ne 0) { throw '[mir4-repository-characterization-invalid-current-writer-binding]' }
   if ($packageSourceSha -cne $packageSourceBefore) { throw '[mir4-repository-characterization-package-source-mutation]' }
-  if ($readmeSha -cne $script:MIR4RepositoryCharacterizationExpectedReadme) { throw '[mir4-repository-characterization-root-readme]' }
+  if ($readmeSha -cne $readmeBefore) { throw '[mir4-repository-characterization-root-readme]' }
   return [pscustomobject][ordered]@{bundle=$bundle;reports=$reportValues}
 }
 
