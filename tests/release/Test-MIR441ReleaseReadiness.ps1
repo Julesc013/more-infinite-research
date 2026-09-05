@@ -31,6 +31,7 @@ $compilerFixtureText=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-co
 $f210UpgradeData=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/data.lua'))
 $f210UpgradeSettings=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings-updates.lua'))
 $releaseNarrativeText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/ReleaseNarratives.ps1'))
+$technicalSealText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/readiness/TechnicalSeal.ps1'))
 $releaseNarrativePlan=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/governance/MIR4-Source-Changelog-PlanV1.json')|ConvertFrom-Json -Depth 100
 $acceptedChangePaths=@(Get-ChildItem -LiteralPath (Join-Path $repo 'changes/unreleased') -Filter '*.json' -File|ForEach-Object{
   $record=Get-Content -Raw -LiteralPath $_.FullName|ConvertFrom-Json -Depth 100
@@ -50,6 +51,7 @@ Assert-MIR441Test (Test-MIR441ForbiddenPackageRelativePath -Path 'docs/maintaine
 Assert-MIR441Test (-not(Test-MIR441ForbiddenPackageRelativePath -Path 'prototypes/docs.lua')) 'mir441-package-membership-file-name-allowed'
 Assert-MIR441Test ($releaseNarrativeText-match'PackageIdentity[.]ps1'-and$releaseNarrativeText-match'CanonicalJsonV1[.]ps1'-and$releaseNarrativeText-match'Get-MIR4CanonicalDigestV1') 'mir441-release-narrative-self-contained-dependencies'
 Assert-MIR441Test ((@($releaseNarrativePlan.change_fragments|Sort-Object)-join'|')-ceq($acceptedChangePaths-join'|')) 'mir441-release-narrative-complete-accepted-inventory'
+Assert-MIR441Test ($technicalSealText-match'Get-MIR441PublicEngineIdentity'-and$technicalSealText-match'targets=@\(\$publicTargetRows\)'-and$technicalSealText-match'outputs=@\(\$publicTargetRows\)') 'mir441-public-release-metadata-redacted'
 
 $external=Assert-MIR441ExternalRoot -RepoRoot $repo -Path 'E:\MIR-READINESS-TEST' -Name test
 Assert-MIR441Test ($external-ceq'E:\MIR-READINESS-TEST') 'mir441-external-root-positive'
@@ -84,8 +86,11 @@ try{
 
 foreach($script in @(@{name='prepare';text=Get-MIR441PrepareTagScriptText},@{name='playtest';text=Get-MIR441PlaytestScriptText},@{name='finalize';text=Get-MIR441FinalizeScriptText})){$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseInput([string]$script.text,[ref]$tokens,[ref]$errors);Assert-MIR441Test ($errors.Count-eq0) "mir441-generated-$([string]$script.name)-syntax"}
 $tagScript=Get-MIR441PrepareTagScriptText;$finalizer=Get-MIR441FinalizeScriptText
+$publicEngine=Get-MIR441PublicEngineIdentity -Engine ([pscustomobject][ordered]@{path='C:\private\factorio.exe';version='2.1.17';binary_sha256=('A'*64);api_version='2.0'})
+Assert-MIR441Test (-not($publicEngine.PSObject.Properties.Name-ccontains'path')-and[string]$publicEngine.version-ceq'2.1.17'-and[string]$publicEngine.binary_sha256-ceq('A'*64)) 'mir441-public-engine-identity-excludes-local-path'
 Assert-MIR441Test ($tagScript-match' tag -s '-and$tagScript-match'verify-tag'-and$tagScript-notmatch'push origin') 'mir441-signed-tag-prepared-not-pushed'
 Assert-MIR441Test ($finalizer-match'--verify-tag'-and$finalizer-match'--draft'-and$finalizer-match'release download'-and$finalizer-notmatch'Invoke-MIRValidation|New-MIR4TargetPackage|candidate-build|qualification') 'mir441-finalizer-publisher-cannot-build'
+Assert-MIR441Test ($finalizer-match'manifest_asset[.]label'-and$finalizer-match'github_assets\)[.]Count\+1'-and$finalizer-match'mir441-final-public-manifest-byte') 'mir441-finalizer-publishes-and-verifies-manifest'
 
 & (Join-Path $repo 'tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1') -RepoRoot $repo -Check|Out-Null
 & (Join-Path $repo 'tools/commands/mir4/Update-MIR441PackagePresentationAuthority.ps1') -RepoRoot $repo -Check|Out-Null
