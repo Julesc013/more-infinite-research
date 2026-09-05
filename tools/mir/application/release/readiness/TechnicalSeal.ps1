@@ -21,6 +21,15 @@ function Get-MIR441DirectoryIdentities {
   }
 }
 
+function Get-MIR441PublicEngineIdentity {
+  param([Parameter(Mandatory)]$Engine)
+  $public=[ordered]@{}
+  foreach($property in $Engine.PSObject.Properties){
+    if([string]$property.Name-cne'path'){$public[[string]$property.Name]=$property.Value}
+  }
+  return [pscustomobject]$public
+}
+
 function New-MIR441DeterministicDirectoryArchive {
   param([Parameter(Mandatory)][string]$SourceRoot,[Parameter(Mandatory)][string]$ArchivePath)
   Add-Type -AssemblyName System.IO.Compression
@@ -109,15 +118,18 @@ if(([string](git -C $RepoRoot cat-file -t "refs/tags/$tag")).Trim()-cne'tag'-or(
 git -C $RepoRoot verify-tag $tag|Out-Null;if($LASTEXITCODE-ne0){throw '[mir441-final-tag-signature]'}
 if(@(git -C $RepoRoot ls-remote --tags origin "refs/tags/$tag").Count-ne0){throw '[mir441-final-remote-tag-present]'}
 git -C $RepoRoot push origin "refs/tags/$tag:refs/tags/$tag";if($LASTEXITCODE-ne0){throw '[mir441-final-tag-push]'}
-$manifest=Get-Content -Raw (Join-Path $window 'mir-4.1.0.release.json')|ConvertFrom-Json -Depth 50
+$manifestPath=Join-Path $window 'mir-4.1.0.release.json';$manifest=Get-Content -Raw $manifestPath|ConvertFrom-Json -Depth 50
 $releaseArgs=@('release','create',$tag,'--verify-tag','--draft','--title',[string]$manifest.title,'--notes-file',(Join-Path $window 'release-copy/github-release.md'))
 foreach($asset in @($manifest.github_assets)){$releaseArgs+=((Join-Path $window ([string]$asset.path))+'#'+[string]$asset.label)}
+$releaseArgs+=($manifestPath+'#'+[string]$manifest.manifest_asset.label)
 & gh @releaseArgs;if($LASTEXITCODE-ne0){throw '[mir441-final-release-create]'}
-$remote=gh release view $tag --json isDraft,assets,url|ConvertFrom-Json -Depth 30;if(-not[bool]$remote.isDraft-or@($remote.assets).Count-ne@($manifest.github_assets).Count){throw '[mir441-final-release-inventory]'}
+$remote=gh release view $tag --json isDraft,assets,url|ConvertFrom-Json -Depth 30;if(-not[bool]$remote.isDraft-or@($remote.assets).Count-ne(@($manifest.github_assets).Count+1)){throw '[mir441-final-release-inventory]'}
 gh release edit $tag --draft=false --latest;if($LASTEXITCODE-ne0){throw '[mir441-final-release-publish]'}
 $readback=Join-Path $window 'public-readback';New-Item -ItemType Directory -Force -Path $readback|Out-Null;gh release download $tag --dir $readback --clobber;if($LASTEXITCODE-ne0){throw '[mir441-final-release-download]'}
 foreach($asset in @($manifest.github_assets)){$path=Join-Path $readback ([IO.Path]::GetFileName([string]$asset.path));if((Get-FileHash $path -Algorithm SHA256).Hash-cne[string]$asset.sha256){throw "[mir441-final-public-byte] $([string]$asset.path)"}}
-$receipt=[ordered]@{schema=1;kind='MIR441PublicationReceiptV1';status='GITHUB-PUBLISHED-PUBLIC-BYTES-VERIFIED';tag=$tag;source_commit=$source;url=[string]$remote.url;assets=@($manifest.github_assets);mod_portal_payloads=@($manifest.mod_portal_payloads);published_at=[DateTimeOffset]::UtcNow.ToString('o')}
+$manifestReadback=Join-Path $readback ([IO.Path]::GetFileName([string]$manifest.manifest_asset.path));if((Get-FileHash $manifestReadback -Algorithm SHA256).Hash-cne(Get-FileHash $manifestPath -Algorithm SHA256).Hash){throw '[mir441-final-public-manifest-byte]'}
+$manifestIdentity=[ordered]@{path=[string]$manifest.manifest_asset.path;label=[string]$manifest.manifest_asset.label;sha256=(Get-FileHash $manifestPath -Algorithm SHA256).Hash.ToUpperInvariant();bytes=(Get-Item -LiteralPath $manifestPath).Length}
+$receipt=[ordered]@{schema=1;kind='MIR441PublicationReceiptV1';status='GITHUB-PUBLISHED-PUBLIC-BYTES-VERIFIED';tag=$tag;source_commit=$source;url=[string]$remote.url;assets=@($manifest.github_assets)+@($manifestIdentity);mod_portal_payloads=@($manifest.mod_portal_payloads);published_at=[DateTimeOffset]::UtcNow.ToString('o')}
 [IO.File]::WriteAllText((Join-Path $window 'publication-receipt.json'),(($receipt|ConvertTo-Json -Depth 50)+"`n"),[Text.UTF8Encoding]::new($false));$receipt
 '@
 }
@@ -141,12 +153,13 @@ function New-MIR441TechnicalSeal {
     if([string]$asset.sha256-cne[string]$target.archive.archive_sha256){throw "[mir441-seal-asset-copy] $id"}
     $targetRows.Add([pscustomobject][ordered]@{target=$id;distribution_version=[string]$target.distribution_version;asset=$asset;content_sha256=[string]$target.archive.content_sha256;entry_count=[int]$target.archive.entry_count;engine=$target.engine;qualification='passed';independent_verification='passed'})
   }
+  $publicTargetRows=@($targetRows|ForEach-Object{[pscustomobject][ordered]@{target=$_.target;distribution_version=$_.distribution_version;asset=$_.asset;content_sha256=$_.content_sha256;entry_count=$_.entry_count;engine=(Get-MIR441PublicEngineIdentity -Engine $_.engine);qualification=$_.qualification;independent_verification=$_.independent_verification}})
   $checksumLines=@($targetRows|Sort-Object target|ForEach-Object{"$([string]$_.asset.sha256)  $([IO.Path]::GetFileName([string]$_.asset.path))"});Write-MIR441Text -Path (Join-Path $window 'SHA256SUMS.txt') -Text (($checksumLines-join"`n")+"`n")
-  $qualification=[ordered]@{schema=1;kind='MIR441ReleaseQualificationSummaryV1';status='GO-4TARGET-TECHNICAL';source=$source;targets=@($targetRows);human_playtest='pending';publication_authorized=$false};Write-MIR441Json -Value $qualification -Path (Join-Path $window 'mir-4.1.0.qualification.json')
+  $qualification=[ordered]@{schema=1;kind='MIR441ReleaseQualificationSummaryV1';status='GO-4TARGET-TECHNICAL';source=$source;targets=@($publicTargetRows);human_playtest='pending';publication_authorized=$false};Write-MIR441Json -Value $qualification -Path (Join-Path $window 'mir-4.1.0.qualification.json')
   $labels=@($targetRows|ForEach-Object{[ordered]@{path=[string]$_.asset.path;label="MIR $([string]$_.distribution_version) for Factorio $([string]$_.engine.version)"}});Write-MIR441Json -Value ([ordered]@{schema=1;kind='MIR441AssetLabelMapV1';assets=$labels}) -Path (Join-Path $window 'asset-labels.json')
   Write-MIR441Json -Value ([ordered]@{schema=1;kind='MIR441KnownIssuesV1';release='4.1.0';issues=@();status='none-declared-at-seal'}) -Path (Join-Path $window 'known-issues.json')
   $upgrade=@('# MIR 4.1.0 upgrade guide','','Back up important saves and install only the package matching the running Factorio line.','','| Target | Upgrade |','| --- | --- |')+@($contract.targets|ForEach-Object{"| $([string]$_.target) | $([string]$_.predecessor) to $([string]$_.distribution_version) |"})+@('','Each direct transition has passed fresh load, migration/configuration reconciliation, first reload, second reload, settings, research state, stable-ID, runtime-state, and target-omission checks.');Write-MIR441Text -Path (Join-Path $window 'upgrade-guide.md') -Text (($upgrade-join"`n")+"`n")
-  $provenance=[ordered]@{schema=1;kind='MIR441ReleaseProvenanceV1';source=$source;package_source_sha256=[string]$independent.package_source_sha256;materializer='tools/mir/application/package/TargetMaterializer.ps1';contract=(Get-MIR441FileIdentity -Path (Join-Path $repo 'governance/release/mir4-4.1-release-readiness-v1.json') -RelativePath 'governance/release/mir4-4.1-release-readiness-v1.json');outputs=@($targetRows);builder='MIR441ReleaseReadiness';build_isolation='serial-external-roots-cleaned-after-custody'};Write-MIR441Json -Value $provenance -Path (Join-Path $window 'mir-4.1.0.provenance.json')
+  $provenance=[ordered]@{schema=1;kind='MIR441ReleaseProvenanceV1';source=$source;package_source_sha256=[string]$independent.package_source_sha256;materializer='tools/mir/application/package/TargetMaterializer.ps1';contract=(Get-MIR441FileIdentity -Path (Join-Path $repo 'governance/release/mir4-4.1-release-readiness-v1.json') -RelativePath 'governance/release/mir4-4.1-release-readiness-v1.json');outputs=@($publicTargetRows);builder='MIR441ReleaseReadiness';build_isolation='serial-external-roots-cleaned-after-custody'};Write-MIR441Json -Value $provenance -Path (Join-Path $window 'mir-4.1.0.provenance.json')
   $components=[ordered]@{schema=1;kind='MIR441ComponentInventoryV1';release='4.1.0';source_authorities=@('src/mod','targets','tools/mir/application/package/TargetMaterializer.ps1');player_assets=@($targetRows|ForEach-Object{[ordered]@{target=$_.target;path=$_.asset.path;sha256=$_.asset.sha256;entries=$_.entry_count}});developer_kit=[ordered]@{included=$false;reason='No separately supported SDK distribution is required by this player release; repository developer surfaces remain source-controlled and package-excluded.'}};Write-MIR441Json -Value $components -Path (Join-Path $window 'mir-4.1.0.components.json')
   Write-MIR441Text -Path (Join-Path $window 'tag-message.txt') -Text "MIR 4.1.0`n`nFour-target generated package and repository fixed point.`nSource: $([string]$source.commit)`n"
   Write-MIR441Text -Path (Join-Path $window 'Prepare-MIR410SignedTag.ps1') -Text (Get-MIR441PrepareTagScriptText)
@@ -158,7 +171,7 @@ function New-MIR441TechnicalSeal {
     $label=switch($name){'SHA256SUMS.txt'{'SHA-256 checksums'};'mir-4.1.0.qualification.json'{'Four-target qualification summary'};'mir-4.1.0.provenance.json'{'Build provenance'};default{'Component inventory'}}
     $githubAssets+=,[ordered]@{path=$i.path;label=$label;sha256=$i.sha256;bytes=$i.bytes}
   }
-  $releaseManifest=[ordered]@{schema=1;kind='MIR441ReleaseManifestV1';status='technically-qualified-unpublished';title='MIR 4.1.0';tag='v4.1.0';source=$source;github_assets=$githubAssets;mod_portal_payloads=@($targetRows|ForEach-Object{[ordered]@{target=$_.target;package=$_.asset.path;copy="release-copy/$([string]$_.target)/mod-portal.md"}});human_playtest='pending';tagging_authorized=$false;publication_authorized=$false};Write-MIR441Json -Value $releaseManifest -Path (Join-Path $window 'mir-4.1.0.release.json')
+  $releaseManifest=[ordered]@{schema=1;kind='MIR441ReleaseManifestV1';status='technically-qualified-unpublished';title='MIR 4.1.0';tag='v4.1.0';source=$source;github_assets=$githubAssets;manifest_asset=[ordered]@{path='mir-4.1.0.release.json';label='Release manifest'};mod_portal_payloads=@($targetRows|ForEach-Object{[ordered]@{target=$_.target;package=$_.asset.path;copy="release-copy/$([string]$_.target)/mod-portal.md"}});human_playtest='pending';tagging_authorized=$false;publication_authorized=$false};Write-MIR441Json -Value $releaseManifest -Path (Join-Path $window 'mir-4.1.0.release.json')
   $core=@(Get-MIR441DirectoryIdentities -Root $window)
   $seal=[ordered]@{schema=1;kind='MIR441TechnicalSealV1';status='MIR41-TECHNICALLY-SEALED-AWAITING-EXACT-MAIN-PROMOTION';release=[ordered]@{source_version='4.1.0';tag='v4.1.0'};source=$source;targets=@($targetRows);package_source_sha256=[string]$independent.package_source_sha256;package_authority=(Get-MIR441FileIdentity -Path (Join-Path $repo 'targets/package-authority.json') -RelativePath 'targets/package-authority.json');narrative_result_digest=[string]$narratives.result_digest;independent_verification=(Get-MIR441FileIdentity -Path (Join-Path $evidence 'independent-verification.json') -RelativePath '../independent-verification.json');sealed_objects=$core;human_playtest='pending';tag_object='pending-local-signing-custody';tagging_authorized=$false;publication_authorized=$false;sealed_at=[DateTimeOffset]::UtcNow.ToString('o');record_sha256=''}
   $seal.record_sha256=Get-MIR4BootstrapRecordSha256 -Record ([pscustomobject]$seal);Write-MIR441Json -Value $seal -Path (Join-Path $window 'technical-seal.json')
