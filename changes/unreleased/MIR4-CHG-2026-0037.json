@@ -25,6 +25,6 @@
   "release_surfaces": {"source_changelog":"omit","target_changelog":"omit","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
   "references": [
     {"kind":"document","value":"docs/maintainer/mir4-4.1-release-readiness.md"},
-    {"kind":"test","value":"tests/release/Test-MIR441ReleaseReadiness.ps1"}
+    {"kind":"document","value":"tests/release/Test-MIR441ReleaseReadiness.ps1"}
   ]
 }

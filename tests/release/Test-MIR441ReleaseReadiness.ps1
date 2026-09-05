@@ -30,6 +30,12 @@ $resumeText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/relea
 $compilerFixtureText=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-compiler-contracts/data-final-fixes.lua'))
 $f210UpgradeData=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/data.lua'))
 $f210UpgradeSettings=[IO.File]::ReadAllText((Join-Path $repo 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/settings-updates.lua'))
+$releaseNarrativeText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/ReleaseNarratives.ps1'))
+$releaseNarrativePlan=Get-Content -Raw -LiteralPath (Join-Path $repo 'releases/governance/MIR4-Source-Changelog-PlanV1.json')|ConvertFrom-Json -Depth 100
+$acceptedChangePaths=@(Get-ChildItem -LiteralPath (Join-Path $repo 'changes/unreleased') -Filter '*.json' -File|ForEach-Object{
+  $record=Get-Content -Raw -LiteralPath $_.FullName|ConvertFrom-Json -Depth 100
+  if([string]$record.status-ceq'accepted'){[IO.Path]::GetRelativePath($repo,$_.FullName).Replace('\','/')}
+}|Sort-Object)
 Assert-MIR441Test ($resourceText-match'EnumerateFiles'-and$resourceText-match'Write-MIR441Json'-and$resourceText-match'resource-hard-stop'-and$commonText-match'AppendAllText'-and$commonText-match'Assert-MIR441CleanTrackedSource') 'mir441-streaming-resource-governor'
 Assert-MIR441Test ($buildText-notmatch'ForEach-Object\s+-Parallel|Start-Job|Start-ThreadJob'-and$buildText-match'foreach\(\$target') 'mir441-serial-materializer'
 Assert-MIR441Test ($buildText-match"-SourceVersion '4[.]1[.]0'"-and$materializerText-match'\$info[.]version\s*=\s*\[string\]\$identity[.]distribution_version') 'mir441-candidate-version-materialized-from-intent'
@@ -38,6 +44,12 @@ Assert-MIR441Test ($qualificationText-match'fresh-\$slug[.]checkpoint[.]json'-an
 Assert-MIR441Test ($compilerFixtureText-match'\^4%[.]\[01\]%[.]%d\+\$'-and$compilerFixtureText-notmatch'\^4%[.]0%[.]%d\+\$') 'mir441-compiler-contract-package-succession'
 Assert-MIR441Test ($f210UpgradeData-match'mir-fixture-assert-upgrade-4-0-21000-to-4-1-21000'-and$f210UpgradeData-notmatch'mir-fixture-assert-upgrade-3-2-11-to-4-0-21000') 'mir441-upgrade-fixture-current-applicability'
 Assert-MIR441Test ($f210UpgradeSettings-match'missing 4[.]0[.]21000 to 4[.]1[.]21000 upgrade setting'-and$f210UpgradeSettings-notmatch'missing 3[.]2[.]11 to 4[.]0[.]21000 upgrade setting') 'mir441-upgrade-fixture-current-diagnostic'
+Assert-MIR441Test (-not(Test-MIR441ForbiddenPackageRelativePath -Path 'prototypes/mir/domain/evidence/compiler_evidence.lua')) 'mir441-package-membership-nested-evidence-allowed'
+Assert-MIR441Test (Test-MIR441ForbiddenPackageRelativePath -Path 'evidence/internal.json') 'mir441-package-membership-top-evidence-rejected'
+Assert-MIR441Test (Test-MIR441ForbiddenPackageRelativePath -Path 'docs/maintainer/internal.md') 'mir441-package-membership-top-docs-rejected'
+Assert-MIR441Test (-not(Test-MIR441ForbiddenPackageRelativePath -Path 'prototypes/docs.lua')) 'mir441-package-membership-file-name-allowed'
+Assert-MIR441Test ($releaseNarrativeText-match'PackageIdentity[.]ps1'-and$releaseNarrativeText-match'CanonicalJsonV1[.]ps1'-and$releaseNarrativeText-match'Get-MIR4CanonicalDigestV1') 'mir441-release-narrative-self-contained-dependencies'
+Assert-MIR441Test ((@($releaseNarrativePlan.change_fragments|Sort-Object)-join'|')-ceq($acceptedChangePaths-join'|')) 'mir441-release-narrative-complete-accepted-inventory'
 
 $external=Assert-MIR441ExternalRoot -RepoRoot $repo -Path 'E:\MIR-READINESS-TEST' -Name test
 Assert-MIR441Test ($external-ceq'E:\MIR-READINESS-TEST') 'mir441-external-root-positive'
