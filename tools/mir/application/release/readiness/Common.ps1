@@ -70,3 +70,12 @@ function Assert-MIR441CleanTrackedSource {
   if($LASTEXITCODE-ne0){throw '[mir441-git-status]'}
   if($dirty.Count-ne0){throw '[mir441-source-dirty]'}
 }
+
+function Assert-MIR441MainAncestor {
+  param([Parameter(Mandatory)][string]$RepoRoot,[string]$Revision='HEAD')
+  $main=(& git -C $RepoRoot rev-parse --verify refs/remotes/origin/main).Trim()
+  if($LASTEXITCODE-ne0-or$main-notmatch'^[a-f0-9]{40}$'){throw '[mir441-main-ancestry-ref]'}
+  & git -C $RepoRoot merge-base --is-ancestor $main $Revision
+  if($LASTEXITCODE-ne0){throw "[mir441-main-ancestry-required] main=$main revision=$Revision"}
+  return $main
+}

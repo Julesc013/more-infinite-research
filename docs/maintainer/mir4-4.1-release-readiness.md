@@ -35,6 +35,12 @@ Keep work and evidence on admitted external roots. The system-drive hard stop is
 
 The monitor appends samples to JSON Lines rather than retaining them in memory. Directory measurement streams file metadata. Each expensive operation runs in a fresh process. Successful expanded work is deleted only after the accepted archive, summary, and custody identity are verified; failed or ambiguous work is retained for classification. Cleanup must pass an absolute containment check and must never target a dirty worktree, unique evidence, public package, or unexplained path.
 
+## Stable-line ancestry precondition
+
+Candidate construction fails before materialization unless the exact local `origin/main` object is an ancestor of the proposed source. MIR 4.1 required one historical lineage reconciliation because the post-4.0 stable commits and the continuing development line shared content but not ancestry. The reconciliation preserves the reviewed development tree, adds exact stable `main` as an ancestor, rewrites neither accepted line, and restores the non-forced exact-promotion precondition. Of the 96 paths changed on stable `main` after the common base, 44 were already byte-identical on `dev`; the remaining paths had evolved under the accepted 4.1 programme, and all eight retired validation paths had registered canonical successors under `tests/`.
+
+This is a one-time ancestry repair, not permission to merge older-lane content wholesale into a newer product line. Subsequent stable corrections continue to require an explicit semantic forward-port disposition.
+
 ## Commands
 
 ```powershell
