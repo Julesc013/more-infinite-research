@@ -8,9 +8,12 @@ Set-StrictMode -Version Latest
 if($Check){$existing=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot;if($null -eq $existing){throw 'No documentation successor is recorded'};Write-Host '[ok] post-release documentation record verified';return}
 $relative='releases/migrations/MIR4-M41-Readme-RestorationV1.json'
 $recordPath=Join-Path $RepoRoot $relative
-# Once a receipt is committed, preserve it. A later change needs a successor.
-& git -C $RepoRoot cat-file -e ('HEAD:'+$relative) 2>$null
-if($LASTEXITCODE -eq 0){throw 'The committed documentation receipt is immutable; create a successor for later work.'}
+# An unmerged PR may revise its draft record; Git retains every prior revision.
+# Once it reaches either protected line, preserve it and require a successor.
+foreach($protectedRef in @('refs/heads/main','refs/heads/dev','refs/remotes/origin/main','refs/remotes/origin/dev','refs/tags/v4.1.0')){
+  & git -C $RepoRoot cat-file -e ($protectedRef+':'+$relative) 2>$null
+  if($LASTEXITCODE -eq 0){throw 'The protected documentation receipt is immutable; create a successor for later work.'}
+}
 . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
 $null=Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot
 $base='3562377b520cccb071b97b3968946eae7024c950'

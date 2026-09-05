@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4PostReleaseDocumentationV1",
-  "recorded_at": "2026-09-05T11:09:13.8105696+00:00",
+  "recorded_at": "2026-09-05T11:28:02.3990322+00:00",
   "authorization": "Maintainer requested restoration of the existing README detail and delivery into the primary checkout on 2026-09-05.",
   "base_commit": "3562377b520cccb071b97b3968946eae7024c950",
   "tag_object": "9e5e63ef45b9d583d3f463fbfa737eb2c3a6b69f",
@@ -16,7 +16,7 @@
     {
       "path": ".mir/assurance.json",
       "previous_sha256": "C8D128C6BFECB57A190DCB65AB69D37F03FF28384CE2F5484722308864185290",
-      "current_sha256": "310623491B9B9B9B39D8FCB0B3E71E6F916A14E642D06979F4F8BEB9C1C06200"
+      "current_sha256": "074DA277D4C9BCF3B1A6505047F724154807C21A44C08E43B4F89E0CF8A56F58"
     },
     {
       "path": "AGENTS.md",
@@ -41,7 +41,7 @@
     {
       "path": "governance/automation/mir4-command-inventory-v1.json",
       "previous_sha256": "E75BD8244F72CAC5E461B0ADAE0D5AB969B52D4F36330D670AA1387455A5EBBE",
-      "current_sha256": "649DB9BB7B1DE3C03DF2990D35E46F4BEB2277D9A386AF67C367052FAF1276A1"
+      "current_sha256": "ABF27C2596AA1C658E136DCE76E82E541B9AAD26E3D60D2086175ECBB05B3716"
     },
     {
       "path": "README.md",
@@ -71,7 +71,7 @@
     {
       "path": "tools/commands/docs/Update-MIRPostReleaseDocumentation.ps1",
       "previous_sha256": null,
-      "current_sha256": "2FC19928FF73C618F3BCF97B10EBE10DBBD4EDD6401E08B6A5B9F4C62B72B608"
+      "current_sha256": "017A01649D8D85712B51CC368EF72EE23AB9D2B1DFE37C631ADFE12A7A633F2C"
     },
     {
       "path": "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
@@ -94,5 +94,5 @@
       "current_sha256": "392A8E983D814921A10109FC8A6422F518EF755E652BB54EBF0D7816230FB8E9"
     }
   ],
-  "record_sha256": "398A8CC9E76A0DC5ED3BDFB84FD823B6C4D3B7244FB5E50322639B3FAFDB2A4F"
+  "record_sha256": "2DA7199EF9F52FA0130E55FE698E991F9E46268E19CBFDEF04CDBD89E67B43C3"
 }

@@ -2195,9 +2195,9 @@
     {
       "path": "tools/commands/docs/Update-MIRPostReleaseDocumentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "2FC19928FF73C618F3BCF97B10EBE10DBBD4EDD6401E08B6A5B9F4C62B72B608",
+      "sha256": "017A01649D8D85712B51CC368EF72EE23AB9D2B1DFE37C631ADFE12A7A633F2C",
       "hash_mode": "canonical-text-v1",
-      "lines": 44,
+      "lines": 47,
       "package_visible": false
     },
     {
@@ -5538,5 +5538,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:529bf22f83fb43159e1cb397af5be6d7d0908e39610fd96feb36a5c18766ea4e"
+  "digest": "sha256:da2e476c7d809279a8c0b597456b7a4e41555f5644ada312c1747967644b1607"
 }
