@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "scope": "controlled-material-process-guard-not-whole-ecosystem-proof",
+  "assertions": 12,
+  "engine_version": "Version: 2.1.17 (build 87315, win64, steam)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.1.17-0",
+  "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+  "test_sha256": "A0B29B12892E5DDCFC6AE8B93E1DC4F495A2EA3D69B0755654249D31EF27121E",
+  "modules": [
+    {
+      "sha256": "99E25349BF5AEFE17A97A3397CED8549428939AED626B01BB0B26FC13EB49E0C",
+      "path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
+    }
+  ],
+  "log_sha256": "EA85529E4967D382D6A16BF50D09473FC9D9DCDB96B1409DB3F29A3E7EFD14C7"
+}

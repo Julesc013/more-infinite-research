@@ -14,8 +14,15 @@ foreach($f in $m.files) {
  if((Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash -ine $f.sha256 -or (Get-Item -LiteralPath $full).Length -ne $f.bytes) { throw "[synthesis-input-identity] $($f.path)" }
 }
 $requests=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $p.synthesis.request_ledger) | ConvertFrom-Json -Depth 100
-$expected=@(1..7 | ForEach-Object { 'K2-{0:D2}' -f $_ })+@(1..16 | ForEach-Object { 'BA-{0:D2}' -f $_ })
-if(@(Compare-Object ($expected | Sort-Object) @($requests.requests.id | Sort-Object)).Count -ne 0) { throw '[synthesis-exact-23-requests]' }
+$originalExpected=@(1..7 | ForEach-Object { 'K2-{0:D2}' -f $_ })+@(1..16 | ForEach-Object { 'BA-{0:D2}' -f $_ })
+$expected=@($requests.requests.id)
+if($expected.Count -ne 66 -or @($expected | Sort-Object -Unique).Count -ne 66) { throw '[community-exact-66-requests]' }
+if(@($originalExpected | Where-Object { $_ -notin $expected }).Count -ne 0) { throw '[community-original-requests-lost]' }
+foreach($request in @($requests.requests | Where-Object id -in $originalExpected)) {
+  if($request.original_request.id -cne $request.id) { throw '[community-original-attribution-lost]' }
+}
+$scienceRequest=@($requests.requests | Where-Object id -eq 'K2-01')[0]
+if($scienceRequest.requested_outcome -notmatch '^Retire early science' -or $scienceRequest.original_complaint -notmatch 'retained') { throw '[community-request-direction]' }
 $components=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $p.synthesis.component_destinations) | ConvertFrom-Json
 $platform=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/platform/mir4-preview-v0/platform.json') | ConvertFrom-Json
 if(@(Compare-Object @($platform.components.id | Sort-Object) @($components.components.id | Sort-Object)).Count -ne 0) { throw '[synthesis-component-coverage]' }
@@ -59,3 +66,21 @@ if($date -cne $p.recorded_at.Substring(0,10)) { throw '[synthesis-authored-date]
 if((Get-MIRCPAuthoredDate -Timestamp '2026-09-06T00:00:00+10:00') -cne '2026-09-06' -or
    (Get-MIRCPAuthoredDate -Timestamp '2026-09-05T14:00:00Z') -cne '2026-09-05') { throw '[synthesis-timezone-regression]' }
 if(@(Get-Content -LiteralPath (Join-Path $RepoRoot 'todo.md') | Where-Object { $_ -ceq "Generated: $date" }).Count -ne 1) { throw '[synthesis-queue-date]' }
+
+# Development outcomes are exact source/receipt bindings, never support authority.
+$community=Get-Content -Raw (Join-Path $RepoRoot 'spec/programmes/evidence/community-2026-09-06/outcomes.json') | ConvertFrom-Json -Depth 100
+if($community.release_candidate_ready -or $community.release_authority -or $community.campaigns.Count -ne 3) { throw '[community-evidence-scope]' }
+foreach($binding in @($community.material_source_bindings)+@($community.browser_source_bindings)+@($community.runtime_receipts)) {
+ if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $binding.path)).Hash -cne $binding.sha256) { throw "[community-evidence-binding] $($binding.path)" }
+}
+$manifest=Get-Content -Raw (Join-Path $RepoRoot 'src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json') | ConvertFrom-Json -Depth 100
+$declarations=@($requests.requests | Where-Object { $null -ne $_.PSObject.Properties['material_route_declaration'] })
+if($declarations.Count -ne 22) { throw '[community-material-accounting]' }
+foreach($request in $declarations) {
+ $identity='recipe-prod-'+$request.material_route_declaration.stream+'-1'
+ if(($manifest | ConvertTo-Json -Depth 100) -notmatch [regex]::Escape($identity)) { throw "[community-material-identity] $identity" }
+ if($request.material_route_declaration.infinite_continuation -cne 'not-implemented' -or $request.qualification.Count -eq 0) { throw '[community-material-false-completion]' }
+}
+$source=Get-Content -Raw (Join-Path $RepoRoot 'src/mod/package-source.json') | ConvertFrom-Json -Depth 100
+if(@($source.bindings | Where-Object source_path -Like 'tests/*').Count -ne 0) { throw '[community-experiment-package-leak]' }
+Write-Output 'Community source bindings, exact receipts, 22 stable material declarations and prototype package exclusion passed.'

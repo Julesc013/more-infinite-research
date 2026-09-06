@@ -1,0 +1,71 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0046",
+  "status": "draft",
+  "change_type": "added",
+  "summary": "Add a personal research/settings browser and guarded finite material research to modern development targets.",
+  "details": [
+    "Browse All/Finite/Infinite research, ingredients, effect ownership and grouped settings; enqueue through the native permission-checked force API.",
+    "Export effective startup settings through the existing validated MIRSET1 restart-required profile path.",
+    "Declare all 22 requested materials using exact recipe identities and the existing emitter; default to three 2% tiers and reject explicit productivity denial or recipe return paths.",
+    "Capture 14 Bob material streams and retained K2 imersite powder; preserve native owners and report withheld or absent routes explicitly.",
+    "Keep optional Car economy and damage-driven maintenance prototypes outside player packages; record open current-environment, continuation and multiplayer qualification."
+  ],
+  "semantic_domains": [
+    "research-browser",
+    "recipe-productivity",
+    "compatibility",
+    "runtime"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Modern bundled browser and finite material declarations; exact qualification remains scoped."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Modern bundled browser and finite material declarations; exact qualification remains scoped."
+    },
+    {
+      "target": "F110",
+      "disposition": "omitted-by-capability",
+      "reason": "Legacy sources omit the browser and retain their existing material behavior."
+    },
+    {
+      "target": "F100",
+      "disposition": "omitted-by-capability",
+      "reason": "Legacy sources omit the browser and retain their existing material behavior."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "changed",
+    "migration": "unknown",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-community-outcomes-2026-09-06.md"
+    }
+  ]
+}

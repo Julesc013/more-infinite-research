@@ -82,7 +82,7 @@ The original spelling, IDs, acceptance lists, and unresolved prototype identitie
 
 | Request | Requested outcome |
 | --- | --- |
-| K2-01 | Red, Green, Military/Black and Blue science retained on late-game MIR productivity research |
+| K2-01 | Retire early science from applicable late K2/K2SO research under its exact phase policy; preserve early research and reachable labs |
 | K2-02 | Rare Metals |
 | K2-03 | Immersite |
 | K2-04 | Sillicon |
@@ -202,3 +202,9 @@ The promotion controller reads effective GitHub rules, refuses routine protectio
 `pwsh tools/mir.ps1 release deliver --manifest <file> --source-root <directory>` copies an existing exact inventory into primary-checkout `dist`. Its JSON manifest has `schema: 1`, a `release_id`, and `files` rows containing `source_path`, `destination_path`, and SHA-256 `sha256`. Intent and completion records live under `build/delivery/<release_id>`. Interrupted copies resume without rebuilding, and mismatched destination material is preserved as a blocking conflict. Source/remote synchronization remains a separate required completion check.
 
 A03–A06 still require the affected save/version identification and individual route/ownership qualification. A08 requires an accepted and rehearsed prospective promotion topology. A09–A15 remain dependency-ordered product and proof work with explicit acceptance obligations. No request ledger row is relabeled delivered merely because this development slice merges. The draft change fragment remains unallocated until its required release qualification is complete.
+
+## Community intake of 6 September 2026
+
+The existing programme now owns [66 distinct requests](../../spec/programmes/community-requests.json). The immutable 23-request input preserves original attribution; the active ledger carries corrected requested outcomes, accepted mechanisms, substitutes and remaining qualification obligations. A16 covers the bundled personal research/settings browser, A17 pipe manufacturing and early progression, A18 optional runtime probes, A19 exact ecosystem admissions, and A20 existing-capability audits and upstream gaps. Optional experiments do not block core outcomes. An implementation or load pass does not establish support or a release candidate.
+
+The [community implementation outcomes](mir4-community-outcomes-2026-09-06.md) record the bundled browser, exact finite material captures, withheld routes and optional prototypes. These scoped results do not close the remaining 4.2 mission.

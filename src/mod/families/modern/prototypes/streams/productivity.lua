@@ -50,7 +50,7 @@ local native_owner_settings_note = {
   "mod-setting-description.mir-note-native-owner-managed-stream"
 }
 
-return {
+local streams = {
   research_copper = {
     items={"copper-plate"},
     icon_item="copper-plate",
@@ -741,3 +741,51 @@ return {
     }}
   }}
 }
+
+
+local function material_family(item, routes, mod_names)
+  return {
+    required_items = {item},
+    icon_item = item,
+    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. item}},
+    ui_visibility = {mode = "visible-if-mods-any", mods_any = mod_names, hidden_reason = "material-ecosystem-not-active"},
+    identity_state = "stable-unreleased",
+    science_packs = "derive-from-unlocks",
+    prerequisites = "derive-from-unlocks",
+    base_cost = 200,
+    growth_factor = 2,
+    research_time = 30,
+    max_level = 3,
+    require_acyclic_process = true,
+    groups = {{change = 0.02, recipe_patterns = exact_recipe_patterns(routes), reject_explicit_productivity_denial = true}}
+  }
+end
+
+-- Separate requested materials share policy, never translated-name matching.
+streams.research_material_aluminium = material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_gold = material_family("bob-gold-plate", {"bob-gold-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_lead = material_family("bob-lead-plate", {"bob-lead-plate", "bob-lead-plate-2"}, {"bobplates", "angelssmelting"})
+streams.research_material_nickel = material_family("bob-nickel-plate", {"bob-nickel-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_platinum = material_family("bob-platinum-plate", {"bob-platinum-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_silver = material_family("bob-silver-plate", {"bob-silver-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_tin = material_family("bob-tin-plate", {"bob-tin-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_titanium = material_family("bob-titanium-plate", {"bob-titanium-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_zinc = material_family("bob-zinc-plate", {"bob-zinc-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_bronze = material_family("bob-bronze-alloy", {"bob-bronze-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_brass = material_family("bob-brass-alloy", {"bob-brass-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", {"bob-gunmetal-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_invar = material_family("bob-invar-alloy", {"bob-invar-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", {"bob-cobalt-steel-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_nitinol = material_family("bob-nitinol-alloy", {"bob-nitinol-alloy"}, {"bobplates", "angelssmelting"})
+streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
+streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"})
+streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}, {"Krastorio2", "Krastorio2-spaced-out"})
+streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
+streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
+streams.research_material_white_paving = material_family("kr-white-reinforced-plate", {"kr-white-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
+
+-- Tin smelting is available initially on the exact Bob core lock.
+streams.research_material_tin.science_packs = {"automation-science-pack"}
+
+return streams

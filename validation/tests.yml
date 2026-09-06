@@ -3848,7 +3848,11 @@
         "spec/programmes/**",
         "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
         "spec/platform/mir4-preview-v0/platform.json",
-        "tests/mir4/Test-MIR4IntegrationProgramme.ps1"
+        "tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+        "spec/programmes/community-requests.json",
+        "spec/programmes/evidence/community-2026-09-06/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
+        "src/mod/families/modern/prototypes/streams/productivity.lua"
       ]
     },
     {
@@ -3919,6 +3923,47 @@
       "inputs": [
         "tools/mir/application/release/readiness/Promotion.ps1",
         "tests/release/Test-MIR4PromotionRecovery.ps1"
+      ]
+    },
+    {
+      "id": "runtime.research-browser",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRResearchBrowser.ps1",
+        "tests/runtime/research_browser.lua",
+        "tests/runtime/browser_fixture_data.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/settings_profile.lua",
+        "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "src/mod/package-source.json"
+      ]
+    },
+    {
+      "id": "runtime.material-route-guard",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1",
+      "requires_factorio": true,
+      "inputs": [
+        "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tests/compiler/material_routes.lua"
+      ]
+    },
+    {
+      "id": "runtime.optional-probes",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIROptionalProbes.ps1",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIROptionalProbes.ps1",
+        "tests/runtime/optional_runtime_probe.lua",
+        "tests/runtime/optional_runtime_services.lua"
       ]
     }
   ]

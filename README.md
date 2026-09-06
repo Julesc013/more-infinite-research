@@ -6,6 +6,10 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
+## Development research browser
+
+The 4.2 development packages for Factorio 2.1 and 2.0 bundle an MIR Research Browser. Open it with the MIR button or `/mir-research`. Personal All/Finite/Infinite filters, ID/family search, pages and a native queue mirror leave force research state unchanged. The enqueue button checks current availability and permissions. The same screen groups effective settings by technology; startup values require a restart, and profile export uses the existing MIRSET1 import setting. Exact multiplayer qualification and detailed omitted-route explanations remain open in the [community request ledger](spec/programmes/community-requests.json).
+
 ## MIR 4.0 Whole-Platform Genesis
 
 MIR 4.0 established the shared product line. **[MIR 4.1.0 is now published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the detailed research and settings model below while separating editable package source, target overlays, repository documentation, and release evidence.

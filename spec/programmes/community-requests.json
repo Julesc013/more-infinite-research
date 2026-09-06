@@ -1,0 +1,3516 @@
+{
+  "schema": 1,
+  "kind": "MIR4CommunityRequests",
+  "status": "active-request-authority-not-support-evidence",
+  "prepared_on": "2026-09-06",
+  "predecessor": "spec/programmes/inputs/synthesis-2026-09-05/REQUEST_LEDGER.json",
+  "intake": {
+    "archive_sha256": "04e04db65ba8d4e24e8f8aba73bc66244882eab633d27d63c4d47544cd42ea32",
+    "manifest": {
+      "schema": 1,
+      "prepared_on": "2026-09-06",
+      "kind": "MIR42CommunityPlanPack",
+      "implementation_performed": false,
+      "engine_qualification_performed": false,
+      "files": [
+        {
+          "path": "EXECUTION_DAG.json",
+          "bytes": 2166,
+          "sha256": "a484d45907b0119b39166e52e6f8f69f207ddab4485ea54d6c5d840a68917c83"
+        },
+        {
+          "path": "IMPLEMENTATION_PROMPT.md",
+          "bytes": 5672,
+          "sha256": "133d7a934fde1c598bf77e28c944726fb87662b05860603fbaa295178d9ca7fa"
+        },
+        {
+          "path": "README.md",
+          "bytes": 773,
+          "sha256": "72aa3a73898e145852e5d872ca27c1b0b9e71e70c6100863ae72b09af3555449"
+        },
+        {
+          "path": "REPORT.md",
+          "bytes": 32501,
+          "sha256": "faa296e3c32b575002bd35367b09b638a9e44a907e101cb770440028ad6c89cf"
+        },
+        {
+          "path": "REQUEST_LEDGER.json",
+          "bytes": 68734,
+          "sha256": "975cbfc0fc056fe7cc761e80146208e8aea9e0e6eb0a3f87869d359381bc7943"
+        },
+        {
+          "path": "SOURCES.json",
+          "bytes": 15638,
+          "sha256": "8f1674227fc67117d0ddb48182db45341034c0e7ea854ed8c4e7de622ebd8ed5"
+        },
+        {
+          "path": "validate_pack.py",
+          "bytes": 1316,
+          "sha256": "64492623bff8414d035127f8a7f336228ee6c0da9446a01181a290f98a11055c"
+        }
+      ]
+    },
+    "source_register": {
+      "schema": 1,
+      "sources": [
+        {
+          "title": "User-supplied Reddit discussion",
+          "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
+          "basis": "Pasted conversation, not a fresh complete thread capture. Relative comment ages are not treated as absolute dates.",
+          "id": "P1",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "User-supplied K2/K2SO Mod Portal discussion",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6a4e8c6884594f98390cc27e",
+          "basis": "Pasted player requests and maintainer replies.",
+          "id": "P2",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Current integration and delivery plan",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/docs/releases/mir4-integration-and-delivery-plan.md",
+          "basis": "Connected GitHub read pinned to the observed dev commit.",
+          "id": "R1",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Modern productivity catalogue",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/productivity.lua",
+          "basis": "Connected GitHub source read; declarations alone are not exact-environment realization proof.",
+          "id": "R2",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Modern direct-effect catalogue",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/direct-effects.lua",
+          "basis": "Connected GitHub source read.",
+          "id": "R3",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Pipeline extent implementation/search evidence",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/f458598732e9583a9d086032ebfbe9ffb747d130/prototypes/mir/pipeline/extent.lua",
+          "basis": "Default-branch search located existing implementation and setting. Old root paths are not proposed as new authoring authorities.",
+          "id": "R4",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Factorio Modifier union",
+          "url": "https://lua-api.factorio.com/latest/types/Modifier.html",
+          "id": "S1",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaEntity",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaEntity.html",
+          "id": "S2",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaGui",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaGui.html",
+          "id": "S3",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaTechnology",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaTechnology.html",
+          "id": "S4",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaSettings",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaSettings.html",
+          "id": "S5",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio data lifecycle",
+          "url": "https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html",
+          "id": "S6",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio QualityPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/QualityPrototype.html",
+          "id": "S7",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaQualityPrototype",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaQualityPrototype.html",
+          "id": "S8",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio RocketSiloPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/RocketSiloPrototype.html",
+          "id": "S9",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaEntityPrototype",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaEntityPrototype.html",
+          "id": "S10",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio Item Weight",
+          "url": "https://lua-api.factorio.com/latest/auxiliary/item-weight.html",
+          "id": "S11",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio ItemPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/ItemPrototype.html",
+          "id": "S12",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio BeltStackSizeBonusModifier",
+          "url": "https://lua-api.factorio.com/latest/types/BeltStackSizeBonusModifier.html",
+          "id": "S13",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio UtilityConstants",
+          "url": "https://lua-api.factorio.com/latest/prototypes/UtilityConstants.html",
+          "id": "S14",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio InserterPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/InserterPrototype.html",
+          "id": "S15",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LoaderPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/LoaderPrototype.html",
+          "id": "S16",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio FluidBox",
+          "url": "https://lua-api.factorio.com/latest/types/FluidBox.html",
+          "id": "S17",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio PipeConnectionDefinition",
+          "url": "https://lua-api.factorio.com/latest/types/PipeConnectionDefinition.html",
+          "id": "S18",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio CarPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/CarPrototype.html",
+          "id": "S19",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaBurner",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaBurner.html",
+          "id": "S20",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaSpacePlatform",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaSpacePlatform.html",
+          "id": "S21",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaLogisticCell",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaLogisticCell.html",
+          "id": "S22",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio EntityWithHealthPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/EntityWithHealthPrototype.html",
+          "id": "S23",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio RepairToolPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/RepairToolPrototype.html",
+          "id": "S24",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaControl",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaControl.html",
+          "id": "S25",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio StickerPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/StickerPrototype.html",
+          "id": "S26",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio TreePrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/TreePrototype.html",
+          "id": "S27",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "K2SO upstream changelog",
+          "url": "https://mods.factorio.com/mod/Krastorio2-spaced-out/changelog",
+          "id": "S28",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "K2 upstream changelog",
+          "url": "https://mods.factorio.com/mod/Krastorio2/changelog",
+          "id": "S29",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Official wiki: rocket silo",
+          "url": "https://wiki.factorio.com/Rocket_silo",
+          "id": "S30",
+          "observed_on": "2026-09-06"
+        },
+        {
+          "title": "Factorio GunSpeedModifier",
+          "url": "https://lua-api.factorio.com/latest/types/GunSpeedModifier.html",
+          "id": "S31",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio LuaForce",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaForce.html",
+          "id": "S32",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Factorio TechnologyPrototype",
+          "url": "https://lua-api.factorio.com/latest/prototypes/TechnologyPrototype.html",
+          "id": "S33",
+          "observed_on": "2026-09-06",
+          "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        }
+      ]
+    },
+    "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
+  },
+  "request_count": 66,
+  "requests": [
+    {
+      "id": "UI-01",
+      "title": "Hide infinite research in game",
+      "requesters": [
+        "Frite222"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "per-player presentation",
+      "proposed_scope": "MIR Research Browser",
+      "rationale": "A personal display filter must not change force research availability.",
+      "implementation": "Add All / Finite / Infinite view modes using technology metadata; keep actual force queue and technology state unchanged.",
+      "acceptance": [
+        "Two players in one force select different modes with identical research availability",
+        "Queued hidden-from-view research is retained",
+        "Setting survives reload without prototype mutation"
+      ],
+      "source_ids": [
+        "P1",
+        "S3",
+        "S4",
+        "S32"
+      ],
+      "feature_group": "research-browser",
+      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
+      ],
+      "remaining_obligations": [
+        "Two-client personal-view and queue interaction",
+        "Configuration change, mod removal and conflict capture",
+        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+      ]
+    },
+    {
+      "id": "UI-02",
+      "title": "Show only infinite research in game",
+      "requesters": [
+        "Frite222"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "per-player presentation",
+      "proposed_scope": "Same browser as UI-01",
+      "rationale": "Use one mutually exclusive tri-state filter, not conflicting hide/show switches.",
+      "implementation": "Classify infinite tails, finite configured caps and upgrade-series entries explicitly; add text search and availability filter.",
+      "acceptance": [
+        "Finite-capped research is classified accurately",
+        "Native and other-mod technologies participate",
+        "No technology-name heuristic for infinity"
+      ],
+      "source_ids": [
+        "P1",
+        "S3",
+        "S33"
+      ],
+      "feature_group": "research-browser",
+      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
+      ],
+      "remaining_obligations": [
+        "Two-client personal-view and queue interaction",
+        "Configuration change, mod removal and conflict capture",
+        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+      ]
+    },
+    {
+      "id": "UI-03",
+      "title": "Native research-screen/queue buttons and queue-mod interoperability",
+      "requesters": [
+        "Julesc012"
+      ],
+      "decision": "partial-4.2-plus-upstream",
+      "mechanism": "custom GUI plus optional adapter",
+      "proposed_scope": "Bundled browser; native filter requested upstream",
+      "rationale": "The inspected custom-GUI API does not establish permission to rewrite native research-screen internals.",
+      "implementation": "Use a shortcut and a supported relative anchor where actually available; expose a bounded query for cooperating queue mods; never require them.",
+      "acceptance": [
+        "No assumed native anchor",
+        "No queue reorder from filtering",
+        "Optional integration absent causes no startup failure"
+      ],
+      "source_ids": [
+        "P1",
+        "S3",
+        "S4",
+        "S32"
+      ],
+      "feature_group": "research-browser",
+      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
+      ],
+      "remaining_obligations": [
+        "Two-client personal-view and queue interaction",
+        "Configuration change, mod removal and conflict capture",
+        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+      ]
+    },
+    {
+      "id": "UI-04",
+      "title": "Grouped settings and one row per technology",
+      "requesters": [
+        "Julesc012"
+      ],
+      "decision": "commit-4.2-partial",
+      "mechanism": "in-mod settings presentation",
+      "proposed_scope": "Grouped viewer/editor for runtime settings; restart-required profile export",
+      "rationale": "An in-game UI can organize controls but cannot make startup prototype settings hot-editable or redesign the native main menu.",
+      "implementation": "Render enable/cost/scaling/cap columns from existing SettingSpec; show effective value, origin, target applicability and restart badge; export only validated sparse overrides.",
+      "acceptance": [
+        "Runtime-own-setting changes work",
+        "Startup edits never claim immediate application",
+        "Import schema rejects unknown IDs and unsafe values",
+        "Multiplayer permissions enforced"
+      ],
+      "source_ids": [
+        "P1",
+        "S5",
+        "S6"
+      ],
+      "feature_group": "research-browser",
+      "status": "implemented-browser-with-open-multiplayer-qualification",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
+      ],
+      "remaining_obligations": [
+        "Two-client personal-view and queue interaction",
+        "Configuration change, mod removal and conflict capture",
+        "Full route omission explanations remain in Inspector; native browser detail shows actual ingredients and effects"
+      ]
+    },
+    {
+      "id": "PROG-01",
+      "title": "Useful earlier Bob/Angel productivity research and continuous science demand",
+      "requesters": [
+        "Garchle"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "technology progression",
+      "proposed_scope": "Small early finite tiers and later qualified infinite continuation",
+      "rationale": "Research should be useful while a factory is growing, not exclusively after the overhaul is finished.",
+      "implementation": "Derive unlock frontiers and science/lab phases per ecosystem; introduce new finite early tiers without renumbering existing stable IDs; offer an opt-in production load-check view rather than mandatory dummy science sinks.",
+      "acceptance": [
+        "Early/mid/late saves can research intended tiers",
+        "No future material in its own prerequisites",
+        "Existing progress and queue survive upgrade",
+        "Cost and benefit remain meaningful at each tier"
+      ],
+      "source_ids": [
+        "P1",
+        "R1",
+        "S33"
+      ],
+      "feature_group": "PROG-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "PIPE-01",
+      "title": "Pipe, underground-pipe and heat-pipe productivity",
+      "requesters": [
+        "ihatebrooms",
+        "Julesc012"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity",
+      "proposed_scope": "Audit missing family, then admit qualified pipe production",
+      "rationale": "No named pipe family was found in the inspected modern catalogue; generated omissions and external owners still need checking.",
+      "implementation": "Audit aliases, settings, ownership and emitted coverage; add a shared pipe family only where absent. Treat 10%/5%/2% as proposed rates, not recovered historical truth. Include casting routes only after process review.",
+      "acceptance": [
+        "Base and overhaul pipe outputs covered",
+        "Underground-pipe recipes containing pipes do not create a recovery exploit",
+        "Heat-pipe balance separate",
+        "No duplicate native/external owner",
+        "Absence has visible diagnostic"
+      ],
+      "source_ids": [
+        "P1",
+        "R2"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-explicit-productivity-denial",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+      ],
+      "remaining_obligations": [
+        "Deliberate permission policy and weighted recycling economics",
+        "10/5/2 remains an unaccepted balance proposal"
+      ]
+    },
+    {
+      "id": "FLUID-01",
+      "title": "Longer connected pipeline extent",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "existing-audit-4.2",
+      "mechanism": "startup prototype setting",
+      "proposed_scope": "Improve existing mir-pipeline-extent-multiplier",
+      "rationale": "MIR already has an extent setting; it must not be sold as new researched range.",
+      "implementation": "Expose existing control clearly; explain that network extent is constrained by the minimum among connected fluidboxes; audit modded inputs and no-op default.",
+      "acceptance": [
+        "Default unchanged",
+        "Representative pipe/tank/machine networks agree with UI",
+        "Mixed limits tested",
+        "Unsupported targets omit control"
+      ],
+      "source_ids": [
+        "P1",
+        "R4",
+        "S17"
+      ],
+      "feature_group": "fluid-range",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "FLUID-02",
+      "title": "Longer underground-pipe connection reach",
+      "requesters": [
+        "Erichteia possible meaning"
+      ],
+      "decision": "defer-or-startup-only",
+      "mechanism": "prototype connection limit",
+      "proposed_scope": "Separate from pipeline extent",
+      "rationale": "Underground reach uses a different property and can change connection topology.",
+      "implementation": "Keep as a separately named optional startup policy or upstream research-hook request; never silently reuse the existing extent multiplier for this.",
+      "acceptance": [
+        "Both endpoints and collision categories tested",
+        "No remote reconnection surprises",
+        "Clearly labeled restart/global behavior"
+      ],
+      "source_ids": [
+        "P1",
+        "S18"
+      ],
+      "feature_group": "fluid-range",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "NATIVE-01",
+      "title": "Weapon firing-speed research",
+      "requesters": [
+        "Julesc012"
+      ],
+      "decision": "existing-audit-4.2",
+      "mechanism": "native gun-speed",
+      "proposed_scope": "Reuse existing MIR streams",
+      "rationale": "Native gun-speed exists; MIR already declares rocket, cannon and other speed streams.",
+      "implementation": "Preserve native owners, check missing ammo categories and saturation, and surface why an existing stream is omitted.",
+      "acceptance": [
+        "No duplicate effect owner",
+        "Each supported ammo category produces an actual change",
+        "Ammo/energy throughput effects documented"
+      ],
+      "source_ids": [
+        "P1",
+        "R3",
+        "S1",
+        "S31"
+      ],
+      "feature_group": "NATIVE-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "WEAPON-01",
+      "title": "Handheld weapon range",
+      "requesters": [
+        "Deadweightgames",
+        "Julesc012"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "prototype attack range; no direct native equivalent verified",
+      "proposed_scope": "Not a core 4.2 promise",
+      "rationale": "Artillery range is not a generic handgun/rifle range modifier.",
+      "implementation": "Request per-force ammo/category range support upstream; avoid swapping guns through hidden per-level prototypes. A startup rebalance is a different optional feature.",
+      "acceptance": [
+        "Preserve weapon item data, ammo, cursor and blueprints if any future adaptation is attempted",
+        "No false artillery substitution"
+      ],
+      "source_ids": [
+        "P1",
+        "S1",
+        "S10"
+      ],
+      "feature_group": "WEAPON-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "VEH-01",
+      "title": "Cars and tanks use less fuel",
+      "requesters": [
+        "Jubei_"
+      ],
+      "decision": "candidate-4.2",
+      "mechanism": "bounded entity runtime modifier",
+      "proposed_scope": "Car-type entities only, initially optional",
+      "rationale": "LuaEntity exposes writable consumption_modifier and effectivity_modifier for Car; this supports a promising event-driven implementation without fuel refunds.",
+      "implementation": "Prototype a measured constant-performance economy mapping, maintain an owned contribution, reconcile on research/build/clone/force/lifecycle changes, and show exact supported entity classes.",
+      "acceptance": [
+        "Less fuel per equal route/work",
+        "Acceleration and top speed unchanged within declared tolerance",
+        "No fuel/residue manipulation",
+        "Multiple forces and other modifier owners handled",
+        "Disable removes only MIR contribution",
+        "Save/reload and migration exact"
+      ],
+      "source_ids": [
+        "P1",
+        "S2",
+        "S19"
+      ],
+      "feature_group": "vehicle-economy",
+      "status": "package-excluded-prototype-engine-verified",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json"
+      ],
+      "remaining_obligations": [
+        "No player service admission",
+        "Multiplayer, clone/quality/surface and save lifecycle qualification",
+        "Car probe does not qualify trains, spiders or every modded Car"
+      ]
+    },
+    {
+      "id": "VEH-02",
+      "title": "Locomotive and spidertron fuel economy",
+      "requesters": [
+        "Jubei_ broader vehicle request"
+      ],
+      "decision": "defer-provider",
+      "mechanism": "distinct engine classes",
+      "proposed_scope": "Do not infer from Car support",
+      "rationale": "The verified Car setters do not establish the same facility for rolling stock or spider vehicles.",
+      "implementation": "Seek exact native/owner adapters. Treat polling remaining fuel or grid-energy refunds as a separate measured experiment, not default implementation.",
+      "acceptance": [
+        "No universal vehicle claim from cars",
+        "Multiple fuel transitions and burnt results accounted for before any simulation is admitted"
+      ],
+      "source_ids": [
+        "P1",
+        "S2",
+        "S20"
+      ],
+      "feature_group": "vehicle-economy",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "FUEL-01",
+      "title": "Boiler/heating tower and stationary fuel-burning efficiency",
+      "requesters": [
+        "Xzarg_poe"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "energy-source/prototype behavior",
+      "proposed_scope": "Not default 4.2 research",
+      "rationale": "Manufacturing more fuel is not increasing combustion efficiency; generic live effectivity support was not verified.",
+      "implementation": "Define useful heat/output per fuel separately from power and pollution. Prefer future native modifiers or exact owner integration over tick-based energy refunds.",
+      "acceptance": [
+        "Fuel/heat balance and residues tested",
+        "No artificial energy creation labeled native efficiency",
+        "Multi-fuel and shutdown behavior exact"
+      ],
+      "source_ids": [
+        "P1",
+        "S20"
+      ],
+      "feature_group": "FUEL-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ROCKET-01",
+      "title": "Faster rocket launch animation",
+      "requesters": [
+        "Erichteia",
+        "NCD_Lardum_AS",
+        "PromiscuousToaster"
+      ],
+      "decision": "defer-research; optional-startup-probe",
+      "mechanism": "quality/prototype launch behavior",
+      "proposed_scope": "Investigate native hook; no default 4.2 guarantee",
+      "rationale": "2.1 quality can affect animation speed, but that does not itself create a research modifier.",
+      "implementation": "Separate rocket-part crafting, launch preparation, ascent and cargo delivery; do not fake launches or replace active silos. Optional global startup tuning must be labeled as such.",
+      "acceptance": [
+        "Quality tiers and buffered second rocket",
+        "Automatic/mixed cargo and interruption",
+        "Launch count and item conservation"
+      ],
+      "source_ids": [
+        "P1",
+        "S9",
+        "S10",
+        "S30"
+      ],
+      "feature_group": "ROCKET-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ROCKET-02",
+      "title": "Rocket maximum payload",
+      "requesters": [
+        "Erichteia",
+        "Deadweightgames"
+      ],
+      "decision": "defer-research; optional-startup-probe",
+      "mechanism": "prototype lift weight",
+      "proposed_scope": "Native force/silo research hook preferred",
+      "rationale": "Rocket payload mass, inventory slots and item stack size are different constraints.",
+      "implementation": "Use the actual RocketSiloPrototype lift_weight only in a deliberate startup policy; do not change only a display/default constant or item weights and claim researched cargo capacity.",
+      "acceptance": [
+        "Actual mixed cargo fits/exceeds boundary as declared",
+        "Automatic requests and selector/display agree",
+        "No item-loss workaround",
+        "Research scope not silently global"
+      ],
+      "source_ids": [
+        "P1",
+        "S9",
+        "S10",
+        "S11"
+      ],
+      "feature_group": "ROCKET-02",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "SPACE-01",
+      "title": "Reduced platform drag",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "no writable drag channel verified",
+      "proposed_scope": "Not artificial speed injection",
+      "rationale": "Writable platform speed is not evidence of a drag modifier.",
+      "implementation": "Request engine-native drag/thrust-efficiency contribution; keep existing thruster fuel/oxidizer productivity as a separately described benefit.",
+      "acceptance": [
+        "Fuel, acceleration and travel-distance conservation",
+        "No speed-writing controller represented as aerodynamics"
+      ],
+      "source_ids": [
+        "P1",
+        "R2",
+        "S21"
+      ],
+      "feature_group": "SPACE-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "QUAL-01",
+      "title": "Higher quality level-skip probability",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-research",
+      "mechanism": "quality prototype chain probability",
+      "proposed_scope": "Optional explicit global startup policy only",
+      "rationale": "The inspected API separates initial improvement from subsequent chain probability; the latter is runtime read-only.",
+      "implementation": "Keep quality probability model separate from productivity; do not introduce hidden quality levels or rewrite all crafted outputs. Request force-scoped probability hooks.",
+      "acceptance": [
+        "No global change marketed per-force",
+        "Probability mass and unlocked quality cap tested",
+        "Recycling/quality loops reviewed"
+      ],
+      "source_ids": [
+        "P1",
+        "S7",
+        "S8"
+      ],
+      "feature_group": "quality-probability",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "QUAL-02",
+      "title": "Higher initial quality probability",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "defer-research",
+      "mechanism": "module effect and quality prototypes",
+      "proposed_scope": "Separate from skip probability",
+      "rationale": "Initial quality success and additional-level skipping are distinct outcomes.",
+      "implementation": "Assess native force hook on the exact engine; otherwise use existing module mechanics or explicit startup tuning, not broad output interception.",
+      "acceptance": [
+        "Correct initial versus conditional probability",
+        "No overwrite of another mod result-quality logic",
+        "All outputs and productivity cycles consistent"
+      ],
+      "source_ids": [
+        "P1",
+        "S7",
+        "S8"
+      ],
+      "feature_group": "quality-probability",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "URAN-01",
+      "title": "Higher uranium-235 probability",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "defer-specialized-design",
+      "mechanism": "recipe output distribution",
+      "proposed_scope": "Not equivalent to generic uranium productivity",
+      "rationale": "Changing U235 probability changes output ratios and enrichment economics.",
+      "implementation": "Keep as an explicit optional nuclear-process proposal. A researched recipe unlock may be possible but requires new recipe and migration UX; never rewrite all centrifuge output per tick.",
+      "acceptance": [
+        "Expected ratios and catalyst returns",
+        "Kovarex/other native owners",
+        "No protected isotope gain loop",
+        "Statistical tests include tolerances"
+      ],
+      "source_ids": [
+        "P1",
+        "S1",
+        "R1"
+      ],
+      "feature_group": "URAN-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "STACK-01",
+      "title": "Larger per-item inventory/chest stacks",
+      "requesters": [
+        "Jubei_",
+        "Deadweightgames"
+      ],
+      "decision": "defer-research",
+      "mechanism": "item prototype stack_size",
+      "proposed_scope": "No hidden item-tier swaps",
+      "rationale": "Inventory slots and item stack maximum are different features; the shared item prototype is not force-specific research state.",
+      "implementation": "Preserve existing inventory-slot research as an explicitly different option. Any startup stack rebalance needs save overflow and compatibility review.",
+      "acceptance": [
+        "Overfull inventory/vehicle/logistic/cursor state preserved",
+        "No item identity change",
+        "No false rocket-capacity claim"
+      ],
+      "source_ids": [
+        "P1",
+        "S12",
+        "R3"
+      ],
+      "feature_group": "STACK-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "STACK-02",
+      "title": "Belt stacking research and stacks above four",
+      "requesters": [
+        "Julesc012"
+      ],
+      "decision": "conditional-native-audit-4.2",
+      "mechanism": "native belt-stack-size-bonus plus prototype limits",
+      "proposed_scope": "No default cap increase",
+      "rationale": "A native modifier exists, but configured inserter/loader/belt caps and presentation determine whether extra research has any effect.",
+      "implementation": "Preserve existing owners, admit only useful finite increments below tested caps. Greater-than-four behavior remains a test-only experiment until visual and transport proof passes.",
+      "acceptance": [
+        "Native owner preserved",
+        "Inserters, loaders, splitters and underground belts",
+        "Readability, serialization, throughput and item conservation",
+        "No paid no-op levels"
+      ],
+      "source_ids": [
+        "P1",
+        "S13",
+        "S14",
+        "S15",
+        "S16"
+      ],
+      "feature_group": "STACK-02",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "HEALTH-01",
+      "title": "More wall maximum health",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "max-health prototype; live max read-only",
+      "proposed_scope": "Not wall manufacturing productivity",
+      "rationale": "Current health repair is not an increase in the maximum or survival of a lethal hit.",
+      "implementation": "Prefer native per-force health/resistance support. Reject damage-event refunds as an undocumented virtual-health system.",
+      "acceptance": [
+        "No health/productivity conflation",
+        "Future lethal-hit and health-ratio semantics explicit"
+      ],
+      "source_ids": [
+        "P1",
+        "R2",
+        "S2",
+        "S23"
+      ],
+      "feature_group": "defensive-health",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "HEALTH-02",
+      "title": "More turret maximum health",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "same boundary as HEALTH-01",
+      "proposed_scope": "Preserve existing turret identity",
+      "rationale": "Prototype replacement affects connections, ammo, health and other mods.",
+      "implementation": "Share the health capability probe; do not generate hidden turret tiers for each research level.",
+      "acceptance": [
+        "Ammo/energy/wires/quality state retained",
+        "No max-health claim based on healing only"
+      ],
+      "source_ids": [
+        "P1",
+        "S2",
+        "S23"
+      ],
+      "feature_group": "defensive-health",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "REPAIR-01",
+      "title": "Faster bot repair, including spidertrons",
+      "requesters": [
+        "Jubei_"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "tool speed and prototype repair multiplier",
+      "proposed_scope": "No generic force modifier verified",
+      "rationale": "Tool strength, target repair multiplier, robot travel and robot work are distinct.",
+      "implementation": "Request target/force robot-repair rate hook; do not remotely add health and claim the bot performed the work. Optional passive repair is a different feature.",
+      "acceptance": [
+        "Repair-pack durability and robot energy conserved",
+        "Manual versus robot repair distinguished",
+        "Quality and long-distance travel covered"
+      ],
+      "source_ids": [
+        "P1",
+        "S23",
+        "S24"
+      ],
+      "feature_group": "REPAIR-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "REPAIR-02",
+      "title": "Passive repair",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "candidate-4.2",
+      "mechanism": "bounded damaged-entity runtime queue",
+      "proposed_scope": "Optional out-of-combat maintenance",
+      "rationale": "A small scoped service is more credible than simulated max health or instant robot repair.",
+      "implementation": "Use allowlisted damaged entities, a quiet-time cooldown, capped rate, deterministic round-robin budget and empty-queue unsubscription. Default off; clearly name free regeneration versus resource-consuming repair.",
+      "acceptance": [
+        "No idle scan",
+        "Lethal hits not undone",
+        "Multiple forces/surfaces, deletion and ownership transfer",
+        "Exact save/reload state",
+        "Other healers compose without exceeding max"
+      ],
+      "source_ids": [
+        "P1",
+        "S2",
+        "S23"
+      ],
+      "feature_group": "REPAIR-02",
+      "status": "package-excluded-prototype-engine-verified",
+      "qualification": [
+        "spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
+        "spec/programmes/evidence/community-2026-09-06/optional-2.0.json"
+      ],
+      "remaining_obligations": [
+        "No player service admission",
+        "Multiplayer, clone/quality/surface and save lifecycle qualification",
+        "Car probe does not qualify trains, spiders or every modded Car"
+      ]
+    },
+    {
+      "id": "LOG-01",
+      "title": "Larger logistic/construction network range",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "defer-upstream",
+      "mechanism": "logistic cell radii read-only",
+      "proposed_scope": "No hidden roboport overlays",
+      "rationale": "Network radius can merge separate networks and is not character reach.",
+      "implementation": "Seek a native scoped contribution with documented network rebuild semantics. Existing robot battery/storage/speed are useful but not this request.",
+      "acceptance": [
+        "No surprise network joins/splits",
+        "Blueprint/removal/force boundaries",
+        "Charging and dispatch remain correct"
+      ],
+      "source_ids": [
+        "P1",
+        "S22",
+        "R3"
+      ],
+      "feature_group": "LOG-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "SLOW-01",
+      "title": "Reduced acid slowdown",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "defer-scoped-research",
+      "mechanism": "sticker-specific runtime/prototype behavior",
+      "proposed_scope": "Exact debuff adapter required",
+      "rationale": "Acid damage, movement slowdown and sticker duration must not be conflated.",
+      "implementation": "Do not delete every sticker or boost global movement. A future allowlisted duration/slowdown adapter must state whether damage duration changes too.",
+      "acceptance": [
+        "Concurrent acid sources",
+        "Damage not silently removed",
+        "Vehicles/characters and other stickers isolated",
+        "No permanent walking bonus"
+      ],
+      "source_ids": [
+        "P1",
+        "S26",
+        "S2"
+      ],
+      "feature_group": "SLOW-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "CRAFT-01",
+      "title": "Larger handcraft queue",
+      "requesters": [
+        "Deadweightgames"
+      ],
+      "decision": "clarify-through-reproducer; no-tech-now",
+      "mechanism": "queue presentation/engine capacity",
+      "proposed_scope": "Do not mistake current count for capacity",
+      "rationale": "crafting_queue_size is a read-only observed queue size, not a writable maximum.",
+      "implementation": "Capture the actual UX limit; improve visibility or request native UX support. Existing character crafting speed is a different possible bonus.",
+      "acceptance": [
+        "No arbitrary queue-size assignment",
+        "No lost/cancelled recipes or ingredients",
+        "True requested bottleneck identified"
+      ],
+      "source_ids": [
+        "P1",
+        "S25",
+        "S1"
+      ],
+      "feature_group": "CRAFT-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "TREE-01",
+      "title": "Artificial tree pollution absorption lifetime",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "owner-specific-intake",
+      "mechanism": "external tree lifecycle/absorption semantics",
+      "proposed_scope": "Exact tree mod/prototype not supplied",
+      "rationale": "The pasted request does not identify what owns the artificial tree or its deterioration.",
+      "implementation": "Separate absorption rate, total capacity and damage/leaf loss; acquire exact owner data and integrate a declared capacity hook. Do not remove arbitrary surface pollution and label it tree capacity.",
+      "acceptance": [
+        "Correct tree identity and owner",
+        "Absorption versus lifetime distinguished",
+        "Natural trees/spores unaffected unless declared",
+        "No unbounded tree scans"
+      ],
+      "source_ids": [
+        "P1",
+        "S27"
+      ],
+      "feature_group": "TREE-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "MACHINE-01",
+      "title": "Lower global machine pollution",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-research",
+      "mechanism": "machine effects/prototype emissions",
+      "proposed_scope": "Separate from electrical efficiency",
+      "rationale": "Live aggregate machine pollution/effect bonuses are not verified writable per-force controls.",
+      "implementation": "Request native emission contribution. Do not erase existing pollution chunks or insert hidden beacons as the normal implementation.",
+      "acceptance": [
+        "Pollution per tick and per product distinguished",
+        "Power not silently changed",
+        "No ecosystem-wide prototype override disguised as personal research"
+      ],
+      "source_ids": [
+        "P1",
+        "S1",
+        "S2"
+      ],
+      "feature_group": "MACHINE-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "MACHINE-02",
+      "title": "Lower global machine energy use",
+      "requesters": [
+        "Erichteia possible meaning"
+      ],
+      "decision": "defer-research",
+      "mechanism": "energy-source/effect receiver",
+      "proposed_scope": "Separate proposal from pollution",
+      "rationale": "The word efficiency is ambiguous; energy use is not identical to direct emissions.",
+      "implementation": "Name an energy channel separately; prefer native effect modifiers over refunding network electricity.",
+      "acceptance": [
+        "Energy conservation and drain behavior",
+        "Existing efficiency modules interact predictably",
+        "No free power service"
+      ],
+      "source_ids": [
+        "P1",
+        "S1",
+        "S2"
+      ],
+      "feature_group": "MACHINE-02",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "MACHINE-03",
+      "title": "Global machine speed",
+      "requesters": [
+        "Erichteia"
+      ],
+      "decision": "defer-research",
+      "mechanism": "crafting speed/prototype effects",
+      "proposed_scope": "No tick-based progress acceleration",
+      "rationale": "Writing progress is not equivalent to engine-native speed across recipes, energy and quality.",
+      "implementation": "Seek native category/force speed contribution; prohibit invisible module slot consumption, global progress rewriting and hidden per-level machine swaps.",
+      "acceptance": [
+        "Craft ingredients/energy/quality/productivity conserved",
+        "Machine categories explicit",
+        "No no-op/overflow at saturation"
+      ],
+      "source_ids": [
+        "P1",
+        "S1",
+        "S2"
+      ],
+      "feature_group": "MACHINE-03",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "MODE-01",
+      "title": "Research bonuses with permanent downsides",
+      "requesters": [
+        "Deadweightgames",
+        "nasaboy007",
+        "Julesc012"
+      ],
+      "decision": "reject-default",
+      "mechanism": "balance and reversible modes",
+      "proposed_scope": "Keep permanent research free of compulsory new penalties",
+      "rationale": "A compulsory irreversible operating penalty can invalidate a functioning factory.",
+      "implementation": "Research may unlock an optional reversible operating mode later; toggling changes only owned runtime contributions and never unresearches unrelated technologies.",
+      "acceptance": [
+        "Disable returns owned contribution",
+        "Permission-gated multiplayer policy",
+        "Energy/ammo side effects previewed"
+      ],
+      "source_ids": [
+        "P1"
+      ],
+      "feature_group": "MODE-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "MODE-02",
+      "title": "Higher-quality beacons consume more energy",
+      "requesters": [
+        "Julesc012"
+      ],
+      "decision": "outside-core-4.2",
+      "mechanism": "optional startup balance profile",
+      "proposed_scope": "Not a compatibility fix",
+      "rationale": "This is a preference about game balance, not missing infinite-research functionality.",
+      "implementation": "Keep upstream defaults by default. A separate explicit global rebalance can be considered later without making it required for MIR features.",
+      "acceptance": [
+        "No silent quality rebalance",
+        "Existing saves and power margins reviewed"
+      ],
+      "source_ids": [
+        "P1",
+        "S8"
+      ],
+      "feature_group": "MODE-02",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "PACK-01",
+      "title": "Split MIR into required feature packs",
+      "requesters": [
+        "Gonhog",
+        "Julesc012"
+      ],
+      "decision": "reject-required-split",
+      "mechanism": "modular internals and one package",
+      "proposed_scope": "One self-contained target ZIP",
+      "rationale": "Internal modularity does not require player-facing dependency fragmentation.",
+      "implementation": "Bundle official admitted support; default-off optional services must remain dormant. Separate a spin-off only for a genuinely different product, not missing core capability.",
+      "acceptance": [
+        "MIR plus requested overhaul alone works",
+        "No auxiliary MIR mod required",
+        "Disabled services have no recurring work"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "PACK-01",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "DEV-01",
+      "title": "Explain AI/Codex and MD/JSON/YAML guidance",
+      "requesters": [
+        "DeepPresentation648",
+        "Julesc012"
+      ],
+      "decision": "document-only",
+      "mechanism": "contributor workflow documentation",
+      "proposed_scope": "Not a gameplay release blocker",
+      "rationale": "Explain actual authorship/review and reproducible commands; do not claim all YAML is a required AI standard.",
+      "implementation": "Document which records are edited versus generated and the standing dev integration workflow. Demonstrate tests and output reproducibility rather than promising infallible agents.",
+      "acceptance": [
+        "No secret/private path published",
+        "New contributor can run ordinary checks",
+        "No paid AI service required to reproduce MIR"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "DEV-01",
+      "status": "documentation-implemented",
+      "qualification": [
+        "CONTRIBUTING.md"
+      ]
+    },
+    {
+      "id": "K2-01",
+      "title": "Retire early science from applicable late K2/K2SO MIR research",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "science policy",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Carry phase intent through final science/lab selection; preserve hard-required packs or diagnose conflict. Correct the reversed requested-outcome wording in R1.",
+      "acceptance": [
+        "Early and both late phases",
+        "Adversarial lab reduction",
+        "Nonzero-progress upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "science-policy",
+      "status": "existing-source-fix-with-open-current-environment-and-affected-save-proof",
+      "qualification": [
+        "spec/programmes/evidence/synthesis-2026-09-06/science-modules.json",
+        "spec/programmes/evidence/synthesis-2026-09-06/k2-science-reloads.json"
+      ],
+      "original_request": {
+        "id": "K2-01",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Red, Green, Military/Black and Blue science retained on late-game MIR productivity research",
+        "group": "k2",
+        "kind": "reported-compatibility-defect",
+        "priority": "P0",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Respect the exact ecosystem progression/science retirement policy on applicable MIR-owned research; retain early progression and valid labs.",
+        "acceptance": [
+          "reproduce on exact 4.1 package before calling it a current defect",
+          "record final-stage recipe/technology/lab graph and science field writer provenance",
+          "no retired packs on governed late-game research",
+          "no early-game science removal",
+          "nonempty reachable allowed science and lab set",
+          "preserve current research, completed levels, queue and progress across upgrade",
+          "ordinary non-instrumented load and two reloads pass"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "patch_candidate": "4.1.x only if independently reproduced and repair fits existing compatibility contract",
+        "diagnosis": "unknown; load order, selector exclusion and stale copy are hypotheses, not confirmed causes"
+      },
+      "original_complaint": "Red, Green, Military/Black and Blue science retained on late-game MIR productivity research",
+      "requested_outcome": "Retire early science from applicable late K2/K2SO MIR research according to the exact ecosystem phase policy; preserve early research and reachable laboratories."
+    },
+    {
+      "id": "K2-02",
+      "title": "Rare Metals productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Resolve exact rare-metal outputs and safe forward-production routes; classify matter/recycling separately.",
+      "acceptance": [
+        "Output identity",
+        "Native/external owner",
+        "All accepted routes and excluded loops"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-02",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Rare Metals",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+        "acceptance": [
+          "resolve exact item, recipe, unlock and effect IDs",
+          "one effective productivity owner per recipe/channel",
+          "all intended safe routes accounted for",
+          "recovery, matter and catalyst routes individually classified",
+          "science/progression tests pass",
+          "upgrade and two reloads pass"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "normalized_display": "Rare Metals",
+        "upstream_existing_owner_evidence": []
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_rare_metals",
+        "output": "kr-rare-metals",
+        "recipes": [
+          "kr-rare-metals",
+          "kr-rare-metals-from-enriched-rare-metals",
+          "kr-casting-rare-metals"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "K2-03",
+      "title": "Imersite productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Preserve the actual K2SO native owner where it satisfies the request; attach only exact safe missing routes under the owner contract.",
+      "acceptance": [
+        "No duplicate native bonus",
+        "Crushing/recycling reversibility",
+        "Archived/current K2SO separately"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-03",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Immersite",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Resolve upstream Imersite identities; preserve/adopt an existing K2SO productivity owner; extend only uncovered certified routes without duplication.",
+        "acceptance": [
+          "resolve exact item, recipe, unlock and effect IDs",
+          "one effective productivity owner per recipe/channel",
+          "all intended safe routes accounted for",
+          "recovery, matter and catalyst routes individually classified",
+          "science/progression tests pass",
+          "upgrade and two reloads pass"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "normalized_display": "Imersite",
+        "upstream_existing_owner_evidence": [
+          "W03"
+        ]
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_imersite",
+        "output": "kr-imersite-crystal",
+        "recipes": [
+          "kr-imersite-crystal",
+          "kr-imersite-powder"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "K2-04",
+      "title": "Silicon productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Resolve exact silicon/quartz/smelting/casting routes rather than translated names.",
+      "acceptance": [
+        "Intended materials only",
+        "Phase/lab researchable",
+        "Recovery and catalyst controls"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-04",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Sillicon",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+        "acceptance": [
+          "resolve exact item, recipe, unlock and effect IDs",
+          "one effective productivity owner per recipe/channel",
+          "all intended safe routes accounted for",
+          "recovery, matter and catalyst routes individually classified",
+          "science/progression tests pass",
+          "upgrade and two reloads pass"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "normalized_display": "Silicon",
+        "upstream_existing_owner_evidence": []
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_silicon",
+        "output": "kr-silicon",
+        "recipes": [
+          "kr-silicon"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "K2-05",
+      "title": "Glass productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Bind intended glass production, excluding color/recycling/return conversions unless separately certified.",
+      "acceptance": [
+        "Multi-route output",
+        "Unlock frontier",
+        "No positive conversion cycle"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-05",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Glass",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Add or extend a safe recipe-productivity family only for exact discovered outputs and certified recipe routes.",
+        "acceptance": [
+          "resolve exact item, recipe, unlock and effect IDs",
+          "one effective productivity owner per recipe/channel",
+          "all intended safe routes accounted for",
+          "recovery, matter and catalyst routes individually classified",
+          "science/progression tests pass",
+          "upgrade and two reloads pass"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "normalized_display": "Glass",
+        "upstream_existing_owner_evidence": []
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_glass",
+        "output": "kr-glass",
+        "recipes": [
+          "kr-glass"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "K2-06",
+      "title": "Black tile plate productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Group with concrete/paving only if its production and progression fit; explicitly exclude free recoloring amplification.",
+      "acceptance": [
+        "Black-to-white and reverse conversions",
+        "No duplicate family membership",
+        "No upstream productivity denial override"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-06",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "Black tiles plate",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Prefer membership in the existing concrete-productivity family when progression and process semantics match; otherwise create one justified paving family.",
+        "acceptance": [
+          "resolve recipe-produced paving item; do not invent tile-prototype productivity",
+          "placement/mining/recoloring/recycling routes cannot create a gain loop",
+          "no duplicate owner",
+          "family presentation and unlocks fit exact ecosystem",
+          "explicit grouping decision in profile"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": []
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_black_paving",
+        "output": "kr-black-reinforced-plate",
+        "recipes": [
+          "kr-black-reinforced-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "K2-07",
+      "title": "White tile plate productivity",
+      "requesters": [
+        "RealK"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Exact K2 and K2SO locks",
+      "rationale": "A concrete requested player outcome; already implemented fragments do not substitute for completed target qualification.",
+      "implementation": "Use the same qualified paving mechanism, keeping white/black member identities explicit.",
+      "acceptance": [
+        "White-to-black and reverse conversions",
+        "No duplicate family membership",
+        "Post-upgrade conservation"
+      ],
+      "source_ids": [
+        "P2",
+        "R1",
+        "S28",
+        "S29"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "krastorio2-spaced-out",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        },
+        {
+          "scenario": "krastorio2",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "K2-07",
+        "status": "requested-not-implemented",
+        "requester": "RealK",
+        "source_refs": [
+          "U02"
+        ],
+        "user_term": "White tiles plate",
+        "group": "k2",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Prefer membership in the existing concrete-productivity family when progression and process semantics match; otherwise create one justified paving family.",
+        "acceptance": [
+          "resolve recipe-produced paving item; do not invent tile-prototype productivity",
+          "placement/mining/recoloring/recycling routes cannot create a gain loop",
+          "no duplicate owner",
+          "family presentation and unlocks fit exact ecosystem",
+          "explicit grouping decision in profile"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": []
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_white_paving",
+        "output": "kr-white-reinforced-plate",
+        "recipes": [
+          "kr-white-reinforced-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Current K2SO 2.0.17 exact capture",
+        "Late continuation and affected-save migration",
+        "Weighted process qualification or explicit productivity permission for withheld routes"
+      ]
+    },
+    {
+      "id": "BA-01",
+      "title": "Aluminium plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Aluminium outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-01",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Aluminium plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_aluminium",
+        "output": "bob-aluminium-plate",
+        "recipes": [
+          "bob-aluminium-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-02",
+      "title": "Gold plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Gold outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-02",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Gold Plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_gold",
+        "output": "bob-gold-plate",
+        "recipes": [
+          "bob-gold-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-03",
+      "title": "Lead plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Lead outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 2,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-03",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Lead plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_lead",
+        "output": "bob-lead-plate",
+        "recipes": [
+          "bob-lead-plate",
+          "bob-lead-plate-2"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-04",
+      "title": "Nickel plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Nickel outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "no_matching_recipes",
+          "effects": 0,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-04",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "NIckel plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_nickel",
+        "output": "bob-nickel-plate",
+        "recipes": [
+          "bob-nickel-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-05",
+      "title": "Platinum plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Platinum outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "withheld-with-exact-environment-evidence",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "skipped",
+          "reason": "missing required item bob-platinum-plate",
+          "effects": 0,
+          "science": "",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-05",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Platinum plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_platinum",
+        "output": "bob-platinum-plate",
+        "recipes": [
+          "bob-platinum-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-06",
+      "title": "Silver plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Silver outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-06",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Silver plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_silver",
+        "output": "bob-silver-plate",
+        "recipes": [
+          "bob-silver-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-07",
+      "title": "Tin plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Tin outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-07",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Tin plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_tin",
+        "output": "bob-tin-plate",
+        "recipes": [
+          "bob-tin-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "automation-science-pack",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-08",
+      "title": "Titanium plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Titanium outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-08",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Titanium Plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_titanium",
+        "output": "bob-titanium-plate",
+        "recipes": [
+          "bob-titanium-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-09",
+      "title": "Copper Tungsten plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Copper Tungsten outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-09",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Copper Tungsten plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_copper_tungsten",
+        "output": "bob-copper-tungsten-alloy",
+        "recipes": [
+          "bob-copper-tungsten-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-10",
+      "title": "Zinc plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Zinc outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-10",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Zinc plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "base-metal",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_zinc",
+        "output": "bob-zinc-plate",
+        "recipes": [
+          "bob-zinc-plate"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-11",
+      "title": "Bronze plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Bronze outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-11",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Bronze plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_bronze",
+        "output": "bob-bronze-alloy",
+        "recipes": [
+          "bob-bronze-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-12",
+      "title": "Brass plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Brass outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-12",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Brass Plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_brass",
+        "output": "bob-brass-alloy",
+        "recipes": [
+          "bob-brass-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-13",
+      "title": "Gunmetal plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Gunmetal outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-13",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Gunmetal plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_gunmetal",
+        "output": "bob-gunmetal-alloy",
+        "recipes": [
+          "bob-gunmetal-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-14",
+      "title": "Invar plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Invar outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-14",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Invar plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_invar",
+        "output": "bob-invar-alloy",
+        "recipes": [
+          "bob-invar-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-15",
+      "title": "Cobalt Steel plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Cobalt Steel outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-15",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Cobalt Steel plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_cobalt_steel",
+        "output": "bob-cobalt-steel-alloy",
+        "recipes": [
+          "bob-cobalt-steel-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "BA-16",
+      "title": "Nitinol plate productivity",
+      "requesters": [
+        "igneustempus (earlier supplied Portal request)",
+        "Julesc012 (repeated in Reddit)"
+      ],
+      "decision": "commit-4.2",
+      "mechanism": "recipe productivity / native owner",
+      "proposed_scope": "Bob-only, Angel-only where valid, and combined environments",
+      "rationale": "One of sixteen explicit requested material outcomes, not one sixteenth of an unqualified blanket claim.",
+      "implementation": "Resolve exact Nitinol outputs, eligible smelting/casting/alloy routes, machine categories, native owners and progression. Reuse the material-family mechanism; do not add fictional prototypes when absent.",
+      "acceptance": [
+        "Exact output and intended route set",
+        "Existing owner preserved or MIR owner qualified",
+        "No duplicated bonuses across intermediate/plate claims",
+        "Process safety over admitted bonus range",
+        "Research/lab reachable",
+        "Upgrade and two reloads"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "material-families",
+      "status": "implemented-finite-routes-with-open-qualification",
+      "qualification": [
+        {
+          "scenario": "bob-core-suite",
+          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
+          "status": "generated",
+          "reason": "recipe_productivity",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack",
+          "lab_status": "full"
+        }
+      ],
+      "original_request": {
+        "id": "BA-16",
+        "status": "requested-not-implemented",
+        "requester": "igneustempus",
+        "source_refs": [
+          "U03"
+        ],
+        "user_term": "Nitinol plate",
+        "group": "bob-angel",
+        "kind": "feature",
+        "priority": "P1",
+        "target_release": "4.2.0",
+        "latest_goal": "4.3 programme closure; no automatic false pass",
+        "prototype_ids": [],
+        "prototype_resolution": "pending-exact-environment-capture",
+        "required_behavior": "Cover exact discovered plate-producing routes in appropriate Bob-only, Angel-only and valid combined environments; use recipe-level ownership and certified forward production.",
+        "acceptance": [
+          "requested display term mapped to exact environment-specific prototype IDs",
+          "missing subject explicitly NOT_PRESENT, not invented or called supported",
+          "direct smelting/casting/molten/ingot alternatives separately enumerated",
+          "catalysts and by-products accounted for",
+          "existing productivity owners preserved",
+          "no unsafe recovery/transmutation amplification",
+          "science, upgrade and reload proof"
+        ],
+        "bundle_policy": "included-in-applicable-official-MIR-ZIP; no required MIR companion",
+        "qualification": [],
+        "reporting_group": "alloy",
+        "group_is_presentation_only": true
+      },
+      "material_route_declaration": {
+        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "stream": "research_material_nitinol",
+        "output": "bob-nitinol-alloy",
+        "recipes": [
+          "bob-nitinol-alloy"
+        ],
+        "default_increment": 0.02,
+        "default_levels": 3,
+        "science": "derive-from-unlocks",
+        "safety": "positive-productivity-permission-and-no-recipe-return-path",
+        "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
+        "infinite_continuation": "not-implemented"
+      },
+      "remaining_obligations": [
+        "Later infinite continuation",
+        "Affected-save upgrade and two reloads",
+        "Actual manufacturing balance and process proof",
+        "Dependency-valid Angel-only and combined routes"
+      ]
+    },
+    {
+      "id": "ECO-AAI",
+      "title": "AAI compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-BZ",
+      "title": "BZ compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-PY",
+      "title": "Pyanodons compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-SE",
+      "title": "Space Exploration compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-IR3",
+      "title": "Industrial Revolution 3 compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-IR4",
+      "title": "Industrial Revolution 4 compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "ECO-PLANETS",
+      "title": "Planet and other Space Age mods compatibility programme",
+      "requesters": [
+        "Julesc012",
+        "earlier maintainer roadmap"
+      ],
+      "decision": "active-4.2-intake",
+      "mechanism": "generic mechanism plus exact profile",
+      "proposed_scope": "Dependency-valid supported engine environments",
+      "rationale": "Do not push entire named ecosystems to 4.3 merely by brand, but do not call unrelated exact locks full support.",
+      "implementation": "Apply science, owner, material and process mechanisms in parallel; publish exact implemented outcomes and concrete unresolved routes.",
+      "acceptance": [
+        "Exact legal dependency closure",
+        "Representative early/late saves",
+        "Actual packaged outcomes",
+        "Subject accounting separated from player completion"
+      ],
+      "source_ids": [
+        "P1",
+        "R1"
+      ],
+      "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    }
+  ]
+}

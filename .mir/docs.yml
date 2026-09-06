@@ -2844,6 +2844,14 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/mir4-community-outcomes-2026-09-06.md
+    title: "MIR 4.2 community implementation outcomes"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-community-implementation-outcomes
   - path: docs/releases/mir4-integration-and-delivery-plan.md
     title: "MIR 4 Integration and Delivery Plan"
     status: current

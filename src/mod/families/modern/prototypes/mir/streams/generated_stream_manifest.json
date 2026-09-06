@@ -13,7 +13,9 @@
       "generated_technology": "mir-auto-prod-manufacturing-assembling-machine-1",
       "stream_key": "research_auto_assembling_machine",
       "migration_policy": "stable",
-      "targets": ["family:assembling-machine"]
+      "targets": [
+        "family:assembling-machine"
+      ]
     },
     "mir-auto-prod-manufacturing-lab-1": {
       "introduced_in": "3.1.0",
@@ -27,7 +29,9 @@
       "generated_technology": "mir-auto-prod-manufacturing-lab-1",
       "stream_key": "research_auto_lab",
       "migration_policy": "stable",
-      "targets": ["family:lab"]
+      "targets": [
+        "family:lab"
+      ]
     },
     "recipe-prod-research_advanced_circuit-1": {
       "introduced_in": "pre-2.2.0",
@@ -1079,6 +1083,336 @@
       "migration_policy": "stable",
       "targets": [
         "stream:research_nutrients"
+      ]
+    },
+    "recipe-prod-research_material_aluminium-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_aluminium",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_aluminium-1",
+      "stream_key": "research_material_aluminium",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_aluminium"
+      ]
+    },
+    "recipe-prod-research_material_gold-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_gold",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_gold-1",
+      "stream_key": "research_material_gold",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_gold"
+      ]
+    },
+    "recipe-prod-research_material_lead-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_lead",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_lead-1",
+      "stream_key": "research_material_lead",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_lead"
+      ]
+    },
+    "recipe-prod-research_material_nickel-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_nickel",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nickel-1",
+      "stream_key": "research_material_nickel",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nickel"
+      ]
+    },
+    "recipe-prod-research_material_platinum-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_platinum",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_platinum-1",
+      "stream_key": "research_material_platinum",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_platinum"
+      ]
+    },
+    "recipe-prod-research_material_silver-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_silver",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_silver-1",
+      "stream_key": "research_material_silver",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_silver"
+      ]
+    },
+    "recipe-prod-research_material_tin-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_tin",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_tin-1",
+      "stream_key": "research_material_tin",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_tin"
+      ]
+    },
+    "recipe-prod-research_material_titanium-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_titanium",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_titanium-1",
+      "stream_key": "research_material_titanium",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_titanium"
+      ]
+    },
+    "recipe-prod-research_material_copper_tungsten-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_copper_tungsten",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_copper_tungsten-1",
+      "stream_key": "research_material_copper_tungsten",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_copper_tungsten"
+      ]
+    },
+    "recipe-prod-research_material_zinc-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_zinc",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_zinc-1",
+      "stream_key": "research_material_zinc",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_zinc"
+      ]
+    },
+    "recipe-prod-research_material_bronze-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_bronze",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_bronze-1",
+      "stream_key": "research_material_bronze",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_bronze"
+      ]
+    },
+    "recipe-prod-research_material_brass-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_brass",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_brass-1",
+      "stream_key": "research_material_brass",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_brass"
+      ]
+    },
+    "recipe-prod-research_material_gunmetal-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_gunmetal",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_gunmetal-1",
+      "stream_key": "research_material_gunmetal",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_gunmetal"
+      ]
+    },
+    "recipe-prod-research_material_invar-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_invar",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_invar-1",
+      "stream_key": "research_material_invar",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_invar"
+      ]
+    },
+    "recipe-prod-research_material_cobalt_steel-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_cobalt_steel",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_cobalt_steel-1",
+      "stream_key": "research_material_cobalt_steel",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_cobalt_steel"
+      ]
+    },
+    "recipe-prod-research_material_nitinol-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_nitinol",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_nitinol-1",
+      "stream_key": "research_material_nitinol",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_nitinol"
+      ]
+    },
+    "recipe-prod-research_material_rare_metals-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_rare_metals",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_rare_metals-1",
+      "stream_key": "research_material_rare_metals",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_rare_metals"
+      ]
+    },
+    "recipe-prod-research_material_imersite-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_imersite",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_imersite-1",
+      "stream_key": "research_material_imersite",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_imersite"
+      ]
+    },
+    "recipe-prod-research_material_silicon-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_silicon",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_silicon-1",
+      "stream_key": "research_material_silicon",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_silicon"
+      ]
+    },
+    "recipe-prod-research_material_glass-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_glass",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_glass-1",
+      "stream_key": "research_material_glass",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_glass"
+      ]
+    },
+    "recipe-prod-research_material_black_paving-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_black_paving",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_black_paving-1",
+      "stream_key": "research_material_black_paving",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_black_paving"
+      ]
+    },
+    "recipe-prod-research_material_white_paving-1": {
+      "introduced_in": "4.2.0",
+      "source": "community-material-route-declaration",
+      "capability": "recipe-productivity",
+      "family": "material_white_paving",
+      "policy": "exact-acyclic-material-manufacturing",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_material_white_paving-1",
+      "stream_key": "research_material_white_paving",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_material_white_paving"
       ]
     }
   }

@@ -226,6 +226,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-06.
 - [MIR 4 Integration and Delivery Plan](../../releases/mir4-integration-and-delivery-plan.md)
 - [MIR 4 Post-4.0 Roadmap](../../releases/mir4-post-4.0-roadmap.md)
 - [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md)
+- [MIR 4.2 community implementation outcomes](../../releases/mir4-community-outcomes-2026-09-06.md)
 - [Portable Return Ledger](../../compatibility/portable-return-ledger.md)
 
 ## modpack-author
