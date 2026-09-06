@@ -3395,9 +3395,9 @@
     {
       "path": "tools/lib/control/Core.ps1",
       "classification": "canonical-internal",
-      "sha256": "3E1B91DEF7A1144C83C324F6B14F431F2950F913273076D77AFEADB47F47A859",
+      "sha256": "EFE1F51A1FB0A7C7F41BD7C97B923F9D4E9EDCE359424AF2FFE4EF3CC206C0EE",
       "hash_mode": "canonical-text-v1",
-      "lines": 157,
+      "lines": 161,
       "package_visible": false
     },
     {
@@ -3523,9 +3523,9 @@
     {
       "path": "tools/lib/control/Views.ps1",
       "classification": "canonical-internal",
-      "sha256": "A8CEE9DC2844840E158A2967C120691FE05133E4E43CAA53B1986FAD00F4F965",
+      "sha256": "8E25C973EA97AC8E86885DF070967C9B213AAD71C1DEB5E9E738A79B9B173BD1",
       "hash_mode": "canonical-text-v1",
-      "lines": 639,
+      "lines": 635,
       "package_visible": false
     },
     {
@@ -5554,5 +5554,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:dc29dbd63e3a58a896231762fe9ed376556ab4facad7aaebe4b0e198aab8f2a6"
+  "digest": "sha256:16b8d64fbc00fa94130bc85aafc3c11b603a254155a673aea4ce8852ed75c252"
 }
