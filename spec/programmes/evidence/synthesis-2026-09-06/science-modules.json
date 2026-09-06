@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "scope": "controlled-modules-not-real-k2-qualification",
+  "assertions": 33,
+  "engine_version": "Version: 2.1.17 (build 87315, win64, steam)\r\nVersion: 64\r\nMap input version: 1.0.0-0\r\nMap output version: 2.1.17-0",
+  "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+  "test_sha256": "8C67838FB0975A0F74801EC899057B63806A7064628CA16FFD03ED5C8ACAD7F2",
+  "modules": [
+    {
+      "path": "src/mod/common/prototypes/mir/core/deepcopy.lua",
+      "sha256": "D18F286FD1AAFA9648133B7E32217F6B4B1E7697B2590D7A793F165447F3524C"
+    },
+    {
+      "path": "src/mod/common/prototypes/mir/platform/factorio/data_raw.lua",
+      "sha256": "FEECAA1ADAEFDF5D53594A63C2616BACED85EB03DFFEFFABBE539D2AF76EC31F"
+    },
+    {
+      "path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua",
+      "sha256": "6FA484A249426216E645EDA302E41DD509DD7986997C0CA2FA08A876EBDEACDA"
+    },
+    {
+      "path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+      "sha256": "B0DF0F0E58EBB681242ECD9DF18EA50DA7C8C73DA3BEC2222893460D4CEB5CD4"
+    },
+    {
+      "path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "sha256": "F1BD359DEC6148D7F5D67BDA9B9E429AEA59D9B7CF54F82B2FF6A690C8389DAE"
+    },
+    {
+      "path": "targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "sha256": "EBE7AA89720E78733E56658EDA8C67F29F6B53150F449AA6C1701DB3CF73B357"
+    },
+    {
+      "path": "targets/f210/files/prototypes/mir/planner/science.lua",
+      "sha256": "815A9833260481C0D41A5519D07DD3FB0E9C61CA820C967A7445B55DCB853F62"
+    }
+  ],
+  "log_sha256": "4172980A1DBDA22B924478B0FAD0F4D2F544279076F2F35D477E2238048CF402"
+}

@@ -31,7 +31,9 @@
     "development-breadth": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta"],
     "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
-    "promotion-check": ["seal.verify"]
+    "promotion-check": ["seal.verify"],
+    "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
+    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery"]
   },
   "classes": [
     {
@@ -248,6 +250,34 @@
       "id": "release-evidence",
       "patterns": ["^\\.mir/(evidence|target-lines|releases/(deltas|sources))/", "^dist/", "^tests/release/Test-MIRPublishedSnapshotIntegrity\\.ps1$"],
       "tests": ["tooling.self-test", "static.release-history", "static.full", "static.package"]
+    },
+    {
+      "id": "mir4-integration-synthesis",
+      "patterns": [
+        "^spec/programmes/inputs/synthesis-2026-09-05/",
+        "^spec/programmes/evidence/synthesis-2026-09-06/",
+        "^tests/mir4/Test-MIR4IntegrationProgramme[.]ps1$",
+        "^tests/compiler/(?:Test-MIRSciencePlanning[.]ps1|science_planning[.]lua)$",
+        "^docs/releases/mir4-integration-and-delivery-plan[.]md$"
+      ],
+      "tests": [
+        "static.mir4-integration-programme",
+        "docs.check"
+      ]
+    },
+    {
+      "id": "mir4-development-epoch",
+      "patterns": [
+        "^governance/repository/development-epoch-v1[.]json$",
+        "^tools/lib/validation/runner/Invoke-MIRValidationRunner[.]ps1$",
+        "^tools/mir/application/assurance/DevelopmentValidation[.]ps1$",
+        "^tests/repository/Test-MIR4(?:HistoricalBaseline|DevelopmentContracts)[.]ps1$"
+      ],
+      "tests": [
+        "static.mir4-historical-baseline",
+        "static.mir4-development-contracts",
+        "tooling.self-test"
+      ]
     }
   ],
   "unknown_policy": {

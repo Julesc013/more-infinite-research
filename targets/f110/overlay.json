@@ -1009,8 +1009,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.legacy source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9445,
-      "expected_sha256": "D869F76ED923EBB771F1C0B526FD6AEE0B9FFEE6D1899281978767BC90239C09",
+      "expected_bytes": 9609,
+      "expected_sha256": "1697D1096313E9FBB5A6105C1272FAE0B026D6F484C5C1FEDC3E37C60A44789D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3471,5 +3471,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "507F8A23696E94DD88479DB054548C8E66672FBE28849B3983AD2D059C107280"
+  "record_sha256": "4FB00D68F6B9FF33C63727FD38CF43A1AA9BC57B345555E6D689FC13BFB177AF"
 }

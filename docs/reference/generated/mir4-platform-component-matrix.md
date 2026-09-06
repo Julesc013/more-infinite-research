@@ -44,7 +44,7 @@ Generated from `spec/platform/mir4-preview-v0/platform.json`. V1 is the current 
 | `extension-closure-v1` | preview | deterministic-resolver-package-excluded |
 | `api-sdk-v1` | preview | bounded-copied-data-only-package-excluded |
 | `synthetic-reference-consumer-v1` | preview | blocked-independent-production-consumer |
-| `process-ir-v1` | preview | synthetic-parity-exact-target-snapshot-blocked |
+| `process-ir-v1` | preview | exact-t12-t13-captures-preview-no-player-mutation |
 | `effect-channel-registry-v1` | preview | owner-references-and-opaque-preservation |
 | `autonomous-synthesis-v1` | preview | diagnose-conservative-experimental-no-player-mutation |
 | `compatibility-subject-ledger-v1` | preview | multidimensional-private-evidence-nontransferable |

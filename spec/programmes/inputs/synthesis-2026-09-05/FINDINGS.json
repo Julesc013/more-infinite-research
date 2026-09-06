@@ -1,0 +1,113 @@
+{
+  "status": "review-findings-not-product-fixes",
+  "findings": [
+    {
+      "id": "F01",
+      "title": "Science exclusion reintroduction",
+      "evidence_class": "CONTROLLED_MODULE_OBSERVATION",
+      "sources": [
+        "R09",
+        "E02"
+      ],
+      "next_action": "Define exclusion/required/user-expansion precedence and verify final emitted technology.",
+      "witness_or_gap": "S01–S04",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F02",
+      "title": "Lab reduction loses late phase information",
+      "evidence_class": "CONTROLLED_MODULE_COUNTEREXAMPLE",
+      "sources": [
+        "R10",
+        "E02"
+      ],
+      "next_action": "Resolve phase intent before lossy lab reduction; test conflicts, skip/default behavior and actual engine locks.",
+      "witness_or_gap": "L01–L04",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F03",
+      "title": "Shipped K2 policy is narrowly gated; F200 lacks it",
+      "evidence_class": "PACKAGE_AND_MODULE_OBSERVATION",
+      "sources": [
+        "E01",
+        "E02",
+        "W01"
+      ],
+      "next_action": "Compare retained V2 and changed upstream exact locks before expanding admission.",
+      "witness_or_gap": "K01–K08",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F04",
+      "title": "ProcessIR maturity documentation disagrees with capture records",
+      "evidence_class": "LIVE_SOURCE_CONTRADICTION",
+      "sources": [
+        "R06",
+        "R07",
+        "R08",
+        "R13"
+      ],
+      "next_action": "Reconcile current projections without redoing valid captures or granting player mutation.",
+      "witness_or_gap": "Not run: repository projection regression",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F05",
+      "title": "Safety filter is not independent economic certification",
+      "evidence_class": "STATIC_FUNCTION_OBSERVATION",
+      "sources": [
+        "R11"
+      ],
+      "next_action": "Check concrete certificate evidence at mutation admission; do not trust booleans alone.",
+      "witness_or_gap": "Not run: certificate trust-boundary conformance",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F06",
+      "title": "Current branch ancestry and exact linear promotion are incompatible without a change",
+      "evidence_class": "LIVE_REFS_AND_RULES",
+      "sources": [
+        "R02",
+        "R03",
+        "R12",
+        "R14",
+        "R15"
+      ],
+      "next_action": "Adopt/rehearse one prospective topology policy before freeze; prefer exact-dev identity with bounded synchronization ancestry.",
+      "witness_or_gap": "Not run: protected promotion rehearsal",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F07",
+      "title": "Published-source promoter lacks durable restart reconciliation",
+      "evidence_class": "STATIC_CODE_AND_SUPPLIED_REPAIR",
+      "sources": [
+        "R15",
+        "A07"
+      ],
+      "next_action": "Import retained repairs; remove routine protection editing; fault-inject ambiguous outcomes.",
+      "witness_or_gap": "Not run: PowerShell/remote failure injection",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    },
+    {
+      "id": "F08",
+      "title": "Historical hash checks impede ordinary edits",
+      "evidence_class": "SUPPLIED_EXECUTION_REPORT",
+      "sources": [
+        "A07"
+      ],
+      "next_action": "Separate pinned historical verification from current development contracts.",
+      "witness_or_gap": "Not run: development-epoch repository checks",
+      "real_engine_reproduction": false,
+      "fixed_by_this_review": false
+    }
+  ]
+}

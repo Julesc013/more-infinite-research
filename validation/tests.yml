@@ -140,8 +140,8 @@
         "tests/compiler/Test-MIRResearchCostModels.ps1",
         "tests/architecture/Test-MIRModuleDependencies.ps1",
         "tests/compiler/Test-MIRCompilerContractCoverage.ps1",
-        "tests/compiler/Test-MIRCompilerSchemaDrift.ps1"
-        ,"tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
+        "tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
+        "tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
       ]
     },
     {
@@ -2204,7 +2204,7 @@
       "layer": "F0",
       "command": "./tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
       "requires_factorio": false,
-    "inputs": [
+      "inputs": [
         ".mir/assurance.json",
         ".github/workflows/validate.yml",
         ".github/workflows/mir4-release-seal.yml",
@@ -3836,6 +3836,89 @@
         "validation/tests.yml",
         "repository",
         "package-source"
+      ]
+    },
+    {
+      "id": "static.mir4-integration-programme",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/programmes/**",
+        "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
+        "spec/platform/mir4-preview-v0/platform.json",
+        "tests/mir4/Test-MIR4IntegrationProgramme.ps1"
+      ]
+    },
+    {
+      "id": "runtime.science-planning-contract",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRSciencePlanning.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRSciencePlanning.ps1",
+        "tests/compiler/science_planning.lua",
+        "src/mod/common/prototypes/mir/core/deepcopy.lua",
+        "src/mod/common/prototypes/mir/platform/factorio/data_raw.lua",
+        "src/mod/families/modern/prototypes/mir/capabilities/science_integration/**",
+        "targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "targets/f210/files/prototypes/mir/planner/science.lua"
+      ]
+    },
+    {
+      "id": "static.mir4-local-delivery",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4LocalDelivery.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir/application/release/LocalDelivery.ps1",
+        "tools/mir/cli/router/ProductCommands.ps1",
+        "tests/release/Test-MIR4LocalDelivery.ps1"
+      ]
+    },
+    {
+      "id": "static.mir4-historical-baseline",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4HistoricalBaseline.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/repository/development-epoch-v1.json",
+        "tests/repository/Test-MIR4HistoricalBaseline.ps1",
+        ".mir/releases/waves/mir4-r0/**",
+        "releases/migrations/**",
+        "governance/repository/migrations/**"
+      ]
+    },
+    {
+      "id": "static.mir4-development-contracts",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/repository/development-epoch-v1.json",
+        "tests/repository/Test-MIR4DevelopmentContracts.ps1",
+        "src/mod/**",
+        "targets/**",
+        "tools/mir/**",
+        "tests/**",
+        "spec/programmes/mir4-4x-operating-programme-v1.json"
+      ]
+    },
+    {
+      "id": "static.mir4-promotion-recovery",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4PromotionRecovery.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir/application/release/readiness/Promotion.ps1",
+        "tests/release/Test-MIR4PromotionRecovery.ps1"
       ]
     }
   ]

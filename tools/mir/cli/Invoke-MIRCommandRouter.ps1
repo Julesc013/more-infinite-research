@@ -62,7 +62,7 @@ Usage:
   .\tools\mir.ps1 mir4 release-narratives <render|check> --plan <path> --output <path>
   .\tools\mir.ps1 mir4 repository <generate|check|inventory|initialize> [--output <path>]
   .\tools\mir.ps1 mir4 factorio-2.1-channel <inspect|check> [--factorio <path>] [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <refresh|refresh-check|baseline|baseline-check|shadow|shadow-check|model|model-check> [--target <f210|f200|f110|f100>] [--output <path>]
   .\tools\mir.ps1 mir4 canonicalization-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 target-key-migration <check|show> [--output <path>]
@@ -77,7 +77,7 @@ Usage:
   .\tools\mir.ps1 mir4 assurance-offline-custody-migration <check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
-  .\tools\mir.ps1 mir4 package-source <baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
+  .\tools\mir.ps1 mir4 package-source <refresh|refresh-check|baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]
@@ -98,6 +98,7 @@ Usage:
   .\tools\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\tools\mir.ps1 release docs-only
   .\tools\mir.ps1 release docs-refresh
+  release deliver --manifest <file> --source-root <directory>
   .\tools\mir.ps1 overnight local [--profile <name>]
   .\tools\mir.ps1 audit local [--profile <name>]
   .\tools\mir.ps1 audit top25 --space-age

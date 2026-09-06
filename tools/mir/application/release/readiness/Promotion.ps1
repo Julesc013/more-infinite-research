@@ -9,7 +9,7 @@ function Invoke-MIR441CaptureCommand {
 
 function Get-MIR441RemoteBranchOid {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Branch)
-  $lines=Invoke-MIR441CaptureCommand -File 'git' -Arguments @('-C',$RepoRoot,'ls-remote','--heads','origin',"refs/heads/$Branch")
+  $lines=@(Invoke-MIR441CaptureCommand -File 'git' -Arguments @('-C',$RepoRoot,'ls-remote','--heads','origin',"refs/heads/$Branch"))
   if($lines.Count-ne1-or$lines[0]-notmatch'^([a-f0-9]{40})\s+'){throw "[mir441-remote-ref] $Branch"}
   return [string]$Matches[1]
 }
@@ -25,8 +25,8 @@ function Test-MIR441RulesetAppliesToMain {
   param([Parameter(Mandatory)]$Ruleset)
   if([string]$Ruleset.target-cne'branch'-or[string]$Ruleset.enforcement-ceq'disabled'-or@($Ruleset.rules|Where-Object type -eq 'pull_request').Count-eq0){return $false}
   $include=@($Ruleset.conditions.ref_name.include);$exclude=@($Ruleset.conditions.ref_name.exclude)
-  $included=(@('~ALL','~DEFAULT_BRANCH','refs/heads/main')|Where-Object{$_-in$include}).Count-gt0
-  $excluded=(@('~ALL','~DEFAULT_BRANCH','refs/heads/main')|Where-Object{$_-in$exclude}).Count-gt0
+  $included=@(@('~ALL','~DEFAULT_BRANCH','refs/heads/main')|Where-Object{$_-in$include}).Count-gt0
+  $excluded=@(@('~ALL','~DEFAULT_BRANCH','refs/heads/main')|Where-Object{$_-in$exclude}).Count-gt0
   return $included-and-not$excluded
 }
 
@@ -57,33 +57,42 @@ function Invoke-MIR441ExactMainPromotion {
     $detail=((Invoke-MIR441CaptureCommand -File 'gh' -Arguments @('api',"repos/$repository/rulesets/$([int64]$summary.id)"))-join"`n")|ConvertFrom-Json -Depth 100
     if(Test-MIR441RulesetAppliesToMain -Ruleset $detail){$applicable.Add($detail)}
   }
-  $planRecord=[pscustomobject][ordered]@{schema=1;kind='MIR441ExactMainPromotionPlanV1';status=$(if($Plan){'planned'}else{'authorized'});repository=$repository;source_commit=$source;main_before=$main;dev_before=$dev;fast_forward=$true;force_push=$false;pull_request_rules_to_suspend=@($applicable|ForEach-Object{[ordered]@{id=[int64]$_.id;name=[string]$_.name}});post_promotion_tests=$false}
+  # GitHub resolves organization inheritance, wildcard includes and exclusions.
+  # Do not approximate those rules with local literal matching.
+  $effective=((Invoke-MIR441CaptureCommand -File 'gh' -Arguments @('api',"repos/$repository/rules/branches/main"))-join "`n") | ConvertFrom-Json -Depth 100
+  $planRecord=[pscustomobject][ordered]@{schema=1;kind='MIR441ExactMainPromotionPlanV1';status=$(if($Plan){'planned'}else{'authorized'});repository=$repository;source_commit=$source;main_before=$main;dev_before=$dev;fast_forward=$true;force_push=$false;pull_request_rules_to_suspend=@();blocking_pull_request_rules=@($effective | Where-Object type -eq 'pull_request');protection_mutation_authorized=$false;post_promotion_tests=$false}
   if($Plan){return $planRecord}
   $root=Join-Path $evidence 'promotion';if(-not(Test-Path -LiteralPath $root)){New-Item -ItemType Directory -Force -Path $root|Out-Null}
-  $changed=[Collections.Generic.List[object]]::new();$pushSucceeded=$false
+  # A normal release may not suspend protections. Resolve the prospective
+  # topology/controller policy before freeze; an unsupported path fails closed.
+  if(@($effective | Where-Object type -eq 'pull_request').Count -gt 0) { throw '[mir441-promotion-protected-pr-required] Normal promotion cannot edit branch protections.' }
+  $lockPath=Join-Path $root 'promotion.lock'
+  $lease=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
   try {
-    foreach($ruleset in @($applicable)){
-      $original=ConvertTo-MIR441RulesetPayload -Ruleset $ruleset;$modified=ConvertTo-MIR441RulesetPayload -Ruleset $ruleset -WithoutPullRequest
-      $originalPath=Join-Path $root "ruleset-$([int64]$ruleset.id)-original.json";$modifiedPath=Join-Path $root "ruleset-$([int64]$ruleset.id)-promotion.json"
-      Write-MIR441Json -Value $original -Path $originalPath;Invoke-MIR441RulesetUpdate -Repository $repository -Id ([int64]$ruleset.id) -Payload $modified -Path $modifiedPath
-      $changed.Add([pscustomobject][ordered]@{id=[int64]$ruleset.id;name=[string]$ruleset.name;original=$original;original_path=$originalPath})
+    $intentPath=Join-Path $root 'promotion-intent.json'
+    $intent=[ordered]@{schema=1;kind='MIR4PromotionIntentV1';repository=$repository;source_commit=$source;main_before=$main;technical_seal_sha256=(Get-FileHash -LiteralPath (Join-Path $window 'technical-seal.json') -Algorithm SHA256).Hash;protection_mutation_authorized=$false}
+    if(Test-Path -LiteralPath $intentPath) {
+      $prior=Get-Content -Raw -LiteralPath $intentPath | ConvertFrom-Json -Depth 20
+      foreach($field in @('repository','source_commit','technical_seal_sha256')) { if([string]$prior.$field -cne [string]$intent[$field]) { throw "[mir441-promotion-intent-conflict] $field" } }
+      $main=[string]$prior.main_before
+    } else { Write-MIR441Json -Value $intent -Path $intentPath }
+    $current=Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch main
+    if($current -cne $source) {
+      if($current -cne $main -or (Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch dev) -cne $source) { throw '[mir441-promotion-precondition-drift]' }
+      $pushFailure=$null
+      try { Invoke-MIR441CaptureCommand -File 'git' -Arguments @('-C',$repo,'push','origin',"${source}:refs/heads/main") | Out-Null }
+      catch { $pushFailure=$_ }
+      # Applied effect plus lost response is resolved by readback, never by
+      # assuming a failed command left remote state unchanged.
+      $current=Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch main
+      if($current -cne $source) {
+        if($null -ne $pushFailure) { throw $pushFailure }
+        throw '[mir441-promotion-readback]'
+      }
     }
-    Invoke-MIR441CaptureCommand -File 'git' -Arguments @('-C',$repo,'push','origin',"${source}:refs/heads/main")|Out-Null;$pushSucceeded=$true
-  } finally {
-    $restoreEntries=@($changed);[array]::Reverse($restoreEntries)
-    foreach($entry in $restoreEntries){
-      $restorePath=Join-Path $root "ruleset-$([int64]$entry.id)-restore.json"
-      try{Invoke-MIR441RulesetUpdate -Repository $repository -Id ([int64]$entry.id) -Payload $entry.original -Path $restorePath}catch{Write-Error "[mir441-promotion-ruleset-restore] $([int64]$entry.id): $($_.Exception.Message)"}
-    }
-  }
-  if(-not$pushSucceeded){throw '[mir441-promotion-push-incomplete]'}
-  $devAfter=Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch dev;$mainAfter=Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch main
-  if($devAfter-cne$source-or$mainAfter-cne$source){throw '[mir441-promotion-readback]'}
-  foreach($entry in @($changed)){
-    $readback=((Invoke-MIR441CaptureCommand -File 'gh' -Arguments @('api',"repos/$repository/rulesets/$([int64]$entry.id)"))-join"`n")|ConvertFrom-Json -Depth 100
-    $expected=(ConvertTo-MIR441CanonicalJson -Value $entry.original -Compress).Trim();$actual=(ConvertTo-MIR441CanonicalJson -Value (ConvertTo-MIR441RulesetPayload -Ruleset $readback) -Compress).Trim()
-    if($actual-cne$expected){throw "[mir441-promotion-ruleset-readback] $([int64]$entry.id)"}
-  }
+    $devAfter=Get-MIR441RemoteBranchOid -RepoRoot $repo -Branch dev
+    $mainAfter=$current
+    if($devAfter -cne $source) { throw '[mir441-promotion-dev-drift-after-effect]' }
   $receipt=[ordered]@{schema=1;kind='MIR441ExactMainPromotionV1';status='MIR41-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST';repository=$repository;source_commit=$source;source_tree=[string]$seal.source.tree;main_before=$main;main_after=$mainAfter;dev_after=$devAfter;fast_forward=$true;force_push=$false;rulesets_restored=$true;post_promotion_tests=$false;tag_remote_absent=$true;human_playtest='pending';publication_authorized=$false;promoted_at=[DateTimeOffset]::UtcNow.ToString('o')}
   Write-MIR441Json -Value $receipt -Path (Join-Path $window 'main-promotion.json')
   $finalCustody=[ordered]@{schema=1;kind='MIR441FinalReleaseWindowCustodyV1';status='sealed-on-main-awaiting-human-playtest';source=$seal.source;objects=@(Get-MIR441DirectoryIdentities -Root $window -Exclude @('final-custody-manifest.json'));human_playtest='pending';publication_authorized=$false};Write-MIR441Json -Value $finalCustody -Path (Join-Path $window 'final-custody-manifest.json')
@@ -91,4 +100,5 @@ function Invoke-MIR441ExactMainPromotion {
   $ready=[ordered]@{schema=1;kind='MIR441FinalReadinessV1';status='READY-FOR-ONE-MINUTE-PLAYTEST-GATE';state='MIR41-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST';source=$seal.source;technical_seal=(Get-MIR441FileIdentity -Path (Join-Path $window 'technical-seal.json') -RelativePath 'release-window/technical-seal.json');promotion=(Get-MIR441FileIdentity -Path (Join-Path $window 'main-promotion.json') -RelativePath 'release-window/main-promotion.json');prepared_tag=(Get-MIR441FileIdentity -Path (Join-Path $window 'prepared-tag.json') -RelativePath 'release-window/prepared-tag.json');final_custody=(Get-MIR441FileIdentity -Path (Join-Path $window 'final-custody-manifest.json') -RelativePath 'release-window/final-custody-manifest.json');capsule=$capsule;automated_work_remaining=@();human_playtest='sole-pending-gate';tag_remote_absent=$true;publication_authorized=$false}
   Write-MIR441Json -Value $ready -Path (Join-Path $evidence 'READY-FOR-ONE-MINUTE-PLAYTEST-GATE.json')
   return [pscustomobject]$ready
+  } finally { $lease.Dispose() }
 }

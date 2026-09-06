@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('refresh','refresh-check','baseline','baseline-check','shadow','shadow-check','model','model-check','materialize','materialize-check','runtime-replay','runtime-replay-check')][string]$Command,
   [Parameter(Mandatory)][string]$RepoRoot,
   [string]$OutputPath,
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'M41-EDITABLE-SOURCE',
@@ -14,6 +14,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+if ($Command -in @('refresh','refresh-check')) {
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') | ConvertTo-Json -Depth 6
+  return
+}
 if ($Command -eq 'runtime-replay') {
   foreach ($required in @(@{name='FactorioBin';value=$FactorioBin},@{name='WorkRoot';value=$WorkRoot},@{name='EvidenceRoot';value=$EvidenceRoot})) {
     if ([string]::IsNullOrWhiteSpace([string]$required.value)) { throw "runtime-replay requires $($required.name)." }

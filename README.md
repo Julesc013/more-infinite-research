@@ -35,6 +35,8 @@ The MIR 4 source tree contains five maturity classes:
 
 Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
 
+For the maintained 4.1 release and the integration programme for 4.2, 4.3, and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
+
 ## Player behavior
 
 - Recipe and fluid-output productivity research for admitted intermediate, logistics, combat, infrastructure, science, and Space Age chains.

@@ -1,0 +1,415 @@
+{
+  "status": "proposal-not-repository-authority",
+  "base_commit": "3683369ba00cfbdd7f8872a5a1b24f0d59f31062",
+  "no_release_version_allocated": true,
+  "existing_wip_limits": {
+    "feature_trains": 1,
+    "authority_migrations": 1,
+    "stable_patches": 1
+  },
+  "recommended_initial_heavy_engine_concurrency": 1,
+  "nodes": [
+    {
+      "id": "A00",
+      "title": "Reobserve baseline and obtain current task authority",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [],
+      "programme_mapping": [
+        "M41-08"
+      ],
+      "owner_domain": "release-state",
+      "acceptance": [
+        "Preserve immutable 4.1",
+        "Observe current refs, channels and local custody",
+        "Keep F210 waiver classification"
+      ],
+      "authority_boundary": "read-only; no new publication authority",
+      "requests": []
+    },
+    {
+      "id": "A01",
+      "title": "Reconcile current projections and bounded development epoch",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00"
+      ],
+      "programme_mapping": [
+        "M41-08",
+        "M43-00"
+      ],
+      "owner_domain": "repository-authority",
+      "acceptance": [
+        "Historical receipts checked against historical objects",
+        "Current contracts permit bounded new edits",
+        "Resolve ProcessIR capture-status discrepancy",
+        "Preserve README and package authority"
+      ],
+      "authority_boundary": "prospective authority amendment requires acceptance",
+      "requests": []
+    },
+    {
+      "id": "A02",
+      "title": "Inventory retained code by product destination",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "component-inventory",
+      "acceptance": [
+        "Every existing component gets a disposition",
+        "Trace source\u2192overlay\u2192ZIP",
+        "Compare retained branch deltas semantically",
+        "No blanket graduation"
+      ],
+      "authority_boundary": "read-only discovery; projections via existing writers",
+      "requests": []
+    },
+    {
+      "id": "A03",
+      "title": "Capture exact K2/K2SO request locks",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "integration-intake",
+      "acceptance": [
+        "Exact engine/mod/settings/package identities",
+        "Native reference tech and reachable labs",
+        "Old admitted and current lineage kept separate"
+      ],
+      "authority_boundary": "read-only acquisition under existing rights and machine policy",
+      "requests": [
+        "K2-01"
+      ]
+    },
+    {
+      "id": "A04",
+      "title": "Resolve science/phase/lab contract and real reproducer",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01",
+        "A03"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "science-integration",
+      "acceptance": [
+        "Port controlled witnesses to repository test authority",
+        "Test configured, additive, required, reduce/skip/default cases",
+        "Verify final emission, early/late progression and nonzero-progress reload",
+        "Classify patch eligibility from actual reproduction"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": [
+        "K2-01"
+      ]
+    },
+    {
+      "id": "A05",
+      "title": "K2 material route and ownership admissions",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01",
+        "A02",
+        "A03"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "material-family",
+      "acceptance": [
+        "Exact route mapping",
+        "Native imersite owner preserved where valid",
+        "No upstream denial override",
+        "Paving recoloring/returns analyzed",
+        "Packaged and qualified per request"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": [
+        "K2-02",
+        "K2-03",
+        "K2-04",
+        "K2-05",
+        "K2-06",
+        "K2-07"
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "Bob/Angel acquisition and sixteen-family admissions",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01",
+        "A02"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "material-family",
+      "acceptance": [
+        "Intake can start read-only immediately after A00",
+        "Separate valid Bob/Angel/combined locks",
+        "Shared mechanism, individual recipe obligations",
+        "Absent subjects do not count as delivered",
+        "Ownership/progression/save proof"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": [
+        "BA-01",
+        "BA-02",
+        "BA-03",
+        "BA-04",
+        "BA-05",
+        "BA-06",
+        "BA-07",
+        "BA-08",
+        "BA-09",
+        "BA-10",
+        "BA-11",
+        "BA-12",
+        "BA-13",
+        "BA-14",
+        "BA-15",
+        "BA-16"
+      ]
+    },
+    {
+      "id": "A07",
+      "title": "Import permanent operator repair",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00"
+      ],
+      "programme_mapping": [
+        "maintenance",
+        "M44-00"
+      ],
+      "owner_domain": "release-operator",
+      "acceptance": [
+        "Inspect supplied repaired files; do not execute historical controller",
+        "Consolidated preflight",
+        "Durable intent and recovery",
+        "Bound draft-ID/tag/seal/assets",
+        "Zero/one/many, timeout, kill and local-copy fault injection"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A08",
+      "title": "Choose and rehearse exact promotion topology",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00"
+      ],
+      "programme_mapping": [
+        "maintenance",
+        "M44-00"
+      ],
+      "owner_domain": "release-policy",
+      "acceptance": [
+        "Accepted policy resolves main/dev divergence",
+        "No routine ruleset suspension",
+        "Checks/no-force/no-delete isolated from any accepted workflow exception",
+        "Test ref drift and recovery"
+      ],
+      "authority_boundary": "requires explicit prospective policy acceptance; no automatic security changes",
+      "requests": []
+    },
+    {
+      "id": "A09",
+      "title": "Run scoped unattended implementation pilot",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01",
+        "A02"
+      ],
+      "programme_mapping": [
+        "M43-00",
+        "M44-00"
+      ],
+      "owner_domain": "automation",
+      "acceptance": [
+        "One writer per domain",
+        "Existing verification planner selected first",
+        "No evaluator weakening or publisher secrets",
+        "Bounded retries and persistent checkpoints",
+        "Measure interventions on actual integrations"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A10",
+      "title": "Extend process certificates only for consumer-required routes",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A02"
+      ],
+      "programme_mapping": [
+        "M43-00",
+        "M44-00"
+      ],
+      "owner_domain": "process-safety",
+      "acceptance": [
+        "Exact model/bonus domain",
+        "Known-safe and known-unsafe controls",
+        "Evidence resolved independently",
+        "Unknown values not coerced to zero/safe",
+        "No second emitter"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A11",
+      "title": "Graduate consumer-used API/MEP/runtime/Inspector slices",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A02"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "public-contracts",
+      "acceptance": [
+        "Real independent consumer",
+        "Negative/unknown-field and resource-bound tests",
+        "Target capability and migration tests",
+        "Read-only surfaces remain read-only",
+        "Not a universal prerequisite for data-only material changes"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A12",
+      "title": "Broaden dependency-valid ecosystem coverage",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A04",
+        "A05",
+        "A06"
+      ],
+      "programme_mapping": [
+        "M43-00"
+      ],
+      "owner_domain": "ecosystem-admission",
+      "acceptance": [
+        "Scouting can start after A00; these dependencies concern reuse/integration",
+        "AAI/BZ/IR/SE/Py/planets/held-out corpus kept visible",
+        "Exact locks and scoped claims",
+        "No invalid mega-mod combination",
+        "Every deferment has actual blocker/next proof"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A13",
+      "title": "Calibrate impact selection and evidence reuse",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01"
+      ],
+      "programme_mapping": [
+        "M44-00"
+      ],
+      "owner_domain": "assurance",
+      "acceptance": [
+        "Bound all semantic inputs and evaluator trust",
+        "Reuse unaffected propositions without cross-target runtime borrowing",
+        "Periodic broader hold-out comparison",
+        "Same-fingerprint contradiction quarantined",
+        "Report actual cold/reused times"
+      ],
+      "authority_boundary": "bounded implementation after accepted task authority",
+      "requests": []
+    },
+    {
+      "id": "A14",
+      "title": "Prepare next coherent release or eligible stable correction",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A01",
+        "A07",
+        "A08"
+      ],
+      "programme_mapping": [
+        "M43-00",
+        "maintenance"
+      ],
+      "owner_domain": "release-coordinator",
+      "acceptance": [
+        "Declare actual feature/target commitment at freeze",
+        "Join every selected slice required proof, not every unrelated future feature",
+        "Exact source/package/operator identities",
+        "Current required acceptance; no recycled F210 waiver",
+        "Immutable publication only under authorization",
+        "Primary-checkout verified dist/notes/index"
+      ],
+      "authority_boundary": "preparation may be authorized separately; publication/signing/GO require actual authority",
+      "requests": []
+    },
+    {
+      "id": "A15",
+      "title": "Historical capability probes and independently admitted targets",
+      "state": "PROPOSED_NOT_EXECUTED",
+      "depends_on": [
+        "A00",
+        "A02"
+      ],
+      "programme_mapping": [
+        "M45-00 (proposed future allocation)"
+      ],
+      "owner_domain": "historical-targets",
+      "acceptance": [
+        "Preserve all 22 lines as inventory",
+        "Exact lawful engine custody",
+        "Loader/effect/version transport proof",
+        "Clean-install baseline where no published predecessor",
+        "No current-target release blockage"
+      ],
+      "authority_boundary": "new target admission/programme allocation requires acceptance",
+      "requests": []
+    }
+  ],
+  "dependency_semantics": "Edges gate implementation completion. Read-only acquisition/scouting may start after A00 where specified. A14 additionally joins the exact frozen set of selected feature proofs; it does not require every roadmap node.",
+  "release_horizon": {
+    "4.1.x": "Reproduced bounded compatible corrections only",
+    "4.2": "Substantial built-in integration admissions",
+    "4.3": "Actual carryover and operational/semantic maturity",
+    "4.4+": "Current authority unallocated; historical allocation proposed"
+  },
+  "time_objectives_hours": {
+    "minor": 24,
+    "patch": 6,
+    "hotfix": 1
+  },
+  "time_objectives_measured": false,
+  "resource_leases": {
+    "authority_migration": {
+      "capacity": 1,
+      "applies_to": [
+        "A01",
+        "A08"
+      ],
+      "note": "Planning may overlap; accepted normative mutations are serialized."
+    },
+    "heavy_engine_campaign": {
+      "capacity": 1,
+      "note": "Initial recommendation, increase only from measured host capacity."
+    },
+    "normative_writer": {
+      "capacity_per_domain": 1,
+      "note": "Exclusive writer lease even across separate worktrees."
+    }
+  }
+}

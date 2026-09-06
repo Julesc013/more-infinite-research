@@ -1,0 +1,73 @@
+{
+  "schema": 2,
+  "kind": "MIR4ChangeFragmentV2",
+  "change_id": "MIR4-CHG-2026-0045",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Keep compatibility exclusions and K2 science phase constraints through science expansion and lab selection.",
+  "details": [
+    "Reapply compatibility exclusions after additive science selection; hard progression requirements retain precedence.",
+    "Normalize the intended F210 K2 science phase before lab selection and require a surviving phase trigger in reduced results.",
+    "Fail closed on hard-required versus retired packs and unreachable phase triggers; preserve the existing exact K2 2.1.2 / K2SO 2.0.13 envelope.",
+    "Add controlled science assertions and exact local K2 load evidence; broader target and save qualification remain explicit release gates."
+  ],
+  "semantic_domains": [
+    "science",
+    "compatibility",
+    "compiler"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Exclusion precedence changes in the shared science selector; F210 additionally retains phase intent during lab selection."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Exclusion precedence changes in the shared science selector; F210 additionally retains phase intent during lab selection."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Exclusion precedence changes in the shared science selector; F210 additionally retains phase intent during lab selection."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Exclusion precedence changes in the shared science selector; F210 additionally retains phase intent during lab selection."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "compatible",
+    "migration": "none",
+    "compatibility": "changed",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "MIR4-SYNTHESIS-F01-F02"
+    },
+    {
+      "kind": "document",
+      "value": "docs/releases/mir4-integration-and-delivery-plan.md"
+    }
+  ]
+}
