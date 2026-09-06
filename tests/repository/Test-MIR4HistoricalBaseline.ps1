@@ -28,6 +28,13 @@ if($LASTEXITCODE -ne 0) { throw '[mir4-history-clone]' }
 & git -C $worktree fetch --no-tags $repo '+refs/remotes/origin/*:refs/remotes/origin/*' 2>&1 | Out-Null
 if($LASTEXITCODE -ne 0) { throw '[mir4-history-remote-ref-custody]' }
 
+# Original branch-policy checks fetch advertised heads. The local object donor
+# is not that remote; keep the primary checkout's upstream for those reads.
+$upstreamOrigin=(& git -C $repo remote get-url origin).Trim()
+if($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($upstreamOrigin)) { throw '[mir4-history-upstream-origin]' }
+& git -C $worktree remote set-url origin $upstreamOrigin
+if($LASTEXITCODE -ne 0) { throw '[mir4-history-upstream-origin]' }
+
 & git -C $worktree checkout --detach $epoch.historical_commit 2>&1 | Out-Null
 if($LASTEXITCODE -ne 0) { throw '[mir4-history-materialization]' }
 $priorMode=$env:MIR4_EXTERNAL_EVIDENCE_MODE
