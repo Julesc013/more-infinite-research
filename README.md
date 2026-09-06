@@ -10,35 +10,6 @@ More Infinite Research (MIR) is a proof-governed Factorio research product line.
 
 The 4.2 development packages for Factorio 2.1 and 2.0 bundle an MIR Research Browser. Open it with the MIR button or `/mir-research`. Personal All/Finite/Infinite filters, ID/family search, pages and a native queue mirror leave force research state unchanged. The enqueue button checks current availability and permissions. The same screen groups effective settings by technology; startup values require a restart, and profile export uses the existing MIRSET1 import setting. Exact multiplayer qualification and detailed omitted-route explanations remain open in the [community request ledger](spec/programmes/community-requests.json).
 
-## MIR 4.0 Whole-Platform Genesis
-
-MIR 4.0 established the shared product line. **[MIR 4.1.0 is now published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the detailed research and settings model below while separating editable package source, target overlays, repository documentation, and release evidence.
-
-### MIR 4.1: choose the right target
-
-Download the ZIP for your Factorio line. All four packages have independent technical qualification; F210 and F200 are the primary player targets, with F110 and F100 supplied as supplemental LTS targets.
-
-| Product | Factorio line | Distribution version | Upgrade baseline | Release requirement |
-| --- | --- | --- | --- | --- |
-| F210 | 2.1 experimental | [4.1.21000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.21000.zip) | MIR `4.0.21000` | required / primary |
-| F200 | 2.0 | [4.1.20000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.20000.zip) | MIR `4.0.20000` | required / primary |
-| F110 | 1.1 | [4.1.11000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.11000.zip) | MIR `4.0.11000` | required / supplemental LTS |
-| F100 | 1.0 | [4.1.10000](https://github.com/Julesc013/more-infinite-research/releases/download/v4.1.0/more-infinite-research_4.1.10000.zip) | MIR `4.0.10000` | required / supplemental LTS |
-
-`4.1.0` identifies the shared source release. The five-digit distribution suffix identifies the target line; it is not a claim that every Factorio generation has identical capabilities. F018 through F013 remain private experimental products unless separately admitted.
-
-F210 follows the latest installed official Factorio 2.1 experimental build until the first official 2.1 stable release. Each qualification records the exact executable, runtime API, prototype API, and changelog identity. An identity change opens fresh review work before evidence is reused. The published F210 package was qualified on 2.1.17; F200, F110, and F100 were qualified on 2.0.77, 1.1.110, and 1.0.0 respectively.
-
-The MIR 4 source tree contains five maturity classes:
-
-- **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
-- **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
-- **shadow** — executable comparison machinery that cannot write player output;
-- **experimental** — bounded private work with no public support authority;
-- **omitted** — intentionally absent from a target or release artifact.
-
-Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
-
 For the maintained 4.1 release and the integration programme for 4.2, 4.3, and later targets, see the [integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md). Planned or preview work does not expand current compatibility claims.
 
 ## Player behavior
@@ -53,15 +24,19 @@ For the maintained 4.1 release and the integration programme for 4.2, 4.3, and l
 
 Install the target-matching player ZIP from the [Factorio Mod Portal](https://mods.factorio.com/mod/more-infinite-research) or the [GitHub release assets](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0), and leave the ZIP packed in the Factorio mods directory. Do not install developer-preview archives or the automatically generated GitHub source archives as a mod.
 
-- F210 upgrades directly from MIR 4.0.21000 and retains its admitted technology IDs, settings, migrations, and runtime state.
-- F200 upgrades directly from MIR 4.0.20000 under its target-local evidence.
-- F110 and F100 upgrade from MIR 4.0.11000 and 4.0.10000 respectively.
-- Back up the save, select the package for the running Factorio line, and keep startup settings unchanged for the first load.
-- A support request should include an exact [SupportBundleV1](SUPPORT.md), not only a mod list or screenshot.
-
 For MIR 3 saves, follow [Upgrading from MIR 3 to MIR 4](docs/user/mir3-to-mir4.md) to reach the corresponding 4.0 baseline first. See also [installation](docs/user/installation.md) and the target package README for current steps. MIR 3 and earlier remain immutable historical baselines; their architecture and release records are retained under `docs/releases/` and `.mir/releases/terminal/`.
 
 ## Repository and branches
+
+The MIR 4 source tree contains five maturity classes:
+
+- **stable** — authorized player compiler, emitter, runtime, migration, and admitted target behavior;
+- **preview** — separately packaged developer interfaces with versioned schemas and conformance tests;
+- **shadow** — executable comparison machinery that cannot write player output;
+- **experimental** — bounded private work with no public support authority;
+- **omitted** — intentionally absent from a target or release artifact.
+
+Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
 
 `dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line: player releases arrive through exact sealed-candidate promotion, while bounded documentation and repository-governance corrections use protected PRs under the branch policy. Historical target branches are custody references, not alternative MIR 4 authoring roots.
 
