@@ -21,6 +21,12 @@ New-Item -ItemType Directory -Force -Path $root | Out-Null
 # with the original Windows checkout convention and the pinned attributes.
 & git clone --shared --no-checkout -c core.autocrlf=true $repo $worktree 2>&1 | Out-Null
 if($LASTEXITCODE -ne 0) { throw '[mir4-history-clone]' }
+
+# A local clone advertises local heads, whereas Actions keeps branch history
+# under refs/remotes/origin. Preserve that read-only namespace in the replay.
+& git -C $worktree fetch --no-tags $repo '+refs/remotes/origin/*:refs/remotes/origin/*' 2>&1 | Out-Null
+if($LASTEXITCODE -ne 0) { throw '[mir4-history-remote-ref-custody]' }
+
 & git -C $worktree checkout --detach $epoch.historical_commit 2>&1 | Out-Null
 if($LASTEXITCODE -ne 0) { throw '[mir4-history-materialization]' }
 $priorMode=$env:MIR4_EXTERNAL_EVIDENCE_MODE
