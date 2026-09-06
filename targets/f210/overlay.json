@@ -193,8 +193,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 45035,
-      "expected_sha256": "41D3F4BAF69231A6DAF8E8A9A4CA2ADFD6EFF01B785ABC249B0DCDCD57D27C45",
+      "expected_bytes": 46427,
+      "expected_sha256": "3FB35142DEE192F466BBCCF405C2E99CCA9748AEFFB1DA0B6C18F5BFBDEAC7CE",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -865,8 +865,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 12249,
-      "expected_sha256": "31E3D3A25F9057C33ABEB27B4F95CA55F00505D47037D5817D6BDB39494E201E",
+      "expected_bytes": 14931,
+      "expected_sha256": "99E25349BF5AEFE17A97A3397CED8549428939AED626B01BB0B26FC13EB49E0C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3617,8 +3617,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed targets.f210 source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3161,
-      "expected_sha256": "964849B4BCBE567E1165E943C26FED1B82840F160629E4613AE2DFF2F38A6A0F",
+      "expected_bytes": 3288,
+      "expected_sha256": "33CB8DFF30F018C6D282B00719003707E494271DD3098786AED81E195869EFE1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3809,8 +3809,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 39914,
-      "expected_sha256": "C39F12EC0177882B7574FFCED76D9F35C41E672BB0656532BD3A128E31625130",
+      "expected_bytes": 52629,
+      "expected_sha256": "107EBC191467C3AFEAFC513026CB2CA64E4792E248781429F70AE53908FA8208",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3857,8 +3857,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 25894,
-      "expected_sha256": "3F53C3C408BE8D1425E9C3AC44BBF6D5240556B2CED4AD8B4A2CCD382A6196EB",
+      "expected_bytes": 29862,
+      "expected_sha256": "C4D2D1C7E27EE3C8C004344B74DA84032B79813E50FC86018EE8D20BA10F6B04",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3880,6 +3880,38 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Bundled personal browser on exact qualified modern GUI targets.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 16998,
+      "expected_sha256": "DE4517FE17170A72CCE28E4755360CFF630BCA4F84DC75CECF4DD74781F0D9C4",
+      "proof_obligations": [
+        "personal-filter-force-noninterference",
+        "bounded-runtime-lifecycle",
+        "exact-target-gui-and-queue"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_model.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Bundled personal browser on exact qualified modern GUI targets.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 2757,
+      "expected_sha256": "0BED8E3CDCD22A319FC270F48E19D4BE9C5D44DE3D8EEA2CA5BBA3D89AD5945D",
+      "proof_obligations": [
+        "personal-filter-force-noninterference",
+        "bounded-runtime-lifecycle",
+        "exact-target-gui-and-queue"
+      ]
     }
   ],
   "invariants": {
@@ -3887,5 +3919,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "80A65C1E8472A6B2ACBE9A5DD5F413C82030B36B5BA2068DAB8A4E633DE116F4"
+  "record_sha256": "B9FECE68D2BDA9EBF6A0DABF55BE9329D6DC03BD173001334899D05D1FECEEFC"
 }

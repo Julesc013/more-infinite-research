@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 440 pages as of 2026-09-06.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 441 pages as of 2026-09-06.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -379,6 +379,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-publication-copy.md | MIR 4.0 Publication Copy | current | release-manager | release-plan | mir-maintainers | 2026-08-29 |
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
+| docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
 | docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
 | docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |

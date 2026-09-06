@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "assertions": 278,
+  "engine": "2.1.17",
+  "control_energy": 602666.6666666567,
+  "economy_energy": 482133.33333334327,
+  "ratio": 0.8000000000000297,
+  "travel": 76.828125,
+  "speed": 0.4467713651470556,
+  "scope": "package-excluded-Car-and-maintenance-prototypes; no-multiplayer-or-save-migration-qualification",
+  "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+  "prototype_sha256": "6B19171C5CA359A7B5863D47A8A12DAB82133124B3497FBCEE10D898880CCE75",
+  "test_sha256": "CE42692BB78243BC81EC213B48C3ABD8A8E269C60EBA651377E6B409CEDD1FD8",
+  "harness_sha256": "7E1E5916412A0DC61C387385727B10C4793C6F7BDF3B0AD5D0311A2E55547F30",
+  "target": "2.1"
+}

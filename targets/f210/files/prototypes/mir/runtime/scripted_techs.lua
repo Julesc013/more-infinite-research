@@ -6,6 +6,8 @@ local planet_discovery_recovery = require("prototypes.mir.runtime.planet_discove
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local runtime_state = require("prototypes.mir.runtime.state")
 
+local research_browser = require("prototypes.mir.runtime.research_browser")
+
 local M = {}
 M.requires_features = {"scripted_techs", "productivity_family_adoption"}
 
@@ -14,7 +16,8 @@ local features = {
   agricultural_growth,
   productivity_family_adoption,
   maximum_level_control,
-  planet_discovery_recovery
+  planet_discovery_recovery,
+  research_browser
 }
 
 for _, feature in ipairs(features) do
@@ -70,6 +73,7 @@ local function register_event(event_id, handler)
 end
 
 function M.register()
+  research_browser.register()
   script.on_init(function(event)
     run_all("on_init", event)
   end)

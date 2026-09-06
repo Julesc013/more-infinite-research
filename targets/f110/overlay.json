@@ -3194,6 +3194,38 @@
       ]
     },
     {
+      "path": "prototypes/mir/runtime/research_browser.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The bundled browser requires the modern runtime and mod-data contracts; this legacy target omits it.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "modern-runtime-contract-unavailable"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_model.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The bundled browser requires the modern runtime and mod-data contracts; this legacy target omits it.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "modern-runtime-contract-unavailable"
+      ]
+    },
+    {
       "path": "prototypes/mir/runtime/scripted_techs.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -3471,5 +3503,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "4FB00D68F6B9FF33C63727FD38CF43A1AA9BC57B345555E6D689FC13BFB177AF"
+  "record_sha256": "CDCD3EDCA27F794D2A5C1F69A596272BF150CB9FB48D7F63A8CF9F799ADF7C31"
 }

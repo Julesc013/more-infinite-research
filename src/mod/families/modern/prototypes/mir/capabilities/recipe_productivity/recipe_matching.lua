@@ -92,7 +92,62 @@ local function has_explicit_productivity_denial(recipe)
   return false
 end
 
+-- A sufficient, deliberately conservative certificate for ordinary material routes.
+-- Any potential return path is rejected, regardless of its present yield. This
+-- cannot bless a catalytic/recovery loop merely because a few levels were safe.
+local function material_graph()
+  return compiler_context.current():state_view("material_route_graph", function()
+    local graph = {edges = {}, complete = true, edge_count = 0}
+    recipe_facts.for_each(function(_, fact)
+      for _, variant in ipairs(fact.variants or {}) do
+        for _, input in ipairs(variant.ingredients or {}) do
+          graph.edges[input.name] = graph.edges[input.name] or {}
+          for _, output in ipairs(variant.results or {}) do
+            if not graph.edges[input.name][output.name] then
+              graph.edge_count = graph.edge_count + 1
+              if graph.edge_count > 100000 then graph.complete = false; return end
+              graph.edges[input.name][output.name] = true
+            end
+          end
+        end
+      end
+    end)
+    return graph
+  end)
+end
+
+function R.material_route_is_acyclic(recipe)
+  if not recipe or recipe.allow_productivity ~= true then return false, "productivity-not-allowed" end
+  if type(recipe.variants) ~= "table" or #recipe.variants == 0 then return false, "missing-process-variants" end
+  local graph = material_graph()
+  if not graph.complete then return false, "process-graph-budget" end
+  for _, variant in ipairs(recipe.variants or {}) do
+    local inputs, queue, visited = {}, {}, {}
+    for _, input in ipairs(variant.ingredients or {}) do inputs[input.name] = true end
+    for _, output in ipairs(variant.results or {}) do
+      if not visited[output.name] then queue[#queue + 1] = output.name; visited[output.name] = true end
+    end
+    local head = 1
+    while head <= #queue do
+      if head > 30000 then return false, "process-search-budget" end
+      local name = queue[head]; head = head + 1
+      if inputs[name] then return false, "potential-return-path:" .. name end
+      for next_name in pairs(graph.edges[name] or {}) do
+        if not visited[next_name] then visited[next_name] = true; queue[#queue + 1] = next_name end
+      end
+    end
+  end
+  return true, "no-recipe-return-path"
+end
+
 local function should_skip_recipe(recipe_name, recipe, options)
+  if options.require_acyclic_process then
+    local admitted, reason = R.material_route_is_acyclic(recipe)
+    if not admitted then
+      if log then log("[more-infinite-research] Material route omitted recipe=" .. recipe_name .. " reason=" .. reason) end
+      return true
+    end
+  end
   if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
     return true
   end
@@ -225,6 +280,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
           module_tier_max = g.module_tier_max,
           place_result_entity_types = g.place_result_entity_types,
           reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
+          require_acyclic_process = g.require_acyclic_process or spec.require_acyclic_process,
           match_mode = g.mode or spec.mode,
           match_stream = g.match and g or spec
         })
@@ -267,6 +323,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
     module_tier_max = spec.module_tier_max,
     place_result_entity_types = spec.place_result_entity_types,
     reject_explicit_productivity_denial = spec.reject_explicit_productivity_denial,
+    require_acyclic_process = spec.require_acyclic_process,
     match_mode = spec.mode,
     match_stream = spec
   })

@@ -267,7 +267,7 @@
         "f210": "release-specific-direct-playtest-waiver"
       }
     },
-    "request_ledger": "spec/programmes/inputs/synthesis-2026-09-05/REQUEST_LEDGER.json",
+    "request_ledger": "spec/programmes/community-requests.json",
     "component_destinations": "spec/programmes/inputs/synthesis-2026-09-05/COMPONENT_DELIVERY.json",
     "historical_inventory": "spec/programmes/inputs/synthesis-2026-09-05/HISTORICAL_TARGET_MATRIX.json",
     "completion_states": [
@@ -665,6 +665,164 @@
         ],
         "state": "queued",
         "evidence": []
+      },
+      {
+        "id": "A16",
+        "title": "Bundled personal research and grouped settings browser",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "runtime-presentation",
+        "requests": [
+          "UI-01",
+          "UI-02",
+          "UI-03",
+          "UI-04"
+        ],
+        "acceptance": [
+          "Personal filters never mutate force technologies or queues",
+          "Bound catalogue and page work; no idle polling",
+          "Validate enqueue against current force and permissions",
+          "MIR runtime settings only; startup profiles use existing validated ingestion",
+          "Two-player, save/reload, queue, target and removal evidence"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+        ]
+      },
+      {
+        "id": "A17",
+        "title": "Qualify pipe manufacturing and early material progression",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A03",
+          "A05",
+          "A06"
+        ],
+        "owner_domain": "material-progression",
+        "requests": [
+          "PIPE-01",
+          "PROG-01"
+        ],
+        "acceptance": [
+          "Audit existing recipe owners before adding families",
+          "Exact safe manufacturing routes and effective caps",
+          "Finite early tiers and later infinite continuation preserve published identities and completed bonuses"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+        ]
+      },
+      {
+        "id": "A18",
+        "title": "Probe optional Car economy and passive maintenance",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "runtime-experiments",
+        "requests": [
+          "VEH-01",
+          "REPAIR-02"
+        ],
+        "acceptance": [
+          "Exact writable API and same-performance fuel measurement",
+          "Own only MIR contributions and quarantine conflicts",
+          "Damage-driven bounded optional maintenance with no inactive work",
+          "Lifecycle, reset, removal and performance proof before shipment"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+        ]
+      },
+      {
+        "id": "A19",
+        "title": "Qualify dependency-valid named ecosystem environments",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "integration-intake",
+        "requests": [
+          "ECO-AAI",
+          "ECO-BZ",
+          "ECO-PY",
+          "ECO-SE",
+          "ECO-IR3",
+          "ECO-IR4",
+          "ECO-PLANETS"
+        ],
+        "acceptance": [
+          "Separate exact dependency-valid engine/mod locks",
+          "Record absent outputs and acquisition blockers individually",
+          "Existing mechanisms and one target-matching package; no blanket support claims"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+        ]
+      },
+      {
+        "id": "A20",
+        "title": "Audit existing capabilities and preserve distinct upstream requests",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A00"
+        ],
+        "owner_domain": "request-accounting",
+        "requests": [
+          "FLUID-01",
+          "FLUID-02",
+          "NATIVE-01",
+          "WEAPON-01",
+          "VEH-02",
+          "FUEL-01",
+          "ROCKET-01",
+          "ROCKET-02",
+          "SPACE-01",
+          "QUAL-01",
+          "QUAL-02",
+          "URAN-01",
+          "STACK-01",
+          "STACK-02",
+          "HEALTH-01",
+          "HEALTH-02",
+          "REPAIR-01",
+          "LOG-01",
+          "SLOW-01",
+          "CRAFT-01",
+          "TREE-01",
+          "MACHINE-01",
+          "MACHINE-02",
+          "MACHINE-03",
+          "MODE-01",
+          "MODE-02",
+          "PACK-01",
+          "DEV-01"
+        ],
+        "acceptance": [
+          "Existing and substitute bonuses do not complete distinct requested semantics",
+          "Keep concrete upstream gaps, optional startup proposals and rejected default penalties visible",
+          "Explain human and agent contributor workflow without requiring a paid AI service"
+        ],
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+        ]
       }
     ]
   }

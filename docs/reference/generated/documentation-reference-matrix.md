@@ -207,6 +207,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-canonical-json-v1-contract | [MIR Canonical JSON V1](../../reference/mir4-canonical-json-v1.md) | current |
 | mir4-canonical-json-v1-developer-guide | [MIR Canonical JSON V1](../../developer/canonicalization.md) | current |
 | mir4-clean-archive-first-extension | [Your First MIR 4 Extension from a Preview Archive](../../developer/first-extension.md) | current |
+| mir4-community-implementation-outcomes | [MIR 4.2 community implementation outcomes](../../releases/mir4-community-outcomes-2026-09-06.md) | current |
 | mir4-compatibility-evidence-transfer-boundary | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-compatibility-factory-data-bundle-v1 | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-compatibility-subject-ledger-v1 | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
