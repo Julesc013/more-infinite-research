@@ -15,5 +15,12 @@
   "current_scope": "Current contracts, source bindings, package determinism, compiler and architecture, documentation, programme, delivery and promotion tests; exact runtime campaigns remain separately required.",
   "release_authority": false,
   "protection_mutation_authority": false,
-  "historical_receipt_rewrite_authority": false
+  "historical_receipt_rewrite_authority": false,
+  "historical_refs": {
+    "refs/heads/main": "f458598732e9583a9d086032ebfbe9ffb747d130",
+    "refs/heads/dev": "3683369ba00cfbdd7f8872a5a1b24f0d59f31062",
+    "refs/heads/legacy": "69f96b3900f337cb1575c0e7e3ca7373089401fb",
+    "refs/heads/release/4.0": "5ca449820bdfa5595ca03686f32c74904c46daf3"
+  },
+  "historical_ref_scope": "Permanent upstream heads captured before the development epoch; original branch validators read an isolated snapshot. Current branch policy is independently required."
 }
