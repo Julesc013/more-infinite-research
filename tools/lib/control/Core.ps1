@@ -44,7 +44,8 @@ function Resolve-MIRCPPathToken {
 function Read-MIRCPJson {
   param(
     [Parameter(Mandatory)][string]$Path,
-    [string]$RepoRoot = ""
+    [string]$RepoRoot = "",
+    [switch]$PreserveTimestamps
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   $Path = Resolve-MIRCPPathToken -Path $Path -RepoRoot $repo
@@ -53,6 +54,9 @@ function Read-MIRCPJson {
     throw "Control-plane JSON not found: $Path"
   }
   try {
+    if ($PreserveTimestamps) {
+      return Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json -DateKind String
+    }
     return Get-Content -Raw -LiteralPath $resolved | ConvertFrom-Json
   } catch {
     throw "Invalid control-plane JSON at ${Path}: $($_.Exception.Message)"

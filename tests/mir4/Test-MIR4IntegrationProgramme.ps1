@@ -48,3 +48,14 @@ foreach($module in $science.modules) {
   if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $module.path)).Hash -cne $module.sha256) { throw "[synthesis-science-proof-stale] $($module.path)" }
 }
 if((Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/compiler/science_planning.lua')).Hash -cne $science.test_sha256) { throw '[synthesis-science-test-stale]' }
+
+# Preserve the authored calendar date across AEST and UTC runners.
+. (Join-Path $RepoRoot 'tools/lib/control/Core.ps1')
+. (Join-Path $RepoRoot 'tools/lib/control/Views.ps1')
+$authored=Read-MIRCPJson -Path 'spec/programmes/mir4-4x-operating-programme-v1.json' -RepoRoot $RepoRoot -PreserveTimestamps
+if($authored.recorded_at -isnot [string] -or $authored.recorded_at -cne $p.recorded_at) { throw '[synthesis-authored-timestamp]' }
+$date=Get-MIRCPAuthoredDate -Timestamp $authored.recorded_at
+if($date -cne $p.recorded_at.Substring(0,10)) { throw '[synthesis-authored-date]' }
+if((Get-MIRCPAuthoredDate -Timestamp '2026-09-06T00:00:00+10:00') -cne '2026-09-06' -or
+   (Get-MIRCPAuthoredDate -Timestamp '2026-09-05T14:00:00Z') -cne '2026-09-05') { throw '[synthesis-timezone-regression]' }
+if(@(Get-Content -LiteralPath (Join-Path $RepoRoot 'todo.md') | Where-Object { $_ -ceq "Generated: $date" }).Count -ne 1) { throw '[synthesis-queue-date]' }

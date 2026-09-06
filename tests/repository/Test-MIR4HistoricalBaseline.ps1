@@ -19,7 +19,8 @@ $worktree=Join-Path $root 'source'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
 # Historical MIR 3 records bind CRLF checkout bytes. Use an isolated clone
 # with the original Windows checkout convention and the pinned attributes.
-& git clone --shared --no-checkout -c core.autocrlf=true $repo $worktree 2>&1 | Out-Null
+# Nested historical worktrees inherit long-path support from this clone only.
+& git clone --shared --no-checkout -c core.autocrlf=true -c core.longpaths=true $repo $worktree 2>&1 | Out-Null
 if($LASTEXITCODE -ne 0) { throw '[mir4-history-clone]' }
 
 # A local clone advertises local heads, whereas Actions keeps branch history
