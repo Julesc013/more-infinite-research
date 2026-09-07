@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4CommunityRequests",
   "status": "active-request-authority-not-support-evidence",
-  "prepared_on": "2026-09-06",
+  "prepared_on": "2026-09-07",
   "predecessor": "spec/programmes/inputs/synthesis-2026-09-05/REQUEST_LEDGER.json",
   "intake": {
     "archive_sha256": "04e04db65ba8d4e24e8f8aba73bc66244882eab633d27d63c4d47544cd42ea32",
@@ -322,12 +322,39 @@
           "id": "S33",
           "observed_on": "2026-09-06",
           "snapshot_warning": "Search/open results exposed mixed cached 2.1 revisions, chiefly 2.1.14 and 2.1.17. Re-resolve and lock the exact selected engine API before implementation; this is feasibility research, not engine qualification."
+        },
+        {
+          "title": "Expanded 4.2 planning packet",
+          "url": "dist/roadmap-expansion-2026-09-07/MASTER_PLAN.md",
+          "basis": "Maintainer-supplied twenty-file packet reconciled with the active programme. The packet is planning evidence, not gameplay qualification.",
+          "id": "P3",
+          "observed_on": "2026-09-07"
+        },
+        {
+          "title": "Maintainer portable research-surface direction",
+          "basis": "Direct maintainer instruction to keep controls in the in-game research surface, prefer an extension of a maintained technology UI over a new tree, and reserve a full OEM+ replacement for a later evidence-led release.",
+          "id": "P4",
+          "observed_on": "2026-09-07"
+        },
+        {
+          "title": "Factorio LuaPlayer translation API",
+          "url": "https://lua-api.factorio.com/latest/classes/LuaPlayer.html#request_translation",
+          "basis": "Installed 2.0.77 and 2.1.17 API snapshots remain the exact implementation authority; the moving web page is feasibility reference only.",
+          "id": "S34",
+          "observed_on": "2026-09-07"
+        },
+        {
+          "title": "Ultimate Research Queue for 2.x",
+          "url": "https://mods.factorio.com/mod/UltimateResearchQueue2",
+          "basis": "Current portal and public source inspection found a maintained MIT custom research GUI and queue owner, but only a queue-read remote interface and no supported presentation-extension contract. Integration requires an upstream hook or another stable public contract, not private GUI mutation.",
+          "id": "S35",
+          "observed_on": "2026-09-07"
         }
       ]
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 66,
+  "request_count": 81,
   "requests": [
     {
       "id": "UI-01",
@@ -3509,6 +3536,298 @@
         "R1"
       ],
       "feature_group": "ecosystem-admission",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-01",
+      "title": "Exact OmniAB suite-combination intake",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-qualified-subsets",
+      "mechanism": "dependency-valid environment locks",
+      "proposed_scope": "Omnimatter and OmniAB installed subsets",
+      "rationale": "The suite is not one universal dependency graph, and conflict-listed compatibility mods cannot be combined merely to maximize names.",
+      "implementation": "Acquire, identify and test ordinary installed subsets independently; carry only individually blocked advanced processes beyond 4.2.",
+      "acceptance": [
+        "Each claimed subset has an exact engine, mod, dependency and settings lock",
+        "Conflict-listed compatibility mods are never combined into a synthetic universal pack",
+        "Claims name the exact qualified subset and actual packaged behavior"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-02",
+      "title": "Canonical OmniAB material and recipe ownership",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "shared material-family admission with one effective owner",
+      "proposed_scope": "Eligible final OmniAB material routes and aliases",
+      "rationale": "Bob and Angel material families should be reused against resolved outputs while representation bridges remain distinct from production routes.",
+      "implementation": "Resolve final outputs and recipes after the suite loads, reuse the generic material family, and preserve native ownership or record a named conflict.",
+      "acceptance": [
+        "Final output identity and every admitted production route are captured",
+        "Aliases and representation bridges do not create duplicate bonuses",
+        "Every route has one effective owner and an explainable disposition"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-03",
+      "title": "OmniAB rescue-route and progression preservation",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "route-role classification",
+      "proposed_scope": "Anti-softlock, starter and emergency routes",
+      "rationale": "A route intended only to rescue progression must not become the preferred resource shortcut after productivity is applied.",
+      "implementation": "Classify rescue and ordinary production routes explicitly and exclude or cap rescue paths unless quantitative proof preserves their role.",
+      "acceptance": [
+        "Every admitted route records ordinary, rescue, conversion or representation role",
+        "A rescue route cannot dominate intended production under the maximum effective bonus",
+        "Early and late progression remain reachable in representative saves"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-04",
+      "title": "OmniAB extraction-tier lifecycle cooperation",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "native lifecycle ownership",
+      "proposed_scope": "Extraction-tier replacement, retirement and machine contents",
+      "rationale": "Omnimatter and OmniAB must continue to own tier unlocking, old-tier disabling and machine recipe switching.",
+      "implementation": "Observe tier transitions and consume their final state without rewriting their lifecycle; validate existing machines and retired recipes through upgrades.",
+      "acceptance": [
+        "Old extraction tiers retire under the suite's own rules",
+        "Existing machine contents and recipes survive or migrate under an evidenced policy",
+        "MIR never becomes owner of extraction-tier state"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-05",
+      "title": "OmniAB compression and reversible-process restraint",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-policy",
+      "mechanism": "closed-loop and representation guard",
+      "proposed_scope": "Compression, decompression and reversible conversions",
+      "rationale": "Representation-only and reversible chains can amplify material when treated as ordinary forward production.",
+      "implementation": "Preserve them by default and admit only routes with a bounded reviewed process certificate and explicit owner.",
+      "acceptance": [
+        "Compression and reverse routes are identified as one process system",
+        "No route is admitted solely because its recipe permission is unset or true",
+        "Maximum-bonus loop analysis and recycling behavior are recorded before admission"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "OAB-06",
+      "title": "OmniAB planet and alternative-start claim matrix",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-qualified-subsets",
+      "mechanism": "named progression matrix",
+      "proposed_scope": "Installed planets and alternative starting locations",
+      "rationale": "Ordinary suite baselines must work before broader starting-location claims are made.",
+      "implementation": "Qualify named starting locations and installed planet subsets independently after the ordinary OmniAB baseline.",
+      "acceptance": [
+        "Every claim names the starting location and installed planet subset",
+        "Science, labs, rescue routes and material progression remain reachable",
+        "Unqualified combinations remain explicit rather than inheriting a blanket claim"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "omniab-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-01",
+      "title": "RIC identity and dependency intake",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-qualified-subsets",
+      "mechanism": "exact mod identity and dependency lock",
+      "proposed_scope": "real-industrial-chemistry",
+      "rationale": "Graphics dependencies, compatibility layers and gameplay suites must not be conflated.",
+      "implementation": "Use the internal ID real-industrial-chemistry and acquire each supported mode with its actual dependency closure.",
+      "acceptance": [
+        "The internal mod ID and exact closure are recorded",
+        "Graphics-only dependencies are distinguished from gameplay owners",
+        "Claims bind an actual containing package and engine"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-02",
+      "title": "RIC mode-aware progression and laboratory proof",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "settings-sensitive science and lab qualification",
+      "proposed_scope": "RIC geography, progression and laboratory modes",
+      "rationale": "Geography and progression settings are independent environment inputs and AAI can change the laboratory frontier.",
+      "implementation": "Capture the meaningful mode matrix and prove early/late science selection, laboratory handoff and representative save progression.",
+      "acceptance": [
+        "Geography and progression settings are independently identified",
+        "Every admitted mode has reachable science and compatible laboratories",
+        "AAI laboratory transitions are tested where present"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-03",
+      "title": "RIC manufacturing productivity families",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "shared material and manufacturing-family admission",
+      "proposed_scope": "Eligible RIC metals, alloys, silicon, glass, electronics, polymers and construction outputs",
+      "rationale": "Actual manufacturing endpoints should reuse proven families instead of accumulating unrelated one-off technology names.",
+      "implementation": "Resolve final recipes, ownership and progression frontiers and then instantiate only eligible family members.",
+      "acceptance": [
+        "Each family member improves an actual installed manufacturing route",
+        "Native owners, alternative routes, returns and effective caps are recorded",
+        "Finite and infinite progression produces an effective player benefit"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-04",
+      "title": "RIC closed-loop chemistry and waste handling",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-policy-with-route-gates",
+      "mechanism": "process certificate",
+      "proposed_scope": "Solvent, catalyst, water recovery and waste routes",
+      "rationale": "Useful ordinary chemistry and hazardous loops require different admission evidence, while emergency sinks must remain available.",
+      "implementation": "Admit ordinary forward routes under the normal guard and certificate-gate recovery loops without removing waste or emergency sinks.",
+      "acceptance": [
+        "Closed loops model all inputs, outputs, returns, probabilities and maximum bonuses",
+        "Waste and emergency sink behavior is preserved",
+        "Blocked individual processes do not prevent qualified ordinary RIC support"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-05",
+      "title": "RIC OpenPit resource and token semantics",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2-policy-with-route-gates",
+      "mechanism": "state-owner and process-role classification",
+      "proposed_scope": "OpenPit deposits, survey samples and state tokens",
+      "rationale": "Resource prototypes do not by themselves distinguish production mining from survey or deposit-state transitions.",
+      "implementation": "Identify the owner and lifecycle of every resource or token before applying a mining or manufacturing effect.",
+      "acceptance": [
+        "Production resources are distinguished from survey, sample and state tokens",
+        "OpenPit remains owner of deposit state",
+        "No bonus duplicates or bypasses a state transition"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-06",
+      "title": "AAI and RIC reconciliation coexistence",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "final-state owner reconciliation",
+      "proposed_scope": "RIC-owned recipes, AAI laboratory handoff and conversion aliases",
+      "rationale": "Final recipes and laboratories can differ after both suites finish their progression changes.",
+      "implementation": "Observe the final installed state, preserve RIC and AAI ownership, and bind aliases to one effective MIR family member.",
+      "acceptance": [
+        "RIC-owned final recipes are used instead of stale intermediate identities",
+        "AAI laboratory handoff remains reachable",
+        "Conversion aliases neither duplicate research nor lose the intended endpoint"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-07",
+      "title": "RIC recipe-driven utilities feasibility probe",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "probe-4.2-not-promised",
+      "mechanism": "narrow recipe/effect feasibility",
+      "proposed_scope": "Potential boiler, recovery and useful-output processes",
+      "rationale": "A narrow supported recipe outcome may be feasible, but it is not evidence for universal boiler or heating-tower efficiency.",
+      "implementation": "Probe actual installed recipe and effect semantics and schedule a later bounded outcome only if the engine exposes a safe owner-compatible mechanism.",
+      "acceptance": [
+        "The exact writable effect and measured useful output are identified",
+        "Fuel-use reduction is not inferred from unrelated crafting productivity",
+        "An unsupported result is retained as an explicit capability blocker"
+      ],
+      "source_ids": ["P3"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "RIC-08",
+      "title": "RIC coverage and exclusion explanations",
+      "requesters": ["Julesc012", "expanded 4.2 packet"],
+      "decision": "commit-4.2",
+      "mechanism": "shared research-browser explanation projection",
+      "proposed_scope": "RIC admitted and withheld routes",
+      "rationale": "Players should see coverage decisions inside the same research experience instead of a separate required tool.",
+      "implementation": "Project route, owner, science, cap and exclusion records through the portable presentation contract.",
+      "acceptance": [
+        "The browser names improved recipes and their effect owner",
+        "Science-pack and exclusion reasons are visible in-game",
+        "The next level reports whether it can provide an effective benefit"
+      ],
+      "source_ids": ["P3", "P4"],
+      "feature_group": "ric-integration",
+      "status": "requested-not-qualified",
+      "qualification": []
+    },
+    {
+      "id": "PLAT-UI-01",
+      "title": "Portable in-game research surface",
+      "requesters": ["Julesc012"],
+      "decision": "commit-4.2-core-and-integration-proof; candidate-4.5-full-overhaul",
+      "mechanism": "host-neutral query core with embedded MIR host and optional companion integration",
+      "proposed_scope": "Research filtering, sorting, personal hiding, explanations and navigation",
+      "rationale": "The useful research experience should work inside MIR, be reusable by other mods, and prefer a maintained technology UI extension over a new full tree when the engine cannot extend the vanilla tree directly.",
+      "implementation": "Refactor a copied-data query and explanation core; keep filters, sorts and personal hidden sets inside the in-game surface; use an OEM-like custom MIR browser and native technology deep links in 4.2; propose or consume a documented upstream extension point for a separately downloadable companion; consider a complete tree and queue replacement in 4.5 only after the integration route is disproved or inadequate.",
+      "acceptance": [
+        "Filter, sort and personal hide controls are available inside the research surface without a mod-settings workflow or external tool",
+        "Personal hidden state changes presentation only and never mutates prototype hidden flags, force technology enablement, prerequisites, availability or queue state",
+        "Localized technology, material and recipe names are searchable with bounded asynchronous translation work",
+        "The selected technology can open in Factorio's native technology GUI on both installed modern engines",
+        "The exact API limitation is documented: neither installed modern engine exposes a relative technology-GUI anchor or a supported way to rearrange the vanilla tree",
+        "The embedded MIR host and any optional companion share one canonical core and exactly one visible UI host",
+        "An existing GUI such as Ultimate Research Queue is extended only through a documented public hook accepted upstream or an equally stable contract; private GUI-tree mutation and source forks are not accepted integration",
+        "The companion, if admitted, depends optionally on MIR and its host project; MIR remains self-contained and does not hard-depend on FLib or the companion",
+        "Two-player divergent view state, save/reload, removal, configuration change, performance and queue interoperability are qualified",
+        "A full OEM+ technology tree and queue overhaul remains an evidence-led 4.5 candidate, not a hidden 4.2 dependency"
+      ],
+      "source_ids": ["P4", "S3", "S4", "S25", "S33", "S34", "S35"],
+      "feature_group": "portable-player-surfaces",
       "status": "requested-not-qualified",
       "qualification": []
     }

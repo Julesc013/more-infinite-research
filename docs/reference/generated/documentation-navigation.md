@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-09-06.
+Current-page navigation generated from Markdown front matter as of 2026-09-07.
 
 ## developer
 
@@ -153,6 +153,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-06.
 - [ADR 0028: MIR 3.2.5 convergence release](../../adr/0028-3-2-5-convergence-release.md)
 - [ADR 0029: Dual-Plane Repository](../../adr/0029-dual-plane-repository.md)
 - [ADR 0030: Host-Neutral MIR Extension Protocol v1](../../adr/0030-host-neutral-extension-protocol.md)
+- [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md)
 - [ADR-0015: Canonical Stream Descriptors](../../adr/0015-canonical-stream-descriptors.md)
 
 ### explanation

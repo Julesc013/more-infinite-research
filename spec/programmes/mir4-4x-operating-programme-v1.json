@@ -2,14 +2,16 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-06T00:00:00+10:00",
-  "objective": "Preserve published MIR 4.1 and convert retained capabilities into qualified bundled integrations, recoverable delivery, and independently admitted historical products through the existing semantic source and emitter.",
+  "recorded_at": "2026-09-07T00:00:00+10:00",
+  "objective": "Preserve published MIR 4.1 and deliver MIR 4.2 as a substantial industrial-research release with complete material routes, useful progression, explainable localized discovery, auditable profiles, qualified current integrations, portable player-surface architecture, and recoverable delivery through the existing semantic source and emitter.",
   "permanent_invariants": [
     "one semantic source",
     "one self-contained player ZIP per target",
     "one public command surface",
     "one authority per mutable fact",
     "one generated release narrative",
+    "player-facing presentation separates copied-data query cores, provider adapters and exactly one UI host so useful surfaces can be reused without a second emitter",
+    "MIR player packages remain self-contained; optional companions and third-party UI integrations never become hidden hard dependencies",
     "independently generated and qualified target packages",
     "evidence remains package-excluded",
     "published versions and bytes are immutable",
@@ -145,7 +147,7 @@
     },
     {
       "id": "M43-00",
-      "outcome": "Integration kernel with qualified bundled K2 and Bob/Angel material slices and rolling dependency-valid ecosystem admissions",
+      "outcome": "Integration kernel delivering substantial industrial research from early factories onward: complete eligible material routes, useful finite-to-infinite progression, localized discovery and explanations, auditable profiles, qualified K2/Bob/Angel/OmniAB/RIC subsets, and a portable in-game presentation core",
       "completion_boundary": "4.2.0",
       "depends_on": [
         "M41-08",
@@ -174,7 +176,7 @@
     },
     {
       "id": "M46-00",
-      "outcome": "Retain later MIR 4 work as unallocated evidence-led evolution",
+      "outcome": "Retain later MIR 4 work as evidence-led evolution, including a 4.5 OEM+ technology-tree and queue overhaul only if maintained-project integration cannot satisfy the accepted player contract",
       "completion_boundary": "4.4.0+",
       "depends_on": [
         "M45-00"
@@ -225,8 +227,8 @@
     },
     {
       "candidate": "4.2.0",
-      "outcome": "Integration kernel and rolling built-in ecosystem admissions",
-      "release_required": false
+      "outcome": "Integration kernel delivering substantial industrial research, complete qualified routes, useful progression, localized explanations, auditable profiles, current ecosystem admissions, and a portable embedded research surface",
+      "release_required": true
     },
     {
       "candidate": "4.3.0",
@@ -668,7 +670,7 @@
       },
       {
         "id": "A16",
-        "title": "Bundled personal research and grouped settings browser",
+        "title": "Bundled localized research, explanation and profile browser",
         "programme_mapping": [
           "M43-00"
         ],
@@ -684,9 +686,13 @@
         ],
         "acceptance": [
           "Personal filters never mutate force technologies or queues",
+          "All, finite, infinite, status, family and personal-hidden filters with deterministic player-selected sorting inside the research surface",
+          "Localized technology, material and relevant recipe discovery through bounded asynchronous translation",
+          "Explain improved recipes, effective owner, science rationale, excluded routes, caps and whether the next level has effective benefit",
+          "Open the selected technology in Factorio's native technology GUI when supported",
           "Bound catalogue and page work; no idle polling",
           "Validate enqueue against current force and permissions",
-          "MIR runtime settings only; startup profiles use existing validated ingestion",
+          "Compare and preview effective MIRSET1 values, defaults and sources in-surface; startup changes remain explicitly restart-required",
           "Two-player, save/reload, queue, target and removal evidence"
         ],
         "state": "active",
@@ -762,10 +768,27 @@
           "ECO-SE",
           "ECO-IR3",
           "ECO-IR4",
-          "ECO-PLANETS"
+          "ECO-PLANETS",
+          "OAB-01",
+          "OAB-02",
+          "OAB-03",
+          "OAB-04",
+          "OAB-05",
+          "OAB-06",
+          "RIC-01",
+          "RIC-02",
+          "RIC-03",
+          "RIC-04",
+          "RIC-05",
+          "RIC-06",
+          "RIC-07",
+          "RIC-08"
         ],
         "acceptance": [
           "Separate exact dependency-valid engine/mod locks",
+          "Prove OmniAB extraction replacement, machine contents, retired recipes and rescue routes while preserving suite ownership",
+          "Prove RIC manufacturing, supported modes, AAI laboratory transitions and OpenPit state ownership",
+          "Admit ordinary useful routes in 4.2 while retaining individually named advanced-process blockers",
           "Record absent outputs and acquisition blockers individually",
           "Existing mechanisms and one target-matching package; no blanket support claims"
         ],
@@ -823,6 +846,35 @@
         "evidence": [
           "spec/programmes/evidence/community-2026-09-06/outcomes.json"
         ]
+      },
+      {
+        "id": "A21",
+        "title": "Qualify portable research-surface core and integration-first companion route",
+        "programme_mapping": [
+          "M43-00"
+        ],
+        "depends_on": [
+          "A02",
+          "A11",
+          "A16"
+        ],
+        "owner_domain": "presentation-platform",
+        "requests": [
+          "PLAT-UI-01"
+        ],
+        "acceptance": [
+          "One canonical copied-data query and explanation core with Factorio, MIR-provider, translation and UI-host adapters",
+          "Embedded 4.2 browser remains self-contained and exposes no raw compiler objects, callbacks or mutation authority",
+          "No claim of direct vanilla-tree extension: installed 2.0 and 2.1 APIs expose native technology deep links but no relative technology-GUI anchor or tree-reordering surface",
+          "Evaluate maintained research UI projects before building a full replacement, beginning with Ultimate Research Queue 2.x",
+          "Admit a portal companion only through a documented public upstream extension hook or equally stable contract; never mutate another mod's private GUI tree or ship a silent source fork",
+          "If a companion is admitted, it optionally depends on its host and MIR, has one visible UI owner, and yields cleanly across add, remove and configuration changes",
+          "Keep filter, sort, personal hide, search and explanations inside the in-game surface rather than a settings menu or external tool",
+          "Prove deterministic bounded work, localized asynchronous translation, two-player divergent views, queue interoperability, save/reload, removal and both modern targets",
+          "Record a full OEM+ custom tree and ultimate queue as a 4.5 candidate only if integration evidence shows the maintained-project route is insufficient"
+        ],
+        "state": "active",
+        "evidence": []
       }
     ]
   }

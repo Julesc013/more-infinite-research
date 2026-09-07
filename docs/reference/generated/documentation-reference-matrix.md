@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-06.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-07.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -328,6 +328,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | offline-family-rule-synthesis | [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md) | current |
 | package-qualification-source-authority | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | policy-overlays | [Policy Overlays](../../compatibility/policy-overlays.md) | current |
+| portable-player-surfaces | [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md) | current |
 | portable-return-ledger | [Portable Return Ledger](../../compatibility/portable-return-ledger.md) | current |
 | prequalification-approved-delta-pending-binding | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | protected-release-capsule-transfer | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
@@ -354,6 +355,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | research-cost-v2-experimental-contract | [ResearchCostModel V2 Preview](../../reference/research-cost-v2-preview.md) | draft |
 | research-cost-v2-sparse-profile-layering | [ResearchCostModel V2 Preview](../../reference/research-cost-v2-preview.md) | draft |
 | research-cost-v2-stable-admission-boundary | [ResearchCostModel V2 Preview](../../reference/research-cost-v2-preview.md) | draft |
+| research-surface-host-ownership | [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md) | current |
 | runtime-performance-release-gate | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | scenario-manifest-schema | [Scenario Manifest Schema](../../reference/schemas/scenario-manifest.md) | current |
 | science-pack-production-route-authority | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |

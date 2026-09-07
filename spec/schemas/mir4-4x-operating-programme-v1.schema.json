@@ -392,7 +392,22 @@
                     "ECO-SE",
                     "ECO-IR3",
                     "ECO-IR4",
-                    "ECO-PLANETS"
+                    "ECO-PLANETS",
+                    "OAB-01",
+                    "OAB-02",
+                    "OAB-03",
+                    "OAB-04",
+                    "OAB-05",
+                    "OAB-06",
+                    "RIC-01",
+                    "RIC-02",
+                    "RIC-03",
+                    "RIC-04",
+                    "RIC-05",
+                    "RIC-06",
+                    "RIC-07",
+                    "RIC-08",
+                    "PLAT-UI-01"
                   ]
                 }
               },

@@ -220,6 +220,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-extension-protocol-v1-decision
+  - path: docs/adr/0031-portable-player-surfaces.md
+    title: "ADR 0031: Portable Player Surfaces and Research Host Ownership"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - portable-player-surfaces
+      - research-surface-host-ownership
   - path: docs/adr/README.md
     title: "Architecture Decision Records"
     status: current
