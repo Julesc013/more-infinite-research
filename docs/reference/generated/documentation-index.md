@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 441 pages as of 2026-09-06.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 442 pages as of 2026-09-07.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -46,7 +46,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/adr/0028-3-2-5-convergence-release.md | ADR 0028: MIR 3.2.5 convergence release | current | maintainer | adr | mir-maintainers | 2026-08-05 |
 | docs/adr/0029-dual-plane-repository.md | ADR 0029: Dual-Plane Repository | current | maintainer | adr | mir-maintainers | 2026-08-12 |
 | docs/adr/0030-host-neutral-extension-protocol.md | ADR 0030: Host-Neutral MIR Extension Protocol v1 | current | maintainer | adr | mir-maintainers | 2026-08-04 |
-| docs/adr/README.md | Architecture Decision Records | current | maintainer | explanation | mir-maintainers | 2026-08-04 |
+| docs/adr/0031-portable-player-surfaces.md | ADR 0031: Portable Player Surfaces and Research Host Ownership | current | maintainer | adr | mir-maintainers | 2026-09-07 |
+| docs/adr/README.md | Architecture Decision Records | current | maintainer | explanation | mir-maintainers | 2026-09-07 |
 | docs/architecture/3.3-2.6-convergence-platform-roadmap.md | MIR 3.3 And 2.6 Convergence Platform Roadmap | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/architecture/3.3-2.6-semantic-platform-roadmap.md | MIR 3.3 And 2.6 Semantic Platform Roadmap | historical-checkpoint | maintainer | release-plan | mir-maintainers | 2026-07-27 |
 | docs/architecture/automatic-family-balance.md | Automatic Family Balance And Scope | current | maintainer | explanation | mir-maintainers | 2026-07-13 |
@@ -78,7 +79,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-05 |
+| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-07 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -380,8 +381,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-4.0-whole-platform-programme.md | MIR 4.0 Whole Platform Programme | current | maintainer | release-plan | mir-maintainers | 2026-08-23 |
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
-| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-06 |
+| docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-09-07 |
 | docs/releases/mod-portal-page.md | More Infinite Research Mod Portal Page | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/README.md | Release Notes | current | player | reference | mir-maintainers | 2026-08-08 |
 | docs/releases/notes/release-notes-0.10.0.md | More Infinite Research 0.10.0 Release Notes | current | player | release-plan | mir-maintainers | 2026-07-16 |

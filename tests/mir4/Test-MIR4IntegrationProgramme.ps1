@@ -15,9 +15,12 @@ foreach($f in $m.files) {
 }
 $requests=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $p.synthesis.request_ledger) | ConvertFrom-Json -Depth 100
 $originalExpected=@(1..7 | ForEach-Object { 'K2-{0:D2}' -f $_ })+@(1..16 | ForEach-Object { 'BA-{0:D2}' -f $_ })
+$integrationExpected=@(1..6 | ForEach-Object { 'OAB-{0:D2}' -f $_ })+@(1..8 | ForEach-Object { 'RIC-{0:D2}' -f $_ })
+$platformExpected=@('PLAT-UI-01')
 $expected=@($requests.requests.id)
-if($expected.Count -ne 66 -or @($expected | Sort-Object -Unique).Count -ne 66) { throw '[community-exact-66-requests]' }
+if($requests.request_count -ne 81 -or $expected.Count -ne 81 -or @($expected | Sort-Object -Unique).Count -ne 81) { throw '[community-exact-81-requests]' }
 if(@($originalExpected | Where-Object { $_ -notin $expected }).Count -ne 0) { throw '[community-original-requests-lost]' }
+if(@($integrationExpected+$platformExpected | Where-Object { $_ -notin $expected }).Count -ne 0) { throw '[community-expanded-requests-lost]' }
 foreach($request in @($requests.requests | Where-Object id -in $originalExpected)) {
   if($request.original_request.id -cne $request.id) { throw '[community-original-attribution-lost]' }
 }
@@ -45,7 +48,7 @@ if(@(Compare-Object ($expected | Sort-Object) @($tasks.requests | Sort-Object -U
 if($p.synthesis.objectives_measured -or $p.synthesis.heavy_engine_concurrency -ne 1) { throw '[synthesis-unmeasured-capacity]' }
 if($p.synthesis.release_baseline.source -cne '3562377b520cccb071b97b3968946eae7024c950' -or $p.synthesis.release_baseline.human_acceptance.f210 -cne 'release-specific-direct-playtest-waiver') { throw '[synthesis-release-history]' }
 if(@($p.work_packages | Where-Object { $_.id -eq 'M41-08' -and $_.state -eq 'complete' }).Count -ne 1 -or @($p.work_packages | Where-Object { $_.id -eq 'M43-00' -and $_.state -eq 'active' }).Count -ne 1) { throw '[synthesis-current-state]' }
-Write-Output 'Synthesis input integrity, complete request/component coverage, dependency graph, and truthful completion boundaries passed.'
+Write-Output 'Synthesis input integrity, complete 81-request/component coverage, dependency graph, and truthful completion boundaries passed.'
 
 # The controlled proof is reusable only for these exact current module bytes.
 $scienceEvidence=Join-Path $RepoRoot 'spec/programmes/evidence/synthesis-2026-09-06/science-modules.json'

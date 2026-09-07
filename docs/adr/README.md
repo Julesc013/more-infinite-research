@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-08-04
+last_reviewed: 2026-09-07
 supersedes: []
 superseded_by: []
 ---
 # Architecture Decision Records
 
-Updated: 2026-08-04
+Updated: 2026-09-07
 
 ADRs record durable 3.0 compatibility-compiler decisions. They should be short, specific, and updated by adding a new ADR rather than rewriting history.
 
@@ -45,3 +45,4 @@ Initial ADR set:
 - `0028`: MIR 3.2.5 convergence release.
 - `0029`: Dual-plane repository, logical paths, and historical aliases.
 - `0030`: Host-neutral extension protocol.
+- `0031`: Portable player surfaces and research host ownership.
