@@ -2347,7 +2347,7 @@
     {
       "path": "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
       "classification": "canonical-internal",
-      "sha256": "8F220418A2ABAADFA92AAA63AC2C031B6BC194058040684397F0B48C61F8B164",
+      "sha256": "C28229244C1533D683A2E9BF7CF8F7F9BA22F66611DE7B37B7897085BCDCB617",
       "hash_mode": "canonical-text-v1",
       "lines": 62,
       "package_visible": false
@@ -3811,9 +3811,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1",
       "classification": "canonical-internal",
-      "sha256": "68B7621F6382186D5A40C1AAAB9775CF33AB380AC29B250A25468F6BECBF7089",
+      "sha256": "F74A35E850047648E96D759A0E62F5E7B744FDB1248E05EB55302D808D82437D",
       "hash_mode": "canonical-text-v1",
-      "lines": 306,
+      "lines": 317,
       "package_visible": false
     },
     {
@@ -4395,9 +4395,9 @@
     {
       "path": "tools/mir.ps1",
       "classification": "canonical-public",
-      "sha256": "7FB9CD18BB557ABA66FBA301637660A012F085A9574CC059C6677041367AE0CA",
+      "sha256": "332A6C714F284FAACD395C605687CCE44DF58CA579E09343CCE7AD21E3B4FC3B",
       "hash_mode": "canonical-text-v1",
-      "lines": 13,
+      "lines": 14,
       "package_visible": false
     },
     {
@@ -5554,5 +5554,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:16b8d64fbc00fa94130bc85aafc3c11b603a254155a673aea4ce8852ed75c252"
+  "digest": "sha256:fef252dfc42a450f1b62370424263f1b4b50fe663c8cfed8388502effa3a04f1"
 }

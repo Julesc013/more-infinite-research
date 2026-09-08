@@ -47,7 +47,7 @@ $result = switch ($Command) {
 }
 
 $serialized = $result | ConvertTo-Json -Depth 100
-if (-not [string]::IsNullOrWhiteSpace($OutputPath) -and -not $DryRun) {
+if (-not [string]::IsNullOrWhiteSpace($OutputPath) -and ($Command -eq 'release-doctor' -or -not $DryRun)) {
   $full = if ([IO.Path]::IsPathRooted($OutputPath)) { [IO.Path]::GetFullPath($OutputPath) } else { [IO.Path]::GetFullPath((Join-Path $RepoRoot $OutputPath)) }
   New-Item -ItemType Directory -Path (Split-Path -Parent $full) -Force | Out-Null
   [IO.File]::WriteAllText($full,$serialized+[Environment]::NewLine,[Text.UTF8Encoding]::new($false))

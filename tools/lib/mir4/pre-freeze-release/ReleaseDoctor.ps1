@@ -196,10 +196,20 @@ function Get-MIR4ReleaseDoctor {
 
   $governance = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/governance/mir4/release-governance.json' -Kind 'MIR4ReleaseGovernanceV1'
   $checks.Add((New-MIR4DoctorCheck 'protected-signing-secret' 'human' 'blocked' ([string]$governance.state)))
-  $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
-  $currentF210Resolution = try { Get-MIR4F210EngineResolutionV1 -RepoRoot $repo } catch { $null }
-  $acceptedTargets = @{}
-  foreach ($decisionFile in @(Get-ChildItem -LiteralPath (Join-Path $repo 'build/mir4/playtests') -Recurse -Filter 'manual-decision.json' -File -ErrorAction SilentlyContinue)) {
+  $plan = $null
+  $automatedIds.Add('final-mile-playtest-candidate-authority')
+  try {
+    $plan = Get-MIR4FinalMilePlaytestCandidateAuthorityV1 -RepoRoot $repo
+    $checks.Add((New-MIR4DoctorCheck 'final-mile-playtest-candidate-authority' 'automated' 'passed' 'Final-mile playtest candidate authority is current.'))
+  } catch {
+    $checks.Add((New-MIR4DoctorCheck 'final-mile-playtest-candidate-authority' 'automated' 'failed' $_.Exception.Message))
+  }
+  if ($null -eq $plan) {
+    $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' 'blocked' 'Candidate authority is unavailable; maintainer playtest receipts cannot be inspected and acceptance is never inferred.'))
+  } else {
+    $currentF210Resolution = try { Get-MIR4F210EngineResolutionV1 -RepoRoot $repo } catch { $null }
+    $acceptedTargets = @{}
+    foreach ($decisionFile in @(Get-ChildItem -LiteralPath (Join-Path $repo 'build/mir4/playtests') -Recurse -Filter 'manual-decision.json' -File -ErrorAction SilentlyContinue)) {
     try {
       $root = Split-Path -Parent $decisionFile.FullName
       $decision = Get-Content -Raw -LiteralPath $decisionFile.FullName | ConvertFrom-Json -Depth 100
@@ -235,11 +245,12 @@ function Get-MIR4ReleaseDoctor {
       }
       if ($evidenceCurrent) { $acceptedTargets[[string]$session.target] = $true }
     } catch {}
+    }
+    $playtestComplete = @('F210','F200' | Where-Object { -not $acceptedTargets.ContainsKey($_) }).Count -eq 0
+    $playtestStatus = if ($playtestComplete) { 'passed' } else { 'blocked' }
+    $playtestDetail = if ($playtestComplete) { 'Explicit, current maintainer ACCEPTED receipts exist for F210 and F200.' } else { 'Current explicit maintainer ACCEPTED receipts are required for both F210 and F200; the command never infers either decision.' }
+    $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' $playtestStatus $playtestDetail))
   }
-  $playtestComplete = @('F210','F200' | Where-Object { -not $acceptedTargets.ContainsKey($_) }).Count -eq 0
-  $playtestStatus = if ($playtestComplete) { 'passed' } else { 'blocked' }
-  $playtestDetail = if ($playtestComplete) { 'Explicit, current maintainer ACCEPTED receipts exist for F210 and F200.' } else { 'Current explicit maintainer ACCEPTED receipts are required for both F210 and F200; the command never infers either decision.' }
-  $checks.Add((New-MIR4DoctorCheck 'maintainer-manual-playtest' 'human' $playtestStatus $playtestDetail))
   $automatedFailed = @($checks | Where-Object { $_.stage -eq 'automated' -and $_.status -ne 'passed' }).Count
   $humanBlocked = @($checks | Where-Object { $_.stage -eq 'human' -and $_.status -ne 'passed' }).Count
   return [pscustomobject][ordered]@{

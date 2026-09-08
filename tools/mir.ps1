@@ -10,3 +10,4 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $router = Join-Path $repo 'tools/mir/cli/Invoke-MIRCommandRouter.ps1'
 & $router @Args
+if ($Args.Count -ge 2 -and $Args[0] -ceq 'release' -and $Args[1] -ceq 'doctor' -and $LASTEXITCODE -eq 2) { exit 2 }
