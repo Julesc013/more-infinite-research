@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 151,
+  "test_count": 152,
   "tests": [
     {
       "id": "docs.check",
@@ -132,6 +132,31 @@
         "source": "scenario-registry",
         "selector": "affected"
       }
+    },
+    {
+      "id": "runtime.angel-tin-final-state-audit",
+      "proposition": "The governed test 'runtime.angel-tin-final-state-audit' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "canonical_implementation": "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1",
+        "fixtures/assert-angel-tin-final-state-audit/**",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ],
+      "matrix": null
     },
     {
       "id": "runtime.bob-tin-qualification",
@@ -5411,11 +5436,11 @@
     "cohorts": {
       "package-repository": 52,
       "tooling-release": 48,
-      "runtime-upgrade": 19,
+      "runtime-upgrade": 20,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 139,
+    "canonical_test_commands": 140,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5428,5 +5453,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7db7dda109331629b6add1aae9cb1e3801309a5a3094a4a28b36d53100d076a6"
+  "digest": "sha256:4ae5e50389babcdb86111b0953add4dc52067ba56808916a0602181a2353d157"
 }

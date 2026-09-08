@@ -4015,6 +4015,22 @@
       ]
     },
     {
+      "id": "runtime.angel-tin-final-state-audit",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1",
+        "fixtures/assert-angel-tin-final-state-audit/**",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",

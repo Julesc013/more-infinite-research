@@ -1157,6 +1157,32 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  angel-tin-final-state-audit:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-angel-tin-final-state-audit
+    harness: tests/runtime/Test-MIRAngelTinFinalStateAudit.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-Angel-only-final-tin-state-diagnostic
+      - exact-hidden-disabled-implicit-crafting-transformations
+      - no-ordinary-tin-ore-acquisition-route
+      - no-native-or-MIR-Tin-productivity-owner
+      - conditional-crafting-capability-is-not-reachability
+      - hidden-disabled-Tin-science-frontier-is-not-progression
+    non_claims:
+      - Bob-plus-Angel
+      - F200
+      - Angel-productivity-support-or-admission
+      - PIPE-01
+      - infinite-continuation
+      - weighted-balance
+      - full-BA-07-or-PROG-01
+      - release-readiness
+      - upgrade-or-persisted-save-recovery
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
