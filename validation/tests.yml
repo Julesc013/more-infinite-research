@@ -3943,6 +3943,20 @@
       ]
     },
     {
+      "id": "runtime.portable-research-surface-no-mir",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRPortableResearchSurfaceNoMir.ps1",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRPortableResearchSurfaceNoMir.ps1",
+        "fixtures/portable-research-surface-no-mir/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",

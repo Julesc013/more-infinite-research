@@ -18,11 +18,13 @@ if([string]::IsNullOrWhiteSpace($CandidateZip)) {
 } else { $candidate=(Resolve-Path (Join-Path $repo $CandidateZip)).Path }
 $archive=[IO.Compression.ZipFile]::OpenRead($candidate)
 try {
- $entry=@($archive.Entries | Where-Object FullName -Like '*/prototypes/mir/runtime/research_browser_model.lua')
- if($entry.Count -ne 1) { throw 'Candidate must contain exactly one browser model.' }
- $stream=$entry[0].Open()
- try { $modelHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)) } finally { $stream.Dispose() }
- if($modelHash -cne (Get-FileHash (Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua')).Hash) { throw 'Candidate model differs from the controlled model under test.' }
+ foreach($name in @('research_browser_core.lua','research_browser_factorio_catalogue.lua','research_browser_mir_provider.lua','research_browser_actions.lua')) {
+  $entry=@($archive.Entries | Where-Object FullName -Like "*/prototypes/mir/runtime/$name")
+  if($entry.Count -ne 1) { throw "Candidate must contain exactly one $name." }
+  $stream=$entry[0].Open()
+  try { $moduleHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)) } finally { $stream.Dispose() }
+  if($moduleHash -cne (Get-FileHash (Join-Path $repo "src/mod/families/modern/prototypes/mir/runtime/$name")).Hash) { throw "Candidate $name differs from the controlled source under test." }
+ }
 } finally { $archive.Dispose() }
 $run=Join-Path $repo ('build/browser-tests/'+[guid]::NewGuid().ToString('N').Substring(0,8))
 $fixture=Join-Path $run 'mods/mir-browser-test_1.0.0'
@@ -31,9 +33,11 @@ Copy-Item -LiteralPath $candidate -Destination (Join-Path $run 'mods')
 @{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 $lua=[Text.StringBuilder]::new()
-[void]$lua.AppendLine('local browser_model=(function()')
-[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua')))
-[void]$lua.AppendLine('end)()')
+foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{name='browser_catalogue';path='research_browser_factorio_catalogue.lua'},@{name='browser_actions';path='research_browser_actions.lua'})) {
+ [void]$lua.AppendLine("local $($module.name)=(function()")
+ [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo "src/mod/families/modern/prototypes/mir/runtime/$($module.path)")))
+ [void]$lua.AppendLine('end)()')
+}
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser.lua')))
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 @{mods=@(@{name='base';enabled=$true},@{name='space-age';enabled=$false},@{name='elevated-rails';enabled=$false},@{name='quality';enabled=$false},@{name='recycler';enabled=$false},@{name='more-infinite-research';enabled=$true},@{name='mir-browser-test';enabled=$true})} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $run 'mods/mod-list.json')
@@ -65,7 +69,9 @@ if($Graphics -and $result.native_players -lt 1) { throw "Graphics test did not e
 if($result.status -ne 'passed') { throw "Browser acceptance failed: $resultPath" }
 $result | Add-Member package_sha256 (Get-FileHash $candidate).Hash
 $result | Add-Member engine_sha256 (Get-FileHash $engine).Hash
-$result | Add-Member model_sha256 (Get-FileHash (Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua')).Hash
+$result | Add-Member core_sha256 (Get-FileHash (Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua')).Hash
+$result | Add-Member catalogue_adapter_sha256 (Get-FileHash (Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua')).Hash
+$result | Add-Member action_predicate_sha256 (Get-FileHash (Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_actions.lua')).Hash
 $result | Add-Member harness_sha256 (Get-FileHash $PSCommandPath).Hash
 $result | Add-Member fixture_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/browser_fixture_data.lua')).Hash
 $result | Add-Member test_sha256 (Get-FileHash (Join-Path $repo 'tests/runtime/research_browser.lua')).Hash

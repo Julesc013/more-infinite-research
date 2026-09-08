@@ -3889,8 +3889,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16998,
-      "expected_sha256": "DE4517FE17170A72CCE28E4755360CFF630BCA4F84DC75CECF4DD74781F0D9C4",
+      "expected_bytes": 16462,
+      "expected_sha256": "2AEB8CEA039BAF41A25D7F76E4E77C006C416895957B9D91C17F2F25BCF126A1",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3905,12 +3905,76 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2757,
-      "expected_sha256": "0BED8E3CDCD22A319FC270F48E19D4BE9C5D44DE3D8EEA2CA5BBA3D89AD5945D",
+      "expected_bytes": 201,
+      "expected_sha256": "77F4734786DF8D920301EF0B7086BBA58A5FA18F00474ED8B6D850658FEB749F",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
         "exact-target-gui-and-queue"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_core.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the canonical copied-data research query core for F200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 6508,
+      "expected_sha256": "286986351937A883EF302F7991D0718546B03FF511CAA66927DEC54A947FA269",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "package-excluded-no-mir-core-fixture",
+        "personal-filter-force-noninterference"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the bounded generic Factorio catalogue adapter for F200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1675,
+      "expected_sha256": "C3A4CD47470813A7F80E0D0C7D42E47869E32CB7747342C41AAC267298C72058",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "package-excluded-no-mir-core-fixture",
+        "bounded-runtime-lifecycle"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_mir_provider.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the separate bounded MIR enrichment provider for F200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 1430,
+      "expected_sha256": "798FC55C38415A6D1E2ABFADCE333BF549A5E41370CBEC73BF8E7D58BDAC3013",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "copied-provider-dtos-only",
+        "bounded-runtime-lifecycle"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/research_browser_actions.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_actions.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the separate native queue permission predicate for F200.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 952,
+      "expected_sha256": "818CD5E786534FCD8F9D346BA71FA937D7542446F941ECD4158AEAE63F6275AE",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "permission-checked-native-queue",
+        "no-second-queue-owner"
       ]
     }
   ],
@@ -3919,5 +3983,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "0A1550FFB19DF29D5FD84CB319377E52D979E9D4D2AA7CAB59C1817A719B947C"
+  "record_sha256": "FC005966A18F8DB3F8FB782F329F7A4599FCEFA462FE5213DFC3F0255ACD956E"
 }

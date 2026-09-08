@@ -4,9 +4,10 @@
   "change_id": "MIR4-CHG-2026-0046",
   "status": "draft",
   "change_type": "added",
-  "summary": "Add a personal research/settings browser and guarded finite material research to modern development targets.",
+  "summary": "Add a personal research/settings browser with a portable copied-data core and guarded finite material research to modern development targets.",
   "details": [
     "Browse All/Finite/Infinite research, ingredients, effect ownership and grouped settings; enqueue through the native permission-checked force API.",
+    "Split the browser into one Factorio-neutral copied-data core, a bounded generic Factorio catalogue adapter, MIR-only copied enrichment and a separate native queue permission predicate; a base-only F210 fixture proves provider absence removes enrichment only, without a stable public API claim.",
     "Export effective startup settings through the existing validated MIRSET1 restart-required profile path.",
     "Declare all 22 requested materials using exact recipe identities and the existing emitter; default to three 2% tiers and reject explicit productivity denial or recipe return paths.",
     "Capture 14 Bob material streams and retained K2 imersite powder; preserve native owners and report withheld or absent routes explicitly.",
@@ -66,6 +67,10 @@
     {
       "kind": "document",
       "value": "docs/releases/mir4-community-outcomes-2026-09-06.md"
+    },
+    {
+      "kind": "document",
+      "value": "docs/adr/0031-portable-player-surfaces.md"
     }
   ]
 }
