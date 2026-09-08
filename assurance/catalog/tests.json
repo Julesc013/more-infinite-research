@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 138,
+  "test_count": 150,
   "tests": [
     {
       "id": "docs.check",
@@ -203,6 +203,27 @@
       }
     },
     {
+      "id": "runtime.material-route-guard",
+      "proposition": "The governed test 'runtime.material-route-guard' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRMaterialRoutes.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRMaterialRoutes.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "tests/compiler/Test-MIRMaterialRoutes.ps1",
+        "tests/compiler/material_routes.lua"
+      ],
+      "matrix": null
+    },
+    {
       "id": "runtime.mir4-historical-private",
       "proposition": "The governed test 'runtime.mir4-historical-private' passes for its exact selected inputs.",
       "cohort": "compatibility-historical",
@@ -251,6 +272,27 @@
       "matrix": null
     },
     {
+      "id": "runtime.optional-probes",
+      "proposition": "The governed test 'runtime.optional-probes' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIROptionalProbes.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIROptionalProbes.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIROptionalProbes.ps1",
+        "tests/runtime/optional_runtime_probe.lua",
+        "tests/runtime/optional_runtime_services.lua"
+      ],
+      "matrix": null
+    },
+    {
       "id": "runtime.performance-regression",
       "proposition": "The governed test 'runtime.performance-regression' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -285,6 +327,81 @@
         "tools/lib/validation/ReleaseAttestations.ps1",
         "tools/lib/validation/PackageIdentity.ps1",
         "tools/lib/validation/SettingsOverrides.ps1"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.portable-research-surface-no-mir",
+      "proposition": "The governed test 'runtime.portable-research-surface-no-mir' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRPortableResearchSurfaceNoMir.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRPortableResearchSurfaceNoMir.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRPortableResearchSurfaceNoMir.ps1",
+        "fixtures/portable-research-surface-no-mir/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+        ".mir/fixtures.yml"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.research-browser",
+      "proposition": "The governed test 'runtime.research-browser' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRResearchBrowser.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRResearchBrowser.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRResearchBrowser.ps1",
+        "tests/runtime/research_browser.lua",
+        "tests/runtime/browser_fixture_data.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/settings_profile.lua",
+        "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "src/mod/package-source.json"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.science-planning-contract",
+      "proposition": "The governed test 'runtime.science-planning-contract' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRSciencePlanning.ps1 -FactorioBin <factorio>",
+      "canonical_implementation": "tests/compiler/Test-MIRSciencePlanning.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRSciencePlanning.ps1",
+        "tests/compiler/science_planning.lua",
+        "src/mod/common/prototypes/mir/core/deepcopy.lua",
+        "src/mod/common/prototypes/mir/platform/factorio/data_raw.lua",
+        "src/mod/families/modern/prototypes/mir/capabilities/science_integration/**",
+        "targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "targets/f210/files/prototypes/mir/planner/science.lua"
       ],
       "matrix": null
     },
@@ -1362,6 +1479,31 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-development-contracts",
+      "proposition": "The governed test 'static.mir4-development-contracts' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "canonical_implementation": "tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/repository/development-epoch-v1.json",
+        "tests/repository/Test-MIR4DevelopmentContracts.ps1",
+        "src/mod/**",
+        "targets/**",
+        "tools/mir/**",
+        "tests/**",
+        "spec/programmes/mir4-4x-operating-programme-v1.json"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-diagnostics-migration-v1",
       "proposition": "The governed test 'static.mir4-diagnostics-migration-v1' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -1941,6 +2083,29 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-historical-baseline",
+      "proposition": "The governed test 'static.mir4-historical-baseline' passes for its exact selected inputs.",
+      "cohort": "compatibility-historical",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/repository/Test-MIR4HistoricalBaseline.ps1",
+      "canonical_implementation": "tests/repository/Test-MIR4HistoricalBaseline.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/repository/development-epoch-v1.json",
+        "tests/repository/Test-MIR4HistoricalBaseline.ps1",
+        ".mir/releases/waves/mir4-r0/**",
+        "releases/migrations/**",
+        "governance/repository/migrations/**"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-historical-succession-w09",
       "proposition": "The governed test 'static.mir4-historical-succession-w09' passes for its exact selected inputs.",
       "cohort": "compatibility-historical",
@@ -2238,6 +2403,32 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-integration-programme",
+      "proposition": "The governed test 'static.mir4-integration-programme' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/programmes/**",
+        "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
+        "spec/platform/mir4-preview-v0/platform.json",
+        "tests/mir4/Test-MIR4IntegrationProgramme.ps1",
+        "spec/programmes/community-requests.json",
+        "spec/programmes/evidence/community-2026-09-06/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
+        "src/mod/families/modern/prototypes/streams/productivity.lua"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-k2-science-sol06",
       "proposition": "The governed test 'static.mir4-k2-science-sol06' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -2266,6 +2457,27 @@
         "fixtures/assert-k2-science-phase-policy/info.json",
         "docs/architecture/module-boundaries.md",
         "tests/mir4/Test-MIR4K2ScienceSOL06.ps1"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-local-delivery",
+      "proposition": "The governed test 'static.mir4-local-delivery' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4LocalDelivery.ps1",
+      "canonical_implementation": "tests/release/Test-MIR4LocalDelivery.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir/application/release/LocalDelivery.ps1",
+        "tools/mir/cli/router/ProductCommands.ps1",
+        "tests/release/Test-MIR4LocalDelivery.ps1"
       ],
       "matrix": null
     },
@@ -3162,6 +3374,26 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-promotion-recovery",
+      "proposition": "The governed test 'static.mir4-promotion-recovery' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4PromotionRecovery.ps1",
+      "canonical_implementation": "tests/release/Test-MIR4PromotionRecovery.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/mir/application/release/readiness/Promotion.ps1",
+        "tests/release/Test-MIR4PromotionRecovery.ps1"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-public-feedback-intake",
       "proposition": "The governed test 'static.mir4-public-feedback-intake' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -3511,6 +3743,37 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-release-doctor-structured-failure",
+      "proposition": "The governed test 'static.mir4-release-doctor-structured-failure' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tools/mir.ps1",
+        "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+        "tools/mir/cli/router/ProductCommands.ps1",
+        "tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1",
+        "validation/tests.yml",
+        "repository"
+      ],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-release-doctor-t06",
       "proposition": "The governed test 'static.mir4-release-doctor-t06' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -3574,6 +3837,35 @@
         "tools/mir.ps1",
         "tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
         "package-source"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-release-operator-recovery-a07",
+      "proposition": "The governed test 'static.mir4-release-operator-recovery-a07' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/assurance.json",
+        ".mir/modules.yml",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/lib/mir4/ReleasePhaseEngine.ps1",
+        "tools/lib/mir4/ReleaseAdapters.ps1",
+        "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",
+        "tools/mir/application/release/LocalDelivery.ps1",
+        "tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+        "tests/release/Test-MIR4LocalDelivery.ps1"
       ],
       "matrix": null
     },
@@ -5092,13 +5384,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 50,
-      "tooling-release": 44,
-      "runtime-upgrade": 13,
+      "package-repository": 52,
+      "tooling-release": 48,
+      "runtime-upgrade": 18,
       "compiler-static": 19,
-      "compatibility-historical": 12
+      "compatibility-historical": 13
     },
-    "canonical_test_commands": 126,
+    "canonical_test_commands": 138,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5111,5 +5403,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:71149f07fd042315bfd45fd998e8ad2be50392305bca9281bc1cdc0fd0320f96"
+  "digest": "sha256:9bd60237c0a269fab9b813385935559c040cdcaa72adf9231696e2764d023839"
 }

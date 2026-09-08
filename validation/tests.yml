@@ -2239,6 +2239,26 @@
       ]
     },
     {
+      "id": "static.mir4-release-operator-recovery-a07",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/assurance.json",
+        ".mir/modules.yml",
+        ".mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/lib/mir4/ReleasePhaseEngine.ps1",
+        "tools/lib/mir4/ReleaseAdapters.ps1",
+        "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",
+        "tools/mir/application/release/LocalDelivery.ps1",
+        "tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+        "tests/release/Test-MIR4LocalDelivery.ps1"
+      ]
+    },
+    {
       "id": "static.mir4-release-doctor-t06",
       "kind": "static",
       "layer": "F0",

@@ -894,6 +894,7 @@ package_excluded_modules:
       - tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
+      - tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1
       - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1

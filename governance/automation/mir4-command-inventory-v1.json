@@ -3939,9 +3939,9 @@
     {
       "path": "tools/lib/mir4/ReleaseLifecycleAdapters.ps1",
       "classification": "canonical-internal",
-      "sha256": "8B31CBF786F7B463A5BC78565B6997F05985A872B8FAA8F7C38CC76965A7234D",
+      "sha256": "6F07DDF173716ED1A5602E517262268C203A6BEB15CC98B43B968DCD64CB7302",
       "hash_mode": "canonical-text-v1",
-      "lines": 305,
+      "lines": 541,
       "package_visible": false
     },
     {
@@ -5554,5 +5554,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:fef252dfc42a450f1b62370424263f1b4b50fe663c8cfed8388502effa3a04f1"
+  "digest": "sha256:b67a1b96207c0732f9dfb2619690f4050cd6a2aa7387a6871c59bbc95cc4efef"
 }
