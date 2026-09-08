@@ -1183,6 +1183,33 @@ fixtures:
       - release-readiness
       - upgrade-or-persisted-save-recovery
 
+  bob-angel-tin-final-state-audit:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-bob-angel-tin-final-state-audit
+    harness: tests/runtime/Test-MIRBobAngelTinFinalStateAudit.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-combined-Bob-Angel-final-tin-state-diagnostic
+      - exact-51-recipe-identity-and-raw-disabled-implicit-crafting-state-with-22-hidden-members
+      - exact-six-all-declared-final-plate-producer-identities-three-declared-recycling-producers-and-three-non-recycling-final-plate-transformations-and-12-ordinary-ore-producers
+      - catalyst-coolant-recycling-direct-plate-to-ore-edge-absence-and-MIR-potential-return-omission
+      - no-native-or-MIR-Tin-productivity-owner
+      - conditional-crafting-capability-and-prototype-frontier-are-not-reachability
+    non_claims:
+      - combined-productivity-admission
+      - MIR-emission
+      - F200
+      - gameplay-progression-or-reachability
+      - upgrade-or-persisted-save-recovery
+      - balance-or-process-safety
+      - PIPE-01
+      - infinite-continuation
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
