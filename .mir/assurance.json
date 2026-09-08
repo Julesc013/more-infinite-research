@@ -34,7 +34,8 @@
     "promotion-check": ["seal.verify"],
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
     "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
-    "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"]
+    "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
+    "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"]
   },
   "classes": [
     {
@@ -226,6 +227,11 @@
       "id": "bob-tin-qualification-f210",
       "patterns": ["^fixtures/assert-bob-tin-qualification/", "^tests/runtime/Test-MIRBobTinQualification[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
       "tests": ["runtime.bob-tin-qualification"]
+    },
+    {
+      "id": "angel-tin-final-state-audit-f210",
+      "patterns": ["^fixtures/assert-angel-tin-final-state-audit/", "^tests/runtime/Test-MIRAngelTinFinalStateAudit[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
+      "tests": ["runtime.angel-tin-final-state-audit"]
     },
     {
       "id": "test-harness",
