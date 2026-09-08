@@ -1132,6 +1132,31 @@ fixtures:
       - late-prototype-conflict-reported-and-refused
       - repeated-reload-idempotence
 
+  bob-tin-qualification:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-qualification
+    harness: tests/runtime/Test-MIRBobTinQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-final-tin-recipe-route
+      - exact-smelting-machine-and-productivity-permission
+      - stable-unreleased-Tin-owner-and-runtime-enforced-level-three-cap
+      - no-byproduct-catalyst-return-or-recycling-route
+      - MIRSET1-imported-cap-three-overrides-distinguishable-direct-cap-two
+      - completed-fractional-and-queued-initialized-current-candidate-state
+      - initialized-current-candidate-state-loaded-twice
+    non_claims:
+      - F200
+      - Angel-or-combined-Bob-Angel
+      - PIPE-01
+      - infinite-continuation
+      - weighted-balance
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity

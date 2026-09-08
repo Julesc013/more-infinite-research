@@ -3999,6 +3999,22 @@
       ]
     },
     {
+      "id": "runtime.bob-tin-qualification",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBobTinQualification.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBobTinQualification.ps1",
+        "fixtures/assert-bob-tin-qualification/**",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",

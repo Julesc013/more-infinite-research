@@ -33,7 +33,8 @@
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"],
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
-    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"]
+    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
+    "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"]
   },
   "classes": [
     {
@@ -220,6 +221,11 @@
       "id": "assurance-tooling",
       "patterns": ["^\\.gitattributes$", "^scripts/Invoke-MIRAssurance\\.ps1$", "^tools/(?:mir\\.ps1|commands/(?:compatibility|control|package|release|targets|workspace)/|lib/(?:assurance|cli|compatibility|control|workspace)/|maintenance/)", "^spec/schemas/", "^tests/(?:tooling/Test-MIR(?:Assurance|Layout|VerificationSchemas)|release/Test-MIR(?:GitHubAdministration|Release(?:Authority|WorkReconciliation)|Terminal(?:Governance|ShadowProjection)))\\.ps1$", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$", "^\\.mir/control/(?:aliases|paths)\\.yml$", "^\\.mir/control-plane/(?:approved-delta-policies|control-plane|ownership)\\.json$", "^\\.mir/lifecycle/tasks/", "^\\.mir/views/", "^\\.github/workflows/(?:validate|assurance-(?:targeted|scheduled))\\.yml$"],
       "tests": ["tooling.self-test", "static.full"]
+    },
+    {
+      "id": "bob-tin-qualification-f210",
+      "patterns": ["^fixtures/assert-bob-tin-qualification/", "^tests/runtime/Test-MIRBobTinQualification[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
+      "tests": ["runtime.bob-tin-qualification"]
     },
     {
       "id": "test-harness",
