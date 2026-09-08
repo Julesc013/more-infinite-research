@@ -943,6 +943,10 @@ runtime_boundaries:
       - prototypes/mir/runtime/settings_profile.lua
       - prototypes/mir/runtime/research_browser.lua
       - prototypes/mir/runtime/research_browser_model.lua
+      - prototypes/mir/runtime/research_browser_core.lua
+      - prototypes/mir/runtime/research_browser_factorio_catalogue.lua
+      - prototypes/mir/runtime/research_browser_mir_provider.lua
+      - prototypes/mir/runtime/research_browser_actions.lua
       - prototypes/mir/runtime/planet_discovery_recovery.lua
       - prototypes/mir/runtime/productivity_family_adoption.lua
       - prototypes/mir/runtime/maximum_level_control.lua
@@ -1249,6 +1253,10 @@ modules:
     - prototypes/mir/runtime/settings_profile.lua
     - prototypes/mir/runtime/research_browser.lua
     - prototypes/mir/runtime/research_browser_model.lua
+    - prototypes/mir/runtime/research_browser_core.lua
+    - prototypes/mir/runtime/research_browser_factorio_catalogue.lua
+    - prototypes/mir/runtime/research_browser_mir_provider.lua
+    - prototypes/mir/runtime/research_browser_actions.lua
     - prototypes/mir/runtime/planet_discovery_recovery.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
     - prototypes/mir/runtime/maximum_level_control.lua

@@ -162,6 +162,18 @@ real_mod_gates:
     status: required
 
 fixtures:
+  portable-research-surface-no-mir:
+    requires_features: []
+    path: fixtures/portable-research-surface-no-mir
+    shipped: false
+    validates:
+      - exact-canonical-copied-data-core
+      - generic-factorio-catalogue-dtos
+      - bounded-deterministic-filter-pagination-and-search
+      - bounded-detail-enrichment-fails-closed
+      - mir-provider-absence-removes-enrichment-only
+      - no-mir-private-state-or-package-dependency
+
   mir4-api-v0-conformance:
     requires_features: []
     path: fixtures/mir4-api-v0

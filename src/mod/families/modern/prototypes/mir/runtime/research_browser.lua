@@ -1,4 +1,7 @@
-local model = require("prototypes.mir.runtime.research_browser_model")
+local core = require("prototypes.mir.runtime.research_browser_core")
+local factorio_catalogue = require("prototypes.mir.runtime.research_browser_factorio_catalogue")
+local mir_provider = require("prototypes.mir.runtime.research_browser_mir_provider")
+local actions = require("prototypes.mir.runtime.research_browser_actions")
 local runtime_state = require("prototypes.mir.runtime.state")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local codec = require("prototypes.mir.settings.profile_codec")
@@ -18,34 +21,17 @@ local function view(player)
   all[player.index] = all[player.index] or {mode = 1, status = 1, page = 1, search = "", tab = "research", effect_page = 1, family = "all"}
   return all[player.index]
 end
-local function data(name)
-  local prototype = prototypes.mod_data and prototypes.mod_data[name]
-  return prototype and prototype.data or {}
-end
 local function catalogue(force)
-  if catalogues[force.index] then return catalogues[force.index] end
-  local result = {names = {}, caps = {}, families = {}, decisions = {}, family_names = {"all", "external"}}
-  local known = {all = true, external = true}
-  for name in pairs(force.technologies) do
-    if #result.names >= model.catalogue_limit then return nil end
-    result.names[#result.names + 1] = name
+  local result = factorio_catalogue.snapshot(force)
+  if not result then return nil end
+  local cached = catalogues[force.index]
+  if not cached then
+    local enrichment = mir_provider.snapshot()
+    cached = {enrichment = enrichment, family_names = core.family_names(enrichment)}
+    catalogues[force.index] = cached
   end
-  table.sort(result.names)
-  for _, binding in ipairs(data("more-infinite-research-maximum-level-policy").bindings or {}) do
-    if type(binding.selected) == "number" and binding.selected > 0 then result.caps[binding.technology] = binding.selected end
-  end
-  for _, row in ipairs(data("more-infinite-research-generation-plan").rows or {}) do
-    if row.technology_id then
-      result.families[row.technology_id] = row.stream_id
-      result.decisions[row.technology_id] = row
-      if row.stream_id and not known[row.stream_id] then
-        known[row.stream_id] = true
-        result.family_names[#result.family_names + 1] = row.stream_id
-      end
-    end
-  end
-  table.sort(result.family_names)
-  catalogues[force.index] = result
+  result.enrichment = cached.enrichment
+  result.family_names = cached.family_names
   return result
 end
 local function label(parent, caption)
@@ -92,12 +78,12 @@ local function settings_rows(player, parent, v)
     if prototype.mod == "more-infinite-research" and not assigned[name] then group(name, prototype.localised_name, {{name = name}}) end
   end
   table.sort(groups, function(a,b) return a.key < b.key end)
-  local pages = math.max(1, math.ceil(#groups / model.page_size))
+  local pages = math.max(1, math.ceil(#groups / core.page_size))
   v.page = math.min(v.page, pages)
   label(parent, {"mir-browser.startup-note"})
   button(parent, "export", {"mir-browser.export"})
   local rows = parent.add{type = "table", column_count = 2}
-  for i = (v.page - 1) * model.page_size + 1, math.min(v.page * model.page_size, #groups) do
+  for i = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #groups) do
     local g = groups[i]
     local title = label(rows, g.title); title.tooltip = g.key
     local values_column = rows.add{type = "flow", direction = "vertical"}
@@ -122,23 +108,24 @@ end
 
 local render
 local function detail(player, parent, v, c)
-  local tech = v.selected and player.force.technologies[v.selected]
+  local portable = v.selected and core.detail(c, v.selected, c.enrichment)
+  local tech = portable and player.force.technologies[portable.technology.key]
   if not tech then return end
   label(parent, {"", tech.localised_name, " (", tech.name, ")"})
   label(parent, tech.localised_description)
-  local decision = c.decisions[tech.name]
-  label(parent, {"mir-browser.family-owner", c.families[tech.name] or "external", tech.name, decision and decision.action or "external"})
-  if c.caps[tech.name] then label(parent, {"mir-browser.cap", c.caps[tech.name]}) end
+  local enrichment = portable.enrichment or {}
+  label(parent, {"mir-browser.family-owner", portable.technology.family, tech.name, enrichment.action or "external"})
+  if portable.technology.cap then label(parent, {"mir-browser.cap", portable.technology.cap}) end
   local ingredients = parent.add{type = "flow"}
   for _, ingredient in ipairs(tech.research_unit_ingredients) do
     ingredients.add{type = "sprite", sprite = "item/" .. ingredient.name, tooltip = {"item-name." .. ingredient.name}}
   end
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
-  enqueue.enabled = model.can_enqueue(player, tech, defines.input_action.start_research)
+  enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
   local effects = tech.prototype.effects
-  local pages = math.max(1, math.ceil(#effects / model.page_size))
+  local pages = math.max(1, math.ceil(#effects / core.page_size))
   v.effect_page = math.min(v.effect_page or 1, pages)
-  for i = (v.effect_page - 1) * model.page_size + 1, math.min(v.effect_page * model.page_size, #effects) do
+  for i = (v.effect_page - 1) * core.page_size + 1, math.min(v.effect_page * core.page_size, #effects) do
     local effect = effects[i]
     label(parent, (effect.recipe or effect.ammo_category or effect.type) .. " : " .. tostring(effect.modifier or effect.change or effect.bonus or effect.type))
   end
@@ -154,7 +141,7 @@ render = function(player)
   local v = view(player)
   local c = catalogue(player.force)
   close(player)
-  if not c then player.print({"mir-browser.catalogue-limit", model.catalogue_limit}); return end
+  if not c then player.print({"mir-browser.catalogue-limit", core.catalogue_limit}); return end
   local frame = player.gui.screen.add{type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"}}
   frame.auto_center = true
   local scale = player.display_scale or 1
@@ -183,11 +170,11 @@ render = function(player)
       if i <= 10 then button(queue, "select", tech.localised_name, {technology = tech.name}) end
     end
     if #(player.force.research_queue or {}) > 10 then label(queue, {"mir-browser.queue-more", #(player.force.research_queue or {}) - 10}) end
-    local page = model.page(c.names, player.force, v, c.caps, c.families)
+    local page = core.query(c, v, c.enrichment)
     v.page, pages = page.page, page.pages
     label(body, {"mir-browser.count", page.count})
-    for _, name in ipairs(page.rows) do
-      button(body, "select", player.force.technologies[name].localised_name, {technology = name})
+    for _, row in ipairs(page.rows) do
+      button(body, "select", player.force.technologies[row.key].localised_name, {technology = row.key})
     end
     detail(player, body, v, c)
   end
@@ -227,7 +214,7 @@ local function click(event)
   if action == "select" then v.selected = tags.technology; v.effect_page = 1
   elseif action == "enqueue" then
     local tech = player.force.technologies[tags.technology]
-    if model.can_enqueue(player, tech, defines.input_action.start_research) then
+    if actions.can_enqueue(player, tech, defines.input_action.start_research) then
       if not player.force.add_research(tech) then player.print({"mir-browser.enqueue-failed"}) end
     else player.print({"mir-browser.enqueue-failed"}) end
   elseif action == "prev" then v.page = math.max(1, v.page - 1)

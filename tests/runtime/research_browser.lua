@@ -22,34 +22,38 @@ script.on_nth_tick(1,function()
   check(force.add_research("mir-browser-progress"),"initial queue")
   force.research_progress=0.375
   local before=snapshot(force)
-  local catalogue={"mir-browser-test-finite","mir-browser-test-infinite"}
+  local catalogue=browser_catalogue.snapshot(force)
   local finite={mode=2,status=1,page=1,search="mir-browser-test"}
   local infinite={mode=3,status=1,page=1,search="mir-browser-test"}
-  local a=browser_model.page(catalogue,force,finite,{},{})
-  local b=browser_model.page(catalogue,force,infinite,{},{})
-  check(#a.rows==1 and a.rows[1]==catalogue[1],"finite personal filter")
-  check(#b.rows==1 and b.rows[1]==catalogue[2],"infinite personal filter")
+  local a=browser_core.query(catalogue,finite)
+  local b=browser_core.query(catalogue,infinite)
+  check(#a.rows==1 and a.rows[1].key=="mir-browser-test-finite","finite personal filter")
+  check(#b.rows==1 and b.rows[1].key=="mir-browser-test-infinite","infinite personal filter")
   check(before==snapshot(force),"personal filters changed force state")
   check(finite.mode==2 and infinite.mode==3,"view states not isolated")
-  local capped=browser_model.page(catalogue,force,finite,{[catalogue[2]]=3},{})
+  local capped=browser_core.query(catalogue,finite,{schema=1,caps={["mir-browser-test-infinite"]=3}})
   check(#capped.rows==2,"effective MIR cap classification")
-  local literal=browser_model.page(catalogue,force,{mode=1,status=1,page=1,search="%["},{},{})
+  local literal=browser_core.query(catalogue,{mode=1,status=1,page=1,search="%["})
   check(#literal.rows==0,"literal search")
   local player={valid=true,force=force,permission_group={allows_action=function() return false end}}
-  local tech=force.technologies[catalogue[1]]
-  check(not browser_model.can_enqueue(player,tech,defines.input_action.start_research),"permission negative")
+  local tech=force.technologies["mir-browser-test-finite"]
+  check(not browser_actions.can_enqueue(player,tech,defines.input_action.start_research),"permission negative")
   player.permission_group=nil
-  check(browser_model.can_enqueue(player,tech,defines.input_action.start_research),"available research")
+  check(browser_actions.can_enqueue(player,tech,defines.input_action.start_research),"available research")
   player.force=game.forces.enemy
-  check(not browser_model.can_enqueue(player,tech,defines.input_action.start_research),"cross-force negative")
+  check(not browser_actions.can_enqueue(player,tech,defines.input_action.start_research),"cross-force negative")
   player.force=force
-  check(not browser_model.can_enqueue(player,force.current_research,defines.input_action.start_research),"duplicate queue negative")
+  check(not browser_actions.can_enqueue(player,force.current_research,defines.input_action.start_research),"duplicate queue negative")
   check(before==snapshot(force),"predicates changed research state")
-  local many={}
-  for name in pairs(force.technologies) do many[#many+1]=name end
-  table.sort(many)
-  local all=browser_model.page(many,force,{mode=1,status=1,page=999999,search=""},{},{})
-  check(#all.rows<=browser_model.page_size and all.page==all.pages,"bounded page clamp")
+  local queued_before=browser_core.query(catalogue,{mode=1,status=4,page=1,search="mir-browser-test-finite"})
+  check(#queued_before.rows==0,"initial snapshot excludes unqueued research")
+  check(force.add_research("mir-browser-test-finite"),"queue mutation")
+  local refreshed_catalogue=browser_catalogue.snapshot(force)
+  local queued_after=browser_core.query(refreshed_catalogue,{mode=1,status=4,page=1,search="mir-browser-test-finite"})
+  check(#queued_after.rows==1 and queued_after.rows[1].queued,"second snapshot exposes queued research")
+  before=snapshot(force)
+  local all=browser_core.query(catalogue,{mode=1,status=1,page=999999,search=""})
+  check(#all.rows<=browser_core.page_size and all.page==all.pages,"bounded page clamp")
   local native_players=0
   for _, actual in pairs(game.players) do
     native_players=native_players+1
