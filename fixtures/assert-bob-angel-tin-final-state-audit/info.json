@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-bob-angel-tin-final-state-audit",
+  "version": "0.1.0",
+  "title": "MIR Bob plus Angel Tin final-state diagnostic audit",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base", "? boblibrary", "? bobores", "? bobplates", "? angelsrefining", "? angelspetrochem", "? angelssmelting", "? more-infinite-research"]
+}

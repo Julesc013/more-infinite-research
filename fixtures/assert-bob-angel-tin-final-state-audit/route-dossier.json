@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "MIR4BobAngelTinFinalStateAuditV1",
+  "scope": "F210 exact combined Bob plus Angel Tin final-state diagnostic audit; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+  },
+  "official_mod_closure": [{"name": "base", "enabled": true}, {"name": "elevated-rails", "enabled": true}, {"name": "quality", "enabled": true}, {"name": "recycler", "enabled": true}, {"name": "space-age", "enabled": true}],
+  "archive_closure": [
+    {"name": "boblibrary", "version": "3.0.0", "sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4"},
+    {"name": "bobores", "version": "3.0.0", "sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+    {"name": "bobplates", "version": "3.0.1", "sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"},
+    {"name": "angelsrefining", "version": "2.1.2", "sha256": "AF5E79E35E591F68D52F13EDA082950E10AC98A4B7722B3F568D0211E3FEB813"},
+    {"name": "angelsrefininggraphics", "version": "2.1.0", "sha256": "79F373BC628F619EDE3B1875827172390D2C3F5EAB56310F6F1572C4553CB6EF"},
+    {"name": "angelspetrochem", "version": "2.1.2", "sha256": "9B4CC14156CF16C9F41784108CCA5E767180A7330B1AF23A387231653CE10A49"},
+    {"name": "angelspetrochemgraphics", "version": "2.1.0", "sha256": "DECDC2FCD5BBBDEF70784943C142C30FAA7294B98E814296C5D44D09A9DE4790"},
+    {"name": "angelssmelting", "version": "2.1.1", "sha256": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9"},
+    {"name": "angelssmeltinggraphics", "version": "2.1.0", "sha256": "EBEF8D1F6F13F84B242DF295CE9FAB9618ED90B4C52852A0B4345908A88D5D35"}
+  ],
+  "final_identity": {"item": "bob-tin-plate", "hidden_angel_alias": "angels-plate-tin", "alias_hidden": true},
+  "raw_recipe_state": {
+    "recipe_ids": ["angels-ingot-tin", "angels-ingot-tin-2", "angels-ingot-tin-3", "angels-ingot-tin-recycling", "angels-liquid-molten-brass-2", "angels-liquid-molten-bronze", "angels-liquid-molten-bronze-2", "angels-liquid-molten-bronze-3", "angels-liquid-molten-gunmetal", "angels-liquid-molten-solder", "angels-liquid-molten-solder-2", "angels-liquid-molten-solder-3", "angels-liquid-molten-tin", "angels-liquid-molten-titanium-4", "angels-ore-crushed-mix4-processing", "angels-ore3-chunk-processing", "angels-ore3-crystal-processing", "angels-ore3-pure-processing", "angels-ore6-chunk-processing", "angels-ore6-crushed-processing", "angels-ore6-crystal-processing", "angels-ore6-pure-processing", "angels-ore9-crushed-processing", "angels-ore9-crystal-processing", "angels-ore9-dust-processing", "angels-ore9-powder-processing", "angels-pellet-tin", "angels-pellet-tin-recycling", "angels-plate-glass-3", "angels-plate-tin", "angels-plate-tin-2", "angels-plate-tin-recycling", "angels-powder-tin", "angels-powder-tin-recycling", "angels-processed-tin", "angels-processed-tin-recycling", "angels-roll-tin", "angels-roll-tin-2", "angels-roll-tin-recycling", "angels-tin-ore-recycling", "angels-wire-coil-tin", "angels-wire-coil-tin-2", "angels-wire-coil-tin-recycling", "angels-wire-tin", "angels-wire-tin-2", "angels-wire-tin-recycling", "bob-bronze-alloy", "bob-gunmetal-alloy", "bob-tin-ore-recycling", "bob-tin-plate", "bob-tin-plate-recycling"],
+    "enabled": false,
+    "category": null,
+    "category_disposition": "implicit-crafting",
+    "hidden_recipe_ids": ["angels-ingot-tin-recycling", "angels-liquid-molten-solder", "angels-liquid-molten-solder-2", "angels-liquid-molten-solder-3", "angels-pellet-tin-recycling", "angels-plate-tin-recycling", "angels-powder-tin", "angels-powder-tin-recycling", "angels-processed-tin-recycling", "angels-roll-tin-recycling", "angels-tin-ore-recycling", "angels-wire-coil-tin", "angels-wire-coil-tin-2", "angels-wire-coil-tin-recycling", "angels-wire-tin", "angels-wire-tin-2", "angels-wire-tin-recycling", "bob-bronze-alloy", "bob-gunmetal-alloy", "bob-tin-ore-recycling", "bob-tin-plate", "bob-tin-plate-recycling"],
+    "automatic_recycling_present": false
+  },
+  "all_declared_final_plate_producer_recipe_ids": ["angels-plate-tin", "angels-plate-tin-2", "angels-plate-tin-recycling", "angels-wire-tin-recycling", "bob-tin-plate", "bob-tin-plate-recycling"],
+  "non_recycling_final_plate_transformations": [
+    {"recipe": "angels-plate-tin", "hidden": null, "ingredients": [{"type": "fluid", "name": "angels-liquid-molten-tin", "amount": 40}], "products": [{"type": "item", "name": "bob-tin-plate", "amount": 4}], "allow_productivity": true, "auto_recycle": false},
+    {"recipe": "angels-plate-tin-2", "hidden": null, "ingredients": [{"type": "item", "name": "angels-roll-tin", "amount": 1}], "products": [{"type": "item", "name": "bob-tin-plate", "amount": 4}], "allow_productivity": true, "auto_recycle": false},
+    {"recipe": "bob-tin-plate", "hidden": true, "ingredients": [{"type": "item", "name": "bob-tin-ore", "amount": 1}], "products": [{"type": "item", "name": "bob-tin-plate", "amount": 1}], "allow_productivity": true, "auto_recycle": false}
+  ],
+  "conditional_crafting_category_capability": {"category": "crafting", "machine_type": "assembling-machine", "machine_ids": ["assembling-machine-1", "assembling-machine-2", "assembling-machine-3"], "route_or_reachability_claimed": false},
+  "ordinary_ore_producers": ["angels-ore-crushed-mix4-processing", "angels-ore3-chunk-processing", "angels-ore3-crystal-processing", "angels-ore3-pure-processing", "angels-ore6-chunk-processing", "angels-ore6-crushed-processing", "angels-ore6-crystal-processing", "angels-ore6-pure-processing", "angels-ore9-crushed-processing", "angels-ore9-crystal-processing", "angels-ore9-dust-processing", "angels-ore9-powder-processing"],
+  "catalyst_route": {"recipe": "angels-ore-crushed-mix4-processing", "catalyst": "angels-catalysator-brown", "amount": 1, "products": [{"type": "item", "name": "bob-tin-ore", "amount": 4}]},
+  "route_graph": {"nodes": ["bob-tin-ore", "angels-processed-tin", "angels-pellet-tin", "angels-ingot-tin", "angels-liquid-molten-tin", "angels-roll-tin", "bob-tin-plate"], "edges": ["bob-tin-ore->angels-processed-tin", "angels-processed-tin->angels-pellet-tin", "angels-pellet-tin->angels-ingot-tin", "angels-ingot-tin->angels-liquid-molten-tin", "angels-liquid-molten-tin->bob-tin-plate", "angels-liquid-molten-tin->angels-roll-tin->bob-tin-plate"]},
+  "final_plate_consumers": ["angels-plate-tin-recycling", "angels-wire-tin", "bob-bronze-alloy", "bob-gunmetal-alloy", "bob-tin-plate-recycling"],
+  "side_paths": {"coolant_byproducts": [{"recipe": "angels-roll-tin-2", "product": "angels-liquid-coolant-used", "amount": 40}, {"recipe": "angels-wire-coil-tin-2", "product": "angels-liquid-coolant-used", "amount": 40}], "recycling_technology": "recycling", "recycling_prerequisite": "planet-discovery-fulgora", "declared_recycling_final_plate_producer_recipe_ids": ["angels-plate-tin-recycling", "angels-wire-tin-recycling", "bob-tin-plate-recycling"], "direct_plate_to_ore_recipe_edges": [], "mir_potential_return_omission": {"recipe": "bob-tin-plate", "reason": "potential-return-path:bob-tin-ore", "stream": "research_material_tin", "stream_disposition": "no_matching_recipes", "return_graph_reconstructed": false}},
+  "productivity": {"permission_recipe_ids": ["angels-ore-crushed-mix4-processing", "angels-ore3-chunk-processing", "angels-ore3-crystal-processing", "angels-ore3-pure-processing", "angels-ore6-chunk-processing", "angels-ore6-crushed-processing", "angels-ore6-crystal-processing", "angels-ore6-pure-processing", "angels-ore9-crushed-processing", "angels-ore9-crystal-processing", "angels-ore9-dust-processing", "angels-ore9-powder-processing", "angels-plate-glass-3", "angels-plate-tin", "angels-plate-tin-2", "angels-wire-tin-2", "bob-bronze-alloy", "bob-gunmetal-alloy", "bob-tin-plate"], "native_owner_technologies": [], "mir_owner_technology": null, "disposition": "permission-present-without-native-or-mir-owner"},
+  "science_lab_frontier": {"technology": "angels-tin-smelting-1", "prototype_unlock_graph": ["automation", "angels-basic-chemistry", "angels-ore-crushing", "angels-metallurgy-1", "angels-tin-smelting-1"], "unlock_recipe_ids": ["angels-ingot-tin", "angels-liquid-molten-tin", "angels-plate-tin"], "science": ["automation-science-pack"], "lab": "lab", "gameplay_reachability_claimed": false},
+  "observed_disposition": "diagnostic-combined-route-present-without-native-or-mir-productivity-owner",
+  "evidence_role": "bounded diagnostic input to A06 BA-07 A17 and PROG-01; not completion authority",
+  "explicit_non_claims": ["combined-productivity-admission", "MIR-emission", "F200", "gameplay-progression-or-reachability", "upgrade-or-persisted-save-recovery", "balance-or-process-safety", "PIPE-01", "infinite-continuation", "full-BA-07-or-PROG-01", "release-readiness"]
+}
