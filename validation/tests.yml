@@ -2262,6 +2262,28 @@
       ]
     },
     {
+      "id": "static.mir4-release-doctor-structured-failure",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tools/mir.ps1",
+        "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+        "tools/mir/cli/router/ProductCommands.ps1",
+        "tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1",
+        "validation/tests.yml",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-canonicalization-diagnostics-t07",
       "kind": "static",
       "layer": "F0",

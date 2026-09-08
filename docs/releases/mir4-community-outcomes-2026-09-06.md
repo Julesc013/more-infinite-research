@@ -5,7 +5,7 @@ applies_to: "MIR 4.2 development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-06
+last_reviewed: 2026-09-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -80,6 +80,6 @@ Maintenance is off by default in the prototype. Damage admission accepts walls/g
 
 The programme retains later infinite continuation, Angel-only and combined material routes, weighted process proofs for withheld routes, affected-save upgrades and two reloads, browser multiplayer/removal acceptance, ecosystem canaries and balance as unfinished work. Existing firing speed, inventory slots or fuel productivity do not complete different requested capabilities. Upstream API requests and optional experiments remain distinct ledger entries.
 
-The historical MIR 4.0 release doctor currently stops at `mir4-final-mile-playtest-authority-package-source` when run against this dev source. The old final-mile authority binds a different package source. Its receipts and release gates remain intact; the failure is an operator-facing preflight blocker, not release approval.
+The historical MIR 4.0 release doctor now returns a structured `not-ready`/`blocked` result with the failed automated `final-mile-playtest-candidate-authority` check carrying `[mir4-final-mile-playtest-authority-package-source]` when run against this dev source. The old final-mile authority binds a different package source, and the doctor never infers maintainer acceptance. Historical authority, receipts, and release gates remain intact; the failure is an operator-facing preflight blocker, not release approval.
 
 The change fragment is [MIR4-CHG-2026-0046](../../changes/unreleased/MIR4-CHG-2026-0046.json). All four current development packages must be delivered to the primary checkout's `dist/community-2026-09-06/` with SHA-256 verification and matching development notes after checks and dev integration. No main promotion, tag, release publication or community comment is authorized by this increment.

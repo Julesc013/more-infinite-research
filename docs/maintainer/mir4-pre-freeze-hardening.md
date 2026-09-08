@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0 pre-freeze development"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-29
+last_reviewed: 2026-09-09
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -61,6 +61,8 @@ Run any of the ten phase dry runs against exact source identities with:
 Use only repository-descendant package-excluded paths. Qualification execution reads `<proof-root>/qualification-workers/f200.json` and `f210.json`; independent verification reads the corresponding files under `<proof-root>/independent-receipts/`. Their schemas are the tracked worker and independent receipt V1 contracts. `M4RC1` is rejected while allocation is unauthorized. Execute, resume, verify, compensate, and receipt operations are available only inside the same non-production attempt boundary.
 
 The doctor checks the authority schemas and bindings, current F210 policy and authorized Steam experimental resolution, remote-ruleset snapshot, immutable action pins, publisher confinement, V1 default extension path, package identity, preview contract, the non-production phase kernel, workflow registration, and the distinct executor-maturity fields. Human signing input and explicit playtest acceptance remain separate blockers and are reported as such.
+
+When the current final-mile candidate authority does not bind this development package source, `release doctor --json --dry-run --output <path>` still emits parseable JSON, writes the explicitly requested output file during dry-run, and exits 2 because an automated check failed. It reports the unavailable candidate authority and blocks manual playtest inspection rather than inferring acceptance; human checks remain blockers, never approval.
 
 Audit the recorded branch and tag policy with:
 
