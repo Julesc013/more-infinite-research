@@ -9,7 +9,6 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX = "mir_research_browser", "mir_browser_"
-local catalogues = {}
 
 local function state()
   local value = runtime_state.bucket("research_browser")
@@ -24,18 +23,25 @@ end
 local function catalogue(force)
   local result = factorio_catalogue.snapshot(force)
   if not result then return nil end
-  local cached = catalogues[force.index]
-  if not cached then
-    local enrichment = mir_provider.snapshot()
-    cached = {enrichment = enrichment, family_names = core.family_names(enrichment)}
-    catalogues[force.index] = cached
-  end
-  result.enrichment = cached.enrichment
-  result.family_names = cached.family_names
+  -- Dynamic cap/level facts must be refreshed with the copied Force snapshot.
+  -- Only the pure core is cache-safe; provider state is never retained here.
+  result.enrichment = mir_provider.snapshot(force)
+  result.family_names = core.family_names(result.enrichment)
   return result
 end
 local function label(parent, caption)
   local element = parent.add{type = "label", caption = caption}
+  element.style.single_line = false
+  element.style.maximal_width = 720
+  return element
+end
+local function fact_label(parent, key, caption)
+  local element = parent.add{
+    type = "label",
+    name = PREFIX .. "fact_" .. key,
+    caption = caption,
+    tags = {mir_browser_fact = key}
+  }
   element.style.single_line = false
   element.style.maximal_width = 720
   return element
@@ -107,6 +113,33 @@ local function settings_rows(player, parent, v)
 end
 
 local render
+local function joined_ingredients(ingredients)
+  local parts = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    parts[#parts + 1] = ingredient.name .. " x" .. tostring(ingredient.amount)
+  end
+  return table.concat(parts, ", ")
+end
+local function setting_caption(setting)
+  return setting.name
+    .. " | default=" .. tostring(setting.default)
+    .. " | raw-direct=" .. tostring(setting.raw_direct)
+    .. " | effective=" .. tostring(setting.effective)
+    .. " | source=" .. setting.source
+    .. " | changed=" .. tostring(setting.changed)
+    .. " | changed-from-default=" .. tostring(setting.changed_from_default)
+    .. " | restart-required=" .. tostring(setting.restart_required)
+end
+local function benefit_caption(recipes)
+  local parts = {}
+  for _, recipe in ipairs(recipes or {}) do
+    parts[#parts + 1] = recipe.recipe_id
+      .. " current-productivity=" .. tostring(recipe.current_productivity_bonus)
+      .. " maximum-productivity=" .. tostring(recipe.maximum_productivity)
+      .. " next-level-effective=" .. tostring(recipe.next_level_has_effective_benefit)
+  end
+  return table.concat(parts, " | ")
+end
 local function detail(player, parent, v, c)
   local portable = v.selected and core.detail(c, v.selected, c.enrichment)
   local tech = portable and player.force.technologies[portable.technology.key]
@@ -116,9 +149,28 @@ local function detail(player, parent, v, c)
   local enrichment = portable.enrichment or {}
   label(parent, {"mir-browser.family-owner", portable.technology.family, tech.name, enrichment.action or "external"})
   if portable.technology.cap then label(parent, {"mir-browser.cap", portable.technology.cap}) end
-  local ingredients = parent.add{type = "flow"}
-  for _, ingredient in ipairs(tech.research_unit_ingredients) do
-    ingredients.add{type = "sprite", sprite = "item/" .. ingredient.name, tooltip = {"item-name." .. ingredient.name}}
+  if enrichment.owner and enrichment.compiler_disposition and enrichment.final_science and enrichment.settings then
+    fact_label(parent, "affected_recipes", "Affected recipes: " .. table.concat(enrichment.owner.affected_recipe_ids or {}, ", "))
+    local disposition = enrichment.compiler_disposition
+    fact_label(parent, "compiler_disposition", "Compiler disposition: " .. disposition.inclusion
+      .. " | action=" .. disposition.action .. " | reason=" .. disposition.reason)
+    fact_label(parent, "route_exclusions", "Route exclusions: " .. disposition.route_exclusions.state
+      .. " | exact-recipe-ids=" .. table.concat(disposition.route_exclusions.recipe_ids or {}, ", "))
+    fact_label(parent, "science", "Final science: " .. joined_ingredients(enrichment.final_science.ingredients)
+      .. " | rationale=" .. enrichment.final_science.rationale)
+    fact_label(parent, "next_level", "Next level has effective benefit: "
+      .. tostring(enrichment.next_level_has_effective_benefit)
+      .. " | current-level=" .. tostring(enrichment.current_level)
+      .. " | effective-cap=" .. tostring(enrichment.effective_cap))
+    fact_label(parent, "recipe_benefits", "Affected recipe benefit facts: " .. benefit_caption(enrichment.recipe_benefits))
+    fact_label(parent, "maximum_setting", setting_caption(enrichment.settings.maximum_level))
+    fact_label(parent, "enabled_setting", setting_caption(enrichment.settings.enabled))
+    fact_label(parent, "startup_restart", "Startup settings require restart; this browser does not mutate startup settings.")
+  else
+    local ingredients = parent.add{type = "flow"}
+    for _, ingredient in ipairs(tech.research_unit_ingredients) do
+      ingredients.add{type = "sprite", sprite = "item/" .. ingredient.name, tooltip = {"item-name." .. ingredient.name}}
+    end
   end
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
@@ -223,7 +275,7 @@ local function click(event)
   elseif action == "effects-next" then v.effect_page = v.effect_page + 1
   elseif action == "settings" or action == "research" then v.tab = action; v.page = 1
   elseif action == "export" then export(player)
-  elseif action == "refresh" then catalogues[player.force.index] = nil end
+  elseif action == "refresh" then end
   render(player)
 end
 local function selection(event)
@@ -242,7 +294,6 @@ function M.on_init()
   for _, player in pairs(game.players) do launch_button(player) end
 end
 function M.on_configuration_changed()
-  catalogues = {}
   for _, player in pairs(game.players) do launch_button(player) end
   refresh_open()
 end
@@ -250,7 +301,7 @@ function M.on_research_finished(event) refresh_open(event.research.force) end
 M.on_research_reversed = M.on_research_finished
 M.on_research_queued = M.on_research_finished
 function M.on_technology_effects_reset() refresh_open() end
-function M.on_forces_merged() catalogues = {}; refresh_open() end
+function M.on_forces_merged() refresh_open() end
 function M.register()
   remote.add_interface("more-infinite-research-browser", {
     open = function(player_index, options)

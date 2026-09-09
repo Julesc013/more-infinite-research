@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "scope": "F210 exact locked Bob-only Tin browser explanation; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8",
+    "boblibrary_version": "3.0.0",
+    "boblibrary_sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4",
+    "bobores_version": "3.0.0",
+    "bobores_sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B",
+    "bobplates_version": "3.0.1",
+    "bobplates_sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"
+  },
+  "public_row": {
+    "technology": "recipe-prod-research_material_tin-1",
+    "stream": "research_material_tin",
+    "action": "emit",
+    "reason": "recipe_productivity",
+    "affected_recipe_ids": ["bob-tin-plate"],
+    "disposition": {
+      "inclusion": "included",
+      "route_exclusions": {
+        "state": "no-additional-route-exclusions-published-for-current-row",
+        "recipe_ids": []
+      }
+    }
+  },
+  "final_science": {
+    "rationale": "final-technology-prototype-cross-bound-to-public-generation-plan-row",
+    "ingredients": [{"name": "automation-science-pack", "amount": 1}]
+  },
+  "settings": {
+    "maximum_level": {
+      "name": "ips-max-level-research_material_tin",
+      "default": 2,
+      "raw_direct": 2,
+      "effective": 3,
+      "source": "mirset1",
+      "changed": true,
+      "changed_from_default": true,
+      "restart_required": true
+    },
+    "enabled": {
+      "name": "ips-enable-research_material_tin",
+      "default": true,
+      "raw_direct": true,
+      "effective": true,
+      "source": "mirset1",
+      "changed": false,
+      "changed_from_default": false,
+      "restart_required": true
+    }
+  },
+  "runtime_levels": {
+    "level_three_current_has_effective_benefit": true,
+    "post_cap_level_four_has_effective_benefit": false,
+    "cap_saturated_recipe_has_effective_benefit": false,
+    "recipe_benefit_rule": "enabled-unresearched-current-or-next-level-within-effective-cap-and-positive-effect-on-current-productivity-below-maximum-productivity"
+  },
+  "locked_route_universe": {
+    "active_mods": ["base", "boblibrary", "bobores", "bobplates", "more-infinite-research"],
+    "forbidden_mods": ["angelssmelting", "angelsrefining", "angelspetrochem"],
+    "exact_recipe": "bob-tin-plate"
+  },
+  "explicit_non_claims": [
+    "F200",
+    "Angel-or-combined-Bob-Angel-route-coverage",
+    "two-genuine-client-or-multiplayer-isolation",
+    "vanilla-technology-tree-button-injection",
+    "startup-hot-mutation",
+    "full-A16-BA-07-or-PROG-01",
+    "release-readiness"
+  ]
+}

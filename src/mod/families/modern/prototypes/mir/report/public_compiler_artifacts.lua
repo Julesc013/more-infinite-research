@@ -30,6 +30,40 @@ local function sorted_effect_identities(effects)
   return identities
 end
 
+-- Publish only exact recipe targets already carried by a materialized effect.
+-- The browser must never recover recipe membership from a display name or an
+-- internal compiler artifact.
+local function sorted_affected_recipe_ids(effects)
+  local known, recipes = {}, {}
+  for _, effect in ipairs(effects or {}) do
+    if type(effect) == "table" and effect.type == "change-recipe-productivity"
+      and type(effect.recipe) == "string" and effect.recipe ~= "" and not known[effect.recipe] then
+      known[effect.recipe] = true
+      table.insert(recipes, effect.recipe)
+    end
+  end
+  table.sort(recipes)
+  return recipes
+end
+
+local function public_row_disposition(row)
+  local inclusion = (row.action == "emit" or row.action == "adopt")
+    and "included" or "excluded"
+  return {
+    schema = 1,
+    inclusion = inclusion,
+    action = row.action,
+    reason = row.reason or row.action,
+    -- A generation-plan row has no authority to describe arbitrary recipes
+    -- outside its own selected effects. Make that absence explicit instead of
+    -- representing it as a global route-exclusion claim.
+    route_exclusions = {
+      state = "no-additional-route-exclusions-published-for-current-row",
+      recipe_ids = {}
+    }
+  }
+end
+
 local function row_effects(row)
   if row.action == "adopt" then return (row.adoption and row.adoption.effects) or {} end
   if row.fields then return row.fields.effects or {} end
@@ -56,6 +90,8 @@ function M.generation_plan(artifact)
       technology_id = row.technology_name or (row.adoption and row.adoption.owner),
       effect_count = #identities,
       effect_identities = identities,
+      affected_recipe_ids = sorted_affected_recipe_ids(row_effects(row)),
+      disposition = public_row_disposition(row),
       subject_fingerprint = design.subject_fingerprint,
       qualification_fingerprint = design.qualification_fingerprint,
       decision_fingerprint = fingerprint.of({

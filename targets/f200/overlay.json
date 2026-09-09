@@ -3553,8 +3553,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11028,
-      "expected_sha256": "839BC36FB377892D5DFDF5B076AABAAE5C620D4A7D5F2E6D5E756A32F1319B00",
+      "expected_bytes": 12391,
+      "expected_sha256": "335A17A08570D9122D7ADFA27B63B253405D4CF057538B0C0CE46C9710BE5008",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3889,8 +3889,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16462,
-      "expected_sha256": "2AEB8CEA039BAF41A25D7F76E4E77C006C416895957B9D91C17F2F25BCF126A1",
+      "expected_bytes": 19328,
+      "expected_sha256": "DBAAE7261DEED198EBF2353621365C960EA7DBBC51C4A96BFC752961587BBBCA",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3921,8 +3921,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical copied-data research query core for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6508,
-      "expected_sha256": "286986351937A883EF302F7991D0718546B03FF511CAA66927DEC54A947FA269",
+      "expected_bytes": 16464,
+      "expected_sha256": "FA48EC2B1CAF5067ABCB6C4DA55F8FEA04FC6226089544EB44D69A940B0C2464",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3953,8 +3953,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1430,
-      "expected_sha256": "798FC55C38415A6D1E2ABFADCE333BF549A5E41370CBEC73BF8E7D58BDAC3013",
+      "expected_bytes": 15946,
+      "expected_sha256": "32A1A3581FCE4D90EFF20AC2CC95AF5B39D629351492BE42709463C0AD8B0A8A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3983,5 +3983,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "FC005966A18F8DB3F8FB782F329F7A4599FCEFA462FE5213DFC3F0255ACD956E"
+  "record_sha256": "00F8B3B5F3523954E3E2F87FABE1C8DCCDF560632BD5BFF98E1ADD83E1B8DD8D"
 }
