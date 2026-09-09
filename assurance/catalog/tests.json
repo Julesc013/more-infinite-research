@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 159,
+  "test_count": 160,
   "tests": [
     {
       "id": "docs.check",
@@ -202,6 +202,31 @@
         "fixtures/assert-bob-angel-tin-route-safety/**",
         "fixtures/assert-bob-angel-tin-final-state-audit/route-dossier.json",
         "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.bob-tin-machine-matrix",
+      "proposition": "The governed test 'runtime.bob-tin-machine-matrix' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBobTinMachineMatrix.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "canonical_implementation": "tests/runtime/Test-MIRBobTinMachineMatrix.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBobTinMachineMatrix.ps1",
+        "fixtures/assert-bob-tin-machine-matrix/**",
         "src/mod/families/modern/prototypes/streams/productivity.lua",
         "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
         "src/mod/package-source.json",
@@ -5613,11 +5638,11 @@
     "cohorts": {
       "package-repository": 52,
       "tooling-release": 48,
-      "runtime-upgrade": 27,
+      "runtime-upgrade": 28,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 147,
+    "canonical_test_commands": 148,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5630,5 +5655,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:57edb56ac0a7483f56269acd9d5d242815211ef42465cf452ca1ac89e6dcb053"
+  "digest": "sha256:401401bcc6e2f6dad5f02e461d60f60529c9c1f62eb6ae60bad6aac7ba2eb132"
 }

@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-bob-tin-machine-matrix",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Bob Tin Machine Matrix",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "boblibrary >= 3.0.0",
+    "bobores >= 3.0.0",
+    "bobplates >= 3.0.1",
+    "more-infinite-research >= 4.2.0"
+  ]
+}
