@@ -1266,6 +1266,36 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  f200-bob-tin-persisted-state:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-f200-bob-tin-persisted-state
+    harness: tests/runtime/Test-MIRF200BobTinPersistedState.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: boblibrary-2.1.0_bobores-2.1.2_bobplates-2.1.1
+    validates:
+      - F200-Bob-only-current-candidate-Tin-persisted-force-research-state-diagnostic
+      - exact-published-anchor-two-completed-levels-and-level-three-fractional-queue
+      - exact-raw-MIRSET1-effective-cap-and-create-stage-product-maximum-level-observation
+      - two-serialized-server-save-successors-with-predecessor-hash-lineage
+      - terminal-cycle-two-reload-preserves-exact-force-research-state
+      - derived-earned-modifier-is-runtime-observed-anchor-effect-times-completed-levels
+    non_claims:
+      - public-F200-support-or-local-playtest-admission
+      - row-level-source-policy-transport-or-uniqueness
+      - private-MIR-managed-state-binding-or-cardinality
+      - older-candidate-upgrade-or-migration
+      - future-companion-or-infinite-continuation
+      - F210
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer-or-second-force-isolation
+      - research-browser
+      - route-safety-or-balance
+      - science-frontier-or-progression-completion
+      - full-X11-BA-07-or-PROG-01
+      - release-readiness
+
   angel-tin-final-state-audit:
     requires_features: [recipe_productivity]
     path: fixtures/assert-angel-tin-final-state-audit
