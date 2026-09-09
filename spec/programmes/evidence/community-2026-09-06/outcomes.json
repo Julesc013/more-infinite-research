@@ -1420,7 +1420,7 @@
   "browser_source_bindings": [
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
-      "sha256": "2AEB8CEA039BAF41A25D7F76E4E77C006C416895957B9D91C17F2F25BCF126A1"
+      "sha256": "DBAAE7261DEED198EBF2353621365C960EA7DBBC51C4A96BFC752961587BBBCA"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua",
@@ -1428,7 +1428,7 @@
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
-      "sha256": "286986351937A883EF302F7991D0718546B03FF511CAA66927DEC54A947FA269"
+      "sha256": "FA48EC2B1CAF5067ABCB6C4DA55F8FEA04FC6226089544EB44D69A940B0C2464"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
@@ -1436,7 +1436,7 @@
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua",
-      "sha256": "798FC55C38415A6D1E2ABFADCE333BF549A5E41370CBEC73BF8E7D58BDAC3013"
+      "sha256": "32A1A3581FCE4D90EFF20AC2CC95AF5B39D629351492BE42709463C0AD8B0A8A"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_actions.lua",

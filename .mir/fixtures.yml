@@ -1263,6 +1263,29 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  bob-tin-browser-explanation:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-browser-explanation
+    harness: tests/runtime/Test-MIRBobTinBrowserExplanation.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-exact-locked-Bob-only-Tin-browser-explanation-diagnostic
+      - exact-public-owner-affected-recipe-compiler-disposition-science-and-scoped-route-exclusion-facts
+      - exact-current-effective-cap-and-next-level-effective-benefit-facts
+      - exact-MIRSET1-effective-default-raw-direct-source-and-restart-required-setting-comparison
+      - fresh-native-player-GUI-and-headless-DTO-execution-surfaces
+    non_claims:
+      - F200-Tin-qualification
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - two-genuine-client-or-multiplayer-isolation
+      - vanilla-technology-tree-button-injection
+      - startup-hot-mutation
+      - full-A16-BA-07-or-PROG-01
+      - release-readiness
+
   f200-bob-tin-production-gain:
     requires_features: [recipe_productivity, scripted_techs, settings_profiles]
     path: fixtures/assert-f200-bob-tin-production-gain
