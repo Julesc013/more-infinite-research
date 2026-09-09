@@ -4047,6 +4047,24 @@
       ]
     },
     {
+      "id": "runtime.bob-angel-tin-route-safety",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1",
+        "fixtures/assert-bob-angel-tin-route-safety/**",
+        "fixtures/assert-bob-angel-tin-final-state-audit/route-dossier.json",
+        "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",

@@ -1210,6 +1210,33 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  bob-angel-tin-route-safety:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-bob-angel-tin-route-safety
+    harness: tests/runtime/Test-MIRBobAngelTinRouteSafety.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_angelsrefining-2.1.2_angelsrefininggraphics-2.1.0_angelspetrochem-2.1.2_angelspetrochemgraphics-2.1.0_angelssmelting-2.1.1_angelssmeltinggraphics-2.1.0
+    validates:
+      - F210-combined-Bob-Angel-Tin-independent-route-safety-diagnostic
+      - exact-six-declared-final-plate-producers-with-three-recycling-exclusions-and-three-non-recycling-unsafe-under-conservative-potential-return-certificate
+      - exact-eight-edge-witnesses-for-all-three-non-recycling-return-paths
+      - direct-plate-to-ore-edge-absence-is-distinct-from-Bob-MIR-potential-return-log-agreement
+      - synthetic-known-safe-and-malformed-search-node-edge-budget-fail-closed-controls-are-not-real-Tin-admissions
+      - Angel-classifications-remain-independent-checker-only-under-Factorio-cross-mod-private-require-isolation
+    non_claims:
+      - combined-productivity-admission
+      - MIR-emission
+      - F200
+      - gameplay-progression-or-reachability
+      - upgrade-or-persisted-save-recovery
+      - balance-or-process-safety
+      - PIPE-01
+      - infinite-continuation
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
