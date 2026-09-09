@@ -1157,6 +1157,33 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  bob-tin-production-gain:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-production-gain
+    harness: tests/runtime/Test-MIRBobTinProductionGain.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-finite-Tin-quantitative-production-gain-diagnostic
+      - exact-Bob-Tin-route-stone-furnace-and-single-MIR-owner
+      - exact-two-percent-per-completed-level-and-imported-cap-three
+      - drained-actual-machine-output-levels-zero-through-three-with-input-exhaustion
+      - baseline-cap-and-no-level-four-fail-closed-controls
+    non_claims:
+      - Angel-or-combined-Bob-Angel-admission
+      - route-safety-completion
+      - F200
+      - science-frontier-or-balance
+      - all-intended-machines-or-stages
+      - vertical-slice-obligation-three-completion
+      - upgrade-or-persisted-save-recovery
+      - multiplayer
+      - research-browser
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
   angel-tin-final-state-audit:
     requires_features: [recipe_productivity]
     path: fixtures/assert-angel-tin-final-state-audit
