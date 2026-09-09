@@ -1420,7 +1420,7 @@
   "browser_source_bindings": [
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
-      "sha256": "DBAAE7261DEED198EBF2353621365C960EA7DBBC51C4A96BFC752961587BBBCA"
+      "sha256": "F3A24F8C14F78D44B473AB90AE41764DE7422EF00679E1C8721C1F2EE0D513FF"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_model.lua",
@@ -1444,7 +1444,7 @@
     },
     {
       "path": "src/mod/families/modern/locale/en/more-infinite-research.cfg",
-      "sha256": "3FB35142DEE192F466BBCCF405C2E99CCA9748AEFFB1DA0B6C18F5BFBDEAC7CE"
+      "sha256": "80CA5CA2645974F546B210F2359EAE664FF11F41B65FB576E8406EBC019270ED"
     },
     {
       "path": "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",

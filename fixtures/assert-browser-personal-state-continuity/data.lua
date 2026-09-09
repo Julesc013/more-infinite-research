@@ -1,0 +1,2 @@
+local function technology(name,infinite)return{type="technology",name=name,icon="__base__/graphics/technology/automation-1.png",icon_size=256,effects={},prerequisites={"automation"},unit={count=1,ingredients={{"automation-science-pack",1}},time=1},max_level=infinite and "infinite" or nil,order="z[mir-browser-personal]-"..name}end
+data:extend({technology("mir-browser-personal-finite",false),technology("mir-browser-personal-infinite",true)})
