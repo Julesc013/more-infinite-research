@@ -37,6 +37,7 @@
     "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
     "bob-tin-production-gain-f210": ["runtime.bob-tin-production-gain"],
     "bob-tin-progression-frontier-f210": ["runtime.bob-tin-progression-frontier"],
+    "bob-tin-persisted-state-f210": ["runtime.bob-tin-persisted-state"],
     "f200-bob-tin-production-gain": ["runtime.f200-bob-tin-production-gain"],
     "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"],
     "bob-angel-tin-final-state-audit-f210": ["runtime.bob-angel-tin-final-state-audit"],
@@ -242,6 +243,11 @@
       "id": "bob-tin-progression-frontier-f210",
       "patterns": ["^fixtures/assert-bob-tin-progression-frontier/", "^tests/runtime/Test-MIRBobTinProgressionFrontier[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
       "tests": ["runtime.bob-tin-progression-frontier"]
+    },
+    {
+      "id": "bob-tin-persisted-state-f210",
+      "patterns": ["^fixtures/assert-bob-tin-persisted-state/", "^tests/runtime/Test-MIRBobTinPersistedState[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
+      "tests": ["runtime.bob-tin-persisted-state"]
     },
     {
       "id": "f200-bob-tin-production-gain",

@@ -160,7 +160,7 @@ function Invoke-BobTinEngine([string]$Name,[string[]]$Arguments) {
   Copy-Item -LiteralPath $factorioLog -Destination $copy
   $log=Get-Content -Raw -LiteralPath $copy
   if($Name -eq 'create' -and $log -notmatch [regex]::Escape('[mir-bob-tin] DATA PASS final-route finite-owner no-return-path')) { throw "Bob Tin final-route assertion is absent after ${Name}: $copy" }
-  if($Name -ne 'create' -and $log -notmatch [regex]::Escape('[mir-bob-tin] RUNTIME PASS direct=2 imported=3 effective=3 completed=2 fractional=0.42 queued=true production=true load-observation=true')) { throw "Bob Tin runtime assertion is absent after ${Name}: $copy" }
+  if($Name -ne 'create' -and $log -notmatch [regex]::Escape('[mir-bob-tin] RUNTIME PASS direct=2 imported=3 effective=3 current-research-level=2 fractional=0.42 queued=true production=true load-observation=true')) { throw "Bob Tin runtime assertion is absent after ${Name}: $copy" }
   return $copy
 }
 $createLog=Invoke-BobTinEngine -Name 'create' -Arguments @('--create',$save)

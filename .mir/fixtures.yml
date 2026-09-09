@@ -1146,7 +1146,7 @@ fixtures:
       - stable-unreleased-Tin-owner-and-runtime-enforced-level-three-cap
       - no-byproduct-catalyst-return-or-recycling-route
       - MIRSET1-imported-cap-three-overrides-distinguishable-direct-cap-two
-      - completed-fractional-and-queued-initialized-current-candidate-state
+      - engine-current-level-two-fractional-and-queued-initialized-current-candidate-state
       - initialized-current-candidate-state-loaded-twice
     non_claims:
       - F200
@@ -1208,6 +1208,33 @@ fixtures:
       - multiplayer
       - research-browser
       - full-cross-target-parity
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
+  bob-tin-persisted-state:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-persisted-state
+    harness: tests/runtime/Test-MIRBobTinPersistedState.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-current-candidate-Tin-persisted-force-research-state-diagnostic
+      - exact-published-anchor-two-completed-levels-and-level-three-fractional-queue
+      - exact-raw-MIRSET1-effective-cap-and-sole-policy-binding
+      - two-serialized-server-save-successors-with-predecessor-hash-lineage
+      - terminal-cycle-two-reload-preserves-exact-force-research-state
+      - derived-earned-modifier-is-runtime-observed-anchor-effect-times-completed-levels
+    non_claims:
+      - older-candidate-upgrade-or-migration
+      - future-companion-or-infinite-continuation
+      - F200
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer-or-second-force-isolation
+      - research-browser
+      - route-safety-or-balance
+      - science-frontier-or-progression-completion
       - full-BA-07-or-PROG-01
       - release-readiness
 
