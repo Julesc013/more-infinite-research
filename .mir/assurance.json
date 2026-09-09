@@ -36,6 +36,7 @@
     "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
     "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
     "bob-tin-production-gain-f210": ["runtime.bob-tin-production-gain"],
+    "bob-tin-machine-matrix-f210": ["runtime.bob-tin-machine-matrix"],
     "bob-tin-progression-frontier-f210": ["runtime.bob-tin-progression-frontier"],
     "bob-tin-persisted-state-f210": ["runtime.bob-tin-persisted-state"],
     "f200-bob-tin-production-gain": ["runtime.f200-bob-tin-production-gain"],
@@ -239,6 +240,11 @@
       "id": "bob-tin-production-gain-f210",
       "patterns": ["^fixtures/assert-bob-tin-production-gain/", "^tests/runtime/Test-MIRBobTinProductionGain[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
       "tests": ["runtime.bob-tin-production-gain"]
+    },
+    {
+      "id": "bob-tin-machine-matrix-f210",
+      "patterns": ["^fixtures/assert-bob-tin-machine-matrix/", "^tests/runtime/Test-MIRBobTinMachineMatrix[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f210/overlay[.]json$"],
+      "tests": ["runtime.bob-tin-machine-matrix"]
     },
     {
       "id": "bob-tin-progression-frontier-f210",

@@ -4031,6 +4031,22 @@
       ]
     },
     {
+      "id": "runtime.bob-tin-machine-matrix",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBobTinMachineMatrix.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBobTinMachineMatrix.ps1",
+        "fixtures/assert-bob-tin-machine-matrix/**",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.bob-tin-progression-frontier",
       "kind": "runtime",
       "layer": "F3",

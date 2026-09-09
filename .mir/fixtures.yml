@@ -1184,6 +1184,31 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  bob-tin-machine-matrix:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-machine-matrix
+    harness: tests/runtime/Test-MIRBobTinMachineMatrix.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-exact-locked-Bob-only-finite-Tin-manufacturing-machine-matrix-diagnostic
+      - exact-six-placeable-usable-smelting-machine-data-stage-set-and-no-unadmitted-match
+      - exact-data-category-energy-placement-and-runtime-recipe-assignment-boundary
+      - drained-actual-ore-to-plate-output-on-every-admitted-machine-levels-zero-through-three
+      - exact-single-MIR-owner-imported-cap-three-and-no-level-four
+    non_claims:
+      - actual-gameplay-balance
+      - all-Bob-recipes-or-machine-stages
+      - Angel-or-combined-Bob-Angel-admission
+      - F200
+      - upgrade-or-migration
+      - infinite-continuation
+      - human-playtest
+      - release-readiness
+      - full-BA-07-or-PROG-01
+
   bob-tin-progression-frontier:
     requires_features: [recipe_productivity, scripted_techs, settings_profiles]
     path: fixtures/assert-bob-tin-progression-frontier
