@@ -174,6 +174,7 @@ local function detail(player, parent, v, c)
   end
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
+  button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
   local effects = tech.prototype.effects
   local pages = math.max(1, math.ceil(#effects / core.page_size))
   v.effect_page = math.min(v.effect_page or 1, pages)
@@ -222,6 +223,14 @@ render = function(player)
       if i <= 10 then button(queue, "select", tech.localised_name, {technology = tech.name}) end
     end
     if #(player.force.research_queue or {}) > 10 then label(queue, {"mir-browser.queue-more", #(player.force.research_queue or {}) - 10}) end
+    local has_hidden = false
+    for name, is_hidden in pairs(v.hidden or {}) do
+      if is_hidden == true and player.force.technologies[name] then has_hidden = true; break end
+    end
+    if has_hidden then
+      local recovery = body.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "hidden-recovery"}}
+      button(recovery, "show-hidden", {"mir-browser.show-hidden"})
+    end
     local page = core.query(c, v, c.enrichment)
     v.page, pages = page.page, page.pages
     label(body, {"mir-browser.count", page.count})
@@ -254,6 +263,32 @@ end
 local function event_player(event)
   return event.player_index and game.get_player(event.player_index)
 end
+local function set_hidden(v, force, values)
+  if type(values) ~= "table" then return false end
+  local count, hidden = 0, {}
+  for index, technology in pairs(values) do
+    if type(index) ~= "number" or index < 1 or index > core.catalogue_limit or index ~= math.floor(index) or type(technology) ~= "string" then return false end
+    count = count + 1
+    if count > core.catalogue_limit or hidden[technology] or not force.technologies[technology] then return false end
+    hidden[technology] = true
+  end
+  if #values ~= count then return false end
+  for index = 1, count do if type(values[index]) ~= "string" then return false end end
+  v.hidden = hidden
+  return true
+end
+local function toggle_hidden(v, force, technology)
+  if type(technology) ~= "string" or not force.technologies[technology] then return false end
+  local values, current = {}, type(v.hidden) == "table" and v.hidden or {}
+  for name, is_hidden in pairs(current) do
+    if is_hidden == true and type(name) == "string" and name ~= technology and force.technologies[name] then values[#values + 1] = name end
+  end
+  if current[technology] ~= true then values[#values + 1] = technology end
+  table.sort(values)
+  local changed = set_hidden(v, force, values)
+  if changed then v.page = 1 end
+  return changed
+end
 local function click(event)
   local player = event_player(event)
   local element = event.element
@@ -269,6 +304,10 @@ local function click(event)
     if actions.can_enqueue(player, tech, defines.input_action.start_research) then
       if not player.force.add_research(tech) then player.print({"mir-browser.enqueue-failed"}) end
     else player.print({"mir-browser.enqueue-failed"}) end
+  elseif action == "toggle-hide" then
+    toggle_hidden(v, player.force, tags.technology)
+  elseif action == "show-hidden" then
+    if set_hidden(v, player.force, {}) then v.page = 1 end
   elseif action == "prev" then v.page = math.max(1, v.page - 1)
   elseif action == "next" then v.page = v.page + 1
   elseif action == "effects-prev" then v.effect_page = math.max(1, v.effect_page - 1)
@@ -309,12 +348,36 @@ function M.register()
       if not player then return false end
       local v = view(player)
       if type(options) == "table" then
-        if options.mode == 1 or options.mode == 2 or options.mode == 3 then v.mode = options.mode end
-        if type(options.search) == "string" then v.search = string.sub(options.search, 1, 160) end
-        if options.tab == "settings" or options.tab == "research" then v.tab = options.tab end
-        if type(options.status) == "number" and options.status >= 1 and options.status <= 4 and options.status == math.floor(options.status) then v.status = options.status end
-        if type(options.selected) == "string" and player.force.technologies[options.selected] then v.selected = options.selected; v.effect_page = 1 end
-        v.page = 1
+        local reset_page = false
+        local requested_page = nil
+        if options.mode == 1 or options.mode == 2 or options.mode == 3 then
+          v.mode = options.mode
+          reset_page = true
+        end
+        if type(options.search) == "string" then
+          v.search = string.sub(options.search, 1, 160)
+          reset_page = true
+        end
+        if options.tab == "settings" or options.tab == "research" then
+          v.tab = options.tab
+          reset_page = true
+        end
+        if type(options.status) == "number" and options.status >= 1 and options.status <= 4 and options.status == math.floor(options.status) then
+          v.status = options.status
+          reset_page = true
+        end
+        if type(options.selected) == "string" and player.force.technologies[options.selected] then
+          v.selected = options.selected
+          v.effect_page = 1
+          reset_page = true
+        end
+        if options.hidden ~= nil and set_hidden(v, player.force, options.hidden) then
+          reset_page = true
+        end
+        if type(options.page) == "number" and options.page >= 1 and options.page <= core.catalogue_limit and options.page == math.floor(options.page) then
+          requested_page = options.page
+        end
+        if requested_page then v.page = requested_page elseif reset_page then v.page = 1 end
       end
       render(player)
       return player.gui.screen[ROOT] ~= nil

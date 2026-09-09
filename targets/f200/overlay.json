@@ -193,8 +193,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 46427,
-      "expected_sha256": "3FB35142DEE192F466BBCCF405C2E99CCA9748AEFFB1DA0B6C18F5BFBDEAC7CE",
+      "expected_bytes": 46512,
+      "expected_sha256": "80CA5CA2645974F546B210F2359EAE664FF11F41B65FB576E8406EBC019270ED",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3889,8 +3889,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 19328,
-      "expected_sha256": "DBAAE7261DEED198EBF2353621365C960EA7DBBC51C4A96BFC752961587BBBCA",
+      "expected_bytes": 22057,
+      "expected_sha256": "F3A24F8C14F78D44B473AB90AE41764DE7422EF00679E1C8721C1F2EE0D513FF",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3983,5 +3983,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "00F8B3B5F3523954E3E2F87FABE1C8DCCDF560632BD5BFF98E1ADD83E1B8DD8D"
+  "record_sha256": "5830CC3C28BC01607E8409A2AF02AD942C87413E3D77C457182CBD78C510ABCB"
 }

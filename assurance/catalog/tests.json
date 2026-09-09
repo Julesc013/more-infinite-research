@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 161,
+  "test_count": 162,
   "tests": [
     {
       "id": "docs.check",
@@ -358,6 +358,33 @@
         "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
         "src/mod/package-source.json",
         "targets/f210/overlay.json",
+        ".mir/fixtures.yml"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.browser-personal-state-continuity",
+      "proposition": "The governed test 'runtime.browser-personal-state-continuity' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "canonical_implementation": "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "fixtures/assert-browser-personal-state-continuity/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
+        "src/mod/families/modern/locale/en/more-infinite-research.cfg",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/package-authority.json",
+        "targets/f210/generation/README.md.template",
         ".mir/fixtures.yml"
       ],
       "matrix": null
@@ -5665,11 +5692,11 @@
     "cohorts": {
       "package-repository": 52,
       "tooling-release": 48,
-      "runtime-upgrade": 29,
+      "runtime-upgrade": 30,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 149,
+    "canonical_test_commands": 150,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5682,5 +5709,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:db9778df406ffcd47ececcf811cd0cf86143a5ea6849a199ac294860b07a21dc"
+  "digest": "sha256:f3dbdebc5dbfcadc7fff27c9e6ebfe9e5cc85b4d0ce221c106eae484d105df59"
 }

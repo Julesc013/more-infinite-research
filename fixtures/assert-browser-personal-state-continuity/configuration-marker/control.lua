@@ -1,0 +1,1 @@
+-- Deliberately inert: adding this fixture produces the exact configuration-change boundary.

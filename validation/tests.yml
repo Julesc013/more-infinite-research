@@ -4097,6 +4097,24 @@
       ]
     },
     {
+      "id": "runtime.browser-personal-state-continuity",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1 -FactorioExe <factorio> -CandidateArchive <candidate> -TimeoutSeconds 240",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
+        "fixtures/assert-browser-personal-state-continuity/**",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
+        "src/mod/families/modern/locale/en/more-infinite-research.cfg",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/package-authority.json",
+        "targets/f210/generation/README.md.template",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.f200-bob-tin-production-gain",
       "kind": "runtime",
       "layer": "F3",

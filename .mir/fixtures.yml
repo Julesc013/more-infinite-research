@@ -1286,6 +1286,31 @@ fixtures:
       - full-A16-BA-07-or-PROG-01
       - release-readiness
 
+  browser-personal-state-continuity:
+    requires_features: [scripted_techs, settings_profiles]
+    path: fixtures/assert-browser-personal-state-continuity
+    harness: tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: base-only
+    validates:
+      - F210-exact-localhost-two-client-browser-personal-state-isolation
+      - bounded-native-unqueued-hidden-technology-recovery-action-present-and-invalid-input-page-preservation
+      - hidden-queued-technology-remains-on-identical-shared-force-queue
+      - exact-save-reload-and-two-client-reconnect-personal-view-continuity
+      - inert-configuration-change-personal-view-and-full-active-force-continuity
+      - literal-MIR-removal-and-readd-fail-closed-before-after-disposition
+    non_claims:
+      - F200
+      - Angel-or-combined-Bob-Angel-route-coverage
+      - remote-wide-network-behavior-beyond-observed-two-local-clients
+      - native-vanilla-technology-tree-mutation-or-injection
+      - queue-ownership-or-reorder
+      - physical-mouse-click-synthesis
+      - full-PLAT-UI-01-A16-or-X11-closure
+      - release-readiness
+
   f200-bob-tin-production-gain:
     requires_features: [recipe_productivity, scripted_techs, settings_profiles]
     path: fixtures/assert-f200-bob-tin-production-gain
