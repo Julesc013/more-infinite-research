@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "kind": "MIR4BobTinPersistedResearchStateV1",
+  "scope": "F210 Bob-only current-candidate Tin persisted force research state across two serialized reload/save cycles; package-excluded fixture evidence",
+  "target": {
+    "factorio_line": "2.1",
+    "factorio_version": "2.1.17",
+    "engine_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+  },
+  "official_mod_closure": [
+    {"name": "base", "enabled": true},
+    {"name": "elevated-rails", "enabled": true},
+    {"name": "quality", "enabled": true},
+    {"name": "recycler", "enabled": true},
+    {"name": "space-age", "enabled": true}
+  ],
+  "archive_closure": [
+    {"name": "boblibrary", "version": "3.0.0", "sha256": "49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4"},
+    {"name": "bobores", "version": "3.0.0", "sha256": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+    {"name": "bobplates", "version": "3.0.1", "sha256": "503D7BF6E88DA1F99463AC00CEC959C2003B2701D80DC4A564CF2EC3920AC8AF"}
+  ],
+  "anchor": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "effect_change_per_completed_level": 0.02,
+    "exact_owner_count": 1,
+    "prototype_max_level": "infinite"
+  },
+  "cap_transport": {
+    "raw_direct_max_level": 2,
+    "mirset1_imported_max_level": 3,
+    "effective_max_level": 3,
+    "maximum_level_policy_binding_count": 1,
+    "maximum_level_policy_setting": "ips-max-level-research_material_tin"
+  },
+  "persisted_state": {
+    "completed_levels": 2,
+    "current_research_technology_level": 3,
+    "current_research": "recipe-prod-research_material_tin-1",
+    "queue": ["recipe-prod-research_material_tin-1"],
+    "fractional_progress": 0.42,
+    "derived_earned_modifier_rule": "completed_levels-times-runtime-observed-anchor-effect",
+    "derived_earned_modifier": 0.04
+  },
+  "serial_cycles": {
+    "initial_generation": 0,
+    "cycle_one_predecessor_generation": 0,
+    "cycle_one_generation": 1,
+    "cycle_two_predecessor_generation": 1,
+    "cycle_two_generation": 2,
+    "terminal_generation": 2
+  },
+  "evidence_role": "bounded current-candidate persisted-state diagnostic input to X04 BA-07 and PROG-01; not migration or progression completion authority",
+  "explicit_non_claims": [
+    "older-candidate-upgrade-or-migration",
+    "future-companion-or-infinite-continuation",
+    "F200",
+    "Angel-or-combined-Bob-Angel-admission",
+    "multiplayer-or-second-force-isolation",
+    "research-browser",
+    "route-safety-or-balance",
+    "science-frontier-or-progression-completion",
+    "full-BA-07-or-PROG-01",
+    "release-readiness"
+  ]
+}

@@ -42,7 +42,7 @@ local function configure_research(force)
   end
   force.research_progress = 0.42
   storage.mir_bob_tin_qualification = {
-    completed_level = technology.level,
+    current_research_level = technology.level,
     fractional_progress = force.research_progress,
     queued = true,
     production_observed = false,
@@ -101,7 +101,7 @@ script.on_event(defines.events.on_tick, function(event)
   if not state or state.load_observed then return end
   local force = game.forces.player
   local technology = force.technologies[technology_name]
-  if technology.level ~= state.completed_level then fail("completed Tin level changed after load") end
+  if technology.level ~= state.current_research_level then fail("current Tin research level changed after load") end
   if not force.current_research or force.current_research.name ~= technology_name then fail("fractional Tin research did not survive load") end
   if math.abs(force.research_progress - state.fractional_progress) > 0.0001 then
     fail("fractional Tin progress did not survive load")
@@ -118,6 +118,6 @@ script.on_event(defines.events.on_tick, function(event)
   if event.tick >= 300 then
     if not state.production_observed then fail("Bob Tin production/load observation did not complete") end
     state.load_observed = true
-    log("[mir-bob-tin] RUNTIME PASS direct=2 imported=3 effective=3 completed=2 fractional=0.42 queued=true production=true load-observation=true")
+    log("[mir-bob-tin] RUNTIME PASS direct=2 imported=3 effective=3 current-research-level=2 fractional=0.42 queued=true production=true load-observation=true")
   end
 end)
