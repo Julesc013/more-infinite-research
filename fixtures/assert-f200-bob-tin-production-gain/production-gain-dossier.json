@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "MIR4F200BobTinProductionGainV1",
+  "scope": "F200 Bob-only finite Tin quantitative production-gain diagnostic; package-excluded evidence",
+  "target": {
+    "factorio_line": "2.0",
+    "factorio_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "boblibrary": {"version": "2.1.0", "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B"},
+    "bobores": {"version": "2.1.2", "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94"},
+    "bobplates": {"version": "2.1.1", "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B"}
+  },
+  "route": {
+    "recipe": "bob-tin-plate",
+    "category": "smelting",
+    "machine": "stone-furnace",
+    "input": {"type": "item", "name": "bob-tin-ore", "amount": 1},
+    "output": {"type": "item", "name": "bob-tin-plate", "amount": 1},
+    "allow_productivity": true,
+    "auto_recycle": false
+  },
+  "mir_owner": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "effect_change_per_completed_level": 0.02,
+    "exact_owner_count": 1,
+    "prototype_max_level": "infinite"
+  },
+  "cap_transport": {
+    "raw_direct_max_level": 2,
+    "mirset1_imported_max_level": 3,
+    "effective_max_level": 3,
+    "no_level_4": true
+  },
+  "production": {
+    "input_ore_per_level": 100,
+    "drain_output_inventory_each_tick": true,
+    "requires_input_exhaustion": true,
+    "levels": [
+      {"completed_level": 0, "expected_output": 100, "expected_bonus": 0},
+      {"completed_level": 1, "expected_output": 102, "expected_bonus": 2},
+      {"completed_level": 2, "expected_output": 104, "expected_bonus": 4},
+      {"completed_level": 3, "expected_output": 106, "expected_bonus": 6}
+    ]
+  },
+  "controls": ["baseline-level-zero", "cap-level-three", "no-level-four", "output-drain", "input-exhaustion"],
+  "evidence_role": "bounded F200 quantitative diagnostic input to A06 BA-07 A17 and PROG-01; not completion authority",
+  "explicit_non_claims": ["F210", "Angel-or-combined-Bob-Angel-admission", "route-safety-completion", "science-frontier-or-balance", "infinite-continuation", "all-intended-machines-or-stages", "upgrade-or-persisted-save-recovery", "multiplayer", "research-browser", "full-cross-target-parity", "full-BA-07-or-PROG-01", "release-readiness"]
+}
