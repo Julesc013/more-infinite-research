@@ -1184,6 +1184,33 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  bob-tin-progression-frontier:
+    requires_features: [recipe_productivity, scripted_techs, settings_profiles]
+    path: fixtures/assert-bob-tin-progression-frontier
+    harness: tests/runtime/Test-MIRBobTinProgressionFrontier.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
+    validates:
+      - F210-Bob-only-Tin-science-and-lab-progression-frontier-diagnostic
+      - exact-stable-anchor-owner-effect-cap-and-direct-prerequisite-observation
+      - exact-installed-science-pack-producers-and-direct-unlock-observation
+      - exact-present-non-hidden-compatible-lab-input-observation
+      - companion-stable-ID-allocation-and-emission-explicitly-blocked
+    non_claims:
+      - companion-stable-id-allocation-or-emission
+      - infinite-continuation-support
+      - progression-completion
+      - migration-or-save-state-transfer
+      - F200
+      - Angel-or-combined-Bob-Angel-admission
+      - multiplayer
+      - research-browser
+      - full-cross-target-parity
+      - full-BA-07-or-PROG-01
+      - release-readiness
+
   f200-bob-tin-production-gain:
     requires_features: [recipe_productivity, scripted_techs, settings_profiles]
     path: fixtures/assert-f200-bob-tin-production-gain
