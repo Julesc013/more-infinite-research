@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "MIR4F200BobTinPersistedResearchStateV1",
+  "scope": "F200 Bob-only current-candidate Tin persisted force research state across two serialized reload/save cycles; package-excluded fixture evidence",
+  "target": {
+    "factorio_line": "2.0",
+    "factorio_version": "2.0.77",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "official_mod_closure": [
+    {"name": "base", "enabled": true},
+    {"name": "elevated-rails", "enabled": true},
+    {"name": "quality", "enabled": true},
+    {"name": "space-age", "enabled": true}
+  ],
+  "archive_closure": [
+    {"name": "boblibrary", "version": "2.1.0", "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B"},
+    {"name": "bobores", "version": "2.1.2", "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94"},
+    {"name": "bobplates", "version": "2.1.1", "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B"}
+  ],
+  "anchor": {
+    "stream_key": "research_material_tin",
+    "technology": "recipe-prod-research_material_tin-1",
+    "effect_type": "change-recipe-productivity",
+    "effect_recipe": "bob-tin-plate",
+    "effect_change_per_completed_level": 0.02,
+    "runtime_effect_value_field": "change",
+    "exact_owner_count": 1,
+    "prototype_max_level": "infinite"
+  },
+  "cap_transport": {
+    "raw_direct_max_level": 2,
+    "mirset1_imported_max_level": 3,
+    "effective_max_level": 3
+  },
+  "maximum_level_product_log": {
+    "selected_cap": 3,
+    "effective_cap": 3,
+    "prototype_max_level": 4294967295,
+    "current_or_next_level": 3,
+    "next_level_valid": true
+  },
+  "persisted_state": {
+    "completed_levels": 2,
+    "current_research_technology_level": 3,
+    "current_research": "recipe-prod-research_material_tin-1",
+    "queue": ["recipe-prod-research_material_tin-1"],
+    "fractional_progress": 0.42,
+    "derived_earned_modifier_rule": "completed_levels-times-runtime-observed-anchor-effect",
+    "derived_earned_modifier": 0.04
+  },
+  "serial_cycles": {
+    "initial_generation": 0,
+    "cycle_one_predecessor_generation": 0,
+    "cycle_one_generation": 1,
+    "cycle_two_predecessor_generation": 1,
+    "cycle_two_generation": 2,
+    "terminal_generation": 2
+  },
+  "evidence_role": "bounded F200 current-candidate persisted-state diagnostic input to X11 BA-07 and PROG-01; not migration or progression completion authority",
+  "explicit_non_claims": [
+    "public-F200-support-or-local-playtest-admission",
+    "row-level-source-policy-transport-or-uniqueness",
+    "private-MIR-managed-state-binding-or-cardinality",
+    "older-candidate-upgrade-or-migration",
+    "future-companion-or-infinite-continuation",
+    "F210",
+    "Angel-or-combined-Bob-Angel-admission",
+    "multiplayer-or-second-force-isolation",
+    "research-browser",
+    "route-safety-or-balance",
+    "science-frontier-or-progression-completion",
+    "full-X11-BA-07-or-PROG-01",
+    "release-readiness"
+  ]
+}

@@ -39,6 +39,7 @@
     "bob-tin-progression-frontier-f210": ["runtime.bob-tin-progression-frontier"],
     "bob-tin-persisted-state-f210": ["runtime.bob-tin-persisted-state"],
     "f200-bob-tin-production-gain": ["runtime.f200-bob-tin-production-gain"],
+    "f200-bob-tin-persisted-state": ["runtime.f200-bob-tin-persisted-state"],
     "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"],
     "bob-angel-tin-final-state-audit-f210": ["runtime.bob-angel-tin-final-state-audit"],
     "bob-angel-tin-route-safety-f210": ["runtime.bob-angel-tin-route-safety"]
@@ -253,6 +254,11 @@
       "id": "f200-bob-tin-production-gain",
       "patterns": ["^fixtures/assert-f200-bob-tin-production-gain/", "^tests/runtime/Test-MIRF200BobTinProductionGain[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f200/overlay[.]json$"],
       "tests": ["runtime.f200-bob-tin-production-gain"]
+    },
+    {
+      "id": "f200-bob-tin-persisted-state",
+      "patterns": ["^fixtures/assert-f200-bob-tin-persisted-state/", "^tests/runtime/Test-MIRF200BobTinPersistedState[.]ps1$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest[.]json$", "^src/mod/package-source[.]json$", "^targets/f200/overlay[.]json$"],
+      "tests": ["runtime.f200-bob-tin-persisted-state"]
     },
     {
       "id": "angel-tin-final-state-audit-f210",
