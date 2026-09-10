@@ -516,6 +516,31 @@ fixtures:
       - queue-and-storage-survive-each-bounded-reload
       - source-save-remains-byte-identical
 
+  k2-03-imersite-bounded:
+    requires_features: []
+    path: fixtures/assert-k2-03-imersite
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_version_envelopes:
+      locked:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
+        xy-k2so-enhancements-nulls-fork: "0.8.3"
+        more-infinite-research: "4.2.21000"
+      current-fresh-load-only:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.17"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - exact-native-owner-preserved-for-imersite-crystal
+      - one-mir-owner-for-imersite-powder
+      - nineteen-final-imersite-route-dispositions
+      - hidden-return-route-remains-excluded
+      - exact-final-science-and-compatible-labs
+      - locked-save-survives-two-byte-identical-reloads-at-42-percent
+      - current-k2so-fresh-load-owner-and-route-parity-only
+      - no-infinite-broad-k2-or-release-authority
+
   mir4-a03-k2-k2so-f210-intake:
     requires_features: []
     path: fixtures/assert-k2-k2so-f210-intake
