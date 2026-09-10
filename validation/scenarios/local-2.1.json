@@ -468,36 +468,47 @@
         "xy-k2so-enhancements-nulls-fork"
       ],
       "settings": {},
-        "expected_plan": {
-          "mode": "load-only",
-          "required_result": "passed",
-          "maximum_dependency_failures": 0,
-          "required_stream_science": {
-            "research_advanced_circuit": [
-              "automation-science-pack",
-              "logistic-science-pack",
-              "chemical-science-pack",
-              "production-science-pack",
-              "electromagnetic-science-pack"
-            ],
-            "research_belts": [
-              "production-science-pack",
-              "space-science-pack"
-            ]
-          },
-          "forbidden_stream_science": {
-            "research_belts": [
-              "kr-basic-tech-card",
-              "automation-science-pack",
-              "logistic-science-pack",
-              "military-science-pack",
-              "chemical-science-pack"
-            ]
-          }
+      "runtime_fixtures": [
+        "fixtures/assert-k2-science-progressed-reload-a04"
+      ],
+      "required_reload_count": 2,
+      "max_reload_duration_seconds": 300,
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0,
+        "required_stream_science": {
+          "research_advanced_circuit": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "electromagnetic-science-pack"
+          ],
+          "research_belts": [
+            "production-science-pack",
+            "space-science-pack"
+          ]
         },
-        "timeout_seconds": 900,
-        "claim_level": "partial-support",
-        "notes": "Local Krastorio 2 Spaced Out stack. The exact archive must load after K2SO finalizes its science and lab graph, and the representative advanced-circuit stream must retain red, green, blue, purple, and electromagnetic science. The local library must include Krastorio2 assets and all required companions."
+        "forbidden_stream_science": {
+          "research_advanced_circuit": [
+            "kr-basic-tech-card"
+          ],
+          "research_belts": [
+            "kr-basic-tech-card",
+            "automation-science-pack",
+            "logistic-science-pack",
+            "military-science-pack",
+            "chemical-science-pack"
+          ]
+        },
+        "required_reload_log_fragments": [
+          "[MIR4_A04_K2_PROGRESS] stage=reload technology=recipe-prod-research_advanced_circuit-1 progress=0.42"
+        ]
+      },
+      "timeout_seconds": 900,
+      "claim_level": "partial-support",
+      "notes": "Local Krastorio 2 Spaced Out stack. The exact archive must load after K2SO finalizes its science and lab graph, and the representative advanced-circuit stream must retain red, green, blue, purple, and electromagnetic science. The local library must include Krastorio2 assets and all required companions."
     },
     {
       "name": "local-2-1-krastorio-base",

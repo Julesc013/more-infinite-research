@@ -28,6 +28,15 @@ $raw = Get-Content -Raw -LiteralPath $receiptPath
 Assert-MIR4M4202CompatibilityAudit ($raw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json')) 'mir4-m42-02-compatibility-audit-schema'
 $receipt = $raw | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $receipt) 'mir4-m42-02-compatibility-audit-record'
+$a04ClosurePath = Join-Path $repo 'spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json'
+$a04Closure = $null
+if (Test-Path -LiteralPath $a04ClosurePath -PathType Leaf) {
+  $a04ClosureRaw = Get-Content -Raw -LiteralPath $a04ClosurePath
+  Assert-MIR4M4202CompatibilityAudit ($a04ClosureRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-a04-k2-science-closure-v1.schema.json')) 'mir4-m42-02-compatibility-audit-a04-schema'
+  $a04Closure = $a04ClosureRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4M4202CompatibilityAudit (Test-MIR4BootstrapRecordHash -Record $a04Closure) 'mir4-m42-02-compatibility-audit-a04-record'
+  Assert-MIR4M4202CompatibilityAudit ([string]$a04Closure.compatibility_audit_evolution.historical_receipt.path -ceq 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' -and (Get-FileHash -LiteralPath $receiptPath -Algorithm SHA256).Hash -ceq [string]$a04Closure.compatibility_audit_evolution.historical_receipt.raw_sha256 -and [string]$receipt.record_sha256 -ceq [string]$a04Closure.compatibility_audit_evolution.historical_receipt.record_sha256) 'mir4-m42-02-compatibility-audit-a04-predecessor'
+}
 $predecessorPath = Join-Path $repo ([string]$receipt.predecessor.receipt)
 $predecessor = Get-Content -Raw -LiteralPath $predecessorPath | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202CompatibilityAudit ((Get-FileHash -LiteralPath $predecessorPath -Algorithm SHA256).Hash -ceq [string]$receipt.predecessor.receipt_sha256 -and [string]$predecessor.record_sha256 -ceq [string]$receipt.predecessor.record_sha256) 'mir4-m42-02-compatibility-audit-predecessor'
@@ -36,15 +45,29 @@ $expectedModuleNames = @('Configuration.ps1', 'InputDiscovery.ps1', 'ScenarioDef
 $functionNames = [Collections.Generic.List[string]]::new()
 $actualModuleNames = @($receipt.decomposition.modules | ForEach-Object { Split-Path -Leaf ([string]$_.path) })
 Assert-MIR4M4202CompatibilityAudit (@($receipt.decomposition.modules).Count -eq 6 -and ($actualModuleNames -join '|') -ceq ($expectedModuleNames -join '|')) 'mir4-m42-02-compatibility-audit-module-order'
+$historicalModuleCommit = '184c8583fb3460b83aea562a177ac8f690ad5c60'
 foreach ($module in @($receipt.decomposition.modules)) {
-  $path = Join-Path $repo ([string]$module.path)
+  $relativePath = [string]$module.path
+  $historicalLines = @(& git -C $repo show "${historicalModuleCommit}:$relativePath")
+  Assert-MIR4M4202CompatibilityAudit ($LASTEXITCODE -eq 0) 'mir4-m42-02-compatibility-audit-historical-object' $relativePath
+  $historicalText = ($historicalLines -join "`n") + "`n"
+  $historicalTokens = $null
+  $historicalErrors = $null
+  $historicalAst = [Management.Automation.Language.Parser]::ParseInput($historicalText, [ref]$historicalTokens, [ref]$historicalErrors)
+  Assert-MIR4M4202CompatibilityAudit (@($historicalErrors).Count -eq 0 -and (Get-MIR4Sha256String -Value $historicalText) -ceq [string]$module.sha256 -and $historicalLines.Count -eq [int]$module.lines -and @($historicalAst.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true)).Count -eq [int]$module.function_count) 'mir4-m42-02-compatibility-audit-historical-module' $relativePath
+
+  $path = Join-Path $repo $relativePath
   $tokens = $null
   $errors = $null
   $ast = [Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors)
-  Assert-MIR4M4202CompatibilityAudit (@($errors).Count -eq 0 -and (Get-MIR4BootstrapTextSha256 -Path $path) -ceq [string]$module.sha256 -and [int]$module.lines -le 400) 'mir4-m42-02-compatibility-audit-module' ([string]$module.path)
-  foreach ($function in @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true))) {
-    [void]$functionNames.Add($function.Name)
+  $currentNames = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true) | ForEach-Object { $_.Name })
+  if ($null -ne $a04Closure) {
+    $currentBinding = @($a04Closure.compatibility_audit_evolution.modules | Where-Object { [string]$_.path -ceq $relativePath })
+    Assert-MIR4M4202CompatibilityAudit ($currentBinding.Count -eq 1 -and @($errors).Count -eq 0 -and (Get-MIR4BootstrapTextSha256 -Path $path) -ceq [string]$currentBinding[0].canonical_sha256 -and (Get-Content -LiteralPath $path).Count -eq [int]$currentBinding[0].lines -and ($currentNames -join '|') -ceq (@($currentBinding[0].function_names) -join '|') -and [int]$currentBinding[0].lines -le 400) 'mir4-m42-02-compatibility-audit-a04-module' $relativePath
+  } else {
+    Assert-MIR4M4202CompatibilityAudit (@($errors).Count -eq 0 -and (Get-MIR4BootstrapTextSha256 -Path $path) -ceq [string]$module.sha256 -and [int]$module.lines -le 400) 'mir4-m42-02-compatibility-audit-module' $relativePath
   }
+  foreach ($name in $currentNames) { [void]$functionNames.Add($name) }
 }
 $projectionSha = Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $functionNames.ToArray())
 Assert-MIR4M4202CompatibilityAudit ($functionNames.Count -eq 35 -and $projectionSha -ceq [string]$receipt.public_contract.previous_function_sha256 -and $projectionSha -ceq [string]$receipt.public_contract.current_function_sha256 -and [bool]$receipt.public_contract.unchanged) 'mir4-m42-02-compatibility-audit-public-contract'
@@ -112,8 +135,13 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 }
 
 $expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
+$expectedInventoryCommandCount = 85
+if ($null -ne $a04Closure) {
+  $expectedInventoryDigest = [string]$a04Closure.compatibility_audit_evolution.command_inventory.digest
+  $expectedInventoryCommandCount = [int]$a04Closure.compatibility_audit_evolution.command_inventory.command_count
+}
 $inventory = Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
-Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq 85 -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
+Assert-MIR4M4202CompatibilityAudit ([int]$inventory.command_count -eq $expectedInventoryCommandCount -and [int]$inventory.summary.unknown -eq 0 -and [int]$inventory.summary.duplicate_command_keys -eq 0 -and [string]$inventory.digest -ceq $expectedInventoryDigest) 'mir4-m42-02-compatibility-audit-inventory'
 Assert-MIR4M4202CompatibilityAudit ([bool]$receipt.semantic_contract.ordered_source_slices_preserved -and [bool]$receipt.semantic_contract.command_root_semantics_preserved -and [bool]$receipt.semantic_contract.parameter_surface_unchanged -and [bool]$receipt.semantic_contract.scenario_execution_unchanged -and [bool]$receipt.semantic_contract.result_collation_unchanged -and [bool]$receipt.semantic_contract.compatibility_claims_unchanged -and [bool]$receipt.semantic_contract.stream_authority_unchanged) 'mir4-m42-02-compatibility-audit-semantic-contract'
 Assert-MIR4M4202CompatibilityAudit (@($receipt.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-m42-02-compatibility-audit-transition'
 Assert-MIR4M4202CompatibilityAudit ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore) -and @($receipt.preservation.package_visible_delta).Count -eq 0 -and (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -ceq $packageBefore) 'mir4-m42-02-compatibility-audit-package-firewall'

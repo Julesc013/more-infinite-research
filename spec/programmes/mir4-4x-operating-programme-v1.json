@@ -408,11 +408,10 @@
           "Verify final emission, early/late progression and nonzero-progress reload",
           "Classify patch eligibility from actual reproduction"
         ],
-        "state": "active",
+        "state": "complete",
         "evidence": [
-          "spec/programmes/evidence/synthesis-2026-09-06/science-modules.json",
-          "spec/programmes/evidence/synthesis-2026-09-06/k2-campaign.json",
-          "spec/programmes/evidence/synthesis-2026-09-06/k2-science-reloads.json"
+          "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json",
+          "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json"
         ]
       },
       {

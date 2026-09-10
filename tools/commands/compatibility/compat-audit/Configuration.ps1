@@ -85,7 +85,7 @@ function Move-MIRCompatScenarioEvidence {
 
   Move-Item -LiteralPath $resolvedUserData -Destination $retainedUserData
   $sourcePrefix = $resolvedUserData.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-  foreach ($propertyName in @("save", "stdout", "stderr")) {
+  foreach ($propertyName in @("save", "stdout", "stderr", "factorio_log")) {
     $sourcePath = [string]$Result.$propertyName
     if ([string]::IsNullOrWhiteSpace($sourcePath)) { continue }
     if (-not $sourcePath.StartsWith($sourcePrefix, [StringComparison]::OrdinalIgnoreCase)) {
@@ -93,6 +93,18 @@ function Move-MIRCompatScenarioEvidence {
     }
     $relativePath = $sourcePath.Substring($sourcePrefix.Length)
     $Result.$propertyName = Join-Path $retainedUserData $relativePath
+  }
+
+  foreach ($reload in @($Result.reloads)) {
+    foreach ($propertyName in @("stdout", "stderr", "factorio_log")) {
+      $sourcePath = [string]$reload.$propertyName
+      if ([string]::IsNullOrWhiteSpace($sourcePath)) { continue }
+      if (-not $sourcePath.StartsWith($sourcePrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Compatibility reload result path '$sourcePath' is outside its runtime user-data root '$resolvedUserData'."
+      }
+      $relativePath = $sourcePath.Substring($sourcePrefix.Length)
+      $reload.$propertyName = Join-Path $retainedUserData $relativePath
+    }
   }
 
   return $Result
@@ -323,6 +335,9 @@ function New-MIRScenario {
     [object[]]$Failures = @(),
     [string]$ClaimLevel = "loads",
     [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    [string[]]$RuntimeFixtures = @(),
+    [int]$RequiredReloadCount = 0,
+    [int]$MaxReloadDurationSeconds = 0,
     $Settings = $null,
     $ExpectedPlan = $null,
     [string]$SourceManifest = "",
@@ -340,6 +355,9 @@ function New-MIRScenario {
     dependency_failures = @($Failures)
     claim_level = $ClaimLevel
     timeout_seconds = $TimeoutSeconds
+    runtime_fixtures = @($RuntimeFixtures)
+    required_reload_count = $RequiredReloadCount
+    max_reload_duration_seconds = $MaxReloadDurationSeconds
     settings = if ($null -eq $Settings) { [pscustomobject]@{} } else { $Settings }
     expected_plan = if ($null -eq $ExpectedPlan) { [pscustomobject]@{} } else { $ExpectedPlan }
     source_manifest = $SourceManifest

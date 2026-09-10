@@ -111,6 +111,10 @@ local_campaign_manifest:
     - timeout_seconds
     - claim_level
     - required_stream_science
+    - runtime_fixtures
+    - required_reload_count
+    - max_reload_duration_seconds
+    - required_reload_log_fragments
   sanitation_budget:
     path: .mir/sanitation-budgets.json
     policy: mir-ecosystem-sanitation-budget-v1
@@ -475,28 +479,42 @@ fixtures:
     external_mod_identity: Krastorio2-spaced-out
     exact_real_campaigns:
       - local-2-1-krastorio-spaced-out
-      - local-2-0-krastorio-spaced-out
-    exact_endpoint_evidence:
-      lower: build/results/mir4-sol/sol06/k2so-f210-lower-v3
-      upper: build/results/mir4-sol/sol06/k2so-f210-upper-v3
-    bounded_version_envelopes:
+    player_authority:
+      target: f210
+      policy: K2SciencePhasePolicyV1
+      source: targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua
+      root_v2_disposition: package-excluded-preview
+    exact_version_envelope:
       f210:
-        Krastorio2: ">=2.1.2 <2.1.3"
-        Krastorio2-spaced-out: ">=2.0.11 <2.0.14"
-      f200:
-        Krastorio2: absent
-        Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
     validates:
-      - target-specific-bounded-version-envelopes
-      - required-science-identity-capability-fingerprint
+      - shipped-f210-v1-exact-version-pair
       - no-behavior-when-k2-is-absent
-      - no-behavior-outside-the-bounded-version-envelopes
-      - factorio-2-0-standalone-profile-forbids-krastorio2
+      - no-behavior-outside-the-exact-version-pair
       - idempotent-mir-owned-technology-normalization
       - ingredient-order-shape-and-amount-preservation
+      - phase-trigger-witness-preservation-through-lab-selection
       - nonempty-normalized-ingredient-lists
       - production-and-utility-basic-card-removal
       - advanced-space-matter-and-singularity-early-pack-removal
+
+  k2-science-progressed-reload-a04:
+    requires_features: []
+    path: fixtures/assert-k2-science-progressed-reload-a04
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_real_campaign: local-2-1-krastorio-spaced-out
+    exact_version_envelope:
+      Krastorio2: "2.1.2"
+      Krastorio2-spaced-out: "2.0.13"
+      more-infinite-research: "4.2.21000"
+    validates:
+      - exact-current-k2-k2so-and-mir-version-pair
+      - early-and-late-shipped-f210-science-lists
+      - fractional-current-research-at-42-percent
+      - queue-and-storage-survive-each-bounded-reload
+      - source-save-remains-byte-identical
 
   mir4-a03-k2-k2so-f210-intake:
     requires_features: []

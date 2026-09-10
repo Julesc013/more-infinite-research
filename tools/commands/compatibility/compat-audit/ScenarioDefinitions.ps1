@@ -378,6 +378,7 @@ foreach ($scenarioManifestPath in @($manualScenarioPaths | Select-Object -Unique
     throw "Scenario manifest must use schema 2: $scenarioManifestPath"
   }
   foreach ($scenario in @($manifest.scenarios)) {
+    Assert-MIRManualScenarioRuntimeContract -Scenario $scenario -ManifestPath $scenarioManifestPath -RepoRoot $repo.Path -DefaultTimeoutSeconds $ScenarioTimeoutSeconds
     $targets = @((Get-MIRObjectProperty -Object $scenario -Name "targets" -Default @()) | ForEach-Object { [string]$_ })
     if ($targets.Count -gt 0 -and $FactorioLine -notin $targets) { continue }
     $scenario | Add-Member -NotePropertyName "_source_manifest" -NotePropertyValue $scenarioManifestPath -Force

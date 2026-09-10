@@ -55,56 +55,32 @@ generated_policy_authority:
     - public claims remain separately governed and evidence-bound
 
 science_phase_policies:
-  - id: K2SciencePhasePolicyV2
-    implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
+  - id: K2SciencePhasePolicyV1
+    implementation: targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua
+    package_source_authority: targets/f210/files
     profiles:
       - id: factorio-2.1-k2so
         target: f210
         mod_ids: [base, Krastorio2, Krastorio2-spaced-out]
         version_ranges:
-          base: ">=2.1.0 <2.2.0"
-          Krastorio2: ">=2.1.2 <2.1.3"
-          Krastorio2-spaced-out: ">=2.0.11 <2.0.14"
+          Krastorio2: "=2.1.2"
+          Krastorio2-spaced-out: "=2.0.13"
         proof_roots:
           - local-2-1-krastorio-spaced-out
-        exact_endpoint_evidence:
-          lower: build/results/mir4-sol/sol06/k2so-f210-lower-v3
-          upper: build/results/mir4-sol/sol06/k2so-f210-upper-v3
-      - id: factorio-2.0-k2so-standalone
-        target: f200
-        mod_ids: [base, Krastorio2-spaced-out]
-        forbidden_mod_ids: [Krastorio2]
-        version_ranges:
-          base: ">=2.0.73 <2.1.0"
-          Krastorio2-spaced-out: ">=1.6.21 <1.6.22"
-        proof_roots:
-          - local-2-0-krastorio-spaced-out
     capability_fingerprint:
-      source: research-pack-prototype-identities
-      profile_rule: every identity required by the matched target profile must exist
-      factorio-2.1-k2so-additional-identities:
-        - kr-basic-tech-card
-      common_required_science_identities:
-        - automation-science-pack
-        - chemical-science-pack
-        - kr-advanced-tech-card
-        - kr-matter-tech-card
-        - kr-singularity-tech-card
-        - logistic-science-pack
-        - military-science-pack
-        - production-science-pack
-        - space-science-pack
-        - utility-science-pack
+      source: exact-installed-f210-policy-applicability
+      exact_active_mod_versions:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
     scope: MIR-owned generated stream and base-continuation technologies only
-    application_stage: planner-after-lab-compatibility-before-technology-design
+    application_stage: normalize-before-lab-selection
     behavior:
       production_or_utility: remove-kr-basic-tech-card
       advanced_space_matter_or_singularity: remove-basic-automation-logistic-military-chemical
     invariants:
-      - no behavior outside a bounded target-specific version envelope
-      - no behavior when required science identities are absent
-      - normalized output remains accepted by at least one lab because normalization only removes ingredients from a prequalified lab-compatible set
-      - Factorio 2.0 standalone K2SO rejects a co-loaded Krastorio2 identity
+      - no behavior outside the exact installed F210 K2/K2SO version pair
+      - phase trigger witnesses remain available to lab selection through required_any_packs
+      - normalized output is selected against the active lab graph after normalization
       - stable technology IDs
       - idempotent ingredient normalization
       - preserve ingredient order shapes and amounts
@@ -113,9 +89,14 @@ science_phase_policies:
     fixture: fixtures/assert-k2-science-phase-policy
     exact_real_campaigns:
       - local-2-1-krastorio-spaced-out
-      - local-2-0-krastorio-spaced-out
-    admission_status: implemented-exact-f210-and-private-f200-development-proof-passed
+    admission_status: qualified-current-f210-exact-campaign-a04
     public_claim: development-evidence-only-no-public-release-claim-authorized
+  - id: K2SciencePhasePolicyV2RootPreview
+    implementation: prototypes/mir/compatibility/policies/k2_science_phase.lua
+    disposition: package-excluded-root-preview
+    player_authority: false
+    f200_player_authority: false
+    claim_boundary: root projection and historic records must not qualify the F210 player package
 
 science_pack_production_route_policy:
   id: SciencePackProductionRoutePolicyV2

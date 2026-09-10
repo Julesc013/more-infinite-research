@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-k2-science-progressed-reload-a04",
+  "version": "0.1.0",
+  "title": "MIR Fixture - A04 K2 Science Progressed Reload",
+  "author": "Julesc013",
+  "description": "Proves exact K2/K2SO MIR science and 42 percent research progress survive bounded reloads.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.17",
+    "Krastorio2 = 2.1.2",
+    "Krastorio2-spaced-out = 2.0.13",
+    "more-infinite-research = 4.2.21000"
+  ]
+}
