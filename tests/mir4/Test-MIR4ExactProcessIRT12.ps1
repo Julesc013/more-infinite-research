@@ -5,6 +5,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/processir/ExactProcessIR.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/inspection/Inspector.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4T12Authority -RepoRoot $RepoRoot
@@ -57,19 +58,22 @@ if($packageAfter-cne$packageBefore){throw '[mir4-t12-package-source-mutation]'}
 $preT14Package='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FA95FCE67A24C'
 $t14Package='F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
 if($packageBefore-cne$preT14Package){
-  if($packageBefore-cne$t14Package){throw '[mir4-t12-package-source-unknown-evolution]'}
-  $t14=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json')|ConvertFrom-Json -Depth 100
-  if([string]$t14.kind-cne'MIR4DocumentationContinuityT14V1'){throw '[mir4-t12-t14-presentation-authority-kind]'}
-  $beforeMatches = [string]::Equals([string]$t14.package_source_fingerprint_before,'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C',[StringComparison]::Ordinal)
-  $afterMatches = [string]::Equals([string]$t14.package_source_fingerprint_after,'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E',[StringComparison]::Ordinal)
-  $deltaMatches = (@($t14.package_visible_delta) -join '|') -ceq 'README.md'
-  $presentationValid = $beforeMatches -and $afterMatches -and $deltaMatches -and
-    ([bool]$t14.player_executable_sources_unchanged) -and ([bool]$t14.one_emitter_preserved) -and
-    (-not [bool]$t14.source_freeze_authorized) -and (-not [bool]$t14.signing_or_sealing_authorized) -and
-    (-not [bool]$t14.promotion_authorized) -and (-not [bool]$t14.publication_authorized)
-  if(-not $presentationValid){
-    throw "[mir4-t12-t14-presentation-evolution] before=$beforeMatches after=$afterMatches delta=$deltaMatches executable=$([bool]$t14.player_executable_sources_unchanged) emitter=$([bool]$t14.one_emitter_preserved) freeze=$([bool]$t14.source_freeze_authorized) signing=$([bool]$t14.signing_or_sealing_authorized) promotion=$([bool]$t14.promotion_authorized) publication=$([bool]$t14.publication_authorized)"
+  if($packageBefore-ceq$t14Package){
+    $t14=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json')|ConvertFrom-Json -Depth 100
+    if([string]$t14.kind-cne'MIR4DocumentationContinuityT14V1'){throw '[mir4-t12-t14-presentation-authority-kind]'}
+    $beforeMatches = [string]::Equals([string]$t14.package_source_fingerprint_before,'9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C',[StringComparison]::Ordinal)
+    $afterMatches = [string]::Equals([string]$t14.package_source_fingerprint_after,'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E',[StringComparison]::Ordinal)
+    $deltaMatches = (@($t14.package_visible_delta) -join '|') -ceq 'README.md'
+    $presentationValid = $beforeMatches -and $afterMatches -and $deltaMatches -and
+      ([bool]$t14.player_executable_sources_unchanged) -and ([bool]$t14.one_emitter_preserved) -and
+      (-not [bool]$t14.source_freeze_authorized) -and (-not [bool]$t14.signing_or_sealing_authorized) -and
+      (-not [bool]$t14.promotion_authorized) -and (-not [bool]$t14.publication_authorized)
+    if(-not $presentationValid){
+      throw "[mir4-t12-t14-presentation-evolution] before=$beforeMatches after=$afterMatches delta=$deltaMatches executable=$([bool]$t14.player_executable_sources_unchanged) emitter=$([bool]$t14.one_emitter_preserved) freeze=$([bool]$t14.source_freeze_authorized) signing=$([bool]$t14.signing_or_sealing_authorized) promotion=$([bool]$t14.promotion_authorized) publication=$([bool]$t14.publication_authorized)"
+    }
+    & (Join-Path $RepoRoot 'tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
+  }else{
+    try{Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t12-package-source-unknown-evolution]'}
   }
-  & (Join-Path $RepoRoot 'tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
 }
 Write-Host '[ok] MIR 4 T12 exact F210/F200 ProcessIR, deterministic captures, custody blocker, bounded comparisons, and offline Inspector passed.'

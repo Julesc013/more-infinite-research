@@ -3,6 +3,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/inspection/CompatibilityCanary.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 $authority=Get-MIR4T13Authority -RepoRoot $RepoRoot
@@ -69,16 +70,19 @@ if($packageAfter-cne$packageBefore){throw '[mir4-t13-package-source-mutation]'}
 $preT14Package='9EFA2BBF5D399CCB6CE78BC907C5051D48E2CDB3DE652BA423FAF95FCE67A24C'
 $t14Package='F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E'
 if($packageBefore-cne$preT14Package){
-  if($packageBefore-cne$t14Package){throw '[mir4-t13-package-source-unknown-evolution]'}
-  & (Join-Path $RepoRoot 'tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
-  $t14Text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json')
-  if(-not($t14Text|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'))){throw '[mir4-t13-t14-presentation-authority-schema]'}
-  $t14=$t14Text|ConvertFrom-Json -Depth 100
-  $deltaMatches=(@($t14.package_visible_delta)-join'|')-ceq'README.md'
-  $presentationValid=$deltaMatches-and
-    ([bool]$t14.player_executable_sources_unchanged)-and([bool]$t14.one_emitter_preserved)-and
-    (-not[bool]$t14.source_freeze_authorized)-and(-not[bool]$t14.signing_or_sealing_authorized)-and
-    (-not[bool]$t14.promotion_authorized)-and(-not[bool]$t14.publication_authorized)
-  if(-not$presentationValid){throw '[mir4-t13-t14-presentation-evolution]'}
+  if($packageBefore-ceq$t14Package){
+    & (Join-Path $RepoRoot 'tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
+    $t14Text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json')
+    if(-not($t14Text|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-documentation-continuity-t14-v1.schema.json'))){throw '[mir4-t13-t14-presentation-authority-schema]'}
+    $t14=$t14Text|ConvertFrom-Json -Depth 100
+    $deltaMatches=(@($t14.package_visible_delta)-join'|')-ceq'README.md'
+    $presentationValid=$deltaMatches-and
+      ([bool]$t14.player_executable_sources_unchanged)-and([bool]$t14.one_emitter_preserved)-and
+      (-not[bool]$t14.source_freeze_authorized)-and(-not[bool]$t14.signing_or_sealing_authorized)-and
+      (-not[bool]$t14.promotion_authorized)-and(-not[bool]$t14.publication_authorized)
+    if(-not$presentationValid){throw '[mir4-t13-t14-presentation-evolution]'}
+  }else{
+    try{Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t13-package-source-unknown-evolution]'}
+  }
 }
 Write-Host '[ok] MIR 4 T13 exact release canaries, lifecycle reloads, target upgrades, expiry, F200 K2SO custody closure, and authority firewall passed.'

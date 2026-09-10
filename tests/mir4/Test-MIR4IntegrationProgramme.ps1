@@ -32,6 +32,21 @@ if(@(Compare-Object @($platform.components.id | Sort-Object) @($components.compo
 $tasks=@($p.synthesis.tasks)
 $ids=@($tasks.id)
 if(@($ids | Sort-Object -Unique).Count -ne $tasks.Count) { throw '[synthesis-duplicate-task]' }
+$a01=@($tasks | Where-Object id -eq 'A01')
+if($a01.Count-ne1-or[string]$a01[0].state-cne'complete') { throw '[mir4-a01-completion-state]' }
+$a01Evidence=@($a01[0].evidence)
+$a01RequiredEvidence=@('spec/programmes/evidence/synthesis-2026-09-06/four-target-packages.json','spec/distribution/mir4-current-package-presentation-v2.json','spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json','.mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json','sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json','.mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json','sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json')
+if($a01Evidence.Count-ne$a01RequiredEvidence.Count-or@($a01RequiredEvidence|Where-Object{$_-notin$a01Evidence}).Count-ne0) { throw '[mir4-a01-evidence-bindings]' }
+$t12Authority=Get-Content -Raw (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json')|ConvertFrom-Json -Depth 100
+$t12Receipt=Get-Content -Raw (Join-Path $RepoRoot 'sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json')|ConvertFrom-Json -Depth 100
+$t13Authority=Get-Content -Raw (Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json')|ConvertFrom-Json -Depth 100
+$t13Receipt=Get-Content -Raw (Join-Path $RepoRoot 'sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json')|ConvertFrom-Json -Depth 100
+if([string]$t12Authority.work_package-cne'T12'-or-not$t12Authority.terminal_fact_authority_preserved-or[string]$t12Receipt.status-cne'completed-machine-work-with-custody-blocker'-or[int]$t12Receipt.capture_count-ne10-or[int]$t12Receipt.required_capture_count-ne11-or-not$t12Receipt.package_source_unchanged){throw '[mir4-a01-t12-historical-object]'}
+if([string]$t13Authority.exact_processir_authority-cne'.mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json'-or[int]$t13Authority.required_capture_count-ne11-or[string]$t13Receipt.status-cne'completed-machine-work'-or[int]$t13Receipt.capture_count-ne11-or-not$t13Receipt.f200_k2so_archive_custody_complete-or-not$t13Receipt.t12_historical_blocker_superseded-or-not$t13Receipt.package_source_unchanged){throw '[mir4-a01-t13-current-supersession]'}
+foreach($record in @($t12Authority,$t13Authority)){foreach($flag in @('semantic_authority','player_mutation_authorized','prototype_write_authorized','automatic_synthesis_authorized','public_support_authorized','source_freeze_authorized','signing_or_sealing_authorized','promotion_authorized','publication_authorized','package_visible')){if($null-ne$record.PSObject.Properties[$flag]-and[bool]$record.$flag){throw "[mir4-a01-authority-gate] $flag"}}}
+$presentation=Get-Content -Raw (Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json')|ConvertFrom-Json -Depth 100
+$presentationReceipt=Get-Content -Raw (Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json')|ConvertFrom-Json -Depth 100
+if([string]$presentation.kind-cne'MIR4CurrentPackagePresentationV2'-or-not$presentation.presentation.repository_readme_package_excluded-or-not$presentation.authority_invariants.one_emitter_preserved-or@($presentation.authority_invariants.PSObject.Properties|Where-Object{$_.Name-ne'one_emitter_preserved'-and[bool]$_.Value}).Count-ne0-or[string]$presentationReceipt.authority.record_sha256-cne[string]$presentation.record_sha256-or@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0-or@($presentationReceipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-a01-package-presentation-authority]'}
 $done=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 while($done.Count -lt $tasks.Count) {
  $before=$done.Count
