@@ -328,11 +328,15 @@
           "Resolve ProcessIR capture-status discrepancy",
           "Preserve README and package authority"
         ],
-        "state": "active",
+        "state": "complete",
         "evidence": [
           "spec/programmes/evidence/synthesis-2026-09-06/four-target-packages.json",
           "spec/distribution/mir4-current-package-presentation-v2.json",
-          "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json"
+          "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json",
+          ".mir/releases/waves/mir4-r0/MIR4-Exact-ProcessIR-T12V1.json",
+          "sdk/preview/mir4/reference/t12/MIR4_T12_RECEIPT.json",
+          ".mir/releases/waves/mir4-r0/MIR4-Release-Compatibility-Canaries-T13V1.json",
+          "sdk/preview/mir4/reference/t13/MIR4_T13_RECEIPT.json"
         ]
       },
       {
