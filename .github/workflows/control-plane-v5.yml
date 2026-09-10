@@ -113,8 +113,10 @@ jobs:
       - id: package-build
         name: Build exact candidate from immutable package source
         shell: pwsh
+        env:
+          MIR_CP_TARGET: ${{ inputs.target }}
         run: |
-          $targetKey = switch ('${{ inputs.target }}') { '2.1' {'f210'} '2.0' {'f200'} '1.1' {'f110'} '1.0' {'f100'} default { throw 'Unsupported target.' } }
+          $targetKey = switch ($env:MIR_CP_TARGET) { '2.1' {'f210'} '2.0' {'f200'} '1.1' {'f110'} '1.0' {'f100'} default { throw 'Unsupported target.' } }
           $result = ./source/tools/commands/package/Build-MIRPackage.ps1 -RepoRoot source -Target $targetKey -CandidateId MIR4-CONTROL-PLANE -OutputDir build/packages/control-plane
           "archive=$([string]$result.archive_path)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - id: export

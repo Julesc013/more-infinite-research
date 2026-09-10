@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "authority_invariants", "player_executable_source_equality", "frozen_v1_current_package_fingerprint_relation", "package_authority", "source_manifest", "package_source", "presentation", "receipts", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CurrentPackagePresentationV2"},
+    "status": {"const": "accepted-current-canonical-package-presentation"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "hash_mode", "sha256", "retired_for_current_checkout"],
+      "properties": {
+        "path": {"const": "spec/distribution/mir4-package-presentation-baseline-v1.json"},
+        "kind": {"const": "MIR4PackagePresentationBaselineV1"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "sha256": {"const": "9E30907A2D6B8AE949FA0FA64CD28A4246B504177187FC22AB064989388AA0A8"},
+        "retired_for_current_checkout": {"const": true}
+      }
+    },
+    "authority_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["one_emitter_preserved", "gameplay_difference_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "player_package_mutation_authorized", "prototype_write_authorized", "public_support_authorized"],
+      "properties": {
+        "one_emitter_preserved": {"const": true},
+        "gameplay_difference_authorized": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocation_authorized": {"const": false},
+        "signing_or_sealing_authorized": {"const": false},
+        "promotion_authorized": {"const": false},
+        "publication_authorized": {"const": false},
+        "player_package_mutation_authorized": {"const": false},
+        "prototype_write_authorized": {"const": false},
+        "public_support_authorized": {"const": false}
+      }
+    },
+    "player_executable_source_equality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "cutover_source_identity", "player_executable_sources_equal", "evidence"],
+      "properties": {
+        "scope": {"const": "m41-05b-documentation-cutover-only"},
+        "cutover_source_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commit", "tree", "package_source_sha256"],
+          "properties": {
+            "commit": {"const": "fed9ae76cdb99b1dcfacfaf263f612d9c6f01a31"},
+            "tree": {"const": "15b2df204cac33121000c36b741738ebfc611237"},
+            "package_source_sha256": {"const": "632E71A660AB5DEE4C3286E21AAA348BA7162674DFB15AEEECEFEF4B2525948E"}
+          }
+        },
+        "player_executable_sources_equal": {"const": true},
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "kind", "hash_mode", "sha256", "invariant"],
+          "properties": {
+            "path": {"const": "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json"},
+            "kind": {"const": "MIR4M4105BDocumentationCutoverV1"},
+            "hash_mode": {"const": "record-self-hash"},
+            "sha256": {"const": "41DA3E5346D719AB36279EDA535ACD9E193E03F4C9DC64B7903B6594654B3C5B"},
+            "invariant": {"const": "invariants.player_executable_sources_unchanged"}
+          }
+        }
+      }
+    },
+    "frozen_v1_current_package_fingerprint_relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frozen_v1_package_source_sha256", "current_package_source_sha256", "package_source_fingerprints_equal", "player_executable_sources_equality_claimed"],
+      "properties": {
+        "frozen_v1_package_source_sha256": {"const": "8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336"},
+        "current_package_source_sha256": {"const": "2BE9A0C5510F6369DBE239746BB525F77952DC5E64C0C0D2DCD9E002B059779E"},
+        "package_source_fingerprints_equal": {"const": false},
+        "player_executable_sources_equality_claimed": {"const": false}
+      }
+    },
+    "package_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "status", "record_sha256"],
+      "properties": {
+        "path": {"const": "targets/package-authority.json"},
+        "kind": {"const": "MIR4CanonicalPackageAuthorityV1"},
+        "status": {"const": "current-f2e-package-source-cutover"},
+        "record_sha256": {"const": "BC0D254E4BA34B9B4B8E87995F9817B19B1D64B077331B58DE5A1822BEB1943F"}
+      }
+    },
+    "source_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "state", "record_sha256"],
+      "properties": {
+        "path": {"const": "src/mod/package-source.json"},
+        "kind": {"const": "MIR4PackageSourceManifestV1"},
+        "state": {"const": "canonical-editable-package-source"},
+        "record_sha256": {"const": "B0ADB772013A1BEB3B25E999BBF0235956497294455B164B1C1C4BF998496D3B"}
+      }
+    },
+    "package_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state"],
+      "properties": {
+        "fingerprint_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "materializer_abi": {"const": "mir4-target-materializer/1"},
+        "roots": {"const": ["src/mod", "targets"]},
+        "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"},
+        "legacy_root_state": {"const": "retired-historical-read-only"}
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_readme_package_excluded", "target_readmes_manifest_bound"],
+      "properties": {
+        "repository_readme_package_excluded": {"const": true},
+        "target_readmes_manifest_bound": {"const": true}
+      }
+    },
+    "receipts": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "status", "hash_mode", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "kind": {"type": "string"},
+          "status": {"type": "string"},
+          "hash_mode": {"enum": ["record-self-hash", "canonical-text-v1"]},
+          "sha256": {"pattern": "^[A-F0-9]{64}$"}
+        }
+      }
+    },
+    "transition_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  }
+}

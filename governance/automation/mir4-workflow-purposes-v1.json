@@ -33,7 +33,7 @@
       "purpose": "qualification",
       "surface": "public",
       "invocation": "reusable-workflow",
-      "sha256": "60C1E09BB20D624E45906C0AC0AF1CB1FF7993C4491665ABBB56F00F088610F1"
+      "sha256": "27CB95ED16D7F8020992A6AE3ACB64479870E82ECDD39B4FA5B532FDDA6900E7"
     },
     {
       "file": ".github/workflows/assurance-promotion.yml",
@@ -73,7 +73,7 @@
       "purpose": "qualification",
       "surface": "private-reusable",
       "invocation": "private-reusable-workflow",
-      "sha256": "F45594DA81F08FB57745040B14F5F738FE4816A66BA175BE445762839FF1234F"
+      "sha256": "103C4FF9351CAB0D7ED9BDD3EFEC91366C2DA13BB4E05DCA6742DE9E6FFB22F4"
     },
     {
       "file": ".github/workflows/emergency-package.yml",
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:63a86500feb277bbc65329610e707a8f8ad9697f2907c8b79fd4bde972fcd2b6"
+  "digest": "sha256:0a6485d7f616b608dff46b8746d69eccef06aed83d3e927a1e65a0b9daea17cf"
 }

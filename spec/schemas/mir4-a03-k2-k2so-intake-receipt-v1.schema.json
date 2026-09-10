@@ -1,0 +1,21 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "type":"object","additionalProperties":false,
+  "required":["schema","kind","recorded_at","task","status","authority_observation","dossier","environment_lock","execution_proof","candidate_binding","engine","execution","next_boundary","release_authority","public_support_authority","record_sha256"],
+  "properties":{
+    "schema":{"const":1},"kind":{"const":"MIR4A03K2K2SOIntakeReceiptV1"},"recorded_at":{"type":"string","format":"date-time"},"task":{"const":"A03"},"status":{"const":"qualified-current-intake"},
+    "authority_observation":{"$ref":"#/$defs/recordBinding"},"dossier":{"$ref":"#/$defs/recordBinding"},"environment_lock":{"$ref":"#/$defs/lockBinding"},"execution_proof":{"$ref":"#/$defs/recordBinding"},
+    "candidate_binding":{"$ref":"#/$defs/candidate"},
+    "engine":{"type":"object","additionalProperties":false,"required":["version","executable_sha256"],"properties":{"version":{"const":"2.1.17"},"executable_sha256":{"const":"710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"}}},
+    "execution":{"type":"object","additionalProperties":false,"required":["plan","summary","attempt","runtime"],"properties":{"plan":{"$ref":"#/$defs/executionArtifact"},"summary":{"$ref":"#/$defs/executionArtifact"},"attempt":{"$ref":"#/$defs/executionArtifact"},"runtime":{"$ref":"#/$defs/runtimeArtifact"}}},
+    "next_boundary":{"const":"A04 owns science/phase/lab behavior, real reproducer, progression, save and reload qualification."},"release_authority":{"const":false},"public_support_authority":{"const":false},"record_sha256":{"$ref":"#/$defs/sha"}
+  },
+  "$defs":{
+    "sha":{"type":"string","pattern":"^[A-F0-9]{64}$"},"digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"path":{"type":"string","pattern":"^[A-Za-z0-9._/-]+$"},
+    "recordBinding":{"type":"object","additionalProperties":false,"required":["path","record_sha256"],"properties":{"path":{"$ref":"#/$defs/path"},"record_sha256":{"$ref":"#/$defs/sha"}}},
+    "lockBinding":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","digest"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"digest":{"$ref":"#/$defs/digest"}}},
+    "candidate":{"type":"object","additionalProperties":false,"required":["archive_sha256","content_sha256","bytes","entries","source_commit","source_tree"],"properties":{"archive_sha256":{"const":"99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E"},"content_sha256":{"const":"2C6829889A140B95BF999D013ADE6A0B651A71FFCE2A52489D2C815ABE872735"},"bytes":{"const":1103729},"entries":{"const":337},"source_commit":{"const":"aed35814232d1ebf629f980ac98869c3e8336903"},"source_tree":{"const":"d68c32d425ae544f73f5762925c3ce429ef6cd3c"}}},
+    "executionArtifact":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","input_key"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"input_key":{"$ref":"#/$defs/sha"}}},
+    "runtimeArtifact":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","record_sha256","input_key"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"record_sha256":{"$ref":"#/$defs/sha"},"input_key":{"$ref":"#/$defs/sha"}}}
+  }
+}

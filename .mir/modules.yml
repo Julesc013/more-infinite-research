@@ -309,6 +309,24 @@ package_excluded_modules:
     authority_evolution_writer: tools/commands/mir4/Update-MIR4PatchLaneRehearsalAuthority.ps1
     boundary: package-excluded deterministic planning and disposable local branch rehearsal only; no implementation merge, version allocation, remote branch write, signing, sealing, tagging, package publication, or public release authority
     stability: stable-m40-01-unpublished-rehearsal-passed
+  mir4_a03_k2_k2so_intake_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    authority_observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
+    environment_lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
+    execution_proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json
+    dossier: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json
+    receipt: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json
+    schemas:
+      - spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json
+      - spec/schemas/mir4-a03-k2-k2so-intake-dossier-v1.schema.json
+      - spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json
+    fixture: fixtures/assert-k2-k2so-f210-intake
+    evidence_writer: tools/commands/mir4/Write-MIR4A00A03Evidence.ps1
+    proof_writer: tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1
+    runtime_verification: tests/runtime/Test-MIR4A03K2K2SOIntake.ps1
+    closure_verification: tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1
+    boundary: exact current F210 K2/K2SO intake, locked package and configuration, fresh post-finalizer read-only observation, and separate historical lineage only; no A04 progression, upgrade, reload, public-support, release, player-mutation, or prototype-write authority
+    stability: qualified-current-intake-a04-not-authorized
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     current_github_actions_lock: governance/automation/github-actions-lock.json
@@ -317,11 +335,11 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-package-presentation-baseline-v1.json
-    current_package_presentation_schema: spec/schemas/mir4-package-presentation-baseline-v1.schema.json
-    current_package_presentation_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Release-Package-Baseline-Authority-Evolution-ReceiptV1.json
-    current_package_presentation_evolution_schema: spec/schemas/mir4-post-release-package-baseline-authority-evolution-receipt-v1.schema.json
-    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4PostReleasePackageBaselineAuthority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v2.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
+    current_package_presentation_evolution_receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
+    current_package_presentation_evolution_schema: contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json
+    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
     completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json

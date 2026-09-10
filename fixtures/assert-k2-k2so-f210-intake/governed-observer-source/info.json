@@ -1,0 +1,8 @@
+{
+  "name": "mir4-a03-k2-intake-observer",
+  "version": "0.1.0",
+  "title": "MIR A03 K2 intake observer",
+  "author": "MIR",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.0", "more-infinite-research", "Krastorio2-spaced-out"]
+}

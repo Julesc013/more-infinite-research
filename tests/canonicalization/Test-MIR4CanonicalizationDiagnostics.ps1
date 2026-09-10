@@ -9,7 +9,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/PackageIdentity.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
+Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 $schemaPairs=[ordered]@{
   'spec/canonicalization/mir-canonical-json-v1.json'='spec/schemas/preview/mir4-canonical-json-v1.schema.json'
   'spec/api/mir4-v1/schema-namespace.json'='spec/schemas/preview/mir4-schema-namespace-v1.schema.json'

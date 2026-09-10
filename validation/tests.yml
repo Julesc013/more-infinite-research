@@ -2477,6 +2477,28 @@
       ]
     },
     {
+      "id": "static.mir4-current-package-presentation-v2",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v2.json",
+        "spec/schemas/mir4-current-package-presentation-v2.schema.json",
+        "contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json",
+        "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+        "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json",
+        "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+        "targets/package-authority.json",
+        "src/mod/package-source.json",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-pre-freeze-hardening",
       "kind": "static",
       "layer": "F0",
@@ -3881,6 +3903,21 @@
       ]
     },
     {
+      "id": "static.mir4-a00-current-authority-observation",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A00CurrentAuthorityObservation.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A00CurrentAuthorityObservation.ps1",
+        "tools/commands/mir4/Write-MIR4A00A03Evidence.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
+        "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json"
+      ]
+    },
+    {
       "id": "static.mir4-integration-programme",
       "kind": "static",
       "layer": "F0",
@@ -3895,6 +3932,65 @@
         "spec/programmes/evidence/community-2026-09-06/**",
         "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
         "src/mod/families/modern/prototypes/streams/productivity.lua"
+      ]
+    },
+    {
+      "id": "static.mir4-a03-k2-k2so-intake-closure",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "tools/mir/application/assurance/EnvironmentEvidence.ps1",
+        "tools/commands/mir4/Write-MIR4A00A03Evidence.ps1",
+        "tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1",
+        "fixtures/assert-k2-k2so-f210-intake/expected-observation.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/programmes/evidence/synthesis-2026-09-06/k2-campaign.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json",
+        "spec/schemas/plan.schema.json",
+        "spec/schemas/capsule.schema.json",
+        "spec/schemas/result.schema.json",
+        "spec/schemas/preview/mir4-environment-lock-v1.schema.json",
+        "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-intake-dossier-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json"
+      ]
+    },
+    {
+      "id": "runtime.k2-k2so-f210-intake",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR4A03K2K2SOIntake.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "candidate",
+        "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+        "fixtures/assert-k2-k2so-f210-intake/**",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        ".mir/fixtures.yml",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/flib_0.17.2.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/k2so-assets_1.0.7.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2_2.1.2.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2-spaced-out_2.0.13.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2Assets_2.1.0.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2MenuSimulations_2.1.0.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-list.json",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-settings.dat"
       ]
     },
     {

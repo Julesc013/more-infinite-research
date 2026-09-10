@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "kind": "MIR4A03K2IntakeObservationV1",
+  "post_finalizer_observation": true,
+  "effective_startup_settings": { "mir-debug-generation-report": true },
+  "native_reference_technology": {
+    "id": "kr-singularity-lab",
+    "prerequisites": ["kr-singularity-tech-card", "quantum-processor"],
+    "science": ["agricultural-science-pack", "cryogenic-science-pack", "electromagnetic-science-pack", "kr-advanced-tech-card", "kr-matter-tech-card", "kr-singularity-tech-card", "metallurgic-science-pack", "production-science-pack", "space-science-pack", "utility-science-pack"]
+  },
+  "compatible_labs": [
+    {"id":"biolab","inputs":["agricultural-science-pack","automation-science-pack","chemical-science-pack","cryogenic-science-pack","electromagnetic-science-pack","kr-advanced-tech-card","kr-matter-tech-card","kr-singularity-tech-card","logistic-science-pack","metallurgic-science-pack","military-science-pack","production-science-pack","space-science-pack","utility-science-pack"]},
+    {"id":"kr-advanced-lab","inputs":["agricultural-science-pack","automation-science-pack","chemical-science-pack","cryogenic-science-pack","electromagnetic-science-pack","kr-advanced-tech-card","kr-matter-tech-card","kr-singularity-tech-card","logistic-science-pack","metallurgic-science-pack","military-science-pack","production-science-pack","space-science-pack","utility-science-pack"]},
+    {
+      "id": "kr-singularity-lab",
+      "inputs": [
+        "agricultural-science-pack",
+        "automation-science-pack",
+        "chemical-science-pack",
+        "cryogenic-science-pack",
+        "electromagnetic-science-pack",
+        "kr-advanced-tech-card",
+        "kr-matter-tech-card",
+        "kr-singularity-tech-card",
+        "logistic-science-pack",
+        "metallurgic-science-pack",
+        "military-science-pack",
+        "production-science-pack",
+        "promethium-science-pack",
+        "space-science-pack",
+        "utility-science-pack"
+      ]
+    },
+    {"id":"lab","inputs":["agricultural-science-pack","automation-science-pack","chemical-science-pack","cryogenic-science-pack","electromagnetic-science-pack","kr-advanced-tech-card","kr-matter-tech-card","kr-singularity-tech-card","logistic-science-pack","metallurgic-science-pack","military-science-pack","production-science-pack","space-science-pack","utility-science-pack"]}
+  ],
+  "mutation_authorized": false,
+  "package_visible": false
+}

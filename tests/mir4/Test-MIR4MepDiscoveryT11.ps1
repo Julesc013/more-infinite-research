@@ -8,7 +8,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
 $before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-Assert-MIR4PackagePresentationV1 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
+Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
 $emitterPath=Join-Path $RepoRoot 'prototypes/mir/emit/mod_data.lua'
 $emitterBefore=(Get-FileHash -LiteralPath $emitterPath -Algorithm SHA256).Hash
 
