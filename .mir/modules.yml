@@ -340,6 +340,22 @@ package_excluded_modules:
     fixture: fixtures/assert-k2-science-progressed-reload-a04
     boundary: exact current F210 K2/K2SO final-emission, progression, and two-reload observation only; no player mutation, generated-prototype write, public-support, release, signing, or publication authority
     stability: bounded-a04-closure-passed-4.2-qualification-only
+  mir4_a05_k2_03_imersite_closure_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    runtime_proof: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Imersite-Runtime-ProofV1.json
+    closure: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Imersite-ClosureV1.json
+    command_inventory_evolution: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Command-Inventory-EvolutionV1.json
+    schemas:
+      - spec/schemas/mir4-a05-k2-03-imersite-runtime-proof-v1.schema.json
+      - spec/schemas/mir4-a05-k2-03-imersite-closure-v1.schema.json
+      - spec/schemas/mir4-a05-k2-03-command-inventory-evolution-v1.schema.json
+    writer: tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1
+    runtime_verification: tests/runtime/Test-MIR4A05K203Imersite.ps1
+    closure_verification: tests/mir4/Test-MIR4A05K203ImersiteClosure.ps1
+    custody: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03
+    fixture: fixtures/assert-k2-03-imersite
+    boundary: exact locked K2SO 2.0.13 plus xy fresh and two-reload Imersite owner, science, route, and partial-research continuity proof together with current K2SO 2.0.17 fresh-load owner and route parity only; no infinite continuation, weighted-process admission, broader K2 or A05 completion, player mutation, prototype write, public support, release, signing, or publication authority
+    stability: bounded-k2-03-passed-a05-open-projection-gap-blocks-release
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     current_github_actions_lock: governance/automation/github-actions-lock.json
