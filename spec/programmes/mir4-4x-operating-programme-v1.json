@@ -356,8 +356,11 @@
           "Compare retained branch deltas semantically",
           "No blanket graduation"
         ],
-        "state": "active",
-        "evidence": []
+        "state": "complete",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-10/a02-component-reconciliation.json",
+          "spec/programmes/evidence/synthesis-2026-09-10/a02-current-source-materializer-proof.json"
+        ]
       },
       {
         "id": "A03",

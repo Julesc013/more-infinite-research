@@ -3966,6 +3966,34 @@
       ]
     },
     {
+      "id": "static.mir4-a02-component-reconciliation",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A02Reconciliation.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A02Reconciliation.ps1",
+        "tools/commands/mir4/Write-MIR4A02Reconciliation.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "targets/package-authority.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/f110/overlay.json",
+        "targets/f100/overlay.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/programmes/inputs/synthesis-2026-09-05/COMPONENT_DELIVERY.json",
+        "spec/programmes/inputs/synthesis-2026-09-05/SOURCES.json",
+        "spec/platform/mir4-preview-v0/platform.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a02-component-reconciliation.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a02-current-source-materializer-proof.json",
+        "spec/schemas/mir4-a02-component-reconciliation-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json"
+      ]
+    },
+    {
       "id": "runtime.k2-k2so-f210-intake",
       "kind": "runtime",
       "layer": "F3",

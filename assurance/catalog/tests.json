@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 166,
+  "test_count": 167,
   "tests": [
     {
       "id": "docs.check",
@@ -1044,6 +1044,43 @@
         "tools/lib/mir4/bootstrap-materialization/**",
         "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
         "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-a02-component-reconciliation",
+      "proposition": "The governed test 'static.mir4-a02-component-reconciliation' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A02Reconciliation.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4A02Reconciliation.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A02Reconciliation.ps1",
+        "tools/commands/mir4/Write-MIR4A02Reconciliation.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "targets/package-authority.json",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/f110/overlay.json",
+        "targets/f100/overlay.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/programmes/inputs/synthesis-2026-09-05/COMPONENT_DELIVERY.json",
+        "spec/programmes/inputs/synthesis-2026-09-05/SOURCES.json",
+        "spec/platform/mir4-preview-v0/platform.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a02-component-reconciliation.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a02-current-source-materializer-proof.json",
+        "spec/schemas/mir4-a02-component-reconciliation-v1.schema.json",
+        "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json"
       ],
       "matrix": null
     },
@@ -5822,13 +5859,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 55,
+      "package-repository": 56,
       "tooling-release": 48,
       "runtime-upgrade": 31,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 154,
+    "canonical_test_commands": 155,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5841,5 +5878,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:54431e7d78b9b38d7fc7178997982e2ffce631dc1c804cf30e1e68653be60a23"
+  "digest": "sha256:0e9fcc7ed431813b40cd5e206501c8df050682c8be2dc34cbac8ff296107a060"
 }
