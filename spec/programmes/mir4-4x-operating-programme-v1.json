@@ -441,8 +441,10 @@
           "Paving recoloring/returns analyzed",
           "Packaged and qualified per request"
         ],
-        "state": "queued",
-        "evidence": []
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
+        ]
       },
       {
         "id": "A06",

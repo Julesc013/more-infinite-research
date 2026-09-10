@@ -784,6 +784,38 @@ streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_white_paving = material_family("kr-white-reinforced-plate", {"kr-white-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
+-- A10-reviewed forward-route certificates. These bind one exact final recipe,
+-- one exact canonical risk fact, and one exact K2/K2SO runtime profile. They
+-- are not a general exception to material-route graph safety.
+local function k2_forward_profiles(risk_fingerprint)
+  local common={base="2.1.17",["elevated-rails"]="2.1.17",quality="2.1.17",recycler="2.1.17",["space-age"]="2.1.17",flib="0.17.2",["k2so-assets"]="1.0.7",Krastorio2="2.1.2",Krastorio2Assets="2.1.0",Krastorio2MenuSimulations="2.1.0",["more-infinite-research"]="4.2.21000"}
+  local locked={};for name, version in pairs(common) do locked[name]=version end
+  locked["Krastorio2-spaced-out"]="2.0.13";locked["xy-k2so-enhancements-nulls-fork"]="0.8.3"
+  local current={};for name, version in pairs(common) do current[name]=version end
+  current["Krastorio2-spaced-out"]="2.0.17"
+  local observers={["mir-validation-settings-overrides"]="0.1.0",["mir-fixture-assert-k2-materials"]="0.1.0"}
+  return {{id="K2SO-2.0.13-with-xy",mod_locks=locked,observer_mod_locks=observers,canonical_risk_fingerprint=risk_fingerprint},{id="K2SO-2.0.17-without-xy",mod_locks=current,observer_mod_locks=observers,canonical_risk_fingerprint=risk_fingerprint}}
+end
+local function k2_forward_route(id, evidence_id, risk_fingerprint, ingredients, results)
+  return {
+    id=id,
+    evidence_id=evidence_id,
+    maximum_productivity=3.0,
+    profiles=k2_forward_profiles(risk_fingerprint),
+    ingredients=ingredients,
+    results=results
+  }
+end
+streams.research_material_rare_metals.reviewed_forward_routes = {
+  ["kr-rare-metals"] = k2_forward_route("A10-K2-rare-metals-ore-v1","A05-K2-02-locked-current-v1","mir32-06ef774e",{{type="item",name="kr-rare-metal-ore",amount=2}},{{type="item",name="kr-rare-metals",amount=1}}),
+  ["kr-rare-metals-from-enriched-rare-metals"] = k2_forward_route("A10-K2-rare-metals-enriched-v1","A05-K2-02-locked-current-v1","mir32-88e83d09",{{type="item",name="kr-enriched-rare-metals",amount=1}},{{type="item",name="kr-rare-metals",amount=1}})
+}
+streams.research_material_silicon.reviewed_forward_routes = {
+  ["kr-silicon"] = k2_forward_route("A10-K2-silicon-v1","A05-K2-04-locked-current-v1","mir32-eb122be7",{{type="item",name="kr-quartz",amount=18}},{{type="item",name="kr-silicon",amount=9}})
+}
+streams.research_material_glass.reviewed_forward_routes = {
+  ["kr-glass"] = k2_forward_route("A10-K2-glass-v1","A05-K2-05-locked-current-v1","mir32-a8a1f439",{{type="item",name="kr-sand",amount=16}},{{type="item",name="kr-glass",amount=8}})
+}
 
 -- Tin smelting is available initially on the exact Bob core lock.
 streams.research_material_tin.science_packs = {"automation-science-pack"}

@@ -5,7 +5,7 @@ applies_to: "MIR 4.2 development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-09
+last_reviewed: 2026-09-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 This development increment implements the bundled modern research browser, guarded finite material declarations, and package-excluded optional prototypes. The 4.2 mission remains open. It is **not a release candidate**, a broad overhaul support claim, or an authorization to publish.
 
-The [existing operating programme](../../spec/programmes/mir4-4x-operating-programme-v1.json) owns execution. Its [active request authority](../../spec/programmes/community-requests.json) retains all 66 intake requests and the original 23 material/science requests separately. The supplied assessment is proposal and attribution; the [measured evidence](../../spec/programmes/evidence/community-2026-09-06/outcomes.json) records actual implementation outcomes. PR #254 was closed without merging; the existing science fix on dev is the source authority.
+The [existing operating programme](../../spec/programmes/mir4-4x-operating-programme-v1.json) owns execution. Its [active request authority](../../spec/programmes/community-requests.json) is an 81-request ledger; its intake and material/science origins remain traceable within that single authority rather than being a current 66-plus-23 count. The supplied assessment is proposal and attribution; the [measured evidence](../../spec/programmes/evidence/community-2026-09-06/outcomes.json) records actual implementation outcomes. PR #254 was closed without merging; the existing science fix on dev is the source authority.
 
 ## Bundled player code
 
@@ -30,16 +30,16 @@ Catalogues are limited to 30,000 technologies, pages and effect groups to 20 row
 
 Every declaration has a stable new manifest identity and uses the existing matching, ownership, science planning and emitter path. Defaults are three 2% tiers; this is not the requested later infinite continuation. Tin and bronze are available with red science in the captured Bob environment. Other streams follow their exact unlock-derived frontier and report feasible labs. Published identities remain unchanged.
 
-The route guard requires explicit productivity permission and rejects any recipe-graph path from a candidate output back to an input. It caches one bounded graph per compiler context and fails closed at its traversal budgets. This is deliberately conservative: oxygen, water, recycling or matter routes can cause rejection even when weighted economics might be safe. It neither proves an exploit nor certifies arbitrary scripted conversions.
+The route guard requires explicit productivity permission and fails closed when it finds any potential recipe-graph return path from a candidate output to an input, including at traversal-budget limits. The only narrow exception is an exact profile-locked reviewed-forward certificate for the named final recipe: it must prove one bounded ordinary deterministic production route with the required fact, risk fingerprint, and complete mod closure. The current certificates cover only the three bounded Rare Metals, Silicon, and Glass outcomes below. Oxygen, water, recycling, matter, weighted, or arbitrary scripted routes otherwise remain rejected; the guard neither proves an exploit nor certifies them safe.
 
 | Request | Material | Exact retained environment result |
 | --- | --- | --- |
-| K2-02 | Rare Metals productivity | Withheld: potential return paths through ore/enrichment, quartz or sand |
+| K2-02 | Rare Metals productivity | Two exact ordinary production routes admitted under profile-locked reviewed-forward certificates; casting remains withheld because final dirty water is ignored by productivity. |
 | K2-03 | Imersite productivity | Imersite powder admitted; K2SO native crystal owner preserved; crystal return path withheld |
-| K2-04 | Silicon productivity | Withheld: potential return paths through ore/enrichment, quartz or sand |
-| K2-05 | Glass productivity | Withheld: potential return paths through ore/enrichment, quartz or sand |
-| K2-06 | Black tile plate productivity | Withheld: manufacturing recipe explicitly disallows productivity |
-| K2-07 | White tile plate productivity | Withheld: manufacturing recipe explicitly disallows productivity |
+| K2-04 | Silicon productivity | Exact quartz-to-silicon route admitted under the profile-locked reviewed-forward certificate. |
+| K2-05 | Glass productivity | Exact sand-to-glass route admitted under the profile-locked reviewed-forward certificate. |
+| K2-06 | Black tile plate productivity | Withheld: final recipe remains not productivity-allowed and has no productivity owner. |
+| K2-07 | White tile plate productivity | Withheld: final recipe remains not productivity-allowed and has no productivity owner. |
 | BA-01 | Aluminium plate productivity | 1 admitted recipe effect(s); automation-science-pack,logistic-science-pack |
 | BA-02 | Gold plate productivity | 1 admitted recipe effect(s); automation-science-pack,logistic-science-pack,chemical-science-pack |
 | BA-03 | Lead plate productivity | 2 admitted recipe effect(s); automation-science-pack,logistic-science-pack |
@@ -64,8 +64,8 @@ Pipe, underground-pipe and heat-pipe recipes explicitly disallow productivity in
 - F210 uses the authorized Steam Factorio 2.1.17 binary. F200 uses `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`, version 2.0.77. Exact binary hashes and package hashes are retained in the evidence records.
 - Bob core: boblibrary, bobores, bobplates, bobelectronics and bobtech, each 3.0.0. Fourteen material streams generated; nickel was withheld and platinum was absent.
 - Standalone K2: Krastorio2 2.1.2, Assets 2.1.0, MenuSimulations 2.1.0 and flib 0.17.2.
-- Retained K2SO: the standalone set plus Krastorio2-spaced-out 2.0.13 and k2so-assets 1.0.7, with its required official expansion mods. This is separate from the older enhanced capture and does not qualify current K2SO 2.0.17.
-- Current K2SO and Angel 2.1 archives require authenticated acquisition. Automatic approval review blocked use of the local Factorio service token pending explicit authorization to send it to the official Mod Portal. No credential is stored in repository evidence.
+- Retained K2SO: the standalone set plus Krastorio2-spaced-out 2.0.13 and k2so-assets 1.0.7, with its required official expansion mods. This retained enhanced environment is separate from the current 2.0.17 qualification.
+- A05 now qualifies only the bounded rare-metals, silicon, and glass material slice in exact current K2SO 2.0.17 without xy, including fresh load and two reloads. It does not establish broader K2SO, enhancement, Angel-only, or combined-environment support. Angel and combined A06 claims still require their own exact dependency-valid locks; the retained BA rows are preliminary Bob-environment observations, not A06 completion or support.
 - The old Angel suite includes angelsindustries, whose latest observed release targets Factorio 1.1. It is not a dependency-valid Factorio 2.1 environment. A valid 2.1 core must use exact current refining, petrochemistry, smelting and graphics dependencies.
 
 The retained science module proof is reused only for its exact unchanged module hashes. Its 33 controlled assertions and earlier K2 save reloads do not replace current K2SO or a genuinely affected partially researched save. New material captures are load-and-audit evidence with explicit source-file and archive bindings. The browser tests separately exercise an actual player, an active queue and 37.5% research progress across a native save/reload.

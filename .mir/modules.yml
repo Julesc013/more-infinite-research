@@ -356,6 +356,20 @@ package_excluded_modules:
     fixture: fixtures/assert-k2-03-imersite
     boundary: exact locked K2SO 2.0.13 plus xy fresh and two-reload Imersite owner, science, route, and partial-research continuity proof together with current K2SO 2.0.17 fresh-load owner and route parity only; no infinite continuation, weighted-process admission, broader K2 or A05 completion, player mutation, prototype write, public support, release, signing, or publication authority
     stability: bounded-k2-03-passed-a05-open-projection-gap-blocks-release
+  mir4_a05_k2_materials_closure_v1:
+    programme: spec/programmes/mir4-4x-operating-programme-v1.json
+    closure: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json
+    command_inventory_evolution: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-Command-Inventory-EvolutionV1.json
+    schemas:
+      - spec/schemas/mir4-a05-k2-materials-closure-v1.schema.json
+      - spec/schemas/mir4-a05-k2-materials-command-inventory-evolution-v1.schema.json
+    writer: tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1
+    runtime_verification: tests/runtime/Test-MIR4A05K2Materials.ps1
+    closure_verification: tests/mir4/Test-MIR4A05K2MaterialsClosure.ps1
+    custody: spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials
+    fixture: fixtures/assert-k2-materials
+    boundary: exact locked K2SO 2.0.13 plus xy and current K2SO 2.0.17 without xy qualification for bounded rare-metals, silicon, and glass routes with exact casting and paving omissions and two byte-identical 42-percent reloads per profile; potential return paths remain withheld unless the exact profile-locked reviewed-forward certificate proves the exact final route is bounded and ordinary; no broader K2SO or enhancement support, Angel or combined A06 support, infinite continuation, broader K2 or A05 completion, public support, release, signing, or publication authority
+    stability: bounded-k2-materials-passed-a05-open-root-projection-gap-blocks-release
   mir4_supply_chain_v1:
     authority: .mir/releases/governance/mir4/supply-chain.json
     current_github_actions_lock: governance/automation/github-actions-lock.json

@@ -1414,25 +1414,17 @@
         "S29"
       ],
       "feature_group": "material-families",
-      "status": "withheld-with-exact-environment-evidence",
+      "status": "implemented-finite-routes-with-open-qualification",
       "qualification": [
         {
-          "scenario": "krastorio2-spaced-out",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
-        },
-        {
-          "scenario": "krastorio2",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
+          "scenario": "krastorio2-spaced-out-locked-and-current",
+          "package_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+          "status": "passed-bounded",
+          "reason": "exact locked/current K2SO final-state closure",
+          "effects": 2,
+          "science": "automation-science-pack,chemical-science-pack,logistic-science-pack",
+          "lab_status": "full",
+          "evidence": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
         }
       ],
       "original_request": {
@@ -1481,7 +1473,6 @@
         "infinite_continuation": "not-implemented"
       },
       "remaining_obligations": [
-        "Current K2SO 2.0.17 exact capture",
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
       ]
@@ -1605,25 +1596,17 @@
         "S29"
       ],
       "feature_group": "material-families",
-      "status": "withheld-with-exact-environment-evidence",
+      "status": "implemented-finite-routes-with-open-qualification",
       "qualification": [
         {
-          "scenario": "krastorio2-spaced-out",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
-        },
-        {
-          "scenario": "krastorio2",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
+          "scenario": "krastorio2-spaced-out-locked-and-current",
+          "package_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+          "status": "passed-bounded",
+          "reason": "exact locked/current K2SO final-state closure",
+          "effects": 1,
+          "science": "automation-science-pack,logistic-science-pack",
+          "lab_status": "full",
+          "evidence": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
         }
       ],
       "original_request": {
@@ -1670,7 +1653,6 @@
         "infinite_continuation": "not-implemented"
       },
       "remaining_obligations": [
-        "Current K2SO 2.0.17 exact capture",
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
       ]
@@ -1698,25 +1680,17 @@
         "S29"
       ],
       "feature_group": "material-families",
-      "status": "withheld-with-exact-environment-evidence",
+      "status": "implemented-finite-routes-with-open-qualification",
       "qualification": [
         {
-          "scenario": "krastorio2-spaced-out",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
-        },
-        {
-          "scenario": "krastorio2",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
+          "scenario": "krastorio2-spaced-out-locked-and-current",
+          "package_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+          "status": "passed-bounded",
+          "reason": "exact locked/current K2SO final-state closure",
+          "effects": 1,
+          "science": "automation-science-pack,chemical-science-pack,logistic-science-pack",
+          "lab_status": "full",
+          "evidence": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
         }
       ],
       "original_request": {
@@ -1763,7 +1737,6 @@
         "infinite_continuation": "not-implemented"
       },
       "remaining_obligations": [
-        "Current K2SO 2.0.17 exact capture",
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
       ]
@@ -1794,22 +1767,14 @@
       "status": "withheld-with-exact-environment-evidence",
       "qualification": [
         {
-          "scenario": "krastorio2-spaced-out",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
+          "scenario": "krastorio2-spaced-out-locked-and-current",
+          "package_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+          "status": "passed-bounded",
+          "reason": "exact locked/current K2SO final-state closure",
           "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
-        },
-        {
-          "scenario": "krastorio2",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
+          "science": "",
+          "lab_status": "full",
+          "evidence": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
         }
       ],
       "original_request": {
@@ -1853,7 +1818,6 @@
         "infinite_continuation": "not-implemented"
       },
       "remaining_obligations": [
-        "Current K2SO 2.0.17 exact capture",
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
       ]
@@ -1884,22 +1848,14 @@
       "status": "withheld-with-exact-environment-evidence",
       "qualification": [
         {
-          "scenario": "krastorio2-spaced-out",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
+          "scenario": "krastorio2-spaced-out-locked-and-current",
+          "package_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+          "status": "passed-bounded",
+          "reason": "exact locked/current K2SO final-state closure",
           "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
-        },
-        {
-          "scenario": "krastorio2",
-          "package_sha256": "0CB17B4DCDFB0161B2DEFBBAF0DEA7D9D04FFB1EA9E03B309FDA84C0865FA935",
-          "status": "skipped",
-          "reason": "no_matching_recipes",
-          "effects": 0,
-          "science": "automation-science-pack,logistic-science-pack,chemical-science-pack",
-          "lab_status": "full"
+          "science": "",
+          "lab_status": "full",
+          "evidence": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
         }
       ],
       "original_request": {
@@ -1943,7 +1899,6 @@
         "infinite_continuation": "not-implemented"
       },
       "remaining_obligations": [
-        "Current K2SO 2.0.17 exact capture",
         "Late continuation and affected-save migration",
         "Weighted process qualification or explicit productivity permission for withheld routes"
       ]

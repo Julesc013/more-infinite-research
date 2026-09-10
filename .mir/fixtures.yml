@@ -541,6 +541,29 @@ fixtures:
       - current-k2so-fresh-load-owner-and-route-parity-only
       - no-infinite-broad-k2-or-release-authority
 
+  k2-materials-bounded:
+    requires_features: []
+    path: fixtures/assert-k2-materials
+    shipped: false
+    external_mod_identity: Krastorio2-spaced-out
+    exact_version_envelopes:
+      locked:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.13"
+        xy-k2so-enhancements-nulls-fork: "0.8.3"
+        more-infinite-research: "4.2.21000"
+      current:
+        Krastorio2: "2.1.2"
+        Krastorio2-spaced-out: "2.0.17"
+        more-infinite-research: "4.2.21000"
+    validates:
+      - exact-rare-silicon-and-glass-final-route-owners
+      - potential-return-paths-withheld-unless-exact-profile-locked-reviewed-forward-certificate-proves-a-bounded-ordinary-route
+      - exact-science-and-compatible-labs
+      - casting-ignored-by-productivity-and-paving-denials-retained
+      - three-forces-at-42-percent-survive-two-byte-identical-reloads-per-profile
+      - bounded-current-k2so-material-qualification-is-not-broader-k2so-enhancement-or-a06-support
+      - no-infinite-broad-k2-or-release-authority
   mir4-a03-k2-k2so-f210-intake:
     requires_features: []
     path: fixtures/assert-k2-k2so-f210-intake
