@@ -305,8 +305,10 @@
           "Observe current refs, channels and local custody",
           "Keep F210 waiver classification"
         ],
-        "state": "active",
-        "evidence": []
+        "state": "complete",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json"
+        ]
       },
       {
         "id": "A01",
@@ -328,7 +330,9 @@
         ],
         "state": "active",
         "evidence": [
-          "spec/programmes/evidence/synthesis-2026-09-06/four-target-packages.json"
+          "spec/programmes/evidence/synthesis-2026-09-06/four-target-packages.json",
+          "spec/distribution/mir4-current-package-presentation-v2.json",
+          "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json"
         ]
       },
       {
@@ -366,11 +370,16 @@
         ],
         "acceptance": [
           "Exact engine/mod/settings/package identities",
-          "Native reference tech and reachable labs",
+          "Native reference technology and science-input-compatible lab prototypes",
           "Old admitted and current lineage kept separate"
         ],
-        "state": "queued",
-        "evidence": []
+        "state": "complete",
+        "evidence": [
+          "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json",
+          "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json",
+          "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json",
+          "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json"
+        ]
       },
       {
         "id": "A04",

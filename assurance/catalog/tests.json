@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 162,
+  "test_count": 166,
   "tests": [
     {
       "id": "docs.check",
@@ -509,6 +509,43 @@
       }
     },
     {
+      "id": "runtime.k2-k2so-f210-intake",
+      "proposition": "The governed test 'runtime.k2-k2so-f210-intake' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR4A03K2K2SOIntake.ps1 -FactorioBin <factorio> -CandidateZip <candidate>",
+      "canonical_implementation": "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "candidate",
+        "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+        "fixtures/assert-k2-k2so-f210-intake/**",
+        "tools/lib/compatibility/FactorioRunner.ps1",
+        "tools/lib/validation/FactorioProcess.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        ".mir/fixtures.yml",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/flib_0.17.2.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/k2so-assets_1.0.7.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2_2.1.2.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2-spaced-out_2.0.13.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2Assets_2.1.0.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/Krastorio2MenuSimulations_2.1.0.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-list.json",
+        "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-settings.dat"
+      ],
+      "matrix": null
+    },
+    {
       "id": "runtime.material-route-guard",
       "proposition": "The governed test 'runtime.material-route-guard' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -983,6 +1020,70 @@
         "spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-a00-current-authority-observation",
+      "proposition": "The governed test 'static.mir4-a00-current-authority-observation' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A00CurrentAuthorityObservation.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4A00CurrentAuthorityObservation.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A00CurrentAuthorityObservation.ps1",
+        "tools/commands/mir4/Write-MIR4A00A03Evidence.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
+        "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-a03-k2-k2so-intake-closure",
+      "proposition": "The governed test 'static.mir4-a03-k2-k2so-intake-closure' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4A03K2K2SOIntakeClosure.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/bootstrap-materialization/**",
+        "tools/mir/application/assurance/EnvironmentEvidence.ps1",
+        "tools/commands/mir4/Write-MIR4A00A03Evidence.ps1",
+        "tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1",
+        "fixtures/assert-k2-k2so-f210-intake/expected-observation.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/programmes/evidence/synthesis-2026-09-06/k2-campaign.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json",
+        "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json",
+        "spec/schemas/plan.schema.json",
+        "spec/schemas/capsule.schema.json",
+        "spec/schemas/result.schema.json",
+        "spec/schemas/preview/mir4-environment-lock-v1.schema.json",
+        "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-intake-dossier-v1.schema.json",
+        "spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json"
       ],
       "matrix": null
     },
@@ -1734,6 +1835,37 @@
         "docs/architecture/module-boundaries.md",
         "assurance/catalog/tests.json",
         "package-source"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-current-package-presentation-v2",
+      "proposition": "The governed test 'static.mir4-current-package-presentation-v2' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v2.json",
+        "spec/schemas/mir4-current-package-presentation-v2.schema.json",
+        "contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json",
+        "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+        "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json",
+        "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+        "targets/package-authority.json",
+        "src/mod/package-source.json",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
+        "repository"
       ],
       "matrix": null
     },
@@ -5690,13 +5822,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 52,
+      "package-repository": 55,
       "tooling-release": 48,
-      "runtime-upgrade": 30,
+      "runtime-upgrade": 31,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 150,
+    "canonical_test_commands": 154,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -5709,5 +5841,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f3dbdebc5dbfcadc7fff27c9e6ebfe9e5cc85b4d0ce221c106eae484d105df59"
+  "digest": "sha256:54431e7d78b9b38d7fc7178997982e2ffce631dc1c804cf30e1e68653be60a23"
 }

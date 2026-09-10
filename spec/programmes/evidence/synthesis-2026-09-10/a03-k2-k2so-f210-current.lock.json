@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "kind": "MIR4EnvironmentLockV1",
+  "maturity": "developer-preview",
+  "capture": "engine-post-finalizer-exact",
+  "target": "f210",
+  "engine": { "version": "2.1.17", "executable_sha256": "sha256:710b0278d3049564b122dafb3cd3d0338d0bde1cec3b7417ae1fc3fb37ab85a8" },
+  "mir": { "version": "4.2.21000", "package_sha256": "sha256:99c020cba2800179ff2d76ee35f58b27a97cf2a7d89993cffe06403dc140090e", "source_commit": "aed35814232d1ebf629f980ac98869c3e8336903", "source_tree": "d68c32d425ae544f73f5762925c3ce429ef6cd3c" },
+  "mods": [
+    { "name": "Krastorio2", "sha256": "sha256:89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43", "version": "2.1.2" },
+    { "name": "Krastorio2-spaced-out", "sha256": "sha256:a2eeb2e5a6119c4117bd3653979d40d305d17539e184bfa6f4ed53ef12a5f242", "version": "2.0.13" },
+    { "name": "Krastorio2Assets", "sha256": "sha256:39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29", "version": "2.1.0" },
+    { "name": "Krastorio2MenuSimulations", "sha256": "sha256:3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7", "version": "2.1.0" },
+    { "name": "flib", "sha256": "sha256:0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d", "version": "0.17.2" },
+    { "name": "k2so-assets", "sha256": "sha256:c3e11214407b08120b2ee717405d3b0398f533647695ab2e6ef6df9267d62017", "version": "1.0.7" },
+    { "name": "mir-validation-settings-overrides", "sha256": "sha256:0a6aaa9e8d89ddcc9e421f8ab065124554531588c4e4f91ec5e4d52ec0e10e26", "version": "0.1.0" },
+    { "name": "mir4-a03-k2-intake-observer", "sha256": "sha256:8031f2310b30e7b66a33edd125aa86137b9aba0b9dbff1e23cd3c31435be8d31", "version": "0.1.0" },
+    { "name": "xy-k2so-enhancements-nulls-fork", "sha256": "sha256:930f43b96b04012fef090c40d8b16a6b3f259d1713c86cf59dff3e9a5a97e2be", "version": "0.8.3" }
+  ],
+  "startup_settings": [ { "name": "mir-debug-generation-report", "value": true } ],
+  "extensions": [],
+  "contracts": [ "mir4-a03-k2-intake/1", "mir4-environment-lock/1", "post-finalizer-read-only-observation/1" ],
+  "canonicalization": "mir-canonical-json/1",
+  "portable": true,
+  "privacy_safe": true,
+  "package_visible": false,
+  "player_mutation_authorized": false,
+  "prototype_write_authorized": false,
+  "public_support_authorized": false,
+  "release_authority": false,
+  "digest": "sha256:93f96b639310a3e6a10e721eaf7f4db7b3ec5f15ccb877dee1dc847dcb3baf1f"
+}

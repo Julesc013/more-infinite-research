@@ -7,7 +7,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-Assert-MIR4PackagePresentationV1 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
+Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
 $corpusPath=Join-Path $repo 'sdk/preview/mir4/api-v1/conformance/corpus.json'
 $corpusJson=Get-Content -Raw -LiteralPath $corpusPath

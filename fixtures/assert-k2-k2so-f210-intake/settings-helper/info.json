@@ -1,0 +1,10 @@
+{
+  "author": "MIR validation harness",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "more-infinite-research"
+  ],
+  "title": "MIR Validation Settings Overrides",
+  "version": "0.1.0",
+  "name": "mir-validation-settings-overrides"
+}

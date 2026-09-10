@@ -498,6 +498,22 @@ fixtures:
       - production-and-utility-basic-card-removal
       - advanced-space-matter-and-singularity-early-pack-removal
 
+  mir4-a03-k2-k2so-f210-intake:
+    requires_features: []
+    path: fixtures/assert-k2-k2so-f210-intake
+    shipped: false
+    validates:
+      - exact-current-f210-k2-k2so-archive-closure
+      - post-finalizer-read-only-native-technology-observation
+      - exact-native-reference-prerequisites-and-ten-science-inputs
+      - exact-compatible-laboratory-input-sets
+      - effective-mir-debug-generation-report-startup-setting
+      - isolated-fresh-headless-create-with-zero-stderr
+      - observer-has-no-player-or-prototype-mutation-authority
+      - exact-environment-lock-includes-settings-helper-and-observer
+      - fresh-assurance-plan-capsule-result-and-runtime-proof-chain
+      - historical-attempts-preserved-separate-from-current-proof
+
   external-technology-cycle:
     requires_features: []
     path: fixtures/external-technology-cycle
