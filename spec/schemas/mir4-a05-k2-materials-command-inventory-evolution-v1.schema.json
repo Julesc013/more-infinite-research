@@ -1,0 +1,28 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"mir4-a05-k2-materials-command-inventory-evolution-v1.schema.json",
+  "title":"MIR4 A05 K2 materials command inventory evolution V1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema","kind","recorded_at","task","status","predecessor","current","transition","authority_flags","record_sha256"],
+  "properties":{
+    "schema":{"const":1},
+    "kind":{"const":"MIR4A05K2MaterialsCommandInventoryEvolutionV1"},
+    "recorded_at":{"type":"string","pattern":"^20[0-9]{2}-[0-9]{2}-[0-9]{2}T"},
+    "task":{"const":"A05/K2-materials"},
+    "status":{"const":"append-only-successor-passed"},
+    "predecessor":{"type":"object","additionalProperties":false,"required":["k2_03_evolution","inventory"],"properties":{"k2_03_evolution":{"$ref":"#/$defs/recordBinding"},"inventory":{"$ref":"#/$defs/predecessorInventory"}}},
+    "current":{"$ref":"#/$defs/currentInventory"},
+    "transition":{"type":"object","additionalProperties":false,"required":["classification","added_implementation_files","reconstructed_predecessor_sha256","public_command_count_unchanged","non_added_summary_counts_unchanged","transition_gates_remain_closed"],"properties":{"classification":{"const":"append-only-one-canonical-internal-writer"},"added_implementation_files":{"type":"array","minItems":1,"maxItems":1,"items":{"$ref":"#/$defs/implementation"}},"reconstructed_predecessor_sha256":{"$ref":"#/$defs/sha"},"public_command_count_unchanged":{"const":true},"non_added_summary_counts_unchanged":{"const":true},"transition_gates_remain_closed":{"const":true}}},
+    "authority_flags":{"type":"object","additionalProperties":false,"required":["public_command_authority","player_mutation_authorized","release_authority","signing_authority","publication_authority"],"properties":{"public_command_authority":{"const":false},"player_mutation_authorized":{"const":false},"release_authority":{"const":false},"signing_authority":{"const":false},"publication_authority":{"const":false}}},
+    "record_sha256":{"$ref":"#/$defs/sha"}
+  },
+  "$defs":{
+    "sha":{"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "path":{"type":"string","pattern":"^[A-Za-z0-9._/-]+$"},
+    "recordBinding":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","record_sha256"],"properties":{"path":{"$ref":"#/$defs/path"},"raw_sha256":{"$ref":"#/$defs/sha"},"record_sha256":{"$ref":"#/$defs/sha"}}},
+    "predecessorInventory":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","canonical_sha256","digest","command_count","canonical_internal_count"],"properties":{"path":{"const":"governance/automation/mir4-command-inventory-v1.json"},"raw_sha256":{"const":"45CE61E163C34A6BE41A02BDB7C2A375F05ED5E1B9E09DE5C36C6564A58B72BC"},"canonical_sha256":{"const":"45CE61E163C34A6BE41A02BDB7C2A375F05ED5E1B9E09DE5C36C6564A58B72BC"},"digest":{"const":"sha256:5074415336ac8c7b45dde4f8e851071352c33d7bfbf76679882cb891eddcfd9d"},"command_count":{"const":85},"canonical_internal_count":{"const":379}}},
+    "currentInventory":{"type":"object","additionalProperties":false,"required":["path","raw_sha256","canonical_sha256","digest","command_count","canonical_internal_count"],"properties":{"path":{"const":"governance/automation/mir4-command-inventory-v1.json"},"raw_sha256":{"$ref":"#/$defs/sha"},"canonical_sha256":{"$ref":"#/$defs/sha"},"digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"},"command_count":{"const":85},"canonical_internal_count":{"const":380}}},
+    "implementation":{"type":"object","additionalProperties":false,"required":["path","classification","sha256","hash_mode","lines","package_visible"],"properties":{"path":{"const":"tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1"},"classification":{"const":"canonical-internal"},"sha256":{"$ref":"#/$defs/sha"},"hash_mode":{"const":"canonical-text-v1"},"lines":{"type":"integer","minimum":1},"package_visible":{"const":false}}}
+  }
+}

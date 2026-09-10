@@ -7,15 +7,15 @@
   "material_source_bindings": [
     {
       "path": "src/mod/families/modern/prototypes/streams/productivity.lua",
-      "sha256": "C4D2D1C7E27EE3C8C004344B74DA84032B79813E50FC86018EE8D20BA10F6B04"
+      "sha256": "5F05D4CCF160E55512E6DC675A928CC69451FA78EB4DCC356C49BB732B027B62"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
-      "sha256": "99E25349BF5AEFE17A97A3397CED8549428939AED626B01BB0B26FC13EB49E0C"
+      "sha256": "0BC4EC274B03A55606CB791DEA3D98D0C405A59351E0B82EFAC4CC0299E6C8F4"
     },
     {
       "path": "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
-      "sha256": "107EBC191467C3AFEAFC513026CB2CA64E4792E248781429F70AE53908FA8208"
+      "sha256": "308206E0E04E5CE638B7C1E09B3614C427134590669A15D21FB23DD6B803D782"
     }
   ],
   "campaigns": [

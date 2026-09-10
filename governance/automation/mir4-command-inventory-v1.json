@@ -2849,6 +2849,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1",
+      "classification": "canonical-internal",
+      "sha256": "92A8BBA5794A8BDE688415C93C9422FA8D637E3976E3D3564BAE9A9FEA880C5F",
+      "hash_mode": "canonical-text-v1",
+      "lines": 168,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/museum/Build-MIRMuseumTarget.ps1",
       "classification": "historical",
       "sha256": "8EA8A94710A82C0AE35611C0B69C98BACE4084B3ED1FCD8AD384F7AF76B4D1E5",
@@ -5587,7 +5595,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 379,
+    "canonical_internal": 380,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5602,5 +5610,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5074415336ac8c7b45dde4f8e851071352c33d7bfbf76679882cb891eddcfd9d"
+  "digest": "sha256:5b7104c98e27dfe69b46033ed5499c508154634ae11d365f530d128bc5b55465"
 }

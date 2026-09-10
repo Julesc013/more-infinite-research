@@ -1,5 +1,6 @@
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local item_prototype_facts = require("prototypes.mir.index.item_prototype_facts")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
@@ -92,9 +93,10 @@ local function has_explicit_productivity_denial(recipe)
   return false
 end
 
--- A sufficient, deliberately conservative certificate for ordinary material routes.
--- Any potential return path is rejected, regardless of its present yield. This
--- cannot bless a catalytic/recovery loop merely because a few levels were safe.
+-- A sufficient, deliberately conservative graph guard for ordinary material
+-- routes. A possible return path remains rejected unless the separate,
+-- version-locked reviewed-forward-route certificate below proves the exact
+-- final route is an ordinary, deterministic, non-recovery process.
 local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
     local graph = {edges = {}, complete = true, edge_count = 0}
@@ -140,12 +142,196 @@ function R.material_route_is_acyclic(recipe)
   return true, "no-recipe-return-path"
 end
 
+-- This list is deliberately paired with recipe_facts.normalized_entry(). A
+-- reviewed route must bind all current semantic fields, and a future field in
+-- that authority fails closed here until the certificate contract is reviewed.
+local REVIEWED_ENTRY_FIELDS = {
+  "type", "name", "amount", "amount_min", "amount_max", "probability",
+  "independent_probability", "declared_probability", "declared_independent_probability",
+  "shared_probability", "extra_count_fraction", "catalyst_amount",
+  "ignored_by_productivity", "ignored_by_stats", "temperature",
+  "minimum_temperature", "maximum_temperature", "fluidbox_index",
+  "percent_spoiled", "always_fresh", "reset_freshness_on_craft",
+  "quality_min", "quality_max", "quality_change", "affected_by_quality"
+}
+
+local REVIEWED_ENTRY_FIELD_SET = {}
+for _, field in ipairs(REVIEWED_ENTRY_FIELDS) do REVIEWED_ENTRY_FIELD_SET[field] = true end
+
+local function has_only_reviewed_entry_fields(entry)
+  if type(entry) ~= "table" then return false end
+  for field in pairs(entry) do
+    if not REVIEWED_ENTRY_FIELD_SET[field] then return false end
+  end
+  return true
+end
+
+local function normalized_probability(entry, field)
+  local value = entry[field]
+  return tonumber(value == nil and 1 or value)
+end
+
+local function reviewed_entry_value(entry, field)
+  if field == "probability" or field == "independent_probability" then
+    return normalized_probability(entry, field)
+  end
+  return entry[field]
+end
+
+local function positive_fixed_amount(value)
+  local number = tonumber(value)
+  return number ~= nil and number == number and number ~= math.huge and number ~= -math.huge and number > 0
+end
+
+local function zero_or_nil(value)
+  return value == nil or (type(value) == "number" and value == 0)
+end
+
+local function ordinary_deterministic_entry(entry)
+  return positive_fixed_amount(entry.amount)
+    and normalized_probability(entry, "probability") == 1
+    and normalized_probability(entry, "independent_probability") == 1
+    and (entry.declared_probability == nil or entry.declared_probability == 1)
+    and (entry.declared_independent_probability == nil or entry.declared_independent_probability == 1)
+    and entry.shared_probability == nil
+    and entry.amount_min == nil
+    and entry.amount_max == nil
+    and zero_or_nil(entry.extra_count_fraction)
+    and zero_or_nil(entry.catalyst_amount)
+    and zero_or_nil(entry.ignored_by_productivity)
+    and zero_or_nil(entry.ignored_by_stats)
+end
+
+local function exact_entry(actual, expected)
+  if not has_only_reviewed_entry_fields(actual) or not has_only_reviewed_entry_fields(expected)
+    or not ordinary_deterministic_entry(actual) or not ordinary_deterministic_entry(expected) then
+    return false
+  end
+  for _, field in ipairs(REVIEWED_ENTRY_FIELDS) do
+    if reviewed_entry_value(actual, field) ~= reviewed_entry_value(expected, field) then
+      return false
+    end
+  end
+  return type(actual.type) == "string" and actual.type ~= ""
+    and type(actual.name) == "string" and actual.name ~= ""
+    and type(expected.type) == "string" and expected.type ~= ""
+    and type(expected.name) == "string" and expected.name ~= ""
+end
+
+local function exact_entries(entries, expected)
+  if type(entries) ~= "table" or type(expected) ~= "table" or #entries ~= #expected then
+    return false
+  end
+  for index, actual in ipairs(entries) do
+    if not exact_entry(actual, expected[index]) then return false end
+  end
+  return true
+end
+
+local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks)
+  if type(mod_locks) ~= "table" or type(runtime_mods) ~= "table" then return false end
+  local count = 0
+  for name, expected in pairs(mod_locks) do
+    count = count + 1
+    if type(name) ~= "string" or name == "" or type(expected) ~= "string" or expected == "" or runtime_mods[name] ~= expected then return false end
+  end
+  if count == 0 then return false end
+  observer_mod_locks = observer_mod_locks or {}
+  if type(observer_mod_locks) ~= "table" then return false end
+  for name, actual in pairs(runtime_mods) do
+    local expected = mod_locks[name] or observer_mod_locks[name]
+    if type(name) ~= "string" or type(actual) ~= "string" or expected ~= actual then return false end
+  end
+  return true
+end
+
+local function valid_mir32_fingerprint(value)
+  return type(value) == "string" and #value == 14
+    and string.match(value, "^mir32%-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]$") ~= nil
+end
+
+local function dense_array(value)
+  if type(value) ~= "table" then return false end
+  local count = 0
+  for index in pairs(value) do
+    if type(index) ~= "number" or index < 1 or index % 1 ~= 0 then return false end
+    count = count + 1
+  end
+  return count == #value
+end
+
+local function empty_dense_array(value)
+  return dense_array(value) and #value == 0
+end
+
+local function matching_profile(profiles, runtime_mods)
+  if type(profiles) ~= "table" or #profiles == 0 then return nil, "profile-missing" end
+  for _, profile in ipairs(profiles) do
+    if type(profile) == "table" and type(profile.id) == "string" and profile.id ~= ""
+      and valid_mir32_fingerprint(profile.canonical_risk_fingerprint)
+      and exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks) then
+      return profile, "matched"
+    end
+  end
+  return nil, "mod-lock"
+end
+
+local reviewed_forward_routes = {}
+
+function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, runtime_mods)
+  if type(certificate) ~= "table" or type(certificate.id) ~= "string" or certificate.id == ""
+    or type(certificate.evidence_id) ~= "string" or certificate.evidence_id == ""
+    or tonumber(certificate.maximum_productivity) ~= 3.0 then
+    return false, "certificate-identity"
+  end
+  if not fact or fact.name ~= recipe_name or fact.source_class ~= "ordinary" or fact.hidden
+    or fact.effective_allow_productivity ~= true or fact.declared_allow_productivity ~= true
+    or fact.allow_productivity ~= true then
+    return false, "permission-or-visibility"
+  end
+  local maximum_productivity = tonumber(fact.effective_maximum_productivity)
+  if maximum_productivity == nil or maximum_productivity > tonumber(certificate.maximum_productivity) then
+    return false, "maximum-productivity"
+  end
+  if not risk or risk.schema ~= 1 or risk.recipe ~= recipe_name
+    or not empty_dense_array(risk.hard_flags) or not empty_dense_array(risk.review_flags)
+    or not empty_dense_array(risk.shared_input_output) or tonumber(risk.evidence_confidence) ~= 1.0
+    or not valid_mir32_fingerprint(risk.risk_fingerprint) then
+    return false, "canonical-risk"
+  end
+  local profile, profile_reason = matching_profile(certificate.profiles, runtime_mods)
+  if not profile then return false, profile_reason end
+  if profile.canonical_risk_fingerprint ~= risk.risk_fingerprint then
+    return false, "canonical-risk"
+  end
+  if #(fact.variants or {}) ~= 1 then return false, "variant-count" end
+  local variant = fact.variants[1]
+  if variant.effective_allow_productivity ~= true or variant.declared_allow_productivity ~= true
+    or tonumber(variant.effective_maximum_productivity) == nil
+    or tonumber(variant.effective_maximum_productivity) > tonumber(certificate.maximum_productivity) then
+    return false, "variant-permission-or-cap"
+  end
+  if not exact_entries(variant.ingredients, certificate.ingredients)
+    or not exact_entries(variant.results, certificate.results) then
+    return false, "io-shape"
+  end
+  return true, "accepted"
+end
 local function should_skip_recipe(recipe_name, recipe, options)
   if options.require_acyclic_process then
     local admitted, reason = R.material_route_is_acyclic(recipe)
     if not admitted then
-      if log then log("[more-infinite-research] Material route omitted recipe=" .. recipe_name .. " reason=" .. reason) end
-      return true
+      local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
+      local certified, certificate_reason = false, "certificate-not-applicable"
+      if string.sub(reason, 1, 22) == "potential-return-path:" and certificate then
+        certified, certificate_reason = reviewed_forward_routes.admits(recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods)
+      end
+      if not certified then
+        local reported_reason = certificate and ("certificate-rejected:" .. certificate_reason) or reason
+        if log then log("[more-infinite-research] Material route omitted recipe=" .. recipe_name .. " reason=" .. reported_reason) end
+        return true
+      end
+      if log then log("[more-infinite-research] Material route admitted recipe=" .. recipe_name .. " reason=reviewed-forward-route:" .. certificate.id) end
     end
   end
   if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
@@ -281,6 +467,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
           place_result_entity_types = g.place_result_entity_types,
           reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
           require_acyclic_process = g.require_acyclic_process or spec.require_acyclic_process,
+          reviewed_forward_routes = g.reviewed_forward_routes or spec.reviewed_forward_routes,
           match_mode = g.mode or spec.mode,
           match_stream = g.match and g or spec
         })
@@ -324,6 +511,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
     place_result_entity_types = spec.place_result_entity_types,
     reject_explicit_productivity_denial = spec.reject_explicit_productivity_denial,
     require_acyclic_process = spec.require_acyclic_process,
+    reviewed_forward_routes = spec.reviewed_forward_routes,
     match_mode = spec.mode,
     match_stream = spec
   })
