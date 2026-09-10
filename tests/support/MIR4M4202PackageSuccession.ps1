@@ -18,12 +18,48 @@ function Test-MIR4M4202PackageSourceSuccession {
     $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
     if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)){return $false}
     $enabledGates=@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
-    return (
+    $bridgeValid=(
       [string]$receipt.package_source.predecessor_sha256-ceq$PredecessorSha256-and
-      [string]$receipt.package_source.current_sha256-ceq$CurrentSha256-and
       @($receipt.package_visible_delta).Count-eq0-and
       $enabledGates.Count-eq1-and
       $enabledGates[0]-ceq'bridge_retirement'
+    )
+    if(-not$bridgeValid){return $false}
+    if([string]$receipt.package_source.current_sha256-ceq$CurrentSha256){return $true}
+
+    $presentationPath=Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json'
+    $presentationSchemaPath=Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v2.schema.json'
+    if(-not(Test-Path -LiteralPath $presentationPath -PathType Leaf)-or-not(Test-Path -LiteralPath $presentationSchemaPath -PathType Leaf)){return $false}
+    $presentationRaw=Get-Content -Raw -LiteralPath $presentationPath
+    if(-not($presentationRaw|Test-Json -SchemaFile $presentationSchemaPath)){return $false}
+    $presentation=$presentationRaw|ConvertFrom-Json -Depth 100 -DateKind String
+    if(-not(Test-MIR4BootstrapRecordHash -Record $presentation)){return $false}
+
+    $acceptedBridge=@($presentation.receipts|Where-Object{
+      [string]$_.path-ceq'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'-and
+      [string]$_.hash_mode-ceq'record-self-hash'
+    })
+    if($acceptedBridge.Count-ne1-or[string]$acceptedBridge[0].sha256-cne[string]$receipt.record_sha256){return $false}
+
+    $packageAuthorityPath=Join-Path $RepoRoot ([string]$presentation.package_authority.path)
+    $sourceManifestPath=Join-Path $RepoRoot ([string]$presentation.source_manifest.path)
+    if(-not(Test-Path -LiteralPath $packageAuthorityPath -PathType Leaf)-or-not(Test-Path -LiteralPath $sourceManifestPath -PathType Leaf)){return $false}
+    $packageAuthority=Get-Content -Raw -LiteralPath $packageAuthorityPath|ConvertFrom-Json -Depth 100 -DateKind String
+    $sourceManifest=Get-Content -Raw -LiteralPath $sourceManifestPath|ConvertFrom-Json -Depth 100 -DateKind String
+    if(-not(Test-MIR4BootstrapRecordHash -Record $packageAuthority)-or-not(Test-MIR4BootstrapRecordHash -Record $sourceManifest)){return $false}
+
+    $enabledAuthorityFlags=@($presentation.authority_invariants.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
+    $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value})
+    return (
+      [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
+      [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
+      [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
+      (@($presentation.package_source.roots)-join'|')-ceq'src/mod|targets'-and
+      [string]$packageAuthority.record_sha256-ceq[string]$presentation.package_authority.record_sha256-and
+      [string]$sourceManifest.record_sha256-ceq[string]$presentation.source_manifest.record_sha256-and
+      $enabledAuthorityFlags.Count-eq1-and
+      $enabledAuthorityFlags[0]-ceq'one_emitter_preserved'-and
+      $enabledTransitionGates.Count-eq0
     )
   }catch{return $false}
 }

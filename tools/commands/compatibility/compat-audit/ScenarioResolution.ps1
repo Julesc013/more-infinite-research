@@ -21,6 +21,9 @@ function Resolve-MIRPortalScenario {
     [bool]$EnableSpaceAgeBundle,
     [string]$ClaimLevel = "loads",
     [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    [string[]]$RuntimeFixtures = @(),
+    [int]$RequiredReloadCount = 0,
+    [int]$MaxReloadDurationSeconds = 0,
     $Settings = $null,
     $ExpectedPlan = $null,
     [string]$SourceManifest = "",
@@ -106,6 +109,9 @@ function Resolve-MIRPortalScenario {
     -Failures $scenarioFailures `
     -ClaimLevel $ClaimLevel `
     -TimeoutSeconds $TimeoutSeconds `
+    -RuntimeFixtures $RuntimeFixtures `
+    -RequiredReloadCount $RequiredReloadCount `
+    -MaxReloadDurationSeconds $MaxReloadDurationSeconds `
     -Settings $Settings `
     -ExpectedPlan $ExpectedPlan `
     -SourceManifest $SourceManifest `
@@ -163,6 +169,16 @@ function Resolve-MIRLockScenario {
 function Invoke-MIRScenarioLoad {
   param([Parameter(Mandatory)]$Scenario)
 
+  $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+  $requiredReloadCount = [int](Get-MIRObjectProperty -Object $Scenario -Name "required_reload_count" -Default 0)
+  $maxReloadDurationSeconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "max_reload_duration_seconds" -Default 0)
+  $runtimeFixtures = @((Get-MIRObjectProperty -Object $Scenario -Name "runtime_fixtures" -Default @()) | ForEach-Object { [string]$_ })
+  if ($requiredReloadCount -lt 0 -or $requiredReloadCount -gt 2 -or
+      ($requiredReloadCount -eq 0 -and $maxReloadDurationSeconds -ne 0) -or
+      ($requiredReloadCount -gt 0 -and ($maxReloadDurationSeconds -lt 1 -or $maxReloadDurationSeconds -gt $scenarioTimeout))) {
+    throw "Scenario '$($Scenario.name)' has an invalid reload contract."
+  }
+
   $dependencyFailures = @($Scenario.dependency_failures)
   if ($dependencyFailures.Count -gt 0 -and -not $ContinueOnDependencyFailure) {
     [pscustomobject]@{
@@ -175,7 +191,10 @@ function Invoke-MIRScenarioLoad {
       dependency_failures = $dependencyFailures
       exit_code = $null
       timed_out = $false
-      timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+      timeout_seconds = $scenarioTimeout
+      required_reload_count = $requiredReloadCount
+      max_reload_duration_seconds = $maxReloadDurationSeconds
+      runtime_fixtures = $runtimeFixtures
       duration_seconds = 0.0
       skipped = $true
       skip_reason = "dependency_resolution_failure"
@@ -186,6 +205,10 @@ function Invoke-MIRScenarioLoad {
       stderr = ""
       audit_rows = @()
       sanitation_rows = @()
+      reloads = @()
+      reload_contract_passed = ($requiredReloadCount -eq 0)
+      science_contract_passed = $false
+      runtime_contract_passed = $false
     }
     return
   }
@@ -205,12 +228,22 @@ function Invoke-MIRScenarioLoad {
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
-  $enabledMods = @("more-infinite-research", "mir-validation-settings-overrides") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
+  $runtimeFixtureMods = @()
+  foreach ($runtimeFixture in $runtimeFixtures) {
+    $source = [IO.Path]::GetFullPath((Join-Path $repo.Path $runtimeFixture))
+    $info = Read-MIRJsonFile -Path (Join-Path $source 'info.json') -Fallback $null
+    $fixtureName = [string]$info.name
+    if ([string]::IsNullOrWhiteSpace($fixtureName)) { throw "Runtime fixture '$runtimeFixture' has no mod identity." }
+    $destination = Join-Path $modsDir $fixtureName
+    if (Test-Path -LiteralPath $destination) { throw "Runtime fixture mod destination already exists: $destination" }
+    Copy-Item -LiteralPath $source -Destination $destination -Recurse
+    $runtimeFixtureMods += $fixtureName
+  }
+
+  $enabledMods = @("more-infinite-research", "mir-validation-settings-overrides") + @($Scenario.resolved_mods) + @($Scenario.official_mods) + $runtimeFixtureMods
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
-  $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
-  $result = Move-MIRCompatScenarioEvidence -UserDataDir $userData -EvidenceRoot $retainedRunRoot -Result $result
   $expectedPlan = Get-MIRObjectProperty -Object $Scenario -Name "expected_plan" -Default ([pscustomobject]@{})
   $requiredStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "required_stream_science" -Default ([pscustomobject]@{})
   $forbiddenStreamScience = Get-MIRObjectProperty -Object $expectedPlan -Name "forbidden_stream_science" -Default ([pscustomobject]@{})
@@ -279,25 +312,43 @@ function Invoke-MIRScenarioLoad {
       }
     }
   )
-  $stdoutText = if (-not [string]::IsNullOrWhiteSpace([string]$result.stdout) -and
-      (Test-Path -LiteralPath ([string]$result.stdout) -PathType Leaf)) {
-    [IO.File]::ReadAllText([string]$result.stdout)
-  } else { "" }
+  $initialLogText = @(
+    foreach ($logPath in @([string]$result.stdout, [string]$result.factorio_log)) {
+      if (-not [string]::IsNullOrWhiteSpace($logPath) -and (Test-Path -LiteralPath $logPath -PathType Leaf)) {
+        [IO.File]::ReadAllText($logPath)
+      }
+    }
+  ) -join "`n"
   $requiredLogAssertions = @(
     foreach ($fragment in @(Get-MIRObjectProperty -Object $expectedPlan -Name "required_log_fragments" -Default @())) {
       $text = [string]$fragment
-      [pscustomobject]@{fragment=$text; passed=$stdoutText.Contains($text, [StringComparison]::Ordinal)}
+      [pscustomobject]@{fragment=$text; passed=$initialLogText.Contains($text, [StringComparison]::Ordinal)}
     }
   )
   $forbiddenLogAssertions = @(
     foreach ($fragment in @(Get-MIRObjectProperty -Object $expectedPlan -Name "forbidden_log_fragments" -Default @())) {
       $text = [string]$fragment
-      [pscustomobject]@{fragment=$text; passed=(-not $stdoutText.Contains($text, [StringComparison]::Ordinal))}
+      [pscustomobject]@{fragment=$text; passed=(-not $initialLogText.Contains($text, [StringComparison]::Ordinal))}
     }
   )
   $runtimeAssertions = @($requiredAuditAssertions) + @($requiredLogAssertions) + @($forbiddenLogAssertions)
   $runtimeContractPassed = @($runtimeAssertions | Where-Object { $_.passed -ne $true }).Count -eq 0
-  [pscustomobject]@{
+  $initialContractsPassed = $result.passed -and $scienceContractPassed -and $runtimeContractPassed
+  $reloadContract = if ($requiredReloadCount -gt 0 -and $initialContractsPassed) {
+    Invoke-MIRFactorioReloadContract `
+      -FactorioBin $FactorioBin `
+      -UserDataDir $userData `
+      -ScenarioName $Scenario.name `
+      -SavePath $result.save `
+      -RequiredReloadCount $requiredReloadCount `
+      -MaxReloadDurationSeconds $maxReloadDurationSeconds `
+      -RequiredLogFragments @(Get-MIRObjectProperty -Object $expectedPlan -Name "required_reload_log_fragments" -Default @())
+  } else {
+    [pscustomobject]@{ attempted = $false; reloads = @(); passed = ($requiredReloadCount -eq 0) }
+  }
+  $reloads = @($reloadContract.reloads)
+  $reloadContractPassed = [bool]$reloadContract.passed
+  $scenarioResult = [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
     requested_mods = @($Scenario.requested_mods)
@@ -309,15 +360,25 @@ function Invoke-MIRScenarioLoad {
     timed_out = $result.timed_out
     timeout_seconds = $result.timeout_seconds
     duration_seconds = [double]$result.duration_seconds
+    required_reload_count = $requiredReloadCount
+    max_reload_duration_seconds = $maxReloadDurationSeconds
+    runtime_fixtures = $runtimeFixtures
     skipped = $false
     skip_reason = ""
     process_passed = [bool]$result.passed
-    passed = ($result.passed -and $scienceContractPassed -and $runtimeContractPassed)
+    passed = ($result.passed -and $scienceContractPassed -and $runtimeContractPassed -and $reloadContractPassed)
     save = $result.save
+    save_sha256 = $result.save_sha256
     stdout = $result.stdout
+    stdout_sha256 = $result.stdout_sha256
     stderr = $result.stderr
+    stderr_sha256 = $result.stderr_sha256
+    factorio_log = $result.factorio_log
+    factorio_log_sha256 = $result.factorio_log_sha256
     audit_rows = @($result.audit_rows)
     sanitation_rows = @($result.sanitation_rows)
+    reloads = $reloads
+    reload_contract_passed = $reloadContractPassed
     science_contract_passed = $scienceContractPassed
     science_assertions = $scienceAssertions
     forbidden_science_assertions = $forbiddenScienceAssertions
@@ -326,4 +387,5 @@ function Invoke-MIRScenarioLoad {
     required_log_assertions = $requiredLogAssertions
     forbidden_log_assertions = $forbiddenLogAssertions
   }
+  Move-MIRCompatScenarioEvidence -UserDataDir $userData -EvidenceRoot $retainedRunRoot -Result $scenarioResult
 }

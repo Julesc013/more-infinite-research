@@ -21,6 +21,13 @@ paths:
   mir4.a03.receipt-schema: spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json
   mir4.a03.evidence-writer: tools/commands/mir4/Write-MIR4A00A03Evidence.ps1
   mir4.a03.execution-proof-writer: tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1
+  mir4.a04.runtime-proof: spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json
+  mir4.a04.closure: .mir/releases/waves/mir4-r0/MIR4-K2-Science-A04-ClosureV1.json
+  mir4.a04.runtime-proof-schema: spec/schemas/mir4-a04-k2-science-runtime-proof-v1.schema.json
+  mir4.a04.closure-schema: spec/schemas/mir4-a04-k2-science-closure-v1.schema.json
+  mir4.a04.writer: tools/commands/mir4/Write-MIR4A04K2ScienceClosure.ps1
+  mir4.a04.closure-test: tests/mir4/Test-MIR4A04K2ScienceClosure.ps1
+  mir4.a04.custody: spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science
   mir4.patch-rehearsal.patch-policy: spec/releases/mir4-patch-policy-v1.json
   mir4.patch-rehearsal.defect-contract: contracts/release/mir4-defect-record-v1.schema.json
   mir4.patch-rehearsal.realization-contract: contracts/release/mir4-change-realization-v1.schema.json

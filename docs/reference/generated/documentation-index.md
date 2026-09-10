@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 442 pages as of 2026-09-09.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 442 pages as of 2026-09-11.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -79,7 +79,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-07 |
+| docs/architecture/module-boundaries.md | MIR 3.0.0 Repository Structure | current | maintainer | explanation | mir-maintainers | 2026-09-11 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -180,7 +180,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/developer-tools.md | Developer Tools | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/documentation-governance.md | Documentation Governance | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/factorio-2.1-experimental-channel.md | Factorio 2.1 Experimental Channel Policy | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
-| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
+| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-09-11 |
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |

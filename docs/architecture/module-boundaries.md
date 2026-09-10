@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-09-07
+last_reviewed: 2026-09-11
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -842,7 +842,9 @@ Terminal shadow projection treats product source and assurance source as separat
 
 `prototypes/mir/capabilities/science_integration/production_route_policy.lua` owns `SciencePackProductionRoutePolicyV1`. It treats alternate science-pack recipes as an OR set, rejects unreachable routes, removes graph-dominated and strictly heavier science-burden routes, and compares deterministic progression facts before using technology and recipe names as final tie-breaks. `pack_production_reachability.lua` derives route facts and caches the selected route in CompilerContext without mutating prototypes.
 
-`prototypes/mir/compatibility/policies/k2_science_phase.lua` owns `K2SciencePhasePolicyV2`. It admits two target-specific profiles: Factorio 2.1 with Krastorio 2 `>=2.1.2 <2.1.3` plus K2SO `>=2.0.11 <2.0.14`, and Factorio 2.0 standalone K2SO `>=1.6.21 <1.6.22` with Krastorio 2 explicitly absent. Version admission is necessary but insufficient: every science identity required by the matched profile must exist as a valid research-pack prototype. The 2.1 profile additionally requires `kr-basic-tech-card`; the standalone 2.0 profile reflects the exact final graph where that retired prototype is absent. The policy remains a pure, idempotent ingredient-list normalization consumed by stream and base-continuation planning after lab compatibility is resolved. Because it only removes ingredients from an already lab-compatible set, the normalized set remains accepted by the same lab. It preserves stable technology identities and ingredient shapes, fails closed outside the bounded version and capability envelope, and never invokes or mutates K2's private finalization code.
+The shipped Factorio 2.1 player authority is `targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua`, which owns `K2SciencePhasePolicyV1` for the exact admitted Krastorio 2 `2.1.2` plus K2SO `2.0.13` pair. It is a pure, idempotent ingredient-list normalization applied before final lab selection: production-or-utility phase research drops `kr-basic-tech-card`, while advanced space, matter, or singularity phase research drops the retired early packs. Phase-trigger witnesses remain available to lab selection through the required-pack contract, and the final planner must still select a nonempty set accepted by an active lab. The policy preserves stable technology identities, ingredient order, shapes, and amounts; fails closed outside the exact version pair; and never invokes or mutates K2's private finalization code.
+
+The root `prototypes/mir/compatibility/policies/k2_science_phase.lua` implementation owns `K2SciencePhasePolicyV2RootPreview` only. Its broader Factorio 2.1 and standalone Factorio 2.0 profiles are package-excluded preview architecture and cannot qualify, replace, or make public claims for the shipped F210 policy. Promotion of that preview requires an independently admitted package-source transition and target-specific runtime, progression, save, and reload proof.
 
 ## MIR 4 W06 ProcessIR boundary
 

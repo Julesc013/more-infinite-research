@@ -37,6 +37,15 @@ function Assert-MIRProperty {
   }
   return $Object.$Name
 }
+function Get-MIRObjectProperty {
+  param($Object, [string]$Name, $Default = $null)
+  if ($null -eq $Object) { return $Default }
+  $property = $Object.PSObject.Properties[$Name]
+  if ($null -eq $property) { return $Default }
+  return $property.Value
+}
+
+. (Join-Path $RepoRoot "tools/lib/compatibility/FactorioRunner.ps1")
 
 foreach ($relativePath in $manifestPaths) {
   $path = Join-Path $RepoRoot $relativePath
@@ -147,13 +156,71 @@ foreach ($relativePath in $manifestPaths) {
 
     $timeout = [int](Assert-MIRProperty -Object $scenario -Name "timeout_seconds" -Context $context)
     if ($timeout -lt 1 -or $timeout -gt 3600) { throw "$context timeout_seconds must be between 1 and 3600." }
+    Assert-MIRManualScenarioRuntimeContract -Scenario $scenario -ManifestPath $relativePath -RepoRoot $RepoRoot
     if ($scenario.PSObject.Properties.Name -contains "mods" -or $scenario.PSObject.Properties.Name -contains "include_space_age") {
       throw "$context retains a schema-1 field; use roots and setup.include_space_age."
     }
   }
 }
 
+function Copy-MIRScenarioForNegativeTest {
+  param($Scenario)
+  return ($Scenario | ConvertTo-Json -Depth 30 | ConvertFrom-Json)
+}
+
+function Assert-MIRRuntimeContractRejects {
+  param($Scenario, [string]$Case)
+  try {
+    Assert-MIRManualScenarioRuntimeContract -Scenario $Scenario -ManifestPath "negative-$Case.json" -RepoRoot $RepoRoot
+  } catch {
+    return
+  }
+  throw "Runtime scenario contract accepted invalid case '$Case'."
+}
+
 $local21Manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\scenarios\local-2.1.json") | ConvertFrom-Json
+$k2Scenario = @($local21Manifest.scenarios | Where-Object { $_.name -eq "local-2-1-krastorio-spaced-out" })
+if ($k2Scenario.Count -ne 1) {
+  throw "validation/scenarios/local-2.1.json must contain exactly one local-2-1-krastorio-spaced-out scenario."
+}
+$k2 = $k2Scenario[0]
+if (@($k2.runtime_fixtures).Count -ne 1 -or
+    [string]$k2.runtime_fixtures[0] -cne "fixtures/assert-k2-science-progressed-reload-a04" -or
+    [int]$k2.required_reload_count -ne 2 -or
+    [int]$k2.max_reload_duration_seconds -ne 300 -or
+    @($k2.expected_plan.required_reload_log_fragments).Count -ne 1) {
+  throw "local-2-1-krastorio-spaced-out must bind the exact A04 progressed-save two-reload contract."
+}
+$expectedEarly = @("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "electromagnetic-science-pack")
+$expectedLate = @("production-science-pack", "space-science-pack")
+if ((@($k2.expected_plan.required_stream_science.research_advanced_circuit) -join "|") -cne ($expectedEarly -join "|") -or
+    (@($k2.expected_plan.required_stream_science.research_belts) -join "|") -cne ($expectedLate -join "|") -or
+    @($k2.expected_plan.forbidden_stream_science.research_advanced_circuit) -notcontains "kr-basic-tech-card") {
+  throw "local-2-1-krastorio-spaced-out must retain the exact early/late shipped F210 science expectations."
+}
+
+$badInteger = Copy-MIRScenarioForNegativeTest $k2
+$badInteger.required_reload_count = "2"
+Assert-MIRRuntimeContractRejects $badInteger "string-count"
+$badCount = Copy-MIRScenarioForNegativeTest $k2
+$badCount.required_reload_count = 3
+Assert-MIRRuntimeContractRejects $badCount "count-above-two"
+$badMaximum = Copy-MIRScenarioForNegativeTest $k2
+$badMaximum.max_reload_duration_seconds = 0
+Assert-MIRRuntimeContractRejects $badMaximum "zero-duration-with-reloads"
+$badFixtureShape = Copy-MIRScenarioForNegativeTest $k2
+$badFixtureShape.runtime_fixtures = "fixtures/assert-k2-science-progressed-reload-a04"
+Assert-MIRRuntimeContractRejects $badFixtureShape "fixture-not-array"
+$badFixturePath = Copy-MIRScenarioForNegativeTest $k2
+$badFixturePath.runtime_fixtures = @("../outside")
+Assert-MIRRuntimeContractRejects $badFixturePath "fixture-path-escape"
+$badFragmentShape = Copy-MIRScenarioForNegativeTest $k2
+$badFragmentShape.expected_plan.required_reload_log_fragments = "marker"
+Assert-MIRRuntimeContractRejects $badFragmentShape "fragment-not-array"
+$badFragment = Copy-MIRScenarioForNegativeTest $k2
+$badFragment.expected_plan.required_reload_log_fragments = @("")
+Assert-MIRRuntimeContractRejects $badFragment "empty-fragment"
+
 $corrundumScenario = @($local21Manifest.scenarios | Where-Object { $_.name -eq "local-2-1-corrundum-maxcap-13" })
 if ($corrundumScenario.Count -ne 1) {
   throw "validation/scenarios/local-2.1.json must contain exactly one local-2-1-corrundum-maxcap-13 scenario."

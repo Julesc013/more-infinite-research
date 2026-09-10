@@ -1995,9 +1995,9 @@
     {
       "path": "tools/commands/compatibility/compat-audit/Configuration.ps1",
       "classification": "canonical-internal",
-      "sha256": "71FD4007C0D109F2823312C6AB70D040D4786F9FB1963C9AD0C8ACF79A526F1C",
+      "sha256": "72B9D23C9D3E4B670DAE9A67F1ED8D0B5AC3B87635E584E2EAD3FE786366A5EE",
       "hash_mode": "canonical-text-v1",
-      "lines": 359,
+      "lines": 377,
       "package_visible": false
     },
     {
@@ -2011,33 +2011,33 @@
     {
       "path": "tools/commands/compatibility/compat-audit/ResultCollation.ps1",
       "classification": "canonical-internal",
-      "sha256": "3A5F427FDCB27C468FFA5B025FF7EF17681EA85D756488F4EBDD6A71C62B1CED",
+      "sha256": "E0249970504C2A8730CDBAEFB9DF4F2B367B422A99D2675697CF6FEC6B8BF266",
       "hash_mode": "canonical-text-v1",
-      "lines": 278,
+      "lines": 300,
       "package_visible": false
     },
     {
       "path": "tools/commands/compatibility/compat-audit/ScenarioDefinitions.ps1",
       "classification": "canonical-internal",
-      "sha256": "7837AF147F33612567785F7ECC5847D7A3CE3E8DCC47FFD68FCA74602FDBAF07",
+      "sha256": "9680D5B930D95582BEDC20BADA9D8B8CB752AEB3116413B85331ACDDE0D7FFD7",
       "hash_mode": "canonical-text-v1",
-      "lines": 388,
+      "lines": 389,
       "package_visible": false
     },
     {
       "path": "tools/commands/compatibility/compat-audit/ScenarioResolution.ps1",
       "classification": "canonical-internal",
-      "sha256": "D4EB8500BD727122EB0C0DCBFD49BB16BF19DCF7BE976AC1831E2E2BD745F39D",
+      "sha256": "6D478F0A6BD0C5F5EFBB167695F854586955404AC9CA22F15276D23AA0A03961",
       "hash_mode": "canonical-text-v1",
-      "lines": 330,
+      "lines": 392,
       "package_visible": false
     },
     {
       "path": "tools/commands/compatibility/compat-audit/ScenarioSelection.ps1",
       "classification": "canonical-internal",
-      "sha256": "D3E4AB2C5E32E87F5F2B8645E9168B1148EC50F8D224A0DCEF516C199327C6F7",
+      "sha256": "A734C5A39EF256378E81E4690FCAC1F3CC03968C0858D5A87F4C89865843DDFC",
       "hash_mode": "canonical-text-v1",
-      "lines": 212,
+      "lines": 215,
       "package_visible": false
     },
     {
@@ -2833,6 +2833,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Write-MIR4A04K2ScienceClosure.ps1",
+      "classification": "canonical-internal",
+      "sha256": "D2E670806EEA3ABD6BE61FB7AC134361E6F2BA83C8F76CB1D3D348DE72F655E3",
+      "hash_mode": "canonical-text-v1",
+      "lines": 120,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/museum/Build-MIRMuseumTarget.ps1",
       "classification": "historical",
       "sha256": "8EA8A94710A82C0AE35611C0B69C98BACE4084B3ED1FCD8AD384F7AF76B4D1E5",
@@ -3395,9 +3403,9 @@
     {
       "path": "tools/lib/compatibility/FactorioRunner.ps1",
       "classification": "canonical-internal",
-      "sha256": "D0B6AD1143EF23496BD5E8EC6E65B5D42DE2E451E6AFF69965F7B2BB57CFD57F",
+      "sha256": "09DBF8868CE1666353456462EBC696F04F98056153AEB46448EA89A892EF871A",
       "hash_mode": "canonical-text-v1",
-      "lines": 261,
+      "lines": 303,
       "package_visible": false
     },
     {
@@ -5571,7 +5579,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 377,
+    "canonical_internal": 378,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5586,5 +5594,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2135f205203d3298693e417353a5438aea6fde98d30fc03b2ca9ba8c0d3bcc64"
+  "digest": "sha256:b273fa46baacabae62bcb78f96b48fcb468dea3c770d7cf91058f1c881ec2014"
 }
