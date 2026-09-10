@@ -33,10 +33,11 @@
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"],
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
-    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
+    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
     "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
     "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
     "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
+    "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
     "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
     "bob-tin-production-gain-f210": ["runtime.bob-tin-production-gain"],
     "bob-tin-machine-matrix-f210": ["runtime.bob-tin-machine-matrix"],
@@ -383,6 +384,26 @@
         "static.mir4-historical-baseline",
         "static.mir4-development-contracts",
         "tooling.self-test"
+      ]
+    },
+    {
+      "id": "a02-component-reconciliation",
+      "patterns": [
+        "^tests/mir4/Test-MIR4A02Reconciliation[.]ps1$",
+        "^tools/commands/mir4/Write-MIR4A02Reconciliation[.]ps1$",
+        "^tools/lib/mir4/BootstrapMaterialization[.]ps1$",
+        "^tools/lib/mir4/bootstrap-materialization/",
+        "^tools/mir/application/package/TargetMaterializer[.]ps1$",
+        "^targets/(?:package-authority[.]json|f(?:210|200|110|100)/overlay[.]json)$",
+        "^src/mod/package-source[.]json$",
+        "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
+        "^spec/programmes/inputs/synthesis-2026-09-05/(?:COMPONENT_DELIVERY|SOURCES)[.]json$",
+        "^spec/platform/mir4-preview-v0/platform[.]json$",
+        "^spec/programmes/evidence/synthesis-2026-09-10/a02-(?:component-reconciliation|current-source-materializer-proof)[.]json$",
+        "^spec/schemas/mir4-(?:a02-component-reconciliation|current-source-materializer-proof)-v1[.]schema[.]json$"
+      ],
+      "tests": [
+        "static.mir4-a02-component-reconciliation"
       ]
     }
   ],

@@ -2817,6 +2817,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Write-MIR4A02Reconciliation.ps1",
+      "classification": "canonical-internal",
+      "sha256": "269EF7C2BDA0A433B40205C69941032ECD8E1FBBC0F68C3951AA9D6D9761DD68",
+      "hash_mode": "canonical-text-v1",
+      "lines": 375,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Write-MIR4A03K2K2SOExecutionProof.ps1",
       "classification": "canonical-internal",
       "sha256": "35E76BE936C82CEA9DBFE22FD28E1C8963196CA2D7FCE6A88D441B3EDAEB7B64",
@@ -5563,7 +5571,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 376,
+    "canonical_internal": 377,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5578,5 +5586,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3d0028a3546b59f96075e767769da9661f5ba3cfe2a1098b6fbb6229a2304a78"
+  "digest": "sha256:2135f205203d3298693e417353a5438aea6fde98d30fc03b2ca9ba8c0d3bcc64"
 }
