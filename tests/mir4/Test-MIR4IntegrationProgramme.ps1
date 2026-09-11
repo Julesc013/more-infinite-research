@@ -85,11 +85,85 @@ if((Get-MIRCPAuthoredDate -Timestamp '2026-09-06T00:00:00+10:00') -cne '2026-09-
    (Get-MIRCPAuthoredDate -Timestamp '2026-09-05T14:00:00Z') -cne '2026-09-05') { throw '[synthesis-timezone-regression]' }
 if(@(Get-Content -LiteralPath (Join-Path $RepoRoot 'todo.md') | Where-Object { $_ -ceq "Generated: $date" }).Count -ne 1) { throw '[synthesis-queue-date]' }
 
-# Development outcomes are exact source/receipt bindings, never support authority.
-$community=Get-Content -Raw (Join-Path $RepoRoot 'spec/programmes/evidence/community-2026-09-06/outcomes.json') | ConvertFrom-Json -Depth 100
+# Development outcomes are exact historical source/receipt bindings, never support authority.
+function Assert-MIR4CommunitySafeRelativePath([string]$RelativePath) {
+ if([string]::IsNullOrWhiteSpace($RelativePath) -or [IO.Path]::IsPathRooted($RelativePath) -or
+    $RelativePath -cnotmatch '^[A-Za-z0-9._/-]+$' -or $RelativePath -cmatch '(^|/)\.\.?($|/)') {
+  throw "[community-evidence-unsafe-path] $RelativePath"
+ }
+ return $RelativePath
+}
+function Resolve-MIR4CommunityRepositoryPath([string]$RelativePath) {
+ $safeRelativePath=Assert-MIR4CommunitySafeRelativePath $RelativePath
+ $repositoryPath=[IO.Path]::GetFullPath($RepoRoot)
+ $fullPath=[IO.Path]::GetFullPath((Join-Path $repositoryPath ($safeRelativePath.Replace('/',[IO.Path]::DirectorySeparatorChar))))
+ if(-not $fullPath.StartsWith($repositoryPath+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
+  throw "[community-evidence-unsafe-path] $RelativePath"
+ }
+ return $fullPath
+}
+function Get-MIR4CommunityGitBlob([string]$Commit,[string]$RelativePath) {
+ $safeRelativePath=Assert-MIR4CommunitySafeRelativePath $RelativePath
+ $objectIdRows=@(& git -C $RepoRoot rev-parse --verify "$Commit`:$safeRelativePath" 2>$null)
+ if($LASTEXITCODE -ne 0 -or $objectIdRows.Count -ne 1) { throw "[community-evidence-snapshot-blob] $safeRelativePath" }
+ $objectId=([string]$objectIdRows[0]).Trim()
+ if($objectId -cnotmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { throw "[community-evidence-snapshot-object] $safeRelativePath" }
+ $startInfo=[Diagnostics.ProcessStartInfo]::new()
+ $startInfo.FileName='git'
+ $startInfo.WorkingDirectory=$RepoRoot
+ $startInfo.UseShellExecute=$false
+ $startInfo.RedirectStandardOutput=$true
+ $startInfo.RedirectStandardError=$true
+ foreach($argument in @('cat-file','blob',$objectId)) { [void]$startInfo.ArgumentList.Add($argument) }
+ $process=[Diagnostics.Process]::new()
+ $process.StartInfo=$startInfo
+ if(-not $process.Start()) { throw "[community-evidence-snapshot-blob] $safeRelativePath" }
+ $standardErrorTask=$process.StandardError.ReadToEndAsync()
+ $memory=[IO.MemoryStream]::new()
+ try {
+  $process.StandardOutput.BaseStream.CopyTo($memory)
+  $process.WaitForExit()
+  $standardError=$standardErrorTask.GetAwaiter().GetResult()
+  if($process.ExitCode -ne 0) { throw "[community-evidence-snapshot-blob] $safeRelativePath $standardError" }
+  return [pscustomobject]@{ object_id=$objectId; bytes=$memory.ToArray() }
+ } finally {
+  $memory.Dispose()
+  $process.Dispose()
+ }
+}
+function Test-MIR4CommunityByteIdentity([byte[]]$Expected,[byte[]]$Actual) {
+ if($Expected.Length -ne $Actual.Length) { return $false }
+ for($index=0;$index -lt $Expected.Length;$index++) {
+  if($Expected[$index] -ne $Actual[$index]) { return $false }
+ }
+ return $true
+}
+function Get-MIR4CommunityByteSha256([byte[]]$Bytes) {
+ $algorithm=[Security.Cryptography.SHA256]::Create()
+ try { return (($algorithm.ComputeHash($Bytes) | ForEach-Object { $_.ToString('X2') }) -join '') }
+ finally { $algorithm.Dispose() }
+}
+$communityRelativePath='spec/programmes/evidence/community-2026-09-06/outcomes.json'
+$communityPath=Resolve-MIR4CommunityRepositoryPath $communityRelativePath
+if(-not (Test-Path -LiteralPath $communityPath -PathType Leaf)) { throw '[community-evidence-snapshot-record]' }
+$snapshotCommitRows=@(& git -C $RepoRoot log -1 --format=%H -- $communityRelativePath 2>$null)
+if($LASTEXITCODE -ne 0 -or $snapshotCommitRows.Count -ne 1) { throw '[community-evidence-snapshot-commit]' }
+$snapshotCommit=([string]$snapshotCommitRows[0]).Trim()
+if($snapshotCommit -cnotmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { throw '[community-evidence-snapshot-commit]' }
+& git -C $RepoRoot merge-base --is-ancestor $snapshotCommit HEAD 2>$null
+if($LASTEXITCODE -ne 0) { throw '[community-evidence-snapshot-not-ancestor]' }
+$snapshotOutcomes=Get-MIR4CommunityGitBlob $snapshotCommit $communityRelativePath
+$currentOutcomesBytes=[IO.File]::ReadAllBytes($communityPath)
+if(-not (Test-MIR4CommunityByteIdentity $snapshotOutcomes.bytes $currentOutcomesBytes)) { throw '[community-evidence-snapshot-record-bytes]' }
+$community=[Text.Encoding]::UTF8.GetString($snapshotOutcomes.bytes) | ConvertFrom-Json -Depth 100
 if($community.release_candidate_ready -or $community.release_authority -or $community.campaigns.Count -ne 3) { throw '[community-evidence-scope]' }
 foreach($binding in @($community.material_source_bindings)+@($community.browser_source_bindings)+@($community.runtime_receipts)) {
- if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $binding.path)).Hash -cne $binding.sha256) { throw "[community-evidence-binding] $($binding.path)" }
+ if($null -eq $binding -or $null -eq $binding.PSObject.Properties['path'] -or $null -eq $binding.PSObject.Properties['sha256']) { throw '[community-evidence-binding-shape]' }
+ $bindingPath=Assert-MIR4CommunitySafeRelativePath ([string]$binding.path)
+ $expectedSha256=[string]$binding.sha256
+ if($expectedSha256 -cnotmatch '^[A-F0-9]{64}$') { throw "[community-evidence-binding-sha256] $bindingPath" }
+ $snapshotBinding=Get-MIR4CommunityGitBlob $snapshotCommit $bindingPath
+ if((Get-MIR4CommunityByteSha256 $snapshotBinding.bytes) -cne $expectedSha256) { throw "[community-evidence-binding] $bindingPath" }
 }
 $manifest=Get-Content -Raw (Join-Path $RepoRoot 'src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json') | ConvertFrom-Json -Depth 100
 $declarations=@($requests.requests | Where-Object { $null -ne $_.PSObject.Properties['material_route_declaration'] })
