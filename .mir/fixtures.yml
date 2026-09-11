@@ -1531,6 +1531,31 @@ fixtures:
       - full-BA-07-or-PROG-01
       - release-readiness
 
+  a06-aluminium-final-state-matrix:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-aluminium-final-state
+    harness: tests/runtime/Test-MIRA06AluminiumFinalState.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: bob-3.0.0-3.0.1_or_angel-2.1.0-2.1.2_or_combined-bob-angel-with-official-expansions
+    validates:
+      - F210-Bob-only-Aluminium-single-owner-route-and-red-green-progression
+      - F210-Angel-only-two-final-Aluminium-routes-single-owner-and-red-green-blue-progression
+      - exact-environment-resolved-item-icon-and-localised-name
+      - permission-unset-Angel-intermediates-remain-unowned
+      - F210-combined-Aluminium-all-three-routes-withheld-by-exact-acyclic-guard-reasons
+      - combined-hidden-Bob-route-and-ownerlessness-preserved
+    non_claims:
+      - combined-productivity-admission
+      - all-enabled-Bob-productivity-admission
+      - production-gain-or-balance
+      - predecessor-upgrade-or-migration
+      - infinite-continuation
+      - full-BA-01-or-A06-completion
+      - F200
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity

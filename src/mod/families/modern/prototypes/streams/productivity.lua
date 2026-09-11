@@ -761,8 +761,33 @@ local function material_family(item, routes, mod_names)
   }
 end
 
+-- Aluminium uses one stable technology identity, but the eligible final
+-- manufacturing routes and the player-facing item differ by installed
+-- ecosystem. The graph guard remains responsible for withholding unsafe or
+-- hidden candidates in each final mod state.
+local function aluminium_mod_active(name)
+  return (mods and mods[name] ~= nil) or (script and script.active_mods and script.active_mods[name] ~= nil)
+end
+
+local function aluminium_material_family()
+  if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
+    return material_family("bob-aluminium-plate", {
+      "bob-aluminium-plate",
+      "angels-plate-aluminium",
+      "angels-plate-aluminium-2"
+    }, {"bobplates", "angelssmelting"})
+  end
+  if aluminium_mod_active("angelssmelting") then
+    return material_family("angels-plate-aluminium", {
+      "angels-plate-aluminium",
+      "angels-plate-aluminium-2"
+    }, {"angelssmelting"})
+  end
+  return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
+end
+
 -- Separate requested materials share policy, never translated-name matching.
-streams.research_material_aluminium = material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_aluminium = aluminium_material_family()
 streams.research_material_gold = material_family("bob-gold-plate", {"bob-gold-plate"}, {"bobplates", "angelssmelting"})
 streams.research_material_lead = material_family("bob-lead-plate", {"bob-lead-plate", "bob-lead-plate-2"}, {"bobplates", "angelssmelting"})
 streams.research_material_nickel = material_family("bob-nickel-plate", {"bob-nickel-plate"}, {"bobplates", "angelssmelting"})
