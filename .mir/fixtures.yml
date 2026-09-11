@@ -1556,6 +1556,28 @@ fixtures:
       - F200
       - release-readiness
 
+  a06-bob-aluminium-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-aluminium-qualification
+    harness: tests/runtime/Test-MIRA06BobAluminiumQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-Aluminium-reviewed-forward-route-certificate
+      - exact-post-finalizer-canonical-risk-and-deterministic-IO-binding
+      - exact-single-owner-0.02-per-completed-tier-and-red-green-progression
+      - deterministic-100-102-104-106-production-at-completed-levels-0-through-3
+      - direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - broader-route-safety-or-balance
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity

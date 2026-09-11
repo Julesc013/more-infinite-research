@@ -842,6 +842,31 @@ streams.research_material_glass.reviewed_forward_routes = {
   ["kr-glass"] = k2_forward_route("A10-K2-glass-v1","A05-K2-05-locked-current-v1","mir32-a8a1f439",{{type="item",name="kr-sand",amount=16}},{{type="item",name="kr-glass",amount=8}})
 }
 
+-- A06-reviewed Bob-only Aluminium route. This certificate is deliberately
+-- narrower than the material family: it binds the one F210 official+Bob
+-- profile observed after finalization, including the package-excluded
+-- observer mods. Angel or combined profiles cannot match this lock.
+local function bob_aluminium_forward_route()
+  return {
+    id="A06-Bob-Aluminium-F210-2.1.17-v1",
+    evidence_id="A06-Bob-Aluminium-F210-locked-current-v1",
+    maximum_productivity=3.0,
+    profiles={{
+      id="Bob-3.0.0-3.0.1-F210-2.1.17",
+      mod_locks={base="2.1.17",["elevated-rails"]="2.1.17",quality="2.1.17",recycler="2.1.17",["space-age"]="2.1.17",["more-infinite-research"]="4.2.21000",boblibrary="3.0.0",bobores="3.0.0",bobplates="3.0.1"},
+      observer_mod_locks={["mir-fixture-assert-a06-bob-aluminium-qualification"]="0.1.0",["mir-validation-settings-overrides"]="0.1.0"},
+      canonical_risk_fingerprint="mir32-fd133af7"
+    }},
+    ingredients={{type="item",name="bob-alumina",amount=2},{type="item",name="carbon",amount=1}},
+    results={{type="item",name="bob-aluminium-plate",amount=2}}
+  }
+end
+if aluminium_mod_active("bobplates") and not aluminium_mod_active("angelssmelting") then
+  streams.research_material_aluminium.reviewed_forward_routes = {
+    ["bob-aluminium-plate"] = bob_aluminium_forward_route()
+  }
+end
+
 -- Tin smelting is available initially on the exact Bob core lock.
 streams.research_material_tin.science_packs = {"automation-science-pack"}
 

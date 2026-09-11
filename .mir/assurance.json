@@ -314,8 +314,8 @@
     },
     {
       "id": "a06-aluminium-final-state-f210",
-      "patterns": ["^fixtures/assert-a06-aluminium-final-state/", "^tests/runtime/Test-MIRA06(?:Aluminium|BobAluminium|AngelAluminium|BobAngelAluminium)FinalState[.]ps1$", "^src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^src/mod/families/modern/prototypes/mir/(?:pipeline/recipe_productivity_permissions|index/productivity_owners|policy/competing_productivity)[.]lua$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/package-authority[.]json$", "^[.]mir/fixtures[.]yml$", "^validation/tests[.]yml$"],
-      "tests": ["runtime.a06-bob-aluminium-final-state", "runtime.a06-angel-aluminium-final-state", "runtime.a06-bob-angel-aluminium-final-state"]
+      "patterns": ["^fixtures/assert-a06(?:-aluminium-final-state|-bob-aluminium-qualification)/", "^tests/runtime/Test-MIRA06(?:Aluminium|BobAluminium|AngelAluminium|BobAngelAluminium)FinalState[.]ps1$", "^tests/runtime/Test-MIRA06BobAluminiumQualification[.]ps1$", "^src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^src/mod/families/modern/prototypes/mir/(?:pipeline/recipe_productivity_permissions|index/productivity_owners|policy/competing_productivity)[.]lua$", "^src/mod/families/modern/prototypes/streams/productivity[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/package-authority[.]json$", "^[.]mir/fixtures[.]yml$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.a06-bob-aluminium-final-state", "runtime.a06-bob-aluminium-qualification", "runtime.a06-angel-aluminium-final-state", "runtime.a06-bob-angel-aluminium-final-state"]
     },
     {
       "id": "k2-materials-bounded-f210",
