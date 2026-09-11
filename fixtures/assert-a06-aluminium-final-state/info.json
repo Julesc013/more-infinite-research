@@ -1,0 +1,17 @@
+{
+  "name": "mir-fixture-assert-a06-aluminium-final-state",
+  "version": "0.1.0",
+  "title": "MIR A06 Aluminium final-state observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "? boblibrary",
+    "? bobores",
+    "? bobplates",
+    "? angelsrefining",
+    "? angelspetrochem",
+    "? angelssmelting",
+    "? more-infinite-research"
+  ]
+}

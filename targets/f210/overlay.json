@@ -3857,8 +3857,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 32380,
-      "expected_sha256": "5F05D4CCF160E55512E6DC675A928CC69451FA78EB4DCC356C49BB732B027B62",
+      "expected_bytes": 33350,
+      "expected_sha256": "CAB80FC427C4774F8B15C4BD76FDD8B0F1DF47452A94BB8D543D18DEC135C679",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3983,5 +3983,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "687187D3A7D6056222867A020C7638A055D4C1090353BAD9B5987ACF0F49C160"
+  "record_sha256": "FF0FF0CDB9967888EA1CB9E371DCBA9AE3C8F6A7A956FF77EE177F1E29A23520"
 }
