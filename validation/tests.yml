@@ -4524,6 +4524,27 @@
       ]
     },
     {
+      "id": "runtime.a06-bob-lead-qualification",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRA06BobLeadQualification.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIRA06BobLeadQualification.ps1",
+        "fixtures/assert-a06-bob-lead-qualification/**",
+        "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+        "src/mod/families/modern/prototypes/mir/index/productivity_owners.lua",
+        "src/mod/families/modern/prototypes/mir/policy/competing_productivity.lua",
+        "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.a06-angel-aluminium-final-state",
       "kind": "runtime",
       "layer": "F3",
