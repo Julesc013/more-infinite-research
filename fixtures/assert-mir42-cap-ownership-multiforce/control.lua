@@ -43,6 +43,15 @@ local function configure_force(force, level, enabled, visible_when_disabled)
   return technology
 end
 
+local function configure_force_before_cap_transition(force, level, enabled, visible_when_disabled)
+  force.enable_all_prototypes()
+  local technology = technology_for(force)
+  technology.enabled = enabled
+  technology.visible_when_disabled = visible_when_disabled
+  technology.level = level
+  return technology
+end
+
 local function force_state(force_name)
   local force = game.forces[force_name]
   if not force then fail("named force is absent " .. force_name) end
@@ -170,8 +179,12 @@ local function advance_seed_to_capped()
 
   local merge_destination = game.create_force("merge-destination")
   local merge_source = game.create_force("merge-source")
-  configure_force(merge_destination, 4, true, false)
-  configure_force(merge_source, 4, true, false)
+  -- Establish the foreign baseline before crossing the cap. Assigning an
+  -- infinite technology level raises research events immediately, so doing
+  -- this in the opposite order would make the engine-default visibility the
+  -- value MIR truthfully owns and restores.
+  configure_force_before_cap_transition(merge_destination, 4, true, false)
+  configure_force_before_cap_transition(merge_source, 4, true, false)
   merge_destination.reset_technology_effects()
   merge_source.reset_technology_effects()
   expect("merge-destination", 4, false, true)
