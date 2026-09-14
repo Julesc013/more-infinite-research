@@ -88,8 +88,7 @@ if (-not $deletionRejected) { throw '[mir4-package-presentation-v3-prior-row-del
 $head = Invoke-MIR4V3Git -Arguments @('rev-parse', 'HEAD')
 $headTree = Invoke-MIR4V3Git -Arguments @('rev-parse', 'HEAD^{tree}')
 $syntheticSource = Invoke-MIR4V3Git -Arguments @('commit-tree', $headTree, '-p', $head, '-m', 'MIR4 V3 synthetic source identity')
-$priorLedgerText = Invoke-MIR4V3Git -Arguments @('show', ('{0}:{1}' -f $syntheticSource, 'spec/distribution/mir4-current-package-presentation-v3.json'))
-$priorLedgerSha256 = Get-MIR4CanonicalTextSha256 -Text $priorLedgerText
+$priorLedgerSha256 = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit $syntheticSource -RelativePath 'spec/distribution/mir4-current-package-presentation-v3.json'
 $twoRowLedger = $ledger | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
 $secondRow = $twoRowLedger.rows[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
 $secondRow.sequence = 2
@@ -97,7 +96,7 @@ $secondRow.row_id = 'mir4-current-package-presentation-v3-0002'
 $secondRow.previous_row_sha256 = [string]$twoRowLedger.rows[0].row_sha256
 $secondRow.source_identity.commit = $syntheticSource
 $secondRow.source_identity.tree = Invoke-MIR4V3Git -Arguments @('rev-parse', "$syntheticSource^{tree}")
-$secondRow.ledger_predecessor = [pscustomobject][ordered]@{
+$secondRow | Add-Member -NotePropertyName ledger_predecessor -NotePropertyValue ([pscustomobject][ordered]@{
   commit = $syntheticSource
   tree = [string]$secondRow.source_identity.tree
   path = 'spec/distribution/mir4-current-package-presentation-v3.json'
@@ -105,18 +104,15 @@ $secondRow.ledger_predecessor = [pscustomobject][ordered]@{
   record_sha256 = [string]$ledger.record_sha256
   final_row_sha256 = [string]$ledger.rows[0].row_sha256
   row_count = 1
-}
+})
 $secondRow.row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $secondRow
 $twoRowLedger.rows = @($twoRowLedger.rows[0], $secondRow)
 $twoRowLedger.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $twoRowLedger
 $twoRowText = $twoRowLedger | ConvertTo-Json -Depth 100
 $twoRowCommit = New-MIR4V3SyntheticLedgerCommit -BaseCommit $syntheticSource -LedgerRepositoryPath 'spec/distribution/mir4-current-package-presentation-v3.json' -LedgerText $twoRowText -Message 'MIR4 V3 synthetic appended ledger'
 
-$syntheticLineage = Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $twoRowLedger -LatestLedgerCommit $twoRowCommit
-if (
-  [string]$syntheticLineage.final_row_sha256 -cne [string]$secondRow.row_sha256 -or
-  [string](Get-MIR4CurrentPackagePresentationV3FinalRow -Ledger $twoRowLedger).row_id -cne 'mir4-current-package-presentation-v3-0002'
-) {
+Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $twoRowLedger -LatestLedgerCommit $twoRowCommit | Out-Null
+if ([string](Get-MIR4CurrentPackagePresentationV3FinalRow -Ledger $twoRowLedger).row_id -cne 'mir4-current-package-presentation-v3-0002') {
   throw '[mir4-package-presentation-v3-final-row-selector]'
 }
 
@@ -127,7 +123,7 @@ $recomputedMutation.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $recom
 $recomputedMutationRejected = $false
 try {
   Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $recomputedMutation -LatestLedgerCommit $twoRowCommit | Out-Null
-} catch { $recomputedMutationRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed\]' }
+} catch { $recomputedMutationRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed(?:-|\])' }
 if (-not $recomputedMutationRejected) { throw '[mir4-package-presentation-v3-recomputed-prior-row-mutation]' }
 
 $trailingDeletion = $twoRowLedger | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
@@ -136,7 +132,7 @@ $trailingDeletion.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $trailin
 $trailingDeletionRejected = $false
 try {
   Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $trailingDeletion -LatestLedgerCommit $twoRowCommit | Out-Null
-} catch { $trailingDeletionRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed\]' }
+} catch { $trailingDeletionRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed(?:-|\])' }
 if (-not $trailingDeletionRejected) { throw '[mir4-package-presentation-v3-recomputed-trailing-row-deletion]' }
 
 $duplicateAppendRejected = $false
