@@ -340,11 +340,13 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
   -- exact shapes once a V3 policy is accepted, including an immediate cap=0
   -- relaxation. Do not infer ownership from any other legacy shape.
   if not policy or policy.blocked_reason or policy.legacy == true then return end
-  if type(visibility_by_cap[technology_name]) == "boolean" then
+  local migrated_visibility = type(visibility_by_cap[technology_name]) == "boolean"
+  local migrated_disable = disabled_by_cap[technology_name] == true
+  if migrated_visibility then
     visibility_by_cap[technology_name] = captured_visibility(
       visibility_by_cap[technology_name], force, policy)
   end
-  if disabled_by_cap[technology_name] == true then
+  if migrated_disable then
     disabled_by_cap[technology_name] = {
       policy_version = POLICY_VERSION,
       force_index = force.index,
@@ -354,6 +356,14 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
       enabled_before_cap = true,
       migrated_from_policy_version = 2
     }
+  end
+  if migrated_visibility or migrated_disable then
+    log("[more-infinite-research] Migrated maximum-level V2 ownership"
+      .. " force=" .. tostring(force.name)
+      .. " technology=" .. tostring(technology_name)
+      .. " enablement-owned=" .. tostring(migrated_disable)
+      .. " visibility-owned=" .. tostring(migrated_visibility)
+      .. " policy-version=" .. tostring(POLICY_VERSION) .. ".")
   end
 end
 
