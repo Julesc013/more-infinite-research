@@ -1,8 +1,9 @@
 . (Join-Path $PSScriptRoot '../../domain/canonicalization/CanonicalJsonV1.ps1')
 
 $script:MIR4EnvironmentPrivateFields = @(
-  'access_token','api_key','authorization','cookie','credential','email','home','hostname',
-  'machine','password','path','private_key','secret','token','user','username'
+  'access_token','address','api_key','authorization','cookie','credential','email','home','hostname',
+  'ip','ip_address','machine','password','path','phone','phone_number','private_key','secret','token',
+  'user','username'
 )
 
 function Get-MIR4EnvironmentDigest {
@@ -41,7 +42,7 @@ function Test-MIR4EnvironmentPrivateValue {
       Test-MIR4EnvironmentPrivateValue -Value $item -Location "$Location[$index]" | Out-Null
       $index++
     }
-  } elseif ($Value -is [string] -and ($Value -match '(?i)^[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)^/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+')) {
+  } elseif ($Value -is [string] -and ($Value -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b')) {
     throw "[mir4-environment-private-value] $Location"
   }
   $true
@@ -227,13 +228,33 @@ function Test-MIR4EnvironmentDiffV1 {
   $true
 }
 
+function Test-MIR4SupportDiagnosticV1 {
+  param([Parameter(Mandatory)]$Diagnostic)
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Diagnostic -Names @('code','severity','message') -Diagnostic 'mir4-support-diagnostic-shape'
+  if ($Diagnostic.code -isnot [string] -or [string]$Diagnostic.code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
+  if ($Diagnostic.severity -isnot [string] -or [string]$Diagnostic.severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
+  if ($Diagnostic.message -isnot [string] -or ([string]$Diagnostic.message).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
+  if ([string]$Diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { throw '[mir4-support-bundle-redaction]' }
+  $true
+}
+
 function ConvertTo-MIR4RedactedDiagnosticV1 {
   param([Parameter(Mandatory)]$Diagnostic)
-  $message = [string]$Diagnostic.message
+  if ($Diagnostic -isnot [pscustomobject] -and $Diagnostic -isnot [Collections.IDictionary]) { throw '[mir4-support-diagnostic-shape]' }
+  $code = if ($Diagnostic -is [Collections.IDictionary]) { $Diagnostic['code'] } else { $Diagnostic.code }
+  $severity = if ($Diagnostic -is [Collections.IDictionary] -and $Diagnostic.Contains('severity')) { $Diagnostic['severity'] } elseif ($Diagnostic -isnot [Collections.IDictionary] -and $null -ne $Diagnostic.PSObject.Properties['severity']) { $Diagnostic.severity } else { 'error' }
+  $rawMessage = if ($Diagnostic -is [Collections.IDictionary]) { $Diagnostic['message'] } else { $Diagnostic.message }
+  if ($code -isnot [string] -or [string]$code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
+  if ($severity -isnot [string] -or [string]$severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
+  if ($rawMessage -isnot [string] -or ([string]$rawMessage).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
+  $message = [string]$rawMessage
   $message = [regex]::Replace($message,'(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/][^\\/\s]+','<user-home>')
   $message = [regex]::Replace($message,'(?i)/(?:home|Users)/[^/\s]+','<user-home>')
   $message = [regex]::Replace($message,'(?i)\b(token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+','$1=<redacted>')
-  [ordered]@{code=[string]$Diagnostic.code;severity=$(if($Diagnostic.severity){[string]$Diagnostic.severity}else{'error'});message=$message}
+  $message = [regex]::Replace($message,'(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b','<email-redacted>')
+  $record = [ordered]@{code=[string]$code;severity=[string]$severity;message=$message}
+  Test-MIR4SupportDiagnosticV1 $record | Out-Null
+  $record
 }
 
 function Get-MIR4EvidenceClosureV1 {
@@ -309,21 +330,20 @@ function New-MIR4EnvironmentSupportBundleV1 {
 function Test-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Bundle)
   Test-MIR4EnvironmentLockV1 $Bundle.environment_lock | Out-Null
-  Test-MIR4EnvironmentPrivateValue -Value $Bundle.subjects -Location '$.subjects' | Out-Null
-  Test-MIR4EnvironmentPrivateValue -Value $Bundle.evidence_items -Location '$.evidence_items' | Out-Null
   if ([int]$Bundle.schema -ne 1 -or [string]$Bundle.kind -cne 'MIR4SupportBundleV1' -or
       [string]$Bundle.target -cne [string]$Bundle.environment_lock.target -or
       [string]$Bundle.environment_lock_digest -cne [string]$Bundle.environment_lock.digest -or
       [bool]$Bundle.claim_eligible -or [bool]$Bundle.arbitrary_code -or [bool]$Bundle.executable_content -or
       [bool]$Bundle.network_access_authorized -or [bool]$Bundle.package_visible -or [bool]$Bundle.player_mutation_authorized -or
       [bool]$Bundle.prototype_write_authorized -or [bool]$Bundle.public_support_authorized -or [bool]$Bundle.release_authority) { throw '[mir4-support-bundle-boundary]' }
+  foreach ($diagnostic in @($Bundle.diagnostics)) { Test-MIR4SupportDiagnosticV1 $diagnostic | Out-Null }
+  # This walks every serialized field, rather than trusting the redaction
+  # declaration, so direct callers cannot inject private evidence metadata.
+  Test-MIR4EnvironmentPrivateValue -Value $Bundle -Location '$' | Out-Null
   $roots = @($Bundle.reproducer.required_evidence_ids | ForEach-Object { [string]$_ })
   $signature = Get-MIR4ReproducerSignatureV1 -EnvironmentLock $Bundle.environment_lock -Evidence @($Bundle.evidence_items) -Roots $roots
   if ([string]$Bundle.reproducer.signature -cne $signature -or -not [bool]$Bundle.reproducer.preserved -or
       [bool]$Bundle.redaction.raw_private_values_retained -or [string]$Bundle.digest -cne (Get-MIR4EnvironmentDigest $Bundle)) { throw '[mir4-support-bundle-integrity]' }
-  foreach ($diagnostic in @($Bundle.diagnostics)) {
-    if ([string]$diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>)') { throw '[mir4-support-bundle-redaction]' }
-  }
   $true
 }
 
