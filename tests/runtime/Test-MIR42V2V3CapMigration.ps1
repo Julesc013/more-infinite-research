@@ -222,22 +222,27 @@ function Invoke-ServerSave([object]$Stage,[string]$Name,[string]$InputSave,[stri
   $copy=Join-Path $Stage.root "factorio-$Name.log";Copy-Item -LiteralPath $factorioLog -Destination $copy;$copy
 }
 
-$predecessorStage=New-Stage -Name predecessor -Candidate $predecessorCandidate -FixtureVersion '0.1.0' -Cap 3
-$v3Stage=New-Stage -Name v3-capped -Candidate $currentCandidate -FixtureVersion '0.1.1' -Cap 3
-$relaxedStage=New-Stage -Name v3-relaxed -Candidate $currentCandidate -FixtureVersion '0.1.2' -Cap 0
-$predecessorSave=Join-Path $predecessorStage.root 'predecessor-v2.zip'
-$predecessorLog=Invoke-Engine $predecessorStage 'predecessor' @('--create',$predecessorSave)
-Assert-Migration (Test-Path -LiteralPath $predecessorSave -PathType Leaf) 'Predecessor save is absent.'
-$predecessorState=Read-State (Get-Content -Raw -LiteralPath $predecessorLog) 'v2-seeded'
+$v2UnboundedStage=New-Stage -Name v2-unbounded -Candidate $predecessorCandidate -FixtureVersion '0.1.0' -Cap 0
+$v2CappedStage=New-Stage -Name v2-capped -Candidate $predecessorCandidate -FixtureVersion '0.1.1' -Cap 3
+$v3Stage=New-Stage -Name v3-capped -Candidate $currentCandidate -FixtureVersion '0.1.2' -Cap 3
+$relaxedStage=New-Stage -Name v3-relaxed -Candidate $currentCandidate -FixtureVersion '0.1.3' -Cap 0
+$v2UnboundedSave=Join-Path $v2UnboundedStage.root 'predecessor-v2-unbounded.zip'
+$v2UnboundedLog=Invoke-Engine $v2UnboundedStage 'v2-unbounded' @('--create',$v2UnboundedSave)
+Assert-Migration (Test-Path -LiteralPath $v2UnboundedSave -PathType Leaf) 'V2 cap=0 seed save is absent.'
+$v2UnboundedState=Read-State (Get-Content -Raw -LiteralPath $v2UnboundedLog) 'v2-unbounded'
+
+$v2CappedSave=Join-Path $v2CappedStage.userdata 'saves/mir42-v2-v3-cap-migration-v2-capped.zip'
+$v2CappedLog=Invoke-ServerSave $v2CappedStage 'v2-capped' $v2UnboundedSave $v2CappedSave 'v2-capped'
+$v2CappedState=Read-State (Get-Content -Raw -LiteralPath $v2CappedLog) 'v2-capped'
 
 $v3Save=Join-Path $v3Stage.userdata 'saves/mir42-v2-v3-cap-migration-v3-capped.zip'
-$v3Log=Invoke-ServerSave $v3Stage 'v3-capped' $predecessorSave $v3Save 'v3-capped'
+$v3Log=Invoke-ServerSave $v3Stage 'v3-capped' $v2CappedSave $v3Save 'v3-capped'
 $v3Text=Get-Content -Raw -LiteralPath $v3Log
 $v3State=Read-State $v3Text 'v3-capped'
 $ownedMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-owned technology=recipe-prod-research_copper-1 enablement-owned=true visibility-owned=true policy-version=3[.]')
 $foreignMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-foreign-disabled technology=recipe-prod-research_copper-1 enablement-owned=false visibility-owned=true policy-version=3[.]')
 Assert-Migration ($ownedMigration.Count -eq 1) "Expected exactly one admitted V2 owned migration diagnostic; observed $($ownedMigration.Count)."
-Assert-Migration ($foreignMigration.Count -eq 1) "Expected exactly one admitted V2 foreign-disabled migration diagnostic; observed $($foreignMigration.Count)."
+Assert-Migration ($foreignMigration.Count -eq 1) "Expected exactly one admitted V2 foreign visibility-only migration diagnostic; observed $($foreignMigration.Count)."
 
 $relaxedSave=Join-Path $relaxedStage.userdata 'saves/mir42-v2-v3-cap-migration-v3-relaxed.zip'
 $relaxedLog=Invoke-ServerSave $relaxedStage 'v3-relaxed' $v3Save $relaxedSave 'v3-relaxed'
@@ -245,17 +250,21 @@ $relaxedState=Read-State (Get-Content -Raw -LiteralPath $relaxedLog) 'v3-relaxed
 $terminalLog=Invoke-Engine $relaxedStage 'terminal' @('--benchmark',$relaxedSave,'--benchmark-ticks','10','--benchmark-runs','1','--benchmark-sanitize')
 $terminalState=Read-State (Get-Content -Raw -LiteralPath $terminalLog) 'terminal'
 
-$v2Forces=@(@{name='v2-owned';level=4;enabled=$false;visible_when_disabled=$true},@{name='v2-foreign-disabled';level=4;enabled=$false;visible_when_disabled=$true})
+$v2UnboundedForces=@(@{name='v2-owned';level=4;enabled=$true;visible_when_disabled=$false},@{name='v2-foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false})
+$v2CappedForces=@(@{name='v2-owned';level=4;enabled=$false;visible_when_disabled=$true},@{name='v2-foreign-disabled';level=4;enabled=$false;visible_when_disabled=$true})
+$v2Forces=$v2CappedForces
 $v3Forces=@($v2Forces+@(@{name='v3-owned';level=4;enabled=$false;visible_when_disabled=$true}))
 $relaxedForces=@(@{name='v2-owned';level=4;enabled=$true;visible_when_disabled=$false},@{name='v2-foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},@{name='v3-owned';level=4;enabled=$true;visible_when_disabled=$false})
-Assert-State $predecessorState 'v2-seeded' 2 3 $false $false $v2Forces
+Assert-State $v2UnboundedState 'v2-unbounded' 2 0 $false $false $v2UnboundedForces
+Assert-State $v2CappedState 'v2-capped' 2 3 $false $false $v2CappedForces
 Assert-State $v3State 'v3-capped' 3 3 $true $false $v3Forces
 Assert-State $relaxedState 'v3-relaxed' 3 0 $true $true $relaxedForces
 Assert-State $terminalState 'terminal' 3 0 $true $true $relaxedForces
 
 $lineage=@(
-  [ordered]@{stage='predecessor-v2';save=Get-Artifact $predecessorSave;predecessor_sha256=$null},
-  [ordered]@{stage='v3-capped';save=Get-Artifact $v3Save;predecessor_sha256=Get-MigrationSha $predecessorSave},
+  [ordered]@{stage='predecessor-v2-unbounded';save=Get-Artifact $v2UnboundedSave;predecessor_sha256=$null},
+  [ordered]@{stage='predecessor-v2-capped';save=Get-Artifact $v2CappedSave;predecessor_sha256=Get-MigrationSha $v2UnboundedSave},
+  [ordered]@{stage='v3-capped';save=Get-Artifact $v3Save;predecessor_sha256=Get-MigrationSha $v2CappedSave},
   [ordered]@{stage='v3-relaxed';save=Get-Artifact $relaxedSave;predecessor_sha256=Get-MigrationSha $v3Save}
 )
 for($index=1;$index -lt $lineage.Count;$index++){
@@ -268,7 +277,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210V2ToV3MaximumLevelMigrationQualificationV1'
   status='passed-current-f210-v2-to-v3-cap-migration-only'
-  scope='Pinned origin/dev F210 V2 package reconstructed at f7f9bab, upgraded into a freshly materialized current F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.'
+  scope='Pinned origin/dev F210 V2 package reconstructed at f7f9bab, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into a freshly materialized current F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.'
   target=[ordered]@{factorio_line='2.1';factorio_version='2.1.17';engine_sha256=$expectedEngineSha}
   predecessor=[ordered]@{commit=$predecessorCommit;tree=$predecessorCommitTree;candidate=Get-Artifact $predecessorCandidate;transport='maximum-level-policy-v2';runtime_controller_policy_version=1}
   source=[ordered]@{commit=$currentCommit;tree=$currentTree;package_source_sha256=Get-MigrationSha (Join-Path $repo 'src/mod/package-source.json');candidate_materialization_closure=$candidateClosure;candidate_materialization_closure_clean=$true}
@@ -276,13 +285,13 @@ $result=[ordered]@{
   candidate_package_excludes_fixture_test_docs_governance_build_dist=$true
   fixture_source_hashes=[ordered]@{info=Get-MigrationSha (Join-Path $fixture 'info.json');data_final_fixes=Get-MigrationSha (Join-Path $fixture 'data-final-fixes.lua');control=Get-MigrationSha (Join-Path $fixture 'control.lua')}
   harness_sha256=Get-MigrationSha $PSCommandPath
-  stages=@((Get-StageManifest $predecessorStage $predecessorCandidate),(Get-StageManifest $v3Stage $currentCandidate),(Get-StageManifest $relaxedStage $currentCandidate))
+  stages=@((Get-StageManifest $v2UnboundedStage $predecessorCandidate),(Get-StageManifest $v2CappedStage $predecessorCandidate),(Get-StageManifest $v3Stage $currentCandidate),(Get-StageManifest $relaxedStage $currentCandidate))
   migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;policy_version=3}
-  state_receipts=[ordered]@{predecessor_v2=$predecessorState;v3_capped=$v3State;v3_relaxed=$relaxedState;terminal=$terminalState}
+  state_receipts=[ordered]@{predecessor_v2_unbounded=$v2UnboundedState;predecessor_v2_capped=$v2CappedState;v3_capped=$v3State;v3_relaxed=$relaxedState;terminal=$terminalState}
   save_lineage=$lineage
   f200_disposition=[ordered]@{status='excluded-current-target-lacks-v3-mod-data-transport';factorio_version='2.0.77';target_profile='targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua';reason='The F200 profile declares prototype_shapes.mod_data=false. Current V3 runtime only migrates V2 ownership after an accepted V3 transported binding; its settings fallback is deliberately legacy/read-only and does not migrate V2 ownership.';reconsider_when='An F200-specific accepted V3 binding transport or equivalent persisted ownership proof is implemented and qualified on the exact F200 engine.'}
   explicit_non_claims=$nonClaims
-  logs=[ordered]@{predecessor=Get-Artifact $predecessorLog;v3_capped=Get-Artifact $v3Log;v3_relaxed=Get-Artifact $relaxedLog;terminal=Get-Artifact $terminalLog}
+  logs=[ordered]@{predecessor_v2_unbounded=Get-Artifact $v2UnboundedLog;predecessor_v2_capped=Get-Artifact $v2CappedLog;v3_capped=Get-Artifact $v3Log;v3_relaxed=Get-Artifact $relaxedLog;terminal=Get-Artifact $terminalLog}
 }
 $resultPath=Join-Path $run 'result.json'
 [IO.File]::WriteAllText($resultPath,(($result|ConvertTo-Json -Depth 40)+"`n"),[Text.UTF8Encoding]::new($false))

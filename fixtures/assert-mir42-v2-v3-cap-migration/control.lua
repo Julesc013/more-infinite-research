@@ -48,9 +48,23 @@ local function require_force(name)
   return force
 end
 
-local function configure(force, level, enabled, visible_when_disabled)
+local function configure_unbounded(force, level, enabled, visible_when_disabled)
   force.enable_all_prototypes()
   local technology = technology_for(force)
+  -- Assigning an infinite technology level can restore Factorio's default
+  -- enablement.  Apply the intended force state afterwards so the V2 cap=0
+  -- seed contains a genuinely pre-disabled foreign technology.
+  technology.level = level
+  technology.enabled = enabled
+  technology.visible_when_disabled = visible_when_disabled
+  return technology
+end
+
+local function configure_under_cap(force, level, enabled, visible_when_disabled)
+  force.enable_all_prototypes()
+  local technology = technology_for(force)
+  -- Under an active cap, ensure the controller sees the intended original
+  -- visibility before a level transition can trigger its observation.
   technology.enabled = enabled
   technology.visible_when_disabled = visible_when_disabled
   technology.level = level
@@ -157,9 +171,21 @@ local function assert_v3_migration_and_cap()
   assert_force("v2-owned", 4, false, true)
   assert_force("v2-foreign-disabled", 4, false, true)
   local v3_owned = game.forces["v3-owned"] or game.create_force("v3-owned")
-  configure(v3_owned, 4, true, false)
+  configure_under_cap(v3_owned, 4, true, false)
   v3_owned.reset_technology_effects()
   assert_force("v3-owned", 4, false, true)
+end
+
+local function assert_v2_unbounded_seed()
+  assert_research_continuity()
+  assert_force("v2-owned", 4, true, false)
+  assert_force("v2-foreign-disabled", 4, false, false)
+end
+
+local function assert_v2_capped_seed()
+  assert_research_continuity()
+  assert_force("v2-owned", 4, false, true)
+  assert_force("v2-foreign-disabled", 4, false, true)
 end
 
 local function assert_v3_relaxation()
@@ -177,8 +203,8 @@ local function save_successor(phase, stage, migration_outcome_observed, cap_zero
 end
 
 script.on_init(function()
-  if policy_schema() ~= 2 or selected_cap() ~= 3 then
-    fail("predecessor stage requires authentic V2 policy and cap=3")
+  if policy_schema() ~= 2 or selected_cap() ~= 0 then
+    fail("predecessor stage requires authentic V2 policy and cap=0")
   end
   if game.forces["v2-owned"] or game.forces["v2-foreign-disabled"] then
     fail("predecessor forces already exist")
@@ -186,25 +212,25 @@ script.on_init(function()
   establish_research_state()
   local owned = game.create_force("v2-owned")
   local foreign = game.create_force("v2-foreign-disabled")
-  configure(owned, 4, true, false)
-  configure(foreign, 4, false, false)
-  owned.reset_technology_effects()
-  foreign.reset_technology_effects()
-  assert_force("v2-owned", 4, false, true)
-  assert_force("v2-foreign-disabled", 4, false, true)
-  assert_research_continuity()
-  storage[storage_key] = {phase = "v2-seeded"}
-  log_state("v2-seeded", false, false)
+  configure_unbounded(owned, 4, true, false)
+  configure_unbounded(foreign, 4, false, false)
+  assert_v2_unbounded_seed()
+  storage[storage_key] = {phase = "v2-unbounded"}
+  log_state("v2-unbounded", false, false)
 end)
 
 script.on_configuration_changed(function()
   local state = storage[storage_key]
-  if not state or policy_schema() ~= 3 then return end
-  if state.phase == "v2-seeded" then
+  if not state then return end
+  if policy_schema() == 2 and state.phase == "v2-unbounded" then
+    if selected_cap() ~= 3 then fail("V2 cap seed stage requires cap=3") end
+    assert_v2_capped_seed()
+    state.phase = "v2-capped-pending-save"
+  elseif policy_schema() == 3 and state.phase == "v2-capped" then
     if selected_cap() ~= 3 then fail("V3 cap stage requires cap=3") end
     assert_v3_migration_and_cap()
     state.phase = "v3-capped-pending-save"
-  elseif state.phase == "v3-capped" then
+  elseif policy_schema() == 3 and state.phase == "v3-capped" then
     if selected_cap() ~= 0 then fail("V3 relaxation stage requires cap=0") end
     assert_v3_relaxation()
     state.phase = "v3-relaxed-pending-save"
@@ -220,7 +246,10 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = storage[storage_key]
   if not state then fail("fixture state is absent") end
-  if state.phase == "v3-capped-pending-save" then
+  if state.phase == "v2-capped-pending-save" then
+    assert_v2_capped_seed()
+    save_successor("v2-capped", "v2-capped", false, false, "mir42-v2-v3-cap-migration-v2-capped")
+  elseif state.phase == "v3-capped-pending-save" then
     assert_v3_migration_and_cap()
     save_successor("v3-capped", "v3-capped", true, false, "mir42-v2-v3-cap-migration-v3-capped")
   elseif state.phase == "v3-relaxed-pending-save" then
