@@ -105,8 +105,8 @@ Usage:
   .\tools\mir.ps1 package build [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--output <build/packages/...>]
   .\tools\mir.ps1 backport validate [--manifest <path>] [--allow-pending-tags]
   .\tools\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
-  .\tools\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]
-  .\tools\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply
+  .\tools\mir.ps1 storage audit [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>]
+  .\tools\mir.ps1 storage clean [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>] --apply
   .\tools\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
   .\tools\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
   .\tools\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>

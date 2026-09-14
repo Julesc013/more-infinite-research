@@ -8,7 +8,7 @@ if($epoch.schema -ne 1 -or $epoch.current_profile -cne 'mir4-development' -or $e
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 [void](Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check)
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
-[void](Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check)
+$commandInventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 # Parse every current tooling and test module, including modules whose original
 # decomposition receipt now belongs to the pinned historical source.
 $files=@(& git -C $repo ls-files --cached --others --exclude-standard -- 'tools/*.ps1' 'tests/*.ps1')
@@ -18,15 +18,54 @@ foreach($path in @($files | Sort-Object -Unique)) {
   [void][Management.Automation.Language.Parser]::ParseFile((Join-Path $repo $path),[ref]$tokens,[ref]$errors)
   if($errors.Count) { throw "[mir4-development-powershell-syntax] $path : $errors" }
 }
-$root=Join-Path $repo ('build/packages/development-contracts/'+[guid]::NewGuid().ToString('N'))
-$results=@()
-foreach($target in @('f210','f200','f110','f100')) {
-  $pair=@()
-  foreach($run in @('A','B')) {
-    $pair+=& (Join-Path $repo 'tools/commands/package/Build-MIRPackage.ps1') -Target $target -SourceVersion '4.2.0' -CandidateId ('DEVELOPMENT-'+$run) -OutputDir $root
+$developmentContractsRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build/packages/development-contracts'))
+$root=Join-Path $developmentContractsRoot ([guid]::NewGuid().ToString('N'))
+$completed=$false
+try {
+  $results=@()
+  foreach($target in @('f210','f200','f110','f100')) {
+    $pair=@()
+    foreach($run in @('A','B')) {
+      $pair+=& (Join-Path $repo 'tools/commands/package/Build-MIRPackage.ps1') -Target $target -SourceVersion '4.2.0' -CandidateId ('DEVELOPMENT-'+$run) -OutputDir $root
+    }
+    if($pair[0].archive_sha256 -cne $pair[1].archive_sha256 -or $pair[0].content_sha256 -cne $pair[1].content_sha256) { throw "[mir4-development-package-determinism] $target" }
+    $results+=[ordered]@{target=$target;archive_sha256=$pair[0].archive_sha256;content_sha256=$pair[0].content_sha256;entry_count=$pair[0].entry_count}
   }
-  if($pair[0].archive_sha256 -cne $pair[1].archive_sha256 -or $pair[0].content_sha256 -cne $pair[1].content_sha256) { throw "[mir4-development-package-determinism] $target" }
-  $results+=@{target=$target;archive=$pair[0].archive_path;content_sha256=$pair[0].content_sha256;entry_count=$pair[0].entry_count}
+  $packageSourceFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+  $receiptId=Get-MIRStringSha256 -Value ("$packageSourceFingerprint`n$($commandInventory.digest)")
+  $receiptRoot=Join-Path $repo 'build/results/validation/development-contracts'
+  [IO.Directory]::CreateDirectory($receiptRoot)|Out-Null
+  $receiptPath=Join-Path $receiptRoot ("$receiptId.json")
+  $receipt=[ordered]@{
+    schema=1
+    kind='MIR4DevelopmentContractsLocalResultV1'
+    status='passed'
+    scope='current-source-and-four-target-determinism'
+    source=[ordered]@{
+      commit=(& git -C $repo rev-parse HEAD).Trim()
+      tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
+      package_source_sha256=$packageSourceFingerprint
+      package_source_dirty=(Test-MIR4CanonicalPackageSourceGitDirty -RepoRoot $repo)
+    }
+    command_inventory_digest=[string]$commandInventory.digest
+    packages=$results
+    retained_expanded_packages=$false
+    release_authority=$false
+  }
+  $receiptJson=($receipt|ConvertTo-Json -Depth 10)+"`n"
+  $temporaryReceipt="$receiptPath.$([guid]::NewGuid().ToString('N')).tmp"
+  [IO.File]::WriteAllText($temporaryReceipt,$receiptJson,[Text.UTF8Encoding]::new($false))
+  [IO.File]::Move($temporaryReceipt,$receiptPath,$true)
+  $completed=$true
+  Write-Host "Current source bindings, tooling syntax, command inventory and four-target package determinism passed. Compact evidence: $receiptPath"
+} finally {
+  if($completed -and (Test-Path -LiteralPath $root -PathType Container)) {
+    $resolvedRoot=[IO.Path]::GetFullPath((Resolve-Path -LiteralPath $root).Path)
+    $expectedPrefix=$developmentContractsRoot.TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
+    $rootItem=Get-Item -LiteralPath $resolvedRoot -Force
+    if(-not $resolvedRoot.StartsWith($expectedPrefix,[StringComparison]::OrdinalIgnoreCase)-or($rootItem.Attributes-band[IO.FileAttributes]::ReparsePoint)-ne0) {
+      throw "[mir4-development-cleanup-boundary] $resolvedRoot"
+    }
+    [IO.Directory]::Delete($resolvedRoot,$true)
+  }
 }
-[ordered]@{status='passed';scope='current-source-and-four-target-determinism';packages=$results;release_authority=$false} | ConvertTo-Json -Depth 8 | Set-Content (Join-Path $root 'receipt.json')
-Write-Host "Current source bindings, tooling syntax, command inventory and four-target package determinism passed. Evidence: $root"

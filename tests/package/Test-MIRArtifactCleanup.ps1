@@ -52,7 +52,11 @@ try {
   $orphanLeaseRun = Join-Path $testRoot "series/orphan-lease-run"
   $stalePackage = Join-Path $packageRoot "stale-package"
   $pinnedPackage = Join-Path $packageRoot "pinned-package"
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage)) {
+  $developmentContracts = Join-Path $packageRoot 'development-contracts'
+  $staleDevelopmentContract = Join-Path $developmentContracts '11111111111111111111111111111111'
+  $recentDevelopmentContract = Join-Path $developmentContracts '22222222222222222222222222222222'
+  $referencedDevelopmentContract = Join-Path $developmentContracts '33333333333333333333333333333333'
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
@@ -61,6 +65,11 @@ try {
   "pinned evidence" | Set-Content -LiteralPath (Join-Path $pinnedTestRun "result.json") -Encoding UTF8
   "candidate" | Set-Content -LiteralPath (Join-Path $stalePackage "candidate.zip") -Encoding UTF8
   "pinned candidate" | Set-Content -LiteralPath (Join-Path $pinnedPackage "candidate-pin.json") -Encoding UTF8
+  "{}" | Set-Content -LiteralPath (Join-Path $staleDevelopmentContract 'receipt.json') -Encoding UTF8
+  "{}" | Set-Content -LiteralPath (Join-Path $referencedDevelopmentContract 'receipt.json') -Encoding UTF8
+  'build/packages/development-contracts/33333333333333333333333333333333' | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
+  & git -C $fixtureRoot add -- .gitignore tracked-reference.txt
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to establish tracked-reference fixture.' }
   $leaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture';owner_pid=$PID;state='active'}
   ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
   $failedLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-failed';owner_pid=2147483647;state='staging-failed'}
@@ -71,7 +80,7 @@ try {
   $orphanLeaseLock.Dispose()
 
   $staleTimestamp = [DateTime]::UtcNow.AddDays(-10)
-  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage)) {
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $referencedDevelopmentContract)) {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
@@ -110,6 +119,9 @@ try {
     @{path='build/tests/series/receipt-captured-crash-run';status='interrupted-lease'},
     @{path='build/tests/series/interrupted-lease-run';status='interrupted-lease'},
     @{path='build/tests/series/orphan-lease-run';status='interrupted-lease'},
+    @{path='build/packages/development-contracts/11111111111111111111111111111111';status='eligible'},
+    @{path='build/packages/development-contracts/22222222222222222222222222222222';status='recent'},
+    @{path='build/packages/development-contracts/33333333333333333333333333333333';status='pinned-reference'},
     @{path='build/results/reparse-run';status='unsafe-reparse'}
   )) {
     if (@($preview | Where-Object { $_.relative_path -ceq $expected.path -and $_.status -ceq $expected.status }).Count -ne 1) {
@@ -117,15 +129,30 @@ try {
     }
   }
 
+  $resultOnlyPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType result -PassThru)
+  if ($resultOnlyPreview.Count -eq 0 -or @($resultOnlyPreview | Where-Object { $_.artifact_type -cne 'result' }).Count -ne 0) {
+    throw 'Typed cleanup selection did not remain bounded to build/results.'
+  }
+  if (@($resultOnlyPreview | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -ceq 'eligible' }).Count -ne 1) {
+    throw 'Typed cleanup selection did not retain result-root classification.'
+  }
+
+  $selectedPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType result,package -PassThru)
+  if (@($selectedPreview | Where-Object { $_.artifact_type -ceq 'test' }).Count -ne 0 -or
+      @($selectedPreview | Where-Object { $_.artifact_type -ceq 'result' }).Count -eq 0 -or
+      @($selectedPreview | Where-Object { $_.artifact_type -ceq 'package' }).Count -eq 0) {
+    throw 'Multi-type cleanup selection did not include exactly the requested typed roots.'
+  }
+
   "new write before apply" | Set-Content -LiteralPath (Join-Path $changingTestRun 'result.txt') -Encoding UTF8
   (Get-Item -LiteralPath $changingTestRun).LastWriteTimeUtc = [DateTime]::UtcNow
 
   $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
   if (Test-Path -LiteralPath $staleRun) { throw "Applied cleanup retained the stale artifact." }
-  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $stalePackage)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
+  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
   if (-not (Test-Path -LiteralPath $changingTestRun)) { throw 'Applied cleanup removed an artifact that received a write before apply.' }
-  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun)) {
+  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $recentDevelopmentContract, $referencedDevelopmentContract)) {
     if (-not (Test-Path -LiteralPath $retained)) { throw "Applied cleanup removed protected or unsafe state: $retained" }
   }
   if (-not (Test-Path -LiteralPath $protectedAssurance) -or -not (Test-Path -LiteralPath $protectedValidation)) {
@@ -134,7 +161,7 @@ try {
   if (@($applied | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -eq "deleted" }).Count -ne 1) {
     throw "Applied cleanup did not report the stale artifact as deleted."
   }
-  foreach ($path in @('build/tests/series/stale-run', 'build/packages/stale-package')) {
+  foreach ($path in @('build/tests/series/stale-run', 'build/packages/stale-package', 'build/packages/development-contracts/11111111111111111111111111111111')) {
     if (@($applied | Where-Object { $_.relative_path -ceq $path -and $_.status -ceq 'deleted' }).Count -ne 1) {
       throw "Apply did not preserve dry-run eligibility for $path."
     }

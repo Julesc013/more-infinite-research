@@ -5,6 +5,8 @@ param(
   [int]$OlderThanDays = 7,
   [ValidateRange(1, 100000)]
   [int]$MaxPlanEntries = 10000,
+  [ValidateSet('result', 'test', 'package')]
+  [string[]]$ArtifactType = @('result', 'test', 'package'),
   [switch]$AllWorktrees,
   [switch]$Apply,
   [switch]$PassThru,
@@ -35,11 +37,12 @@ $runBoundaryNames = @(
   'mir-immutable-input-lease.json', 'mir-immutable-input-lease.lock', 'config.ini', 'mod-list.json', 'server-settings.json',
   'result.json', 'receipt.json', 'userdata', 'mods'
 )
-$artifactRootDefinitions = @(
-  [pscustomobject]@{ relative_path = 'build/results'; artifact_type = 'result'; direct_children_only = $true },
-  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false },
-  [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true }
-)
+$artifactRootDefinitions = @(@(
+  [pscustomobject]@{ relative_path = 'build/results'; artifact_type = 'result'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false },
+  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false },
+  [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @('development-contracts'); non_pinning_custody_markers = @(); check_tracked_reference = $false },
+  [pscustomobject]@{ relative_path = 'build/packages/development-contracts'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @('receipt.json'); check_tracked_reference = $true }
+) | Where-Object { $_.artifact_type -in $ArtifactType })
 
 function Test-MIRArtifactPathWithin {
   param(
@@ -145,6 +148,7 @@ function Get-MIRArtifactCandidates {
   if ($Definition.direct_children_only) {
     foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
       $item = Get-Item -LiteralPath $path -Force
+      if ($item.Name -in @($Definition.excluded_child_names)) { continue }
       [pscustomobject]@{ item = $item; boundary = 'direct-child' }
     }
     return
@@ -225,14 +229,18 @@ function Get-MIRArtifactItemFacts {
 }
 
 function Get-MIRArtifactCustodyMarker {
-  param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item)
+  param(
+    [Parameter(Mandatory)][System.IO.FileSystemInfo]$Item,
+    [string[]]$IgnoreNames = @()
+  )
 
   if (-not $Item.PSIsContainer) {
-    if ($Item.Name -in $directCustodyMarkers -or $Item.Name -like '*pin*.json') { return $Item.Name }
+    if (($Item.Name -in $directCustodyMarkers -or $Item.Name -like '*pin*.json') -and $Item.Name -notin $IgnoreNames) { return $Item.Name }
     return $null
   }
   if (($Item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { return $null }
   foreach ($name in $directCustodyMarkers) {
+    if ($name -in $IgnoreNames) { continue }
     if (Test-Path -LiteralPath (Join-Path $Item.FullName $name) -PathType Leaf) { return $name }
   }
   try {
@@ -242,6 +250,20 @@ function Get-MIRArtifactCustodyMarker {
     }
   } catch {
     return '__unsafe-inspection__'
+  }
+  return $null
+}
+
+function Get-MIRArtifactTrackedReference {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  foreach ($needle in @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique) {
+    $matches = @(& git -C $WorktreeRoot grep -l -F -- $needle 2>$null)
+    if ($LASTEXITCODE -eq 0 -and $matches.Count -gt 0) { return [string]$matches[0] }
+    if ($LASTEXITCODE -notin @(0, 1)) { return '__unsafe-reference-scan__' }
   }
   return $null
 }
@@ -258,12 +280,17 @@ function Get-MIRArtifactRow {
   $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $item.FullName).Replace('\', '/')
   $isProtected = $item.PSIsContainer -and $item.Name -in $protectedNames
   $lease = if ($item.PSIsContainer) { Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName } else { $null }
-  $custodyMarker = if ($isProtected -or ($null -ne $lease -and ($lease.active -or $lease.ambiguous))) { $null } else { Get-MIRArtifactCustodyMarker -Item $item }
+  $trackedReference = if ([bool]$Definition.check_tracked_reference) { Get-MIRArtifactTrackedReference -WorktreeRoot $WorktreeRoot -RelativePath $relativePath } else { $null }
+  $custodyMarker = if ($isProtected -or ($null -ne $lease -and ($lease.active -or $lease.ambiguous))) { $null } else { Get-MIRArtifactCustodyMarker -Item $item -IgnoreNames @($Definition.non_pinning_custody_markers) }
   $facts = $null
   $status = $null
   $reason = $null
   if ($isProtected) {
     $status = 'protected'; $reason = 'protected artifact root'
+  } elseif ($trackedReference -ceq '__unsafe-reference-scan__') {
+    $status = 'unsafe-inspection'; $reason = 'could not inspect tracked references'
+  } elseif (-not [string]::IsNullOrWhiteSpace([string]$trackedReference)) {
+    $status = 'pinned-reference'; $reason = "tracked reference: $trackedReference"
   } elseif ($null -ne $lease -and $lease.active) {
     $status = 'active-lease'; $reason = $lease.reason
   } elseif ($null -ne $lease -and $lease.ambiguous) {
@@ -361,7 +388,14 @@ function Assert-MIRArtifactEligibleForDeletion {
       throw "Cleanup target has a live, ambiguous, or interrupted lease: $fullPath"
     }
   }
-  if ($null -ne (Get-MIRArtifactCustodyMarker -Item $item)) {
+  $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $fullPath).Replace('\', '/')
+  if ([bool]$Definition.check_tracked_reference) {
+    $trackedReference = Get-MIRArtifactTrackedReference -WorktreeRoot $WorktreeRoot -RelativePath $relativePath
+    if (-not [string]::IsNullOrWhiteSpace([string]$trackedReference)) {
+      throw "Cleanup target acquired a tracked reference after audit: $fullPath"
+    }
+  }
+  if ($null -ne (Get-MIRArtifactCustodyMarker -Item $item -IgnoreNames @($Definition.non_pinning_custody_markers))) {
     throw "Cleanup target acquired a direct custody marker after audit: $fullPath"
   }
   $facts = Get-MIRArtifactItemFacts -Item $item

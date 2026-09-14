@@ -640,7 +640,7 @@
     },
     {
       "key": "storage audit",
-      "public_syntax": ".\\tools\\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]",
+      "public_syntax": ".\\tools\\mir.ps1 storage audit [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -648,7 +648,7 @@
     },
     {
       "key": "storage clean",
-      "public_syntax": ".\\tools\\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply",
+      "public_syntax": ".\\tools\\mir.ps1 storage clean [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>] --apply",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -3163,9 +3163,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "11AF5714B80ED1BDFAF4156E130100CAF936B77B6DD7F16EA04E13071ECD7409",
+      "sha256": "18E8D00927CD416C00FADA08C6554105CE50CA91741D92A667D8CFEECAB9BA35",
       "hash_mode": "canonical-text-v1",
-      "lines": 453,
+      "lines": 487,
       "package_visible": false
     },
     {
@@ -5443,7 +5443,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "4A8E086A1BCB546F7FB4F28007689DA94E2264F09023521F262F3A51558A4CBE",
+      "sha256": "59658DDFD6C5134B2FCF79D474C5ED469C028126D7BEEFD10B204807F85FDA2C",
       "hash_mode": "canonical-text-v1",
       "lines": 137,
       "package_visible": false
@@ -5531,9 +5531,9 @@
     {
       "path": "tools/mir/cli/router/RepositoryCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "41FA92DA37B6E4083C1E02E3B0BB3B5D6C8994C6C3B5A778753C1C94FC2B7AA8",
+      "sha256": "D3D96FBCA8D39A266B3921DE894456871DB24BA750080EE1547ADC9392318507",
       "hash_mode": "canonical-text-v1",
-      "lines": 137,
+      "lines": 144,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ca7e0c1ad8d6bd370e5b676301399f207324133f726ff0eea335b92d32afdb7b"
+  "digest": "sha256:eb542eb44e19f3ca8a6edf7078d9de79c4973054625aac95cb20392104a4ef1d"
 }
