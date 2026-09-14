@@ -142,6 +142,27 @@ if ([string]$remoteBootstrap.status -cne 'trusted-base-v3-absent-bounded-bootstr
   throw '[mir4-package-presentation-v3-remote-bootstrap]'
 }
 
+foreach ($originUrl in @(
+  'https://github.com/Julesc013/more-infinite-research',
+  'https://github.com/Julesc013/more-infinite-research.git',
+  'git@github.com:Julesc013/more-infinite-research.git',
+  'ssh://git@github.com/Julesc013/more-infinite-research.git'
+)) {
+  if (-not (Test-MIR4CurrentPackagePresentationV3TrustedOriginUrl -OriginUrl $originUrl)) {
+    throw "[mir4-package-presentation-v3-trusted-origin-accepted] $originUrl"
+  }
+}
+foreach ($originUrl in @(
+  'http://github.com/Julesc013/more-infinite-research.git',
+  'https://github.com/Julesc013/other-repository.git',
+  'https://evilgithub.com/Julesc013/more-infinite-research.git',
+  'git://github.com/Julesc013/more-infinite-research.git'
+)) {
+  if (Test-MIR4CurrentPackagePresentationV3TrustedOriginUrl -OriginUrl $originUrl) {
+    throw "[mir4-package-presentation-v3-trusted-origin-rejected] $originUrl"
+  }
+}
+
 $legacyMigrationBase = Copy-MIR4V3Ledger -Ledger $ledger
 $legacyMigrationBase.PSObject.Properties.Remove('custody')
 $legacyMigrationBase.PSObject.Properties.Remove('genesis_record_sha256')

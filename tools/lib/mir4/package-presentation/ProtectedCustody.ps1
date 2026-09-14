@@ -16,6 +16,15 @@ function Test-MIR4CurrentPackagePresentationV3LegacyContentChainMigration {
   )
 }
 
+function Test-MIR4CurrentPackagePresentationV3TrustedOriginUrl {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$OriginUrl)
+
+  # Custody reads a protected GitHub remote only.  Plain HTTP is deliberately
+  # excluded: Git permits it, but it does not provide transport integrity.
+  return $OriginUrl -imatch '^(?:https://github\.com/|git@github\.com:|ssh://git@github\.com/)Julesc013/more-infinite-research(?:\.git)?/?$'
+}
+
 function Assert-MIR4CurrentPackagePresentationV3ProtectedCustodyPrefix {
   [CmdletBinding()]
   param(
@@ -115,7 +124,7 @@ function Resolve-MIR4CurrentPackagePresentationV3TrustedBase {
 
   $origin = @(& git -C $repo remote get-url origin 2>$null)
   if ($LASTEXITCODE -ne 0 -or $origin.Count -ne 1 -or
-      [string]$origin[0] -notmatch '(?i)^(?:https?://github\.com/|git@github\.com:|ssh://git@github\.com/)Julesc013/more-infinite-research(?:\.git)?/?$') {
+      -not (Test-MIR4CurrentPackagePresentationV3TrustedOriginUrl -OriginUrl ([string]$origin[0]))) {
     throw '[mir4-package-presentation-v3-custody-origin-untrusted]'
   }
   $commit = @(& git -C $repo rev-parse --verify ($reference + '^{commit}') 2>$null)
