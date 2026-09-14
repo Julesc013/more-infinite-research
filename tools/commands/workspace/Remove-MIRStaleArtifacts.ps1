@@ -38,10 +38,14 @@ $runBoundaryNames = @(
   'result.json', 'receipt.json', 'userdata', 'mods'
 )
 $artifactRootDefinitions = @(@(
-  [pscustomobject]@{ relative_path = 'build/results'; artifact_type = 'result'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false },
-  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false },
-  [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @('development-contracts'); non_pinning_custody_markers = @(); check_tracked_reference = $false },
-  [pscustomobject]@{ relative_path = 'build/packages/development-contracts'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @('receipt.json'); check_tracked_reference = $true }
+  [pscustomobject]@{ relative_path = 'build/results'; artifact_type = 'result'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false },
+  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false },
+  [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @('development-contracts'); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false },
+  # Development-contract package expansion is an implementation detail of one
+  # deterministic test.  Its only disposable children are the 32-hex run
+  # directories created by that test; report every other child, but never
+  # promote it into the deletion set.
+  [pscustomobject]@{ relative_path = 'build/packages/development-contracts'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @('receipt.json'); check_tracked_reference = $true; canonical_guid_leaf_only = $true }
 ) | Where-Object { $_.artifact_type -in $ArtifactType })
 
 function Test-MIRArtifactPathWithin {
@@ -54,6 +58,17 @@ function Test-MIRArtifactPathWithin {
   $fullRoot = [IO.Path]::GetFullPath($Root).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
   $prefix = $fullRoot + [IO.Path]::DirectorySeparatorChar
   return $fullPath.StartsWith($prefix, $comparison)
+}
+
+function Test-MIRArtifactPathWithinOrEqual {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$Root
+  )
+
+  $fullPath = [IO.Path]::GetFullPath($Path).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+  $fullRoot = [IO.Path]::GetFullPath($Root).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+  return $fullPath.Equals($fullRoot, $comparison) -or (Test-MIRArtifactPathWithin -Path $fullPath -Root $fullRoot)
 }
 
 function Assert-MIRArtifactDirectory {
@@ -76,7 +91,17 @@ function Get-MIRArtifactWorktrees {
   )
 
   if (-not $IncludeAll) { return @($CurrentRepoRoot) }
-  $projectRoot = Split-Path -Parent $CurrentRepoRoot
+  # A linked worktree lives below build/worktrees, so its parent is not the
+  # project root.  Git's common directory is the authority that works for
+  # both primary and linked worktrees.
+  $commonGitDirectory = @(& git -C $CurrentRepoRoot rev-parse --path-format=absolute --git-common-dir)
+  if ($LASTEXITCODE -ne 0 -or $commonGitDirectory.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$commonGitDirectory[0])) {
+    throw 'Unable to resolve the common Git directory for registered-worktree cleanup.'
+  }
+  $projectRoot = Split-Path -Parent ([IO.Path]::GetFullPath(([string]$commonGitDirectory[0]).Trim()))
+  if (-not (Test-Path -LiteralPath $projectRoot -PathType Container)) {
+    throw "Resolved project root is absent: $projectRoot"
+  }
   $worktreeLines = @(& git -C $CurrentRepoRoot worktree list --porcelain)
   if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate registered Git worktrees.' }
 
@@ -84,13 +109,23 @@ function Get-MIRArtifactWorktrees {
   foreach ($line in $worktreeLines) {
     if (-not $line.StartsWith('worktree ', [StringComparison]::Ordinal)) { continue }
     $candidate = [IO.Path]::GetFullPath($line.Substring(9))
-    if (-not (Test-MIRArtifactPathWithin -Path $candidate -Root $projectRoot)) {
+    if (-not (Test-MIRArtifactPathWithinOrEqual -Path $candidate -Root $projectRoot)) {
       Write-Warning "Skipping registered worktree outside the current project directory: $candidate"
       continue
     }
     if (Test-Path -LiteralPath $candidate -PathType Container) { $worktrees.Add($candidate) }
   }
   return @($worktrees | Sort-Object -Unique)
+}
+
+function Test-MIRArtifactCanonicalCandidate {
+  param(
+    [Parameter(Mandatory)]$Definition,
+    [Parameter(Mandatory)][System.IO.FileSystemInfo]$Item
+  )
+
+  if (-not [bool]$Definition.canonical_guid_leaf_only) { return $true }
+  return $Item.PSIsContainer -and $Item.Name -cmatch '^[0-9a-f]{32}$'
 }
 
 function Test-MIRArtifactIgnored {
@@ -149,7 +184,11 @@ function Get-MIRArtifactCandidates {
     foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
       $item = Get-Item -LiteralPath $path -Force
       if ($item.Name -in @($Definition.excluded_child_names)) { continue }
-      [pscustomobject]@{ item = $item; boundary = 'direct-child' }
+      [pscustomobject]@{
+        item = $item
+        boundary = 'direct-child'
+        canonical_candidate = (Test-MIRArtifactCanonicalCandidate -Definition $Definition -Item $item)
+      }
     }
     return
   }
@@ -161,7 +200,7 @@ function Get-MIRArtifactCandidates {
         ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
         $item.Name -in $protectedNames -or
         (Test-MIRArtifactRunBoundary -Item $item)) {
-      [pscustomobject]@{ item = $item; boundary = 'run-or-file' }
+      [pscustomobject]@{ item = $item; boundary = 'run-or-file'; canonical_candidate = $true }
       continue
     }
     $pendingDirectories.Push($item)
@@ -177,17 +216,17 @@ function Get-MIRArtifactCandidates {
             ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
             $item.Name -in $protectedNames -or
             (Test-MIRArtifactRunBoundary -Item $item)) {
-          [pscustomobject]@{ item = $item; boundary = 'run-or-file' }
+          [pscustomobject]@{ item = $item; boundary = 'run-or-file'; canonical_candidate = $true }
           continue
         }
         $pendingDirectories.Push($item)
       }
     } catch {
-      [pscustomobject]@{ item = $directoryItem; boundary = 'unreadable-directory' }
+      [pscustomobject]@{ item = $directoryItem; boundary = 'unreadable-directory'; canonical_candidate = $true }
       continue
     }
     if (-not $hasChild) {
-      [pscustomobject]@{ item = $directoryItem; boundary = 'empty-directory' }
+      [pscustomobject]@{ item = $directoryItem; boundary = 'empty-directory'; canonical_candidate = $true }
     }
   }
 }
@@ -256,14 +295,18 @@ function Get-MIRArtifactCustodyMarker {
 
 function Get-MIRArtifactTrackedReference {
   param(
-    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots,
     [Parameter(Mandatory)][string]$RelativePath
   )
 
-  foreach ($needle in @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique) {
-    $matches = @(& git -C $WorktreeRoot grep -l -F -- $needle 2>$null)
-    if ($LASTEXITCODE -eq 0 -and $matches.Count -gt 0) { return [string]$matches[0] }
-    if ($LASTEXITCODE -notin @(0, 1)) { return '__unsafe-reference-scan__' }
+  foreach ($referenceWorktreeRoot in @($ReferenceWorktreeRoots | Sort-Object -Unique)) {
+    foreach ($needle in @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique) {
+      $matches = @(& git -C $referenceWorktreeRoot grep -l -F -- $needle 2>$null)
+      if ($LASTEXITCODE -eq 0 -and $matches.Count -gt 0) {
+        return ("{0}:{1}" -f (Split-Path -Leaf $referenceWorktreeRoot), [string]$matches[0])
+      }
+      if ($LASTEXITCODE -notin @(0, 1)) { return '__unsafe-reference-scan__' }
+    }
   }
   return $null
 }
@@ -273,19 +316,22 @@ function Get-MIRArtifactRow {
     [Parameter(Mandatory)][string]$WorktreeRoot,
     [Parameter(Mandatory)]$Definition,
     [Parameter(Mandatory)][string]$ArtifactRoot,
-    [Parameter(Mandatory)]$Candidate
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots
   )
 
   $item = $Candidate.item
   $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $item.FullName).Replace('\', '/')
   $isProtected = $item.PSIsContainer -and $item.Name -in $protectedNames
   $lease = if ($item.PSIsContainer) { Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName } else { $null }
-  $trackedReference = if ([bool]$Definition.check_tracked_reference) { Get-MIRArtifactTrackedReference -WorktreeRoot $WorktreeRoot -RelativePath $relativePath } else { $null }
+  $trackedReference = if ([bool]$Definition.check_tracked_reference) { Get-MIRArtifactTrackedReference -ReferenceWorktreeRoots $ReferenceWorktreeRoots -RelativePath $relativePath } else { $null }
   $custodyMarker = if ($isProtected -or ($null -ne $lease -and ($lease.active -or $lease.ambiguous))) { $null } else { Get-MIRArtifactCustodyMarker -Item $item -IgnoreNames @($Definition.non_pinning_custody_markers) }
   $facts = $null
   $status = $null
   $reason = $null
-  if ($isProtected) {
+  if (-not [bool]$Candidate.canonical_candidate) {
+    $status = 'noncanonical-child'; $reason = 'only canonical 32-hex GUID leaf directories are eligible in this artifact root'
+  } elseif ($isProtected) {
     $status = 'protected'; $reason = 'protected artifact root'
   } elseif ($trackedReference -ceq '__unsafe-reference-scan__') {
     $status = 'unsafe-inspection'; $reason = 'could not inspect tracked references'
@@ -350,7 +396,7 @@ function Test-MIRArtifactStillCandidate {
   )
 
   foreach ($candidate in (Get-MIRArtifactCandidates -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $ArtifactRoot)) {
-    if ([IO.Path]::GetFullPath($candidate.item.FullName).Equals([IO.Path]::GetFullPath($Path), $comparison)) { return $true }
+    if ([bool]$candidate.canonical_candidate -and [IO.Path]::GetFullPath($candidate.item.FullName).Equals([IO.Path]::GetFullPath($Path), $comparison)) { return $true }
   }
   return $false
 }
@@ -359,7 +405,8 @@ function Assert-MIRArtifactEligibleForDeletion {
   param(
     [Parameter(Mandatory)]$Row,
     [Parameter(Mandatory)][string]$WorktreeRoot,
-    [Parameter(Mandatory)]$Definition
+    [Parameter(Mandatory)]$Definition,
+    [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots
   )
 
   $artifactRoot = Get-MIRArtifactRoot -WorktreeRoot $WorktreeRoot -Definition $Definition
@@ -390,7 +437,7 @@ function Assert-MIRArtifactEligibleForDeletion {
   }
   $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $fullPath).Replace('\', '/')
   if ([bool]$Definition.check_tracked_reference) {
-    $trackedReference = Get-MIRArtifactTrackedReference -WorktreeRoot $WorktreeRoot -RelativePath $relativePath
+    $trackedReference = Get-MIRArtifactTrackedReference -ReferenceWorktreeRoots $ReferenceWorktreeRoots -RelativePath $relativePath
     if (-not [string]::IsNullOrWhiteSpace([string]$trackedReference)) {
       throw "Cleanup target acquired a tracked reference after audit: $fullPath"
     }
@@ -431,7 +478,7 @@ foreach ($worktree in $worktrees) {
       if ($results.Count -ge $MaxPlanEntries) {
         throw "Artifact cleanup plan exceeded its bounded $MaxPlanEntries-entry limit; no removal was attempted. Narrow the scope or raise -MaxPlanEntries after reviewing storage capacity."
       }
-      $results.Add((Get-MIRArtifactRow -WorktreeRoot $worktree -Definition $definition -ArtifactRoot $artifactRoot -Candidate $candidate))
+      $results.Add((Get-MIRArtifactRow -WorktreeRoot $worktree -Definition $definition -ArtifactRoot $artifactRoot -Candidate $candidate -ReferenceWorktreeRoots $worktrees))
     }
   }
 }
@@ -446,12 +493,16 @@ if ($Apply -and $eligible.Count -gt 0 -and -not $SkipActiveProcessCheck) {
 
 $physicalFreeBefore = if ($Apply) { Get-MIRArtifactDriveFreeBytes -Path $RepoRoot } else { $null }
 if ($Apply) {
+  $revalidatedWorktrees = @(Get-MIRArtifactWorktrees -CurrentRepoRoot $RepoRoot -IncludeAll:$AllWorktrees)
+  if ((@($revalidatedWorktrees | Sort-Object) -join "`n") -cne (@($worktrees | Sort-Object) -join "`n")) {
+    throw 'Registered worktree scope changed after the cleanup audit; refusing deletion.'
+  }
   foreach ($row in $eligible) {
     $worktreeRoot = [string]$row.worktree_root
     if (-not ($worktreeRoot -in $worktrees)) { throw "Unable to resolve audited worktree for cleanup target: $($row.full_path)" }
     $definition = $definitionsByRoot[("{0}|{1}" -f $worktreeRoot, $row.artifact_root_relative_path)]
     if ($null -eq $definition) { throw "Unable to resolve typed artifact root for cleanup target: $($row.full_path)" }
-    if (-not (Assert-MIRArtifactEligibleForDeletion -Row $row -WorktreeRoot $worktreeRoot -Definition $definition)) {
+    if (-not (Assert-MIRArtifactEligibleForDeletion -Row $row -WorktreeRoot $worktreeRoot -Definition $definition -ReferenceWorktreeRoots $worktrees)) {
       $row.status = 'already-absent'; $row.reason = 'removed by another process before re-audit'; continue
     }
     if ($PSCmdlet.ShouldProcess($row.full_path, 'permanently remove stale ignored artifact')) {
@@ -472,7 +523,7 @@ if (-not $PassThru) {
     Write-Host 'No typed artifact roots were found.'
   }
   $matched = @($results | Where-Object { $_.status -in @('eligible', 'deleted') })
-  [long]$matchedBytes = ($matched | Measure-Object -Property logical_bytes -Sum).Sum
+  [long]$matchedBytes = if ($matched.Count -eq 0) { 0 } else { [long]($matched | Measure-Object -Property logical_bytes -Sum).Sum }
   $mode = if ($Apply) { 'apply' } else { 'dry-run' }
   Write-Host ('[storage] mode={0} retention_days={1} matched={2} logical_size={3}' -f $mode, $OlderThanDays, $matched.Count, (Format-MIRArtifactBytes -Bytes $matchedBytes))
   Write-Host '[storage] Logical size counts every hardlink path; physical disk reclaimed can be lower.'

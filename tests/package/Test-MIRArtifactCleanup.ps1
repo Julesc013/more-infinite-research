@@ -15,6 +15,9 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 
 $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
 $fixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-{0}" -f [guid]::NewGuid().ToString("N"))
+$emptyAuditRoot = $null
+$allWorktreesFixtureRoot = $null
+$allWorktreesLinkedRoot = $null
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
 $activeLeaseLock = $null
 $gitEnvironmentNames = @(
@@ -35,6 +38,12 @@ try {
   & git -C $fixtureRoot init --quiet
   if ($LASTEXITCODE -ne 0) { throw "Unable to initialize artifact-cleanup fixture repository." }
   "/build/" | Set-Content -LiteralPath (Join-Path $fixtureRoot ".gitignore") -Encoding UTF8
+  & git -C $fixtureRoot config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $fixtureRoot config user.name 'MIR artifact cleanup test'
+  & git -C $fixtureRoot add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the artifact-cleanup fixture ignore policy.' }
+  & git -C $fixtureRoot commit --quiet -m 'fixture: establish ignored build root'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the artifact-cleanup fixture ignore policy.' }
 
   $artifactRoot = Join-Path $fixtureRoot "build/results"
   $testRoot = Join-Path $fixtureRoot "build/tests"
@@ -56,7 +65,8 @@ try {
   $staleDevelopmentContract = Join-Path $developmentContracts '11111111111111111111111111111111'
   $recentDevelopmentContract = Join-Path $developmentContracts '22222222222222222222222222222222'
   $referencedDevelopmentContract = Join-Path $developmentContracts '33333333333333333333333333333333'
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract)) {
+  $nonCanonicalDevelopmentContract = Join-Path $developmentContracts 'legacy-expanded-output'
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
@@ -80,7 +90,7 @@ try {
   $orphanLeaseLock.Dispose()
 
   $staleTimestamp = [DateTime]::UtcNow.AddDays(-10)
-  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $referencedDevelopmentContract)) {
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
@@ -122,6 +132,7 @@ try {
     @{path='build/packages/development-contracts/11111111111111111111111111111111';status='eligible'},
     @{path='build/packages/development-contracts/22222222222222222222222222222222';status='recent'},
     @{path='build/packages/development-contracts/33333333333333333333333333333333';status='pinned-reference'},
+    @{path='build/packages/development-contracts/legacy-expanded-output';status='noncanonical-child'},
     @{path='build/results/reparse-run';status='unsafe-reparse'}
   )) {
     if (@($preview | Where-Object { $_.relative_path -ceq $expected.path -and $_.status -ceq $expected.status }).Count -ne 1) {
@@ -152,7 +163,7 @@ try {
   if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
   if (-not (Test-Path -LiteralPath $changingTestRun)) { throw 'Applied cleanup removed an artifact that received a write before apply.' }
-  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $recentDevelopmentContract, $referencedDevelopmentContract)) {
+  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     if (-not (Test-Path -LiteralPath $retained)) { throw "Applied cleanup removed protected or unsafe state: $retained" }
   }
   if (-not (Test-Path -LiteralPath $protectedAssurance) -or -not (Test-Path -LiteralPath $protectedValidation)) {
@@ -173,6 +184,56 @@ try {
   if (@($secondApply | Where-Object { $_.status -eq 'deleted' }).Count -ne 0) {
     throw 'A repeated cleanup was not idempotent after exact stale targets were removed.'
   }
+
+  # A public no-PassThru audit with no typed roots must report a zero-byte
+  # summary rather than relying on Measure-Object's null Sum result.
+  $emptyAuditRoot = Join-Path $tempRoot ("mir-artifact-cleanup-empty-{0}" -f [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $emptyAuditRoot -Force | Out-Null
+  & git -C $emptyAuditRoot init --quiet
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the empty artifact-cleanup fixture repository.' }
+  $emptyAuditOutput = & $cleanupScript -RepoRoot $emptyAuditRoot -OlderThanDays 7 6>&1 2>&1
+  if (-not (@($emptyAuditOutput | Out-String) -match 'logical_size=0 B')) {
+    throw 'A public empty-root artifact audit did not complete with an explicit zero-byte summary.'
+  }
+
+  # Starting from a linked worktree must use Git's common directory to include
+  # the primary checkout, and a tracked primary reference must pin the matching
+  # disposable child throughout the selected registered-worktree scope.
+  $allWorktreesFixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-all-worktrees-{0}" -f [guid]::NewGuid().ToString('N'))
+  $allWorktreesLinkedRoot = Join-Path $allWorktreesFixtureRoot 'build/worktrees/selected'
+  New-Item -ItemType Directory -Path $allWorktreesFixtureRoot -Force | Out-Null
+  & git -C $allWorktreesFixtureRoot init --quiet
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the registered-worktree fixture repository.' }
+  '/build/' | Set-Content -LiteralPath (Join-Path $allWorktreesFixtureRoot '.gitignore') -Encoding UTF8
+  & git -C $allWorktreesFixtureRoot config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $allWorktreesFixtureRoot config user.name 'MIR artifact cleanup test'
+  & git -C $allWorktreesFixtureRoot add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the registered-worktree fixture ignore policy.' }
+  & git -C $allWorktreesFixtureRoot commit --quiet -m 'fixture: establish ignored build root'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the registered-worktree fixture ignore policy.' }
+  & git -C $allWorktreesFixtureRoot worktree add --detach --quiet $allWorktreesLinkedRoot HEAD
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to create the registered linked-worktree fixture.' }
+  $sharedGuid = '44444444444444444444444444444444'
+  "build/packages/development-contracts/$sharedGuid" | Set-Content -LiteralPath (Join-Path $allWorktreesFixtureRoot 'primary-pin.txt') -Encoding UTF8
+  & git -C $allWorktreesFixtureRoot add -- primary-pin.txt
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to stage the primary worktree pin fixture.' }
+  & git -C $allWorktreesFixtureRoot commit --quiet -m 'fixture: pin shared development-contract path'
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the primary worktree pin fixture.' }
+  $primaryStale = Join-Path $allWorktreesFixtureRoot 'build/results/primary-stale'
+  $linkedDevelopmentContract = Join-Path $allWorktreesLinkedRoot "build/packages/development-contracts/$sharedGuid"
+  foreach ($path in @($primaryStale, $linkedDevelopmentContract)) {
+    New-Item -ItemType Directory -Path $path -Force | Out-Null
+    'fixture' | Set-Content -LiteralPath (Join-Path $path 'result.txt') -Encoding UTF8
+    Get-ChildItem -LiteralPath $path -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
+    (Get-Item -LiteralPath $path).LastWriteTimeUtc = $staleTimestamp
+  }
+  $allWorktreesPreview = @(& $cleanupScript -RepoRoot $allWorktreesLinkedRoot -AllWorktrees -ArtifactType result,package -OlderThanDays 7 -PassThru)
+  if (@($allWorktreesPreview | Where-Object { $_.worktree_root -ceq $allWorktreesFixtureRoot -and $_.relative_path -ceq 'build/results/primary-stale' -and $_.status -ceq 'eligible' }).Count -ne 1) {
+    throw 'All-worktrees cleanup from a linked worktree omitted its Git-metadata-derived primary checkout.'
+  }
+  if (@($allWorktreesPreview | Where-Object { $_.worktree_root -ceq $allWorktreesLinkedRoot -and $_.relative_path -ceq "build/packages/development-contracts/$sharedGuid" -and $_.status -ceq 'pinned-reference' }).Count -ne 1) {
+    throw 'All-worktrees cleanup did not apply the selected registered-worktree pin scope.'
+  }
 } finally {
   if ($null -ne $activeLeaseLock) { $activeLeaseLock.Dispose() }
   if (Test-Path -LiteralPath $fixtureRoot) {
@@ -182,6 +243,15 @@ try {
       throw "Artifact-cleanup fixture escaped the system temp directory: $resolvedFixture"
     }
     Remove-Item -LiteralPath $resolvedFixture -Recurse -Force
+  }
+  if ($null -ne $allWorktreesFixtureRoot -and (Test-Path -LiteralPath $allWorktreesFixtureRoot)) {
+    if ($null -ne $allWorktreesLinkedRoot -and (Test-Path -LiteralPath $allWorktreesLinkedRoot)) {
+      & git -C $allWorktreesFixtureRoot worktree remove --force $allWorktreesLinkedRoot 2>$null
+    }
+    Remove-Item -LiteralPath $allWorktreesFixtureRoot -Recurse -Force
+  }
+  if ($null -ne $emptyAuditRoot -and (Test-Path -LiteralPath $emptyAuditRoot)) {
+    Remove-Item -LiteralPath $emptyAuditRoot -Recurse -Force
   }
   foreach ($name in $gitEnvironmentNames) {
     if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }
