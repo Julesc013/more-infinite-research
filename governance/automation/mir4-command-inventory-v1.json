@@ -3163,7 +3163,7 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "0387BF8CD53133512ADB39B182FB1FB1E5CEF60912FB3C6903C1C76870B62019",
+      "sha256": "94D1D16FF85EC572179FB9F9893AE2B5C9FEBC927B7D57FCE435D1A5600952A5",
       "hash_mode": "canonical-text-v1",
       "lines": 622,
       "package_visible": false
@@ -3211,9 +3211,9 @@
     {
       "path": "tools/lib/assurance/evidence/CommandExecution.ps1",
       "classification": "canonical-internal",
-      "sha256": "E375096CBB0B669D67EE0BEFF51CA922C5F6257CD275C98D6DA2799C8FA37AE0",
+      "sha256": "52008E91EFFECFF9F3A853142B92D9A4FC4EE49E80E791F358774D9B3092436D",
       "hash_mode": "canonical-text-v1",
-      "lines": 109,
+      "lines": 111,
       "package_visible": false
     },
     {
@@ -3227,17 +3227,17 @@
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "9FD9182075F1CAA01F45A0287617C3BF63D68D372F20740250711E6FA5F89FB3",
+      "sha256": "F4225F87D1ABCF001FA320E0E9962D0DA5006E72731BF6DF10B48AB04C41D922",
       "hash_mode": "canonical-text-v1",
-      "lines": 744,
+      "lines": 812,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "CE71C500DA419F05F15BD64C13DF8F52BD7E68E45F69E401F2E04E36A8FABD58",
+      "sha256": "0BBF2D5041381A6E7A14F2C9CC6B66075567182B75A731E0A8B23D841458079F",
       "hash_mode": "canonical-text-v1",
-      "lines": 569,
+      "lines": 583,
       "package_visible": false
     },
     {
@@ -3259,9 +3259,9 @@
     {
       "path": "tools/lib/assurance/evidence/WorkerArtifactValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "2F08F2B28D4C094B30E00314833F6CEDCA15C50EA67709C57B9D089B23095F5F",
+      "sha256": "FCDA1ACE1FD2F97A2A72B2269A4A2E4D27969BF8556B896BD4FA5DC56D7B4918",
       "hash_mode": "canonical-text-v1",
-      "lines": 312,
+      "lines": 325,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b714036fbe5524d44a6a31407c79d0236e24d46661d4bc76b3a3357ec3b91215"
+  "digest": "sha256:43930dcfaad0269cded41696ec7a9006eb74d290449d7dd96f1abf0b7f2ef4ab"
 }

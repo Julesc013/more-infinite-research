@@ -54,6 +54,17 @@ $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
 
+$developmentContractsTest = @($catalog.tests | Where-Object { [string]$_.id -eq 'static.mir4-development-contracts' })
+if ($developmentContractsTest.Count -ne 1 -or
+    [string]$developmentContractsTest[0].command -cne './tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>' -or
+    @($developmentContractsTest[0].inputs) -notcontains 'source-identity' -or
+    @($developmentContractsTest[0].captured_artifacts).Count -ne 1 -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].path_pattern -cne '<test-output>' -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].schema -cne 'contracts/repository/mir4-development-contracts-local-result-v1.schema.json' -or
+    [string]$developmentContractsTest[0].captured_artifacts[0].kind -cne 'MIR4DevelopmentContractsLocalResultV1') {
+  throw 'static.mir4-development-contracts must bind a clean exact plan source and one worker-private receipt output.'
+}
+
 $releaseHistoryClassificationCases = [ordered]@{
   ".mir/portable-return.yml" = "release-governance"
   ".mir/control-plane/package-locks.json" = "release-governance"
@@ -291,8 +302,8 @@ if ($performanceTest.Count -ne 1 -or
 }
 foreach ($requiredPerformanceIsolationSnippet in @(
   '"<test-output>"=[string]$TestOutput',
-  '$performanceOutputPath = Join-Path $workRoot "performance-regression.json"',
-  '-TestOutput $performanceOutputPath',
+  '$testOutputPath = Join-Path $workRoot "test-output.json"',
+  '-TestOutput $testOutputPath',
   '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
   '-Kind "runtime-performance-evidence"'
 )) {

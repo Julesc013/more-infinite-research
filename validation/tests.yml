@@ -4224,10 +4224,11 @@
       "id": "static.mir4-development-contracts",
       "kind": "static",
       "layer": "F0",
-      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>",
       "requires_factorio": false,
       "inputs": [
         "governance/repository/development-epoch-v1.json",
+        "source-identity",
         "tests/repository/Test-MIR4DevelopmentContracts.ps1",
         "src/mod/**",
         "targets/**",
@@ -4247,7 +4248,7 @@
       ],
       "captured_artifacts": [
         {
-          "path_pattern": "build/results/validation/development-contracts/*.json",
+          "path_pattern": "<test-output>",
           "schema": "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
           "kind": "MIR4DevelopmentContractsLocalResultV1"
         }

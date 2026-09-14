@@ -26,6 +26,8 @@ function Resolve-MIRAssuranceCommandText {
     "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
     "<approved-delta-path>"=[string]$approvedDeltaPath
     "<source-commit>"=[string]$Plan.source_commit
+    "<source-tree>"=[string]$Plan.source_tree
+    "<package-source-sha256>"=[string]$Plan.package_source_sha256
     "<package-source-commit>"=[string]$Plan.package_source_commit
     "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
     "<test-output>"=[string]$TestOutput

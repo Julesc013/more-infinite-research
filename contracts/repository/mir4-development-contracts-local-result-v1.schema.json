@@ -17,11 +17,11 @@
         "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
         "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
         "package_source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
-        "package_source_dirty": {"type": "boolean"},
+        "package_source_dirty": {"const": false},
         "selected_inputs_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
         "selected_input_file_count": {"type": "integer", "minimum": 1},
-        "selected_inputs_dirty": {"type": "boolean"},
-        "repository_dirty": {"type": "boolean"}
+        "selected_inputs_dirty": {"const": false},
+        "repository_dirty": {"const": false}
       }
     },
     "command_inventory_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
@@ -29,6 +29,12 @@
       "type": "array",
       "minItems": 4,
       "maxItems": 4,
+      "allOf": [
+        {"contains": {"type": "object", "required": ["target"], "properties": {"target": {"const": "f210"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["target"], "properties": {"target": {"const": "f200"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["target"], "properties": {"target": {"const": "f110"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"type": "object", "required": ["target"], "properties": {"target": {"const": "f100"}}}, "minContains": 1, "maxContains": 1}
+      ],
       "items": {
         "type": "object",
         "additionalProperties": false,

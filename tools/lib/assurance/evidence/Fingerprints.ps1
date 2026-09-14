@@ -236,6 +236,20 @@ function Get-MIRAssuranceInputFingerprint {
       $files = @(Get-MIRAssurancePackageFiles)
       return [ordered]@{ kind="package-source"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
     }
+    "source-identity" {
+      $material = [ordered]@{
+        commit=[string]$Plan.source_commit
+        tree=[string]$Plan.source_tree
+        package_source_sha256=[string]$Plan.package_source_sha256
+      }
+      return [ordered]@{
+        kind='source-identity'
+        commit=[string]$material.commit
+        tree=[string]$material.tree
+        package_source_sha256=[string]$material.package_source_sha256
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
+    }
     "repository" {
       $files = @(Get-MIRAssuranceRepositoryFiles)
       return [ordered]@{ kind="repository"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }

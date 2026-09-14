@@ -322,7 +322,7 @@ function Get-MIRArtifactFirstGitGrepMatch {
   param(
     [Parameter(Mandatory)][string]$WorktreeRoot,
     [Parameter(Mandatory)][string]$Needle,
-    [ValidateRange(256,1048576)][int]$MaxPathCharacters = 16384
+    [ValidateRange(16,1048576)][int]$MaxPathCharacters = 16384
   )
 
   $startInfo = [Diagnostics.ProcessStartInfo]::new()

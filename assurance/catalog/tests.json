@@ -2439,7 +2439,7 @@
       "cohort": "package-repository",
       "kind": "static",
       "layer": "F0",
-      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>",
       "canonical_implementation": "tests/repository/Test-MIR4DevelopmentContracts.ps1",
       "target_scope": "portable",
       "freshness": "exact-input-fingerprint",
@@ -2449,6 +2449,7 @@
       "requires_factorio": false,
       "inputs": [
         "governance/repository/development-epoch-v1.json",
+        "source-identity",
         "tests/repository/Test-MIR4DevelopmentContracts.ps1",
         "src/mod/**",
         "targets/**",
@@ -2468,7 +2469,7 @@
       ],
       "captured_artifacts": [
         {
-          "path_pattern": "build/results/validation/development-contracts/*.json",
+          "path_pattern": "<test-output>",
           "schema": "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
           "kind": "MIR4DevelopmentContractsLocalResultV1"
         }
@@ -6478,5 +6479,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c66ce577f03444a3a0cafb4900d7e13b18545a5ea56fd84df370aae36eae8728"
+  "digest": "sha256:30e192f51702abd019b2d14f95038502bfa58e4033ed83240a438d91d770c80a"
 }

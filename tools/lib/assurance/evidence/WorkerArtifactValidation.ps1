@@ -25,12 +25,25 @@ function Test-MIRAssuranceCapturedArtifactBindings {
     if ($matches.Count -ne 1) { return [ordered]@{valid=$false;reason='captured-artifact-ambiguous-or-missing'} }
     $artifact = $matches[0]
     $sourcePath = [string]$artifact.source_path
-    if ([string]::IsNullOrWhiteSpace($sourcePath) -or
-        -not (Test-MIRAssurancePathPattern -Path $sourcePath -Pattern ([string]$declaration.path_pattern))) {
+    $sourceMatches = if ([string]$declaration.path_pattern -ceq '<test-output>') {
+      $sourcePath -match '^build/results/assurance/evidence/.+/work/[0-9a-f]{32}/test-output[.]json$'
+    } else {
+      Test-MIRAssurancePathPattern -Path $sourcePath -Pattern ([string]$declaration.path_pattern)
+    }
+    if ([string]::IsNullOrWhiteSpace($sourcePath) -or -not $sourceMatches) {
       return [ordered]@{valid=$false;reason='captured-artifact-source-mismatch'}
     }
     $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
-    try { Test-MIRAssuranceCapturedArtifactJson -Path $artifactPath -Declaration $declaration -TestId ([string]$Test.id) }
+    try {
+      $record = Test-MIRAssuranceCapturedArtifactJson -Path $artifactPath -Declaration $declaration -TestId ([string]$Test.id)
+      if ([string]$declaration.kind -ceq 'MIR4DevelopmentContractsLocalResultV1') {
+        if ([string]$artifact.source_commit -cne [string]$record.source.commit -or
+            [string]$artifact.source_tree -cne [string]$record.source.tree -or
+            [string]$artifact.package_source_sha256 -cne [string]$record.source.package_source_sha256) {
+          return [ordered]@{valid=$false;reason='captured-artifact-source-identity-mismatch'}
+        }
+      }
+    }
     catch { return [ordered]@{valid=$false;reason='captured-artifact-schema-or-kind-mismatch'} }
   }
   return [ordered]@{valid=$true;reason='captured-artifacts-exact'}
