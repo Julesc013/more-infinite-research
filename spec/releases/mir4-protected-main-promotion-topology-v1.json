@@ -2,13 +2,20 @@
   "schema": 1,
   "kind": "MIR42ProtectedMainPromotionTopologyV1",
   "release_line": "4.2",
-  "status": "accepted-and-synthetically-rehearsed-release-blocked",
+  "status": "implemented-and-synthetically-rehearsed-release-blocked",
   "strategy": "main-based-tree-transplant-protected-pr",
   "selection": {
     "reason": "The protected branches require pull requests and linear history while GitHub exposes squash and rebase integration, so an exact dev commit fast-forward is not a prospective routine path.",
     "main_dev_divergence_allowed": true,
     "main_unique_changes_must_be_patch_equivalent_in_dev": true,
     "protection_exception_allowed": false
+  },
+  "governance": {
+    "canonical_repository": "Julesc013/more-infinite-research",
+    "canonical_main_ref": "refs/heads/main",
+    "policy_observation": "github-rest-v3-current-observation-required",
+    "effective_policy_rechecked_before_merge": true,
+    "synthetic_rehearsal_only": true
   },
   "candidate": {
     "base": "exact observed main commit",
@@ -23,7 +30,8 @@
     "exact_candidate_commit": true,
     "exact_candidate_tree": true,
     "exact_target_package_bytes": true,
-    "trusted_record_hash_required": true,
+    "materializer_blob_bound": true,
+    "governed_independent_receipts_required": true,
     "package_files_rehashed_at_intention": true,
     "package_files_rehashed_at_readback": true,
     "calendar_does_not_waive_gates": true
@@ -52,6 +60,9 @@
     "qualified_dev_ref_unchanged_required": true,
     "direct_main_child_required": true,
     "commit_message_binding_required": true,
+    "actual_pr_observation_required": true,
+    "squash_method_required": true,
+    "required_checks_observed": true,
     "commit_rebinding_record_required": true,
     "human_playtest_after_readback": true
   },

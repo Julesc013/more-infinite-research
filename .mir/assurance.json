@@ -402,10 +402,13 @@
       "id": "mir4-protected-promotion-topology-a08",
       "patterns": [
         "^tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology[.]ps1$",
+        "^tools/lib/mir4/pre-freeze-release/ReleaseDoctor[.]ps1$",
+        "^tools/lib/mir4/PreFreezeRelease[.]ps1$",
+        "^tools/commands/mir4/Invoke-MIR4PreFreeze[.]ps1$",
         "^tests/mir4/Test-MIR4ProtectedPromotionTopologyA08[.]ps1$",
-        "^spec/(?:releases/mir4-protected-main-promotion-topology-v1|schemas/mir4-protected-main-(?:promotion-topology|qualification)-v1[.]schema)[.]json$",
+        "^spec/(?:releases/mir4-protected-main-promotion-topology-v1|schemas/mir4-(?:protected-main-(?:promotion-topology|qualification)-v1|target-qualification-worker-receipt-v1|independent-verification-receipt-v1)[.]schema)[.]json$",
         "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
-        "^[.]mir/(?:assurance[.]json|modules[.]yml)$",
+        "^(?:validation/trust[.]json|[.]mir/(?:assurance[.]json|modules[.]yml))$",
         "^validation/tests[.]yml$"
       ],
       "tests": [

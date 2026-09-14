@@ -4291,9 +4291,16 @@
       "inputs": [
         ".mir/assurance.json",
         ".mir/modules.yml",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
         "spec/releases/mir4-protected-main-promotion-topology-v1.json",
         "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
         "spec/schemas/mir4-protected-main-qualification-v1.schema.json",
+        "spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json",
+        "spec/schemas/mir4-independent-verification-receipt-v1.schema.json",
+        "validation/trust.json",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tools/lib/mir4/PreFreezeRelease.ps1",
+        "tools/lib/mir4/pre-freeze-release/ReleaseDoctor.ps1",
         "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
         "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
         "validation/tests.yml"
@@ -6310,5 +6317,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e9834892e7b3af72452ef014354ff4e4908de04a5dff05f5a28c8c39802a9431"
+  "digest": "sha256:4e03f433736bfbe81ce55ab09ace47d34904a6e152c3b63d6c0c3eb3940f54fa"
 }

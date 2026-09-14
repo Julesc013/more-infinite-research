@@ -2347,9 +2347,9 @@
     {
       "path": "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
       "classification": "canonical-internal",
-      "sha256": "C28229244C1533D683A2E9BF7CF8F7F9BA22F66611DE7B37B7897085BCDCB617",
+      "sha256": "7D1F9B02AC482734BFF332CFEDD4BC8B6D6AB30FF685BD384C28DA4DF1457334",
       "hash_mode": "canonical-text-v1",
-      "lines": 62,
+      "lines": 69,
       "package_visible": false
     },
     {
@@ -3203,9 +3203,9 @@
     {
       "path": "tools/lib/assurance/evidence/AttemptState.ps1",
       "classification": "canonical-internal",
-      "sha256": "8165A25D94443F55243927DA3A8D990748373EE92A8BA45CB45A3F921B2C88DC",
+      "sha256": "325421D573E9AC67A43D206A510477CE4881DC4459851266FB04D6CCBCB6C0DC",
       "hash_mode": "canonical-text-v1",
-      "lines": 75,
+      "lines": 802,
       "package_visible": false
     },
     {
@@ -3219,17 +3219,17 @@
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "AE7C83E9287F7336D8A4E2B42701C534757C48BF5173D7F3CBE0360E071C606F",
+      "sha256": "D2909D05C9FAB388FF8C628D909E808F6DCF7F40883A7AADAF2EE554008A9A5D",
       "hash_mode": "canonical-text-v1",
-      "lines": 182,
+      "lines": 212,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "DFE45F47286CBF2657F6304FA8DBB67B01A282E8E82134C483D63553D2A4EDAD",
+      "sha256": "4158FA6462BF490847744B9A19247FC238910849151E0DBA90EE55BB9E31E3C0",
       "hash_mode": "canonical-text-v1",
-      "lines": 526,
+      "lines": 588,
       "package_visible": false
     },
     {
@@ -3267,9 +3267,9 @@
     {
       "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
       "classification": "canonical-internal",
-      "sha256": "F7DBFB0ADBAA7475565F5CF3B4D65D4E6950B5894C7A6A86AB6B1B3452FC8537",
+      "sha256": "52EA1E2EC93666720040BC1CF37CD1AA197AA64FA7E0A3B984D56E000312ADD3",
       "hash_mode": "canonical-text-v1",
-      "lines": 481,
+      "lines": 511,
       "package_visible": false
     },
     {
@@ -3867,9 +3867,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
       "classification": "canonical-internal",
-      "sha256": "950426484F1D34E2FE96DFC6CEF2D42A148E2865D603C7992656F915A5372D6C",
+      "sha256": "F519D6F91C75DA751F6ADEF220DB2D6399FB317D68B32C92B505604409891091",
       "hash_mode": "canonical-text-v1",
-      "lines": 451,
+      "lines": 412,
       "package_visible": false
     },
     {
@@ -5626,5 +5626,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:51afb9cea3d42e54fc675598daa79dcf507ad2e3b10043defa0f79f3668829f9"
+  "digest": "sha256:074f5c49dbbbf47506a66e2d327e7777ace772d71631d0f548d143bb1a691a36"
 }
