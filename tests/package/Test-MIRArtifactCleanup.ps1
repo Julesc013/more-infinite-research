@@ -154,6 +154,14 @@ try {
     throw 'Typed-root cleanup descended into a noncanonical development-contract child.'
   }
 
+  # The scanner reads only one bounded output path.  Deliberately lowering the
+  # configured cap below this tracked filename must fail closed instead of
+  # accepting or retaining arbitrary grep output.
+  $boundedReferencePreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType package -MaxTrackedReferencePathCharacters 16 -PassThru)
+  if (@($boundedReferencePreview | Where-Object { $_.relative_path -ceq 'build/packages/development-contracts/33333333333333333333333333333333' -and $_.status -ceq 'unsafe-inspection' }).Count -ne 1) {
+    throw 'Tracked-reference scanning did not fail closed on bounded first-match output.'
+  }
+
   $resultOnlyPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType result -PassThru)
   if ($resultOnlyPreview.Count -eq 0 -or @($resultOnlyPreview | Where-Object { $_.artifact_type -cne 'result' }).Count -ne 0) {
     throw 'Typed cleanup selection did not remain bounded to build/results.'

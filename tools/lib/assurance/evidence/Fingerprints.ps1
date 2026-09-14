@@ -525,6 +525,15 @@ function Get-MIRAssuranceTestFingerprint {
     requires_factorio=[bool]$Test.requires_factorio
     requires_candidate=[bool]$Test.requires_candidate
     inputs=@($Test.inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    captured_artifacts=@(
+      foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
+        [ordered]@{
+          path_pattern=[string]$artifact.path_pattern
+          schema=[string]$artifact.schema
+          kind=[string]$artifact.kind
+        }
+      }
+    )
     domain_dependencies=@($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
     scenario_sha256=if ($Test.scenario) { Get-MIRAssuranceJsonHash -Value $Test.scenario } else { "" }
   }

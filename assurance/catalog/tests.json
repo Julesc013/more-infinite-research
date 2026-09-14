@@ -2452,8 +2452,11 @@
         "tests/repository/Test-MIR4DevelopmentContracts.ps1",
         "src/mod/**",
         "targets/**",
+        "tools/mir.ps1",
         "tools/mir/**",
+        "tools/commands/**",
         "tools/lib/**",
+        "scripts/**",
         "tools/commands/package/Build-MIRPackage.ps1",
         "tests/**",
         "governance/automation/mir4-command-inventory-v1.json",
@@ -6475,5 +6478,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:de2855c26f1121db542408cacd200f9b7466f86d2054802ebab2c60c9102c477"
+  "digest": "sha256:c66ce577f03444a3a0cafb4900d7e13b18545a5ea56fd84df370aae36eae8728"
 }

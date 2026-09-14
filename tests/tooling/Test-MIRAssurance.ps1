@@ -999,6 +999,47 @@ try {
       [string]$plannerPlan.candidate_descriptor.content_sha256 -ne [string]$workerPlan.candidate_descriptor.content_sha256) {
     throw "Separate roots did not preserve exact isolated candidate identity."
   }
+
+  # The development-contract proof reads command dispatch and script sources in
+  # addition to the package builder.  Prove the real planner invalidates its
+  # reusable row when each representative source changes; a synthetic hash
+  # comparison would not exercise catalogue-to-fingerprint binding.
+  function Get-MIRDevelopmentContractsPlanFingerprint {
+    param([Parameter(Mandatory)]$Plan)
+    $rows = @($Plan.tests | Where-Object { [string]$_.id -eq 'static.mir4-development-contracts' })
+    if ($rows.Count -ne 1) { throw 'Verification plan does not contain exactly one development-contract test row.' }
+    return $rows[0].fingerprint
+  }
+  # The development-contract test is deliberately selected by the dedicated
+  # development profile, rather than the minimal `fast` profile used above for
+  # the cross-platform general-plan comparison.  Exercise the profile that
+  # owns this proposition so a missing row is never mistaken for reusable
+  # evidence.
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-development-contracts.json
+  if ($LASTEXITCODE -ne 0) { throw 'Development-contract verification plan did not materialize.' }
+  $developmentContractsPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-development-contracts.json') | ConvertFrom-Json
+  $baselineDevelopmentContractsFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $developmentContractsPlan
+  $nonBuildCommandPath = Join-Path $plannerRoot 'tools\commands\workspace\Remove-MIRStaleArtifacts.ps1'
+  [IO.File]::AppendAllText($nonBuildCommandPath, "`n# assurance planner invalidation: non-Build command`n", [Text.UTF8Encoding]::new($false))
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-non-build-command.json
+  if ($LASTEXITCODE -ne 0) { throw 'Verification plan did not reconstruct after non-Build command mutation.' }
+  $nonBuildCommandPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-non-build-command.json') | ConvertFrom-Json
+  $nonBuildCommandFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $nonBuildCommandPlan
+  if ([string]$nonBuildCommandFingerprint.fingerprint_sha256 -eq [string]$baselineDevelopmentContractsFingerprint.fingerprint_sha256 -or
+      [string]$nonBuildCommandFingerprint.inputs.'tools/commands/**'.sha256 -eq [string]$baselineDevelopmentContractsFingerprint.inputs.'tools/commands/**'.sha256) {
+    throw 'Development-contract assurance-plan reuse was not invalidated by a non-Build command source change.'
+  }
+
+  $scriptInputPath = Join-Path $plannerRoot 'scripts\Invoke-MIRAssurance.ps1'
+  [IO.File]::AppendAllText($scriptInputPath, "`n# assurance planner invalidation: script input`n", [Text.UTF8Encoding]::new($false))
+  & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile mir4-development --output build/results/assurance/verification-plan-scripts-input.json
+  if ($LASTEXITCODE -ne 0) { throw 'Verification plan did not reconstruct after script input mutation.' }
+  $scriptInputPlan = Get-Content -Raw -LiteralPath (Join-Path $plannerRoot 'build\results\assurance\verification-plan-scripts-input.json') | ConvertFrom-Json
+  $scriptInputFingerprint = Get-MIRDevelopmentContractsPlanFingerprint -Plan $scriptInputPlan
+  if ([string]$scriptInputFingerprint.fingerprint_sha256 -eq [string]$nonBuildCommandFingerprint.fingerprint_sha256 -or
+      [string]$scriptInputFingerprint.inputs.'scripts/**'.sha256 -eq [string]$nonBuildCommandFingerprint.inputs.'scripts/**'.sha256) {
+    throw 'Development-contract assurance-plan reuse was not invalidated by a scripts source change.'
+  }
 } finally {
   if (Test-Path -LiteralPath $equivalenceRoot) { Remove-Item -LiteralPath $equivalenceRoot -Recurse -Force }
 }

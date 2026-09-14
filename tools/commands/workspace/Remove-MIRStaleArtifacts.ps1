@@ -5,6 +5,8 @@ param(
   [int]$OlderThanDays = 7,
   [ValidateRange(1, 100000)]
   [int]$MaxPlanEntries = 10000,
+  [ValidateRange(16, 1048576)]
+  [int]$MaxTrackedReferencePathCharacters = 16384,
   [ValidateSet('result', 'test', 'package')]
   [string[]]$ArtifactType = @('result', 'test', 'package'),
   [switch]$AllWorktrees,
@@ -316,6 +318,65 @@ function Get-MIRArtifactCustodyMarker {
   return $null
 }
 
+function Get-MIRArtifactFirstGitGrepMatch {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)][string]$Needle,
+    [ValidateRange(256,1048576)][int]$MaxPathCharacters = 16384
+  )
+
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = 'git'
+  $startInfo.ArgumentList.Add('-C')
+  $startInfo.ArgumentList.Add($WorktreeRoot)
+  $startInfo.ArgumentList.Add('grep')
+  $startInfo.ArgumentList.Add('-l')
+  $startInfo.ArgumentList.Add('-F')
+  $startInfo.ArgumentList.Add('--')
+  $startInfo.ArgumentList.Add($Needle)
+  $startInfo.UseShellExecute = $false
+  $startInfo.RedirectStandardOutput = $true
+  # The bounded first-match reader must not retain a second arbitrary stream.
+  # Git writes diagnostics to its inherited stream; nonzero status below is a
+  # fail-closed inspection error.
+  $startInfo.RedirectStandardError = $false
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  [void]$process.Start()
+  $builder = [Text.StringBuilder]::new()
+  $buffer = New-Object char[] 1024
+  try {
+    while (($read = $process.StandardOutput.Read($buffer, 0, $buffer.Length)) -gt 0) {
+      for ($index = 0; $index -lt $read; $index++) {
+        $character = $buffer[$index]
+        if ($character -eq "`n") {
+          $match = $builder.ToString().TrimEnd("`r")
+          if ($match.Length -eq 0) { throw 'Git reference scan emitted an empty path.' }
+          # A single matching tracked path is sufficient to pin an artifact.
+          # Stop the process before it can fill memory with more matches.
+          if (-not $process.HasExited) { $process.Kill($true) }
+          $process.WaitForExit()
+          return $match
+        }
+        [void]$builder.Append($character)
+        if ($builder.Length -gt $MaxPathCharacters) {
+          throw 'Git reference scan exceeded the bounded first-path length.'
+        }
+      }
+    }
+    $process.WaitForExit()
+    if ($builder.Length -ne 0) { throw 'Git reference scan ended with an unterminated path.' }
+    if ($process.ExitCode -eq 1) { return $null }
+    if ($process.ExitCode -ne 0) { throw "Git reference scan failed with exit code $($process.ExitCode)." }
+    throw 'Git reference scan succeeded without a path.'
+  } catch {
+    if (-not $process.HasExited) { $process.Kill($true); $process.WaitForExit() }
+    throw
+  } finally {
+    $process.Dispose()
+  }
+}
+
 function Get-MIRArtifactTrackedReference {
   param(
     [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots,
@@ -324,11 +385,11 @@ function Get-MIRArtifactTrackedReference {
 
   foreach ($referenceWorktreeRoot in @($ReferenceWorktreeRoots | Sort-Object -Unique)) {
     foreach ($needle in @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique) {
-      $matches = @(& git -C $referenceWorktreeRoot grep -l -F -- $needle 2>$null)
-      if ($LASTEXITCODE -eq 0 -and $matches.Count -gt 0) {
-        return ("{0}:{1}" -f (Split-Path -Leaf $referenceWorktreeRoot), [string]$matches[0])
+      try { $match = Get-MIRArtifactFirstGitGrepMatch -WorktreeRoot $referenceWorktreeRoot -Needle $needle -MaxPathCharacters $MaxTrackedReferencePathCharacters }
+      catch { return '__unsafe-reference-scan__' }
+      if (-not [string]::IsNullOrWhiteSpace([string]$match)) {
+        return ("{0}:{1}" -f (Split-Path -Leaf $referenceWorktreeRoot), [string]$match)
       }
-      if ($LASTEXITCODE -notin @(0, 1)) { return '__unsafe-reference-scan__' }
     }
   }
   return $null

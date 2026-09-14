@@ -2,10 +2,11 @@ function Wait-MIRAssuranceEvidence {
   param(
     [Parameter(Mandatory)]$Fingerprint,
     [Parameter(Mandatory)]$Context,
+    $Test = $null,
     [int]$PollSeconds = 5
   )
   while ($true) {
-    $reused = Get-MIRAssuranceReusableEvidence -Fingerprint $Fingerprint -Context $Context
+    $reused = Get-MIRAssuranceReusableEvidence -Fingerprint $Fingerprint -Context $Context -Test $Test
     if ($null -ne $reused) { return $reused }
     $running = Get-MIRAssuranceRunningEvidence -Fingerprint $Fingerprint -Context $Context
     if ($null -eq $running) { return $null }
@@ -29,6 +30,156 @@ function Get-MIRAssuranceArtifactDescriptor {
     bytes=$item.Length
     sha256=(Get-MIRAssuranceSha256 -Path $item.FullName)
   }
+}
+
+function Get-MIRAssuranceCapturedArtifactDeclarations {
+  param([Parameter(Mandatory)]$Test)
+
+  $property = $Test.PSObject.Properties['captured_artifacts']
+  $declaredValue = if ($null -ne $property) {
+    $property.Value
+  } elseif ($Test -is [Collections.IDictionary] -and $Test.Contains('captured_artifacts')) {
+    # Plan decoration deliberately converts catalogue records to ordered
+    # dictionaries before fingerprinting.  Dictionary entries do not appear in
+    # PSObject.Properties, so retaining only the latter would silently erase a
+    # catalogue proof obligation from the executable plan.
+    $Test['captured_artifacts']
+  } else {
+    $null
+  }
+  if ($null -eq $declaredValue) { return @() }
+  $declarations = [Collections.Generic.List[object]]::new()
+  foreach ($value in @($declaredValue)) {
+    if ($null -eq $value) { throw "Assurance test '$([string]$Test.id)' declares a null captured artifact." }
+    $pathPattern = [string]$value.path_pattern
+    $schema = [string]$value.schema
+    $kind = [string]$value.kind
+    if ([string]::IsNullOrWhiteSpace($pathPattern) -or
+        [string]::IsNullOrWhiteSpace($schema) -or
+        [string]::IsNullOrWhiteSpace($kind)) {
+      throw "Assurance test '$([string]$Test.id)' declares an incomplete captured artifact."
+    }
+    if ([IO.Path]::IsPathRooted($pathPattern) -or $pathPattern.IndexOf([char]0) -ge 0 -or
+        @($pathPattern.Replace('\', '/').Split('/') | Where-Object { $_ -in @('', '.', '..') }).Count -gt 0) {
+      throw "Assurance test '$([string]$Test.id)' declares an unsafe captured-artifact path pattern: $pathPattern"
+    }
+    if ([IO.Path]::IsPathRooted($schema) -or $schema.IndexOf([char]0) -ge 0 -or
+        @($schema.Replace('\', '/').Split('/') | Where-Object { $_ -in @('', '.', '..') }).Count -gt 0) {
+      throw "Assurance test '$([string]$Test.id)' declares an unsafe captured-artifact schema: $schema"
+    }
+    $declarations.Add([pscustomobject][ordered]@{
+      path_pattern=$pathPattern.Replace('\', '/')
+      schema=$schema.Replace('\', '/')
+      kind=$kind
+    })
+  }
+  return @($declarations)
+}
+
+function Get-MIRAssuranceCapturedArtifactSources {
+  param(
+    [Parameter(Mandatory)]$Test,
+    [int]$MaxFilesPerDeclaration = 16
+  )
+
+  if ($MaxFilesPerDeclaration -le 0) { throw 'Captured-artifact file limit must be positive.' }
+  $sources = [Collections.Generic.List[object]]::new()
+  foreach ($declaration in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
+    # Catalogue patterns deliberately name one concrete repository directory
+    # and a leaf glob.  Do not turn a proof declaration into an unbounded
+    # recursive workspace scan; new forms require an explicit implementation.
+    $directory = Split-Path -Parent ([string]$declaration.path_pattern)
+    $leafPattern = Split-Path -Leaf ([string]$declaration.path_pattern)
+    if ([string]::IsNullOrWhiteSpace($directory) -or [string]::IsNullOrWhiteSpace($leafPattern) -or
+        $directory -match '[*?\[]' -or $leafPattern.Contains('/') -or $leafPattern.Contains('\')) {
+      throw "Assurance test '$([string]$Test.id)' declares an unsupported captured-artifact pattern: $($declaration.path_pattern)"
+    }
+    $sourceDirectory = [IO.Path]::GetFullPath((Join-Path $repo $directory))
+    $repoBoundary = [IO.Path]::GetFullPath($repo).TrimEnd([char]92, [char]47) + [IO.Path]::DirectorySeparatorChar
+    if (-not $sourceDirectory.StartsWith($repoBoundary, [StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath $sourceDirectory -PathType Container)) {
+      throw "Assurance test '$([string]$Test.id)' did not produce captured artifact directory: $($declaration.path_pattern)"
+    }
+    $directoryItem = Get-Item -LiteralPath $sourceDirectory -Force
+    if (($directoryItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Assurance test '$([string]$Test.id)' captured-artifact directory is a reparse point: $($declaration.path_pattern)"
+    }
+    $matches = @(
+      [IO.Directory]::EnumerateFiles($sourceDirectory, $leafPattern, [IO.SearchOption]::TopDirectoryOnly) |
+        Sort-Object
+    )
+    if ($matches.Count -ne 1) {
+      throw "Assurance test '$([string]$Test.id)' must produce exactly one captured artifact for '$($declaration.path_pattern)'; found $($matches.Count)."
+    }
+    if ($matches.Count -gt $MaxFilesPerDeclaration) {
+      throw "Assurance test '$([string]$Test.id)' exceeded the captured-artifact file limit for '$($declaration.path_pattern)'."
+    }
+    $item = Get-Item -LiteralPath $matches[0] -Force
+    if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      throw "Assurance test '$([string]$Test.id)' captured artifact is a reparse point: $($declaration.path_pattern)"
+    }
+    $sources.Add([pscustomobject][ordered]@{
+      declaration=$declaration
+      path=$item.FullName
+      source_path=(Get-MIRAssuranceRepoRelativePath -Path $item.FullName)
+    })
+  }
+  return @($sources)
+}
+
+function Test-MIRAssuranceCapturedArtifactJson {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Declaration,
+    [Parameter(Mandatory)][string]$TestId
+  )
+
+  $schemaPath = [IO.Path]::GetFullPath((Join-Path $repo ([string]$Declaration.schema)))
+  $repoBoundary = [IO.Path]::GetFullPath($repo).TrimEnd([char]92, [char]47) + [IO.Path]::DirectorySeparatorChar
+  if (-not $schemaPath.StartsWith($repoBoundary, [StringComparison]::OrdinalIgnoreCase) -or
+      -not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
+    throw "Assurance test '$TestId' has no usable captured-artifact schema: $($Declaration.schema)"
+  }
+  try { $json = Get-Content -Raw -LiteralPath $Path }
+  catch { throw "Assurance test '$TestId' cannot read captured artifact '$Path': $($_.Exception.Message)" }
+  try {
+    if (-not ($json | Test-Json -SchemaFile $schemaPath)) {
+      throw "Captured artifact '$Path' does not satisfy $($Declaration.schema)."
+    }
+    $record = $json | ConvertFrom-Json -Depth 100
+  } catch {
+    throw "Assurance test '$TestId' captured artifact is schema-invalid: $($_.Exception.Message)"
+  }
+  if ([string]$record.kind -cne [string]$Declaration.kind) {
+    throw "Assurance test '$TestId' captured artifact has kind '$([string]$record.kind)' instead of '$([string]$Declaration.kind)'."
+  }
+}
+
+function Copy-MIRAssuranceCapturedArtifacts {
+  param(
+    [Parameter(Mandatory)]$Test,
+    [Parameter(Mandatory)][string]$WorkRoot
+  )
+
+  $sources = @(Get-MIRAssuranceCapturedArtifactSources -Test $Test)
+  if ($sources.Count -eq 0) { return @() }
+  $captureRoot = Join-Path $WorkRoot 'captured-artifacts'
+  New-Item -ItemType Directory -Force -Path $captureRoot | Out-Null
+  $descriptors = [Collections.Generic.List[object]]::new()
+  for ($index = 0; $index -lt $sources.Count; $index++) {
+    $source = $sources[$index]
+    Test-MIRAssuranceCapturedArtifactJson -Path ([string]$source.path) -Declaration $source.declaration -TestId ([string]$Test.id)
+    $destination = Join-Path $captureRoot ("{0:D3}-{1}" -f ($index + 1), [IO.Path]::GetFileName([string]$source.path))
+    Copy-Item -LiteralPath ([string]$source.path) -Destination $destination -Force
+    Test-MIRAssuranceCapturedArtifactJson -Path $destination -Declaration $source.declaration -TestId ([string]$Test.id)
+    $descriptor = Get-MIRAssuranceArtifactDescriptor -Path $destination -Kind ([string]$source.declaration.kind)
+    $descriptor['schema'] = [string]$source.declaration.schema
+    $descriptor['captured_artifact'] = $true
+    $descriptor['source_path'] = [string]$source.source_path
+    $descriptor['path_pattern'] = [string]$source.declaration.path_pattern
+    $descriptors.Add($descriptor)
+  }
+  return @($descriptors)
 }
 
 function Get-MIRAssuranceScenarioResult {
@@ -107,7 +258,7 @@ function Invoke-MIRAssuranceTest {
     $running = Get-MIRAssuranceRunningEvidence -Fingerprint $fingerprint -Context $Context
     if ($null -ne $running) {
       Write-Host "[WAIT] $id $($fingerprint.input_key)"
-      $adopted = Wait-MIRAssuranceEvidence -Fingerprint $fingerprint -Context $Context
+      $adopted = Wait-MIRAssuranceEvidence -Fingerprint $fingerprint -Context $Context -Test $Test
       if ($null -ne $adopted) {
         $checkpoint = Get-MIRAssuranceCampaignCheckpoint -Test $Test -Plan $Plan -Context $Context
         if ($null -ne $checkpoint) {
@@ -119,14 +270,14 @@ function Invoke-MIRAssuranceTest {
       Write-Host "[RUN] no exact campaign checkpoint after prior worker; continuing $id"
     }
   }
-  $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId $id
+  $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId $id -Test $Test
   if ([string]$decision.disposition -eq "REUSE") {
     Write-Host "[REUSE] $id $($fingerprint.input_key)"
     return $decision.evidence
   }
   if ([string]$decision.disposition -eq "WAIT") {
     Write-Host "[WAIT] $id $($fingerprint.input_key)"
-    $adopted = Wait-MIRAssuranceEvidence -Fingerprint $fingerprint -Context $Context
+    $adopted = Wait-MIRAssuranceEvidence -Fingerprint $fingerprint -Context $Context -Test $Test
     if ($null -ne $adopted) {
       $adopted.disposition = "WAIT"
       $adopted.decision_reason = "adopted-matching-worker-result"
@@ -204,6 +355,11 @@ function Invoke-MIRAssuranceTest {
         }
       )
     }
+    # A catalogue declaration is a proof obligation, not presentation-only
+    # metadata.  Capture the exact, schema-valid output inside this immutable
+    # worker subtree before publishing the result capsule.
+    $capturedArtifacts = @(Copy-MIRAssuranceCapturedArtifacts -Test $Test -WorkRoot $workRoot)
+    if ($capturedArtifacts.Count -gt 0) { $artifacts = @($artifacts) + $capturedArtifacts }
     $status = "passed"
   } catch {
     $status = "failed"
@@ -376,7 +532,7 @@ function Invoke-MIRAssuranceGate {
   }
   foreach ($test in @($Plan.tests)) {
     $fingerprint = $test.fingerprint
-    $capsule = Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context
+    $capsule = Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context -Test $test
     $passed = $null -ne $capsule
     if ($passed -and [bool]$test.force_fresh) {
       if (-not (Test-MIRAssuranceFreshCampaignEvidence -Capsule $capsule -Test $test -Plan $Plan)) { $passed = $false }

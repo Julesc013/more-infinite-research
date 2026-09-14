@@ -13,6 +13,7 @@ function Get-MIRAssuranceReusableEvidence {
   param(
     [Parameter(Mandatory)]$Fingerprint,
     [Parameter(Mandatory)]$Context,
+    $Test = $null,
     $Lock = $null
   )
   $identity = [ordered]@{
@@ -43,7 +44,7 @@ function Get-MIRAssuranceReusableEvidence {
     if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) { return $null }
     $capsule = Read-MIRAssuranceEvidencePointer -Path $paths.passed
     if ($null -eq $capsule) { return $null }
-    $validation = Test-MIRAssuranceCapsule -Capsule $capsule -Fingerprint $Fingerprint -Context $Context
+    $validation = Test-MIRAssuranceCapsule -Capsule $capsule -Fingerprint $Fingerprint -Context $Context -Test $Test
     if (-not [bool]$validation.valid) { return $null }
     $result = ConvertTo-MIRAssuranceOrderedMap -Object $capsule
     $result.disposition = "REUSE"
@@ -65,7 +66,7 @@ function Get-MIRAssuranceCampaignCheckpoint {
     [Parameter(Mandatory)]$Context
   )
   if (-not [bool]$Test.force_fresh) { return $null }
-  $checkpoint = Get-MIRAssuranceReusableEvidence -Fingerprint $Test.fingerprint -Context $Context
+  $checkpoint = Get-MIRAssuranceReusableEvidence -Fingerprint $Test.fingerprint -Context $Context -Test $Test
   if ($null -eq $checkpoint -or -not (Test-MIRAssuranceFreshCampaignEvidence -Capsule $checkpoint -Test $Test -Plan $Plan)) {
     return $null
   }
@@ -169,7 +170,8 @@ function Get-MIRAssuranceEvidenceDecision {
   param(
     [Parameter(Mandatory)]$Fingerprint,
     [Parameter(Mandatory)]$Context,
-    [Parameter(Mandatory)][string]$TestId
+    [Parameter(Mandatory)][string]$TestId,
+    $Test = $null
   )
   $inputMap = if ($null -eq $Fingerprint.inputs) {
     [ordered]@{}
@@ -194,7 +196,7 @@ function Get-MIRAssuranceEvidenceDecision {
     return [ordered]@{disposition="RUN"; reason="reuse-disabled"}
   }
   if (Test-MIRAssuranceCanReuseTest -TestId $TestId -Context $Context) {
-    $reused = Get-MIRAssuranceReusableEvidence -Fingerprint $Fingerprint -Context $Context
+    $reused = Get-MIRAssuranceReusableEvidence -Fingerprint $Fingerprint -Context $Context -Test $Test
     if ($null -ne $reused) {
       return [ordered]@{disposition="REUSE"; reason="exact-trusted-pass"; evidence=$reused}
     }

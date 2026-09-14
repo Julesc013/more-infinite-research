@@ -45,13 +45,19 @@ function Assert-MIRDevelopmentContractsReparseGuardRegression {
 }
 
 function ConvertFrom-MIRDevelopmentContractsPorcelainV1Z {
-  param([Parameter(Mandatory)][AllowEmptyString()][string[]]$Fields)
+  param(
+    [Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]]$Fields,
+    [ValidateRange(1,1000000)][int]$MaxFields = 100000,
+    [ValidateRange(16,1048576)][int]$MaxFieldCharacters = 65536
+  )
 
+  if ($Fields.Count -gt $MaxFields) { throw '[mir4-development-selected-input-git-status-bounded-fields]' }
   $records=[Collections.Generic.List[object]]::new()
   for($index=0;$index -lt $Fields.Count;) {
     $field=$Fields[$index]
     $index++
     if($field.Length -eq 0 -and $index -eq $Fields.Count) { break }
+    if ($field.Length -gt $MaxFieldCharacters) { throw '[mir4-development-selected-input-git-status-bounded-field]' }
     if($field.Length -lt 4 -or $field[2] -cne ' ') { throw "[mir4-development-selected-input-git-status-record] $field" }
     $status=$field.Substring(0,2)
     $paths=[Collections.Generic.List[string]]::new()
@@ -62,29 +68,68 @@ function ConvertFrom-MIRDevelopmentContractsPorcelainV1Z {
       $index++
     }
     $records.Add([pscustomobject]@{status=$status;paths=@($paths)})
+    if ($records.Count -gt $MaxFields) { throw '[mir4-development-selected-input-git-status-bounded-records]' }
   }
   return @($records)
 }
 
 function Get-MIRDevelopmentContractsPorcelainV1Z {
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateRange(1024,67108864)][int]$MaxOutputBytes = 8388608,
+    [ValidateRange(16,1048576)][int]$MaxFieldBytes = 65536,
+    [ValidateRange(1,1000000)][int]$MaxFields = 100000
+  )
 
   $startInfo=[Diagnostics.ProcessStartInfo]::new()
   $startInfo.FileName='git'
-  $startInfo.Arguments=('-C "{0}" status --porcelain=v1 -z --untracked-files=all' -f $RepoRoot.Replace('"','\"'))
+  $startInfo.ArgumentList.Add('-C')
+  $startInfo.ArgumentList.Add($RepoRoot)
+  $startInfo.ArgumentList.Add('status')
+  $startInfo.ArgumentList.Add('--porcelain=v1')
+  $startInfo.ArgumentList.Add('-z')
+  $startInfo.ArgumentList.Add('--untracked-files=all')
   $startInfo.UseShellExecute=$false
   $startInfo.RedirectStandardOutput=$true
-  $startInfo.RedirectStandardError=$true
+  # Do not buffer an arbitrary diagnostic stream while this bounded reader is
+  # waiting on status output.  Git receives the inherited diagnostic handle;
+  # nonzero exit remains a fail-closed status error below.
+  $startInfo.RedirectStandardError=$false
   $process=[Diagnostics.Process]::new()
   $process.StartInfo=$startInfo
   [void]$process.Start()
-  $bytes=[IO.MemoryStream]::new()
-  $process.StandardOutput.BaseStream.CopyTo($bytes)
-  $standardError=$process.StandardError.ReadToEnd()
-  $process.WaitForExit()
-  if($process.ExitCode -ne 0) { throw "[mir4-development-selected-input-git-status] $standardError" }
-  $fields=[Text.UTF8Encoding]::new($false).GetString($bytes.ToArray()).Split([char]0,[StringSplitOptions]::None)
-  return @(ConvertFrom-MIRDevelopmentContractsPorcelainV1Z -Fields $fields)
+  $fields=[Collections.Generic.List[string]]::new()
+  $fieldBytes=[Collections.Generic.List[byte]]::new()
+  $buffer=New-Object byte[] 4096
+  [long]$totalBytes=0
+  try {
+    while (($read=$process.StandardOutput.BaseStream.Read($buffer,0,$buffer.Length)) -gt 0) {
+      $totalBytes += $read
+      if ($totalBytes -gt $MaxOutputBytes) { throw '[mir4-development-selected-input-git-status-bounded-output]' }
+      for ($offset=0;$offset -lt $read;$offset++) {
+        $byte=$buffer[$offset]
+        if ($byte -eq 0) {
+          if ($fieldBytes.Count -gt $MaxFieldBytes) { throw '[mir4-development-selected-input-git-status-bounded-field]' }
+          try { $fields.Add([Text.UTF8Encoding]::new($false,$true).GetString($fieldBytes.ToArray())) }
+          catch { throw '[mir4-development-selected-input-git-status-utf8]' }
+          if ($fields.Count -gt $MaxFields) { throw '[mir4-development-selected-input-git-status-bounded-fields]' }
+          $fieldBytes.Clear()
+          continue
+        }
+        $fieldBytes.Add($byte)
+        if ($fieldBytes.Count -gt $MaxFieldBytes) { throw '[mir4-development-selected-input-git-status-bounded-field]' }
+      }
+    }
+    if ($fieldBytes.Count -ne 0) { throw '[mir4-development-selected-input-git-status-truncated]' }
+    $process.WaitForExit()
+    if($process.ExitCode -ne 0) { throw '[mir4-development-selected-input-git-status]' }
+  } catch {
+    if (-not $process.HasExited) { $process.Kill($true);$process.WaitForExit() }
+    throw
+  } finally {
+    $process.Dispose()
+  }
+  return @(ConvertFrom-MIRDevelopmentContractsPorcelainV1Z -Fields @($fields) -MaxFields $MaxFields -MaxFieldCharacters $MaxFieldBytes)
 }
 
 function Assert-MIRDevelopmentContractsPorcelainV1ZRegression {
@@ -99,6 +144,27 @@ function Assert-MIRDevelopmentContractsPorcelainV1ZRegression {
   $allPaths=@($records | ForEach-Object { $_.paths } | ForEach-Object { $_.Replace('\','/') })
   foreach($required in @('tools/commands/package/Build-MIRPackage.ps1','targets/f210/old.lua','targets/f210/new.lua','contracts/repository/mir4-development-contracts-local-result-v1.schema.json','contracts/repository/renamed.schema.json','validation/tests.yml')) {
     if($required -notin $allPaths) { throw "[mir4-development-selected-input-git-status-path] $required" }
+  }
+  $boundedFieldsCaught=$false
+  try { $null=ConvertFrom-MIRDevelopmentContractsPorcelainV1Z -Fields @(' M a',' M b',' M c') -MaxFields 2 } catch { $boundedFieldsCaught=$_.Exception.Message -match 'bounded-fields' }
+  if(-not $boundedFieldsCaught) { throw '[mir4-development-selected-input-git-status-bounded-fields-self-test]' }
+  $boundedFieldCaught=$false
+  try { $null=ConvertFrom-MIRDevelopmentContractsPorcelainV1Z -Fields @(' M '+('x'*128)) -MaxFieldCharacters 64 } catch { $boundedFieldCaught=$_.Exception.Message -match 'bounded-field' }
+  if(-not $boundedFieldCaught) { throw '[mir4-development-selected-input-git-status-bounded-field-self-test]' }
+}
+
+function Assert-MIRDevelopmentContractsPorcelainStreamingBoundRegression {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $fixture=Join-Path $RepoRoot ('mir4-development-status-bound-' + [guid]::NewGuid().ToString('N'))
+  try {
+    New-Item -ItemType Directory -Force -Path $fixture | Out-Null
+    foreach($index in 1..24) { [IO.File]::WriteAllText((Join-Path $fixture ("status-$index.txt")),('x'*128),[Text.UTF8Encoding]::new($false)) }
+    $caught=$false
+    try { $null=Get-MIRDevelopmentContractsPorcelainV1Z -RepoRoot $RepoRoot -MaxOutputBytes 1024 -MaxFieldBytes 512 -MaxFields 100 } catch { $caught=$_.Exception.Message -match 'bounded-output' }
+    if(-not $caught) { throw '[mir4-development-selected-input-git-status-bounded-output-self-test]' }
+  } finally {
+    if(Test-Path -LiteralPath $fixture) { Remove-Item -LiteralPath $fixture -Recurse -Force }
   }
 }
 
@@ -131,7 +197,12 @@ function Assert-MIRDevelopmentContractsInputFingerprintRegression {
   )
 
   $baseline=Get-MIRDevelopmentContractsSelectedInputFingerprint -RepoRoot $RepoRoot -SelectedInputPaths $SelectedInputPaths -PackageSourceFingerprint $PackageSourceFingerprint -CommandInventoryDigest $CommandInventoryDigest
-  foreach($relative in @('tools/commands/package/Build-MIRPackage.ps1','contracts/repository/mir4-development-contracts-local-result-v1.schema.json')) {
+  foreach($relative in @(
+    'tools/commands/package/Build-MIRPackage.ps1',
+    'tools/commands/workspace/Remove-MIRStaleArtifacts.ps1',
+    'scripts/Invoke-MIRAssurance.ps1',
+    'contracts/repository/mir4-development-contracts-local-result-v1.schema.json'
+  )) {
     if($relative -notin $SelectedInputPaths) { throw "[mir4-development-selected-input-missing] $relative" }
     $identity=Get-MIRFileContentIdentity -Path (Join-Path $RepoRoot $relative) -RelativePath $relative
     $changed=Get-MIRDevelopmentContractsSelectedInputFingerprint -RepoRoot $RepoRoot -SelectedInputPaths $SelectedInputPaths -PackageSourceFingerprint $PackageSourceFingerprint -CommandInventoryDigest $CommandInventoryDigest -IdentityOverrides @{$relative=[pscustomobject]@{Length=([long]$identity.Length+1);Sha256=('0' * 64)}}
@@ -143,6 +214,7 @@ $epoch=Get-Content -Raw (Join-Path $repo 'governance/repository/development-epoc
 if($epoch.schema -ne 1 -or $epoch.current_profile -cne 'mir4-development' -or $epoch.release_authority -or $epoch.protection_mutation_authority -or $epoch.historical_receipt_rewrite_authority) { throw '[mir4-development-authority]' }
 Assert-MIRDevelopmentContractsReparseGuardRegression
 Assert-MIRDevelopmentContractsPorcelainV1ZRegression
+Assert-MIRDevelopmentContractsPorcelainStreamingBoundRegression -RepoRoot $repo
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 [void](Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check)
 $packageSourceFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
@@ -157,6 +229,7 @@ $requiredCatalogueInputs=@(
   'governance/repository/development-epoch-v1.json',
   'tests/repository/Test-MIR4DevelopmentContracts.ps1',
   'src/mod/**', 'targets/**', 'tools/mir/**', 'tools/lib/**',
+  'tools/mir.ps1', 'tools/commands/**', 'scripts/**',
   'tools/commands/package/Build-MIRPackage.ps1', 'tests/**',
   'governance/automation/mir4-command-inventory-v1.json',
   'contracts/repository/mir4-command-inventory-v1.schema.json',
@@ -176,7 +249,11 @@ if($capturedArtifacts.Count -ne 1 -or
 }
 # Parse every current tooling and test module, including modules whose original
 # decomposition receipt now belongs to the pinned historical source.
-$files=@(& git -C $repo ls-files --cached --others --exclude-standard -- ':(glob)tools/**/*.ps1' ':(glob)tests/**/*.ps1')
+$toolingPathspecs=@(
+  'tools/mir.ps1', ':(glob)tools/mir/**/*.ps1', ':(glob)tools/commands/**/*.ps1',
+  ':(glob)tools/lib/**/*.ps1', ':(glob)scripts/**/*.ps1', ':(glob)tests/**/*.ps1'
+)
+$files=@(& git -C $repo ls-files --cached --others --exclude-standard -- @toolingPathspecs)
 if($LASTEXITCODE -ne 0 -or $files.Count -eq 0) { throw '[mir4-development-tooling-inventory]' }
 foreach($path in @($files | Sort-Object -Unique)) {
   $tokens=$null;$errors=$null

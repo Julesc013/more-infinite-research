@@ -3163,9 +3163,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "E7460F4EE08A2040F3BCB2C1CDD6DE6DDE0B86D97A8055ABD62866F50885C590",
+      "sha256": "0387BF8CD53133512ADB39B182FB1FB1E5CEF60912FB3C6903C1C76870B62019",
       "hash_mode": "canonical-text-v1",
-      "lines": 561,
+      "lines": 622,
       "package_visible": false
     },
     {
@@ -3219,31 +3219,31 @@
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "D2909D05C9FAB388FF8C628D909E808F6DCF7F40883A7AADAF2EE554008A9A5D",
+      "sha256": "81E8DCDBAFED8B591AA93D6B8962AAF6AC94785093B436C1A2216124CC77CA99",
       "hash_mode": "canonical-text-v1",
-      "lines": 212,
+      "lines": 214,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "4158FA6462BF490847744B9A19247FC238910849151E0DBA90EE55BB9E31E3C0",
+      "sha256": "9FD9182075F1CAA01F45A0287617C3BF63D68D372F20740250711E6FA5F89FB3",
       "hash_mode": "canonical-text-v1",
-      "lines": 588,
+      "lines": 744,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "4CB888C3A037F55C50B3FA9F301AF59865D00CA75DFA28BF2FD4EDF96B01C552",
+      "sha256": "CE71C500DA419F05F15BD64C13DF8F52BD7E68E45F69E401F2E04E36A8FABD58",
       "hash_mode": "canonical-text-v1",
-      "lines": 560,
+      "lines": 569,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Plans.ps1",
       "classification": "canonical-internal",
-      "sha256": "A64F9A75629512D923ABD0AE39DC4A81F126E79F21441BF46B430303458A4027",
+      "sha256": "E6236BC30F0D719685A4AF8DD40C772520D90B4201F406D875182A2D96276CF0",
       "hash_mode": "canonical-text-v1",
       "lines": 239,
       "package_visible": false
@@ -3259,15 +3259,15 @@
     {
       "path": "tools/lib/assurance/evidence/WorkerArtifactValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "E13B8CC2FE0F9A8017DCCBA2892EB0CB821B82F4EDF8022313108C9132804B2F",
+      "sha256": "2F08F2B28D4C094B30E00314833F6CEDCA15C50EA67709C57B9D089B23095F5F",
       "hash_mode": "canonical-text-v1",
-      "lines": 269,
+      "lines": 312,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
       "classification": "canonical-internal",
-      "sha256": "52EA1E2EC93666720040BC1CF37CD1AA197AA64FA7E0A3B984D56E000312ADD3",
+      "sha256": "A60BD5289DE35FDE4E69952925A920EF4A186FCE6219511B77037E409641E6D8",
       "hash_mode": "canonical-text-v1",
       "lines": 511,
       "package_visible": false
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0d9b151e0fc2c6d72986a7e84cc5147a9475c7149e80d0189fda73e44f35c595"
+  "digest": "sha256:b714036fbe5524d44a6a31407c79d0236e24d46661d4bc76b3a3357ec3b91215"
 }

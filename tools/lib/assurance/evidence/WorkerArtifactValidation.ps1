@@ -1,8 +1,47 @@
+function Test-MIRAssuranceCapturedArtifactBindings {
+  param(
+    [Parameter(Mandatory)]$Capsule,
+    [Parameter(Mandatory)]$Test
+  )
+
+  $declarations = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)
+  # Descriptors are deliberately emitted as ordered dictionaries until their
+  # JSON boundary.  Dictionary keys are available through the PowerShell
+  # adapter, but not through PSObject.Properties, so use the value itself.
+  $captured = @($Capsule.artifacts | Where-Object { [bool]$_.captured_artifact })
+  if ($declarations.Count -eq 0) {
+    if ($captured.Count -ne 0) { return [ordered]@{valid=$false;reason='unexpected-captured-artifact'} }
+    return [ordered]@{valid=$true;reason='no-captured-artifacts-declared'}
+  }
+  if ($captured.Count -ne $declarations.Count) {
+    return [ordered]@{valid=$false;reason='captured-artifact-count-mismatch'}
+  }
+  foreach ($declaration in $declarations) {
+    $matches = @($captured | Where-Object {
+      [string]$_.kind -ceq [string]$declaration.kind -and
+      [string]$_.schema -ceq [string]$declaration.schema -and
+      [string]$_.path_pattern -ceq [string]$declaration.path_pattern
+    })
+    if ($matches.Count -ne 1) { return [ordered]@{valid=$false;reason='captured-artifact-ambiguous-or-missing'} }
+    $artifact = $matches[0]
+    $sourcePath = [string]$artifact.source_path
+    if ([string]::IsNullOrWhiteSpace($sourcePath) -or
+        -not (Test-MIRAssurancePathPattern -Path $sourcePath -Pattern ([string]$declaration.path_pattern))) {
+      return [ordered]@{valid=$false;reason='captured-artifact-source-mismatch'}
+    }
+    $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+    try { Test-MIRAssuranceCapturedArtifactJson -Path $artifactPath -Declaration $declaration -TestId ([string]$Test.id) }
+    catch { return [ordered]@{valid=$false;reason='captured-artifact-schema-or-kind-mismatch'} }
+  }
+  return [ordered]@{valid=$true;reason='captured-artifacts-exact'}
+}
+
 function Test-MIRAssuranceCapsule {
   param(
     [Parameter(Mandatory)]$Capsule,
     [Parameter(Mandatory)]$Fingerprint,
-    [Parameter(Mandatory)]$Context
+    [Parameter(Mandatory)]$Context,
+    $Test = $null
   )
   if ([int]$Capsule.schema -ne $evidenceSchema) { return [ordered]@{valid=$false; reason="schema-mismatch"} }
   if ([string]$Capsule.conclusion -ne "passed" -or [string]$Capsule.status -ne "passed") { return [ordered]@{valid=$false; reason="not-passing"} }
@@ -49,6 +88,10 @@ function Test-MIRAssuranceCapsule {
     if ($item.Length -ne [long]$artifact.bytes -or (Get-MIRAssuranceSha256 -Path $artifactPath) -ne [string]$artifact.sha256) {
       return [ordered]@{valid=$false; reason="artifact-digest-mismatch"}
     }
+  }
+  if ($null -ne $Test) {
+    $capturedValidation = Test-MIRAssuranceCapturedArtifactBindings -Capsule $Capsule -Test $Test
+    if (-not [bool]$capturedValidation.valid) { return $capturedValidation }
   }
   $expectedDigest = Get-MIRAssuranceCapsuleDigest -Capsule $Capsule
   if ([string]$Capsule.result_digest -ne $expectedDigest) { return [ordered]@{valid=$false; reason="result-digest-mismatch"} }
