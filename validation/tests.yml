@@ -3951,6 +3951,34 @@
       ]
     },
     {
+      "id": "static.mir42-support-export-a14",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR42SupportExportA14.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/schemas/mir4-4x-operating-programme-v1.schema.json",
+        "spec/schemas/preview/mir4-support-bundle-v1.schema.json",
+        "spec/schemas/mir4-inspector-compatibility-programme-v1.schema.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Bootstrap-Local-Candidate-PlanV3.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Inspector-Compatibility-ProgrammeV1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Compatibility-Campaign-SOL07V1.json",
+        ".mir/releases/waves/mir4-r0/MIR4-Target-RegistryV6.json",
+        ".mir/compatibility.yml",
+        "spec/compatibility/claims.json",
+        "tools/lib/mir4/PlatformPreview.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
+        "tools/mir/application/assurance/EnvironmentEvidence.ps1",
+        "tools/mir/application/extensions/ModuleEcosystem.ps1",
+        "tools/mir/application/inspection/CompatibilityIndex.ps1",
+        "tools/mir/application/inspection/SupportAssessment.ps1",
+        "tools/mir/application/inspection/CompatibilityFactory.ps1",
+        "tests/mir4/Test-MIR42SupportExportA14.ps1",
+        "package-source"
+      ]
+    },
+    {
       "id": "static.mir4-a03-k2-k2so-intake-closure",
       "kind": "static",
       "layer": "F0",

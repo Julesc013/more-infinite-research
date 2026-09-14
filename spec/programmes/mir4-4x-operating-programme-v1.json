@@ -727,7 +727,8 @@
         "depends_on": [
           "A01",
           "A07",
-          "A08"
+          "A08",
+          "A13"
         ],
         "owner_domain": "release-coordinator",
         "requests": [],

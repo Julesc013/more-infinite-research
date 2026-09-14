@@ -276,6 +276,8 @@ function New-MIR4EnvironmentSupportBundleV1 {
     [AllowEmptyCollection()]$EvidenceItems=@(),[AllowEmptyCollection()]$Diagnostics=@()
   )
   Test-MIR4EnvironmentLockV1 $EnvironmentLock | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $Subjects -Location '$.subjects' | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $EvidenceItems -Location '$.evidence_items' | Out-Null
   $evidence = @(ConvertTo-MIR4EnvironmentRows -Rows @($EvidenceItems) -IdField 'id' -Diagnostic 'mir4-support-evidence-id')
   foreach ($item in $evidence) {
     if ($null -eq $item.PSObject.Properties['dependencies']) { $item | Add-Member -NotePropertyName dependencies -NotePropertyValue @() }
@@ -307,6 +309,8 @@ function New-MIR4EnvironmentSupportBundleV1 {
 function Test-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Bundle)
   Test-MIR4EnvironmentLockV1 $Bundle.environment_lock | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $Bundle.subjects -Location '$.subjects' | Out-Null
+  Test-MIR4EnvironmentPrivateValue -Value $Bundle.evidence_items -Location '$.evidence_items' | Out-Null
   if ([int]$Bundle.schema -ne 1 -or [string]$Bundle.kind -cne 'MIR4SupportBundleV1' -or
       [string]$Bundle.target -cne [string]$Bundle.environment_lock.target -or
       [string]$Bundle.environment_lock_digest -cne [string]$Bundle.environment_lock.digest -or

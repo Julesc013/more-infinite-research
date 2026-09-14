@@ -67,7 +67,7 @@ Read-only intake can start once the starting state is observed. Dependencies bel
 | A11 | M43-00 | Graduate consumer-used API/MEP/runtime/Inspector slices | A02 |
 | A12 | M43-00 | Broaden dependency-valid ecosystem coverage | A04, A05, A06 |
 | A13 | M44-00 | Calibrate impact selection and evidence reuse | A01 |
-| A14 | M43-00, M44-00, maintenance | Prepare next coherent release or eligible stable correction | A01, A07, A08 |
+| A14 | M43-00, M44-00, maintenance | Prepare next coherent release or eligible stable correction | A01, A07, A08, A13 |
 | A15 | M45-00 | Historical capability probes and independently admitted targets | A00, A02 |
 | A16 | M43-00 | Bundled localized research, explanation and profile browser | A00 |
 | A17 | M43-00 | Pipe-manufacturing investigation and useful early-to-infinite material progression | A03, A05, A06 |
