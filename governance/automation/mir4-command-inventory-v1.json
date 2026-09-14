@@ -3059,9 +3059,9 @@
     {
       "path": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
       "classification": "historical",
-      "sha256": "5C36E0C13CA7C468963813CBA9D5CD42B33B06FBDA6D1C77FC85CAEC8A92EF07",
+      "sha256": "68DE8F2F7625B5F53352EC5563512EEDA9422C3995107AF338856DCA0A1B9FE8",
       "hash_mode": "canonical-text-v1",
-      "lines": 1596,
+      "lines": 1599,
       "package_visible": false
     },
     {
@@ -5610,5 +5610,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5b7104c98e27dfe69b46033ed5499c508154634ae11d365f530d128bc5b55465"
+  "digest": "sha256:1056661b2f4bafd808cb31f8578d7ed181a00c1e339d7e7d9c4dfb990b27d00b"
 }

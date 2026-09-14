@@ -97,7 +97,8 @@ foreach ($requiredIdempotencePolicy in @(
   '$finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob',
   '} elseif ([string]$file.blob -eq $finalOverlayBlob) {',
   'hash-object --no-filters -- $destination',
-  'if ($existingBlob -ne $finalOverlayBlob) {'
+  'if ($existingBlob -ne $finalOverlayBlob) {',
+  '-c core.autocrlf=input hash-object --path=$relativePath -- $path'
 )) {
   if (-not $materializerText.Contains($requiredIdempotencePolicy)) {
     throw "Terminal projection materializer does not preserve idempotent final-overlay writes: $requiredIdempotencePolicy"
@@ -257,6 +258,7 @@ $materializerSourceRoot = Join-Path $testRoot "frozen-source"
 $sourceFreeze = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/releases/terminal/MIR3TerminalSourceFreezeV1.json") | ConvertFrom-Json -Depth 100
 & git -C $RepoRoot worktree add --detach $materializerSourceRoot ([string]$sourceFreeze.common_source.commit)
 if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the frozen pre-allocation source for projection regression tests." }
+$provedCrlfPerformanceOutput = $false
 try {
   foreach ($row in @($profiles.targets)) {
     $targetRoot = Join-Path $testRoot ([string]$row.release)
@@ -359,6 +361,26 @@ try {
     }
     & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $materializerSourceRoot -Check
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection check failed for $($row.release)." }
+
+    if (-not $provedCrlfPerformanceOutput -and $null -ne $row.performance_transition -and
+        @($row.performance_transition.output_blobs).Count -gt 0) {
+      $portabilityOutput = @($row.performance_transition.output_blobs)[0]
+      $portabilityPath = Join-Path $targetRoot ([string]$portabilityOutput.path)
+      $originalBytes = [IO.File]::ReadAllBytes($portabilityPath)
+      $portabilityText = [Text.UTF8Encoding]::new($false, $true).GetString($originalBytes)
+      if (-not $portabilityText.Contains("`n")) {
+        throw "Terminal performance transition portability fixture lacks a text line ending."
+      }
+      $crlfText = $portabilityText.Replace("`r`n", "`n").Replace("`r", "`n").Replace("`n", "`r`n")
+      try {
+        [IO.File]::WriteAllText($portabilityPath, $crlfText, [Text.UTF8Encoding]::new($false))
+        & $commandPath -Release ([string]$row.release) -TargetRoot $targetRoot -SourceRepoRoot $materializerSourceRoot -Check
+        if ($LASTEXITCODE -ne 0) { throw "Terminal projection rejected clean-filter-equivalent CRLF output." }
+        $provedCrlfPerformanceOutput = $true
+      } finally {
+        [IO.File]::WriteAllBytes($portabilityPath, $originalBytes)
+      }
+    }
 
     $info = Get-Content -Raw -LiteralPath (Join-Path $targetRoot "info.json") | ConvertFrom-Json
     $record = Get-Content -Raw -LiteralPath (Join-Path $targetRoot ".mir/releases/records/$([string]$row.release).json") | ConvertFrom-Json -Depth 100
@@ -558,7 +580,8 @@ try {
     }
     if ($null -ne $row.performance_transition) {
       foreach ($output in @($row.performance_transition.output_blobs)) {
-        $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$output.path))).Trim()
+        $relativePath = ([string]$output.path).Replace("\", "/")
+        $materializedBlob = (& git -C $materializerSourceRoot -c core.autocrlf=input hash-object --path=$relativePath -- (Join-Path $targetRoot $relativePath)).Trim()
         if ($materializedBlob -ne [string]$output.blob) { throw "Terminal projection did not materialize exact performance transition output $($row.performance_transition.id): $($output.path)" }
       }
     }
@@ -606,6 +629,10 @@ try {
         }
       }
     }
+  }
+
+  if (-not $provedCrlfPerformanceOutput) {
+    throw "Terminal projection regression did not exercise CRLF performance-output normalization."
   }
 
   $tamperedRoot = Join-Path $testRoot "2.5.9"
