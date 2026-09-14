@@ -207,7 +207,7 @@ local function advance_seed_to_capped()
   -- This is a deliberate post-reset foreign state. The controller must have
   -- cleared the old record before reconciling this force, so cap removal
   -- cannot restore the pre-reset enabled/hidden state.
-  configure_force(reset_force, 4, false, true)
+  configure_force_before_cap_transition(reset_force, 4, false, true)
   expect("reset-probe", 4, false, true)
 
   local automation = event_force.technologies["automation"]
