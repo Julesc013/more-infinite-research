@@ -351,6 +351,29 @@ function Get-MIR4CurrentPackagePresentationV3LatestLedgerCommit {
   return [string]$commit
 }
 
+function Get-MIR4CurrentPackagePresentationV3CommittedRowHighWaterMark {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$TipCommit
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $relative = 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $commits = @(& git -C $repo log --format=%H $TipCommit -- $relative 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $commits.Count -lt 1) {
+    throw '[mir4-package-presentation-v3-ledger-history-missing]'
+  }
+  $highWaterMark = 0
+  foreach ($commit in $commits) {
+    $text = Get-MIR4CurrentPackagePresentationV3GitText -RepoRoot $repo -Commit ([string]$commit) -RelativePath $relative
+    try { $historic = $text | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[mir4-package-presentation-v3-ledger-history-json] $commit" }
+    $rowCount = @($historic.rows).Count
+    if ($rowCount -gt $highWaterMark) { $highWaterMark = $rowCount }
+  }
+  return $highWaterMark
+}
+
 function Assert-MIR4CurrentPackagePresentationV3GitLineage {
   [CmdletBinding()]
   param(
@@ -372,6 +395,10 @@ function Assert-MIR4CurrentPackagePresentationV3GitLineage {
         (ConvertTo-MIR4BootstrapCanonicalJson -Value $Ledger.rows[$index])) {
       throw "[mir4-package-presentation-v3-ledger-committed-row] $index"
     }
+  }
+  $highWaterMark = Get-MIR4CurrentPackagePresentationV3CommittedRowHighWaterMark -RepoRoot $repo -TipCommit $LatestLedgerCommit
+  if (@($Ledger.rows).Count -ne $highWaterMark) {
+    throw '[mir4-package-presentation-v3-ledger-lineage-regression]'
   }
   if (@($Ledger.rows).Count -eq 1) { return }
   $current = @($Ledger.rows)[-1]

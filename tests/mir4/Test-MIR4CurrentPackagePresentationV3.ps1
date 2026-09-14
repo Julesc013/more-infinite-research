@@ -120,19 +120,21 @@ $recomputedMutation = $twoRowLedger | ConvertTo-Json -Depth 100 | ConvertFrom-Js
 $recomputedMutation.rows[-1].recorded_at = '2026-09-15T00:00:00Z'
 $recomputedMutation.rows[-1].row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $recomputedMutation.rows[-1]
 $recomputedMutation.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $recomputedMutation
+$recomputedMutationCommit = New-MIR4V3SyntheticLedgerCommit -BaseCommit $twoRowCommit -LedgerRepositoryPath 'spec/distribution/mir4-current-package-presentation-v3.json' -LedgerText ($recomputedMutation | ConvertTo-Json -Depth 100) -Message 'MIR4 V3 synthetic recomputed mutation'
 $recomputedMutationRejected = $false
 try {
-  Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $recomputedMutation -LatestLedgerCommit $twoRowCommit | Out-Null
-} catch { $recomputedMutationRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed(?:-|\])' }
+  Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $recomputedMutation -LatestLedgerCommit $recomputedMutationCommit | Out-Null
+} catch { $recomputedMutationRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-lineage-parent\]' }
 if (-not $recomputedMutationRejected) { throw '[mir4-package-presentation-v3-recomputed-prior-row-mutation]' }
 
 $trailingDeletion = $twoRowLedger | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
 $trailingDeletion.rows = @($trailingDeletion.rows[0])
 $trailingDeletion.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $trailingDeletion
+$trailingDeletionCommit = New-MIR4V3SyntheticLedgerCommit -BaseCommit $twoRowCommit -LedgerRepositoryPath 'spec/distribution/mir4-current-package-presentation-v3.json' -LedgerText ($trailingDeletion | ConvertTo-Json -Depth 100) -Message 'MIR4 V3 synthetic recomputed trailing deletion'
 $trailingDeletionRejected = $false
 try {
-  Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $trailingDeletion -LatestLedgerCommit $twoRowCommit | Out-Null
-} catch { $trailingDeletionRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-committed(?:-|\])' }
+  Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $trailingDeletion -LatestLedgerCommit $trailingDeletionCommit | Out-Null
+} catch { $trailingDeletionRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-ledger-lineage-regression\]' }
 if (-not $trailingDeletionRejected) { throw '[mir4-package-presentation-v3-recomputed-trailing-row-deletion]' }
 
 $duplicateAppendRejected = $false
