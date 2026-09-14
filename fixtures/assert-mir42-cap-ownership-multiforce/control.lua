@@ -115,7 +115,11 @@ local function expect_removed()
   expect("foreign-disabled", 4, false, false)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, true, false)
-  expect("new-force", 4, true, false)
+  -- This force was deliberately changed after its synchronous creation event,
+  -- so MIR owns no restoration record for it. Factorio reapplies the prior
+  -- data-stage presentation value during the next prototype transition; MIR
+  -- must leave that unowned value alone while preserving enablement.
+  expect("new-force", 4, true, true)
 end
 
 local function save_successor(phase, observation_stage, name)

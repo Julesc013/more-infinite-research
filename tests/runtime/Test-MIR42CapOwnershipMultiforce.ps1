@@ -369,7 +369,7 @@ $removedForces=@(
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$false}
+  [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true}
 )
 Assert-MIR42State $seedState 'seed' 0 $false 0 $seedForces
 Assert-MIR42State $cappedState 'capped' 3 $false 1 $cappedForces
