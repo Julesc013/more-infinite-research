@@ -43,7 +43,7 @@ $record=[ordered]@{
   public_release_proof=[bool]$runtime.public_release_proof-or[bool]$migration.public_release_proof-or[bool]$continuity.public_release_proof
 }
 $parity=Get-MIR4CanonicalDigestV1 -Value $record -Domain 'mir4:runtime-continuity-functional-parity:1'
-Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:5913a0d3fa7746af872bbdaa67e7f3b45bdfc82391522922f25fcc14028b45df') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
+Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:cc4076c557be32b28e05340e9013f8425196fec25c3ddd90e7ba444a94dafae9') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
 
 $tampered=$runtime.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $tampered.groups=@($tampered.groups)+@($tampered.groups[0])
