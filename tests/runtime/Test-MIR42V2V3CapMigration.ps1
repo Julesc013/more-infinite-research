@@ -232,7 +232,12 @@ $predecessorState=Read-State (Get-Content -Raw -LiteralPath $predecessorLog) 'v2
 
 $v3Save=Join-Path $v3Stage.userdata 'saves/mir42-v2-v3-cap-migration-v3-capped.zip'
 $v3Log=Invoke-ServerSave $v3Stage 'v3-capped' $predecessorSave $v3Save 'v3-capped'
-$v3State=Read-State (Get-Content -Raw -LiteralPath $v3Log) 'v3-capped'
+$v3Text=Get-Content -Raw -LiteralPath $v3Log
+$v3State=Read-State $v3Text 'v3-capped'
+$ownedMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-owned technology=recipe-prod-research_copper-1 enablement-owned=true visibility-owned=true policy-version=3[.]')
+$foreignMigration=[regex]::Matches($v3Text,'\[more-infinite-research\] Migrated maximum-level V2 ownership force=v2-foreign-disabled technology=recipe-prod-research_copper-1 enablement-owned=false visibility-owned=true policy-version=3[.]')
+Assert-Migration ($ownedMigration.Count -eq 1) "Expected exactly one admitted V2 owned migration diagnostic; observed $($ownedMigration.Count)."
+Assert-Migration ($foreignMigration.Count -eq 1) "Expected exactly one admitted V2 foreign-disabled migration diagnostic; observed $($foreignMigration.Count)."
 
 $relaxedSave=Join-Path $relaxedStage.userdata 'saves/mir42-v2-v3-cap-migration-v3-relaxed.zip'
 $relaxedLog=Invoke-ServerSave $relaxedStage 'v3-relaxed' $v3Save $relaxedSave 'v3-relaxed'
@@ -272,6 +277,7 @@ $result=[ordered]@{
   fixture_source_hashes=[ordered]@{info=Get-MigrationSha (Join-Path $fixture 'info.json');data_final_fixes=Get-MigrationSha (Join-Path $fixture 'data-final-fixes.lua');control=Get-MigrationSha (Join-Path $fixture 'control.lua')}
   harness_sha256=Get-MigrationSha $PSCommandPath
   stages=@((Get-StageManifest $predecessorStage $predecessorCandidate),(Get-StageManifest $v3Stage $currentCandidate),(Get-StageManifest $relaxedStage $currentCandidate))
+  migration_diagnostics=[ordered]@{owned_enablement_and_visibility_count=$ownedMigration.Count;foreign_visibility_only_count=$foreignMigration.Count;policy_version=3}
   state_receipts=[ordered]@{predecessor_v2=$predecessorState;v3_capped=$v3State;v3_relaxed=$relaxedState;terminal=$terminalState}
   save_lineage=$lineage
   f200_disposition=[ordered]@{status='excluded-current-target-lacks-v3-mod-data-transport';factorio_version='2.0.77';target_profile='targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua';reason='The F200 profile declares prototype_shapes.mod_data=false. Current V3 runtime only migrates V2 ownership after an accepted V3 transported binding; its settings fallback is deliberately legacy/read-only and does not migrate V2 ownership.';reconsider_when='An F200-specific accepted V3 binding transport or equivalent persisted ownership proof is implemented and qualified on the exact F200 engine.'}

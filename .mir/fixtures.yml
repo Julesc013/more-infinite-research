@@ -1690,6 +1690,7 @@ fixtures:
     validates:
       - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
       - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3
+      - exact-runtime-diagnostic-identifies-admitted-owned-and-visibility-only-V2-records
       - foreign-disabled-state-never-gains-MIR-enablement-ownership
       - current-V3-cap-enforcement-keeps-a-distinct-V3-ownership-record
       - cap-zero-restores-only-V2-or-V3-MIR-owned-enablement-and-visibility
