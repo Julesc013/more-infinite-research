@@ -39,6 +39,7 @@
   },
   "runtime_binding": {
     "native_infinite_max_level_sentinel": 4294967295,
+    "maximum_level_policy_schema": 3,
     "maximum_level_policy_binding_count": 1
   },
   "science_lab_frontier": {

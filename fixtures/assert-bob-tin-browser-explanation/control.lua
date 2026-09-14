@@ -7,6 +7,7 @@ local extra_field_name = "mir-browser-extra-field-row-regression"
 local core = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_core")
 local catalogue_adapter = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_factorio_catalogue")
 local provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
+local fingerprint = require("__more-infinite-research__/prototypes/mir/core/fingerprint")
 
 local function fail(message) error("[mir-bob-tin-browser-explanation] " .. message) end
 local function check(value, message) if not value then fail(message) end end
@@ -211,23 +212,110 @@ local function assert_fake_and_limit_negatives(catalogue)
   saturated.details[technology_name].recipe_benefits[1].current_productivity_bonus = 1
   rejects(saturated, "saturated recipe benefit=true detail was accepted")
 
-  local sparse_policy = provider.policy_caps_for_test({
+  local function identified(record, field)
+    local material = {}
+    for key, value in pairs(record) do material[key] = value end
+    material[field] = nil
+    record[field] = fingerprint.of(material)
+    return record
+  end
+
+  local function identify_policy(policy)
+    for _, binding in ipairs(policy.bindings) do identified(binding, "binding_fingerprint") end
+    return identified(policy, "artifact_fingerprint")
+  end
+
+  local function accepted_v3_policy()
+    return identify_policy({
+      schema = 3,
+      kind = "MIRMaximumLevelPolicyV3",
+      finalizer_adapter = "factorio-data-final-fixes-v1",
+      finalizer_status = "accepted",
+      bindings = {{
+        schema = 3,
+        record_type = "MaximumLevelBinding",
+        technology_id = technology_name,
+        setting = {name = "ips-max-level-research_material_tin"},
+        cap = {effective = 3},
+        diagnostics = {status = "accepted"},
+        prototype_strategy = {mode = "lossless-infinite-prototype", max_level = "infinite"},
+        runtime_strategy = {mode = "absolute-cap-controller"},
+        target_requirements = {
+          scripted_techs = true,
+          scripted_techs_supported = true,
+          mod_data_transport_supported = true,
+          finalizer_adapter = "factorio-data-final-fixes-v1"
+        },
+        finalizer_observation = {
+          adapter = "factorio-data-final-fixes-v1",
+          status = "accepted",
+          observed_prototype_max_level = "infinite"
+        }
+      }}
+    })
+  end
+
+  local v3_policy = provider.policy_caps_for_test(accepted_v3_policy())
+  check(v3_policy[technology_name]
+    and v3_policy[technology_name].selected == 3
+    and v3_policy[technology_name].setting == "ips-max-level-research_material_tin",
+    "canonical V3 policy did not expose Tin effective cap three")
+
+  local sparse_artifact = accepted_v3_policy()
+  sparse_artifact.bindings[3] = deep_copy(sparse_artifact.bindings[1])
+  sparse_artifact.bindings[3].cap.effective = 4
+  local sparse_policy = provider.policy_caps_for_test(sparse_artifact)
+  check(next(sparse_policy) == nil, "sparse policy binding array was accepted")
+
+  local late_finite_policy = provider.policy_caps_for_test(
+    accepted_v3_policy(), {[technology_name] = {max_level = 5}})
+  check(next(late_finite_policy) == nil,
+    "late finite prototype conflict was advertised as an effective browser cap")
+
+  local incomplete_policy = accepted_v3_policy()
+  incomplete_policy.bindings[1].binding_fingerprint = nil
+  check(next(provider.policy_caps_for_test(incomplete_policy)) == nil,
+    "incomplete V3 provenance was advertised as an effective browser cap")
+
+  local incomplete_artifact = accepted_v3_policy()
+  incomplete_artifact.artifact_fingerprint = nil
+  check(next(provider.policy_caps_for_test(incomplete_artifact)) == nil,
+    "V3 artifact without a fingerprint was advertised as an effective browser cap")
+
+  local late_binding_forgery = accepted_v3_policy()
+  late_binding_forgery.bindings[1].cap.effective = 4
+  check(next(provider.policy_caps_for_test(late_binding_forgery)) == nil,
+    "late binding forgery with stale identity was advertised as an effective browser cap")
+
+  local late_artifact_forgery = accepted_v3_policy()
+  late_artifact_forgery.finalizer_status = "forged-after-finalizer"
+  check(next(provider.policy_caps_for_test(late_artifact_forgery)) == nil,
+    "late artifact forgery with stale identity was advertised as an effective browser cap")
+
+  for _, case in ipairs({
+    {name = "positive infinity", value = math.huge},
+    {name = "negative infinity", value = -math.huge},
+    {name = "NaN", value = 0 / 0},
+    {name = "fractional", value = 3.5}
+  }) do
+    local invalid_cap_policy = accepted_v3_policy()
+    invalid_cap_policy.bindings[1].cap.effective = case.value
+    identify_policy(invalid_cap_policy)
+    check(next(provider.policy_caps_for_test(invalid_cap_policy)) == nil,
+      case.name .. " V3 effective cap was advertised as an enforceable browser cap")
+  end
+
+  local legacy_policy = provider.policy_caps_for_test({
     schema = 2,
     kind = "MIRMaximumLevelPolicyV2",
-    bindings = {
-      [1] = {
-        technology = technology_name,
-        selected = 3,
-        setting = "ips-max-level-research_material_tin"
-      },
-      [3] = {
-        technology = technology_name,
-        selected = 4,
-        setting = "ips-max-level-research_material_tin"
-      }
-    }
+    bindings = {{
+      technology = technology_name,
+      setting = "ips-max-level-research_material_tin",
+      selected = 3
+    }}
   })
-  check(next(sparse_policy) == nil, "sparse policy binding array was accepted")
+  check(next(legacy_policy) == nil,
+    "read-only V2 transport was advertised as an enforceable browser cap")
 end
 
 local function assert_duplicate_public_row_negative(force)
@@ -323,7 +411,29 @@ local function assert_native_ui(player, force)
   check(contains(facts.maximum_setting, "ips-max-level-research_material_tin | default=2 | raw-direct=2 | effective=3 | source=mirset1 | changed=true | changed-from-default=true | restart-required=true"), "maximum-setting GUI caption differs")
   check(contains(facts.enabled_setting, "ips-enable-research_material_tin | default=true | raw-direct=true | effective=true | source=mirset1 | changed=false | changed-from-default=false | restart-required=true"), "enable-setting GUI caption differs")
   check(facts.startup_restart == "Startup settings require restart; this browser does not mutate startup settings.", "restart GUI caption differs")
-  return facts
+
+  local before_level = force.technologies[technology_name].level
+  local before_caption = facts.next_level
+  check(type(force.reset) == "function", "player force does not expose LuaForce.reset")
+  force.reset()
+  local after_technology = force.technologies[technology_name]
+  check(after_technology and after_technology.level ~= before_level,
+    "force reset did not produce a distinct Tin research level")
+  frame = player.gui.screen.mir_research_browser
+  check(frame and frame.valid, "native browser closed during force-reset refresh")
+  local refreshed = {}
+  capture_facts(frame, refreshed)
+  check(refreshed.next_level ~= before_caption,
+    "native browser retained its pre-reset next-level explanation")
+  check(contains(refreshed.next_level, "current-level=" .. tostring(after_technology.level)),
+    "native browser did not refresh to the post-reset Tin level")
+  return refreshed, {
+    event = "on_force_reset",
+    before_level = before_level,
+    after_level = after_technology.level,
+    before_caption = before_caption,
+    after_caption = refreshed.next_level
+  }
 end
 
 script.on_init(function()
@@ -349,13 +459,15 @@ script.on_nth_tick(1, function()
   assert_detail(detail)
   assert_level_negatives()
   local player = game.players[1]
-  local facts = player and assert_native_ui(player, force) or {}
+  local facts, force_reset_refresh = {}, nil
+  if player then facts, force_reset_refresh = assert_native_ui(player, force) end
   helpers.write_file("bob-tin-browser-explanation.json", helpers.table_to_json({
     status = "passed",
     scope = "F210-exact-locked-Bob-only-browser-explanation",
     execution_surface = player and "native-player-gui" or "headless-dto",
     detail = detail,
     ui_facts = facts,
+    force_reset_refresh = force_reset_refresh,
     native_players = player and 1 or 0
   }), false)
   state.complete = true

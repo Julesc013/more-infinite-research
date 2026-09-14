@@ -1148,6 +1148,7 @@ modules:
     - prototypes/mir/domain/technology/technology_candidate.lua
     - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
+    - prototypes/mir/domain/technology/maximum_level_binding.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
     - prototypes/mir/domain/technology/gate.lua
     - prototypes/mir/domain/technology/safety_qualification.lua
@@ -1581,7 +1582,7 @@ rules:
   - Prototype-family emission must consult the current target profile before calling the Factorio data adapter.
   - Compatibility overlays register policy only.
   - Compatibility repairs may normalize exact-version upstream loader schemas or remove one topology-proven cross-mod cycle edge.
-  - MaximumLevelBinding is the single normalized cap registry consumed by presentation, mod-data transport, and runtime control.
+  - MaximumLevelBinding is the single normalized cap registry consumed by presentation, mod-data transport, and runtime control. Its canonical F210/F200 player source is src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua; the root prototype copy is retained characterization and cannot regain player authority.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.

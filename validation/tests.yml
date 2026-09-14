@@ -4586,6 +4586,77 @@
       ]
     },
     {
+      "id": "runtime.maximum-level-cap-ownership-multiforce-f210",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+        "fixtures/assert-mir42-cap-ownership-multiforce/**",
+        "fixtures/late-mir42-cap-binding-blocker/**",
+        "fixtures/late-mir42-policy-binding-blocker/**",
+        "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
+      "id": "runtime.maximum-level-settings-derived-cap-transition-f200",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "fixtures/assert-mir42-f200-settings-cap-transition/**",
+        "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/package-source.json",
+        "targets/f200/overlay.json",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
+      "id": "runtime.maximum-level-v2-v3-migration-f210",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42V2V3CapMigration.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        "fixtures/assert-mir42-v2-v3-cap-migration/**",
+        "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/common/prototypes/mir/platform/factorio/target_line.lua",
+        "targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "runtime.a06-angel-aluminium-final-state",
       "kind": "runtime",
       "layer": "F3",

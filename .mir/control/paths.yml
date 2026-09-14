@@ -3,6 +3,10 @@ authority: mir-repository-paths-v1
 
 paths:
   package.root: src/mod
+  package.maximum-level-binding: src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua
+  package.maximum-level-construction: src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua
+  package.maximum-level-presentation: src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
+  package.maximum-level-runtime: src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua
   package.targets: targets
   package.generated: build/packages
   mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v2.json

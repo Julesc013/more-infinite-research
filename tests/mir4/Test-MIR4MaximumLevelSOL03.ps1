@@ -77,7 +77,7 @@ if ([int]$assertions.required_audit_rows -ne 1 -or [int]$assertions.required_aud
   throw "SOL-03 exact runtime contract is not 11/11 passed."
 }
 
-$requiredAuthorities = @(
+$historicalAuthorities = @(
   "prototypes/mir/domain/technology/maximum_level_binding.lua",
   "prototypes/mir/pipeline/compiler_orchestrator.lua",
   "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
@@ -85,22 +85,95 @@ $requiredAuthorities = @(
   "prototypes/mir/runtime/maximum_level_control.lua",
   "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua"
 )
-foreach ($relative in $requiredAuthorities) {
+foreach ($relative in $historicalAuthorities) {
   if ($relative -notin @($record.implementation_authorities) -or -not (Test-Path -LiteralPath (Join-Path $RepoRoot $relative))) {
-    throw "SOL-03 implementation authority is missing: $relative"
+    throw "SOL-03 historical implementation authority is missing: $relative"
   }
 }
-$bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/domain/technology/maximum_level_binding.lua")
-$runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/runtime/maximum_level_control.lua")
+$canonicalAuthorities = @(
+  "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
+  "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+  "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+  "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+  "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
+  "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua"
+)
+foreach ($relative in $canonicalAuthorities) {
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot $relative))) {
+    throw "Canonical player-package maximum-level authority is missing: $relative"
+  }
+}
+$bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua")
+$constructionSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua")
+$publicationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua")
+$presentationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua")
+$modDataSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/emit/mod_data.lua")
+$runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua")
+$browserProviderSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua")
+$f210DispatcherSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua")
+$f200DispatcherSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua")
+$compilerContractSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/assert-compiler-contracts/data-final-fixes.lua")
 $repairSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua")
 foreach ($token in @("MIRMaximumLevelPolicyV3", "exact-technology", "exact-native-owner", "exact-stream", "ecosystem-profile", "factorio-data-final-fixes-v1")) {
   if ($bindingSource -notmatch [regex]::Escape($token)) {
     throw "Maximum-level binding authority lacks required V3 token: $token"
   }
 }
-if ($runtimeSource -notmatch "more-infinite-research-maximum-level-policy" -or $runtimeSource -notmatch "POLICY_VERSION = 3" -or
+if ($constructionSource -notmatch "maximum_level_binding.from_plan" -or
+    $publicationSource -match "MIRMaximumLevelPolicyV2" -or
+    $presentationSource -notmatch "observe_finalizers" -or
+    $modDataSource -notmatch "maximum-level-policy-v3" -or
+    $runtimeSource -notmatch "more-infinite-research-maximum-level-policy" -or
+    $runtimeSource -notmatch "POLICY_VERSION = 3" -or
+    $runtimeSource -notmatch "normalize_event_force" -or
+    $runtimeSource -notmatch "enabled_before_cap" -or
+    $runtimeSource -notmatch "owns_disable" -or
+    $runtimeSource -notmatch "migrate_legacy_force_state" -or
+    $runtimeSource -notmatch "migrated_from_policy_version = 2" -or
+    $runtimeSource -notmatch "maximum_level_legacy_transport_read_only" -or
+    $runtimeSource -notmatch "maximum_level_policy_finalizer_adapter_invalid" -or
+    $runtimeSource -notmatch "maximum_level_binding_fingerprint_missing" -or
+    $runtimeSource -notmatch "maximum_level_binding_fingerprint_invalid" -or
+    $runtimeSource -notmatch "maximum_level_policy_fingerprint_invalid" -or
+    $runtimeSource -notmatch "finite_number" -or
+    $runtimeSource -notmatch "settings-derived-v3" -or
+    $runtimeSource -notmatch 'policy[.]policy_transport ~= "transported-v3"' -or
+    $runtimeSource -notmatch "maximum_level_target_requirements_mismatch" -or
+    $runtimeSource -notmatch "MAXIMUM_LEVEL_FINALIZER_ADAPTER" -or
+    $runtimeSource -notmatch "local prior_policy = prior_managed and prior_managed\[technology_name\] or nil" -or
+    $runtimeSource -notmatch "local cap = current_policy and caps\[technology_name\] or nil" -or
+    $runtimeSource -notmatch "clear_force_index\(event and event\.source_index\)" -or
+    $runtimeSource -notmatch "function M\.on_force_reset\(event\)" -or
+    $runtimeSource -notmatch "clear_force_state\(force\)" -or
+    $browserProviderSource -notmatch "fingerprint_matches" -or
+    $browserProviderSource -notmatch "finite_positive_integer\(cap\.effective\)" -or
+    $f210DispatcherSource -notmatch "defines\.events\.on_force_reset" -or
+    $f200DispatcherSource -notmatch "defines\.events\.on_force_reset" -or
+    $compilerContractSource -notmatch "positive infinity" -or
+    $compilerContractSource -notmatch "negative infinity" -or
+    $compilerContractSource -notmatch "NaN" -or
+    $compilerContractSource -notmatch "fractional" -or
+    $runtimeSource -match "function M\.on_research_finished\(\) normalize_all\(\) end" -or
     $repairSource -notmatch 'corrundum' -or $repairSource -notmatch '1\.0\.47') {
   throw "SOL-03 runtime transport or exact Corrundum repair wiring is missing."
+}
+$normalizeAll = $runtimeSource.IndexOf("local function normalize_all()")
+$normalizeAllForce = $runtimeSource.IndexOf("normalize_force(force, managed, caps, transport_blocked, prior_managed)", $normalizeAll)
+$normalizeAllRemember = $runtimeSource.IndexOf("remember_managed(managed)", $normalizeAll)
+$normalizeEvent = $runtimeSource.IndexOf("local function normalize_event_force(event)")
+$normalizeEventForce = $runtimeSource.IndexOf("normalize_force(force, managed, caps, transport_blocked, prior_managed)", $normalizeEvent)
+$normalizeEventRemember = $runtimeSource.IndexOf("remember_managed(managed)", $normalizeEvent)
+if ($normalizeAll -lt 0 -or $normalizeAllForce -lt 0 -or $normalizeAllRemember -lt $normalizeAllForce -or
+    $normalizeEvent -lt 0 -or $normalizeEventForce -lt 0 -or $normalizeEventRemember -lt $normalizeEventForce) {
+  throw "SOL-03 does not retain prior managed state through bounded normalization before replacing it."
+}
+$manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/package-source.json") | ConvertFrom-Json -Depth 100
+$binding = @($manifest.bindings | Where-Object {
+  [string]$_.source_path -eq "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua"
+})
+if ($binding.Count -ne 1 -or @($binding[0].target_scope | Sort-Object) -join ',' -ne 'f200,f210' -or
+    [string]$binding[0].output_path -ne "prototypes/mir/domain/technology/maximum_level_binding.lua") {
+  throw "Canonical MaximumLevelBinding package admission is absent or has the wrong target scope."
 }
 if (-not $record.exit_gate.normalized_binding_v3 -or
     -not $record.exit_gate.three_ownership_routes_proven -or
