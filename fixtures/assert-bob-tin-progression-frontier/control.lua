@@ -32,12 +32,23 @@ local function emit_runtime_observation()
   local effective = startup_settings.get(setting_name)
   local tin_bindings = {}
   local policy = prototypes.mod_data["more-infinite-research-maximum-level-policy"]
+  if not policy or not policy.data or policy.data.schema ~= 3
+      or policy.data.kind ~= "MIRMaximumLevelPolicyV3" then
+    fail("canonical schema-3 maximum-level policy transport is absent")
+  end
   for _, row in ipairs((policy and policy.data and policy.data.bindings) or {}) do
-    if row.technology == anchor_name then table.insert(tin_bindings, row) end
+    if row.technology_id == anchor_name then table.insert(tin_bindings, row) end
   end
   if #tin_bindings ~= 1 then fail("Tin maximum-level policy binding cardinality differs " .. tostring(#tin_bindings)) end
   local binding = tin_bindings[1]
-  if binding.technology ~= anchor_name or binding.setting ~= setting_name or binding.selected ~= effective or binding.selected ~= imported then
+  if binding.schema ~= 3 or binding.record_type ~= "MaximumLevelBinding"
+      or binding.technology_id ~= anchor_name
+      or not binding.setting or binding.setting.name ~= setting_name
+      or not binding.cap or binding.cap.effective ~= effective
+      or binding.cap.effective ~= imported
+      or not binding.diagnostics or binding.diagnostics.status ~= "accepted"
+      or not binding.finalizer_observation or binding.finalizer_observation.status ~= "accepted"
+      or not binding.runtime_strategy or binding.runtime_strategy.mode ~= "absolute-cap-controller" then
     fail("Tin maximum-level policy binding differs from runtime cap/profile")
   end
   local force = game.forces.player
@@ -50,9 +61,10 @@ local function emit_runtime_observation()
     raw_direct_max_level = raw_direct,
     mirset1_imported_max_level = imported,
     effective_max_level = effective,
-    policy_technology = binding.technology,
-    policy_setting = binding.setting,
-    policy_selected = binding.selected,
+    policy_schema = binding.schema,
+    policy_technology = binding.technology_id,
+    policy_setting = binding.setting.name,
+    policy_selected = binding.cap.effective,
     policy_binding_count = #tin_bindings,
     force_next_level = technology.level
   }))

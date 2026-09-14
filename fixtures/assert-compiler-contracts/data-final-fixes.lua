@@ -69,12 +69,7 @@ local function fail(message)
 end
 
 if not focused_contracts.maximum_level_binding then
-  local mir_version = mods and mods["more-infinite-research"] or ""
-  -- MIR 4.1 preserves the accepted MIR 4.0 player surface while package authority moves to src/mod.
-  -- The shadow MaximumLevelBinding contract remains package-excluded until a separate semantic cutover.
-  if not tostring(mir_version):match("^4%.[01]%.%d+$") then
-    fail("MaximumLevelBinding is absent outside the governed MIR 4.0/4.1 package targets")
-  end
+  fail("Canonical player package is missing MaximumLevelBinding schema 3")
 end
 
 (function()
@@ -121,7 +116,7 @@ local function expect_error(label, expected, callback)
   end
 end
 
-if focused_contracts.maximum_level_binding then (function()
+(function()
   local plan = {
     fingerprint = "maximum-level-binding-fixture-plan",
     stream_plan = {rows = {
@@ -219,7 +214,7 @@ if focused_contracts.maximum_level_binding then (function()
       or blocked.bindings[2].diagnostics.active_code ~= "maximum_level_unknown_finalizer_adapter" then
     fail("unknown MaximumLevelBinding finalizer did not emit a stable blocking diagnostic")
   end
-end)(); end
+end)();
 
 local function valid_pack(id, line, mod_id, version)
   return {

@@ -32,6 +32,7 @@
     "raw_direct_max_level": 2,
     "mirset1_imported_max_level": 3,
     "effective_max_level": 3,
+    "maximum_level_policy_schema": 3,
     "maximum_level_policy_binding_count": 1,
     "maximum_level_policy_setting": "ips-max-level-research_material_tin"
   },

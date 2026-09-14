@@ -2458,6 +2458,22 @@
       ]
     },
     {
+      "path": "prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "operation": "omit",
+      "semantic_class": "target-omission",
+      "source_path": null,
+      "transform": null,
+      "reason": "The exact f110 package baseline does not contain this path.",
+      "capability_disposition": "omitted-by-target-profile",
+      "expected_bytes": null,
+      "expected_sha256": null,
+      "proof_obligations": [
+        "explicit-target-omission",
+        "exact-target-path-inventory",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
       "path": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
       "operation": "omit",
       "semantic_class": "target-omission",
@@ -3503,5 +3519,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "CDCD3EDCA27F794D2A5C1F69A596272BF150CB9FB48D7F63A8CF9F799ADF7C31"
+  "record_sha256": "41500C57C0BA8F6D6B1756FD53770DEF84181C444ADADE14D84E684F7638EBBB"
 }

@@ -16,6 +16,8 @@ local pure_compiler = require("prototypes.mir.planner.compiler")
 local family_resolver = require("prototypes.mir.families.resolver")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
 
 local M = {}
 
@@ -137,6 +139,12 @@ local function compile_active(context)
   latest.pure_compilation = pure_compilation
   latest.transformation_plan = pure_compilation.transformation_plan
   latest.transformation_plan_fingerprint = pure_compilation.transformation_plan.plan_fingerprint
+  local maximum_level_policy = maximum_level_binding.from_plan(latest, {
+    plan_fingerprint = latest.compilation_fingerprint,
+    target_profile = target_line.factorio_version,
+    scripted_techs_supported = target_line.feature_enabled("scripted_techs"),
+    mod_data_supported = target_line.mod_data_supported()
+  })
   context:set_state("compiler_input", input)
   context:set_state("compilation_snapshot", input_snapshot)
   context:set_state("qualification_snapshot", final_snapshot)
@@ -146,6 +154,7 @@ local function compile_active(context)
   context:set_state("technology_candidate_catalog", latest.technology_catalog)
   context:set_state("technology_qualifications", latest.technology_catalog.qualifications)
   context:set_state("compiler_result", latest.compiler_result)
+  context:set_state("maximum_level_policy", maximum_level_policy)
   context:record_immutable_artifact(
     "technology_candidate_catalog", latest.technology_catalog, technology_catalog_contract)
   stream_compiler.accept_artifact(latest.stream_plan, context, {trusted = true})
@@ -158,6 +167,14 @@ end
 function M.compile(context)
   context = context or compiler_context.current()
   return compiler_context.with_active(context, compile_active, context)
+end
+
+function M.maximum_level_policy(context)
+  context = context or compiler_context.current()
+  M.compile(context)
+  local policy = context:state_view("maximum_level_policy")
+  if not policy then error("Maximum-level policy was not constructed with the compiler plan.", 2) end
+  return policy
 end
 
 M.record_work_volume = record_work_volume
