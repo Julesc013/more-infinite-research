@@ -3523,9 +3523,9 @@
     {
       "path": "tools/lib/control/Observation.ps1",
       "classification": "canonical-internal",
-      "sha256": "AA83328669736A1A59A007166B95EEC4E6360F207C9F7E6004528ED191125D51",
+      "sha256": "2E779E0C9542F8BF0253FD915B5BA700F6FE70523FCEBFCBABA9D62A2153D9DE",
       "hash_mode": "canonical-text-v1",
-      "lines": 248,
+      "lines": 273,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ec737c8871611bc4e1de316dd96626511b2ae8fb3276b9c566b56f76e52d7710"
+  "digest": "sha256:90fa65fd0b84f98f4c33a6b5b712045a6f7a6a65a7d487b1cbc4233d8653c3f9"
 }
