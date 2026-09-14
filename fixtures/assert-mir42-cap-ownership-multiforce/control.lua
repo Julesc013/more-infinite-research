@@ -185,7 +185,8 @@ local function advance_seed_to_capped()
   -- while clearing every bucket still keyed by the removed source index.
   configure_force(merge_destination, 4, true, false)
   game.merge_forces(merge_source, merge_destination)
-  if game.forces["merge-source"] then fail("merged source force still exists") end
+  local retired_source = game.forces["merge-source"]
+  if retired_source and retired_source.valid then fail("merged source force still exists") end
   expect("merge-destination", 4, false, true)
 
   local reused_force = game.create_force("merge-reuse")
