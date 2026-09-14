@@ -635,8 +635,11 @@ if ($isShadowConvergence) {
   }
 
   foreach ($output in @($transition.output_blobs)) {
-    $path = Join-Path $TargetRoot ([string]$output.path)
-    $blob = (& git hash-object --no-filters -- $path 2>$null)
+    $relativePath = ([string]$output.path).Replace("\", "/")
+    $path = Join-Path $TargetRoot $relativePath
+    # A worktree may materialize text with platform line endings. Compare the
+    # value Git would clean for this repository path with the immutable blob.
+    $blob = (& git -C $SourceRepoRoot -c core.autocrlf=input hash-object --path=$relativePath -- $path 2>$null)
     if ($LASTEXITCODE -ne 0 -or ([string]$blob).Trim() -ne [string]$output.blob) { throw "Terminal performance transition output is stale: $($output.path)" }
   }
 }
