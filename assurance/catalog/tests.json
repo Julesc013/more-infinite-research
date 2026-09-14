@@ -798,6 +798,7 @@
         "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
         "fixtures/assert-mir42-cap-ownership-multiforce/**",
         "fixtures/late-mir42-cap-binding-blocker/**",
+        "fixtures/late-mir42-policy-binding-blocker/**",
         "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
         "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
         "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
@@ -6291,5 +6292,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:6117aac4dec86cc0fcbf17bb79891d26df3a8a120de66b6994f5c5667d44c891"
+  "digest": "sha256:e3650f9b11109f148361da9b0f0a3f95cc9fff15213318c5747cd6000abfcdd1"
 }
