@@ -3163,9 +3163,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "4B67DD572126AA7CC2D634A7BF7F8B5941D031EECEFFA4623804BB11CE4DD2CC",
+      "sha256": "E7460F4EE08A2040F3BCB2C1CDD6DE6DDE0B86D97A8055ABD62866F50885C590",
       "hash_mode": "canonical-text-v1",
-      "lines": 538,
+      "lines": 561,
       "package_visible": false
     },
     {
@@ -5171,9 +5171,9 @@
     {
       "path": "tools/mir/application/tooling/TestWorkflowCatalogues.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "CD1187C09AB2A559DEC25ABB9E21D5C5B2E58A77BC9A01474B9A40CACA4A8E2C",
+      "sha256": "B66E074F71FBFE6C0813388DD2C8AE9E7F1520F56E1DDEEA0D3F553B1A0B8D08",
       "hash_mode": "canonical-text-v1",
-      "lines": 184,
+      "lines": 191,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e7880c7405b0132072413bb6f2abb90614636ea33b93b4b0a38a4e34cca992f4"
+  "digest": "sha256:0d9b151e0fc2c6d72986a7e84cc5147a9475c7149e80d0189fda73e44f35c595"
 }

@@ -4232,8 +4232,22 @@
         "src/mod/**",
         "targets/**",
         "tools/mir/**",
+        "tools/lib/**",
+        "tools/commands/package/Build-MIRPackage.ps1",
         "tests/**",
-        "spec/programmes/mir4-4x-operating-programme-v1.json"
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-command-inventory-v1.schema.json",
+        "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+        "contracts/repository/mir4-test-proof-catalogue-v1.schema.json",
+        "validation/tests.yml",
+        "assurance/catalog/tests.json"
+      ],
+      "captured_artifacts": [
+        {
+          "path_pattern": "build/results/validation/development-contracts/*.json",
+          "schema": "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+          "kind": "MIR4DevelopmentContractsLocalResultV1"
+        }
       ]
     },
     {

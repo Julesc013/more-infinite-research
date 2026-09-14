@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-08-06
+last_reviewed: 2026-09-15
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -27,7 +27,7 @@ Local validation must leave enough evidence to diagnose and summarize a run with
 | `build/results/assurance/` | Local content-addressed assurance and reuse copies | Protected from routine stale-result cleanup; promote any durable authority before deleting `build/`. |
 | `build/results/validation/` | Current validation diagnostics and failure packets | Protected from routine stale-result cleanup. |
 | Other `build/results/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
-| `build/` | The sole repository-local generated root: package staging, caches, generated target material, temporary files, and results | Reconstructible; delete after active commands have stopped and required compact authorities have been promoted. Git worktrees are forbidden here. |
+| `build/` | The sole repository-local generated root: package staging, caches, generated target material, temporary files, results, and any active linked-worktree placement selected by the resolved worktree policy | Reconstructible output may be removed after active commands have stopped and required compact authorities have been promoted. Git worktrees remain governed by the resolved `MIR_WORKTREE_HOME` policy and are never cleanup candidates merely because they are physically beneath `build/`. |
 | `dist/playtest/` | Current local playtest handoff | May be refreshed only from qualified exact bytes; immutable rolling revisions are never overwritten. |
 
 ## Audit And Cleanup
@@ -38,7 +38,7 @@ Preview stale output in the current worktree:
 .\tools\mir.ps1 storage audit
 ```
 
-Preview stale output across registered worktrees located beside the current worktree:
+Preview stale output across the registered worktrees for the current Git common directory:
 
 ```powershell
 .\tools\mir.ps1 storage audit --all-worktrees
@@ -56,7 +56,7 @@ Delete completed ephemeral output immediately after inspection by setting the ag
 .\tools\mir.ps1 storage clean --older-than-days 0 --apply
 ```
 
-Cleanup is dry-run-first unless `--apply` is present. It considers only immediate children of the canonical `build/results/` root, requires every target to be ignored by Git, refuses reparse points, revalidates each target immediately before deletion, and refuses applied cleanup while Factorio is running. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
+Cleanup is dry-run-first unless `--apply` is present. Its typed roots are immediate children of `build/results/` (excluding protected `assurance` and `validation`), run boundaries below `build/tests/`, immediate children of `build/packages/` (excluding `development-contracts`), and direct canonical 32-lowercase-hex child directories of `build/packages/development-contracts/`. Noncanonical development-contract children are reported but never selected. Every selected target must be ignored by Git and passes a second exact typed-root, custody/lease/reference, age, and recursive no-follow reparse audit immediately before deletion; applied cleanup refuses to run while Factorio is running. Registered worktrees are resolved through Git metadata, including a primary checkout initialized with `--separate-git-dir`, rather than by parent-directory inference. Deletion is permanent, so promote any compact evidence needed for a release or future diagnosis before applying it.
 
 The retired `.work/` path is forbidden and its reappearance fails the layout gate. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is a read-only legacy quarantine until the post-2.5.5 storage inventory; ordinary commands must not write there, and this focused migration does not delete it.
 
@@ -66,4 +66,4 @@ When a run finishes, retain its compact summary, failure packet, or authority-bo
 
 The scenario runners already prefer NTFS hardlinks for local mod ZIPs when the source and staging directory share a volume. Windows and Explorer report each hardlink path in logical directory totals even though the file content occupies physical disk once, so logical artifact size can substantially exceed physical storage use. Keep `testmods_*` as the shared source library and remove stale staging links instead of deleting or duplicating the library.
 
-Use a different output drive for deliberately long campaigns when practical. The retention rules still apply to that output root, but the repository cleanup command intentionally operates only on registered worktrees beneath the current project directory and does not roam arbitrary disks.
+Use a different output drive for deliberately long campaigns when practical. The retention rules still apply to that output root, but the repository cleanup command intentionally operates only on worktrees registered to the current Git common directory and does not roam arbitrary disks.

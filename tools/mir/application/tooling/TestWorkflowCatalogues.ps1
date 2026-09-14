@@ -32,6 +32,12 @@ function Get-MIR4TestProofCatalogueV1 {
     if (-not [string]::IsNullOrWhiteSpace($command) -and $implementation -notmatch '^(?:tests|scripts|tools)/') {
       throw "[mir4-test-catalogue-entrypoint] $($test.id): $implementation"
     }
+    $capturedArtifacts = [Collections.Generic.List[object]]::new()
+    if ($test.PSObject.Properties['captured_artifacts']) {
+      foreach ($artifact in @($test.captured_artifacts)) {
+        if ($null -ne $artifact) { $capturedArtifacts.Add($artifact) }
+      }
+    }
     $rows += [pscustomobject][ordered]@{
       id = [string]$test.id
       proposition = "The governed test '$($test.id)' passes for its exact selected inputs."
@@ -47,6 +53,7 @@ function Get-MIR4TestProofCatalogueV1 {
       exit_behavior = 'zero-pass-nonzero-fail'
       requires_factorio = [bool]$test.requires_factorio
       inputs = if ($test.PSObject.Properties['inputs']) { @($test.inputs | Where-Object { $null -ne $_ }) } else { @() }
+      captured_artifacts = $capturedArtifacts
       matrix = if ($test.PSObject.Properties['matrix']) { $test.matrix } else { $null }
     }
   }

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR4 development contracts local result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "scope", "source", "command_inventory_digest", "packages", "retained_expanded_packages", "release_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4DevelopmentContractsLocalResultV1"},
+    "status": {"const": "passed"},
+    "scope": {"const": "current-source-and-four-target-determinism"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree", "package_source_sha256", "package_source_dirty", "selected_inputs_sha256", "selected_input_file_count", "selected_inputs_dirty", "repository_dirty"],
+      "properties": {
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "package_source_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "package_source_dirty": {"type": "boolean"},
+        "selected_inputs_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+        "selected_input_file_count": {"type": "integer", "minimum": 1},
+        "selected_inputs_dirty": {"type": "boolean"},
+        "repository_dirty": {"type": "boolean"}
+      }
+    },
+    "command_inventory_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "packages": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "archive_sha256", "content_sha256", "entry_count"],
+        "properties": {
+          "target": {"enum": ["f210", "f200", "f110", "f100"]},
+          "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+          "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+          "entry_count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "retained_expanded_packages": {"const": false},
+    "release_authority": {"const": false}
+  }
+}

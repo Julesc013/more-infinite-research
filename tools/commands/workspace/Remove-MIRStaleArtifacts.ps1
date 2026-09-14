@@ -91,17 +91,26 @@ function Get-MIRArtifactWorktrees {
   )
 
   if (-not $IncludeAll) { return @($CurrentRepoRoot) }
-  # A linked worktree lives below build/worktrees, so its parent is not the
-  # project root.  Git's common directory is the authority that works for
-  # both primary and linked worktrees.
+  # The registered-worktree list and common Git directory are the authority.
+  # Do not infer the primary checkout from the common-directory parent: a
+  # repository initialized with --separate-git-dir deliberately has no such
+  # relationship.  Every returned root must instead prove that it resolves to
+  # this exact common Git directory.
   $commonGitDirectory = @(& git -C $CurrentRepoRoot rev-parse --path-format=absolute --git-common-dir)
   if ($LASTEXITCODE -ne 0 -or $commonGitDirectory.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$commonGitDirectory[0])) {
     throw 'Unable to resolve the common Git directory for registered-worktree cleanup.'
   }
-  $projectRoot = Split-Path -Parent ([IO.Path]::GetFullPath(([string]$commonGitDirectory[0]).Trim()))
-  if (-not (Test-Path -LiteralPath $projectRoot -PathType Container)) {
-    throw "Resolved project root is absent: $projectRoot"
+  $commonGitDirectory = [IO.Path]::GetFullPath(([string]$commonGitDirectory[0]).Trim())
+  $configuredPrimaryWorktree = @(& git -C $CurrentRepoRoot config --path --get core.worktree)
+  if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+    throw 'Unable to resolve the configured primary worktree from Git metadata.'
   }
+  if ($configuredPrimaryWorktree.Count -gt 1) {
+    throw 'Git metadata supplied more than one configured primary worktree.'
+  }
+  $configuredPrimaryWorktree = if ($configuredPrimaryWorktree.Count -eq 1 -and -not [string]::IsNullOrWhiteSpace([string]$configuredPrimaryWorktree[0])) {
+    [IO.Path]::GetFullPath(([string]$configuredPrimaryWorktree[0]).Trim())
+  } else { $null }
   $worktreeLines = @(& git -C $CurrentRepoRoot worktree list --porcelain)
   if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate registered Git worktrees.' }
 
@@ -109,11 +118,25 @@ function Get-MIRArtifactWorktrees {
   foreach ($line in $worktreeLines) {
     if (-not $line.StartsWith('worktree ', [StringComparison]::Ordinal)) { continue }
     $candidate = [IO.Path]::GetFullPath($line.Substring(9))
-    if (-not (Test-MIRArtifactPathWithinOrEqual -Path $candidate -Root $projectRoot)) {
-      Write-Warning "Skipping registered worktree outside the current project directory: $candidate"
-      continue
+    # `git init --separate-git-dir` represents the primary record by the
+    # common Git directory. Its configured core.worktree is the registered
+    # primary checkout; never substitute a directory parent as a guess.
+    if ($candidate.Equals($commonGitDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+      if ($null -eq $configuredPrimaryWorktree -or -not (Test-Path -LiteralPath $configuredPrimaryWorktree -PathType Container)) {
+        throw 'A separate-Git-directory primary worktree lacks a usable core.worktree metadata path.'
+      }
+      $candidate = $configuredPrimaryWorktree
     }
-    if (Test-Path -LiteralPath $candidate -PathType Container) { $worktrees.Add($candidate) }
+    if (-not (Test-Path -LiteralPath $candidate -PathType Container)) { continue }
+    $candidateCommonDirectory = @(& git -C $candidate rev-parse --path-format=absolute --git-common-dir)
+    if ($LASTEXITCODE -ne 0 -or $candidateCommonDirectory.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$candidateCommonDirectory[0])) {
+      throw "Unable to resolve the common Git directory for registered worktree: $candidate"
+    }
+    $candidateCommonDirectory = [IO.Path]::GetFullPath(([string]$candidateCommonDirectory[0]).Trim())
+    if (-not $candidateCommonDirectory.Equals($commonGitDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+      throw "Registered worktree did not resolve to the current common Git directory: $candidate"
+    }
+    $worktrees.Add($candidate)
   }
   return @($worktrees | Sort-Object -Unique)
 }
