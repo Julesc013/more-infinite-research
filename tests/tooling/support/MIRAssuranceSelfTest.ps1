@@ -630,6 +630,47 @@ function Invoke-MIRAssuranceSelfTest {
     throw 'Quarantine resolution accepted a tampered result or missing bound artifact, or failed after valid bytes were restored.'
   }
 
+  # An unrelated executor preflight error must inspect the resolved state with
+  # the same definition identity.  It must not turn an already valid resolution
+  # into a fabricated quarantine merely because the error handler omitted that
+  # authoritative fingerprint component.
+  $resolvedExecutionErrorTest = [pscustomobject][ordered]@{
+    id=[string]$fullValidationIdentity.test_id
+    requires_factorio=$true
+    fingerprint=[pscustomobject]$fullValidationIdentity
+  }
+  $resolvedExecutionErrorContext = $Context.PSObject.Copy()
+  $resolvedExecutionErrorContext.factorio = ''
+  $resolvedExecutionErrorResults = @(Invoke-MIRAssurancePlan `
+    -Plan ([pscustomobject][ordered]@{tests=@($resolvedExecutionErrorTest)}) `
+    -Context $resolvedExecutionErrorContext)
+  $resolvedExecutionErrorState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  if ($resolvedExecutionErrorResults.Count -ne 1 -or
+      [string]$resolvedExecutionErrorResults[0].schema -ne 'mir-plan-execution-error-v1' -or
+      [string]$resolvedExecutionErrorResults[0].message -notmatch 'requires --factorio' -or
+      @($resolvedExecutionErrorState.resolved_incidents).Count -ne 1 -or
+      @($resolvedExecutionErrorState.unresolved_incidents).Count -ne 0) {
+    throw 'An unrelated executor error failed to preserve a valid prior quarantine resolution.'
+  }
+
+  # The accepted reproduction remains live evidence, not a one-time ceremony.
+  # If its bound artifact is corrupted after resolution, resolution readers must
+  # reopen the incident and reuse must replace the old passed pointer with a
+  # quarantined state.
+  [IO.File]::WriteAllText($fullValidationArtifactPath, "tampered after resolution`n", [Text.UTF8Encoding]::new($false))
+  $postResolutionTamperState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  $postResolutionTamperReuse = Get-MIRAssuranceReusableEvidence -Fingerprint $fullValidationIdentity -Context $Context
+  $postResolutionTamperReconciledState = Get-MIRAssuranceAttemptQuarantineState -Identity $fullValidationIdentity -Context $Context
+  $fullValidationPaths = Get-MIRAssuranceEvidencePaths -TestId $fullValidationIdentity.test_id -InputKey $fullValidationIdentity.input_key
+  if (@($postResolutionTamperState.resolved_incidents).Count -ne 0 -or
+      @($postResolutionTamperState.unresolved_incidents).Count -ne 1 -or
+      $null -ne $postResolutionTamperReuse -or
+      @($postResolutionTamperReconciledState.unresolved_incidents).Count -ne 1 -or
+      (Test-Path -LiteralPath $fullValidationPaths.passed -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $fullValidationPaths.blocked -PathType Leaf)) {
+    throw 'Tampering after a valid quarantine resolution did not reopen and reconcile the incident.'
+  }
+
   Start-Sleep -Milliseconds 2
   $independentProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
   $independentProducer['run_id'] = "independent-$([guid]::NewGuid().ToString('N'))"

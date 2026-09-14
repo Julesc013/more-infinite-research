@@ -304,6 +304,7 @@ function Invoke-MIRAssurancePlan {
         input_key=[string]$test.fingerprint.input_key
         target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) { [string]$test.fingerprint.target } else { [string]$Context.target }
         fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
+        definition_sha256=[string]$test.fingerprint.definition_sha256
       }
       $quarantineState = $null
       if (-not [string]::IsNullOrWhiteSpace([string]$identity.input_key) -and
