@@ -18,7 +18,6 @@ local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
-
 local M = {}
 
 local function now()
@@ -178,5 +177,4 @@ function M.maximum_level_policy(context)
 end
 
 M.record_work_volume = record_work_volume
-
 return M

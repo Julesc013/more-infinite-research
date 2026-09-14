@@ -2433,8 +2433,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compiler-orchestrator context_construction responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 10341,
-      "expected_sha256": "2496AFD8AE40999750EA0C2775E94C15E14C72574CA12912A4C8D47E5DE9707F",
+      "expected_bytes": 10339,
+      "expected_sha256": "E04507FE40B5C2CFB8CC51CD8F57D8209689FEE05BC6DF54616E63F6FADCD5E8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3999,5 +3999,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "A329BC0DD6FFC512E879F5F81AF7E6EDE8BB11816150D8EE95BF1CDB88412BF1"
+  "record_sha256": "39209BF266A8E9F79F810360749BF0C02A45BF9D84989BF0DBBDC313D1A7207A"
 }
