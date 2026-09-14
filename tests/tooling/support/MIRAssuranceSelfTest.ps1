@@ -318,7 +318,8 @@ function Invoke-MIRAssuranceSelfTest {
       [Parameter(Mandatory)]$Identity,
       [Parameter(Mandatory)][ValidateSet('passed', 'failed')][string]$Status,
       [Parameter(Mandatory)][string]$Label,
-      $Producer = $null
+      $Producer = $null,
+      [switch]$Unpublished
     )
     $casePaths = Get-MIRAssuranceEvidencePaths -TestId $Identity.test_id -InputKey $Identity.input_key
     $syntheticAttemptRoots.Add([string]$casePaths.root)
@@ -375,7 +376,9 @@ function Invoke-MIRAssuranceSelfTest {
       duration_seconds=0
       message=if ($Status -eq 'passed') { '' } else { 'synthetic failure' }
     }
-    $capsule = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
+    if (-not $Unpublished) {
+      $capsule = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
+    }
     return [pscustomobject][ordered]@{identity=$Identity;paths=$casePaths;work=$work;capsule=$capsule}
   }
   $newSyntheticIdentity = {
@@ -399,6 +402,55 @@ function Invoke-MIRAssuranceSelfTest {
       $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $sameIdentity -Context $Context)) {
     throw 'Independent same-semantic trusted attempts with distinct work paths and times were incorrectly quarantined or made non-reusable.'
   }
+
+  # Model the only recoverable crash window: the immutable contradictory
+  # capsule reached disk but its producer died before it could transition the
+  # mutable pointer.  A reader under the exact lock must see that capsule and
+  # reject the formerly valid passed pointer before a later writer reconciles
+  # it.  This is deterministic rather than scheduler-dependent.
+  $crashWindowIdentity = & $newSyntheticIdentity 'durable-publication-before-pointer'
+  $crashWindowPass = & $newSyntheticAttempt -Identity $crashWindowIdentity -Status passed -Label 'initial-pass'
+  $crashWindowFailure = & $newSyntheticAttempt `
+    -Identity $crashWindowIdentity `
+    -Status failed `
+    -Label 'durable-failure-before-pointer' `
+    -Unpublished
+  $crashWindowPaths = Get-MIRAssuranceEvidencePaths -TestId $crashWindowIdentity.test_id -InputKey $crashWindowIdentity.input_key
+  $crashWindowLock = Enter-MIRAssuranceAttemptStateLock -Identity $crashWindowIdentity
+  $crashWindowReuse = $null
+  $crashWindowState = $null
+  try {
+    $crashWindowFailure.capsule['outcome_digest'] = Get-MIRAssuranceOutcomeDigest -Capsule $crashWindowFailure.capsule
+    $crashWindowRoundTrip = ($crashWindowFailure.capsule | ConvertTo-Json -Depth 40 -Compress) | ConvertFrom-Json
+    $crashWindowFailure.capsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $crashWindowRoundTrip
+    New-Item -ItemType Directory -Force -Path $crashWindowPaths.attempts | Out-Null
+    $crashWindowAttemptPath = Join-Path $crashWindowPaths.attempts ("unreconciled-$([guid]::NewGuid().ToString('N')).json")
+    $crashWindowFailure.capsule['attempt_path'] = Get-MIRAssuranceRepoRelativePath -Path $crashWindowAttemptPath
+    Write-MIRAssuranceAtomicJson -Value $crashWindowFailure.capsule -Path $crashWindowAttemptPath
+    $crashWindowReuse = Get-MIRAssuranceReusableEvidence `
+      -Fingerprint $crashWindowIdentity `
+      -Context $Context `
+      -Lock $crashWindowLock
+    $crashWindowReaderReconciled =
+      -not (Test-Path -LiteralPath $crashWindowPass.paths.passed -PathType Leaf) -and
+      (Test-Path -LiteralPath $crashWindowPass.paths.blocked -PathType Leaf)
+    $crashWindowState = Set-MIRAssuranceAttemptPointer `
+      -Capsule $crashWindowFailure.capsule `
+      -AttemptPath $crashWindowAttemptPath `
+      -Context $Context `
+      -Lock $crashWindowLock
+  } finally {
+    Exit-MIRAssuranceAttemptStateLock -Lock $crashWindowLock
+  }
+  if ($null -ne $crashWindowReuse -or
+      -not $crashWindowReaderReconciled -or
+      -not [bool]$crashWindowState.quarantined -or
+      (Test-Path -LiteralPath $crashWindowPass.paths.passed -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $crashWindowPass.paths.blocked -PathType Leaf) -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $crashWindowIdentity -Context $Context)) {
+    throw 'A durable contradictory attempt published before its pointer transition was incorrectly allowed to reuse a stale pass.'
+  }
+
   $contradictionIdentity = & $newSyntheticIdentity 'contradiction'
   $contradictionPass = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'passing'
   $contradictionFail = & $newSyntheticAttempt -Identity $contradictionIdentity -Status failed -Label 'failing'
@@ -452,6 +504,66 @@ function Invoke-MIRAssuranceSelfTest {
       (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
       $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
     throw 'A normal retry or interleaved writer bypassed an unresolved exact-evidence quarantine.'
+  }
+
+  # A syntactically complete resolution that points to an independent *failed*
+  # attempt must not clear quarantine.  This exercises the reader, not merely
+  # the guarded writer, because historical/crafted resolution files are input.
+  $forgedResolutionIdentity = & $newSyntheticIdentity 'forged-failing-resolution'
+  $forgedResolutionPass = & $newSyntheticAttempt -Identity $forgedResolutionIdentity -Status passed -Label 'initial-pass'
+  $forgedResolutionFailure = & $newSyntheticAttempt -Identity $forgedResolutionIdentity -Status failed -Label 'initial-failure'
+  $forgedIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $forgedResolutionIdentity)
+  if ($forgedIncidents.Count -ne 1) {
+    throw 'Forged-resolution self-test did not establish exactly one contradiction incident.'
+  }
+  $forgedIncident = $forgedIncidents[0]
+  Start-Sleep -Milliseconds 2
+  $forgedProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
+  $forgedProducer['run_id'] = "independent-failed-$([guid]::NewGuid().ToString('N'))"
+  $forgedProducer['job'] = 'self-test-forged-failed-resolution'
+  $forgedIndependentFailure = & $newSyntheticAttempt `
+    -Identity $forgedResolutionIdentity `
+    -Status failed `
+    -Label 'independent-failed-reproduction' `
+    -Producer $forgedProducer
+  $forgedAttemptRows = @(Get-MIRAssuranceTrustedExactAttempts -Identity $forgedResolutionIdentity -Context $Context)
+  $forgedSelectedRows = @($forgedAttemptRows | Where-Object {
+    [string]$_.path -eq [string]$forgedIndependentFailure.capsule.attempt_path
+  })
+  if ($forgedSelectedRows.Count -ne 1) {
+    throw 'Forged-resolution self-test did not find its independent failed immutable attempt.'
+  }
+  $forgedSelected = $forgedSelectedRows[0]
+  $forgedResolution = [ordered]@{
+    schema=1
+    kind='mir-assurance-quarantine-resolution-v1'
+    status='resolved'
+    identity=$forgedResolutionIdentity
+    incident_path=[string]$forgedIncident.path
+    incident_sha256=[string]$forgedIncident.incident.incident_sha256
+    decision='accept-independent-fresh-reproduction'
+    accepted_outcome_digest=[string]$forgedSelected.outcome_digest
+    independent_attempt=[ordered]@{
+      path=[string]$forgedSelected.path
+      sha256=[string]$forgedSelected.sha256
+      result_digest=[string]$forgedSelected.result_digest
+      outcome_digest=[string]$forgedSelected.outcome_digest
+      producer_execution_identity=[string]$forgedSelected.producer_execution_identity
+    }
+    adjudicator='self-test-forged-failed-adjudicator'
+    adjudicated_at=[DateTimeOffset]::UtcNow.ToString('o')
+  }
+  $forgedResolution['resolution_sha256'] = Get-MIRAssuranceJsonHash -Value $forgedResolution
+  $forgedResolutionPath = Join-Path `
+    (Get-MIRAssuranceAttemptQuarantineResolutionDirectory -Identity $forgedResolutionIdentity) `
+    ("$($forgedResolution.resolution_sha256).json")
+  Write-MIRAssuranceAtomicJson -Value $forgedResolution -Path $forgedResolutionPath
+  $forgedResolutionState = Get-MIRAssuranceAttemptQuarantineState -Identity $forgedResolutionIdentity -Context $Context
+  if (@($forgedResolutionState.unresolved_incidents).Count -ne 1 -or
+      @($forgedResolutionState.resolved_incidents).Count -ne 0 -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $forgedResolutionIdentity -Context $Context) -or
+      (Get-MIRAssuranceEvidenceDecision -Fingerprint $forgedResolutionIdentity -Context $Context -TestId $forgedResolutionIdentity.test_id).disposition -ne 'INVALID') {
+    throw 'A crafted failed independent reproduction was incorrectly accepted as a quarantine resolution.'
   }
 
   Start-Sleep -Milliseconds 2

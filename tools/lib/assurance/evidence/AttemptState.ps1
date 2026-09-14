@@ -223,6 +223,19 @@ function Exit-MIRAssuranceAttemptStateLock {
   }
 }
 
+function Assert-MIRAssuranceAttemptStateLock {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$Lock
+  )
+  $expectedPath = [IO.Path]::GetFullPath((Get-MIRAssuranceAttemptStateLockPath -Identity $Identity))
+  if ($null -eq $Lock.stream -or
+      [string]::IsNullOrWhiteSpace([string]$Lock.path) -or
+      [IO.Path]::GetFullPath([string]$Lock.path) -ne $expectedPath) {
+    throw "The supplied MIR assurance attempt-state lock does not own the exact fingerprint state."
+  }
+}
+
 function Get-MIRAssuranceAttemptQuarantineIncidents {
   param([Parameter(Mandatory)]$Identity)
   $directory = Get-MIRAssuranceAttemptQuarantineDirectory -Identity $Identity
@@ -297,7 +310,14 @@ function Get-MIRAssuranceAttemptQuarantineResolutions {
         [string]$resolution.resolution_sha256 -ne (Get-MIRAssuranceJsonHash -Value $material)) {
       continue
     }
-    $attemptPath = Resolve-MIRAssurancePath -Path ([string]$resolution.independent_attempt.path)
+    try { $attemptPath = Resolve-MIRAssurancePath -Path ([string]$resolution.independent_attempt.path) }
+    catch { continue }
+    $paths = Get-MIRAssuranceEvidencePaths -TestId $Identity.test_id -InputKey $Identity.input_key
+    $attemptRoot = [IO.Path]::GetFullPath($paths.attempts).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    $resolvedAttemptPath = [IO.Path]::GetFullPath($attemptPath)
+    if (-not $resolvedAttemptPath.StartsWith($attemptRoot, [StringComparison]::OrdinalIgnoreCase)) {
+      continue
+    }
     $attempt = $null
     # Capsule digest canonicalization accepts the normal PowerShell JSON date
     # materialization used when the immutable capsule was written.  Keep that
@@ -306,6 +326,9 @@ function Get-MIRAssuranceAttemptQuarantineResolutions {
     try { $attempt = Get-Content -Raw -LiteralPath $attemptPath -ErrorAction Stop | ConvertFrom-Json }
     catch { continue }
     if (-not (Test-MIRAssuranceExactTrustedAttempt -Capsule $attempt -Identity $Identity -Context $Context) -or
+        [string]$attempt.status -ne 'passed' -or
+        [string]$attempt.conclusion -ne 'passed' -or
+        [string]$attempt.attempt_path -ne (Get-MIRAssuranceRepoRelativePath -Path $resolvedAttemptPath) -or
         (Get-MIRAssuranceSha256 -Path $attemptPath) -ne [string]$resolution.independent_attempt.sha256 -or
         (Get-MIRAssuranceOutcomeDigest -Capsule $attempt) -ne [string]$resolution.independent_attempt.outcome_digest -or
         [string]$attempt.result_digest -ne [string]$resolution.independent_attempt.result_digest -or
@@ -416,12 +439,87 @@ function Write-MIRAssuranceAttemptQuarantineIncident {
   return [pscustomobject][ordered]@{path=(Get-MIRAssuranceRepoRelativePath -Path $path);incident=$incident}
 }
 
+# Call only while the exact fingerprint attempt-state lock is held.  Immutable
+# attempt publication is intentionally reconciled from disk rather than trusted
+# through the mutable pointer: a process can die after its atomic capsule write
+# but before it updates passed.json or blocked.json.
+function Get-MIRAssuranceAttemptStateSnapshot {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$Context,
+    [Parameter(Mandatory)]$Lock
+  )
+  Assert-MIRAssuranceAttemptStateLock -Identity $Identity -Lock $Lock
+  $attempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $Identity -Context $Context)
+  $conclusions = @($attempts | ForEach-Object { [string]$_.conclusion } | Sort-Object -Unique)
+  $outcomes = @($attempts | ForEach-Object { [string]$_.outcome_digest } | Sort-Object -Unique)
+  $contradiction = $conclusions.Count -gt 1 -or $outcomes.Count -gt 1
+  $incident = $null
+  if ($contradiction) {
+    $incident = Write-MIRAssuranceAttemptQuarantineIncident -Identity $Identity -Attempts $attempts
+  }
+  $quarantineState = Get-MIRAssuranceAttemptQuarantineState -Identity $Identity -Context $Context
+  return [pscustomobject][ordered]@{
+    attempts=$attempts
+    incident=$incident
+    quarantine_state=$quarantineState
+    unresolved=@($quarantineState.unresolved_incidents)
+  }
+}
+
+function Set-MIRAssuranceQuarantinedPointer {
+  param(
+    [Parameter(Mandatory)]$Identity,
+    [Parameter(Mandatory)]$StateSnapshot,
+    [Parameter(Mandatory)]$Lock
+  )
+  Assert-MIRAssuranceAttemptStateLock -Identity $Identity -Lock $Lock
+  $unresolved = @($StateSnapshot.unresolved)
+  $attempts = @($StateSnapshot.attempts)
+  if ($unresolved.Count -eq 0 -or $attempts.Count -eq 0) {
+    throw 'A quarantined pointer requires unresolved incidents and immutable exact attempts.'
+  }
+  $paths = Get-MIRAssuranceEvidencePaths -TestId $Identity.test_id -InputKey $Identity.input_key
+  $current = @($attempts | Sort-Object path | Select-Object -Last 1)[0]
+  $opposite = @(
+    $attempts | Where-Object {
+      [string]$_.conclusion -ne [string]$current.conclusion -or
+      [string]$_.outcome_digest -ne [string]$current.outcome_digest
+    } | Sort-Object path | Select-Object -First 1
+  )[0]
+  $pointer = [ordered]@{
+    schema=1
+    test_id=[string]$Identity.test_id
+    input_key=[string]$Identity.input_key
+    conclusion='quarantined'
+    capsule_path=[string]$current.path
+    capsule_sha256=[string]$current.sha256
+    incident_path=[string]$unresolved[0].path
+    incident_sha256=[string]$unresolved[0].incident.incident_sha256
+    current_capsule_path=[string]$current.path
+    current_capsule_sha256=[string]$current.sha256
+  }
+  if ($null -ne $opposite) {
+    $pointer['capsule_path'] = [string]$opposite.path
+    $pointer['capsule_sha256'] = [string]$opposite.sha256
+    $pointer['opposite_capsule_path'] = [string]$opposite.path
+    $pointer['opposite_capsule_sha256'] = [string]$opposite.sha256
+    $pointer['opposite_outcome_digest'] = [string]$opposite.outcome_digest
+  }
+  New-Item -ItemType Directory -Force -Path $paths.root | Out-Null
+  if (Test-Path -LiteralPath $paths.passed -PathType Leaf) { Remove-Item -LiteralPath $paths.passed -Force }
+  Write-MIRAssuranceAtomicJson -Value $pointer -Path $paths.blocked
+  if (Test-Path -LiteralPath $paths.running -PathType Leaf) { Remove-Item -LiteralPath $paths.running -Force }
+  return $pointer
+}
+
 function Set-MIRAssuranceAttemptPointer {
   param(
     [Parameter(Mandatory)]$Capsule,
     [Parameter(Mandatory)][string]$AttemptPath,
     [Parameter(Mandatory)]$Context,
-    [int]$LockTimeoutMilliseconds = 15000
+    [int]$LockTimeoutMilliseconds = 15000,
+    $Lock = $null
   )
   $identity = Get-MIRAssuranceAttemptIdentity -Capsule $Capsule
   $paths = Get-MIRAssuranceEvidencePaths -TestId $identity.test_id -InputKey $identity.input_key
@@ -433,21 +531,20 @@ function Set-MIRAssuranceAttemptPointer {
       [string]$Capsule.attempt_path -ne (Get-MIRAssuranceRepoRelativePath -Path $resolvedAttempt)) {
     throw "Assurance attempt pointer must bind the immutable capsule inside its exact attempt subtree."
   }
-  $lock = Enter-MIRAssuranceAttemptStateLock -Identity $identity -TimeoutMilliseconds $LockTimeoutMilliseconds
+  $ownsLock = $null -eq $Lock
+  if ($ownsLock) {
+    $Lock = Enter-MIRAssuranceAttemptStateLock -Identity $identity -TimeoutMilliseconds $LockTimeoutMilliseconds
+  } else {
+    Assert-MIRAssuranceAttemptStateLock -Identity $identity -Lock $Lock
+  }
   try {
     # The state lock covers the exact trusted scan, immutable incident write,
     # resolution read, and mutable pointer update.  Worker imports call this
     # same function, so an importer cannot race a local executor into a pass.
-    $attempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $identity -Context $Context)
-    $conclusions = @($attempts | ForEach-Object { [string]$_.conclusion } | Sort-Object -Unique)
-    $outcomes = @($attempts | ForEach-Object { [string]$_.outcome_digest } | Sort-Object -Unique)
-    $contradiction = $conclusions.Count -gt 1 -or $outcomes.Count -gt 1
-    $incident = $null
-    if ($contradiction) {
-      $incident = Write-MIRAssuranceAttemptQuarantineIncident -Identity $identity -Attempts $attempts
-    }
-    $quarantineState = Get-MIRAssuranceAttemptQuarantineState -Identity $identity -Context $Context
-    $unresolved = @($quarantineState.unresolved_incidents)
+    $stateSnapshot = Get-MIRAssuranceAttemptStateSnapshot -Identity $identity -Context $Context -Lock $Lock
+    $attempts = @($stateSnapshot.attempts)
+    $incident = $stateSnapshot.incident
+    $unresolved = @($stateSnapshot.unresolved)
     $currentPath = Get-MIRAssuranceRepoRelativePath -Path $resolvedAttempt
     $currentSha256 = Get-MIRAssuranceSha256 -Path $resolvedAttempt
     $pointer = [ordered]@{
@@ -497,7 +594,7 @@ function Set-MIRAssuranceAttemptPointer {
       trusted_attempt_count=$attempts.Count
     }
   } finally {
-    Exit-MIRAssuranceAttemptStateLock -Lock $lock
+    if ($ownsLock) { Exit-MIRAssuranceAttemptStateLock -Lock $Lock }
   }
 }
 
@@ -577,16 +674,21 @@ function Resolve-MIRAssuranceAttemptQuarantine {
       }
       $written.Add([pscustomobject][ordered]@{path=(Get-MIRAssuranceRepoRelativePath -Path $path);resolution=$resolution})
     }
+    # The durable resolution and its consequence are one exact-fingerprint
+    # state transition.  Do not release and reacquire here: a concurrent writer
+    # could otherwise publish another observation between resolution and the
+    # replacement of the quarantined pointer.
+    $selectedPath = Resolve-MIRAssurancePath -Path ([string]$selected.path)
+    $pointerState = Set-MIRAssuranceAttemptPointer `
+      -Capsule $selected.capsule `
+      -AttemptPath $selectedPath `
+      -Context $Context `
+      -Lock $lock
+    if ([bool]$pointerState.quarantined) {
+      throw 'Independent quarantine resolution did not clear every exact unresolved contradiction.'
+    }
   } finally {
     Exit-MIRAssuranceAttemptStateLock -Lock $lock
-  }
-  # Re-enter through the canonical atomic pointer writer after the resolution
-  # record exists.  This keeps pointer effects and worker-import behavior
-  # identical to normal local evidence.
-  $selectedPath = Resolve-MIRAssurancePath -Path ([string]$selected.path)
-  $pointerState = Set-MIRAssuranceAttemptPointer -Capsule $selected.capsule -AttemptPath $selectedPath -Context $Context
-  if ([bool]$pointerState.quarantined) {
-    throw 'Independent quarantine resolution did not clear every exact unresolved contradiction.'
   }
   return [ordered]@{
     status='resolved'
@@ -606,13 +708,22 @@ function Write-MIRAssuranceAttempt {
   $Capsule['outcome_digest'] = Get-MIRAssuranceOutcomeDigest -Capsule $Capsule
   $roundTripped = ($Capsule | ConvertTo-Json -Depth 40 -Compress) | ConvertFrom-Json
   $Capsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $roundTripped
+  $identity = Get-MIRAssuranceAttemptIdentity -Capsule $Capsule
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Capsule.test_id -InputKey $Capsule.input_key
-  New-Item -ItemType Directory -Force -Path $paths.attempts | Out-Null
-  $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffffffZ')
-  $attemptPath = Join-Path $paths.attempts ("$stamp-$([guid]::NewGuid().ToString('N')).json")
-  $Capsule['attempt_path'] = Get-MIRAssuranceRepoRelativePath -Path $attemptPath
-  Write-MIRAssuranceAtomicJson -Value $Capsule -Path $attemptPath
-  $state = Set-MIRAssuranceAttemptPointer -Capsule $Capsule -AttemptPath $attemptPath -Context $Context
+  $lock = Enter-MIRAssuranceAttemptStateLock -Identity $identity
+  try {
+    New-Item -ItemType Directory -Force -Path $paths.attempts | Out-Null
+    $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssfffffffZ')
+    $attemptPath = Join-Path $paths.attempts ("$stamp-$([guid]::NewGuid().ToString('N')).json")
+    $Capsule['attempt_path'] = Get-MIRAssuranceRepoRelativePath -Path $attemptPath
+    # The immutable capsule is the commit record.  A crash after this write is
+    # safe because every reusable read reconciles the complete attempt set while
+    # holding this same lock before trusting any mutable pointer.
+    Write-MIRAssuranceAtomicJson -Value $Capsule -Path $attemptPath
+    $state = Set-MIRAssuranceAttemptPointer -Capsule $Capsule -AttemptPath $attemptPath -Context $Context -Lock $lock
+  } finally {
+    Exit-MIRAssuranceAttemptStateLock -Lock $lock
+  }
   $Capsule['quarantined'] = [bool]$state.quarantined
   $Capsule['quarantine_incident'] = [string]$state.incident
   return $Capsule

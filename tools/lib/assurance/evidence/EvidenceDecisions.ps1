@@ -10,22 +10,51 @@ function ConvertTo-MIRAssuranceOrderedMap {
 }
 
 function Get-MIRAssuranceReusableEvidence {
-  param([Parameter(Mandatory)]$Fingerprint, [Parameter(Mandatory)]$Context)
+  param(
+    [Parameter(Mandatory)]$Fingerprint,
+    [Parameter(Mandatory)]$Context,
+    $Lock = $null
+  )
+  $identity = [ordered]@{
+    test_id=[string]$Fingerprint.test_id
+    input_key=[string]$Fingerprint.input_key
+    target=[string]$Fingerprint.target
+    fingerprint_sha256=[string]$Fingerprint.fingerprint_sha256
+  }
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Fingerprint.test_id -InputKey $Fingerprint.input_key
-  if (-not (Test-Path -LiteralPath $paths.passed -PathType Leaf)) { return $null }
-  if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) { return $null }
-  $capsule = Read-MIRAssuranceEvidencePointer -Path $paths.passed
-  if ($null -eq $capsule) { return $null }
-  $validation = Test-MIRAssuranceCapsule -Capsule $capsule -Fingerprint $Fingerprint -Context $Context
-  if (-not [bool]$validation.valid) { return $null }
-  $result = ConvertTo-MIRAssuranceOrderedMap -Object $capsule
-  $result.disposition = "REUSE"
-  $result.decision_reason = [string]$validation.reason
-  $result.reused_at = (Get-Date).ToUniversalTime().ToString("o")
-  $result.source_duration_seconds = [double]$capsule.duration_seconds
-  $result.duration_seconds = 0
-  $result.evidence_path = Get-MIRAssuranceRepoRelativePath -Path $paths.passed
-  return $result
+  $ownsLock = $null -eq $Lock
+  if ($ownsLock) {
+    $Lock = Enter-MIRAssuranceAttemptStateLock -Identity $identity
+  } else {
+    Assert-MIRAssuranceAttemptStateLock -Identity $identity -Lock $Lock
+  }
+  try {
+    # Never trust passed.json alone.  A durable immutable attempt may have been
+    # published before a crashed producer reached its pointer transition.
+    $snapshot = Get-MIRAssuranceAttemptStateSnapshot -Identity $identity -Context $Context -Lock $Lock
+    if (@($snapshot.unresolved).Count -gt 0) {
+      # Complete the deferred pointer transition under the same observation
+      # lock.  This is recoverable crash repair, not a new trust decision.
+      $null = Set-MIRAssuranceQuarantinedPointer -Identity $identity -StateSnapshot $snapshot -Lock $Lock
+      return $null
+    }
+    if (-not (Test-Path -LiteralPath $paths.passed -PathType Leaf)) { return $null }
+    if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) { return $null }
+    $capsule = Read-MIRAssuranceEvidencePointer -Path $paths.passed
+    if ($null -eq $capsule) { return $null }
+    $validation = Test-MIRAssuranceCapsule -Capsule $capsule -Fingerprint $Fingerprint -Context $Context
+    if (-not [bool]$validation.valid) { return $null }
+    $result = ConvertTo-MIRAssuranceOrderedMap -Object $capsule
+    $result.disposition = "REUSE"
+    $result.decision_reason = [string]$validation.reason
+    $result.reused_at = (Get-Date).ToUniversalTime().ToString("o")
+    $result.source_duration_seconds = [double]$capsule.duration_seconds
+    $result.duration_seconds = 0
+    $result.evidence_path = Get-MIRAssuranceRepoRelativePath -Path $paths.passed
+    return $result
+  } finally {
+    if ($ownsLock) { Exit-MIRAssuranceAttemptStateLock -Lock $Lock }
+  }
 }
 
 function Get-MIRAssuranceCampaignCheckpoint {
