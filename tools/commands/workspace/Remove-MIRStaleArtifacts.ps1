@@ -3,6 +3,8 @@ param(
   [string]$RepoRoot = "",
   [ValidateRange(0, 3650)]
   [int]$OlderThanDays = 7,
+  [ValidateRange(1, 100000)]
+  [int]$MaxPlanEntries = 10000,
   [switch]$AllWorktrees,
   [switch]$Apply,
   [switch]$PassThru,
@@ -10,18 +12,34 @@ param(
   [switch]$SkipActiveProcessCheck
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
 
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
-  $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
+  $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 } else {
   $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 }
 
-$protectedArtifactNames = @("assurance", "validation")
-$comparison = [System.StringComparison]::OrdinalIgnoreCase
+. (Join-Path $PSScriptRoot '../../lib/validation/ImmutableInputStaging.ps1')
+
+$comparison = [StringComparison]::OrdinalIgnoreCase
 $now = [DateTime]::UtcNow
 $cutoff = $now.AddDays(-$OlderThanDays)
+$protectedNames = @('assurance', 'validation')
+$directCustodyMarkers = @(
+  'result.json', 'receipt.json', 'evidence.json', 'candidate.json', 'predecessor.json',
+  'offline-inputs.json', 'package-custody.json', 'seal.json', 'source-proof.json'
+)
+$runBoundaryNames = @(
+  'mir-immutable-input-lease.json', 'mir-immutable-input-lease.lock', 'config.ini', 'mod-list.json', 'server-settings.json',
+  'result.json', 'receipt.json', 'userdata', 'mods'
+)
+$artifactRootDefinitions = @(
+  [pscustomobject]@{ relative_path = 'build/results'; artifact_type = 'result'; direct_children_only = $true },
+  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false },
+  [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true }
+)
 
 function Test-MIRArtifactPathWithin {
   param(
@@ -29,10 +47,23 @@ function Test-MIRArtifactPathWithin {
     [Parameter(Mandatory)][string]$Root
   )
 
-  $fullPath = [System.IO.Path]::GetFullPath($Path)
-  $fullRoot = [System.IO.Path]::GetFullPath($Root).TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
-  $rootPrefix = $fullRoot + [System.IO.Path]::DirectorySeparatorChar
-  return $fullPath.StartsWith($rootPrefix, $comparison)
+  $fullPath = [IO.Path]::GetFullPath($Path)
+  $fullRoot = [IO.Path]::GetFullPath($Root).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+  $prefix = $fullRoot + [IO.Path]::DirectorySeparatorChar
+  return $fullPath.StartsWith($prefix, $comparison)
+}
+
+function Assert-MIRArtifactDirectory {
+  param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Context)
+
+  if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+    throw "$Context is absent: $Path"
+  }
+  $item = Get-Item -LiteralPath $Path -Force
+  if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+    throw "$Context may not be a reparse point: $Path"
+  }
+  return $item
 }
 
 function Get-MIRArtifactWorktrees {
@@ -42,45 +73,21 @@ function Get-MIRArtifactWorktrees {
   )
 
   if (-not $IncludeAll) { return @($CurrentRepoRoot) }
-
   $projectRoot = Split-Path -Parent $CurrentRepoRoot
   $worktreeLines = @(& git -C $CurrentRepoRoot worktree list --porcelain)
-  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate registered Git worktrees." }
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate registered Git worktrees.' }
 
-  $worktrees = @()
+  $worktrees = [Collections.Generic.List[string]]::new()
   foreach ($line in $worktreeLines) {
-    if (-not $line.StartsWith("worktree ", [System.StringComparison]::Ordinal)) { continue }
-    $candidate = [System.IO.Path]::GetFullPath($line.Substring(9))
+    if (-not $line.StartsWith('worktree ', [StringComparison]::Ordinal)) { continue }
+    $candidate = [IO.Path]::GetFullPath($line.Substring(9))
     if (-not (Test-MIRArtifactPathWithin -Path $candidate -Root $projectRoot)) {
       Write-Warning "Skipping registered worktree outside the current project directory: $candidate"
       continue
     }
-    if (Test-Path -LiteralPath $candidate -PathType Container) { $worktrees += $candidate }
+    if (Test-Path -LiteralPath $candidate -PathType Container) { $worktrees.Add($candidate) }
   }
-
   return @($worktrees | Sort-Object -Unique)
-}
-
-function Get-MIRArtifactItemFacts {
-  param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item)
-
-  $entries = @($Item)
-  if ($Item.PSIsContainer) {
-    $entries += @(Get-ChildItem -LiteralPath $Item.FullName -Force -Recurse -ErrorAction Stop)
-  }
-
-  $reparsePoints = @($entries | Where-Object { ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 })
-  [long]$logicalBytes = 0
-  foreach ($file in @($entries | Where-Object { -not $_.PSIsContainer })) {
-    $logicalBytes += [long]$file.Length
-  }
-
-  $latestWrite = @($entries | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1)
-  return [pscustomobject]@{
-    logical_bytes = $logicalBytes
-    latest_write_utc = if ($latestWrite.Count -gt 0) { $latestWrite[0].LastWriteTimeUtc } else { $Item.LastWriteTimeUtc }
-    has_reparse_point = ($reparsePoints.Count -gt 0)
-  }
 }
 
 function Test-MIRArtifactIgnored {
@@ -95,111 +102,351 @@ function Test-MIRArtifactIgnored {
 
 function Format-MIRArtifactBytes {
   param([long]$Bytes)
-  if ($Bytes -ge 1GB) { return ("{0:N2} GiB" -f ($Bytes / 1GB)) }
-  if ($Bytes -ge 1MB) { return ("{0:N2} MiB" -f ($Bytes / 1MB)) }
-  if ($Bytes -ge 1KB) { return ("{0:N2} KiB" -f ($Bytes / 1KB)) }
+  if ($Bytes -ge 1GB) { return ('{0:N2} GiB' -f ($Bytes / 1GB)) }
+  if ($Bytes -ge 1MB) { return ('{0:N2} MiB' -f ($Bytes / 1MB)) }
+  if ($Bytes -ge 1KB) { return ('{0:N2} KiB' -f ($Bytes / 1KB)) }
   return "$Bytes B"
 }
 
-$worktrees = @(Get-MIRArtifactWorktrees -CurrentRepoRoot $RepoRoot -IncludeAll:$AllWorktrees)
-$results = @()
+function Get-MIRArtifactRoot {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)]$Definition
+  )
 
-foreach ($worktree in $worktrees) {
-  $artifactRootCandidate = Join-Path $worktree "build/results"
-  if (-not (Test-Path -LiteralPath $artifactRootCandidate -PathType Container)) { continue }
-  $artifactRoot = (Resolve-Path -LiteralPath $artifactRootCandidate).Path
+  $candidate = Join-Path $WorktreeRoot $Definition.relative_path
+  if (-not (Test-Path -LiteralPath $candidate -PathType Container)) { return $null }
+  $item = Assert-MIRArtifactDirectory -Path $candidate -Context "Artifact root $($Definition.relative_path)"
+  if (-not (Test-MIRArtifactPathWithin -Path $item.FullName -Root $WorktreeRoot)) {
+    throw "Artifact root escaped its worktree: $($item.FullName)"
+  }
+  return $item.FullName
+}
 
-  if (-not (Test-MIRArtifactPathWithin -Path $artifactRoot -Root $worktree)) {
-    throw "Artifact root escaped its worktree: $artifactRoot"
+function Test-MIRArtifactRunBoundary {
+  param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item)
+
+  if (-not $Item.PSIsContainer) { return $true }
+  if (($Item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { return $true }
+  foreach ($name in $runBoundaryNames) {
+    if (Test-Path -LiteralPath (Join-Path $Item.FullName $name)) { return $true }
+  }
+  return $false
+}
+
+function Get-MIRArtifactCandidates {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)]$Definition,
+    [Parameter(Mandatory)][string]$ArtifactRoot
+  )
+
+  $rootItem = Get-Item -LiteralPath $ArtifactRoot -Force
+  if ($Definition.direct_children_only) {
+    foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
+      $item = Get-Item -LiteralPath $path -Force
+      [pscustomobject]@{ item = $item; boundary = 'direct-child' }
+    }
+    return
   }
 
-  foreach ($item in @(Get-ChildItem -LiteralPath $artifactRoot -Force | Sort-Object Name)) {
+  $pendingDirectories = [Collections.Generic.Stack[System.IO.FileSystemInfo]]::new()
+  foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
+    $item = Get-Item -LiteralPath $path -Force
+    if (-not $item.PSIsContainer -or
+        ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+        $item.Name -in $protectedNames -or
+        (Test-MIRArtifactRunBoundary -Item $item)) {
+      [pscustomobject]@{ item = $item; boundary = 'run-or-file' }
+      continue
+    }
+    $pendingDirectories.Push($item)
+  }
+  while ($pendingDirectories.Count -gt 0) {
+    $directoryItem = $pendingDirectories.Pop()
+    $hasChild = $false
+    try {
+      foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($directoryItem.FullName)) {
+        $hasChild = $true
+        $item = Get-Item -LiteralPath $path -Force
+        if (-not $item.PSIsContainer -or
+            ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+            $item.Name -in $protectedNames -or
+            (Test-MIRArtifactRunBoundary -Item $item)) {
+          [pscustomobject]@{ item = $item; boundary = 'run-or-file' }
+          continue
+        }
+        $pendingDirectories.Push($item)
+      }
+    } catch {
+      [pscustomobject]@{ item = $directoryItem; boundary = 'unreadable-directory' }
+      continue
+    }
+    if (-not $hasChild) {
+      [pscustomobject]@{ item = $directoryItem; boundary = 'empty-directory' }
+    }
+  }
+}
+
+function Get-MIRArtifactItemFacts {
+  param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item)
+
+  $facts = [ordered]@{
+    logical_bytes = [long]0
+    file_count = [long]0
+    latest_write_utc = $Item.LastWriteTimeUtc
+    has_reparse_point = $false
+    scan_error = $null
+  }
+  $pendingItems = [Collections.Generic.Stack[System.IO.FileSystemInfo]]::new()
+  $pendingItems.Push($Item)
+  while ($pendingItems.Count -gt 0) {
+    $current = $pendingItems.Pop()
+    if ($Current.LastWriteTimeUtc -gt $facts.latest_write_utc) { $facts.latest_write_utc = $Current.LastWriteTimeUtc }
+    if (($current.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+      $facts.has_reparse_point = $true
+      continue
+    }
+    if (-not $current.PSIsContainer) {
+      $facts.logical_bytes = [long]$facts.logical_bytes + [long]$Current.Length
+      $facts.file_count = [long]$facts.file_count + 1
+      continue
+    }
+    try {
+      foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($current.FullName)) {
+        if ($null -ne $facts.scan_error) { break }
+        $pendingItems.Push((Get-Item -LiteralPath $path -Force))
+      }
+    } catch {
+      $facts.scan_error = $_.Exception.Message
+    }
+  }
+  return [pscustomobject]$facts
+}
+
+function Get-MIRArtifactCustodyMarker {
+  param([Parameter(Mandatory)][System.IO.FileSystemInfo]$Item)
+
+  if (-not $Item.PSIsContainer) {
+    if ($Item.Name -in $directCustodyMarkers -or $Item.Name -like '*pin*.json') { return $Item.Name }
+    return $null
+  }
+  if (($Item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { return $null }
+  foreach ($name in $directCustodyMarkers) {
+    if (Test-Path -LiteralPath (Join-Path $Item.FullName $name) -PathType Leaf) { return $name }
+  }
+  try {
+    foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($Item.FullName)) {
+      $child = Get-Item -LiteralPath $path -Force
+      if (-not $child.PSIsContainer -and $child.Name -like '*pin*.json') { return $child.Name }
+    }
+  } catch {
+    return '__unsafe-inspection__'
+  }
+  return $null
+}
+
+function Get-MIRArtifactRow {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)]$Definition,
+    [Parameter(Mandatory)][string]$ArtifactRoot,
+    [Parameter(Mandatory)]$Candidate
+  )
+
+  $item = $Candidate.item
+  $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $item.FullName).Replace('\', '/')
+  $isProtected = $item.PSIsContainer -and $item.Name -in $protectedNames
+  $lease = if ($item.PSIsContainer) { Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName } else { $null }
+  $custodyMarker = if ($isProtected -or ($null -ne $lease -and ($lease.active -or $lease.ambiguous))) { $null } else { Get-MIRArtifactCustodyMarker -Item $item }
+  $facts = $null
+  $status = $null
+  $reason = $null
+  if ($isProtected) {
+    $status = 'protected'; $reason = 'protected artifact root'
+  } elseif ($null -ne $lease -and $lease.active) {
+    $status = 'active-lease'; $reason = $lease.reason
+  } elseif ($null -ne $lease -and $lease.ambiguous) {
+    $status = 'ambiguous-lease'; $reason = $lease.reason
+  } elseif ($null -ne $lease -and $lease.present -and $lease.state -in @('active', 'staging', 'receipt-captured', 'staging-failed', 'failed', 'missing-record')) {
+    $status = 'interrupted-lease'; $reason = $lease.reason
+  } elseif ($custodyMarker -ceq '__unsafe-inspection__') {
+    $status = 'unsafe-inspection'; $reason = 'could not inspect direct custody markers'
+  } elseif ($null -ne $custodyMarker) {
+    $status = 'pinned-custody'; $reason = "direct custody marker: $custodyMarker"
+  } else {
     $facts = Get-MIRArtifactItemFacts -Item $item
-    $relativePath = [System.IO.Path]::GetRelativePath($worktree, $item.FullName).Replace("\", "/")
-    $isProtected = $item.PSIsContainer -and $item.Name -in $protectedArtifactNames
-    $isIgnored = Test-MIRArtifactIgnored -WorktreeRoot $worktree -RelativePath $relativePath
-    $status = if ($isProtected) {
-      "protected"
+    if ($null -ne $facts.scan_error) {
+      $status = 'unsafe-inspection'; $reason = $facts.scan_error
     } elseif ($facts.has_reparse_point) {
-      "unsafe-reparse"
-    } elseif (-not $isIgnored) {
-      "not-ignored"
+      $status = 'unsafe-reparse'; $reason = 'reparse point encountered during no-follow traversal'
+    } elseif (-not (Test-MIRArtifactIgnored -WorktreeRoot $WorktreeRoot -RelativePath $relativePath)) {
+      $status = 'not-ignored'; $reason = 'Git does not ignore this artifact'
     } elseif ($facts.latest_write_utc -gt $cutoff) {
-      "recent"
+      $status = 'recent'; $reason = 'newer than retention cutoff'
     } else {
-      "eligible"
+      $status = 'eligible'; $reason = 'ignored, stale, unpinned, and no lease is live'
     }
+  }
+  if ($null -eq $facts) {
+    $facts = [pscustomobject]@{ logical_bytes = [long]0; file_count = [long]0; latest_write_utc = $item.LastWriteTimeUtc; has_reparse_point = $false; scan_error = $null }
+  }
+  return [pscustomobject]@{
+    worktree = Split-Path -Leaf $WorktreeRoot
+    worktree_root = $WorktreeRoot
+    item = $item.Name
+    kind = if ($item.PSIsContainer) { 'directory' } else { 'file' }
+    artifact_type = $Definition.artifact_type
+    boundary = $Candidate.boundary
+    status = $status
+    reason = $reason
+    age_days = [Math]::Round(($now - $facts.latest_write_utc).TotalDays, 1)
+    logical_bytes = [long]$facts.logical_bytes
+    logical_size = Format-MIRArtifactBytes -Bytes $facts.logical_bytes
+    file_count = [long]$facts.file_count
+    full_path = $item.FullName
+    artifact_root = $ArtifactRoot
+    artifact_root_relative_path = $Definition.relative_path
+    relative_path = $relativePath
+    audit_latest_write_utc = $facts.latest_write_utc
+    audit_file_count = [long]$facts.file_count
+    lease_state = if ($null -ne $lease) { $lease.state } else { $null }
+  }
+}
 
-    $results += [pscustomobject]@{
-      worktree = Split-Path -Leaf $worktree
-      item = $item.Name
-      kind = if ($item.PSIsContainer) { "directory" } else { "file" }
-      status = $status
-      age_days = [Math]::Round(($now - $facts.latest_write_utc).TotalDays, 1)
-      logical_bytes = [long]$facts.logical_bytes
-      logical_size = Format-MIRArtifactBytes -Bytes $facts.logical_bytes
-      full_path = $item.FullName
-      artifact_root = $artifactRoot
-      relative_path = $relativePath
+function Test-MIRArtifactStillCandidate {
+  param(
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)]$Definition,
+    [Parameter(Mandatory)][string]$ArtifactRoot,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  foreach ($candidate in (Get-MIRArtifactCandidates -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $ArtifactRoot)) {
+    if ([IO.Path]::GetFullPath($candidate.item.FullName).Equals([IO.Path]::GetFullPath($Path), $comparison)) { return $true }
+  }
+  return $false
+}
+
+function Assert-MIRArtifactEligibleForDeletion {
+  param(
+    [Parameter(Mandatory)]$Row,
+    [Parameter(Mandatory)][string]$WorktreeRoot,
+    [Parameter(Mandatory)]$Definition
+  )
+
+  $artifactRoot = Get-MIRArtifactRoot -WorktreeRoot $WorktreeRoot -Definition $Definition
+  if ($null -eq $artifactRoot -or -not $artifactRoot.Equals($Row.artifact_root, $comparison)) {
+    throw "Artifact root changed after audit: $($Row.full_path)"
+  }
+  $fullPath = [IO.Path]::GetFullPath($Row.full_path)
+  if (-not (Test-MIRArtifactPathWithin -Path $fullPath -Root $artifactRoot)) {
+    throw "Cleanup target escaped its typed artifact root: $fullPath"
+  }
+  if (-not (Test-Path -LiteralPath $fullPath)) { return $false }
+  if (-not (Test-MIRArtifactStillCandidate -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $artifactRoot -Path $fullPath)) {
+    throw "Cleanup target is no longer an exact typed-root candidate: $fullPath"
+  }
+  $item = Get-Item -LiteralPath $fullPath -Force
+  $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $fullPath).Replace('\', '/')
+  if (-not (Test-MIRArtifactIgnored -WorktreeRoot $WorktreeRoot -RelativePath $relativePath)) {
+    throw "Cleanup target is no longer ignored by Git: $fullPath"
+  }
+  if ($item.PSIsContainer -and $item.Name -in $protectedNames) {
+    throw "Cleanup target is a protected artifact root: $fullPath"
+  }
+  if ($item.PSIsContainer) {
+    $lease = Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName
+    if ($lease.active -or $lease.ambiguous -or ($lease.present -and $lease.state -in @('active', 'staging', 'receipt-captured', 'staging-failed', 'failed', 'missing-record'))) {
+      throw "Cleanup target has a live, ambiguous, or interrupted lease: $fullPath"
+    }
+  }
+  if ($null -ne (Get-MIRArtifactCustodyMarker -Item $item)) {
+    throw "Cleanup target acquired a direct custody marker after audit: $fullPath"
+  }
+  $facts = Get-MIRArtifactItemFacts -Item $item
+  if ($null -ne $facts.scan_error -or $facts.has_reparse_point) {
+    throw "Cleanup target is no longer safe for no-follow removal: $fullPath"
+  }
+  if ($facts.latest_write_utc -gt $cutoff) {
+    throw "Cleanup target changed after the audit and is now too recent: $fullPath"
+  }
+  if ($facts.latest_write_utc -gt $Row.audit_latest_write_utc -or
+      $facts.logical_bytes -ne $Row.logical_bytes -or
+      $facts.file_count -ne $Row.audit_file_count) {
+    throw "Cleanup target received a write after the audit: $fullPath"
+  }
+  return $true
+}
+
+function Get-MIRArtifactDriveFreeBytes {
+  param([Parameter(Mandatory)][string]$Path)
+  $root = [IO.Path]::GetPathRoot([IO.Path]::GetFullPath($Path))
+  return [IO.DriveInfo]::new($root).AvailableFreeSpace
+}
+
+$results = [Collections.Generic.List[object]]::new()
+$definitionsByRoot = @{}
+$worktrees = @(Get-MIRArtifactWorktrees -CurrentRepoRoot $RepoRoot -IncludeAll:$AllWorktrees)
+foreach ($worktree in $worktrees) {
+  foreach ($definition in $artifactRootDefinitions) {
+    $artifactRoot = Get-MIRArtifactRoot -WorktreeRoot $worktree -Definition $definition
+    if ($null -eq $artifactRoot) { continue }
+    $definitionsByRoot[("{0}|{1}" -f $worktree, $definition.relative_path)] = $definition
+    foreach ($candidate in (Get-MIRArtifactCandidates -WorktreeRoot $worktree -Definition $definition -ArtifactRoot $artifactRoot)) {
+      if ($results.Count -ge $MaxPlanEntries) {
+        throw "Artifact cleanup plan exceeded its bounded $MaxPlanEntries-entry limit; no removal was attempted. Narrow the scope or raise -MaxPlanEntries after reviewing storage capacity."
+      }
+      $results.Add((Get-MIRArtifactRow -WorktreeRoot $worktree -Definition $definition -ArtifactRoot $artifactRoot -Candidate $candidate))
     }
   }
 }
 
-$eligible = @($results | Where-Object { $_.status -eq "eligible" })
-
+$eligible = @($results | Where-Object { $_.status -eq 'eligible' })
 if ($Apply -and $eligible.Count -gt 0 -and -not $SkipActiveProcessCheck) {
-  $factorioProcesses = @(Get-Process -Name "factorio" -ErrorAction SilentlyContinue)
+  $factorioProcesses = @(Get-Process -Name 'factorio' -ErrorAction SilentlyContinue)
   if ($factorioProcesses.Count -gt 0) {
-    throw "Refusing artifact cleanup while Factorio is running. Finish the active run before cleaning artifacts."
+    throw 'Refusing artifact cleanup while Factorio is running. Finish the active run before cleaning artifacts.'
   }
 }
 
+$physicalFreeBefore = if ($Apply) { Get-MIRArtifactDriveFreeBytes -Path $RepoRoot } else { $null }
 if ($Apply) {
   foreach ($row in $eligible) {
-    $fullPath = [System.IO.Path]::GetFullPath($row.full_path)
-    $artifactRoot = [System.IO.Path]::GetFullPath($row.artifact_root)
-    $parentPath = [System.IO.Path]::GetDirectoryName($fullPath)
-    if (-not $parentPath.Equals($artifactRoot, $comparison)) {
-      throw "Cleanup target is not an immediate artifact-root child: $fullPath"
+    $worktreeRoot = [string]$row.worktree_root
+    if (-not ($worktreeRoot -in $worktrees)) { throw "Unable to resolve audited worktree for cleanup target: $($row.full_path)" }
+    $definition = $definitionsByRoot[("{0}|{1}" -f $worktreeRoot, $row.artifact_root_relative_path)]
+    if ($null -eq $definition) { throw "Unable to resolve typed artifact root for cleanup target: $($row.full_path)" }
+    if (-not (Assert-MIRArtifactEligibleForDeletion -Row $row -WorktreeRoot $worktreeRoot -Definition $definition)) {
+      $row.status = 'already-absent'; $row.reason = 'removed by another process before re-audit'; continue
     }
-    if (-not (Test-MIRArtifactPathWithin -Path $fullPath -Root $artifactRoot)) {
-      throw "Cleanup target escaped its artifact root: $fullPath"
-    }
-    if (-not (Test-Path -LiteralPath $fullPath)) { continue }
-    $worktreeRoot = Split-Path -Parent (Split-Path -Parent $artifactRoot)
-    if (-not (Test-MIRArtifactIgnored -WorktreeRoot $worktreeRoot -RelativePath $row.relative_path)) {
-      throw "Cleanup target is not ignored by Git: $fullPath"
-    }
-
-    $currentItem = Get-Item -LiteralPath $fullPath -Force
-    $currentFacts = Get-MIRArtifactItemFacts -Item $currentItem
-    if ($currentFacts.has_reparse_point) { throw "Cleanup target contains a reparse point: $fullPath" }
-    if ($currentFacts.latest_write_utc -gt $cutoff) { throw "Cleanup target changed after the audit and is now too recent: $fullPath" }
-
-    if ($PSCmdlet.ShouldProcess($fullPath, "permanently remove stale ignored artifact")) {
-      Remove-Item -LiteralPath $fullPath -Recurse -Force
-      $row.status = "deleted"
+    if ($PSCmdlet.ShouldProcess($row.full_path, 'permanently remove stale ignored artifact')) {
+      Remove-Item -LiteralPath $row.full_path -Recurse -Force
+      $row.status = 'deleted'
+      $row.reason = 'deleted after second typed-root audit'
     }
   }
 }
+$physicalFreeAfter = if ($Apply) { Get-MIRArtifactDriveFreeBytes -Path $RepoRoot } else { $null }
 
 if (-not $PassThru) {
   if ($results.Count -gt 0) {
-    $results |
-      Select-Object worktree, status, kind, age_days, logical_size, item |
+    $results | Sort-Object worktree, artifact_type, full_path |
+      Select-Object worktree, artifact_type, status, kind, age_days, logical_size, item, reason |
       Format-Table -AutoSize
   } else {
-    Write-Host "No artifact roots were found."
+    Write-Host 'No typed artifact roots were found.'
   }
-
-  $matched = @($results | Where-Object { $_.status -in @("eligible", "deleted") })
+  $matched = @($results | Where-Object { $_.status -in @('eligible', 'deleted') })
   [long]$matchedBytes = ($matched | Measure-Object -Property logical_bytes -Sum).Sum
-  $mode = if ($Apply) { "apply" } else { "dry-run" }
-  Write-Host ("[storage] mode={0} retention_days={1} matched={2} logical_size={3}" -f $mode, $OlderThanDays, $matched.Count, (Format-MIRArtifactBytes -Bytes $matchedBytes))
-  Write-Host "[storage] Logical size counts every hardlink path; physical disk reclaimed can be lower."
-  if (-not $Apply -and $eligible.Count -gt 0) {
-    Write-Host "[storage] Nothing was deleted. Re-run with -Apply after reviewing the exact targets."
+  $mode = if ($Apply) { 'apply' } else { 'dry-run' }
+  Write-Host ('[storage] mode={0} retention_days={1} matched={2} logical_size={3}' -f $mode, $OlderThanDays, $matched.Count, (Format-MIRArtifactBytes -Bytes $matchedBytes))
+  Write-Host '[storage] Logical size counts every hardlink path; physical disk reclaimed can be lower.'
+  if ($Apply) {
+    Write-Host ('[storage] physical_free_delta_bytes={0}' -f ([long]$physicalFreeAfter - [long]$physicalFreeBefore))
+  } elseif ($eligible.Count -gt 0) {
+    Write-Host '[storage] Nothing was deleted. Re-run with -Apply after reviewing the exact targets.'
   }
 }
 
-if ($PassThru) { return $results }
+if ($PassThru) { return @($results) }

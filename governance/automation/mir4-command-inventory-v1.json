@@ -3163,9 +3163,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "7D72A6FB9AD8B4DDE716041E622D5175AED6581D267FF375BA28F6036985D714",
+      "sha256": "11AF5714B80ED1BDFAF4156E130100CAF936B77B6DD7F16EA04E13071ECD7409",
       "hash_mode": "canonical-text-v1",
-      "lines": 206,
+      "lines": 453,
       "package_visible": false
     },
     {
@@ -4190,6 +4190,14 @@
       "sha256": "37EB17FBD60D449390D2A052375CC9941E348F422C7277F2264A8AF13D96C7DE",
       "hash_mode": "canonical-text-v1",
       "lines": 276,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/ImmutableInputStaging.ps1",
+      "classification": "canonical-internal",
+      "sha256": "E9642B262FEA43E125C8304870749962EAF04328CD7D76ACDE014E4CB793AEC2",
+      "hash_mode": "canonical-text-v1",
+      "lines": 410,
       "package_visible": false
     },
     {
@@ -5595,7 +5603,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 380,
+    "canonical_internal": 381,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5610,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1056661b2f4bafd808cb31f8578d7ed181a00c1e339d7e7d9c4dfb990b27d00b"
+  "digest": "sha256:ec737c8871611bc4e1de316dd96626511b2ae8fb3276b9c566b56f76e52d7710"
 }
