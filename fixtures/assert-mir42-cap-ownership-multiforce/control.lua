@@ -1,6 +1,7 @@
 local technology_name = "recipe-prod-research_copper-1"
 local setting_name = "ips-max-level-research_copper"
 local blocker_name = "late-mir42-cap-binding-blocker"
+local policy_blocker_name = "late-mir42-policy-binding-blocker"
 local storage_key = "mir42_cap_ownership_multiforce"
 local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
 
@@ -20,6 +21,14 @@ end
 
 local function blocker_active()
   return script.active_mods[blocker_name] ~= nil
+end
+
+local function policy_blocker_active()
+  return script.active_mods[policy_blocker_name] ~= nil
+end
+
+local function any_blocker_active()
+  return blocker_active() or policy_blocker_active()
 end
 
 local function browser_cap()
@@ -88,6 +97,7 @@ local function state_json(stage)
     .. ",\"cap\":" .. tostring(selected_cap())
     .. ",\"browser_cap\":" .. tostring(browser_cap())
     .. ",\"blocker\":" .. bool(blocker_active())
+    .. ",\"policy_blocker\":" .. bool(policy_blocker_active())
     .. ",\"configuration_changed_events\":" .. tostring(state.configuration_changed_events)
     .. ",\"merge_source_index\":" .. tostring(state.merge_source_index or 0)
     .. ",\"merge_destination_index\":" .. tostring(state.merge_destination_index or 0)
@@ -157,7 +167,7 @@ end
 
 local function advance_seed_to_capped()
   local state = storage[storage_key]
-  if selected_cap() ~= 3 or blocker_active() then return end
+  if selected_cap() ~= 3 or any_blocker_active() then return end
   if state.configuration_changed_events < 1 then
     fail("Capped stage did not observe configuration change")
   end
@@ -221,10 +231,23 @@ local function complete_merge_probe()
   save_successor("capped", "event-probe", "mir42-cap-ownership-multiforce-capped")
 end
 
-local function advance_capped_to_blocked()
+local function advance_capped_to_policy_blocked()
   local state = storage[storage_key]
-  if selected_cap() ~= 3 or not blocker_active() then return end
+  if selected_cap() ~= 3 or blocker_active() or not policy_blocker_active() then return end
   if state.configuration_changed_events < 2 then
+    fail("Policy-blocked stage did not observe configuration change")
+  end
+  -- An invalid transported policy is authoritative enough to stop both
+  -- runtime mutation and browser claims, but not to restore prior ownership.
+  expect_event_probe()
+  save_successor("policy-blocked", "policy-blocked",
+    "mir42-cap-ownership-multiforce-policy-blocked")
+end
+
+local function advance_policy_blocked_to_blocked()
+  local state = storage[storage_key]
+  if selected_cap() ~= 3 or not blocker_active() or policy_blocker_active() then return end
+  if state.configuration_changed_events < 3 then
     fail("Blocked stage did not observe configuration change")
   end
   -- A late finalizer conflict must leave both MIR-owned and unowned force
@@ -235,8 +258,8 @@ end
 
 local function advance_blocked_to_removal()
   local state = storage[storage_key]
-  if selected_cap() ~= 0 or blocker_active() then return end
-  if state.configuration_changed_events < 3 then
+  if selected_cap() ~= 0 or any_blocker_active() then return end
+  if state.configuration_changed_events < 4 then
     fail("Removal stage did not observe configuration change")
   end
   expect_removed()
@@ -244,7 +267,7 @@ local function advance_blocked_to_removal()
 end
 
 script.on_init(function()
-  if selected_cap() ~= 0 or blocker_active() then
+  if selected_cap() ~= 0 or any_blocker_active() then
     fail("Seed requires an infinite cap and no late blocker")
   end
   local names = {"owned", "foreign-disabled", "below-cap", "event-probe"}
@@ -278,7 +301,8 @@ script.on_configuration_changed(function()
     .. tostring(state.configuration_changed_events)
     .. " phase=" .. tostring(state.phase)
     .. " cap=" .. tostring(selected_cap())
-    .. " blocker=" .. bool(blocker_active()))
+    .. " blocker=" .. bool(blocker_active())
+    .. " policy-blocker=" .. bool(policy_blocker_active()))
 end)
 
 script.on_load(function()
@@ -292,7 +316,7 @@ script.on_event(defines.events.on_tick, function()
   if not state then fail("fixture state is absent") end
 
   if terminal_pending then
-    if selected_cap() ~= 0 or blocker_active() then
+    if selected_cap() ~= 0 or any_blocker_active() then
       fail("terminal reload no longer represents the removal candidate")
     end
     if not terminal_logged then
@@ -308,7 +332,9 @@ script.on_event(defines.events.on_tick, function()
   elseif state.phase == "merge-pending" then
     complete_merge_probe()
   elseif state.phase == "capped" then
-    advance_capped_to_blocked()
+    advance_capped_to_policy_blocked()
+  elseif state.phase == "policy-blocked" then
+    advance_policy_blocked_to_blocked()
   elseif state.phase == "blocked" then
     advance_blocked_to_removal()
   elseif state.phase ~= "removal" then

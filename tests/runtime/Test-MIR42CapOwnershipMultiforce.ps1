@@ -21,6 +21,7 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 $engineSha='710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8'
 $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
 $blockerName='late-mir42-cap-binding-blocker'
+$policyBlockerName='late-mir42-policy-binding-blocker'
 $technologyName='recipe-prod-research_copper-1'
 $settingName='ips-max-level-research_copper'
 $nonClaims=@(
@@ -84,12 +85,13 @@ function Assert-MIR42Data($Data,[string]$ExpectedCap){
   Assert-Exact 'V3 finalizer' $Data.finalizer 'accepted'
   Assert-Exact 'V3 prototype strategy observation' $Data.prototype 'infinite'
 }
-function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[int]$ExpectedBrowserCap,[bool]$ExpectedBlocker,[int]$ExpectedConfigurationChanges,[object[]]$ExpectedForces){
-  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','browser_cap','blocker','configuration_changed_events','merge_source_index','merge_destination_index','reused_force_index','merge_source_was_capped','source_index_reused','forces')
+function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[int]$ExpectedBrowserCap,[bool]$ExpectedBlocker,[bool]$ExpectedPolicyBlocker,[int]$ExpectedConfigurationChanges,[object[]]$ExpectedForces){
+  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','browser_cap','blocker','policy_blocker','configuration_changed_events','merge_source_index','merge_destination_index','reused_force_index','merge_source_was_capped','source_index_reused','forces')
   Assert-Exact "$ExpectedStage.stage" $State.stage $ExpectedStage
   Assert-Exact "$ExpectedStage.cap" ([int]$State.cap) $ExpectedCap
   Assert-Exact "$ExpectedStage.browser_cap" ([int]$State.browser_cap) $ExpectedBrowserCap
   Assert-Exact "$ExpectedStage.blocker" ([bool]$State.blocker) $ExpectedBlocker
+  Assert-Exact "$ExpectedStage.policy_blocker" ([bool]$State.policy_blocker) $ExpectedPolicyBlocker
   Assert-Exact "$ExpectedStage.configuration_changed_events" ([int]$State.configuration_changed_events) $ExpectedConfigurationChanges
   if($ExpectedStage -in @('seed','capped')){
     Assert-Exact "$ExpectedStage.merge_source_index" ([int]$State.merge_source_index) 0
@@ -152,6 +154,7 @@ function Get-MIR42SemanticStateJson($State){
     cap=[int]$State.cap
     browser_cap=[int]$State.browser_cap
     blocker=[bool]$State.blocker
+    policy_blocker=[bool]$State.policy_blocker
     configuration_changed_events=[int]$State.configuration_changed_events
     merge_source_index=[int]$State.merge_source_index
     merge_destination_index=[int]$State.merge_destination_index
@@ -220,7 +223,8 @@ try{
 
 $fixture=Join-Path $repo 'fixtures/assert-mir42-cap-ownership-multiforce'
 $blockerFixture=Join-Path $repo 'fixtures/late-mir42-cap-binding-blocker'
-foreach($path in @($fixture,$blockerFixture)){
+$policyBlockerFixture=Join-Path $repo 'fixtures/late-mir42-policy-binding-blocker'
+foreach($path in @($fixture,$blockerFixture,$policyBlockerFixture)){
   Assert-MIR42 (Test-Path -LiteralPath $path -PathType Container) "fixture directory is absent: $path"
 }
 
@@ -228,7 +232,7 @@ $run=Join-Path $output ([guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $run|Out-Null
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 
-function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker){
+function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePolicyBlocker){
   $stageRoot=Join-Path $run $Name
   $mods=Join-Path $stageRoot 'mods'
   $userdata=Join-Path $stageRoot 'userdata'
@@ -239,6 +243,10 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker){
   if($UseBlocker){
     $blockerArchive=Publish-MIRModDirectoryArchive -Source $blockerFixture -Name $blockerName -Version '0.1.0' -ModsDir $mods
   }
+  $policyBlockerArchive=$null
+  if($UsePolicyBlocker){
+    $policyBlockerArchive=Publish-MIRModDirectoryArchive -Source $policyBlockerFixture -Name $policyBlockerName -Version '0.1.0' -ModsDir $mods
+  }
   Initialize-MIRSettingsOverrideMod -ModsDir $mods -FactorioVersion '2.1'
   Set-CopiedStartupSettingDefaults -ModsDir $mods -Overrides @{
     'ips-enable-research_copper'=$true
@@ -247,6 +255,7 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker){
   Complete-MIRSettingsOverrideMod -ModsDir $mods
   $modNames=@('base','elevated-rails','quality','recycler','space-age','more-infinite-research',$fixtureName,'mir-validation-settings-overrides')
   if($UseBlocker){$modNames+=,$blockerName}
+  if($UsePolicyBlocker){$modNames+=,$policyBlockerName}
   $modList=[ordered]@{mods=@($modNames|ForEach-Object{[ordered]@{name=$_;enabled=$true}})}
   $modListPath=Join-Path $mods 'mod-list.json'
   [IO.File]::WriteAllText($modListPath,(($modList|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
@@ -259,6 +268,7 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker){
     name=$Name
     cap=$Cap
     blocker=$UseBlocker
+    policy_blocker=$UsePolicyBlocker
     root=$stageRoot
     mods=$mods
     userdata=$userdata
@@ -266,6 +276,7 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker){
     server_settings=$serverSettings
     fixture_archive=$fixtureArchive
     blocker_archive=$blockerArchive
+    policy_blocker_archive=$policyBlockerArchive
     settings_archive=(Join-Path $mods 'mir-validation-settings-overrides_0.1.0.zip')
     mod_list=$modListPath
   }
@@ -344,10 +355,11 @@ function Invoke-MIR42ServerSave($Stage,[string]$Name,[string]$InputSave,[string]
   return $copy
 }
 
-$seedStage=New-MIR42Stage -Name 'seed' -Cap 0 -UseBlocker:$false
-$cappedStage=New-MIR42Stage -Name 'capped' -Cap 3 -UseBlocker:$false
-$blockedStage=New-MIR42Stage -Name 'blocked' -Cap 3 -UseBlocker:$true
-$removalStage=New-MIR42Stage -Name 'removal' -Cap 0 -UseBlocker:$false
+$seedStage=New-MIR42Stage -Name 'seed' -Cap 0 -UseBlocker:$false -UsePolicyBlocker:$false
+$cappedStage=New-MIR42Stage -Name 'capped' -Cap 3 -UseBlocker:$false -UsePolicyBlocker:$false
+$policyBlockedStage=New-MIR42Stage -Name 'policy-blocked' -Cap 3 -UseBlocker:$false -UsePolicyBlocker:$true
+$blockedStage=New-MIR42Stage -Name 'blocked' -Cap 3 -UseBlocker:$true -UsePolicyBlocker:$false
+$removalStage=New-MIR42Stage -Name 'removal' -Cap 0 -UseBlocker:$false -UsePolicyBlocker:$false
 
 $seedSave=Join-Path $seedStage.root 'seed.zip'
 $seedLog=Invoke-MIR42Engine $seedStage 'seed' @('--create',$seedSave)
@@ -365,8 +377,19 @@ Assert-MIR42Data $cappedData '3'
 $cappedState=Read-MIR42State $cappedText 'capped'
 $eventProbeState=Read-MIR42State $cappedText 'event-probe'
 
+$policyBlockedSave=Join-Path $policyBlockedStage.userdata 'saves/mir42-cap-ownership-multiforce-policy-blocked.zip'
+$policyBlockedLog=Invoke-MIR42ServerSave $policyBlockedStage 'policy-blocked' $cappedSave $policyBlockedSave 'policy-blocked'
+$policyBlockedText=Get-Content -Raw -LiteralPath $policyBlockedLog
+$policyBlockedData=Read-MIR42Data $policyBlockedText
+Assert-MIR42Data $policyBlockedData '3'
+$policyBlockedState=Read-MIR42State $policyBlockedText 'policy-blocked'
+$policyBlockerRecords=[regex]::Matches($policyBlockedText,'\[late-mir42-policy-binding-blocker\] DATA technology=recipe-prod-research_copper-1 prototype=infinite policy-adapter-pre=factorio-data-final-fixes-v1 policy-adapter-post=fixture-unknown-finalizer-v1')
+Assert-MIR42 ($policyBlockerRecords.Count -eq 1) "expected exactly one late policy blocker data receipt; observed $($policyBlockerRecords.Count)."
+$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=3 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_finalizer_adapter_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
+Assert-MIR42 ($policyConflicts.Count -eq 1) "expected exactly one Copper invalid-policy refusal; observed $($policyConflicts.Count)."
+
 $blockedSave=Join-Path $blockedStage.userdata 'saves/mir42-cap-ownership-multiforce-blocked.zip'
-$blockedLog=Invoke-MIR42ServerSave $blockedStage 'blocked' $cappedSave $blockedSave 'blocked'
+$blockedLog=Invoke-MIR42ServerSave $blockedStage 'blocked' $policyBlockedSave $blockedSave 'blocked'
 $blockedText=Get-Content -Raw -LiteralPath $blockedLog
 $blockedData=Read-MIR42Data $blockedText
 Assert-MIR42Data $blockedData '3'
@@ -416,14 +439,16 @@ $removedForces=@(
   [pscustomobject]@{name='merge-destination';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$true}
 )
-Assert-MIR42State $seedState 'seed' 0 0 $false 0 $seedForces
-Assert-MIR42State $cappedState 'capped' 3 3 $false 1 $cappedForces
-Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false 1 $eventForces
-Assert-MIR42State $blockedState 'blocked' 3 0 $true 2 $eventForces
-Assert-MIR42State $removalState 'removal' 0 0 $false 3 $removedForces
-Assert-MIR42State $terminalState 'terminal' 0 0 $false 3 $removedForces
+Assert-MIR42State $seedState 'seed' 0 0 $false $false 0 $seedForces
+Assert-MIR42State $cappedState 'capped' 3 3 $false $false 1 $cappedForces
+Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 $eventForces
+Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 $eventForces
+Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 $eventForces
+Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 $removedForces
+Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 $removedForces
 Assert-MIR42StableForceIndices $seedState $cappedState 'seed-to-capped'
 Assert-MIR42StableForceIndices $seedState $eventProbeState 'seed-to-event-probe'
+Assert-MIR42StableForceIndices $eventProbeState $policyBlockedState 'event-probe-to-policy-blocked'
 Assert-MIR42StableForceIndices $eventProbeState $blockedState 'event-probe-to-blocked'
 Assert-MIR42StableForceIndices $eventProbeState $removalState 'event-probe-to-removal'
 Assert-MIR42StableForceIndices $removalState $terminalState 'removal-to-terminal'
@@ -432,7 +457,8 @@ Assert-Exact 'terminal semantic state after serialized reload' (Get-MIR42Semanti
 $lineage=@(
   [ordered]@{stage='seed';save=Get-MIR42Artifact $seedSave;predecessor_sha256=$null},
   [ordered]@{stage='capped';save=Get-MIR42Artifact $cappedSave;predecessor_sha256=Get-MIR42Sha $seedSave},
-  [ordered]@{stage='blocked';save=Get-MIR42Artifact $blockedSave;predecessor_sha256=Get-MIR42Sha $cappedSave},
+  [ordered]@{stage='policy-blocked';save=Get-MIR42Artifact $policyBlockedSave;predecessor_sha256=Get-MIR42Sha $cappedSave},
+  [ordered]@{stage='blocked';save=Get-MIR42Artifact $blockedSave;predecessor_sha256=Get-MIR42Sha $policyBlockedSave},
   [ordered]@{stage='removal';save=Get-MIR42Artifact $removalSave;predecessor_sha256=Get-MIR42Sha $blockedSave}
 )
 for($index=1;$index -lt $lineage.Count;$index++){
@@ -448,14 +474,15 @@ function Get-MIR42StageManifest($Stage){
     config=Get-MIR42Artifact $Stage.config
   }
   if($Stage.blocker){$entries.blocker=Get-MIR42Artifact $Stage.blocker_archive}
-  return [ordered]@{name=$Stage.name;cap=$Stage.cap;blocker=$Stage.blocker;artifacts=$entries}
+  if($Stage.policy_blocker){$entries.policy_blocker=Get-MIR42Artifact $Stage.policy_blocker_archive}
+  return [ordered]@{name=$Stage.name;cap=$Stage.cap;blocker=$Stage.blocker;policy_blocker=$Stage.policy_blocker;artifacts=$entries}
 }
 
 $result=[ordered]@{
   schema=1
   kind='MIR42F210CapOwnershipMultiforceQualificationV1'
   status='passed-current-f210-candidate-cap-ownership-multiforce-only'
-  scope='Freshly materialized F210 candidate: V3 copper absolute cap ownership, named-force isolation, late finalizer refusal, cap removal, and terminal serialized reload; package-excluded fixture evidence.'
+  scope='Freshly materialized F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy/finalizer refusal, cap removal, and terminal serialized reload; package-excluded fixture evidence.'
   target=[ordered]@{factorio_line='2.1';factorio_version='2.1.17';engine_sha256=$engineSha}
   source=[ordered]@{
     commit=$sourceCommit
@@ -473,21 +500,26 @@ $result=[ordered]@{
     main_control=Get-MIR42Sha (Join-Path $fixture 'control.lua')
     blocker_info=Get-MIR42Sha (Join-Path $blockerFixture 'info.json')
     blocker_data_final_fixes=Get-MIR42Sha (Join-Path $blockerFixture 'data-final-fixes.lua')
+    policy_blocker_info=Get-MIR42Sha (Join-Path $policyBlockerFixture 'info.json')
+    policy_blocker_data_final_fixes=Get-MIR42Sha (Join-Path $policyBlockerFixture 'data-final-fixes.lua')
   }
   harness_sha256=Get-MIR42Sha $PSCommandPath
   stages=@(
     (Get-MIR42StageManifest $seedStage)
     (Get-MIR42StageManifest $cappedStage)
+    (Get-MIR42StageManifest $policyBlockedStage)
     (Get-MIR42StageManifest $blockedStage)
     (Get-MIR42StageManifest $removalStage)
   )
-  v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
-  named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
+  v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;policy_blocked=$policyBlockedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
+  named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;policy_blocked=$policyBlockedState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
+  policy_conflict=[ordered]@{technology=$technologyName;selected_cap=3;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_finalizer_adapter_invalid';count=$policyConflicts.Count}
   late_conflict=[ordered]@{technology=$technologyName;selected_cap=3;late_observed_prototype_max_level=5;reason='maximum_level_late_prototype_mutation';count=$lateConflicts.Count}
   save_lineage=$lineage
   logs=[ordered]@{
     seed=Get-MIR42Artifact $seedLog
     capped=Get-MIR42Artifact $cappedLog
+    policy_blocked=Get-MIR42Artifact $policyBlockedLog
     blocked=Get-MIR42Artifact $blockedLog
     removal=Get-MIR42Artifact $removalLog
     terminal=Get-MIR42Artifact $terminalLog

@@ -4595,6 +4595,7 @@
         "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
         "fixtures/assert-mir42-cap-ownership-multiforce/**",
         "fixtures/late-mir42-cap-binding-blocker/**",
+        "fixtures/late-mir42-policy-binding-blocker/**",
         "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
         "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
         "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",

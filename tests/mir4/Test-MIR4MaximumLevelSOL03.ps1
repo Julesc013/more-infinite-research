@@ -127,6 +127,10 @@ if ($constructionSource -notmatch "maximum_level_binding.from_plan" -or
     $runtimeSource -notmatch "migrate_legacy_force_state" -or
     $runtimeSource -notmatch "migrated_from_policy_version = 2" -or
     $runtimeSource -notmatch "maximum_level_legacy_transport_read_only" -or
+    $runtimeSource -notmatch "maximum_level_policy_finalizer_adapter_invalid" -or
+    $runtimeSource -notmatch "maximum_level_binding_fingerprint_missing" -or
+    $runtimeSource -notmatch "maximum_level_target_requirements_mismatch" -or
+    $runtimeSource -notmatch "MAXIMUM_LEVEL_FINALIZER_ADAPTER" -or
     $runtimeSource -notmatch "local prior_policy = prior_managed and prior_managed\[technology_name\] or nil" -or
     $runtimeSource -notmatch "local cap = current_policy and caps\[technology_name\] or nil" -or
     $runtimeSource -notmatch "clear_force_index\(event and event\.source_index\)" -or

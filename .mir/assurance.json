@@ -335,7 +335,7 @@
     },
     {
       "id": "maximum-level-cap-ownership-multiforce-f210",
-      "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-cap-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^src/mod/families/modern/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-(?:cap|policy)-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^src/mod/families/modern/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
       "tests": ["runtime.maximum-level-cap-ownership-multiforce-f210"]
     },
     {

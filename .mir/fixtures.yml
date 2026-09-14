@@ -1653,6 +1653,7 @@ fixtures:
     path: fixtures/assert-mir42-cap-ownership-multiforce
     supplemental_paths:
       - fixtures/late-mir42-cap-binding-blocker
+      - fixtures/late-mir42-policy-binding-blocker
     harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
     exact_target:
       factorio_line: "2.1"
@@ -1660,6 +1661,7 @@ fixtures:
       mod_lock: exact-engine-2.1.17-official-expansions-only
     validates:
       - canonical-schema-3-copper-binding-and-transport
+      - strict-runtime-and-browser-refusal-of-unknown-policy-finalizer-adapter
       - MIR-owned-enable-and-visibility-restoration-after-cap-removal
       - foreign-disabled-state-preservation-through-cap-and-removal
       - force-created-and-technology-reset-event-isolation

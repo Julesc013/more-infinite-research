@@ -9,6 +9,7 @@ local setting_defaults = require("prototypes.mir.settings.defaults")
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 3
 local INFINITE_RUNTIME_MAX_LEVEL = 4294967295
+local MAXIMUM_LEVEL_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
 
 local function ensure_state()
   return runtime_state.bucket("maximum_level_control")
@@ -28,6 +29,26 @@ local function finite_cap(value)
   local selected = tonumber(value)
   if not selected or selected <= 0 then return nil end
   return math.floor(selected)
+end
+
+local function finite_positive_integer(value)
+  return type(value) == "number" and value > 0 and value == math.floor(value)
+end
+
+local function bounded_string(value)
+  return type(value) == "string" and value ~= "" and #value <= 1024
+end
+
+local function dense_array(value)
+  if type(value) ~= "table" then return false end
+  local count = 0
+  for index in pairs(value) do
+    if type(index) ~= "number" or index < 1 or index ~= math.floor(index) then
+      return false
+    end
+    count = count + 1
+  end
+  return #value == count
 end
 
 local function selected_maximum(setting_name)
@@ -88,34 +109,74 @@ local function add_runtime_settings_policy(managed)
   add_base_continuation_runtime_bindings(managed)
 end
 
-local function normalized_v3_binding(binding, policy_blocked)
+local function v3_binding_admission_error(binding)
   if type(binding) ~= "table" or binding.schema ~= 3
-      or binding.record_type ~= "MaximumLevelBinding" then
-    return nil
+      or binding.record_type ~= "MaximumLevelBinding"
+      or not bounded_string(binding.technology_id) then
+    return "maximum_level_binding_shape_invalid"
   end
   local diagnostics = binding.diagnostics or {}
   local finalizer = binding.finalizer_observation or {}
+  local prototype_strategy = binding.prototype_strategy or {}
   local strategy = binding.runtime_strategy or {}
-  local blocked_reason
-  if policy_blocked then
-    blocked_reason = "maximum_level_policy_finalizer_conflict"
-  elseif diagnostics.status == "blocking-conflict" then
-    blocked_reason = diagnostics.active_code or "maximum_level_binding_conflict"
-  elseif finalizer.status ~= "accepted" then
-    blocked_reason = diagnostics.active_code or "maximum_level_finalizer_observation_missing"
-  elseif strategy.mode ~= "absolute-cap-controller" and finite_cap(binding.cap and binding.cap.effective) then
-    blocked_reason = "maximum_level_runtime_strategy_mismatch"
+  local requirements = binding.target_requirements or {}
+  local cap = type(binding.cap) == "table" and binding.cap.effective or nil
+  local finite = finite_positive_integer(cap)
+  local unbounded = cap == "infinite"
+  if not bounded_string(binding.binding_fingerprint) then
+    return "maximum_level_binding_fingerprint_missing"
+  elseif type(binding.setting) ~= "table" or not bounded_string(binding.setting.name)
+      or (not finite and not unbounded) then
+    return "maximum_level_binding_policy_fields_invalid"
+  elseif type(binding.diagnostics) ~= "table" then
+    return "maximum_level_binding_diagnostics_invalid"
+  elseif diagnostics.status ~= "accepted" then
+    return diagnostics.active_code or "maximum_level_binding_conflict"
+  elseif type(binding.prototype_strategy) ~= "table"
+      or type(binding.runtime_strategy) ~= "table"
+      or type(binding.target_requirements) ~= "table"
+      or type(binding.finalizer_observation) ~= "table" then
+    return "maximum_level_binding_strategy_shape_invalid"
+  elseif prototype_strategy.mode ~= "lossless-infinite-prototype"
+      or prototype_strategy.max_level ~= "infinite" then
+    return "maximum_level_prototype_strategy_mismatch"
+  elseif (finite and strategy.mode ~= "absolute-cap-controller")
+      or (unbounded and strategy.mode ~= "unbounded") then
+    return "maximum_level_runtime_strategy_mismatch"
+  elseif requirements.scripted_techs ~= finite
+      or requirements.scripted_techs_supported ~= true
+      or requirements.mod_data_transport_supported ~= true
+      or requirements.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER then
+    return "maximum_level_target_requirements_mismatch"
+  elseif finalizer.status ~= "accepted"
+      or finalizer.adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER
+      or finalizer.observed_prototype_max_level ~= "infinite" then
+    return "maximum_level_finalizer_observation_invalid"
   end
+  return nil
+end
+
+local function normalized_v3_binding(binding, policy_blocked_reason)
+  if type(binding) ~= "table" or not bounded_string(binding.technology_id) then
+    return nil, "maximum_level_binding_identity_invalid"
+  end
+  local binding_error = v3_binding_admission_error(binding)
+  local binding_detail = type(binding.binding) == "table" and binding.binding or {}
+  local setting = type(binding.setting) == "table" and binding.setting or {}
+  local cap = type(binding.cap) == "table" and binding.cap or {}
+  local blocked_reason
+  if policy_blocked_reason then blocked_reason = policy_blocked_reason
+  elseif binding_error then blocked_reason = binding_error end
   return {
     technology = tostring(binding.technology_id),
-    source = binding.binding and binding.binding.source or binding.source,
-    operation = binding.binding and binding.binding.operation or binding.operation,
-    setting = binding.setting and binding.setting.name or binding.setting_name,
-    selected = binding.cap and binding.cap.effective or binding.selected,
+    source = binding_detail.source or binding.source,
+    operation = binding_detail.operation or binding.operation,
+    setting = setting.name or binding.setting_name,
+    selected = cap.effective or binding.selected,
     blocked_reason = blocked_reason,
     binding_fingerprint = binding.binding_fingerprint,
     legacy = false
-  }
+  }, binding_error
 end
 
 local function normalized_v2_binding(binding)
@@ -142,14 +203,36 @@ local function transported_policy()
 
   local managed = {}
   if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
-    local policy_blocked = artifact.finalizer_status ~= "accepted"
-    for _, binding in ipairs(artifact.bindings or {}) do
-      local normalized = normalized_v3_binding(binding, policy_blocked)
+    local policy_blocked_reason
+    if artifact.finalizer_status ~= "accepted" then
+      policy_blocked_reason = "maximum_level_policy_finalizer_conflict"
+    elseif artifact.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER then
+      policy_blocked_reason = "maximum_level_policy_finalizer_adapter_invalid"
+    elseif not bounded_string(artifact.artifact_fingerprint) then
+      policy_blocked_reason = "maximum_level_policy_fingerprint_missing"
+    elseif not dense_array(artifact.bindings) then
+      policy_blocked_reason = "maximum_level_policy_bindings_invalid"
+    end
+    local transport_blocked = policy_blocked_reason ~= nil
+    local bindings = type(artifact.bindings) == "table" and artifact.bindings or {}
+    local counts = {}
+    for _, binding in ipairs(bindings) do
+      if type(binding) == "table" and bounded_string(binding.technology_id) then
+        counts[binding.technology_id] = (counts[binding.technology_id] or 0) + 1
+      end
+    end
+    for _, binding in ipairs(bindings) do
+      local duplicate_reason = type(binding) == "table"
+        and counts[binding.technology_id] ~= nil
+        and counts[binding.technology_id] ~= 1
+        and "maximum_level_policy_duplicate_binding" or nil
+      local normalized = normalized_v3_binding(
+        binding, policy_blocked_reason or duplicate_reason)
       if normalized and normalized.technology ~= "" then
         managed[normalized.technology] = normalized
       end
     end
-    return managed, policy_blocked
+    return managed, transport_blocked
   end
 
   -- V2 is a read-only migration bridge for already installed packages. New
