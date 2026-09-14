@@ -430,10 +430,10 @@ $result=[ordered]@{
   }
   harness_sha256=Get-MIR42Sha $PSCommandPath
   stages=@(
-    Get-MIR42StageManifest $seedStage,
-    Get-MIR42StageManifest $cappedStage,
-    Get-MIR42StageManifest $blockedStage,
-    Get-MIR42StageManifest $removalStage
+    (Get-MIR42StageManifest $seedStage)
+    (Get-MIR42StageManifest $cappedStage)
+    (Get-MIR42StageManifest $blockedStage)
+    (Get-MIR42StageManifest $removalStage)
   )
   v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
   named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
