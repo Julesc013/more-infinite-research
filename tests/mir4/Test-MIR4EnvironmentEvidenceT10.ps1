@@ -7,7 +7,7 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 
 $before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
+Assert-MIR4CurrentPackagePresentation -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
 
 $a=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-environment-evidence-v1/positive/environment-f210-a.json')|ConvertFrom-Json -Depth 100
 $b=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'fixtures/mir4-environment-evidence-v1/positive/environment-f210-b.json')|ConvertFrom-Json -Depth 100

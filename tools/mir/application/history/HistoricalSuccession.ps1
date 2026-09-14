@@ -118,9 +118,9 @@ function New-MIR4PackageSuccessionWitnessV1 {
   if ([string]$historicalPresentation.package_source_sha256 -cne $historicalSourceSha256) {
     throw '[mir4-w09-frozen-v1-source-drift]'
   }
-  $presentation=Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $repo -PackageSourceSha256 ([string]$SourceIdentity.package_source_sha256)
+  $presentation=Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 ([string]$SourceIdentity.package_source_sha256)
   if(
-    -not(Test-MIR4BootstrapRecordHash -Record $presentation) -or
+    -not(Test-MIR4CurrentPackagePresentationV3RowHash -Row $presentation) -or
     [string](Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)-cne[string]$SourceIdentity.package_source_sha256
   ){throw '[mir4-w09-current-package-source-drift]'}
   if (@($witness.changed_package_roots | Sort-Object -Unique).Count -ne 14) { throw '[mir4-w09-succession-root-count]' }

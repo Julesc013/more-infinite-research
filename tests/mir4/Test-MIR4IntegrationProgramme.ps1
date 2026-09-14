@@ -2,6 +2,9 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+. (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 $path=Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json'
 $raw=Get-Content -Raw -LiteralPath $path
 if(-not($raw | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json'))) { throw '[synthesis-programme-schema]' }
@@ -46,7 +49,8 @@ if([string]$t13Authority.exact_processir_authority-cne'.mir/releases/waves/mir4-
 foreach($record in @($t12Authority,$t13Authority)){foreach($flag in @('semantic_authority','player_mutation_authorized','prototype_write_authorized','automatic_synthesis_authorized','public_support_authorized','source_freeze_authorized','signing_or_sealing_authorized','promotion_authorized','publication_authorized','package_visible')){if($null-ne$record.PSObject.Properties[$flag]-and[bool]$record.$flag){throw "[mir4-a01-authority-gate] $flag"}}}
 $presentation=Get-Content -Raw (Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json')|ConvertFrom-Json -Depth 100
 $presentationReceipt=Get-Content -Raw (Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json')|ConvertFrom-Json -Depth 100
-if([string]$presentation.kind-cne'MIR4CurrentPackagePresentationV2'-or-not$presentation.presentation.repository_readme_package_excluded-or-not$presentation.authority_invariants.one_emitter_preserved-or@($presentation.authority_invariants.PSObject.Properties|Where-Object{$_.Name-ne'one_emitter_preserved'-and[bool]$_.Value}).Count-ne0-or[string]$presentationReceipt.authority.record_sha256-cne[string]$presentation.record_sha256-or@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0-or@($presentationReceipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0){throw '[mir4-a01-package-presentation-authority]'}
+$currentPresentation=Get-MIR4CurrentPackagePresentation -RepoRoot $RepoRoot
+if([string]$presentation.kind-cne'MIR4CurrentPackagePresentationV2'-or-not$presentation.presentation.repository_readme_package_excluded-or-not$presentation.authority_invariants.one_emitter_preserved-or@($presentation.authority_invariants.PSObject.Properties|Where-Object{$_.Name-ne'one_emitter_preserved'-and[bool]$_.Value}).Count-ne0-or[string]$presentationReceipt.authority.record_sha256-cne[string]$presentation.record_sha256-or@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0-or@($presentationReceipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-ne0-or-not(Test-MIR4CurrentPackagePresentationV3RowHash -Row $currentPresentation)-or[string]$currentPresentation.package_source.canonical_fingerprint_sha256-cne(Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot)){throw '[mir4-a01-package-presentation-authority]'}
 $done=[Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
 while($done.Count -lt $tasks.Count) {
  $before=$done.Count

@@ -8,7 +8,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/history/HistoricalSuccession.ps1')
 . (Join-Path $repo 'tools/mir/application/history/SuccessorHost.ps1')
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
+Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 $packageBefore|Out-Null
 if((Get-MIR4FrozenPackagePresentationV1SourceSha256 -RepoRoot $repo)-cne'8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'){throw '[mir4-w09-frozen-v1-source-reader]'}
 $authority=Get-MIR4W09Authority -RepoRoot $repo
 if(@($authority.outputs).Count-ne 2-or@($authority.historical_targets).Count-ne 6-or@($authority.museum_targets).Count-ne 7-or[string]$authority.successor_target-cne'f300'){throw '[mir4-w09-authority-shape]'}

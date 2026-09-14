@@ -9,12 +9,15 @@ paths:
   package.maximum-level-runtime: src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua
   package.targets: targets
   package.generated: build/packages
-  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v2.json
-  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
+  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v3.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
   mir4.package-presentation.compatibility-reader: tools/lib/mir4/PackagePresentation.ps1
-  mir4.package-presentation.evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
-  mir4.package-presentation.evolution-schema: contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json
-  mir4.package-presentation.evolution-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
+  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1
+  mir4.package-presentation.historical-v2: spec/distribution/mir4-current-package-presentation-v2.json
+  mir4.package-presentation.historical-v2-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
+  mir4.package-presentation.historical-v2-evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
+  mir4.package-presentation.historical-v2-evolution-schema: contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json
+  mir4.package-presentation.historical-v2-evolution-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
   mir4.a03.authority-observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
   mir4.a03.environment-lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
   mir4.a03.execution-proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json

@@ -2515,6 +2515,33 @@
       ]
     },
     {
+      "id": "static.mir4-current-package-presentation-v3",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v3.json",
+        "spec/schemas/mir4-current-package-presentation-v3.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v2.json",
+        "spec/schemas/mir4-current-package-presentation-v2.schema.json",
+        "contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json",
+        "releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json",
+        "releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json",
+        "releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json",
+        "targets/package-authority.json",
+        "src/mod/package-source.json",
+        "src/mod",
+        "targets",
+        "tools/commands/package/TargetMaterializer.ps1",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-pre-freeze-hardening",
       "kind": "static",
       "layer": "F0",

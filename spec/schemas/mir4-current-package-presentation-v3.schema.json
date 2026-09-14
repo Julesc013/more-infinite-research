@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "authority_invariants", "append_only", "genesis_row_sha256", "rows", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CurrentPackagePresentationV3Ledger"},
+    "status": {"const": "accepted-current-package-presentation-ledger"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "hash_mode", "record_sha256", "retired_for_current_checkout"],
+      "properties": {
+        "path": {"const": "spec/distribution/mir4-current-package-presentation-v2.json"},
+        "kind": {"const": "MIR4CurrentPackagePresentationV2"},
+        "hash_mode": {"const": "record-self-hash"},
+        "record_sha256": {"pattern": "^[A-F0-9]{64}$"},
+        "retired_for_current_checkout": {"const": true}
+      }
+    },
+    "authority_invariants": {"$ref": "#/$defs/authorityInvariants"},
+    "append_only": {"const": true},
+    "genesis_row_sha256": {"const": "F16B81179F463B9C2C01863D7EEE6CEA123F10AFA0ADB64279CDC373F8CC88AC"},
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/row"}
+    },
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "record_sha256": {"pattern": "^[A-F0-9]{64}$"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "authorityInvariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["one_emitter_preserved", "gameplay_difference_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "player_package_mutation_authorized", "prototype_write_authorized", "public_support_authorized"],
+      "properties": {
+        "one_emitter_preserved": {"const": true},
+        "gameplay_difference_authorized": {"const": false},
+        "source_freeze_authorized": {"const": false},
+        "candidate_allocation_authorized": {"const": false},
+        "signing_or_sealing_authorized": {"const": false},
+        "promotion_authorized": {"const": false},
+        "publication_authorized": {"const": false},
+        "player_package_mutation_authorized": {"const": false},
+        "prototype_write_authorized": {"const": false},
+        "public_support_authorized": {"const": false}
+      }
+    },
+    "recordDescriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "state_or_status", "record_sha256"],
+      "properties": {
+        "path": {"type": "string"},
+        "kind": {"type": "string"},
+        "state_or_status": {"type": "string"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "packageSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state"],
+      "properties": {
+        "canonical_fingerprint_sha256": {"$ref": "#/$defs/sha256"},
+        "materializer_abi": {"const": "mir4-target-materializer/1"},
+        "roots": {"const": ["src/mod", "targets"]},
+        "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"},
+        "legacy_root_state": {"const": "retired-historical-read-only"}
+      }
+    },
+    "materializerProof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "normalized_text_sha256", "materializer_abi", "sole_current_writer", "package_excluded"],
+      "properties": {
+        "path": {"const": "tools/mir/application/package/TargetMaterializer.ps1"},
+        "normalized_text_sha256": {"$ref": "#/$defs/sha256"},
+        "materializer_abi": {"const": "mir4-target-materializer/1"},
+        "sole_current_writer": {"const": true},
+        "package_excluded": {"const": true}
+      }
+    },
+    "packageVisibleScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_visible", "package_visible_delta", "package_source_roots", "controller_authority_only"],
+      "properties": {
+        "package_visible": {"const": false},
+        "package_visible_delta": {"const": []},
+        "package_source_roots": {"const": ["src/mod", "targets"]},
+        "controller_authority_only": {"const": true}
+      }
+    },
+    "transitionGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "row_id", "recorded_at", "previous_row_sha256", "source_identity", "source_manifest", "package_authority", "package_source", "materializer_proof", "package_visible_scope", "transition_gate", "row_sha256"],
+      "properties": {
+        "sequence": {"type": "integer", "minimum": 1},
+        "row_id": {"pattern": "^mir4-current-package-presentation-v3-[0-9]{4}$"},
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "previous_row_sha256": {"$ref": "#/$defs/sha256"},
+        "source_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commit", "tree"],
+          "properties": {
+            "commit": {"pattern": "^[a-f0-9]{40}$"},
+            "tree": {"pattern": "^[a-f0-9]{40}$"}
+          }
+        },
+        "source_manifest": {"$ref": "#/$defs/recordDescriptor"},
+        "package_authority": {"$ref": "#/$defs/recordDescriptor"},
+        "package_source": {"$ref": "#/$defs/packageSource"},
+        "materializer_proof": {"$ref": "#/$defs/materializerProof"},
+        "package_visible_scope": {"$ref": "#/$defs/packageVisibleScope"},
+        "transition_gate": {"$ref": "#/$defs/transitionGate"},
+        "row_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

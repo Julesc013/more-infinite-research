@@ -82,7 +82,7 @@ if($packageBefore-cne$preT14Package){
       (-not[bool]$t14.promotion_authorized)-and(-not[bool]$t14.publication_authorized)
     if(-not$presentationValid){throw '[mir4-t13-t14-presentation-evolution]'}
   }else{
-    try{Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t13-package-source-unknown-evolution]'}
+    try{Assert-MIR4CurrentPackagePresentation -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t13-package-source-unknown-evolution]'}
   }
 }
 Write-Host '[ok] MIR 4 T13 exact release canaries, lifecycle reloads, target upgrades, expiry, F200 K2SO custody closure, and authority firewall passed.'

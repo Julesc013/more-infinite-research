@@ -228,6 +228,270 @@ function Assert-MIR4CurrentPackagePresentationV2 {
 function Get-MIR4CurrentPackageSourceSha256 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $v2=Get-MIR4CurrentPackagePresentationV2 -RepoRoot $repo
-  return [string](Assert-MIR4CurrentPackagePresentationV2LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$v2.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 ([string]$v2.package_source.fingerprint_sha256))
+  return [string](Get-MIR4CurrentPackagePresentation -RepoRoot $repo).package_source.canonical_fingerprint_sha256
+}
+
+function Get-MIR4CurrentPackagePresentationV3RowSha256 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Row)
+  $unsigned = [ordered]@{}
+  foreach ($property in $Row.PSObject.Properties) {
+    if ([string]$property.Name -cne 'row_sha256') { $unsigned[$property.Name] = $property.Value }
+  }
+  return Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value ([pscustomobject]$unsigned))
+}
+
+function Test-MIR4CurrentPackagePresentationV3RowHash {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Row)
+  return [string]$Row.row_sha256 -match '^[A-F0-9]{64}$' -and
+    [string]$Row.row_sha256 -ceq (Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $Row)
+}
+
+function Get-MIR4CurrentPackagePresentationV3Archive {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $git = Get-Command git -CommandType Application -ErrorAction Stop | Select-Object -First 1
+  $info = [Diagnostics.ProcessStartInfo]::new()
+  $info.FileName = [string]$git.Source
+  $info.UseShellExecute = $false
+  $info.CreateNoWindow = $true
+  $info.RedirectStandardOutput = $true
+  $info.RedirectStandardError = $true
+  foreach ($argument in @('-C', $repo, 'archive', '--format=zip', $Commit, 'src/mod', 'targets')) {
+    [void]$info.ArgumentList.Add($argument)
+  }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $info
+  $archiveBytes = [IO.MemoryStream]::new()
+  try {
+    if (-not $process.Start()) { throw "[mir4-package-presentation-v3-archive-start] $Commit" }
+    $process.StandardOutput.BaseStream.CopyTo($archiveBytes)
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "[mir4-package-presentation-v3-archive] $Commit $stderr" }
+    $archiveBytes.Position = 0
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $archive = [IO.Compression.ZipArchive]::new($archiveBytes, [IO.Compression.ZipArchiveMode]::Read, $true)
+    try {
+      $rows = @()
+      $textByPath = @{}
+      foreach ($entry in @($archive.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) } | Sort-Object FullName)) {
+        $relative = [string]$entry.FullName
+        if ($relative -notmatch '^(?:src/mod|targets)/') { throw "[mir4-package-presentation-v3-archive-path] $relative" }
+        $identity = Get-MIRZipEntryContentIdentity -Entry $entry -RelativePath $relative
+        $rows += ("{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256)
+        if ($relative -in @('src/mod/package-source.json', 'targets/package-authority.json')) {
+          $stream = $entry.Open()
+          try {
+            $reader = [IO.StreamReader]::new($stream, [Text.UTF8Encoding]::new($false, $true), $true, 1024, $true)
+            try { $textByPath[$relative] = $reader.ReadToEnd() }
+            finally { $reader.Dispose() }
+          } finally { $stream.Dispose() }
+        }
+      }
+      if ($rows.Count -eq 0 -or -not $textByPath.ContainsKey('src/mod/package-source.json') -or -not $textByPath.ContainsKey('targets/package-authority.json')) {
+        throw "[mir4-package-presentation-v3-archive-inputs] $Commit"
+      }
+      return [pscustomobject][ordered]@{
+        fingerprint_sha256 = Get-MIRStringSha256 -Value ($rows -join "`n")
+        rows = @($rows)
+        text_by_path = $textByPath
+      }
+    } finally {
+      $archive.Dispose()
+    }
+  } finally {
+    $archiveBytes.Dispose()
+    $process.Dispose()
+  }
+}
+
+function Get-MIR4CurrentPackagePresentationV3CommitTree {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Commit)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $tree = @(& git -C $repo show -s --format=%T $Commit 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $tree.Count -ne 1 -or [string]$tree[0] -notmatch '^[a-f0-9]{40}$') {
+    throw "[mir4-package-presentation-v3-source-tree] $Commit"
+  }
+  return [string]$tree[0]
+}
+
+function Assert-MIR4CurrentPackagePresentationV3Row {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Row,
+    [Parameter(Mandatory)][int]$Sequence,
+    [Parameter(Mandatory)][string]$PreviousRowSha256
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  if (
+    -not (Test-MIR4CurrentPackagePresentationV3RowHash -Row $Row) -or
+    [int]$Row.sequence -ne $Sequence -or
+    [string]$Row.row_id -cne ('mir4-current-package-presentation-v3-{0:d4}' -f $Sequence) -or
+    [string]$Row.previous_row_sha256 -cne $PreviousRowSha256 -or
+    [string]$Row.source_identity.commit -notmatch '^[a-f0-9]{40}$' -or
+    [string]$Row.source_identity.tree -cne (Get-MIR4CurrentPackagePresentationV3CommitTree -RepoRoot $repo -Commit ([string]$Row.source_identity.commit)) -or
+    [string]$Row.package_source.materializer_abi -cne 'mir4-target-materializer/1' -or
+    (@($Row.package_source.roots) -join '|') -cne 'src/mod|targets' -or
+    [string]$Row.package_source.sole_writer -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
+    [string]$Row.package_source.legacy_root_state -cne 'retired-historical-read-only' -or
+    [string]$Row.materializer_proof.path -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
+    [string]$Row.materializer_proof.materializer_abi -cne 'mir4-target-materializer/1' -or
+    -not [bool]$Row.materializer_proof.sole_current_writer -or
+    -not [bool]$Row.materializer_proof.package_excluded -or
+    [bool]$Row.package_visible_scope.package_visible -or
+    @($Row.package_visible_scope.package_visible_delta).Count -ne 0 -or
+    (@($Row.package_visible_scope.package_source_roots) -join '|') -cne 'src/mod|targets' -or
+    -not [bool]$Row.package_visible_scope.controller_authority_only
+  ) {
+    throw "[mir4-package-presentation-v3-row-contract] $Sequence"
+  }
+  foreach ($name in @('version_allocation', 'tagging', 'signing', 'sealing', 'publication')) {
+    if ([bool]$Row.transition_gate.$name) { throw "[mir4-package-presentation-v3-row-gate] $Sequence/$name" }
+  }
+  $archive = Get-MIR4CurrentPackagePresentationV3Archive -RepoRoot $repo -Commit ([string]$Row.source_identity.commit)
+  if ([string]$archive.fingerprint_sha256 -cne [string]$Row.package_source.canonical_fingerprint_sha256) {
+    throw "[mir4-package-presentation-v3-row-fingerprint] $Sequence"
+  }
+  $manifest = [string]$archive.text_by_path['src/mod/package-source.json'] | ConvertFrom-Json -Depth 100 -DateKind String
+  $authority = [string]$archive.text_by_path['targets/package-authority.json'] | ConvertFrom-Json -Depth 100 -DateKind String
+  if (
+    -not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
+    -not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+    [string]$Row.source_manifest.path -cne 'src/mod/package-source.json' -or
+    [string]$Row.source_manifest.kind -cne [string]$manifest.kind -or
+    [string]$Row.source_manifest.state_or_status -cne [string]$manifest.source_state -or
+    [string]$Row.source_manifest.record_sha256 -cne [string]$manifest.record_sha256 -or
+    [string]$Row.package_authority.path -cne 'targets/package-authority.json' -or
+    [string]$Row.package_authority.kind -cne [string]$authority.kind -or
+    [string]$Row.package_authority.state_or_status -cne [string]$authority.status -or
+    [string]$Row.package_authority.record_sha256 -cne [string]$authority.record_sha256 -or
+    [string]$manifest.materializer_abi -cne [string]$Row.package_source.materializer_abi -or
+    [string]$authority.writer.implementation -cne [string]$Row.package_source.sole_writer -or
+    -not [bool]$authority.writer.sole_current_writer -or
+    [string]$authority.legacy_root_projection.compatibility_state -cne [string]$Row.package_source.legacy_root_state
+  ) {
+    throw "[mir4-package-presentation-v3-row-bindings] $Sequence"
+  }
+  $materializerSha = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit ([string]$Row.source_identity.commit) -RelativePath 'tools/mir/application/package/TargetMaterializer.ps1'
+  if ([string]$Row.materializer_proof.normalized_text_sha256 -cne $materializerSha) {
+    throw "[mir4-package-presentation-v3-row-materializer] $Sequence"
+  }
+  return $Row
+}
+
+function Get-MIR4CurrentPackagePresentationV3Ledger {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$RequireLiveCurrent)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $relative = 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $path = Join-Path $repo $relative
+  $schema = Join-Path $repo 'spec/schemas/mir4-current-package-presentation-v3.schema.json'
+  $raw = Get-Content -Raw -LiteralPath $path
+  if (-not ($raw | Test-Json -SchemaFile $schema)) { throw '[mir4-package-presentation-v3-schema]' }
+  $ledger = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $ledger) -or -not [bool]$ledger.append_only) { throw '[mir4-package-presentation-v3-ledger-hash]' }
+  $v2Path = Join-Path $repo ([string]$ledger.predecessor.path)
+  $v2Schema = Join-Path $repo 'spec/schemas/mir4-current-package-presentation-v2.schema.json'
+  $v2Raw = Get-Content -Raw -LiteralPath $v2Path
+  if (-not ($v2Raw | Test-Json -SchemaFile $v2Schema)) { throw '[mir4-package-presentation-v3-v2-schema]' }
+  $v2 = $v2Raw | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-MIR4CurrentPackagePresentationV2Record -Record $v2
+  if (
+    [string]$ledger.predecessor.path -cne 'spec/distribution/mir4-current-package-presentation-v2.json' -or
+    [string]$ledger.predecessor.kind -cne 'MIR4CurrentPackagePresentationV2' -or
+    [string]$ledger.predecessor.hash_mode -cne 'record-self-hash' -or
+    [string]$ledger.predecessor.record_sha256 -cne [string]$v2.record_sha256 -or
+    [string]$v2.record_sha256 -cne 'C33F1B568CA247108D88C4F2A109C45E29F2C77C4EE026CB4C9047BAA3A2360F' -or
+    -not [bool]$ledger.predecessor.retired_for_current_checkout
+  ) { throw '[mir4-package-presentation-v3-v2-predecessor]' }
+  $expectedInvariants = [ordered]@{
+    one_emitter_preserved = $true
+    gameplay_difference_authorized = $false
+    source_freeze_authorized = $false
+    candidate_allocation_authorized = $false
+    signing_or_sealing_authorized = $false
+    promotion_authorized = $false
+    publication_authorized = $false
+    player_package_mutation_authorized = $false
+    prototype_write_authorized = $false
+    public_support_authorized = $false
+  }
+  foreach ($name in $expectedInvariants.Keys) {
+    if ([bool]$ledger.authority_invariants.PSObject.Properties[$name].Value -ne [bool]$expectedInvariants[$name]) {
+      throw "[mir4-package-presentation-v3-authority] $name"
+    }
+  }
+  foreach ($name in @('version_allocation', 'tagging', 'signing', 'sealing', 'publication')) {
+    if ([bool]$ledger.transition_gate.$name) { throw "[mir4-package-presentation-v3-gate] $name" }
+  }
+  $previous = [string]$v2.record_sha256
+  $rows = @($ledger.rows)
+  for ($index = 0; $index -lt $rows.Count; $index++) {
+    Assert-MIR4CurrentPackagePresentationV3Row -RepoRoot $repo -Row $rows[$index] -Sequence ($index + 1) -PreviousRowSha256 $previous | Out-Null
+    $previous = [string]$rows[$index].row_sha256
+  }
+  if ([string]$ledger.genesis_row_sha256 -cne [string]$rows[0].row_sha256) { throw '[mir4-package-presentation-v3-genesis]' }
+  if ($RequireLiveCurrent) {
+    $current = $rows[-1]
+    $tracked = @('src/mod', 'targets', 'tools/mir/application/package/TargetMaterializer.ps1')
+    $dirty = @(& git -C $repo status --porcelain -- @tracked 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw '[mir4-package-presentation-v3-current-dirty]' }
+    & git -C $repo diff --quiet ([string]$current.source_identity.commit) -- @tracked 2>$null
+    if ($LASTEXITCODE -eq 1) { throw '[mir4-package-presentation-v3-current-source-drift]' }
+    if ($LASTEXITCODE -ne 0) { throw '[mir4-package-presentation-v3-current-source-commit]' }
+    $liveFingerprint = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+    $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+    $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
+    $materializer = Get-MIRFileContentIdentity -Path (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1') -RelativePath 'tools/mir/application/package/TargetMaterializer.ps1'
+    if (
+      [string]$liveFingerprint -cne [string]$current.package_source.canonical_fingerprint_sha256 -or
+      [string]$authority.record_sha256 -cne [string]$current.package_authority.record_sha256 -or
+      [string]$manifest.record_sha256 -cne [string]$current.source_manifest.record_sha256 -or
+      [string]$materializer.Sha256 -cne [string]$current.materializer_proof.normalized_text_sha256
+    ) { throw '[mir4-package-presentation-v3-current-bindings]' }
+  }
+  return $ledger
+}
+
+function Assert-MIR4CurrentPackagePresentationV3Ledger {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[bool]$RequireLiveCurrent = $true)
+  return Get-MIR4CurrentPackagePresentationV3Ledger -RepoRoot $RepoRoot -RequireLiveCurrent:$RequireLiveCurrent
+}
+
+function Get-MIR4CurrentPackagePresentationV3FinalRow {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Ledger)
+  $rows = @($Ledger.rows)
+  if ($rows.Count -lt 1) { throw '[mir4-package-presentation-v3-final-row]' }
+  return $rows[-1]
+}
+
+function Get-MIR4CurrentPackagePresentation {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $ledger = Assert-MIR4CurrentPackagePresentationV3Ledger -RepoRoot $RepoRoot
+  return Get-MIR4CurrentPackagePresentationV3FinalRow -Ledger $ledger
+}
+
+function Assert-MIR4CurrentPackagePresentation {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
+  $current = Get-MIR4CurrentPackagePresentation -RepoRoot $RepoRoot
+  if ([string]$current.package_source.canonical_fingerprint_sha256 -cne $PackageSourceSha256) {
+    throw '[mir4-package-presentation-current-fingerprint]'
+  }
+  return $current
 }
