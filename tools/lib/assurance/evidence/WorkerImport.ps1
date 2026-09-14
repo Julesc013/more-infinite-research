@@ -412,6 +412,7 @@ function Import-MIRAssuranceWorkerEvidence {
       continue
     }
 
+    $attemptState = $null
     try {
       foreach ($relativePath in @($workerObject.files)) {
         $source = Resolve-MIRAssuranceWorkerObjectPath -SourceRoot $resolvedArtifactRoot -DestinationRoot $workerObject.destination_paths.root -RepoRelativePath $relativePath
@@ -430,22 +431,19 @@ function Import-MIRAssuranceWorkerEvidence {
           Copy-Item -LiteralPath $source -Destination $resolvedDestination
         }
       }
-      if (Test-Path -LiteralPath $workerObject.destination_paths.running -PathType Leaf) {
-        Remove-Item -LiteralPath $workerObject.destination_paths.running -Force
-      }
       if ([string]$workerObject.outcome -eq "passed") {
-        if (Test-Path -LiteralPath $workerObject.destination_paths.blocked -PathType Leaf) {
-          Remove-Item -LiteralPath $workerObject.destination_paths.blocked -Force
-        }
-        Write-MIRAssuranceAtomicJson -Value $workerObject.pointer -Path $workerObject.destination_paths.passed
         $validation = Test-MIRAssuranceCapsule -Capsule $workerObject.capsule -Fingerprint $test.fingerprint -Context $Context
         if (-not [bool]$validation.valid) {
-          Remove-Item -LiteralPath $workerObject.destination_paths.passed -Force
           throw "Imported worker evidence failed canonical validation: $([string]$validation.reason)"
         }
-      } else {
-        Write-MIRAssuranceAtomicJson -Value $workerObject.pointer -Path $workerObject.destination_paths.blocked
       }
+      # Imported content is immutable evidence, but its mutable reusable
+      # pointer is still a local decision.  Route it through the same
+      # contradiction guard as locally executed attempts.
+      $attemptState = Set-MIRAssuranceAttemptPointer `
+        -Capsule $workerObject.capsule `
+        -AttemptPath ([string]$workerObject.capsule.attempt_path) `
+        -Context $Context
     } catch {
       $rejected.Add([ordered]@{test_id=[string]$test.id;reasons=@($_.Exception.Message)})
       continue
@@ -461,8 +459,15 @@ function Import-MIRAssuranceWorkerEvidence {
       artifact=[string]$rowCandidates[0].Name
       entries=[int]$tree.entries
       expanded_bytes=[long]$tree.expanded_bytes
+      quarantined=[bool]$attemptState.quarantined
+      quarantine_incident=[string]$attemptState.incident
     }
-    if ([string]$workerObject.outcome -eq "passed") { $imported += $record }
+    if ([bool]$attemptState.quarantined) {
+      $rejected.Add([ordered]@{
+        test_id=[string]$test.id
+        reasons=@("trusted exact evidence is quarantined; independent fresh reproduction is required: $([string]$attemptState.incident)")
+      })
+    } elseif ([string]$workerObject.outcome -eq "passed") { $imported += $record }
     else { $failed += $record }
   }
   $passed = $failed.Count -eq 0 -and $missing.Count -eq 0 -and $rejected.Count -eq 0 -and $duplicates.Count -eq 0

@@ -261,7 +261,7 @@ function Invoke-MIRAssuranceTest {
     duration_seconds=$duration
     message=$message
   }
-  $capsule = Write-MIRAssuranceAttempt -Capsule $capsule
+  $capsule = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
   if ($status -ne "passed") { throw "Assurance test failed: $id - $message" }
   return $capsule
 }
@@ -512,12 +512,36 @@ function Get-MIRAssuranceResultCounts {
   )
   $total = @($Results).Count
   $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
+  $coldExecutionSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -eq "RUN"
+  } | ForEach-Object { [double]$_.duration_seconds } | Measure-Object -Sum).Sum), 3)
+  $reusedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -in @("REUSE", "WAIT")
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
+      [double]$_.source_duration_seconds
+    } else {
+      [double]$_.duration_seconds
+    }
+  } | Measure-Object -Sum).Sum), 3)
+  $checkpointedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -eq "CHECKPOINT"
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
+      [double]$_.source_duration_seconds
+    } else {
+      [double]$_.duration_seconds
+    }
+  } | Measure-Object -Sum).Sum), 3)
   return [ordered]@{
     expected=$expected
     total=$total
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     checkpointed=@($Results | Where-Object { [string]$_.disposition -eq "CHECKPOINT" }).Count
+    cold_execution_seconds=$coldExecutionSeconds
+    reused_source_seconds=$reusedSourceSeconds
+    checkpointed_source_seconds=$checkpointedSourceSeconds
     failed=@($Results | Where-Object { [string]$_.status -ne "passed" }).Count
     incomplete=[Math]::Max(0, $expected - $total)
     unexpected=[Math]::Max(0, $total - $expected)
