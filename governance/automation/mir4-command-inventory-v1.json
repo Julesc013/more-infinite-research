@@ -2481,6 +2481,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1",
+      "classification": "canonical-internal",
+      "sha256": "7C8C4AA5E66CCA8E1B5AC27E3796D944A3FBD707CA45CF174CD4C7300D75400E",
+      "hash_mode": "canonical-text-v1",
+      "lines": 341,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1",
       "classification": "migration-only",
       "sha256": "55132DB6BB995558560784900E36DE0E6295CB4EA925AECEB550A9A14D35E1AB",
@@ -2683,9 +2691,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "8A1D1703ED10E14FADE24E58AA5387D9D834A80539165FBD4CA2F55775A0D901",
+      "sha256": "70D32A4E1F55F99A4BD7532F250F8241389A48486FDA5CF58E15C54F3DD6898B",
       "hash_mode": "canonical-text-v1",
-      "lines": 191,
+      "lines": 206,
       "package_visible": false
     },
     {
@@ -3795,9 +3803,9 @@
     {
       "path": "tools/lib/mir4/PackagePresentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "D04E88E51073F030AC644A2919EC00C868F0377C418F4AC3B690BAF75170F924",
+      "sha256": "354D9BAF76B844DA1119FC96B02215DF3A03701CA32D80CB286F8FCC7D2A58C9",
       "hash_mode": "canonical-text-v1",
-      "lines": 234,
+      "lines": 623,
       "package_visible": false
     },
     {
@@ -4683,7 +4691,7 @@
     {
       "path": "tools/mir/application/history/HistoricalSuccession.ps1",
       "classification": "historical",
-      "sha256": "C97CCAF459A220045F996BAD0E2BC695B29AB3BE3CBD011D04EF9C1CCD5EDF23",
+      "sha256": "5508A2CF41CBD433B103EB94EE22C649060D247BC836A159F1CFE908841BC166",
       "hash_mode": "canonical-text-v1",
       "lines": 183,
       "package_visible": false
@@ -5603,7 +5611,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 381,
+    "canonical_internal": 382,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5618,5 +5626,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ec737c8871611bc4e1de316dd96626511b2ae8fb3276b9c566b56f76e52d7710"
+  "digest": "sha256:570ddd54ae80e2d65320197bfb7b9fcd2496ccbfe2ba0c5fca045f97bcb8e7e3"
 }
