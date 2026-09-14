@@ -8,19 +8,27 @@ Plan -> DryRun -> Execute -> Resume -> Verify -> Compensate/Rollback -> Receipt
 
 Its ten phase adapters are source freeze, target build, target qualification, preview assets, independent verification, release seal, promotion, target publication, public readback, and restore drill.
 
+## Current workflow boundary
+
+Use the [active operating programme](spec/programmes/mir4-4x-operating-programme-v1.json), [branch authority](.mir/branches.yml), and [current integration and delivery plan](docs/releases/mir4-integration-and-delivery-plan.md#recoverable-release-and-local-delivery) for the candidate being prepared. Their accepted target commitments, qualification and human-acceptance requirements govern execution. This entry point does not allocate a release, select a new promotion topology, or authorize publication.
+
+Resolve and rehearse promotion topology and effective rules before freeze. A routine release does not suspend or edit protections. A historical finalizer or past one-use exception is not a controller or authorization for a new candidate.
+
 ## Readiness order
 
 1. Reconcile exact repository, programme, queue, branch, and external-state identity.
 2. Run the release doctor. Distinguish registered, fail-closed, executor-implemented, dry-run-passed, production-rehearsal-passed, and production-authorized. Until the first official 2.1 stable release, F210 selects the latest official Steam experimental 2.1.x at or above the current governed floor and records its exact version and executable hash in every proof. A Steam update selects a new execution identity, invalidates cross-patch evidence reuse, and materializes the API and opportunity review task set; it does not permanently pin the former patch. If newer APIs are adopted, raise the declared compatibility floor through an exact qualified change. When official 2.1 stable appears, stop and reopen the channel, floor, and release policy with the maintainer.
 3. Close release-blocking defects under independent review, then freeze one exact source commit and allocate the candidate identity.
-4. Build the four target packages twice, serially, from the frozen source and retain only the accepted archives plus compact construction receipts.
-5. Qualify F210, F200, F110, and F100 independently on their exact engines, including direct predecessor upgrade and two reloads. F210 re-observes the current installed experimental engine immediately before its lane.
+4. Build each target committed by the accepted candidate plan twice, serially, from the frozen source and retain the accepted archives plus compact construction receipts. Do not silently omit a committed target.
+5. Qualify each committed target independently on its exact engine, including its required predecessor upgrade and reload evidence. F210 re-observes the current installed experimental engine immediately before its lane. A previous four-target result does not qualify a new candidate or replace its target commitments.
 6. Independently recompute package, engine, runtime, transition, resource, and custody identities; create the technical seal and pass the offline restore drill.
-7. Prepare and verify the signed annotated tag locally without pushing it, then fast-forward protected `main` to the exact sealed `dev` commit and restore every temporarily suspended branch rule.
-8. Run the final F210/F200 maintainer playtest against the already sealed bytes represented by `main`. On `NO-GO`, publish nothing and correct forward through a new candidate. On `GO`, push the existing tag and publish the existing assets without building, testing, or rewriting source.
+7. Prepare and verify the signed annotated tag locally without pushing it. Promote only the exact qualified candidate through the prospectively accepted and rehearsed path, with required checks and protections intact. Unresolved ancestry or rules are a preflight blocker, not permission to suspend them.
+8. Obtain the candidate-bound human gameplay acceptance in the order required by the current release contract; this summary does not change the acceptance/promotion ordering. On `NO-GO`, publish nothing and correct forward through a new candidate. Only with actual `GO` and publication authority, push the existing tag and publish the existing assets without rebuilding or rewriting their source.
 9. Read back public bytes and close publication receipts. Mod Portal upload remains a separate maintainer action using the identical sealed target ZIPs and prepared copy.
 
-Historical T17 sessions retain their original command and evidence contract. MIR 4.1 uses the sealed release-window launcher and `Finalize-MIR410.ps1 -Decision <GO|NO-GO> -Reviewer <identity>` because technical qualification, restore, tag preparation, and exact-main promotion have already completed. The finalizer verifies exact source, tag, and asset identities and contains no build or test operation.
+## Historical MIR 4.1 closeout
+
+Historical T17 sessions and the completed MIR 4.1 release retain their original command and evidence contracts. `Finalize-MIR410.ps1 -Decision <GO|NO-GO> -Reviewer <identity>` belongs to that already-qualified, source/tag/asset-bound release window. Do not execute it to prepare or publish MIR 4.2 or another candidate, and do not replay completed publication. Preserve historical receipts and published bytes unchanged.
 
 ## Non-negotiable behavior
 
@@ -28,7 +36,7 @@ Historical T17 sessions retain their original command and evidence contract. MIR
 - Never rebuild after seal.
 - Never promote `main` before exact qualification.
 - Never publish preview assets as Factorio player packages.
-- Never run a build, test, qualification, or documentation rewrite after the MIR 4.1 playtest gate; a defect creates a new candidate.
+- Do not alter candidate bytes after their bound acceptance or seal; a required product change creates a new candidate and the affected qualification. Current repository-documentation maintenance does not rewrite an old release or confer new gameplay acceptance.
 - On an external outage, preserve the sealed candidate and resume the publication event; do not create new bytes.
 - Every retry uses the event identity and is idempotent. Partial work is verified, resumed, or compensated.
 
