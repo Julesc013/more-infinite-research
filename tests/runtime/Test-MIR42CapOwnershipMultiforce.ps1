@@ -173,7 +173,9 @@ try{
     $_.FullName -match '(^|/)(AGENTS|CONTRIBUTING|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)[.]md$' -or
     $_.FullName -match '(^|/)(todo[.]md|CHANGELOG[.]md|[.]gitattributes|[.]gitignore)$'
   })
-  Assert-MIR42 ($forbidden.Count -eq 0) "candidate contains package-excluded path $($forbidden[0].FullName)"
+  if($forbidden.Count -ne 0){
+    throw "[mir42-cap-ownership-multiforce] candidate contains package-excluded path $($forbidden[0].FullName)"
+  }
 } finally {
   $candidateArchive.Dispose()
 }
