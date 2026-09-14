@@ -2483,9 +2483,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1",
       "classification": "canonical-internal",
-      "sha256": "B2243743FFE77F44208563E65B92C4E4BBB4398D7A25A52A603647EA1A185DA9",
+      "sha256": "FDEDF1637D4AABC70898C1300F9F8D0FB5091F2564C2A2DFB54A92FEC0D35D12",
       "hash_mode": "canonical-text-v1",
-      "lines": 283,
+      "lines": 332,
       "package_visible": false
     },
     {
@@ -3801,11 +3801,19 @@
       "package_visible": false
     },
     {
+      "path": "tools/lib/mir4/package-presentation/ProtectedCustody.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B61274F60CD364F81A6C92A950DCA4A7D8F9DF2DF54EC166CF3E340F744DA166",
+      "hash_mode": "canonical-text-v1",
+      "lines": 176,
+      "package_visible": false
+    },
+    {
       "path": "tools/lib/mir4/PackagePresentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "573C40C100C9442324AF9811032854473FF9A7BB0BC124A3E4E0FB9841EC2B87",
+      "sha256": "F31F830FFCEDFB8F4E591751EB594F2C978802655ECD9F9627FDCE2DE9B791DF",
       "hash_mode": "canonical-text-v1",
-      "lines": 524,
+      "lines": 526,
       "package_visible": false
     },
     {
@@ -5611,7 +5619,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 382,
+    "canonical_internal": 383,
     "compatibility_wrapper": 168,
     "migration_only": 48,
     "historical": 16,
@@ -5626,5 +5634,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d6761e924eab39487a94e5ed3ebe563dfac2f8b1f6357f45a2a55bb18e4b5bc4"
+  "digest": "sha256:ccb36ec40d76891e848b08e47ab876f392a0dfeadd534a421b0b73b8f68a9f46"
 }

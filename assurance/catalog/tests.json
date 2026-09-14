@@ -2448,6 +2448,7 @@
         "targets",
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/lib/mir4/package-presentation/ProtectedCustody.ps1",
         "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1",
         "tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
         "repository"
@@ -6438,5 +6439,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f6737be31393a99994054485a9e0e61ea00128c6c90c257c7d6c420ef0b20f0a"
+  "digest": "sha256:1116377a24b11d0dd475c20d53f1cf44014760769e5afa7c341b40cf5c53c94f"
 }

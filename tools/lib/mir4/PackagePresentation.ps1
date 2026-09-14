@@ -521,3 +521,5 @@ function Assert-MIR4CurrentPackagePresentation {
   }
   return $current
 }
+
+. (Join-Path $PSScriptRoot 'package-presentation/ProtectedCustody.ps1')

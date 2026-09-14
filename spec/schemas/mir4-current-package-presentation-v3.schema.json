@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "authority_invariants", "append_only", "genesis_row_sha256", "genesis_record_sha256", "rows", "transition_gate", "record_sha256"],
+  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "authority_invariants", "append_only", "custody", "genesis_row_sha256", "genesis_record_sha256", "rows", "transition_gate", "record_sha256"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4CurrentPackagePresentationV3Ledger"},
@@ -11,6 +11,7 @@
     "predecessor": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "hash_mode", "record_sha256", "retired_for_current_checkout"], "properties": {"path": {"const": "spec/distribution/mir4-current-package-presentation-v2.json"}, "kind": {"const": "MIR4CurrentPackagePresentationV2"}, "hash_mode": {"const": "record-self-hash"}, "record_sha256": {"pattern": "^[A-F0-9]{64}$"}, "retired_for_current_checkout": {"const": true}}},
     "authority_invariants": {"$ref": "#/$defs/authorityInvariants"},
     "append_only": {"const": true},
+    "custody": {"$ref": "#/$defs/custody"},
     "genesis_row_sha256": {"const": "D3CFC1529C32C820458F4EEBD72E2A5A6401762ED037C376624A6534D41EEEF1"},
     "genesis_record_sha256": {"const": "7837F146C60944351540005CCDE54E78A637768895DFF884EE2B672727A30AF5"},
     "rows": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/row"}},
@@ -20,6 +21,7 @@
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
     "authorityInvariants": {"type": "object", "additionalProperties": false, "required": ["one_emitter_preserved", "gameplay_difference_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "player_package_mutation_authorized", "prototype_write_authorized", "public_support_authorized"], "properties": {"one_emitter_preserved": {"const": true}, "gameplay_difference_authorized": {"const": false}, "source_freeze_authorized": {"const": false}, "candidate_allocation_authorized": {"const": false}, "signing_or_sealing_authorized": {"const": false}, "promotion_authorized": {"const": false}, "publication_authorized": {"const": false}, "player_package_mutation_authorized": {"const": false}, "prototype_write_authorized": {"const": false}, "public_support_authorized": {"const": false}}},
+    "custody": {"type": "object", "additionalProperties": false, "required": ["mode", "content_chain_proof", "append_only_tail_retention", "standalone_cryptographic_tail_retention_proof", "bootstrap"], "properties": {"mode": {"const": "protected-remote-prefix-v1"}, "content_chain_proof": {"const": "internal-consistency-and-live-final-binding-only"}, "append_only_tail_retention": {"const": "operational-protected-remote-custody-property"}, "standalone_cryptographic_tail_retention_proof": {"const": false}, "bootstrap": {"const": "bounded-v3-content-chain-migration-v1"}}},
     "recordDescriptor": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "state_or_status", "record_sha256"], "properties": {"path": {"type": "string"}, "kind": {"type": "string"}, "state_or_status": {"type": "string"}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
     "packageSource": {"type": "object", "additionalProperties": false, "required": ["canonical_fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state", "binding_count", "unique_binding_count"], "properties": {"canonical_fingerprint_sha256": {"$ref": "#/$defs/sha256"}, "materializer_abi": {"const": "mir4-target-materializer/1"}, "roots": {"const": ["src/mod", "targets"]}, "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}, "legacy_root_state": {"const": "retired-historical-read-only"}, "binding_count": {"type": "integer", "minimum": 1}, "unique_binding_count": {"type": "integer", "minimum": 1}}},
     "materializerProof": {"type": "object", "additionalProperties": false, "required": ["path", "normalized_text_sha256", "materializer_abi", "sole_current_writer", "package_excluded"], "properties": {"path": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}, "normalized_text_sha256": {"$ref": "#/$defs/sha256"}, "materializer_abi": {"const": "mir4-target-materializer/1"}, "sole_current_writer": {"const": true}, "package_excluded": {"const": true}}},

@@ -6,6 +6,7 @@ param(
   [switch]$Append,
   [switch]$MigrateGenesis,
   [switch]$MigrateContentChain,
+  [switch]$MigrateProtectedCustody,
   [switch]$Check
 )
 
@@ -174,7 +175,7 @@ function Write-MIR4PackagePresentationV3Ledger {
   }
 }
 
-if ($Check -and ($Append -or $MigrateGenesis -or $MigrateContentChain)) {
+if ($Check -and ($Append -or $MigrateGenesis -or $MigrateContentChain -or $MigrateProtectedCustody)) {
   throw '[mir4-package-presentation-v3-check-mutation]'
 }
 if ($MigrateGenesis) {
@@ -184,6 +185,9 @@ if ($Check) {
   if (-not (Test-Path -LiteralPath $ledgerPath -PathType Leaf)) { throw '[mir4-package-presentation-v3-stale]' }
   . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
   Assert-MIR4CurrentPackagePresentationV3Ledger -RepoRoot $repo | Out-Null
+  if ([string]$env:GITHUB_ACTIONS -ceq 'true') {
+    Assert-MIR4CurrentPackagePresentationV3ProtectedCustody -RepoRoot $repo -HostedContext | Out-Null
+  }
   [pscustomobject][ordered]@{status='current';path=$ledgerRelative;append_only=$true;publication_authorized=$false}
   return
 }
@@ -214,6 +218,13 @@ if ($MigrateContentChain) {
     predecessor = $legacy.predecessor
     authority_invariants = $legacy.authority_invariants
     append_only = $true
+    custody = [ordered]@{
+      mode = 'protected-remote-prefix-v1'
+      content_chain_proof = 'internal-consistency-and-live-final-binding-only'
+      append_only_tail_retention = 'operational-protected-remote-custody-property'
+      standalone_cryptographic_tail_retention_proof = $false
+      bootstrap = 'bounded-v3-content-chain-migration-v1'
+    }
     genesis_row_sha256 = $genesisRowSha256
     genesis_record_sha256 = $genesisRecordSha256
     rows = @($legacyRows[0])
@@ -236,6 +247,43 @@ if ($MigrateContentChain) {
     record_sha256 = ''
   }
   Write-MIR4PackagePresentationV3Ledger -Ledger $ledger -Status 'content-chain-migrated'
+  return
+}
+
+if ($MigrateProtectedCustody) {
+  if ($Append) { throw '[mir4-package-presentation-v3-custody-migrate-append]' }
+  $legacy = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json -Depth 100 -DateKind String
+  if (
+    $legacy.PSObject.Properties['custody'] -or
+    [string]$legacy.record_sha256 -cne '6EACD569D85FD587DDD7A13F3A57CAC78CC9236D3D74AB9B3C0C88738AA025CE' -or
+    @($legacy.rows).Count -ne 2 -or
+    [string]$legacy.rows[0].row_sha256 -cne $genesisRowSha256 -or
+    [string]$legacy.rows[1].row_sha256 -cne '326F1140ABADED3076735C63FC2A88A494A347466187D5CD5FAF2C25108D2208'
+  ) {
+    throw '[mir4-package-presentation-v3-custody-migration-contract]'
+  }
+  $ledger = [pscustomobject][ordered]@{
+    schema = [int]$legacy.schema
+    kind = [string]$legacy.kind
+    status = [string]$legacy.status
+    recorded_at = [string]$legacy.recorded_at
+    predecessor = $legacy.predecessor
+    authority_invariants = $legacy.authority_invariants
+    append_only = $true
+    custody = [ordered]@{
+      mode = 'protected-remote-prefix-v1'
+      content_chain_proof = 'internal-consistency-and-live-final-binding-only'
+      append_only_tail_retention = 'operational-protected-remote-custody-property'
+      standalone_cryptographic_tail_retention_proof = $false
+      bootstrap = 'bounded-v3-content-chain-migration-v1'
+    }
+    genesis_row_sha256 = [string]$legacy.genesis_row_sha256
+    genesis_record_sha256 = [string]$legacy.genesis_record_sha256
+    rows = @($legacy.rows)
+    transition_gate = $legacy.transition_gate
+    record_sha256 = ''
+  }
+  Write-MIR4PackagePresentationV3Ledger -Ledger $ledger -Status 'protected-custody-migrated'
   return
 }
 
@@ -268,6 +316,7 @@ $ledger = [pscustomobject][ordered]@{
   predecessor = $existing.predecessor
   authority_invariants = $existing.authority_invariants
   append_only = $true
+  custody = $existing.custody
   genesis_row_sha256 = [string]$existing.genesis_row_sha256
   genesis_record_sha256 = [string]$existing.genesis_record_sha256
   rows = $rows

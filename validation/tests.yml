@@ -2536,6 +2536,7 @@
         "targets",
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/lib/mir4/package-presentation/ProtectedCustody.ps1",
         "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1",
         "tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
         "repository"

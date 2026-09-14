@@ -51,6 +51,14 @@ $objectDbBefore = Get-MIR4V3SharedObjectDbSnapshot
 & $writer -RepoRoot $repo -Check | Out-Null
 & $writer -RepoRoot $repo | Out-Null
 if ([IO.File]::ReadAllText($ledgerPath) -cne $beforeText) { throw '[mir4-package-presentation-v3-writer-fixed-point]' }
+$previousGitHubActions = $env:GITHUB_ACTIONS
+try {
+  $env:GITHUB_ACTIONS = 'true'
+  & $writer -RepoRoot $repo -Check | Out-Null
+} finally {
+  if ($null -eq $previousGitHubActions) { Remove-Item Env:GITHUB_ACTIONS -ErrorAction SilentlyContinue }
+  else { $env:GITHUB_ACTIONS = $previousGitHubActions }
+}
 
 $ledger = Assert-MIR4CurrentPackagePresentationV3Ledger -RepoRoot $repo
 $current = Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 $beforeFingerprint
@@ -60,6 +68,11 @@ if (
   -not (Test-MIR4V3Schema -Ledger $ledger) -or
   -not (Test-MIR4BootstrapRecordHash -Record $ledger) -or
   $rows.Count -ne 2 -or
+  [string]$ledger.custody.mode -cne 'protected-remote-prefix-v1' -or
+  [string]$ledger.custody.content_chain_proof -cne 'internal-consistency-and-live-final-binding-only' -or
+  [string]$ledger.custody.append_only_tail_retention -cne 'operational-protected-remote-custody-property' -or
+  [bool]$ledger.custody.standalone_cryptographic_tail_retention_proof -or
+  [string]$ledger.custody.bootstrap -cne 'bounded-v3-content-chain-migration-v1' -or
   [string]$ledger.genesis_row_sha256 -cne 'D3CFC1529C32C820458F4EEBD72E2A5A6401762ED037C376624A6534D41EEEF1' -or
   [string]$ledger.genesis_record_sha256 -cne '7837F146C60944351540005CCDE54E78A637768895DFF884EE2B672727A30AF5' -or
   [string]$current.row_id -cne [string]$rows[-1].row_id -or
@@ -124,10 +137,123 @@ if ([string](Get-MIR4CurrentPackagePresentationV3FinalRow -Ledger $postSquash).r
   throw '[mir4-package-presentation-v3-final-row-selector]'
 }
 
+$remoteBootstrap = Assert-MIR4CurrentPackagePresentationV3ProtectedCustody -RepoRoot $repo -TrustedBaseRef 'refs/remotes/origin/dev' -HostedContext
+if ([string]$remoteBootstrap.status -cne 'trusted-base-v3-absent-bounded-bootstrap' -or -not [bool]$remoteBootstrap.protected_custody_required) {
+  throw '[mir4-package-presentation-v3-remote-bootstrap]'
+}
+
+$legacyMigrationBase = Copy-MIR4V3Ledger -Ledger $ledger
+$legacyMigrationBase.PSObject.Properties.Remove('custody')
+$legacyMigrationBase.PSObject.Properties.Remove('genesis_record_sha256')
+$legacyMigrationBase.rows[1] = [pscustomobject][ordered]@{
+  sequence = 2
+  row_id = 'mir4-current-package-presentation-v3-0002'
+  recorded_at = '2026-09-15T00:00:00+10:00'
+  previous_row_sha256 = 'D3CFC1529C32C820458F4EEBD72E2A5A6401762ED037C376624A6534D41EEEF1'
+  source_identity = [ordered]@{ commit = '245f05311c62fc6097a1e17f3b3dabf244fb176e'; tree = 'b71199a40c8da5f4123a96f96eeb874a14fa410e' }
+  source_manifest = $ledger.rows[1].source_manifest
+  package_authority = $ledger.rows[1].package_authority
+  package_source = $ledger.rows[1].package_source
+  materializer_proof = $ledger.rows[1].materializer_proof
+  package_visible_scope = $ledger.rows[1].package_visible_scope
+  transition_gate = $ledger.rows[1].transition_gate
+  row_sha256 = ''
+  ledger_predecessor = [ordered]@{
+    commit = '245f05311c62fc6097a1e17f3b3dabf244fb176e'
+    tree = 'b71199a40c8da5f4123a96f96eeb874a14fa410e'
+    path = 'spec/distribution/mir4-current-package-presentation-v3.json'
+    normalized_text_sha256 = '71D97B5A4A5CDDF56DAB22FBB3C0D96E851EFB2C5090D1435D5A42FA10A39C6A'
+    record_sha256 = '7837F146C60944351540005CCDE54E78A637768895DFF884EE2B672727A30AF5'
+    final_row_sha256 = 'D3CFC1529C32C820458F4EEBD72E2A5A6401762ED037C376624A6534D41EEEF1'
+    row_count = 1
+  }
+}
+$legacyMigrationBase.rows[1].row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $legacyMigrationBase.rows[1]
+$legacyMigrationBase.record_sha256 = 'E8F9FD3C982C4D531F7E917603DC63F8C07F9C237D3E2932F2CABF8A9E552717'
+if (-not (Test-MIR4CurrentPackagePresentationV3LegacyContentChainMigration -Ledger $legacyMigrationBase)) {
+  throw '[mir4-package-presentation-v3-legacy-migration-shape]'
+}
+$migrationCustody = Assert-MIR4CurrentPackagePresentationV3ProtectedCustodyPrefix -RepoRoot $repo -CandidateLedger $ledger -TrustedLedger $legacyMigrationBase -TrustedBaseRef 'synthetic-legacy'
+if ([string]$migrationCustody.status -cne 'bounded-content-chain-migration') { throw '[mir4-package-presentation-v3-legacy-migration-custody]' }
+
+$trustedThree = Copy-MIR4V3Ledger -Ledger $ledger
+$thirdRow = Copy-MIR4V3Ledger -Ledger ([pscustomobject]@{ rows = @($trustedThree.rows[-1]) })
+$thirdRow = $thirdRow.rows[0]
+$thirdRow.sequence = 3
+$thirdRow.row_id = 'mir4-current-package-presentation-v3-0003'
+$thirdRow.recorded_at = '2026-09-15T00:00:01+10:00'
+$thirdRow.previous_row_sha256 = [string]$trustedThree.rows[-1].row_sha256
+$trustedThree.rows = @($trustedThree.rows) + @($thirdRow)
+$prior = $trustedThree.rows[1]
+$thirdRow.ledger_predecessor = [pscustomobject][ordered]@{
+  prior_record_sha256 = Get-MIR4CurrentPackagePresentationV3PrefixRecordSha256 -Ledger $trustedThree -RowCount 2
+  prior_row_sha256 = [string]$prior.row_sha256
+  prior_row_count = 2
+  prior_package_fingerprint_sha256 = [string]$prior.package_source.canonical_fingerprint_sha256
+  prior_source_manifest_record_sha256 = [string]$prior.source_manifest.record_sha256
+  prior_package_authority_record_sha256 = [string]$prior.package_authority.record_sha256
+  prior_materializer_sha256 = [string]$prior.materializer_proof.normalized_text_sha256
+  prior_binding_count = [int]$prior.package_source.binding_count
+  prior_unique_binding_count = [int]$prior.package_source.unique_binding_count
+}
+$thirdRow.row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $thirdRow
+Set-MIR4V3LedgerRecord -Ledger $trustedThree | Out-Null
+Assert-MIR4CurrentPackagePresentationV3LedgerRecord -RepoRoot $repo -Ledger $trustedThree -RequireLiveCurrent:$false | Out-Null
+$ordinaryAppend = Assert-MIR4CurrentPackagePresentationV3ProtectedCustodyPrefix -RepoRoot $repo -CandidateLedger $trustedThree -TrustedLedger $ledger -TrustedBaseRef 'synthetic-two'
+if ([string]$ordinaryAppend.status -cne 'protected-prefix-appended') { throw '[mir4-package-presentation-v3-custody-ordinary-append]' }
+
+$tailDeletion = Copy-MIR4V3Ledger -Ledger $trustedThree
+$tailDeletion.rows = @($tailDeletion.rows | Select-Object -SkipLast 1)
+Set-MIR4V3LedgerRecord -Ledger $tailDeletion | Out-Null
+Assert-MIR4CurrentPackagePresentationV3LedgerRecord -RepoRoot $repo -Ledger $tailDeletion -RequireLiveCurrent:$false | Out-Null
+$tailDeletionRejected = $false
+try { Assert-MIR4CurrentPackagePresentationV3ProtectedCustodyPrefix -RepoRoot $repo -CandidateLedger $tailDeletion -TrustedLedger $trustedThree -TrustedBaseRef 'synthetic-three' | Out-Null } catch { $tailDeletionRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-custody-tail-retention\]' }
+if (-not $tailDeletionRejected) { throw '[mir4-package-presentation-v3-custody-tail-deletion]' }
+
+$nonconsecutiveReplay = Copy-MIR4V3Ledger -Ledger $ledger
+$replaySecond = Copy-MIR4V3Ledger -Ledger ([pscustomobject]@{ rows = @($trustedThree.rows[2]) })
+$replaySecond = $replaySecond.rows[0]
+$replaySecond.sequence = 2
+$replaySecond.row_id = 'mir4-current-package-presentation-v3-0002'
+$replaySecond.previous_row_sha256 = [string]$ledger.rows[0].row_sha256
+$replaySecond.ledger_predecessor = $ledger.rows[1].ledger_predecessor
+$replaySecond.row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $replaySecond
+$replayThird = Copy-MIR4V3Ledger -Ledger ([pscustomobject]@{ rows = @($trustedThree.rows[2]) })
+$replayThird = $replayThird.rows[0]
+$replayThird.sequence = 3
+$replayThird.row_id = 'mir4-current-package-presentation-v3-0003'
+$replayThird.recorded_at = '2026-09-15T00:00:02+10:00'
+$replayThird.previous_row_sha256 = [string]$replaySecond.row_sha256
+$nonconsecutiveReplay.rows = @($ledger.rows[0], $replaySecond, $replayThird)
+$replayThird.ledger_predecessor = [pscustomobject][ordered]@{
+  prior_record_sha256 = Get-MIR4CurrentPackagePresentationV3PrefixRecordSha256 -Ledger $nonconsecutiveReplay -RowCount 2
+  prior_row_sha256 = [string]$replaySecond.row_sha256
+  prior_row_count = 2
+  prior_package_fingerprint_sha256 = [string]$replaySecond.package_source.canonical_fingerprint_sha256
+  prior_source_manifest_record_sha256 = [string]$replaySecond.source_manifest.record_sha256
+  prior_package_authority_record_sha256 = [string]$replaySecond.package_authority.record_sha256
+  prior_materializer_sha256 = [string]$replaySecond.materializer_proof.normalized_text_sha256
+  prior_binding_count = [int]$replaySecond.package_source.binding_count
+  prior_unique_binding_count = [int]$replaySecond.package_source.unique_binding_count
+}
+$replayThird.row_sha256 = Get-MIR4CurrentPackagePresentationV3RowSha256 -Row $replayThird
+Set-MIR4V3LedgerRecord -Ledger $nonconsecutiveReplay | Out-Null
+Assert-MIR4CurrentPackagePresentationV3LedgerRecord -RepoRoot $repo -Ledger $nonconsecutiveReplay -RequireLiveCurrent:$false | Out-Null
+$replayRejected = $false
+try { Assert-MIR4CurrentPackagePresentationV3ProtectedCustodyPrefix -RepoRoot $repo -CandidateLedger $nonconsecutiveReplay -TrustedLedger $trustedThree -TrustedBaseRef 'synthetic-three' | Out-Null } catch { $replayRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-custody-prefix\]' }
+if (-not $replayRejected) { throw '[mir4-package-presentation-v3-custody-nonconsecutive-replay]' }
+
+$hostedUnavailableRejected = $false
+try { Assert-MIR4CurrentPackagePresentationV3ProtectedCustody -RepoRoot $repo -TrustedBaseRef 'refs/remotes/origin/mir4-v3-missing' -HostedContext | Out-Null } catch { $hostedUnavailableRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-custody-base-unavailable\]' }
+if (-not $hostedUnavailableRejected) { throw '[mir4-package-presentation-v3-hosted-unavailable-base]' }
+$hostedUntrustedRejected = $false
+try { Assert-MIR4CurrentPackagePresentationV3ProtectedCustody -RepoRoot $repo -TrustedBaseRef 'HEAD' -HostedContext | Out-Null } catch { $hostedUntrustedRejected = $_.Exception.Message -match '\[mir4-package-presentation-v3-custody-base-untrusted\]' }
+if (-not $hostedUntrustedRejected) { throw '[mir4-package-presentation-v3-hosted-untrusted-base]' }
+
 Assert-MIR4V3Reject -Name 'duplicate-append' -Action { & $writer -RepoRoot $repo -Append -SourceCommit ('a' * 40) | Out-Null }
 if ([IO.File]::ReadAllText($ledgerPath) -cne $beforeText) { throw '[mir4-package-presentation-v3-append-drift]' }
 
 $objectDbAfter = Get-MIR4V3SharedObjectDbSnapshot
 if ($objectDbAfter -cne $objectDbBefore) { throw '[mir4-package-presentation-v3-shared-object-db-drift]' }
 
-Write-Host '[ok] MIR4 V3 retains its fixed genesis, content-binds every successor, selects only the live final row, and does not write the shared Git object database.'
+Write-Host '[ok] MIR4 V3 content-binds internal history and the live final row; protected remote custody, not standalone cryptography, retains the append-only tail.'
