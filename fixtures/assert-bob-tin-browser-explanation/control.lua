@@ -211,19 +211,47 @@ local function assert_fake_and_limit_negatives(catalogue)
   saturated.details[technology_name].recipe_benefits[1].current_productivity_bonus = 1
   rejects(saturated, "saturated recipe benefit=true detail was accepted")
 
+  local v3_policy = provider.policy_caps_for_test({
+    schema = 3,
+    kind = "MIRMaximumLevelPolicyV3",
+    finalizer_status = "accepted",
+    bindings = {{
+      schema = 3,
+      record_type = "MaximumLevelBinding",
+      technology_id = technology_name,
+      setting = {name = "ips-max-level-research_material_tin"},
+      cap = {effective = 3},
+      diagnostics = {status = "accepted"},
+      finalizer_observation = {status = "accepted"}
+    }}
+  })
+  check(v3_policy[technology_name]
+    and v3_policy[technology_name].selected == 3
+    and v3_policy[technology_name].setting == "ips-max-level-research_material_tin",
+    "canonical V3 policy did not expose Tin effective cap three")
+
   local sparse_policy = provider.policy_caps_for_test({
-    schema = 2,
-    kind = "MIRMaximumLevelPolicyV2",
+    schema = 3,
+    kind = "MIRMaximumLevelPolicyV3",
+    finalizer_status = "accepted",
     bindings = {
       [1] = {
-        technology = technology_name,
-        selected = 3,
-        setting = "ips-max-level-research_material_tin"
+        schema = 3,
+        record_type = "MaximumLevelBinding",
+        technology_id = technology_name,
+        setting = {name = "ips-max-level-research_material_tin"},
+        cap = {effective = 3},
+        diagnostics = {status = "accepted"},
+        finalizer_observation = {status = "accepted"}
       },
       [3] = {
-        technology = technology_name,
-        selected = 4,
-        setting = "ips-max-level-research_material_tin"
+        schema = 3,
+        record_type = "MaximumLevelBinding",
+        technology_id = technology_name,
+        setting = {name = "ips-max-level-research_material_tin"},
+        cap = {effective = 4},
+        diagnostics = {status = "accepted"},
+        finalizer_observation = {status = "accepted"}
       }
     }
   })

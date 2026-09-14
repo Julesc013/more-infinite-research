@@ -1648,6 +1648,34 @@ fixtures:
       - broader-withheld-route-admission
       - release-readiness
 
+  maximum-level-cap-ownership-multiforce-f210:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-cap-ownership-multiforce
+    supplemental_paths:
+      - fixtures/late-mir42-cap-binding-blocker
+    harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: exact-engine-2.1.17-official-expansions-only
+    validates:
+      - canonical-schema-3-copper-binding-and-transport
+      - MIR-owned-enable-and-visibility-restoration-after-cap-removal
+      - foreign-disabled-state-preservation-through-cap-and-removal
+      - force-created-and-technology-reset-event-isolation
+      - positive-distinct-and-stable-named-force-identities
+      - exact-late-finalizer-conflict-refusal-without-runtime-mutation
+      - serialized-removal-to-terminal-reload-semantic-equivalence
+    non_claims:
+      - predecessor-upgrade-or-general-save-migration
+      - multiplayer-gameplay-or-human-playtest
+      - unbounded-multiforce-coverage
+      - browser-or-profile-user-interface-qualification
+      - all-stream-or-all-ecosystem-cap-qualification
+      - external-late-mutator-compatibility-or-endorsement
+      - performance-or-memory-envelope-qualification
+      - release-readiness-or-publication-authorization
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity

@@ -40,6 +40,7 @@ local function json_observation(stage, state, observed)
     ",\"raw_direct_max_level\":" .. observed.raw_direct ..
     ",\"mirset1_imported_max_level\":" .. observed.imported ..
     ",\"effective_max_level\":" .. observed.effective ..
+    ",\"policy_schema\":" .. observed.policy_schema ..
     ",\"policy_binding_count\":" .. observed.policy_binding_count ..
     ",\"policy_setting\":" .. json_string(observed.policy_setting) ..
     ",\"policy_technology\":" .. json_string(observed.policy_technology) ..
@@ -71,16 +72,27 @@ local function cap_observation()
   local effective = startup_settings.get(setting_name)
   if raw ~= raw_direct_cap or effective ~= imported_cap then fail("runtime cap resolver differs") end
   local policy = prototypes.mod_data["more-infinite-research-maximum-level-policy"]
+  if not policy or not policy.data or policy.data.schema ~= 3
+      or policy.data.kind ~= "MIRMaximumLevelPolicyV3" then
+    fail("canonical schema-3 maximum-level policy transport is absent")
+  end
   local bindings = {}
   for _, row in ipairs((policy and policy.data and policy.data.bindings) or {}) do
-    if row.technology == technology_name then table.insert(bindings, row) end
+    if row.technology_id == technology_name then table.insert(bindings, row) end
   end
   if #bindings ~= 1 then fail("Tin maximum-level policy binding cardinality differs " .. tostring(#bindings)) end
   local binding = bindings[1]
-  if binding.technology ~= technology_name or binding.setting ~= setting_name or binding.selected ~= effective or binding.selected ~= imported then
+  if binding.schema ~= 3 or binding.record_type ~= "MaximumLevelBinding"
+      or binding.technology_id ~= technology_name
+      or not binding.setting or binding.setting.name ~= setting_name
+      or not binding.cap or binding.cap.effective ~= effective
+      or binding.cap.effective ~= imported
+      or not binding.diagnostics or binding.diagnostics.status ~= "accepted"
+      or not binding.finalizer_observation or binding.finalizer_observation.status ~= "accepted"
+      or not binding.runtime_strategy or binding.runtime_strategy.mode ~= "absolute-cap-controller" then
     fail("Tin maximum-level policy binding differs from runtime profile")
   end
-  return {raw_direct = raw, imported = imported, effective = effective, policy_binding_count = #bindings, policy_setting = binding.setting, policy_technology = binding.technology}
+  return {raw_direct = raw, imported = imported, effective = effective, policy_schema = binding.schema, policy_binding_count = #bindings, policy_setting = binding.setting.name, policy_technology = binding.technology_id}
 end
 
 local function queue_names(force)
@@ -109,6 +121,7 @@ local function assert_exact_research_state(state)
     raw_direct = caps.raw_direct,
     imported = caps.imported,
     effective = caps.effective,
+    policy_schema = caps.policy_schema,
     policy_binding_count = caps.policy_binding_count,
     policy_setting = caps.policy_setting,
     policy_technology = caps.policy_technology

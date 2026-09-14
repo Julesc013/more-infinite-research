@@ -195,19 +195,42 @@ end
 
 local function policy_caps(artifact)
   artifact = artifact or mod_data("more-infinite-research-maximum-level-policy")
-  if type(artifact) ~= "table" or artifact.schema ~= 2
-    or artifact.kind ~= "MIRMaximumLevelPolicyV2" or not dense_array(artifact.bindings) then
+  if type(artifact) ~= "table" or not dense_array(artifact.bindings) then
     return {}
   end
   local values, counts = {}, {}
-  for _, binding in ipairs(artifact.bindings) do
-    if type(binding) == "table" and type(binding.technology) == "string" then
-      counts[binding.technology] = (counts[binding.technology] or 0) + 1
-      if finite_positive_integer(binding.selected)
-        and type(binding.setting) == "string" and binding.setting ~= "" then
-        values[binding.technology] = {selected = binding.selected, setting = binding.setting}
+  if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
+    if artifact.finalizer_status ~= "accepted" then return {} end
+    for _, binding in ipairs(artifact.bindings) do
+      if type(binding) == "table" and type(binding.technology_id) == "string" then
+        local technology_id = binding.technology_id
+        counts[technology_id] = (counts[technology_id] or 0) + 1
+        local setting = binding.setting
+        local cap = binding.cap
+        local diagnostics = binding.diagnostics
+        local finalizer = binding.finalizer_observation
+        if type(setting) == "table" and type(setting.name) == "string" and setting.name ~= ""
+          and type(cap) == "table" and finite_positive_integer(cap.effective)
+          and type(diagnostics) == "table" and diagnostics.status == "accepted"
+          and type(finalizer) == "table" and finalizer.status == "accepted" then
+          values[technology_id] = {selected = cap.effective, setting = setting.name}
+        end
       end
     end
+  elseif artifact.schema == 2 and artifact.kind == "MIRMaximumLevelPolicyV2" then
+    -- Read-only migration input for saves whose existing package transported
+    -- V2. V3 policy failures must not fall through to this permissive shape.
+    for _, binding in ipairs(artifact.bindings) do
+      if type(binding) == "table" and type(binding.technology) == "string" then
+        counts[binding.technology] = (counts[binding.technology] or 0) + 1
+        if finite_positive_integer(binding.selected)
+          and type(binding.setting) == "string" and binding.setting ~= "" then
+          values[binding.technology] = {selected = binding.selected, setting = binding.setting}
+        end
+      end
+    end
+  else
+    return {}
   end
   for technology, count in pairs(counts) do
     if count ~= 1 then values[technology] = nil end

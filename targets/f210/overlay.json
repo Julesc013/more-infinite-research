@@ -1890,7 +1890,7 @@
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
       "expected_bytes": 3305,
-      "expected_sha256": "8FA881F1A4E8A45817ECEA02978B5CE8FF841AA77B9871D6731E3E72E3E7B25C",
+      "expected_sha256": "D50772611479EE5A659512167020E5F6782FDD7FE41456B01C5004D98E5AEF1A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2433,8 +2433,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compiler-orchestrator context_construction responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9488,
-      "expected_sha256": "C4353BE60937B718AABE0E04F201E23C371555CC02041E58C62609C9A8A607D0",
+      "expected_bytes": 10341,
+      "expected_sha256": "2496AFD8AE40999750EA0C2775E94C15E14C72574CA12912A4C8D47E5DE9707F",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2481,8 +2481,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compiler-orchestrator publication responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8436,
-      "expected_sha256": "2D4B8DC16966F8AC98EAED33D00BE0DCD82619DA952497BB20549BB7E84731FF",
+      "expected_bytes": 6453,
+      "expected_sha256": "56493F9E531CDC9E5BAEC676A8BB39C1628152B7EB9F9806E368AD82DBC57D3A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2522,6 +2522,22 @@
       ]
     },
     {
+      "path": "prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "operation": "add",
+      "semantic_class": "target-overlay",
+      "source_path": "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "transform": "copy-exact-bytes",
+      "reason": "Materialize the governed families.modern source for f210.",
+      "capability_disposition": "included-for-target",
+      "expected_bytes": 11462,
+      "expected_sha256": "463D1970EC00C0C995934DB0D42195F53E8F2D949BC425B3D52B7E5B4895F314",
+      "proof_obligations": [
+        "exact-path-and-byte-identity",
+        "canonical-package-authority-established-after-replay",
+        "fresh-runtime-replay-complete-before-cutover"
+      ]
+    },
+    {
       "path": "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -2529,8 +2545,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3066,
-      "expected_sha256": "1E1D4CD95E2E7DAC105F6CF50DC73A5A48E179C495CAA8E1C100ECFE69BAC420",
+      "expected_bytes": 3552,
+      "expected_sha256": "F81AB7A37B99B10510277A440EECE15C1129A6E2BF7975F6F6A7565EC67C452A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3569,8 +3585,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed families.modern source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9606,
-      "expected_sha256": "687E2EB214C7097C1691562ECE206AA69FDE24194164A8EF33F48AF14405C0EA",
+      "expected_bytes": 18368,
+      "expected_sha256": "8BC6F3168DECBA18B18232A029BDE66012B9A7ABAEFC2AF65A7F29D194518509",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3953,8 +3969,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 15946,
-      "expected_sha256": "32A1A3581FCE4D90EFF20AC2CC95AF5B39D629351492BE42709463C0AD8B0A8A",
+      "expected_bytes": 17174,
+      "expected_sha256": "A2B5DDD0CD850F89796C799D7121B3BCF1CB9C80229BB75754E296E973DFD687",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3983,5 +3999,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "E5D2D5AB4973613D98DC491D3A580FA5C3DB92A81517C1E3BA6DE13B04F6808A"
+  "record_sha256": "ADF5C103103D23D510494E0A75F70348E9F206E6A116A10DF1D041E2C86FACBB"
 }

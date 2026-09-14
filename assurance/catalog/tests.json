@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 177,
+  "test_count": 178,
   "tests": [
     {
       "id": "docs.check",
@@ -777,6 +777,38 @@
         "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/compiler/material_routes.lua"
+      ],
+      "matrix": null
+    },
+    {
+      "id": "runtime.maximum-level-cap-ownership-multiforce-f210",
+      "proposition": "The governed test 'runtime.maximum-level-cap-ownership-multiforce-f210' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1 -FactorioBin <factorio>",
+      "canonical_implementation": "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+        "fixtures/assert-mir42-cap-ownership-multiforce/**",
+        "fixtures/late-mir42-cap-binding-blocker/**",
+        "src/mod/families/modern/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "src/mod/families/modern/prototypes/mir/emit/mod_data.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
+        "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/package-source.json",
+        "targets/f210/overlay.json",
+        "targets/f200/overlay.json",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
       ],
       "matrix": null
     },
@@ -6242,11 +6274,11 @@
     "cohorts": {
       "package-repository": 59,
       "tooling-release": 48,
-      "runtime-upgrade": 38,
+      "runtime-upgrade": 39,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 165,
+    "canonical_test_commands": 166,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -6259,5 +6291,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:72e4340980d0788c3b7e9abf2ed60aa4258994f415091e5e57ab06b25ee7e70d"
+  "digest": "sha256:6117aac4dec86cc0fcbf17bb79891d26df3a8a120de66b6994f5c5667d44c891"
 }
