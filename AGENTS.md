@@ -9,6 +9,17 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - Creating implementation branches, pushing them to this repository, opening and merging PRs into `dev`, synchronizing the primary checkout with `origin/dev`, and removing completed disposable work branches are standing maintainer-authorized actions. Do not ask for confirmation for this routine dev workflow.
 - Complete required automated checks and obey enforced branch rules without treating them as a requirement for another maintainer approval. Changes to `main` and release publication retain their separate policy requirements.
 
+## Source layout: maintainer-directed cutover
+
+The maintainer has selected `source/` as the single canonical editable product-source root and authorized replacement of the era-based layout. This supersedes earlier project instructions to preserve `src/`, `src/mod/`, or parallel modern/legacy source families. It does not claim that the physical cutover is already complete.
+
+- Adopt the existing root-contraction checkpoint and active source-layout work. Preserve the maintainer's deletions/moves and unique or dirty worker material; never discard them merely to synchronize with remote.
+- Decompose by semantic responsibility and actual capability. Share research, ownership, progression, configuration, and presentation implementations; select narrowly scoped platform adapters by their real contracts. Do not rename the old split to `source/mod/`, `source/families/modern`, `source/families/legacy`, or equivalent whole-version copies.
+- Extend the existing package-source mapping and materializer to compose those components. Target records select capabilities and adapters; they are not alternate editable mod trees. Generated self-contained packages may contain the same shared bytes without creating duplicate source authorities.
+- Update active path/module authorities, generators, tests, command imports, editor/CI configuration, and documentation links with the cutover. Preserve published objects and validate historical references against their pinned source. Old path assertions are migration work, not a veto or a reason to restore obsolete root copies.
+- Preserve package import contracts, technology/settings identities, and published migration identities unless a separately reviewed semantic change requires a migration. Keep authored README/Portal prose intact apart from affected source-map facts and links.
+- Completion requires removal of superseded current source roots and parallel implementations, dependency-closure and collision checks, actual materialized-package parity or explicitly reviewed semantic differences, and verified adoption of the preserved local cleanup. A rename-only PR or this instruction change is not completion of the repository overhaul.
+
 ## Local Factorio engine authority
 
 - Use `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
