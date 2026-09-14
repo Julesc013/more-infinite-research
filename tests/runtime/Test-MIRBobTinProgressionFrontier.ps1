@@ -57,7 +57,26 @@ function Assert-DriftNegatives($Data,$Runtime,$Record){
   $drift=$Data|ConvertTo-Json -Depth 50|ConvertFrom-Json;$drift.anchor.effect_change_per_completed_level=0.03;$caught=$false;try{Assert-Observation $drift $Runtime $Record}catch{$caught=$true};if(-not $caught){throw 'Bob Tin progression-frontier accepted stale data observation.'}
   $frontierDrift=$Data|ConvertTo-Json -Depth 50|ConvertFrom-Json;$frontierDrift.science_lab_frontier.candidate_science_packs[0].direct_unlock_technology_ids=@('frontier-drift');$caught=$false;try{Assert-Observation $frontierDrift $Runtime $Record}catch{$caught=$true};if(-not $caught){throw 'Bob Tin progression-frontier accepted stale nested science-frontier observation.'}
   $driftRuntime=$Runtime|ConvertTo-Json -Depth 50|ConvertFrom-Json;$driftRuntime.policy_selected=4;$caught=$false;try{Assert-Observation $Data $driftRuntime $Record}catch{$caught=$true};if(-not $caught){throw 'Bob Tin progression-frontier accepted stale runtime observation.'}
-  $fixtureSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier/data-final-fixes.lua');if($fixtureSource -match 'recipe[.]enabled\s*==\s*true' -or $fixtureSource -notmatch 'recipe[.]enabled\s*~=\s*false'){throw 'Bob Tin progression-frontier raw default-enabled normalization drifted.'};if($fixtureSource -match 'string[.]match\(name, "%-science%-pack[$]"\)' -or $fixtureSource -notmatch 'all-final-technology-unit-ingredients-with-exact-item-or-tool-prototype-binding'){throw 'Bob Tin progression-frontier technology-unit ingredient selection rule drifted.'};$controlSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier/control.lua');$cardinalityGuard='if #tin_bindings ~= 1 then fail("Tin maximum-level policy binding cardinality differs " .. tostring(#tin_bindings)) end';$consistencyGuard='if binding.technology ~= anchor_name or binding.setting ~= setting_name or binding.selected ~= effective or binding.selected ~= imported then';foreach($guard in @($cardinalityGuard,$consistencyGuard)){$withoutGuard=$controlSource.Replace($guard,'');$caught=$false;try{if($withoutGuard -notmatch [regex]::Escape($guard)){throw 'Bob Tin progression-frontier missing maximum-level policy guard.'}}catch{$caught=$true};if(-not $caught){throw 'Bob Tin progression-frontier accepted missing maximum-level policy guard.'};if($controlSource -notmatch [regex]::Escape($guard)){throw 'Bob Tin progression-frontier maximum-level policy guard drifted.'}};$source=Get-Content -Raw -LiteralPath $PSCommandPath;if($source -match "candidate_science_packs=@\(" -or $source -match "present_non_hidden_lab_prototypes=@\("){throw 'Bob Tin progression-frontier receipt must derive frontier observations from runtime logs.'}
+  $fixtureSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier/data-final-fixes.lua')
+  if($fixtureSource -match 'recipe[.]enabled\s*==\s*true' -or $fixtureSource -notmatch 'recipe[.]enabled\s*~=\s*false'){throw 'Bob Tin progression-frontier raw default-enabled normalization drifted.'}
+  if($fixtureSource -match 'string[.]match\(name, "%-science%-pack[$]"\)' -or $fixtureSource -notmatch 'all-final-technology-unit-ingredients-with-exact-item-or-tool-prototype-binding'){throw 'Bob Tin progression-frontier technology-unit ingredient selection rule drifted.'}
+  $controlSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier/control.lua')
+  $policyGuards=@(
+    'policy.data.schema ~= 3',
+    'policy.data.kind ~= "MIRMaximumLevelPolicyV3"',
+    'row.technology_id == anchor_name',
+    'if #tin_bindings ~= 1 then fail("Tin maximum-level policy binding cardinality differs " .. tostring(#tin_bindings)) end',
+    'binding.technology_id ~= anchor_name',
+    'binding.setting.name ~= setting_name',
+    'binding.cap.effective ~= effective',
+    'binding.finalizer_observation.status ~= "accepted"',
+    'binding.runtime_strategy.mode ~= "absolute-cap-controller"'
+  )
+  foreach($guard in $policyGuards){
+    if(-not $controlSource.Contains($guard)){throw "Bob Tin progression-frontier maximum-level policy guard drifted: $guard"}
+  }
+  $source=Get-Content -Raw -LiteralPath $PSCommandPath
+  if($source -match "candidate_science_packs=@\(" -or $source -match "present_non_hidden_lab_prototypes=@\("){throw 'Bob Tin progression-frontier receipt must derive frontier observations from runtime logs.'}
 }
 
 $engineSha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
