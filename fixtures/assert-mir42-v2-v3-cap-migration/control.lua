@@ -51,9 +51,12 @@ end
 local function configure(force, level, enabled, visible_when_disabled)
   force.enable_all_prototypes()
   local technology = technology_for(force)
+  -- Assigning an infinite technology level can restore Factorio's default
+  -- enablement. Apply the intended force state afterwards so the V2 cap=0
+  -- seed contains a genuinely pre-disabled foreign technology.
+  technology.level = level
   technology.enabled = enabled
   technology.visible_when_disabled = visible_when_disabled
-  technology.level = level
   return technology
 end
 
