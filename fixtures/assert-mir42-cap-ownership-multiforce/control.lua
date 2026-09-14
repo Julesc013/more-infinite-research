@@ -180,11 +180,17 @@ local function advance_seed_to_capped()
   state.merge_source_index = merge_source.index
   state.merge_destination_index = merge_destination.index
 
-  -- Re-open only the destination immediately before the merge. The
-  -- synchronous on_forces_merged handler must cap that destination again,
-  -- while clearing every bucket still keyed by the removed source index.
+  -- Re-open only the destination immediately before the merge. Factorio
+  -- completes the merge and raises on_forces_merged after this callback;
+  -- the next-tick phase verifies that handler capped the destination again
+  -- and cleared every bucket still keyed by the removed source index.
   configure_force(merge_destination, 4, true, false)
   game.merge_forces(merge_source, merge_destination)
+  state.phase = "merge-pending"
+end
+
+local function complete_merge_probe()
+  local state = storage[storage_key]
   local retired_source = game.forces["merge-source"]
   if retired_source and retired_source.valid then fail("merged source force still exists") end
   expect("merge-destination", 4, false, true)
@@ -286,6 +292,8 @@ script.on_event(defines.events.on_tick, function()
 
   if state.phase == "seed" then
     advance_seed_to_capped()
+  elseif state.phase == "merge-pending" then
+    complete_merge_probe()
   elseif state.phase == "capped" then
     advance_capped_to_blocked()
   elseif state.phase == "blocked" then
