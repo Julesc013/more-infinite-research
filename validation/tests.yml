@@ -119,6 +119,22 @@
       ]
     },
     {
+      "id": "static.immutable-input-staging",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRImmutableInputStaging.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tests/tooling/Test-MIRImmutableInputStaging.ps1",
+        "tests/runtime/Test-MIRF200BobTinProductionGain.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "src/mod/package-source.json",
+        "targets/package-authority.json",
+        "targets/f200/overlay.json"
+      ]
+    },
+    {
       "id": "static.compiler",
       "kind": "static",
       "layer": "F0",
