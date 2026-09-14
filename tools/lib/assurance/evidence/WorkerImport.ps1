@@ -453,6 +453,7 @@ function Import-MIRAssuranceWorkerEvidence {
       input_key=[string]$test.fingerprint.input_key
       outcome=[string]$workerObject.outcome
       result_digest=[string]$workerObject.capsule.result_digest
+      outcome_digest=(Get-MIRAssuranceOutcomeDigest -Capsule $workerObject.capsule)
       capsule_sha256=[string]$workerObject.pointer.capsule_sha256
       receipt_sha256=[string]$workerObject.receipt_sha256
       pointer_status=[string]$workerObject.pointer_status

@@ -317,7 +317,8 @@ function Invoke-MIRAssuranceSelfTest {
     param(
       [Parameter(Mandatory)]$Identity,
       [Parameter(Mandatory)][ValidateSet('passed', 'failed')][string]$Status,
-      [Parameter(Mandatory)][string]$Label
+      [Parameter(Mandatory)][string]$Label,
+      $Producer = $null
     )
     $casePaths = Get-MIRAssuranceEvidencePaths -TestId $Identity.test_id -InputKey $Identity.input_key
     $syntheticAttemptRoots.Add([string]$casePaths.root)
@@ -361,7 +362,7 @@ function Invoke-MIRAssuranceSelfTest {
       command='synthetic'
       resolved_command='synthetic'
       inputs=[ordered]@{}
-      producer=(Get-MIRAssuranceProducer)
+      producer=if ($null -ne $Producer) { $Producer } else { Get-MIRAssuranceProducer }
       assertions=$assertions
       exit_code=$exitCode
       result=$descriptor
@@ -391,18 +392,19 @@ function Invoke-MIRAssuranceSelfTest {
   }
   $sameIdentity = & $newSyntheticIdentity 'same-result'
   $sameFirst = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'first'
-  $sameSecondCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($sameFirst.capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
-  $sameSecond = Write-MIRAssuranceAttempt -Capsule $sameSecondCapsule -Context $Context
+  Start-Sleep -Milliseconds 2
+  $sameSecond = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'second-independent-work-path'
   if ([bool]$sameSecond.quarantined -or
       @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $sameIdentity).Count -ne 0 -or
       $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $sameIdentity -Context $Context)) {
-    throw 'Identical trusted attempts were incorrectly quarantined or made non-reusable.'
+    throw 'Independent same-semantic trusted attempts with distinct work paths and times were incorrectly quarantined or made non-reusable.'
   }
   $contradictionIdentity = & $newSyntheticIdentity 'contradiction'
   $contradictionPass = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'passing'
   $contradictionFail = & $newSyntheticAttempt -Identity $contradictionIdentity -Status failed -Label 'failing'
   $contradictionIncidents = @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $contradictionIdentity)
   $contradictionAttempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $contradictionIdentity -Context $Context)
+  $contradictionBlocked = Get-Content -Raw -LiteralPath $contradictionPass.paths.blocked | ConvertFrom-Json -DateKind String
   if (-not [bool]$contradictionFail.capsule.quarantined -or
       $contradictionIncidents.Count -ne 1 -or
       @($contradictionIncidents[0].incident.attempts).Count -ne 2 -or
@@ -411,9 +413,108 @@ function Invoke-MIRAssuranceSelfTest {
       $contradictionAttempts.Count -ne 2 -or
       (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
       -not (Test-Path -LiteralPath $contradictionPass.paths.blocked -PathType Leaf) -or
+      [string]$contradictionBlocked.incident_path -ne [string]$contradictionIncidents[0].path -or
+      [string]::IsNullOrWhiteSpace([string]$contradictionBlocked.opposite_capsule_path) -or
+      [string]$contradictionBlocked.capsule_path -ne [string]$contradictionBlocked.opposite_capsule_path -or
       $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context) -or
       (Get-MIRAssuranceEvidenceDecision -Fingerprint $contradictionIdentity -Context $Context -TestId $contradictionIdentity.test_id).disposition -ne 'INVALID') {
     throw 'Contradictory trusted attempts did not preserve both observations, quarantine their identity, and disable reuse.'
+  }
+
+  # A normal retry and a delayed first writer both remain blocked.  The latter
+  # is exercised while the same exact identity lock is held, so a second writer
+  # cannot publish a passed pointer between the conflict scan and the incident.
+  $normalRetry = & $newSyntheticAttempt -Identity $contradictionIdentity -Status passed -Label 'normal-same-worker-retry'
+  $stateLock = Enter-MIRAssuranceAttemptStateLock -Identity $contradictionIdentity
+  $lateWriterRejected = $false
+  try {
+    try {
+      $null = Set-MIRAssuranceAttemptPointer `
+        -Capsule $contradictionPass.capsule `
+        -AttemptPath (Resolve-MIRAssurancePath -Path ([string]$contradictionPass.capsule.attempt_path)) `
+        -Context $Context `
+        -LockTimeoutMilliseconds 25
+    } catch {
+      $lateWriterRejected = $_.Exception.Message -match 'attempt-state lock'
+    }
+  } finally {
+    Exit-MIRAssuranceAttemptStateLock -Lock $stateLock
+  }
+  $lateWriter = Set-MIRAssuranceAttemptPointer `
+    -Capsule $contradictionPass.capsule `
+    -AttemptPath (Resolve-MIRAssurancePath -Path ([string]$contradictionPass.capsule.attempt_path)) `
+    -Context $Context
+  $unresolvedState = Get-MIRAssuranceAttemptQuarantineState -Identity $contradictionIdentity -Context $Context
+  if (-not [bool]$normalRetry.capsule.quarantined -or
+      -not $lateWriterRejected -or
+      -not [bool]$lateWriter.quarantined -or
+      @($unresolvedState.unresolved_incidents).Count -ne 1 -or
+      (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
+    throw 'A normal retry or interleaved writer bypassed an unresolved exact-evidence quarantine.'
+  }
+
+  Start-Sleep -Milliseconds 2
+  $independentProducer = ConvertTo-MIRAssuranceOrderedMap -Object (Get-MIRAssuranceProducer)
+  $independentProducer['run_id'] = "independent-$([guid]::NewGuid().ToString('N'))"
+  $independentProducer['job'] = 'self-test-independent-reproduction'
+  $independentPass = & $newSyntheticAttempt `
+    -Identity $contradictionIdentity `
+    -Status passed `
+    -Label 'independent-fresh-reproduction' `
+    -Producer $independentProducer
+  $resolution = Resolve-MIRAssuranceAttemptQuarantine `
+    -Identity $contradictionIdentity `
+    -IndependentAttemptPath ([string]$independentPass.capsule.attempt_path) `
+    -Adjudicator 'self-test-independent-adjudicator' `
+    -Context $Context
+  $resolvedState = Get-MIRAssuranceAttemptQuarantineState -Identity $contradictionIdentity -Context $Context
+  if ([string]$resolution.status -ne 'resolved' -or
+      @($resolvedState.unresolved_incidents).Count -ne 0 -or
+      @($resolvedState.resolved_incidents).Count -ne 1 -or
+      -not (Test-Path -LiteralPath $contradictionPass.paths.passed -PathType Leaf) -or
+      $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $contradictionIdentity -Context $Context)) {
+    throw 'A valid independently reproduced and adjudicated outcome did not resolve the quarantine into a trusted pass.'
+  }
+
+  # The command itself succeeds, but a seeded exact opposite observation turns
+  # the execution into a nonqualified plan failure.  This proves the local
+  # executor cannot return a passing result merely because its child process
+  # exited zero; verify and qualify consume this same result-count contract.
+  $executionQuarantineIdentity = & $newSyntheticIdentity 'execution-quarantine'
+  $null = & $newSyntheticAttempt -Identity $executionQuarantineIdentity -Status failed -Label 'seeded-opposite'
+  $executionQuarantineTest = [pscustomobject][ordered]@{
+    id=[string]$executionQuarantineIdentity.test_id
+    safe_test_id=[string]$executionQuarantineIdentity.test_id
+    requires_factorio=$false
+    requires_candidate=$false
+    inputs=@()
+    kind='static'
+    layer='F0'
+    command='./tests/tooling/Test-MIRVerificationSchemas.ps1'
+    force_fresh=$false
+    fingerprint=[pscustomobject]$executionQuarantineIdentity
+  }
+  $executionQuarantinePlan = [pscustomobject][ordered]@{
+    baseline='self-test'
+    tests=@($executionQuarantineTest)
+  }
+  $executionQuarantineResults = @(Invoke-MIRAssurancePlan `
+    -Plan $executionQuarantinePlan `
+    -Context $Context)
+  $executionQuarantineAttempts = @(Get-MIRAssuranceTrustedExactAttempts -Identity $executionQuarantineIdentity -Context $Context)
+  $executionQuarantineCounts = Get-MIRAssuranceResultCounts `
+    -Results $executionQuarantineResults `
+    -ExpectedTotal 1
+  if ($executionQuarantineResults.Count -ne 1 -or
+      [string]$executionQuarantineResults[0].schema -ne 'mir-plan-execution-quarantine-v1' -or
+      [string]$executionQuarantineResults[0].status -ne 'failed' -or
+      [string]$executionQuarantineResults[0].conclusion -ne 'quarantined' -or
+      $executionQuarantineCounts.failed -ne 1 -or
+      $executionQuarantineCounts.quarantined -ne 1 -or
+      @($executionQuarantineAttempts | Where-Object conclusion -eq 'passed').Count -ne 1 -or
+      $null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $executionQuarantineIdentity -Context $Context)) {
+    throw 'A locally successful assurance command incorrectly escaped exact-evidence quarantine as a qualified result.'
   }
 
   $fanInRoot = Join-Path $artifactRoot ("worker-import-self-test\" + [guid]::NewGuid().ToString("N"))
