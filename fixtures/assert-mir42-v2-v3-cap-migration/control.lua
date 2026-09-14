@@ -48,7 +48,7 @@ local function require_force(name)
   return force
 end
 
-local function configure(force, level, enabled, visible_when_disabled)
+local function configure_unbounded(force, level, enabled, visible_when_disabled)
   force.enable_all_prototypes()
   local technology = technology_for(force)
   -- Assigning an infinite technology level can restore Factorio's default
@@ -57,6 +57,18 @@ local function configure(force, level, enabled, visible_when_disabled)
   technology.level = level
   technology.enabled = enabled
   technology.visible_when_disabled = visible_when_disabled
+  return technology
+end
+
+local function configure_under_cap(force, level, enabled, visible_when_disabled)
+  force.enable_all_prototypes()
+  local technology = technology_for(force)
+  -- Establish the pre-cap values before advancing the level. The active V3
+  -- controller then captures these exact values when the level crosses the
+  -- cap, rather than Factorio's default force state.
+  technology.enabled = enabled
+  technology.visible_when_disabled = visible_when_disabled
+  technology.level = level
   return technology
 end
 
@@ -160,7 +172,7 @@ local function assert_v3_migration_and_cap()
   assert_force("v2-owned", 4, false, true)
   assert_force("v2-foreign-disabled", 4, false, true)
   local v3_owned = game.forces["v3-owned"] or game.create_force("v3-owned")
-  configure(v3_owned, 4, true, false)
+  configure_under_cap(v3_owned, 4, true, false)
   v3_owned.reset_technology_effects()
   assert_force("v3-owned", 4, false, true)
 end
@@ -201,8 +213,8 @@ script.on_init(function()
   establish_research_state()
   local owned = game.create_force("v2-owned")
   local foreign = game.create_force("v2-foreign-disabled")
-  configure(owned, 4, true, false)
-  configure(foreign, 4, false, false)
+  configure_unbounded(owned, 4, true, false)
+  configure_unbounded(foreign, 4, false, false)
   assert_v2_unbounded_seed()
   storage[storage_key] = {phase = "v2-unbounded"}
   log_state("v2-unbounded", false, false)
