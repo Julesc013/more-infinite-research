@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "release_line", "status", "strategy", "selection", "candidate", "qualification", "promotion", "readback", "recovery", "authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR42ProtectedMainPromotionTopologyV1"},
+    "release_line": {"const": "4.2"},
+    "status": {"const": "accepted-and-synthetically-rehearsed-release-blocked"},
+    "strategy": {"const": "main-based-tree-transplant-protected-pr"},
+    "selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reason", "main_dev_divergence_allowed", "main_unique_changes_must_be_patch_equivalent_in_dev", "protection_exception_allowed"],
+      "properties": {
+        "reason": {"type": "string", "minLength": 40},
+        "main_dev_divergence_allowed": {"const": true},
+        "main_unique_changes_must_be_patch_equivalent_in_dev": {"const": true},
+        "protection_exception_allowed": {"const": false}
+      }
+    },
+    "candidate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["base", "parent_count", "exact_dev_tree", "source_commit_trailer_required", "create_only_ref", "restart_adopts_only_exact_existing_ref"],
+      "properties": {
+        "base": {"const": "exact observed main commit"}, "parent_count": {"const": 1}, "exact_dev_tree": {"const": true},
+        "source_commit_trailer_required": {"const": true}, "create_only_ref": {"const": true}, "restart_adopts_only_exact_existing_ref": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["before_promotion", "exact_candidate_commit", "exact_candidate_tree", "exact_target_package_bytes", "calendar_does_not_waive_gates"],
+      "properties": {
+        "before_promotion": {"const": true}, "exact_candidate_commit": {"const": true}, "exact_candidate_tree": {"const": true},
+        "exact_target_package_bytes": {"const": true}, "calendar_does_not_waive_gates": {"const": true}
+      }
+    },
+    "promotion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "merge_method", "pull_request_required", "linear_history_required", "required_status_checks", "commit_identity_changes_at_squash_boundary", "force_push", "branch_deletion", "ruleset_mutation", "bypass_actor_count"],
+      "properties": {
+        "target": {"const": "main"}, "merge_method": {"const": "squash"}, "pull_request_required": {"const": true}, "linear_history_required": {"const": true},
+        "required_status_checks": {"type": "array", "items": {"type": "string"}, "minItems": 2, "uniqueItems": true, "allOf": [{"contains": {"const": "branch-policy"}}, {"contains": {"const": "verification-gate"}}]},
+        "commit_identity_changes_at_squash_boundary": {"const": true}, "force_push": {"const": false}, "branch_deletion": {"const": false},
+        "ruleset_mutation": {"const": false}, "bypass_actor_count": {"const": 0}
+      }
+    },
+    "readback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["main_base_ancestry_required", "exact_tree_required", "exact_package_bytes_required", "qualified_dev_ref_unchanged_required", "commit_rebinding_record_required", "human_playtest_after_readback"],
+      "properties": {
+        "main_base_ancestry_required": {"const": true}, "exact_tree_required": {"const": true}, "exact_package_bytes_required": {"const": true},
+        "qualified_dev_ref_unchanged_required": {"const": true}, "commit_rebinding_record_required": {"const": true}, "human_playtest_after_readback": {"const": true}
+      }
+    },
+    "recovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["persist_before_effect", "remote_ref_readback_required", "ref_drift_fails_closed", "tree_or_package_mismatch_creates_new_candidate"],
+      "properties": {
+        "persist_before_effect": {"const": true}, "remote_ref_readback_required": {"const": true}, "ref_drift_fails_closed": {"const": true}, "tree_or_package_mismatch_creates_new_candidate": {"const": true}
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_allocation", "main_mutation", "tagging", "signing", "sealing", "publication", "human_acceptance"],
+      "properties": {
+        "candidate_allocation": {"const": false}, "main_mutation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false},
+        "sealing": {"const": false}, "publication": {"const": false}, "human_acceptance": {"const": false}
+      }
+    }
+  }
+}

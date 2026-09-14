@@ -38,6 +38,7 @@
     "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
     "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
     "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
+    "mir4-protected-promotion-topology-a08": ["static.mir4-protected-promotion-topology-a08"],
     "bob-tin-qualification-f210": ["runtime.bob-tin-qualification"],
     "bob-tin-production-gain-f210": ["runtime.bob-tin-production-gain"],
     "bob-tin-machine-matrix-f210": ["runtime.bob-tin-machine-matrix"],
@@ -395,6 +396,20 @@
       "tests": [
         "static.mir4-release-operator-recovery-a07",
         "static.mir4-local-delivery"
+      ]
+    },
+    {
+      "id": "mir4-protected-promotion-topology-a08",
+      "patterns": [
+        "^tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology[.]ps1$",
+        "^tests/mir4/Test-MIR4ProtectedPromotionTopologyA08[.]ps1$",
+        "^spec/(?:releases/mir4-protected-main-promotion-topology-v1|schemas/mir4-protected-main-promotion-topology-v1[.]schema)[.]json$",
+        "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
+        "^[.]mir/(?:assurance[.]json|modules[.]yml)$",
+        "^validation/tests[.]yml$"
+      ],
+      "tests": [
+        "static.mir4-protected-promotion-topology-a08"
       ]
     },
     {

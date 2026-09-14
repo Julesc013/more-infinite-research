@@ -844,6 +844,7 @@ package_excluded_modules:
     stability: stable-t15-complete-t16-t17-human-blocked-release-blocked
   mir4_pre_freeze_hardening_v1:
     authorities:
+      - spec/releases/mir4-protected-main-promotion-topology-v1.json
       - .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
       - .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
       - .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
@@ -890,6 +891,7 @@ package_excluded_modules:
     phase_engine: tools/lib/mir4/ReleasePhaseEngine.ps1
     release_adapters: tools/lib/mir4/ReleaseAdapters.ps1
     release_lifecycle_adapters: tools/lib/mir4/ReleaseLifecycleAdapters.ps1
+    protected_promotion_topology: tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1
     commands:
       - tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
       - tools/commands/mir4/Invoke-MIR4ReleaseWorkflow.ps1
@@ -951,11 +953,13 @@ package_excluded_modules:
       - spec/schemas/mir4-github-actions-lock-v2.schema.json
       - contracts/repository/mir-github-actions-lock-v1.schema.json
       - spec/schemas/mir4-ruleset-snapshot-v1.schema.json
+      - spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json
     supporting_validators:
       - tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1
       - tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
       - tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1
+      - tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1
       - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1

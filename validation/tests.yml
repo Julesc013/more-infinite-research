@@ -2275,6 +2275,22 @@
       ]
     },
     {
+      "id": "static.mir4-protected-promotion-topology-a08",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/assurance.json",
+        ".mir/modules.yml",
+        "spec/releases/mir4-protected-main-promotion-topology-v1.json",
+        "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
+        "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
+        "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
+        "validation/tests.yml"
+      ]
+    },
+    {
       "id": "static.mir4-release-doctor-t06",
       "kind": "static",
       "layer": "F0",
