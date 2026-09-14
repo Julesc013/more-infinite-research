@@ -22,7 +22,7 @@
     },
     "authority_invariants": {"$ref": "#/$defs/authorityInvariants"},
     "append_only": {"const": true},
-    "genesis_row_sha256": {"const": "F16B81179F463B9C2C01863D7EEE6CEA123F10AFA0ADB64279CDC373F8CC88AC"},
+    "genesis_row_sha256": {"const": "D3CFC1529C32C820458F4EEBD72E2A5A6401762ED037C376624A6534D41EEEF1"},
     "rows": {
       "type": "array",
       "minItems": 1,
@@ -64,13 +64,15 @@
     "packageSource": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["canonical_fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state"],
+      "required": ["canonical_fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state", "binding_count", "unique_binding_count"],
       "properties": {
         "canonical_fingerprint_sha256": {"$ref": "#/$defs/sha256"},
         "materializer_abi": {"const": "mir4-target-materializer/1"},
         "roots": {"const": ["src/mod", "targets"]},
         "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"},
-        "legacy_root_state": {"const": "retired-historical-read-only"}
+        "legacy_root_state": {"const": "retired-historical-read-only"},
+        "binding_count": {"type": "integer", "minimum": 1},
+        "unique_binding_count": {"type": "integer", "minimum": 1}
       }
     },
     "materializerProof": {
@@ -108,6 +110,20 @@
         "publication": {"const": false}
       }
     },
+    "ledgerPredecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tree", "path", "normalized_text_sha256", "record_sha256", "final_row_sha256", "row_count"],
+      "properties": {
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "tree": {"pattern": "^[a-f0-9]{40}$"},
+        "path": {"const": "spec/distribution/mir4-current-package-presentation-v3.json"},
+        "normalized_text_sha256": {"$ref": "#/$defs/sha256"},
+        "record_sha256": {"$ref": "#/$defs/sha256"},
+        "final_row_sha256": {"$ref": "#/$defs/sha256"},
+        "row_count": {"type": "integer", "minimum": 1}
+      }
+    },
     "row": {
       "type": "object",
       "additionalProperties": false,
@@ -129,6 +145,7 @@
         "source_manifest": {"$ref": "#/$defs/recordDescriptor"},
         "package_authority": {"$ref": "#/$defs/recordDescriptor"},
         "package_source": {"$ref": "#/$defs/packageSource"},
+        "ledger_predecessor": {"$ref": "#/$defs/ledgerPredecessor"},
         "materializer_proof": {"$ref": "#/$defs/materializerProof"},
         "package_visible_scope": {"$ref": "#/$defs/packageVisibleScope"},
         "transition_gate": {"$ref": "#/$defs/transitionGate"},

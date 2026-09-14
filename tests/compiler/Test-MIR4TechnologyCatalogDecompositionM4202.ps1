@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202TechnologyCatalog([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-technology-catalog-test] $Code"}}
@@ -18,7 +19,7 @@ Assert-MIR4M4202TechnologyCatalog ($raw|Test-Json -SchemaFile $schemaPath) 'rece
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202TechnologyCatalog (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
 $currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-$expectedManifestBindings=434
+$currentPresentation=Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 $currentPackageSource
 if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
   $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json'
   $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json'
@@ -37,15 +38,14 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
     $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
     Assert-MIR4M4202TechnologyCatalog (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
     Assert-MIR4M4202TechnologyCatalog ([string]$l6.predecessor.package_source_sha256-ceq[string]$successor.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-l6-successor-chain'
-    $expectedManifestBindings=441
-  }else{$expectedManifestBindings=437}
+}
 }
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202TechnologyCatalog ($evolvedPaths.Count-eq14-and@($evolvedPaths|Sort-Object -Unique).Count-eq14-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
-Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings).Count-eq[int]$currentPresentation.package_source.binding_count) 'manifest-binding-count'
+Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq[int]$currentPresentation.package_source.unique_binding_count) 'manifest-binding-uniqueness'
 
 $sourceRoot='src/mod/families/modern/prototypes/mir/planner'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/technology_catalog.lua")

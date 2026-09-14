@@ -4,6 +4,7 @@ param(
   [string]$SourceCommit = '',
   [string]$RecordedAt = '2026-09-15T00:00:00+10:00',
   [switch]$Append,
+  [switch]$MigrateGenesis,
   [switch]$Check
 )
 
@@ -27,6 +28,14 @@ function Get-MIR4PackagePresentationV3CommitTree {
     throw "[mir4-package-presentation-v3-source-tree] $Commit"
   }
   return [string]$tree[0]
+}
+
+function Get-MIR4PackagePresentationV3HeadCommit {
+  $head = (@(& git -C $repo rev-parse HEAD 2>$null) | Select-Object -First 1)
+  if ($LASTEXITCODE -ne 0 -or [string]$head -notmatch '^[a-f0-9]{40}$') {
+    throw '[mir4-package-presentation-v3-head]'
+  }
+  return [string]$head
 }
 
 function Get-MIR4PackagePresentationV3RowSha256 {
@@ -62,23 +71,51 @@ function Get-MIR4PackagePresentationV3V2Predecessor {
   return $v2
 }
 
+function Get-MIR4PackagePresentationV3CommittedLedgerPredecessor {
+  param(
+    [Parameter(Mandatory)]$Ledger,
+    [Parameter(Mandatory)][string]$Commit
+  )
+
+  $head = Get-MIR4PackagePresentationV3HeadCommit
+  if ($Commit -cne $head) { throw "[mir4-package-presentation-v3-append-source-not-head] $Commit" }
+  $dirty = @(& git -C $repo status --porcelain -- $ledgerRelative 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw '[mir4-package-presentation-v3-append-ledger-dirty]' }
+  $workingIdentity = Get-MIRFileContentIdentity -Path $ledgerPath -RelativePath $ledgerRelative
+  $committedIdentity = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit $head -RelativePath $ledgerRelative
+  if ([string]$workingIdentity.Sha256 -cne $committedIdentity) { throw '[mir4-package-presentation-v3-append-ledger-uncommitted]' }
+  return [ordered]@{
+    commit = $head
+    tree = Get-MIR4PackagePresentationV3CommitTree -Commit $head
+    path = $ledgerRelative
+    normalized_text_sha256 = $committedIdentity
+    record_sha256 = [string]$Ledger.record_sha256
+    final_row_sha256 = [string](@($Ledger.rows)[-1].row_sha256)
+    row_count = @($Ledger.rows).Count
+  }
+}
+
 function New-MIR4PackagePresentationV3Row {
   param(
     [Parameter(Mandatory)][int]$Sequence,
     [Parameter(Mandatory)][string]$PreviousRowSha256,
     [Parameter(Mandatory)][string]$Commit,
-    [Parameter(Mandatory)][string]$Timestamp
+    [Parameter(Mandatory)][string]$Timestamp,
+    $LedgerPredecessor
   )
 
   Assert-MIR4PackagePresentationV3CleanSource -Commit $Commit
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $manifestPath = Join-Path $repo 'src/mod/package-source.json'
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $bindingCount = @($manifest.bindings).Count
+  $uniqueBindingCount = @($manifest.bindings | ForEach-Object { "{0}|{1}" -f [string]$_.layer, [string]$_.output_path } | Sort-Object -Unique).Count
   if (-not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
       [string]$manifest.materializer_abi -cne 'mir4-target-materializer/1' -or
       [string]$authority.writer.implementation -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
       -not [bool]$authority.writer.sole_current_writer -or
-      [string]$authority.legacy_root_projection.compatibility_state -cne 'retired-historical-read-only') {
+      [string]$authority.legacy_root_projection.compatibility_state -cne 'retired-historical-read-only' -or
+      $bindingCount -ne $uniqueBindingCount) {
     throw '[mir4-package-presentation-v3-source-authority]'
   }
   $materializerRelative = 'tools/mir/application/package/TargetMaterializer.ps1'
@@ -110,6 +147,8 @@ function New-MIR4PackagePresentationV3Row {
       roots = @(Get-MIR4CanonicalPackageSourceRoots)
       sole_writer = [string]$authority.writer.implementation
       legacy_root_state = [string]$authority.legacy_root_projection.compatibility_state
+      binding_count = $bindingCount
+      unique_binding_count = $uniqueBindingCount
     }
     materializer_proof = [ordered]@{
       path = $materializerRelative
@@ -133,6 +172,7 @@ function New-MIR4PackagePresentationV3Row {
     }
     row_sha256 = ''
   }
+  if ($null -ne $LedgerPredecessor) { $row | Add-Member -NotePropertyName ledger_predecessor -NotePropertyValue $LedgerPredecessor }
   $row.row_sha256 = Get-MIR4PackagePresentationV3RowSha256 -Row $row
   return $row
 }
@@ -153,13 +193,48 @@ function Write-MIR4PackagePresentationV3NewOrIdentical {
   }
 }
 
-if ($Check -and $Append) { throw '[mir4-package-presentation-v3-check-append]' }
+if ($Check -and ($Append -or $MigrateGenesis)) { throw '[mir4-package-presentation-v3-check-mutation]' }
 
 if ($Check) {
   if (-not (Test-Path -LiteralPath $ledgerPath -PathType Leaf)) { throw '[mir4-package-presentation-v3-stale]' }
   . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
   Assert-MIR4CurrentPackagePresentationV3Ledger -RepoRoot $repo | Out-Null
   [pscustomobject][ordered]@{status='current';path=$ledgerRelative;append_only=$true;publication_authorized=$false}
+  return
+}
+
+if ($MigrateGenesis) {
+  if ($Append) { throw '[mir4-package-presentation-v3-migrate-append]' }
+  if (-not (Test-Path -LiteralPath $ledgerPath -PathType Leaf)) { throw '[mir4-package-presentation-v3-migrate-missing-ledger]' }
+  $legacy = Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $legacyRows = @($legacy.rows)
+  if ($legacyRows.Count -ne 1 -or
+      [string]$legacyRows[0].row_sha256 -cne 'F16B81179F463B9C2C01863D7EEE6CEA123F10AFA0ADB64279CDC373F8CC88AC' -or
+      $legacyRows[0].PSObject.Properties['ledger_predecessor'] -or
+      $legacyRows[0].package_source.PSObject.Properties['binding_count'] -or
+      [string]$legacyRows[0].source_identity.commit -cne 'b6cf5f19d24f4474ee9dbb0473e59ce9caa8b75d') {
+    throw '[mir4-package-presentation-v3-migrate-genesis-contract]'
+  }
+  $v2 = Get-MIR4PackagePresentationV3V2Predecessor
+  $row = New-MIR4PackagePresentationV3Row -Sequence 1 -PreviousRowSha256 ([string]$v2.record_sha256) -Commit ([string]$legacyRows[0].source_identity.commit) -Timestamp ([string]$legacyRows[0].recorded_at)
+  $ledger = [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR4CurrentPackagePresentationV3Ledger'
+    status = 'accepted-current-package-presentation-ledger'
+    recorded_at = [string]$legacy.recorded_at
+    predecessor = $legacy.predecessor
+    authority_invariants = $legacy.authority_invariants
+    append_only = $true
+    genesis_row_sha256 = [string]$row.row_sha256
+    rows = @($row)
+    transition_gate = $legacy.transition_gate
+    record_sha256 = ''
+  }
+  $ledger.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $ledger
+  $json = (ConvertTo-MIR4BootstrapCanonicalJson -Value $ledger) + [char]10
+  if (-not ($json | Test-Json -SchemaFile $schemaPath)) { throw '[mir4-package-presentation-v3-migrate-schema]' }
+  [IO.File]::WriteAllText($ledgerPath, $json, [Text.UTF8Encoding]::new($false))
+  [pscustomobject][ordered]@{status='seed-contract-migrated';path=$ledgerRelative;rows=1;append_only=$true;publication_authorized=$false}
   return
 }
 
@@ -181,14 +256,16 @@ if (Test-Path -LiteralPath $ledgerPath -PathType Leaf) {
   $previousRow = @($existing.rows)[-1]
   $row = New-MIR4PackagePresentationV3Row -Sequence (@($existing.rows).Count + 1) -PreviousRowSha256 ([string]$previousRow.row_sha256) -Commit $SourceCommit -Timestamp $RecordedAt
   $sameIdentity = (
-    [string]$previousRow.source_identity.commit -ceq [string]$row.source_identity.commit -and
-    [string]$previousRow.source_identity.tree -ceq [string]$row.source_identity.tree -and
     [string]$previousRow.package_source.canonical_fingerprint_sha256 -ceq [string]$row.package_source.canonical_fingerprint_sha256 -and
     [string]$previousRow.source_manifest.record_sha256 -ceq [string]$row.source_manifest.record_sha256 -and
     [string]$previousRow.package_authority.record_sha256 -ceq [string]$row.package_authority.record_sha256 -and
-    [string]$previousRow.materializer_proof.normalized_text_sha256 -ceq [string]$row.materializer_proof.normalized_text_sha256
+    [string]$previousRow.materializer_proof.normalized_text_sha256 -ceq [string]$row.materializer_proof.normalized_text_sha256 -and
+    [int]$previousRow.package_source.binding_count -eq [int]$row.package_source.binding_count -and
+    [int]$previousRow.package_source.unique_binding_count -eq [int]$row.package_source.unique_binding_count
   )
   if ($sameIdentity) { throw '[mir4-package-presentation-v3-append-duplicate]' }
+  $ledgerPredecessor = Get-MIR4PackagePresentationV3CommittedLedgerPredecessor -Ledger $existing -Commit $SourceCommit
+  $row = New-MIR4PackagePresentationV3Row -Sequence (@($existing.rows).Count + 1) -PreviousRowSha256 ([string]$previousRow.row_sha256) -Commit $SourceCommit -Timestamp $RecordedAt -LedgerPredecessor $ledgerPredecessor
   $rows = @($existing.rows) + @($row)
   $ledger = [pscustomobject][ordered]@{
     schema = 1

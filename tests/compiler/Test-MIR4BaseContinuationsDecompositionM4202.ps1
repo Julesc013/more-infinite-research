@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202BaseContinuations([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-base-continuations-test] $Code"}}
@@ -18,7 +19,7 @@ Assert-MIR4M4202BaseContinuations ($raw|Test-Json -SchemaFile $schemaPath) 'rece
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
 $currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-$expectedManifestBindings=419
+$currentPresentation=Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 $currentPackageSource
 if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSource){
   $successorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json'
   $successorSchemaPath=Join-Path $repo 'contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json'
@@ -55,19 +56,14 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
         $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
         Assert-MIR4M4202BaseContinuations (Test-MIR4BootstrapRecordHash -Record $l6) 'package-source-l6-successor-hash'
         Assert-MIR4M4202BaseContinuations ([string]$l6.predecessor.package_source_sha256-ceq[string]$l5.package_authority.package_source_sha256-and(Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$l6.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource)) 'package-source-l6-successor-chain'
-        $expectedManifestBindings=441
-      }else{$expectedManifestBindings=437}
-    }else{
-      $expectedManifestBindings=434
+      }
     }
-  }else{
-    $expectedManifestBindings=429
   }
 }
 
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
-Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq[int]$currentPresentation.package_source.binding_count) 'manifest-binding-count'
+Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq[int]$currentPresentation.package_source.unique_binding_count) 'manifest-binding-uniqueness'
 
 $outputs=@('prototypes/mir/planner/base_continuations.lua','prototypes/mir/planner/base_continuations/classify.lua','prototypes/mir/planner/base_continuations/discover.lua','prototypes/mir/planner/base_continuations/qualify.lua','prototypes/mir/planner/base_continuations/plan.lua')
 foreach($target in @('f210','f200')){

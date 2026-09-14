@@ -11,6 +11,21 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+
+# The M42-02 receipt is immutable historical evidence.  Its original source
+# materializer encoded the then-current 441-binding presentation and must not
+# reconstruct or overwrite a later package-source succession.
+if ($Check) {
+  return [pscustomobject][ordered]@{
+    status = 'historical-non-runnable'
+    authority = 'M42-02-L6-COMPILER-ORCHESTRATOR'
+    successor = 'tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1'
+    package_mutation_authorized = $false
+    publication_authorized = $false
+  }
+}
+throw '[mir4-m42-02-compiler-orchestrator-historical-non-runnable]'
+
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 

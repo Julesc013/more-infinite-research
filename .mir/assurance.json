@@ -68,8 +68,8 @@
     },
     {
       "id": "mir4-current-package-presentation-v3",
-      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$", "^tests/support/MIR4M4202PackageSuccession\\.ps1$", "^tools/mir/application/history/HistoricalSuccession\\.ps1$"],
-      "tests": ["static.mir4-current-package-presentation-v3"]
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$", "^tests/support/MIR4M4202PackageSuccession\\.ps1$", "^tests/compiler/Test-MIR4(?:BaseContinuations|StreamCompiler|TechnologyCatalog|EffectOwnership|CompilerOrchestrator)DecompositionM4202\\.ps1$", "^tools/mir/application/history/HistoricalSuccession\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v3", "static.mir4-base-continuations-decomposition-m42-02-l2", "static.mir4-stream-compiler-decomposition-m42-02-l3", "static.mir4-technology-catalog-decomposition-m42-02-l4", "static.mir4-effect-ownership-decomposition-m42-02-l5", "static.mir4-compiler-orchestrator-decomposition-m42-02-l6"]
     },
     {
       "id": "mir4-post-release-foundation",

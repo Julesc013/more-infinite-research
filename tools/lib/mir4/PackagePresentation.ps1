@@ -323,6 +323,64 @@ function Get-MIR4CurrentPackagePresentationV3CommitTree {
   return [string]$tree[0]
 }
 
+function Get-MIR4CurrentPackagePresentationV3GitText {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $path = $RelativePath.Replace('\\', '/')
+  $text = (& git -C $repo show ($Commit + ':' + $path) 2>$null | Out-String)
+  if ($LASTEXITCODE -ne 0) { throw "[mir4-package-presentation-v3-git-text] $Commit/$path" }
+  return $text
+}
+
+function Get-MIR4CurrentPackagePresentationV3LatestLedgerCommit {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $relative = 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $commit = (@(& git -C $repo log -1 --format=%H HEAD -- $relative 2>$null) | Select-Object -First 1)
+  if ($LASTEXITCODE -ne 0 -or [string]$commit -notmatch '^[a-f0-9]{40}$') {
+    throw '[mir4-package-presentation-v3-ledger-lineage-missing]'
+  }
+  return [string]$commit
+}
+
+function Assert-MIR4CurrentPackagePresentationV3GitLineage {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Ledger,
+    [Parameter(Mandatory)][string]$LatestLedgerCommit
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $relative = 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $committedText = Get-MIR4CurrentPackagePresentationV3GitText -RepoRoot $repo -Commit $LatestLedgerCommit -RelativePath $relative
+  $committed = $committedText | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$committed.record_sha256 -cne [string]$Ledger.record_sha256 -or
+      @($committed.rows).Count -ne @($Ledger.rows).Count) {
+    throw '[mir4-package-presentation-v3-ledger-committed-snapshot]'
+  }
+  for ($index = 0; $index -lt @($Ledger.rows).Count; $index++) {
+    if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $committed.rows[$index]) -cne
+        (ConvertTo-MIR4BootstrapCanonicalJson -Value $Ledger.rows[$index])) {
+      throw "[mir4-package-presentation-v3-ledger-committed-row] $index"
+    }
+  }
+  if (@($Ledger.rows).Count -eq 1) { return }
+  $current = @($Ledger.rows)[-1]
+  $parent = (@(& git -C $repo rev-parse ($LatestLedgerCommit + '^') 2>$null) | Select-Object -First 1)
+  if ($LASTEXITCODE -ne 0 -or [string]$parent -cne [string]$current.ledger_predecessor.commit) {
+    throw '[mir4-package-presentation-v3-ledger-lineage-parent]'
+  }
+}
+
 function Assert-MIR4CurrentPackagePresentationV3Row {
   [CmdletBinding()]
   param(
@@ -344,6 +402,9 @@ function Assert-MIR4CurrentPackagePresentationV3Row {
     (@($Row.package_source.roots) -join '|') -cne 'src/mod|targets' -or
     [string]$Row.package_source.sole_writer -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
     [string]$Row.package_source.legacy_root_state -cne 'retired-historical-read-only' -or
+    [int]$Row.package_source.binding_count -lt 1 -or
+    [int]$Row.package_source.unique_binding_count -lt 1 -or
+    [int]$Row.package_source.binding_count -ne [int]$Row.package_source.unique_binding_count -or
     [string]$Row.materializer_proof.path -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
     [string]$Row.materializer_proof.materializer_abi -cne 'mir4-target-materializer/1' -or
     -not [bool]$Row.materializer_proof.sole_current_writer -or
@@ -364,6 +425,8 @@ function Assert-MIR4CurrentPackagePresentationV3Row {
   }
   $manifest = [string]$archive.text_by_path['src/mod/package-source.json'] | ConvertFrom-Json -Depth 100 -DateKind String
   $authority = [string]$archive.text_by_path['targets/package-authority.json'] | ConvertFrom-Json -Depth 100 -DateKind String
+  $bindingCount = @($manifest.bindings).Count
+  $uniqueBindingCount = @($manifest.bindings | ForEach-Object { "{0}|{1}" -f [string]$_.layer, [string]$_.output_path } | Sort-Object -Unique).Count
   if (
     -not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
     -not (Test-MIR4BootstrapRecordHash -Record $authority) -or
@@ -378,13 +441,38 @@ function Assert-MIR4CurrentPackagePresentationV3Row {
     [string]$manifest.materializer_abi -cne [string]$Row.package_source.materializer_abi -or
     [string]$authority.writer.implementation -cne [string]$Row.package_source.sole_writer -or
     -not [bool]$authority.writer.sole_current_writer -or
-    [string]$authority.legacy_root_projection.compatibility_state -cne [string]$Row.package_source.legacy_root_state
+    [string]$authority.legacy_root_projection.compatibility_state -cne [string]$Row.package_source.legacy_root_state -or
+    [int]$Row.package_source.binding_count -ne $bindingCount -or
+    [int]$Row.package_source.unique_binding_count -ne $uniqueBindingCount
   ) {
     throw "[mir4-package-presentation-v3-row-bindings] $Sequence"
   }
   $materializerSha = Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit ([string]$Row.source_identity.commit) -RelativePath 'tools/mir/application/package/TargetMaterializer.ps1'
   if ([string]$Row.materializer_proof.normalized_text_sha256 -cne $materializerSha) {
     throw "[mir4-package-presentation-v3-row-materializer] $Sequence"
+  }
+  if ($Sequence -eq 1) {
+    if ($Row.PSObject.Properties['ledger_predecessor'] -or $bindingCount -ne 448 -or $uniqueBindingCount -ne 448) {
+      throw '[mir4-package-presentation-v3-genesis-contract]'
+    }
+  } else {
+    $lineage = $Row.ledger_predecessor
+    if ($null -eq $lineage -or
+        [string]$lineage.commit -cne [string]$Row.source_identity.commit -or
+        [string]$lineage.tree -cne [string]$Row.source_identity.tree -or
+        [string]$lineage.path -cne 'spec/distribution/mir4-current-package-presentation-v3.json' -or
+        [int]$lineage.row_count -ne ($Sequence - 1) -or
+        [string]$lineage.final_row_sha256 -cne $PreviousRowSha256 -or
+        [string]$lineage.normalized_text_sha256 -cne (Get-MIRGitTextAtCommitSha256 -RepoRoot $repo -Commit ([string]$lineage.commit) -RelativePath ([string]$lineage.path))) {
+      throw "[mir4-package-presentation-v3-row-lineage] $Sequence"
+    }
+    $priorText = Get-MIR4CurrentPackagePresentationV3GitText -RepoRoot $repo -Commit ([string]$lineage.commit) -RelativePath ([string]$lineage.path)
+    $priorLedger = $priorText | ConvertFrom-Json -Depth 100 -DateKind String
+    if ([string]$priorLedger.record_sha256 -cne [string]$lineage.record_sha256 -or
+        @($priorLedger.rows).Count -ne [int]$lineage.row_count -or
+        [string]$priorLedger.rows[-1].row_sha256 -cne [string]$lineage.final_row_sha256) {
+      throw "[mir4-package-presentation-v3-row-lineage-record] $Sequence"
+    }
   }
   return $Row
 }
@@ -461,6 +549,16 @@ function Get-MIR4CurrentPackagePresentationV3Ledger {
       [string]$manifest.record_sha256 -cne [string]$current.source_manifest.record_sha256 -or
       [string]$materializer.Sha256 -cne [string]$current.materializer_proof.normalized_text_sha256
     ) { throw '[mir4-package-presentation-v3-current-bindings]' }
+    $liveBindingCount = @($manifest.bindings).Count
+    $liveUniqueBindingCount = @($manifest.bindings | ForEach-Object { "{0}|{1}" -f [string]$_.layer, [string]$_.output_path } | Sort-Object -Unique).Count
+    if ([int]$current.package_source.binding_count -ne $liveBindingCount -or
+        [int]$current.package_source.unique_binding_count -ne $liveUniqueBindingCount) {
+      throw '[mir4-package-presentation-v3-current-cardinality]'
+    }
+    $ledgerRelative = 'spec/distribution/mir4-current-package-presentation-v3.json'
+    $ledgerDirty = @(& git -C $repo status --porcelain -- $ledgerRelative 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $ledgerDirty.Count -ne 0) { throw '[mir4-package-presentation-v3-ledger-dirty]' }
+    Assert-MIR4CurrentPackagePresentationV3GitLineage -RepoRoot $repo -Ledger $ledger -LatestLedgerCommit (Get-MIR4CurrentPackagePresentationV3LatestLedgerCommit -RepoRoot $repo)
   }
   return $ledger
 }

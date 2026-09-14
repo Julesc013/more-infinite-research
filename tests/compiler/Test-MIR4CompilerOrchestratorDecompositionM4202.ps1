@@ -7,6 +7,7 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+. (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $repo 'tests/support/MIR4M4202PackageSuccession.ps1')
 
 function Assert-MIR4M4202CompilerOrchestrator([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir4-m42-02-compiler-orchestrator-test] $Code"}}
@@ -18,13 +19,20 @@ Assert-MIR4M4202CompilerOrchestrator ($raw|Test-Json -SchemaFile $schemaPath) 'r
 $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202CompilerOrchestrator (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt-hash'
 $currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+$currentPresentation=Assert-MIR4CurrentPackagePresentation -RepoRoot $repo -PackageSourceSha256 $currentPackageSource
+$historicalWriter=Join-Path $repo 'tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1'
+$historicalWriterStatus=& $historicalWriter -RepoRoot $repo -Check
+Assert-MIR4M4202CompilerOrchestrator ([string]$historicalWriterStatus.status-ceq'historical-non-runnable'-and[string]$historicalWriterStatus.successor-ceq'tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Ledger.ps1'-and-not[bool]$historicalWriterStatus.package_mutation_authorized-and-not[bool]$historicalWriterStatus.publication_authorized) 'historical-writer-disposition'
+$historicalWriterRejected=$false
+try { & $historicalWriter -RepoRoot $repo | Out-Null } catch { $historicalWriterRejected=$_.Exception.Message-match'\[mir4-m42-02-compiler-orchestrator-historical-non-runnable\]' }
+Assert-MIR4M4202CompilerOrchestrator $historicalWriterRejected 'historical-writer-rejects-mutation'
 Assert-MIR4M4202CompilerOrchestrator (Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.package_authority.package_source_sha256) -CurrentSha256 $currentPackageSource) 'package-source-fingerprint'
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202CompilerOrchestrator ($evolvedPaths.Count-eq16-and@($evolvedPaths|Sort-Object -Unique).Count-eq16-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 
 $manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
-Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings).Count-eq441) 'manifest-binding-count'
-Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq441) 'manifest-binding-uniqueness'
+Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings).Count-eq[int]$currentPresentation.package_source.binding_count) 'manifest-binding-count'
+Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq[int]$currentPresentation.package_source.unique_binding_count) 'manifest-binding-uniqueness'
 
 $sourceRoot='src/mod/families/modern/prototypes/mir/pipeline'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/compiler_orchestrator.lua")
