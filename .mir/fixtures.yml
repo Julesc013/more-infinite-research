@@ -1678,6 +1678,35 @@ fixtures:
       - performance-or-memory-envelope-qualification
       - release-readiness-or-publication-authorization
 
+  maximum-level-v2-v3-migration-f210:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-v2-v3-cap-migration
+    harness: tests/runtime/Test-MIR42V2V3CapMigration.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      predecessor_commit: f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e
+      mod_lock: exact-engine-2.1.17-official-expansions-only
+    validates:
+      - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
+      - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3
+      - foreign-disabled-state-never-gains-MIR-enablement-ownership
+      - current-V3-cap-enforcement-keeps-a-distinct-V3-ownership-record
+      - cap-zero-restores-only-V2-or-V3-MIR-owned-enablement-and-visibility
+      - completed-levels-current-research-queue-and-fractional-progress-survive-upgrade-and-reload
+    f200_disposition:
+      status: excluded-current-target-lacks-v3-mod-data-transport
+      factorio_version: "2.0.77"
+      reason: F200 declares prototype_shapes.mod_data=false, while V3 ownership migration requires an accepted transported V3 binding; settings fallback is legacy/read-only.
+      reconsider_when: F200-specific accepted-V3 binding transport or equivalent persisted ownership proof is implemented and exact-engine qualified.
+    non_claims:
+      - F200-v2-to-v3-ownership-migration-qualification
+      - general-save-migration-or-all-predecessor-coverage
+      - multiplayer-gameplay-or-human-playtest
+      - non-copper-or-non-F210-cap-migration
+      - browser-or-profile-user-interface-qualification
+      - release-readiness-or-publication-authorization
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
