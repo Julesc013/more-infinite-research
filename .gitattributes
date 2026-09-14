@@ -23,6 +23,19 @@
 # This retained implementation receipt is sealed and referenced by the exact
 # CRLF raw SHA-256 recorded in MIR3TerminalProductImplementationReconciliationV1.
 .mir/releases/terminal/MIR3TerminalProductImplementationReceiptV1.json text eol=crlf
+# The foundation admission is later reused by its exact retained CRLF raw
+# SHA-256 in MIR3TerminalAssuranceCalibrationReceiptV1.
+.mir/releases/terminal/MIR3TerminalFoundationAdmissionV1.json text eol=crlf
+# Terminal target seals retain the raw CRLF identities of these two shared
+# qualification authorities.
+.mir/releases/terminal/MIR3TerminalFixedPointReceiptV1.json text eol=crlf
+.mir/releases/terminal/MIR3TerminalCandidateSettingsQualificationV1.json text eol=crlf
+# The admitted MIR 3 .5 wave index is bound by its exact retained CRLF raw
+# SHA-256 in MIR3TerminalFoundationAdmissionV1.
+docs/releases/archive/MIR-3.5-WAVE-INDEX.json text eol=crlf
+# The historical manual-review object is named for the exact CRLF attestation
+# bytes retained by MIR3TerminalAssuranceCalibrationReceiptV1.
+.mir/evidence/objects/sha256/83/83AC0C36C02F2C41E1080706B0CD7EF2FE688956D38D79D579DE32F273944748.json text eol=crlf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json text eol=lf
 .mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json text eol=lf
