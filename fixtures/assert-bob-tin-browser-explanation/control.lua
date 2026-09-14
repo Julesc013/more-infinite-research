@@ -211,51 +211,76 @@ local function assert_fake_and_limit_negatives(catalogue)
   saturated.details[technology_name].recipe_benefits[1].current_productivity_bonus = 1
   rejects(saturated, "saturated recipe benefit=true detail was accepted")
 
-  local v3_policy = provider.policy_caps_for_test({
-    schema = 3,
-    kind = "MIRMaximumLevelPolicyV3",
-    finalizer_status = "accepted",
-    bindings = {{
+  local function accepted_v3_policy()
+    return {
       schema = 3,
-      record_type = "MaximumLevelBinding",
-      technology_id = technology_name,
-      setting = {name = "ips-max-level-research_material_tin"},
-      cap = {effective = 3},
-      diagnostics = {status = "accepted"},
-      finalizer_observation = {status = "accepted"}
-    }}
-  })
-  check(v3_policy[technology_name]
-    and v3_policy[technology_name].selected == 3
-    and v3_policy[technology_name].setting == "ips-max-level-research_material_tin",
-    "canonical V3 policy did not expose Tin effective cap three")
-
-  local sparse_policy = provider.policy_caps_for_test({
-    schema = 3,
-    kind = "MIRMaximumLevelPolicyV3",
-    finalizer_status = "accepted",
-    bindings = {
-      [1] = {
+      kind = "MIRMaximumLevelPolicyV3",
+      finalizer_adapter = "factorio-data-final-fixes-v1",
+      finalizer_status = "accepted",
+      artifact_fingerprint = "fixture-artifact-fingerprint",
+      bindings = {{
         schema = 3,
         record_type = "MaximumLevelBinding",
         technology_id = technology_name,
         setting = {name = "ips-max-level-research_material_tin"},
         cap = {effective = 3},
         diagnostics = {status = "accepted"},
-        finalizer_observation = {status = "accepted"}
-      },
-      [3] = {
-        schema = 3,
-        record_type = "MaximumLevelBinding",
-        technology_id = technology_name,
-        setting = {name = "ips-max-level-research_material_tin"},
-        cap = {effective = 4},
-        diagnostics = {status = "accepted"},
-        finalizer_observation = {status = "accepted"}
-      }
+        prototype_strategy = {mode = "lossless-infinite-prototype", max_level = "infinite"},
+        runtime_strategy = {mode = "absolute-cap-controller"},
+        target_requirements = {
+          scripted_techs = true,
+          scripted_techs_supported = true,
+          mod_data_transport_supported = true,
+          finalizer_adapter = "factorio-data-final-fixes-v1"
+        },
+        finalizer_observation = {
+          adapter = "factorio-data-final-fixes-v1",
+          status = "accepted",
+          observed_prototype_max_level = "infinite"
+        },
+        binding_fingerprint = "fixture-binding-fingerprint"
+      }}
     }
-  })
+  end
+
+  local v3_policy = provider.policy_caps_for_test(accepted_v3_policy())
+  check(v3_policy[technology_name]
+    and v3_policy[technology_name].selected == 3
+    and v3_policy[technology_name].setting == "ips-max-level-research_material_tin",
+    "canonical V3 policy did not expose Tin effective cap three")
+
+  local sparse_artifact = accepted_v3_policy()
+  sparse_artifact.bindings[3] = deep_copy(sparse_artifact.bindings[1])
+  sparse_artifact.bindings[3].cap.effective = 4
+  local sparse_policy = provider.policy_caps_for_test(sparse_artifact)
   check(next(sparse_policy) == nil, "sparse policy binding array was accepted")
+
+  local late_finite_policy = provider.policy_caps_for_test(
+    accepted_v3_policy(), {[technology_name] = {max_level = 5}})
+  check(next(late_finite_policy) == nil,
+    "late finite prototype conflict was advertised as an effective browser cap")
+
+  local incomplete_policy = accepted_v3_policy()
+  incomplete_policy.bindings[1].binding_fingerprint = nil
+  check(next(provider.policy_caps_for_test(incomplete_policy)) == nil,
+    "incomplete V3 provenance was advertised as an effective browser cap")
+
+  local incomplete_artifact = accepted_v3_policy()
+  incomplete_artifact.artifact_fingerprint = nil
+  check(next(provider.policy_caps_for_test(incomplete_artifact)) == nil,
+    "V3 artifact without a fingerprint was advertised as an effective browser cap")
+
+  local legacy_policy = provider.policy_caps_for_test({
+    schema = 2,
+    kind = "MIRMaximumLevelPolicyV2",
+    bindings = {{
+      technology = technology_name,
+      setting = "ips-max-level-research_material_tin",
+      selected = 3
+    }}
+  })
+  check(next(legacy_policy) == nil,
+    "read-only V2 transport was advertised as an enforceable browser cap")
 end
 
 local function assert_duplicate_public_row_negative(force)

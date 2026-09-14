@@ -3969,8 +3969,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 17174,
-      "expected_sha256": "A2B5DDD0CD850F89796C799D7121B3BCF1CB9C80229BB75754E296E973DFD687",
+      "expected_bytes": 18489,
+      "expected_sha256": "3260552C1A4CF0D10BCD0B90F161ED6CCA2896EE130A49F65FD3B962DFC7B036",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3999,5 +3999,5 @@
     "no_full_target_source_copy": true,
     "independent_target_proof_required": true
   },
-  "record_sha256": "F94AD5B19F9058FE0091D1407E8B8FF09173F459A9E2D358E4746D948DA5CA0E"
+  "record_sha256": "FB932EDA7F3D6F8ACED5BB7CAE0E56F4E0B3FEB0CD210759B459B2312BDB4A98"
 }

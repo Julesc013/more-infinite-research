@@ -2,6 +2,7 @@ local technology_name = "recipe-prod-research_copper-1"
 local setting_name = "ips-max-level-research_copper"
 local blocker_name = "late-mir42-cap-binding-blocker"
 local storage_key = "mir42_cap_ownership_multiforce"
+local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
 
 local terminal_pending = false
 local terminal_logged = false
@@ -19,6 +20,12 @@ end
 
 local function blocker_active()
   return script.active_mods[blocker_name] ~= nil
+end
+
+local function browser_cap()
+  local values = browser_provider.policy_caps_for_test()
+  local row = values and values[technology_name]
+  return row and row.selected or 0
 end
 
 local function technology_for(force)
@@ -70,8 +77,14 @@ local function state_json(stage)
   end
   return "{\"stage\":" .. quote(stage)
     .. ",\"cap\":" .. tostring(selected_cap())
+    .. ",\"browser_cap\":" .. tostring(browser_cap())
     .. ",\"blocker\":" .. bool(blocker_active())
     .. ",\"configuration_changed_events\":" .. tostring(state.configuration_changed_events)
+    .. ",\"merge_source_index\":" .. tostring(state.merge_source_index or 0)
+    .. ",\"merge_destination_index\":" .. tostring(state.merge_destination_index or 0)
+    .. ",\"reused_force_index\":" .. tostring(state.reused_force_index or 0)
+    .. ",\"merge_source_was_capped\":" .. bool(state.merge_source_was_capped)
+    .. ",\"source_index_reused\":" .. bool(state.source_index_reused)
     .. ",\"forces\":[" .. table.concat(rows, ",") .. "]}"
 end
 
@@ -108,6 +121,8 @@ end
 local function expect_event_probe()
   expect_capped_base()
   expect("new-force", 4, true, false)
+  expect("merge-destination", 4, false, true)
+  expect("merge-reuse", 4, true, false)
 end
 
 local function expect_removed()
@@ -120,6 +135,8 @@ local function expect_removed()
   -- data-stage presentation value during the next prototype transition; MIR
   -- must leave that unowned value alone while preserving enablement.
   expect("new-force", 4, true, true)
+  expect("merge-destination", 4, true, false)
+  expect("merge-reuse", 4, true, true)
 end
 
 local function save_successor(phase, observation_stage, name)
@@ -150,6 +167,36 @@ local function advance_seed_to_capped()
   event_force.reset_technology_effects()
 
   state.force_names[#state.force_names + 1] = "new-force"
+
+  local merge_destination = game.create_force("merge-destination")
+  local merge_source = game.create_force("merge-source")
+  configure_force(merge_destination, 4, true, false)
+  configure_force(merge_source, 4, true, false)
+  merge_destination.reset_technology_effects()
+  merge_source.reset_technology_effects()
+  expect("merge-destination", 4, false, true)
+  expect("merge-source", 4, false, true)
+  state.merge_source_was_capped = true
+  state.merge_source_index = merge_source.index
+  state.merge_destination_index = merge_destination.index
+
+  -- Re-open only the destination immediately before the merge. The
+  -- synchronous on_forces_merged handler must cap that destination again,
+  -- while clearing every bucket still keyed by the removed source index.
+  configure_force(merge_destination, 4, true, false)
+  game.merge_forces(merge_source, merge_destination)
+  if game.forces["merge-source"] then fail("merged source force still exists") end
+  expect("merge-destination", 4, false, true)
+
+  local reused_force = game.create_force("merge-reuse")
+  state.reused_force_index = reused_force.index
+  state.source_index_reused = reused_force.index == state.merge_source_index
+  if not state.source_index_reused then
+    fail("exact Factorio force index was not reused after merge")
+  end
+  configure_force(reused_force, 4, true, false)
+  state.force_names[#state.force_names + 1] = "merge-destination"
+  state.force_names[#state.force_names + 1] = "merge-reuse"
   expect_event_probe()
   save_successor("capped", "event-probe", "mir42-cap-ownership-multiforce-capped")
 end
@@ -192,6 +239,11 @@ script.on_init(function()
   storage[storage_key] = {
     phase = "seed",
     configuration_changed_events = 0,
+    merge_source_index = 0,
+    merge_destination_index = 0,
+    reused_force_index = 0,
+    merge_source_was_capped = false,
+    source_index_reused = false,
     force_names = names
   }
   expect_seed()

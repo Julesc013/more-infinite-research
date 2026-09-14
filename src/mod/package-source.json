@@ -6838,10 +6838,10 @@
       "semantic_class": "target-overlay",
       "source_path": "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua",
       "transform": "copy-exact-bytes",
-      "source_bytes": 17174,
-      "source_sha256": "A2B5DDD0CD850F89796C799D7121B3BCF1CB9C80229BB75754E296E973DFD687",
-      "output_bytes": 17174,
-      "output_sha256": "A2B5DDD0CD850F89796C799D7121B3BCF1CB9C80229BB75754E296E973DFD687"
+      "source_bytes": 18489,
+      "source_sha256": "3260552C1A4CF0D10BCD0B90F161ED6CCA2896EE130A49F65FD3B962DFC7B036",
+      "output_bytes": 18489,
+      "output_sha256": "3260552C1A4CF0D10BCD0B90F161ED6CCA2896EE130A49F65FD3B962DFC7B036"
     },
     {
       "layer": "families.modern",
@@ -6865,5 +6865,5 @@
     "no_target_full_source_copy": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "7AA657CC71CED1D903AAAF776A17E09F2A4E1C630D0254D6FE2B768C3D5C4C39"
+  "record_sha256": "C271C820006A3F811EB4AA141A1237413BC579C0B955D62D2A061F7F15F7ECE5"
 }

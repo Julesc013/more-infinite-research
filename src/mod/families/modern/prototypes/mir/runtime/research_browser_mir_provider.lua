@@ -193,42 +193,66 @@ function M.next_level_has_effective_benefit(technology, selected_cap, recipes)
   return false
 end
 
-local function policy_caps(artifact)
+local INFINITE_RUNTIME_MAX_LEVEL = 4294967295
+local MAXIMUM_LEVEL_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
+
+local function prototype_is_runtime_infinite(technology_id, prototype_table)
+  local technologies = prototype_table
+    or (prototypes and prototypes.technology)
+  local technology = technologies and technologies[technology_id]
+  local maximum = technology and technology.max_level or nil
+  return maximum == "infinite"
+    or (type(maximum) == "number" and maximum >= INFINITE_RUNTIME_MAX_LEVEL)
+end
+
+local function policy_caps(artifact, prototype_table)
   artifact = artifact or mod_data("more-infinite-research-maximum-level-policy")
   if type(artifact) ~= "table" or not dense_array(artifact.bindings) then
     return {}
   end
   local values, counts = {}, {}
   if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
-    if artifact.finalizer_status ~= "accepted" then return {} end
+    if artifact.finalizer_status ~= "accepted"
+        or artifact.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER
+        or not bounded_string(artifact.artifact_fingerprint) then return {} end
     for _, binding in ipairs(artifact.bindings) do
-      if type(binding) == "table" and type(binding.technology_id) == "string" then
+      if type(binding) == "table" and binding.schema == 3
+          and binding.record_type == "MaximumLevelBinding"
+          and bounded_string(binding.technology_id) then
         local technology_id = binding.technology_id
         counts[technology_id] = (counts[technology_id] or 0) + 1
         local setting = binding.setting
         local cap = binding.cap
         local diagnostics = binding.diagnostics
         local finalizer = binding.finalizer_observation
-        if type(setting) == "table" and type(setting.name) == "string" and setting.name ~= ""
+        local prototype_strategy = binding.prototype_strategy
+        local strategy = binding.runtime_strategy
+        local requirements = binding.target_requirements
+        if bounded_string(binding.binding_fingerprint)
+          and type(setting) == "table" and bounded_string(setting.name)
           and type(cap) == "table" and finite_positive_integer(cap.effective)
           and type(diagnostics) == "table" and diagnostics.status == "accepted"
-          and type(finalizer) == "table" and finalizer.status == "accepted" then
+          and type(prototype_strategy) == "table"
+          and prototype_strategy.mode == "lossless-infinite-prototype"
+          and prototype_strategy.max_level == "infinite"
+          and type(strategy) == "table" and strategy.mode == "absolute-cap-controller"
+          and type(requirements) == "table"
+          and requirements.scripted_techs == true
+          and requirements.scripted_techs_supported == true
+          and requirements.mod_data_transport_supported == true
+          and requirements.finalizer_adapter == MAXIMUM_LEVEL_FINALIZER_ADAPTER
+          and type(finalizer) == "table" and finalizer.status == "accepted"
+          and finalizer.adapter == MAXIMUM_LEVEL_FINALIZER_ADAPTER
+          and finalizer.observed_prototype_max_level == "infinite"
+          and prototype_is_runtime_infinite(technology_id, prototype_table) then
           values[technology_id] = {selected = cap.effective, setting = setting.name}
         end
       end
     end
   elseif artifact.schema == 2 and artifact.kind == "MIRMaximumLevelPolicyV2" then
-    -- Read-only migration input for saves whose existing package transported
-    -- V2. V3 policy failures must not fall through to this permissive shape.
-    for _, binding in ipairs(artifact.bindings) do
-      if type(binding) == "table" and type(binding.technology) == "string" then
-        counts[binding.technology] = (counts[binding.technology] or 0) + 1
-        if finite_positive_integer(binding.selected)
-          and type(binding.setting) == "string" and binding.setting ~= "" then
-          values[binding.technology] = {selected = binding.selected, setting = binding.setting}
-        end
-      end
-    end
+    -- The V3 runtime controller deliberately cannot enforce a V2 transport,
+    -- so the browser must not advertise those legacy caps as effective.
+    return {}
   else
     return {}
   end
@@ -238,8 +262,8 @@ local function policy_caps(artifact)
   return values
 end
 
-function M.policy_caps_for_test(artifact)
-  return policy_caps(artifact)
+function M.policy_caps_for_test(artifact, prototype_table)
+  return policy_caps(artifact, prototype_table)
 end
 
 local function valid_public_row(row)
