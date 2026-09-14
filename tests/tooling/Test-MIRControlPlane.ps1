@@ -170,6 +170,32 @@ foreach ($requiredPublicationNode in @("tag", "publication", "public-byte-verifi
 }
 $registry = Update-MIRCPExecutionRegistry -Target "2.1" -RepoRoot $repo -Check
 $registryResult = Assert-MIRCPExecutionRegistry -Registry $registry -RepoRoot $repo
+$historicalBundleIdentity = Get-MIRCPV4HistoricalBundleIdentity -Path (Join-Path $repo '.mir/evidence/3.2.2-local-automated-qualification.json')
+if ([string]$historicalBundleIdentity.source_sha256 -cne 'AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF' -or
+    [string]$historicalBundleIdentity.working_tree_sha256 -notin @('AB79AB1450287C67361B6F17D1B90B0ED95A913D411DEC714B406304CEBA16DF','0AF6F8B82C24EB76D6C4BE9856E4D38AA377B07B86971D7680BAAA24CAEAD23A')) {
+  throw 'Historical v4 replay did not bind the exact original CRLF receipt bytes or their exact tracked-LF reconstruction.'
+}
+$historicalRepresentationRoot=Join-Path $repo ('build/results/control-plane-historical-representation/'+[guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $historicalRepresentationRoot -Force|Out-Null
+try {
+  $portableText=$historicalBundleIdentity.json_text.Replace("`r`n","`n").Replace("`r","`n")
+  $lfPath=Join-Path $historicalRepresentationRoot 'tracked-lf.json'
+  $crlfPath=Join-Path $historicalRepresentationRoot 'original-crlf.json'
+  $tamperedPath=Join-Path $historicalRepresentationRoot 'tampered.json'
+  [IO.File]::WriteAllBytes($lfPath,[Text.Encoding]::UTF8.GetBytes($portableText))
+  [IO.File]::WriteAllBytes($crlfPath,[Text.Encoding]::UTF8.GetBytes($portableText.Replace("`n","`r`n")))
+  [IO.File]::WriteAllBytes($tamperedPath,[Text.Encoding]::UTF8.GetBytes($portableText+' '))
+  $lfIdentity=Get-MIRCPV4HistoricalBundleIdentity -Path $lfPath
+  $crlfIdentity=Get-MIRCPV4HistoricalBundleIdentity -Path $crlfPath
+  if([string]$lfIdentity.source_sha256-cne[string]$crlfIdentity.source_sha256-or
+     [string]$lfIdentity.representation-cne'tracked-lf-reconstructs-original-crlf-v1'-or
+     [string]$crlfIdentity.representation-cne'original-crlf-v1'){throw 'Historical v4 original-byte reconstruction differs across exact checkout representations.'}
+  $tamperRejected=$false
+  try{$null=Get-MIRCPV4HistoricalBundleIdentity -Path $tamperedPath}catch{if($_.Exception.Message.StartsWith('[mircp-v4-historical-bundle-identity]',[StringComparison]::Ordinal)){$tamperRejected=$true}else{throw}}
+  if(-not$tamperRejected){throw 'Historical v4 original-byte reconstruction accepted altered content.'}
+} finally {
+  if(Test-Path -LiteralPath $historicalRepresentationRoot){[IO.Directory]::Delete($historicalRepresentationRoot,$true)}
+}
 $replay = Update-MIRCPV4ReplayReport -RepoRoot $repo -Check
 if ([string]$replay.verdict -ne "passed" -or [int]$replay.metrics.source_evidence -ne 130) { throw "Historical v4 evidence replay is incomplete." }
 $shadowContract = Assert-MIRCPShadowContract -RepoRoot $repo
