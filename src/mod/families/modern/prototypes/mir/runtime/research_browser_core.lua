@@ -235,7 +235,7 @@ end
 local function positive_cap(enrichment, key)
   local caps = enrichment and enrichment.caps
   local cap = caps and caps[key]
-  return type(cap) == "number" and cap > 0 and cap or nil
+  return finite_positive_integer(cap) and cap or nil
 end
 
 local function family_for(enrichment, key)

@@ -109,6 +109,10 @@ $publicationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod
 $presentationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua")
 $modDataSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/emit/mod_data.lua")
 $runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua")
+$browserProviderSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua")
+$f210DispatcherSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua")
+$f200DispatcherSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua")
+$compilerContractSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures/assert-compiler-contracts/data-final-fixes.lua")
 $repairSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua")
 foreach ($token in @("MIRMaximumLevelPolicyV3", "exact-technology", "exact-native-owner", "exact-stream", "ecosystem-profile", "factorio-data-final-fixes-v1")) {
   if ($bindingSource -notmatch [regex]::Escape($token)) {
@@ -129,11 +133,26 @@ if ($constructionSource -notmatch "maximum_level_binding.from_plan" -or
     $runtimeSource -notmatch "maximum_level_legacy_transport_read_only" -or
     $runtimeSource -notmatch "maximum_level_policy_finalizer_adapter_invalid" -or
     $runtimeSource -notmatch "maximum_level_binding_fingerprint_missing" -or
+    $runtimeSource -notmatch "maximum_level_binding_fingerprint_invalid" -or
+    $runtimeSource -notmatch "maximum_level_policy_fingerprint_invalid" -or
+    $runtimeSource -notmatch "finite_number" -or
+    $runtimeSource -notmatch "settings-derived-v3" -or
+    $runtimeSource -notmatch 'policy[.]policy_transport ~= "transported-v3"' -or
     $runtimeSource -notmatch "maximum_level_target_requirements_mismatch" -or
     $runtimeSource -notmatch "MAXIMUM_LEVEL_FINALIZER_ADAPTER" -or
     $runtimeSource -notmatch "local prior_policy = prior_managed and prior_managed\[technology_name\] or nil" -or
     $runtimeSource -notmatch "local cap = current_policy and caps\[technology_name\] or nil" -or
     $runtimeSource -notmatch "clear_force_index\(event and event\.source_index\)" -or
+    $runtimeSource -notmatch "function M\.on_force_reset\(event\)" -or
+    $runtimeSource -notmatch "clear_force_state\(force\)" -or
+    $browserProviderSource -notmatch "fingerprint_matches" -or
+    $browserProviderSource -notmatch "finite_positive_integer\(cap\.effective\)" -or
+    $f210DispatcherSource -notmatch "defines\.events\.on_force_reset" -or
+    $f200DispatcherSource -notmatch "defines\.events\.on_force_reset" -or
+    $compilerContractSource -notmatch "positive infinity" -or
+    $compilerContractSource -notmatch "negative infinity" -or
+    $compilerContractSource -notmatch "NaN" -or
+    $compilerContractSource -notmatch "fractional" -or
     $runtimeSource -match "function M\.on_research_finished\(\) normalize_all\(\) end" -or
     $repairSource -notmatch 'corrundum' -or $repairSource -notmatch '1\.0\.47') {
   throw "SOL-03 runtime transport or exact Corrundum repair wiring is missing."

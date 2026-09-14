@@ -6,8 +6,12 @@ local M = {}
 
 local function finite_maximum(value)
   local maximum = tonumber(value)
-  if not maximum or maximum <= 0 then return nil end
-  return math.floor(maximum)
+  if type(maximum) ~= "number" or maximum ~= maximum
+      or maximum == math.huge or maximum == -math.huge
+      or maximum <= 0 or maximum ~= math.floor(maximum) then
+    return nil
+  end
+  return maximum
 end
 
 local function technology_name(technology)

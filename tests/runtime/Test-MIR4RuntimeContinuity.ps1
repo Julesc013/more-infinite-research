@@ -21,7 +21,7 @@ $continuity=New-MIR4ContinuityBundle -RepoRoot $repo -Providers $providers -Sour
 
 Assert-MIR4RuntimeContinuityV1 ($providers.Count-eq17-and@($runtime.targets).Count-eq17-and@($continuity.targets).Count-eq17) 'mir4-runtime-continuity-target-count'
 Assert-MIR4RuntimeContinuityV1 ([string]$runtime.digest-ceq[string]$runtimeReverse.digest-and[string]$migration.digest-ceq[string]$migrationReverse.digest) 'mir4-runtime-continuity-order-parity'
-Assert-MIR4RuntimeContinuityV1 (@($runtime.runtime_feature_specs).Count-eq7-and@($runtime.state_specs).Count-eq5-and@($runtime.registration_plan.groups).Count-eq9-and@($migration.edges).Count-eq10) 'mir4-runtime-continuity-contract-counts'
+Assert-MIR4RuntimeContinuityV1 (@($runtime.runtime_feature_specs).Count-eq7-and@($runtime.state_specs).Count-eq5-and@($runtime.registration_plan.groups).Count-eq10-and@($migration.edges).Count-eq10) 'mir4-runtime-continuity-contract-counts'
 Assert-MIR4RuntimeContinuityV1 ([bool]$runtime.registration_plan.law_results.all_passed-and[bool]$migration.law_results.all_passed) 'mir4-runtime-continuity-laws'
 Assert-MIR4RuntimeContinuityV1 (-not[bool]$runtime.package_visible-and-not[bool]$migration.package_visible-and-not[bool]$continuity.package_visible-and-not[bool]$runtime.runtime_mutation_authorized-and-not[bool]$migration.migration_execution_authorized-and-not[bool]$continuity.runtime_mutation_authorized) 'mir4-runtime-continuity-authority-firewall'
 Assert-MIR4RuntimeContinuityV1 (-not[bool]$runtime.public_release_proof-and-not[bool]$migration.public_release_proof-and-not[bool]$continuity.public_release_proof) 'mir4-runtime-continuity-public-proof-firewall'
@@ -43,7 +43,7 @@ $record=[ordered]@{
   public_release_proof=[bool]$runtime.public_release_proof-or[bool]$migration.public_release_proof-or[bool]$continuity.public_release_proof
 }
 $parity=Get-MIR4CanonicalDigestV1 -Value $record -Domain 'mir4:runtime-continuity-functional-parity:1'
-Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:5913a0d3fa7746af872bbdaa67e7f3b45bdfc82391522922f25fcc14028b45df') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
+Assert-MIR4RuntimeContinuityV1 ([string]$parity-ceq'sha256:f4ae23c776f829837ef90fa3238e0ac5f1878628abcba4e9b123331fc3c3fc43') 'mir4-runtime-continuity-functional-parity' ([string]$parity)
 
 $tampered=$runtime.registration_plan|ConvertTo-Json -Depth 100|ConvertFrom-Json
 $tampered.groups=@($tampered.groups)+@($tampered.groups[0])

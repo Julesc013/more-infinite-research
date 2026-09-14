@@ -1661,12 +1661,14 @@ fixtures:
       mod_lock: exact-engine-2.1.17-official-expansions-only
     validates:
       - canonical-schema-3-copper-binding-and-transport
-      - strict-runtime-and-browser-refusal-of-unknown-policy-finalizer-adapter
+      - strict-runtime-and-browser-refusal-of-late-forged-schema-3-policy-identities
       - MIR-owned-enable-and-visibility-restoration-after-cap-removal
       - foreign-disabled-state-preservation-through-cap-and-removal
-      - force-created-and-technology-reset-event-isolation
+      - native-queue-preservation-when-no-external-queue-owner-is-present
+      - force-created-and-technology-effects-reset-event-isolation
+      - LuaForce-reset-clears-only-reset-force-stale-ownership-before-current-cap-reconciliation
       - positive-distinct-and-stable-named-force-identities
-      - exact-late-finalizer-conflict-refusal-without-runtime-mutation
+      - exact-late-policy-forgery-refusal-without-runtime-browser-queue-or-force-mutation
       - serialized-removal-to-terminal-reload-semantic-equivalence
     non_claims:
       - predecessor-upgrade-or-general-save-migration
@@ -1675,7 +1677,32 @@ fixtures:
       - browser-or-profile-user-interface-qualification
       - all-stream-or-all-ecosystem-cap-qualification
       - external-late-mutator-compatibility-or-endorsement
+      - external-queue-manager-interoperability-or-second-queue-owner
+      - unobservable-same-value-foreign-write-detection
+      - CAP-FOREIGN-DISABLE
       - performance-or-memory-envelope-qualification
+      - release-readiness-or-publication-authorization
+
+  maximum-level-settings-derived-cap-transition-f200:
+    requires_features: [recipe_productivity, scripted_techs]
+    path: fixtures/assert-mir42-f200-settings-cap-transition
+    harness: tests/runtime/Test-MIR42F200SettingsCapTransition.ps1
+    exact_target:
+      factorio_line: "2.0"
+      factorio_version: "2.0.77"
+      mod_lock: exact-engine-2.0.77-base-only
+    validates:
+      - F200-no-mod-data-policy-transport-uses-settings-derived-V3-controller-records
+      - F200-finite-cap-three-disables-MIR-owned-and-preserves-foreign-disabled-enablement
+      - F200-cap-zero-restores-only-settings-derived-V3-MIR-owned-enablement-and-visibility
+      - F200-settings-derived-V3-is-distinct-from-read-only-V2-transport-migration
+    non_claims:
+      - F200-V2-to-V3-transported-ownership-migration-qualification
+      - external-queue-manager-interoperability-or-second-queue-owner
+      - unobservable-same-value-foreign-write-detection
+      - CAP-FOREIGN-DISABLE
+      - multiplayer-gameplay-or-human-playtest
+      - all-stream-or-ecosystem-coverage
       - release-readiness-or-publication-authorization
 
   maximum-level-v2-v3-migration-f210:
@@ -1696,10 +1723,10 @@ fixtures:
       - cap-zero-restores-only-V2-or-V3-MIR-owned-enablement-and-visibility
       - completed-levels-current-research-queue-and-fractional-progress-survive-upgrade-and-reload
     f200_disposition:
-      status: excluded-current-target-lacks-v3-mod-data-transport
+      status: settings-derived-V3-transition-qualified-no-transported-V2-migration
       factorio_version: "2.0.77"
-      reason: F200 declares prototype_shapes.mod_data=false, while V3 ownership migration requires an accepted transported V3 binding; settings fallback is legacy/read-only.
-      reconsider_when: F200-specific accepted-V3 binding transport or equivalent persisted ownership proof is implemented and exact-engine qualified.
+      reason: F200 declares prototype_shapes.mod_data=false. Its new settings-derived V3 controller records current MIR ownership and is separately exact-engine qualified through finite cap to zero; only authentic transported V2 ownership migration remains unclaimed.
+      reconsider_when: F200-specific accepted V3 transport plus an authentic persisted V2 predecessor case is implemented and exact-engine qualified.
     non_claims:
       - F200-v2-to-v3-ownership-migration-qualification
       - general-save-migration-or-all-predecessor-coverage

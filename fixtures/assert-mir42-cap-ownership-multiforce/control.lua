@@ -85,6 +85,7 @@ end
 local function state_json(stage)
   local state = storage[storage_key]
   local rows = {}
+  local event_queue = {}
   for _, name in ipairs(state.force_names) do
     local row = force_state(name)
     rows[#rows + 1] = "{\"name\":" .. quote(row.name)
@@ -93,17 +94,22 @@ local function state_json(stage)
       .. ",\"enabled\":" .. bool(row.enabled)
       .. ",\"visible_when_disabled\":" .. bool(row.visible_when_disabled) .. "}"
   end
+  for _, technology in ipairs((game.forces["event-probe"] and game.forces["event-probe"].research_queue) or {}) do
+    event_queue[#event_queue + 1] = quote(technology.name)
+  end
   return "{\"stage\":" .. quote(stage)
     .. ",\"cap\":" .. tostring(selected_cap())
     .. ",\"browser_cap\":" .. tostring(browser_cap())
     .. ",\"blocker\":" .. bool(blocker_active())
     .. ",\"policy_blocker\":" .. bool(policy_blocker_active())
     .. ",\"configuration_changed_events\":" .. tostring(state.configuration_changed_events)
+    .. ",\"force_reset_events\":" .. tostring(state.force_reset_events)
     .. ",\"merge_source_index\":" .. tostring(state.merge_source_index or 0)
     .. ",\"merge_destination_index\":" .. tostring(state.merge_destination_index or 0)
     .. ",\"reused_force_index\":" .. tostring(state.reused_force_index or 0)
     .. ",\"merge_source_was_capped\":" .. bool(state.merge_source_was_capped)
     .. ",\"source_index_reused\":" .. bool(state.source_index_reused)
+    .. ",\"event_probe_queue\":[" .. table.concat(event_queue, ",") .. "]"
     .. ",\"forces\":[" .. table.concat(rows, ",") .. "]}"
 end
 
@@ -128,6 +134,7 @@ local function expect_seed()
   expect("foreign-disabled", 4, false, false)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, true, false)
+  expect("reset-probe", 4, true, false)
 end
 
 local function expect_capped_base()
@@ -135,6 +142,7 @@ local function expect_capped_base()
   expect("foreign-disabled", 4, false, true)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, false, true)
+  expect("reset-probe", 4, false, true)
 end
 
 local function expect_event_probe()
@@ -142,6 +150,10 @@ local function expect_event_probe()
   expect("new-force", 4, true, false)
   expect("merge-destination", 4, false, true)
   expect("merge-reuse", 4, true, false)
+  local queue = game.forces["event-probe"].research_queue or {}
+  if #queue ~= 1 or queue[1].name ~= "automation" then
+    fail("event-probe native queue changed outside MIR-owned copper normalization")
+  end
 end
 
 local function expect_removed()
@@ -149,6 +161,10 @@ local function expect_removed()
   expect("foreign-disabled", 4, false, false)
   expect("below-cap", 2, true, false)
   expect("event-probe", 4, true, false)
+  -- LuaForce.reset invalidates the old ownership record. The post-reset
+  -- foreign presentation must not be changed back to the pre-reset baseline
+  -- when the cap is later removed.
+  expect("reset-probe", 4, false, true)
   -- This force was deliberately changed after its synchronous creation event,
   -- so MIR owns no restoration record for it. Factorio reapplies the prior
   -- data-stage presentation value during the next prototype transition; MIR
@@ -184,6 +200,22 @@ local function advance_seed_to_capped()
     fail("event-probe does not expose reset_technology_effects")
   end
   event_force.reset_technology_effects()
+
+  local reset_force = game.forces["reset-probe"]
+  if not reset_force.reset then fail("reset-probe does not expose LuaForce.reset") end
+  reset_force.reset()
+  -- This is a deliberate post-reset foreign state. The controller must have
+  -- cleared the old record before reconciling this force, so cap removal
+  -- cannot restore the pre-reset enabled/hidden state.
+  configure_force(reset_force, 4, false, true)
+  expect("reset-probe", 4, false, true)
+
+  local automation = event_force.technologies["automation"]
+  if not automation then fail("event-probe automation technology is absent") end
+  event_force.research_queue = {automation}
+  if event_force.research_queue[1] and event_force.research_queue[1].name == technology_name then
+    fail("event-probe queue unexpectedly contains the cap-managed Copper technology")
+  end
 
   state.force_names[#state.force_names + 1] = "new-force"
 
@@ -270,7 +302,7 @@ script.on_init(function()
   if selected_cap() ~= 0 or any_blocker_active() then
     fail("Seed requires an infinite cap and no late blocker")
   end
-  local names = {"owned", "foreign-disabled", "below-cap", "event-probe"}
+  local names = {"owned", "foreign-disabled", "below-cap", "event-probe", "reset-probe"}
   for _, name in ipairs(names) do
     if game.forces[name] then fail("seed force already exists " .. name) end
     game.create_force(name)
@@ -279,9 +311,11 @@ script.on_init(function()
   configure_force(game.forces["foreign-disabled"], 4, false, false)
   configure_force(game.forces["below-cap"], 2, true, false)
   configure_force(game.forces["event-probe"], 4, true, false)
+  configure_force(game.forces["reset-probe"], 4, true, false)
   storage[storage_key] = {
     phase = "seed",
     configuration_changed_events = 0,
+    force_reset_events = 0,
     merge_source_index = 0,
     merge_destination_index = 0,
     reused_force_index = 0,
@@ -303,6 +337,13 @@ script.on_configuration_changed(function()
     .. " cap=" .. tostring(selected_cap())
     .. " blocker=" .. bool(blocker_active())
     .. " policy-blocker=" .. bool(policy_blocker_active()))
+end)
+
+script.on_event(defines.events.on_force_reset, function(event)
+  local state = storage[storage_key]
+  if state and event and event.force and event.force.name == "reset-probe" then
+    state.force_reset_events = state.force_reset_events + 1
+  end
 end)
 
 script.on_load(function()

@@ -1,7 +1,6 @@
 local technology_name = "recipe-prod-research_copper-1"
 local policy_name = "more-infinite-research-maximum-level-policy"
 local expected_adapter = "factorio-data-final-fixes-v1"
-local replacement_adapter = "fixture-unknown-finalizer-v1"
 
 local function fail(message)
   error("[late-mir42-policy-binding-blocker] " .. message)
@@ -41,7 +40,8 @@ if not technology or technology.max_level ~= "infinite" then
   fail("requires the infinite Copper prototype to remain unchanged")
 end
 
-policy.finalizer_adapter = replacement_adapter
+-- This is a late V3 forgery after the compiler has bound both identities.
+-- Keep both fingerprint strings nonempty, but do not recompute either one.
+binding.cap.effective = 4
 log("[late-mir42-policy-binding-blocker] DATA technology=" .. technology_name
-  .. " prototype=infinite policy-adapter-pre=" .. expected_adapter
-  .. " policy-adapter-post=" .. replacement_adapter)
+  .. " prototype=infinite cap-pre=3 cap-post=4 artifact-identity=stale")

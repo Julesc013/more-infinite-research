@@ -15,11 +15,23 @@ local PRECEDENCE = {
   global = 6
 }
 
+local function finite_number(value)
+  return type(value) == "number" and value == value
+    and value ~= math.huge and value ~= -math.huge
+end
+
+local function finite_nonnegative_integer(value)
+  return finite_number(value) and value >= 0 and value == math.floor(value)
+end
+
 local function effective_cap(value)
   if value == "infinite" then return "infinite" end
   local number = tonumber(value)
-  if not number or number <= 0 then return "infinite" end
-  return math.floor(number)
+  if not finite_nonnegative_integer(number) then
+    error("MaximumLevelBinding cap must be infinite or a finite non-negative integer.", 3)
+  end
+  if number == 0 then return "infinite" end
+  return number
 end
 
 local function finite_cap(value)

@@ -7,6 +7,7 @@ local extra_field_name = "mir-browser-extra-field-row-regression"
 local core = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_core")
 local catalogue_adapter = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_factorio_catalogue")
 local provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
+local fingerprint = require("__more-infinite-research__/prototypes/mir/core/fingerprint")
 
 local function fail(message) error("[mir-bob-tin-browser-explanation] " .. message) end
 local function check(value, message) if not value then fail(message) end end
@@ -211,13 +212,25 @@ local function assert_fake_and_limit_negatives(catalogue)
   saturated.details[technology_name].recipe_benefits[1].current_productivity_bonus = 1
   rejects(saturated, "saturated recipe benefit=true detail was accepted")
 
+  local function identified(record, field)
+    local material = {}
+    for key, value in pairs(record) do material[key] = value end
+    material[field] = nil
+    record[field] = fingerprint.of(material)
+    return record
+  end
+
+  local function identify_policy(policy)
+    for _, binding in ipairs(policy.bindings) do identified(binding, "binding_fingerprint") end
+    return identified(policy, "artifact_fingerprint")
+  end
+
   local function accepted_v3_policy()
-    return {
+    return identify_policy({
       schema = 3,
       kind = "MIRMaximumLevelPolicyV3",
       finalizer_adapter = "factorio-data-final-fixes-v1",
       finalizer_status = "accepted",
-      artifact_fingerprint = "fixture-artifact-fingerprint",
       bindings = {{
         schema = 3,
         record_type = "MaximumLevelBinding",
@@ -237,10 +250,9 @@ local function assert_fake_and_limit_negatives(catalogue)
           adapter = "factorio-data-final-fixes-v1",
           status = "accepted",
           observed_prototype_max_level = "infinite"
-        },
-        binding_fingerprint = "fixture-binding-fingerprint"
+        }
       }}
-    }
+    })
   end
 
   local v3_policy = provider.policy_caps_for_test(accepted_v3_policy())
@@ -269,6 +281,29 @@ local function assert_fake_and_limit_negatives(catalogue)
   incomplete_artifact.artifact_fingerprint = nil
   check(next(provider.policy_caps_for_test(incomplete_artifact)) == nil,
     "V3 artifact without a fingerprint was advertised as an effective browser cap")
+
+  local late_binding_forgery = accepted_v3_policy()
+  late_binding_forgery.bindings[1].cap.effective = 4
+  check(next(provider.policy_caps_for_test(late_binding_forgery)) == nil,
+    "late binding forgery with stale identity was advertised as an effective browser cap")
+
+  local late_artifact_forgery = accepted_v3_policy()
+  late_artifact_forgery.finalizer_status = "forged-after-finalizer"
+  check(next(provider.policy_caps_for_test(late_artifact_forgery)) == nil,
+    "late artifact forgery with stale identity was advertised as an effective browser cap")
+
+  for _, case in ipairs({
+    {name = "positive infinity", value = math.huge},
+    {name = "negative infinity", value = -math.huge},
+    {name = "NaN", value = 0 / 0},
+    {name = "fractional", value = 3.5}
+  }) do
+    local invalid_cap_policy = accepted_v3_policy()
+    invalid_cap_policy.bindings[1].cap.effective = case.value
+    identify_policy(invalid_cap_policy)
+    check(next(provider.policy_caps_for_test(invalid_cap_policy)) == nil,
+      case.name .. " V3 effective cap was advertised as an enforceable browser cap")
+  end
 
   local legacy_policy = provider.policy_caps_for_test({
     schema = 2,

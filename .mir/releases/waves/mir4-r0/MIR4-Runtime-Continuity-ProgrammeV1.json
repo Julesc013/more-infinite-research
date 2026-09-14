@@ -30,12 +30,12 @@
     {
       "id": "runtime.scripted-dispatcher",
       "version": 1,
-      "source": "prototypes/mir/runtime/scripted_techs.lua",
+      "source": "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",
       "handlers": ["register"],
       "target_requirements": ["scripted_techs"],
       "state_ids": ["state.scripted-techs"],
       "determinism": "declared-group-and-ordinal-order",
-      "complexity_budget": {"event_groups": 9, "idle_tick": 0, "diagnostics_per_dispatch": 32},
+      "complexity_budget": {"event_groups": 10, "idle_tick": 0, "diagnostics_per_dispatch": 32},
       "migration_refs": ["migration.same-target", "migration.skipped-patch"],
       "disable_or_removal": "dispatcher-not-registered-when-target-feature-disabled"
     },
@@ -78,14 +78,14 @@
     {
       "id": "runtime.maximum-level-control",
       "version": 1,
-      "source": "prototypes/mir/runtime/maximum_level_control.lua",
-      "handlers": ["on_init", "on_configuration_changed", "on_research_finished", "on_research_reversed", "on_research_queued", "on_technology_effects_reset", "on_force_created", "on_forces_merged"],
+      "source": "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+      "handlers": ["on_init", "on_configuration_changed", "on_research_finished", "on_research_reversed", "on_research_queued", "on_technology_effects_reset", "on_force_created", "on_force_reset", "on_forces_merged"],
       "target_requirements": ["scripted_techs"],
       "state_ids": ["state.maximum-level-control"],
-      "determinism": "policy-binding-and-force-index-stable-normalization",
+      "determinism": "policy-binding-force-index-stable-normalization-and-force-reset-reconciliation",
       "complexity_budget": {"force_scan": "O(forces*(managed+queue))", "idle_tick": 0, "diagnostics_per_dispatch": 64},
       "migration_refs": ["migration.same-target", "migration.profile-schema"],
-      "disable_or_removal": "restore-only-properties-owned-by-this-feature"
+      "disable_or_removal": "restore-only-properties-owned-by-this-feature; force-reset-clears-only-that-force-stale-ownership-before-current-cap-reconciliation"
     },
     {
       "id": "runtime.planet-discovery-recovery",
@@ -177,7 +177,7 @@
       ],
       "aliases": [],
       "tombstones": [],
-      "ownership_transfer": "restore-only-properties-recorded-as-owned"
+      "ownership_transfer": "restore-only-properties-recorded-as-owned; force-reset-invalidates-only-that-force-prior-ownership-records"
     }
   ],
   "registration_groups": [
@@ -188,6 +188,7 @@
     {"id":"event.research-queued","registration":"defines.events.on_research_queued","filter":"valid-research-then-technology-name","subscribers":["runtime.maximum-level-control:on_research_queued"]},
     {"id":"event.technology-effects-reset","registration":"defines.events.on_technology_effects_reset","filter":"event-available","subscribers":["runtime.spoilage-preservation:on_technology_effects_reset","runtime.agricultural-growth-speed:on_technology_effects_reset","runtime.maximum-level-control:on_technology_effects_reset"]},
     {"id":"event.force-created","registration":"defines.events.on_force_created","filter":"event-available","subscribers":["runtime.maximum-level-control:on_force_created"]},
+    {"id":"event.force-reset","registration":"defines.events.on_force_reset","filter":"event-available","subscribers":["runtime.maximum-level-control:on_force_reset"]},
     {"id":"event.forces-merged","registration":"defines.events.on_forces_merged","filter":"event-available","subscribers":["runtime.maximum-level-control:on_forces_merged"]},
     {"id":"event.tower-planted-seed","registration":"defines.events.on_tower_planted_seed","filter":"valid-plant-before-dispatch","subscribers":["runtime.agricultural-growth-speed:on_tower_planted_seed"]}
   ],

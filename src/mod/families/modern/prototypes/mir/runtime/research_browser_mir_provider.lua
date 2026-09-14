@@ -4,6 +4,7 @@
 local profile_codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {schema = 2, catalogue_limit = 30000}
 
@@ -43,6 +44,15 @@ local function dense_array(value)
     count = count + 1
   end
   return #value == count
+end
+
+local function fingerprint_matches(record, field)
+  if type(record) ~= "table" or not bounded_string(record[field]) then return false end
+  local material = {}
+  for key, value in pairs(record) do material[key] = value end
+  material[field] = nil
+  local ok, actual = pcall(fingerprint.of, material)
+  return ok and actual == record[field]
 end
 
 local function only_fields(value, allowed)
@@ -214,7 +224,7 @@ local function policy_caps(artifact, prototype_table)
   if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
     if artifact.finalizer_status ~= "accepted"
         or artifact.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER
-        or not bounded_string(artifact.artifact_fingerprint) then return {} end
+        or not fingerprint_matches(artifact, "artifact_fingerprint") then return {} end
     for _, binding in ipairs(artifact.bindings) do
       if type(binding) == "table" and binding.schema == 3
           and binding.record_type == "MaximumLevelBinding"
@@ -228,7 +238,7 @@ local function policy_caps(artifact, prototype_table)
         local prototype_strategy = binding.prototype_strategy
         local strategy = binding.runtime_strategy
         local requirements = binding.target_requirements
-        if bounded_string(binding.binding_fingerprint)
+        if fingerprint_matches(binding, "binding_fingerprint")
           and type(setting) == "table" and bounded_string(setting.name)
           and type(cap) == "table" and finite_positive_integer(cap.effective)
           and type(diagnostics) == "table" and diagnostics.status == "accepted"
@@ -322,7 +332,7 @@ local function detail_for_row(row, recipes, disposition, caps, force)
   local ingredients = science_ingredients(technology.prototype)
   if not effects or not benefits or not ingredients or not same_array(observed_recipes, recipes) then return nil end
   local level = tonumber(technology.level)
-  if not level or level < 1 or level ~= math.floor(level) then return nil end
+  if not finite_positive_integer(level) then return nil end
   return {
     schema = 1,
     family = row.stream_id,

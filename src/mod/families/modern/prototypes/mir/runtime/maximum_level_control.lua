@@ -5,6 +5,7 @@ local runtime_state = require("prototypes.mir.runtime.state")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local stream_registry = require("prototypes.mir.streams.registry")
 local setting_defaults = require("prototypes.mir.settings.defaults")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 3
@@ -25,14 +26,17 @@ local function prototype_is_infinite(value)
     or (type(value) == "number" and value >= INFINITE_RUNTIME_MAX_LEVEL)
 end
 
-local function finite_cap(value)
-  local selected = tonumber(value)
-  if not selected or selected <= 0 then return nil end
-  return math.floor(selected)
+local function finite_number(value)
+  return type(value) == "number" and value == value
+    and value ~= math.huge and value ~= -math.huge
 end
 
 local function finite_positive_integer(value)
-  return type(value) == "number" and value > 0 and value == math.floor(value)
+  return finite_number(value) and value > 0 and value == math.floor(value)
+end
+
+local function finite_cap(value)
+  return finite_positive_integer(value) and value or nil
 end
 
 local function bounded_string(value)
@@ -51,20 +55,35 @@ local function dense_array(value)
   return #value == count
 end
 
+local function fingerprint_matches(record, field)
+  if type(record) ~= "table" or not bounded_string(record[field]) then return false end
+  local material = {}
+  for key, value in pairs(record) do material[key] = value end
+  material[field] = nil
+  local ok, actual = pcall(fingerprint.of, material)
+  return ok and actual == record[field]
+end
+
 local function selected_maximum(setting_name)
   local selected = tonumber(startup_settings.get(setting_name))
-  if not selected or selected <= 0 then return "infinite" end
-  return math.floor(selected)
+  if finite_number(selected) and selected == 0 then return "infinite" end
+  if finite_positive_integer(selected) then return selected end
+  return nil
 end
 
 local function add_runtime_binding(managed, technology_name, setting_name, source, operation)
   if not (prototypes and prototypes.technology and prototypes.technology[technology_name]) then return end
+  local selected = selected_maximum(setting_name)
   managed[technology_name] = {
     source = source,
     operation = operation,
     setting = setting_name,
-    selected = selected_maximum(setting_name),
-    legacy = true
+    selected = selected,
+    policy_transport = "settings-derived-v3",
+    ownership_kind = "settings-derived-v3",
+    blocked_reason = selected == nil
+      and "maximum_level_runtime_setting_invalid" or nil,
+    legacy = false
   }
 end
 
@@ -125,6 +144,8 @@ local function v3_binding_admission_error(binding)
   local unbounded = cap == "infinite"
   if not bounded_string(binding.binding_fingerprint) then
     return "maximum_level_binding_fingerprint_missing"
+  elseif not fingerprint_matches(binding, "binding_fingerprint") then
+    return "maximum_level_binding_fingerprint_invalid"
   elseif type(binding.setting) ~= "table" or not bounded_string(binding.setting.name)
       or (not finite and not unbounded) then
     return "maximum_level_binding_policy_fields_invalid"
@@ -175,6 +196,8 @@ local function normalized_v3_binding(binding, policy_blocked_reason)
     selected = cap.effective or binding.selected,
     blocked_reason = blocked_reason,
     binding_fingerprint = binding.binding_fingerprint,
+    policy_transport = "transported-v3",
+    ownership_kind = "transported-v3",
     legacy = false
   }, binding_error
 end
@@ -191,6 +214,8 @@ local function normalized_v2_binding(binding)
     setting = binding.setting,
     selected = binding.selected,
     blocked_reason = "maximum_level_legacy_transport_read_only",
+    policy_transport = "legacy-v2-read-only",
+    ownership_kind = "legacy-v2-read-only",
     legacy = true
   }
 end
@@ -199,7 +224,13 @@ local function transported_policy()
   local policy_prototype = prototypes and prototypes.mod_data
     and prototypes.mod_data[POLICY_DATA_NAME]
   local artifact = policy_prototype and policy_prototype.data or nil
-  if type(artifact) ~= "table" then return nil, false end
+  if type(artifact) ~= "table" then
+    -- F200 has no mod-data prototype surface, so its V3 controller derives a
+    -- structured policy from settings. A modern target that does expose
+    -- mod-data must not silently downgrade a missing policy into that path.
+    if prototypes and prototypes.mod_data then return {}, true end
+    return nil, false
+  end
 
   local managed = {}
   if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
@@ -210,6 +241,8 @@ local function transported_policy()
       policy_blocked_reason = "maximum_level_policy_finalizer_adapter_invalid"
     elseif not bounded_string(artifact.artifact_fingerprint) then
       policy_blocked_reason = "maximum_level_policy_fingerprint_missing"
+    elseif not fingerprint_matches(artifact, "artifact_fingerprint") then
+      policy_blocked_reason = "maximum_level_policy_fingerprint_invalid"
     elseif not dense_array(artifact.bindings) then
       policy_blocked_reason = "maximum_level_policy_bindings_invalid"
     end
@@ -316,15 +349,23 @@ local function captured_visibility(value, force, policy)
     policy_version = POLICY_VERSION,
     force_index = force.index,
     ownership_key = ownership_key(policy),
+    ownership_kind = policy and policy.ownership_kind or nil,
     value = value
   }
 end
 
 local function owns_visibility(record, force, policy)
-  return type(record) == "table"
-    and record.policy_version == POLICY_VERSION
+  if type(record) ~= "table" then return false end
+  local expected_kind = policy and policy.ownership_kind or nil
+  local kind_matches = record.ownership_kind == expected_kind
+    -- Preserve existing exact F210 V3 records written before the ownership
+    -- discriminator existed. Settings-derived F200 records never use this
+    -- compatibility path, so ambiguous old fallback state remains unowned.
+    or (expected_kind == "transported-v3" and record.ownership_kind == nil)
+  return record.policy_version == POLICY_VERSION
     and record.force_index == force.index
     and record.ownership_key == ownership_key(policy)
+    and kind_matches
 end
 
 local function owns_disable(record, force, policy)
@@ -339,7 +380,8 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
   -- disable it performed and the original visibility boolean. Upgrade those
   -- exact shapes once a V3 policy is accepted, including an immediate cap=0
   -- relaxation. Do not infer ownership from any other legacy shape.
-  if not policy or policy.blocked_reason or policy.legacy == true then return end
+  if not policy or policy.blocked_reason
+      or policy.policy_transport ~= "transported-v3" then return end
   local migrated_visibility = type(visibility_by_cap[technology_name]) == "boolean"
   local migrated_disable = disabled_by_cap[technology_name] == true
   if migrated_visibility then
@@ -353,6 +395,7 @@ local function migrate_legacy_force_state(disabled_by_cap, visibility_by_cap,
       cap = cap,
       binding_fingerprint = policy.binding_fingerprint,
       ownership_key = ownership_key(policy),
+      ownership_kind = policy.ownership_kind,
       enabled_before_cap = true,
       migrated_from_policy_version = 2
     }
@@ -448,6 +491,7 @@ local function normalize_force(force, managed, caps, transport_blocked, prior_ma
             cap = cap,
             binding_fingerprint = policy and policy.binding_fingerprint or nil,
             ownership_key = ownership_key(policy),
+            ownership_kind = policy and policy.ownership_kind or nil,
             enabled_before_cap = true
           }
           technology.enabled = false
@@ -559,6 +603,16 @@ function M.on_research_queued(event) normalize_event_force(event) end
 function M.on_technology_effects_reset(event) normalize_event_force(event) end
 function M.on_force_created(event)
   clear_force_state(event and event.force)
+  normalize_event_force(event)
+end
+
+function M.on_force_reset(event)
+  local force = force_from_event(event)
+  -- LuaForce.reset discards the force's research state. Any ownership record
+  -- captured before that reset is no longer evidence about the reset state;
+  -- clear only this force, then apply the current policy without restoring a
+  -- pre-reset foreign value.
+  clear_force_state(force)
   normalize_event_force(event)
 end
 

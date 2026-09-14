@@ -4602,9 +4602,32 @@
         "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
         "src/mod/families/modern/prototypes/mir/pipeline/mutations/maximum_level_presentation.lua",
         "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua",
+        "src/mod/families/modern/prototypes/mir/runtime/research_browser_mir_provider.lua",
         "src/mod/package-source.json",
         "targets/f210/overlay.json",
         "targets/f200/overlay.json",
+        "targets/f210/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/package-authority.json",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
+      "id": "runtime.maximum-level-settings-derived-cap-transition-f200",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransition.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "fixtures/assert-mir42-f200-settings-cap-transition/**",
+        "src/mod/families/modern/prototypes/mir/runtime/maximum_level_control.lua",
+        "src/mod/package-source.json",
+        "targets/f200/overlay.json",
+        "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
+        "targets/f200/files/prototypes/mir/platform/factorio/target_profiles.lua",
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ]

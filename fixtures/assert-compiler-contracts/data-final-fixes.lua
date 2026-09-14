@@ -208,6 +208,20 @@ end
   if accepted.finalizer_status ~= "accepted" then
     fail("known MaximumLevelBinding finalizer observations were not accepted")
   end
+
+  for _, invalid_cap in ipairs({
+    {name = "positive infinity", value = math.huge},
+    {name = "negative infinity", value = -math.huge},
+    {name = "NaN", value = 0 / 0},
+    {name = "fractional", value = 3.5}
+  }) do
+    local invalid_plan = deepcopy(plan)
+    invalid_plan.stream_plan.rows[2].planned_max_level = invalid_cap.value
+    expect_error("MaximumLevelBinding " .. invalid_cap.name,
+      "MaximumLevelBinding cap must be infinite or a finite non-negative integer.",
+      function() focused_contracts.maximum_level_binding.from_plan(invalid_plan, options) end)
+  end
+
   observations["generated-productivity"].adapter = "unknown-finalizer"
   local blocked = focused_contracts.maximum_level_binding.observe_finalizers(policy, observations)
   if blocked.finalizer_status ~= "blocking-conflict"

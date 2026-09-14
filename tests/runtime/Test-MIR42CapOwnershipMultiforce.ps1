@@ -32,6 +32,9 @@ $nonClaims=@(
   'browser-or-profile-user-interface-qualification',
   'all-stream-or-all-ecosystem-cap-qualification',
   'external-late-mutator-compatibility-or-endorsement',
+  'external-queue-manager-interoperability-or-second-queue-owner',
+  'unobservable-same-value-foreign-write-detection',
+  'CAP-FOREIGN-DISABLE',
   'performance-or-memory-envelope-qualification'
 )
 
@@ -85,14 +88,16 @@ function Assert-MIR42Data($Data,[string]$ExpectedCap){
   Assert-Exact 'V3 finalizer' $Data.finalizer 'accepted'
   Assert-Exact 'V3 prototype strategy observation' $Data.prototype 'infinite'
 }
-function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[int]$ExpectedBrowserCap,[bool]$ExpectedBlocker,[bool]$ExpectedPolicyBlocker,[int]$ExpectedConfigurationChanges,[object[]]$ExpectedForces){
-  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','browser_cap','blocker','policy_blocker','configuration_changed_events','merge_source_index','merge_destination_index','reused_force_index','merge_source_was_capped','source_index_reused','forces')
+function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[int]$ExpectedBrowserCap,[bool]$ExpectedBlocker,[bool]$ExpectedPolicyBlocker,[int]$ExpectedConfigurationChanges,[int]$ExpectedForceResetEvents,[string[]]$ExpectedEventProbeQueue,[object[]]$ExpectedForces){
+  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','browser_cap','blocker','policy_blocker','configuration_changed_events','force_reset_events','merge_source_index','merge_destination_index','reused_force_index','merge_source_was_capped','source_index_reused','event_probe_queue','forces')
   Assert-Exact "$ExpectedStage.stage" $State.stage $ExpectedStage
   Assert-Exact "$ExpectedStage.cap" ([int]$State.cap) $ExpectedCap
   Assert-Exact "$ExpectedStage.browser_cap" ([int]$State.browser_cap) $ExpectedBrowserCap
   Assert-Exact "$ExpectedStage.blocker" ([bool]$State.blocker) $ExpectedBlocker
   Assert-Exact "$ExpectedStage.policy_blocker" ([bool]$State.policy_blocker) $ExpectedPolicyBlocker
   Assert-Exact "$ExpectedStage.configuration_changed_events" ([int]$State.configuration_changed_events) $ExpectedConfigurationChanges
+  Assert-Exact "$ExpectedStage.force_reset_events" ([int]$State.force_reset_events) $ExpectedForceResetEvents
+  Assert-Exact "$ExpectedStage.event_probe_queue" ((@($State.event_probe_queue)|ForEach-Object{[string]$_}) -join "`n") ($ExpectedEventProbeQueue -join "`n")
   if($ExpectedStage -in @('seed','capped')){
     Assert-Exact "$ExpectedStage.merge_source_index" ([int]$State.merge_source_index) 0
     Assert-Exact "$ExpectedStage.merge_destination_index" ([int]$State.merge_destination_index) 0
@@ -156,6 +161,8 @@ function Get-MIR42SemanticStateJson($State){
     blocker=[bool]$State.blocker
     policy_blocker=[bool]$State.policy_blocker
     configuration_changed_events=[int]$State.configuration_changed_events
+    force_reset_events=[int]$State.force_reset_events
+    event_probe_queue=@($State.event_probe_queue|ForEach-Object{[string]$_})
     merge_source_index=[int]$State.merge_source_index
     merge_destination_index=[int]$State.merge_destination_index
     reused_force_index=[int]$State.reused_force_index
@@ -383,9 +390,9 @@ $policyBlockedText=Get-Content -Raw -LiteralPath $policyBlockedLog
 $policyBlockedData=Read-MIR42Data $policyBlockedText
 Assert-MIR42Data $policyBlockedData '3'
 $policyBlockedState=Read-MIR42State $policyBlockedText 'policy-blocked'
-$policyBlockerRecords=[regex]::Matches($policyBlockedText,'\[late-mir42-policy-binding-blocker\] DATA technology=recipe-prod-research_copper-1 prototype=infinite policy-adapter-pre=factorio-data-final-fixes-v1 policy-adapter-post=fixture-unknown-finalizer-v1')
+$policyBlockerRecords=[regex]::Matches($policyBlockedText,'\[late-mir42-policy-binding-blocker\] DATA technology=recipe-prod-research_copper-1 prototype=infinite cap-pre=3 cap-post=4 artifact-identity=stale')
 Assert-MIR42 ($policyBlockerRecords.Count -eq 1) "expected exactly one late policy blocker data receipt; observed $($policyBlockerRecords.Count)."
-$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=3 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_finalizer_adapter_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
+$policyConflicts=[regex]::Matches($policyBlockedText,'\[more-infinite-research\] Maximum-level conflict technology=recipe-prod-research_copper-1 selected=3 final-observed=4294967295 binding-operation=emit source=generated-stream reason=maximum_level_policy_fingerprint_invalid setting=ips-max-level-research_copper; runtime queue normalization was refused[.]')
 Assert-MIR42 ($policyConflicts.Count -eq 1) "expected exactly one Copper invalid-policy refusal; observed $($policyConflicts.Count)."
 
 $blockedSave=Join-Path $blockedStage.userdata 'saves/mir42-cap-ownership-multiforce-blocked.zip'
@@ -416,13 +423,15 @@ $seedForces=@(
   [pscustomobject]@{name='owned';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false}
+  [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
+  [pscustomobject]@{name='reset-probe';level=4;enabled=$true;visible_when_disabled=$false}
 )
 $cappedForces=@(
   [pscustomobject]@{name='owned';level=4;enabled=$false;visible_when_disabled=$true},
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$true},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='event-probe';level=4;enabled=$false;visible_when_disabled=$true}
+  [pscustomobject]@{name='event-probe';level=4;enabled=$false;visible_when_disabled=$true},
+  [pscustomobject]@{name='reset-probe';level=4;enabled=$false;visible_when_disabled=$true}
 )
 $eventForces=@(
   $cappedForces
@@ -435,17 +444,18 @@ $removedForces=@(
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
+  [pscustomobject]@{name='reset-probe';level=4;enabled=$false;visible_when_disabled=$true},
   [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true},
   [pscustomobject]@{name='merge-destination';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$true}
 )
-Assert-MIR42State $seedState 'seed' 0 0 $false $false 0 $seedForces
-Assert-MIR42State $cappedState 'capped' 3 3 $false $false 1 $cappedForces
-Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 $eventForces
-Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 $eventForces
-Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 $eventForces
-Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 $removedForces
-Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 $removedForces
+Assert-MIR42State $seedState 'seed' 0 0 $false $false 0 0 @() $seedForces
+Assert-MIR42State $cappedState 'capped' 3 3 $false $false 1 0 @() $cappedForces
+Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false $false 1 1 @('automation') $eventForces
+Assert-MIR42State $policyBlockedState 'policy-blocked' 3 0 $false $true 2 1 @('automation') $eventForces
+Assert-MIR42State $blockedState 'blocked' 3 0 $true $false 3 1 @('automation') $eventForces
+Assert-MIR42State $removalState 'removal' 0 0 $false $false 4 1 @('automation') $removedForces
+Assert-MIR42State $terminalState 'terminal' 0 0 $false $false 4 1 @('automation') $removedForces
 Assert-MIR42StableForceIndices $seedState $cappedState 'seed-to-capped'
 Assert-MIR42StableForceIndices $seedState $eventProbeState 'seed-to-event-probe'
 Assert-MIR42StableForceIndices $eventProbeState $policyBlockedState 'event-probe-to-policy-blocked'
@@ -482,7 +492,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210CapOwnershipMultiforceQualificationV1'
   status='passed-current-f210-candidate-cap-ownership-multiforce-only'
-  scope='Freshly materialized F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy/finalizer refusal, cap removal, and terminal serialized reload; package-excluded fixture evidence.'
+  scope='Freshly materialized F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.'
   target=[ordered]@{factorio_line='2.1';factorio_version='2.1.17';engine_sha256=$engineSha}
   source=[ordered]@{
     commit=$sourceCommit
@@ -513,7 +523,7 @@ $result=[ordered]@{
   )
   v3_observations=[ordered]@{seed=$seedData;capped=$cappedData;policy_blocked=$policyBlockedData;blocked=$blockedData;removal=$removalData;terminal=$terminalData}
   named_force_state_receipts=[ordered]@{seed=$seedState;capped=$cappedState;event_probe=$eventProbeState;policy_blocked=$policyBlockedState;blocked=$blockedState;removal=$removalState;terminal=$terminalState}
-  policy_conflict=[ordered]@{technology=$technologyName;selected_cap=3;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_finalizer_adapter_invalid';count=$policyConflicts.Count}
+  policy_conflict=[ordered]@{technology=$technologyName;selected_cap=3;runtime_prototype_max_level=4294967295;reason='maximum_level_policy_fingerprint_invalid';count=$policyConflicts.Count}
   late_conflict=[ordered]@{technology=$technologyName;selected_cap=3;late_observed_prototype_max_level=5;reason='maximum_level_late_prototype_mutation';count=$lateConflicts.Count}
   save_lineage=$lineage
   logs=[ordered]@{
