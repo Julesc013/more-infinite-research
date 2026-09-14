@@ -1148,6 +1148,7 @@ modules:
     - prototypes/mir/domain/technology/technology_candidate.lua
     - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
+    - prototypes/mir/domain/technology/maximum_level_binding.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
     - prototypes/mir/domain/technology/gate.lua
     - prototypes/mir/domain/technology/safety_qualification.lua
