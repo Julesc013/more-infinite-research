@@ -1625,6 +1625,29 @@ fixtures:
       - bob-lead-plate-2-quantitative-or-cycle-safety-investigation
       - release-readiness
 
+  a06-bob-ordinary-alloys-qualification:
+    requires_features: [recipe_productivity]
+    path: fixtures/assert-a06-bob-ordinary-alloys-qualification
+    harness: tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification.ps1
+    exact_target:
+      factorio_line: "2.1"
+      factorio_version: "2.1.17"
+      mod_lock: official-expansions_boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1_only
+    validates:
+      - F210-Bob-only-five-ordinary-alloy-acyclic-route-qualifications
+      - exact-post-finalizer-canonical-risk-permission-owner-and-science-matrix
+      - exact-Brass-potential-return-negative-guard-and-zero-owner-effects
+      - Bronze-deterministic-250-255-260-265-production-at-completed-levels-0-through-3
+      - Bronze-direct-cap-2-MIRSET1-effective-cap-3-and-no-level-four
+      - Bronze-fresh-current-candidate-level-three-state-across-two-serialized-reloads
+    non_claims:
+      - predecessor-upgrade-or-migration
+      - Angel-or-combined-admission
+      - F200
+      - progression-continuation
+      - broader-withheld-route-admission
+      - release-readiness
+
   vanilla-recipe-productivity-ownership:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generation-integrity
