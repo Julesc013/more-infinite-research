@@ -1355,6 +1355,7 @@ fixtures:
       mod_lock: boblibrary-3.0.0_bobores-3.0.0_bobplates-3.0.1
     validates:
       - F210-exact-locked-Bob-only-Tin-browser-explanation-diagnostic
+      - native-browser-refresh-after-LuaForce-reset-and-maximum-level-reconciliation
       - exact-public-owner-affected-recipe-compiler-disposition-science-and-scoped-route-exclusion-facts
       - exact-current-effective-cap-and-next-level-effective-benefit-facts
       - exact-MIRSET1-effective-default-raw-direct-source-and-restart-required-setting-comparison

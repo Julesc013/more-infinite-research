@@ -411,7 +411,29 @@ local function assert_native_ui(player, force)
   check(contains(facts.maximum_setting, "ips-max-level-research_material_tin | default=2 | raw-direct=2 | effective=3 | source=mirset1 | changed=true | changed-from-default=true | restart-required=true"), "maximum-setting GUI caption differs")
   check(contains(facts.enabled_setting, "ips-enable-research_material_tin | default=true | raw-direct=true | effective=true | source=mirset1 | changed=false | changed-from-default=false | restart-required=true"), "enable-setting GUI caption differs")
   check(facts.startup_restart == "Startup settings require restart; this browser does not mutate startup settings.", "restart GUI caption differs")
-  return facts
+
+  local before_level = force.technologies[technology_name].level
+  local before_caption = facts.next_level
+  check(type(force.reset) == "function", "player force does not expose LuaForce.reset")
+  force.reset()
+  local after_technology = force.technologies[technology_name]
+  check(after_technology and after_technology.level ~= before_level,
+    "force reset did not produce a distinct Tin research level")
+  frame = player.gui.screen.mir_research_browser
+  check(frame and frame.valid, "native browser closed during force-reset refresh")
+  local refreshed = {}
+  capture_facts(frame, refreshed)
+  check(refreshed.next_level ~= before_caption,
+    "native browser retained its pre-reset next-level explanation")
+  check(contains(refreshed.next_level, "current-level=" .. tostring(after_technology.level)),
+    "native browser did not refresh to the post-reset Tin level")
+  return refreshed, {
+    event = "on_force_reset",
+    before_level = before_level,
+    after_level = after_technology.level,
+    before_caption = before_caption,
+    after_caption = refreshed.next_level
+  }
 end
 
 script.on_init(function()
@@ -437,13 +459,15 @@ script.on_nth_tick(1, function()
   assert_detail(detail)
   assert_level_negatives()
   local player = game.players[1]
-  local facts = player and assert_native_ui(player, force) or {}
+  local facts, force_reset_refresh = {}, nil
+  if player then facts, force_reset_refresh = assert_native_ui(player, force) end
   helpers.write_file("bob-tin-browser-explanation.json", helpers.table_to_json({
     status = "passed",
     scope = "F210-exact-locked-Bob-only-browser-explanation",
     execution_surface = player and "native-player-gui" or "headless-dto",
     detail = detail,
     ui_facts = facts,
+    force_reset_refresh = force_reset_refresh,
     native_players = player and 1 or 0
   }), false)
   state.complete = true
