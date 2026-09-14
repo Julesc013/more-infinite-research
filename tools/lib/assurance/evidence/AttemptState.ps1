@@ -49,6 +49,7 @@ function Get-MIRAssuranceAttemptIdentity {
     input_key=[string]$Capsule.input_key
     target=[string]$Capsule.target
     fingerprint_sha256=[string]$Capsule.fingerprint_sha256
+    definition_sha256=[string]$Capsule.definition_sha256
   }
 }
 
@@ -104,9 +105,11 @@ function Test-MIRAssuranceExactTrustedAttempt {
   )
   if ([int]$Capsule.schema -ne $evidenceSchema -or
       [string]$Capsule.test_id -ne [string]$Identity.test_id -or
-      [string]$Capsule.input_key -ne [string]$Identity.input_key -or
-      [string]$Capsule.target -ne [string]$Identity.target -or
-      [string]$Capsule.fingerprint_sha256 -ne [string]$Identity.fingerprint_sha256 -or
+       [string]$Capsule.input_key -ne [string]$Identity.input_key -or
+       [string]$Capsule.target -ne [string]$Identity.target -or
+       [string]$Capsule.fingerprint_sha256 -ne [string]$Identity.fingerprint_sha256 -or
+       [string]::IsNullOrWhiteSpace([string]$Identity.definition_sha256) -or
+       [string]$Capsule.definition_sha256 -ne [string]$Identity.definition_sha256 -or
       [string]$Capsule.status -notin @("passed", "failed") -or
       [string]$Capsule.conclusion -ne [string]$Capsule.status -or
       -not (Test-MIRAssuranceTrustedProducer -Producer $Capsule.producer -Context $Context)) {
@@ -118,6 +121,35 @@ function Test-MIRAssuranceExactTrustedAttempt {
   $derivedOutcomeDigest = Get-MIRAssuranceOutcomeDigest -Capsule $Capsule
   return -not ($null -ne $Capsule.PSObject.Properties['outcome_digest'] -and
     [string]$Capsule.outcome_digest -ne $derivedOutcomeDigest)
+}
+
+# Resolution is stronger than a structural trusted-attempt scan.  A resolution
+# grants a future reusable pass, so it replays the ordinary capsule admission
+# check and its bound executor logs before accepting a historical record.
+function Test-MIRAssuranceResolutionCapsule {
+  param(
+    [Parameter(Mandatory)]$Capsule,
+    [Parameter(Mandatory)]$Fingerprint,
+    [Parameter(Mandatory)]$Context
+  )
+  $validation = Test-MIRAssuranceCapsule -Capsule $Capsule -Fingerprint $Fingerprint -Context $Context
+  if (-not [bool]$validation.valid) { return $validation }
+  try {
+    $resultPath = Resolve-MIRAssurancePath -Path ([string]$Capsule.result.path)
+    $resultDirectory = Split-Path -Parent $resultPath
+    $stdoutPath = Join-Path $resultDirectory 'stdout.txt'
+    $stderrPath = Join-Path $resultDirectory 'stderr.txt'
+    if (-not (Test-Path -LiteralPath $stdoutPath -PathType Leaf) -or
+        -not (Test-Path -LiteralPath $stderrPath -PathType Leaf) -or
+        (Get-MIRAssuranceSha256 -Path $stdoutPath) -ne [string]$Capsule.stdout_sha256 -or
+        (Get-MIRAssuranceSha256 -Path $stderrPath) -ne [string]$Capsule.stderr_sha256 -or
+        (Get-MIRAssuranceTextHash -Text ((Get-Content -Raw -LiteralPath $stdoutPath) + "`n" + (Get-Content -Raw -LiteralPath $stderrPath))) -ne [string]$Capsule.log_digest) {
+      return [ordered]@{valid=$false;reason='bound-executor-log-mismatch'}
+    }
+  } catch {
+    return [ordered]@{valid=$false;reason='bound-executor-log-unreadable'}
+  }
+  return [ordered]@{valid=$true;reason='full-exact-passing-capsule'}
 }
 
 function Get-MIRAssuranceTrustedExactAttempts {
@@ -262,6 +294,8 @@ function Get-MIRAssuranceAttemptQuarantineIncidents {
         [string]$incident.identity.input_key -ne [string]$Identity.input_key -or
         [string]$incident.identity.target -ne [string]$Identity.target -or
         [string]$incident.identity.fingerprint_sha256 -ne [string]$Identity.fingerprint_sha256 -or
+        ((-not [string]::IsNullOrWhiteSpace([string]$Identity.definition_sha256)) -and
+          [string]$incident.identity.definition_sha256 -ne [string]$Identity.definition_sha256) -or
         [string]$incident.incident_sha256 -ne (Get-MIRAssuranceJsonHash -Value $incidentMaterial)) {
       continue
     }
@@ -306,6 +340,8 @@ function Get-MIRAssuranceAttemptQuarantineResolutions {
         [string]$resolution.identity.input_key -ne [string]$Identity.input_key -or
         [string]$resolution.identity.target -ne [string]$Identity.target -or
         [string]$resolution.identity.fingerprint_sha256 -ne [string]$Identity.fingerprint_sha256 -or
+        ((-not [string]::IsNullOrWhiteSpace([string]$Identity.definition_sha256)) -and
+          [string]$resolution.identity.definition_sha256 -ne [string]$Identity.definition_sha256) -or
         [string]$resolution.accepted_outcome_digest -notmatch '^[A-Fa-f0-9]{64}$' -or
         [string]$resolution.resolution_sha256 -ne (Get-MIRAssuranceJsonHash -Value $material)) {
       continue
@@ -329,12 +365,15 @@ function Get-MIRAssuranceAttemptQuarantineResolutions {
         [string]$attempt.status -ne 'passed' -or
         [string]$attempt.conclusion -ne 'passed' -or
         [string]$attempt.attempt_path -ne (Get-MIRAssuranceRepoRelativePath -Path $resolvedAttemptPath) -or
+        [string]$resolution.independent_attempt.definition_sha256 -ne [string]$Identity.definition_sha256 -or
         (Get-MIRAssuranceSha256 -Path $attemptPath) -ne [string]$resolution.independent_attempt.sha256 -or
         (Get-MIRAssuranceOutcomeDigest -Capsule $attempt) -ne [string]$resolution.independent_attempt.outcome_digest -or
         [string]$attempt.result_digest -ne [string]$resolution.independent_attempt.result_digest -or
         (Get-MIRAssuranceProducerExecutionIdentity -Producer $attempt.producer) -ne [string]$resolution.independent_attempt.producer_execution_identity) {
       continue
     }
+    $resolutionValidation = Test-MIRAssuranceResolutionCapsule -Capsule $attempt -Fingerprint ([pscustomobject]$Identity) -Context $Context
+    if (-not [bool]$resolutionValidation.valid) { continue }
     $resolutions.Add([pscustomobject][ordered]@{
       path=(Get-MIRAssuranceRepoRelativePath -Path $item.FullName)
       resolution=$resolution
@@ -395,7 +434,8 @@ function Get-MIRAssuranceAttemptQuarantineState {
 function Write-MIRAssuranceAttemptQuarantineIncident {
   param(
     [Parameter(Mandatory)]$Identity,
-    [Parameter(Mandatory)][AllowEmptyCollection()]$Attempts
+    [Parameter(Mandatory)][AllowEmptyCollection()]$Attempts,
+    [Parameter(Mandatory)]$Context
   )
   $attemptRows = @(
     foreach ($attempt in @($Attempts | Sort-Object path -Unique)) {
@@ -424,11 +464,33 @@ function Write-MIRAssuranceAttemptQuarantineIncident {
   $incident['incident_sha256'] = Get-MIRAssuranceJsonHash -Value $incident
   $directory = Get-MIRAssuranceAttemptQuarantineDirectory -Identity $Identity
   $attemptMaterialSha256 = Get-MIRAssuranceJsonHash -Value $attemptRows
+  $resolutions = @(Get-MIRAssuranceAttemptQuarantineResolutions -Identity $Identity -Context $Context)
   foreach ($existing in @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $Identity)) {
     $existingKeys = @($existing.incident.attempts | ForEach-Object { "$([string]$_.path):$([string]$_.sha256)" })
     $currentKeys = @($attemptRows | ForEach-Object { "$([string]$_.path):$([string]$_.sha256)" })
     $existingRemainsPresent = $existingKeys.Count -ge 2 -and @($existingKeys | Where-Object { $_ -notin $currentKeys }).Count -eq 0
-    if ((Get-MIRAssuranceJsonHash -Value @($existing.incident.attempts)) -eq $attemptMaterialSha256 -or $existingRemainsPresent) {
+    if ((Get-MIRAssuranceJsonHash -Value @($existing.incident.attempts)) -eq $attemptMaterialSha256) {
+      return $existing
+    }
+    $acceptedOutcomes = @(
+      $resolutions | Where-Object {
+        [string]$_.resolution.incident_path -eq [string]$existing.path -and
+        [string]$_.resolution.incident_sha256 -eq [string]$existing.incident.incident_sha256
+      } | ForEach-Object { [string]$_.resolution.accepted_outcome_digest } | Sort-Object -Unique
+    )
+    $postResolutionConflict = @(
+      $attemptRows | Where-Object {
+        $key = "$([string]$_.path):$([string]$_.sha256)"
+        $key -notin $existingKeys -and [string]$_.outcome_digest -notin $acceptedOutcomes
+      }
+    )
+    # A resolved incident records only the observations it adjudicated.  A
+    # later opposite observation is a new contradiction, even when an older
+    # incident remains a subset of the current immutable attempt set.
+    if ($acceptedOutcomes.Count -gt 0 -and $postResolutionConflict.Count -gt 0) {
+      continue
+    }
+    if ($existingRemainsPresent) {
       return $existing
     }
   }
@@ -456,7 +518,7 @@ function Get-MIRAssuranceAttemptStateSnapshot {
   $contradiction = $conclusions.Count -gt 1 -or $outcomes.Count -gt 1
   $incident = $null
   if ($contradiction) {
-    $incident = Write-MIRAssuranceAttemptQuarantineIncident -Identity $Identity -Attempts $attempts
+    $incident = Write-MIRAssuranceAttemptQuarantineIncident -Identity $Identity -Attempts $attempts -Context $Context
   }
   $quarantineState = Get-MIRAssuranceAttemptQuarantineState -Identity $Identity -Context $Context
   return [pscustomobject][ordered]@{
@@ -613,6 +675,10 @@ function Resolve-MIRAssuranceAttemptQuarantine {
     input_key=[string]$Identity.input_key
     target=[string]$Identity.target
     fingerprint_sha256=[string]$Identity.fingerprint_sha256
+    definition_sha256=[string]$Identity.definition_sha256
+  }
+  if ([string]$exactIdentity.definition_sha256 -notmatch '^[A-Fa-f0-9]{64}$') {
+    throw 'Quarantine resolution requires the current exact test definition digest.'
   }
   $lock = Enter-MIRAssuranceAttemptStateLock -Identity $exactIdentity
   try {
@@ -624,6 +690,10 @@ function Resolve-MIRAssuranceAttemptQuarantine {
     $selected = $selected[0]
     if ([string]$selected.conclusion -ne 'passed') {
       throw 'Quarantine resolution may only establish a reusable passed pointer from an independent passing reproduction.'
+    }
+    $selectedValidation = Test-MIRAssuranceResolutionCapsule -Capsule $selected.capsule -Fingerprint ([pscustomobject]$exactIdentity) -Context $Context
+    if (-not [bool]$selectedValidation.valid) {
+      throw "Quarantine resolution requires a fully validated independent passing capsule: $([string]$selectedValidation.reason)."
     }
     $state = Get-MIRAssuranceAttemptQuarantineState -Identity $exactIdentity -Context $Context
     if (@($state.unresolved_incidents).Count -eq 0) {
@@ -661,6 +731,7 @@ function Resolve-MIRAssuranceAttemptQuarantine {
           sha256=[string]$selected.sha256
           result_digest=[string]$selected.result_digest
           outcome_digest=[string]$selected.outcome_digest
+          definition_sha256=[string]$selected.capsule.definition_sha256
           producer_execution_identity=[string]$selected.producer_execution_identity
         }
         adjudicator=$Adjudicator

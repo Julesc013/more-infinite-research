@@ -20,6 +20,7 @@ function Get-MIRAssuranceReusableEvidence {
     input_key=[string]$Fingerprint.input_key
     target=[string]$Fingerprint.target
     fingerprint_sha256=[string]$Fingerprint.fingerprint_sha256
+    definition_sha256=[string]$Fingerprint.definition_sha256
   }
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Fingerprint.test_id -InputKey $Fingerprint.input_key
   $ownsLock = $null -eq $Lock
