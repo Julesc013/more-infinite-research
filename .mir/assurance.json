@@ -50,7 +50,8 @@
     "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"],
     "bob-angel-tin-final-state-audit-f210": ["runtime.bob-angel-tin-final-state-audit"],
     "bob-angel-tin-route-safety-f210": ["runtime.bob-angel-tin-route-safety"],
-    "maximum-level-cap-ownership-multiforce-f210": ["runtime.maximum-level-cap-ownership-multiforce-f210"]
+    "maximum-level-cap-ownership-multiforce-f210": ["runtime.maximum-level-cap-ownership-multiforce-f210"],
+    "maximum-level-v2-v3-migration-f210": ["runtime.maximum-level-v2-v3-migration-f210"]
   },
   "classes": [
     {
@@ -337,6 +338,11 @@
       "id": "maximum-level-cap-ownership-multiforce-f210",
       "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-(?:cap|policy)-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^src/mod/families/modern/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
       "tests": ["runtime.maximum-level-cap-ownership-multiforce-f210"]
+    },
+    {
+      "id": "maximum-level-v2-v3-migration-f210",
+      "patterns": ["^fixtures/assert-mir42-v2-v3-cap-migration/", "^tests/runtime/Test-MIR42V2V3CapMigration[.]ps1$", "^src/mod/common/prototypes/mir/platform/factorio/target_line[.]lua$", "^src/mod/families/modern/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^src/mod/package-source[.]json$", "^targets/(?:f210|f200)/overlay[.]json$", "^targets/f200/files/prototypes/mir/platform/factorio/target_profiles[.]lua$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-v2-v3-migration-f210"]
     },
     {
       "id": "k2-materials-bounded-f210",
