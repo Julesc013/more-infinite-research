@@ -63,6 +63,14 @@ if(@(Compare-Object ($expected | Sort-Object) @($tasks.requests | Sort-Object -U
 if($p.synthesis.objectives_measured -or $p.synthesis.heavy_engine_concurrency -ne 1) { throw '[synthesis-unmeasured-capacity]' }
 if($p.synthesis.release_baseline.source -cne '3562377b520cccb071b97b3968946eae7024c950' -or $p.synthesis.release_baseline.human_acceptance.f210 -cne 'release-specific-direct-playtest-waiver') { throw '[synthesis-release-history]' }
 if(@($p.work_packages | Where-Object { $_.id -eq 'M41-08' -and $_.state -eq 'complete' }).Count -ne 1 -or @($p.work_packages | Where-Object { $_.id -eq 'M43-00' -and $_.state -eq 'active' }).Count -ne 1) { throw '[synthesis-current-state]' }
+$m44=@($p.work_packages | Where-Object id -eq 'M44-00')
+$m42Train=@($p.outcome_trains | Where-Object candidate -eq '4.2.0')
+$m43Train=@($p.outcome_trains | Where-Object candidate -eq '4.3.0')
+if($m44.Count-ne1-or[string]$m44[0].state-cne'active'-or[string]$m44[0].completion_boundary-cne'4.3.0'-or
+   'M43-00'-in@($m44[0].depends_on)-or@('M41-08','M42-01','M42-02'|Where-Object{$_-notin@($m44[0].depends_on)}).Count-ne0-or
+   [string]$m44[0].outcome-notmatch'consumer-used.*MIR 4\.2.*unconsumed generalized machinery.*4\.3'-or
+   $m42Train.Count-ne1-or[string]$m42Train[0].outcome-notmatch'consumed M44.*exact-fingerprint evidence reuse.*release-recovery'-or
+   $m43Train.Count-ne1-or[string]$m43Train[0].outcome-notmatch'remaining generalized M44') { throw '[synthesis-m44-consumed-pullforward]' }
 Write-Output 'Synthesis input integrity, complete 81-request/component coverage, dependency graph, and truthful completion boundaries passed.'
 
 # The controlled proof is reusable only for these exact current module bytes.

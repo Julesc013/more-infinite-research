@@ -25,7 +25,7 @@ Status: `active`. MIR 4.1 completes the repository, package, tooling, test, docu
 | `M41-07` | `4.1.0` | `complete` | M42-02 | Retire every current-product authority bridge and retain only owned, tested, read-only, package-excluded historical compatibility paths |
 | `M41-08` | `4.1.0` | `complete` | M41-07 | Freeze, build, qualify, seal, and promote the private four-target MIR 4.1 candidate to exact main readiness with only the human playtest gate remaining |
 | `M43-00` | `4.2.0` | `active` | M41-08, M42-01, M42-02 | Integration kernel delivering substantial industrial research from early factories onward: complete eligible material routes, useful finite-to-infinite progression, localized discovery and explanations, auditable profiles, qualified K2/Bob/Angel/OmniAB/RIC subsets, and a portable in-game presentation core |
-| `M44-00` | `4.3.0` | `blocked-dependency` | M43-00 | Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation |
+| `M44-00` | `4.3.0` | `active` | M41-08, M42-01, M42-02 | Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation; deliver the consumer-used selection, exact-fingerprint evidence reuse, support-export, and release-recovery subset with MIR 4.2 while reserving unconsumed generalized machinery for 4.3 |
 | `M45-00` | `4.4.0+` | `blocked-dependency` | M44-00 | Allocate a coherent external product outcome only when evidence supports it |
 | `M46-00` | `4.4.0+` | `blocked-dependency` | M45-00 | Retain later MIR 4 work as evidence-led evolution, including a 4.5 OEM+ technology-tree and queue overhaul only if maintained-project integration cannot satisfy the accepted player contract |
 

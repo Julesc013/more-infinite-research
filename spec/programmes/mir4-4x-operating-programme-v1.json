@@ -158,12 +158,14 @@
     },
     {
       "id": "M44-00",
-      "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation",
+      "outcome": "Industrialize semantic selection, evidence lifecycle, recovery, release lanes, and preservation; deliver the consumer-used selection, exact-fingerprint evidence reuse, support-export, and release-recovery subset with MIR 4.2 while reserving unconsumed generalized machinery for 4.3",
       "completion_boundary": "4.3.0",
       "depends_on": [
-        "M43-00"
+        "M41-08",
+        "M42-01",
+        "M42-02"
       ],
-      "state": "blocked-dependency"
+      "state": "active"
     },
     {
       "id": "M45-00",
@@ -227,12 +229,12 @@
     },
     {
       "candidate": "4.2.0",
-      "outcome": "Integration kernel delivering substantial industrial research, complete qualified routes, useful progression, localized explanations, auditable profiles, current ecosystem admissions, and a portable embedded research surface",
+      "outcome": "Integration kernel delivering substantial industrial research, complete qualified routes, useful progression, localized explanations, auditable profiles, current ecosystem admissions, a portable embedded research surface, and the consumed M44 selection, exact-fingerprint evidence reuse, support-export, and release-recovery capabilities required by 4.2",
       "release_required": true
     },
     {
       "candidate": "4.3.0",
-      "outcome": "Industrialized semantic selection, evidence lifecycle, recovery, measured release lanes, offline operation, and preservation",
+      "outcome": "Complete the remaining generalized M44 industrialization beyond the consumer-used capabilities already delivered with 4.2, including measured selection, revocation, partial-run recovery, nondeterminism handling, offline operation, and preservation",
       "release_required": false
     },
     {
