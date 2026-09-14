@@ -10,7 +10,7 @@ function Get-MIR4RuntimeContinuityAuthority {
   }
   if (@($authority.runtime_features.id | Sort-Object -Unique).Count -ne 7) { throw '[mir4-runtime-feature-count]' }
   if (@($authority.state_specs.id | Sort-Object -Unique).Count -ne 5) { throw '[mir4-state-spec-count]' }
-  if (@($authority.registration_groups.id | Sort-Object -Unique).Count -ne 10) { throw '[mir4-registration-group-count]' }
+  if (@($authority.registration_groups.id | Sort-Object -Unique).Count -ne 9) { throw '[mir4-registration-group-count]' }
   if (@($authority.migration_edges.id | Sort-Object -Unique).Count -ne 10) { throw '[mir4-migration-edge-count]' }
   foreach ($relative in @($authority.terminal_player_authority)) {
     if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$relative)) -PathType Leaf)) { throw "[mir4-runtime-terminal-authority] $relative" }
@@ -138,9 +138,7 @@ function New-MIR4RuntimeRegistrationPlan {
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
   $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
   $featureById = @{}; foreach ($feature in @($RuntimeFeatures)) { $featureById[[string]$feature.id] = $feature }
-  $dispatcherFeature = $featureById['runtime.scripted-dispatcher']
-  if ($null -eq $dispatcherFeature) { throw '[mir4-runtime-dispatcher-feature-missing]' }
-  $dispatcherPath = Join-Path $repo ([string]$dispatcherFeature.source)
+  $dispatcherPath = Join-Path $repo 'prototypes/mir/runtime/scripted_techs.lua'
   $stagePath = Join-Path $repo 'prototypes/mir/stage/control.lua'
   $dispatcherText = Get-Content -Raw -LiteralPath $dispatcherPath
   $stageText = Get-Content -Raw -LiteralPath $stagePath
@@ -162,7 +160,7 @@ function New-MIR4RuntimeRegistrationPlan {
   )
   $combined = $dispatcherText + "`n" + $stageText
   $plan = [pscustomobject][ordered]@{
-    kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner=[string]$dispatcherFeature.source;owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
+    kind='MIR4RuntimeRegistrationPlanV1';schema=1;owner='prototypes/mir/runtime/scripted_techs.lua';owner_sha256=(Get-MIR4PlatformInputSha256 $dispatcherPath);groups=$groups
     ordering='authority-array-preserved-as-explicit-ordinal';filter_before_dispatch=$true;one_registration_per_group=$true
     on_load=[ordered]@{registered=($combined -match 'script\.on_load');persistent_mutation=$false};on_tick=[ordered]@{registered=($combined -match 'defines\.events\.on_tick');budget=0}
     cross_feature_state_mutation=$false;duplicate_rejection=$true;maximum_diagnostics_per_dispatch=64

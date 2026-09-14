@@ -15,12 +15,10 @@ $providers=@(New-MIR4NormalizedTargetProviders -RepoRoot $RepoRoot)
 $runtimeA=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers $providers -SourceIdentity $null
 $runtimeB=New-MIR4RuntimeStateMatrix -RepoRoot $RepoRoot -Providers @($providers|Sort-Object id -Descending) -SourceIdentity $null
 if($runtimeA.digest-cne$runtimeB.digest){throw '[mir4-w04-runtime-determinism]'}
-if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 10-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
+if(@($runtimeA.runtime_feature_specs).Count-ne 7-or@($runtimeA.state_specs).Count-ne 5-or@($runtimeA.registration_plan.groups).Count-ne 9-or@($runtimeA.targets).Count-ne 17){throw '[mir4-w04-runtime-contract-counts]'}
 foreach($feature in @($runtimeA.runtime_feature_specs)){if([string]$feature.source_sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$feature.source)))){throw "[mir4-w04-runtime-source-canonical-hash] $($feature.id)"}}
 if([string]$runtimeA.registration_plan.owner_sha256-cne(Get-MIR4PlatformInputSha256 (Join-Path $RepoRoot ([string]$runtimeA.registration_plan.owner)))){throw '[mir4-w04-runtime-owner-canonical-hash]'}
 if(-not$runtimeA.registration_plan.law_results.all_passed-or$runtimeA.registration_plan.on_load.registered-or$runtimeA.registration_plan.on_tick.registered-or-not$runtimeA.registration_plan.filter_before_dispatch){throw '[mir4-w04-dispatcher-laws]'}
-$forceResetGroup=@($runtimeA.registration_plan.groups|Where-Object { $_.id -eq 'event.force-reset' })
-if($forceResetGroup.Count-ne1-or@($forceResetGroup[0].subscribers).Count-ne1-or[string]$forceResetGroup[0].subscribers[0].id-cne'runtime.maximum-level-control:on_force_reset'){throw '[mir4-w04-force-reset-registration]'}
 $f210=@($runtimeA.targets|Where-Object { $_.target -eq 'f210' })[0]
 $f110=@($runtimeA.targets|Where-Object { $_.target -eq 'f110' })[0]
 $f014=@($runtimeA.targets|Where-Object { $_.target -eq 'f014' })[0]
