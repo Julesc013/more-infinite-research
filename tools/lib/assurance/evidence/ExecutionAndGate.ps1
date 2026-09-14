@@ -261,7 +261,10 @@ function Invoke-MIRAssuranceTest {
     duration_seconds=$duration
     message=$message
   }
-  $capsule = Write-MIRAssuranceAttempt -Capsule $capsule
+  $capsule = Write-MIRAssuranceAttempt -Capsule $capsule -Context $Context
+  if ([bool]$capsule.quarantined) {
+    throw "Assurance test result is quarantined pending independent fresh reproduction: $id ($([string]$capsule.quarantine_incident))."
+  }
   if ($status -ne "passed") { throw "Assurance test failed: $id - $message" }
   return $capsule
 }
@@ -296,9 +299,43 @@ function Invoke-MIRAssurancePlan {
     } catch {
       $capturedFailure = $false
       $paths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
+      $identity = [ordered]@{
+        test_id=[string]$test.id
+        input_key=[string]$test.fingerprint.input_key
+        target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) { [string]$test.fingerprint.target } else { [string]$Context.target }
+        fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
+        definition_sha256=[string]$test.fingerprint.definition_sha256
+      }
+      $quarantineState = $null
+      if (-not [string]::IsNullOrWhiteSpace([string]$identity.input_key) -and
+          -not [string]::IsNullOrWhiteSpace([string]$identity.target) -and
+          -not [string]::IsNullOrWhiteSpace([string]$identity.fingerprint_sha256)) {
+        $quarantineState = Get-MIRAssuranceAttemptQuarantineState -Identity $identity -Context $Context
+      }
+      if ($null -ne $quarantineState -and @($quarantineState.unresolved_incidents).Count -gt 0) {
+        $incident = $quarantineState.unresolved_incidents[0]
+        $blocked = if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) {
+          Read-MIRAssuranceEvidencePointer -Path $paths.blocked
+        } else { $null }
+        $results += [pscustomobject][ordered]@{
+          schema='mir-plan-execution-quarantine-v1'
+          test_id=[string]$test.id
+          status='failed'
+          conclusion='quarantined'
+          disposition='RUN'
+          input_key=[string]$test.fingerprint.input_key
+          fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
+          incident_path=[string]$incident.path
+          incident_sha256=[string]$incident.incident.incident_sha256
+          opposite_capsule_path=if ($null -ne $blocked -and $null -ne $blocked.PSObject.Properties['attempt_path']) { [string]$blocked.attempt_path } else { '' }
+          message=$_.Exception.Message
+          completed_at=(Get-Date).ToUniversalTime().ToString('o')
+        }
+        $capturedFailure = $true
+      }
       if (Test-Path -LiteralPath $paths.blocked -PathType Leaf) {
         $blocked = Read-MIRAssuranceEvidencePointer -Path $paths.blocked
-        if ($null -ne $blocked) {
+        if (-not $capturedFailure -and $null -ne $blocked) {
           $results += $blocked
           $capturedFailure = $true
         }
@@ -512,12 +549,37 @@ function Get-MIRAssuranceResultCounts {
   )
   $total = @($Results).Count
   $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
+  $coldExecutionSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -eq "RUN"
+  } | ForEach-Object { [double]$_.duration_seconds } | Measure-Object -Sum).Sum), 3)
+  $reusedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -in @("REUSE", "WAIT")
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
+      [double]$_.source_duration_seconds
+    } else {
+      [double]$_.duration_seconds
+    }
+  } | Measure-Object -Sum).Sum), 3)
+  $checkpointedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
+    [string]$_.disposition -eq "CHECKPOINT"
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
+      [double]$_.source_duration_seconds
+    } else {
+      [double]$_.duration_seconds
+    }
+  } | Measure-Object -Sum).Sum), 3)
   return [ordered]@{
     expected=$expected
     total=$total
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     checkpointed=@($Results | Where-Object { [string]$_.disposition -eq "CHECKPOINT" }).Count
+    quarantined=@($Results | Where-Object { [string]$_.conclusion -eq 'quarantined' }).Count
+    cold_execution_seconds=$coldExecutionSeconds
+    reused_source_seconds=$reusedSourceSeconds
+    checkpointed_source_seconds=$checkpointedSourceSeconds
     failed=@($Results | Where-Object { [string]$_.status -ne "passed" }).Count
     incomplete=[Math]::Max(0, $expected - $total)
     unexpected=[Math]::Max(0, $total - $expected)
