@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "MIR4XOperatingProgrammeV1",
   "status": "active",
-  "recorded_at": "2026-09-07T00:00:00+10:00",
+  "recorded_at": "2026-09-15T00:00:00+10:00",
   "objective": "Preserve published MIR 4.1 and deliver MIR 4.2 as a substantial industrial-research release with complete material routes, useful progression, explainable localized discovery, auditable profiles, qualified current integrations, portable player-surface architecture, and recoverable delivery through the existing semantic source and emitter.",
   "permanent_invariants": [
     "one semantic source",
@@ -292,6 +292,79 @@
     },
     "objectives_measured": false,
     "heavy_engine_concurrency": 1,
+    "m44_42_allocation": {
+      "work_package": "M44-00",
+      "consumed_by_4_2": [
+        {
+          "id": "impact-selected-verification",
+          "task": "A13",
+          "acceptance": "Select only the propositions affected by the declared semantic impact; every omission names its unaffected proposition.",
+          "evidence": {
+            "static_test": "tests/tooling/Test-MIRAssurance.ps1",
+            "candidate_receipt": "spec/programmes/evidence/mir42/a13-impact-selection.json"
+          }
+        },
+        {
+          "id": "exact-fingerprint-evidence-reuse",
+          "task": "A13",
+          "acceptance": "Reuse evidence only when target, candidate source, environment, command, evaluator, and input fingerprints exactly match; a contradiction quarantines reuse.",
+          "evidence": {
+            "static_test": "tests/tooling/Test-MIRAssurance.ps1",
+            "candidate_receipt": "spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json"
+          }
+        },
+        {
+          "id": "redacted-support-export",
+          "task": "A14",
+          "acceptance": "Produce a minimal redacted support export bound to the exact candidate and environment, reconcile it with the qualified support matrix, and exclude credentials, personal data, and unsupported claims.",
+          "evidence": {
+            "static_test": "tests/mir4/Test-MIR42SupportExportA14.ps1",
+            "candidate_receipt": "spec/programmes/evidence/mir42/a14-support-export.json"
+          }
+        },
+        {
+          "id": "candidate-bound-release-recovery",
+          "task": "A07",
+          "acceptance": "Rehearse interruption and recovery from persisted intent bound to candidate identity, effects, recovery decision, and local delivery record without publication.",
+          "evidence": {
+            "static_test": "tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
+            "candidate_receipt": "spec/programmes/evidence/mir42/a07-release-recovery.json"
+          }
+        }
+      ],
+      "reserved_for_4_3": [
+        {
+          "id": "generalized-selection-and-reuse-policy",
+          "outcome": "Calibrate generalized selection and reuse policy beyond the consumer-used 4.2 propositions.",
+          "delivery_boundary": "4.3.0"
+        },
+        {
+          "id": "evidence-revocation-and-lifecycle",
+          "outcome": "Provide generalized evidence revocation and lifecycle management.",
+          "delivery_boundary": "4.3.0"
+        },
+        {
+          "id": "cross-task-partial-run-recovery",
+          "outcome": "Recover partial runs across arbitrary work, not only candidate-bound release recovery.",
+          "delivery_boundary": "4.3.0"
+        },
+        {
+          "id": "nondeterminism-classification",
+          "outcome": "Classify and resolve nondeterministic outcomes beyond exact-fingerprint contradiction quarantine.",
+          "delivery_boundary": "4.3.0"
+        },
+        {
+          "id": "offline-operation-and-preservation",
+          "outcome": "Establish generalized offline operation and preservation beyond the 4.2 candidate handoff.",
+          "delivery_boundary": "4.3.0"
+        },
+        {
+          "id": "measured-release-lane-calibration",
+          "outcome": "Calibrate reusable release lanes beyond the qualified 4.2 candidate path.",
+          "delivery_boundary": "4.3.0"
+        }
+      ]
+    },
     "tasks": [
       {
         "id": "A00",
@@ -503,6 +576,7 @@
           "Inspect supplied repaired files; do not execute historical controller",
           "Consolidated preflight",
           "Durable intent and recovery",
+          "Rehearse interruption and recovery from persisted intent bound to candidate identity, effects, recovery decision, and local delivery record without publication.",
           "Bound draft-ID/tag/seal/assets",
           "Zero/one/many, timeout, kill and local-copy fault injection"
         ],
@@ -633,6 +707,8 @@
         "acceptance": [
           "Bound all semantic inputs and evaluator trust",
           "Reuse unaffected propositions without cross-target runtime borrowing",
+          "Select only the propositions affected by the declared semantic impact; every omission names its unaffected proposition.",
+          "Reuse evidence only when target, candidate source, environment, command, evaluator, and input fingerprints exactly match; a contradiction quarantines reuse.",
           "Periodic broader hold-out comparison",
           "Same-fingerprint contradiction quarantined",
           "Report actual cold/reused times"
@@ -645,6 +721,7 @@
         "title": "Prepare next coherent release or eligible stable correction",
         "programme_mapping": [
           "M43-00",
+          "M44-00",
           "maintenance"
         ],
         "depends_on": [
@@ -659,6 +736,7 @@
           "Join every selected slice required proof, not every unrelated future feature",
           "Exact source/package/operator identities",
           "Current required acceptance; no recycled F210 waiver",
+          "Produce a minimal redacted support export bound to the exact candidate and environment, reconcile it with the qualified support matrix, and exclude credentials, personal data, and unsupported claims.",
           "Immutable publication only under authorization",
           "Primary-checkout verified dist/notes/index"
         ],

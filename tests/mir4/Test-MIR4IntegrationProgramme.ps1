@@ -68,9 +68,31 @@ $m42Train=@($p.outcome_trains | Where-Object candidate -eq '4.2.0')
 $m43Train=@($p.outcome_trains | Where-Object candidate -eq '4.3.0')
 if($m44.Count-ne1-or[string]$m44[0].state-cne'active'-or[string]$m44[0].completion_boundary-cne'4.3.0'-or
    'M43-00'-in@($m44[0].depends_on)-or@('M41-08','M42-01','M42-02'|Where-Object{$_-notin@($m44[0].depends_on)}).Count-ne0-or
-   [string]$m44[0].outcome-notmatch'consumer-used.*MIR 4\.2.*unconsumed generalized machinery.*4\.3'-or
-   $m42Train.Count-ne1-or[string]$m42Train[0].outcome-notmatch'consumed M44.*exact-fingerprint evidence reuse.*release-recovery'-or
+   $m42Train.Count-ne1-or[string]$m42Train[0].outcome-notmatch'consumed M44.*exact-fingerprint evidence reuse.*support-export.*release-recovery'-or
    $m43Train.Count-ne1-or[string]$m43Train[0].outcome-notmatch'remaining generalized M44') { throw '[synthesis-m44-consumed-pullforward]' }
+$m44Allocation=$p.synthesis.m44_42_allocation
+$m44Expected=[ordered]@{
+  'impact-selected-verification'=[ordered]@{task='A13';acceptance='Select only the propositions affected by the declared semantic impact; every omission names its unaffected proposition.';static_test='tests/tooling/Test-MIRAssurance.ps1';candidate_receipt='spec/programmes/evidence/mir42/a13-impact-selection.json'}
+  'exact-fingerprint-evidence-reuse'=[ordered]@{task='A13';acceptance='Reuse evidence only when target, candidate source, environment, command, evaluator, and input fingerprints exactly match; a contradiction quarantines reuse.';static_test='tests/tooling/Test-MIRAssurance.ps1';candidate_receipt='spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json'}
+  'redacted-support-export'=[ordered]@{task='A14';acceptance='Produce a minimal redacted support export bound to the exact candidate and environment, reconcile it with the qualified support matrix, and exclude credentials, personal data, and unsupported claims.';static_test='tests/mir4/Test-MIR42SupportExportA14.ps1';candidate_receipt='spec/programmes/evidence/mir42/a14-support-export.json'}
+  'candidate-bound-release-recovery'=[ordered]@{task='A07';acceptance='Rehearse interruption and recovery from persisted intent bound to candidate identity, effects, recovery decision, and local delivery record without publication.';static_test='tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1';candidate_receipt='spec/programmes/evidence/mir42/a07-release-recovery.json'}
+}
+if([string]$m44Allocation.work_package-cne'M44-00'-or@($m44Allocation.consumed_by_4_2).Count-ne$m44Expected.Count-or@($m44Allocation.consumed_by_4_2.id|Sort-Object -Unique).Count-ne$m44Expected.Count){throw '[synthesis-m44-allocation-shape]'}
+$m44Tasks=@{}
+foreach($task in $tasks){$m44Tasks[[string]$task.id]=$task}
+foreach($capability in @($m44Allocation.consumed_by_4_2)){
+  $expectedCapability=$m44Expected[[string]$capability.id]
+  if($null-eq$expectedCapability-or[string]$capability.task-cne$expectedCapability.task-or[string]$capability.acceptance-cne$expectedCapability.acceptance-or
+     [string]$capability.evidence.static_test-cne$expectedCapability.static_test-or[string]$capability.evidence.candidate_receipt-cne$expectedCapability.candidate_receipt){throw "[synthesis-m44-consumed-binding] $($capability.id)"}
+  $task=$m44Tasks[[string]$capability.task]
+  if($null-eq$task-or'M44-00'-notin@($task.programme_mapping)-or[string]$task.state-ceq'complete'-or
+     [string]$capability.acceptance-notin@($task.acceptance)){throw "[synthesis-m44-task-binding] $($capability.id)"}
+  if([string]$capability.evidence.static_test-cnotmatch'^tests/[A-Za-z0-9._/-]+\.ps1$'-or
+     [string]$capability.evidence.candidate_receipt-cnotmatch'^spec/programmes/evidence/mir42/[A-Za-z0-9._/-]+\.json$'){throw "[synthesis-m44-evidence-binding] $($capability.id)"}
+}
+$m44Reserved=@('generalized-selection-and-reuse-policy','evidence-revocation-and-lifecycle','cross-task-partial-run-recovery','nondeterminism-classification','offline-operation-and-preservation','measured-release-lane-calibration')
+if(@($m44Allocation.reserved_for_4_3).Count-ne$m44Reserved.Count-or@(Compare-Object ($m44Reserved|Sort-Object) @($m44Allocation.reserved_for_4_3.id|Sort-Object)).Count-ne0-or
+   @($m44Allocation.reserved_for_4_3|Where-Object{[string]$_.delivery_boundary-cne'4.3.0'-or[string]$_.outcome.Length-lt20}).Count-ne0){throw '[synthesis-m44-reserved-allocation]'}
 Write-Output 'Synthesis input integrity, complete 81-request/component coverage, dependency graph, and truthful completion boundaries passed.'
 
 # The controlled proof is reusable only for these exact current module bytes.

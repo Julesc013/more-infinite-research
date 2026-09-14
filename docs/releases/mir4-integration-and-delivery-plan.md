@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-07
+last_reviewed: 2026-09-15
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -24,7 +24,7 @@ The task authority is the `synthesis` section of [the existing operating program
 
 [Published MIR 4.1.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0) is release `383203807`, published at `2026-09-05T09:55:54Z`, source `3562377b520cccb071b97b3968946eae7024c950`. Four player packages and five supporting assets exist. The 4.1 qualification identities are F210 2.1.17, F200 2.0.77, F110 1.1.110, and F100 1.0.0. These exact qualification engines are distinct from dependency floors and moving engine-channel policy.
 
-The starting protected refs were main `f458598732e9583a9d086032ebfbe9ffb747d130` and dev `3683369ba00cfbdd7f8872a5a1b24f0d59f31062`. They have equal trees and distinct ancestry. They are observations, never reset targets. M42-00/01/02 completed inside 4.1; M41-08 publication is complete. M43-00 now owns 4.2 integration work. M44-00 owns 4.3 industrialization. The 4.4 historical-product and 4.5 OEM+ research-surface allocations remain proposals gated by evidence, with capability probes able to proceed independently and feasible work allowed to move earlier.
+The starting protected refs were main `f458598732e9583a9d086032ebfbe9ffb747d130` and dev `3683369ba00cfbdd7f8872a5a1b24f0d59f31062`. They have equal trees and distinct ancestry. They are observations, never reset targets. M42-00/01/02 completed inside 4.1; M41-08 publication is complete. M43-00 owns 4.2 integration work. M44-00 owns industrialization, with its consumer-used selection, exact-fingerprint evidence reuse, support-export, and candidate-bound release-recovery subset required for 4.2 and its generalized remainder reserved for 4.3. The 4.4 historical-product and 4.5 OEM+ research-surface allocations remain proposals gated by evidence, with capability probes able to proceed independently and feasible work allowed to move earlier.
 
 F200 was directly human-verified. F210 used a direct-playtest waiver for that exact release; automated evidence remains automated evidence. A future release cannot inherit the waiver. F210 Portal visibility was observed in the prior handoff with matching SHA-1; the other three uploads were not observed there. A stale observation is not proof of present absence.
 
@@ -37,8 +37,8 @@ Live GitHub readback on 7 September found no open issues; the five visible repos
 | Line | Outcome and completion gate |
 | --- | --- |
 | 4.1.x | A reproduced compatible stable correction; no patch allocation merely for a module witness or repository tooling change |
-| 4.2 | Substantial industrial research from early factories onward: complete qualified material routes, useful finite-to-infinite progression, localized discovery and explanations, auditable profiles, K2/Bob/Angel/OmniAB/RIC outcomes, a portable embedded research surface, and fresh release proof |
-| 4.3 | Specifically evidenced carryover plus measured selection/reuse, revocation, partial-run recovery, nondeterminism handling, offline operation, and dependable release delivery |
+| 4.2 | Substantial industrial research from early factories onward: complete qualified material routes, useful finite-to-infinite progression, localized discovery and explanations, auditable profiles, K2/Bob/Angel/OmniAB/RIC outcomes, a portable embedded research surface, fresh release proof, and the consumer-used M44 selection, exact-fingerprint evidence reuse, support-export, and candidate-bound release-recovery subset |
+| 4.3 | Specifically evidenced carryover plus the remaining generalized M44 selection/reuse policy, revocation and lifecycle, cross-task partial-run recovery, nondeterminism handling, offline operation, preservation, and measured release-lane calibration |
 | 4.4 | Independently supported historical products only after capability, installation, rights, engine, effect, and lifecycle proof |
 | 4.5 | Next demonstrated industrial and operational expansion; a full OEM+ technology-tree and ultimate queue is a candidate only if maintained-project integration cannot meet its contract |
 | Beyond | Rolling compatibility, explicit maintenance tiers and preservation; MIR 5 only for a justified public-contract break |
@@ -67,7 +67,7 @@ Read-only intake can start once the starting state is observed. Dependencies bel
 | A11 | M43-00 | Graduate consumer-used API/MEP/runtime/Inspector slices | A02 |
 | A12 | M43-00 | Broaden dependency-valid ecosystem coverage | A04, A05, A06 |
 | A13 | M44-00 | Calibrate impact selection and evidence reuse | A01 |
-| A14 | M43-00, maintenance | Prepare next coherent release or eligible stable correction | A01, A07, A08 |
+| A14 | M43-00, M44-00, maintenance | Prepare next coherent release or eligible stable correction | A01, A07, A08 |
 | A15 | M45-00 | Historical capability probes and independently admitted targets | A00, A02 |
 | A16 | M43-00 | Bundled localized research, explanation and profile browser | A00 |
 | A17 | M43-00 | Pipe-manufacturing investigation and useful early-to-infinite material progression | A03, A05, A06 |
@@ -77,6 +77,10 @@ Read-only intake can start once the starting state is observed. Dependencies bel
 | A21 | M43-00 | Portable research-surface core and integration-first companion route | A02, A11, A16 |
 
 Each task's explicit acceptance obligations live in the operating programme. A task is complete only when its evidence resolves those obligations. Implemented modules, planned tests, and an imported ledger do not complete gameplay requests.
+
+## M44 4.2 consumption boundary
+
+The operating programme's `m44_42_allocation` is the structured authority for this split. Each consumed capability names its owning task, the exact acceptance obligation that must appear on that task, a governed static test, and the future candidate-specific receipt. The four consumed capabilities remain incomplete until those task obligations and receipts exist. The named generalized M44 rows remain reserved for 4.3; the 4.2 candidate neither claims them nor satisfies them by completing a narrower consumer-used capability.
 
 ## MIR 4.2 product charter
 
