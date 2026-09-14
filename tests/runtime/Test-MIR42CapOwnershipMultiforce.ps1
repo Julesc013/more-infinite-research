@@ -84,12 +84,27 @@ function Assert-MIR42Data($Data,[string]$ExpectedCap){
   Assert-Exact 'V3 finalizer' $Data.finalizer 'accepted'
   Assert-Exact 'V3 prototype strategy observation' $Data.prototype 'infinite'
 }
-function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[bool]$ExpectedBlocker,[int]$ExpectedConfigurationChanges,[object[]]$ExpectedForces){
-  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','blocker','configuration_changed_events','forces')
+function Assert-MIR42State($State,[string]$ExpectedStage,[int]$ExpectedCap,[int]$ExpectedBrowserCap,[bool]$ExpectedBlocker,[int]$ExpectedConfigurationChanges,[object[]]$ExpectedForces){
+  Assert-Properties "state.$ExpectedStage" $State @('stage','cap','browser_cap','blocker','configuration_changed_events','merge_source_index','merge_destination_index','reused_force_index','merge_source_was_capped','source_index_reused','forces')
   Assert-Exact "$ExpectedStage.stage" $State.stage $ExpectedStage
   Assert-Exact "$ExpectedStage.cap" ([int]$State.cap) $ExpectedCap
+  Assert-Exact "$ExpectedStage.browser_cap" ([int]$State.browser_cap) $ExpectedBrowserCap
   Assert-Exact "$ExpectedStage.blocker" ([bool]$State.blocker) $ExpectedBlocker
   Assert-Exact "$ExpectedStage.configuration_changed_events" ([int]$State.configuration_changed_events) $ExpectedConfigurationChanges
+  if($ExpectedStage -in @('seed','capped')){
+    Assert-Exact "$ExpectedStage.merge_source_index" ([int]$State.merge_source_index) 0
+    Assert-Exact "$ExpectedStage.merge_destination_index" ([int]$State.merge_destination_index) 0
+    Assert-Exact "$ExpectedStage.reused_force_index" ([int]$State.reused_force_index) 0
+    Assert-Exact "$ExpectedStage.merge_source_was_capped" ([bool]$State.merge_source_was_capped) $false
+    Assert-Exact "$ExpectedStage.source_index_reused" ([bool]$State.source_index_reused) $false
+  } else {
+    Assert-MIR42 ([int]$State.merge_source_index -gt 0) "$ExpectedStage has no removed merge-source index."
+    Assert-MIR42 ([int]$State.merge_destination_index -gt 0) "$ExpectedStage has no merge-destination index."
+    Assert-Exact "$ExpectedStage.reused_force_index" ([int]$State.reused_force_index) ([int]$State.merge_source_index)
+    Assert-MIR42 ([int]$State.merge_destination_index -ne [int]$State.merge_source_index) "$ExpectedStage merge destination reused the source index."
+    Assert-Exact "$ExpectedStage.merge_source_was_capped" ([bool]$State.merge_source_was_capped) $true
+    Assert-Exact "$ExpectedStage.source_index_reused" ([bool]$State.source_index_reused) $true
+  }
   $actual=@($State.forces)
   Assert-MIR42 ($actual.Count -eq $ExpectedForces.Count) "$ExpectedStage force receipt count differs."
   $seen=@{}
@@ -135,8 +150,14 @@ function Get-MIR42SemanticStateJson($State){
   })
   return ([ordered]@{
     cap=[int]$State.cap
+    browser_cap=[int]$State.browser_cap
     blocker=[bool]$State.blocker
     configuration_changed_events=[int]$State.configuration_changed_events
+    merge_source_index=[int]$State.merge_source_index
+    merge_destination_index=[int]$State.merge_destination_index
+    reused_force_index=[int]$State.reused_force_index
+    merge_source_was_capped=[bool]$State.merge_source_was_capped
+    source_index_reused=[bool]$State.source_index_reused
     forces=$forces
   }|ConvertTo-Json -Depth 8 -Compress)
 }
@@ -149,8 +170,25 @@ $engineVersion=([regex]::Match($engineVersion,'Version:\s+2[.]1[.]17[^\r\n]*').V
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 Assert-MIR42 ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'requires source commit/tree identities.'
-$packageSourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod)
-Assert-MIR42 ($packageSourceChanges.Count -eq 0) "requires a clean src/mod root: $($packageSourceChanges -join '; ')"
+$candidateMaterializationClosure=@(
+  'src/mod'
+  'targets'
+  'tools/mir/application/package'
+  'tools/mir/application/release'
+  'tools/mir/domain/canonicalization'
+  'tools/lib/mir4/BootstrapMaterialization.ps1'
+  'tools/lib/mir4/bootstrap-materialization'
+  'tools/lib/validation/PackageIdentity.ps1'
+  'tools/lib/validation/MIR4DistributionIdentity.ps1'
+  'spec/schemas/mir4-canonical-package-authority-v1.schema.json'
+  'spec/schemas/mir4-package-composition-result-v1.schema.json'
+  'contracts/release'
+  'releases/governance'
+  'changes'
+  '.mir/releases/waves/mir4-r0'
+)
+$candidateInputChanges=@(& git -C $repo status --porcelain --untracked-files=all -- @candidateMaterializationClosure)
+Assert-MIR42 ($candidateInputChanges.Count -eq 0) "requires a clean candidate-materialization closure: $($candidateInputChanges -join '; ')"
 
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
@@ -363,20 +401,27 @@ $cappedForces=@(
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$false;visible_when_disabled=$true}
 )
-$eventForces=@($cappedForces + [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$false})
+$eventForces=@(
+  $cappedForces
+  [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$false}
+  [pscustomobject]@{name='merge-destination';level=4;enabled=$false;visible_when_disabled=$true}
+  [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$false}
+)
 $removedForces=@(
   [pscustomobject]@{name='owned';level=4;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='foreign-disabled';level=4;enabled=$false;visible_when_disabled=$false},
   [pscustomobject]@{name='below-cap';level=2;enabled=$true;visible_when_disabled=$false},
   [pscustomobject]@{name='event-probe';level=4;enabled=$true;visible_when_disabled=$false},
-  [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true}
+  [pscustomobject]@{name='new-force';level=4;enabled=$true;visible_when_disabled=$true},
+  [pscustomobject]@{name='merge-destination';level=4;enabled=$true;visible_when_disabled=$false},
+  [pscustomobject]@{name='merge-reuse';level=4;enabled=$true;visible_when_disabled=$true}
 )
-Assert-MIR42State $seedState 'seed' 0 $false 0 $seedForces
-Assert-MIR42State $cappedState 'capped' 3 $false 1 $cappedForces
-Assert-MIR42State $eventProbeState 'event-probe' 3 $false 1 $eventForces
-Assert-MIR42State $blockedState 'blocked' 3 $true 2 $eventForces
-Assert-MIR42State $removalState 'removal' 0 $false 3 $removedForces
-Assert-MIR42State $terminalState 'terminal' 0 $false 3 $removedForces
+Assert-MIR42State $seedState 'seed' 0 0 $false 0 $seedForces
+Assert-MIR42State $cappedState 'capped' 3 3 $false 1 $cappedForces
+Assert-MIR42State $eventProbeState 'event-probe' 3 3 $false 1 $eventForces
+Assert-MIR42State $blockedState 'blocked' 3 0 $true 2 $eventForces
+Assert-MIR42State $removalState 'removal' 0 0 $false 3 $removedForces
+Assert-MIR42State $terminalState 'terminal' 0 0 $false 3 $removedForces
 Assert-MIR42StableForceIndices $seedState $cappedState 'seed-to-capped'
 Assert-MIR42StableForceIndices $seedState $eventProbeState 'seed-to-event-probe'
 Assert-MIR42StableForceIndices $eventProbeState $blockedState 'event-probe-to-blocked'
@@ -416,7 +461,8 @@ $result=[ordered]@{
     commit=$sourceCommit
     tree=$sourceTree
     package_source_sha256=Get-MIR42Sha (Join-Path $repo 'src/mod/package-source.json')
-    package_source_roots_clean=$true
+    candidate_materialization_closure=@($candidateMaterializationClosure)
+    candidate_materialization_closure_clean=$true
   }
   candidate=Get-MIR42Artifact $candidateZip
   freshly_materialized_candidate=Get-MIR42Artifact $freshCandidateZip
