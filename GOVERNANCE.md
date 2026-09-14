@@ -22,6 +22,10 @@ Maintainers exclusively approve protected signing and recovery readiness, F210/F
 
 ## Change custody
 
-Normal MIR 4.1 and later work targets protected `main` by pull request. The aggregate verification gate must pass before merge. Retained `dev` mirrors `main` and receives no independent work. MIR 4.0.x corrections target protected `release/4.0` under the patch contract. Immutable release evidence is never rewritten; corrections are new events.
+Branch roles are defined in [the branch authority](.mir/branches.yml) and explained in [Contributing](CONTRIBUTING.md). Next-minor and next-major implementation, feature work, and refactors target protected `dev` by pull request. Protected `main` serves the latest stable MIR 4.x line, bounded stable corrections, repository-governance maintenance, and exact qualified development promotions. MIR 4.0.x corrections target protected `release/4.0` under its patch contract.
+
+Routine implementation branches, public development pushes, pull requests, integration into `dev`, and primary-checkout synchronization are standing maintainer-authorized under [AGENTS.md](AGENTS.md). Required checks and enforced branch rules still apply; they are execution requirements, not a request for renewed routine permission. Source freeze, `main` promotion, signing and public release retain their separate acceptance and authorization requirements.
+
+Read back the protected target after integration and complete required forward-port dispositions. `main` and `dev` may intentionally differ during next-release development; `dev` is not a read-only mirror. Preserve dirty or uniquely valuable local work. Immutable release evidence is never rewritten; corrections are new events.
 
 See [Contributing](CONTRIBUTING.md), [Release runbook](RELEASE-RUNBOOK.md), and [Project continuity](PROJECT-CONTINUITY.md).
