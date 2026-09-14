@@ -3203,9 +3203,9 @@
     {
       "path": "tools/lib/assurance/evidence/AttemptState.ps1",
       "classification": "canonical-internal",
-      "sha256": "8165A25D94443F55243927DA3A8D990748373EE92A8BA45CB45A3F921B2C88DC",
+      "sha256": "325421D573E9AC67A43D206A510477CE4881DC4459851266FB04D6CCBCB6C0DC",
       "hash_mode": "canonical-text-v1",
-      "lines": 75,
+      "lines": 802,
       "package_visible": false
     },
     {
@@ -3219,17 +3219,17 @@
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "AE7C83E9287F7336D8A4E2B42701C534757C48BF5173D7F3CBE0360E071C606F",
+      "sha256": "D2909D05C9FAB388FF8C628D909E808F6DCF7F40883A7AADAF2EE554008A9A5D",
       "hash_mode": "canonical-text-v1",
-      "lines": 182,
+      "lines": 212,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "DFE45F47286CBF2657F6304FA8DBB67B01A282E8E82134C483D63553D2A4EDAD",
+      "sha256": "4158FA6462BF490847744B9A19247FC238910849151E0DBA90EE55BB9E31E3C0",
       "hash_mode": "canonical-text-v1",
-      "lines": 526,
+      "lines": 588,
       "package_visible": false
     },
     {
@@ -3267,9 +3267,9 @@
     {
       "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
       "classification": "canonical-internal",
-      "sha256": "F7DBFB0ADBAA7475565F5CF3B4D65D4E6950B5894C7A6A86AB6B1B3452FC8537",
+      "sha256": "52EA1E2EC93666720040BC1CF37CD1AA197AA64FA7E0A3B984D56E000312ADD3",
       "hash_mode": "canonical-text-v1",
-      "lines": 481,
+      "lines": 511,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:90fa65fd0b84f98f4c33a6b5b712045a6f7a6a65a7d487b1cbc4233d8653c3f9"
+  "digest": "sha256:ca7e0c1ad8d6bd370e5b676301399f207324133f726ff0eea335b92d32afdb7b"
 }
