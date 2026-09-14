@@ -2285,6 +2285,7 @@
         ".mir/modules.yml",
         "spec/releases/mir4-protected-main-promotion-topology-v1.json",
         "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
+        "spec/schemas/mir4-protected-main-qualification-v1.schema.json",
         "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
         "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
         "validation/tests.yml"

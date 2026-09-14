@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-protected-main-qualification-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "candidate", "packages", "release_authority", "publication_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR42ProtectedMainQualificationV1"},
+    "status": {"const": "independently-qualified"},
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "commit", "tree"],
+      "properties": {
+        "ref": {"type": "string", "pattern": "^refs/heads/candidate/[a-z0-9][a-z0-9._-]{2,80}$"},
+        "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tree": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "relative_path", "archive_sha256", "content_sha256", "bytes", "entry_count"],
+        "properties": {
+          "target": {"type": "string", "minLength": 1},
+          "relative_path": {"type": "string", "minLength": 1, "pattern": "^(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"},
+          "archive_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+          "content_sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+          "bytes": {"type": "integer", "minimum": 1},
+          "entry_count": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "release_authority": {"const": false},
+    "publication_authority": {"const": false}
+  }
+}

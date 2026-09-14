@@ -403,7 +403,7 @@
       "patterns": [
         "^tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology[.]ps1$",
         "^tests/mir4/Test-MIR4ProtectedPromotionTopologyA08[.]ps1$",
-        "^spec/(?:releases/mir4-protected-main-promotion-topology-v1|schemas/mir4-protected-main-promotion-topology-v1[.]schema)[.]json$",
+        "^spec/(?:releases/mir4-protected-main-promotion-topology-v1|schemas/mir4-protected-main-(?:promotion-topology|qualification)-v1[.]schema)[.]json$",
         "^spec/programmes/mir4-4x-operating-programme-v1[.]json$",
         "^[.]mir/(?:assurance[.]json|modules[.]yml)$",
         "^validation/tests[.]yml$"

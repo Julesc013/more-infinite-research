@@ -23,6 +23,9 @@
     "exact_candidate_commit": true,
     "exact_candidate_tree": true,
     "exact_target_package_bytes": true,
+    "trusted_record_hash_required": true,
+    "package_files_rehashed_at_intention": true,
+    "package_files_rehashed_at_readback": true,
     "calendar_does_not_waive_gates": true
   },
   "promotion": {
@@ -35,6 +38,8 @@
       "verification-gate"
     ],
     "commit_identity_changes_at_squash_boundary": true,
+    "candidate_create_only_push": true,
+    "protected_request_contract_required": true,
     "force_push": false,
     "branch_deletion": false,
     "ruleset_mutation": false,
@@ -45,11 +50,15 @@
     "exact_tree_required": true,
     "exact_package_bytes_required": true,
     "qualified_dev_ref_unchanged_required": true,
+    "direct_main_child_required": true,
+    "commit_message_binding_required": true,
     "commit_rebinding_record_required": true,
     "human_playtest_after_readback": true
   },
   "recovery": {
     "persist_before_effect": true,
+    "remote_candidate_create_only_required": true,
+    "protected_request_persisted_before_execution": true,
     "remote_ref_readback_required": true,
     "ref_drift_fails_closed": true,
     "tree_or_package_mismatch_creates_new_candidate": true

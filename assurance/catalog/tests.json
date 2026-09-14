@@ -4293,6 +4293,7 @@
         ".mir/modules.yml",
         "spec/releases/mir4-protected-main-promotion-topology-v1.json",
         "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
+        "spec/schemas/mir4-protected-main-qualification-v1.schema.json",
         "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
         "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
         "validation/tests.yml"
@@ -6309,5 +6310,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c79509271b5b0aabd949edde9baa81bb21743aba37f595885b21baad02fc6b04"
+  "digest": "sha256:e9834892e7b3af72452ef014354ff4e4908de04a5dff05f5a28c8c39802a9431"
 }
