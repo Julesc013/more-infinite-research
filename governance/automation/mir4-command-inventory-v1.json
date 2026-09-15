@@ -2179,9 +2179,9 @@
     {
       "path": "tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1",
       "classification": "canonical-internal",
-      "sha256": "7218645392FF2F4FF6852FE712130D9520B745E3E6AA4EDDD3F307F4E0A03ECB",
+      "sha256": "B720E8993024D6B4783C76985D8ABCAABC0A8E47607FDE7EBF52ABB7CFD293A8",
       "hash_mode": "canonical-text-v1",
-      "lines": 157,
+      "lines": 106,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5c820186a2e6244d31b91f812e59c1dca5d119a2add21e62a2fffd34e8a6fc91"
+  "digest": "sha256:c9dcc4eccc60a3d0a8ebc36667f639f01b088d31da31ca70fa9f7d495a10a4c5"
 }
