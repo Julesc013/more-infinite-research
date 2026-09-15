@@ -4587,9 +4587,9 @@
     {
       "path": "tools/mir/application/compiler/CompilationRun.ps1",
       "classification": "canonical-internal",
-      "sha256": "F8B2C61ACF644651741E7A373A6882E3D5C8D4AB26771FB5232134E68F09D2AF",
+      "sha256": "205D7043E99F1104A3C9B391B24AF2A952D443E3B68F101CCCD11CF097BFD0D5",
       "hash_mode": "canonical-text-v1",
-      "lines": 288,
+      "lines": 308,
       "package_visible": false
     },
     {
@@ -4963,9 +4963,9 @@
     {
       "path": "tools/mir/application/processir/ProcessIR.ps1",
       "classification": "canonical-internal",
-      "sha256": "07D34A4C9104225B41797E75278F775275250538F8286FADE7F6EB83AC637CD2",
+      "sha256": "F19577978E503C6862EF8ADBFE6DA31D7CC0D3F21C1F4610455AFC33809B3D90",
       "hash_mode": "canonical-text-v1",
-      "lines": 483,
+      "lines": 503,
       "package_visible": false
     },
     {
@@ -5211,9 +5211,9 @@
     {
       "path": "tools/mir/application/runtime/RuntimeStateModel.ps1",
       "classification": "canonical-internal",
-      "sha256": "C3B20168F8C2E93CE9F676AE7EF927083CAFA2950A03AEB54BF792E34669C089",
+      "sha256": "7FC72814F1F8A9100CE8986796FFE9E775451DB3BD5CDF10E955777DE6E76004",
       "hash_mode": "canonical-text-v1",
-      "lines": 331,
+      "lines": 358,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:efba8c8b1dba0749c60a730a8b9fc3a91d896f3ec5ceaedc50540a02b31a6bed"
+  "digest": "sha256:0fec3020b928b388e3ad092a6f5ed2cbf332cab4538b1d97d91068b0d2fa8529"
 }

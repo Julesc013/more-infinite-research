@@ -9,6 +9,26 @@ function Resolve-MIR4SemanticCompositionTarget {
   return 'f210'
 }
 
+function Get-MIR4SemanticCurrentTargetPackageContext {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210'
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $cacheVariable = Get-Variable -Scope Script -Name MIR4SemanticCurrentTargetPackageContexts -ErrorAction SilentlyContinue
+  if ($null -eq $cacheVariable -or $null -eq $cacheVariable.Value) {
+    $script:MIR4SemanticCurrentTargetPackageContexts = @{}
+  }
+  $key = "$repo|$Target"
+  if (-not $script:MIR4SemanticCurrentTargetPackageContexts.ContainsKey($key)) {
+    $script:MIR4SemanticCurrentTargetPackageContexts[$key] = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
+  }
+  return $script:MIR4SemanticCurrentTargetPackageContexts[$key]
+}
+
 function Resolve-MIR4SemanticAuthorityPath {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -23,7 +43,7 @@ function Resolve-MIR4SemanticAuthorityPath {
     . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
   }
   if (Test-MIR4CurrentTargetPackageOutputPath -RelativePath $relative) {
-    $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $Target
+    $context = Get-MIR4SemanticCurrentTargetPackageContext -RepoRoot $RepoRoot -Target $Target
     return Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $relative
   }
   return Join-Path $RepoRoot $relative
