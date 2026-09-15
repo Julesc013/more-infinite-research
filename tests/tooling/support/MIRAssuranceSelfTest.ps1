@@ -156,22 +156,8 @@ function Invoke-MIRAssuranceSelfTest {
     }
   }
 
-  $planningAuthority = $null
-  try {
-    $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
-  } catch {
-    $developmentEpochPath = Join-Path $repo 'governance/repository/development-epoch-v1.json'
-    $developmentEpoch = if (Test-Path -LiteralPath $developmentEpochPath -PathType Leaf) { Get-Content -Raw -LiteralPath $developmentEpochPath | ConvertFrom-Json } else { $null }
-    $expectedMissing = "Typed release authority is missing: .mir/releases/records/$([string]$Context.info.version).json"
-    if ($null -eq $developmentEpoch -or
-        [string]$developmentEpoch.kind -cne 'MIR4DevelopmentEpochV1' -or
-        [bool]$developmentEpoch.release_authority -or
-        [string]$Context.info.version -cnotmatch '^4[.][0-9]{1,5}[.][0-9]{5}$' -or
-        $_.Exception.Message -cne $expectedMissing) {
-      throw
-    }
-  }
-  if ($null -ne $planningAuthority -and [string]$planningAuthority.state -eq "planned") {
+  $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
+  if ([string]$planningAuthority.state -eq "planned") {
     if ([string]$planningAuthority.authority_class -ne "planned-reservation" -or
         [string]$planningAuthority.candidate_id -ne "not-assigned" -or
         [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
@@ -185,6 +171,12 @@ function Invoke-MIRAssuranceSelfTest {
     }
     if (-not $candidateAuthorityRejected) {
       throw "Planned release reservation was incorrectly accepted as exact candidate authority."
+    }
+  } elseif ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
+    if ([string]$planningAuthority.authority_class -ne 'development-context-no-release-authority' -or
+        [bool]$planningAuthority.release_authority -or
+        [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
+      throw 'Development planning authority escaped its private, current-source-only boundary.'
     }
   }
 

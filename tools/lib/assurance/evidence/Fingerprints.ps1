@@ -535,15 +535,18 @@ function Get-MIRAssuranceTestFingerprint {
   $templateIdProperty = $Test.PSObject.Properties['template_id']
   $domainDependenciesProperty = $Test.PSObject.Properties['domain_dependencies']
   $scenarioProperty = $Test.PSObject.Properties['scenario']
+  $requiresFactorioProperty = $Test.PSObject.Properties['requires_factorio']
+  $requiresCandidateProperty = $Test.PSObject.Properties['requires_candidate']
+  $inputsProperty = $Test.PSObject.Properties['inputs']
   $definition = [ordered]@{
     id=[string]$Test.id
     template_id=if ($null -ne $templateIdProperty) { [string]$templateIdProperty.Value } else { '' }
     kind=[string]$Test.kind
     layer=[string]$Test.layer
     command=[string]$Test.command
-    requires_factorio=[bool]$Test.requires_factorio
-    requires_candidate=[bool]$Test.requires_candidate
-    inputs=@($Test.inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    requires_factorio=if ($null -ne $requiresFactorioProperty) { [bool]$requiresFactorioProperty.Value } else { $false }
+    requires_candidate=if ($null -ne $requiresCandidateProperty) { [bool]$requiresCandidateProperty.Value } else { $false }
+    inputs=if ($null -ne $inputsProperty) { @($inputsProperty.Value | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
     captured_artifacts=@(
       foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
         [ordered]@{

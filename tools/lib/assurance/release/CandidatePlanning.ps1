@@ -199,11 +199,75 @@ function Get-MIRAssuranceLocalPlaytestPlanningAuthority {
   }
 }
 
+function Get-MIRAssuranceDevelopmentPlanningAuthority {
+  param([Parameter(Mandatory)]$Context)
+
+  if ([string]$Context.verification_profile.execution_context_mode -ne 'development-context') {
+    return $null
+  }
+  $authorityRelative = ([string]$Context.verification_profile.execution_context).Replace('\', '/')
+  if ($authorityRelative -cne 'spec/execution/mir4-4.1-development-context-v1.json') {
+    throw "Development planning execution context path is unsafe: $authorityRelative"
+  }
+  $authorityPath = Join-Path $repo $authorityRelative
+  $registryRelative = 'targets/registry.json'
+  $registryPath = Join-Path $repo $registryRelative
+  if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or
+      -not (Test-Path -LiteralPath $registryPath -PathType Leaf)) {
+    throw 'Development planning execution context or target registry is absent.'
+  }
+  $authority = Get-Content -Raw -LiteralPath $authorityPath | ConvertFrom-Json -DateKind String
+  $registry = Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json -DateKind String
+  $targetRows = @($registry.targets | Where-Object { [string]$_.factorio_line -eq [string]$Context.target })
+  if (-not (Test-MIR4BootstrapRecordHash -Record $authority) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
+      [string]$authority.kind -ne 'MIR4DevelopmentExecutionContextV1' -or
+      [string]$authority.status -ne 'active-private-mir4.1-qualification-no-release-authority' -or
+      @($authority.allowed) -notcontains 'repository-development' -or
+      @($authority.allowed) -notcontains 'private-candidate-qualification' -or
+      @($authority.forbidden) -notcontains 'public-release-authority' -or
+      @($authority.forbidden) -notcontains 'production-signing' -or
+      @($authority.forbidden) -notcontains 'tagging' -or
+      @($authority.forbidden) -notcontains 'publication' -or
+      [bool]$authority.transition_gate.source_freeze -or
+      [bool]$authority.transition_gate.version_allocation -or
+      [bool]$authority.transition_gate.tagging -or
+      [bool]$authority.transition_gate.signing -or
+      [bool]$authority.transition_gate.sealing -or
+      [bool]$authority.transition_gate.publication -or
+      [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
+      $targetRows.Count -ne 1) {
+    throw 'Development planning execution context boundary is invalid.'
+  }
+  $targetRow = $targetRows[0]
+  if (@($authority.targets) -notcontains [string]$targetRow.target -or
+      [string]$Context.info.version -notmatch '^4[.][0-9]{1,5}[.][0-9]{5}$') {
+    throw 'Development planning target or distribution identity is invalid.'
+  }
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $identity = Resolve-MIR4CanonicalPackageIdentity `
+    -RepoRoot $repo `
+    -Target ([string]$targetRow.target) `
+    -DistributionVersion ([string]$Context.info.version)
+  $sourceCommit = Resolve-MIRAssuranceCommit -Commit HEAD
+  return [pscustomobject][ordered]@{
+    release = [string]$identity.distribution_version
+    target = [string]$Context.target
+    state = [string]$authority.status
+    authority_class = 'development-context-no-release-authority'
+    candidate_id = 'MIR4-ASSURANCE-' + ((& git -C $repo rev-parse 'HEAD^{tree}').Trim().ToUpperInvariant())
+    package_source_commit = $sourceCommit
+    release_authority = $false
+  }
+}
+
 function Get-MIRAssuranceReleasePlanningAuthority {
   param([Parameter(Mandatory)]$Context)
 
   $localPlaytest = Get-MIRAssuranceLocalPlaytestPlanningAuthority -Context $Context
   if ($null -ne $localPlaytest) { return $localPlaytest }
+  $development = Get-MIRAssuranceDevelopmentPlanningAuthority -Context $Context
+  if ($null -ne $development) { return $development }
 
   $version = [string]$Context.info.version
   $recordPath = Join-Path $repo ".mir\releases\records\$version.json"
