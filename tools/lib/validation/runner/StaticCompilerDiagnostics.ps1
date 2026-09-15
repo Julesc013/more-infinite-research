@@ -1,17 +1,17 @@
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $dataFinalFixesStagePath = Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua"
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
-  $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
-  $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
-  $capabilityContractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
-  $capabilityPolicyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
-  $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
-  $compilerDiagnosticsPath = Join-Path $repo "prototypes\mir\report\compiler_diagnostics.lua"
-  $pipelineCommandsPath = Join-Path $repo "prototypes\mir\pipeline\commands.lua"
+  $dataFinalFixesStagePath = Get-MIRValidationPath -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/report/diagnostics_sink.lua")
+  $indexRegistryPath = Get-MIRValidationPath -RelativePath "prototypes/mir/index/registry_builder.lua"
+  $capabilityRegistryPath = Get-MIRValidationPath -RelativePath "prototypes/mir/capabilities/registry.lua"
+  $capabilityContractPath = Get-MIRValidationPath -RelativePath "prototypes/mir/capabilities/contract.lua"
+  $capabilityPolicyPath = Get-MIRValidationPath -RelativePath "prototypes/mir/policy/capabilities.lua"
+  $schemaPath = Get-MIRValidationPath -RelativePath "prototypes/mir/core/schema.lua"
+  $compilerDiagnosticsPath = Get-MIRValidationPath -RelativePath "prototypes/mir/report/compiler_diagnostics.lua"
+  $pipelineCommandsPath = Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/commands.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
-  $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
+  $compatPlannerText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/planner.lua")
   $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "tests\tooling\Test-MIRPolicyLints.ps1")
 
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
@@ -34,9 +34,9 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   }
 
   $indexRegistryText = Get-Content -Raw -LiteralPath $indexRegistryPath
-  $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
-  $decisionExportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\decision_export.lua")
-  $coverageReportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\coverage.lua")
+  $decisionRecordText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/decisions/decision_record.lua")
+  $decisionExportText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/report/decision_export.lua")
+  $coverageReportText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/report/coverage.lua")
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
@@ -57,7 +57,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RecipeFact' },
-    @{ File = "prototypes\mir\index\recipe_facts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_facts.lua")); Snippet = 'productive_result_names' },
+    @{ File = "prototypes\mir\index\recipe_facts.lua"; Text = (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/index/recipe_facts.lua")); Snippet = 'productive_result_names' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'schema = schema.fact_registry' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'build_loop_risk_facts' },
@@ -118,16 +118,16 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
 
 Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
-  $scienceSelectorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_selector.lua")
-  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
+  $productivityText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/streams/productivity.lua")
+  $scienceSelectorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/capabilities/science_integration/science_selector.lua")
+  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/planner/prerequisites.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/report/diagnostics_sink.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Convert-MIRCompatAuditResults.ps1")
-  $exactRecipePolicyPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"
-  $airScrubbingDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"
-  $atanAshDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\atan_ash.lua"
-  $compatibilityDiagnosticsReportPath = Join-Path $repo "prototypes\mir\report\compatibility_diagnostics.lua"
-  $manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
+  $exactRecipePolicyPath = Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua"
+  $airScrubbingDiagnosticsPath = Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua"
+  $atanAshDiagnosticsPath = Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/diagnostics/atan_ash.lua"
+  $compatibilityDiagnosticsReportPath = Get-MIRValidationPath -RelativePath "prototypes/mir/report/compatibility_diagnostics.lua"
+  $manifestPath = Get-MIRValidationPath -RelativePath "prototypes/mir/streams/generated_stream_manifest.json"
   $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
 
   foreach ($path in @($exactRecipePolicyPath, $airScrubbingDiagnosticsPath, $atanAshDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
@@ -193,7 +193,7 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
 
 Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $repairPath = Join-Path $repo "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"
+  $repairPath = Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua"
   $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
   $compatibilityManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
   $atanAshDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\targets\atan-ash.md")
@@ -237,8 +237,8 @@ Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
 }
 
 Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded and governed" {
-  $registryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\registry.lua")
-  $repairText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\factorio_2_1_ambient_sound_schema.lua")
+  $registryText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/registry.lua")
+  $repairText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua")
   $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
   $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
   $docsText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\docs.yml")
@@ -279,11 +279,11 @@ Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded 
 }
 
 Invoke-RepoCheck "schema-3 MaximumLevelBinding is the governed cross-route cap authority" {
-  $bindingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\technology\maximum_level_binding.lua")
-  $orchestratorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\compiler_orchestrator.lua")
-  $presentationText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\mutations\maximum_level_presentation.lua")
-  $runtimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\maximum_level_control.lua")
-  $modDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\mod_data.lua")
+  $bindingText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/technology/maximum_level_binding.lua")
+  $orchestratorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua")
+  $presentationText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua")
+  $runtimeText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/runtime/maximum_level_control.lua")
+  $modDataText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/mod_data.lua")
   $fixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-compiler-contracts\data-final-fixes.lua")
   $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
   $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
@@ -318,8 +318,8 @@ Invoke-RepoCheck "schema-3 MaximumLevelBinding is the governed cross-route cap a
 }
 
 Invoke-RepoCheck "bounded technology prerequisite cycle repairs are wired" {
-  $registryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\registry.lua")
-  $repairText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\technology_prerequisite_cycles.lua")
+  $registryText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/registry.lua")
+  $repairText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua")
   $fixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\external-technology-cycle\data-final-fixes.lua")
   $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
   foreach ($check in @(

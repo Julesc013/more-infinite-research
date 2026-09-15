@@ -9,6 +9,32 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 
+# M41-05B is an immutable documentation-cutover receipt.  Current editable
+# package presentation is governed by V3; this command deliberately verifies
+# the pinned M41 object and never recalculates it from a later source layout.
+$historicalOutputRelative = 'releases/migrations/MIR4-M41-05B-Documentation-CutoverV1.json'
+$historicalOutputPath = Join-Path $RepoRoot $historicalOutputRelative
+$historicalSchemaPath = Join-Path $RepoRoot 'contracts/repository/mir4-m41-05b-documentation-cutover-v1.schema.json'
+if ($Check) {
+  if (-not (Test-Path -LiteralPath $historicalOutputPath -PathType Leaf)) { throw '[mir4-m41-05b-receipt-missing]' }
+  $historicalRaw = Get-Content -Raw -LiteralPath $historicalOutputPath
+  if (-not ($historicalRaw | Test-Json -SchemaFile $historicalSchemaPath)) { throw '[mir4-m41-05b-receipt-schema]' }
+  $historical = $historicalRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4BootstrapRecordHash -Record $historical) -or
+      [string]$historical.kind -cne 'MIR4M4105BDocumentationCutoverV1' -or
+      [string]$historical.base.commit -cne 'fed9ae76cdb99b1dcfacfaf263f612d9c6f01a31') {
+    throw '[mir4-m41-05b-historical-custody]'
+  }
+  $pinnedReadme = @(& git -C $RepoRoot show 'c4597569a3a5499172d39ef814a80bbb0a9d8978:README.md')
+  if ($LASTEXITCODE -ne 0 -or
+      (Get-MIR4Sha256String -Value (($pinnedReadme -join "`n") + "`n")) -cne [string]$historical.repository_landing.sha256) {
+    throw '[mir4-m41-05b-pinned-history]'
+  }
+  Write-Host '[ok] immutable M41-05B documentation cutover receipt matches its pinned history.'
+  return $historical
+}
+throw '[mir4-m41-05b-historical-receipt-is-not-a-current-writer]'
+
 function Get-MIR4105BHash([string]$RelativePath) {
   return Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot $RelativePath)
 }

@@ -1,15 +1,15 @@
 Invoke-RepoCheck "prototype limit settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $settingsCatalogText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\catalog.lua")
-  $effectContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\effect_contracts.lua")
-  $streamDescriptorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\streams\descriptor.lua")
-  $effectScalingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\effect_scaling.lua")
+  $settingsCatalogText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/catalog.lua")
+  $effectContractsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/effect_contracts.lua")
+  $streamDescriptorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/streams/descriptor.lua")
+  $effectScalingText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/effect_scaling.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $stepsText = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")) + "`n" +
-    (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua"))
-  $prototypeLimitSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\prototype_limits.lua")
-  $prototypeLimitPipelineText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\prototype_limits.lua")
-  $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
+  $stepsText = (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua")) + "`n" +
+    (Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/commands.lua"))
+  $prototypeLimitSettingsText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/settings/prototype_limits.lua")
+  $prototypeLimitPipelineText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/prototype_limits.lua")
+  $localeText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "locale/en/more-infinite-research.cfg")
   $settingsManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\settings.yml")
   $modulesManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
   $fixturesManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\fixtures.yml")

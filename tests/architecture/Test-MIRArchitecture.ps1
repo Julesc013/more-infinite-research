@@ -1,6 +1,7 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 param(
-  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path
+  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../..")).Path,
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210'
 )
 # Canonical validation scripts live three levels below the repository root.
 # Keep the former scripts/ base explicit while tooling internals complete L5.
@@ -10,6 +11,9 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
+& (Join-Path $repo 'tests/architecture/Test-MIR4CurrentTargetPackage.ps1') -RepoRoot $repo
 
 & (Join-Path $repo "tools\commands\docs\Update-MIRPipelineDocumentation.ps1") -RepoRoot $repo -Check
 & (Join-Path $repo "tools\commands\docs\Update-MIRGeneratedAuthorityDocs.ps1") -RepoRoot $repo -Check
@@ -83,7 +87,7 @@ Assert-MIRModuleManifestSemantics
 
 function Get-MIRPath {
   param([Parameter(Mandatory)][string]$RelativePath)
-  return Join-Path $repo $RelativePath
+  return Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath
 }
 
 function Read-MIRFile {
@@ -118,7 +122,8 @@ function Assert-MIRContains {
 
 function Assert-MIRAbsent {
   param([Parameter(Mandatory)][string]$RelativePath)
-  $path = Get-MIRPath -RelativePath $RelativePath
+  $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -eq $path) { return }
   if (Test-Path -LiteralPath $path) {
     throw "Obsolete MIR 3 shim path must be absent: $RelativePath"
   }
@@ -132,16 +137,12 @@ function Assert-MIRNoPatternInLuaTree {
     [string[]]$ExcludeRelative = @()
   )
 
-  $root = Get-MIRPath -RelativePath $RelativeRoot
-  if (-not (Test-Path -LiteralPath $root)) { return }
-
   $matches = @(
-    Get-ChildItem -LiteralPath $root -Recurse -File -Filter "*.lua" |
-      Where-Object {
-        $relative = [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/")
-        $ExcludeRelative -notcontains $relative
-      } |
-      Select-String -Pattern $Pattern
+    foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix (($RelativeRoot.TrimEnd('/')) + '/')) {
+      if ([string]$entry.output_path -like '*.lua' -and $ExcludeRelative -notcontains [string]$entry.output_path) {
+        Select-String -LiteralPath ([string]$entry.source_file) -Pattern $Pattern
+      }
+    }
   )
   if ($matches.Count -gt 0) {
     $matches | Write-Host
@@ -167,13 +168,13 @@ function Assert-MIRNoPatternInLuaFile {
 }
 
 function Assert-MIRNoTopLevelRequireCycles {
-  $luaRoot = Get-MIRPath -RelativePath "prototypes/mir"
   $graph = @{}
-  foreach ($file in Get-ChildItem -LiteralPath $luaRoot -Recurse -File -Filter "*.lua") {
-    $relative = [System.IO.Path]::GetRelativePath($repo, $file.FullName).Replace("\", "/")
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'prototypes/mir/') {
+    if (-not ([string]$entry.output_path -like '*.lua')) { continue }
+    $relative = [string]$entry.output_path
     $module = ($relative -replace '\.lua$', '').Replace("/", ".")
     $dependencies = @()
-    $text = Get-Content -Raw -LiteralPath $file.FullName
+    $text = Get-Content -Raw -LiteralPath ([string]$entry.source_file)
     foreach ($match in [regex]::Matches($text, '(?m)^(?:local\s+\w+\s*=\s*|return\s+)require\("([^"]+)"\)')) {
       $dependency = $match.Groups[1].Value
       if ($dependency.StartsWith("prototypes.mir.")) {
@@ -493,7 +494,7 @@ if ($LASTEXITCODE -ne 0) {
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'commands.run_all({return_snapshot = false})'
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes/mir/pipeline/commands.lua")) -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -1055,9 +1056,11 @@ Assert-MIRNoPatternInLuaTree `
   -Message "MIR settings modules must not inspect finalized prototypes or force hidden values."
 
 $settingsExtendMatches = @(
-  Get-ChildItem -LiteralPath (Get-MIRPath -RelativePath "prototypes/mir/settings") -Recurse -File -Filter "*.lua" |
-    Where-Object { [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") -ne "prototypes/mir/settings/stage_builder.lua" } |
-    Select-String -Pattern "data:extend"
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'prototypes/mir/settings/') {
+    if ([string]$entry.output_path -like '*.lua' -and [string]$entry.output_path -cne 'prototypes/mir/settings/stage_builder.lua') {
+      Select-String -LiteralPath ([string]$entry.source_file) -Pattern "data:extend"
+    }
+  }
 )
 if ($settingsExtendMatches.Count -gt 0) {
   $settingsExtendMatches | Write-Host
