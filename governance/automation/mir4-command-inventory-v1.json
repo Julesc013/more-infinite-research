@@ -3107,9 +3107,9 @@
     {
       "path": "tools/commands/targets/Set-MIRTerminalShadowProjection.ps1",
       "classification": "historical",
-      "sha256": "68DE8F2F7625B5F53352EC5563512EEDA9422C3995107AF338856DCA0A1B9FE8",
+      "sha256": "3B152A67240AB53B730A306D4D451CC18700DEA9E010D9FB5D7914C1C6E7FF8D",
       "hash_mode": "canonical-text-v1",
-      "lines": 1599,
+      "lines": 1604,
       "package_visible": false
     },
     {
@@ -3227,9 +3227,9 @@
     {
       "path": "tools/lib/assurance/Core.ps1",
       "classification": "canonical-internal",
-      "sha256": "9163F79F8911F6A57E3922A4E3A9525CE770D96114553B94F5B1069605F761C1",
+      "sha256": "19887BB4AB3492C3594696C9A08739DCE3D93E57BAE7196137D95E459B498F23",
       "hash_mode": "canonical-text-v1",
-      "lines": 683,
+      "lines": 688,
       "package_visible": false
     },
     {
@@ -3259,33 +3259,33 @@
     {
       "path": "tools/lib/assurance/evidence/CommandExecution.ps1",
       "classification": "canonical-internal",
-      "sha256": "52008E91EFFECFF9F3A853142B92D9A4FC4EE49E80E791F358774D9B3092436D",
+      "sha256": "1BDD55B8E5C5D62AD0C4B4AEA1DB347A72954B50B882E461DDDF7E7AFC83EB53",
       "hash_mode": "canonical-text-v1",
-      "lines": 111,
+      "lines": 115,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "81E8DCDBAFED8B591AA93D6B8962AAF6AC94785093B436C1A2216124CC77CA99",
+      "sha256": "6EF8A86B0436E1C5CDBC7C57ECBD54980F56B808B14FBDC4EE133D6A55BC11E8",
       "hash_mode": "canonical-text-v1",
-      "lines": 214,
+      "lines": 228,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "C04AE1A7C5A5F1228E43B546E9AED6EC7E2A234738C4BF092DD954B4C5B45273",
+      "sha256": "3338F55E0B01E4E8F465DBDB62650E5C3B58293EAF378FC4DD7B46D247A3939F",
       "hash_mode": "canonical-text-v1",
-      "lines": 813,
+      "lines": 833,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "127C1849DF6CB544FD2B81B819752145E3277F76DA1ACF93F9FEFE44A300D205",
+      "sha256": "B5E3E63380D316DB32C1D43868957F093B3CD58E817CDC0DD35C05C62B09183E",
       "hash_mode": "canonical-text-v1",
-      "lines": 583,
+      "lines": 588,
       "package_visible": false
     },
     {
@@ -3323,9 +3323,9 @@
     {
       "path": "tools/lib/assurance/Hashing.ps1",
       "classification": "canonical-internal",
-      "sha256": "206A30EEB01F0E90F0EEC24C919E9042F3D3EFAABB48770BD7739B06F88B8AA1",
+      "sha256": "835FF61CBDFD8B16EB357C4C4A635823B31EC84E6BEDAB5D343497054C8491D9",
       "hash_mode": "canonical-text-v1",
-      "lines": 315,
+      "lines": 319,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a5408300106c25994ced7c34175cc47dba44fb99b693831ad0f8a1a077b4bff2"
+  "digest": "sha256:cf456192bbc34a0c8dbfa78c9003f64977b27723fa59c6b51e0a2a6e70e19553"
 }

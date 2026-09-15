@@ -363,6 +363,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Terminal projection check failed for $($row.release)." }
 
     if (-not $provedCrlfPerformanceOutput -and $null -ne $row.performance_transition -and
+        $null -ne $row.performance_transition.PSObject.Properties['output_blobs'] -and
         @($row.performance_transition.output_blobs).Count -gt 0) {
       $portabilityOutput = @($row.performance_transition.output_blobs)[0]
       $portabilityPath = Join-Path $targetRoot ([string]$portabilityOutput.path)
@@ -455,7 +456,11 @@ try {
     foreach ($overlay in @($row.assurance_overlays)) {
       foreach ($file in @($overlay.files)) {
         $materializedBlob = (& git hash-object --no-filters -- (Join-Path $targetRoot ([string]$file.path))).Trim()
-        $transitionOutput = @($row.performance_transition.output_blobs | Where-Object { [string]$_.path -eq [string]$file.path })
+        $transitionOutput = @()
+        if ($null -ne $row.performance_transition -and
+            $null -ne $row.performance_transition.PSObject.Properties['output_blobs']) {
+          $transitionOutput = @($row.performance_transition.output_blobs | Where-Object { [string]$_.path -eq [string]$file.path })
+        }
         $orderedOverlayOutputs = @(
           foreach ($orderedOverlay in @($row.assurance_overlays)) {
             foreach ($orderedFile in @($orderedOverlay.files)) {
@@ -578,7 +583,8 @@ try {
         throw "Current-tier direct pre-.5 upgrade fixture is stale or unregistered."
       }
     }
-    if ($null -ne $row.performance_transition) {
+    if ($null -ne $row.performance_transition -and
+        $null -ne $row.performance_transition.PSObject.Properties['output_blobs']) {
       foreach ($output in @($row.performance_transition.output_blobs)) {
         $relativePath = ([string]$output.path).Replace("\", "/")
         $materializedBlob = (& git -C $materializerSourceRoot -c core.autocrlf=input hash-object --path=$relativePath -- (Join-Path $targetRoot $relativePath)).Trim()

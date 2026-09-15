@@ -302,7 +302,7 @@ if ($performanceTest.Count -ne 1 -or
   throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
 }
 foreach ($requiredPerformanceIsolationSnippet in @(
-  '"<test-output>"=[string]$TestOutput',
+  '"<test-output>"={ [string]$TestOutput }',
   '$testOutputPath = Join-Path $workRoot "test-output.json"',
   '-TestOutput $testOutputPath',
   '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
@@ -603,6 +603,7 @@ foreach ($requiredSuccessorFingerprint in @(
 }
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
+$repo = $RepoRoot
 . $coreScript
 . (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 $nfcText = "caf$([char]0x00E9)`npolicy`n"

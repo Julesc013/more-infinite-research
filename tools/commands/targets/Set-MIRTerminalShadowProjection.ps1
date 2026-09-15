@@ -508,7 +508,11 @@ function Set-MIRAssuranceOverlays {
       $finalOverlayBlob = [string]$orderedOverlayOutputs[-1].blob
       if ($Check) {
         if (-not (Test-Path -LiteralPath $destination -PathType Leaf)) { throw "Terminal assurance overlay file is missing: $path" }
-        $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
+        $transitionOutput = @()
+        if ($null -ne $Target.performance_transition -and
+            $null -ne $Target.performance_transition.PSObject.Properties['output_blobs']) {
+          $transitionOutput = @($Target.performance_transition.output_blobs | Where-Object { [string]$_.path -eq $path })
+        }
         $expectedBlob = if ($transitionOutput.Count -eq 1) {
           [string]$transitionOutput[0].blob
         } elseif ($orderedOverlayOutputs.Count -gt 0) {
@@ -634,7 +638,8 @@ if ($isShadowConvergence) {
     Write-MIRUtf8NoBom -Path $testPath -Text ($test.TrimEnd() + "`n")
   }
 
-  foreach ($output in @($transition.output_blobs)) {
+  $transitionOutputs = if ($null -ne $transition.PSObject.Properties['output_blobs']) { @($transition.output_blobs) } else { @() }
+  foreach ($output in $transitionOutputs) {
     $relativePath = ([string]$output.path).Replace("\", "/")
     $path = Join-Path $TargetRoot $relativePath
     # A worktree may materialize text with platform line endings. Compare the

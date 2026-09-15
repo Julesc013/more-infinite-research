@@ -1,3 +1,5 @@
+$script:MIRAssurancePatternFingerprintCache = @{}
+
 function Get-MIRAssurancePatternFingerprint {
   param([Parameter(Mandatory)][string[]]$Patterns)
   if ($null -eq $script:MIRAssurancePatternFingerprintCache) { $script:MIRAssurancePatternFingerprintCache = @{} }
@@ -530,9 +532,12 @@ function Get-MIRAssuranceTestFingerprint {
     [Parameter(Mandatory)]$Plan,
     [Parameter(Mandatory)]$Context
   )
+  $templateIdProperty = $Test.PSObject.Properties['template_id']
+  $domainDependenciesProperty = $Test.PSObject.Properties['domain_dependencies']
+  $scenarioProperty = $Test.PSObject.Properties['scenario']
   $definition = [ordered]@{
     id=[string]$Test.id
-    template_id=[string]$Test.template_id
+    template_id=if ($null -ne $templateIdProperty) { [string]$templateIdProperty.Value } else { '' }
     kind=[string]$Test.kind
     layer=[string]$Test.layer
     command=[string]$Test.command
@@ -548,8 +553,8 @@ function Get-MIRAssuranceTestFingerprint {
         }
       }
     )
-    domain_dependencies=@($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
-    scenario_sha256=if ($Test.scenario) { Get-MIRAssuranceJsonHash -Value $Test.scenario } else { "" }
+    domain_dependencies=if ($null -ne $domainDependenciesProperty) { @($domainDependenciesProperty.Value | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    scenario_sha256=if ($null -ne $scenarioProperty -and $null -ne $scenarioProperty.Value) { Get-MIRAssuranceJsonHash -Value $scenarioProperty.Value } else { "" }
   }
   $definitionHash = Get-MIRAssuranceJsonHash -Value $definition
   $inputFingerprints = [ordered]@{}

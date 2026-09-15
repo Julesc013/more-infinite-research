@@ -173,15 +173,29 @@ function Get-MIRAssuranceEvidenceDecision {
     [Parameter(Mandatory)][string]$TestId,
     $Test = $null
   )
-  $inputMap = if ($null -eq $Fingerprint.inputs) {
+  $fingerprintInputs = if ($Fingerprint -is [System.Collections.IDictionary] -and $Fingerprint.Contains('inputs')) {
+    $Fingerprint['inputs']
+  } elseif ($null -ne $Fingerprint.PSObject.Properties['inputs']) {
+    $Fingerprint.PSObject.Properties['inputs'].Value
+  } else {
+    $null
+  }
+  $inputMap = if ($null -eq $fingerprintInputs) {
     [ordered]@{}
   } else {
-    ConvertTo-MIRAssuranceOrderedMap -Object $Fingerprint.inputs
+    ConvertTo-MIRAssuranceOrderedMap -Object $fingerprintInputs
   }
   $missingInputs = @(
     foreach ($inputName in @($inputMap.Keys | Sort-Object)) {
       $inputValue = $inputMap[$inputName]
-      if ($null -ne $inputValue -and [string]$inputValue.state -eq "missing") {
+      $state = if ($inputValue -is [System.Collections.IDictionary] -and $inputValue.Contains('state')) {
+        [string]$inputValue['state']
+      } elseif ($null -ne $inputValue -and $null -ne $inputValue.PSObject.Properties['state']) {
+        [string]$inputValue.PSObject.Properties['state'].Value
+      } else {
+        ''
+      }
+      if ($state -eq "missing") {
         [string]$inputName
       }
     }

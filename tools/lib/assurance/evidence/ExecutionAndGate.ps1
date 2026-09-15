@@ -471,7 +471,13 @@ function Invoke-MIRAssuranceTest {
     layer=[string]$Test.layer
     command=[string]$Test.command
     resolved_command=$resolvedCommand
-    inputs=$fingerprint.inputs
+    inputs=if ($fingerprint -is [System.Collections.IDictionary] -and $fingerprint.Contains('inputs')) {
+      $fingerprint['inputs']
+    } elseif ($null -ne $fingerprint.PSObject.Properties['inputs']) {
+      $fingerprint.PSObject.Properties['inputs'].Value
+    } else {
+      [ordered]@{}
+    }
     producer=$evidenceProducer
     assertions=$assertions
     exit_code=$exitCode
@@ -526,9 +532,15 @@ function Invoke-MIRAssurancePlan {
       $identity = [ordered]@{
         test_id=[string]$test.id
         input_key=[string]$test.fingerprint.input_key
-        target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) { [string]$test.fingerprint.target } else { [string]$Context.target }
+        target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) {
+          [string]$test.fingerprint.target
+        } elseif ($null -ne $Context.PSObject.Properties['target']) {
+          [string]$Context.target
+        } else {
+          ''
+        }
         fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
-        definition_sha256=[string]$test.fingerprint.definition_sha256
+        definition_sha256=if ($null -ne $test.fingerprint.PSObject.Properties['definition_sha256']) { [string]$test.fingerprint.definition_sha256 } else { '' }
       }
       $quarantineState = $null
       if (-not [string]::IsNullOrWhiteSpace([string]$identity.input_key) -and
@@ -776,14 +788,18 @@ function Get-MIRAssuranceResultCounts {
   $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
   $coldExecutionSeconds = [Math]::Round([double](@($Results | Where-Object {
     [string]$_.disposition -eq "RUN"
-  } | ForEach-Object { [double]$_.duration_seconds } | Measure-Object -Sum).Sum), 3)
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties['duration_seconds']) { [double]$_.duration_seconds } else { 0.0 }
+  } | Measure-Object -Sum).Sum), 3)
   $reusedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
     [string]$_.disposition -in @("REUSE", "WAIT")
   } | ForEach-Object {
     if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
       [double]$_.source_duration_seconds
-    } else {
+    } elseif ($null -ne $_.PSObject.Properties['duration_seconds']) {
       [double]$_.duration_seconds
+    } else {
+      0.0
     }
   } | Measure-Object -Sum).Sum), 3)
   $checkpointedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
@@ -791,8 +807,10 @@ function Get-MIRAssuranceResultCounts {
   } | ForEach-Object {
     if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
       [double]$_.source_duration_seconds
-    } else {
+    } elseif ($null -ne $_.PSObject.Properties['duration_seconds']) {
       [double]$_.duration_seconds
+    } else {
+      0.0
     }
   } | Measure-Object -Sum).Sum), 3)
   return [ordered]@{
@@ -801,7 +819,9 @@ function Get-MIRAssuranceResultCounts {
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     checkpointed=@($Results | Where-Object { [string]$_.disposition -eq "CHECKPOINT" }).Count
-    quarantined=@($Results | Where-Object { [string]$_.conclusion -eq 'quarantined' }).Count
+    quarantined=@($Results | Where-Object {
+      $null -ne $_.PSObject.Properties['conclusion'] -and [string]$_.conclusion -eq 'quarantined'
+    }).Count
     cold_execution_seconds=$coldExecutionSeconds
     reused_source_seconds=$reusedSourceSeconds
     checkpointed_source_seconds=$checkpointedSourceSeconds

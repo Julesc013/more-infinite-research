@@ -156,8 +156,22 @@ function Invoke-MIRAssuranceSelfTest {
     }
   }
 
-  $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
-  if ([string]$planningAuthority.state -eq "planned") {
+  $planningAuthority = $null
+  try {
+    $planningAuthority = Get-MIRAssuranceReleasePlanningAuthority -Context $Context
+  } catch {
+    $developmentEpochPath = Join-Path $repo 'governance/repository/development-epoch-v1.json'
+    $developmentEpoch = if (Test-Path -LiteralPath $developmentEpochPath -PathType Leaf) { Get-Content -Raw -LiteralPath $developmentEpochPath | ConvertFrom-Json } else { $null }
+    $expectedMissing = "Typed release authority is missing: .mir/releases/records/$([string]$Context.info.version).json"
+    if ($null -eq $developmentEpoch -or
+        [string]$developmentEpoch.kind -cne 'MIR4DevelopmentEpochV1' -or
+        [bool]$developmentEpoch.release_authority -or
+        [string]$Context.info.version -cnotmatch '^4[.][0-9]{1,5}[.][0-9]{5}$' -or
+        $_.Exception.Message -cne $expectedMissing) {
+      throw
+    }
+  }
+  if ($null -ne $planningAuthority -and [string]$planningAuthority.state -eq "planned") {
     if ([string]$planningAuthority.authority_class -ne "planned-reservation" -or
         [string]$planningAuthority.candidate_id -ne "not-assigned" -or
         [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
@@ -413,7 +427,7 @@ function Invoke-MIRAssuranceSelfTest {
     [ordered]@{valid=$false;reason='no-capsule'}
   }
   $capturedDeclarationCount = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $capturedValid.test).Count
-  $capturedDescriptorCount = @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count
+  $capturedDescriptorCount = if ($null -ne $capturedValid.capsule) { @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count } else { 0 }
   if ($null -eq $capturedValid.capsule -or -not [string]::IsNullOrWhiteSpace([string]$capturedValid.error) -or
       @($capturedValid.capsule.artifacts).Count -ne 1 -or
       [string]$capturedValid.capsule.artifacts[0].kind -ne $capturedKind -or
@@ -596,7 +610,7 @@ function Invoke-MIRAssuranceSelfTest {
   $sameFirst = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'first'
   Start-Sleep -Milliseconds 2
   $sameSecond = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'second-independent-work-path'
-  if ([bool]$sameSecond.quarantined -or
+  if ([bool]$sameSecond.capsule.quarantined -or
       @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $sameIdentity).Count -ne 0 -or
       $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $sameIdentity -Context $Context)) {
     throw 'Independent same-semantic trusted attempts with distinct work paths and times were incorrectly quarantined or made non-reusable.'

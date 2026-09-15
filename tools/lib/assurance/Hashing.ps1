@@ -1,5 +1,9 @@
 Set-Variable -Name MIRAssuranceCanonicalTextDigestPolicyId -Scope Script -Option ReadOnly -Value "utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
 Set-Variable -Name MIRAssuranceCanonicalJsonDigestPolicyId -Scope Script -Option ReadOnly -Value "json-sorted-properties-utf8-nfc-lf-final-newline-v1" -ErrorAction SilentlyContinue
+$script:MIRAssuranceGitIndexBlobs = $null
+$script:MIRAssuranceDirtyPaths = @{}
+$script:MIRAssuranceBlobCache = @{}
+$script:MIRAssuranceTreeHashCache = @{}
 
 function Get-MIRAssuranceCanonicalTextDigest {
   param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
