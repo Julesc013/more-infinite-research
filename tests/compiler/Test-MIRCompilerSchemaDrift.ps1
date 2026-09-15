@@ -118,7 +118,7 @@ Assert-MIRText "prototypes\mir\providers\contract.lua" "Duplicate CompilerProvid
 Assert-MIRText "prototypes\mir\compatibility\packs\schema.lua" "CompatibilityPack schema must be 2"
 Assert-MIRText "prototypes\mir\domain\technology\technology_design.lua" "TechnologyDesign schema 2 record is required"
 Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
-Assert-MIRText "prototypes\mir\planner\compilation_plan.lua" "schema = 2"
+Assert-MIRText "prototypes\mir\planner\compilation_plan\build.lua" "schema = 2"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInput schema 2 record is required"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 3 planned or final record is required"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
