@@ -741,16 +741,18 @@ function Invoke-MIRAssuranceBuild {
     $targetRows = @($authority.targets | Where-Object { [string]$_.target_id -ceq "factorio-$([string]$Context.target)" })
     if ($targetRows.Count -ne 1) { throw "Assurance target is not governed by canonical MIR 4 package authority: $($Context.target)" }
     $candidateId = 'MIR4-ASSURANCE-' + ([string]$fingerprint.material.source_tree).ToUpperInvariant()
-    $sourceVersion = if ([string]$Context.info.version -match '^4[.]') {
-      [string]$Context.info.version
-    } else {
-      [string]$targetRows[0].baseline_source_version
-    }
+    $buildVersion = [string]$Context.info.version
     $buildArguments = @{
       Target = [string]$targetRows[0].target
       CandidateId = $candidateId
-      SourceVersion = $sourceVersion
       OutputDir = 'build/packages/assurance'
+    }
+    if ($buildVersion -match '^4[.][0-9]{1,5}[.][0-9]{5}$') {
+      $buildArguments['DistributionVersion'] = $buildVersion
+    } elseif ($buildVersion -match '^4[.][0-9]{1,5}[.][0-9]{1,2}$') {
+      $buildArguments['SourceVersion'] = $buildVersion
+    } else {
+      $buildArguments['SourceVersion'] = [string]$targetRows[0].baseline_source_version
     }
     $buildResult = & (Join-Path $repo 'tools/commands/package/Build-MIRPackage.ps1') @buildArguments
     if ([IO.Path]::GetFullPath([string]$buildResult.archive_path) -cne $candidateFullPath) {

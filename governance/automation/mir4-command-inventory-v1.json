@@ -3275,9 +3275,9 @@
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "3338F55E0B01E4E8F465DBDB62650E5C3B58293EAF378FC4DD7B46D247A3939F",
+      "sha256": "55276AD2AF07E7059081E5D35C9C5EEA0BA9910400CFC9E23B27A89253084AF1",
       "hash_mode": "canonical-text-v1",
-      "lines": 833,
+      "lines": 835,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:cf456192bbc34a0c8dbfa78c9003f64977b27723fa59c6b51e0a2a6e70e19553"
+  "digest": "sha256:bb2ca4de9900db06ff911b3fac388f032387bf7f443f586bda48199c849db177"
 }
