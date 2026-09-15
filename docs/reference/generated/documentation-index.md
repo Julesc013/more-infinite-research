@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 447 pages as of 2026-09-15.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 447 pages as of 2026-09-16.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -176,7 +176,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/adding-a-family-rule.md | Adding A Family Rule | current | developer | how-to | mir-maintainers | 2026-07-12 |
 | docs/maintainer/adding-a-generated-stream.md | Adding A Generated Stream | current | developer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/adding-a-policy-overlay.md | Adding A Policy Overlay | current | developer | how-to | mir-maintainers | 2026-07-07 |
-| docs/maintainer/artifact-retention.md | Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-09-15 |
+| docs/maintainer/artifact-retention.md | Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-09-16 |
 | docs/maintainer/backport-reconstruction.md | Deterministic Backport Reconstruction | current | maintainer | how-to | mir-maintainers | 2026-08-08 |
 | docs/maintainer/backporting.md | Target-Line Versioning And Backports | current | maintainer | how-to | mir-maintainers | 2026-08-17 |
 | docs/maintainer/build-and-package.md | Build And Package | current | maintainer | how-to | mir-maintainers | 2026-07-20 |
