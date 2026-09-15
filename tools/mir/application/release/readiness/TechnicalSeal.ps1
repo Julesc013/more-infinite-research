@@ -139,7 +139,7 @@ function New-MIR441TechnicalSeal {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$WorkRoot,[Parameter(Mandatory)][string]$EvidenceRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot;$evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot
   if(@(& git -C $repo status --porcelain).Count-ne0){throw '[mir441-seal-working-tree-dirty]'}
-  $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo;$source=Get-MIR441GitIdentity -RepoRoot $repo
+  $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo;Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'technical_seal';$source=Get-MIR441GitIdentity -RepoRoot $repo
   $independent=Get-Content -Raw -LiteralPath (Join-Path $evidence 'independent-verification.json')|ConvertFrom-Json -Depth 100 -DateKind String
   if([string]$independent.status-cne'MIR-4.1.0-FOUR-TARGET-INDEPENDENT-VERIFICATION-PASSED'-or[string]$independent.source.commit-cne[string]$source.commit-or[string]$independent.source.tree-cne[string]$source.tree){throw '[mir441-seal-independent-input]'}
   $window=Join-Path $evidence 'release-window';if(Test-Path -LiteralPath $window){Remove-MIR441ContainedTree -AdmittedRoot $evidence -Path $window};New-Item -ItemType Directory -Force -Path $window|Out-Null

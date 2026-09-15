@@ -9,7 +9,8 @@ function Test-MIR441ReleaseReadiness {
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   $contract=Test-MIR441ReleaseReadinessContract -RepoRoot $repo
   $git=Get-MIR441GitIdentity -RepoRoot $repo
-  $result=[ordered]@{schema=1;kind='MIR441ReleaseReadinessCheckV1';status='MIR-4.1-RELEASE-READINESS-PASSED';contract=$contract;source=$git;working_tree_clean=(@(& git -C $repo status --porcelain).Count-eq0);resources=$null}
+  $historicalSuccessor=[bool]$contract.historical_contract
+  $result=[ordered]@{schema=1;kind='MIR441ReleaseReadinessCheckV1';status=$(if($historicalSuccessor){'MIR-4.1-RELEASE-READINESS-HISTORICAL-SUCCESSOR-PASSED'}else{'MIR-4.1-RELEASE-READINESS-PASSED'});contract=$contract;source=$git;working_tree_clean=(@(& git -C $repo status --porcelain).Count-eq0);resources=$null}
   if(-not[string]::IsNullOrWhiteSpace($WorkRoot)){$result.resources=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot}
   return [pscustomobject]$result
 }

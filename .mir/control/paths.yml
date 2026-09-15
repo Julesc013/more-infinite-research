@@ -147,6 +147,11 @@ paths:
   mir4.package-source.composable-layout-writer: tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1
   mir4.package-source.composable-predecessor-proof: tools/mir/application/package/SourceCompositionProof.ps1
   mir4.package-source.composable-predecessor-proof-schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
+  mir4.release.m41-to-m42-composable-source-succession: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
+  mir4.release.m41-to-m42-composable-source-succession-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json
+  mir4.release.m41-to-m42-composable-source-succession-application: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+  mir4.release.m41-to-m42-composable-source-succession-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccession.ps1
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1

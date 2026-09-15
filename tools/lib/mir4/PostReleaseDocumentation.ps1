@@ -24,7 +24,7 @@ function Get-MIR4PostReleaseDocumentationPaths {
 
 function Get-MIR4PostReleaseDocumentation {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot)
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Historical)
   $relative='releases/migrations/MIR4-M41-Readme-RestorationV1.json'
   $path=Join-Path $RepoRoot $relative
   if(-not(Test-Path -LiteralPath $path -PathType Leaf)){return $null}
@@ -38,14 +38,14 @@ function Get-MIR4PostReleaseDocumentation {
   if($LASTEXITCODE -ne 0 -or [string]$target[0] -cne [string]$record.base_commit){throw '[mir4-post-release-docs-source]'}
   $predecessor=Join-Path $RepoRoot ([string]$record.predecessor.path)
   if((Get-FileHash -LiteralPath $predecessor -Algorithm SHA256).Hash -cne [string]$record.predecessor.sha256){throw '[mir4-post-release-docs-predecessor]'}
-  if((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot) -cne [string]$record.package_source_sha256){throw '[mir4-post-release-docs-package-change]'}
+  if(-not$Historical-and(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot) -cne [string]$record.package_source_sha256){throw '[mir4-post-release-docs-package-change]'}
   $allowed=@(Get-MIR4PostReleaseDocumentationPaths)
   $seen=@{}
   foreach($binding in @($record.bindings)){
     $name=[string]$binding.path
     if($name -cnotin $allowed -or $seen.ContainsKey($name)){throw "[mir4-post-release-docs-path] $name"}
     $seen[$name]=$true
-    if((Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot $name)) -cne [string]$binding.current_sha256){throw "[mir4-post-release-docs-current] $name"}
+    if(-not$Historical-and(Get-MIR4BootstrapTextSha256 -Path (Join-Path $RepoRoot $name)) -cne [string]$binding.current_sha256){throw "[mir4-post-release-docs-current] $name"}
     $object=([string]$record.base_commit)+':'+$name
     & git -C $RepoRoot cat-file -e $object 2>$null
     if($LASTEXITCODE -eq 0){
@@ -55,11 +55,13 @@ function Get-MIR4PostReleaseDocumentation {
       if($priorHash -cne [string]$binding.previous_sha256){throw "[mir4-post-release-docs-prior] $name"}
     }elseif($null -ne $binding.previous_sha256){throw "[mir4-post-release-docs-new-path] $name"}
   }
-  $changed=@(& git -C $RepoRoot diff --name-only ([string]$record.base_commit) --)
-  if($LASTEXITCODE -ne 0){throw '[mir4-post-release-docs-diff]'}
-  $untracked=@(& git -C $RepoRoot ls-files --others --exclude-standard)
-  if($LASTEXITCODE -ne 0){throw '[mir4-post-release-docs-untracked]'}
-  $actual=@($changed+$untracked|ForEach-Object{([string]$_).Replace('\','/')}|Where-Object{$_ -and $_ -cne $relative}|Sort-Object -Unique)
-  if(($actual -join "`n") -cne (@($seen.Keys|Sort-Object)-join "`n")){throw '[mir4-post-release-docs-scope]'}
+  if(-not$Historical){
+    $changed=@(& git -C $RepoRoot diff --name-only ([string]$record.base_commit) --)
+    if($LASTEXITCODE -ne 0){throw '[mir4-post-release-docs-diff]'}
+    $untracked=@(& git -C $RepoRoot ls-files --others --exclude-standard)
+    if($LASTEXITCODE -ne 0){throw '[mir4-post-release-docs-untracked]'}
+    $actual=@($changed+$untracked|ForEach-Object{([string]$_).Replace('\','/')}|Where-Object{$_ -and $_ -cne $relative}|Sort-Object -Unique)
+    if(($actual -join "`n") -cne (@($seen.Keys|Sort-Object)-join "`n")){throw '[mir4-post-release-docs-scope]'}
+  }
   return $record
 }

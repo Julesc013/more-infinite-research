@@ -39,7 +39,10 @@ function Invoke-MIR441RulesetUpdate {
 function Invoke-MIR441ExactMainPromotion {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$EvidenceRoot,[switch]$Plan)
-  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot;$window=Join-Path $evidence 'release-window'
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
+  Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'promotion'
+  $evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot;$window=Join-Path $evidence 'release-window'
   if(@(& git -C $repo status --porcelain).Count-ne0){throw '[mir441-promotion-working-tree-dirty]'}
   $seal=Get-Content -Raw -LiteralPath (Join-Path $window 'technical-seal.json')|ConvertFrom-Json -Depth 100 -DateKind String
   $prepared=Get-Content -Raw -LiteralPath (Join-Path $window 'prepared-tag.json')|ConvertFrom-Json -Depth 50 -DateKind String
