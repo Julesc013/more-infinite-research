@@ -49,6 +49,7 @@ try {
   $artifactRoot = Join-Path $fixtureRoot "build/results"
   $testRoot = Join-Path $fixtureRoot "build/tests"
   $packageRoot = Join-Path $fixtureRoot "build/packages"
+  $campaignRoot = Join-Path $fixtureRoot "build/mir4"
   $protectedAssurance = Join-Path $artifactRoot "assurance"
   $protectedValidation = Join-Path $artifactRoot "validation"
   $staleRun = Join-Path $artifactRoot "stale-run"
@@ -60,8 +61,12 @@ try {
   $receiptCapturedLeaseRun = Join-Path $testRoot "series/receipt-captured-crash-run"
   $failedLeaseRun = Join-Path $testRoot "series/interrupted-lease-run"
   $orphanLeaseRun = Join-Path $testRoot "series/orphan-lease-run"
+  $staleGuidTestRun = Join-Path $testRoot 'local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+  $scanBoundedTestRun = Join-Path $testRoot 'series/scan-bounded-run'
   $stalePackage = Join-Path $packageRoot "stale-package"
   $pinnedPackage = Join-Path $packageRoot "pinned-package"
+  $staleCampaign = Join-Path $campaignRoot 'stale-campaign'
+  $pinnedCampaign = Join-Path $campaignRoot 'pinned-campaign'
   $developmentContracts = Join-Path $packageRoot 'development-contracts'
   $staleDevelopmentContract = Join-Path $developmentContracts '11111111111111111111111111111111'
   $recentDevelopmentContract = Join-Path $developmentContracts '22222222222222222222222222222222'
@@ -69,7 +74,7 @@ try {
   $nonCanonicalDevelopmentContract = Join-Path $developmentContracts 'legacy-expanded-output'
   $nestedNonCanonicalDevelopmentContract = Join-Path $nonCanonicalDevelopmentContract '66666666666666666666666666666666'
   $nestedReparseDevelopmentContract = Join-Path $developmentContracts '55555555555555555555555555555555'
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
@@ -78,6 +83,12 @@ try {
   "pinned evidence" | Set-Content -LiteralPath (Join-Path $pinnedTestRun "result.json") -Encoding UTF8
   "candidate" | Set-Content -LiteralPath (Join-Path $stalePackage "candidate.zip") -Encoding UTF8
   "pinned candidate" | Set-Content -LiteralPath (Join-Path $pinnedPackage "candidate-pin.json") -Encoding UTF8
+  New-Item -ItemType Directory -Path (Join-Path $staleGuidTestRun 'repo'), (Join-Path $staleGuidTestRun 'source'), (Join-Path $scanBoundedTestRun 'payload'), (Join-Path $pinnedCampaign 'nested') -Force | Out-Null
+  'copied repository fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'repo/fixture.txt') -Encoding UTF8
+  'copied source fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'source/fixture.txt') -Encoding UTF8
+  '[path]' | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun 'config.ini') -Encoding UTF8
+  1..4 | ForEach-Object { "payload $_" | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun ("payload/item-{0}.txt" -f $_)) -Encoding UTF8 }
+  'campaign result that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedCampaign 'nested/result.json') -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $staleDevelopmentContract 'receipt.json') -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $referencedDevelopmentContract 'receipt.json') -Encoding UTF8
   'build/packages/development-contracts/33333333333333333333333333333333' | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
@@ -96,7 +107,7 @@ try {
   New-Item -ItemType Directory -Path $nestedNonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract -Force | Out-Null
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedNonCanonicalDevelopmentContract 'result.txt') -Encoding UTF8
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedReparseDevelopmentContract 'result.txt') -Encoding UTF8
-  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $stalePackage, $pinnedPackage, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
@@ -114,7 +125,14 @@ try {
   New-Item -ItemType Junction -Path $reparseRun -Target $reparseTarget | Out-Null
   New-Item -ItemType Directory -Path $nestedReparseTarget -Force | Out-Null
   'outside nested' | Set-Content -LiteralPath (Join-Path $nestedReparseTarget 'outside.txt') -Encoding UTF8
-  New-Item -ItemType Junction -Path (Join-Path $nestedReparseDevelopmentContract 'nested-link') -Target $nestedReparseTarget | Out-Null
+  $nestedReparseLink = Join-Path $nestedReparseDevelopmentContract 'nested-link'
+  New-Item -ItemType Junction -Path $nestedReparseLink -Target $nestedReparseTarget | Out-Null
+  # The fixture represents a stale run which already contained the unsafe
+  # link.  Restoring both link and leaf timestamps prevents the current-root
+  # timestamp fast path from mistaking the test setup operation for a recent
+  # runtime write.
+  (Get-Item -LiteralPath $nestedReparseLink -Force).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath $nestedReparseDevelopmentContract -Force).LastWriteTimeUtc = $staleTimestamp
 
   $planBoundCaught = $false
   try { & $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -MaxPlanEntries 1 -PassThru | Out-Null } catch { $planBoundCaught = $_.Exception.Message -match 'bounded 1-entry limit' }
@@ -139,6 +157,9 @@ try {
     @{path='build/tests/series/receipt-captured-crash-run';status='interrupted-lease'},
     @{path='build/tests/series/interrupted-lease-run';status='interrupted-lease'},
     @{path='build/tests/series/orphan-lease-run';status='interrupted-lease'},
+    @{path='build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';status='eligible'},
+    @{path='build/mir4/stale-campaign';status='eligible'},
+    @{path='build/mir4/pinned-campaign';status='pinned-custody'},
     @{path='build/packages/development-contracts/11111111111111111111111111111111';status='eligible'},
     @{path='build/packages/development-contracts/22222222222222222222222222222222';status='recent'},
     @{path='build/packages/development-contracts/33333333333333333333333333333333';status='pinned-reference'},
@@ -152,6 +173,18 @@ try {
   }
   if (@($preview | Where-Object { $_.relative_path -ceq 'build/packages/development-contracts/legacy-expanded-output/66666666666666666666666666666666' }).Count -ne 0) {
     throw 'Typed-root cleanup descended into a noncanonical development-contract child.'
+  }
+  if (@($preview | Where-Object { $_.relative_path -ceq 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/repo/fixture.txt' }).Count -ne 0) {
+    throw 'A canonical GUID test run was expanded into individual copied-checkout files instead of one owned run boundary.'
+  }
+
+  # A per-candidate no-follow scan limit must fail closed.  The normal audit
+  # remains able to classify this completed run, while a deliberately tiny
+  # limit proves that a large copied fixture is never selected on partial
+  # metadata alone.
+  $scanBoundedPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType test -MaxScannedEntriesPerCandidate 2 -PassThru)
+  if (@($scanBoundedPreview | Where-Object { $_.relative_path -ceq 'build/tests/series/scan-bounded-run' -and $_.status -ceq 'scan-budget-exceeded' }).Count -ne 1) {
+    throw 'A bounded no-follow scan did not fail closed for an oversized test-run candidate.'
   }
 
   # The scanner reads only one bounded output path.  Deliberately lowering the
@@ -182,10 +215,10 @@ try {
 
   $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
   if (Test-Path -LiteralPath $staleRun) { throw "Applied cleanup retained the stale artifact." }
-  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
+  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $staleGuidTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleCampaign) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
   if (-not (Test-Path -LiteralPath $changingTestRun)) { throw 'Applied cleanup removed an artifact that received a write before apply.' }
-  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $nestedReparseDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $pinnedCampaign, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $nestedReparseDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     if (-not (Test-Path -LiteralPath $retained)) { throw "Applied cleanup removed protected or unsafe state: $retained" }
   }
   if (-not (Test-Path -LiteralPath $protectedAssurance) -or -not (Test-Path -LiteralPath $protectedValidation)) {
@@ -197,7 +230,7 @@ try {
   if (@($applied | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -eq "deleted" }).Count -ne 1) {
     throw "Applied cleanup did not report the stale artifact as deleted."
   }
-  foreach ($path in @('build/tests/series/stale-run', 'build/packages/stale-package', 'build/packages/development-contracts/11111111111111111111111111111111')) {
+  foreach ($path in @('build/tests/series/stale-run', 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'build/packages/stale-package', 'build/mir4/stale-campaign', 'build/packages/development-contracts/11111111111111111111111111111111')) {
     if (@($applied | Where-Object { $_.relative_path -ceq $path -and $_.status -ceq 'deleted' }).Count -ne 1) {
       throw "Apply did not preserve dry-run eligibility for $path."
     }
