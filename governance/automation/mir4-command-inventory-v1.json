@@ -3195,9 +3195,9 @@
     {
       "path": "tools/commands/workspace/Get-MIRLegacyInventory.ps1",
       "classification": "canonical-internal",
-      "sha256": "5C4A317B701A1459698A98CD08339CE076FC79608A9E06DF42205571BB2FFE18",
+      "sha256": "62A8704849CD6E03BA9113E9898E354D7277432DEE38571BF2BC112D85161D89",
       "hash_mode": "canonical-text-v1",
-      "lines": 379,
+      "lines": 388,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c9dcc4eccc60a3d0a8ebc36667f639f01b088d31da31ca70fa9f7d495a10a4c5"
+  "digest": "sha256:efba8c8b1dba0749c60a730a8b9fc3a91d896f3ec5ceaedc50540a02b31a6bed"
 }

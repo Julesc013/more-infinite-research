@@ -33,6 +33,12 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   Join-Path $repo $OutputRoot
 }
 
+function Get-MIRCollectionCount {
+  param([AllowNull()][object[]]$Items)
+  if ($null -eq $Items) { return 0 }
+  return $Items.Length
+}
+
 function Get-MIRRelativePath {
   param([Parameter(Mandatory)][string]$Path)
   $resolved = (Resolve-Path -LiteralPath $Path).Path
@@ -56,7 +62,7 @@ function Get-MIRCodeLines {
 function Test-MIRShimOnlyLua {
   param([Parameter(Mandatory)][string]$Text)
   $lines = @(Get-MIRCodeLines -Text $Text)
-  return $lines.Count -eq 1 -and $lines[0] -match '^return\s+require\("prototypes\.'
+  return (Get-MIRCollectionCount -Items $lines) -eq 1 -and $lines[0] -match '^return\s+require\("prototypes\.'
 }
 
 function Get-MIRLuaFiles {
@@ -135,7 +141,7 @@ function Get-MIRModuleInventory {
         path = [string]$entry.output_path
         area = $Label
         shim_only = [bool](Test-MIRShimOnlyLua -Text $text)
-        code_lines = @(Get-MIRCodeLines -Text $text).Count
+        code_lines = Get-MIRCollectionCount -Items @(Get-MIRCodeLines -Text $text)
       }
   }
   return $rows
@@ -165,7 +171,7 @@ $shimDirectories = @(
   "prototypes\planner"
 ) | Where-Object {
   $prefix = $_.Replace("\", "/").TrimEnd('/') + '/'
-  @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix).Count -gt 0
+  (Get-MIRCollectionCount -Items @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix)) -gt 0
 }
 
 $oldRootHelperFiles = @(
@@ -183,7 +189,7 @@ $oldRootHelperFiles = @(
   "prototypes\weapon-speed-adjustments.lua"
 ) | Where-Object {
   $path = $_.Replace("\", "/")
-  @($targetPackage.outputs.Keys | Where-Object { $_ -ceq $path }).Count -gt 0
+  (Get-MIRCollectionCount -Items @($targetPackage.outputs.Keys | Where-Object { $_ -ceq $path })) -gt 0
 }
 
 $runtimeControlLuaFiles = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'control/' | Where-Object { [string]$_.output_path -match '\.lua$' })
@@ -222,33 +228,36 @@ foreach ($row in $manifestRows) {
   }
 }
 $missingManifestKeys = @($sourceStreamKeys | Where-Object { -not $manifestStreamKeys[[string]$_] } | Sort-Object -Unique)
+$legacyActiveModules = @($legacyModules | Where-Object { -not $_.shim_only })
+$compatActiveModules = @($compatModules | Where-Object { -not $_.shim_only })
+$libActiveModules = @($libModules | Where-Object { -not $_.shim_only })
 
 $shipped = [pscustomobject]@{
   schema = 1
   generated_at = (Get-Date).ToString("o")
   counts = [pscustomobject]@{
-    lua_files = $luaFiles.Count
-    mir_legacy_modules = $legacyModules.Count
-    mir_legacy_active_modules = @($legacyModules | Where-Object { -not $_.shim_only }).Count
-    compat_modules = $compatModules.Count
-    compat_active_modules = @($compatModules | Where-Object { -not $_.shim_only }).Count
-    lib_modules = $libModules.Count
-    lib_active_modules = @($libModules | Where-Object { -not $_.shim_only }).Count
-    requires_mir_legacy = $legacyRequires.Count
-    requires_compat = $compatRequires.Count
-    requires_lib = $libRequires.Count
-    requires_config = $configRequires.Count
-    requires_util = $utilRequires.Count
-    requires_diagnostics = $diagnosticsRequires.Count
-    shim_directories_present = $shimDirectories.Count
-    old_root_helper_files_present = $oldRootHelperFiles.Count
-    runtime_control_lua_files = $runtimeControlLuaFiles.Count
-    data_extend_matches = $dataExtendMatches.Count
-    data_extend_matches_outside_allowed = $dataExtendOutsideAllowed.Count
-    data_raw_matches = $dataRawMatches.Count
-    data_raw_matches_outside_platform = $dataRawOutsidePlatform.Count
-    source_stream_keys = $sourceStreamKeys.Count
-    generated_streams_without_manifest = $missingManifestKeys.Count
+    lua_files = Get-MIRCollectionCount -Items $luaFiles
+    mir_legacy_modules = Get-MIRCollectionCount -Items $legacyModules
+    mir_legacy_active_modules = Get-MIRCollectionCount -Items $legacyActiveModules
+    compat_modules = Get-MIRCollectionCount -Items $compatModules
+    compat_active_modules = Get-MIRCollectionCount -Items $compatActiveModules
+    lib_modules = Get-MIRCollectionCount -Items $libModules
+    lib_active_modules = Get-MIRCollectionCount -Items $libActiveModules
+    requires_mir_legacy = Get-MIRCollectionCount -Items $legacyRequires
+    requires_compat = Get-MIRCollectionCount -Items $compatRequires
+    requires_lib = Get-MIRCollectionCount -Items $libRequires
+    requires_config = Get-MIRCollectionCount -Items $configRequires
+    requires_util = Get-MIRCollectionCount -Items $utilRequires
+    requires_diagnostics = Get-MIRCollectionCount -Items $diagnosticsRequires
+    shim_directories_present = Get-MIRCollectionCount -Items $shimDirectories
+    old_root_helper_files_present = Get-MIRCollectionCount -Items $oldRootHelperFiles
+    runtime_control_lua_files = Get-MIRCollectionCount -Items $runtimeControlLuaFiles
+    data_extend_matches = Get-MIRCollectionCount -Items $dataExtendMatches
+    data_extend_matches_outside_allowed = Get-MIRCollectionCount -Items $dataExtendOutsideAllowed
+    data_raw_matches = Get-MIRCollectionCount -Items $dataRawMatches
+    data_raw_matches_outside_platform = Get-MIRCollectionCount -Items $dataRawOutsidePlatform
+    source_stream_keys = Get-MIRCollectionCount -Items $sourceStreamKeys
+    generated_streams_without_manifest = Get-MIRCollectionCount -Items $missingManifestKeys
   }
   modules = [pscustomobject]@{
     mir_legacy = $legacyModules
@@ -321,7 +330,7 @@ $repoLegacy = [pscustomobject]@{
     artifacts_dir_present = [bool](Test-Path -LiteralPath (Join-Path $repo "artifacts"))
   }
   scripts = [pscustomobject]@{
-    count = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Recurse -File -Filter "*.ps1").Count
+    count = Get-MIRCollectionCount -Items @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Recurse -File -Filter "*.ps1")
     mir_cli_present = [bool](Test-Path -LiteralPath (Join-Path $repo "scripts\mir.ps1"))
     legacy_inventory_command = ".\tools\mir.ps1 legacy inventory"
   }
