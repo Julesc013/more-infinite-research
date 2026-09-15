@@ -27,6 +27,32 @@ foreach($pair in $schemaPairs.GetEnumerator()){
 $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
 $registry=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV2'
 $support=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
+$schemaScratchRelative = 'build/mir4/test-canonical-package-record-schema-' + [guid]::NewGuid().ToString('N')
+$schemaScratch = Join-Path $repo $schemaScratchRelative
+New-Item -ItemType Directory -Force -Path $schemaScratch | Out-Null
+try {
+  $negativeCases = @(
+    [pscustomobject]@{id='manifest-unknown';path='source/package-source.json';kind='MIR4ComposablePackageSourceV2';schema='spec/schemas/mir4-composable-package-source-v2.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
+    [pscustomobject]@{id='registry-invalid-target';path='targets/registry.json';kind='MIR4TargetRegistryV2';schema='spec/schemas/mir4-target-registry-v2.schema.json';mutate={param($r)$r.targets[0].target='f999'}},
+    [pscustomobject]@{id='support-missing';path='targets/support-policy.json';kind='MIR4TargetSupportPolicyV1';schema='spec/schemas/mir4-target-support-policy-v1.schema.json';mutate={param($r)[void]$r.PSObject.Properties.Remove('invariants')}},
+    [pscustomobject]@{id='composition-unknown';path='targets/f210/composition.json';kind='MIR4TargetCompositionV2';schema='spec/schemas/mir4-target-composition-v2.schema.json';mutate={param($r)$r.operations[0]|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}}
+  )
+  foreach ($case in $negativeCases) {
+    $record = Get-Content -Raw -LiteralPath (Join-Path $repo $case.path) | ConvertFrom-Json -Depth 100 -DateKind String
+    & $case.mutate $record
+    $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+    $relative = ($schemaScratchRelative + '/' + $case.id + '.json').Replace('\\','/')
+    [IO.File]::WriteAllText((Join-Path $repo $relative), (ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10, [Text.UTF8Encoding]::new($false))
+    $rejected = $false
+    try { Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath $relative -Kind $case.kind -Schema $case.schema -Code 'mir4-editable-source-negative' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir4-editable-source-negative-schema' }
+    if (-not $rejected) { throw "[mir4-editable-source-rehashed-schema-accepted] $($case.id)" }
+    $materializerRejected = $false
+    try { Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $relative -Kind $case.kind | Out-Null } catch { $materializerRejected = $_.Exception.Message -match 'mir4-target-materializer-record-schema' }
+    if (-not $materializerRejected) { throw "[mir4-editable-source-materializer-schema-accepted] $($case.id)" }
+  }
+} finally {
+  if (Test-Path -LiteralPath $schemaScratch -PathType Container) { Remove-Item -LiteralPath $schemaScratch -Recurse -Force }
+}
 if(@($manifest.bindings).Count-ne447-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne439-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne447){throw '[mir4-editable-source-binding-uniqueness]'}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}

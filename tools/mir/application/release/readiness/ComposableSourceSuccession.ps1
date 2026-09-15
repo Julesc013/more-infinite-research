@@ -18,7 +18,9 @@ function Get-MIR4M41ToM42SourceSuccessionPolicy {
     source_freeze_path = 'releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json'
     source_freeze_schema = 'contracts/repository/mir4-m41-source-freeze-authority-evolution-v1.schema.json'
     layout_authority_path = 'governance/repository/composable-source-layout-v1.json'
+    layout_authority_schema = 'contracts/repository/mir4-composable-source-layout-authority-v1.schema.json'
     layout_proof_path = 'assurance/repository/composable-source-layout-v1.json'
+    layout_proof_schema = 'contracts/repository/mir4-composable-source-layout-proof-policy-v1.schema.json'
     layout_receipt_path = 'assurance/repository/composable-source-layout-receipt-v1.json'
     layout_receipt_schema = 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
     output_path = 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json'
@@ -38,7 +40,9 @@ function Read-MIR4M41ToM42SourceSuccessionJson {
   $path = Join-Path $RepoRoot $RelativePath
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[$Code-missing] $RelativePath" }
   $raw = Get-Content -Raw -LiteralPath $path
-  if (-not ($raw | Test-Json -SchemaFile (Join-Path $RepoRoot $SchemaPath))) { throw "[$Code-schema] $RelativePath" }
+  $schemaValid = $false
+  try { $schemaValid = $raw | Test-Json -SchemaFile (Join-Path $RepoRoot $SchemaPath) -ErrorAction Stop } catch { $schemaValid = $false }
+  if (-not $schemaValid) { throw "[$Code-schema] $RelativePath" }
   return $raw | ConvertFrom-Json -Depth 100 -DateKind String
 }
 
@@ -69,13 +73,30 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionInputs {
     $HistoricalSourceFreeze = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.source_freeze_path -SchemaPath $policy.source_freeze_schema -Code 'mir4-m41-m42-succession-source-freeze'
   }
   if ($null -eq $LayoutAuthority) {
-    $LayoutAuthority = Get-Content -Raw -LiteralPath (Join-Path $repo $policy.layout_authority_path) | ConvertFrom-Json -Depth 100 -DateKind String
+    $LayoutAuthority = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.layout_authority_path -SchemaPath $policy.layout_authority_schema -Code 'mir4-m41-m42-succession-layout-authority'
   }
   if ($null -eq $LayoutProof) {
-    $LayoutProof = Get-Content -Raw -LiteralPath (Join-Path $repo $policy.layout_proof_path) | ConvertFrom-Json -Depth 100 -DateKind String
+    $LayoutProof = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.layout_proof_path -SchemaPath $policy.layout_proof_schema -Code 'mir4-m41-m42-succession-layout-proof'
   }
   if ($null -eq $LayoutReceipt) {
     $LayoutReceipt = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.layout_receipt_path -SchemaPath $policy.layout_receipt_schema -Code 'mir4-m41-m42-succession-layout-receipt'
+  }
+
+  # Callers may supply records for negative and held-out tests.  They receive
+  # the same exact-shape validation as records loaded from the checkout; a
+  # recomputed self-hash is never a substitute for an admitted contract.
+  foreach ($validation in @(
+    [pscustomobject]@{record=$HistoricalReadiness; schema=$policy.readiness_schema; code='mir4-m41-m42-succession-readiness'},
+    [pscustomobject]@{record=$HistoricalSourceFreeze; schema=$policy.source_freeze_schema; code='mir4-m41-m42-succession-source-freeze'},
+    [pscustomobject]@{record=$LayoutAuthority; schema=$policy.layout_authority_schema; code='mir4-m41-m42-succession-layout-authority'},
+    [pscustomobject]@{record=$LayoutProof; schema=$policy.layout_proof_schema; code='mir4-m41-m42-succession-layout-proof'},
+    [pscustomobject]@{record=$LayoutReceipt; schema=$policy.layout_receipt_schema; code='mir4-m41-m42-succession-layout-receipt'}
+  )) {
+    $schemaValid = $false
+    try { $schemaValid = (ConvertTo-MIR4BootstrapCanonicalJson -Value $validation.record) | Test-Json -SchemaFile (Join-Path $repo ([string]$validation.schema)) -ErrorAction Stop } catch { $schemaValid = $false }
+    if (-not $schemaValid) {
+      throw "[$($validation.code)-schema]"
+    }
   }
 
   if ([string]$HistoricalReadiness.kind -cne 'MIR441ReleaseReadinessV1' -or
@@ -93,16 +114,42 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionInputs {
       [string]$HistoricalSourceFreeze.package_source.authority_record_sha256 -cne [string]$HistoricalReadiness.package_source.authority_record_sha256) {
     throw '[mir4-m41-m42-succession-historical-lineage]'
   }
+  $expectedLayoutScope = 'Replace the abbreviated and era-split live player-source layout with one package-shaped source root, explicit target adapters, explicit Factorio-1 compatibility code, and content-identity deduplication without changing materialized package bytes.'
+  $expectedLayoutInvariants = @(
+    'one-live-source-root', 'no-live-src-root', 'no-live-modern-or-legacy-lanes',
+    'cross-checkout-source-bytes-pinned-to-lf', 'one-binding-per-target-output',
+    'exact-predecessor-path-map', 'binary-safe-all-binding-predecessor-proof',
+    'content-identical-inputs-share-one-physical-source', 'all-four-materialized-package-trees-unchanged',
+    'historical-records-remain-immutable', 'one-current-package-writer', 'release-firewall'
+  )
+  $expectedLayoutChecks = @(
+    'authority-and-proof-policy', 'v2-source-target-and-package-authority-schemas',
+    'self-hashed-authorities', 'physical-source-set-equals-manifest', 'predecessor-path-bijection',
+    'binary-safe-all-binding-predecessor-proof', 'deduplicated-current-source-identities',
+    'no-retained-live-src-or-era-lanes', 'cross-checkout-source-byte-stability',
+    'four-target-deterministic-materialization', 'exact-predecessor-package-content-parity',
+    'historical-path-resolution-and-negative-counterexamples', 'release-firewall'
+  )
   if ([string]$LayoutAuthority.kind -cne 'MIR4ComposableSourceLayoutAuthorityV1' -or
       [string]$LayoutAuthority.migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
       [string]$LayoutAuthority.state -cne 'authorized-development-migration' -or
-      [string]$LayoutAuthority.writers[0].path -cne 'tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1') {
+      [string]$LayoutAuthority.scope -cne $expectedLayoutScope -or
+      [string]$LayoutAuthority.predecessor.branch -cne 'dev' -or
+      [string]$LayoutAuthority.predecessor.commit -cne '92d563ada31e82430fbf25f639267b03a8a180d1' -or
+      [string]$LayoutAuthority.predecessor.manifest -cne 'src/mod/package-source.json' -or
+      [string]$LayoutAuthority.predecessor.manifest_record_sha256 -cne '8BDB2B9D3D63A5FBD49556609D6A7371B2BF11FA1D5F15BFD696E4C17EA3EF5E' -or
+      (@($LayoutAuthority.required_invariants) -join '|') -cne ($expectedLayoutInvariants -join '|') -or
+      @($LayoutAuthority.writers).Count -ne 1 -or
+      [string]$LayoutAuthority.writers[0].path -cne 'tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1' -or
+      [string]$LayoutAuthority.rollback -cne 'Revert the exact source-layout work package to the recorded dev predecessor; do not recreate partial src/mod or target payload trees.') {
     throw '[mir4-m41-m42-succession-layout-authority]'
   }
   Assert-MIR4M41ToM42SourceSuccessionGate -Gate $LayoutAuthority.transition_gate -Code 'mir4-m41-m42-succession-layout-gate'
   if ([string]$LayoutProof.kind -cne 'MIR4ComposableSourceLayoutProofPolicyV1' -or
       [string]$LayoutProof.migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
       [string]$LayoutProof.test_id -cne 'static.mir4-composable-source-layout-v1' -or
+      [string]$LayoutProof.evidence_entrypoint -cne 'tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1' -or
+      (@($LayoutProof.required_checks) -join '|') -cne ($expectedLayoutChecks -join '|') -or
       -not [bool]$LayoutProof.independent_exact_engine_required_for_gameplay_claims -or
       [bool]$LayoutProof.release_transition_authority) {
     throw '[mir4-m41-m42-succession-layout-proof]'
@@ -131,7 +178,13 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionInputs {
   if (-not (Test-Path -LiteralPath $fixedPointPath -PathType Leaf)) {
     throw '[mir4-m41-m42-succession-fixed-point]'
   }
-  $fixedPoint = Get-Content -Raw -LiteralPath $fixedPointPath | ConvertFrom-Json -Depth 100 -DateKind String
+  $fixedPointRaw = Get-Content -Raw -LiteralPath $fixedPointPath
+  $fixedPointSchemaValid = $false
+  try { $fixedPointSchemaValid = $fixedPointRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-repository-fixed-point-v2.schema.json') -ErrorAction Stop } catch { $fixedPointSchemaValid = $false }
+  if (-not $fixedPointSchemaValid) {
+    throw '[mir4-m41-m42-succession-fixed-point-schema]'
+  }
+  $fixedPoint = $fixedPointRaw | ConvertFrom-Json -Depth 100 -DateKind String
   if ([int]$fixedPoint.schema -ne 2 -or
       [string]$fixedPoint.kind -cne 'MIR4RepositoryFixedPointV2' -or
       [string]$fixedPoint.state -cne 'MIR42-COMPOSABLE-SOURCE-LAYOUT' -or
@@ -215,6 +268,11 @@ function Test-MIR4M41ToM42ComposableSourceSuccession {
       [string]$SuccessionRecord.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV1' -or
       [string]$SuccessionRecord.status -cne 'MIR41-HISTORICAL-SOURCE-FREEZE-PRESERVED-MIR42-COMPOSABLE-SUCCESSOR-VERIFIED') {
     throw '[mir4-m41-m42-succession-record-integrity]'
+  }
+  $recordSchemaValid = $false
+  try { $recordSchemaValid = (ConvertTo-MIR4BootstrapCanonicalJson -Value $SuccessionRecord) | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema) -ErrorAction Stop } catch { $recordSchemaValid = $false }
+  if (-not $recordSchemaValid) {
+    throw '[mir4-m41-m42-succession-record-schema]'
   }
   Assert-MIR4M41ToM42SourceSuccessionGate -Gate $SuccessionRecord.transition_gate -Code 'mir4-m41-m42-succession-release-firewall'
   if ([bool]$SuccessionRecord.transition_gate.private_build -or

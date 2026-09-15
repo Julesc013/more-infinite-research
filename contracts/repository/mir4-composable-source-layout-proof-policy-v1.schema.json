@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "migration_id", "test_id", "evidence_entrypoint", "required_checks", "independent_exact_engine_required_for_gameplay_claims", "release_transition_authority"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ComposableSourceLayoutProofPolicyV1"},
+    "migration_id": {"const": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1"},
+    "test_id": {"const": "static.mir4-composable-source-layout-v1"},
+    "evidence_entrypoint": {"const": "tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1"},
+    "required_checks": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "independent_exact_engine_required_for_gameplay_claims": {"const": true},
+    "release_transition_authority": {"const": false}
+  }
+}

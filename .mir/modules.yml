@@ -422,11 +422,12 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v2.json
-    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
-    current_package_presentation_evolution_receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
-    current_package_presentation_evolution_schema: contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json
-    current_package_presentation_evolution_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v3.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
+    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority.ps1
+    frozen_package_presentation_v2: spec/distribution/mir4-current-package-presentation-v2.json
+    frozen_package_presentation_v2_evolution_receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
+    frozen_package_presentation_v2_verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
     completion_authority: .mir/releases/waves/mir4-r0/MIR4-Supply-Chain-Preservation-T15V1.json
     independent_machine_acceptance: .mir/releases/waves/mir4-r0/MIR4-T15-Independent-Machine-AcceptanceV1.json
     authority_evolution_receipt: .mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json

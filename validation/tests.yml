@@ -2515,6 +2515,38 @@
       ]
     },
     {
+      "id": "static.mir4-current-package-presentation-v3",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v3.json",
+        "spec/schemas/mir4-current-package-presentation-v3.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v2.json",
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "targets/registry.json",
+        "targets/support-policy.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "governance/repository/composable-source-layout-v1.json",
+        "assurance/repository/composable-source-layout-v1.json",
+        "assurance/repository/composable-source-layout-receipt-v1.json",
+        "contracts/repository/mir4-composable-source-layout-authority-v1.schema.json",
+        "contracts/repository/mir4-composable-source-layout-proof-policy-v1.schema.json",
+        "contracts/repository/mir4-composable-source-layout-migration-v1.schema.json",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV3.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-pre-freeze-hardening",
       "kind": "static",
       "layer": "F0",

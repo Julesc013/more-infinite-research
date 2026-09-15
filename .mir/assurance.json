@@ -35,6 +35,7 @@
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
     "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
     "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
+    "mir4-current-package-presentation-v3": ["static.mir4-current-package-presentation-v3"],
     "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
     "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
     "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
@@ -61,6 +62,11 @@
       "id": "mir4-current-package-presentation-v2",
       "patterns": ["^spec/distribution/mir4-current-package-presentation-v2(?:-evolution-receipt)?\\.json$", "^spec/schemas/mir4-current-package-presentation-v2\\.schema\\.json$", "^contracts/repository/mir4-current-package-presentation-v2-evolution-receipt\\.schema\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV2\\.ps1$"],
       "tests": ["static.mir4-current-package-presentation-v2"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v3",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^(?:governance|assurance)/repository/composable-source-layout-v1\\.json$", "^assurance/repository/composable-source-layout-receipt-v1\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v3"]
     },
     {
       "id": "mir4-post-release-foundation",

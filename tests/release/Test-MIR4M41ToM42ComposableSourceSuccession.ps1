@@ -24,7 +24,23 @@ Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -R
 
 $tamperedAuthority=Copy-MIR4M41ToM42Succession $inputs.layout_authority
 $tamperedAuthority.transition_gate.main_promotion=$true
-Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $tamperedAuthority -LayoutProof $inputs.layout_proof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-gate'
+Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $tamperedAuthority -LayoutProof $inputs.layout_proof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-authority-schema'
+
+$tamperedScope=Copy-MIR4M41ToM42Succession $inputs.layout_authority
+$tamperedScope.scope='broader ungoverned source migration'
+Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $tamperedScope -LayoutProof $inputs.layout_proof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-authority'
+
+$tamperedInvariant=Copy-MIR4M41ToM42Succession $inputs.layout_authority
+$tamperedInvariant.required_invariants[0]='missing-live-source-boundary'
+Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $tamperedInvariant -LayoutProof $inputs.layout_proof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-authority'
+
+$unknownProof=Copy-MIR4M41ToM42Succession $inputs.layout_proof
+$unknownProof|Add-Member -NotePropertyName unauthorized_gate -NotePropertyValue $true
+Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $inputs.layout_authority -LayoutProof $unknownProof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-proof-schema'
+
+$missingProof=Copy-MIR4M41ToM42Succession $inputs.layout_proof
+[void]$missingProof.PSObject.Properties.Remove('required_checks')
+Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -RepoRoot $repo -HistoricalReadiness $inputs.historical_readiness -HistoricalSourceFreeze $inputs.historical_source_freeze -LayoutAuthority $inputs.layout_authority -LayoutProof $missingProof -LayoutReceipt $inputs.layout_receipt|Out-Null} 'mir4-m41-m42-succession-layout-proof-schema'
 
 $tamperedHistorical=Copy-MIR4M41ToM42Succession $inputs.historical_readiness
 $tamperedHistorical.package_source.current_sha256=('F'*64 -join '')
@@ -33,7 +49,17 @@ Assert-MIR4M41ToM42Rejected {Get-MIR4M41ToM42ComposableSourceSuccessionInputs -R
 $tamperedRecord=Copy-MIR4M41ToM42Succession (New-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo)
 $tamperedRecord.transition_gate.main_promotion=$true
 $tamperedRecord.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tamperedRecord
-Assert-MIR4M41ToM42Rejected {Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo -SuccessionRecord $tamperedRecord|Out-Null} 'mir4-m41-m42-succession-release-firewall'
+Assert-MIR4M41ToM42Rejected {Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo -SuccessionRecord $tamperedRecord|Out-Null} 'mir4-m41-m42-succession-record-schema'
+
+$unknownRecord=Copy-MIR4M41ToM42Succession (New-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo)
+$unknownRecord|Add-Member -NotePropertyName unauthorized_gate -NotePropertyValue $true
+$unknownRecord.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $unknownRecord
+Assert-MIR4M41ToM42Rejected {Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo -SuccessionRecord $unknownRecord|Out-Null} 'mir4-m41-m42-succession-record-schema'
+
+$missingRecord=Copy-MIR4M41ToM42Succession (New-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo)
+[void]$missingRecord.PSObject.Properties.Remove('invariants')
+$missingRecord.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $missingRecord
+Assert-MIR4M41ToM42Rejected {Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo -SuccessionRecord $missingRecord|Out-Null} 'mir4-m41-m42-succession-record-schema'
 
 $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
 foreach($operation in @('private_build','qualification','technical_seal','promotion')){

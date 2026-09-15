@@ -7,9 +7,13 @@ function Test-MIR4M4202PackageSourceSuccession {
     [Parameter(Mandatory)][string]$CurrentSha256
   )
 
-  if($PredecessorSha256-ceq$CurrentSha256){return $true}
-
   try{
+    . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
+    $currentPresentation = Get-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot
+    if ([string]$currentPresentation.package_source.fingerprint_sha256 -cne $CurrentSha256 -or
+        (@($currentPresentation.package_source.roots) -join '|') -cne 'source|targets') { return $false }
+    if($PredecessorSha256-ceq$CurrentSha256){return $true}
+
     $receiptPath=Join-Path $RepoRoot 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
     $schemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json'
     if(-not(Test-Path -LiteralPath $receiptPath -PathType Leaf)-or-not(Test-Path -LiteralPath $schemaPath -PathType Leaf)){return $false}
@@ -48,39 +52,21 @@ function Test-MIR4M4202PackageSourceSuccession {
       }
     }
 
-    $presentationPath=Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json'
-    $presentationSchemaPath=Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v2.schema.json'
-    if(-not(Test-Path -LiteralPath $presentationPath -PathType Leaf)-or-not(Test-Path -LiteralPath $presentationSchemaPath -PathType Leaf)){return $false}
-    $presentationRaw=Get-Content -Raw -LiteralPath $presentationPath
-    if(-not($presentationRaw|Test-Json -SchemaFile $presentationSchemaPath)){return $false}
-    $presentation=$presentationRaw|ConvertFrom-Json -Depth 100 -DateKind String
-    if(-not(Test-MIR4BootstrapRecordHash -Record $presentation)){return $false}
-
-    $acceptedBridge=@($presentation.receipts|Where-Object{
-      [string]$_.path-ceq'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'-and
-      [string]$_.hash_mode-ceq'record-self-hash'
-    })
-    if($acceptedBridge.Count-ne1-or[string]$acceptedBridge[0].sha256-cne[string]$receipt.record_sha256){return $false}
-
-    $packageAuthorityPath=Join-Path $RepoRoot ([string]$presentation.package_authority.path)
-    $sourceManifestPath=Join-Path $RepoRoot ([string]$presentation.source_manifest.path)
-    if(-not(Test-Path -LiteralPath $packageAuthorityPath -PathType Leaf)-or-not(Test-Path -LiteralPath $sourceManifestPath -PathType Leaf)){return $false}
-    $packageAuthority=Get-Content -Raw -LiteralPath $packageAuthorityPath|ConvertFrom-Json -Depth 100 -DateKind String
-    $sourceManifest=Get-Content -Raw -LiteralPath $sourceManifestPath|ConvertFrom-Json -Depth 100 -DateKind String
-    if(-not(Test-MIR4BootstrapRecordHash -Record $packageAuthority)-or-not(Test-MIR4BootstrapRecordHash -Record $sourceManifest)){return $false}
-
-    $enabledAuthorityFlags=@($presentation.authority_invariants.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
-    $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value})
+    # V2 is frozen predecessor evidence. Current succession is bound to V3,
+    # which validates the source/ and target-composition current authority.
+    $presentation=$currentPresentation
+    $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
     return (
       [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
       (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
-      [string]$packageAuthority.record_sha256-ceq[string]$presentation.package_authority.record_sha256-and
-      [string]$sourceManifest.record_sha256-ceq[string]$presentation.source_manifest.record_sha256-and
-      $enabledAuthorityFlags.Count-eq1-and
-      $enabledAuthorityFlags[0]-ceq'one_emitter_preserved'-and
-      $enabledTransitionGates.Count-eq0
+      [bool]$presentation.authority_invariants.v2_receipts_immutable-and
+      [bool]$presentation.authority_invariants.single_editable_source_root-and
+      [bool]$presentation.authority_invariants.single_package_writer-and
+      -not[bool]$presentation.transition_gate.main_promotion-and
+      -not[bool]$presentation.transition_gate.publication-and
+      ($enabledTransitionGates-join'|')-ceq'development_merge'
     )
   }catch{return $false}
 }

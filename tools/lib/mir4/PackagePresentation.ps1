@@ -129,11 +129,7 @@ function Get-MIR4CurrentPackagePresentationV2 {
   ) {
     throw '[mir4-package-presentation-v2-executable-source-equality]'
   }
-  $a=Get-MIR4CanonicalPackageAuthority -RepoRoot $repo;$m=Get-Content -Raw (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100 -DateKind String;$liveFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
-  if([string]$a.record_sha256-cne[string]$v2.package_authority.record_sha256-or[string]$m.record_sha256-cne[string]$v2.source_manifest.record_sha256-or[string]$a.source_manifest.path-cne[string]$v2.source_manifest.path-or[string]$a.source_manifest.record_sha256-cne[string]$v2.source_manifest.record_sha256-or[string]$m.materializer_abi-cne'mir4-target-materializer/1'-or(@(Get-MIR4CanonicalPackageSourceRoots)-join'|')-cne'src/mod|targets'-or[string]$a.writer.implementation-cne'tools/mir/application/package/TargetMaterializer.ps1'-or[string]$a.legacy_root_projection.compatibility_state-cne'retired-historical-read-only'-or[string]$v2.package_source.fingerprint_sha256-cne$liveFingerprint){throw '[mir4-package-presentation-v2-binding]'}
   foreach($r in @($v2.receipts)){$path=Join-Path $repo $r.path;$actual=Get-Content -Raw $path|ConvertFrom-Json -Depth 100 -DateKind String;if([string]$r.hash_mode-ceq'record-self-hash'){if(-not(Test-MIR4BootstrapRecordHash $actual)){throw '[mir4-package-presentation-v2-receipt-self-hash]'};$hash=Get-MIR4BootstrapRecordSha256 $actual}else{$hash=Get-MIR4BootstrapTextSha256 $path};if([string]$actual.kind-cne[string]$r.kind-or[string]$actual.status-cne[string]$r.status-or$hash-cne[string]$r.sha256){throw '[mir4-package-presentation-v2-receipt]'}}
-  if('README.md'-in@(Get-MIR4CanonicalPackageSourceFiles $repo)){throw '[mir4-package-presentation-v2-root-readme-source]'}
-  foreach($target in @('f210','f200','f110','f100')){$rows=@($m.bindings|Where-Object{[string]$_.source_path-ceq"targets/$target/generation/README.md.template"-and[string]$_.output_path-ceq'README.md'-and[string]$_.semantic_class-ceq'package-documentation'-and[string]$_.transform-ceq'exact-template-v1'-and(@($_.target_scope)-join'|')-ceq$target});if($rows.Count-ne1){throw "[mir4-package-presentation-v2-readme-binding] $target"}}
   return $v2
 }
 
@@ -217,17 +213,126 @@ function Assert-MIR4CurrentPackagePresentationV2LiveFingerprint {
 function Assert-MIR4CurrentPackagePresentationV2 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$v2=Get-MIR4CurrentPackagePresentationV2 $repo
-  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
-  $liveFingerprint=Assert-MIR4CurrentPackagePresentationV2LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$v2.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
-  if(-not[bool]$v2.presentation.repository_readme_package_excluded){throw '[mir4-package-presentation-v2-root-readme]'}
-  foreach($target in @('f210','f200','f110','f100')){if(-not(Test-Path (Join-Path $repo "targets/$target/generation/README.md.template") -PathType Leaf)){throw "[mir4-package-presentation-v2-target-readme] $target"}}
-  foreach($name in @('version_allocation','tagging','signing','sealing','publication')){if([bool]$v2.transition_gate.$name){throw "[mir4-package-presentation-v2-gate] $name"}}
+  if ([string]$v2.package_source.fingerprint_sha256 -cne $PackageSourceSha256) { throw '[mir4-package-presentation-v2-historical-fingerprint]' }
   $v2
 }
 
 function Get-MIR4CurrentPackageSourceSha256 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  $v2=Get-MIR4CurrentPackagePresentationV2 -RepoRoot $repo
-  return [string](Assert-MIR4CurrentPackagePresentationV2LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$v2.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 ([string]$v2.package_source.fingerprint_sha256))
+  $v3=Get-MIR4CurrentPackagePresentationV3 -RepoRoot $repo
+  return [string](Assert-MIR4CurrentPackagePresentationV3LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$v3.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 ([string]$v3.package_source.fingerprint_sha256))
+}
+
+function Test-MIR4CurrentPackagePresentationV3Schema {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$RepoRoot)
+  try { return [bool]((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v3.schema.json') -ErrorAction Stop) } catch { return $false }
+}
+
+function Get-MIR4CurrentPackagePresentationV3 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $raw = Get-Content -Raw -LiteralPath $path
+  $v3 = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4CurrentPackagePresentationV3Schema -Record $v3 -RepoRoot $repo) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $v3) -or
+      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $v3) + [char]10)) {
+    throw '[mir4-package-presentation-v3-schema]'
+  }
+  $v2 = Get-MIR4CurrentPackagePresentationV2 -RepoRoot $repo
+  if ([string]$v3.predecessor.path -cne 'spec/distribution/mir4-current-package-presentation-v2.json' -or
+      [string]$v3.predecessor.kind -cne 'MIR4CurrentPackagePresentationV2' -or
+      [string]$v3.predecessor.hash_mode -cne 'record-self-hash' -or
+      [string]$v3.predecessor.record_sha256 -cne [string]$v2.record_sha256 -or
+      -not [bool]$v3.predecessor.frozen_historical_receipt) {
+    throw '[mir4-package-presentation-v3-predecessor]'
+  }
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV2' -Schema 'spec/schemas/mir4-composable-package-source-v2.schema.json' -Code 'mir4-package-presentation-v3-source-manifest'
+  $layout = $v3.source_layout_successor
+  $layoutAuthorityPath = Join-Path $repo ([string]$layout.authority.path)
+  $layoutProofPath = Join-Path $repo ([string]$layout.proof_policy.path)
+  $layoutReceiptPath = Join-Path $repo ([string]$layout.receipt.path)
+  $layoutAuthorityRaw = Get-Content -Raw -LiteralPath $layoutAuthorityPath
+  $layoutProofRaw = Get-Content -Raw -LiteralPath $layoutProofPath
+  $layoutReceiptRaw = Get-Content -Raw -LiteralPath $layoutReceiptPath
+  try {
+    $layoutAuthoritySchemaValid = [bool]($layoutAuthorityRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-composable-source-layout-authority-v1.schema.json') -ErrorAction Stop)
+    $layoutProofSchemaValid = [bool]($layoutProofRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-composable-source-layout-proof-policy-v1.schema.json') -ErrorAction Stop)
+    $layoutReceiptSchemaValid = [bool]($layoutReceiptRaw | Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json') -ErrorAction Stop)
+  } catch {
+    throw '[mir4-package-presentation-v3-layout-successor-schema]'
+  }
+  if (-not $layoutAuthoritySchemaValid -or -not $layoutProofSchemaValid -or -not $layoutReceiptSchemaValid) {
+    throw '[mir4-package-presentation-v3-layout-successor-schema]'
+  }
+  $layoutAuthority = $layoutAuthorityRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  $layoutProof = $layoutProofRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  $layoutReceipt = $layoutReceiptRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$layout.migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
+      [string]$layout.authority.path -cne 'governance/repository/composable-source-layout-v1.json' -or
+      [string]$layout.proof_policy.path -cne 'assurance/repository/composable-source-layout-v1.json' -or
+      [string]$layout.receipt.path -cne 'assurance/repository/composable-source-layout-receipt-v1.json' -or
+      [string]$layoutAuthority.kind -cne 'MIR4ComposableSourceLayoutAuthorityV1' -or
+      [string]$layoutProof.kind -cne 'MIR4ComposableSourceLayoutProofPolicyV1' -or
+      (Get-MIR4BootstrapTextSha256 -Path $layoutAuthorityPath) -cne [string]$layout.authority.sha256 -or
+      (Get-MIR4BootstrapTextSha256 -Path $layoutProofPath) -cne [string]$layout.proof_policy.sha256 -or
+      [string]$layout.receipt.kind -cne 'MIR4ComposableSourceLayoutMigrationV1' -or
+      -not (Test-MIR4BootstrapRecordHash -Record $layoutReceipt) -or
+      [string]$layout.receipt.record_sha256 -cne [string]$layoutReceipt.record_sha256 -or
+      [string]$layoutReceipt.migration_id -cne [string]$layout.migration_id -or
+      [string]$layoutReceipt.authority.path -cne [string]$layout.authority.path -or
+      [string]$layoutReceipt.authority.sha256 -cne [string]$layout.authority.sha256 -or
+      [string]$layoutReceipt.proof_policy.path -cne [string]$layout.proof_policy.path -or
+      [string]$layoutReceipt.proof_policy.sha256 -cne [string]$layout.proof_policy.sha256 -or
+      -not [bool]$layoutReceipt.invariants.single_editable_source_root -or
+      -not [bool]$layoutReceipt.invariants.single_package_writer -or
+      [bool]$layoutReceipt.transition_gate.main_promotion -or
+      [bool]$layoutReceipt.transition_gate.publication) {
+    throw '[mir4-package-presentation-v3-layout-successor]'
+  }
+  if ([string]$v3.package_authority.record_sha256 -cne [string]$authority.record_sha256 -or
+      [string]$v3.source_manifest.record_sha256 -cne [string]$manifest.record_sha256 -or
+      [string]$v3.package_source.fingerprint_sha256 -cne (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) -or
+      [string]$v3.package_source.materializer_abi -cne [string]$manifest.materializer_abi -or
+      (@($v3.package_source.roots) -join '|') -cne 'source|targets' -or
+      [string]$v3.package_source.sole_writer -cne [string]$authority.writer.implementation -or
+      [string]$v3.package_source.legacy_root_state -cne [string]$authority.legacy_root_projection.compatibility_state -or
+      -not [bool]$v3.presentation.repository_readme_package_excluded -or
+      -not [bool]$v3.presentation.target_readmes_manifest_bound) {
+    throw '[mir4-package-presentation-v3-current-binding]'
+  }
+  foreach ($target in @('f210','f200','f110','f100')) {
+    $rows = @($manifest.bindings | Where-Object {
+      [string]$_.source_path -ceq "source/presentation/$target/README.md.template" -and
+      [string]$_.output_path -ceq 'README.md' -and
+      [string]$_.semantic_class -ceq 'package-documentation' -and
+      [string]$_.transform -ceq 'exact-template-v1' -and
+      (@($_.target_scope) -join '|') -ceq $target
+    })
+    if ($rows.Count -ne 1) { throw "[mir4-package-presentation-v3-readme-binding] $target" }
+  }
+  return $v3
+}
+
+function Assert-MIR4CurrentPackagePresentationV3LiveFingerprint {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$StoredPackageSourceSha256,[Parameter(Mandatory)][string]$RequiredPackageSourceSha256)
+  $recomputed = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot
+  if ($StoredPackageSourceSha256 -notmatch '^[A-F0-9]{64}$' -or
+      $RequiredPackageSourceSha256 -notmatch '^[A-F0-9]{64}$' -or
+      $StoredPackageSourceSha256 -cne $RequiredPackageSourceSha256 -or
+      $RequiredPackageSourceSha256 -cne $recomputed) {
+    throw '[mir4-package-presentation-v3-live-fingerprint]'
+  }
+  return $StoredPackageSourceSha256
+}
+
+function Assert-MIR4CurrentPackagePresentationV3 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
+  $v3 = Get-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot
+  return Assert-MIR4CurrentPackagePresentationV3LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$v3.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
 }

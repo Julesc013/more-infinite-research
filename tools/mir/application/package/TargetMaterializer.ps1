@@ -14,10 +14,14 @@ if (-not (Get-Command Write-MIR441PackagePresentationV1 -ErrorAction SilentlyCon
 
 function Read-MIR4TargetMaterializerRecord {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Kind)
-  $path = Join-Path $RepoRoot $RelativePath
-  $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String
-  if ([string]$record.kind -cne $Kind -or -not (Test-MIR4BootstrapRecordHash -Record $record)) { throw "[mir4-target-materializer-record] $RelativePath" }
-  return $record
+  $definitions = [ordered]@{
+    MIR4ComposablePackageSourceV2 = 'spec/schemas/mir4-composable-package-source-v2.schema.json'
+    MIR4TargetRegistryV2 = 'spec/schemas/mir4-target-registry-v2.schema.json'
+    MIR4TargetSupportPolicyV1 = 'spec/schemas/mir4-target-support-policy-v1.schema.json'
+    MIR4TargetCompositionV2 = 'spec/schemas/mir4-target-composition-v2.schema.json'
+  }
+  if (-not $definitions.Contains($Kind)) { throw "[mir4-target-materializer-kind] $Kind" }
+  return Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $RepoRoot -RelativePath $RelativePath -Kind $Kind -Schema ([string]$definitions[$Kind]) -Code 'mir4-target-materializer-record'
 }
 
 function Get-MIR4TargetMaterializerState {

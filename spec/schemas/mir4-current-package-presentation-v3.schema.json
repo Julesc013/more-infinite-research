@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "source_layout_successor", "package_authority", "source_manifest", "package_source", "presentation", "authority_invariants", "transition_gate", "record_sha256"],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "record": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "kind": {"type": "string", "minLength": 1}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "file": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "gates": {"type": "object", "additionalProperties": false, "required": ["development_merge", "private_build", "qualification", "technical_seal", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"development_merge": {"const": true}, "private_build": {"const": false}, "qualification": {"const": false}, "technical_seal": {"const": false}, "main_promotion": {"const": false}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  },
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4CurrentPackagePresentationV3"},
+    "status": {"const": "accepted-current-composable-source-package-presentation"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "hash_mode", "record_sha256", "frozen_historical_receipt"], "properties": {"path": {"const": "spec/distribution/mir4-current-package-presentation-v2.json"}, "kind": {"const": "MIR4CurrentPackagePresentationV2"}, "hash_mode": {"const": "record-self-hash"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "frozen_historical_receipt": {"const": true}}},
+    "source_layout_successor": {"type": "object", "additionalProperties": false, "required": ["migration_id", "authority", "proof_policy", "receipt"], "properties": {"migration_id": {"const": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1"}, "authority": {"$ref": "#/$defs/file"}, "proof_policy": {"$ref": "#/$defs/file"}, "receipt": {"$ref": "#/$defs/record"}}},
+    "package_authority": {"allOf": [{"$ref": "#/$defs/record"}, {"properties": {"path": {"const": "targets/package-authority.json"}, "kind": {"const": "MIR4CanonicalPackageAuthorityV2"}}}]},
+    "source_manifest": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "state", "record_sha256"], "properties": {"path": {"const": "source/package-source.json"}, "kind": {"const": "MIR4ComposablePackageSourceV2"}, "state": {"const": "canonical-composable-package-source"}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "package_source": {"type": "object", "additionalProperties": false, "required": ["fingerprint_sha256", "materializer_abi", "roots", "sole_writer", "legacy_root_state"], "properties": {"fingerprint_sha256": {"$ref": "#/$defs/sha256"}, "materializer_abi": {"const": "mir4-target-materializer/1"}, "roots": {"const": ["source", "targets"]}, "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}, "legacy_root_state": {"const": "retired-historical-read-only"}}},
+    "presentation": {"type": "object", "additionalProperties": false, "required": ["repository_readme_package_excluded", "target_readmes_manifest_bound"], "properties": {"repository_readme_package_excluded": {"const": true}, "target_readmes_manifest_bound": {"const": true}}},
+    "authority_invariants": {"type": "object", "additionalProperties": false, "required": ["v2_receipts_immutable", "single_editable_source_root", "single_package_writer", "package_bytes_unchanged", "gameplay_semantics_changed", "candidate_allocation_authorized", "signing_or_sealing_authorized", "promotion_authorized", "publication_authorized", "public_support_authorized"], "properties": {"v2_receipts_immutable": {"const": true}, "single_editable_source_root": {"const": true}, "single_package_writer": {"const": true}, "package_bytes_unchanged": {"const": true}, "gameplay_semantics_changed": {"const": false}, "candidate_allocation_authorized": {"const": false}, "signing_or_sealing_authorized": {"const": false}, "promotion_authorized": {"const": false}, "publication_authorized": {"const": false}, "public_support_authorized": {"const": false}}},
+    "transition_gate": {"$ref": "#/$defs/gates"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  }
+}

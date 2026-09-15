@@ -118,7 +118,7 @@ function New-MIR4PackageSuccessionWitnessV1 {
   if ([string]$historicalPresentation.package_source_sha256 -cne $historicalSourceSha256) {
     throw '[mir4-w09-frozen-v1-source-drift]'
   }
-  $presentation=Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $repo -PackageSourceSha256 ([string]$SourceIdentity.package_source_sha256)
+  $presentation=Assert-MIR4CurrentPackagePresentationV3 -RepoRoot $repo -PackageSourceSha256 ([string]$SourceIdentity.package_source_sha256)
   if(
     -not(Test-MIR4BootstrapRecordHash -Record $presentation) -or
     [string](Get-MIR4CurrentPackageSourceSha256 -RepoRoot $repo)-cne[string]$SourceIdentity.package_source_sha256
