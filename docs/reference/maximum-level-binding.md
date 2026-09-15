@@ -1,20 +1,30 @@
 ---
 title: "Maximum-Level Binding Contract"
-status: current
-applies_to: "4.0.0+"
+status: historical-checkpoint
+applies_to: "pre-cutover schema-3 maximum-level characterization"
+checkpoint_source_commit: "297aa5cc902da96847165a4f9caa1048608839fb"
+checkpoint_candidate_sha256: not-recorded
 audience: developer
 doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-08-21
 supersedes: []
-superseded_by: []
+superseded_by:
+  - "current composed V2 publication (not equivalent to this contract)"
+  - "X04 progression-and-continuity successor qualification"
 source_of_truth_for:
-  - maximum-level-binding-policy-v3
+  - historical-maximum-level-binding-policy-v3
 ---
 
-# Maximum-Level Binding Contract
+# Historical Maximum-Level Binding Contract
 
-`MIRMaximumLevelPolicyV3` is the one maximum-level registry for MIR-generated technologies, base continuations, and adopted native owners. Every managed technology has at most one normalized schema-3 `MaximumLevelBinding`.
+This document records the pre-cutover schema-3 `MIRMaximumLevelPolicyV3` characterization pinned at `297aa5cc902da96847165a4f9caa1048608839fb`. It is not the current package contract and must not be used to claim that the composed MIR 4.2 F210 target has V3 save, queue, finalizer, or migration semantics.
+
+The current composed F210 output publishes `MIRMaximumLevelPolicyV2` through `prototypes/mir/pipeline/compiler_orchestrator/publication.lua` and uses a `POLICY_VERSION = 1` runtime controller. It has not been declared equivalent to this historical V3 contract. The X04 progression-and-continuity delivery slice owns the successor port and qualification (currently prepared in progression PR #286).
+
+The remainder of this page is retained as the immutable V3 characterization.
+
+`MIRMaximumLevelPolicyV3` was the one maximum-level registry for MIR-generated technologies, base continuations, and adopted native owners. Every managed technology had at most one normalized schema-3 `MaximumLevelBinding`.
 
 ## Resolution
 

@@ -28,19 +28,19 @@ foreach($record in @($immutableTruth.records)){
   if(-not$front.Success-or$front.Groups['body'].Value-match'(?m)^source_of_truth_for:'){throw "[mir4-t14-immutable-doc-byte-custody] $($record.path)"}
 }
 
-$rootDocs=@(
-  'README.md','CONTRIBUTING.md','AGENTS.md','GOVERNANCE.md','SECURITY.md','PROJECT-CONTINUITY.md',
-  'FORKING.md','MAINTAINER-HANDOFF.md','EXTENSION-PROTOCOL.md','RELEASE-RUNBOOK.md','SUPPORT.md'
+$repositoryDocs=@(
+  'README.md','CONTRIBUTING.md','AGENTS.md','GOVERNANCE.md','SECURITY.md','FORKING.md','SUPPORT.md',
+  'docs/PROJECT-CONTINUITY.md','docs/MAINTAINER-HANDOFF.md','docs/EXTENSION-PROTOCOL.md','docs/RELEASE-RUNBOOK.md'
 )
-foreach($path in $rootDocs){if(-not(Test-Path -LiteralPath (Join-Path $RepoRoot $path)-PathType Leaf)){throw "[mir4-t14-root-doc] $path"}}
+foreach($path in $repositoryDocs){if(-not(Test-Path -LiteralPath (Join-Path $RepoRoot $path)-PathType Leaf)){throw "[mir4-t14-repository-doc] $path"}}
 
 $readme=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'README.md')
-foreach($term in @('MIR 4.0 Whole-Platform Genesis','4.0.21000','4.0.20000','stable','preview','shadow','experimental','omitted','SupportBundleV1','No blanket')){
+foreach($term in @('More Infinite Research','Development research browser','4.2 development packages','stable','preview','shadow','experimental','omitted','No blanket')){
   if($readme-notmatch[regex]::Escape($term)){throw "[mir4-t14-readme-contract] $term"}
 }
 $agents=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'AGENTS.md')
 if($agents-notmatch'main.*dev'-or$agents-notmatch'one emitter'-or$agents-notmatch'package-source parity'){throw '[mir4-t14-agent-continuity]'}
-$runbook=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'RELEASE-RUNBOOK.md')
+$runbook=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'docs/RELEASE-RUNBOOK.md')
 foreach($phase in @('source freeze','target build','target qualification','preview assets','independent verification','release seal','promotion','target publication','public readback','restore drill')){
   if($runbook-notmatch[regex]::Escape($phase)){throw "[mir4-t14-release-phase] $phase"}
 }

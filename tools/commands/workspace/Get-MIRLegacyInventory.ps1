@@ -22,6 +22,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
   $OutputRoot = Join-Path $repo "build\results\legacy-inventory"
 }
@@ -33,6 +35,12 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
 
 function Get-MIRRelativePath {
   param([Parameter(Mandatory)][string]$Path)
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage) {
+    if ((Resolve-Path -LiteralPath $entry.source_file).Path -ceq $resolved) {
+      return [string]$entry.output_path
+    }
+  }
   return [System.IO.Path]::GetRelativePath($repo, $Path).Replace("\", "/")
 }
 
@@ -52,26 +60,12 @@ function Test-MIRShimOnlyLua {
 }
 
 function Get-MIRLuaFiles {
-  $roots = @(
-    "prototypes"
+  return @(
+    Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage |
+      Where-Object { [string]$_.output_path -match '^(?:prototypes/.+|settings\.lua|data\.lua|data-updates\.lua|data-final-fixes\.lua|control\.lua)$' -and [string]$_.output_path -match '\.lua$' } |
+      ForEach-Object { Get-Item -LiteralPath $_.source_file } |
+      Sort-Object FullName -Unique
   )
-
-  $files = @()
-  foreach ($root in $roots) {
-    $path = Join-Path $repo $root
-    if (Test-Path -LiteralPath $path) {
-      $files += @(Get-ChildItem -LiteralPath $path -Recurse -File -Filter "*.lua")
-    }
-  }
-
-  foreach ($rootFile in @("settings.lua", "data.lua", "data-updates.lua", "data-final-fixes.lua", "control.lua")) {
-    $path = Join-Path $repo $rootFile
-    if (Test-Path -LiteralPath $path) {
-      $files += @(Get-Item -LiteralPath $path)
-    }
-  }
-
-  return @($files | Sort-Object FullName -Unique)
 }
 
 function Get-MIRMatches {
@@ -133,18 +127,16 @@ function Get-MIRModuleInventory {
     [Parameter(Mandatory)][string]$Label
   )
 
-  $root = Join-Path $repo $RelativeRoot
   $rows = @()
-  if (Test-Path -LiteralPath $root) {
-    foreach ($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter "*.lua" | Sort-Object FullName)) {
-      $text = Get-Content -Raw -LiteralPath $file.FullName
+  $prefix = $RelativeRoot.Replace("\", "/").TrimEnd('/') + '/'
+  foreach ($entry in @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix | Where-Object { [string]$_.output_path -match '\.lua$' })) {
+      $text = Get-Content -Raw -LiteralPath $entry.source_file
       $rows += [pscustomobject]@{
-        path = Get-MIRRelativePath -Path $file.FullName
+        path = [string]$entry.output_path
         area = $Label
         shim_only = [bool](Test-MIRShimOnlyLua -Text $text)
         code_lines = @(Get-MIRCodeLines -Text $text).Count
       }
-    }
   }
   return $rows
 }
@@ -171,7 +163,10 @@ $shimDirectories = @(
   "prototypes\lib",
   "prototypes\mir\legacy",
   "prototypes\planner"
-) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
+) | Where-Object {
+  $prefix = $_.Replace("\", "/").TrimEnd('/') + '/'
+  @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix).Count -gt 0
+}
 
 $oldRootHelperFiles = @(
   "defaults.lua",
@@ -186,13 +181,12 @@ $oldRootHelperFiles = @(
   "prototypes\technology-effect-safety.lua",
   "prototypes\util.lua",
   "prototypes\weapon-speed-adjustments.lua"
-) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
-
-$runtimeControlLuaFiles = @()
-$controlDir = Join-Path $repo "control"
-if (Test-Path -LiteralPath $controlDir) {
-  $runtimeControlLuaFiles = @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+) | Where-Object {
+  $path = $_.Replace("\", "/")
+  @($targetPackage.outputs.Keys | Where-Object { $_ -ceq $path }).Count -gt 0
 }
+
+$runtimeControlLuaFiles = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'control/' | Where-Object { [string]$_.output_path -match '\.lua$' })
 
 $legacyRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.mir\.legacy')
 $compatRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.compat')
@@ -211,10 +205,10 @@ $dataRawOutsidePlatform = @(Get-MIRMatchesOutsideRoots -Matches $dataRawMatches 
 ))
 
 $sourceStreamKeys = @(
-  Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\productivity.lua")
-  Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  Get-MIRStreamKeysFromSource -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/streams/productivity.lua')
+  Get-MIRStreamKeysFromSource -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/streams/direct-effects.lua')
 )
-$manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
+$manifestPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/streams/generated_stream_manifest.json'
 $manifestRows = @()
 if (Test-Path -LiteralPath $manifestPath) {
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json

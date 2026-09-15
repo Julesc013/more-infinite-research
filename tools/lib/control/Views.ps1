@@ -89,7 +89,7 @@ function Get-MIRCPEffectiveReleaseStatus {
 
 function Get-MIRCPTagProof {
   param([Parameter(Mandatory)]$Release)
-  $rows = if ($null -ne $Release.proofs.PSObject.Properties["tag"]) { @($Release.proofs.tag) } else { @() }
+  $rows = @(if ($null -ne $Release.proofs.PSObject.Properties["tag"]) { @($Release.proofs.tag) } else { @() })
   if ($rows.Count -eq 0) { return $null }
   return $rows[0]
 }
@@ -115,9 +115,9 @@ function ConvertTo-MIRCPLegacyDevelopmentRelease {
     [Parameter(Mandatory)]$Release,
     [string]$RepoRoot = ""
   )
-  $focused = if ($null -ne $Release.proofs.PSObject.Properties["focused_qualification"]) { @($Release.proofs.focused_qualification) } else { @() }
-  $candidate = if ($null -ne $Release.proofs.PSObject.Properties["candidate_qualification"]) { @($Release.proofs.candidate_qualification) } else { @() }
-  $manual = if ($null -ne $Release.proofs.PSObject.Properties["manual_acceptance"]) { @($Release.proofs.manual_acceptance) } else { @() }
+  $focused = @(if ($null -ne $Release.proofs.PSObject.Properties["focused_qualification"]) { @($Release.proofs.focused_qualification) } else { @() })
+  $candidate = @(if ($null -ne $Release.proofs.PSObject.Properties["candidate_qualification"]) { @($Release.proofs.candidate_qualification) } else { @() })
+  $manual = @(if ($null -ne $Release.proofs.PSObject.Properties["manual_acceptance"]) { @($Release.proofs.manual_acceptance) } else { @() })
   $tag = Get-MIRCPTagProof -Release $Release
   $remaining = @(Get-MIRCPRemainingReleaseStates -Release $Release -RepoRoot $RepoRoot)
   [string[]]$exceptionIds = [string[]]::new(0)
@@ -328,7 +328,8 @@ function New-MIRCPDashboardLines {
     $effectiveStatus = Get-MIRCPEffectiveReleaseStatus -Release $release -CandidateClosures $CandidateClosures
     $allocation = if ($null -ne $release.PSObject.Properties["candidate_allocation"]) {
       "$($release.candidate_allocation.namespace) / $($release.candidate_allocation.minimum_next_ordinal)"
-    } else { [string]$release.candidate_floor }
+    } elseif ($null -ne $release.PSObject.Properties['candidate_floor']) { [string]$release.candidate_floor }
+    else { 'n/a' }
     $lines.Add("| $(Format-MIRCPCode $release.release) | $(Format-MIRCPCode $release.candidate_id) | $(Format-MIRCPCode $allocation) | $(Format-MIRCPCode $release.target) | $(Format-MIRCPCode $release.branch) | $(Format-MIRCPCode $release.state) | $(Format-MIRCPCode $effectiveStatus) | $exceptionCount |")
   }
   $lines.Add("")
@@ -577,7 +578,7 @@ function Update-MIRCPViews {
         branch = [string]$_.branch
         release = [string]$_.release
         candidate_id = [string]$_.candidate_id
-        candidate_floor = [string]$_.candidate_floor
+        candidate_floor = if ($null -ne $_.PSObject.Properties['candidate_floor']) { [string]$_.candidate_floor } else { 'n/a' }
         target = [string]$_.target
         state = [string]$_.state
         effective_status = Get-MIRCPEffectiveReleaseStatus -Release $_ -CandidateClosures $candidateClosures

@@ -10,14 +10,17 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$repoInfo = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)
-  $path = Join-Path $repo $RelativePath
+  $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -eq $path) { $path = Join-Path $repo $RelativePath }
   if (-not (Test-Path -LiteralPath $path)) {
     throw "Missing required settings visibility file: $RelativePath"
   }
@@ -78,14 +81,19 @@ function Assert-NoPatternInTree {
     [Parameter(Mandatory)][string]$Message
   )
 
-  $root = Join-Path $repo $RelativeRoot
-  if (-not (Test-Path -LiteralPath $root)) { return }
-
-  $matches = @(
-    Get-ChildItem -LiteralPath $root -Recurse -File |
-      Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") } |
-      Select-String -Pattern $Pattern
+  $packageFiles = @(
+    Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix ($RelativeRoot.TrimEnd('/') + '/') |
+      ForEach-Object { Get-Item -LiteralPath $_.source_file } |
+      Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") }
   )
+  $files = if ($packageFiles.Count -gt 0) {
+    $packageFiles
+  } else {
+    $root = Join-Path $repo $RelativeRoot
+    if (-not (Test-Path -LiteralPath $root)) { return }
+    @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension -in @(".lua", ".yml", ".md", ".ps1") })
+  }
+  $matches = @($files | Select-String -Pattern $Pattern)
 
   if ($matches.Count -gt 0) {
     $matches | Write-Host
@@ -121,8 +129,10 @@ $fixtureText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readab
 $fixtureSettingsText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
 $fixtureInfoText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/info.json"
 $streamKeys = @(
-  Get-RegexValues -Text $productivityText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
-  Get-RegexValues -Text $directEffectsText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
+  # Only top-level stream declarations are setting subjects.  Nested fields
+  # such as research_time are not stream keys.
+  Get-RegexValues -Text $productivityText -Pattern '(?m)^  (research_(?!time\b)[A-Za-z0-9_]+)\s*='
+  Get-RegexValues -Text $directEffectsText -Pattern '(?m)^  (research_(?!time\b)[A-Za-z0-9_]+)\s*='
 ) | Sort-Object -Unique
 $baseExtensionKeys = Get-RegexValues -Text $catalogText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
 

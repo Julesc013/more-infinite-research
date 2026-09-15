@@ -193,8 +193,8 @@ if ($manifest.summary.unclassified -ne 0 -or $manifest.summary.case_collisions -
   throw "Layout manifest contains unsafe or unclassified paths: $($manifest.summary | ConvertTo-Json -Compress)"
 }
 foreach ($guide in @(
-  'EXTENSION-PROTOCOL.md','FORKING.md','GOVERNANCE.md','MAINTAINER-HANDOFF.md',
-  'PROJECT-CONTINUITY.md','RELEASE-RUNBOOK.md','SECURITY.md','SUPPORT.md'
+  'FORKING.md','GOVERNANCE.md','SECURITY.md','SUPPORT.md',
+  'docs/EXTENSION-PROTOCOL.md','docs/MAINTAINER-HANDOFF.md','docs/PROJECT-CONTINUITY.md','docs/RELEASE-RUNBOOK.md'
 )) {
   $row = @($manifest.entries | Where-Object path -ceq $guide)
   if ($row.Count -ne 1 -or [string]$row[0].class -cne 'repository-policy' -or

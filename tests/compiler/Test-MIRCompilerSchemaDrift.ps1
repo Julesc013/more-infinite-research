@@ -9,13 +9,20 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 
-function Read-MIRText { param([string]$Path) Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $Path) }
+$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+
+function Read-MIRText {
+  param([string]$Path)
+  Get-Content -Raw -LiteralPath (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $Path)
+}
 function Assert-MIRText { param([string]$Path, [string]$Needle)
   $text = Read-MIRText $Path
   if (-not $text.Contains($Needle)) { throw "$Path is missing schema authority marker: $Needle" }
 }
 
-$streamManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\streams\generated_stream_manifest.json") | ConvertFrom-Json
+$streamManifest = Read-MIRText 'prototypes/mir/streams/generated_stream_manifest.json' | ConvertFrom-Json
 if ($streamManifest.schema -ne 1) { throw "Generated stream manifest schema drifted from 1." }
 $streamAuthorityText = Read-MIRText ".mir\streams.yml"
 foreach ($manifestProperty in @($streamManifest.streams.PSObject.Properties)) {

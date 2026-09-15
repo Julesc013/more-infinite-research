@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 442 pages as of 2026-09-15.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 447 pages as of 2026-09-15.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -165,7 +165,10 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/developer/testing-against-factorio.md | Testing MIR Extensions Against Factorio | current | developer | how-to | mir-maintainers | 2026-09-01 |
 | docs/developer/v0-to-v1-migration.md | Migrating MEP V0 to V1 | current | developer | how-to | mir-maintainers | 2026-08-26 |
 | docs/explanation/README.md | MIR 4 explanation | current | developer | explanation | mir-maintainers | 2026-08-31 |
+| docs/EXTENSION-PROTOCOL.md | MIR Extension Protocol | current | developer | reference | mir-maintainers | 2026-09-15 |
 | docs/how-to/README.md | MIR 4 how-to guides | current | maintainer | how-to | mir-maintainers | 2026-08-31 |
+| docs/LATEST-RELEASE.md | MIR 4.1.0 Local Delivery Index | current | maintainer | reference | mir-maintainers | 2026-09-15 |
+| docs/MAINTAINER-HANDOFF.md | Maintainer Handoff | current | maintainer | how-to | mir-maintainers | 2026-09-15 |
 | docs/maintainer/2.5.0-post-release-stabilization.md | MIR 2.5.0 Post-Release Stabilization | archived | release-manager | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/adding-a-capability.md | Adding A Capability | current | developer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/adding-a-compatibility-fixture.md | Adding A Compatibility Fixture | current | developer | how-to | mir-maintainers | 2026-07-07 |
@@ -209,6 +212,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/triage-playbook.md | Triage Playbook | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | Ultimate Convergence Follow-Up Audit Prompt | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/validation.md | Validation | current | maintainer | how-to | mir-maintainers | 2026-07-12 |
+| docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |
 | docs/README.md | More Infinite Research 4 documentation | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |
 | docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-08-03 |
@@ -231,7 +235,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/generated/stream-defaults.md | Generated Stream Defaults | current | player | reference | mir-maintainers | 2026-09-02 |
 | docs/reference/generated/technology-quality-and-promotion.md | Technology Quality And Promotion Inventory | current | maintainer | reference | mir-maintainers | 2026-08-18 |
 | docs/reference/glossary.md | Glossary | draft | developer | reference | mir-maintainers | 2026-07-07 |
-| docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | current | developer | reference | mir-maintainers | 2026-08-21 |
+| docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | historical-checkpoint | developer | reference | mir-maintainers | 2026-08-21 |
 | docs/reference/mir4-api-sdk-v0-stability.md | MIR 4 API and SDK V0 Stability Policy | deprecated | developer | reference | mir-maintainers | 2026-08-24 |
 | docs/reference/mir4-canonical-json-v1.md | MIR Canonical JSON V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/reference/mir4-environment-evidence.md | MIR 4 Environment Evidence V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
@@ -279,6 +283,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-08-03 |
+| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-09-15 |
 | docs/releases/0.x-factorio-version-metadata-correction.md | MIR 0.x Factorio Version Metadata Correction | current | release-manager | reference | mir-maintainers | 2026-07-16 |
 | docs/releases/3.2.1-emergency-build-trigger.md | MIR 3.2.1 Emergency Build Trigger | historical-checkpoint | release-manager | release-plan | mir-maintainers | 2026-07-26 |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | MIR 3.2.2 To 3.2.3 Repository Change Report | current | release-manager | reference | mir-maintainers | 2026-07-31 |

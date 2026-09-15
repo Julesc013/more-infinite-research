@@ -2719,11 +2719,11 @@
         "AGENTS.md",
         "GOVERNANCE.md",
         "SECURITY.md",
-        "PROJECT-CONTINUITY.md",
+        "docs/PROJECT-CONTINUITY.md",
         "FORKING.md",
-        "MAINTAINER-HANDOFF.md",
-        "EXTENSION-PROTOCOL.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/MAINTAINER-HANDOFF.md",
+        "docs/EXTENSION-PROTOCOL.md",
+        "docs/RELEASE-RUNBOOK.md",
         "SUPPORT.md",
         "docs/developer/**",
         "docs/maintainer/documentation-governance.md",
@@ -3114,7 +3114,7 @@
         "tools/mir.ps1",
         "tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
         "docs/maintainer/factorio-2.1-experimental-channel.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "repository"
       ],
       "captured_artifacts": [],
@@ -4201,7 +4201,7 @@
         "tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "docs/maintainer/mir4-w09-manual-playtest.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "repository"
       ],
       "captured_artifacts": [],
@@ -5128,7 +5128,7 @@
       "requires_factorio": false,
       "inputs": [
         "README.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "CHANGELOG.md",
         "changes/unreleased/MIR4-CHG-2026-0036.json",
         "contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
@@ -6703,5 +6703,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d7da08638584fb6997360f690f25f4c30074700be7513862e8e03b9d93912bca"
+  "digest": "sha256:1426b6d15de8d0f1370e167d996c7e18fed1903b0ab5c4f5aaf885a8fa1dec1b"
 }

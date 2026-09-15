@@ -44,6 +44,9 @@ function ConvertTo-MIRLuaLiteral($Value, [int]$Indent = 0) {
 }
 
 function Set-MIRGeneratedLua([string]$RelativePath, [string]$Source, $Value) {
+  if ($RelativePath -notmatch '^source/prototypes/mir/') {
+    throw "Compiler authorities must be emitted to canonical source, not a package projection: $RelativePath"
+  }
   $path = Join-Path $RepoRoot $RelativePath
   $content = "-- Generated from $Source. Do not edit by hand.`nreturn " + (ConvertTo-MIRLuaLiteral $Value) + "`n"
   if ($Check) {
@@ -65,7 +68,7 @@ foreach ($modifier in @($effectProfile.target_bearing_modifiers | Sort-Object ty
     targets = @($modifier.targets)
   }
 }
-Set-MIRGeneratedLua "prototypes/mir/domain/effects/generated_target_contracts.lua" $effectSource ([ordered]@{
+Set-MIRGeneratedLua "source/prototypes/mir/domain/effects/generated_target_contracts.lua" $effectSource ([ordered]@{
   schema = [int]$effectProfile.schema
   factorio_target = [string]$effectProfile.factorio_target
   factorio_api_version = [string]$effectProfile.factorio_api_version
@@ -74,7 +77,7 @@ Set-MIRGeneratedLua "prototypes/mir/domain/effects/generated_target_contracts.lu
 
 $gateSource = ".mir/technology-hard-gates.json"
 $gateProfile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $gateSource) | ConvertFrom-Json
-Set-MIRGeneratedLua "prototypes/mir/domain/technology/generated_hard_gate_authority.lua" $gateSource $gateProfile
+Set-MIRGeneratedLua "source/prototypes/mir/domain/technology/generated_hard_gate_authority.lua" $gateSource $gateProfile
 
 $qualitySource = ".mir/technology-quality-profiles.json"
 $qualityProfiles = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $qualitySource) | ConvertFrom-Json
@@ -104,6 +107,6 @@ foreach ($profileId in $requiredProfiles) {
     }
   }
 }
-Set-MIRGeneratedLua "prototypes/mir/domain/technology/generated_quality_profiles.lua" $qualitySource $qualityProfiles
+Set-MIRGeneratedLua "source/prototypes/mir/domain/technology/generated_quality_profiles.lua" $qualitySource $qualityProfiles
 
 if ($Check) { Write-Host "[ok] Generated compiler authorities converge with their machine sources." }

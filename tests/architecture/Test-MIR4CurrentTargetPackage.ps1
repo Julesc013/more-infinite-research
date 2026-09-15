@@ -23,22 +23,60 @@ foreach ($target in @('f210','f200','f110','f100')) {
   }
 }
 
+# The former repository-root player projection has no current source or test
+# authority.  Package-shaped paths belong only to source plus a selected
+# composition (or to pinned historical Git/archive readers outside this test).
+foreach ($retiredRoot in @(
+  'info.json', 'changelog.txt', 'thumbnail.png',
+  'settings.lua', 'data.lua', 'data-updates.lua', 'data-final-fixes.lua', 'control.lua',
+  'prototypes', 'locale', 'migrations'
+)) {
+  if (Test-Path -LiteralPath (Join-Path $repo $retiredRoot)) {
+    throw "[mir4-current-target-package-retired-root-present] $retiredRoot"
+  }
+}
+
 # Current validation is allowed to inspect the repository's governance and
 # tooling, but must obtain every player-package path through the explicit
-# target context. Frozen historical verifiers are deliberately outside this
-# check and retain their pinned Git-object readers.
-$currentReaders = @(
-  'tools/lib/validation/runner/Bootstrap.ps1',
-  'tools/lib/validation/runner/StaticCore.ps1',
-  'tools/lib/validation/runner/StaticSciencePackSettings.ps1',
-  'tools/lib/validation/runner/StaticPrototypeLimits.ps1',
-  'tools/lib/validation/runner/StaticCompilerDiagnostics.ps1',
-  'tests/architecture/Test-MIRArchitecture.ps1'
-)
-$rawProductPath = '(?m)Join-Path\s+\$repo\s+["''](?:info\.json|changelog\.txt|thumbnail\.png|settings\.lua|data\.lua|data-updates\.lua|data-final-fixes\.lua|control\.lua|prototypes(?:[\\/]|["''])|locale(?:[\\/]|["''])|migrations(?:[\\/]|["'']))'
-foreach ($relative in $currentReaders) {
-  $text = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
-  if ($text -match $rawProductPath) { throw "[mir4-current-target-package-raw-root-reader] $relative" }
+# target context.  Scan all executable current-tool surfaces by default: a
+# hand-maintained list would let a new reader restore the retired root
+# projection unnoticed.  The two exceptions below deliberately operate on an
+# immutable historical reconstruction, never this checkout; each is tagged at
+# the read site and must retain its named proof mechanism.
+$historicalReaderExceptions = @{
+  'scripts/Invoke-MIRBackportQualification.ps1' = [pscustomobject]@{
+    marker = 'MIR4-ROOT-PROJECTION-HISTORICAL-EXCEPTION: backport-source-historical-root-v1'
+    proof = '-HistoricalSourceRoot'
+  }
+  'tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1' = [pscustomobject]@{
+    marker = 'MIR4-ROOT-PROJECTION-HISTORICAL-EXCEPTION: bootstrap-capsule-historical-root-v1'
+    proof = 'Assert-MIR4GitSourceProof'
+  }
+}
+$rawProductPath = '(?im)Join-Path\s+\$(?:repo|repoRoot|repository|root|workspace)\s+["''](?:info\.json|changelog\.txt|thumbnail\.png|settings\.lua|data\.lua|data-updates\.lua|data-final-fixes\.lua|control\.lua|prototypes(?:[\\/]|["''])|locale(?:[\\/]|["''])|migrations(?:[\\/]|["'']))'
+$rawRootCounterexample = 'Join-Path $repo ' + '"info.json"'
+$fixtureCounterexample = 'Join-Path $fixture ' + '"info.json"'
+if ($rawRootCounterexample -notmatch $rawProductPath -or
+    $fixtureCounterexample -match $rawProductPath) {
+  throw '[mir4-current-target-package-raw-root-reader-guard-invalid]'
+}
+$toolRoots = @('scripts', 'tests', 'tools')
+foreach ($toolRoot in $toolRoots) {
+  $toolPath = Join-Path $repo $toolRoot
+  if (-not (Test-Path -LiteralPath $toolPath -PathType Container)) { continue }
+  Get-ChildItem -LiteralPath $toolPath -Recurse -File -Filter '*.ps1' | ForEach-Object {
+    $relative = [IO.Path]::GetRelativePath($repo, $_.FullName).Replace('\', '/')
+    $text = Get-Content -Raw -LiteralPath $_.FullName
+    if ($text -notmatch $rawProductPath) { return }
+    $exception = $historicalReaderExceptions[$relative]
+    if ($null -eq $exception) {
+      throw "[mir4-current-target-package-raw-root-reader] $relative"
+    }
+    if ($text -notmatch [regex]::Escape([string]$exception.marker) -or
+        $text -notmatch [regex]::Escape([string]$exception.proof)) {
+      throw "[mir4-current-target-package-historical-reader-ungoverned] $relative"
+    }
+  }
 }
 
 Write-Host '[ok] current validators resolve every player package path through source/composition target authority.'

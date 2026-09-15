@@ -1,3 +1,19 @@
+function Resolve-MIR4SemanticAuthorityPath {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$AuthorityPath)
+  $relative = $AuthorityPath.Replace('\', '/').TrimStart('/')
+  # Legacy shadow-programme records describe package paths. Resolve those
+  # records through the canonical F210 composition so target adapters (such as
+  # science selection) cannot fall back to a retired root projection.
+  if (-not (Get-Command Test-MIR4CurrentTargetPackageOutputPath -ErrorAction SilentlyContinue)) {
+    . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  if (Test-MIR4CurrentTargetPackageOutputPath -RelativePath $relative) {
+    $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+    return Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $relative
+  }
+  return Join-Path $RepoRoot $relative
+}
+
 function Get-MIR4SemanticCompilerAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
@@ -11,7 +27,7 @@ function Get-MIR4SemanticCompilerAuthority {
   if (@($authority.merge_laws.id | Sort-Object -Unique).Count -ne 12) { throw '[mir4-semantic-merge-law-count]' }
   if (@($authority.plans.id | Sort-Object -Unique).Count -ne 7) { throw '[mir4-semantic-plan-count]' }
   foreach ($pathValue in @($authority.terminal_player_authority)) {
-    if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$pathValue)) -PathType Leaf)) { throw "[mir4-semantic-terminal-authority] $pathValue" }
+    if (-not (Test-Path -LiteralPath (Resolve-MIR4SemanticAuthorityPath -RepoRoot $repo -AuthorityPath ([string]$pathValue)) -PathType Leaf)) { throw "[mir4-semantic-terminal-authority] $pathValue" }
   }
   return $authority
 }
@@ -25,9 +41,9 @@ function New-MIR4SemanticAuthorityRef {
     [Parameter(Mandatory)][string]$Maturity
   )
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $file = Join-Path $repo $Path
+  $file = Resolve-MIR4SemanticAuthorityPath -RepoRoot $repo -AuthorityPath $Path
   if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "[mir4-semantic-reference-missing] ${Role}:$Path" }
-  return [ordered]@{role=$Role;authority=$Path;sha256=(Get-MIR4PlatformInputSha256 $file);status=$Status;maturity=$Maturity}
+  return [ordered]@{role=$Role;authority=([IO.Path]::GetRelativePath($repo,$file).Replace('\','/'));sha256=(Get-MIR4PlatformInputSha256 $file);status=$Status;maturity=$Maturity}
 }
 
 function New-MIR4ProviderMicroProtocolMatrix {

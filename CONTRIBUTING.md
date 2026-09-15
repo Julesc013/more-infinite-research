@@ -23,7 +23,7 @@ Every change must identify its maturity: stable, preview, shadow, experimental, 
 - Target behavior needs an explicit disposition and target-local proof.
 - Changes to authorities must update their machine-readable manifests.
 
-See [Governance](GOVERNANCE.md), [Extension Protocol](EXTENSION-PROTOCOL.md), and [the module boundaries](docs/architecture/module-boundaries.md).
+See [Governance](GOVERNANCE.md), [Extension Protocol](docs/EXTENSION-PROTOCOL.md), and [the module boundaries](docs/architecture/module-boundaries.md).
 
 ## Development workflow
 
@@ -62,7 +62,7 @@ A PR should state:
 - rollback or compensation boundary;
 - remaining human, credential, or external-service blockers.
 
-Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](RELEASE-RUNBOOK.md).
+Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/RELEASE-RUNBOOK.md).
 
 ## Changelog and player copy
 

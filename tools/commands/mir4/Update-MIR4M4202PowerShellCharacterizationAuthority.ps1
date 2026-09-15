@@ -10,6 +10,13 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
+. (Join-Path $repo 'tools/mir/application/package/HistoricalSourceAuthority.ps1')
+
+# M42-02 is a frozen characterization of the former PowerShell surface.  It
+# must never regenerate that receipt from the current source layout; current
+# decomposition decisions have their own authorities.  Keep its historical
+# evidence self-hashed while proving the source/composition successor exists.
+return Assert-MIR4PinnedHistoricalSourceAuthority -RepoRoot $repo -ReceiptPath 'releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json' -SchemaPath 'contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json' -Kind 'MIR4M4202PowerShellCharacterizationV1' -AuthorityId 'M42-02-powershell-characterization'
 
 function Get-MIR4M4202PowerShellRawSha256([string]$RelativePath){
   $path=Join-Path $repo $RelativePath
@@ -80,7 +87,7 @@ $tracked=@(
 )
 if(@($tracked|Where-Object{[string]$_.decision-ceq'decompose'}).Count-ne11-or@($tracked|Where-Object{[string]$_.decision-ceq'retain-with-explicit-waiver'}).Count-ne9){throw '[mir4-m42-02-powershell-disposition-count]'}
 
-$packageSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100 -DateKind String
+$packageSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100 -DateKind String
 $canonicalOutputs=@($packageSource.bindings|ForEach-Object{[string]$_.output_path}|Where-Object{$_-match'^prototypes/(?:mir/.+|streams/.+)[.]lua$'}|Sort-Object -Unique)
 $moduleAssignments=@(Get-Content -LiteralPath (Join-Path $repo '.mir/modules.yml')|ForEach-Object{if($_-match'^    - (prototypes/(?:mir/.+|streams/.+)[.]lua)$'){$Matches[1]}}|Sort-Object -Unique)
 if($canonicalOutputs.Count-ne267-or$moduleAssignments.Count-ne267-or@($canonicalOutputs|Where-Object{$_-notin$moduleAssignments}).Count-ne0){throw '[mir4-m42-02-powershell-module-reconciliation]'}
@@ -97,7 +104,7 @@ $receipt=[pscustomobject][ordered]@{
   tracked_files=$tracked
   decomposition_sequence=@($tracked|Where-Object{[string]$_.decision-ceq'decompose'}|Sort-Object sequence|ForEach-Object{[pscustomobject][ordered]@{sequence=[int]$_.sequence;node=[string]$_.next_node;path=[string]$_.path}})
   waivers=@($tracked|Where-Object{[string]$_.decision-ceq'retain-with-explicit-waiver'}|ForEach-Object{[string]$_.path}|Sort-Object)
-  architecture_reconciliation=[pscustomobject][ordered]@{authority='src/mod/package-source.json#bindings[].output_path';canonical_output_count=$canonicalOutputs.Count;assigned_output_count=$moduleAssignments.Count;added_assignments=9;removed_stale_assignments=2;module_manifest_sha256=(Get-MIR4M4202PowerShellRawSha256 '.mir/modules.yml');architecture_test='tests/architecture/Test-MIRArchitecture.ps1'}
+  architecture_reconciliation=[pscustomobject][ordered]@{authority='source/package-source.json#bindings[].output_path';canonical_output_count=$canonicalOutputs.Count;assigned_output_count=$moduleAssignments.Count;added_assignments=9;removed_stale_assignments=2;module_manifest_sha256=(Get-MIR4M4202PowerShellRawSha256 '.mir/modules.yml');architecture_test='tests/architecture/Test-MIRArchitecture.ps1'}
   authority_bindings=@($bindingPaths|ForEach-Object{[pscustomobject][ordered]@{path=$_;sha256=(Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $_));hash_mode='canonical-text-v1';package_visible=$false}})
   preservation=[pscustomobject][ordered]@{package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo);package_visible_delta=@();gameplay=$false;saves=$true;settings=$true;migrations=$true;compatibility_claims=$true}
   transition_gate=[pscustomobject][ordered]@{version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}

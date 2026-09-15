@@ -3,14 +3,24 @@
 param(
   [string]$RepoRoot = '',
   [string]$RuntimeEvidenceRoot = 'build/mir4/a04-k2-science/runtime-attempt-01',
-  [switch]$RequireLocalEvidence
+  [switch]$RequireLocalEvidence,
+  [switch]$Check
 )
 $ErrorActionPreference = 'Stop'
-if (-not $RequireLocalEvidence) { throw '[mir4-a04-local-evidence-required]' }
+if (-not $Check -and -not $RequireLocalEvidence) { throw '[mir4-a04-local-evidence-required]' }
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path }
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+if (-not $Check) { throw '[mir4-a04-historical-receipt-read-only-use-check]' }
+$a04Receipt = 'spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json'
+$a04Schema = 'spec/schemas/mir4-a04-k2-science-closure-v1.schema.json'
+$a04Text = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $a04Receipt)
+if (-not ($a04Text | Test-Json -SchemaFile (Join-Path $RepoRoot $a04Schema))) { throw '[mir4-a04-historical-receipt-schema]' }
+$a04Record = $a04Text | ConvertFrom-Json -Depth 100 -DateKind String
+if (-not (Test-MIR4BootstrapRecordHash $a04Record)) { throw '[mir4-a04-historical-receipt-self-hash]' }
+[pscustomobject]@{status='passed-historical-receipt-verification';receipt=$a04Receipt;player_mutation_authorized=$false;publication_authorized=$false}
+return
 function Assert-A04 { param([bool]$Condition,[string]$Code) if (-not $Condition) { throw $Code } }
 function Resolve-A04Path { param([string]$Relative,[bool]$Required=$true)
   Assert-A04 ($Relative -cmatch '^[A-Za-z0-9._/-]+$' -and $Relative -notmatch '(^|/)\.\.(/|$)') "[mir4-a04-relative-path] $Relative"

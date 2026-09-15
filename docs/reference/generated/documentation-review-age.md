@@ -165,7 +165,10 @@ Ages are measured against the newest governed review date, 2026-09-15, so checko
 | docs/developer/testing-against-factorio.md | current | 2026-09-01 | 14 | current-window |
 | docs/developer/v0-to-v1-migration.md | current | 2026-08-26 | 20 | current-window |
 | docs/explanation/README.md | current | 2026-08-31 | 15 | current-window |
+| docs/EXTENSION-PROTOCOL.md | current | 2026-09-15 | 0 | current-window |
 | docs/how-to/README.md | current | 2026-08-31 | 15 | current-window |
+| docs/LATEST-RELEASE.md | current | 2026-09-15 | 0 | current-window |
+| docs/MAINTAINER-HANDOFF.md | current | 2026-09-15 | 0 | current-window |
 | docs/maintainer/2.5.0-post-release-stabilization.md | archived | 2026-08-08 | 38 | current-window |
 | docs/maintainer/adding-a-capability.md | current | 2026-07-07 | 70 | current-window |
 | docs/maintainer/adding-a-compatibility-fixture.md | current | 2026-07-07 | 70 | current-window |
@@ -209,6 +212,7 @@ Ages are measured against the newest governed review date, 2026-09-15, so checko
 | docs/maintainer/triage-playbook.md | current | 2026-07-07 | 70 | current-window |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | archived | 2026-08-08 | 38 | current-window |
 | docs/maintainer/validation.md | current | 2026-07-12 | 65 | current-window |
+| docs/PROJECT-CONTINUITY.md | current | 2026-09-15 | 0 | current-window |
 | docs/README.md | current | 2026-08-31 | 15 | current-window |
 | docs/reference/asset-sources.md | current | 2026-07-23 | 54 | current-window |
 | docs/reference/compiler-authority-table.md | current | 2026-08-03 | 43 | current-window |
@@ -231,7 +235,7 @@ Ages are measured against the newest governed review date, 2026-09-15, so checko
 | docs/reference/generated/stream-defaults.md | current | 2026-09-02 | 13 | current-window |
 | docs/reference/generated/technology-quality-and-promotion.md | current | 2026-08-18 | 28 | current-window |
 | docs/reference/glossary.md | draft | 2026-07-07 | 70 | current-window |
-| docs/reference/maximum-level-binding.md | current | 2026-08-21 | 25 | current-window |
+| docs/reference/maximum-level-binding.md | historical-checkpoint | 2026-08-21 | 25 | current-window |
 | docs/reference/mir4-api-sdk-v0-stability.md | deprecated | 2026-08-24 | 22 | current-window |
 | docs/reference/mir4-canonical-json-v1.md | current | 2026-08-26 | 20 | current-window |
 | docs/reference/mir4-environment-evidence.md | current | 2026-08-26 | 20 | current-window |
@@ -279,6 +283,7 @@ Ages are measured against the newest governed review date, 2026-09-15, so checko
 | docs/reference/schemas/technology-lifecycle.md | current | 2026-08-03 | 43 | current-window |
 | docs/reference/settings-reference.md | archived | 2026-07-07 | 70 | current-window |
 | docs/reference/settings.md | current | 2026-08-03 | 43 | current-window |
+| docs/RELEASE-RUNBOOK.md | current | 2026-09-15 | 0 | current-window |
 | docs/releases/0.x-factorio-version-metadata-correction.md | current | 2026-07-16 | 61 | current-window |
 | docs/releases/3.2.1-emergency-build-trigger.md | historical-checkpoint | 2026-07-26 | 51 | current-window |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | current | 2026-07-31 | 46 | current-window |

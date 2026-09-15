@@ -49,6 +49,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 function Resolve-MIRInputFile {
   param([Parameter(Mandatory)][string]$Path)
@@ -160,7 +161,8 @@ if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
   throw "Package-visible working-tree changes must be committed before capturing a playtest bundle."
 }
 
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $packageSourceSha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $candidateContentSha256 = Get-MIRZipContentFingerprint -Path $candidatePath
 if ($candidateContentSha256 -ne $packageSourceSha256) {

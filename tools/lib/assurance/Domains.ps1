@@ -1,5 +1,8 @@
 $script:MIRAssuranceDomainManifestCache = @{}
 $script:MIRAssuranceFixturePathIndex = $null
+if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+  . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+}
 
 function Get-MIRAssuranceVerificationProfilePath {
   param([Parameter(Mandatory)][string]$Target)
@@ -16,7 +19,8 @@ function Get-MIRAssuranceVerificationProfile {
   if ([int]$profile.schema -ne 1 -or [string]$profile.target -ne $Target) {
     throw "Verification profile is invalid for Factorio $Target`: $path"
   }
-  $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target (ConvertTo-MIR4CurrentTargetKey -FactorioVersion $Target)
+  $info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
   $developmentContext = [string]$profile.execution_context_mode -eq 'development-context'
   if ($developmentContext) {
     $authorityRelative = ([string]$profile.execution_context).Replace('\', '/')

@@ -1168,6 +1168,14 @@ docs:
     doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/EXTENSION-PROTOCOL.md
+    title: "MIR Extension Protocol"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-extension-protocol
   - path: docs/how-to/README.md
     title: "MIR 4 how-to guides"
     status: current
@@ -1175,6 +1183,22 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/LATEST-RELEASE.md
+    title: "MIR 4.1.0 Local Delivery Index"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir410-local-delivery-index
+  - path: docs/MAINTAINER-HANDOFF.md
+    title: "Maintainer Handoff"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - maintainer-handoff
   - path: docs/maintainer/2.5.0-post-release-stabilization.md
     title: "MIR 2.5.0 Post-Release Stabilization"
     status: archived
@@ -1539,6 +1563,14 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/PROJECT-CONTINUITY.md
+    title: "Project Continuity"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - project-continuity
   - path: docs/README.md
     title: "More Infinite Research 4 documentation"
     status: current
@@ -1711,12 +1743,12 @@ docs:
     source_of_truth_for: []
   - path: docs/reference/maximum-level-binding.md
     title: "Maximum-Level Binding Contract"
-    status: current
+    status: historical-checkpoint
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - maximum-level-binding-policy-v3
+      - historical-maximum-level-binding-policy-v3
   - path: docs/reference/mir4-api-sdk-v0-stability.md
     title: "MIR 4 API and SDK V0 Stability Policy"
     status: deprecated
@@ -2102,6 +2134,14 @@ docs:
     source_of_truth_for:
       - settings-reference
       - base-continuation-cost-setting-semantics
+  - path: docs/RELEASE-RUNBOOK.md
+    title: "MIR 4 Release Runbook"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir4-release-runbook
   - path: docs/releases/0.x-factorio-version-metadata-correction.md
     title: "MIR 0.x Factorio Version Metadata Correction"
     status: current

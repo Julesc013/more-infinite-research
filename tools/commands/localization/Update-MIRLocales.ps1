@@ -1,19 +1,22 @@
 param(
   [string]$RepositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [string]$PolicyPath,
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [switch]$MachineTranslateMissing,
   [switch]$RefreshMachineTranslations
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepositoryRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
 if ([string]::IsNullOrWhiteSpace($PolicyPath)) {
   $PolicyPath = Join-Path $repo ".mir\locales\manifest.json"
 }
 
 Import-Module (Join-Path $repo "tools\lib\localization\MIRLocalization.psm1") -Force
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
-$sourcePath = Join-Path $repo ($policy.source_file -replace '/', '\')
+$sourcePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath ([string]$policy.source_file)
 $source = Read-MIRLocaleFile -Path $sourcePath
 $memoryRoot = Join-Path $repo ($policy.translation_memory_directory -replace '/', '\')
 $overridePath = Join-Path $repo ($policy.translation_overrides -replace '/', '\')
@@ -229,7 +232,7 @@ foreach ($locale in $policy.supported_factorio_locales) {
   $code = [string]$locale.code
   if ($code -eq $policy.source_locale) { continue }
 
-  $outputPath = Join-Path $repo "locale\$code\$($policy.generated_file_name)"
+  $outputPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath "locale/$code/$($policy.generated_file_name)"
   $memoryPath = Join-Path $memoryRoot "$code.json"
   $existing = $null
   if (Test-Path -LiteralPath $outputPath) {

@@ -3,19 +3,27 @@ param(
   [string]$FactorioBin,
   [string]$CandidateZip,
   [string]$PriorZip,
+  [string]$HistoricalSourceRoot,
   [switch]$StaticOnly,
   [switch]$RuntimeOnly,
   [switch]$UseExistingCandidate
 )
 
 $ErrorActionPreference = "Stop"
-$repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repository = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+if ([string]::IsNullOrWhiteSpace($HistoricalSourceRoot)) {
+  throw 'This retired MIR 2 backport runner has no current-package authority. Reconstruct its pinned historical source and pass -HistoricalSourceRoot; use the current target materializer for MIR 4 work.'
+}
+$repo = (Resolve-Path -LiteralPath $HistoricalSourceRoot).Path
 $profilePath = Join-Path $repo ".mir\target-reconstruction.json"
 $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
 $canonicalProfilePath = Join-Path $repo ".mir\targets.json"
 $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
 $canonicalFeatureModelPath = Join-Path $repo ".mir\canonical-lower-features.json"
 $testCatalogPath = Join-Path $repo "validation\tests.yml"
+# MIR4-ROOT-PROJECTION-HISTORICAL-EXCEPTION: backport-source-historical-root-v1
+# `$repo is the caller-supplied -HistoricalSourceRoot, reconstructed under its
+# immutable backport source lock; it is never the current MIR 4 checkout.
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
   $CandidateZip = Join-Path $repo "dist\$($info.name)_$($info.version).zip"

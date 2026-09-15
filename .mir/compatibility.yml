@@ -129,8 +129,9 @@ science_pack_production_route_policy:
   public_claim: generic-route-correction-only-exact-ecosystem-claims-remain-evidence-bound
 
 maximum_level_binding_policy:
+  status: historical-characterization-not-current-package-authority
   id: MIRMaximumLevelPolicyV3
-  authority: prototypes/mir/domain/technology/maximum_level_binding.lua
+  authority: pinned-git:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/domain/technology/maximum_level_binding.lua
   transport: prototypes/mir/emit/mod_data.lua
   runtime_consumer: prototypes/mir/runtime/maximum_level_control.lua
   presentation_consumer: prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
@@ -152,7 +153,20 @@ maximum_level_binding_policy:
     - unknown-or-conflicting-finalizers-block-runtime-normalization
   fixture: fixtures/assert-compiler-contracts
   exact_real_campaign: local-2-1-corrundum-maxcap-13
-  public_claim: generic-maximum-level-contract-only-exact-ecosystem-claims-remain-evidence-bound
+  public_claim: historical-characterization-only
+  current_composed_output:
+    id: MIRMaximumLevelPolicyV2
+    publication_authority: prototypes/mir/pipeline/compiler_orchestrator/publication.lua
+    transport: prototypes/mir/emit/mod_data.lua
+    runtime_consumer: prototypes/mir/runtime/maximum_level_control.lua
+    runtime_policy_version: 1
+    semantics: absolute-highest-technology-level
+    equivalence_to_v3: not-claimed
+  successor_obligation:
+    id: X04
+    owner: X04 progression-and-continuity delivery slice
+    implementation_context: progression PR #286 until integrated
+    required_before_v3_claim: port-and-qualify-the-schema-3-binding-save-and-queue-contract-against-current-composed-source
 
 mod_interactions:
   policy: .mir/mod-interaction-policy.json

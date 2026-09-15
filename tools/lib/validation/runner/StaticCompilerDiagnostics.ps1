@@ -278,42 +278,33 @@ Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded 
   }
 }
 
-Invoke-RepoCheck "schema-3 MaximumLevelBinding is the governed cross-route cap authority" {
-  $bindingText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/technology/maximum_level_binding.lua")
-  $orchestratorText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/compiler_orchestrator.lua")
-  $presentationText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua")
+Invoke-RepoCheck "current composed maximum-level publication is explicit and does not claim historical V3 equivalence" {
+  if ($null -ne (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/technology/maximum_level_binding.lua" -AllowMissing)) {
+    throw "Current F210 package must not regain the undeclared historical MaximumLevelBinding module."
+  }
+  $publicationText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/pipeline/compiler_orchestrator/publication.lua")
+  $maxLevelText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/policy/max_level.lua")
   $runtimeText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/runtime/maximum_level_control.lua")
   $modDataText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/emit/mod_data.lua")
-  $fixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-compiler-contracts\data-final-fixes.lua")
-  $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
   $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
   $docsText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\docs.yml")
   $contractDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\reference\maximum-level-binding.md")
   foreach ($check in @(
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'local SCHEMA = 3' },
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'local KIND = "MIRMaximumLevelPolicyV3"' },
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = '["exact-technology"] = 1' },
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'semantics = "absolute-highest-technology-level"' },
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'retain_completed_bonus = true' },
-    @{ File = "maximum_level_binding.lua"; Text = $bindingText; Snippet = 'maximum_level_unknown_finalizer_adapter' },
-    @{ File = "compiler_orchestrator.lua"; Text = $orchestratorText; Snippet = 'maximum_level_binding.from_plan(latest' },
-    @{ File = "compiler_orchestrator.lua"; Text = $orchestratorText; Snippet = 'context:set_state("maximum_level_policy", maximum_level_policy)' },
-    @{ File = "maximum_level_presentation.lua"; Text = $presentationText; Snippet = 'maximum_level_binding.observe_finalizers(policy, observations)' },
-    @{ File = "maximum_level_control.lua"; Text = $runtimeText; Snippet = 'binding.record_type == "MaximumLevelBinding"' },
-    @{ File = "mod_data.lua"; Text = $modDataText; Snippet = 'more-infinite-research.maximum-level-policy-v3' },
-    @{ File = "assert-compiler-contracts"; Text = $fixtureText; Snippet = 'unknown MaximumLevelBinding finalizer did not emit a stable blocking diagnostic' },
-    @{ File = ".mir\modules.yml"; Text = $modulesText; Snippet = 'prototypes/mir/domain/technology/maximum_level_binding.lua' },
+    @{ File = "publication.lua"; Text = $publicationText; Snippet = 'kind = "MIRMaximumLevelPolicyV2"' },
+    @{ File = "publication.lua"; Text = $publicationText; Snippet = 'semantics = "absolute-highest-technology-level"' },
+    @{ File = "max_level.lua"; Text = $maxLevelText; Snippet = 'target_line.feature_enabled("scripted_techs")' },
+    @{ File = "maximum_level_control.lua"; Text = $runtimeText; Snippet = 'POLICY_VERSION = 1' },
+    @{ File = "maximum_level_control.lua"; Text = $runtimeText; Snippet = 'add_runtime_settings_policy(managed)' },
+    @{ File = "mod_data.lua"; Text = $modDataText; Snippet = 'more-infinite-research.maximum-level-policy-v2' },
     @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'maximum_level_binding_policy:' },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'equivalence_to_v3: not-claimed' },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'id: X04' },
     @{ File = ".mir\docs.yml"; Text = $docsText; Snippet = 'docs/reference/maximum-level-binding.md' },
-    @{ File = "maximum-level-binding.md"; Text = $contractDocText; Snippet = '`MIRMaximumLevelPolicyV3` is the one maximum-level registry' }
+    @{ File = "maximum-level-binding.md"; Text = $contractDocText; Snippet = 'not the current package contract' }
   )) {
     if (-not $check.Text.Contains($check.Snippet)) {
-      throw "Missing schema-3 MaximumLevelBinding wiring in $($check.File): $($check.Snippet)"
+      throw "Missing current maximum-level limitation/publication wiring in $($check.File): $($check.Snippet)"
     }
-  }
-  if ($bindingText.Contains("data.raw") -or $bindingText.Contains("prototypes.technology") -or
-      $bindingText.Contains('require("prototypes.mir.platform.factorio.target_line")')) {
-    throw "MaximumLevelBinding domain authority must remain pure and target-neutral."
   }
 }
 

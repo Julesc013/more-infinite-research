@@ -36,13 +36,13 @@ The MIR 4 source tree contains five maturity classes:
 - **experimental** — bounded private work with no public support authority;
 - **omitted** — intentionally absent from a target or release artifact.
 
-Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
+Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](docs/EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](docs/RELEASE-RUNBOOK.md).
 
 `dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line: player releases arrive through exact sealed-candidate promotion, while bounded documentation and repository-governance corrections use protected PRs under the branch policy. Historical target branches are custody references, not alternative MIR 4 authoring roots.
 
 Editable player code lives in the single package-shaped `source` tree. Files shared by F210 and F200 use their package paths directly; exact target adapters live under `source/adapters`, package presentation inputs under `source/presentation`, and lifecycle generators under `source/generation`. Factorio 1 compatibility code is isolated under `source/compatibility/factorio-1` pending characterized convergence into the shared implementation. `targets` contains only target identity, policy, and composition records—not second source copies. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
 
-The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](PROJECT-CONTINUITY.md) before changing authorities or release state.
+The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](docs/PROJECT-CONTINUITY.md) before changing authorities or release state.
 
 ## Stable player plane reference
 
@@ -550,7 +550,7 @@ Before testing, inspect or materialize the MIR verification plan and run the nar
 .\tools\mir.ps1 mir4 release-engine readiness-check --work-root <external-work-root>
 ```
 
-Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
+Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](docs/RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
 
 The detailed validation and audit commands below remain useful for development and historical MIR 3 workflows. The older `release gate` and `release docs-only` commands rebuild archives and must not be used to refresh a sealed MIR 4 release.
 

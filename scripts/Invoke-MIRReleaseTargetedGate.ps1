@@ -127,7 +127,9 @@ function Assert-MIRReleaseGateCrossTargetCandidate {
   }
 }
 
-$modInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$modInfo = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $modName = [string]$modInfo.name
 $modVersion = [string]$modInfo.version
 $targetFactorioVersion = [string]$modInfo.factorio_version

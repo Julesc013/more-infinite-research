@@ -136,10 +136,14 @@ function Assert-MIR4RuntimeRegistrationPlan {
 function New-MIR4RuntimeRegistrationPlan {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$RuntimeFeatures)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
   $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
   $featureById = @{}; foreach ($feature in @($RuntimeFeatures)) { $featureById[[string]$feature.id] = $feature }
-  $dispatcherPath = Join-Path $repo 'prototypes/mir/runtime/scripted_techs.lua'
-  $stagePath = Join-Path $repo 'prototypes/mir/stage/control.lua'
+  $dispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
+  $stagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/stage/control.lua'
   $dispatcherText = Get-Content -Raw -LiteralPath $dispatcherPath
   $stageText = Get-Content -Raw -LiteralPath $stagePath
   $groups = @(

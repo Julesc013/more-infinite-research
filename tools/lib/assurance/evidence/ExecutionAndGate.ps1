@@ -664,6 +664,7 @@ function Invoke-MIRAssuranceGate {
 
 function Get-MIRAssuranceBuildFingerprint {
   param([Parameter(Mandatory)]$Context)
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target (ConvertTo-MIR4CurrentTargetKey -FactorioVersion ([string]$Context.target))
   $material = [ordered]@{
     schema=$buildReceiptSchema
     target=[string]$Context.target
@@ -671,7 +672,7 @@ function Get-MIRAssuranceBuildFingerprint {
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1"))
-    info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "info.json"))
+    info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'info.json'))
   }
   return [ordered]@{ material=$material; input_key=(Get-MIRAssuranceJsonHash -Value $material) }
 }

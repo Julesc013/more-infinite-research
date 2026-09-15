@@ -7,6 +7,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 & (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
@@ -667,7 +668,8 @@ try {
   $script:MIRAssurancePatternFingerprintCache = @{}
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
-$candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateContext = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+$candidateInfo = Get-MIR4CurrentTargetPackageOutputText -Context $candidateContext -RelativePath 'info.json' | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree -Target '2.1').Replace("\", "/")
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')

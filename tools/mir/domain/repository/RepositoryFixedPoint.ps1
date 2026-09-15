@@ -146,6 +146,7 @@ function Get-MIR4RepositoryPathClass {
   if ($path -match '^(docs/|targets/|modules/|assurance/|changes/|releases/)') { return 'generated-projection' }
   if ($path -match '^(\.github/|tools/|scripts/|prototypes/|migrations/|locale/|source/)' -or $path -match '^(data|settings)(-updates|-final-fixes)?\.lua$' -or $path -eq 'control.lua') { return 'executable-source' }
   if ($path -match '^dist/' -or $path.EndsWith('.zip')) { return 'archive' }
-  if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','EXTENSION-PROTOCOL.md','FORKING.md','GOVERNANCE.md','MAINTAINER-HANDOFF.md','PROJECT-CONTINUITY.md','README.md','RELEASE-RUNBOOK.md','SECURITY.md','SUPPORT.md','LICENSE','changelog.txt','info.json','thumbnail.png','todo.md')) { return 'normative-authority' }
+  if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','FORKING.md','GOVERNANCE.md','README.md','SECURITY.md','SUPPORT.md','LICENSE','todo.md')) { return 'normative-authority' }
+  if ($path -in @('docs/EXTENSION-PROTOCOL.md','docs/MAINTAINER-HANDOFF.md','docs/PROJECT-CONTINUITY.md','docs/RELEASE-RUNBOOK.md')) { return 'normative-authority' }
   return 'unknown'
 }

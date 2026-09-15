@@ -3,6 +3,7 @@ param(
   [string]$ArchivePath,
   [string]$BaselinePath,
   [string]$OutputPath,
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [int]$TopEntryCount = 20,
   [double]$GrowthReviewPercent = 20.0,
   [double]$RootGrowthReviewPercent = 30.0,
@@ -12,7 +13,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 
 if ([string]::IsNullOrWhiteSpace($ArchivePath)) {
   $ArchivePath = Join-Path $repo "dist\$($info.name)_$($info.version).zip"

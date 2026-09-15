@@ -17,6 +17,22 @@ function Test-MIR4CurrentTargetPackageOutputPath {
     $portable.StartsWith('migrations/', [StringComparison]::Ordinal)
 }
 
+function ConvertTo-MIR4CurrentTargetKey {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$FactorioVersion)
+  $targetByFactorioVersion = @{
+    '2.1' = 'f210'
+    '2.0' = 'f200'
+    '1.1' = 'f110'
+    '1.0' = 'f100'
+  }
+  $target = [string]$targetByFactorioVersion[$FactorioVersion]
+  if ([string]::IsNullOrWhiteSpace($target)) {
+    throw "[mir4-current-target-package-unsupported-factorio-version] $FactorioVersion"
+  }
+  return $target
+}
+
 function New-MIR4CurrentTargetPackageContext {
   [CmdletBinding()]
   param(
@@ -80,4 +96,19 @@ function Get-MIR4CurrentTargetPackageOutputText {
   param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RelativePath)
   $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $Context -RelativePath $RelativePath
   return Get-Content -Raw -LiteralPath $path
+}
+
+function Get-MIR4CurrentTargetPackageOutputBytes {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RelativePath)
+  $portable = $RelativePath.Replace('\', '/').TrimStart('/')
+  $entry = $null
+  if (-not $Context.outputs.TryGetValue($portable, [ref]$entry)) {
+    throw "[mir4-current-target-package-undeclared-output] $($Context.target) $portable"
+  }
+  # Reuse the canonical materializer's read-only binding transform.  This is
+  # deliberately not an archive writer: validators compare its bytes with a
+  # candidate archive without reviving the retired repository-root projection.
+  [byte[]]$bytes = @(Read-MIR4CanonicalSourceBindingBytes -State $Context.state -Binding $entry.binding)
+  return ,$bytes
 }

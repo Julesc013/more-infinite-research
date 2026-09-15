@@ -1782,11 +1782,11 @@
         "AGENTS.md",
         "GOVERNANCE.md",
         "SECURITY.md",
-        "PROJECT-CONTINUITY.md",
+        "docs/PROJECT-CONTINUITY.md",
         "FORKING.md",
-        "MAINTAINER-HANDOFF.md",
-        "EXTENSION-PROTOCOL.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/MAINTAINER-HANDOFF.md",
+        "docs/EXTENSION-PROTOCOL.md",
+        "docs/RELEASE-RUNBOOK.md",
         "SUPPORT.md",
         "docs/developer/**",
         "docs/maintainer/documentation-governance.md",
@@ -2661,7 +2661,7 @@
         "tests/mir4/Test-MIR4PlaytestHandoffT17.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "docs/maintainer/mir4-w09-manual-playtest.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "repository"
       ]
     },
@@ -3136,7 +3136,7 @@
         "tools/mir.ps1",
         "tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
         "docs/maintainer/factorio-2.1-experimental-channel.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "repository"
       ]
     },
@@ -3255,7 +3255,7 @@
       "requires_factorio": false,
       "inputs": [
         "README.md",
-        "RELEASE-RUNBOOK.md",
+        "docs/RELEASE-RUNBOOK.md",
         "CHANGELOG.md",
         "changes/unreleased/MIR4-CHG-2026-0036.json",
         "contracts/repository/mir4-4.1-release-readiness-v1.schema.json",
