@@ -33,11 +33,12 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202EffectOwnership ($evolvedPaths.Count-eq15-and@($evolvedPaths|Sort-Object -Unique).Count-eq15-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
+$expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback $expectedManifestBindings
+$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
 Assert-MIR4M4202EffectOwnership (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202EffectOwnership (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202EffectOwnership (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
-$sourceRoot='src/mod/families/modern/prototypes/mir/planner'
+$sourceRoot='source/prototypes/mir/planner'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership.lua")
 Assert-MIR4M4202EffectOwnership ($facade-match'effect_ownership[.]resolution'-and$facade-match'effect_ownership[.]planned_operations'-and$facade-notmatch'function\s') 'thin-facade'
 $responsibilities=@('facts','resolution','planned_operations')
@@ -54,7 +55,7 @@ Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$s
 Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership/facts.lua")).Count-le160) 'facts-size'
 Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership/resolution.lua")).Count-le140) 'resolution-size'
 Assert-MIR4M4202EffectOwnership (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/effect_ownership/planned_operations.lua")).Count-le220) 'planned-operations-size'
-$ownershipRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'families.modern'-and[string]$_.output_path-in$outputs})
+$ownershipRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'capability'-and[string]$_.output_path-in$outputs})
 Assert-MIR4M4202EffectOwnership ($ownershipRows.Count-eq4-and@($ownershipRows|Where-Object{@($_.target_scope)-join'|'-cne'f210|f200'}).Count-eq0) 'package-bindings'
 foreach($row in $ownershipRows){
   $source=Join-Path $repo ([string]$row.source_path)

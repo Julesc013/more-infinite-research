@@ -1,18 +1,18 @@
 {
-  "schema": 1,
-  "kind": "MIR4CanonicalPackageAuthorityV1",
-  "status": "current-f2e-package-source-cutover",
+  "schema": 2,
+  "kind": "MIR4CanonicalPackageAuthorityV2",
+  "status": "current-composable-source",
   "materializer_abi": "mir4-target-materializer/1",
-  "editable_source_root": "src/mod",
+  "editable_source_root": "source",
   "target_authority_root": "targets",
   "generated_output_root": "build/packages",
   "source_manifest": {
-    "path": "src/mod/package-source.json",
-    "record_sha256": "8BDB2B9D3D63A5FBD49556609D6A7371B2BF11FA1D5F15BFD696E4C17EA3EF5E"
+    "path": "source/package-source.json",
+    "record_sha256": "A2B4251594A60EB52A1CC971C49F7B323CE545ADCA436D644BAB156EE7230178"
   },
   "target_registry": {
     "path": "targets/registry.json",
-    "record_sha256": "9470BC8F42783B27D97CD6098D5B727ACFF77AC145DE6C5E38AD046C9EFDD614"
+    "record_sha256": "8671915B6085E8579A6177036298D2FBC8AAE550AF392C4EF64DD3B035810C01"
   },
   "support_policy": {
     "path": "targets/support-policy.json",
@@ -83,5 +83,5 @@
     "sealing": false,
     "publication": false
   },
-  "record_sha256": "6C766554D4C287D14DC8FD822BA530B7B57C3D98756FA2A54AAC3D9125CBDF6B"
+  "record_sha256": "B8A898ED53C212D7F58AB49A8F36445E9E0EB46638FD18D6F377CE11C1DBECE8"
 }

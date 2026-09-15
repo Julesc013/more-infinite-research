@@ -20,6 +20,7 @@
     "assurance/repository/assurance-offline-custody-tooling-v1.json",
     "assurance/repository/historical-tooling-v1.json",
     "assurance/repository/release-tooling-v1.json",
+    "assurance/repository/composable-source-layout-v1.json",
     "tools/lib/assurance",
     "validation",
     ".mir/control-plane"

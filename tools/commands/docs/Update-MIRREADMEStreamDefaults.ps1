@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$defaultsPath = Join-Path $RepoRoot "src\mod\families\modern\prototypes\mir\settings\defaults.lua"
+$defaultsPath = Join-Path $RepoRoot "source\prototypes\mir\settings\defaults.lua"
 $documentPath = Join-Path $RepoRoot "docs\reference\generated\stream-defaults.md"
 $defaultsText = Get-Content -Raw -LiteralPath $defaultsPath
 
@@ -97,7 +97,7 @@ $lines.Add('')
 $lines.Add('# Generated Stream Defaults')
 $lines.Add('')
 $lines.Add('<!-- BEGIN GENERATED MIR STREAM DEFAULTS -->')
-$lines.Add('This package-excluded effective-default table is generated from `src/mod/families/modern/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
+$lines.Add('This package-excluded effective-default table is generated from `source/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.')
 $lines.Add('')
 $lines.Add('| Stream | Enabled | Base cost | Growth | Time | Max |')
 $lines.Add('| --- | --- | ---: | ---: | ---: | --- |')

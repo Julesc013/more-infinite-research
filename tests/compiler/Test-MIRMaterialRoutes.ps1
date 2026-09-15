@@ -17,7 +17,7 @@ New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata') | Out
 $version=(& $engine --version | Out-String)
 if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]') { throw 'This F210 module regression requires an exact Factorio 2.1 engine.' }
 $modules=[ordered]@{
- 'prototypes.mir.capabilities.recipe_productivity.recipe_matching'='src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua'
+ 'prototypes.mir.capabilities.recipe_productivity.recipe_matching'='source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')

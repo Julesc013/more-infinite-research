@@ -16,9 +16,9 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Assert-MIRModuleManifestSemantics {
   $manifestPath = Join-Path $repo ".mir\modules.yml"
-  $packageSourcePath = Join-Path $repo "src\mod\package-source.json"
+  $packageSourcePath = Join-Path $repo "source\package-source.json"
   if (-not (Test-Path -LiteralPath $packageSourcePath -PathType Leaf)) {
-    throw "Missing canonical package-source authority: src/mod/package-source.json"
+    throw "Missing canonical package-source authority: source/package-source.json"
   }
   $packageSource = Get-Content -Raw -LiteralPath $packageSourcePath | ConvertFrom-Json -Depth 100
   $canonicalLua = @(

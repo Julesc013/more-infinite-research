@@ -192,8 +192,8 @@ function Get-MIRAssuranceCommitPackageSourceHash {
     & git -C $repo archive --format=zip --output=$sourceArchive $resolvedCommit -- @roots 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Unable to extract committed package inputs for $resolvedCommit." }
     Expand-Archive -LiteralPath $sourceArchive -DestinationPath $sourceRoot
-    if ([string]$layout.kind -ceq 'canonical-materializer-source') {
-      return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot
+    if ([string]$layout.kind -in @('canonical-materializer-source','canonical-materializer-source-v1')) {
+      return Get-MIRPackageSourceFingerprint -RepoRoot $sourceRoot -Roots $roots
     }
     return Get-MIRLegacyRootPackageSourceFingerprint -RepoRoot $sourceRoot
   } finally {

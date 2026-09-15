@@ -112,13 +112,13 @@ $engineVersion=([regex]::Match($version,'Version:\s+2[.]1[.]17[^\r\n]*').Value).
 if([string]::IsNullOrWhiteSpace($engineVersion)){throw 'Route-safety could not bind exact engine version.'}
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 if($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $sourceTree -notmatch '^[0-9a-f]{40}$'){throw 'Route-safety requires 40-hex source commit/tree bindings.'}
-$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod)
+$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
 if($sourceChanges.Count -ne 0){throw "Route-safety refuses a changed package-source root: $($sourceChanges -join '; ')"}
 
 $fixture=Join-Path $repo 'fixtures/assert-bob-angel-tin-route-safety'
 $dossier=Join-Path $fixture 'route-safety-dossier.json'
 $combinedDossier=Join-Path $repo 'fixtures/assert-bob-angel-tin-final-state-audit/route-dossier.json'
-$packageSource=Join-Path $repo 'src/mod/package-source.json'
+$packageSource=Join-Path $repo 'source/package-source.json'
 try{$record=Get-Content -Raw -LiteralPath $dossier|ConvertFrom-Json -ErrorAction Stop;$combined=Get-Content -Raw -LiteralPath $combinedDossier|ConvertFrom-Json -ErrorAction Stop}catch{throw "Route-safety dossier JSON is invalid: $($_.Exception.Message)"}
 
 Assert-Props root $record @('schema','kind','scope','target','official_mod_closure','archive_closure','combined_audit_binding','bounds','producer_classifications','controls','direct_vs_mir','observed_disposition','evidence_role','explicit_non_claims')

@@ -23,7 +23,7 @@ Assert-MIR4SourceModel (@($report.target_overlays.operations | Where-Object { [s
 Assert-MIR4SourceModel (@($report.target_overlays | Where-Object { [int]$_.operation_counts.replace -ne 0 }).Count -eq 0) 'mir4-shadow-source-model-collision-free-overlays'
 Assert-MIR4SourceModel ([bool]$report.invariants.declaration_order_independent -and [bool]$report.invariants.no_path_collision -and [bool]$report.invariants.no_unowned_path) 'mir4-shadow-source-model-invariants'
 Assert-MIR4SourceModel (@($report.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0) 'mir4-shadow-source-model-transition-firewall'
-$editableSourcePresent = Test-Path -LiteralPath (Join-Path $repo 'src/mod') -PathType Container
+$editableSourcePresent = Test-Path -LiteralPath (Join-Path $repo 'source') -PathType Container
 if ($editableSourcePresent) {
   $successorRelative = 'releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json'
   $successorPath = Join-Path $repo $successorRelative

@@ -57,9 +57,9 @@ function Test-A02RecordContract {
   $proofTargets = @($proof.targets | Sort-Object target)
   Stop-A02Test ($proofTargets.Count -eq 4 -and (@($proofTargets.target) -join '|') -ceq 'f100|f110|f200|f210') 'mir4-a02-proof-targets'
 
-  $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
+  $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
   $sourcePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  foreach ($binding in @($manifest.bindings)) { [void]$sourcePaths.Add([string]$binding.source_path) }
+  foreach ($binding in @($manifest.bindings)) { [void]$sourcePaths.Add([string]$binding.predecessor_source_path) }
   foreach ($component in @($Record.components)) {
     Stop-A02Test (@($component.canonical_owned_paths).Count -gt 0) 'mir4-a02-unbound-component'
     Stop-A02Test ([bool]$component.assessment.assessed -and [bool]$component.assessment.complete -and -not [bool]$component.assessment.unresolved) 'mir4-a02-not-assessed-complete'

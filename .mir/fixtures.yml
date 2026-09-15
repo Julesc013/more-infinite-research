@@ -482,7 +482,7 @@ fixtures:
     player_authority:
       target: f210
       policy: K2SciencePhasePolicyV1
-      source: targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua
+      source: source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua
       root_v2_disposition: package-excluded-preview
     exact_version_envelope:
       f210:

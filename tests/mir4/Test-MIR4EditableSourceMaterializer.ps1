@@ -12,34 +12,47 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $historicalPackage='8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'
 $historicalReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
 $schemaPairs=[ordered]@{
-  'src/mod/package-source.json'='spec/schemas/mir4-package-source-manifest-v1.schema.json'
-  'targets/registry.json'='spec/schemas/mir4-target-registry-v1.schema.json'
+  'source/package-source.json'='spec/schemas/mir4-composable-package-source-v2.schema.json'
+  'targets/package-authority.json'='spec/schemas/mir4-canonical-package-authority-v2.schema.json'
+  'targets/registry.json'='spec/schemas/mir4-target-registry-v2.schema.json'
   'targets/support-policy.json'='spec/schemas/mir4-target-support-policy-v1.schema.json'
-  'targets/f210/overlay.json'='spec/schemas/mir4-target-overlay-v1.schema.json'
-  'targets/f200/overlay.json'='spec/schemas/mir4-target-overlay-v1.schema.json'
-  'targets/f110/overlay.json'='spec/schemas/mir4-target-overlay-v1.schema.json'
-  'targets/f100/overlay.json'='spec/schemas/mir4-target-overlay-v1.schema.json'
+  'targets/f210/composition.json'='spec/schemas/mir4-target-composition-v2.schema.json'
+  'targets/f200/composition.json'='spec/schemas/mir4-target-composition-v2.schema.json'
+  'targets/f110/composition.json'='spec/schemas/mir4-target-composition-v2.schema.json'
+  'targets/f100/composition.json'='spec/schemas/mir4-target-composition-v2.schema.json'
 }
 foreach($pair in $schemaPairs.GetEnumerator()){
   if(-not((Get-Content -Raw -LiteralPath (Join-Path $repo $pair.Key))|Test-Json -SchemaFile (Join-Path $repo $pair.Value))){throw "[mir4-editable-source-schema] $($pair.Key)"}
 }
-$manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'src/mod/package-source.json' -Kind 'MIR4PackageSourceManifestV1'
-$registry=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV1'
+$manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+$registry=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV2'
 $support=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
-if(@($manifest.bindings).Count-ne447-or@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-ne447-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne447){throw '[mir4-editable-source-binding-uniqueness]'}
+if(@($manifest.bindings).Count-ne447-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne439-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne447){throw '[mir4-editable-source-binding-uniqueness]'}
+$targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
+if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
 if(@($support.targets|Where-Object{[string]$_.qualification-cne'independent-exact-engine-required'}).Count-ne0-or-not[bool]$support.invariants.no_cross_target_proof_substitution){throw '[mir4-editable-source-independent-target-proof]'}
 
 $declared=@($manifest.bindings.source_path|Sort-Object -CaseSensitive -Unique)
 $actual=[Collections.Generic.List[string]]::new()
-foreach($file in @(Get-ChildItem -LiteralPath (Join-Path $repo 'src/mod') -Recurse -File|Where-Object{$_.FullName-cne(Join-Path $repo 'src/mod/package-source.json')})){$actual.Add([IO.Path]::GetRelativePath($repo,$file.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/'))}
-foreach($target in @('f210','f200','f110','f100')){
-  foreach($leaf in @('files','generation')){
-    $root=Join-Path $repo "targets/$target/$leaf"
-    foreach($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -ErrorAction SilentlyContinue)){$actual.Add([IO.Path]::GetRelativePath($repo,$file.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/'))}
-  }
-}
+foreach($file in @(Get-ChildItem -LiteralPath (Join-Path $repo 'source') -Recurse -File|Where-Object{$_.FullName-notin@((Join-Path $repo 'source/package-source.json'),(Join-Path $repo 'source/.mir-root.json'))})){$actual.Add([IO.Path]::GetRelativePath($repo,$file.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/'))}
 if(($declared-join"`n")-cne(@($actual|Sort-Object -CaseSensitive -Unique)-join"`n")){throw '[mir4-editable-source-physical-source-set]'}
+if(Test-Path -LiteralPath (Join-Path $repo 'src') -PathType Container){throw '[mir4-editable-source-abbreviated-root-retained]'}
+if(Test-Path -LiteralPath (Join-Path $repo 'source/families') -PathType Container){throw '[mir4-editable-source-era-family-retained]'}
+if(@(Get-ChildItem -LiteralPath (Join-Path $repo 'targets') -Recurse -File|Where-Object{$_.FullName-match'[\\/](?:files|generation)[\\/]'}).Count-ne0){throw '[mir4-editable-source-payload-outside-source-root]'}
+$relocationCases=[ordered]@{
+  'src/mod/common/prototypes/mir/core/deepcopy.lua'='source/prototypes/mir/core/deepcopy.lua'
+  'src/mod/families/modern/prototypes/mir/core/fingerprint.lua'='source/prototypes/mir/core/fingerprint.lua'
+  'src/mod/families/legacy/prototypes/mir/core/fingerprint.lua'='source/compatibility/factorio-1/prototypes/mir/core/fingerprint.lua'
+  'targets/f210/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
+  'targets/f200/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
+}
+foreach($case in $relocationCases.GetEnumerator()){
+  if((Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $case.Key)-cne$case.Value){throw "[mir4-editable-source-relocation] $($case.Key)"}
+}
+$relocationRejected=$false
+try{[void](Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath 'src/mod/not-a-declared-source.lua')}catch{$relocationRejected=$_.Exception.Message.Contains('[mir4-package-source-relocation-ambiguous]')}
+if(-not$relocationRejected){throw '[mir4-editable-source-relocation-negative]'}
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
   foreach($binding in @($state.manifest.bindings|Where-Object{$target-in@($_.target_scope)})){[void](Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $binding)}
@@ -72,4 +85,4 @@ if([string]$f2e.verification.legacy_root_projection_sha256-cne$historicalPackage
 if(-not[bool]$proof.transition_gate.package_cutover-or-not[bool]$proof.transition_gate.old_writer_retirement-or
    @($proof.transition_gate.PSObject.Properties|Where-Object{$_.Name-notin@('package_cutover','old_writer_retirement')-and[bool]$_.Value}).Count-ne0){throw '[mir4-editable-source-transition-authority]'}
 
-[pscustomobject][ordered]@{status='passed';test_id='static.mir4-editable-source-materializer-m41-f2c';historical_fixed_point_preserved=$true;bindings=@($manifest.bindings).Count;source_files=$declared.Count;targets=@($proof.targets).Count;content_roots=@($proof.targets|ForEach-Object{[ordered]@{target=[string]$_.target;content_sha256=[string]$_.content_sha256;entries=[int]$_.entry_count}});package_source_sha256=(Get-MIRPackageSourceFingerprint -RepoRoot $repo);historical_root_package_source_sha256=$historicalPackage;historical_root_readme_sha256=$historicalReadme;production_archive_input=$false;package_cutover=$true;record_sha256=[string]$proof.record_sha256}|ConvertTo-Json -Depth 20
+[pscustomobject][ordered]@{status='passed';test_id='static.mir4-editable-source-materializer-m41-f2c';historical_fixed_point_preserved=$true;bindings=@($manifest.bindings).Count;source_files=$declared.Count;deduplicated_source_bindings=(@($manifest.bindings).Count-$declared.Count);targets=@($proof.targets).Count;content_roots=@($proof.targets|ForEach-Object{[ordered]@{target=[string]$_.target;content_sha256=[string]$_.content_sha256;entries=[int]$_.entry_count}});package_source_sha256=(Get-MIRPackageSourceFingerprint -RepoRoot $repo);historical_root_package_source_sha256=$historicalPackage;historical_root_readme_sha256=$historicalReadme;production_archive_input=$false;package_cutover=$true;record_sha256=[string]$proof.record_sha256}|ConvertTo-Json -Depth 20

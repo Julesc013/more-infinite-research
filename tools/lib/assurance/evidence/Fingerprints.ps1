@@ -131,7 +131,7 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
         @($authority.forbidden) -notcontains 'production-signing' -or
         @($authority.forbidden) -notcontains 'tagging' -or
         @($authority.forbidden) -notcontains 'publication' -or
-        [string]$registry.kind -ne 'MIR4TargetRegistryV1' -or
+        [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
         $targetRows.Count -ne 1) {
       throw 'Development approved-delta execution context boundary is invalid.'
     }

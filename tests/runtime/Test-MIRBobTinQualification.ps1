@@ -22,9 +22,9 @@ if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]17') { throw 'Bo
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 if($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $sourceTree -notmatch '^[0-9a-f]{40}$') { throw 'Bob Tin qualification could not bind the current source commit/tree.' }
-$sourceRootChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod)
+$sourceRootChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
 if($sourceRootChanges.Count -ne 0) { throw "Bob Tin qualification refuses a changed package-source root: $($sourceRootChanges -join '; ')" }
-$packageSource=Join-Path $repo 'src/mod/package-source.json'
+$packageSource=Join-Path $repo 'source/package-source.json'
 $packageSourceSha256=(Get-FileHash -LiteralPath $packageSource -Algorithm SHA256).Hash
 $expectedHashes=[ordered]@{
   boblibrary='49EAE2D4D8E58EBD28BAFDB7E71D5307CBCE2077E0642440ED7EC527D466FFC4'

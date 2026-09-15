@@ -966,16 +966,21 @@ try {
   # The roots need independent indexes and working trees for LF/CRLF proof, not
   # duplicate copies of the immutable repository object store. Sharing objects
   # prevents this regression from becoming a disk-capacity false failure.
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --shared $RepoRoot $plannerRoot
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" clone -c core.autocrlf=false --quiet --shared $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --shared $RepoRoot $workerRoot
-  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
+  if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
+    & git -C $plannerRoot apply --index --whitespace=nowarn $stagedPatchPath
+    if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $plannerRoot" }
+    # Give both line-ending configurations a real clean checkout of the same
+    # staged tree. Applying a patch independently under core.autocrlf=true can
+    # leave newly relocated raw-hashed files in non-canonical working bytes.
+    & git -C $plannerRoot -c user.name='MIR assurance self-test' -c user.email='mir-assurance@invalid.local' commit --quiet -m 'self-test: materialize staged equivalence tree'
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the staged equivalence tree in the disposable planner root.' }
+  }
+  & git -c "safe.directory=$plannerRoot" clone -c core.autocrlf=true --quiet --shared $plannerRoot $workerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root from the exact staged tree." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {
-    if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
-      & git -C $root apply --index --whitespace=nowarn $stagedPatchPath
-      if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $root" }
-    }
     & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
     if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
   }

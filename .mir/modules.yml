@@ -172,20 +172,20 @@ package_excluded_modules:
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
-  mir4_editable_source_materializer_v1:
+  mir4_composable_source_materializer_v2:
     predecessor: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
-    source_manifest: src/mod/package-source.json
-    source_manifest_schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+    source_manifest: source/package-source.json
+    source_manifest_schema: spec/schemas/mir4-composable-package-source-v2.schema.json
     package_authority: targets/package-authority.json
-    package_authority_schema: spec/schemas/mir4-canonical-package-authority-v1.schema.json
+    package_authority_schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
     package_authority_application: tools/mir/application/package/PackageAuthority.ps1
     target_registry: targets/registry.json
     target_support_policy: targets/support-policy.json
-    target_overlays:
-      - targets/f210/overlay.json
-      - targets/f200/overlay.json
-      - targets/f110/overlay.json
-      - targets/f100/overlay.json
+    target_compositions:
+      - targets/f210/composition.json
+      - targets/f200/composition.json
+      - targets/f110/composition.json
+      - targets/f100/composition.json
     implementation: tools/mir/application/package/TargetMaterializer.ps1
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
@@ -196,7 +196,11 @@ package_excluded_modules:
     cutover_receipt_schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
     proof_schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
     output: build/packages
-    algorithm: canonical-common-family-target-overlay-materializer-v1
+    algorithm: canonical-package-shaped-source-target-composition-materializer-v2
+    layout_migration_authority: governance/repository/composable-source-layout-v1.json
+    layout_migration_proof: assurance/repository/composable-source-layout-v1.json
+    layout_migration_receipt: assurance/repository/composable-source-layout-receipt-v1.json
+    layout_migration_test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
     package_visible: false
     editable_source_authority: true
     package_cutover_authority: true
@@ -205,6 +209,7 @@ package_excluded_modules:
     legacy_root_writer_retired: true
     historical_archives_are_comparison_fixtures_only: true
     four_target_runtime_replay_complete: true
+    remaining_factorio_1_code_convergence_obligation: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1

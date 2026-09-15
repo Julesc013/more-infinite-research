@@ -531,7 +531,7 @@ docs:
       - mir4-target-provider-abi
       - mir4-private-target-product-set
   - path: docs/architecture/module-boundaries.md
-    title: "MIR 3.0.0 Repository Structure"
+    title: "MIR 4 Repository and Module Boundaries"
     status: current
     audience: maintainer
     doc_type: explanation

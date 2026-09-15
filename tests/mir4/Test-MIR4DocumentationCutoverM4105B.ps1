@@ -48,7 +48,7 @@ foreach ($term in @('latest installed official Factorio 2.1 experimental build',
 foreach ($marker in @('PIPELINE','STREAM DEFAULTS')) {
   Assert-MIR4DocumentationCutover ($readme.Contains("BEGIN GENERATED MIR $marker")) 'mir4-readme-inline-reference'
 }
-Assert-MIR4DocumentationCutover ($readme.Contains('src/mod') -and $readme.Contains('targets') -and $readme.Contains('repository root is not a player package')) 'mir4-readme-package-boundary'
+Assert-MIR4DocumentationCutover ($readme.Contains('source') -and $readme.Contains('targets') -and $readme.Contains('repository root is not a player package')) 'mir4-readme-package-boundary'
 
 $files = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $RepoRoot)
 Assert-MIR4DocumentationCutover ('README.md' -notin $files) 'mir4-m41-05b-root-package-membership'

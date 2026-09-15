@@ -2,6 +2,7 @@
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
+. (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 $path=Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json'
 $raw=Get-Content -Raw -LiteralPath $path
 if(-not($raw | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-4x-operating-programme-v1.schema.json'))) { throw '[synthesis-programme-schema]' }
@@ -107,7 +108,8 @@ $scienceEvidence=Join-Path $RepoRoot 'spec/programmes/evidence/synthesis-2026-09
 $science=Get-Content -Raw $scienceEvidence | ConvertFrom-Json
 if($science.status -cne 'passed' -or $science.assertions -ne 33 -or $science.scope -cne 'controlled-modules-not-real-k2-qualification') { throw '[synthesis-science-proof-scope]' }
 foreach($module in $science.modules) {
-  if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $module.path)).Hash -cne $module.sha256) { throw "[synthesis-science-proof-stale] $($module.path)" }
+  $currentModule=Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $RepoRoot -RelativePath ([string]$module.path)
+  if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $currentModule)).Hash -cne $module.sha256) { throw "[synthesis-science-proof-stale] $($module.path)" }
 }
 if((Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/compiler/science_planning.lua')).Hash -cne $science.test_sha256) { throw '[synthesis-science-test-stale]' }
 
@@ -202,7 +204,7 @@ foreach($binding in @($community.material_source_bindings)+@($community.browser_
  $snapshotBinding=Get-MIR4CommunityGitBlob $snapshotCommit $bindingPath
  if((Get-MIR4CommunityByteSha256 $snapshotBinding.bytes) -cne $expectedSha256) { throw "[community-evidence-binding] $bindingPath" }
 }
-$manifest=Get-Content -Raw (Join-Path $RepoRoot 'src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json') | ConvertFrom-Json -Depth 100
+$manifest=Get-Content -Raw (Join-Path $RepoRoot 'source/prototypes/mir/streams/generated_stream_manifest.json') | ConvertFrom-Json -Depth 100
 $declarations=@($requests.requests | Where-Object { $null -ne $_.PSObject.Properties['material_route_declaration'] })
 if($declarations.Count -ne 22) { throw '[community-material-accounting]' }
 foreach($request in $declarations) {
@@ -210,6 +212,6 @@ foreach($request in $declarations) {
  if(($manifest | ConvertTo-Json -Depth 100) -notmatch [regex]::Escape($identity)) { throw "[community-material-identity] $identity" }
  if($request.material_route_declaration.infinite_continuation -cne 'not-implemented' -or $request.qualification.Count -eq 0) { throw '[community-material-false-completion]' }
 }
-$source=Get-Content -Raw (Join-Path $RepoRoot 'src/mod/package-source.json') | ConvertFrom-Json -Depth 100
+$source=Get-Content -Raw (Join-Path $RepoRoot 'source/package-source.json') | ConvertFrom-Json -Depth 100
 if(@($source.bindings | Where-Object source_path -Like 'tests/*').Count -ne 0) { throw '[community-experiment-package-leak]' }
 Write-Output 'Community source bindings, exact receipts, 22 stable material declarations and prototype package exclusion passed.'

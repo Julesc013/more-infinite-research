@@ -27,6 +27,27 @@ function Test-MIR4M4202PackageSourceSuccession {
     if(-not$bridgeValid){return $false}
     if([string]$receipt.package_source.current_sha256-ceq$CurrentSha256){return $true}
 
+    $sourceLayoutPath=Join-Path $RepoRoot 'assurance/repository/composable-source-layout-receipt-v1.json'
+    $sourceLayoutSchemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
+    if((Test-Path -LiteralPath $sourceLayoutPath -PathType Leaf)-and(Test-Path -LiteralPath $sourceLayoutSchemaPath -PathType Leaf)){
+      $sourceLayoutRaw=Get-Content -Raw -LiteralPath $sourceLayoutPath
+      if(-not($sourceLayoutRaw|Test-Json -SchemaFile $sourceLayoutSchemaPath)){return $false}
+      $sourceLayout=$sourceLayoutRaw|ConvertFrom-Json -Depth 100 -DateKind String
+      if(-not(Test-MIR4BootstrapRecordHash -Record $sourceLayout)){return $false}
+      . (Join-Path $RepoRoot 'tools/lib/assurance/Hashing.ps1')
+      $observedPredecessor=Get-MIRAssuranceCommitPackageSourceHash -Commit ([string]$sourceLayout.predecessor.commit)
+      $targetKeys=@($sourceLayout.target_parity|ForEach-Object{[string]$_.target})
+      $enabledLayoutGates=@($sourceLayout.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
+      if($observedPredecessor-ceq[string]$sourceLayout.predecessor.package_source_fingerprint_sha256-and
+         [string]$sourceLayout.current.package_source_fingerprint_sha256-ceq$CurrentSha256-and
+         ($targetKeys-join'|')-ceq'f210|f200|f110|f100'-and
+         @($sourceLayout.target_parity|Where-Object{-not[bool]$_.deterministic_archive_bytes}).Count-eq0-and
+         [bool]$sourceLayout.invariants.package_bytes_unchanged-and
+         $enabledLayoutGates.Count-eq1-and$enabledLayoutGates[0]-ceq'development_merge'){
+        return $true
+      }
+    }
+
     $presentationPath=Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json'
     $presentationSchemaPath=Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v2.schema.json'
     if(-not(Test-Path -LiteralPath $presentationPath -PathType Leaf)-or-not(Test-Path -LiteralPath $presentationSchemaPath -PathType Leaf)){return $false}
@@ -54,7 +75,7 @@ function Test-MIR4M4202PackageSourceSuccession {
       [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
-      (@($presentation.package_source.roots)-join'|')-ceq'src/mod|targets'-and
+      (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
       [string]$packageAuthority.record_sha256-ceq[string]$presentation.package_authority.record_sha256-and
       [string]$sourceManifest.record_sha256-ceq[string]$presentation.source_manifest.record_sha256-and
       $enabledAuthorityFlags.Count-eq1-and
@@ -62,6 +83,27 @@ function Test-MIR4M4202PackageSourceSuccession {
       $enabledTransitionGates.Count-eq0
     )
   }catch{return $false}
+}
+
+function Get-MIR4M4202CurrentManifestBindingExpectation {
+  [CmdletBinding()]
+  [OutputType([int])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][int]$Fallback
+  )
+
+  try{
+    $receiptPath=Join-Path $RepoRoot 'assurance/repository/composable-source-layout-receipt-v1.json'
+    $schemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
+    if(-not(Test-Path -LiteralPath $receiptPath -PathType Leaf)-or-not(Test-Path -LiteralPath $schemaPath -PathType Leaf)){return $Fallback}
+    $raw=Get-Content -Raw -LiteralPath $receiptPath
+    if(-not($raw|Test-Json -SchemaFile $schemaPath)){return $Fallback}
+    $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+    if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)-or
+       [string]$receipt.current.package_source_fingerprint_sha256-cne(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)){return $Fallback}
+    return [int]$receipt.relocation.binding_count
+  }catch{return $Fallback}
 }
 
 function Get-MIR4M4202ReadinessSuccessionV1 {

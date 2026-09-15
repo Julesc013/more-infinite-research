@@ -2,7 +2,7 @@ schema: 1
 authority: mir-repository-paths-v1
 
 paths:
-  package.root: src/mod
+  package.root: source
   package.targets: targets
   package.generated: build/packages
   mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v2.json
@@ -114,16 +114,16 @@ paths:
   mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
   mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
-  mir4.package-source.editable-source-manifest: src/mod/package-source.json
-  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+  mir4.package-source.editable-source-manifest: source/package-source.json
+  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-composable-package-source-v2.schema.json
   mir4.package-source.canonical-authority: targets/package-authority.json
-  mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v1.schema.json
+  mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
   mir4.package-source.canonical-authority-application: tools/mir/application/package/PackageAuthority.ps1
   mir4.package-source.target-registry: targets/registry.json
-  mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v1.schema.json
+  mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v2.schema.json
   mir4.package-source.target-support-policy: targets/support-policy.json
   mir4.package-source.target-support-policy-schema: spec/schemas/mir4-target-support-policy-v1.schema.json
-  mir4.package-source.target-overlay-schema: spec/schemas/mir4-target-overlay-v1.schema.json
+  mir4.package-source.target-composition-schema-v2: spec/schemas/mir4-target-composition-v2.schema.json
   mir4.package-source.target-materializer: tools/mir/application/package/TargetMaterializer.ps1
   mir4.package-source.target-composition-schema: spec/schemas/mir4-package-composition-result-v1.schema.json
   mir4.package-source.editable-source-materializer-proof-schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
@@ -136,6 +136,12 @@ paths:
   mir4.package-source.f2e-receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
   mir4.package-source.f2e-receipt-schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
   mir4.package-source.f2e-proof: tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
+  mir4.package-source.composable-layout-authority: governance/repository/composable-source-layout-v1.json
+  mir4.package-source.composable-layout-proof: assurance/repository/composable-source-layout-v1.json
+  mir4.package-source.composable-layout-receipt: assurance/repository/composable-source-layout-receipt-v1.json
+  mir4.package-source.composable-layout-schema: contracts/repository/mir4-composable-source-layout-migration-v1.schema.json
+  mir4.package-source.composable-layout-test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
+  mir4.package-source.composable-layout-writer: tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1

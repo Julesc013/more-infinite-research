@@ -1,4 +1,4 @@
-$script:MIR4RepositoryRootIds = @('governance','contracts','spec','src','targets','modules','sdk','tools-mir','tests','assurance','changes','releases','docs','examples')
+$script:MIR4RepositoryRootIds = @('governance','contracts','spec','source','targets','modules','sdk','tools-mir','tests','assurance','changes','releases','docs','examples')
 $script:MIR4RepositoryClasses = @('normative-authority','generated-projection','executable-source','test-fixture','reusable-cache','durable-evidence','process-scratch','archive','obsolete','unknown')
 $script:MIR4RepositoryFixedPointAuthorityPath = '.mir/control/repository-fixed-point.json'
 $script:MIR4RepositoryMigrationAuthorityPath = 'governance/repository/migrations/fixed-point-tooling-v1.json'
@@ -29,11 +29,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4RepositoryFixedPointAuthorityPath
   if ([int]$authority.schema -ne 2 -or [string]$authority.kind -cne 'MIR4RepositoryFixedPointV2') { throw '[mir4-repository-authority-schema]' }
-  if ([string]$authority.state -cne 'MIR41-CURRENT-PRODUCT-BRIDGES-RETIRED' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
+  if ([string]$authority.state -cne 'MIR42-COMPOSABLE-SOURCE-LAYOUT' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
     throw '[mir4-repository-cutover-boundary]'
   }
   if ([string]$authority.migration_authority -cne $script:MIR4RepositoryMigrationAuthorityPath) { throw '[mir4-repository-migration-authority-binding]' }
-  if (@($authority.migration_sequence).Count -ne 18 -or
+  if (@($authority.migration_sequence).Count -ne 19 -or
       [string]$authority.migration_sequence[0].migration_id -cne 'MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1' -or
       [string]$authority.migration_sequence[0].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[1].migration_id -cne 'MIR4-CANONICALIZATION-TOOLING-V1' -or
@@ -69,7 +69,9 @@ function Get-MIR4RepositoryFixedPointAuthority {
       [string]$authority.migration_sequence[16].migration_id -cne 'M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1' -or
       [string]$authority.migration_sequence[16].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[17].migration_id -cne 'M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1' -or
-      [string]$authority.migration_sequence[17].state -cne 'current-append-only-successor') {
+      [string]$authority.migration_sequence[17].state -cne 'accepted-immutable-predecessor' -or
+      [string]$authority.migration_sequence[18].migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
+      [string]$authority.migration_sequence[18].state -cne 'current-append-only-successor') {
     throw '[mir4-repository-migration-sequence]'
   }
   $ids = @($authority.visible_roots | ForEach-Object { [string]$_.id })
@@ -120,7 +122,7 @@ function Get-MIR4RepositoryRootMarker {
     path=[string]$Root.path
     mode=[string]$Root.mode
     current_authorities=@($Root.current_authorities)
-    writable_authority=([string]$Root.id -in @('changes','src','targets'))
+    writable_authority=([string]$Root.id -in @('changes','source','targets'))
     marker_is_writable_authority=$false
     package_visible=$false
     source=$script:MIR4RepositoryFixedPointAuthorityPath
@@ -142,7 +144,7 @@ function Get-MIR4RepositoryPathClass {
   if ($path -match '^(\.agents/|\.codex/)') { return 'normative-authority' }
   if ($path -match '^(fixtures/|validation/|tests/|examples/)') { return 'test-fixture' }
   if ($path -match '^(docs/|targets/|modules/|assurance/|changes/|releases/)') { return 'generated-projection' }
-  if ($path -match '^(\.github/|tools/|scripts/|prototypes/|migrations/|locale/|src/)' -or $path -match '^(data|settings)(-updates|-final-fixes)?\.lua$' -or $path -eq 'control.lua') { return 'executable-source' }
+  if ($path -match '^(\.github/|tools/|scripts/|prototypes/|migrations/|locale/|source/)' -or $path -match '^(data|settings)(-updates|-final-fixes)?\.lua$' -or $path -eq 'control.lua') { return 'executable-source' }
   if ($path -match '^dist/' -or $path.EndsWith('.zip')) { return 'archive' }
   if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','EXTENSION-PROTOCOL.md','FORKING.md','GOVERNANCE.md','MAINTAINER-HANDOFF.md','PROJECT-CONTINUITY.md','README.md','RELEASE-RUNBOOK.md','SECURITY.md','SUPPORT.md','LICENSE','changelog.txt','info.json','thumbnail.png','todo.md')) { return 'normative-authority' }
   return 'unknown'

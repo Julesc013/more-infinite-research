@@ -20,7 +20,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | --- | --- | --- |
 | architecture-decision-record-index | [Architecture Decision Records](../../architecture/decisions/README.md) | current |
 | architecture-overview | [Architecture](../../architecture/README.md) | current |
-| authority-projection-command-boundaries | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| authority-projection-command-boundaries | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | automatic-family-balance | [Automatic Family Balance And Scope](../../architecture/automatic-family-balance.md) | current |
 | automatic-family-compiler | [Automatic Family Compiler](../../architecture/automatic-family-compiler.md) | current |
 | automatic-family-release-scope | [Automatic Family Balance And Scope](../../architecture/automatic-family-balance.md) | current |
@@ -323,7 +323,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-w09-manual-playtest-checklist | [MIR 4 W09 Manual Playtest Handoff](../../maintainer/mir4-w09-manual-playtest.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | modpack-campaign-evidence-contract | [Modpack Campaigns](../../maintainer/modpack-campaigns.md) | current |
-| module-boundaries | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| module-boundaries | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | native-owner-binding-contract | [Native Owner Binding](../../architecture/native-owner-binding.md) | current |
 | offline-family-rule-synthesis | [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md) | current |
 | package-qualification-source-authority | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
@@ -358,7 +358,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | research-surface-host-ownership | [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md) | current |
 | runtime-performance-release-gate | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | scenario-manifest-schema | [Scenario Manifest Schema](../../reference/schemas/scenario-manifest.md) | current |
-| science-pack-production-route-authority | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| science-pack-production-route-authority | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | semantic-mod-interaction-graph | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | settings-governance | [Settings Governance](../../maintainer/settings-governance.md) | current |
 | settings-reference | [Settings Reference](../../reference/settings.md) | current |

@@ -2,7 +2,7 @@
   "schema": 2,
   "kind": "MIR4RepositoryFixedPointV2",
   "programme_id": "M4C02-09-24H",
-  "state": "MIR41-CURRENT-PRODUCT-BRIDGES-RETIRED",
+  "state": "MIR42-COMPOSABLE-SOURCE-LAYOUT",
   "unknown_policy": "block-deletion-and-release",
   "physical_cutover": true,
   "current_package_source_remains_authoritative": false,
@@ -25,7 +25,8 @@
     {"migration_id":"MIR4-RELEASE-TOOLING-V1","authority":"governance/repository/migrations/release-tooling-v1.json","receipt":"releases/migrations/MIR4-Release-Tooling-MigrationV1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"M41-03-CHANGE-AND-RELEASE-AUTHORITY-V1","authority":"changes/unreleased","receipt":"releases/migrations/MIR4-M41-03-Change-And-Release-Authority-EvolutionV1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1","authority":"governance/repository/migrations/repository-characterization-v1.json","receipt":"releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json","state":"accepted-immutable-predecessor"},
-    {"migration_id":"M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1","authority":"governance/repository/migrations/current-product-bridge-retirement-v1.json","receipt":"releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json","state":"current-append-only-successor"}
+    {"migration_id":"M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1","authority":"governance/repository/migrations/current-product-bridge-retirement-v1.json","receipt":"releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json","state":"accepted-immutable-predecessor"},
+    {"migration_id":"MIR4-COMPOSABLE-SOURCE-LAYOUT-V1","authority":"governance/repository/composable-source-layout-v1.json","receipt":"assurance/repository/composable-source-layout-receipt-v1.json","state":"current-append-only-successor"}
   ],
   "root_markers": ".mir-root.json",
   "classification_order": [
@@ -41,16 +42,16 @@
     "unknown"
   ],
   "visible_roots": [
-    {"id":"governance","path":"governance","mode":"active-migration-authority","current_authorities":["governance/repository/migrations/fixed-point-tooling-v1.json","governance/repository/migrations/canonicalization-tooling-v1.json","governance/repository/migrations/diagnostics-tooling-v1.json","governance/repository/migrations/target-key-tooling-v1.json","governance/repository/migrations/whole-platform-tooling-v1.json","governance/repository/migrations/technology-acceptance-tooling-v1.json","governance/repository/migrations/target-compiler-tooling-v1.json","governance/repository/migrations/semantic-compiler-policy-tooling-v1.json","governance/repository/migrations/runtime-continuity-tooling-v1.json","governance/repository/migrations/module-sdk-mep-tooling-v1.json","governance/repository/migrations/processir-exact-tooling-v1.json","governance/repository/migrations/inspector-compatibility-tooling-v1.json","governance/repository/migrations/assurance-offline-custody-tooling-v1.json","governance/repository/migrations/historical-tooling-v1.json","governance/repository/migrations/release-tooling-v1.json","governance/repository/migrations/repository-characterization-v1.json","governance/repository/migrations/current-product-bridge-retirement-v1.json",".mir/control",".mir/control-plane",".mir/*.yml"]},
+    {"id":"governance","path":"governance","mode":"active-migration-authority","current_authorities":["governance/repository/migrations/fixed-point-tooling-v1.json","governance/repository/migrations/canonicalization-tooling-v1.json","governance/repository/migrations/diagnostics-tooling-v1.json","governance/repository/migrations/target-key-tooling-v1.json","governance/repository/migrations/whole-platform-tooling-v1.json","governance/repository/migrations/technology-acceptance-tooling-v1.json","governance/repository/migrations/target-compiler-tooling-v1.json","governance/repository/migrations/semantic-compiler-policy-tooling-v1.json","governance/repository/migrations/runtime-continuity-tooling-v1.json","governance/repository/migrations/module-sdk-mep-tooling-v1.json","governance/repository/migrations/processir-exact-tooling-v1.json","governance/repository/migrations/inspector-compatibility-tooling-v1.json","governance/repository/migrations/assurance-offline-custody-tooling-v1.json","governance/repository/migrations/historical-tooling-v1.json","governance/repository/migrations/release-tooling-v1.json","governance/repository/migrations/repository-characterization-v1.json","governance/repository/migrations/current-product-bridge-retirement-v1.json","governance/repository/composable-source-layout-v1.json",".mir/control",".mir/control-plane",".mir/*.yml"]},
     {"id":"contracts","path":"contracts","mode":"active-contract-root","current_authorities":["contracts/repository","contracts/release","spec/api","spec/schemas"]},
     {"id":"spec","path":"spec","mode":"canonical","current_authorities":["spec"]},
-    {"id":"src","path":"src","mode":"canonical-editable-player-source","current_authorities":["src/mod","src/mod/package-source.json"]},
+    {"id":"source","path":"source","mode":"canonical-composable-player-source","current_authorities":["source","source/package-source.json"]},
     {"id":"targets","path":"targets","mode":"canonical-target-authority","current_authorities":["targets/package-authority.json","targets/registry.json","targets/support-policy.json","targets/f210","targets/f200","targets/f110","targets/f100"]},
     {"id":"modules","path":"modules","mode":"historical-preview-package-excluded","current_authorities":[]},
     {"id":"sdk","path":"sdk","mode":"canonical-package-excluded","current_authorities":["sdk"]},
     {"id":"tools-mir","path":"tools/mir","mode":"active-layered-tooling","current_authorities":["tools/mir/domain","tools/mir/application","tools/mir/ports","tools/mir/adapters","tools/mir/cli","tools/mir.ps1","tools/commands","tools/lib"]},
     {"id":"tests","path":"tests","mode":"active-test-root","current_authorities":["tests/repository","tests/canonicalization","tests/diagnostics","tests/targets","tests/platform","tests/technology","tests/compiler","tests/runtime","tests/extensions","tests/processir","tests/inspection","tests/assurance","tests/history","tests/release-tooling","validation/tests","validation/tests.yml"]},
-    {"id":"assurance","path":"assurance","mode":"active-proof-policy-root","current_authorities":["assurance/repository/fixed-point-tooling-v1.json","assurance/repository/canonicalization-tooling-v1.json","assurance/repository/diagnostics-tooling-v1.json","assurance/repository/target-key-tooling-v1.json","assurance/repository/whole-platform-tooling-v1.json","assurance/repository/technology-acceptance-tooling-v1.json","assurance/repository/target-compiler-tooling-v1.json","assurance/repository/semantic-compiler-policy-tooling-v1.json","assurance/repository/runtime-continuity-tooling-v1.json","assurance/repository/module-sdk-mep-tooling-v1.json","assurance/repository/processir-exact-tooling-v1.json","assurance/repository/inspector-compatibility-tooling-v1.json","assurance/repository/assurance-offline-custody-tooling-v1.json","assurance/repository/historical-tooling-v1.json","assurance/repository/release-tooling-v1.json","tools/lib/assurance","validation",".mir/control-plane"]},
+    {"id":"assurance","path":"assurance","mode":"active-proof-policy-root","current_authorities":["assurance/repository/fixed-point-tooling-v1.json","assurance/repository/canonicalization-tooling-v1.json","assurance/repository/diagnostics-tooling-v1.json","assurance/repository/target-key-tooling-v1.json","assurance/repository/whole-platform-tooling-v1.json","assurance/repository/technology-acceptance-tooling-v1.json","assurance/repository/target-compiler-tooling-v1.json","assurance/repository/semantic-compiler-policy-tooling-v1.json","assurance/repository/runtime-continuity-tooling-v1.json","assurance/repository/module-sdk-mep-tooling-v1.json","assurance/repository/processir-exact-tooling-v1.json","assurance/repository/inspector-compatibility-tooling-v1.json","assurance/repository/assurance-offline-custody-tooling-v1.json","assurance/repository/historical-tooling-v1.json","assurance/repository/release-tooling-v1.json","assurance/repository/composable-source-layout-v1.json","tools/lib/assurance","validation",".mir/control-plane"]},
     {"id":"changes","path":"changes","mode":"active-change-authority","current_authorities":["changes/unreleased","changes/history"]},
     {"id":"releases","path":"releases","mode":"active-release-record-root","current_authorities":["releases/migrations","releases/rehearsals",".mir/releases",".mir/releases.json",".mir/distributions.json"]},
     {"id":"docs","path":"docs","mode":"canonical","current_authorities":["docs",".mir/docs.yml"]},
@@ -73,8 +74,8 @@
     "rollback-recorded"
   ],
   "remaining_move": {
-    "classification": "none-current-product-bridge-retirement-complete",
-    "reason": "Canonical package source, target policy, materialization, tooling, tests, documentation, and current-product readers have converged; retained compatibility readers are explicitly historical, read-only, package-excluded, owned, tested, and bounded.",
-    "rollback": "Revert the exact bridge-retirement migration before source freeze, restore the predecessor repository-fixed-point authority, and rerun its bound characterization and package proofs; never silently reactivate legacy current authority."
+    "classification": "none-composable-source-cutover-complete",
+    "reason": "The sole editable player source now has one package-shaped source root and target composition records; the separate Factorio 1 compatibility implementation remains an explicitly recorded code-convergence obligation, not an unfinished repository-root move.",
+    "rollback": "Revert the exact composable-source-layout migration, restore the predecessor package-source and target records, and rerun the four-target byte-parity proof; never silently reactivate the retired src or era-lane layout."
   }
 }

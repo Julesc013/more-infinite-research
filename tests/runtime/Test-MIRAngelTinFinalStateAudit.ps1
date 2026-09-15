@@ -24,9 +24,9 @@ if([string]::IsNullOrWhiteSpace($engineVersion)) { throw 'Angel Tin final-state 
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 if($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $sourceTree -notmatch '^[0-9a-f]{40}$') { throw 'Angel Tin audit requires nonempty 40-hex source commit and tree bindings.' }
-$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod)
+$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
 if($sourceChanges.Count -ne 0) { throw "Angel Tin audit refuses a changed package-source root: $($sourceChanges -join '; ')" }
-$packageSource=Join-Path $repo 'src/mod/package-source.json'
+$packageSource=Join-Path $repo 'source/package-source.json'
 $fixture=Join-Path $repo 'fixtures/assert-angel-tin-final-state-audit'
 $dossier=Join-Path $fixture 'route-dossier.json'
 $expectedArchives=[ordered]@{

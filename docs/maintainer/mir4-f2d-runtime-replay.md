@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # MIR 4.1 F2D runtime replay
 
-F2D proves the accepted 4.0 product as generated from `src/mod` and `targets`; it does not allocate MIR 4.1 or cut over package authority. Run one target and one Factorio process at a time through the existing public CLI:
+F2D proves the accepted 4.0 product as generated from `source` and `targets`; it does not allocate MIR 4.1 or cut over package authority. Run one target and one Factorio process at a time through the existing public CLI:
 
 ```powershell
 ./tools/mir.ps1 mir4 package-source runtime-replay `

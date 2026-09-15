@@ -43,11 +43,12 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202TechnologyCatalog ($evolvedPaths.Count-eq14-and@($evolvedPaths|Sort-Object -Unique).Count-eq14-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
+$expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback $expectedManifestBindings
+$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
 Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202TechnologyCatalog (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
-$sourceRoot='src/mod/families/modern/prototypes/mir/planner'
+$sourceRoot='source/prototypes/mir/planner'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/technology_catalog.lua")
 Assert-MIR4M4202TechnologyCatalog ($facade-match'technology_catalog[.]build'-and$facade-match'technology_catalog[.]validate'-and$facade-match'technology_catalog[.]query'-and$facade-notmatch'function\s') 'thin-facade'
 $responsibilities=@('model','index','query','build','validate')
@@ -64,7 +65,7 @@ Assert-MIR4M4202TechnologyCatalog ($validate-notmatch'function M[.]from_preselec
 Assert-MIR4M4202TechnologyCatalog (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/technology_catalog.lua")).Count-le25) 'facade-size'
 Assert-MIR4M4202TechnologyCatalog (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/technology_catalog/build.lua")).Count-le200) 'build-size'
 Assert-MIR4M4202TechnologyCatalog (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/technology_catalog/validate.lua")).Count-le180) 'validate-size'
-$catalogRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'families.modern'-and[string]$_.output_path-in$outputs})
+$catalogRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'capability'-and[string]$_.output_path-in$outputs})
 Assert-MIR4M4202TechnologyCatalog ($catalogRows.Count-eq6-and@($catalogRows|Where-Object{@($_.target_scope)-join'|'-cne'f210|f200'}).Count-eq0) 'package-bindings'
 foreach($row in $catalogRows){
   $source=Join-Path $repo ([string]$row.source_path)
