@@ -140,7 +140,7 @@ Require-MIR4F2DTarget (Test-MIR4FixedFactorioEngineIdentity -Target $Target -Obs
 
 $rolePaths = @(& git -C $RepoRoot diff --name-only $authorityBaseCommit --)
 $rolePaths += @(& git -C $RepoRoot ls-files --others --exclude-standard)
-$rolePaths += @($change.relative,$schemaRelative,'CHANGELOG.md','releases/governance/MIR4-Source-Changelog-PlanV1.json','todo.md','tools/lib/validation/FactorioVersionPolicy.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/mir/application/package/RuntimeReplay.ps1','tools/mir/application/package/RuntimeReplayVerifier.ps1','validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1','validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1','tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1')
+$rolePaths += @($change.relative,$schemaRelative,'CHANGELOG.md','releases/governance/MIR4-Source-Changelog-PlanV1.json','TODO.md','tools/lib/validation/FactorioVersionPolicy.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/mir/application/package/RuntimeReplay.ps1','tools/mir/application/package/RuntimeReplayVerifier.ps1','validation/tests/mir4/Test-MIR4RuntimeReplayF2D.ps1','validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1','tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1')
 $rolePaths = @($rolePaths | ForEach-Object { ([string]$_).Replace('\\','/') } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and $_ -cne $outputRelative } | Sort-Object -Unique -CaseSensitive)
 $evolved = [Collections.Generic.List[object]]::new()
 $current = [Collections.Generic.List[object]]::new()

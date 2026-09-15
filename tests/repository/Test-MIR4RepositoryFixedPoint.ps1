@@ -5,6 +5,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/repository/RepositoryFixedPoint.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
+. (Join-Path $repo 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
 
 function Assert-MIR4RepositoryMigrationV1 {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code,[string]$Detail='')
@@ -36,8 +37,8 @@ $actualActive = @($authority.visible_roots | Where-Object { [string]$_.mode -lik
 Assert-MIR4RepositoryMigrationV1 ((@($actualActive) -join '|') -ceq (@($expectedActive | Sort-Object) -join '|')) 'mir4-repository-migration-active-roots'
 Assert-MIR4RepositoryMigrationV1 (@($authority.visible_roots | Where-Object { [string]$_.mode -like 'shadow*' }).Count -eq 0) 'mir4-repository-migration-no-current-shadow-boundary'
 Assert-MIR4RepositoryMigrationV1 (@($authority.move_gate).Count -eq 6) 'mir4-repository-migration-move-gate'
-Assert-MIR4RepositoryMigrationV1 ([string]$authority.remaining_move.classification -ceq 'none-composable-source-cutover-complete') 'mir4-repository-migration-debt-class'
-Assert-MIR4RepositoryMigrationV1 (@($authority.migration_sequence).Count -eq 19) 'mir4-repository-migration-sequence-count'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.remaining_move.classification -ceq 'none-factorio-one-source-convergence-static-complete-engine-proof-required') 'mir4-repository-migration-debt-class'
+Assert-MIR4RepositoryMigrationV1 (@($authority.migration_sequence).Count -eq 20) 'mir4-repository-migration-sequence-count'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[0].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[1].migration_id -ceq 'MIR4-CANONICALIZATION-TOOLING-V1' -and [string]$authority.migration_sequence[1].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-canonicalization-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[2].migration_id -ceq 'MIR4-DIAGNOSTICS-TOOLING-V1' -and [string]$authority.migration_sequence[2].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-diagnostics-predecessor'
@@ -56,7 +57,8 @@ Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[14].migr
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[15].migration_id -ceq 'M41-03-CHANGE-AND-RELEASE-AUTHORITY-V1' -and [string]$authority.migration_sequence[15].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-m41-03-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[16].migration_id -ceq 'M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1' -and [string]$authority.migration_sequence[16].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-characterization-predecessor'
 Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[17].migration_id -ceq 'M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1' -and [string]$authority.migration_sequence[17].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-bridge-retirement-predecessor'
-Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[18].migration_id -ceq 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -and [string]$authority.migration_sequence[18].state -ceq 'current-append-only-successor') 'mir4-repository-migration-sequence-composable-source-successor'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[18].migration_id -ceq 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -and [string]$authority.migration_sequence[18].state -ceq 'accepted-immutable-predecessor') 'mir4-repository-migration-sequence-composable-source-predecessor'
+Assert-MIR4RepositoryMigrationV1 ([string]$authority.migration_sequence[19].migration_id -ceq 'MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2' -and [string]$authority.migration_sequence[19].authority -ceq 'governance/repository/factorio-one-source-convergence-v1.json' -and [string]$authority.migration_sequence[19].receipt -ceq 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json' -and [string]$authority.migration_sequence[19].state -ceq 'current-append-only-successor') 'mir4-repository-migration-sequence-factorio-one-successor'
 foreach ($root in @($authority.visible_roots)) {
   $marker = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path (([string]$root.path) + '/.mir-root.json')
   $expectedWritable = [string]$root.id -in @('changes','source','targets')
@@ -322,11 +324,11 @@ Assert-MIR4RepositoryMigrationV1 ([string]$sourceFreeze.package_source.predecess
 $sourceLayoutRaw=Get-Content -Raw -LiteralPath (Join-Path $repo 'assurance/repository/composable-source-layout-receipt-v1.json')
 Assert-MIR4RepositoryMigrationV1 ($sourceLayoutRaw|Test-Json -SchemaFile (Join-Path $repo 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json')) 'mir4-repository-migration-composable-source-schema'
 $sourceLayout=$sourceLayoutRaw|ConvertFrom-Json -Depth 100 -DateKind String
-$currentManifest=Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path 'source/package-source.json'
-$currentPackageAuthority=Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
 Assert-MIR4RepositoryMigrationV1 ((Test-MIR4BootstrapRecordHash -Record $sourceLayout)-and[string]$sourceLayout.predecessor.commit-ceq'92d563ada31e82430fbf25f639267b03a8a180d1'-and[string]$sourceLayout.predecessor.package_source_fingerprint_sha256-ceq'BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57'-and[string]$sourceLayout.predecessor.manifest_path-ceq'src/mod/package-source.json'-and[string]$sourceLayout.predecessor.manifest_record_sha256-ceq'8BDB2B9D3D63A5FBD49556609D6A7371B2BF11FA1D5F15BFD696E4C17EA3EF5E') 'mir4-repository-migration-composable-source-predecessor'
-Assert-MIR4RepositoryMigrationV1 ([string]$sourceLayout.current.source_root-ceq'source'-and[string]$sourceLayout.current.package_source_fingerprint_sha256-ceq$currentPackageSourceSha256-and[string]$sourceLayout.current.manifest.sha256-ceq[string]$currentManifest.record_sha256-and[string]$sourceLayout.current.package_authority.sha256-ceq[string]$currentPackageAuthority.record_sha256-and[int]$sourceLayout.relocation.binding_count-eq447-and[int]$sourceLayout.relocation.physical_source_count-eq439-and[bool]$sourceLayout.invariants.package_bytes_unchanged) 'mir4-repository-migration-composable-source-current'
+Assert-MIR4RepositoryMigrationV1 ([string]$sourceLayout.current.source_root-ceq'source'-and[string]$sourceLayout.current.package_source_fingerprint_sha256-ceq'7B0A39E3C5286624C8B6B272E32D1F6DE21F86FE91187E39AEF42FB80FCFC9ED'-and[string]$sourceLayout.current.manifest.sha256-ceq'A2B4251594A60EB52A1CC971C49F7B323CE545ADCA436D644BAB156EE7230178'-and[string]$sourceLayout.current.package_authority.sha256-ceq'B8A898ED53C212D7F58AB49A8F36445E9E0EB46638FD18D6F377CE11C1DBECE8'-and[int]$sourceLayout.relocation.binding_count-eq447-and[int]$sourceLayout.relocation.physical_source_count-eq439-and[bool]$sourceLayout.invariants.package_bytes_unchanged) 'mir4-repository-migration-composable-source-historical'
 Assert-MIR4RepositoryMigrationV1 ([bool]$sourceLayout.transition_gate.development_merge-and@($sourceLayout.transition_gate.PSObject.Properties|Where-Object{$_.Name-ne'development_merge'-and[bool]$_.Value}).Count-eq0) 'mir4-repository-migration-composable-source-release-firewall'
+ $sourceSuccession = Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo
+Assert-MIR4RepositoryMigrationV1 ([string]$sourceSuccession.current_package_source_sha256 -ceq $currentPackageSourceSha256 -and [bool]$sourceSuccession.factorio_one_exact_engine_proof_required -and -not [bool]$sourceSuccession.current_release_operations_authorized) 'mir4-repository-migration-factorio-one-current-successor'
 Assert-MIR4RepositoryMigrationV1 ([string]$receipt.package_source_sha256 -ceq 'F9E3F19201B5D660B24883168BBC43B0F06760FA272E33F1380AB6967D42EB0E') 'mir4-repository-migration-historical-package-fingerprint'
 
 $receiptDigest = Get-MIR4CanonicalDigestV1 -Value $receipt -Domain 'mir4:repository-migration-receipt:1' -OmitTopLevelDigest

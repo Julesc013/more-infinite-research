@@ -29,11 +29,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4RepositoryFixedPointAuthorityPath
   if ([int]$authority.schema -ne 2 -or [string]$authority.kind -cne 'MIR4RepositoryFixedPointV2') { throw '[mir4-repository-authority-schema]' }
-  if ([string]$authority.state -cne 'MIR42-COMPOSABLE-SOURCE-LAYOUT' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
+  if ([string]$authority.state -cne 'MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
     throw '[mir4-repository-cutover-boundary]'
   }
   if ([string]$authority.migration_authority -cne $script:MIR4RepositoryMigrationAuthorityPath) { throw '[mir4-repository-migration-authority-binding]' }
-  if (@($authority.migration_sequence).Count -ne 19 -or
+  if (@($authority.migration_sequence).Count -ne 20 -or
       [string]$authority.migration_sequence[0].migration_id -cne 'MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1' -or
       [string]$authority.migration_sequence[0].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[1].migration_id -cne 'MIR4-CANONICALIZATION-TOOLING-V1' -or
@@ -71,7 +71,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
       [string]$authority.migration_sequence[17].migration_id -cne 'M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1' -or
       [string]$authority.migration_sequence[17].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[18].migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
-      [string]$authority.migration_sequence[18].state -cne 'current-append-only-successor') {
+      [string]$authority.migration_sequence[18].state -cne 'accepted-immutable-predecessor' -or
+      [string]$authority.migration_sequence[19].migration_id -cne 'MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2' -or
+      [string]$authority.migration_sequence[19].authority -cne 'governance/repository/factorio-one-source-convergence-v1.json' -or
+      [string]$authority.migration_sequence[19].receipt -cne 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json' -or
+      [string]$authority.migration_sequence[19].state -cne 'current-append-only-successor') {
     throw '[mir4-repository-migration-sequence]'
   }
   $ids = @($authority.visible_roots | ForEach-Object { [string]$_.id })
@@ -146,7 +150,7 @@ function Get-MIR4RepositoryPathClass {
   if ($path -match '^(docs/|targets/|modules/|assurance/|changes/|releases/)') { return 'generated-projection' }
   if ($path -match '^(\.github/|tools/|scripts/|prototypes/|migrations/|locale/|source/)' -or $path -match '^(data|settings)(-updates|-final-fixes)?\.lua$' -or $path -eq 'control.lua') { return 'executable-source' }
   if ($path -match '^dist/' -or $path.EndsWith('.zip')) { return 'archive' }
-  if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','FORKING.md','GOVERNANCE.md','README.md','SECURITY.md','SUPPORT.md','LICENSE','todo.md')) { return 'normative-authority' }
+  if ($path -in @('.gitattributes','.gitignore','AGENTS.md','CONTRIBUTING.md','FORKING.md','GOVERNANCE.md','README.md','SECURITY.md','SUPPORT.md','LICENSE','TODO.md')) { return 'normative-authority' }
   if ($path -in @('docs/EXTENSION-PROTOCOL.md','docs/MAINTAINER-HANDOFF.md','docs/PROJECT-CONTINUITY.md','docs/RELEASE-RUNBOOK.md')) { return 'normative-authority' }
   return 'unknown'
 }

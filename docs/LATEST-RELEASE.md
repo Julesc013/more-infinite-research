@@ -16,7 +16,7 @@ source_of_truth_for:
 
 [Published GitHub release](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0). The nine public release assets are external custody bytes; a primary checkout may materialize verified local copies under `dist`, but a clean source checkout does not claim to contain them.
 
-> This file indexes immutable published 4.1.0 delivery only. It is not the live MIR 4.2 candidate or execution authority. Use the tracked [current-candidate view](releases/current-candidate.md) and [executable queue](../todo.md) for current development; a qualified 4.2 maintainer handoff belongs in `dist/playtest/`, not in this 4.1 index.
+> This file indexes immutable published 4.1.0 delivery only. It is not the live MIR 4.2 candidate or execution authority. Use the tracked [current-candidate view](releases/current-candidate.md) and [executable queue](../TODO.md) for current development; a qualified 4.2 maintainer handoff belongs in `dist/playtest/`, not in this 4.1 index.
 
 | Target | Verified local-delivery location when materialized | Mod Portal copy location when materialized |
 | --- | --- | --- |

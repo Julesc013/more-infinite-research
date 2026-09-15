@@ -193,7 +193,7 @@ if ($unclassified.Count -gt 0) {
 $forbiddenNames = @(".mir", ".codex", ".github", ".work", "docs", "fixtures", "scripts", "tests", "tools", "build", "dist")
 $forbidden = @($current.entries | Where-Object {
   $first = ($_.path.Replace("\", "/") -split "/", 2)[0]
-  $forbiddenNames -contains $first -or @("AGENTS.md", "CONTRIBUTING.md", "todo.md") -contains $_.path
+  $forbiddenNames -contains $first -or @("AGENTS.md", "CONTRIBUTING.md", "TODO.md") -contains $_.path
 } | ForEach-Object { $_.path })
 if ($forbidden.Count -gt 0) {
   $triggers.Add([pscustomobject][ordered]@{ kind = "repository-only-path"; paths = $forbidden })

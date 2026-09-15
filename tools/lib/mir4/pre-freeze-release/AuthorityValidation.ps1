@@ -1424,6 +1424,7 @@ function Test-MIR4PreFreezeAuthorities {
         [string]$supplyChain.predecessor.record_sha256 -cne [string]$controlExecutor.record_sha256) {
       throw '[mir4-prefreeze-m42-02-supply-chain-predecessor]'
     }
+    # MIR4-TODO-HISTORICAL-EXCEPTION: m42-02-supply-chain-enrollment-v1
     $supplyChainEnrollmentBaselines = @{
       'docs/releases/mir4-post-4.0-roadmap.md'='24E6D2555808C1C940102FAF56C22F71CEDEECE84BED18C4E7177FECF9D6C8D4'
       'spec/programmes/mir4-4x-operating-programme-v1.json'='15197FD8F9A6A47224C491B1AFAF9A334F380BB4A96F5301DB68D627E950F846'

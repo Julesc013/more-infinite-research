@@ -129,7 +129,7 @@ function Get-DocumentationFiles {
   if (Test-Path -LiteralPath $readmePath) {
     $files += Get-Item -LiteralPath $readmePath
   }
-  $todoPath = Join-Path $repo "todo.md"
+  $todoPath = Join-Path $repo "TODO.md"
   if (Test-Path -LiteralPath $todoPath) {
     $files += Get-Item -LiteralPath $todoPath
   }

@@ -5,14 +5,16 @@ paths:
   package.root: source
   package.targets: targets
   package.generated: build/packages
-  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v3.json
-  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
+  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v4.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
+  mir4.package-presentation.frozen-v3: spec/distribution/mir4-current-package-presentation-v3.json
+  mir4.package-presentation.frozen-v3-schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
   mir4.package-presentation.compatibility-reader: tools/lib/mir4/PackagePresentation.ps1
   mir4.package-presentation.frozen-v2: spec/distribution/mir4-current-package-presentation-v2.json
   mir4.package-presentation.frozen-v2-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
   mir4.package-presentation.frozen-v2-evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
   mir4.package-presentation.frozen-v2-verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
-  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority.ps1
+  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1
   mir4.a03.authority-observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
   mir4.a03.environment-lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
   mir4.a03.execution-proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json
@@ -147,6 +149,13 @@ paths:
   mir4.package-source.composable-layout-schema: contracts/repository/mir4-composable-source-layout-migration-v1.schema.json
   mir4.package-source.composable-layout-test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
   mir4.package-source.composable-layout-writer: tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1
+  mir4.package-source.factorio-one-convergence-authority: governance/repository/factorio-one-source-convergence-v1.json
+  mir4.package-source.factorio-one-convergence-receipt: assurance/repository/factorio-one-source-convergence-v1.json
+  mir4.package-source.factorio-one-convergence-authority-schema: contracts/repository/mir4-factorio-one-source-convergence-authority-v1.schema.json
+  mir4.package-source.factorio-one-convergence-receipt-schema: contracts/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json
+  mir4.package-source.factorio-one-convergence-application: tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1
+  mir4.package-source.factorio-one-convergence-writer: tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1
+  mir4.package-source.factorio-one-convergence-proof: tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1
   mir4.package-source.composable-predecessor-proof: tools/mir/application/package/SourceCompositionProof.ps1
   mir4.package-source.composable-predecessor-proof-schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
   mir4.release.m41-to-m42-composable-source-succession: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
@@ -154,6 +163,10 @@ paths:
   mir4.release.m41-to-m42-composable-source-succession-application: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
   mir4.release.m41-to-m42-composable-source-succession-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1
   mir4.release.m41-to-m42-composable-source-succession-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccession.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v2: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+  mir4.release.m41-to-m42-composable-source-succession-v2-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+  mir4.release.m41-to-m42-composable-source-succession-v2-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v2-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.historical-verifier: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1

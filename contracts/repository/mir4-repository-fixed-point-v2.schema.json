@@ -7,7 +7,7 @@
     "schema": {"const": 2},
     "kind": {"const": "MIR4RepositoryFixedPointV2"},
     "programme_id": {"type": "string", "minLength": 1},
-    "state": {"const": "MIR42-COMPOSABLE-SOURCE-LAYOUT"},
+    "state": {"const": "MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE"},
     "unknown_policy": {"const": "block-deletion-and-release"},
     "physical_cutover": {"const": true},
     "current_package_source_remains_authoritative": {"const": false},

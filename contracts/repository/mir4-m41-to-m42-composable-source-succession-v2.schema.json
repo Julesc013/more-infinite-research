@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "historical", "layout_successor", "factorio_one_successor", "current", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 2},
+    "kind": {"const": "MIR4M41ToM42ComposableSourceSuccessionV2"},
+    "status": {"const": "MIR41-HISTORICAL-SOURCE-FREEZE-PRESERVED-MIR42-FACTORIO-ONE-SOURCE-SUCCESSOR-VERIFIED"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "historical": {"$ref": "#/$defs/recordBinding"},
+    "layout_successor": {"$ref": "#/$defs/recordBinding"},
+    "factorio_one_successor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authority", "receipt"],
+      "properties": {"authority": {"$ref": "#/$defs/fileBinding"}, "receipt": {"$ref": "#/$defs/recordBinding"}}
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["fixed_point", "package_source_sha256", "package_authority", "tooling_inventory"],
+      "properties": {
+        "fixed_point": {"const": "MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE"},
+        "package_source_sha256": {"$ref": "#/$defs/sha256"},
+        "package_authority": {"$ref": "#/$defs/recordBinding"},
+        "tooling_inventory": {"$ref": "#/$defs/toolingInventoryBinding"}
+      }
+    },
+    "invariants": {
+      "type": "object", "additionalProperties": false,
+      "required": ["historical_mir41_lineage_immutable", "v1_layout_receipt_immutable", "factorio_one_static_convergence_proven", "package_bytes_unchanged", "factorio_two_presentation_content_changed", "factorio_two_executable_content_preserved", "factorio_one_semantic_content_changed", "factorio_one_exact_engine_proof_required", "current_mir41_release_operations_authorized"],
+      "properties": {
+        "historical_mir41_lineage_immutable": {"const": true}, "v1_layout_receipt_immutable": {"const": true}, "factorio_one_static_convergence_proven": {"const": true}, "package_bytes_unchanged": {"const": false}, "factorio_two_presentation_content_changed": {"const": true}, "factorio_two_executable_content_preserved": {"const": true}, "factorio_one_semantic_content_changed": {"const": true}, "factorio_one_exact_engine_proof_required": {"const": true}, "current_mir41_release_operations_authorized": {"const": false}
+      }
+    },
+    "transition_gate": {"$ref": "#/$defs/gates"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "fileBinding": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha256"}}},
+    "recordBinding": {"type": "object", "additionalProperties": false, "required": ["path", "kind", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "kind": {"type": "string", "minLength": 1}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "toolingInventoryBinding": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "hash_mode", "digest", "command_count", "unknown", "duplicate_command_keys"], "properties": {"path": {"const": "governance/automation/mir4-command-inventory-v1.json"}, "sha256": {"$ref": "#/$defs/sha256"}, "hash_mode": {"const": "canonical-text-v1"}, "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}, "command_count": {"const": 85}, "unknown": {"const": 0}, "duplicate_command_keys": {"const": 0}}},
+    "gates": {"type": "object", "additionalProperties": false, "required": ["development_merge", "private_build", "qualification", "technical_seal", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"], "properties": {"development_merge": {"const": true}, "private_build": {"const": false}, "qualification": {"const": false}, "technical_seal": {"const": false}, "main_promotion": {"const": false}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}}
+  }
+}

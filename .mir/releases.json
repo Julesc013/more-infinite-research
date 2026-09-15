@@ -116,7 +116,7 @@
   "views": {
     "backport_queue": "path:views.backport-queue",
     "branch_policy": ".mir/branches.yml",
-    "maintainer_queue": "todo.md",
+    "maintainer_queue": "TODO.md",
     "publication_checklist": "path:views.publication-checklist",
     "release_dashboard": "docs/releases/control-plane-dashboard.md"
   }

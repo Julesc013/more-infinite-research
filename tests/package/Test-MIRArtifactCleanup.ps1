@@ -19,8 +19,10 @@ $emptyAuditRoot = $null
 $allWorktreesFixtureRoot = $null
 $allWorktreesLinkedRoot = $null
 $allWorktreesFixtureGitDirectory = $null
+$wideDiscoveryFixtureRoot = $null
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
 $activeLeaseLock = $null
+$nestedCampaignLeaseLock = $null
 $gitEnvironmentNames = @(
   "GIT_INDEX_FILE", "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR",
   "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES"
@@ -62,11 +64,21 @@ try {
   $failedLeaseRun = Join-Path $testRoot "series/interrupted-lease-run"
   $orphanLeaseRun = Join-Path $testRoot "series/orphan-lease-run"
   $staleGuidTestRun = Join-Path $testRoot 'local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+  $pinnedGuidTestRun = Join-Path $testRoot 'local-delivery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+  $wideGuidTestRun = Join-Path $testRoot 'local-delivery/cccccccccccccccccccccccccccccccc'
   $scanBoundedTestRun = Join-Path $testRoot 'series/scan-bounded-run'
   $stalePackage = Join-Path $packageRoot "stale-package"
   $pinnedPackage = Join-Path $packageRoot "pinned-package"
   $staleCampaign = Join-Path $campaignRoot 'stale-campaign'
   $pinnedCampaign = Join-Path $campaignRoot 'pinned-campaign'
+  $activeLeaseCampaign = Join-Path $campaignRoot 'active-lease-campaign'
+  $ambiguousLeaseCampaign = Join-Path $campaignRoot 'ambiguous-lease-campaign'
+  $interruptedLeaseCampaign = Join-Path $campaignRoot 'interrupted-lease-campaign'
+  $terminalLeaseCampaign = Join-Path $campaignRoot 'terminal-lease-campaign'
+  $activeCampaignLeaseRun = Join-Path $activeLeaseCampaign 'candidate/inputs'
+  $ambiguousCampaignLeaseRun = Join-Path $ambiguousLeaseCampaign 'candidate/inputs'
+  $interruptedCampaignLeaseRun = Join-Path $interruptedLeaseCampaign 'candidate/inputs'
+  $terminalCampaignLeaseRun = Join-Path $terminalLeaseCampaign 'candidate/inputs'
   $developmentContracts = Join-Path $packageRoot 'development-contracts'
   $staleDevelopmentContract = Join-Path $developmentContracts '11111111111111111111111111111111'
   $recentDevelopmentContract = Join-Path $developmentContracts '22222222222222222222222222222222'
@@ -74,7 +86,7 @@ try {
   $nonCanonicalDevelopmentContract = Join-Path $developmentContracts 'legacy-expanded-output'
   $nestedNonCanonicalDevelopmentContract = Join-Path $nonCanonicalDevelopmentContract '66666666666666666666666666666666'
   $nestedReparseDevelopmentContract = Join-Path $developmentContracts '55555555555555555555555555555555'
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
@@ -83,9 +95,10 @@ try {
   "pinned evidence" | Set-Content -LiteralPath (Join-Path $pinnedTestRun "result.json") -Encoding UTF8
   "candidate" | Set-Content -LiteralPath (Join-Path $stalePackage "candidate.zip") -Encoding UTF8
   "pinned candidate" | Set-Content -LiteralPath (Join-Path $pinnedPackage "candidate-pin.json") -Encoding UTF8
-  New-Item -ItemType Directory -Path (Join-Path $staleGuidTestRun 'repo'), (Join-Path $staleGuidTestRun 'source'), (Join-Path $scanBoundedTestRun 'payload'), (Join-Path $pinnedCampaign 'nested') -Force | Out-Null
+  New-Item -ItemType Directory -Path (Join-Path $staleGuidTestRun 'repo'), (Join-Path $staleGuidTestRun 'source'), (Join-Path $pinnedGuidTestRun 'evidence/nested'), (Join-Path $wideGuidTestRun 'payload/one'), (Join-Path $wideGuidTestRun 'payload/two'), (Join-Path $wideGuidTestRun 'payload/three'), (Join-Path $wideGuidTestRun 'payload/four'), (Join-Path $scanBoundedTestRun 'payload'), (Join-Path $pinnedCampaign 'nested'), $activeCampaignLeaseRun, $ambiguousCampaignLeaseRun, $interruptedCampaignLeaseRun, $terminalCampaignLeaseRun -Force | Out-Null
   'copied repository fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'repo/fixture.txt') -Encoding UTF8
   'copied source fixture' | Set-Content -LiteralPath (Join-Path $staleGuidTestRun 'source/fixture.txt') -Encoding UTF8
+  'nested GUID evidence that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedGuidTestRun 'evidence/nested/candidate-pin.json') -Encoding UTF8
   '[path]' | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun 'config.ini') -Encoding UTF8
   1..4 | ForEach-Object { "payload $_" | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun ("payload/item-{0}.txt" -f $_)) -Encoding UTF8 }
   'campaign result that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedCampaign 'nested/result.json') -Encoding UTF8
@@ -102,12 +115,17 @@ try {
   ($receiptCapturedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $receiptCapturedLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
   $orphanLeaseLock = [IO.File]::Open((Join-Path $orphanLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
   $orphanLeaseLock.Dispose()
+  ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  '{ not valid JSON' | Set-Content -LiteralPath (Join-Path $ambiguousCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  ($receiptCapturedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $interruptedCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  $terminalLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-terminal';owner_pid=$null;state='completed'}
+  ($terminalLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $terminalCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
 
   $staleTimestamp = [DateTime]::UtcNow.AddDays(-10)
   New-Item -ItemType Directory -Path $nestedNonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract -Force | Out-Null
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedNonCanonicalDevelopmentContract 'result.txt') -Encoding UTF8
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedReparseDevelopmentContract 'result.txt') -Encoding UTF8
-  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
@@ -116,6 +134,7 @@ try {
     (Get-Item -LiteralPath $protectedPath).LastWriteTimeUtc = $staleTimestamp
   }
   $activeLeaseLock = [IO.File]::Open((Join-Path $activeLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  $nestedCampaignLeaseLock = [IO.File]::Open((Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
 
   $reparseTarget = Join-Path $fixtureRoot 'reparse-target'
   $reparseRun = Join-Path $artifactRoot 'reparse-run'
@@ -158,8 +177,14 @@ try {
     @{path='build/tests/series/interrupted-lease-run';status='interrupted-lease'},
     @{path='build/tests/series/orphan-lease-run';status='interrupted-lease'},
     @{path='build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';status='eligible'},
+    @{path='build/tests/local-delivery/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';status='pinned-custody'},
+    @{path='build/tests/local-delivery/cccccccccccccccccccccccccccccccc';status='eligible'},
     @{path='build/mir4/stale-campaign';status='eligible'},
     @{path='build/mir4/pinned-campaign';status='pinned-custody'},
+    @{path='build/mir4/active-lease-campaign';status='active-lease'},
+    @{path='build/mir4/ambiguous-lease-campaign';status='ambiguous-lease'},
+    @{path='build/mir4/interrupted-lease-campaign';status='interrupted-lease'},
+    @{path='build/mir4/terminal-lease-campaign';status='eligible'},
     @{path='build/packages/development-contracts/11111111111111111111111111111111';status='eligible'},
     @{path='build/packages/development-contracts/22222222222222222222222222222222';status='recent'},
     @{path='build/packages/development-contracts/33333333333333333333333333333333';status='pinned-reference'},
@@ -185,6 +210,14 @@ try {
   $scanBoundedPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType test -MaxScannedEntriesPerCandidate 2 -PassThru)
   if (@($scanBoundedPreview | Where-Object { $_.relative_path -ceq 'build/tests/series/scan-bounded-run' -and $_.status -ceq 'scan-budget-exceeded' }).Count -ne 1) {
     throw 'A bounded no-follow scan did not fail closed for an oversized test-run candidate.'
+  }
+
+  # A modestly wide GUID run must also stop before storing an unbounded set of
+  # child paths.  The discovery stack remains independent, so this exercises
+  # the per-candidate no-follow facts stack rather than the root discovery.
+  $wideStackPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType test -MaxScannedEntriesPerCandidate 64 -MaxPendingDirectoriesPerCandidate 2 -PassThru)
+  if (@($wideStackPreview | Where-Object { $_.relative_path -ceq 'build/tests/local-delivery/cccccccccccccccccccccccccccccccc' -and $_.status -ceq 'scan-budget-exceeded' }).Count -ne 1) {
+    throw 'A wide canonical GUID run did not fail closed before exceeding its bounded pending-directory stack.'
   }
 
   # The scanner reads only one bounded output path.  Deliberately lowering the
@@ -215,10 +248,10 @@ try {
 
   $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
   if (Test-Path -LiteralPath $staleRun) { throw "Applied cleanup retained the stale artifact." }
-  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $staleGuidTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleCampaign) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
+  if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $staleGuidTestRun) -or (Test-Path -LiteralPath $wideGuidTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleCampaign) -or (Test-Path -LiteralPath $terminalLeaseCampaign) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
   if (-not (Test-Path -LiteralPath $changingTestRun)) { throw 'Applied cleanup removed an artifact that received a write before apply.' }
-  foreach ($retained in @($pinnedTestRun, $pinnedPackage, $pinnedCampaign, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $reparseRun, $nestedReparseDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+  foreach ($retained in @($pinnedTestRun, $pinnedGuidTestRun, $pinnedPackage, $pinnedCampaign, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $reparseRun, $nestedReparseDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     if (-not (Test-Path -LiteralPath $retained)) { throw "Applied cleanup removed protected or unsafe state: $retained" }
   }
   if (-not (Test-Path -LiteralPath $protectedAssurance) -or -not (Test-Path -LiteralPath $protectedValidation)) {
@@ -230,7 +263,7 @@ try {
   if (@($applied | Where-Object { $_.relative_path -ceq 'build/results/stale-run' -and $_.status -eq "deleted" }).Count -ne 1) {
     throw "Applied cleanup did not report the stale artifact as deleted."
   }
-  foreach ($path in @('build/tests/series/stale-run', 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'build/packages/stale-package', 'build/mir4/stale-campaign', 'build/packages/development-contracts/11111111111111111111111111111111')) {
+  foreach ($path in @('build/tests/series/stale-run', 'build/tests/local-delivery/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'build/tests/local-delivery/cccccccccccccccccccccccccccccccc', 'build/packages/stale-package', 'build/mir4/stale-campaign', 'build/mir4/terminal-lease-campaign', 'build/packages/development-contracts/11111111111111111111111111111111')) {
     if (@($applied | Where-Object { $_.relative_path -ceq $path -and $_.status -ceq 'deleted' }).Count -ne 1) {
       throw "Apply did not preserve dry-run eligibility for $path."
     }
@@ -253,6 +286,25 @@ try {
   if (-not (@($emptyAuditOutput | Out-String) -match 'logical_size=0 B')) {
     throw 'A public empty-root artifact audit did not complete with an explicit zero-byte summary.'
   }
+
+  # Discovery uses a separate bounded path stack from facts collection.  Keep
+  # this fixture deliberately small while proving that a wide unmarked tree
+  # cannot enqueue beyond either the pending-directory or entry limit.
+  $wideDiscoveryFixtureRoot = Join-Path $tempRoot ("mir-artifact-cleanup-wide-discovery-{0}" -f [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $wideDiscoveryFixtureRoot -Force | Out-Null
+  & git -C $wideDiscoveryFixtureRoot init --quiet
+  if ($LASTEXITCODE -ne 0) { throw 'Unable to initialize the wide discovery fixture repository.' }
+  '/build/' | Set-Content -LiteralPath (Join-Path $wideDiscoveryFixtureRoot '.gitignore') -Encoding UTF8
+  $wideDiscoveryTestRoot = Join-Path $wideDiscoveryFixtureRoot 'build/tests/wide'
+  1..4 | ForEach-Object { New-Item -ItemType Directory -Path (Join-Path $wideDiscoveryTestRoot ("branch-{0}" -f $_)) -Force | Out-Null }
+  Get-ChildItem -LiteralPath (Join-Path $wideDiscoveryFixtureRoot 'build') -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
+  (Get-Item -LiteralPath (Join-Path $wideDiscoveryFixtureRoot 'build')).LastWriteTimeUtc = $staleTimestamp
+  $discoveryStackBoundCaught = $false
+  try { & $cleanupScript -RepoRoot $wideDiscoveryFixtureRoot -OlderThanDays 7 -ArtifactType test -MaxPendingCandidateDiscoveryDirectories 2 -PassThru | Out-Null } catch { $discoveryStackBoundCaught = $_.Exception.Message -match 'bounded 2-directory pending limit' }
+  if (-not $discoveryStackBoundCaught) { throw 'Candidate discovery did not stop before a modest wide tree exceeded its pending-directory stack.' }
+  $discoveryEntryBoundCaught = $false
+  try { & $cleanupScript -RepoRoot $wideDiscoveryFixtureRoot -OlderThanDays 7 -ArtifactType test -MaxCandidateDiscoveryEntries 2 -PassThru | Out-Null } catch { $discoveryEntryBoundCaught = $_.Exception.Message -match 'bounded 2-entry limit' }
+  if (-not $discoveryEntryBoundCaught) { throw 'Candidate discovery did not stop before a modest wide tree exceeded its entry budget.' }
 
   # Starting from a linked worktree must use Git's common directory to include
   # the primary checkout even when it was initialized with --separate-git-dir,
@@ -297,6 +349,7 @@ try {
   }
 } finally {
   if ($null -ne $activeLeaseLock) { $activeLeaseLock.Dispose() }
+  if ($null -ne $nestedCampaignLeaseLock) { $nestedCampaignLeaseLock.Dispose() }
   if (Test-Path -LiteralPath $fixtureRoot) {
     $resolvedFixture = [System.IO.Path]::GetFullPath($fixtureRoot)
     $tempPrefix = $tempRoot + [System.IO.Path]::DirectorySeparatorChar
@@ -316,6 +369,9 @@ try {
   }
   if ($null -ne $emptyAuditRoot -and (Test-Path -LiteralPath $emptyAuditRoot)) {
     Remove-Item -LiteralPath $emptyAuditRoot -Recurse -Force
+  }
+  if ($null -ne $wideDiscoveryFixtureRoot -and (Test-Path -LiteralPath $wideDiscoveryFixtureRoot)) {
+    Remove-Item -LiteralPath $wideDiscoveryFixtureRoot -Recurse -Force
   }
   foreach ($name in $gitEnvironmentNames) {
     if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }

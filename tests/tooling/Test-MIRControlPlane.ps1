@@ -13,9 +13,11 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Shadow", "Executor", "Release", "Calibration")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 $records = Assert-MIRCPRecords -RepoRoot $repo
-$info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
+$currentPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target f210
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $currentPackage -RelativePath 'info.json' | ConvertFrom-Json
 $verificationProfile = Read-MIRCPJson -Path "validation/profiles/factorio-$([string]$info.factorio_version).json" -RepoRoot $repo
 $developmentContext = [string]$verificationProfile.execution_context_mode -eq 'development-context'
 $freeze = Assert-MIRCPPackageFreeze -RepoRoot $repo -AllLocks:$AllPackageLocks -AllowDevelopmentWorkingTree:$developmentContext
@@ -133,7 +135,61 @@ try {
 
 $views = Update-MIRCPViews -RepoRoot $repo -Check
 if ([string]$views.status -ne "current") { throw "Control-plane generated views are not current." }
-$todoText = Get-Content -Raw -LiteralPath (Join-Path $repo 'todo.md')
+$trackedQueuePaths = @(& git -C $repo ls-files -- 'TODO.md' 'todo.md')
+if ($LASTEXITCODE -ne 0 -or $trackedQueuePaths.Count -ne 1 -or [string]$trackedQueuePaths[0] -cne 'TODO.md') {
+  throw 'The generated maintainer queue must be tracked with the canonical TODO.md spelling.'
+}
+$historicalTodoExceptions = @{
+  'tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1' = [pscustomobject][ordered]@{
+    marker = 'MIR4-TODO-HISTORICAL-EXCEPTION: m41-05b-documentation-cutover-v1'
+    occurrence_pattern = '(?m)^\s*''todo[.]md''=''generated-operating-queue''\s*$'
+  }
+  'tools/lib/mir4/pre-freeze-release/AuthorityValidation.ps1' = [pscustomobject][ordered]@{
+    marker = 'MIR4-TODO-HISTORICAL-EXCEPTION: m42-02-supply-chain-enrollment-v1'
+    occurrence_pattern = '(?m)^\s*''todo[.]md''=''D70A5B24BB7CEB42D3F541920E7DC4BE2C4095B263CC6FD25C72EAF692BA3BE2''\s*$'
+  }
+}
+function Assert-MIR4HistoricalTodoOccurrence {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$Text,
+    [Parameter(Mandatory)]$Exceptions
+  )
+  $matches = @([regex]::Matches($Text, '(?<![A-Za-z0-9])todo[.]md(?![A-Za-z0-9])'))
+  if ($matches.Count -eq 0) { return $false }
+  if (-not $Exceptions.ContainsKey($RelativePath)) {
+    throw "Current executable authority retains the retired lowercase todo.md path: $RelativePath"
+  }
+  $exception = $Exceptions[$RelativePath]
+  $markerMatches = @([regex]::Matches($Text, [regex]::Escape([string]$exception.marker)))
+  $approvedMatches = @([regex]::Matches($Text, [string]$exception.occurrence_pattern))
+  if ($matches.Count -ne 1 -or $markerMatches.Count -ne 1 -or $approvedMatches.Count -ne 1) {
+    throw "Historical lowercase todo.md exception is not occurrence-specific: $RelativePath"
+  }
+  return $true
+}
+$seenHistoricalTodoExceptions = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+Get-ChildItem -LiteralPath (Join-Path $repo 'tools') -Recurse -File -Filter '*.ps1' | ForEach-Object {
+  $relative = [IO.Path]::GetRelativePath($repo, $_.FullName).Replace('\', '/')
+  $text = Get-Content -Raw -LiteralPath $_.FullName
+  if (Assert-MIR4HistoricalTodoOccurrence -RelativePath $relative -Text $text -Exceptions $historicalTodoExceptions) {
+    [void]$seenHistoricalTodoExceptions.Add($relative)
+  }
+}
+if ($seenHistoricalTodoExceptions.Count -ne $historicalTodoExceptions.Count -or @($historicalTodoExceptions.Keys | Where-Object { -not $seenHistoricalTodoExceptions.Contains($_) }).Count -ne 0) {
+  throw 'A declared historical lowercase todo.md exception no longer identifies its sole retained historical occurrence.'
+}
+$syntheticHistoricalTodo = "# $($historicalTodoExceptions['tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1'].marker)`n  'todo.md'='generated-operating-queue'`n`$live_reader = 'todo.md'"
+$syntheticHistoricalTodoRejected = $false
+try {
+  Assert-MIR4HistoricalTodoOccurrence -RelativePath 'tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1' -Text $syntheticHistoricalTodo -Exceptions $historicalTodoExceptions | Out-Null
+} catch {
+  $syntheticHistoricalTodoRejected = $_.Exception.Message -eq 'Historical lowercase todo.md exception is not occurrence-specific: tools/commands/mir4/Update-MIR4M4105BDocumentationCutoverAuthority.ps1'
+}
+if (-not $syntheticHistoricalTodoRejected) {
+  throw 'A historical lowercase todo.md marker can hide an additional live reader.'
+}
+$todoText = Get-Content -Raw -LiteralPath (Join-Path $repo 'TODO.md')
 if ($todoText -notmatch '(?m)^## Active MIR 4\.x operating programme$' -or
     $todoText -notmatch '(?m)^## Historical MIR 4\.0 pre-freeze execution record$' -or
     $todoText -notmatch '\| `M42-00` \| `4\.1\.0` \| `complete` \|' -or

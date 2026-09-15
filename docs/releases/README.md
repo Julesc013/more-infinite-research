@@ -14,7 +14,7 @@ superseded_by: []
 
 The MIR 3 terminal `.9` family is sealed, GitHub-published, and verified. The [MIR 3 terminal `.9` programme](mir-3-terminal-dot-9-programme.md) remains the custody authority while Mod Portal upload/redownload evidence and EOL closure are completed. It routes every later MIR 3 correction to the matching `.9` line, prohibits `.6` through `.8`, and hands the completed programme to MIR 4.
 
-Machine-readable release authority lives in `.mir/releases/records/`, with current roles in `.mir/releases/records/current.json` and the wave decision in `.mir/releases/waves/MIR3-Terminal-ChangeSet.json`. Generated dashboards and `todo.md` are views, not independent release state.
+Machine-readable release authority lives in `.mir/releases/records/`, with current roles in `.mir/releases/records/current.json` and the wave decision in `.mir/releases/waves/MIR3-Terminal-ChangeSet.json`. Generated dashboards and `TODO.md` are views, not independent release state.
 
 ## Current terminal wave
 

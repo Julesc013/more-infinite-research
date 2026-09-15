@@ -223,9 +223,16 @@ package_excluded_modules:
     layout_migration_test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
     predecessor_proof: tools/mir/application/package/SourceCompositionProof.ps1
     predecessor_proof_schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
-    factorio_1_source_convergence_proof: tools/mir/application/package/FactorioOneSourceConvergence.ps1
+    factorio_1_source_convergence_proof_implementation: tools/mir/application/package/FactorioOneSourceConvergence.ps1
     factorio_1_source_convergence_test: tests/mir4/Test-MIR4FactorioOneSourceConvergenceM4202.ps1
     factorio_1_source_convergence_schema: spec/schemas/mir4-factorio-one-source-convergence-proof-v1.schema.json
+    factorio_1_convergence_authority: governance/repository/factorio-one-source-convergence-v1.json
+    factorio_1_convergence_authority_schema: contracts/repository/mir4-factorio-one-source-convergence-authority-v1.schema.json
+    factorio_1_convergence_receipt: assurance/repository/factorio-one-source-convergence-v1.json
+    factorio_1_convergence_receipt_schema: contracts/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json
+    factorio_1_convergence_application: tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1
+    factorio_1_convergence_writer: tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1
+    factorio_1_convergence_authority_proof: tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1
     package_visible: false
     editable_source_authority: true
     package_cutover_authority: true
@@ -252,6 +259,21 @@ package_excluded_modules:
     release_transition_authority: false
     historical_mir41_lineage_immutable: true
     current_mir41_release_operations_authorized: false
+  mir4_m41_to_m42_composable_source_succession_v2:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json
+    factorio_one_authority: governance/repository/factorio-one-source-convergence-v1.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    factorio_two_executable_content_preserved: true
+    factorio_one_exact_engine_proof_required: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1
@@ -425,9 +447,11 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v3.json
-    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
-    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v4.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
+    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1
+    frozen_package_presentation_v3: spec/distribution/mir4-current-package-presentation-v3.json
+    frozen_package_presentation_v3_schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
     frozen_package_presentation_v2: spec/distribution/mir4-current-package-presentation-v2.json
     frozen_package_presentation_v2_evolution_receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
     frozen_package_presentation_v2_verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
@@ -885,7 +909,7 @@ package_excluded_modules:
     generated_views:
       - .mir/releases/waves/mir4-r0/dashboard.json
       - .mir/releases/waves/mir4-r0/queue.json
-      - todo.md
+      - TODO.md
     validator: tests/mir4/Test-MIR4ReleaseReadinessReconciliation.ps1
     documentation: docs/maintainer/mir4-full-platform-closeout.md
     boundary: append-only reconciliation of historical queue and closeout records plus one current pre-freeze release cut, workflow maturity vocabulary, blocker authority, MIR 3 residual disposition, and generated execution queue; no source freeze, candidate allocation, signing, sealing, main mutation, tagging, publication, public compatibility claim, or component graduation authority

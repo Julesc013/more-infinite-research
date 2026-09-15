@@ -316,7 +316,7 @@ $repoLegacy = [pscustomobject]@{
   schema = 1
   generated_at = (Get-Date).ToString("o")
   root_policy = [pscustomobject]@{
-    todo_md_present = [bool](Test-Path -LiteralPath (Join-Path $repo "todo.md"))
+    todo_md_present = [bool](Test-Path -LiteralPath (Join-Path $repo "TODO.md"))
     dist_dir_present = [bool](Test-Path -LiteralPath (Join-Path $repo "dist"))
     artifacts_dir_present = [bool](Test-Path -LiteralPath (Join-Path $repo "artifacts"))
   }

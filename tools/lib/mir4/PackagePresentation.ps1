@@ -336,3 +336,138 @@ function Assert-MIR4CurrentPackagePresentationV3 {
   $v3 = Get-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot
   return Assert-MIR4CurrentPackagePresentationV3LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$v3.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
 }
+
+# V3 is a frozen receipt for the byte-preserving source-layout cutover.  The
+# later Factorio-1 semantic convergence deliberately changed the live package
+# authority, so V3 may be read as historical evidence but cannot represent the
+# live checkout.
+function Get-MIR4CurrentPackagePresentationV3Historical {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v3.json'
+  $raw = Get-Content -Raw -LiteralPath $path
+  $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4CurrentPackagePresentationV3Schema -Record $record -RepoRoot $repo) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10) -or
+      [string]$record.kind -cne 'MIR4CurrentPackagePresentationV3' -or
+      [string]$record.status -cne 'accepted-current-composable-source-package-presentation' -or
+      [string]$record.record_sha256 -cne '0E66F8BD58371E54BF3783200A73423703BCC539D9538526D1BEABA05C494790' -or
+      [string]$record.package_authority.record_sha256 -cne 'B8A898ED53C212D7F58AB49A8F36445E9E0EB46638FD18D6F377CE11C1DBECE8' -or
+      [string]$record.source_manifest.record_sha256 -cne 'A2B4251594A60EB52A1CC971C49F7B323CE545ADCA436D644BAB156EE7230178' -or
+      [string]$record.package_source.fingerprint_sha256 -cne '7B0A39E3C5286624C8B6B272E32D1F6DE21F86FE91187E39AEF42FB80FCFC9ED' -or
+      -not [bool]$record.authority_invariants.package_bytes_unchanged -or
+      [bool]$record.authority_invariants.gameplay_semantics_changed) {
+    throw '[mir4-package-presentation-v3-historical-binding]'
+  }
+  return $record
+}
+
+function Test-MIR4CurrentPackagePresentationV4Schema {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$RepoRoot)
+  try { return [bool]((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v4.schema.json') -ErrorAction Stop) } catch { return $false }
+}
+
+function Get-MIR4CurrentPackagePresentationV4Inputs {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1')
+  $v3 = Get-MIR4CurrentPackagePresentationV3Historical -RepoRoot $repo
+  $receipt = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo
+  Assert-MIR4FactorioOneSourceConvergenceReceiptCurrent -RepoRoot $repo -Receipt $receipt | Out-Null
+  $current = Get-MIR4FactorioOneSourceConvergenceCurrentAuthority -RepoRoot $repo
+  return [pscustomobject][ordered]@{v3=$v3;receipt=$receipt;current=$current}
+}
+
+function New-MIR4CurrentPackagePresentationV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-16T00:43:00+10:00')
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  $inputs = Get-MIR4CurrentPackagePresentationV4Inputs -RepoRoot $repo
+  $current = $inputs.current
+  $record = [pscustomobject][ordered]@{
+    schema = 1
+    kind = 'MIR4CurrentPackagePresentationV4'
+    status = 'accepted-current-factorio-one-source-convergence-package-presentation'
+    recorded_at = $RecordedAt
+    predecessor = [pscustomobject][ordered]@{path='spec/distribution/mir4-current-package-presentation-v3.json';kind=[string]$inputs.v3.kind;record_sha256=[string]$inputs.v3.record_sha256}
+    factorio_one_convergence = [pscustomobject][ordered]@{
+      authority = [pscustomobject][ordered]@{path='governance/repository/factorio-one-source-convergence-v1.json';sha256=(Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo 'governance/repository/factorio-one-source-convergence-v1.json'))}
+      receipt = [pscustomobject][ordered]@{path='assurance/repository/factorio-one-source-convergence-v1.json';kind=[string]$inputs.receipt.kind;record_sha256=[string]$inputs.receipt.record_sha256}
+      factorio_two_executable_content_proof = [pscustomobject][ordered]@{
+        kind = [string]$inputs.receipt.factorio_two_executable_content_proof.kind
+        status = [string]$inputs.receipt.factorio_two_executable_content_proof.status
+        baseline_revision = [string]$inputs.receipt.factorio_two_executable_content_proof.baseline_revision
+        record_sha256 = [string]$inputs.receipt.factorio_two_executable_content_proof.record_sha256
+      }
+    }
+    package_authority = $current.package_authority
+    source_manifest = [pscustomobject][ordered]@{path=[string]$current.manifest.path;kind=[string]$current.manifest.kind;state='canonical-composable-package-source';record_sha256=[string]$current.manifest.record_sha256}
+    package_source = [pscustomobject][ordered]@{fingerprint_sha256=[string]$current.package_source_fingerprint_sha256;materializer_abi='mir4-target-materializer/1';roots=@('source','targets');sole_writer=[string]$current.sole_writer;legacy_root_state='retired-historical-read-only'}
+    presentation = [pscustomobject][ordered]@{repository_readme_package_excluded=$true;target_readmes_manifest_bound=$true}
+    target_content_identities = @($inputs.receipt.target_content_identities)
+    authority_invariants = [pscustomobject][ordered]@{v3_receipt_immutable=$true;factorio_two_presentation_content_changed=$true;factorio_two_executable_content_preserved=$true;factorio_one_semantic_content_changed=$true;factorio_one_exact_engine_proof_required=$true;candidate_allocation_authorized=$false;signing_or_sealing_authorized=$false;promotion_authorized=$false;publication_authorized=$false;public_support_authorized=$false}
+    transition_gate = [pscustomobject][ordered]@{development_merge=$true;private_build=$false;qualification=$false;technical_seal=$false;main_promotion=$false;version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}
+    record_sha256 = ''
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  if (-not (Test-MIR4CurrentPackagePresentationV4Schema -Record $record -RepoRoot $repo)) { throw '[mir4-package-presentation-v4-schema]' }
+  return $record
+}
+
+function Get-MIR4CurrentPackagePresentationV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v4.json'
+  $raw = Get-Content -Raw -LiteralPath $path
+  $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4CurrentPackagePresentationV4Schema -Record $record -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10)) { throw '[mir4-package-presentation-v4-integrity]' }
+  $expected = New-MIR4CurrentPackagePresentationV4 -RepoRoot $repo -RecordedAt ([string]$record.recorded_at)
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) { throw '[mir4-package-presentation-v4-stale]' }
+  return $record
+}
+
+function Assert-MIR4CurrentPackagePresentationV4LiveFingerprint {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$StoredPackageSourceSha256,[Parameter(Mandatory)][string]$RequiredPackageSourceSha256)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $recomputed = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+  if ($StoredPackageSourceSha256 -notmatch '^[A-F0-9]{64}$' -or $RequiredPackageSourceSha256 -notmatch '^[A-F0-9]{64}$' -or $StoredPackageSourceSha256 -cne $RequiredPackageSourceSha256 -or $RequiredPackageSourceSha256 -cne $recomputed) { throw '[mir4-package-presentation-v4-live-fingerprint]' }
+  return $StoredPackageSourceSha256
+}
+
+function Assert-MIR4CurrentPackagePresentationV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
+  $record = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot
+  return Assert-MIR4CurrentPackagePresentationV4LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
+}
+
+# Current consumers deliberately route through V4.  V1--V3 remain available
+# only under their explicit historical reader names/contracts.
+function Get-MIR4CurrentPackageSourceSha256 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $record = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot
+  return Assert-MIR4CurrentPackagePresentationV4LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256)
+}
+
+# Compatibility entry points retain their names for existing package-excluded
+# consumers, but deliberately resolve the current authority through V4.  Use
+# Get-MIR4CurrentPackagePresentationV3Historical for the frozen V3 receipt.
+function Get-MIR4CurrentPackagePresentationV3 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  return Get-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot
+}
+
+function Assert-MIR4CurrentPackagePresentationV3LiveFingerprint {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$StoredPackageSourceSha256,[Parameter(Mandatory)][string]$RequiredPackageSourceSha256)
+  return Assert-MIR4CurrentPackagePresentationV4LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 $StoredPackageSourceSha256 -RequiredPackageSourceSha256 $RequiredPackageSourceSha256
+}
+
+function Assert-MIR4CurrentPackagePresentationV3 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
+  return Assert-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot -PackageSourceSha256 $PackageSourceSha256
+}

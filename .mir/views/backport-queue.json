@@ -3,7 +3,7 @@
   "candidate_id": "2.5-P15",
   "generated_from": [
     "path:releases.records/2.5.11.json",
-    ""
+    ".mir/releases/deltas/2.5.10-to-2.5.11.json"
   ],
   "release": "2.5.11",
   "remaining_obligations": [

@@ -306,3 +306,182 @@ function Assert-MIR441CurrentReleaseOperationAuthorized {
     throw "[mir441-current-release-operation-not-authorized] $Operation"
   }
 }
+
+# V1 is immutable historical evidence for the 447/439 byte-preserving layout
+# cutover.  It is deliberately not regenerated against later semantic source
+# changes; V2 below is the live current-successor contract.
+function Test-MIR4M41ToM42ComposableSourceSuccessionV1Historical {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42SourceSuccessionPolicy
+  $record = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.output_path -SchemaPath $policy.output_schema -Code 'mir4-m41-m42-succession-v1-historical'
+  if (-not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      [string]$record.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV1' -or
+      [string]$record.status -cne 'MIR41-HISTORICAL-SOURCE-FREEZE-PRESERVED-MIR42-COMPOSABLE-SUCCESSOR-VERIFIED' -or
+      [string]$record.current.fixed_point -cne 'MIR42-COMPOSABLE-SOURCE-LAYOUT' -or
+      [string]$record.current.package_source_sha256 -cne '7B0A39E3C5286624C8B6B272E32D1F6DE21F86FE91187E39AEF42FB80FCFC9ED' -or
+      -not [bool]$record.invariants.package_bytes_unchanged -or [bool]$record.invariants.gameplay_semantics_changed) {
+    throw '[mir4-m41-m42-succession-v1-historical-integrity]'
+  }
+  Assert-MIR4M41ToM42SourceSuccessionGate -Gate $record.transition_gate -Code 'mir4-m41-m42-succession-v1-historical-gate'
+  return [pscustomobject][ordered]@{status='passed-historical-mir41-to-mir42-composable-source-layout';record_sha256=[string]$record.record_sha256;release_authority=$false}
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy {
+  return [ordered]@{
+    output_path = 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json'
+    output_schema = 'contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json'
+    v1_path = 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json'
+    v1_schema = 'contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json'
+    layout_receipt_path = 'assurance/repository/composable-source-layout-receipt-v1.json'
+    layout_receipt_schema = 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
+    factorio_authority_path = 'governance/repository/factorio-one-source-convergence-v1.json'
+    factorio_receipt_path = 'assurance/repository/factorio-one-source-convergence-v1.json'
+    fixed_point_path = '.mir/control/repository-fixed-point.json'
+    fixed_point_schema = 'contracts/repository/mir4-repository-fixed-point-v2.schema.json'
+    tooling_inventory_path = 'governance/automation/mir4-command-inventory-v1.json'
+  }
+}
+
+function Read-MIR4M41ToM42ComposableSourceSuccessionV2 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy
+  return Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.output_path -SchemaPath $policy.output_schema -Code 'mir4-m41-m42-succession-v2-record'
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV2ToolingInventoryBinding {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy
+  $path = Join-Path $repo $policy.tooling_inventory_path
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw '[mir4-m41-m42-succession-v2-tooling-inventory-missing]'
+  }
+  try {
+    $inventory = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String
+  } catch {
+    throw '[mir4-m41-m42-succession-v2-tooling-inventory-json]'
+  }
+  if ([int]$inventory.schema -ne 1 -or
+      [string]$inventory.kind -cne 'MIR4CommandInventoryV1' -or
+      [string]$inventory.state -cne 'M42-01-CANONICAL' -or
+      [string]$inventory.digest -notmatch '^sha256:[a-f0-9]{64}$' -or
+      [int]$inventory.command_count -ne 85 -or
+      [int]$inventory.summary.unknown -ne 0 -or
+      [int]$inventory.summary.duplicate_command_keys -ne 0) {
+    throw '[mir4-m41-m42-succession-v2-tooling-inventory-invariants]'
+  }
+  return [pscustomobject][ordered]@{
+    path = $policy.tooling_inventory_path
+    sha256 = Get-MIR4BootstrapTextSha256 -Path $path
+    hash_mode = 'canonical-text-v1'
+    digest = [string]$inventory.digest
+    command_count = [int]$inventory.command_count
+    unknown = [int]$inventory.summary.unknown
+    duplicate_command_keys = [int]$inventory.summary.duplicate_command_keys
+  }
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV2Inputs {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy
+  . (Join-Path $repo 'tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1')
+
+  $v1 = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.v1_path -SchemaPath $policy.v1_schema -Code 'mir4-m41-m42-succession-v2-v1'
+  Test-MIR4M41ToM42ComposableSourceSuccessionV1Historical -RepoRoot $repo | Out-Null
+  $layout = Read-MIR4M41ToM42SourceSuccessionJson -RepoRoot $repo -RelativePath $policy.layout_receipt_path -SchemaPath $policy.layout_receipt_schema -Code 'mir4-m41-m42-succession-v2-layout'
+  if (-not (Test-MIR4BootstrapRecordHash -Record $layout) -or [string]$layout.record_sha256 -cne [string]$v1.current.layout_receipt.record_sha256) {
+    throw '[mir4-m41-m42-succession-v2-layout-binding]'
+  }
+  $factorio = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo
+  Assert-MIR4FactorioOneSourceConvergenceReceiptCurrent -RepoRoot $repo -Receipt $factorio | Out-Null
+  $current = Get-MIR4FactorioOneSourceConvergenceCurrentAuthority -RepoRoot $repo
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $factorio.current) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $current)) {
+    throw '[mir4-m41-m42-succession-v2-factorio-current-binding]'
+  }
+  $fixedPointRaw = Get-Content -Raw -LiteralPath (Join-Path $repo $policy.fixed_point_path)
+  $fixedPointValid = $false
+  try { $fixedPointValid = [bool]($fixedPointRaw | Test-Json -SchemaFile (Join-Path $repo $policy.fixed_point_schema) -ErrorAction Stop) } catch { $fixedPointValid = $false }
+  if (-not $fixedPointValid) { throw '[mir4-m41-m42-succession-v2-fixed-point-schema]' }
+  $fixedPoint = $fixedPointRaw | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$fixedPoint.state -cne 'MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE' -or
+      @($fixedPoint.migration_sequence | Where-Object { [string]$_.migration_id -ceq 'MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2' -and [string]$_.state -ceq 'current-append-only-successor' }).Count -ne 1) {
+    throw '[mir4-m41-m42-succession-v2-fixed-point]'
+  }
+  $toolingInventory = Get-MIR4M41ToM42ComposableSourceSuccessionV2ToolingInventoryBinding -RepoRoot $repo
+  return [pscustomobject][ordered]@{v1=$v1;layout=$layout;factorio=$factorio;current=$current;fixed_point=$fixedPoint;tooling_inventory=$toolingInventory}
+}
+
+function New-MIR4M41ToM42ComposableSourceSuccessionV2 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-16T00:43:00+10:00')
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy
+  $inputs = Get-MIR4M41ToM42ComposableSourceSuccessionV2Inputs -RepoRoot $repo
+  $record = [pscustomobject][ordered]@{
+    schema = 2
+    kind = 'MIR4M41ToM42ComposableSourceSuccessionV2'
+    status = 'MIR41-HISTORICAL-SOURCE-FREEZE-PRESERVED-MIR42-FACTORIO-ONE-SOURCE-SUCCESSOR-VERIFIED'
+    recorded_at = $RecordedAt
+    historical = [pscustomobject][ordered]@{path=$policy.v1_path;kind=[string]$inputs.v1.kind;record_sha256=[string]$inputs.v1.record_sha256}
+    layout_successor = [pscustomobject][ordered]@{path=$policy.layout_receipt_path;kind=[string]$inputs.layout.kind;record_sha256=[string]$inputs.layout.record_sha256}
+    factorio_one_successor = [pscustomobject][ordered]@{
+      authority = [pscustomobject][ordered]@{path=$policy.factorio_authority_path;sha256=(Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $policy.factorio_authority_path))}
+      receipt = [pscustomobject][ordered]@{path=$policy.factorio_receipt_path;kind=[string]$inputs.factorio.kind;record_sha256=[string]$inputs.factorio.record_sha256}
+    }
+    current = [pscustomobject][ordered]@{
+      fixed_point = 'MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE'
+      package_source_sha256 = [string]$inputs.current.package_source_fingerprint_sha256
+      package_authority = [pscustomobject][ordered]@{path=[string]$inputs.current.package_authority.path;kind=[string]$inputs.current.package_authority.kind;record_sha256=[string]$inputs.current.package_authority.record_sha256}
+      tooling_inventory = $inputs.tooling_inventory
+    }
+    invariants = [pscustomobject][ordered]@{
+      historical_mir41_lineage_immutable = $true
+      v1_layout_receipt_immutable = $true
+      factorio_one_static_convergence_proven = $true
+      package_bytes_unchanged = $false
+      factorio_two_presentation_content_changed = $true
+      factorio_two_executable_content_preserved = $true
+      factorio_one_semantic_content_changed = $true
+      factorio_one_exact_engine_proof_required = $true
+      current_mir41_release_operations_authorized = $false
+    }
+    transition_gate = [pscustomobject][ordered]@{development_merge=$true;private_build=$false;qualification=$false;technical_seal=$false;main_promotion=$false;version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}
+    record_sha256 = ''
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  $json = ConvertTo-MIR4BootstrapCanonicalJson -Value $record
+  if (-not ($json | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema))) { throw '[mir4-m41-m42-succession-v2-schema]' }
+  return $record
+}
+
+function Test-MIR4M41ToM42ComposableSourceSuccessionV2 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[object]$SuccessionRecord)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV2Policy
+  if ($null -eq $SuccessionRecord) { $SuccessionRecord = Read-MIR4M41ToM42ComposableSourceSuccessionV2 -RepoRoot $repo }
+  $schemaValid = $false
+  try { $schemaValid = [bool]((ConvertTo-MIR4BootstrapCanonicalJson -Value $SuccessionRecord) | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema) -ErrorAction Stop) } catch { $schemaValid = $false }
+  if (-not $schemaValid) { throw '[mir4-m41-m42-succession-v2-schema]' }
+  if (-not (Test-MIR4BootstrapRecordHash -Record $SuccessionRecord)) { throw '[mir4-m41-m42-succession-v2-hash]' }
+  $expected = New-MIR4M41ToM42ComposableSourceSuccessionV2 -RepoRoot $repo -RecordedAt ([string]$SuccessionRecord.recorded_at)
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $SuccessionRecord) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) { throw '[mir4-m41-m42-succession-v2-stale]' }
+  Assert-MIR4M41ToM42SourceSuccessionGate -Gate $SuccessionRecord.transition_gate -Code 'mir4-m41-m42-succession-v2-gate'
+  return [pscustomobject][ordered]@{status='passed-historical-mir41-to-current-mir42-factorio-one-source-succession';current_release_operations_authorized=$false;factorio_one_exact_engine_proof_required=$true;current_package_source_sha256=[string]$SuccessionRecord.current.package_source_sha256;tooling_inventory_digest=[string]$SuccessionRecord.current.tooling_inventory.digest;record_sha256=[string]$SuccessionRecord.record_sha256}
+}
+
+# The existing public function is intentionally routed to V2. Consumers that
+# need the byte-preserving layout receipt use the explicit HistoricalV1 name.
+function Test-MIR4M41ToM42ComposableSourceSuccession {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[object]$SuccessionRecord)
+  return Test-MIR4M41ToM42ComposableSourceSuccessionV2 -RepoRoot $RepoRoot -SuccessionRecord $SuccessionRecord
+}

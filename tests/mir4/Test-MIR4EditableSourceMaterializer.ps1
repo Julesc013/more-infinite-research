@@ -97,6 +97,9 @@ function Assert-MIR4EditableSourceRejected([scriptblock]$Action,[string]$Code){
   try{&$Action}catch{$rejected=$_.Exception.Message.Contains($Code)}
   if(-not$rejected){throw "[mir4-editable-source-negative] $Code"}
 }
+Assert-MIR4EditableSourceRejected {
+  New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId HISTORICAL-REJECT -SourceVersion '4.1.0' -OutputRoot 'build/packages/test-historical-rejection' | Out-Null
+} '[mir4-target-materializer-historical-source-version-requires-pinned-checkout]'
 $omissionState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f200')
 $omission=@($omissionState.composition.operations|Where-Object{[string]$_.operation-ceq'omit'}|Select-Object -First 1)
 if($omission.Count-ne1){throw '[mir4-editable-source-omission-fixture]'}

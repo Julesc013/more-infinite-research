@@ -135,12 +135,15 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
     $forbiddenPatterns = @(
       "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|artifacts|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
-      "^$([regex]::Escape($root))(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$",
+      "^$([regex]::Escape($root))(?i:AGENTS\.md|CONTRIBUTING\.md|TODO\.md)$",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
       "~$",
       "\.(tmp|bak|swp)$"
     )
+    if ("${root}TODO.md" -notmatch $forbiddenPatterns[1]) {
+      throw 'Package exclusion guard does not reject the canonical TODO.md queue.'
+    }
     $forbiddenEntries = @(
       foreach ($entryName in $entryNames) {
         foreach ($pattern in $forbiddenPatterns) {

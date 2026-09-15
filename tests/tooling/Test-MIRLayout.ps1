@@ -522,8 +522,8 @@ foreach ($wrapper in $validationCompatibilityTests) {
     throw "Validation test entrypoint is not a classified thin compatibility forwarder: $($wrapper.FullName.Substring($repo.Length + 1))"
   }
 }
-$registryText = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')
-if ($registryText -match 'validation[/\\]tests[/\\]') {
+$registry = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+if (@($registry.tests | Where-Object { $_.PSObject.Properties['command'] -and [string]$_.command -match '^[.]?[\\/]?validation[/\\]tests[/\\]' }).Count -ne 0) {
   throw 'Executable test registry still selects the validation compatibility namespace.'
 }
 $legacySchemaGlob = ("verification/" + "schema/**")

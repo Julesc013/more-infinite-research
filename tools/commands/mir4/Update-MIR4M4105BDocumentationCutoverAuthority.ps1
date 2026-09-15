@@ -92,6 +92,7 @@ $currentRoles = [ordered]@{
   'docs/reference/generated/stream-defaults.md'='generated-stream-defaults'
   'releases/governance/MIR4-Source-Changelog-PlanV1.json'='source-changelog-plan'
   'spec/programmes/mir4-4x-operating-programme-v1.json'='current-operating-programme'
+  # MIR4-TODO-HISTORICAL-EXCEPTION: m41-05b-documentation-cutover-v1
   'todo.md'='generated-operating-queue'
   'tools/commands/docs/Update-MIRPipelineDocumentation.ps1'='runtime-pipeline-writer'
   'tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1'='stream-default-writer'

@@ -21,6 +21,8 @@
     "assurance/repository/historical-tooling-v1.json",
     "assurance/repository/release-tooling-v1.json",
     "assurance/repository/composable-source-layout-v1.json",
+    "assurance/repository/factorio-one-source-convergence-v1.json",
+    "assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json",
     "tools/lib/assurance",
     "validation",
     ".mir/control-plane"

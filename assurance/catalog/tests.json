@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 183,
+  "test_count": 186,
   "tests": [
     {
       "id": "docs.check",
@@ -2510,6 +2510,42 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-current-package-presentation-v4",
+      "proposition": "The governed test 'static.mir4-current-package-presentation-v4' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV4.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4CurrentPackagePresentationV4.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v4.json",
+        "spec/schemas/mir4-current-package-presentation-v4.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v3.json",
+        "governance/repository/factorio-one-source-convergence-v1.json",
+        "assurance/repository/factorio-one-source-convergence-v1.json",
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "targets/registry.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV4.ps1",
+        "repository"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-current-product-bridge-retirement-m41",
       "proposition": "The governed test 'static.mir4-current-product-bridge-retirement-m41' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -3121,6 +3157,41 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-factorio-one-source-convergence",
+      "proposition": "The governed test 'static.mir4-factorio-one-source-convergence' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "governance/repository/factorio-one-source-convergence-v1.json",
+        "assurance/repository/factorio-one-source-convergence-v1.json",
+        "contracts/repository/mir4-factorio-one-source-convergence-authority-v1.schema.json",
+        "contracts/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json",
+        "tools/mir/application/package/FactorioOneSourceConvergence.ps1",
+        "tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1",
+        "tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1",
+        "tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1",
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "targets/registry.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "repository"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-final-programme-reconciliation",
       "proposition": "The governed test 'static.mir4-final-programme-reconciliation' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -3689,6 +3760,40 @@
         "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1",
         "tests/release/Test-MIR4M41ToM42ComposableSourceSuccession.ps1",
         "package-source"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-m41-to-m42-composable-source-succession-v2",
+      "proposition": "The governed test 'static.mir4-m41-to-m42-composable-source-succession-v2' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1",
+      "canonical_implementation": "tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json",
+        "assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json",
+        "contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json",
+        "contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json",
+        "governance/repository/factorio-one-source-convergence-v1.json",
+        "assurance/repository/factorio-one-source-convergence-v1.json",
+        ".mir/control/repository-fixed-point.json",
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1",
+        "tools/mir/application/release/readiness/ComposableSourceSuccession.ps1",
+        "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1",
+        "tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1",
+        "repository"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -6684,13 +6789,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 63,
-      "tooling-release": 50,
-      "runtime-upgrade": 38,
+      "package-repository": 64,
+      "tooling-release": 51,
+      "runtime-upgrade": 39,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 171,
+    "canonical_test_commands": 174,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -6703,5 +6808,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1426b6d15de8d0f1370e167d996c7e18fed1903b0ab5c4f5aaf885a8fa1dec1b"
+  "digest": "sha256:c19762e35980f4778ccb0ec79905e1b949d8a7e34523b5ec970d7a154cb5a06a"
 }

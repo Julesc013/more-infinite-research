@@ -122,7 +122,7 @@ $date=Get-MIRCPAuthoredDate -Timestamp $authored.recorded_at
 if($date -cne $p.recorded_at.Substring(0,10)) { throw '[synthesis-authored-date]' }
 if((Get-MIRCPAuthoredDate -Timestamp '2026-09-06T00:00:00+10:00') -cne '2026-09-06' -or
    (Get-MIRCPAuthoredDate -Timestamp '2026-09-05T14:00:00Z') -cne '2026-09-05') { throw '[synthesis-timezone-regression]' }
-if(@(Get-Content -LiteralPath (Join-Path $RepoRoot 'todo.md') | Where-Object { $_ -ceq "Generated: $date" }).Count -ne 1) { throw '[synthesis-queue-date]' }
+if(@(Get-Content -LiteralPath (Join-Path $RepoRoot 'TODO.md') | Where-Object { $_ -ceq "Generated: $date" }).Count -ne 1) { throw '[synthesis-queue-date]' }
 
 # Development outcomes are exact historical source/receipt bindings, never support authority.
 function Assert-MIR4CommunitySafeRelativePath([string]$RelativePath) {

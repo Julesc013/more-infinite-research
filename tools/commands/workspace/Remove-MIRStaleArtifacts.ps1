@@ -11,6 +11,18 @@ param(
   # preview into an unbounded metadata scan.
   [ValidateRange(1, 10000000)]
   [int]$MaxScannedEntriesPerCandidate = 250000,
+  # A scan entry cap alone does not prevent a wide directory from retaining
+  # that many child paths before any are processed.  Bound the pending path
+  # stack independently and fail closed before adding another child path.
+  [ValidateRange(1, 1000000)]
+  [int]$MaxPendingDirectoriesPerCandidate = 8192,
+  # Candidate discovery has a separate path stack from the per-candidate
+  # facts scan.  Keep it bounded too: no cleanup may proceed after an
+  # incomplete recursive discovery pass.
+  [ValidateRange(1, 1000000)]
+  [int]$MaxPendingCandidateDiscoveryDirectories = 8192,
+  [ValidateRange(1, 10000000)]
+  [int]$MaxCandidateDiscoveryEntries = 250000,
   [ValidateRange(1, 3600)]
   [int]$MaxAuditSeconds = 90,
   [ValidateRange(16, 1048576)]
@@ -59,7 +71,7 @@ $artifactRootDefinitions = @(@(
   # an ownership boundary, not an invitation to individually inspect every
   # file in a copied repo/source fixture.  The contents are still walked once
   # no-follow before that exact leaf can be selected for deletion.
-  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false; canonical_guid_run_boundary = $true; scan_descendant_custody = $false },
+  [pscustomobject]@{ relative_path = 'build/tests'; artifact_type = 'test'; direct_children_only = $false; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false; canonical_guid_run_boundary = $true; scan_descendant_custody = $true },
   [pscustomobject]@{ relative_path = 'build/packages'; artifact_type = 'package'; direct_children_only = $true; excluded_child_names = @('development-contracts'); non_pinning_custody_markers = @(); check_tracked_reference = $false; canonical_guid_leaf_only = $false; canonical_guid_run_boundary = $false; scan_descendant_custody = $false },
   # Development-contract package expansion is an implementation detail of one
   # deterministic test.  Its only disposable children are the 32-hex run
@@ -252,10 +264,15 @@ function Get-MIRArtifactCandidates {
   )
 
   $rootItem = Get-Item -LiteralPath $ArtifactRoot -Force
+  $discoveryEntryCount = [long]0
   if ($Definition.direct_children_only) {
     foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
       Assert-MIRArtifactAuditBudget
       Write-MIRArtifactAuditProgress
+      if ($discoveryEntryCount -ge $MaxCandidateDiscoveryEntries) {
+        throw "Artifact candidate discovery reached its bounded $MaxCandidateDiscoveryEntries-entry limit before completing $($Definition.relative_path); no removal was attempted. Narrow the artifact type or raise -MaxCandidateDiscoveryEntries after reviewing the tree."
+      }
+      $discoveryEntryCount++
       $item = Get-Item -LiteralPath $path -Force
       if ($item.Name -in @($Definition.excluded_child_names)) { continue }
       [pscustomobject]@{
@@ -274,6 +291,10 @@ function Get-MIRArtifactCandidates {
   foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($rootItem.FullName)) {
     Assert-MIRArtifactAuditBudget
     Write-MIRArtifactAuditProgress
+    if ($discoveryEntryCount -ge $MaxCandidateDiscoveryEntries) {
+      throw "Artifact candidate discovery reached its bounded $MaxCandidateDiscoveryEntries-entry limit before completing $($Definition.relative_path); no removal was attempted. Narrow the artifact type or raise -MaxCandidateDiscoveryEntries after reviewing the tree."
+    }
+    $discoveryEntryCount++
     $item = Get-Item -LiteralPath $path -Force
     if (-not $item.PSIsContainer -or
         ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
@@ -281,6 +302,9 @@ function Get-MIRArtifactCandidates {
         (Test-MIRArtifactRunBoundary -Definition $Definition -Item $item)) {
       [pscustomobject]@{ item = $item; boundary = 'run-or-file'; canonical_candidate = $true }
       continue
+    }
+    if ($pendingDirectories.Count -ge $MaxPendingCandidateDiscoveryDirectories) {
+      throw "Artifact candidate discovery reached its bounded $MaxPendingCandidateDiscoveryDirectories-directory pending limit before completing $($Definition.relative_path); no removal was attempted. Narrow the artifact type or raise -MaxPendingCandidateDiscoveryDirectories after reviewing the tree."
     }
     $pendingDirectories.Push($item.FullName)
   }
@@ -298,6 +322,10 @@ function Get-MIRArtifactCandidates {
         Assert-MIRArtifactAuditBudget
         Write-MIRArtifactAuditProgress
         $hasChild = $true
+        if ($discoveryEntryCount -ge $MaxCandidateDiscoveryEntries) {
+          throw "Artifact candidate discovery reached its bounded $MaxCandidateDiscoveryEntries-entry limit before completing $($Definition.relative_path); no removal was attempted. Narrow the artifact type or raise -MaxCandidateDiscoveryEntries after reviewing the tree."
+        }
+        $discoveryEntryCount++
         $item = Get-Item -LiteralPath $path -Force
         if (-not $item.PSIsContainer -or
             ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
@@ -306,9 +334,13 @@ function Get-MIRArtifactCandidates {
           [pscustomobject]@{ item = $item; boundary = 'run-or-file'; canonical_candidate = $true }
           continue
         }
+        if ($pendingDirectories.Count -ge $MaxPendingCandidateDiscoveryDirectories) {
+          throw "Artifact candidate discovery reached its bounded $MaxPendingCandidateDiscoveryDirectories-directory pending limit before completing $($Definition.relative_path); no removal was attempted. Narrow the artifact type or raise -MaxPendingCandidateDiscoveryDirectories after reviewing the tree."
+        }
         $pendingDirectories.Push($item.FullName)
       }
     } catch {
+      if ($_.Exception.Message -like 'Artifact candidate discovery reached its bounded *') { throw }
       [pscustomobject]@{ item = $directoryItem; boundary = 'unreadable-directory'; canonical_candidate = $true }
       continue
     }
@@ -322,6 +354,7 @@ function Get-MIRArtifactItemFacts {
   param(
     [Parameter(Mandatory)][System.IO.FileSystemInfo]$Item,
     [switch]$InspectDescendantCustody,
+    [switch]$InspectDescendantLeases,
     [string[]]$IgnoreCustodyMarkerNames = @()
   )
 
@@ -332,16 +365,26 @@ function Get-MIRArtifactItemFacts {
     has_reparse_point = $false
     scan_error = $null
     scan_budget_exceeded = $false
+    scan_stack_budget_exceeded = $false
+    scan_budget_reason = $null
     scan_skipped = $false
     scan_entry_count = [long]0
     descendant_custody_marker = $null
+    descendant_lease = $null
   }
 
-  # Hold only directory paths, not one FileSystemInfo object for every entry
-  # in a copied mod library.  A wide `mods` directory used to materialize its
-  # complete child list before processing any member, consuming memory and
-  # creating a plan row for every file below an unrecognised test run.
+  # Hold only a bounded number of directory paths, never a FileSystemInfo
+  # object for every entry in a copied mod library.  Register every child
+  # before it can enter the stack: a wide `mods` directory must fail closed
+  # rather than accumulating unbounded paths before processing any member.
   $pendingDirectories = [Collections.Generic.Stack[string]]::new()
+  if ($pendingDirectories.Count -ge $MaxPendingDirectoriesPerCandidate) {
+    $facts.scan_budget_exceeded = $true
+    $facts.scan_stack_budget_exceeded = $true
+    $facts.scan_budget_reason = "no-follow scan reached its bounded $MaxPendingDirectoriesPerCandidate-directory pending limit"
+    return [pscustomobject]$facts
+  }
+  $facts.scan_entry_count++
   $pendingDirectories.Push($Item.FullName)
   while ($pendingDirectories.Count -gt 0) {
     Assert-MIRArtifactAuditBudget
@@ -351,11 +394,6 @@ function Get-MIRArtifactItemFacts {
       $current = Get-Item -LiteralPath $currentPath -Force
     } catch {
       $facts.scan_error = $_.Exception.Message
-      break
-    }
-    $facts.scan_entry_count++
-    if ($facts.scan_entry_count -gt $MaxScannedEntriesPerCandidate) {
-      $facts.scan_budget_exceeded = $true
       break
     }
     if ($current.LastWriteTimeUtc -gt $facts.latest_write_utc) { $facts.latest_write_utc = $current.LastWriteTimeUtc }
@@ -377,6 +415,12 @@ function Get-MIRArtifactItemFacts {
       foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($current.FullName)) {
         Assert-MIRArtifactAuditBudget
         Write-MIRArtifactAuditProgress
+        if ($facts.scan_entry_count -ge $MaxScannedEntriesPerCandidate) {
+          $facts.scan_budget_exceeded = $true
+          $facts.scan_budget_reason = "no-follow scan exceeded the bounded $MaxScannedEntriesPerCandidate-entry per-candidate limit"
+          break
+        }
+        $facts.scan_entry_count++
         try {
           $child = Get-Item -LiteralPath $path -Force
         } catch {
@@ -385,22 +429,18 @@ function Get-MIRArtifactItemFacts {
         }
         if ($child.LastWriteTimeUtc -gt $facts.latest_write_utc) { $facts.latest_write_utc = $child.LastWriteTimeUtc }
         if (($child.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
-          $facts.scan_entry_count++
-          if ($facts.scan_entry_count -gt $MaxScannedEntriesPerCandidate) {
-            $facts.scan_budget_exceeded = $true
-            break
-          }
           $facts.has_reparse_point = $true
           continue
         }
         if ($child.PSIsContainer) {
+          if ($pendingDirectories.Count -ge $MaxPendingDirectoriesPerCandidate) {
+            $facts.scan_budget_exceeded = $true
+            $facts.scan_stack_budget_exceeded = $true
+            $facts.scan_budget_reason = "no-follow scan reached its bounded $MaxPendingDirectoriesPerCandidate-directory pending limit"
+            break
+          }
           $pendingDirectories.Push($child.FullName)
           continue
-        }
-        $facts.scan_entry_count++
-        if ($facts.scan_entry_count -gt $MaxScannedEntriesPerCandidate) {
-          $facts.scan_budget_exceeded = $true
-          break
         }
         $facts.logical_bytes = [long]$facts.logical_bytes + [long]$child.Length
         $facts.file_count = [long]$facts.file_count + 1
@@ -409,6 +449,9 @@ function Get-MIRArtifactItemFacts {
             $child.Name -notin $IgnoreCustodyMarkerNames) {
           $facts.descendant_custody_marker = $child.Name
         }
+        if ($InspectDescendantLeases -and $child.Name -in @('mir-immutable-input-lease.json', 'mir-immutable-input-lease.lock')) {
+          Add-MIRArtifactDescendantLeaseFact -Facts $facts -LeasePath $child.FullName
+        }
       }
     } catch {
       $facts.scan_error = $_.Exception.Message
@@ -416,6 +459,51 @@ function Get-MIRArtifactItemFacts {
     if ($null -ne $facts.scan_error -or $facts.scan_budget_exceeded) { break }
   }
   return [pscustomobject]$facts
+}
+
+function Get-MIRArtifactLeaseProtectionStatus {
+  param($Lease)
+
+  if ($null -eq $Lease -or -not [bool]$Lease.present) { return $null }
+  if ([bool]$Lease.active) { return 'active-lease' }
+  if ([bool]$Lease.ambiguous) { return 'ambiguous-lease' }
+  if ([string]$Lease.state -in @('active', 'staging', 'receipt-captured', 'staging-failed', 'failed', 'missing-record')) {
+    return 'interrupted-lease'
+  }
+  return $null
+}
+
+function Add-MIRArtifactDescendantLeaseFact {
+  param(
+    [Parameter(Mandatory)][Collections.IDictionary]$Facts,
+    [Parameter(Mandatory)][string]$LeasePath
+  )
+
+  # Keep the first cleanup-blocking result.  A valid, unlocked terminal lease
+  # is intentionally not a custody pin, but any live, corrupt, ambiguous, or
+  # interrupted nested lease prevents campaign removal.  Probe through the
+  # shared liveness helper rather than inferring state from a filename.
+  if ($null -ne $Facts['descendant_lease']) { return }
+  try {
+    $lease = Get-MIRImmutableInputLeaseLiveness -RunRoot (Split-Path -Parent $LeasePath)
+  } catch {
+    $lease = [pscustomobject]@{
+      present = $true
+      active = $false
+      ambiguous = $true
+      state = 'invalid'
+      reason = "could not inspect nested immutable-input lease: $($_.Exception.Message)"
+      record = $null
+    }
+  }
+  $status = Get-MIRArtifactLeaseProtectionStatus -Lease $lease
+  if ($null -eq $status) { return }
+  $Facts['descendant_lease'] = [pscustomobject]@{
+    path = $LeasePath
+    status = $status
+    state = [string]$lease.state
+    reason = [string]$lease.reason
+  }
 }
 
 function Get-MIRArtifactCustodyMarker {
@@ -638,6 +726,7 @@ function Get-MIRArtifactRow {
   $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $item.FullName).Replace('\', '/')
   $isProtected = $item.PSIsContainer -and $item.Name -in $protectedNames
   $lease = if ($item.PSIsContainer) { Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName } else { $null }
+  $leaseStatus = Get-MIRArtifactLeaseProtectionStatus -Lease $lease
   $trackedReference = if ([bool]$Definition.check_tracked_reference) { Get-MIRArtifactTrackedReference -ReferenceWorktreeRoots $ReferenceWorktreeRoots -RelativePath $relativePath -ReferenceIndex $ReferenceIndex } else { $null }
   $custodyMarker = if ($isProtected -or ($null -ne $lease -and ($lease.active -or $lease.ambiguous))) { $null } else { Get-MIRArtifactCustodyMarker -Item $item -IgnoreNames @($Definition.non_pinning_custody_markers) }
   $facts = $null
@@ -651,12 +740,8 @@ function Get-MIRArtifactRow {
     $status = 'unsafe-inspection'; $reason = 'could not inspect tracked references'
   } elseif (-not [string]::IsNullOrWhiteSpace([string]$trackedReference)) {
     $status = 'pinned-reference'; $reason = "tracked reference: $trackedReference"
-  } elseif ($null -ne $lease -and $lease.active) {
-    $status = 'active-lease'; $reason = $lease.reason
-  } elseif ($null -ne $lease -and $lease.ambiguous) {
-    $status = 'ambiguous-lease'; $reason = $lease.reason
-  } elseif ($null -ne $lease -and $lease.present -and $lease.state -in @('active', 'staging', 'receipt-captured', 'staging-failed', 'failed', 'missing-record')) {
-    $status = 'interrupted-lease'; $reason = $lease.reason
+  } elseif ($null -ne $leaseStatus) {
+    $status = $leaseStatus; $reason = $lease.reason
   } elseif ($custodyMarker -ceq '__unsafe-inspection__') {
     $status = 'unsafe-inspection'; $reason = 'could not inspect direct custody markers'
   } elseif ($null -ne $custodyMarker) {
@@ -674,13 +759,15 @@ function Get-MIRArtifactRow {
     # deletion.
     $status = 'recent'; $reason = 'candidate root is newer than retention cutoff'
   } else {
-    $facts = Get-MIRArtifactItemFacts -Item $item -InspectDescendantCustody:([bool]$Definition.scan_descendant_custody) -IgnoreCustodyMarkerNames @($Definition.non_pinning_custody_markers)
+    $facts = Get-MIRArtifactItemFacts -Item $item -InspectDescendantCustody:([bool]$Definition.scan_descendant_custody) -InspectDescendantLeases:([string]$Definition.artifact_type -ceq 'campaign') -IgnoreCustodyMarkerNames @($Definition.non_pinning_custody_markers)
     if ($null -ne $facts.scan_error) {
       $status = 'unsafe-inspection'; $reason = $facts.scan_error
     } elseif ($facts.has_reparse_point) {
       $status = 'unsafe-reparse'; $reason = 'reparse point encountered during no-follow traversal'
+    } elseif ($null -ne $facts.descendant_lease) {
+      $status = $facts.descendant_lease.status; $reason = "nested immutable-input lease ($($facts.descendant_lease.state)): $($facts.descendant_lease.reason)"
     } elseif ($facts.scan_budget_exceeded) {
-      $status = 'scan-budget-exceeded'; $reason = "no-follow scan exceeded the bounded $MaxScannedEntriesPerCandidate-entry per-candidate limit"
+      $status = 'scan-budget-exceeded'; $reason = $facts.scan_budget_reason
     } elseif (-not [string]::IsNullOrWhiteSpace([string]$facts.descendant_custody_marker)) {
       $status = 'pinned-custody'; $reason = "descendant custody marker: $($facts.descendant_custody_marker)"
     } elseif ($facts.latest_write_utc -gt $cutoff) {
@@ -690,7 +777,7 @@ function Get-MIRArtifactRow {
     }
   }
   if ($null -eq $facts) {
-    $facts = [pscustomobject]@{ logical_bytes = [long]0; file_count = [long]0; latest_write_utc = $item.LastWriteTimeUtc; has_reparse_point = $false; scan_error = $null; scan_budget_exceeded = $false; scan_skipped = $true; scan_entry_count = [long]0; descendant_custody_marker = $null }
+    $facts = [pscustomobject]@{ logical_bytes = [long]0; file_count = [long]0; latest_write_utc = $item.LastWriteTimeUtc; has_reparse_point = $false; scan_error = $null; scan_budget_exceeded = $false; scan_stack_budget_exceeded = $false; scan_budget_reason = $null; scan_skipped = $true; scan_entry_count = [long]0; descendant_custody_marker = $null; descendant_lease = $null }
   }
   return [pscustomobject]@{
     worktree = Split-Path -Leaf $WorktreeRoot
@@ -761,7 +848,7 @@ function Assert-MIRArtifactEligibleForDeletion {
   }
   if ($item.PSIsContainer) {
     $lease = Get-MIRImmutableInputLeaseLiveness -RunRoot $item.FullName
-    if ($lease.active -or $lease.ambiguous -or ($lease.present -and $lease.state -in @('active', 'staging', 'receipt-captured', 'staging-failed', 'failed', 'missing-record'))) {
+    if ($null -ne (Get-MIRArtifactLeaseProtectionStatus -Lease $lease)) {
       throw "Cleanup target has a live, ambiguous, or interrupted lease: $fullPath"
     }
   }
@@ -775,12 +862,15 @@ function Assert-MIRArtifactEligibleForDeletion {
   if ($null -ne (Get-MIRArtifactCustodyMarker -Item $item -IgnoreNames @($Definition.non_pinning_custody_markers))) {
     throw "Cleanup target acquired a direct custody marker after audit: $fullPath"
   }
-  $facts = Get-MIRArtifactItemFacts -Item $item -InspectDescendantCustody:([bool]$Definition.scan_descendant_custody) -IgnoreCustodyMarkerNames @($Definition.non_pinning_custody_markers)
+  $facts = Get-MIRArtifactItemFacts -Item $item -InspectDescendantCustody:([bool]$Definition.scan_descendant_custody) -InspectDescendantLeases:($Definition.artifact_type -ceq 'campaign') -IgnoreCustodyMarkerNames @($Definition.non_pinning_custody_markers)
   if ($null -ne $facts.scan_error -or $facts.has_reparse_point -or $facts.scan_budget_exceeded) {
     throw "Cleanup target is no longer safe for no-follow removal: $fullPath"
   }
   if (-not [string]::IsNullOrWhiteSpace([string]$facts.descendant_custody_marker)) {
     throw "Cleanup target acquired a descendant custody marker after audit: $fullPath"
+  }
+  if ($null -ne $facts.descendant_lease) {
+    throw "Cleanup target has a live, ambiguous, or interrupted descendant lease: $fullPath"
   }
   if ($facts.latest_write_utc -gt $cutoff) {
     throw "Cleanup target changed after the audit and is now too recent: $fullPath"

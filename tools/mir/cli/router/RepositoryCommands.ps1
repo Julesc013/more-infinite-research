@@ -67,11 +67,11 @@ function Invoke-MIRRepositoryCommandGroup {
         if (-not [int]::TryParse($olderThanText, [ref]$olderThanDays) -or $olderThanDays -lt 0) {
           throw "--older-than-days must be a non-negative integer."
         }
-        $artifactTypeText = Get-MIRArgValue -Items $Args -Name "--artifact-type" -Default "result,test,package"
+        $artifactTypeText = Get-MIRArgValue -Items $Args -Name "--artifact-type" -Default "result,test,package,campaign"
         [string[]]$artifactTypes = @($artifactTypeText.Split(',', [StringSplitOptions]::RemoveEmptyEntries) | ForEach-Object { $_.Trim().ToLowerInvariant() })
-        $invalidArtifactTypes = @($artifactTypes | Where-Object { $_ -notin @('result', 'test', 'package') })
+        $invalidArtifactTypes = @($artifactTypes | Where-Object { $_ -notin @('result', 'test', 'package', 'campaign') })
         if ($artifactTypes.Count -eq 0 -or $invalidArtifactTypes.Count -gt 0) {
-          throw "--artifact-type must be one or more comma-separated values from result, test, package."
+          throw "--artifact-type must be one or more comma-separated values from result, test, package, campaign."
         }
         $params = @{
           RepoRoot = $repo.Path

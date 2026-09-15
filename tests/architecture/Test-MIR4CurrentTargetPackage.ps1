@@ -65,13 +65,33 @@ function Get-MIR4RootReaderVariableName {
 function Get-MIR4RootReaderExpressionValues {
   param($Ast,[hashtable]$Facts)
   $values = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-  foreach ($literal in @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.StringConstantExpressionAst] }, $true))) {
-    [void]$values.Add([string]$literal.Value)
-  }
-  foreach ($variable in @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.VariableExpressionAst] }, $true))) {
-    $name = Get-MIR4RootReaderVariableName -Ast $variable
-    if ($name -and $Facts.ContainsKey($name)) {
-      foreach ($value in @($Facts[$name])) { [void]$values.Add([string]$value) }
+  # Resolve only a constant expression or a plain variable/alias expression.
+  # Recursively collecting every literal below a command incorrectly treats
+  # an argument such as `-RelativePath 'info.json'` as the command's return
+  # value, then taints unrelated variables with the same name in other
+  # functions. Member access and interpolated values likewise describe data,
+  # not a literal repository-relative package path.
+  try {
+    $constant = $Ast.SafeGetValue()
+    foreach ($value in @($constant)) {
+      if ($value -is [string]) { [void]$values.Add([string]$value) }
+    }
+  } catch {}
+  $hasNonAliasExpression = $null -ne $Ast.Find({
+    param($node)
+    $node -is [System.Management.Automation.Language.CommandAst] -or
+      $node -is [System.Management.Automation.Language.MemberExpressionAst] -or
+      $node -is [System.Management.Automation.Language.ExpandableStringExpressionAst]
+  }, $true)
+  if (-not $hasNonAliasExpression) {
+    foreach ($literal in @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.StringConstantExpressionAst] }, $true))) {
+      [void]$values.Add([string]$literal.Value)
+    }
+    foreach ($variable in @($Ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.VariableExpressionAst] }, $true))) {
+      $name = Get-MIR4RootReaderVariableName -Ast $variable
+      if ($name -and $Facts.ContainsKey($name)) {
+        foreach ($value in @($Facts[$name])) { [void]$values.Add([string]$value) }
+      }
     }
   }
   return @($values)
@@ -79,7 +99,7 @@ function Get-MIR4RootReaderExpressionValues {
 
 function Test-MIR4RetiredPackagePathValue {
   param([string]$Value)
-  $portable = $Value.Replace('\\', '/').TrimStart('/')
+  $portable = $Value.Replace('\', '/').TrimStart('/')
   return $portable -in @('info.json','changelog.txt','thumbnail.png','settings.lua','data.lua','data-updates.lua','data-final-fixes.lua','control.lua') -or
     $portable.StartsWith('prototypes/', [StringComparison]::OrdinalIgnoreCase) -or
     $portable.StartsWith('locale/', [StringComparison]::OrdinalIgnoreCase) -or
@@ -101,6 +121,18 @@ function Get-MIR4RootReaderJoinPathValues {
   return @()
 }
 
+function Get-MIR4RootReaderScopeKey {
+  param([Parameter(Mandatory)]$Ast)
+  $cursor = $Ast
+  while ($null -ne $cursor) {
+    if ($cursor -is [System.Management.Automation.Language.FunctionDefinitionAst]) {
+      return "function:$($cursor.Name):$($cursor.Extent.StartOffset)"
+    }
+    $cursor = $cursor.Parent
+  }
+  return 'script'
+}
+
 function Get-MIR4RetiredRootReaderViolations {
   param([Parameter(Mandatory)][string]$ScriptPath)
   $tokens = $null
@@ -112,6 +144,7 @@ function Get-MIR4RetiredRootReaderViolations {
     foreach ($assignment in $assignments) {
       [pscustomobject]@{
         ast = $assignment
+        scope = Get-MIR4RootReaderScopeKey -Ast $assignment
         name = Get-MIR4RootReaderVariableName -Ast $assignment.Left
         literals = @(Get-MIR4RootReaderExpressionValues -Ast $assignment.Right -Facts @{})
         references = @(
@@ -123,40 +156,58 @@ function Get-MIR4RetiredRootReaderViolations {
       }
     }
   )
-  $facts = @{}
-  foreach ($entry in $assignmentData) {
-    if (-not $entry.name) { continue }
-    $facts[$entry.name] = @($entry.literals)
-  }
-  for ($iteration = 0; $iteration -lt 4; $iteration++) {
-    $changed = $false
-    foreach ($entry in $assignmentData) {
+  $scopeKeys = @(
+    @($assignmentData | ForEach-Object { [string]$_.scope }) +
+    @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -or $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -or $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true) |
+      ForEach-Object { Get-MIR4RootReaderScopeKey -Ast $_ }) |
+      Sort-Object -Unique
+  )
+  $factsByScope = @{}
+  $rootVariablesByScope = @{}
+  $taintedPathVariablesByScope = @{}
+  foreach ($scope in $scopeKeys) {
+    $scopeAssignments = @($assignmentData | Where-Object scope -ceq $scope)
+    $facts = @{}
+    foreach ($entry in $scopeAssignments) {
       if (-not $entry.name) { continue }
-      $next = @($entry.literals + @($entry.references | ForEach-Object { @($facts[$_]) }) | Sort-Object -Unique)
-      if ((@($facts[$entry.name]) -join "`n") -cne ($next -join "`n")) { $facts[$entry.name] = $next; $changed = $true }
+      $facts[$entry.name] = @(@($facts[$entry.name]) + $entry.literals | Sort-Object -Unique)
     }
-    foreach ($foreachAst in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true))) {
-      $name = Get-MIR4RootReaderVariableName -Ast $foreachAst.Variable
-      if (-not $name) { continue }
-      $next = @(Get-MIR4RootReaderExpressionValues -Ast $foreachAst.Condition -Facts $facts | Sort-Object -Unique)
-      if ((@($facts[$name]) -join "`n") -cne ($next -join "`n")) { $facts[$name] = $next; $changed = $true }
-    }
-    if (-not $changed) { break }
-  }
-  $rootVariables = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
-  foreach ($name in @('repo','repoRoot','repository','root','workspace')) { [void]$rootVariables.Add($name) }
-  for ($iteration = 0; $iteration -lt 4; $iteration++) {
-    $changed = $false
-    foreach ($entry in $assignmentData) {
-      if ($entry.name -and $entry.literals.Count -eq 0 -and $entry.references.Count -eq 1 -and $rootVariables.Contains($entry.references[0])) {
-        $changed = $rootVariables.Add($entry.name) -or $changed
+    for ($iteration = 0; $iteration -lt 4; $iteration++) {
+      $changed = $false
+      foreach ($entry in $scopeAssignments) {
+        if (-not $entry.name) { continue }
+        $next = @(@($facts[$entry.name]) + $entry.literals + @($entry.references | ForEach-Object { @($facts[$_]) }) | Sort-Object -Unique)
+        if ((@($facts[$entry.name]) -join "`n") -cne ($next -join "`n")) { $facts[$entry.name] = $next; $changed = $true }
       }
+      foreach ($foreachAst in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true) | Where-Object { (Get-MIR4RootReaderScopeKey -Ast $_) -ceq $scope })) {
+        $name = Get-MIR4RootReaderVariableName -Ast $foreachAst.Variable
+        if (-not $name) { continue }
+        $next = @(@($facts[$name]) + @(Get-MIR4RootReaderExpressionValues -Ast $foreachAst.Condition -Facts $facts) | Sort-Object -Unique)
+        if ((@($facts[$name]) -join "`n") -cne ($next -join "`n")) { $facts[$name] = $next; $changed = $true }
+      }
+      if (-not $changed) { break }
     }
-    if (-not $changed) { break }
+    $rootVariables = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    foreach ($name in @('repo','repoRoot','repository','root','workspace')) { [void]$rootVariables.Add($name) }
+    for ($iteration = 0; $iteration -lt 4; $iteration++) {
+      $changed = $false
+      foreach ($entry in $scopeAssignments) {
+        $hasCommand = $null -ne $entry.ast.Right.Find({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true)
+        if ($entry.name -and -not $hasCommand -and $entry.literals.Count -eq 0 -and $entry.references.Count -eq 1 -and $rootVariables.Contains($entry.references[0])) {
+          $changed = $rootVariables.Add($entry.name) -or $changed
+        }
+      }
+      if (-not $changed) { break }
+    }
+    $factsByScope[$scope] = $facts
+    $rootVariablesByScope[$scope] = @($rootVariables)
+    $taintedPathVariablesByScope[$scope] = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
   }
-  $rootVariableArray = @($rootVariables)
-  $taintedPathVariables = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
   foreach ($assignment in $assignments) {
+    $scope = Get-MIR4RootReaderScopeKey -Ast $assignment
+    $facts = $factsByScope[$scope]
+    $rootVariableArray = $rootVariablesByScope[$scope]
+    $taintedPathVariables = $taintedPathVariablesByScope[$scope]
     $name = Get-MIR4RootReaderVariableName -Ast $assignment.Left
     if (-not $name) { continue }
     foreach ($join in @($assignment.Right.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))) {
@@ -169,6 +220,10 @@ function Get-MIR4RetiredRootReaderViolations {
   $violations = [Collections.Generic.List[string]]::new()
   foreach ($reader in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))) {
     if ([string]$reader.GetCommandName() -notin $readerCommands) { continue }
+    $scope = Get-MIR4RootReaderScopeKey -Ast $reader
+    $facts = $factsByScope[$scope]
+    $rootVariableArray = $rootVariablesByScope[$scope]
+    $taintedPathVariables = $taintedPathVariablesByScope[$scope]
     $directValues = @(
       $reader.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) |
         ForEach-Object { Get-MIR4RootReaderJoinPathValues -CommandAst $_ -RootVariables $rootVariableArray -Facts $facts }
@@ -185,6 +240,10 @@ function Get-MIR4RetiredRootReaderViolations {
   foreach ($reader in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true))) {
     $member = [string]$reader.Member.Extent.Text
     if ($member -notin @('ReadAllText','ReadAllBytes','OpenRead','Open')) { continue }
+    $scope = Get-MIR4RootReaderScopeKey -Ast $reader
+    $facts = $factsByScope[$scope]
+    $rootVariableArray = $rootVariablesByScope[$scope]
+    $taintedPathVariables = $taintedPathVariablesByScope[$scope]
     $directValues = @(
       $reader.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) |
         ForEach-Object { Get-MIR4RootReaderJoinPathValues -CommandAst $_ -RootVariables $rootVariableArray -Facts $facts }
@@ -197,23 +256,28 @@ function Get-MIR4RetiredRootReaderViolations {
   return @($violations | Sort-Object -Unique)
 }
 
-$dynamicRootCounterexample = @'
+$dynamicRootCounterexamples = @(@'
 $candidatePath = 'info.json'
 $readPath = Join-Path $repo $candidatePath
 Get-Content -LiteralPath $readPath
-'@
-$dynamicRootTokens = $null
-$dynamicRootErrors = $null
-$dynamicRootAst = [System.Management.Automation.Language.Parser]::ParseInput($dynamicRootCounterexample, [ref]$dynamicRootTokens, [ref]$dynamicRootErrors)
-if (@($dynamicRootErrors).Count -ne 0) { throw '[mir4-current-target-package-dynamic-root-reader-guard-invalid]' }
-$dynamicRootPath = Join-Path ([IO.Path]::GetTempPath()) ("mir4-current-target-package-guard-$([Guid]::NewGuid().ToString('N')).ps1")
-try {
-  [IO.File]::WriteAllText($dynamicRootPath, $dynamicRootCounterexample, [Text.UTF8Encoding]::new($false))
-  if (@(Get-MIR4RetiredRootReaderViolations -ScriptPath $dynamicRootPath).Count -ne 1) {
-    throw '[mir4-current-target-package-dynamic-root-reader-guard-invalid]'
+'@, @'
+$readPath = Join-Path $repo 'prototypes\mir\obsolete.lua'
+[IO.File]::ReadAllText($readPath)
+'@)
+foreach ($dynamicRootCounterexample in $dynamicRootCounterexamples) {
+  $dynamicRootTokens = $null
+  $dynamicRootErrors = $null
+  $dynamicRootAst = [System.Management.Automation.Language.Parser]::ParseInput($dynamicRootCounterexample, [ref]$dynamicRootTokens, [ref]$dynamicRootErrors)
+  if (@($dynamicRootErrors).Count -ne 0) { throw '[mir4-current-target-package-dynamic-root-reader-guard-invalid]' }
+  $dynamicRootPath = Join-Path ([IO.Path]::GetTempPath()) ("mir4-current-target-package-guard-$([Guid]::NewGuid().ToString('N')).ps1")
+  try {
+    [IO.File]::WriteAllText($dynamicRootPath, $dynamicRootCounterexample, [Text.UTF8Encoding]::new($false))
+    if (@(Get-MIR4RetiredRootReaderViolations -ScriptPath $dynamicRootPath).Count -ne 1) {
+      throw '[mir4-current-target-package-dynamic-root-reader-guard-invalid]'
+    }
+  } finally {
+    if (Test-Path -LiteralPath $dynamicRootPath) { Remove-Item -LiteralPath $dynamicRootPath -Force }
   }
-} finally {
-  if (Test-Path -LiteralPath $dynamicRootPath) { Remove-Item -LiteralPath $dynamicRootPath -Force }
 }
 $toolRoots = @('scripts', 'tests', 'tools')
 foreach ($toolRoot in $toolRoots) {
@@ -227,7 +291,7 @@ foreach ($toolRoot in $toolRoots) {
     if ($violations.Count -eq 0) { return }
     $exception = $historicalReaderExceptions[$relative]
     if ($null -eq $exception) {
-      throw "[mir4-current-target-package-raw-root-reader] $relative"
+      throw "[mir4-current-target-package-raw-root-reader] $relative :: $($violations -join '; ')"
     }
     if ($text -notmatch [regex]::Escape([string]$exception.marker) -or
         $text -notmatch [regex]::Escape([string]$exception.proof)) {

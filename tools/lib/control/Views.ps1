@@ -218,7 +218,7 @@ function New-MIRCPLegacyReleaseLedger {
     views = [pscustomobject][ordered]@{
       branch_policy = ".mir/branches.yml"
       release_dashboard = "docs/releases/control-plane-dashboard.md"
-      maintainer_queue = "todo.md"
+      maintainer_queue = "TODO.md"
       publication_checklist = "path:views.publication-checklist"
       backport_queue = "path:views.backport-queue"
     }
@@ -615,10 +615,23 @@ function Update-MIRCPViews {
   }
   Write-MIRCPJson -Path ([string]$policy.outputs.publication_checklist) -Value $publication -RepoRoot $repo -Check:$Check
 
+  $backportGeneratedFrom = [Collections.Generic.List[string]]::new()
+  $backportGeneratedFrom.Add("path:releases.records/$($backport.release).json")
+  if ($null -ne $backport.PSObject.Properties['backport_manifest'] -and
+      -not [string]::IsNullOrWhiteSpace([string]$backport.backport_manifest)) {
+    $backportGeneratedFrom.Add([string]$backport.backport_manifest)
+  } elseif ($null -ne $backport.PSObject.Properties['proofs'] -and
+            $null -ne $backport.proofs.PSObject.Properties['approved_delta'] -and
+            -not [string]::IsNullOrWhiteSpace([string]$backport.proofs.approved_delta)) {
+    $backportGeneratedFrom.Add([string]$backport.proofs.approved_delta)
+  } elseif ($null -ne $backport.PSObject.Properties['programme'] -and
+            -not [string]::IsNullOrWhiteSpace([string]$backport.programme)) {
+    $backportGeneratedFrom.Add([string]$backport.programme)
+  }
   $backportQueue = [pscustomobject][ordered]@{
     schema = 1
     authority = "mir-generated-backport-queue-v1"
-    generated_from = @("path:releases.records/$($backport.release).json", [string]$backport.backport_manifest)
+    generated_from = @($backportGeneratedFrom)
     release = [string]$backport.release
     candidate_id = [string]$backport.candidate_id
     target = [string]$backport.target

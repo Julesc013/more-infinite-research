@@ -305,10 +305,14 @@ function Test-MIRPackagePath {
 function Get-MIRLayoutClass {
   param([Parameter(Mandatory)][string]$Path)
   if (Test-MIRPackagePath -Path $Path) { return "product-package" }
+  if ($Path -in @(
+    "docs/EXTENSION-PROTOCOL.md", "docs/MAINTAINER-HANDOFF.md", "docs/PROJECT-CONTINUITY.md", "docs/RELEASE-RUNBOOK.md"
+  )) { return "repository-policy" }
   foreach ($row in @(
     @("governance/", "repository-shadow-projection"),
     @("contracts/", "repository-shadow-projection"),
     @("spec/", "product-specification"),
+    @("source/", "product-source"),
     @("src/", "repository-shadow-projection"),
     @("targets/", "repository-shadow-projection"),
     @("modules/", "repository-shadow-projection"),
@@ -334,7 +338,7 @@ function Get-MIRLayoutClass {
   }
   if ($Path -in @(
     ".gitattributes", ".gitignore", "AGENTS.md", "CONTRIBUTING.md", "FORKING.md", "GOVERNANCE.md",
-    "SECURITY.md", "SUPPORT.md", "todo.md", "mir.toml", "mir.lock",
+    "SECURITY.md", "SUPPORT.md", "TODO.md", "mir.toml", "mir.lock",
     "docs/EXTENSION-PROTOCOL.md", "docs/MAINTAINER-HANDOFF.md", "docs/PROJECT-CONTINUITY.md", "docs/RELEASE-RUNBOOK.md"
   )) { return "repository-policy" }
   if ($Path -eq "CHANGELOG.md") { return "repository-shadow-projection" }
@@ -349,7 +353,7 @@ function Get-MIRCanonicalTarget {
     $base = [string]$Paths.paths.PSObject.Properties[[string]$alias[0].to].Value
     return Join-MIRRepoRelativePath -Base $base -Suffix $Path.Substring(([string]$alias[0].from).Length)
   }
-  if ($Path -eq "todo.md") { return ".mir/views/tasks.md" }
+  if ($Path -eq "TODO.md") { return ".mir/views/tasks.md" }
   if ($Path.StartsWith("scripts/", [StringComparison]::Ordinal)) { return "tools/" }
   if ($Path.StartsWith(".mir/target-lines/", [StringComparison]::Ordinal)) { return ".mir/releases/sources/" }
   return $Path
@@ -404,7 +408,7 @@ function New-MIRLayoutManifest {
     } else {
       "canonical"
     }
-    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("CHANGELOG.md", "todo.md", "mir.lock")
+    $generated = $path -match "^(?:\.mir/(?:generated|views)/|validation/generated/|docs/reference/generated/|sdk/(?:preview|experimental)/|(?:governance|contracts|spec|src|targets|modules|tests|assurance|changes|releases|docs|examples|tools/mir)/\.mir-root\.json$)" -or $path -in @("CHANGELOG.md", "TODO.md", "mir.lock")
     $rows.Add([pscustomobject][ordered]@{
       path=$path
       class=$class

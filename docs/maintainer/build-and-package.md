@@ -55,7 +55,7 @@ For regression or architecture work before the version bump, prefer validation a
 
 The source repository intentionally keeps governance and release evidence that must not ship in the mod zip:
 
-- `todo.md` is the executable future-work ledger.
+- `TODO.md` is the executable future-work ledger.
 - `.mir/` is the machine-readable governance manifest set.
 - `docs/` contains maintainer, user, architecture, release, and reference docs.
 - `fixtures/`, `scripts/`, `tests/`, and `tools/` are validation and maintainer workspaces.
