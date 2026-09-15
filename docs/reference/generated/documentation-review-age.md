@@ -61,7 +61,7 @@ Ages are measured against the newest governed review date, 2026-09-15, so checko
 | docs/architecture/decisions/0004-mir3-eol-mir4-entry-gate.md | current | 2026-08-16 | 30 | current-window |
 | docs/architecture/decisions/0005-mir4-local-beta-candidate-boundary.md | current | 2026-08-16 | 30 | current-window |
 | docs/architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md | current | 2026-08-17 | 29 | current-window |
-| docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md | current | 2026-09-01 | 14 | current-window |
+| docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md | historical-checkpoint | 2026-09-15 | 0 | current-window |
 | docs/architecture/decisions/README.md | current | 2026-09-01 | 14 | current-window |
 | docs/architecture/factorio-lifecycle.md | current | 2026-07-08 | 69 | current-window |
 | docs/architecture/mir-extension-protocol-v1.md | archived | 2026-08-08 | 38 | current-window |

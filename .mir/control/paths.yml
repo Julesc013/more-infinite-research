@@ -114,6 +114,9 @@ paths:
   mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
   mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
+  mir4.package-source.composable-source-model-application: tools/mir/application/package/ComposableSourceModel.ps1
+  mir4.package-source.composable-source-model-proof-schema: spec/schemas/mir4-composable-source-model-proof-v2.schema.json
+  mir4.package-source.composable-source-model-proof: tests/mir4/Test-MIR4ComposableSourceModelM4202.ps1
   mir4.package-source.editable-source-manifest: source/package-source.json
   mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-composable-package-source-v2.schema.json
   mir4.package-source.canonical-authority: targets/package-authority.json
@@ -142,6 +145,8 @@ paths:
   mir4.package-source.composable-layout-schema: contracts/repository/mir4-composable-source-layout-migration-v1.schema.json
   mir4.package-source.composable-layout-test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
   mir4.package-source.composable-layout-writer: tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1
+  mir4.package-source.composable-predecessor-proof: tools/mir/application/package/SourceCompositionProof.ps1
+  mir4.package-source.composable-predecessor-proof-schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1

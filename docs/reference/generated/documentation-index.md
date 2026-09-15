@@ -61,7 +61,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/decisions/0004-mir3-eol-mir4-entry-gate.md | ADR 0004: MIR 3 EOL and MIR 4 Entry Gate | current | maintainer | adr | mir-maintainers | 2026-08-16 |
 | docs/architecture/decisions/0005-mir4-local-beta-candidate-boundary.md | ADR 0005: MIR 4 Local Beta Candidate Boundary | current | release-manager | adr | mir-maintainers | 2026-08-16 |
 | docs/architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md | ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities | current | maintainer | adr | mir-maintainers | 2026-08-17 |
-| docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md | ADR 0007: MIR 4.1 Foundation Completion Boundary | current | maintainer | adr | mir-maintainers | 2026-09-01 |
+| docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md | ADR 0007: MIR 4.1 Foundation Completion Boundary (Historical) | historical-checkpoint | maintainer | adr | mir-maintainers | 2026-09-15 |
 | docs/architecture/decisions/README.md | Architecture Decision Records | current | maintainer | reference | mir-maintainers | 2026-09-01 |
 | docs/architecture/factorio-lifecycle.md | Factorio Lifecycle Boundaries | current | maintainer | explanation | mir-maintainers | 2026-07-08 |
 | docs/architecture/mir-extension-protocol-v1.md | MIR Extension Protocol v1 Roadmap | archived | developer | archive | mir-maintainers | 2026-08-08 |

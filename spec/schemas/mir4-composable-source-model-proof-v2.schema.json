@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/package/mir4-composable-source-model-proof-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "source_authority", "bindings", "targets", "semantic_class_counts", "declaration_order_probe_sha256", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 2},
+    "kind": {"const": "MIR4ComposableSourceModelProofV2"},
+    "status": {"const": "passed-canonical-composable-source-model"},
+    "source_authority": {"$ref": "#/$defs/sourceAuthority"},
+    "bindings": {"type": "array", "minItems": 447, "maxItems": 447, "items": {"$ref": "#/$defs/binding"}},
+    "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/target"}},
+    "semantic_class_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+    "declaration_order_probe_sha256": {"$ref": "#/$defs/sha256"},
+    "invariants": {"$ref": "#/$defs/invariants"},
+    "transition_gate": {"$ref": "#/$defs/transitionGate"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "recordBinding": {"type": "object", "additionalProperties": false, "required": ["path", "record_sha256"], "properties": {"path": {"type": "string", "minLength": 1}, "record_sha256": {"$ref": "#/$defs/sha256"}}},
+    "sourceAuthority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_root", "source_manifest", "package_authority", "target_registry", "sole_writer"],
+      "properties": {
+        "source_root": {"const": "source"},
+        "source_manifest": {"$ref": "#/$defs/recordBinding"},
+        "package_authority": {"$ref": "#/$defs/recordBinding"},
+        "target_registry": {"$ref": "#/$defs/recordBinding"},
+        "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}
+      }
+    },
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["layer", "target_scope", "output_path", "semantic_class", "source_path", "transform", "output_bytes", "output_sha256"],
+      "properties": {
+        "layer": {"enum": ["shared", "capability", "compatibility", "adapter", "presentation"]},
+        "target_scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["f210", "f200", "f110", "f100"]}},
+        "output_path": {"type": "string", "minLength": 1},
+        "semantic_class": {"enum": ["common-semantic-source", "common-asset-locale", "generated-metadata", "generated-lifecycle-entrypoint", "target-overlay", "target-replacement", "target-compatibility-shim", "migration", "package-documentation"]},
+        "source_path": {"type": "string", "pattern": "^source/.+"},
+        "transform": {"enum": ["copy-exact-bytes", "decode-base64-v1", "exact-template-v1"]},
+        "output_bytes": {"type": "integer", "minimum": 0},
+        "output_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "target_id", "composition", "source_binding_count", "baseline_content_sha256", "baseline_entry_count"],
+      "properties": {
+        "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "target_id": {"pattern": "^factorio-(?:2[.]1|2[.]0|1[.]1|1[.]0)$"},
+        "composition": {
+          "type": "object", "additionalProperties": false,
+          "required": ["path", "record_sha256", "operation_count", "omission_count"],
+          "properties": {"path": {"pattern": "^targets/f(?:210|200|110|100)/composition[.]json$"}, "record_sha256": {"$ref": "#/$defs/sha256"}, "operation_count": {"type": "integer", "minimum": 1}, "omission_count": {"type": "integer", "minimum": 0}}
+        },
+        "source_binding_count": {"type": "integer", "minimum": 1},
+        "baseline_content_sha256": {"$ref": "#/$defs/sha256"},
+        "baseline_entry_count": {"type": "integer", "minimum": 1}
+      }
+    },
+    "invariants": {
+      "type": "object", "additionalProperties": false,
+      "required": ["single_editable_source_root", "manifest_and_package_authority_self_hashed", "all_source_bindings_present_and_exact", "one_output_binding_per_target", "all_target_differences_explicit", "era_family_labels_absent", "retired_source_tree_absent", "target_payload_directories_absent", "declaration_order_independent", "historical_receipts_comparison_only", "sole_current_writer"],
+      "properties": {
+        "single_editable_source_root": {"const": true}, "manifest_and_package_authority_self_hashed": {"const": true}, "all_source_bindings_present_and_exact": {"const": true}, "one_output_binding_per_target": {"const": true}, "all_target_differences_explicit": {"const": true}, "era_family_labels_absent": {"const": true}, "retired_source_tree_absent": {"const": true}, "target_payload_directories_absent": {"const": true}, "declaration_order_independent": {"const": true}, "historical_receipts_comparison_only": {"const": true}, "sole_current_writer": {"const": true}
+      }
+    },
+    "transitionGate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["package_cutover", "old_writer_retirement", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {"package_cutover": {"const": true}, "old_writer_retirement": {"const": true}, "version_allocation": {"const": false}, "tagging": {"const": false}, "signing": {"const": false}, "sealing": {"const": false}, "publication": {"const": false}}
+    }
+  }
+}

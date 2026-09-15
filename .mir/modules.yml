@@ -146,19 +146,39 @@ package_excluded_modules:
     runtime_replay_required_before_cutover: true
   mir4_shadow_source_model_v1:
     predecessor: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
-    implementation: tools/mir/application/package/ShadowSourceModel.ps1
-    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
-    public_facade: tools/mir.ps1
+    historical_receipt_verifier: tools/mir/application/package/ShadowSourceModel.ps1
     proof: tests/mir4/Test-MIR4ShadowSourceModel.ps1
-    proof_schema: spec/schemas/mir4-shadow-source-model-proof-v1.schema.json
-    output: build/reports/package-source/mir4-shadow-source-model-v1.json
-    algorithm: semantic-common-family-target-overlay-and-omission-model-v1
+    receipt_schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
+    receipt: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
+    status: frozen-historical-receipt-no-current-source-authority
     package_visible: false
     editable_source_authority: false
     package_cutover_authority: false
     release_transition_authority: false
     current_writer_unchanged: true
     runtime_replay_required_before_cutover: true
+  mir4_composable_source_model_v2:
+    source_manifest: source/package-source.json
+    package_authority: targets/package-authority.json
+    target_registry: targets/registry.json
+    target_compositions:
+      - targets/f210/composition.json
+      - targets/f200/composition.json
+      - targets/f110/composition.json
+      - targets/f100/composition.json
+    implementation: tools/mir/application/package/ComposableSourceModel.ps1
+    command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
+    public_facade: tools/mir.ps1
+    proof: tests/mir4/Test-MIR4ComposableSourceModelM4202.ps1
+    proof_schema: spec/schemas/mir4-composable-source-model-proof-v2.schema.json
+    output: build/reports/package-source/mir4-composable-source-model-v2.json
+    algorithm: canonical-source-target-composition-inspection-v2
+    package_visible: false
+    editable_source_authority: true
+    package_cutover_authority: true
+    release_transition_authority: false
+    current_writer: tools/mir/application/package/TargetMaterializer.ps1
+    historical_receipts_comparison_only: true
   mir4_m41_f2b_shadow_source_model_authority_evolution_v1:
     predecessor: releases/migrations/MIR4-M41-F2A-Shadow-Target-Materializer-Authority-EvolutionV1.json
     receipt: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
@@ -201,6 +221,8 @@ package_excluded_modules:
     layout_migration_proof: assurance/repository/composable-source-layout-v1.json
     layout_migration_receipt: assurance/repository/composable-source-layout-receipt-v1.json
     layout_migration_test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
+    predecessor_proof: tools/mir/application/package/SourceCompositionProof.ps1
+    predecessor_proof_schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
     package_visible: false
     editable_source_authority: true
     package_cutover_authority: true
@@ -208,6 +230,7 @@ package_excluded_modules:
     current_writer: tools/mir/application/package/TargetMaterializer.ps1
     legacy_root_writer_retired: true
     historical_archives_are_comparison_fixtures_only: true
+    binary_safe_predecessor_equivalence: true
     four_target_runtime_replay_complete: true
     remaining_factorio_1_code_convergence_obligation: true
   mir4_whole_platform_programme_v1:

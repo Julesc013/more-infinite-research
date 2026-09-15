@@ -8,6 +8,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+. (Join-Path $repo 'tools/mir/application/package/SourceCompositionProof.ps1')
 
 function Assert-MIR4ComposableSource([bool]$Condition,[string]$Code){
   if(-not$Condition){throw "[$Code]"}
@@ -34,6 +35,13 @@ Assert-MIR4ComposableSource ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo
 $attributes=Get-Content -Raw -LiteralPath (Join-Path $repo '.gitattributes')
 Assert-MIR4ComposableSource ($attributes-match'(?m)^source/\*\* text eol=lf$') 'mir4-composable-source-checkout-bytes-pinned'
 
+$predecessorProof = Write-MIR4ComposableSourcePredecessorProof -RepoRoot $repo -OutputPath 'build/reports/package-source/tests/mir4-composable-source-predecessor-proof-v1.json'
+$predecessorProofPath = Join-Path $repo 'build/reports/package-source/tests/mir4-composable-source-predecessor-proof-v1.json'
+Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $predecessorProof) 'mir4-composable-source-predecessor-self-hash'
+Assert-MIR4ComposableSource ((Get-Content -Raw -LiteralPath $predecessorProofPath) | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json')) 'mir4-composable-source-predecessor-schema'
+Assert-MIR4ComposableSource ([int]$predecessorProof.binding_count-eq447-and[int]$predecessorProof.physical_source_count-eq439) 'mir4-composable-source-predecessor-cardinality'
+Assert-MIR4ComposableSource ([bool]$predecessorProof.invariants.binary_safe_git_blob_reads-and[bool]$predecessorProof.invariants.source_output_scope_transform_and_identity_equal-and[bool]$predecessorProof.invariants.transformed_output_bytes_and_hash_equal-and[bool]$predecessorProof.invariants.resolver_round_trip_complete) 'mir4-composable-source-predecessor-invariants'
+
 $manifest=Read-MIR4ComposableSourceJson 'source/package-source.json'
 $packageAuthority=Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
 $registry=Read-MIR4ComposableSourceJson 'targets/registry.json'
@@ -42,6 +50,7 @@ Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $packageAuthority) 'mi
 Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $registry) 'mir4-composable-source-registry-self-hash'
 Assert-MIR4ComposableSource ([string]$manifest.predecessor_record_sha256-ceq[string]$receipt.predecessor.manifest_record_sha256) 'mir4-composable-source-predecessor-binding'
 Assert-MIR4ComposableSource ([string]$receipt.predecessor.package_source_fingerprint_sha256-ceq'BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57'-and[string]$receipt.current.package_source_fingerprint_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'mir4-composable-source-package-fingerprint-succession'
+Assert-MIR4ComposableSource ([string]$receipt.predecessor_proof.implementation-ceq'tools/mir/application/package/SourceCompositionProof.ps1'-and[string]$receipt.predecessor_proof.schema-ceq'spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json'-and[string]$receipt.predecessor_proof.record_sha256-ceq[string]$predecessorProof.record_sha256) 'mir4-composable-source-predecessor-proof-receipt'
 Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq447-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq439-and@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-eq447) 'mir4-composable-source-cardinality'
 
 $declared=@($manifest.bindings.source_path|Sort-Object -Unique -CaseSensitive)

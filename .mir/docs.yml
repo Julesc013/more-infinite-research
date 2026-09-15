@@ -353,8 +353,8 @@ docs:
       - mir4-local-playtest-shadow-boundary
       - mir4-approved-bootstrap-correction-boundary
   - path: docs/architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md
-    title: "ADR 0007: MIR 4.1 Foundation Completion Boundary"
-    status: current
+    title: "ADR 0007: MIR 4.1 Foundation Completion Boundary (Historical)"
+    status: historical-checkpoint
     audience: maintainer
     doc_type: adr
     owner: mir-maintainers

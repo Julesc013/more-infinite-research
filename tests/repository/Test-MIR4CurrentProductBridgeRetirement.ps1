@@ -15,10 +15,11 @@ function Assert-MIR4BridgeRetirement {
 }
 
 $fixedPoint = Get-MIR4RepositoryFixedPointAuthority -RepoRoot $RepoRoot
-Assert-MIR4BridgeRetirement ([string]$fixedPoint.state -ceq 'MIR41-CURRENT-PRODUCT-BRIDGES-RETIRED') 'fixed point state'
+Assert-MIR4BridgeRetirement ([string]$fixedPoint.state -ceq 'MIR42-COMPOSABLE-SOURCE-LAYOUT') 'fixed point state'
 Assert-MIR4BridgeRetirement ([bool]$fixedPoint.physical_cutover) 'physical cutover'
-Assert-MIR4BridgeRetirement (-not [bool]$fixedPoint.current_package_source_remains_authoritative) 'legacy package source authority'
+Assert-MIR4BridgeRetirement (-not [bool]$fixedPoint.current_package_source_remains_authoritative) 'retired package source authority'
 Assert-MIR4BridgeRetirement (@($fixedPoint.visible_roots | Where-Object { [string]$_.mode -like 'shadow-*' }).Count -eq 0) 'shadow root modes remain'
+Assert-MIR4BridgeRetirement (@($fixedPoint.migration_sequence | Where-Object { [string]$_.migration_id -ceq 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -and [string]$_.state -ceq 'current-append-only-successor' }).Count -eq 1) 'composable-source successor'
 
 $authority = Get-MIR4CurrentProductBridgeRetirementAuthority -RepoRoot $RepoRoot
 $bridges = @($authority.bridge_dispositions)
@@ -61,13 +62,13 @@ Assert-MIR4BridgeRetirement ($receiptRaw | Test-Json -SchemaFile (Join-Path $Rep
 $receipt = $receiptRaw | ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4BridgeRetirement (Test-MIR4BootstrapRecordHash -Record $receipt) 'receipt record hash'
 Assert-MIR4BridgeRetirement ([string]$receipt.status -ceq 'M41-CURRENT-PRODUCT-BRIDGES-RETIRED-PRIVATE-QUALIFICATION-PENDING') 'receipt status'
+Assert-MIR4BridgeRetirement ([string]$receipt.fixed_point.state -ceq 'MIR41-CURRENT-PRODUCT-BRIDGES-RETIRED') 'historical receipt fixed-point state'
 Assert-MIR4BridgeRetirement (@($receipt.evolved_bindings).Count -gt 0) 'receipt evolved bindings'
 Assert-MIR4BridgeRetirement (@($receipt.current_authorities).Count -gt 0) 'receipt current authorities'
 Assert-MIR4BridgeRetirement (@($receipt.evolved_bindings | Where-Object { [bool]$_.package_visible -or [bool]$_.release_authority }).Count -eq 0) 'evolved binding authority firewall'
 Assert-MIR4BridgeRetirement (@($receipt.current_authorities | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.path) -or [string]::IsNullOrWhiteSpace([string]$_.sha256) }).Count -eq 0) 'current authority identity'
 
-& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementAuthority.ps1') -RepoRoot $RepoRoot -Check | Out-Null
-& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4M41CurrentProductBridgeRetirementReceipt.ps1') -RepoRoot $RepoRoot -Check | Out-Null
+& (Join-Path $RepoRoot 'tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1') -RepoRoot $RepoRoot -Check | Out-Null
 
 [pscustomobject][ordered]@{
   status = 'passed'

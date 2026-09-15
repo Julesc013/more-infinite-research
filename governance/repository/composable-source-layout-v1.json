@@ -24,6 +24,7 @@
     "cross-checkout-source-bytes-pinned-to-lf",
     "one-binding-per-target-output",
     "exact-predecessor-path-map",
+    "binary-safe-all-binding-predecessor-proof",
     "content-identical-inputs-share-one-physical-source",
     "all-four-materialized-package-trees-unchanged",
     "historical-records-remain-immutable",

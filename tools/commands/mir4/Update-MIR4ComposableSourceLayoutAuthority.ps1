@@ -12,6 +12,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/assurance/Hashing.ps1')
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+. (Join-Path $repo 'tools/mir/application/package/SourceCompositionProof.ps1')
 
 $authorityRelative='governance/repository/composable-source-layout-v1.json'
 $proofRelative='assurance/repository/composable-source-layout-v1.json'
@@ -36,8 +37,8 @@ $proofPolicy=Read-MIR4ComposableLayoutJson $proofRelative
 if([string]$authority.kind-cne'MIR4ComposableSourceLayoutAuthorityV1'-or[string]$authority.migration_id-cne'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1'){throw '[mir4-composable-layout-authority]'}
 if([string]$proofPolicy.kind-cne'MIR4ComposableSourceLayoutProofPolicyV1'-or[string]$proofPolicy.test_id-cne'static.mir4-composable-source-layout-v1'){throw '[mir4-composable-layout-proof-policy]'}
 
-$predecessorText=(& git -C $repo show ($predecessorCommit+':'+$predecessorManifestPath) 2>$null|Out-String)
-if($LASTEXITCODE-ne0){throw '[mir4-composable-layout-predecessor-read]'}
+$predecessorBytes=Read-MIR4GitBlobBytes -RepoRoot $repo -Commit $predecessorCommit -RelativePath $predecessorManifestPath
+$predecessorText=([Text.UTF8Encoding]::new($false,$true)).GetString($predecessorBytes)
 $predecessor=$predecessorText|ConvertFrom-Json -Depth 100 -DateKind String
 if([string]$predecessor.record_sha256-cne$predecessorManifestHash-or@($predecessor.bindings).Count-ne447-or@($predecessor.bindings.source_path|Sort-Object -Unique).Count-ne447){throw '[mir4-composable-layout-predecessor]'}
 $observedPredecessorPackageSourceFingerprint=Get-MIRAssuranceCommitPackageSourceHash -Commit $predecessorCommit
@@ -56,6 +57,8 @@ if(-not(Test-MIR4BootstrapRecordHash $manifest)-or-not(Test-MIR4BootstrapRecordH
 $sourcePaths=@($manifest.bindings.source_path|Sort-Object -Unique -CaseSensitive)
 $predecessorPaths=@($manifest.bindings.predecessor_source_path|Sort-Object -Unique -CaseSensitive)
 if(@($manifest.bindings).Count-ne447-or$sourcePaths.Count-ne439-or$predecessorPaths.Count-ne447-or[string]$manifest.predecessor_record_sha256-cne$predecessorManifestHash){throw '[mir4-composable-layout-current-cardinality]'}
+$predecessorProof=Get-MIR4ComposableSourcePredecessorProof -RepoRoot $repo -PredecessorCommit $predecessorCommit
+if(-not(Test-MIR4BootstrapRecordHash $predecessorProof)-or[int]$predecessorProof.binding_count-ne447-or[int]$predecessorProof.physical_source_count-ne439-or-not[bool]$predecessorProof.invariants.binary_safe_git_blob_reads-or-not[bool]$predecessorProof.invariants.resolver_round_trip_complete){throw '[mir4-composable-layout-predecessor-proof]'}
 
 $targetBindings=[Collections.Generic.List[object]]::new()
 foreach($target in @('f210','f200','f110','f100')){
@@ -104,6 +107,7 @@ $record=[ordered]@{
     target_compositions=@($targetBindings)
     sole_writer='tools/mir/application/package/TargetMaterializer.ps1'
   }
+  predecessor_proof=[ordered]@{implementation='tools/mir/application/package/SourceCompositionProof.ps1';schema='spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json';commit=$predecessorCommit;binding_count=[int]$predecessorProof.binding_count;physical_source_count=[int]$predecessorProof.physical_source_count;record_sha256=[string]$predecessorProof.record_sha256}
   relocation=[ordered]@{binding_count=447;physical_source_count=439;deduplicated_binding_count=8;unique_predecessor_path_count=447;old_live_root_absent=$true;era_lane_directories_absent=$true;target_payload_directories_empty=$true;exact_predecessor_resolution=$true}
   target_parity=@($targetParity)
   compatibility_convergence=[ordered]@{factorio_1_state='explicit-compatibility-code-pending-characterized-convergence';divergent_predecessor_same_output_modules=75;next_action='replace characterized duplicates with shared canonical modules plus exact engine adapters';claim='layout-cutover-does-not-claim-zero-compatibility-duplication'}

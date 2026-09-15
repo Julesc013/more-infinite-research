@@ -55,8 +55,40 @@ try{[void](Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath 
 if(-not$relocationRejected){throw '[mir4-editable-source-relocation-negative]'}
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
+  $selection=Get-MIR4TargetMaterializationBindings -State $state
+  if(-not[bool]$selection.scoped_operation_closure-or@($selection.bindings).Count-ne@($state.manifest.bindings|Where-Object{$target-in@($_.target_scope)}).Count){throw "[mir4-editable-source-scoped-operation-closure] $target"}
   foreach($binding in @($state.manifest.bindings|Where-Object{$target-in@($_.target_scope)})){[void](Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $binding)}
 }
+
+function Copy-MIR4EditableSourceState($State){
+  return ($State|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String)
+}
+function Assert-MIR4EditableSourceRejected([scriptblock]$Action,[string]$Code){
+  $rejected=$false
+  try{&$Action}catch{$rejected=$_.Exception.Message.Contains($Code)}
+  if(-not$rejected){throw "[mir4-editable-source-negative] $Code"}
+}
+$omissionState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f200')
+$omission=@($omissionState.composition.operations|Where-Object{[string]$_.operation-ceq'omit'}|Select-Object -First 1)
+if($omission.Count-ne1){throw '[mir4-editable-source-omission-fixture]'}
+$omission[0].expected_bytes=0
+Assert-MIR4EditableSourceRejected {Get-MIR4TargetMaterializationBindings -State $omissionState|Out-Null} '[mir4-target-materializer-omission]'
+
+$metadataState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f210')
+$metadata=@($metadataState.composition.operations|Where-Object{[string]$_.path-ceq'info.json'}|Select-Object -First 1)
+if($metadata.Count-ne1){throw '[mir4-editable-source-metadata-fixture]'}
+$metadata[0].semantic_class='target-overlay'
+Assert-MIR4EditableSourceRejected {Get-MIR4TargetMaterializationBindings -State $metadataState|Out-Null} '[mir4-target-materializer-operation-mismatch]'
+
+$byteState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f210')
+$byteOperation=@($byteState.composition.operations|Where-Object{[string]$_.path-ceq'info.json'}|Select-Object -First 1)
+$byteOperation[0].expected_bytes=[int64]$byteOperation[0].expected_bytes+1
+Assert-MIR4EditableSourceRejected {Get-MIR4TargetMaterializationBindings -State $byteState|Out-Null} '[mir4-target-materializer-operation-mismatch]'
+
+$transformState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f210')
+$transformOperation=@($transformState.composition.operations|Where-Object{[string]$_.path-ceq'info.json'}|Select-Object -First 1)
+$transformOperation[0].transform='copy-exact-bytes'
+Assert-MIR4EditableSourceRejected {Get-MIR4TargetMaterializationBindings -State $transformState|Out-Null} '[mir4-target-materializer-operation-mismatch]'
 
 $productionText=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 if($productionText-match'Read-MIR4ArchiveBytes|Get-MIR4Shadow|spec/distribution/mir4-golden|dist/more-infinite-research_4[.]0'){throw '[mir4-editable-source-production-archive-input]'}

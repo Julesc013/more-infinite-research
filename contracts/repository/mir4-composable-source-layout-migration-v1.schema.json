@@ -3,7 +3,7 @@
   "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-composable-source-layout-migration-v1.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "kind", "recorded_at", "status", "migration_id", "authority", "proof_policy", "predecessor", "current", "relocation", "target_parity", "compatibility_convergence", "invariants", "transition_gate", "record_sha256"],
+  "required": ["schema", "kind", "recorded_at", "status", "migration_id", "authority", "proof_policy", "predecessor", "current", "predecessor_proof", "relocation", "target_parity", "compatibility_convergence", "invariants", "transition_gate", "record_sha256"],
   "properties": {
     "schema": {"const": 1},
     "kind": {"const": "MIR4ComposableSourceLayoutMigrationV1"},
@@ -36,6 +36,18 @@
         "target_registry": {"$ref": "#/$defs/recordBinding"},
         "target_compositions": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetBinding"}},
         "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}
+      }
+    },
+    "predecessor_proof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["implementation", "schema", "commit", "binding_count", "physical_source_count", "record_sha256"],
+      "properties": {
+        "implementation": {"const": "tools/mir/application/package/SourceCompositionProof.ps1"},
+        "schema": {"const": "spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "binding_count": {"const": 447},
+        "physical_source_count": {"const": 439},
+        "record_sha256": {"$ref": "#/$defs/sha"}
       }
     },
     "relocation": {

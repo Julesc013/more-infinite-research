@@ -186,7 +186,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-target-changelog-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-whole-platform-consolidation | [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md) | current |
 | mir4-4.0.0-candidate-release-notes | [More Infinite Research 4.0.0 Candidate Release Notes](../../releases/notes/release-notes-4.0.0-candidate.md) | current |
-| mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | current |
+| mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary (Historical)](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | historical-checkpoint |
 | mir4-4.1-one-minute-playtest-gate | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
 | mir4-4.1-release-readiness | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
 | mir4-4.1-resource-bounded-release | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |

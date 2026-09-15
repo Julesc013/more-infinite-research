@@ -67,25 +67,57 @@ function Get-MIR4TargetMaterializationBindings {
   param([Parameter(Mandatory)]$State)
   $target = [string]$State.target.target
   $pathMap = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
-  foreach ($binding in @($State.manifest.bindings | Where-Object { [string]$_.layer -ceq 'shared' })) {
-    if ($target -notin @($binding.target_scope)) { throw "[mir4-target-materializer-common-scope] $($binding.output_path)" }
-    $pathMap.Add([string]$binding.output_path, $binding)
+  $expectedBindings = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  foreach ($binding in @($State.manifest.bindings | Where-Object { $target -in @($_.target_scope) })) {
+    $path = [string]$binding.output_path
+    Assert-MIR4PortableArchivePath -Path $path
+    if (-not $expectedBindings.TryAdd($path, $binding)) { throw "[mir4-target-materializer-manifest-collision] ${target}:$path" }
+    if ([string]$binding.layer -ceq 'shared') { $pathMap.Add($path, $binding) }
   }
+  if ($expectedBindings.Count -eq 0) { throw "[mir4-target-materializer-empty-target] $target" }
   $omissions = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $operations = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
   foreach ($operation in @($State.composition.operations)) {
     $path = [string]$operation.path
     Assert-MIR4PortableArchivePath -Path $path
+    if (-not $operations.TryAdd($path, $operation)) { throw "[mir4-target-materializer-operation-collision] ${target}:$path" }
     if ([string]$operation.operation -ceq 'omit') {
-      if ($pathMap.ContainsKey($path) -or -not $omissions.Add($path) -or $null -ne $operation.source_path -or $null -ne $operation.expected_sha256) { throw "[mir4-target-materializer-omission] ${target}:$path" }
+      $otherTargetBindings = @($State.manifest.bindings | Where-Object { [string]$_.output_path -ceq $path -and $target -notin @($_.target_scope) })
+      if ($expectedBindings.ContainsKey($path) -or $pathMap.ContainsKey($path) -or -not $omissions.Add($path) -or
+          $otherTargetBindings.Count -eq 0 -or [string]$operation.semantic_class -cne 'target-omission' -or
+          $null -ne $operation.source_path -or $null -ne $operation.transform -or
+          $null -ne $operation.expected_bytes -or $null -ne $operation.expected_sha256) {
+        throw "[mir4-target-materializer-omission] ${target}:$path"
+      }
       continue
     }
-    $matches = @($State.manifest.bindings | Where-Object {
-      [string]$_.output_path -ceq $path -and [string]$_.source_path -ceq [string]$operation.source_path -and $target -in @($_.target_scope) -and [string]$_.layer -cne 'shared'
-    })
-    if ($matches.Count -ne 1 -or $pathMap.ContainsKey($path) -or [string]$matches[0].output_sha256 -cne [string]$operation.expected_sha256) { throw "[mir4-target-materializer-overlay] ${target}:$path" }
-    $pathMap.Add($path, $matches[0])
+    if (-not $expectedBindings.ContainsKey($path)) { throw "[mir4-target-materializer-operation-unbound] ${target}:$path" }
+    $binding = $expectedBindings[$path]
+    if ([string]$binding.layer -ceq 'shared' -or $pathMap.ContainsKey($path) -or
+        [string]$binding.source_path -cne [string]$operation.source_path -or
+        [string]$binding.transform -cne [string]$operation.transform -or
+        [string]$binding.semantic_class -cne [string]$operation.semantic_class -or
+        [int64]$binding.output_bytes -ne [int64]$operation.expected_bytes -or
+        [string]$binding.output_sha256 -cne [string]$operation.expected_sha256) {
+      throw "[mir4-target-materializer-operation-mismatch] ${target}:$path"
+    }
+    $pathMap.Add($path, $binding)
   }
-  return [pscustomobject][ordered]@{bindings=@($pathMap.Values | Sort-Object output_path -CaseSensitive);omissions=@($omissions | Sort-Object -CaseSensitive)}
+  foreach ($entry in $expectedBindings.GetEnumerator()) {
+    $path = [string]$entry.Key
+    $binding = $entry.Value
+    if ([string]$binding.layer -ceq 'shared') {
+      if ($operations.ContainsKey($path)) { throw "[mir4-target-materializer-shared-operation] ${target}:$path" }
+    } elseif (-not $operations.ContainsKey($path) -or -not $pathMap.ContainsKey($path)) {
+      throw "[mir4-target-materializer-operation-closure] ${target}:$path"
+    }
+  }
+  if ($pathMap.Count -ne $expectedBindings.Count) { throw "[mir4-target-materializer-selection-closure] $target" }
+  return [pscustomobject][ordered]@{
+    bindings=@($pathMap.Values | Sort-Object output_path -CaseSensitive)
+    omissions=@($omissions | Sort-Object -CaseSensitive)
+    scoped_operation_closure=$true
+  }
 }
 
 function New-MIR4TargetPackage {
@@ -154,7 +186,7 @@ function New-MIR4TargetPackage {
     archive_sha256=[string]$inventory.archive_sha256
     content_sha256=[string]$inventory.content_sha256
     entry_count=[int]$inventory.entry_count
-    invariants=[pscustomobject][ordered]@{no_historical_archive_input=$true;all_source_hashes_verified=$true;all_output_hashes_verified=$true;all_target_differences_explicit=$true;version_identity_verified=$true;canonical_package_authority=$true}
+    invariants=[pscustomobject][ordered]@{no_historical_archive_input=$true;all_source_hashes_verified=$true;all_output_hashes_verified=$true;all_target_differences_explicit=$true;scoped_operation_closure=[bool]$selection.scoped_operation_closure;version_identity_verified=$true;canonical_package_authority=$true}
     transition_gate=[pscustomobject][ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false}
     record_sha256=''
   }
@@ -179,7 +211,8 @@ function Invoke-MIR4TargetMaterializerParity {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target
     $a = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M41-F2E-A' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
     $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M41-F2E-B' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
-    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count) { throw "[mir4-target-materializer-determinism] $target" }
+    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count -or
+        -not [bool]$a.invariants.scoped_operation_closure -or -not [bool]$b.invariants.scoped_operation_closure) { throw "[mir4-target-materializer-determinism] $target" }
     if ([string]$a.content_sha256 -cne [string]$identity.target_authority.baseline_content_sha256 -or
         [int]$a.entry_count -ne [int]$identity.target_authority.baseline_entry_count) { throw "[mir4-target-materializer-baseline-parity] $target" }
     $rows.Add([pscustomobject][ordered]@{target=$target;distribution_version=[string]$a.distribution_version;source_binding_count=[int]$a.source_binding_count;omission_count=[int]$a.omission_count;archive_a=[string]$a.archive_sha256;archive_b=[string]$b.archive_sha256;content_sha256=[string]$a.content_sha256;entry_count=[int]$a.entry_count;deterministic_archive_bytes=$true;composition_record_a=[string]$a.record_sha256;composition_record_b=[string]$b.record_sha256})
@@ -221,7 +254,8 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $target
     $a = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-A' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
     $b = New-MIR4TargetPackage -RepoRoot $repo -Target $target -CandidateId 'M42-02-CURRENT-B' -SourceVersion ([string]$identity.source_version) -OutputRoot $OutputRoot
-    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count) {
+    if ([string]$a.archive_sha256 -cne [string]$b.archive_sha256 -or [string]$a.content_sha256 -cne [string]$b.content_sha256 -or [int]$a.entry_count -ne [int]$b.entry_count -or
+        -not [bool]$a.invariants.scoped_operation_closure -or -not [bool]$b.invariants.scoped_operation_closure) {
       throw "[mir4-current-source-materializer-determinism] $target"
     }
     $absoluteOutput = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }

@@ -57,7 +57,7 @@ generated_policy_authority:
 science_phase_policies:
   - id: K2SciencePhasePolicyV1
     implementation: source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua
-    package_source_authority: targets/f210/files
+    package_source_authority: targets/f210/composition.json
     profiles:
       - id: factorio-2.1-k2so
         target: f210
