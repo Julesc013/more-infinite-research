@@ -1,5 +1,16 @@
 $script:MIRAssurancePatternFingerprintCache = @{}
 
+function Get-MIRAssuranceOptionalObjectValue {
+  param([AllowNull()]$Object, [Parameter(Mandatory)][string]$Name)
+  if ($null -eq $Object) { return $null }
+  if ($Object -is [System.Collections.IDictionary] -and $Object.Contains($Name)) {
+    return $Object[$Name]
+  }
+  $property = $Object.PSObject.Properties[$Name]
+  if ($null -ne $property) { return $property.Value }
+  return $null
+}
+
 function Get-MIRAssurancePatternFingerprint {
   param([Parameter(Mandatory)][string[]]$Patterns)
   if ($null -eq $script:MIRAssurancePatternFingerprintCache) { $script:MIRAssurancePatternFingerprintCache = @{} }
@@ -532,21 +543,21 @@ function Get-MIRAssuranceTestFingerprint {
     [Parameter(Mandatory)]$Plan,
     [Parameter(Mandatory)]$Context
   )
-  $templateIdProperty = $Test.PSObject.Properties['template_id']
-  $domainDependenciesProperty = $Test.PSObject.Properties['domain_dependencies']
-  $scenarioProperty = $Test.PSObject.Properties['scenario']
-  $requiresFactorioProperty = $Test.PSObject.Properties['requires_factorio']
-  $requiresCandidateProperty = $Test.PSObject.Properties['requires_candidate']
-  $inputsProperty = $Test.PSObject.Properties['inputs']
+  $templateId = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'template_id'
+  $domainDependencies = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'domain_dependencies'
+  $scenario = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'scenario'
+  $requiresFactorio = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_factorio'
+  $requiresCandidate = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_candidate'
+  $inputs = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'inputs'
   $definition = [ordered]@{
     id=[string]$Test.id
-    template_id=if ($null -ne $templateIdProperty) { [string]$templateIdProperty.Value } else { '' }
+    template_id=if ($null -ne $templateId) { [string]$templateId } else { '' }
     kind=[string]$Test.kind
     layer=[string]$Test.layer
     command=[string]$Test.command
-    requires_factorio=if ($null -ne $requiresFactorioProperty) { [bool]$requiresFactorioProperty.Value } else { $false }
-    requires_candidate=if ($null -ne $requiresCandidateProperty) { [bool]$requiresCandidateProperty.Value } else { $false }
-    inputs=if ($null -ne $inputsProperty) { @($inputsProperty.Value | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    requires_factorio=if ($null -ne $requiresFactorio) { [bool]$requiresFactorio } else { $false }
+    requires_candidate=if ($null -ne $requiresCandidate) { [bool]$requiresCandidate } else { $false }
+    inputs=if ($null -ne $inputs) { @($inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
     captured_artifacts=@(
       foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
         [ordered]@{
@@ -556,8 +567,8 @@ function Get-MIRAssuranceTestFingerprint {
         }
       }
     )
-    domain_dependencies=if ($null -ne $domainDependenciesProperty) { @($domainDependenciesProperty.Value | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
-    scenario_sha256=if ($null -ne $scenarioProperty -and $null -ne $scenarioProperty.Value) { Get-MIRAssuranceJsonHash -Value $scenarioProperty.Value } else { "" }
+    domain_dependencies=if ($null -ne $domainDependencies) { @($domainDependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    scenario_sha256=if ($null -ne $scenario) { Get-MIRAssuranceJsonHash -Value $scenario } else { "" }
   }
   $definitionHash = Get-MIRAssuranceJsonHash -Value $definition
   $inputFingerprints = [ordered]@{}

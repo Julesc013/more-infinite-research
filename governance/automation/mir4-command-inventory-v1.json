@@ -3283,9 +3283,9 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "8F3D4FC3AE02C06FA176E6AEDE824EF0C5932213FE04DCB4E2B0D617B02FBCCB",
+      "sha256": "5C2FD1B4E32252601844DC39A9FC7F39AFCC38E63FB77586C9354F49564A4C5C",
       "hash_mode": "canonical-text-v1",
-      "lines": 591,
+      "lines": 602,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:caf24480f8b7be5a1c0a04e9c1a68d7cffdb2a908df2368bb13f2aa8b77c3953"
+  "digest": "sha256:5c820186a2e6244d31b91f812e59c1dca5d119a2add21e62a2fffd34e8a6fc91"
 }
