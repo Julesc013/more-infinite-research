@@ -43,7 +43,7 @@ function Test-MIR4EnvironmentPrivateValue {
       Test-MIR4EnvironmentPrivateValue -Value $item -Location "$Location[$index]" | Out-Null
       $index++
     }
-  } elseif ($Value -is [string] -and ($Value -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b')) {
+  } elseif ($Value -is [string] -and ($Value -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]' -or $Value -match '(?i)/(?:home|Users)/[^/\s]+' -or $Value -match '(?i)\b(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\bbearer\s+(?!<redacted>(?=$|[\s,;]))[^\s,;]+' -or $Value -match '(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b')) {
     throw "[mir4-environment-private-value] $Location"
   }
   $true
@@ -235,7 +235,7 @@ function Test-MIR4SupportDiagnosticV1 {
   if ($Diagnostic.code -isnot [string] -or [string]$Diagnostic.code -cnotmatch '^[a-z][a-z0-9-]{0,63}$') { throw '[mir4-support-diagnostic-code]' }
   if ($Diagnostic.severity -isnot [string] -or [string]$Diagnostic.severity -cnotin @('error','warning','info')) { throw '[mir4-support-diagnostic-severity]' }
   if ($Diagnostic.message -isnot [string] -or ([string]$Diagnostic.message).Length -gt 4096) { throw '[mir4-support-diagnostic-message]' }
-  if ([string]$Diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))|(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { throw '[mir4-support-bundle-redaction]' }
+  if ([string]$Diagnostic.message -match '(?i)[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/[^/\s]+|(?:token|secret|password|api[_-]?key)\s*[=:]\s*(?!<redacted>(?=$|[\s,;]))|(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>(?=$|[\s,;]))|\bbearer\s+(?!<redacted>(?=$|[\s,;]))|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b') { throw '[mir4-support-bundle-redaction]' }
   $true
 }
 
@@ -253,6 +253,7 @@ function ConvertTo-MIR4RedactedDiagnosticV1 {
   $message = [regex]::Replace($message,'(?i)/(?:home|Users)/[^/\s]+','<user-home>')
   $message = [regex]::Replace($message,'(?i)\b(token|secret|password|api[_-]?key)\s*[=:]\s*[^\s,;]+','$1=<redacted>')
   $message = [regex]::Replace($message,'(?i)\b((?:proxy-)?authorization)\s*:\s*bearer\s+[^\s,;]+','$1: Bearer <redacted>')
+  $message = [regex]::Replace($message,'(?i)\bbearer\s+[^\s,;]+','Bearer <redacted>')
   $message = [regex]::Replace($message,'(?i)\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b','<email-redacted>')
   $record = [ordered]@{code=[string]$code;severity=[string]$severity;message=$message}
   Test-MIR4SupportDiagnosticV1 $record | Out-Null
@@ -331,6 +332,7 @@ function New-MIR4EnvironmentSupportBundleV1 {
 
 function Test-MIR4SupportBundleV1 {
   param([Parameter(Mandatory)]$Bundle)
+  Test-MIR4EnvironmentObjectFieldsV1 -Value $Bundle -Names @('schema','kind','bundle_id','target','subjects','source_ledger_digest','environment_lock','environment_lock_digest','evidence_items','diagnostics','redaction','reproducer','minimized','source_bundle_digest','minimization','maturity','synthetic','claim_eligible','arbitrary_code','executable_content','network_access_authorized','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority','canonicalization','digest') -Diagnostic 'mir4-support-bundle-shape'
   Test-MIR4EnvironmentLockV1 $Bundle.environment_lock | Out-Null
   if ([int]$Bundle.schema -ne 1 -or [string]$Bundle.kind -cne 'MIR4SupportBundleV1' -or
       [string]$Bundle.target -cne [string]$Bundle.environment_lock.target -or

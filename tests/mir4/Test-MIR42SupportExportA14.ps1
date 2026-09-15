@@ -31,7 +31,7 @@ $evidence=@(
   [pscustomobject][ordered]@{id='context.discardable';kind='context';summary='Non-reproducer context removed by minimization.';dependencies=@();required_by_reproducer=$false}
 )
 $diagnostics=@(
-  [pscustomobject][ordered]@{code='mir42-a14-redaction';severity='error';message='token=MIR42_A14_PRIVATE_TOKEN secret=MIR42_A14_PRIVATE_SECRET Authorization: Bearer MIR42_A14_PRIVATE_TOKEN Proxy-Authorization: Bearer MIR42_A14_PROXY_TOKEN path C:\Users\MIR42-A14\profile and /home/mir42-a14/cache contact jules@example.invalid'}
+  [pscustomobject][ordered]@{code='mir42-a14-redaction';severity='error';message='token=MIR42_A14_PRIVATE_TOKEN secret=MIR42_A14_PRIVATE_SECRET Authorization: Bearer MIR42_A14_PRIVATE_TOKEN Proxy-Authorization: Bearer MIR42_A14_PROXY_TOKEN Bearer MIR42_A14_BARE_TOKEN path C:\Users\MIR42-A14\profile and /home/mir42-a14/cache contact jules@example.invalid'}
 )
 $bundle=New-MIR4EnvironmentSupportBundleV1 -EnvironmentLock $references.f210 -BundleId 'org.more-infinite-research.a14.support-export-contract' -EvidenceItems $evidence -Diagnostics $diagnostics
 Test-MIR4SupportBundleV1 $bundle|Out-Null
@@ -44,7 +44,8 @@ if([string]$bundle.target-cne'f210'-or[string]$bundle.maturity-cne'developer-pre
    ([string]$bundle.diagnostics[0].message)-notmatch'<email-redacted>'-or
    ([string]$bundle.diagnostics[0].message)-notmatch'Authorization: Bearer <redacted>'-or
    ([string]$bundle.diagnostics[0].message)-notmatch'Proxy-Authorization: Bearer <redacted>'-or
-   ([string]$bundle.diagnostics[0].message)-match'MIR42_A14_(?:PRIVATE_(?:TOKEN|SECRET)|PROXY_TOKEN)|[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/|\b(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>)|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b'){
+   ([string]$bundle.diagnostics[0].message)-notmatch'Bearer <redacted>'-or
+   ([string]$bundle.diagnostics[0].message)-match'MIR42_A14_(?:PRIVATE_(?:TOKEN|SECRET)|PROXY_TOKEN|BARE_TOKEN)|[A-Z]:[\\/](?:Users|Documents and Settings)[\\/]|/(?:home|Users)/|\b(?:proxy-)?authorization\s*:\s*bearer\s+(?!<redacted>)|\bbearer\s+(?!<redacted>)|\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}\b'){
   throw '[mir42-a14-redaction]'
 }
 foreach($flag in @('claim_eligible','arbitrary_code','executable_content','network_access_authorized','package_visible','player_mutation_authorized','prototype_write_authorized','public_support_authorized','release_authority')){
@@ -80,9 +81,12 @@ Assert-MIR42A14SupportBundleReject -Id 'token-in-diagnostic-code' -Expected '[mi
 Assert-MIR42A14SupportBundleReject -Id 'email-in-diagnostic-severity' -Expected '[mir4-support-diagnostic-severity]' -Mutate {param($value)$value.diagnostics[0].severity='jules@example.invalid'}
 Assert-MIR42A14SupportBundleReject -Id 'email-in-diagnostic-message' -Expected '[mir4-support-bundle-redaction]' -Mutate {param($value)$value.diagnostics[0].message='Contact jules@example.invalid for the private result.'}
 Assert-MIR42A14SupportBundleReject -Id 'bearer-in-diagnostic-message' -Expected '[mir4-support-bundle-redaction]' -Mutate {param($value)$value.diagnostics[0].message='Authorization: Bearer MIR42_A14_PRIVATE_TOKEN'}
+Assert-MIR42A14SupportBundleReject -Id 'bare-bearer-in-diagnostic-message' -Expected '[mir4-support-bundle-redaction]' -Mutate {param($value)$value.diagnostics[0].message='Bearer MIR42_A14_BARE_TOKEN'}
 Assert-MIR42A14SupportBundleReject -Id 'private-evidence-summary' -Expected '[mir4-environment-private-value]' -Mutate {param($value)$value.evidence_items[0].summary='token=MIR42_A14_PRIVATE_TOKEN'}
 Assert-MIR42A14SupportBundleReject -Id 'bearer-in-evidence-summary' -Expected '[mir4-environment-private-value]' -Mutate {param($value)$value.evidence_items[0].summary='Proxy-Authorization: Bearer MIR42_A14_PRIVATE_TOKEN'}
+Assert-MIR42A14SupportBundleReject -Id 'bare-bearer-in-evidence-summary' -Expected '[mir4-environment-private-value]' -Mutate {param($value)$value.evidence_items[0].summary='Bearer MIR42_A14_BARE_TOKEN'}
 Assert-MIR42A14SupportBundleReject -Id 'private-evidence-metadata' -Expected '[mir4-environment-private-field]' -Mutate {param($value)$value.evidence_items[0]|Add-Member -NotePropertyName metadata -NotePropertyValue ([ordered]@{email='jules@example.invalid'})}
+Assert-MIR42A14SupportBundleReject -Id 'unauthorized-publication-flag' -Expected '[mir4-support-bundle-shape]' -Mutate {param($value)$value|Add-Member -NotePropertyName publication_authorized -NotePropertyValue $true}
 
 $ledger=New-MIR4CompatibilitySubjectLedger -RepoRoot $RepoRoot -SourceIdentity $null
 $surface=New-MIR4ReferenceSupportBundleV1 -Ledger $ledger -RepoRoot $RepoRoot -Target f210
