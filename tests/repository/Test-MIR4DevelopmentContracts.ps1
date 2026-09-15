@@ -255,6 +255,22 @@ function Assert-MIRDevelopmentContractsReceiptSchemaRegression {
   }
 }
 
+function Assert-MIRDevelopmentContractsCanonicalPackageAuthorityRegression {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $authority=Read-MIR4TargetMaterializerRecord -RepoRoot $RepoRoot -RelativePath 'targets/package-authority.json' -Kind 'MIR4CanonicalPackageAuthorityV2'
+  if([int]$authority.schema -ne 2 -or [string]$authority.kind -cne 'MIR4CanonicalPackageAuthorityV2' -or [string]$authority.record_sha256 -notmatch '^[A-F0-9]{64}$') {
+    throw '[mir4-development-canonical-package-authority-positive]'
+  }
+  $wrongKindRejected=$false
+  try {
+    Read-MIR4TargetMaterializerRecord -RepoRoot $RepoRoot -RelativePath 'targets/package-authority.json' -Kind 'MIR4TargetRegistryV2' | Out-Null
+  } catch {
+    $wrongKindRejected=$_.Exception.Message -match '\[mir4-target-materializer-record-schema\]'
+  }
+  if(-not $wrongKindRejected) { throw '[mir4-development-canonical-package-authority-wrong-kind]' }
+}
+
 function Get-MIRDevelopmentContractsSelectedInputFingerprint {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -303,6 +319,7 @@ Assert-MIRDevelopmentContractsReparseGuardRegression
 Assert-MIRDevelopmentContractsPorcelainV1ZRegression
 Assert-MIRDevelopmentContractsPorcelainStreamingBoundRegression -RepoRoot $repo
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+Assert-MIRDevelopmentContractsCanonicalPackageAuthorityRegression -RepoRoot $repo
 [void](Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check)
 $packageSourceFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 $receiptSchema=Join-Path $repo 'contracts/repository/mir4-development-contracts-local-result-v1.schema.json'

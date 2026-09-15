@@ -15,6 +15,7 @@ if (-not (Get-Command Write-MIR441PackagePresentationV1 -ErrorAction SilentlyCon
 function Read-MIR4TargetMaterializerRecord {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RelativePath,[Parameter(Mandatory)][string]$Kind)
   $definitions = [ordered]@{
+    MIR4CanonicalPackageAuthorityV2 = 'spec/schemas/mir4-canonical-package-authority-v2.schema.json'
     MIR4ComposablePackageSourceV2 = 'spec/schemas/mir4-composable-package-source-v2.schema.json'
     MIR4TargetRegistryV2 = 'spec/schemas/mir4-target-registry-v2.schema.json'
     MIR4TargetSupportPolicyV1 = 'spec/schemas/mir4-target-support-policy-v1.schema.json'

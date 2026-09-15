@@ -32,6 +32,9 @@ $schemaScratch = Join-Path $repo $schemaScratchRelative
 New-Item -ItemType Directory -Force -Path $schemaScratch | Out-Null
 try {
   $negativeCases = @(
+    [pscustomobject]@{id='authority-unknown';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
+    [pscustomobject]@{id='authority-invalid-gate';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)$r.transition_gate.publication=$true}},
+    [pscustomobject]@{id='authority-missing-writer';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)[void]$r.PSObject.Properties.Remove('writer')}},
     [pscustomobject]@{id='manifest-unknown';path='source/package-source.json';kind='MIR4ComposablePackageSourceV2';schema='spec/schemas/mir4-composable-package-source-v2.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
     [pscustomobject]@{id='registry-invalid-target';path='targets/registry.json';kind='MIR4TargetRegistryV2';schema='spec/schemas/mir4-target-registry-v2.schema.json';mutate={param($r)$r.targets[0].target='f999'}},
     [pscustomobject]@{id='support-missing';path='targets/support-policy.json';kind='MIR4TargetSupportPolicyV1';schema='spec/schemas/mir4-target-support-policy-v1.schema.json';mutate={param($r)[void]$r.PSObject.Properties.Remove('invariants')}},
