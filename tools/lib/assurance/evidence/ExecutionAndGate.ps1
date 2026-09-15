@@ -300,19 +300,24 @@ function Invoke-MIRAssuranceTest {
   )
   New-Item -ItemType Directory -Force -Path $evidenceRoot | Out-Null
   $id = [string]$Test.id
-  if ([bool]$Test.requires_factorio -and (-not $Context.factorio -or -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf))) {
+  $requiresFactorio = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_factorio'
+  $requiresCandidate = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_candidate'
+  $inputs = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'inputs'
+  $plannedFingerprint = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'fingerprint'
+  $forceFresh = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'force_fresh'
+  if ([bool]$requiresFactorio -and (-not $Context.factorio -or -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf))) {
     throw "Test $id requires --factorio with a matching Factorio binary."
   }
   if ($id -eq "runtime.upgrade" -and (-not $Context.prior_release -or -not (Test-Path -LiteralPath $Context.prior_release -PathType Leaf))) {
     throw "Test runtime.upgrade requires --prior with the exact prior-release archive."
   }
-  if ([bool]$Test.requires_candidate -or @($Test.inputs | Where-Object { [string]$_ -eq "candidate" }).Count -gt 0) {
+  if ([bool]$requiresCandidate -or @($inputs | Where-Object { [string]$_ -eq "candidate" }).Count -gt 0) {
     if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) {
       throw "Test $id requires the exact candidate archive: $($Context.candidate)"
     }
   }
 
-  $fingerprint = if ($Test.fingerprint) { $Test.fingerprint } else { Get-MIRAssuranceTestFingerprint -Test $Test -Plan $Plan -Context $Context }
+  $fingerprint = if ($null -ne $plannedFingerprint) { $plannedFingerprint } else { Get-MIRAssuranceTestFingerprint -Test $Test -Plan $Plan -Context $Context }
   # Fresh campaigns do not reuse arbitrary historical evidence.  They do,
   # however, adopt a cryptographically exact row that was completed for this
   # same immutable campaign before an interruption.  That makes the boundary
@@ -322,7 +327,7 @@ function Invoke-MIRAssuranceTest {
     Write-Host "[CHECKPOINT] $id $($fingerprint.input_key)"
     return $checkpoint
   }
-  if ([bool]$Test.force_fresh) {
+  if ([bool]$forceFresh) {
     $running = Get-MIRAssuranceRunningEvidence -Fingerprint $fingerprint -Context $Context
     if ($null -ne $running) {
       Write-Host "[WAIT] $id $($fingerprint.input_key)"
