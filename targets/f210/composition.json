@@ -1032,7 +1032,7 @@
       "path": "prototypes/mir/compatibility/claim_registry.lua",
       "operation": "add",
       "semantic_class": "target-compatibility-shim",
-      "source_path": "source/adapters/f210/prototypes/mir/compatibility/claim_registry.lua",
+      "source_path": "source/prototypes/mir/compatibility/claim_registry.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -1080,7 +1080,7 @@
       "path": "prototypes/mir/compatibility/policies/k2_science_phase.lua",
       "operation": "add",
       "semantic_class": "target-compatibility-shim",
-      "source_path": "source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+      "source_path": "source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -2581,58 +2581,10 @@
       ]
     },
     {
-      "path": "prototypes/mir/planner/base_continuations.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/base_continuations.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed base-continuations facade for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 65,
-      "expected_sha256": "8586F27F6E66F9C0EDBA0CE05F6C00106DACA161C6FC11E47CC939CA0B239CE1",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/base_continuations/classify.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/base_continuations/classify.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed base-continuations classify responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 2522,
-      "expected_sha256": "C34DE519999BDF51F7E57FF5C91B8CA564A2F1E2F198610C4698C1E05C90886C",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/base_continuations/discover.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/base_continuations/discover.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed base-continuations discover responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4280,
-      "expected_sha256": "39BEF285336001C1EEB815696CC313842874DEC3197D5DAFABE6811D9A2CF681",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
       "path": "prototypes/mir/planner/base_continuations/qualify.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/planner/base_continuations/qualify.lua",
+      "source_path": "source/prototypes/mir/planner/base_continuations/qualify.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed base-continuations qualify responsibility for f210.",
       "capability_disposition": "included-for-target",
@@ -2648,7 +2600,7 @@
       "path": "prototypes/mir/planner/base_continuations/plan.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/planner/base_continuations/plan.lua",
+      "source_path": "source/prototypes/mir/planner/base_continuations/plan.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed base-continuations plan responsibility for f210.",
       "capability_disposition": "included-for-target",
@@ -2872,7 +2824,7 @@
       "path": "prototypes/mir/planner/native_owner_binding.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/planner/native_owner_binding.lua",
+      "source_path": "source/prototypes/mir/planner/native_owner_binding.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -2920,7 +2872,7 @@
       "path": "prototypes/mir/planner/science.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/planner/science.lua",
+      "source_path": "source/prototypes/mir/planner/science.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -2949,74 +2901,10 @@
       ]
     },
     {
-      "path": "prototypes/mir/planner/stream_compiler/compile.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/stream_compiler/compile.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed stream-compiler compile responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4145,
-      "expected_sha256": "6303BD8BACEFFF0F986575FA2FEB3EBCC85A335D4C2B1CA76F46AE3D8BF2D892",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/stream_compiler/diagnostics.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/stream_compiler/diagnostics.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed stream-compiler diagnostics responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 5078,
-      "expected_sha256": "64404C3B5920D9368ADDF7B505C44B0A8E7BC76FB7BD768554256302959FC60E",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/stream_compiler/discover.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/stream_compiler/discover.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed stream-compiler discover responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 2273,
-      "expected_sha256": "5D4AEEFDF6E22F7AC8DF0E60F548DC8748FBF07F408960E5DC176A78F9B862F1",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/stream_compiler/ownership.lua",
-      "operation": "add",
-      "semantic_class": "target-replacement",
-      "source_path": "source/prototypes/mir/planner/stream_compiler/ownership.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed stream-compiler ownership responsibility for f210.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 2178,
-      "expected_sha256": "A49CCA3200EDDDC9BCFBADDB431D331D7A691C3BEAA7DB7B3518EA737524C448",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "behavior-preserving-decomposition",
-        "four-target-current-source-determinism"
-      ]
-    },
-    {
       "path": "prototypes/mir/planner/stream_compiler/qualify.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "source_path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed stream-compiler qualify responsibility for f210.",
       "capability_disposition": "included-for-target",
@@ -3256,7 +3144,7 @@
       "path": "prototypes/mir/policy/max_level.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/policy/max_level.lua",
+      "source_path": "source/prototypes/mir/policy/max_level.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -3320,7 +3208,7 @@
       "path": "prototypes/mir/providers/pipeline/budget.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f210/prototypes/mir/providers/pipeline/budget.lua",
+      "source_path": "source/prototypes/mir/providers/pipeline/budget.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
@@ -3979,5 +3867,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "8BF35CD6739D796364E6BE34FB5FD9AA10847FB64566C2BDD1D3E3DBEA772037"
+  "record_sha256": "8C0B2E68C54A6CE1A5DCF2710BEE3BD7E05248335352684DA6E9693490FB070F"
 }

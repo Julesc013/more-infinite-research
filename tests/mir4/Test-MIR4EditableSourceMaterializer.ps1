@@ -56,7 +56,7 @@ try {
 } finally {
   if (Test-Path -LiteralPath $schemaScratch -PathType Container) { Remove-Item -LiteralPath $schemaScratch -Recurse -Force }
 }
-if(@($manifest.bindings).Count-ne447-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne439-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne447){throw '[mir4-editable-source-binding-uniqueness]'}
+if(@($manifest.bindings).Count-ne358-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne358-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne358){throw '[mir4-editable-source-binding-uniqueness]'}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
@@ -72,16 +72,16 @@ if(@(Get-ChildItem -LiteralPath (Join-Path $repo 'targets') -Recurse -File|Where
 $relocationCases=[ordered]@{
   'src/mod/common/prototypes/mir/core/deepcopy.lua'='source/prototypes/mir/core/deepcopy.lua'
   'src/mod/families/modern/prototypes/mir/core/fingerprint.lua'='source/prototypes/mir/core/fingerprint.lua'
-  'src/mod/families/legacy/prototypes/mir/core/fingerprint.lua'='source/compatibility/factorio-1/prototypes/mir/core/fingerprint.lua'
-  'targets/f210/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
   'targets/f200/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
 }
 foreach($case in $relocationCases.GetEnumerator()){
   if((Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $case.Key)-cne$case.Value){throw "[mir4-editable-source-relocation] $($case.Key)"}
 }
-$relocationRejected=$false
-try{[void](Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath 'src/mod/not-a-declared-source.lua')}catch{$relocationRejected=$_.Exception.Message.Contains('[mir4-package-source-relocation-ambiguous]')}
-if(-not$relocationRejected){throw '[mir4-editable-source-relocation-negative]'}
+foreach($retiredPath in @('src/mod/not-a-declared-source.lua','src/mod/families/legacy/prototypes/mir/core/fingerprint.lua','targets/f210/files/prototypes/mir/planner/stream_compiler.lua')){
+  $relocationRejected=$false
+  try{[void](Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $retiredPath)}catch{$relocationRejected=$_.Exception.Message.Contains('[mir4-package-source-relocation-ambiguous]')}
+  if(-not$relocationRejected){throw "[mir4-editable-source-relocation-negative] $retiredPath"}
+}
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
   $selection=Get-MIR4TargetMaterializationBindings -State $state
@@ -130,8 +130,7 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $modern=$target-in@('f210','f200')
-  $expectedDelta=if($modern){32}else{0}
+  $expectedDelta=if($target-in@('f210','f200')){32}else{103}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

@@ -44,6 +44,77 @@ function Read-MIR4GitBlobBytes {
   }
 }
 
+function Read-MIR4GitBlobSet {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][ValidatePattern('^[a-f0-9]{40}$')][string]$Commit,
+    [Parameter(Mandatory)][string[]]$RelativePath
+  )
+
+  $paths = @($RelativePath | Sort-Object -Unique -CaseSensitive)
+  $result = [Collections.Generic.Dictionary[string, byte[]]]::new([StringComparer]::Ordinal)
+  if ($paths.Count -eq 0) { return ,$result }
+  foreach ($path in $paths) { [void](Assert-MIR4PortableArchivePath -Path $path) }
+
+  $git = @(Get-Command git -CommandType Application -ErrorAction Stop | Where-Object { Test-Path -LiteralPath $_.Source -PathType Leaf } | Select-Object -First 1)
+  if ($git.Count -ne 1) { throw '[mir4-composable-source-predecessor-git]' }
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = [string]$git[0].Source
+  $startInfo.UseShellExecute = $false
+  $startInfo.CreateNoWindow = $true
+  $startInfo.RedirectStandardInput = $true
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  foreach ($argument in @('-C', $RepoRoot, 'cat-file', '--batch')) { [void]$startInfo.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  if (-not $process.Start()) { throw '[mir4-composable-source-predecessor-git-batch-start]' }
+  try {
+    # Feed requests asynchronously while consuming binary responses. A
+    # synchronous write can deadlock once the stdout pipe fills.
+    $requestText = (($paths | ForEach-Object { "$Commit`:$_" }) -join "`n") + "`n"
+    $writeTask = $process.StandardInput.WriteAsync($requestText)
+    $stream = $process.StandardOutput.BaseStream
+    foreach ($path in $paths) {
+      $headerBytes = [Collections.Generic.List[byte]]::new()
+      while ($true) {
+        $value = $stream.ReadByte()
+        if ($value -lt 0) { throw "[mir4-composable-source-predecessor-git-batch-eof] $path" }
+        if ($value -eq 10) { break }
+        [void]$headerBytes.Add([byte]$value)
+      }
+      $header = [Text.Encoding]::ASCII.GetString($headerBytes.ToArray())
+      if ($header -notmatch '^[a-f0-9]{40} blob ([0-9]+)$') {
+        throw "[mir4-composable-source-predecessor-git-batch-header] $path $header"
+      }
+      $length = [int64]$Matches[1]
+      if ($length -gt [int]::MaxValue) { throw "[mir4-composable-source-predecessor-git-batch-size] $path" }
+      $bytes = [byte[]]::new([int]$length)
+      $offset = 0
+      while ($offset -lt $bytes.Length) {
+        $read = $stream.Read($bytes, $offset, $bytes.Length - $offset)
+        if ($read -le 0) { throw "[mir4-composable-source-predecessor-git-batch-blob] $path" }
+        $offset += $read
+      }
+      if ($stream.ReadByte() -ne 10) { throw "[mir4-composable-source-predecessor-git-batch-delimiter] $path" }
+      $result.Add($path, $bytes)
+    }
+    [void]$writeTask.GetAwaiter().GetResult()
+    $process.StandardInput.Close()
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "[mir4-composable-source-predecessor-git-batch] $stderr" }
+    return ,$result
+  } finally {
+    if (-not $process.HasExited) {
+      $process.Kill($true)
+      $process.WaitForExit()
+    }
+    $process.Dispose()
+  }
+}
+
 function Test-MIR4ExactByteSequence {
   [CmdletBinding()]
   param([Parameter(Mandatory)][byte[]]$Left,[Parameter(Mandatory)][byte[]]$Right)
@@ -71,25 +142,25 @@ function Get-MIR4ComposableSourcePredecessorProof {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [ValidatePattern('^[a-f0-9]{40}$')][string]$PredecessorCommit = '92d563ada31e82430fbf25f639267b03a8a180d1'
+    [ValidatePattern('^[a-f0-9]{40}$')][string]$PredecessorCommit = '92d563ada31e82430fbf25f639267b03a8a180d1',
+    [ValidatePattern('^[a-f0-9]{40}$')][string]$SourceLayoutCommit = '297aa5cc902da96847165a4f9caa1048608839fb'
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
-  $manifestRelative = [string]$authority.source_manifest.path
-  $manifestRaw = Get-Content -Raw -LiteralPath (Join-Path $repo $manifestRelative)
-  if (-not ($manifestRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-composable-package-source-v2.schema.json'))) {
-    throw '[mir4-composable-source-predecessor-current-schema]'
-  }
-  $manifest = $manifestRaw | ConvertFrom-Json -Depth 100 -DateKind String
-  if (-not (Test-MIR4BootstrapRecordHash -Record $manifest) -or
-      [string]$manifest.record_sha256 -cne [string]$authority.source_manifest.record_sha256) {
-    throw '[mir4-composable-source-predecessor-current-record]'
+  # This proof belongs to the completed 447-binding layout migration. Read its
+  # exact source-side state from the pinned migration commit so later semantic
+  # convergence cannot turn historical byte parity into a current constraint.
+  $manifestRelative = 'source/package-source.json'
+  $manifestBytes = Read-MIR4GitBlobBytes -RepoRoot $repo -Commit $SourceLayoutCommit -RelativePath $manifestRelative
+  $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+  $manifest = $strictUtf8.GetString($manifestBytes) | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$manifest.kind -cne 'MIR4ComposablePackageSourceV2' -or
+      -not (Test-MIR4BootstrapRecordHash -Record $manifest)) {
+    throw '[mir4-composable-source-predecessor-layout-record]'
   }
 
   $predecessorManifestRelative = 'src/mod/package-source.json'
   $predecessorManifestBytes = Read-MIR4GitBlobBytes -RepoRoot $repo -Commit $PredecessorCommit -RelativePath $predecessorManifestRelative
-  $strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
   $predecessorManifestRaw = $strictUtf8.GetString($predecessorManifestBytes)
   if (-not ($predecessorManifestRaw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-package-source-manifest-v1.schema.json'))) {
     throw '[mir4-composable-source-predecessor-manifest-schema]'
@@ -109,6 +180,8 @@ function Get-MIR4ComposableSourcePredecessorProof {
   if ($predecessorByPath.Count -ne 447 -or @($manifest.bindings).Count -ne 447) {
     throw '[mir4-composable-source-predecessor-cardinality]'
   }
+  $predecessorBlobs = Read-MIR4GitBlobSet -RepoRoot $repo -Commit $PredecessorCommit -RelativePath @($predecessorManifest.bindings.source_path)
+  $sourceBlobs = Read-MIR4GitBlobSet -RepoRoot $repo -Commit $SourceLayoutCommit -RelativePath @($manifest.bindings.source_path)
 
   $seenPredecessors = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
   $sourceIdentities = [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::Ordinal)
@@ -139,7 +212,7 @@ function Get-MIR4ComposableSourcePredecessorProof {
       }
     }
 
-    $predecessorBytes = Read-MIR4GitBlobBytes -RepoRoot $repo -Commit $PredecessorCommit -RelativePath $predecessorPath
+    $predecessorBytes = $predecessorBlobs[$predecessorPath]
     if ([int64]$predecessorBytes.Length -ne [int64]$predecessor.source_bytes -or
         (Get-MIR4Sha256Bytes -Bytes $predecessorBytes) -cne [string]$predecessor.source_sha256) {
       throw "[mir4-composable-source-predecessor-blob] $predecessorPath"
@@ -150,8 +223,7 @@ function Get-MIR4ComposableSourcePredecessorProof {
       throw "[mir4-composable-source-predecessor-output] $predecessorPath"
     }
     $sourcePath = [string]$binding.source_path
-    $sourceFullPath = Join-Path $repo $sourcePath
-    $sourceBytes = [IO.File]::ReadAllBytes($sourceFullPath)
+    $sourceBytes = $sourceBlobs[$sourcePath]
     if ([int64]$sourceBytes.Length -ne [int64]$binding.source_bytes -or
         (Get-MIR4Sha256Bytes -Bytes $sourceBytes) -cne [string]$binding.source_sha256 -or
         -not (Test-MIR4ExactByteSequence -Left $predecessorBytes -Right $sourceBytes)) {
@@ -163,7 +235,9 @@ function Get-MIR4ComposableSourcePredecessorProof {
     } else {
       $sourceIdentities.Add($sourcePath, $identity)
     }
-    if ((Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $predecessorPath) -cne $sourcePath) {
+    # The manifest itself was the relocation authority at SourceLayoutCommit.
+    # Requiring today's resolver here would falsely preserve retired paths.
+    if ([string]$binding.predecessor_source_path -cne $predecessorPath) {
       throw "[mir4-composable-source-predecessor-resolver] $predecessorPath"
     }
   }

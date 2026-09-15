@@ -11,7 +11,7 @@
     "source_state": {"const": "canonical-composable-package-source"},
     "predecessor_record_sha256": {"$ref": "#/$defs/sha256"},
     "source_roots": {"const": ["source"]},
-    "bindings": {"type": "array", "minItems": 447, "maxItems": 447, "items": {"$ref": "#/$defs/binding"}},
+    "bindings": {"type": "array", "minItems": 358, "maxItems": 358, "items": {"$ref": "#/$defs/binding"}},
     "invariants": {
       "type": "object",
       "additionalProperties": false,

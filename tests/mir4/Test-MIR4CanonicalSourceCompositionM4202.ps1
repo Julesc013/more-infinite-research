@@ -9,6 +9,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $repo 'tools/mir/application/package/SourceCompositionProof.ps1')
+. (Join-Path $repo 'tools/mir/application/package/FactorioOneSourceConvergence.ps1')
 
 function Assert-MIR4ComposableSource([bool]$Condition,[string]$Code){
   if(-not$Condition){throw "[$Code]"}
@@ -49,9 +50,10 @@ Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $manifest) 'mir4-compo
 Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $packageAuthority) 'mir4-composable-source-package-authority-self-hash'
 Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $registry) 'mir4-composable-source-registry-self-hash'
 Assert-MIR4ComposableSource ([string]$manifest.predecessor_record_sha256-ceq[string]$receipt.predecessor.manifest_record_sha256) 'mir4-composable-source-predecessor-binding'
-Assert-MIR4ComposableSource ([string]$receipt.predecessor.package_source_fingerprint_sha256-ceq'BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57'-and[string]$receipt.current.package_source_fingerprint_sha256-ceq(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'mir4-composable-source-package-fingerprint-succession'
+Assert-MIR4ComposableSource ([string]$receipt.predecessor.package_source_fingerprint_sha256-ceq'BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57'-and[string]$receipt.current.package_source_fingerprint_sha256-ceq'7B0A39E3C5286624C8B6B272E32D1F6DE21F86FE91187E39AEF42FB80FCFC9ED') 'mir4-composable-source-historical-package-fingerprint'
+Assert-MIR4ComposableSource ([string]$receipt.current.package_source_fingerprint_sha256-cne(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'mir4-composable-source-current-semantic-succession'
 Assert-MIR4ComposableSource ([string]$receipt.predecessor_proof.implementation-ceq'tools/mir/application/package/SourceCompositionProof.ps1'-and[string]$receipt.predecessor_proof.schema-ceq'spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json'-and[string]$receipt.predecessor_proof.record_sha256-ceq[string]$predecessorProof.record_sha256) 'mir4-composable-source-predecessor-proof-receipt'
-Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq447-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq439-and@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-eq447) 'mir4-composable-source-cardinality'
+Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq358-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq358-and@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-eq358) 'mir4-composable-source-cardinality'
 
 $declared=@($manifest.bindings.source_path|Sort-Object -Unique -CaseSensitive)
 $physical=@(Get-ChildItem -LiteralPath (Join-Path $repo 'source') -Recurse -File|Where-Object{$_.FullName-notin@((Join-Path $repo 'source/package-source.json'),(Join-Path $repo 'source/.mir-root.json'))}|ForEach-Object{[IO.Path]::GetRelativePath($repo,$_.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/')}|Sort-Object -Unique -CaseSensitive)
@@ -63,14 +65,12 @@ Assert-MIR4ComposableSource (@(Get-ChildItem -LiteralPath (Join-Path $repo 'targ
 $cases=[ordered]@{
   'src/mod/common/prototypes/mir/core/deepcopy.lua'='source/prototypes/mir/core/deepcopy.lua'
   'src/mod/families/modern/prototypes/mir/core/fingerprint.lua'='source/prototypes/mir/core/fingerprint.lua'
-  'src/mod/families/legacy/prototypes/mir/core/fingerprint.lua'='source/compatibility/factorio-1/prototypes/mir/core/fingerprint.lua'
-  'targets/f210/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
   'targets/f200/files/prototypes/mir/planner/stream_compiler.lua'='source/prototypes/mir/planner/stream_compiler.lua'
 }
 foreach($case in $cases.GetEnumerator()){
   Assert-MIR4ComposableSource ((Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $case.Key)-ceq$case.Value) 'mir4-composable-source-relocation'
 }
-foreach($bad in @('src/mod/not-declared.lua','../source/data.lua','C:/outside.lua')){
+foreach($bad in @('src/mod/not-declared.lua','src/mod/families/legacy/prototypes/mir/core/fingerprint.lua','targets/f210/files/prototypes/mir/planner/stream_compiler.lua','../source/data.lua','C:/outside.lua')){
   $rejected=$false
   try{[void](Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $repo -RelativePath $bad)}catch{$rejected=$true}
   Assert-MIR4ComposableSource $rejected 'mir4-composable-source-relocation-negative'
@@ -81,6 +81,11 @@ Assert-MIR4ComposableSource (($targetKeys-join'|')-ceq'f210|f200|f110|f100') 'mi
 Assert-MIR4ComposableSource ([int]$receipt.relocation.deduplicated_binding_count-eq8-and[int]$receipt.compatibility_convergence.divergent_predecessor_same_output_modules-eq75) 'mir4-composable-source-honest-convergence-boundary'
 Assert-MIR4ComposableSource (@($receipt.transition_gate.PSObject.Properties|Where-Object{$_.Name-ne'development_merge'-and[bool]$_.Value}).Count-eq0) 'mir4-composable-source-release-firewall'
 
+$convergence=Get-MIR4FactorioOneSourceConvergenceProof -RepoRoot $repo
+Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $convergence) 'mir4-composable-source-convergence-self-hash'
+Assert-MIR4ComposableSource ([string]$convergence.status-ceq'passed-static-source-convergence-engine-proof-required'-and[bool]$convergence.exact_engine_proof_required-and-not[bool]$convergence.release_transition_authority) 'mir4-composable-source-convergence-boundary'
 $proof=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/composable-source-layout-current.json'
 Assert-MIR4ComposableSource (@($proof.targets).Count-eq4-and@($proof.targets|Where-Object{-not[bool]$_.deterministic_archive_bytes}).Count-eq0) 'mir4-composable-source-current-determinism'
-[pscustomobject][ordered]@{status='passed';test_id='static.mir4-composable-source-layout-v1';bindings=@($manifest.bindings).Count;physical_sources=$physical.Count;deduplicated_bindings=(@($manifest.bindings).Count-$physical.Count);targets=@($proof.targets).Count;factorio_1_divergent_predecessor_modules=[int]$receipt.compatibility_convergence.divergent_predecessor_same_output_modules;release_authority=$false}|ConvertTo-Json -Depth 10
+$expectedContent=[ordered]@{f210='56670789F9A759EC81B09214C996B58F07A072B49D5B161228618226A778C852';f200='0FF10FEA35841F9484735C76ECF37F8D52D0AD723D5C66DD693096FAA5891D82';f110='73D29EF07F02B8C7AC267280B5551F094D35E7FA86496C8A3CB21C9061D4E89B';f100='1EE69576BD18F4062BE2428F04CF965191C542614852A75E1FB40FBF2AC5D780'}
+foreach($target in $expectedContent.Keys){$row=@($proof.targets|Where-Object target -ceq $target);Assert-MIR4ComposableSource ($row.Count-eq1-and[string]$row[0].content_sha256-ceq[string]$expectedContent[$target]) 'mir4-composable-source-reviewed-semantic-identity'}
+[pscustomobject][ordered]@{status='passed';test_id='static.mir4-composable-source-layout-v1';bindings=@($manifest.bindings).Count;physical_sources=$physical.Count;deduplicated_bindings=(@($manifest.bindings).Count-$physical.Count);targets=@($proof.targets).Count;factorio_1_historical_pairs=[int]$convergence.historical_characterization.factorio_one_pair_count;factorio_1_exact_engine_proof_required=$true;release_authority=$false}|ConvertTo-Json -Depth 10

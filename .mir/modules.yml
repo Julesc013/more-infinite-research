@@ -223,6 +223,9 @@ package_excluded_modules:
     layout_migration_test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
     predecessor_proof: tools/mir/application/package/SourceCompositionProof.ps1
     predecessor_proof_schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
+    factorio_1_source_convergence_proof: tools/mir/application/package/FactorioOneSourceConvergence.ps1
+    factorio_1_source_convergence_test: tests/mir4/Test-MIR4FactorioOneSourceConvergenceM4202.ps1
+    factorio_1_source_convergence_schema: spec/schemas/mir4-factorio-one-source-convergence-proof-v1.schema.json
     package_visible: false
     editable_source_authority: true
     package_cutover_authority: true
@@ -232,7 +235,7 @@ package_excluded_modules:
     historical_archives_are_comparison_fixtures_only: true
     binary_safe_predecessor_equivalence: true
     four_target_runtime_replay_complete: true
-    remaining_factorio_1_code_convergence_obligation: true
+    factorio_1_code_convergence: static-source-complete-exact-engine-proof-required
   mir4_m41_to_m42_composable_source_succession_v1:
     historical_readiness: governance/release/mir4-4.1-release-readiness-v1.json
     historical_source_freeze: releases/migrations/MIR4-M41-Source-Freeze-Authority-EvolutionV1.json

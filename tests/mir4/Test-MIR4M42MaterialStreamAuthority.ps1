@@ -21,10 +21,9 @@ function Get-MIR4StreamRecordBlock {
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $sourceManifestPath = Join-Path $repo 'source/prototypes/mir/streams/generated_stream_manifest.json'
 $authorityPath = Join-Path $repo '.mir/streams.yml'
-$f110ProfilePath = Join-Path $repo 'source/adapters/f110/prototypes/mir/platform/factorio/target_profiles.lua'
-$f100ProfilePath = Join-Path $repo 'source/adapters/f100/prototypes/mir/platform/factorio/target_profiles.lua'
+$factorioOneProfilePath = Join-Path $repo 'source/adapters/platform/base-version-profile/target_profiles.lua'
 
-foreach ($path in @($sourceManifestPath, $authorityPath, $f110ProfilePath, $f100ProfilePath)) {
+foreach ($path in @($sourceManifestPath, $authorityPath, $factorioOneProfilePath)) {
   Assert-MIR4MaterialStreamAuthority (Test-Path -LiteralPath $path -PathType Leaf) "[mir4-m42-stream-authority-input-missing] $path"
 }
 
@@ -66,9 +65,9 @@ $reviewedForward = @($materialRows | Where-Object { [string]$_.Value.policy -ceq
 Assert-MIR4MaterialStreamAuthority ($acyclic.Count -eq 19) '[mir4-m42-stream-authority-acyclic-count]'
 Assert-MIR4MaterialStreamAuthority ((@($reviewedForward.Value.stream_key | Sort-Object) -join '|') -ceq 'research_material_glass|research_material_rare_metals|research_material_silicon') '[mir4-m42-stream-authority-reviewed-forward-set]'
 
-foreach ($profilePath in @($f110ProfilePath, $f100ProfilePath)) {
-  $profile = Get-Content -Raw -LiteralPath $profilePath
-  Assert-MIR4MaterialStreamAuthority ($profile -match '(?ms)features\s*=\s*\{.*?recipe_productivity\s*=\s*false') "[mir4-m42-stream-authority-f1-capability] $profilePath"
-}
+$profile = Get-Content -Raw -LiteralPath $factorioOneProfilePath
+Assert-MIR4MaterialStreamAuthority ($profile -match 'current_factorio_line' -and $profile -match 'line == "1\.0" or line == "1\.1"') '[mir4-m42-stream-authority-f1-profile-selector]'
+Assert-MIR4MaterialStreamAuthority ($profile -match '(?ms)local function reduced_profile\(.*?features\s*=\s*\{.*?recipe_productivity\s*=\s*false') '[mir4-m42-stream-authority-f1-capability]'
+Assert-MIR4MaterialStreamAuthority ($profile -match '\["1\.1"\]\s*=\s*reduced_profile\("1\.1"' -and $profile -match '\["1\.0"\]\s*=\s*reduced_profile\("1\.0"') '[mir4-m42-stream-authority-f1-profile-use]'
 
 Write-Host '[ok] MIR 4.2 material stream authority reconciles all 98 emitted streams and explicitly omits the 22 recipe-productivity rows on F110/F100.'
