@@ -11,10 +11,111 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repository = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+
+function Get-MIRBackportGitObjectText {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Object)
+  $text = @(& git -C $RepoRoot show $Object) -join "`n"
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($text)) {
+    throw "[mir-backport-historical-authority-object] $Object"
+  }
+  return $text
+}
+
+function Get-MIRBackportTextSha256 {
+  param([Parameter(Mandatory)][string]$Text)
+  $normalized = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($normalized)))
+}
+
+function Assert-MIRBackportHistoricalSourceRoot {
+  param([Parameter(Mandatory)][string]$AuthorityRepository,[Parameter(Mandatory)][string]$SourceRoot)
+
+  # This retired MIR 2 runner is allowed to inspect a Factorio-shaped root only
+  # after its caller is bound to the exact historical package object recorded by
+  # the current release ledger.  A merely clean checkout is not authority.
+  $manifestPath = '.mir/releases/backports/2.5.0.json'
+  $recordPath = '.mir/releases/records/2.5.0.json'
+  foreach ($path in @($manifestPath,$recordPath)) {
+    & git -C $AuthorityRepository diff --quiet -- $path
+    if ($LASTEXITCODE -ne 0) { throw "[mir-backport-historical-authority-dirty] $path" }
+    & git -C $AuthorityRepository diff --cached --quiet -- $path
+    if ($LASTEXITCODE -ne 0) { throw "[mir-backport-historical-authority-index-dirty] $path" }
+  }
+  $manifest = Get-MIRBackportGitObjectText -RepoRoot $AuthorityRepository -Object "HEAD:$manifestPath" | ConvertFrom-Json
+  $record = Get-MIRBackportGitObjectText -RepoRoot $AuthorityRepository -Object "HEAD:$recordPath" | ConvertFrom-Json
+  if ([int]$manifest.schema -ne 2 -or [int]$record.schema -ne 1 -or
+      [string]$manifest.target_release -cne '2.5.0' -or [string]$manifest.target_factorio -cne '2.0' -or
+      [string]$record.release -cne '2.5.0' -or [string]$record.candidate_id -cne '2.5-P11' -or
+      [string]$record.target -cne '2.0' -or [string]$record.state -cne 'publicly-verified') {
+    throw '[mir-backport-historical-authority-record]'
+  }
+  $expectedCommit = [string]$record.package.source_commit
+  $expectedTree = [string]$record.package.source_tree
+  $expectedContentSha256 = [string]$record.package.content_sha256
+  $expectedArchiveSha256 = [string]$record.package.archive_sha256
+  if ($expectedCommit -notmatch '^[0-9a-f]{40}$' -or $expectedTree -notmatch '^[0-9a-f]{40}$' -or
+      $expectedContentSha256 -notmatch '^[A-F0-9]{64}$' -or $expectedArchiveSha256 -notmatch '^[A-F0-9]{64}$' -or
+      [string]$manifest.integration.target_package_source_commit -cne $expectedCommit -or
+      [string]$manifest.expected_target.package_source_tree -cne $expectedTree -or
+      [string]$manifest.expected_target.package_content_sha256 -cne $expectedContentSha256 -or
+      [string]$manifest.expected_target.archive_sha256 -cne $expectedArchiveSha256) {
+    throw '[mir-backport-historical-authority-binding]'
+  }
+  $authorityCommit = (& git -C $AuthorityRepository rev-parse "$expectedCommit`^{commit}").Trim()
+  $authorityTree = (& git -C $AuthorityRepository rev-parse "$expectedCommit`^{tree}").Trim()
+  if ($LASTEXITCODE -ne 0 -or $authorityCommit -cne $expectedCommit -or $authorityTree -cne $expectedTree) {
+    throw '[mir-backport-historical-authority-git-object]'
+  }
+  $sourceRepo = (Resolve-Path -LiteralPath $SourceRoot).Path
+  $sourceGitRoot = (& git -C $sourceRepo rev-parse --show-toplevel).Trim()
+  if ($LASTEXITCODE -ne 0 -or [IO.Path]::GetFullPath($sourceGitRoot) -cne [IO.Path]::GetFullPath($sourceRepo)) {
+    throw '[mir-backport-historical-root-not-git-root]'
+  }
+  $sourceCommit = (& git -C $sourceRepo rev-parse HEAD).Trim()
+  if ($LASTEXITCODE -ne 0 -or $sourceCommit -cne $expectedCommit) {
+    throw "[mir-backport-historical-root-commit] expected=$expectedCommit actual=$sourceCommit"
+  }
+  $sourceTree = (& git -C $sourceRepo rev-parse 'HEAD^{tree}').Trim()
+  if ($LASTEXITCODE -ne 0 -or $sourceTree -cne $expectedTree) {
+    throw "[mir-backport-historical-root-tree] expected=$expectedTree actual=$sourceTree"
+  }
+  $sourceStatus = @(& git -C $sourceRepo status --porcelain --untracked-files=all)
+  if ($LASTEXITCODE -ne 0 -or $sourceStatus.Count -ne 0) {
+    throw '[mir-backport-historical-root-dirty]'
+  }
+  $expectedLockObject = (& git -C $AuthorityRepository rev-parse "$expectedCommit`:.mir/backport-source-lock.json").Trim()
+  $sourceLockObject = (& git -C $sourceRepo rev-parse 'HEAD:.mir/backport-source-lock.json').Trim()
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($expectedLockObject) -or $sourceLockObject -cne $expectedLockObject) {
+    throw '[mir-backport-historical-root-lock-object]'
+  }
+  $sourceLockText = Get-MIRBackportGitObjectText -RepoRoot $sourceRepo -Object 'HEAD:.mir/backport-source-lock.json'
+  $sourceLock = $sourceLockText | ConvertFrom-Json
+  if ([int]$sourceLock.schema -ne 4 -or [int]$sourceLock.projection_schema -ne 3 -or
+      [string]$sourceLock.candidate_id -cne [string]$record.candidate_id -or
+      [string]$sourceLock.mir_version -cne [string]$record.release -or
+      [string]$sourceLock.target -cne [string]$record.target -or
+      [string]$sourceLock.projection.package_source_commit -cne $expectedCommit -or
+      [string]$sourceLock.projection.package_source_tree -cne $expectedTree -or
+      [string]$sourceLock.projection.package_source_sha256 -cne $expectedContentSha256 -or
+      [string]$sourceLock.candidate.archive_sha256 -cne $expectedArchiveSha256 -or
+      [string]$sourceLock.candidate.content_sha256 -cne $expectedContentSha256) {
+    throw '[mir-backport-historical-root-lock-binding]'
+  }
+  return [pscustomobject][ordered]@{
+    release_record = $recordPath
+    source_commit = $expectedCommit
+    source_tree = $expectedTree
+    source_lock_object = $expectedLockObject
+    source_lock_sha256 = Get-MIRBackportTextSha256 -Text $sourceLockText
+    source_root = $sourceRepo
+  }
+}
+
 if ([string]::IsNullOrWhiteSpace($HistoricalSourceRoot)) {
   throw 'This retired MIR 2 backport runner has no current-package authority. Reconstruct its pinned historical source and pass -HistoricalSourceRoot; use the current target materializer for MIR 4 work.'
 }
-$repo = (Resolve-Path -LiteralPath $HistoricalSourceRoot).Path
+$historicalSourceBinding = Assert-MIRBackportHistoricalSourceRoot -AuthorityRepository $repository -SourceRoot $HistoricalSourceRoot
+$repo = [string]$historicalSourceBinding.source_root
 $profilePath = Join-Path $repo ".mir\target-reconstruction.json"
 $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
 $canonicalProfilePath = Join-Path $repo ".mir\targets.json"
@@ -135,6 +236,9 @@ function Get-MIRSealValues {
     target_factorio = $profile.factorio.line
     target = $profile.factorio.line
     source_commit = (& git -C $repo rev-parse HEAD).Trim()
+    historical_source_commit = [string]$historicalSourceBinding.source_commit
+    historical_source_tree = [string]$historicalSourceBinding.source_tree
+    historical_source_lock_sha256 = [string]$historicalSourceBinding.source_lock_sha256
     source_clean = $true
     canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
     canonical_anchor_is_ancestor = $true
@@ -200,6 +304,12 @@ if ($Action -eq "qualify") {
     branch = $profile.branch
     release = $profile.release
     target_factorio = $profile.factorio.line
+    historical_source = [ordered]@{
+      release_record = [string]$historicalSourceBinding.release_record
+      source_commit = [string]$historicalSourceBinding.source_commit
+      source_tree = [string]$historicalSourceBinding.source_tree
+      source_lock_sha256 = [string]$historicalSourceBinding.source_lock_sha256
+    }
     candidate = [ordered]@{ path=[IO.Path]::GetRelativePath($repo,$CandidateZip).Replace("\","/"); sha256=$candidateHash; size_bytes=(Get-Item $CandidateZip).Length }
     factorio = [ordered]@{ version=$profile.factorio.qualified_version; binary_sha256=$profile.factorio.binary_sha256 }
     capability_classification = "passed"
@@ -234,7 +344,7 @@ if ($Action -eq "seal") {
 
 $stored = Get-Content -Raw -LiteralPath $sealPath | ConvertFrom-Json
 $current = Get-MIRSealValues
-foreach ($field in @("branch", "release", "mir_version", "target_factorio", "target", "source_clean", "canonical_dev_anchor", "canonical_anchor_is_ancestor", "backport_source_lock_sha256", "canonical_feature_model_sha256", "target_profile_sha256", "target_reconstruction_profile_sha256", "canonical_target_catalog_sha256", "test_catalog_sha256", "fixtures_fingerprint", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
+foreach ($field in @("branch", "release", "mir_version", "target_factorio", "target", "source_clean", "canonical_dev_anchor", "canonical_anchor_is_ancestor", "backport_source_lock_sha256", "historical_source_commit", "historical_source_tree", "historical_source_lock_sha256", "canonical_feature_model_sha256", "target_profile_sha256", "target_reconstruction_profile_sha256", "canonical_target_catalog_sha256", "test_catalog_sha256", "fixtures_fingerprint", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
   if ([string]$stored.$field -ne [string]$current.$field) { throw "Seal mismatch: $field" }
 }
 foreach ($field in @("path", "sha256", "size_bytes", "content_fingerprint", "package_source_fingerprint")) {

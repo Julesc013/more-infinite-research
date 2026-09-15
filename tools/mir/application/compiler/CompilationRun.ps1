@@ -1,14 +1,29 @@
+function Resolve-MIR4SemanticCompositionTarget {
+  param([Parameter(Mandatory)][string]$Target)
+
+  # Compilation records also cover frozen pre-2.0 providers.  Those have no
+  # current editable package composition, so retain their explicit F210
+  # reference-only authority.  Every target that does have a composition must
+  # use its own selected binding; F200 must never inherit an F210 adapter hash.
+  if ($Target -in @('f210','f200','f110','f100')) { return $Target }
+  return 'f210'
+}
+
 function Resolve-MIR4SemanticAuthorityPath {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$AuthorityPath)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$AuthorityPath,
+    [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210'
+  )
   $relative = $AuthorityPath.Replace('\', '/').TrimStart('/')
   # Legacy shadow-programme records describe package paths. Resolve those
-  # records through the canonical F210 composition so target adapters (such as
-  # science selection) cannot fall back to a retired root projection.
+  # records through the selected canonical composition so target adapters (such
+  # as science selection) cannot fall back to a retired root projection.
   if (-not (Get-Command Test-MIR4CurrentTargetPackageOutputPath -ErrorAction SilentlyContinue)) {
     . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
   }
   if (Test-MIR4CurrentTargetPackageOutputPath -RelativePath $relative) {
-    $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+    $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $Target
     return Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $relative
   }
   return Join-Path $RepoRoot $relative
@@ -38,10 +53,11 @@ function New-MIR4SemanticAuthorityRef {
     [Parameter(Mandatory)][string]$Role,
     [Parameter(Mandatory)][string]$Path,
     [Parameter(Mandatory)][string]$Status,
-    [Parameter(Mandatory)][string]$Maturity
+    [Parameter(Mandatory)][string]$Maturity,
+    [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210'
   )
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $file = Resolve-MIR4SemanticAuthorityPath -RepoRoot $repo -AuthorityPath $Path
+  $file = Resolve-MIR4SemanticAuthorityPath -RepoRoot $repo -AuthorityPath $Path -Target $Target
   if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "[mir4-semantic-reference-missing] ${Role}:$Path" }
   return [ordered]@{role=$Role;authority=([IO.Path]::GetRelativePath($repo,$file).Replace('\','/'));sha256=(Get-MIR4PlatformInputSha256 $file);status=$Status;maturity=$Maturity}
 }
@@ -160,16 +176,17 @@ function Test-MIR4SemanticMergeLaws {
 function New-MIR4FeatureSettingCutoverMatrix {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Providers)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
-  $settingsRefs = @(
-    (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'setting-spec-catalog' -Path '.mir/settings.yml' -Status 'player-authoritative-unchanged' -Maturity 'stable'),
-    (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'setting-catalog-implementation' -Path 'prototypes/mir/settings/catalog.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable'),
-    (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'effective-settings' -Path 'prototypes/mir/settings/effective.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable')
-  )
   $rows = @(
     foreach ($provider in @($Providers)) {
+      $compositionTarget = Resolve-MIR4SemanticCompositionTarget -Target ([string]$provider.id)
+      $settingsRefs = @(
+        (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'setting-spec-catalog' -Path '.mir/settings.yml' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget),
+        (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'setting-catalog-implementation' -Path 'prototypes/mir/settings/catalog.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget),
+        (New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'effective-settings' -Path 'prototypes/mir/settings/effective.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget)
+      )
       $snapshotPath = if ($provider.predecessor) { [string]$provider.predecessor.snapshot } else { '' }
       $snapshotRef = if ($snapshotPath -and (Test-Path -LiteralPath (Join-Path $repo $snapshotPath) -PathType Leaf)) {
-        New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'terminal-feature-setting-snapshot' -Path $snapshotPath -Status 'reference-available' -Maturity 'stable'
+        New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'terminal-feature-setting-snapshot' -Path $snapshotPath -Status 'reference-available' -Maturity 'stable' -Target $compositionTarget
       } else {
         [ordered]@{role='terminal-feature-setting-snapshot';authority=$null;sha256=$null;status='blocked-missing-predecessor-snapshot';maturity='omitted-by-target'}
       }
@@ -200,26 +217,28 @@ function New-MIR4SemanticCompilationRuns {
   $inputs = Get-MIR4PlatformInputs $repo
   $inputLock = [pscustomobject][ordered]@{kind='MIR4PlatformInputLockV1';inputs=$inputs;digest=''}; Add-MIR4PlatformDigest $inputLock|Out-Null
   $schemaPath = Join-Path $repo ([string]$authority.compilation_run_schema)
-  $externalExtensionClosure = $null
-  if (Get-Command Resolve-MIR4ExtensionClosureV1 -ErrorAction SilentlyContinue) {
-    $referenceExtension = New-MIR4ReferenceExtensionV1 -RepoRoot $repo
-    $externalExtensionClosure = Resolve-MIR4ExtensionClosureV1 -RepoRoot $repo -Extensions @($referenceExtension) -Target f210
-  }
+  $externalExtensionClosureByTarget = @{}
   $runs = @(
     foreach ($provider in @($Providers)) {
       $target = [string]$provider.id
+      $compositionTarget = Resolve-MIR4SemanticCompositionTarget -Target $target
       $contract = $contractByTarget[$target]
       $featureSetting = $cutoverByTarget[$target]
       $snapshotPath = if ($provider.predecessor) { [string]$provider.predecessor.snapshot } else { '' }
       $hasSnapshot = $snapshotPath -and (Test-Path -LiteralPath (Join-Path $repo $snapshotPath) -PathType Leaf)
-      $snapshotRef = if ($hasSnapshot) { New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'normalized-terminal-snapshot' -Path $snapshotPath -Status 'reference-available' -Maturity 'stable' } else { [ordered]@{role='normalized-terminal-snapshot';authority=$null;sha256=$null;status='blocked-missing-predecessor-snapshot';maturity='omitted-by-target'} }
+      $snapshotRef = if ($hasSnapshot) { New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'normalized-terminal-snapshot' -Path $snapshotPath -Status 'reference-available' -Maturity 'stable' -Target $compositionTarget } else { [ordered]@{role='normalized-terminal-snapshot';authority=$null;sha256=$null;status='blocked-missing-predecessor-snapshot';maturity='omitted-by-target'} }
       $planRows = @(
         foreach($plan in @($authority.plans)){
           $owner=[string]$plan.owner
-          $ownerValue=if($owner -eq 'W04'){New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json' -Status 'implemented-W04-shadow' -Maturity 'shadow'}else{New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path $owner -Status ([string]$plan.status) -Maturity $(if([string]$plan.status -match 'blocked'){'blocked'}else{'stable'})}
+          $ownerValue=if($owner -eq 'W04'){New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path '.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json' -Status 'implemented-W04-shadow' -Maturity 'shadow' -Target $compositionTarget}else{New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role ([string]$plan.id) -Path $owner -Status ([string]$plan.status) -Maturity $(if([string]$plan.status -match 'blocked'){'blocked'}else{'stable'}) -Target $compositionTarget}
           [ordered]@{id=[string]$plan.id;owner=$ownerValue;executor_authorized=$false}
         }
       )
+      if (-not $externalExtensionClosureByTarget.ContainsKey($compositionTarget) -and (Get-Command Resolve-MIR4ExtensionClosureV1 -ErrorAction SilentlyContinue)) {
+        $referenceExtension = New-MIR4ReferenceExtensionV1 -RepoRoot $repo
+        $externalExtensionClosureByTarget[$compositionTarget] = Resolve-MIR4ExtensionClosureV1 -RepoRoot $repo -Extensions @($referenceExtension) -Target $compositionTarget
+      }
+      $externalExtensionClosure = $externalExtensionClosureByTarget[$compositionTarget]
       $proofs = @(
         [ordered]@{id='old-new-semantic-parity';status=$(if($hasSnapshot){'shadow-reference-ready'}else{'blocked-missing-predecessor-snapshot'});evidence=$snapshotRef},
         [ordered]@{id='target-parity';status='passed-provider-contract-laws';evidence=[ordered]@{contract_digest=[string]$contract.digest;provider_digest=[string]$provider.digest}},
@@ -230,27 +249,27 @@ function New-MIR4SemanticCompilationRuns {
       )
       $run = [pscustomobject][ordered]@{
         kind='MIR4CompilationRunV1';schema=1;programme_id=[string]$authority.programme_id
-        target=[ordered]@{id=$target;factorio_line=[string]$provider.factorio_line;provider_digest=[string]$provider.digest;contract_digest=[string]$contract.digest}
+        target=[ordered]@{id=$target;composition_target=$compositionTarget;factorio_line=[string]$provider.factorio_line;provider_digest=[string]$provider.digest;contract_digest=[string]$contract.digest}
         versions=[ordered]@{source='4.0.0';distribution=[string]$provider.distribution_version}
         adapter='LegacyCompilerHostAdapterV1';maturity='shadow'
         contract_set=[ordered]@{kind=[string]$contracts.kind;digest=[string]$contracts.digest;target_contract_digest=[string]$contract.digest;authority='.mir/releases/waves/mir4-r0/MIR4-Target-Compiler-ProgrammeV1.json'}
         platform_profile=[ordered]@{authority=[string]$provider.profile.authority;authority_sha256=[string]$provider.profile.authority_sha256;profile_digest=[string]$provider.profile.digest;status=[string]$provider.profile.status}
         environment_lock=[ordered]@{kind=[string]$inputLock.kind;digest=[string]$inputLock.digest;engine_lock=$provider.engine_lock;immutable_inputs=$true}
         target_provider=[ordered]@{kind=[string]$contract.provider_spec.kind;digest=[string]$provider.digest;maturity=[string]$contract.provider_spec.maturity;authority='MIR4-Target-RegistryV6'}
-        module_extension_closure=[ordered]@{module_graph=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'module-dependency-graph' -Path '.mir/module-dependencies.json' -Status 'reference-available' -Maturity 'stable');provider_protocol_digest=[string]$protocols.digest;external_extension_closure=$(if($externalExtensionClosure){[ordered]@{authority='.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json';reference_target='f210';closure_digest=[string]$externalExtensionClosure.digest;target_status=$(if($target -in @('f210','f200','f110','f100')){'reference-available'}else{'target-transport-static-or-unavailable'})}}else{'deferred-W05'});mutation_authorized=$false}
+        module_extension_closure=[ordered]@{module_graph=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'module-dependency-graph' -Path '.mir/module-dependencies.json' -Status 'reference-available' -Maturity 'stable' -Target $compositionTarget);provider_protocol_digest=[string]$protocols.digest;external_extension_closure=$(if($externalExtensionClosure){[ordered]@{authority='.mir/releases/waves/mir4-r0/MIR4-Module-Ecosystem-ProgrammeV1.json';reference_target=$compositionTarget;closure_digest=[string]$externalExtensionClosure.digest;target_status=$(if($target -in @('f210','f200','f110','f100')){'reference-available'}else{'target-transport-static-or-unavailable'})}}else{'deferred-W05'});mutation_authorized=$false}
         feature_manifest=$featureSetting.feature_manifest
         setting_spec=$featureSetting.setting_spec
-        normalized_facts=[ordered]@{snapshot=$snapshotRef;adapter=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compilation-snapshot-adapter' -Path 'prototypes/mir/pipeline/compilation_snapshot_adapter.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');duplicated_facts=$false}
-        graphs=[ordered]@{qualification=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'graph-qualification' -Path 'prototypes/mir/graph/qualification.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');snapshot=$snapshotRef;duplicated_graph=$false}
-        process_ir=[ordered]@{authority=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'process-ir-shadow-owner' -Path 'tools/mir/application/processir/ProcessIR.ps1' -Status 'opaque-reference-deferred-W06' -Maturity 'shadow');semantic_owner='W06';duplicated_process_facts=$false}
-        policy=[ordered]@{compatibility=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compatibility-policy' -Path '.mir/compatibility.yml' -Status 'player-authoritative-unchanged' -Maturity 'stable');snapshot=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'policy-snapshot' -Path 'prototypes/mir/domain/compiler/policy_snapshot.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');merge_law_digest=[string]$mergeLaws.digest}
-        claims=[ordered]@{registry=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compatibility-claim-registry' -Path 'prototypes/mir/compatibility/claim_registry.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');provider_claim=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'provider-claim' -Path 'prototypes/mir/providers/pipeline/provider_claim.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable')}
-        resolutions=[ordered]@{owner=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'owner-arbitration' -Path 'prototypes/mir/providers/pipeline/owner_arbitration.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');decision=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'provider-decision' -Path 'prototypes/mir/providers/pipeline/decision.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable')}
+        normalized_facts=[ordered]@{snapshot=$snapshotRef;adapter=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compilation-snapshot-adapter' -Path 'prototypes/mir/pipeline/compilation_snapshot_adapter.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);duplicated_facts=$false}
+        graphs=[ordered]@{qualification=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'graph-qualification' -Path 'prototypes/mir/graph/qualification.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);snapshot=$snapshotRef;duplicated_graph=$false}
+        process_ir=[ordered]@{authority=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'process-ir-shadow-owner' -Path 'tools/mir/application/processir/ProcessIR.ps1' -Status 'opaque-reference-deferred-W06' -Maturity 'shadow' -Target $compositionTarget);semantic_owner='W06';duplicated_process_facts=$false}
+        policy=[ordered]@{compatibility=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compatibility-policy' -Path '.mir/compatibility.yml' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);snapshot=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'policy-snapshot' -Path 'prototypes/mir/domain/compiler/policy_snapshot.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);merge_law_digest=[string]$mergeLaws.digest}
+        claims=[ordered]@{registry=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'compatibility-claim-registry' -Path 'prototypes/mir/compatibility/claim_registry.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);provider_claim=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'provider-claim' -Path 'prototypes/mir/providers/pipeline/provider_claim.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget)}
+        resolutions=[ordered]@{owner=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'owner-arbitration' -Path 'prototypes/mir/providers/pipeline/owner_arbitration.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);decision=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'provider-decision' -Path 'prototypes/mir/providers/pipeline/decision.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget)}
         plans=$planRows
-        operations=[ordered]@{plan=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'transformation-plan' -Path 'prototypes/mir/domain/compiler/transformation_plan.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');executor=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'technology-operation-executor' -Path 'prototypes/mir/emit/technology_operation_executor.lua' -Status 'existing-authoritative-not-invoked' -Maturity 'stable');execution_authorized=$false}
+        operations=[ordered]@{plan=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'transformation-plan' -Path 'prototypes/mir/domain/compiler/transformation_plan.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);executor=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'technology-operation-executor' -Path 'prototypes/mir/emit/technology_operation_executor.lua' -Status 'existing-authoritative-not-invoked' -Maturity 'stable' -Target $compositionTarget);execution_authorized=$false}
         runtime_state=[ordered]@{inventory_kind=[string]$runtimeInventory.kind;inventory_digest=[string]$runtimeInventory.digest;authority='.mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json';status='W04-shadow-contract-complete-runtime-proof-required';mutation_authorized=$false}
         proof_obligations=$proofs
-        bounded_public_projections=[ordered]@{authority=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'public-compiler-artifacts' -Path 'prototypes/mir/report/public_compiler_artifacts.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable');mode='reference-only';new_projection_authorized=$false;budget='existing-public-artifact-bounds'}
+        bounded_public_projections=[ordered]@{authority=(New-MIR4SemanticAuthorityRef -RepoRoot $repo -Role 'public-compiler-artifacts' -Path 'prototypes/mir/report/public_compiler_artifacts.lua' -Status 'player-authoritative-unchanged' -Maturity 'stable' -Target $compositionTarget);mode='reference-only';new_projection_authorized=$false;budget='existing-public-artifact-bounds'}
         merge_law_catalogue=[ordered]@{kind=[string]$mergeLaws.kind;digest=[string]$mergeLaws.digest;implemented_passed=[bool]$mergeLaws.implemented_passed;deferred_owners=@($mergeLaws.deferred_owners)}
         input_digests=$inputs
         stages=@('contract-admission','environment-lock','legacy-provider-adaptation','feature-setting-reference-aggregation','safety-kernel','policy-engine','merge-law-evaluation','plan-reference-projection','bounded-public-reference')

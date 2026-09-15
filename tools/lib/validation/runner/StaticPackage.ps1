@@ -157,10 +157,10 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
     $innerInfoEntry = $entries | Where-Object { $_.FullName -eq "${root}info.json" } | Select-Object -First 1
     $innerInfo = Read-ZipEntryText $innerInfoEntry | ConvertFrom-Json
-    if ($innerInfo.name -ne $info.name -or $innerInfo.version -ne $info.version -or $innerInfo.factorio_version -ne $info.factorio_version) {
-      throw "Package info.json metadata does not match repository info.json."
+    if ($innerInfo.name -ne $repoInfo.name -or $innerInfo.version -ne $repoInfo.version -or $innerInfo.factorio_version -ne $repoInfo.factorio_version) {
+      throw "Package info.json metadata does not match the selected target composition."
     }
-    $repoDeps = @($info.dependencies)
+    $repoDeps = @($repoInfo.dependencies)
     $packageDeps = @($innerInfo.dependencies)
     $depDiff = @(Compare-Object -ReferenceObject $repoDeps -DifferenceObject $packageDeps)
     if ($depDiff.Count -gt 0) {
