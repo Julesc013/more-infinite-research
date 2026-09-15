@@ -5075,9 +5075,9 @@
     {
       "path": "tools/mir/application/release/readiness/Promotion.ps1",
       "classification": "canonical-internal",
-      "sha256": "7E8A23E390503C4BEB5BD3F432F06CFD9F4639CEA90297C0BC369C672CD141D5",
+      "sha256": "8BF9DB021D24D4CCDAFCF7516CFD6F67F99DDEA339F18C96485390C01572A901",
       "hash_mode": "canonical-text-v1",
-      "lines": 108,
+      "lines": 112,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0fec3020b928b388e3ad092a6f5ed2cbf332cab4538b1d97d91068b0d2fa8529"
+  "digest": "sha256:2f29e1abb4b24247910ec1382a8d7cc2655831ac4d833af88ff944ffd82091ec"
 }

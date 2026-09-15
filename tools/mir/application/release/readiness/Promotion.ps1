@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
 
+if (-not (Get-Command Get-MIR441ReleaseReadinessContract -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot 'Contract.ps1')
+}
+
 function Invoke-MIR441CaptureCommand {
   param([Parameter(Mandatory)][string]$File,[Parameter(Mandatory)][string[]]$Arguments)
   $output=@(& $File @Arguments 2>&1);$code=$LASTEXITCODE
