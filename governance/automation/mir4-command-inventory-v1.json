@@ -4499,9 +4499,9 @@
     {
       "path": "tools/mir/application/assurance/EnvironmentEvidence.ps1",
       "classification": "canonical-internal",
-      "sha256": "B7680F2564F7B1D29FDF6728EEAC3C95E1EAECAE5BD10315D917CBE9C4F5698C",
+      "sha256": "A01A6074C71141BC8C1479C6A94C83F6560076DA1252E92D57979B635ED68E2E",
       "hash_mode": "canonical-text-v1",
-      "lines": 364,
+      "lines": 392,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:43930dcfaad0269cded41696ec7a9006eb74d290449d7dd96f1abf0b7f2ef4ab"
+  "digest": "sha256:d41e2f2f123ceecf01cd19d58b17b0a924fae809e3bcfb190a331c857bddde43"
 }
