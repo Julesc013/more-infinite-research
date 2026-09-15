@@ -65,7 +65,7 @@
     },
     {
       "id": "mir4-current-package-presentation-v3",
-      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^(?:governance|assurance)/repository/composable-source-layout-v1\\.json$", "^assurance/repository/composable-source-layout-receipt-v1\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$"],
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^spec/schemas/mir4-current-package-presentation-v3\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^(?:governance|assurance)/repository/composable-source-layout-v1\\.json$", "^assurance/repository/composable-source-layout-receipt-v1\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:HistoricalSourceAuthority|PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV3Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV3\\.ps1$"],
       "tests": ["static.mir4-current-package-presentation-v3"]
     },
     {
