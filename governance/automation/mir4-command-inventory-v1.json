@@ -640,7 +640,7 @@
     },
     {
       "key": "storage audit",
-      "public_syntax": ".\\tools\\mir.ps1 storage audit [--all-worktrees] [--older-than-days <days>]",
+      "public_syntax": ".\\tools\\mir.ps1 storage audit [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -648,7 +648,7 @@
     },
     {
       "key": "storage clean",
-      "public_syntax": ".\\tools\\mir.ps1 storage clean [--all-worktrees] [--older-than-days <days>] --apply",
+      "public_syntax": ".\\tools\\mir.ps1 storage clean [--artifact-type <result|test|package>[,...]] [--all-worktrees] [--older-than-days <days>] --apply",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -3163,9 +3163,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "11AF5714B80ED1BDFAF4156E130100CAF936B77B6DD7F16EA04E13071ECD7409",
+      "sha256": "94D1D16FF85EC572179FB9F9893AE2B5C9FEBC927B7D57FCE435D1A5600952A5",
       "hash_mode": "canonical-text-v1",
-      "lines": 453,
+      "lines": 622,
       "package_visible": false
     },
     {
@@ -3211,39 +3211,39 @@
     {
       "path": "tools/lib/assurance/evidence/CommandExecution.ps1",
       "classification": "canonical-internal",
-      "sha256": "E375096CBB0B669D67EE0BEFF51CA922C5F6257CD275C98D6DA2799C8FA37AE0",
+      "sha256": "52008E91EFFECFF9F3A853142B92D9A4FC4EE49E80E791F358774D9B3092436D",
       "hash_mode": "canonical-text-v1",
-      "lines": 109,
+      "lines": 111,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "D2909D05C9FAB388FF8C628D909E808F6DCF7F40883A7AADAF2EE554008A9A5D",
+      "sha256": "81E8DCDBAFED8B591AA93D6B8962AAF6AC94785093B436C1A2216124CC77CA99",
       "hash_mode": "canonical-text-v1",
-      "lines": 212,
+      "lines": 214,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "4158FA6462BF490847744B9A19247FC238910849151E0DBA90EE55BB9E31E3C0",
+      "sha256": "F4225F87D1ABCF001FA320E0E9962D0DA5006E72731BF6DF10B48AB04C41D922",
       "hash_mode": "canonical-text-v1",
-      "lines": 588,
+      "lines": 812,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "4CB888C3A037F55C50B3FA9F301AF59865D00CA75DFA28BF2FD4EDF96B01C552",
+      "sha256": "0BBF2D5041381A6E7A14F2C9CC6B66075567182B75A731E0A8B23D841458079F",
       "hash_mode": "canonical-text-v1",
-      "lines": 560,
+      "lines": 583,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Plans.ps1",
       "classification": "canonical-internal",
-      "sha256": "A64F9A75629512D923ABD0AE39DC4A81F126E79F21441BF46B430303458A4027",
+      "sha256": "E6236BC30F0D719685A4AF8DD40C772520D90B4201F406D875182A2D96276CF0",
       "hash_mode": "canonical-text-v1",
       "lines": 239,
       "package_visible": false
@@ -3259,15 +3259,15 @@
     {
       "path": "tools/lib/assurance/evidence/WorkerArtifactValidation.ps1",
       "classification": "canonical-internal",
-      "sha256": "E13B8CC2FE0F9A8017DCCBA2892EB0CB821B82F4EDF8022313108C9132804B2F",
+      "sha256": "FCDA1ACE1FD2F97A2A72B2269A4A2E4D27969BF8556B896BD4FA5DC56D7B4918",
       "hash_mode": "canonical-text-v1",
-      "lines": 269,
+      "lines": 325,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/WorkerImport.ps1",
       "classification": "canonical-internal",
-      "sha256": "52EA1E2EC93666720040BC1CF37CD1AA197AA64FA7E0A3B984D56E000312ADD3",
+      "sha256": "A60BD5289DE35FDE4E69952925A920EF4A186FCE6219511B77037E409641E6D8",
       "hash_mode": "canonical-text-v1",
       "lines": 511,
       "package_visible": false
@@ -5171,9 +5171,9 @@
     {
       "path": "tools/mir/application/tooling/TestWorkflowCatalogues.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "CD1187C09AB2A559DEC25ABB9E21D5C5B2E58A77BC9A01474B9A40CACA4A8E2C",
+      "sha256": "B66E074F71FBFE6C0813388DD2C8AE9E7F1520F56E1DDEEA0D3F553B1A0B8D08",
       "hash_mode": "canonical-text-v1",
-      "lines": 184,
+      "lines": 191,
       "package_visible": false
     },
     {
@@ -5443,7 +5443,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "4A8E086A1BCB546F7FB4F28007689DA94E2264F09023521F262F3A51558A4CBE",
+      "sha256": "59658DDFD6C5134B2FCF79D474C5ED469C028126D7BEEFD10B204807F85FDA2C",
       "hash_mode": "canonical-text-v1",
       "lines": 137,
       "package_visible": false
@@ -5531,9 +5531,9 @@
     {
       "path": "tools/mir/cli/router/RepositoryCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "41FA92DA37B6E4083C1E02E3B0BB3B5D6C8994C6C3B5A778753C1C94FC2B7AA8",
+      "sha256": "D3D96FBCA8D39A266B3921DE894456871DB24BA750080EE1547ADC9392318507",
       "hash_mode": "canonical-text-v1",
-      "lines": 137,
+      "lines": 144,
       "package_visible": false
     },
     {
@@ -5618,5 +5618,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ca7e0c1ad8d6bd370e5b676301399f207324133f726ff0eea335b92d32afdb7b"
+  "digest": "sha256:43930dcfaad0269cded41696ec7a9006eb74d290449d7dd96f1abf0b7f2ef4ab"
 }

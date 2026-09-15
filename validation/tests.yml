@@ -4224,16 +4224,34 @@
       "id": "static.mir4-development-contracts",
       "kind": "static",
       "layer": "F0",
-      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>",
       "requires_factorio": false,
       "inputs": [
         "governance/repository/development-epoch-v1.json",
+        "source-identity",
         "tests/repository/Test-MIR4DevelopmentContracts.ps1",
         "src/mod/**",
         "targets/**",
+        "tools/mir.ps1",
         "tools/mir/**",
+        "tools/commands/**",
+        "tools/lib/**",
+        "scripts/**",
+        "tools/commands/package/Build-MIRPackage.ps1",
         "tests/**",
-        "spec/programmes/mir4-4x-operating-programme-v1.json"
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-command-inventory-v1.schema.json",
+        "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+        "contracts/repository/mir4-test-proof-catalogue-v1.schema.json",
+        "validation/tests.yml",
+        "assurance/catalog/tests.json"
+      ],
+      "captured_artifacts": [
+        {
+          "path_pattern": "<test-output>",
+          "schema": "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+          "kind": "MIR4DevelopmentContractsLocalResultV1"
+        }
       ]
     },
     {

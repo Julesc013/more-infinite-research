@@ -453,7 +453,7 @@ function Import-MIRAssuranceWorkerEvidence {
         }
       }
       if ([string]$workerObject.outcome -eq "passed") {
-        $validation = Test-MIRAssuranceCapsule -Capsule $workerObject.capsule -Fingerprint $test.fingerprint -Context $Context
+        $validation = Test-MIRAssuranceCapsule -Capsule $workerObject.capsule -Fingerprint $test.fingerprint -Context $Context -Test $test
         if (-not [bool]$validation.valid) {
           throw "Imported worker evidence failed canonical validation: $([string]$validation.reason)"
         }

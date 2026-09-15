@@ -313,6 +313,198 @@ function Invoke-MIRAssuranceSelfTest {
   # one reusable pointer, while any changed conclusion or result digest is a
   # quarantined contradiction that requires a new independent reproduction.
   $syntheticAttemptRoots = [Collections.Generic.List[string]]::new()
+
+  # Captured artifacts are catalogue obligations: a worker capsule must carry
+  # the schema-validated development-contract receipt, not merely report that
+  # its command exited zero.  Exercise the real executor and worker-object
+  # reader with a tiny schema-valid receipt, then prove absent, ambiguous,
+  # malformed, and descriptor-mismatched receipts are rejected.
+  $capturedCaseRoot = Join-Path $artifactRoot ('captured-artifact-self-test-' + [guid]::NewGuid().ToString('N'))
+  $capturedSchema = 'contracts/repository/mir4-development-contracts-local-result-v1.schema.json'
+  $capturedKind = 'MIR4DevelopmentContractsLocalResultV1'
+  $capturedPackages = @(
+    foreach ($target in @('f210','f200','f110','f100')) {
+      [ordered]@{target=$target;archive_sha256=('4' * 64);content_sha256=('5' * 64);entry_count=1}
+    }
+  )
+  $newCapturedValidJson = {
+    param([Parameter(Mandatory)]$Plan)
+    return (([ordered]@{
+      schema=1;kind=$capturedKind;status='passed';scope='current-source-and-four-target-determinism'
+      source=[ordered]@{
+        commit=[string]$Plan.source_commit;tree=[string]$Plan.source_tree;package_source_sha256=[string]$Plan.package_source_sha256;package_source_dirty=$false
+        selected_inputs_sha256=('3' * 64);selected_input_file_count=1;selected_inputs_dirty=$false;repository_dirty=$false
+      }
+      command_inventory_digest=('sha256:' + ('6' * 64));packages=$capturedPackages
+      retained_expanded_packages=$false;release_authority=$false
+    } | ConvertTo-Json -Depth 20) + "`n")
+  }
+  $invokeCapturedCase = {
+    param(
+      [Parameter(Mandatory)][string]$Label,
+      [Parameter(Mandatory)][ValidateSet('valid','missing','ambiguous','invalid')][string]$Mode,
+      [switch]$ExactTestOutput
+    )
+    $caseDirectory = Join-Path $capturedCaseRoot $Label
+    New-Item -ItemType Directory -Force -Path $caseDirectory | Out-Null
+    $writerPath = Join-Path $caseDirectory 'write-receipt.ps1'
+    $receiptStem = Join-Path $caseDirectory 'receipt'
+    $plan = [pscustomobject][ordered]@{
+      baseline='self-test';source_commit=(& git -C $repo rev-parse HEAD).Trim();source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();package_source_sha256=('2' * 64)
+    }
+    $capturedValidJson = & $newCapturedValidJson $plan
+    $writes = [Collections.Generic.List[string]]::new()
+    if (-not $ExactTestOutput) {
+      switch ($Mode) {
+        'valid' { $writes.Add($receiptStem + '-one.json') }
+        'ambiguous' {
+          $writes.Add($receiptStem + '-one.json')
+          $writes.Add($receiptStem + '-two.json')
+        }
+        'invalid' { $writes.Add($receiptStem + '-one.json') }
+      }
+    }
+    $writerLines = [Collections.Generic.List[string]]::new()
+    $payload = if ($Mode -eq 'invalid') { "{}`n" } else { $capturedValidJson }
+    $base64 = [Convert]::ToBase64String([Text.UTF8Encoding]::new($false).GetBytes($payload))
+    if ($ExactTestOutput) {
+      $writerLines.Add('param([Parameter(Mandatory)][string]$ReceiptPath)')
+      if ($Mode -ne 'missing') {
+        $writerLines.Add("[IO.File]::WriteAllBytes(`$ReceiptPath,[Convert]::FromBase64String('$base64'))")
+        # A neighbouring JSON file would make a glob declaration ambiguous.
+        # The worker-provided output identity must ignore it.
+        $writerLines.Add("[IO.File]::WriteAllBytes((Join-Path (Split-Path -Parent `$ReceiptPath) 'unrelated.json'),[Convert]::FromBase64String('$base64'))")
+      }
+    } else {
+      foreach ($path in $writes) {
+        $writerLines.Add("[IO.File]::WriteAllBytes('$($path.Replace("'","''"))',[Convert]::FromBase64String('$base64'))")
+      }
+    }
+    [IO.File]::WriteAllText($writerPath, (($writerLines -join "`n") + "`n"), [Text.UTF8Encoding]::new($false))
+    $relativeWriter = (Get-MIRAssuranceRepoRelativePath -Path $writerPath).Replace('\','/')
+    $pattern = if ($ExactTestOutput) { '<test-output>' } else { (Get-MIRAssuranceRepoRelativePath -Path (Join-Path $caseDirectory 'receipt-*.json')).Replace('\','/') }
+    $command = if ($ExactTestOutput) { './' + $relativeWriter + ' -ReceiptPath <test-output>' } else { './' + $relativeWriter }
+    $test = [pscustomobject][ordered]@{
+      id=('self-test.captured-artifact.' + $Label)
+      safe_test_id=('self-test.captured-artifact.' + $Label)
+      kind='static';layer='F0';requires_factorio=$false;requires_candidate=$false;inputs=@()
+      command=$command
+      captured_artifacts=@([pscustomobject][ordered]@{path_pattern=$pattern;schema=$capturedSchema;kind=$capturedKind})
+      force_fresh=$false
+    }
+    $test | Add-Member -NotePropertyName fingerprint -NotePropertyValue (Get-MIRAssuranceTestFingerprint -Test $test -Plan $plan -Context $Context)
+    $casePaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$test.id) -InputKey ([string]$test.fingerprint.input_key)
+    $syntheticAttemptRoots.Add([string]$casePaths.root)
+    try {
+      # The durable worker boundary is the immutable JSON capsule, whose
+      # canonical representation is what reuse/import validates.
+      $liveCapsule = Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $Context
+      $capsulePath = Resolve-MIRAssurancePath -Path ([string]$liveCapsule.attempt_path)
+      $capsule = Get-Content -Raw -LiteralPath $capsulePath | ConvertFrom-Json
+      return [pscustomobject][ordered]@{test=$test;plan=$plan;paths=$casePaths;capsule=$capsule;error=$null}
+    } catch {
+      return [pscustomobject][ordered]@{test=$test;plan=$plan;paths=$casePaths;capsule=$null;error=$_.Exception.Message}
+    }
+  }
+  $capturedValid = & $invokeCapturedCase 'valid' 'valid'
+  $capturedValidation = if ($null -ne $capturedValid.capsule) {
+    Test-MIRAssuranceCapsule -Capsule $capturedValid.capsule -Fingerprint $capturedValid.test.fingerprint -Context $Context -Test $capturedValid.test
+  } else {
+    [ordered]@{valid=$false;reason='no-capsule'}
+  }
+  $capturedDeclarationCount = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $capturedValid.test).Count
+  $capturedDescriptorCount = @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count
+  if ($null -eq $capturedValid.capsule -or -not [string]::IsNullOrWhiteSpace([string]$capturedValid.error) -or
+      @($capturedValid.capsule.artifacts).Count -ne 1 -or
+      [string]$capturedValid.capsule.artifacts[0].kind -ne $capturedKind -or
+      [string]$capturedValid.capsule.artifacts[0].schema -ne $capturedSchema -or
+      [string]$capturedValid.capsule.artifacts[0].sha256 -notmatch '^[A-F0-9]{64}$' -or
+      -not [bool]$capturedValidation.valid) {
+    throw "A catalogue-declared development-contract receipt was not captured and descriptor-bound into the worker capsule: $($capturedValid.error) [$($capturedValidation.reason); declarations=$capturedDeclarationCount; captured=$capturedDescriptorCount]"
+  }
+  $exactCaptured = & $invokeCapturedCase 'exact-output' 'valid' -ExactTestOutput
+  $exactCapturedValidation = if ($null -ne $exactCaptured.capsule) {
+    Test-MIRAssuranceCapsule -Capsule $exactCaptured.capsule -Fingerprint $exactCaptured.test.fingerprint -Context $Context -Test $exactCaptured.test
+  } else { [ordered]@{valid=$false;reason='no-capsule'} }
+  if ($null -eq $exactCaptured.capsule -or -not [string]::IsNullOrWhiteSpace([string]$exactCaptured.error) -or
+      [string]$exactCaptured.capsule.artifacts[0].path_pattern -cne '<test-output>' -or
+      [string]$exactCaptured.capsule.artifacts[0].source_path -notmatch '/work/[0-9a-f]{32}/test-output[.]json$' -or
+      -not [bool]$exactCapturedValidation.valid) {
+    throw "An exact worker test-output receipt was not captured independently of adjacent JSON files: $($exactCaptured.error) [$($exactCapturedValidation.reason)]"
+  }
+  $missingExactCaptured = & $invokeCapturedCase 'exact-output-missing' 'missing' -ExactTestOutput
+  if ($null -ne $missingExactCaptured.capsule -or [string]$missingExactCaptured.error -notmatch 'exact <test-output>') {
+    throw "A missing exact worker test-output receipt did not fail closed: $($missingExactCaptured.error)"
+  }
+  $planIdentityMismatch = ConvertTo-MIRAssuranceOrderedMap -Object (($exactCaptured.plan | ConvertTo-Json -Depth 20) | ConvertFrom-Json)
+  $planIdentityMismatch['source_tree'] = ('0' * 40)
+  $planIdentityCaught = $false
+  try {
+    $null = Test-MIRAssuranceCapturedArtifactJson -Path (Resolve-MIRAssurancePath -Path ([string]$exactCaptured.capsule.artifacts[0].path)) -Declaration (Get-MIRAssuranceCapturedArtifactDeclarations -Test $exactCaptured.test)[0] -TestId ([string]$exactCaptured.test.id) -Plan $planIdentityMismatch
+  } catch { $planIdentityCaught = $_.Exception.Message -match 'does not match the active plan' }
+  if (-not $planIdentityCaught) { throw 'A receipt for a different plan source identity was accepted.' }
+  $capturedWorkerPlan = [pscustomobject][ordered]@{
+    tests=@($capturedValid.test)
+    work=@([pscustomobject][ordered]@{test_id=[string]$capturedValid.test.id;safe_test_id=[string]$capturedValid.test.safe_test_id;fingerprint=[string]$capturedValid.test.fingerprint.fingerprint_sha256;disposition='RUN';layer='F0'})
+    plan_material_sha256=(Get-MIRAssuranceTextHash -Text ('captured-artifact-worker-' + [guid]::NewGuid().ToString('N')))
+    required_test_set_sha256=(Get-MIRAssuranceJsonHash -Value @([string]$capturedValid.test.id))
+    generated_at=[string]$capturedValid.capsule.started_at;source_commit=[string]$capturedValid.capsule.producer.commit
+    source_tree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();target=[string]$Context.target;profile='self-test-captured-artifact';producer=$capturedValid.capsule.producer
+  }
+  $null = Write-MIRAssuranceWorkerReceipt -Plan $capturedWorkerPlan -Test $capturedValid.test -Capsule $capturedValid.capsule
+  $capturedWorkerRoot = Join-Path $capturedCaseRoot 'worker'
+  $capturedWorkerArtifact = Join-Path $capturedWorkerRoot 'captured-artifact-worker'
+  New-Item -ItemType Directory -Force -Path $capturedWorkerArtifact | Out-Null
+  foreach ($item in @(Get-ChildItem -LiteralPath $capturedValid.paths.root -Force)) {
+    Copy-Item -LiteralPath $item.FullName -Destination $capturedWorkerArtifact -Recurse -Force
+  }
+  $capturedWorkerObject = Read-MIRAssuranceWorkerObject -SourceRoot $capturedWorkerArtifact -Plan $capturedWorkerPlan -Test $capturedValid.test -Context $Context
+  if (@($capturedWorkerObject.capsule.artifacts).Count -ne 1 -or
+      [string]$capturedWorkerObject.capsule.artifacts[0].kind -ne $capturedKind -or
+      [string]$capturedWorkerObject.capsule.artifacts[0].sha256 -ne [string]$capturedValid.capsule.artifacts[0].sha256) {
+    throw 'Worker artifact import did not retain the captured development-contract receipt kind and digest.'
+  }
+  foreach ($negative in @(
+    [ordered]@{label='missing';mode='missing';reason='exactly one captured artifact'},
+    [ordered]@{label='ambiguous';mode='ambiguous';reason='exactly one captured artifact'},
+    [ordered]@{label='invalid';mode='invalid';reason='schema-invalid'}
+  )) {
+    $case = & $invokeCapturedCase ([string]$negative.label) ([string]$negative.mode)
+    if ($null -ne $case.capsule -or [string]$case.error -notmatch [regex]::Escape([string]$negative.reason)) {
+      throw "Captured-artifact negative case '$($negative.label)' did not fail closed: $($case.error)"
+    }
+  }
+  $identityMismatchedCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($exactCaptured.capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+  $identityMismatchedArtifact = ConvertTo-MIRAssuranceOrderedMap -Object $identityMismatchedCapsule.artifacts[0]
+  $identityMismatchedArtifact['source_tree'] = ('0' * 40)
+  $identityMismatchedCapsule['artifacts'] = @($identityMismatchedArtifact)
+  $identityMismatchedStructured = Get-Content -Raw -LiteralPath (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path)) | ConvertFrom-Json
+  $identityMismatchedStructured.artifacts = @([pscustomobject]$identityMismatchedArtifact)
+  Write-MIRAssuranceAtomicJson -Value $identityMismatchedStructured -Path (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path))
+  $identityMismatchedResult = Get-MIRAssuranceArtifactDescriptor -Path (Resolve-MIRAssurancePath -Path ([string]$identityMismatchedCapsule.result.path)) -Kind 'structured-test-result'
+  $identityMismatchedResult['schema'] = 'mir-test-result-v1';$identityMismatchedResult['status'] = 'passed'
+  $identityMismatchedCapsule['result'] = $identityMismatchedResult
+  $identityMismatchedCapsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $identityMismatchedCapsule
+  $identityMismatchedValidation = Test-MIRAssuranceCapsule -Capsule $identityMismatchedCapsule -Fingerprint $exactCaptured.test.fingerprint -Context $Context -Test $exactCaptured.test
+  if ([bool]$identityMismatchedValidation.valid -or [string]$identityMismatchedValidation.reason -ne 'captured-artifact-source-identity-mismatch') {
+    throw 'A capsule whose captured receipt identity descriptor disagreed with its receipt was accepted.'
+  }
+  $mismatchedCapsule = ConvertTo-MIRAssuranceOrderedMap -Object (($capturedValid.capsule | ConvertTo-Json -Depth 40) | ConvertFrom-Json)
+  $mismatchedArtifact = ConvertTo-MIRAssuranceOrderedMap -Object $mismatchedCapsule.artifacts[0]
+  $mismatchedArtifact['kind'] = 'MIR4DevelopmentContractsMismatchedReceiptV1'
+  $mismatchedCapsule['artifacts'] = @($mismatchedArtifact)
+  $mismatchedStructured = Get-Content -Raw -LiteralPath (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path)) | ConvertFrom-Json
+  $mismatchedStructured.artifacts = @([pscustomobject]$mismatchedArtifact)
+  Write-MIRAssuranceAtomicJson -Value $mismatchedStructured -Path (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path))
+  $mismatchedResult = Get-MIRAssuranceArtifactDescriptor -Path (Resolve-MIRAssurancePath -Path ([string]$mismatchedCapsule.result.path)) -Kind 'structured-test-result'
+  $mismatchedResult['schema'] = 'mir-test-result-v1';$mismatchedResult['status'] = 'passed'
+  $mismatchedCapsule['result'] = $mismatchedResult
+  $mismatchedCapsule['result_digest'] = Get-MIRAssuranceCapsuleDigest -Capsule $mismatchedCapsule
+  if ([bool](Test-MIRAssuranceCapsule -Capsule $mismatchedCapsule -Fingerprint $capturedValid.test.fingerprint -Context $Context -Test $capturedValid.test).valid) {
+    throw 'A descriptor-mismatched captured development-contract receipt was accepted.'
+  }
+  if (Test-Path -LiteralPath $capturedCaseRoot) { Remove-Item -LiteralPath $capturedCaseRoot -Recurse -Force }
+
   $newSyntheticAttempt = {
     param(
       [Parameter(Mandatory)]$Identity,

@@ -236,6 +236,20 @@ function Get-MIRAssuranceInputFingerprint {
       $files = @(Get-MIRAssurancePackageFiles)
       return [ordered]@{ kind="package-source"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
     }
+    "source-identity" {
+      $material = [ordered]@{
+        commit=[string]$Plan.source_commit
+        tree=[string]$Plan.source_tree
+        package_source_sha256=[string]$Plan.package_source_sha256
+      }
+      return [ordered]@{
+        kind='source-identity'
+        commit=[string]$material.commit
+        tree=[string]$material.tree
+        package_source_sha256=[string]$material.package_source_sha256
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
+    }
     "repository" {
       $files = @(Get-MIRAssuranceRepositoryFiles)
       return [ordered]@{ kind="repository"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
@@ -525,6 +539,15 @@ function Get-MIRAssuranceTestFingerprint {
     requires_factorio=[bool]$Test.requires_factorio
     requires_candidate=[bool]$Test.requires_candidate
     inputs=@($Test.inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    captured_artifacts=@(
+      foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
+        [ordered]@{
+          path_pattern=[string]$artifact.path_pattern
+          schema=[string]$artifact.schema
+          kind=[string]$artifact.kind
+        }
+      }
+    )
     domain_dependencies=@($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
     scenario_sha256=if ($Test.scenario) { Get-MIRAssuranceJsonHash -Value $Test.scenario } else { "" }
   }

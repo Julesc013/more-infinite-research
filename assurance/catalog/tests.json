@@ -30,6 +30,7 @@
         "tests/tooling/Test-MIRGovernance.ps1",
         "scripts/Invoke-MIRValidation.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -55,6 +56,7 @@
         "tools/lib/validation/ReleaseAttestations.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -88,6 +90,7 @@
         "tools/lib/validation/SettingsOverrides.ps1",
         "prototypes/mir/report/compiler_telemetry.lua"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -111,6 +114,7 @@
         "tests/release/Test-MIRApprovedPatchDelta.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -141,6 +145,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -171,6 +176,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -201,6 +207,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -231,6 +238,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -261,6 +269,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -291,6 +300,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -325,6 +335,7 @@
         "targets/package-authority.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -342,6 +353,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": null,
+      "captured_artifacts": [],
       "matrix": {
         "source": "scenario-registry",
         "selector": "affected"
@@ -370,6 +382,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -395,6 +408,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -422,6 +436,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -449,6 +464,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -474,6 +490,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -499,6 +516,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -524,6 +542,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -549,6 +568,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -574,6 +594,7 @@
         "targets/f210/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -601,6 +622,7 @@
         "targets/f210/generation/README.md.template",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -630,6 +652,7 @@
         ".mir/releases/waves/mir4-r0/MIR4-Private-Lane-AuthorizationV3.json",
         "runtime.full"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -647,6 +670,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": null,
+      "captured_artifacts": [],
       "matrix": {
         "source": "scenario-registry",
         "selector": "smoke"
@@ -675,6 +699,7 @@
         "targets/f200/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -700,6 +725,7 @@
         "targets/f200/overlay.json",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -717,6 +743,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": true,
       "inputs": null,
+      "captured_artifacts": [],
       "matrix": {
         "source": "scenario-registry",
         "selector": "full"
@@ -757,6 +784,7 @@
         "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-list.json",
         "build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods/mod-settings.dat"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -778,6 +806,7 @@
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tests/compiler/material_routes.lua"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -801,6 +830,7 @@
         ".mir/releases/waves/mir4-r0/MIR4-Historical-Private-Candidate-AuthorizationV1.json",
         "tests/runtime/Test-MIR4HistoricalPrivateRuntime.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -826,6 +856,7 @@
         "tests/runtime/Test-MIRMuseumRuntime.ps1",
         "tests/runtime/Test-MIRMuseumExact.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -847,6 +878,7 @@
         "tests/runtime/optional_runtime_probe.lua",
         "tests/runtime/optional_runtime_services.lua"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -885,6 +917,7 @@
         "tools/lib/validation/PackageIdentity.ps1",
         "tools/lib/validation/SettingsOverrides.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -908,6 +941,7 @@
         "src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
         ".mir/fixtures.yml"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -934,6 +968,7 @@
         "targets/f200/files/prototypes/mir/runtime/scripted_techs.lua",
         "src/mod/package-source.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -960,6 +995,7 @@
         "targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "targets/f210/files/prototypes/mir/planner/science.lua"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -987,6 +1023,7 @@
         "scenario-harness",
         "settings"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1011,6 +1048,7 @@
         "scenario-harness",
         "evidence"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1033,6 +1071,7 @@
         ".mir/module-dependencies.json",
         "tests/architecture/Test-MIRArchitecture.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1055,6 +1094,7 @@
         ".mir/settings.yml",
         ".mir/native-owner-cost-models.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1078,6 +1118,7 @@
         "tests/release/Test-MIRBranchPolicy.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1113,6 +1154,7 @@
         "tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
         "tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1134,6 +1176,7 @@
         "tools/commands/technology/Export-MIRCompilerPreview.ps1",
         "tests/compiler/Test-MIRCompilerPreviewExport.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1155,6 +1198,7 @@
         "test-catalog",
         "target-profile"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1180,6 +1224,7 @@
         "targets/package-authority.json",
         "targets/f200/overlay.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1210,6 +1255,7 @@
         "tools/maintenance/**",
         "tests/tooling/Test-MIRLayout.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1235,6 +1281,7 @@
         "prototypes/mir/settings/**",
         "prototypes/streams/**"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1260,6 +1307,7 @@
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1284,6 +1332,7 @@
         "spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json",
         "spec/schemas/mir4-a00-current-authority-observation-v1.schema.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1321,6 +1370,7 @@
         "spec/schemas/mir4-a02-component-reconciliation-v1.schema.json",
         "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1361,6 +1411,7 @@
         "spec/schemas/mir4-a03-k2-k2so-intake-dossier-v1.schema.json",
         "spec/schemas/mir4-a03-k2-k2so-intake-receipt-v1.schema.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1416,6 +1467,7 @@
         "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json",
         "docs/releases/mir4-integration-and-delivery-plan.md"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1462,6 +1514,7 @@
         "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-dossier.json",
         "spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-intake-receipt.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1528,6 +1581,7 @@
         "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Command-Inventory-EvolutionV1.json",
         "spec/schemas/mir4-a05-k2-03-command-inventory-evolution-v1.schema.json"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1555,6 +1609,7 @@
         "validation/scenarios/local-2.0.json",
         "tests/mir4/Test-MIR4AffectedProofSOL08.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1603,6 +1658,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1663,6 +1719,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1695,6 +1752,7 @@
         "tests/assurance/Test-MIR4AssuranceOfflineCustody.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1746,6 +1804,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1786,6 +1845,7 @@
         "tests/mir4/Test-MIR4AssuranceScaleW08.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1824,6 +1884,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1867,6 +1928,7 @@
         "mir4-bootstrap-toolchain",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1913,6 +1975,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1947,6 +2010,7 @@
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tests/release/Test-MIR4BootstrapTargetReadiness.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -1994,6 +2058,7 @@
         "validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2034,6 +2099,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2065,6 +2131,7 @@
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2128,6 +2195,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2155,6 +2223,7 @@
         "validation/scenarios/local-2.0.json",
         "tests/mir4/Test-MIR4CompatibilityCampaignSOL07.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2193,6 +2262,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2230,6 +2300,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2279,6 +2350,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2310,6 +2382,7 @@
         "tests/mir4/Test-MIR4CurrentPackagePresentationV2.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2357,6 +2430,7 @@
         "repository",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2365,7 +2439,7 @@
       "cohort": "package-repository",
       "kind": "static",
       "layer": "F0",
-      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1",
+      "command": "./tests/repository/Test-MIR4DevelopmentContracts.ps1 -ExpectedSourceCommit <source-commit> -ExpectedSourceTree <source-tree> -ExpectedPackageSourceSha256 <package-source-sha256> -ReceiptPath <test-output>",
       "canonical_implementation": "tests/repository/Test-MIR4DevelopmentContracts.ps1",
       "target_scope": "portable",
       "freshness": "exact-input-fingerprint",
@@ -2375,12 +2449,30 @@
       "requires_factorio": false,
       "inputs": [
         "governance/repository/development-epoch-v1.json",
+        "source-identity",
         "tests/repository/Test-MIR4DevelopmentContracts.ps1",
         "src/mod/**",
         "targets/**",
+        "tools/mir.ps1",
         "tools/mir/**",
+        "tools/commands/**",
+        "tools/lib/**",
+        "scripts/**",
+        "tools/commands/package/Build-MIRPackage.ps1",
         "tests/**",
-        "spec/programmes/mir4-4x-operating-programme-v1.json"
+        "governance/automation/mir4-command-inventory-v1.json",
+        "contracts/repository/mir4-command-inventory-v1.schema.json",
+        "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+        "contracts/repository/mir4-test-proof-catalogue-v1.schema.json",
+        "validation/tests.yml",
+        "assurance/catalog/tests.json"
+      ],
+      "captured_artifacts": [
+        {
+          "path_pattern": "<test-output>",
+          "schema": "contracts/repository/mir4-development-contracts-local-result-v1.schema.json",
+          "kind": "MIR4DevelopmentContractsLocalResultV1"
+        }
       ],
       "matrix": null
     },
@@ -2430,6 +2522,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2458,6 +2551,7 @@
         "tests/diagnostics/Test-MIR4DiagnosticsV1.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2503,6 +2597,7 @@
         "tests/mir4/Test-MIR4DocumentationContinuityT14.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2536,6 +2631,7 @@
         "tests/mir4/Test-MIR4DocumentationCutoverM4105B.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2577,6 +2673,7 @@
         "tests/mir4/Test-MIR4EditableSourceMaterializer.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2614,6 +2711,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2658,6 +2756,7 @@
         "tests/mir4/Test-MIR4EnvironmentEvidenceT10.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2699,6 +2798,7 @@
         "tests/mir4/Test-MIR4ExactProcessIRT12.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2727,6 +2827,7 @@
         "tests/mir4/Test-MIR4ExperimentalApiSdk.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2767,6 +2868,7 @@
         "tests/mir4/Test-MIR4ExtensionDeveloperExperienceT09.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2798,6 +2900,7 @@
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2840,6 +2943,7 @@
         "docs/maintainer/mir4-f2d-runtime-replay.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2872,6 +2976,7 @@
         "RELEASE-RUNBOOK.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2894,6 +2999,7 @@
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tests/release/Test-MIR4FinalProgrammeReconciliation.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2927,6 +3033,7 @@
         "docs/maintainer/mir4-full-platform-closeout.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2961,6 +3068,7 @@
         "tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -2984,6 +3092,7 @@
         "releases/migrations/**",
         "governance/repository/migrations/**"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3031,6 +3140,7 @@
         "tests/mir4/Test-MIR4HistoricalSuccessionW09.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3085,6 +3195,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3116,6 +3227,7 @@
         "tests/history/Test-MIR4HistoricalTooling.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3147,6 +3259,7 @@
         "tests/release/Test-MIR4HybridPlatformAuthority.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3205,6 +3318,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3237,6 +3351,7 @@
         "tests/inspection/Test-MIR4InspectorCompatibility.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3281,6 +3396,7 @@
         "tests/mir4/Test-MIR4InspectorCompatibilityW07.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3307,6 +3423,7 @@
         "src/mod/families/modern/prototypes/mir/runtime/research_browser*.lua",
         "src/mod/families/modern/prototypes/streams/productivity.lua"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3339,6 +3456,7 @@
         "docs/architecture/module-boundaries.md",
         "tests/mir4/Test-MIR4K2ScienceSOL06.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3360,6 +3478,7 @@
         "tools/mir/cli/router/ProductCommands.ps1",
         "tests/release/Test-MIR4LocalDelivery.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3395,6 +3514,7 @@
         "tests/release/Test-MIR4LocalPlaytestShadow.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3418,6 +3538,7 @@
         "tools/commands/mir4/Export-MIR4M4C01Closeout.ps1",
         "tests/mir4/Test-MIR4M4C01CloseoutSOL09.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3446,6 +3567,7 @@
         "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
         "tests/mir4/Test-MIR4MaximumLevelSOL03.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3492,6 +3614,7 @@
         "tests/mir4/Test-MIR4MepDiscoveryT11.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3534,6 +3657,7 @@
         "tests/mir4/Test-MIR4ModuleEcosystemW05.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3594,6 +3718,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3623,6 +3748,7 @@
         "tests/extensions/Test-MIR4ModuleEcosystem.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3693,6 +3819,7 @@
         "mir4-bootstrap-governed-output",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3748,6 +3875,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3785,6 +3913,7 @@
         "tests/mir4/Test-MIR4PackageAuthorityF2E.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3813,6 +3942,7 @@
         ".mir/branches.yml",
         "tests/mir4/Test-MIR4PatchLaneRehearsal.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3861,6 +3991,7 @@
         "tests/mir4/Test-MIR4PlatformPreview.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3897,6 +4028,7 @@
         "RELEASE-RUNBOOK.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3936,6 +4068,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -3985,6 +4118,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4058,6 +4192,7 @@
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4102,6 +4237,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4155,6 +4291,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4188,6 +4325,7 @@
         "tests/processir/Test-MIR4ProcessIRExact.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4222,6 +4360,7 @@
         "tests/mir4/Test-MIR4ProcessIRSynthesisW06.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4252,6 +4391,7 @@
         "fixtures/assert-recycler-progression-routes/data-final-fixes.lua",
         "tests/mir4/Test-MIR4ProductionRouteSOL04.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4272,6 +4412,7 @@
         "tools/mir/application/release/readiness/Promotion.ps1",
         "tests/release/Test-MIR4PromotionRecovery.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4294,6 +4435,7 @@
         ".mir/fixtures.yml",
         "tests/mir4/Test-MIR4PublicFeedbackIntake.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4334,6 +4476,7 @@
         ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4366,6 +4509,7 @@
         "tests/release/Test-MIR4R0Identity.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4398,6 +4542,7 @@
         "tests/mir4/Test-MIR4ReleaseAdaptersT03.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4435,6 +4580,7 @@
         "tests/mir4/Test-MIR4ReleaseAdaptersT04.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4484,6 +4630,7 @@
         "tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4526,6 +4673,7 @@
         "docs/maintainer/mir4-supply-chain-preservation.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4581,6 +4729,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4621,6 +4770,7 @@
         "docs/compatibility/mir4-release-canaries.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4652,6 +4802,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4684,6 +4835,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4719,6 +4871,7 @@
         "tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4748,6 +4901,7 @@
         "tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1",
         "tests/release/Test-MIR4LocalDelivery.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4773,6 +4927,7 @@
         "tests/mir4/Test-MIR4ReleasePhaseEngine.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4817,6 +4972,7 @@
         "tools/mir/cli/Invoke-MIR4ReleaseEngine.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4850,6 +5006,7 @@
         "docs/maintainer/mir4-full-platform-closeout.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4900,6 +5057,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4924,6 +5082,7 @@
         "tests/release-tooling/Test-MIR4ReleaseTooling.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -4954,6 +5113,7 @@
         "tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5006,6 +5166,7 @@
         "validation/tests/mir4/Test-MIR4RepositoryFixedPointW01.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5032,6 +5193,7 @@
         ".mir/modules.yml",
         "tests/mir4/Test-MIR4ResearchCostV2SOL05.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5067,6 +5229,7 @@
         "docs/maintainer/mir4-supply-chain-preservation.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5122,6 +5285,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5151,6 +5315,7 @@
         "tests/runtime/Test-MIR4RuntimeContinuity.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5184,6 +5349,7 @@
         "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5225,6 +5391,7 @@
         "tests/mir4/Test-MIR4SdkV1T08.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5289,6 +5456,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5324,6 +5492,7 @@
         "tests/compiler/Test-MIR4SemanticCompiler.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5350,6 +5519,7 @@
         "tests/mir4/Test-MIR4SemanticCompilationW03.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5376,6 +5546,7 @@
         "tests/mir4/Test-MIR4ShadowSourceModel.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5406,6 +5577,7 @@
         "tests/mir4/Test-MIR4ShadowTargetMaterializer.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5442,6 +5614,7 @@
         "docs/maintainer/mir4-release-governance.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5481,6 +5654,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5514,6 +5688,7 @@
         "docs/maintainer/mir4-supply-chain-preservation.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5562,6 +5737,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5607,6 +5783,7 @@
         "docs/maintainer/mir4-supply-chain-preservation.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5645,6 +5822,7 @@
         "docs/maintainer/mir4-supply-chain-preservation.md",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5696,6 +5874,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5723,6 +5902,7 @@
         "tests/targets/Test-MIR4TargetCompiler.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5750,6 +5930,7 @@
         "tests/mir4/Test-MIR4TargetCompilerW02.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5801,6 +5982,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5833,6 +6015,7 @@
         "tests/platform/Test-MIR4WholePlatform.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5883,6 +6066,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5910,6 +6094,7 @@
         "tests/technology/Test-MIR4TechnologyAcceptance.ps1",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5947,6 +6132,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -5978,6 +6164,7 @@
         "tests/tooling/Test-MIR4TestWorkflowConvergence.ps1",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6027,6 +6214,7 @@
         "assurance/catalog/tests.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6066,6 +6254,7 @@
         "docs/reference/generated/mir4-whole-platform-matrix.md",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6118,6 +6307,7 @@
         "validation/tests.yml",
         "repository"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6142,6 +6332,7 @@
         "tools/commands/museum/Build-MIRMuseumTarget.ps1",
         "tests/runtime/Test-MIRMuseumCompiler.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6166,6 +6357,7 @@
         "info.json",
         "package-source"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6188,6 +6380,7 @@
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tools/lib/assurance/Evidence.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6217,6 +6410,7 @@
         "tools/commands/docs/Update-MIRREADMEStreamDefaults.ps1",
         "tests/compiler/Test-MIRSettingsVisibility.ps1"
       ],
+      "captured_artifacts": [],
       "matrix": null
     },
     {
@@ -6260,6 +6454,7 @@
         "spec/schemas/**",
         "validation/profiles/**"
       ],
+      "captured_artifacts": [],
       "matrix": null
     }
   ],
@@ -6284,5 +6479,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ed1a084136f0ed2f5023496219a03672a9f40fa777d49a3b814589c5b4588d9f"
+  "digest": "sha256:30e192f51702abd019b2d14f95038502bfa58e4033ed83240a438d91d770c80a"
 }

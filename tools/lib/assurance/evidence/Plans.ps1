@@ -10,7 +10,7 @@ function Add-MIRAssurancePlanDecisions {
     if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($test.id) start" }
     $fingerprint = Get-MIRAssuranceTestFingerprint -Test $test -Plan $Plan -Context $Context
     if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($test.id) done" }
-    $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId ([string]$test.id)
+    $decision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId ([string]$test.id) -Test $test
     $test["fingerprint"] = $fingerprint
     $test["disposition"] = [string]$decision.disposition
     $test["decision_reason"] = [string]$decision.reason
