@@ -1319,3 +1319,443 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_aluminium-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_aluminium-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_aluminium
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_aluminium-1
+      stream_key: research_material_aluminium
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_aluminium
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_black_paving-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_black_paving-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_black_paving
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_black_paving-1
+      stream_key: research_material_black_paving
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_black_paving
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_brass-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_brass-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_brass
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_brass-1
+      stream_key: research_material_brass
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_brass
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_bronze-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_bronze-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_bronze
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_bronze-1
+      stream_key: research_material_bronze
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_bronze
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_cobalt_steel-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_cobalt_steel-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_cobalt_steel
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_cobalt_steel-1
+      stream_key: research_material_cobalt_steel
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_cobalt_steel
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_copper_tungsten-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_copper_tungsten-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_copper_tungsten
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_copper_tungsten-1
+      stream_key: research_material_copper_tungsten
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_copper_tungsten
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_glass-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_glass-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_glass
+      policy: exact-reviewed-forward-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_glass-1
+      stream_key: research_material_glass
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_glass
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_gold-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gold-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_gold
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_gold-1
+      stream_key: research_material_gold
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_gold
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_gunmetal-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gunmetal-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_gunmetal
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_gunmetal-1
+      stream_key: research_material_gunmetal
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_gunmetal
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_imersite-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_imersite-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_imersite
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_imersite-1
+      stream_key: research_material_imersite
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_imersite
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_invar-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_invar-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_invar
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_invar-1
+      stream_key: research_material_invar
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_invar
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_lead-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_lead-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_lead
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_lead-1
+      stream_key: research_material_lead
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_lead
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_nickel-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nickel-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_nickel
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_nickel-1
+      stream_key: research_material_nickel
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_nickel
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_nitinol-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_nitinol-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_nitinol
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_nitinol-1
+      stream_key: research_material_nitinol
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_nitinol
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_platinum-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_platinum-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_platinum
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_platinum-1
+      stream_key: research_material_platinum
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_platinum
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_rare_metals-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_rare_metals-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_rare_metals
+      policy: exact-reviewed-forward-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_rare_metals-1
+      stream_key: research_material_rare_metals
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_rare_metals
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_silicon-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_silicon-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_silicon
+      policy: exact-reviewed-forward-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_silicon-1
+      stream_key: research_material_silicon
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_silicon
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_silver-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_silver-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_silver
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_silver-1
+      stream_key: research_material_silver
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_silver
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_tin-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_tin-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_tin
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_tin-1
+      stream_key: research_material_tin
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_tin
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_titanium-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_titanium-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_titanium
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_titanium-1
+      stream_key: research_material_titanium
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_titanium
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_white_paving-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_white_paving-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_white_paving
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_white_paving-1
+      stream_key: research_material_white_paving
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_white_paving
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
+    recipe-prod-research_material_zinc-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_zinc-1
+      introduced_in: "4.2.0"
+      source: community-material-route-declaration
+      capability: recipe-productivity
+      family: material_zinc
+      policy: exact-acyclic-material-manufacturing
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_material_zinc-1
+      stream_key: research_material_zinc
+      migration_policy: stable
+      target_capability_disposition:
+        f110: omitted-recipe-productivity-unavailable
+        f100: omitted-recipe-productivity-unavailable
+      targets:
+        - stream:research_material_zinc
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
