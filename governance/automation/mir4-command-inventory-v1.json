@@ -3211,9 +3211,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "084D313F14624DF598E19681383E45F941AAE0DCF0FDAFC4E682C9CA355668EB",
+      "sha256": "BC05761FEAEF701103BB7D2E62D3C98CD0ADD7C1BC15A6A798C6DD8C8AA09284",
       "hash_mode": "canonical-text-v1",
-      "lines": 1032,
+      "lines": 1035,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c5ea5a41485f7b8b19facc2f308378a556b22cb584e84c759cfed3604280b094"
+  "digest": "sha256:4884bb1fc3e4e25549e94608def72cecb83636be9159f4f753a62cb97be8db65"
 }
