@@ -1066,9 +1066,11 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
-        "prototypes/**",
+        "source/**",
+        "targets/**",
         ".mir/modules.yml",
         ".mir/module-dependencies.json",
+        "tools/lib/validation/CurrentTargetPackage.ps1",
         "tests/architecture/Test-MIRArchitecture.ps1"
       ],
       "captured_artifacts": [],
@@ -6808,5 +6810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c19762e35980f4778ccb0ec79905e1b949d8a7e34523b5ec970d7a154cb5a06a"
+  "digest": "sha256:95765bdbe085c8fab9ece1a3eaa0b3b6131296bd79ec87d7dcdd283d28f21a65"
 }

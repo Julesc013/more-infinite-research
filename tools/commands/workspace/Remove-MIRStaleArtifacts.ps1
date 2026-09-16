@@ -29,6 +29,10 @@ param(
   [int]$MaxTrackedReferencePathCharacters = 16384,
   [ValidateSet('result', 'test', 'package', 'campaign')]
   [string[]]$ArtifactType = @('result', 'test', 'package', 'campaign'),
+  # Optional one-campaign scope for pruning superseded child runs without
+  # treating the whole governed campaign as disposable. The path must name
+  # exactly one direct child of build/mir4.
+  [string]$CampaignRoot = '',
   [switch]$AllWorktrees,
   [switch]$Apply,
   [switch]$PassThru,
@@ -43,6 +47,36 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 } else {
   $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+}
+
+$campaignRelativeRoot = 'build/mir4'
+$campaignNonPinningCustodyMarkers = @()
+$trackedReferenceLeafFallback = $true
+if (-not [string]::IsNullOrWhiteSpace($CampaignRoot)) {
+  if ($ArtifactType.Count -ne 1 -or [string]$ArtifactType[0] -cne 'campaign') {
+    throw '-CampaignRoot requires -ArtifactType campaign as the only selected artifact type.'
+  }
+  if ([IO.Path]::IsPathRooted($CampaignRoot)) {
+    throw '-CampaignRoot must be repository-relative.'
+  }
+  $campaignRelativeRoot = $CampaignRoot.Replace('\', '/').Trim('/')
+  if ($campaignRelativeRoot -notmatch '^build/mir4/[^/]+$') {
+    throw '-CampaignRoot must name exactly one direct child of build/mir4.'
+  }
+  $campaignBase = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/mir4')).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+  $campaignFull = [IO.Path]::GetFullPath((Join-Path $RepoRoot $campaignRelativeRoot))
+  if (-not $campaignFull.StartsWith($campaignBase + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    throw '-CampaignRoot escaped build/mir4.'
+  }
+  # A child run's result.json identifies the run but does not by itself make
+  # every abandoned attempt permanent custody. Exact tracked references,
+  # other custody markers, nested leases, age, ignored status and the full
+  # second audit still protect governed or live runs.
+  $campaignNonPinningCustodyMarkers = @('result.json')
+  # The exact campaign-relative path is unambiguous. Generic child names such
+  # as `candidate` or prefixes of a retained successor would otherwise make a
+  # bounded batched grep both noisy and over-conservative.
+  $trackedReferenceLeafFallback = $false
 }
 
 . (Join-Path $PSScriptRoot '../../lib/validation/ImmutableInputStaging.ps1')
@@ -84,7 +118,7 @@ $artifactRootDefinitions = @(@(
   # A campaign must be ignored, stale, unreferenced in every selected
   # worktree, free of direct or descendant custody, lease-free, and pass the
   # same no-follow re-audit before it can be selected.
-  [pscustomobject]@{ relative_path = 'build/mir4'; artifact_type = 'campaign'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @(); check_tracked_reference = $true; canonical_guid_leaf_only = $false; canonical_guid_run_boundary = $false; scan_descendant_custody = $true }
+  [pscustomobject]@{ relative_path = $campaignRelativeRoot; artifact_type = 'campaign'; direct_children_only = $true; excluded_child_names = @(); non_pinning_custody_markers = @($campaignNonPinningCustodyMarkers); check_tracked_reference = $true; canonical_guid_leaf_only = $false; canonical_guid_run_boundary = $false; scan_descendant_custody = $true }
 ) | Where-Object { $_.artifact_type -in $ArtifactType })
 
 function Assert-MIRArtifactAuditBudget {
@@ -275,6 +309,9 @@ function Get-MIRArtifactCandidates {
       $discoveryEntryCount++
       $item = Get-Item -LiteralPath $path -Force
       if ($item.Name -in @($Definition.excluded_child_names)) { continue }
+      # Explicit campaign scope owns immediate child run directories. Files at
+      # the campaign root are campaign metadata/evidence, never run candidates.
+      if ([string]$Definition.artifact_type -ceq 'campaign' -and -not $item.PSIsContainer) { continue }
       [pscustomobject]@{
         item = $item
         boundary = 'direct-child'
@@ -595,6 +632,7 @@ function Get-MIRArtifactTrackedReference {
   param(
     [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots,
     [Parameter(Mandatory)][string]$RelativePath,
+    [bool]$IncludeLeafFallback = $true,
     [hashtable]$ReferenceIndex = $null
   )
 
@@ -603,8 +641,9 @@ function Get-MIRArtifactTrackedReference {
     if ($ReferenceIndex.ContainsKey($RelativePath)) { return [string]$ReferenceIndex[$RelativePath] }
     return $null
   }
+  $needles = if ($IncludeLeafFallback) { @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique } else { @($RelativePath) }
   foreach ($referenceWorktreeRoot in @($ReferenceWorktreeRoots | Sort-Object -Unique)) {
-    foreach ($needle in @($RelativePath, (Split-Path -Leaf $RelativePath)) | Select-Object -Unique) {
+    foreach ($needle in $needles) {
       try { $match = Get-MIRArtifactFirstGitGrepMatch -WorktreeRoot $referenceWorktreeRoot -Needle $needle -MaxPathCharacters $MaxTrackedReferencePathCharacters }
       catch { return '__unsafe-reference-scan__' }
       if (-not [string]::IsNullOrWhiteSpace([string]$match)) {
@@ -618,7 +657,8 @@ function Get-MIRArtifactTrackedReference {
 function Get-MIRArtifactTrackedReferenceIndex {
   param(
     [Parameter(Mandatory)][string[]]$ReferenceWorktreeRoots,
-    [Parameter(Mandatory)][AllowEmptyCollection()][string[]]$RelativePaths
+    [Parameter(Mandatory)][AllowEmptyCollection()][string[]]$RelativePaths,
+    [bool]$IncludeLeafFallback = $true
   )
 
   $index = @{}
@@ -633,7 +673,8 @@ function Get-MIRArtifactTrackedReferenceIndex {
   # unexpected/bounded result instead of retaining it in an unbounded array.
   $needleToRelativePaths = @{}
   foreach ($relativePath in $relativePaths) {
-    foreach ($needle in @($relativePath, (Split-Path -Leaf $relativePath)) | Select-Object -Unique) {
+    $referenceNeedles = if ($IncludeLeafFallback) { @($relativePath, (Split-Path -Leaf $relativePath)) | Select-Object -Unique } else { @($relativePath) }
+    foreach ($needle in $referenceNeedles) {
       if (-not $needleToRelativePaths.ContainsKey($needle)) {
         $needleToRelativePaths[$needle] = [Collections.Generic.List[string]]::new()
       }
@@ -854,7 +895,7 @@ function Assert-MIRArtifactEligibleForDeletion {
   }
   $relativePath = [IO.Path]::GetRelativePath($WorktreeRoot, $fullPath).Replace('\', '/')
   if ([bool]$Definition.check_tracked_reference) {
-    $trackedReference = Get-MIRArtifactTrackedReference -ReferenceWorktreeRoots $ReferenceWorktreeRoots -RelativePath $relativePath
+    $trackedReference = Get-MIRArtifactTrackedReference -ReferenceWorktreeRoots $ReferenceWorktreeRoots -RelativePath $relativePath -IncludeLeafFallback:$trackedReferenceLeafFallback
     if (-not [string]::IsNullOrWhiteSpace([string]$trackedReference)) {
       throw "Cleanup target acquired a tracked reference after audit: $fullPath"
     }
@@ -929,7 +970,7 @@ $trackedReferenceRelativePaths = @(
     [IO.Path]::GetRelativePath([string]$plan.worktree_root, [string]$plan.candidate.item.FullName).Replace('\', '/')
   }
 )
-$trackedReferenceIndex = Get-MIRArtifactTrackedReferenceIndex -ReferenceWorktreeRoots $worktrees -RelativePaths $trackedReferenceRelativePaths
+$trackedReferenceIndex = Get-MIRArtifactTrackedReferenceIndex -ReferenceWorktreeRoots $worktrees -RelativePaths $trackedReferenceRelativePaths -IncludeLeafFallback:$trackedReferenceLeafFallback
 foreach ($plan in $candidatePlans) {
   Assert-MIRArtifactAuditBudget
   $currentAuditWorktreeRoot = [string]$plan.worktree_root

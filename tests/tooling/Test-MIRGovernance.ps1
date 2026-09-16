@@ -50,7 +50,10 @@ function Read-MIRText {
 function Get-MIRPinnedTerminalInfo {
   # .mir/convergence.yml records terminal MIR3.  Its release block remains
   # bound to its pre-cutover package object, not the composed MIR4 target.
-  $preCutoverCommit = '297aa5cc902da96847165a4f9caa1048608839fb'
+  # Use the last remote-reachable dev commit before the physical source-tree
+  # cutover. The convergence proof has its own intermediate baseline, but that
+  # unmerged commit is not guaranteed to exist in a fresh hosted checkout.
+  $preCutoverCommit = '609e4edd68b2fb862207875a40f3c0687e105110'
   $text = @(& git -C $repo show "${preCutoverCommit}:info.json")
   if ($LASTEXITCODE -ne 0 -or $text.Count -eq 0) {
     throw "Unable to read pinned terminal info.json from $preCutoverCommit."

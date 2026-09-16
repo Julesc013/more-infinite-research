@@ -23,6 +23,7 @@ $wideDiscoveryFixtureRoot = $null
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
 $activeLeaseLock = $null
 $nestedCampaignLeaseLock = $null
+$scopedCampaignLeaseLock = $null
 $gitEnvironmentNames = @(
   "GIT_INDEX_FILE", "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR",
   "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES"
@@ -75,6 +76,13 @@ try {
   $ambiguousLeaseCampaign = Join-Path $campaignRoot 'ambiguous-lease-campaign'
   $interruptedLeaseCampaign = Join-Path $campaignRoot 'interrupted-lease-campaign'
   $terminalLeaseCampaign = Join-Path $campaignRoot 'terminal-lease-campaign'
+  $scopedCampaign = Join-Path $campaignRoot 'scoped-campaign'
+  $staleScopedRun = Join-Path $scopedCampaign 'stale-result-run'
+  $referencedScopedRun = Join-Path $scopedCampaign 'referenced-run'
+  $custodyScopedRun = Join-Path $scopedCampaign 'custody-run'
+  $activeLeaseScopedRun = Join-Path $scopedCampaign 'active-lease-run'
+  $recentScopedRun = Join-Path $scopedCampaign 'recent-run'
+  $scopedCampaignResult = Join-Path $scopedCampaign 'result.json'
   $activeCampaignLeaseRun = Join-Path $activeLeaseCampaign 'candidate/inputs'
   $ambiguousCampaignLeaseRun = Join-Path $ambiguousLeaseCampaign 'candidate/inputs'
   $interruptedCampaignLeaseRun = Join-Path $interruptedLeaseCampaign 'candidate/inputs'
@@ -86,7 +94,7 @@ try {
   $nonCanonicalDevelopmentContract = Join-Path $developmentContracts 'legacy-expanded-output'
   $nestedNonCanonicalDevelopmentContract = Join-Path $nonCanonicalDevelopmentContract '66666666666666666666666666666666'
   $nestedReparseDevelopmentContract = Join-Path $developmentContracts '55555555555555555555555555555555'
-  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
+  foreach ($path in @($protectedAssurance, $protectedValidation, $staleRun, $recentRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleScopedRun, $referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun, $staleDevelopmentContract, $recentDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract)) {
     New-Item -ItemType Directory -Path $path -Force | Out-Null
     "fixture" | Set-Content -LiteralPath (Join-Path $path "result.txt") -Encoding UTF8
   }
@@ -102,9 +110,16 @@ try {
   '[path]' | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun 'config.ini') -Encoding UTF8
   1..4 | ForEach-Object { "payload $_" | Set-Content -LiteralPath (Join-Path $scanBoundedTestRun ("payload/item-{0}.txt" -f $_)) -Encoding UTF8 }
   'campaign result that must remain pinned' | Set-Content -LiteralPath (Join-Path $pinnedCampaign 'nested/result.json') -Encoding UTF8
+  '{"status":"superseded"}' | Set-Content -LiteralPath (Join-Path $staleScopedRun 'result.json') -Encoding UTF8
+  '{"status":"referenced"}' | Set-Content -LiteralPath (Join-Path $referencedScopedRun 'result.json') -Encoding UTF8
+  '{"status":"custody"}' | Set-Content -LiteralPath (Join-Path $custodyScopedRun 'result.json') -Encoding UTF8
+  '{"kind":"unique-evidence"}' | Set-Content -LiteralPath (Join-Path $custodyScopedRun 'evidence.json') -Encoding UTF8
+  '{"status":"active"}' | Set-Content -LiteralPath (Join-Path $activeLeaseScopedRun 'result.json') -Encoding UTF8
+  '{"status":"recent"}' | Set-Content -LiteralPath (Join-Path $recentScopedRun 'result.json') -Encoding UTF8
+  '{"status":"campaign-root-evidence"}' | Set-Content -LiteralPath $scopedCampaignResult -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $staleDevelopmentContract 'receipt.json') -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $referencedDevelopmentContract 'receipt.json') -Encoding UTF8
-  'build/packages/development-contracts/33333333333333333333333333333333' | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
+  @('build/packages/development-contracts/33333333333333333333333333333333','build/mir4/scoped-campaign/referenced-run/result.json') | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
   & git -C $fixtureRoot add -- .gitignore tracked-reference.txt
   if ($LASTEXITCODE -ne 0) { throw 'Unable to establish tracked-reference fixture.' }
   $leaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture';owner_pid=$PID;state='active'}
@@ -118,6 +133,7 @@ try {
   ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
   '{ not valid JSON' | Set-Content -LiteralPath (Join-Path $ambiguousCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
   ($receiptCapturedLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $interruptedCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
+  ($leaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $activeLeaseScopedRun 'mir-immutable-input-lease.json') -Encoding UTF8
   $terminalLeaseRecord = [ordered]@{schema=1;kind='MIRImmutableInputLeaseV1';lease_id='fixture-terminal';owner_pid=$null;state='completed'}
   ($terminalLeaseRecord | ConvertTo-Json -Depth 5) | Set-Content -LiteralPath (Join-Path $terminalCampaignLeaseRun 'mir-immutable-input-lease.json') -Encoding UTF8
 
@@ -125,16 +141,18 @@ try {
   New-Item -ItemType Directory -Path $nestedNonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract -Force | Out-Null
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedNonCanonicalDevelopmentContract 'result.txt') -Encoding UTF8
   'fixture' | Set-Content -LiteralPath (Join-Path $nestedReparseDevelopmentContract 'result.txt') -Encoding UTF8
-  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
+  foreach ($stalePath in @($staleRun, $staleTestRun, $changingTestRun, $pinnedTestRun, $activeLeaseRun, $receiptCapturedLeaseRun, $failedLeaseRun, $orphanLeaseRun, $staleGuidTestRun, $pinnedGuidTestRun, $wideGuidTestRun, $scanBoundedTestRun, $stalePackage, $pinnedPackage, $staleCampaign, $pinnedCampaign, $activeLeaseCampaign, $ambiguousLeaseCampaign, $interruptedLeaseCampaign, $terminalLeaseCampaign, $staleScopedRun, $referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $staleDevelopmentContract, $referencedDevelopmentContract, $nonCanonicalDevelopmentContract, $nestedReparseDevelopmentContract)) {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
+  (Get-Item -LiteralPath $scopedCampaignResult).LastWriteTimeUtc = $staleTimestamp
   foreach ($protectedPath in @($protectedAssurance, $protectedValidation)) {
     Get-ChildItem -LiteralPath $protectedPath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $protectedPath).LastWriteTimeUtc = $staleTimestamp
   }
   $activeLeaseLock = [IO.File]::Open((Join-Path $activeLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
   $nestedCampaignLeaseLock = [IO.File]::Open((Join-Path $activeCampaignLeaseRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+  $scopedCampaignLeaseLock = [IO.File]::Open((Join-Path $activeLeaseScopedRun 'mir-immutable-input-lease.lock'), [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
 
   $reparseTarget = Join-Path $fixtureRoot 'reparse-target'
   $reparseRun = Join-Path $artifactRoot 'reparse-run'
@@ -241,6 +259,37 @@ try {
       @($selectedPreview | Where-Object { $_.artifact_type -ceq 'result' }).Count -eq 0 -or
       @($selectedPreview | Where-Object { $_.artifact_type -ceq 'package' }).Count -eq 0) {
     throw 'Multi-type cleanup selection did not include exactly the requested typed roots.'
+  }
+
+  $scopedCampaignPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -PassThru)
+  if (@($scopedCampaignPreview | Where-Object { $_.relative_path -ceq 'build/mir4/scoped-campaign/result.json' }).Count -ne 0) {
+    throw 'Scoped campaign cleanup treated root evidence as a child run candidate.'
+  }
+  foreach ($expected in @(
+    @{path='build/mir4/scoped-campaign/stale-result-run';status='eligible'},
+    @{path='build/mir4/scoped-campaign/referenced-run';status='pinned-reference'},
+    @{path='build/mir4/scoped-campaign/custody-run';status='pinned-custody'},
+    @{path='build/mir4/scoped-campaign/active-lease-run';status='active-lease'},
+    @{path='build/mir4/scoped-campaign/recent-run';status='recent'}
+  )) {
+    if (@($scopedCampaignPreview | Where-Object { $_.relative_path -ceq $expected.path -and $_.status -ceq $expected.status }).Count -ne 1) {
+      throw "Scoped campaign cleanup did not classify $($expected.path) as $($expected.status)."
+    }
+  }
+  foreach ($invalidCampaignRoot in @('build/mir4', 'build/mir4/scoped-campaign/stale-result-run', '../build/mir4/scoped-campaign')) {
+    $invalidCampaignCaught = $false
+    try { & $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot $invalidCampaignRoot -PassThru | Out-Null } catch { $invalidCampaignCaught = $true }
+    if (-not $invalidCampaignCaught) { throw "Scoped campaign cleanup accepted an invalid root: $invalidCampaignRoot" }
+  }
+
+  $scopedCampaignApplied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
+  if (Test-Path -LiteralPath $staleScopedRun) { throw 'Scoped campaign cleanup retained an eligible superseded result run.' }
+  if (-not (Test-Path -LiteralPath $scopedCampaignResult -PathType Leaf)) { throw 'Scoped campaign cleanup removed campaign-root evidence.' }
+  foreach ($retained in @($referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun)) {
+    if (-not (Test-Path -LiteralPath $retained)) { throw "Scoped campaign cleanup removed protected state: $retained" }
+  }
+  if (@($scopedCampaignApplied | Where-Object { $_.relative_path -ceq 'build/mir4/scoped-campaign/stale-result-run' -and $_.status -ceq 'deleted' }).Count -ne 1) {
+    throw 'Scoped campaign apply did not delete exactly its eligible superseded result run.'
   }
 
   "new write before apply" | Set-Content -LiteralPath (Join-Path $changingTestRun 'result.txt') -Encoding UTF8
@@ -350,6 +399,7 @@ try {
 } finally {
   if ($null -ne $activeLeaseLock) { $activeLeaseLock.Dispose() }
   if ($null -ne $nestedCampaignLeaseLock) { $nestedCampaignLeaseLock.Dispose() }
+  if ($null -ne $scopedCampaignLeaseLock) { $scopedCampaignLeaseLock.Dispose() }
   if (Test-Path -LiteralPath $fixtureRoot) {
     $resolvedFixture = [System.IO.Path]::GetFullPath($fixtureRoot)
     $tempPrefix = $tempRoot + [System.IO.Path]::DirectorySeparatorChar
