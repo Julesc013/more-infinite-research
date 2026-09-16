@@ -4691,9 +4691,9 @@
     {
       "path": "tools/mir/application/extensions/ExperimentalApiSdk.ps1",
       "classification": "canonical-internal",
-      "sha256": "16A574D8D17AB1AB5D2F1E9131F34E5CD5B634CDE1014C29C9B8261C76F53F5C",
+      "sha256": "E6CBE5386CDBD95BEBBDDBC8CD7CB69B5C2AC9543FAF551D7D28082B83C37077",
       "hash_mode": "canonical-text-v1",
-      "lines": 547,
+      "lines": 553,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:66d6dd8a2c28cc44c13feb0735ecc0495f7eb5269ca2bd99871e7b6a1008aa26"
+  "digest": "sha256:42648da372a976b954e7f1dfdbb97a9f1cf28659daff1db4c13b8de6b4ecd333"
 }
