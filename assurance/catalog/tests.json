@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 191,
+  "test_count": 192,
   "tests": [
     {
       "id": "docs.check",
@@ -3980,6 +3980,58 @@
       "matrix": null
     },
     {
+      "id": "static.mir4-m41-to-m42-composable-source-succession-v4",
+      "proposition": "The governed test 'static.mir4-m41-to-m42-composable-source-succession-v4' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1",
+      "canonical_implementation": "tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json",
+        "assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json",
+        "contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json",
+        "contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v5.json",
+        "spec/schemas/mir4-current-package-presentation-v5.schema.json",
+        "source:source/package-source.json",
+        "targets/package-authority.json",
+        "targets/registry.json",
+        "targets/support-policy.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "governance/automation/mir4-command-inventory-v1.json",
+        ".github/workflows/release-candidate.yml",
+        ".mir/assurance.json",
+        ".mir/compatibility.yml",
+        ".mir/test-impact.yml",
+        ".mir/control/paths.yml",
+        ".mir/control/repository-fixed-point.json",
+        ".mir/modules.yml",
+        "assurance/catalog/tests.json",
+        "tools/lib/assurance/evidence/Fingerprints.ps1",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/mir/application/release/readiness/ComposableSourceSuccession.ps1",
+        "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1",
+        "tests/support/MIR4M4202PackageSuccession.ps1",
+        "tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1",
+        "tests/tooling/Test-MIRAssurance.ps1",
+        "validation/tests.yml",
+        "repository"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.mir4-m4c01-closeout-sol09",
       "proposition": "The governed test 'static.mir4-m4c01-closeout-sol09' passes for its exact selected inputs.",
       "cohort": "package-repository",
@@ -6971,12 +7023,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 65,
-      "tooling-release": 52,
+      "tooling-release": 53,
       "runtime-upgrade": 42,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 179,
+    "canonical_test_commands": 180,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -6989,5 +7041,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:35e433181cec31764772feb5787d416011b4f9357b2892153bd111b66facd922"
+  "digest": "sha256:ead3e1e935e13480ad8f8e6dd7f8486aade74bf0ff8b56c65cc5f7dd57557c16"
 }

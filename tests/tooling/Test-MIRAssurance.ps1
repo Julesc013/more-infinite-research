@@ -684,6 +684,12 @@ try {
 } catch {
   if ($_.Exception.Message -notmatch '^\[mir-assurance-required-source-input-no-match\] source/does-not-exist/\*\*$') { throw }
 }
+try {
+  $null = Get-MIRAssuranceInputFingerprint -InputName 'source:source\..\README.md' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+  throw 'A Windows-separator source traversal assurance input was accepted.'
+} catch {
+  if ($_.Exception.Message -cne '[mir-assurance-source-input-path] source\..\README.md') { throw }
+}
 $currentTargetContext = Get-MIRAssuranceMaterializedPackageContext -Target 'f210'
 $ambientRepairOutput = Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentTargetContext -RelativePath 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' -AllowMissing
 $currentCompatibilitySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/compatibility.yml')

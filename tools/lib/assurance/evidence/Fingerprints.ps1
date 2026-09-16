@@ -42,7 +42,11 @@ function Assert-MIRAssuranceSafeProofInputPath {
     [Parameter(Mandatory)][string]$Kind
   )
 
-  $portable = $Path.Replace("\\", "/").TrimStart("/")
+  # PowerShell string literals do not use a backslash escape. Replacing two
+  # consecutive separators left a single Windows separator intact, allowing a
+  # typed source proof such as \`source:source\..\README.md\` to evade the
+  # traversal check below.
+  $portable = $Path.Replace("\", "/").TrimStart("/")
   if ([string]::IsNullOrWhiteSpace($portable) -or
       $portable -match '(^|/)\.\.?(?:/|$)' -or
       $portable -match '^[A-Za-z]:') {

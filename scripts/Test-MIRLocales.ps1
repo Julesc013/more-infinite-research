@@ -1,5 +1,5 @@
 param(
-  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\source\locale"),
+  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\locale"),
   [string]$PolicyPath = (Join-Path $PSScriptRoot "..\.mir\locales\manifest.json"),
   [string]$FactorioLocaleRoot,
   [switch]$AllowMissingSupportedLanguages

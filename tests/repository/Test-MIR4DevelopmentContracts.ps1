@@ -336,7 +336,7 @@ $requiredCatalogueInputs=@(
   'governance/repository/development-epoch-v1.json',
   'source-identity',
   'tests/repository/Test-MIR4DevelopmentContracts.ps1',
-  'source/**', 'targets/**', 'tools/mir/**', 'tools/lib/**',
+  'source:source/**', 'targets/**', 'tools/mir/**', 'tools/lib/**',
   'tools/mir.ps1', 'tools/commands/**', 'scripts/**',
   'tools/commands/package/Build-MIRPackage.ps1', 'tests/**',
   'governance/automation/mir4-command-inventory-v1.json',
