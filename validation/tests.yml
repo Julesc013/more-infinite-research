@@ -5084,6 +5084,26 @@
       ]
     },
     {
+      "id": "runtime.technology-design-characterization",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1",
+        "tests/compiler/technology_design_characterization.lua",
+        "source:source/prototypes/mir/core/deepcopy.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/prototypes/mir/core/trusted_record.lua",
+        "source:source/prototypes/mir/domain/effects/metadata.lua",
+        "source:source/prototypes/mir/domain/effects/generated_target_contracts.lua",
+        "source:source/prototypes/mir/integrity/effect_contracts.lua",
+        "source:source/prototypes/mir/domain/technology/gate.lua",
+        "source:source/prototypes/mir/domain/technology/technology_design.lua"
+      ]
+    },
+    {
       "id": "runtime.material-route-guard",
       "kind": "runtime",
       "layer": "F3",
