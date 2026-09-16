@@ -80,7 +80,7 @@
       "maturity": "shadow",
       "completion_state": "implemented-reference-aggregate",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Semantic-Compiler-ProgrammeV1.json", ".mir/streams.yml"],
-      "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "prototypes/mir/settings/registry.lua"],
+      "implementations": ["tools/mir/application/compiler/CompilationRun.ps1", "source/prototypes/mir/settings/registry.lua"],
       "verification": ["tests/mir4/Test-MIR4SemanticCompilationW03.ps1", "tests/compiler/Test-MIRSettingsVisibility.ps1"],
       "cutover": "feature-and-setting-owner-by-owner-with-generated-parity",
       "blockers": []
@@ -104,7 +104,7 @@
       "maturity": "mixed",
       "completion_state": "stable-terminal-authority-plus-shadow-aggregate",
       "authorities": [".mir/technology-lifecycle.json", ".mir/modules.yml"],
-      "implementations": ["prototypes/mir/planner/compiler.lua", "prototypes/mir/emit/technology_operation_executor.lua", "tools/mir/application/compiler/CompilationRun.ps1"],
+      "implementations": ["source/prototypes/mir/planner/compiler.lua", "source/prototypes/mir/emit/technology_operation_executor.lua", "tools/mir/application/compiler/CompilationRun.ps1"],
       "verification": ["tests/compiler/Test-MIRCompiler.ps1", "tests/compiler/Test-MIRTechnologyLifecycle.ps1"],
       "cutover": "terminal-player-executors-remain-authoritative-until-bounded-parity",
       "blockers": []
@@ -116,7 +116,7 @@
       "maturity": "mixed",
       "completion_state": "stable-terminal-runtime-plus-shadow-contracts",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"],
-      "implementations": ["prototypes/mir/stage/control.lua", "tools/mir/application/runtime/RuntimeStateModel.ps1"],
+      "implementations": ["source/prototypes/mir/stage/control.lua", "tools/mir/application/runtime/RuntimeStateModel.ps1"],
       "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1", "tests/runtime/Test-MIRUpgrade.ps1"],
       "cutover": "runtime-feature-by-runtime-feature-after-reload-and-state-parity",
       "blockers": ["MAINTAINER-MANUAL-PLAYTEST"]
@@ -128,7 +128,7 @@
       "maturity": "preview",
       "completion_state": "implemented-private-contracts",
       "authorities": [".mir/releases/waves/mir4-r0/MIR4-Runtime-Continuity-ProgrammeV1.json"],
-      "implementations": ["tools/mir/application/runtime/RuntimeStateModel.ps1", "migrations"],
+      "implementations": ["tools/mir/application/runtime/RuntimeStateModel.ps1", "source/migrations"],
       "verification": ["tests/runtime/Test-MIR4RuntimeContinuity.ps1", "tests/runtime/Test-MIR4RuntimeContinuityMigration.ps1", "tests/mir4/Test-MIR4RuntimeContinuityW04.ps1"],
       "cutover": "edge-by-edge-after-continuous-reload-equivalence",
       "blockers": ["MAINTAINER-MANUAL-PLAYTEST"]
