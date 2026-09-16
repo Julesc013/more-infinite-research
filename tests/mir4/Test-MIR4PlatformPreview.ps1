@@ -1,4 +1,5 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
+Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 . (Join-Path $repo 'tools\lib\mir4\PlatformPreview.ps1')
