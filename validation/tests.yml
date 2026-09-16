@@ -91,9 +91,11 @@
       "command": "./scripts/Invoke-MIRValidation.ps1 -ArchitectureOnly",
       "requires_factorio": false,
       "inputs": [
-        "prototypes/**",
+        "source/**",
+        "targets/**",
         ".mir/modules.yml",
         ".mir/module-dependencies.json",
+        "tools/lib/validation/CurrentTargetPackage.ps1",
         "tests/architecture/Test-MIRArchitecture.ps1"
       ]
     },
