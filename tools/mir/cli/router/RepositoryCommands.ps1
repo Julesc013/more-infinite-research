@@ -79,6 +79,8 @@ function Invoke-MIRRepositoryCommandGroup {
           ArtifactType = @($artifactTypes | Select-Object -Unique)
           AllWorktrees = (Test-MIRArgSwitch -Items $Args -Name "--all-worktrees")
         }
+        $campaignRoot = Get-MIRArgValue -Items $Args -Name "--campaign-root"
+        if ($campaignRoot) { $params.CampaignRoot = $campaignRoot }
         if ($verb -eq "clean" -and (Test-MIRArgSwitch -Items $Args -Name "--apply")) { $params.Apply = $true }
         & (Join-Path $repo "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1") @params
       }

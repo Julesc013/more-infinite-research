@@ -640,7 +640,7 @@
     },
     {
       "key": "storage audit",
-      "public_syntax": ".\\tools\\mir.ps1 storage audit [--artifact-type <result|test|package|campaign>[,...]] [--all-worktrees] [--older-than-days <days>]",
+      "public_syntax": ".\\tools\\mir.ps1 storage audit [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -648,7 +648,7 @@
     },
     {
       "key": "storage clean",
-      "public_syntax": ".\\tools\\mir.ps1 storage clean [--artifact-type <result|test|package|campaign>[,...]] [--all-worktrees] [--older-than-days <days>] --apply",
+      "public_syntax": ".\\tools\\mir.ps1 storage clean [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>] --apply",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -3211,9 +3211,9 @@
     {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
-      "sha256": "EA0097595F56ED5163D6A1A1D81A958D8477499036DDB1668146B20FE2188B1B",
+      "sha256": "084D313F14624DF598E19681383E45F941AAE0DCF0FDAFC4E682C9CA355668EB",
       "hash_mode": "canonical-text-v1",
-      "lines": 994,
+      "lines": 1032,
       "package_visible": false
     },
     {
@@ -5547,7 +5547,7 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "86B34280317AEF97DEC54B1D49B06402B63DDD41A7F90B8719ED39A97FCC8157",
+      "sha256": "BA8386A0C3FFBE62CA96D6DB15C57DF3E8C7EC86860552D2B366C3CB14CC245B",
       "hash_mode": "canonical-text-v1",
       "lines": 137,
       "package_visible": false
@@ -5635,9 +5635,9 @@
     {
       "path": "tools/mir/cli/router/RepositoryCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "ED2E646E41DABF25032D221A086ADE24727B129A58DAA24CC0104039D02CAE1F",
+      "sha256": "FD101662EC219FAF604CB5F10672B66BB3AFAD1ADD25CC2870F3C9821A01139C",
       "hash_mode": "canonical-text-v1",
-      "lines": 144,
+      "lines": 146,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b6da097a45e485d3ad0e0177d0c2ceaa10ea0f0110061ea596d1da1faaa10a84"
+  "digest": "sha256:c5ea5a41485f7b8b19facc2f308378a556b22cb584e84c759cfed3604280b094"
 }
