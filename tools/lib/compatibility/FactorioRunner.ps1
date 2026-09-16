@@ -95,7 +95,7 @@ function Copy-MIRModUnderTest {
     "scripts",
     "tests",
     "tmp",
-    "todo.md",
+    "TODO.md",
     "tools"
   )
   New-Item -ItemType Directory -Path $target | Out-Null

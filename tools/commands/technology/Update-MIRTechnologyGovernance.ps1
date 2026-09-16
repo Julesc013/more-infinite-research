@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $sourcePath = Join-Path $RepoRoot ".mir\technology-governance.json"
-$outputPath = Join-Path $RepoRoot "prototypes\mir\domain\technology\generated_promotion_registry.lua"
+$outputPath = Join-Path $RepoRoot "source\prototypes\mir\domain\technology\generated_promotion_registry.lua"
 
 function ConvertTo-MIRLuaString([string]$Value) {
   return '"' + $Value.Replace('\', '\\').Replace('"', '\"').Replace("`r", '\r').Replace("`n", '\n') + '"'

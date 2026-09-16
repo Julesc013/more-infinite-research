@@ -172,6 +172,12 @@ function Invoke-MIRAssuranceSelfTest {
     if (-not $candidateAuthorityRejected) {
       throw "Planned release reservation was incorrectly accepted as exact candidate authority."
     }
+  } elseif ([string]$Context.verification_profile.execution_context_mode -eq 'development-context') {
+    if ([string]$planningAuthority.authority_class -ne 'development-context-no-release-authority' -or
+        [bool]$planningAuthority.release_authority -or
+        [string]$planningAuthority.package_source_commit -ne (Resolve-MIRAssuranceCommit -Commit HEAD)) {
+      throw 'Development planning authority escaped its private, current-source-only boundary.'
+    }
   }
 
   if ([string]$Context.target -eq "2.1" -and [string]$Context.info.version -eq "3.2.0") {
@@ -413,7 +419,7 @@ function Invoke-MIRAssuranceSelfTest {
     [ordered]@{valid=$false;reason='no-capsule'}
   }
   $capturedDeclarationCount = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $capturedValid.test).Count
-  $capturedDescriptorCount = @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count
+  $capturedDescriptorCount = if ($null -ne $capturedValid.capsule) { @($capturedValid.capsule.artifacts | Where-Object { [bool]$_.captured_artifact }).Count } else { 0 }
   if ($null -eq $capturedValid.capsule -or -not [string]::IsNullOrWhiteSpace([string]$capturedValid.error) -or
       @($capturedValid.capsule.artifacts).Count -ne 1 -or
       [string]$capturedValid.capsule.artifacts[0].kind -ne $capturedKind -or
@@ -596,7 +602,7 @@ function Invoke-MIRAssuranceSelfTest {
   $sameFirst = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'first'
   Start-Sleep -Milliseconds 2
   $sameSecond = & $newSyntheticAttempt -Identity $sameIdentity -Status passed -Label 'second-independent-work-path'
-  if ([bool]$sameSecond.quarantined -or
+  if ([bool]$sameSecond.capsule.quarantined -or
       @(Get-MIRAssuranceAttemptQuarantineIncidents -Identity $sameIdentity).Count -ne 0 -or
       $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $sameIdentity -Context $Context)) {
     throw 'Independent same-semantic trusted attempts with distinct work paths and times were incorrectly quarantined or made non-reusable.'
@@ -1753,6 +1759,22 @@ function Invoke-MIRAssuranceSelfTest {
     $null = Assert-MIRAssurancePlan -Plan $truncatedPlan -Context $Context
   } catch { $truncatedPlanRejected = $true }
   if (-not $truncatedPlanRejected) { throw "Truncated verification plan was accepted." }
+
+  foreach ($planWithoutManifest in @([ordered]@{}, [pscustomobject][ordered]@{})) {
+    if ($null -ne (Get-MIRAssuranceOptionalObjectValue -Object $planWithoutManifest -Name 'domain_manifest')) {
+      throw 'An absent optional plan domain manifest was not normalized to null.'
+    }
+  }
+  $manifestSentinel = [pscustomobject][ordered]@{manifest_sha256=('A' * 64)}
+  foreach ($planWithManifest in @(
+    [ordered]@{domain_manifest=$manifestSentinel},
+    [pscustomobject][ordered]@{domain_manifest=$manifestSentinel}
+  )) {
+    $resolvedManifest = Get-MIRAssuranceOptionalObjectValue -Object $planWithManifest -Name 'domain_manifest'
+    if ([string]$resolvedManifest.manifest_sha256 -cne [string]$manifestSentinel.manifest_sha256) {
+      throw 'An optional plan domain manifest was not preserved across supported plan object types.'
+    }
+  }
 
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan

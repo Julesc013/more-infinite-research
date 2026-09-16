@@ -1,10 +1,13 @@
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "../../..")),
+  [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
   [switch]$Check
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target $Target
 . (Join-Path $repo "tools\lib\validation\TargetProfiles.ps1")
 
 function ConvertTo-MIRLuaString {
@@ -49,7 +52,7 @@ function ConvertTo-MIRLuaLiteral {
 }
 
 $manifest = Get-MIRTargetManifest -RepoRoot $repo
-$info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$info = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $null = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $info.factorio_version
 
 $profilesLua = ConvertTo-MIRLuaLiteral -Value $manifest.profiles -Indent 2
@@ -73,7 +76,7 @@ end
 return M
 "@
 $content = $content.Replace("`r`n", "`n").TrimEnd() + "`n"
-$outputPath = Join-Path $repo "prototypes\mir\platform\factorio\target_profiles.lua"
+$outputPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/platform/factorio/target_profiles.lua'
 
 if ($Check) {
   if (-not (Test-Path -LiteralPath $outputPath -PathType Leaf)) {
@@ -83,7 +86,7 @@ if ($Check) {
   if ($existing -ne $content) {
     throw "Generated target profile Lua is stale. Run tools/commands/targets/Sync-MIRTargetProfiles.ps1."
   }
-  Write-Host "[ok] MIR target profile Lua matches .mir/targets.json and info.json."
+  Write-Host "[ok] MIR target profile Lua matches .mir/targets.json and $Target composition."
   exit 0
 }
 

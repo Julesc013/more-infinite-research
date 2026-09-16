@@ -73,7 +73,7 @@ if($packageBefore-cne$preT14Package){
     }
     & (Join-Path $RepoRoot 'tests/mir4/Test-MIR4PreFreezeHardening.ps1') -RepoRoot $RepoRoot|Out-Null
   }else{
-    try{Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t12-package-source-unknown-evolution]'}
+    try{Assert-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot -PackageSourceSha256 $packageBefore|Out-Null}catch{throw '[mir4-t12-package-source-unknown-evolution]'}
   }
 }
 Write-Host '[ok] MIR 4 T12 exact F210/F200 ProcessIR, deterministic captures, custody blocker, bounded comparisons, and offline Inspector passed.'

@@ -76,14 +76,14 @@
         },
         {
           "title": "Modern productivity catalogue",
-          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/productivity.lua",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/source/prototypes/streams/productivity.lua",
           "basis": "Connected GitHub source read; declarations alone are not exact-environment realization proof.",
           "id": "R2",
           "observed_on": "2026-09-06"
         },
         {
           "title": "Modern direct-effect catalogue",
-          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/src/mod/families/modern/prototypes/streams/direct-effects.lua",
+          "url": "https://github.com/Julesc013/more-infinite-research/blob/abe152a332741db268a39b5088866e5aab634fed/source/prototypes/streams/direct-effects.lua",
           "basis": "Connected GitHub source read.",
           "id": "R3",
           "observed_on": "2026-09-06"
@@ -1457,7 +1457,7 @@
         "upstream_existing_owner_evidence": []
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_rare_metals",
         "output": "kr-rare-metals",
         "recipes": [
@@ -1553,7 +1553,7 @@
         ]
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_imersite",
         "output": "kr-imersite-crystal",
         "recipes": [
@@ -1639,7 +1639,7 @@
         "upstream_existing_owner_evidence": []
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_silicon",
         "output": "kr-silicon",
         "recipes": [
@@ -1723,7 +1723,7 @@
         "upstream_existing_owner_evidence": []
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_glass",
         "output": "kr-glass",
         "recipes": [
@@ -1804,7 +1804,7 @@
         "qualification": []
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_black_paving",
         "output": "kr-black-reinforced-plate",
         "recipes": [
@@ -1885,7 +1885,7 @@
         "qualification": []
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_white_paving",
         "output": "kr-white-reinforced-plate",
         "recipes": [
@@ -1971,7 +1971,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_aluminium",
         "output": "bob-aluminium-plate",
         "recipes": [
@@ -2059,7 +2059,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_gold",
         "output": "bob-gold-plate",
         "recipes": [
@@ -2147,7 +2147,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_lead",
         "output": "bob-lead-plate",
         "recipes": [
@@ -2236,7 +2236,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_nickel",
         "output": "bob-nickel-plate",
         "recipes": [
@@ -2324,7 +2324,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_platinum",
         "output": "bob-platinum-plate",
         "recipes": [
@@ -2412,7 +2412,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_silver",
         "output": "bob-silver-plate",
         "recipes": [
@@ -2500,7 +2500,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_tin",
         "output": "bob-tin-plate",
         "recipes": [
@@ -2588,7 +2588,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_titanium",
         "output": "bob-titanium-plate",
         "recipes": [
@@ -2676,7 +2676,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_copper_tungsten",
         "output": "bob-copper-tungsten-alloy",
         "recipes": [
@@ -2764,7 +2764,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_zinc",
         "output": "bob-zinc-plate",
         "recipes": [
@@ -2852,7 +2852,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_bronze",
         "output": "bob-bronze-alloy",
         "recipes": [
@@ -2940,7 +2940,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_brass",
         "output": "bob-brass-alloy",
         "recipes": [
@@ -3028,7 +3028,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_gunmetal",
         "output": "bob-gunmetal-alloy",
         "recipes": [
@@ -3116,7 +3116,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_invar",
         "output": "bob-invar-alloy",
         "recipes": [
@@ -3204,7 +3204,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_cobalt_steel",
         "output": "bob-cobalt-steel-alloy",
         "recipes": [
@@ -3292,7 +3292,7 @@
         "group_is_presentation_only": true
       },
       "material_route_declaration": {
-        "source": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "source": "source/prototypes/streams/productivity.lua",
         "stream": "research_material_nitinol",
         "output": "bob-nitinol-alloy",
         "recipes": [

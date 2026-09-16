@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "kind": "MIR4ComposableSourceLayoutProofPolicyV1",
+  "migration_id": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1",
+  "test_id": "static.mir4-composable-source-layout-v1",
+  "evidence_entrypoint": "tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1",
+  "required_checks": [
+    "authority-and-proof-policy",
+    "v2-source-target-and-package-authority-schemas",
+    "self-hashed-authorities",
+    "physical-source-set-equals-manifest",
+    "predecessor-path-bijection",
+    "binary-safe-all-binding-predecessor-proof",
+    "deduplicated-current-source-identities",
+    "no-retained-live-src-or-era-lanes",
+    "cross-checkout-source-byte-stability",
+    "four-target-deterministic-materialization",
+    "exact-predecessor-package-content-parity",
+    "historical-path-resolution-and-negative-counterexamples",
+    "release-firewall"
+  ],
+  "independent_exact_engine_required_for_gameplay_claims": true,
+  "release_transition_authority": false
+}

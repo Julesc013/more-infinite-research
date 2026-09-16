@@ -41,12 +41,12 @@ $engineVersion=([regex]::Match($version,'Version:\s+2[.]1[.]17[^\r\n]*').Value).
 if([string]::IsNullOrWhiteSpace($engineVersion)){throw 'Bob Tin production-gain could not bind engine version.'}
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 if($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $sourceTree -notmatch '^[0-9a-f]{40}$'){throw 'Bob Tin production-gain requires exact source commit/tree bindings.'}
-$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod)
+$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source)
 if($sourceChanges.Count -ne 0){throw "Bob Tin production-gain refuses a changed package-source root: $($sourceChanges -join '; ')"}
 
 $fixture=Join-Path $repo 'fixtures/assert-bob-tin-production-gain'
 $dossier=Join-Path $fixture 'production-gain-dossier.json'
-$packageSource=Join-Path $repo 'src/mod/package-source.json'
+$packageSource=Join-Path $repo 'source/package-source.json'
 try{$record=Get-Content -Raw -LiteralPath $dossier|ConvertFrom-Json -ErrorAction Stop}catch{throw "Bob Tin production-gain dossier JSON is invalid: $($_.Exception.Message)"}
 Assert-Props root $record @('schema','kind','scope','target','route','mir_owner','cap_transport','production','controls','evidence_role','explicit_non_claims')
 Assert-Exact schema $record.schema 1;Assert-Exact kind $record.kind 'MIR4BobTinProductionGainV1';Assert-Exact scope $record.scope 'F210 Bob-only finite Tin quantitative production-gain diagnostic; package-excluded evidence';Assert-Exact evidence_role $record.evidence_role 'bounded quantitative diagnostic input to A06 BA-07 A17 and PROG-01; not completion authority';Assert-Array explicit_non_claims $record.explicit_non_claims $expectedNonClaims

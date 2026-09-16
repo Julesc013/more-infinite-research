@@ -46,6 +46,7 @@ function Invoke-MIR441TargetQualification {
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   Assert-MIR441CleanTrackedSource -RepoRoot $repo
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
+  Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'qualification'
   $targetRows=@($contract.targets|Where-Object{[string]$_.target-ceq$Target})
   if($targetRows.Count-ne1){throw "[mir441-qualification-target] $Target"};$targetRow=$targetRows[0]
   $work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot

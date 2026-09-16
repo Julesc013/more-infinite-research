@@ -2,15 +2,19 @@ schema: 1
 authority: mir-repository-paths-v1
 
 paths:
-  package.root: src/mod
+  package.root: source
   package.targets: targets
   package.generated: build/packages
-  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v2.json
-  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
+  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v4.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
+  mir4.package-presentation.frozen-v3: spec/distribution/mir4-current-package-presentation-v3.json
+  mir4.package-presentation.frozen-v3-schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
   mir4.package-presentation.compatibility-reader: tools/lib/mir4/PackagePresentation.ps1
-  mir4.package-presentation.evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
-  mir4.package-presentation.evolution-schema: contracts/repository/mir4-current-package-presentation-v2-evolution-receipt.schema.json
-  mir4.package-presentation.evolution-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
+  mir4.package-presentation.frozen-v2: spec/distribution/mir4-current-package-presentation-v2.json
+  mir4.package-presentation.frozen-v2-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
+  mir4.package-presentation.frozen-v2-evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
+  mir4.package-presentation.frozen-v2-verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
+  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1
   mir4.a03.authority-observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
   mir4.a03.environment-lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
   mir4.a03.execution-proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json
@@ -114,43 +118,70 @@ paths:
   mir4.package-source.shadow-source-model-authority-evolution: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
   mir4.package-source.shadow-source-model-authority-evolution-schema: contracts/repository/mir4-m41-f2b-shadow-source-model-authority-evolution-v1.schema.json
   mir4.package-source.shadow-source-model-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2BShadowSourceModelAuthority.ps1
-  mir4.package-source.editable-source-manifest: src/mod/package-source.json
-  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-package-source-manifest-v1.schema.json
+  mir4.package-source.composable-source-model-application: tools/mir/application/package/ComposableSourceModel.ps1
+  mir4.package-source.composable-source-model-proof-schema: spec/schemas/mir4-composable-source-model-proof-v2.schema.json
+  mir4.package-source.composable-source-model-proof: tests/mir4/Test-MIR4ComposableSourceModelM4202.ps1
+  mir4.package-source.editable-source-manifest: source/package-source.json
+  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-composable-package-source-v2.schema.json
   mir4.package-source.canonical-authority: targets/package-authority.json
-  mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v1.schema.json
+  mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
   mir4.package-source.canonical-authority-application: tools/mir/application/package/PackageAuthority.ps1
   mir4.package-source.target-registry: targets/registry.json
-  mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v1.schema.json
+  mir4.package-source.target-registry-schema: spec/schemas/mir4-target-registry-v2.schema.json
   mir4.package-source.target-support-policy: targets/support-policy.json
   mir4.package-source.target-support-policy-schema: spec/schemas/mir4-target-support-policy-v1.schema.json
-  mir4.package-source.target-overlay-schema: spec/schemas/mir4-target-overlay-v1.schema.json
+  mir4.package-source.target-composition-schema-v2: spec/schemas/mir4-target-composition-v2.schema.json
   mir4.package-source.target-materializer: tools/mir/application/package/TargetMaterializer.ps1
   mir4.package-source.target-composition-schema: spec/schemas/mir4-package-composition-result-v1.schema.json
   mir4.package-source.editable-source-materializer-proof-schema: spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json
   mir4.package-source.editable-source-materializer-proof: tests/mir4/Test-MIR4EditableSourceMaterializer.ps1
   mir4.package-source.editable-source-materializer-authority-evolution: releases/migrations/MIR4-M41-F2C-Editable-Source-Materializer-Authority-EvolutionV1.json
   mir4.package-source.editable-source-materializer-authority-evolution-schema: contracts/repository/mir4-m41-f2c-editable-source-materializer-authority-evolution-v1.schema.json
-  mir4.package-source.editable-source-materializer-authority-evolution-writer: tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1
+  mir4.package-source.editable-source-materializer-authority-evolution-historical-verifier: tools/commands/mir4/Update-MIR4M41F2CEditableSourceMaterializerAuthority.ps1
   mir4.package-source.f2e-authority: targets/package-authority.json
   mir4.package-source.f2e-verifier: tools/mir/application/package/PackageAuthorityVerifier.ps1
   mir4.package-source.f2e-receipt: releases/migrations/MIR4-M41-F2E-Package-Authority-CutoverV1.json
   mir4.package-source.f2e-receipt-schema: contracts/repository/mir4-m41-f2e-package-authority-cutover-v1.schema.json
   mir4.package-source.f2e-proof: tests/mir4/Test-MIR4PackageAuthorityF2E.ps1
+  mir4.package-source.composable-layout-authority: governance/repository/composable-source-layout-v1.json
+  mir4.package-source.composable-layout-proof: assurance/repository/composable-source-layout-v1.json
+  mir4.package-source.composable-layout-receipt: assurance/repository/composable-source-layout-receipt-v1.json
+  mir4.package-source.composable-layout-schema: contracts/repository/mir4-composable-source-layout-migration-v1.schema.json
+  mir4.package-source.composable-layout-test: tests/mir4/Test-MIR4CanonicalSourceCompositionM4202.ps1
+  mir4.package-source.composable-layout-writer: tools/commands/mir4/Update-MIR4ComposableSourceLayoutAuthority.ps1
+  mir4.package-source.factorio-one-convergence-authority: governance/repository/factorio-one-source-convergence-v1.json
+  mir4.package-source.factorio-one-convergence-receipt: assurance/repository/factorio-one-source-convergence-v1.json
+  mir4.package-source.factorio-one-convergence-authority-schema: contracts/repository/mir4-factorio-one-source-convergence-authority-v1.schema.json
+  mir4.package-source.factorio-one-convergence-receipt-schema: contracts/repository/mir4-factorio-one-source-convergence-receipt-v1.schema.json
+  mir4.package-source.factorio-one-convergence-application: tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1
+  mir4.package-source.factorio-one-convergence-writer: tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1
+  mir4.package-source.factorio-one-convergence-proof: tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1
+  mir4.package-source.composable-predecessor-proof: tools/mir/application/package/SourceCompositionProof.ps1
+  mir4.package-source.composable-predecessor-proof-schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
+  mir4.release.m41-to-m42-composable-source-succession: assurance/repository/mir4-m41-to-m42-composable-source-succession-v1.json
+  mir4.release.m41-to-m42-composable-source-succession-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v1.schema.json
+  mir4.release.m41-to-m42-composable-source-succession-application: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+  mir4.release.m41-to-m42-composable-source-succession-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccession.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v2: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+  mir4.release.m41-to-m42-composable-source-succession-v2-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+  mir4.release.m41-to-m42-composable-source-succession-v2-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v2-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2.ps1
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
-  mir4.m42-02.stream-compiler.writer: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1
+  mir4.m42-02.stream-compiler.historical-verifier: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1
   mir4.m42-02.stream-compiler.test: tests/compiler/Test-MIR4StreamCompilerDecompositionM4202.ps1
   mir4.m42-02.technology-catalog.receipt: releases/migrations/MIR4-M42-02-Technology-Catalog-DecompositionV1.json
   mir4.m42-02.technology-catalog.receipt-schema: contracts/repository/mir4-m42-02-technology-catalog-decomposition-v1.schema.json
-  mir4.m42-02.technology-catalog.writer: tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1
+  mir4.m42-02.technology-catalog.historical-verifier: tools/commands/mir4/Update-MIR4M4202TechnologyCatalogDecompositionAuthority.ps1
   mir4.m42-02.technology-catalog.test: tests/compiler/Test-MIR4TechnologyCatalogDecompositionM4202.ps1
   mir4.m42-02.effect-ownership.receipt: releases/migrations/MIR4-M42-02-Effect-Ownership-DecompositionV1.json
   mir4.m42-02.effect-ownership.receipt-schema: contracts/repository/mir4-m42-02-effect-ownership-decomposition-v1.schema.json
-  mir4.m42-02.effect-ownership.writer: tools/commands/mir4/Update-MIR4M4202EffectOwnershipDecompositionAuthority.ps1
+  mir4.m42-02.effect-ownership.historical-verifier: tools/commands/mir4/Update-MIR4M4202EffectOwnershipDecompositionAuthority.ps1
   mir4.m42-02.effect-ownership.test: tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1
   mir4.m42-02.compiler-orchestrator.receipt: releases/migrations/MIR4-M42-02-Compiler-Orchestrator-DecompositionV1.json
   mir4.m42-02.compiler-orchestrator.receipt-schema: contracts/repository/mir4-m42-02-compiler-orchestrator-decomposition-v1.schema.json
-  mir4.m42-02.compiler-orchestrator.writer: tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1
+  mir4.m42-02.compiler-orchestrator.historical-verifier: tools/commands/mir4/Update-MIR4M4202CompilerOrchestratorDecompositionAuthority.ps1
   mir4.m42-02.compiler-orchestrator.test: tests/compiler/Test-MIR4CompilerOrchestratorDecompositionM4202.ps1
   mir4.m42-02.powershell-characterization.receipt: releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json
   mir4.m42-02.powershell-characterization.receipt-schema: contracts/repository/mir4-m42-02-powershell-characterization-v1.schema.json

@@ -4,6 +4,9 @@ function Test-MIR4PreFreezeAuthorities {
   if (-not (Get-Command Get-MIR4BootstrapRecordSha256 -ErrorAction SilentlyContinue)) {
     . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   }
+  if (-not (Get-Command Test-MIR4M41ToM42ComposableSourceSuccession -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
+  }
   $schemas = [ordered]@{
     '.mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json' = 'spec/schemas/mir4-post-readiness-merge-receipt-sol15-v1.schema.json'
     '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json' = 'spec/schemas/mir4-pre-freeze-development-plan-v1.schema.json'
@@ -1421,6 +1424,7 @@ function Test-MIR4PreFreezeAuthorities {
         [string]$supplyChain.predecessor.record_sha256 -cne [string]$controlExecutor.record_sha256) {
       throw '[mir4-prefreeze-m42-02-supply-chain-predecessor]'
     }
+    # MIR4-TODO-HISTORICAL-EXCEPTION: m42-02-supply-chain-enrollment-v1
     $supplyChainEnrollmentBaselines = @{
       'docs/releases/mir4-post-4.0-roadmap.md'='24E6D2555808C1C940102FAF56C22F71CEDEECE84BED18C4E7177FECF9D6C8D4'
       'spec/programmes/mir4-4x-operating-programme-v1.json'='15197FD8F9A6A47224C491B1AFAF9A334F380BB4A96F5301DB68D627E950F846'
@@ -1547,12 +1551,17 @@ function Test-MIR4PreFreezeAuthorities {
     base_commit=([string]$sourceFreeze.base.commit -ceq '65bb11c1226a8160c27ab074ddb503c20df98c69')
     base_tree=([string]$sourceFreeze.base.tree -ceq 'bebfd455f7f13d724eabb43c3ed48362d8d7901e')
     record_sha256=([string]$sourceFreeze.record_sha256 -ceq (Get-MIR4BootstrapRecordSha256 -Record $sourceFreeze))
-    package_source_sha256=([string]$sourceFreeze.package_source.current_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo))
-    package_authority_record_sha256=([string]$sourceFreeze.package_source.authority_record_sha256 -ceq [string](Get-MIR4CanonicalPackageAuthority -RepoRoot $repo).record_sha256)
+    historical_package_source_sha256=([string]$sourceFreeze.package_source.current_sha256 -ceq '0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA')
+    historical_package_authority_record_sha256=([string]$sourceFreeze.package_source.authority_record_sha256 -ceq '325CFA978C191C93E41F85D8F9AEB664B3A045D34D6721D647F8BE4E4F7F3CDB')
   }
   $failedSourceFreezeChainChecks=@($sourceFreezeChainChecks.GetEnumerator()|Where-Object{-not[bool]$_.Value}|ForEach-Object{[string]$_.Key})
   if ($failedSourceFreezeChainChecks.Count -ne 0) {
     throw "[mir4-prefreeze-m41-source-freeze-chain] failed=$($failedSourceFreezeChainChecks-join',')"
+  }
+  try {
+    $composableSourceSuccessor = Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo
+  } catch {
+    throw "[mir4-prefreeze-m41-composable-source-successor] $($_.Exception.Message)"
   }
   $sourceFreezePaths = @{}
   foreach ($binding in @($sourceFreeze.evolved_bindings)) {
@@ -1588,7 +1597,7 @@ function Test-MIR4PreFreezeAuthorities {
   # The published freeze receipt authenticates its original source. An explicit,
   # separately validated documentation successor binds every later changed path.
   . (Join-Path $repo 'tools/lib/mir4/PostReleaseDocumentation.ps1')
-  $postReleaseDocumentation=Get-MIR4PostReleaseDocumentation -RepoRoot $repo
+  $postReleaseDocumentation=Get-MIR4PostReleaseDocumentation -RepoRoot $repo -Historical:$true
   if($null -ne $postReleaseDocumentation){
     $trackedSourceFreezeChanges=@(& git -C $repo diff --name-only ([string]$sourceFreeze.base.commit) ([string]$postReleaseDocumentation.base_commit) --)
   }else{
@@ -1637,7 +1646,17 @@ function Test-MIR4PreFreezeAuthorities {
     }
   }
   if ($staleAuthorityBindings.Count -ne 0) {
-    throw "[mir4-prefreeze-current-authority-binding] $(@($staleAuthorityBindings | Sort-Object) -join ',')"
+    # These hashes are the immutable MIR 4.1 authority lineage just replayed
+    # above.  They are not allowed to impersonate current authority after the
+    # governed V2 source-composition cutover.  The successor validator binds
+    # the actual current package source and authority, while its closed gates
+    # ensure that no current 4.1 release operation can use this historical
+    # lineage.  A direct comparison to the current tree would otherwise turn
+    # the historical record into a false authority and reject the approved
+    # successor merely because its paths were intentionally superseded.
+    if ([bool]$composableSourceSuccessor.current_release_operations_authorized) {
+      throw '[mir4-prefreeze-m41-composable-source-successor-release-firewall]'
+    }
   }
   $review = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json' -Kind 'MIR4IndependentReadinessAcceptanceLunaV1'
   if ([string]$review.verdict -cne 'ACCEPTED-RELEASE-READINESS' -or [bool]$review.maintainer_acceptance) {

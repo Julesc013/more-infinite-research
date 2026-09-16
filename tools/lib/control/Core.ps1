@@ -38,7 +38,8 @@ function Resolve-MIRCPPathToken {
   if ($Path -notmatch '^path:(?<id>[a-z][a-z0-9.-]+)(?<suffix>/.*)?$') {
     throw "Invalid logical repository path token: $Path"
   }
-  return Resolve-MIRCPPathId -Id $Matches.id -Suffix ([string]$Matches.suffix) -RepoRoot $RepoRoot
+  $suffix = if ($Matches.ContainsKey('suffix')) { [string]$Matches['suffix'] } else { '' }
+  return Resolve-MIRCPPathId -Id $Matches.id -Suffix $suffix -RepoRoot $RepoRoot
 }
 
 function Read-MIRCPJson {

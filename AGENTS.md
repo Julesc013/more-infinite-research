@@ -33,7 +33,7 @@ The maintainer has selected `source/` as the single canonical editable product-s
 - Compatibility: `.mir/compatibility.yml`, `.mir/streams.yml`, and `docs/compatibility/claim-levels.md`.
 - Generated streams: `.mir/streams.yml` and `docs/reference/schemas/stream-spec.md`.
 - Fixtures: `.mir/fixtures.yml` and `docs/maintainer/fixture-workflow.md`.
-- Release operations: `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json` and `RELEASE-RUNBOOK.md`.
+- Release operations: `.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json` and `docs/RELEASE-RUNBOOK.md`.
 - Backports: `.mir/branches.yml`, `docs/releases/mir4-post-4.0-roadmap.md`, and the MIR 3 history in `docs/maintainer/backporting.md`.
 
 ## Non-negotiable rules

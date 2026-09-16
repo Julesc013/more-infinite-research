@@ -29,6 +29,8 @@ jobs:
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       mir4_bootstrap: ${{ steps.mode.outputs.mir4_bootstrap }}
+      plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}
+      candidate_artifact: ${{ steps.artifact-names.outputs.candidate_artifact }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -97,17 +99,23 @@ jobs:
           }
           $matrix = @{ include = $work } | ConvertTo-Json -Depth 10 -Compress
           "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - id: artifact-names
+        name: Bind plan artifact identities
+        shell: pwsh
+        run: |
+          "plan_artifact=mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "candidate_artifact=mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
-          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ steps.artifact-names.outputs.plan_artifact }}
           path: build/results/assurance/verification-plan.json
           if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: ${{ steps.mode.outputs.mir4_bootstrap != 'true' }}
         with:
           include-hidden-files: true
-          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ steps.artifact-names.outputs.candidate_artifact }}
           path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}
           if-no-files-found: error
 
@@ -133,12 +141,12 @@ jobs:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ matrix.no_op != true }}
         with:
-          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.plan.outputs.plan_artifact }}
           path: build/results/assurance
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
-          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.plan.outputs.candidate_artifact }}
           path: build/candidate-transfer
       - name: Resolve exact development candidate
         if: ${{ matrix.no_op != true && needs.plan.outputs.mir4_bootstrap != 'true' }}
@@ -242,12 +250,12 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.plan.outputs.plan_artifact }}
           path: build/results/assurance
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}
         with:
-          name: mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.plan.outputs.candidate_artifact }}
           path: build/candidate-transfer
       - name: Resolve exact development candidate
         if: ${{ needs.plan.outputs.mir4_bootstrap != 'true' }}

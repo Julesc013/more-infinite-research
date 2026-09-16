@@ -315,11 +315,13 @@ function Assert-MIRCPPackageFreeze {
   )
   $repo = Get-MIRCPRepoRoot -RepoRoot $RepoRoot
   . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
+  . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
   $authority = Read-MIRCPJson -Path ".mir/control-plane/package-locks.json" -RepoRoot $repo
   if ([int]$authority.schema -ne 1 -or [string]$authority.authority -ne "mir-control-plane-v5-package-locks") {
     throw "Package-lock authority is invalid."
   }
-  $info = Read-MIRCPJson -Path "info.json" -RepoRoot $repo
+  $currentPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target f210
+  $info = Get-MIR4CurrentTargetPackageOutputText -Context $currentPackage -RelativePath 'info.json' | ConvertFrom-Json
   $target = [string]$info.factorio_version
   $policy = Get-MIRCPPolicy -RepoRoot $repo
   $current = Read-MIRCPJson -Path ("path:" + [string]$policy.records.current) -RepoRoot $repo

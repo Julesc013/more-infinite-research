@@ -65,34 +65,40 @@ if([string]$receipt.package_authority.package_source_sha256-cne$currentPackageSo
   }
 }
 
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
+$expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback $expectedManifestBindings
+$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
 Assert-MIR4M4202BaseContinuations (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
-Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-uniqueness'
+Assert-MIR4M4202BaseContinuations (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
 $outputs=@('prototypes/mir/planner/base_continuations.lua','prototypes/mir/planner/base_continuations/classify.lua','prototypes/mir/planner/base_continuations/discover.lua','prototypes/mir/planner/base_continuations/qualify.lua','prototypes/mir/planner/base_continuations/plan.lua')
+$sharedSourceRoot='source/prototypes/mir/planner'
+$facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sharedSourceRoot/base_continuations.lua")
+Assert-MIR4M4202BaseContinuations ($facade-match'base_continuations[.]plan'-and$facade-notmatch'function\s') 'thin-shared-facade'
+Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "$sharedSourceRoot/base_continuations.lua")).Count-le5) 'shared-facade-size'
+foreach($responsibility in @('classify','discover')){
+  Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo "$sharedSourceRoot/base_continuations/$responsibility.lua") -PathType Leaf) "shared-module-$responsibility"
+}
 foreach($target in @('f210','f200')){
-  $sourceRoot="targets/$target/files/prototypes/mir/planner"
-  $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/base_continuations.lua")
-  Assert-MIR4M4202BaseContinuations ($facade-match'base_continuations[.]plan'-and$facade-notmatch'function\s') "thin-facade-$target"
-  Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/base_continuations.lua")).Count-le5) "facade-size-$target"
-  foreach($responsibility in @('classify','discover','qualify','plan')){
-    Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo "$sourceRoot/base_continuations/$responsibility.lua") -PathType Leaf) "module-$target-$responsibility"
+  $adapterRoot="source/adapters/$target/prototypes/mir/planner"
+  foreach($responsibility in @('qualify','plan')){
+    Assert-MIR4M4202BaseContinuations (Test-Path -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/$responsibility.lua") -PathType Leaf) "adapter-module-$target-$responsibility"
   }
-  $plan=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/base_continuations/plan.lua")
+  $plan=Get-Content -Raw -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/plan.lua")
   foreach($owner in @('classify','discover','qualify')){Assert-MIR4M4202BaseContinuations ($plan-match"base_continuations[.]$owner") "plan-import-$target-$owner"}
   foreach($superseded in @('local function rejected_candidate','local function find_equivalent_infinite_extension','local function resolve_science_packs','local function build_prerequisites')){Assert-MIR4M4202BaseContinuations ($plan-notmatch[regex]::Escape($superseded)) "duplicate-responsibility-$target-$superseded"}
-  Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/base_continuations/plan.lua")).Count-le400) "plan-size-$target"
-  $targetRows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq"targets.$target"-and[string]$_.output_path-in$outputs})
+  Assert-MIR4M4202BaseContinuations (@(Get-Content -LiteralPath (Join-Path $repo "$adapterRoot/base_continuations/plan.lua")).Count-le400) "plan-size-$target"
+  $targetRows=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-in$outputs})
   Assert-MIR4M4202BaseContinuations ($targetRows.Count-eq5) "target-binding-count-$target"
 }
 
-$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/f210/files/prototypes/mir/planner/base_continuations/qualify.lua')
-$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'targets/f200/files/prototypes/mir/planner/base_continuations/qualify.lua')
+$f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/adapters/f210/prototypes/mir/planner/base_continuations/qualify.lua')
+$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua')
 Assert-MIR4M4202BaseContinuations ($f210Qualify-match'planner_science[.]normalize_ingredients'-and$f200Qualify-notmatch'planner_science') 'target-science-policy-preserved'
 foreach($shared in @('classify.lua','discover.lua')){
-  $f210Hash=(Get-FileHash -LiteralPath (Join-Path $repo "targets/f210/files/prototypes/mir/planner/base_continuations/$shared") -Algorithm SHA256).Hash
-  $f200Hash=(Get-FileHash -LiteralPath (Join-Path $repo "targets/f200/files/prototypes/mir/planner/base_continuations/$shared") -Algorithm SHA256).Hash
-  Assert-MIR4M4202BaseContinuations ($f210Hash-ceq$f200Hash) "shared-target-behavior-$shared"
+  $sharedOutput="prototypes/mir/planner/base_continuations/$shared"
+  $f210Source=[string]@($manifest.bindings|Where-Object{'f210'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path
+  $f200Source=[string]@($manifest.bindings|Where-Object{'f200'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path
+  Assert-MIR4M4202BaseContinuations ($f210Source-ceq$f200Source-and$f210Source-ceq"source/prototypes/mir/planner/base_continuations/$shared") "shared-target-source-$shared"
 }
 
 foreach($target in @('f210','f200','f110','f100')){

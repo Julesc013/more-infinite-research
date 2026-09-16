@@ -36,24 +36,24 @@ The MIR 4 source tree contains five maturity classes:
 - **experimental** — bounded private work with no public support authority;
 - **omitted** — intentionally absent from a target or release artifact.
 
-Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](RELEASE-RUNBOOK.md).
+Code existence never promotes maturity. The stable player ZIP contains only admitted Factorio package files. Developer SDK, MEP, API, Inspector, ProcessIR, evidence, and release tooling stay outside player packages; separately released preview assets retain their own maturity and support scope. See [Extension Protocol](docs/EXTENSION-PROTOCOL.md), [Support](SUPPORT.md), and the [release runbook](docs/RELEASE-RUNBOOK.md).
 
 `dev` is the MIR 4 integration authority. Short-lived branches merge to protected `dev` through passing aggregate verification. `main` is the published stable line: player releases arrive through exact sealed-candidate promotion, while bounded documentation and repository-governance corrections use protected PRs under the branch policy. Historical target branches are custody references, not alternative MIR 4 authoring roots.
 
-Editable player source lives in `src/mod`: `common` owns shared files and `families/modern` and `families/legacy` own the engine-family implementations. Target definitions, overlays, and package README/changelog templates live in `targets`. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
+Editable player code lives in the single package-shaped `source` tree. Shared behavior uses its package path directly; exact target differences live under narrowly scoped `source/adapters`, package presentation inputs under `source/presentation`, and lifecycle generators under `source/generation`. Factorio 1 targets use the same shared implementation with explicit base-version and disabled-runtime-capability adapters—there is no parallel Factorio 1 source tree. `targets` contains only target identity, policy, and composition records—not second source copies. The repository root is not a player package; its retained MIR 3 files are historical compatibility inputs. The canonical materializer produces standalone target packages below `build/packages`.
 
-The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](PROJECT-CONTINUITY.md) before changing authorities or release state.
+The primary checkout is the normal handoff location: final published ZIPs belong in `dist`, with their release notes and upload text available alongside them. External custody archives retain original evidence; they do not replace delivery into the working checkout. Temporary worktrees need an explicit completion or preservation disposition. Read [Contributing](CONTRIBUTING.md), [Governance](GOVERNANCE.md), and [Project continuity](docs/PROJECT-CONTINUITY.md) before changing authorities or release state.
 
 ## Stable player plane reference
 
-The following generated pipeline, settings, and research catalog describe the modern player family used by the F210/F200 targets. Individual rows still depend on the active game content and settings. F110/F100 use the legacy family and omit effects and Space Age features unavailable on those engines; their package README and target definitions state the supported subset. Shadow and preview implementations do not replace player behavior by code existence alone.
+The following generated pipeline, settings, and research catalog describe the shared implementation used by the F210/F200 targets. Individual rows still depend on the active game content and settings. F110/F100 are composed from the explicitly bounded Factorio 1 compatibility implementation and omit effects and Space Age features unavailable on those engines; their package README and target definitions state the supported subset. Shadow and preview implementations do not replace player behavior by code existence alone.
 
 ### How it works
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
 <!-- BEGIN GENERATED MIR PIPELINE -->
-This package-excluded reference is generated from `src/mod/families/modern/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
+This package-excluded reference is generated from `source/prototypes/mir/pipeline/commands.lua`; run `./scripts/Update-MIRPipelineDocumentation.ps1` after changing the command DAG.
 
 | Phase | Command | Kind | Implementation | Depends on |
 | ---: | --- | --- | --- | --- |
@@ -342,7 +342,7 @@ Every generated stream receives:
 Per-stream effective defaults and exceptions:
 
 <!-- BEGIN GENERATED MIR STREAM DEFAULTS -->
-This package-excluded effective-default table is generated from `src/mod/families/modern/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
+This package-excluded effective-default table is generated from `source/prototypes/mir/settings/defaults.lua`; run `./scripts/Update-MIRREADMEStreamDefaults.ps1` after changing stream defaults. It includes every stream with an explicit user-facing default override or a top-priority settings row.
 
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | ---: | ---: | ---: | --- |
@@ -428,7 +428,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 
 ### Main Files
 
-Paths in this table are paths inside a materialized modern player package. In the repository, locate their editable definitions under `src/mod/common` or `src/mod/families/modern`; lifecycle entrypoints are rendered from `src/mod/generation/lifecycle`, with target-owned replacements under `targets`. The generated pipeline above shows the current command order.
+Paths in this table are paths inside a materialized F210/F200 player package. In the repository, the shared editable definitions use the same paths below `source`; lifecycle entrypoints are rendered from `source/generation/lifecycle`, and exact target differences come from `source/adapters` through `targets/*/composition.json`. The generated pipeline above shows the current command order.
 
 | File | Purpose |
 | --- | --- |
@@ -550,7 +550,7 @@ Before testing, inspect or materialize the MIR verification plan and run the nar
 .\tools\mir.ps1 mir4 release-engine readiness-check --work-root <external-work-root>
 ```
 
-Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
+Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](docs/RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
 
 The detailed validation and audit commands below remain useful for development and historical MIR 3 workflows. The older `release gate` and `release docs-only` commands rebuild archives and must not be used to refresh a sealed MIR 4 release.
 
@@ -670,7 +670,7 @@ The validation script checks:
 
 ## Documentation Map
 
-- **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
+- **`TODO.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
 - **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, no-shim shipped layout, package boundary, and architecture lint targets.

@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-composable-source-layout-migration-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "status", "migration_id", "authority", "proof_policy", "predecessor", "current", "predecessor_proof", "relocation", "target_parity", "compatibility_convergence", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4ComposableSourceLayoutMigrationV1"},
+    "recorded_at": {"type": "string", "minLength": 1},
+    "status": {"const": "passed-byte-preserving-source-composition-cutover"},
+    "migration_id": {"const": "MIR4-COMPOSABLE-SOURCE-LAYOUT-V1"},
+    "authority": {"$ref": "#/$defs/recordBinding"},
+    "proof_policy": {"$ref": "#/$defs/recordBinding"},
+    "predecessor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["branch", "commit", "package_source_fingerprint_sha256", "manifest_path", "manifest_record_sha256", "binding_count", "physical_source_count"],
+      "properties": {
+        "branch": {"const": "dev"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "package_source_fingerprint_sha256": {"$ref": "#/$defs/sha"},
+        "manifest_path": {"const": "src/mod/package-source.json"},
+        "manifest_record_sha256": {"$ref": "#/$defs/sha"},
+        "binding_count": {"const": 447},
+        "physical_source_count": {"const": 447}
+      }
+    },
+    "current": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_root", "package_source_fingerprint_sha256", "manifest", "package_authority", "target_registry", "target_compositions", "sole_writer"],
+      "properties": {
+        "source_root": {"const": "source"},
+        "package_source_fingerprint_sha256": {"$ref": "#/$defs/sha"},
+        "manifest": {"$ref": "#/$defs/recordBinding"},
+        "package_authority": {"$ref": "#/$defs/recordBinding"},
+        "target_registry": {"$ref": "#/$defs/recordBinding"},
+        "target_compositions": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetBinding"}},
+        "sole_writer": {"const": "tools/mir/application/package/TargetMaterializer.ps1"}
+      }
+    },
+    "predecessor_proof": {
+      "type": "object", "additionalProperties": false,
+      "required": ["implementation", "schema", "commit", "binding_count", "physical_source_count", "record_sha256"],
+      "properties": {
+        "implementation": {"const": "tools/mir/application/package/SourceCompositionProof.ps1"},
+        "schema": {"const": "spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json"},
+        "commit": {"pattern": "^[a-f0-9]{40}$"},
+        "binding_count": {"const": 447},
+        "physical_source_count": {"const": 439},
+        "record_sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "relocation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["binding_count", "physical_source_count", "deduplicated_binding_count", "unique_predecessor_path_count", "old_live_root_absent", "era_lane_directories_absent", "target_payload_directories_empty", "exact_predecessor_resolution"],
+      "properties": {
+        "binding_count": {"const": 447},
+        "physical_source_count": {"const": 439},
+        "deduplicated_binding_count": {"const": 8},
+        "unique_predecessor_path_count": {"const": 447},
+        "old_live_root_absent": {"const": true},
+        "era_lane_directories_absent": {"const": true},
+        "target_payload_directories_empty": {"const": true},
+        "exact_predecessor_resolution": {"const": true}
+      }
+    },
+    "target_parity": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/targetParity"}},
+    "compatibility_convergence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["factorio_1_state", "divergent_predecessor_same_output_modules", "next_action", "claim"],
+      "properties": {
+        "factorio_1_state": {"const": "explicit-compatibility-code-pending-characterized-convergence"},
+        "divergent_predecessor_same_output_modules": {"const": 75},
+        "next_action": {"const": "replace characterized duplicates with shared canonical modules plus exact engine adapters"},
+        "claim": {"const": "layout-cutover-does-not-claim-zero-compatibility-duplication"}
+      }
+    },
+    "invariants": {
+      "type": "object", "additionalProperties": false,
+      "required": ["package_bytes_unchanged", "historical_records_rewritten", "single_editable_source_root", "single_package_writer", "gameplay_semantics_changed"],
+      "properties": {
+        "package_bytes_unchanged": {"const": true},
+        "historical_records_rewritten": {"const": false},
+        "single_editable_source_root": {"const": true},
+        "single_package_writer": {"const": true},
+        "gameplay_semantics_changed": {"const": false}
+      }
+    },
+    "transition_gate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["development_merge", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "development_merge": {"const": true},
+        "main_promotion": {"const": false},
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha"}
+  },
+  "$defs": {
+    "sha": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "recordBinding": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+      "properties": {"path": {"type": "string", "minLength": 1}, "sha256": {"$ref": "#/$defs/sha"}}
+    },
+    "targetBinding": {
+      "type": "object", "additionalProperties": false, "required": ["target", "path", "record_sha256"],
+      "properties": {
+        "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "path": {"pattern": "^targets/f(?:210|200|110|100)/composition[.]json$"},
+        "record_sha256": {"$ref": "#/$defs/sha"}
+      }
+    },
+    "targetParity": {
+      "type": "object", "additionalProperties": false, "required": ["target", "content_sha256", "entry_count", "deterministic_archive_bytes"],
+      "properties": {
+        "target": {"enum": ["f210", "f200", "f110", "f100"]},
+        "content_sha256": {"$ref": "#/$defs/sha"},
+        "entry_count": {"type": "integer", "minimum": 1},
+        "deterministic_archive_bytes": {"const": true}
+      }
+    }
+  }
+}

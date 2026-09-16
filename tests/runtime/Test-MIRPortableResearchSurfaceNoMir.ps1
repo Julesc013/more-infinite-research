@@ -8,8 +8,8 @@ $ErrorActionPreference='Stop'
 $repo=(Resolve-Path $RepoRoot).Path
 $engine=(Resolve-Path $FactorioBin).Path
 $fixtureSource=Join-Path $repo 'fixtures/portable-research-surface-no-mir'
-$coreSource=Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_core.lua'
-$adapterSource=Join-Path $repo 'src/mod/families/modern/prototypes/mir/runtime/research_browser_factorio_catalogue.lua'
+$coreSource=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_core.lua'
+$adapterSource=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua'
 foreach($path in @($fixtureSource,$coreSource,$adapterSource)) { if(-not(Test-Path -LiteralPath $path)){throw "Missing portable no-MIR input: $path"} }
 $fixtureInfo=Get-Content -Raw (Join-Path $fixtureSource 'info.json')|ConvertFrom-Json
 if(@($fixtureInfo.dependencies|Where-Object{[string]$_ -match 'more-infinite-research'}).Count){throw 'No-MIR fixture declares MIR.'}

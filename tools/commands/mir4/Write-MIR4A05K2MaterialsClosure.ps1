@@ -3,15 +3,25 @@
 param(
   [string]$RepoRoot='',
   [string]$RuntimeResult='build/mir4/a05-k2-materials/k2-materials-runtime-reviewed-forward-rerun/result.json',
-  [switch]$RequireLocalEvidence
+  [switch]$RequireLocalEvidence,
+  [switch]$Check
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
-if(-not $RequireLocalEvidence){throw '[mir4-a05-k2-materials-local-evidence-required]'}
+if(-not $Check -and -not $RequireLocalEvidence){throw '[mir4-a05-k2-materials-local-evidence-required]'}
 if(-not $RepoRoot){$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path}
 $RepoRoot=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+if(-not $Check){throw '[mir4-a05-k2-materials-historical-receipt-read-only-use-check]'}
+$a05Receipt='spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json'
+$a05Schema='spec/schemas/mir4-a05-k2-materials-closure-v1.schema.json'
+$a05Text=Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $a05Receipt)
+if(-not($a05Text|Test-Json -SchemaFile (Join-Path $RepoRoot $a05Schema))){throw '[mir4-a05-k2-materials-historical-receipt-schema]'}
+$a05Record=$a05Text|ConvertFrom-Json -Depth 100 -DateKind String
+if(-not(Test-MIR4BootstrapRecordHash $a05Record)){throw '[mir4-a05-k2-materials-historical-receipt-self-hash]'}
+[pscustomobject]@{status='passed-historical-receipt-verification';receipt=$a05Receipt;player_mutation_authorized=$false;publication_authorized=$false}
+return
 
 function Assert-A05K2Closure { param([bool]$Condition,[string]$Code) if(-not $Condition){throw $Code} }
 function Resolve-A05K2ClosurePath { param([string]$Relative,[bool]$Required=$true)

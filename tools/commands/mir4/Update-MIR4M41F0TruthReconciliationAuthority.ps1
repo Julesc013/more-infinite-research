@@ -32,7 +32,7 @@ if ((Get-MIRFileContentSha256 -Path (Join-Path $RepoRoot 'README.md') -RelativeP
 
 $mirToml = [IO.File]::ReadAllText((Join-Path $RepoRoot 'mir.toml'))
 if ($mirToml -match '(?m)^(?:programme_id|programme_execution_id|candidate_state|next_candidate|whole_platform_programme)\s*=') { throw '[mir4-m41-f0-mutable-candidate-state]' }
-$todoText = [IO.File]::ReadAllText((Join-Path $RepoRoot 'todo.md'))
+$todoText = [IO.File]::ReadAllText((Join-Path $RepoRoot 'TODO.md'))
 if ($todoText.IndexOf('## Active MIR 4.x operating programme', [StringComparison]::Ordinal) -lt 0 -or
     $todoText.IndexOf('## Historical MIR 4.0 pre-freeze execution record', [StringComparison]::Ordinal) -lt $todoText.IndexOf('## Active MIR 4.x operating programme', [StringComparison]::Ordinal)) { throw '[mir4-m41-f0-todo-routing]' }
 $changelogText = [IO.File]::ReadAllText((Join-Path $RepoRoot 'CHANGELOG.md'))
@@ -46,7 +46,7 @@ $rolePaths = @(
   'docs/reference/generated/documentation-index.md','docs/reference/generated/documentation-navigation.md','docs/reference/generated/documentation-owner-dashboard.md','docs/reference/generated/documentation-reference-matrix.md','docs/reference/generated/documentation-review-age.md',
   'docs/releases/mir4-post-4.0-roadmap.md','mir.lock','mir.toml','releases/governance/MIR4-Source-Changelog-PlanV1.json',
   'sdk/preview/mir4/reference/compilation-runs.json','sdk/preview/mir4/reference/inspection-bundle-v1.json','sdk/preview/mir4/reference/inspector-workbench-result-v1.json','sdk/preview/mir4/reference/query-snapshot-f210.json',
-  'spec/programmes/mir4-4x-operating-programme-v1.json','spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json','spec/schemas/mir4-4x-operating-programme-v1.schema.json','todo.md',
+  'spec/programmes/mir4-4x-operating-programme-v1.json','spec/schemas/mir3-dot9-mod-portal-visibility-canonicalization-reconciliation-v1.schema.json','spec/schemas/mir4-4x-operating-programme-v1.schema.json','TODO.md',
   'tools/commands/mir4/Update-MIR4M41F0TruthReconciliationAuthority.ps1','tools/commands/release/Test-MIR4R0Bootstrap.ps1','tools/lib/control/Views.ps1','tools/lib/mir4/BootstrapMaterialization.ps1','tools/lib/mir4/PreFreezeRelease.ps1','tools/lib/workspace/RepoPaths.ps1',
   'tools/mir.ps1','tools/mir/application/release/ReleaseNarratives.ps1','tools/mir/cli/Invoke-MIR4ReleaseNarratives.ps1','tools/mir/domain/repository/RepositoryFixedPoint.ps1',
   'validation/tests.yml','validation/tests/mir4/Test-MIR4PreFreezeHardening.ps1','validation/tests/mir4/Test-MIR4ReleaseNarrativesM4103.ps1','validation/tests/mir4/Test-MIR4RepositoryCharacterizationM4200A.ps1','validation/tests/release/Test-MIR3Dot9ModPortalVisibilityRecheck.ps1','validation/tests/tooling/Test-MIRControlPlane.ps1'
@@ -79,7 +79,7 @@ $characterization = Invoke-MIR4RepositoryCharacterizationV1 -RepoRoot $RepoRoot 
 $proof = [ordered]@{
   programme_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json') -Mode 'canonical-text-v1'
   source_changelog_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot 'CHANGELOG.md') -Mode 'canonical-text-v1'
-  todo_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot 'todo.md') -Mode 'canonical-text-v1'
+  todo_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot 'TODO.md') -Mode 'canonical-text-v1'
   portal_reconciliation_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot '.mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-Visibility-Canonicalization-ReconciliationV1.json') -Mode 'canonical-text-v1'
   platform_lock_sha256=Get-MIR4PreFreezeFileSha256 -Path (Join-Path $RepoRoot 'mir.lock') -Mode 'canonical-text-v1'
   physical_files=[int]$characterization.summary.physical_files;unknown_paths=[int]$characterization.invariants.unknown_paths;package_files=[int]$characterization.summary.package_files

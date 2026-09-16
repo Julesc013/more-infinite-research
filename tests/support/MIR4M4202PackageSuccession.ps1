@@ -7,9 +7,15 @@ function Test-MIR4M4202PackageSourceSuccession {
     [Parameter(Mandatory)][string]$CurrentSha256
   )
 
-  if($PredecessorSha256-ceq$CurrentSha256){return $true}
-
   try{
+    . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
+    # V3 is frozen layout evidence.  Current package presentation is V4 and
+    # binds the approved Factorio-1 convergence successor.
+    $currentPresentation = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot
+    if ([string]$currentPresentation.package_source.fingerprint_sha256 -cne $CurrentSha256 -or
+        (@($currentPresentation.package_source.roots) -join '|') -cne 'source|targets') { return $false }
+    if($PredecessorSha256-ceq$CurrentSha256){return $true}
+
     $receiptPath=Join-Path $RepoRoot 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
     $schemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-m41-current-product-bridge-retirement-v1.schema.json'
     if(-not(Test-Path -LiteralPath $receiptPath -PathType Leaf)-or-not(Test-Path -LiteralPath $schemaPath -PathType Leaf)){return $false}
@@ -27,41 +33,82 @@ function Test-MIR4M4202PackageSourceSuccession {
     if(-not$bridgeValid){return $false}
     if([string]$receipt.package_source.current_sha256-ceq$CurrentSha256){return $true}
 
-    $presentationPath=Join-Path $RepoRoot 'spec/distribution/mir4-current-package-presentation-v2.json'
-    $presentationSchemaPath=Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v2.schema.json'
-    if(-not(Test-Path -LiteralPath $presentationPath -PathType Leaf)-or-not(Test-Path -LiteralPath $presentationSchemaPath -PathType Leaf)){return $false}
-    $presentationRaw=Get-Content -Raw -LiteralPath $presentationPath
-    if(-not($presentationRaw|Test-Json -SchemaFile $presentationSchemaPath)){return $false}
-    $presentation=$presentationRaw|ConvertFrom-Json -Depth 100 -DateKind String
-    if(-not(Test-MIR4BootstrapRecordHash -Record $presentation)){return $false}
+    $sourceLayoutPath=Join-Path $RepoRoot 'assurance/repository/composable-source-layout-receipt-v1.json'
+    $sourceLayoutSchemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
+    if((Test-Path -LiteralPath $sourceLayoutPath -PathType Leaf)-and(Test-Path -LiteralPath $sourceLayoutSchemaPath -PathType Leaf)){
+      $sourceLayoutRaw=Get-Content -Raw -LiteralPath $sourceLayoutPath
+      if(-not($sourceLayoutRaw|Test-Json -SchemaFile $sourceLayoutSchemaPath)){return $false}
+      $sourceLayout=$sourceLayoutRaw|ConvertFrom-Json -Depth 100 -DateKind String
+      if(-not(Test-MIR4BootstrapRecordHash -Record $sourceLayout)){return $false}
+      . (Join-Path $RepoRoot 'tools/lib/assurance/Hashing.ps1')
+      $observedPredecessor=Get-MIRAssuranceCommitPackageSourceHash -Commit ([string]$sourceLayout.predecessor.commit)
+      $targetKeys=@($sourceLayout.target_parity|ForEach-Object{[string]$_.target})
+      $enabledLayoutGates=@($sourceLayout.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
+      if($observedPredecessor-ceq[string]$sourceLayout.predecessor.package_source_fingerprint_sha256-and
+         [string]$sourceLayout.current.package_source_fingerprint_sha256-ceq$CurrentSha256-and
+         ($targetKeys-join'|')-ceq'f210|f200|f110|f100'-and
+         @($sourceLayout.target_parity|Where-Object{-not[bool]$_.deterministic_archive_bytes}).Count-eq0-and
+         [bool]$sourceLayout.invariants.package_bytes_unchanged-and
+         $enabledLayoutGates.Count-eq1-and$enabledLayoutGates[0]-ceq'development_merge'){
+        return $true
+      }
+    }
 
-    $acceptedBridge=@($presentation.receipts|Where-Object{
-      [string]$_.path-ceq'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'-and
-      [string]$_.hash_mode-ceq'record-self-hash'
-    })
-    if($acceptedBridge.Count-ne1-or[string]$acceptedBridge[0].sha256-cne[string]$receipt.record_sha256){return $false}
-
-    $packageAuthorityPath=Join-Path $RepoRoot ([string]$presentation.package_authority.path)
-    $sourceManifestPath=Join-Path $RepoRoot ([string]$presentation.source_manifest.path)
-    if(-not(Test-Path -LiteralPath $packageAuthorityPath -PathType Leaf)-or-not(Test-Path -LiteralPath $sourceManifestPath -PathType Leaf)){return $false}
-    $packageAuthority=Get-Content -Raw -LiteralPath $packageAuthorityPath|ConvertFrom-Json -Depth 100 -DateKind String
-    $sourceManifest=Get-Content -Raw -LiteralPath $sourceManifestPath|ConvertFrom-Json -Depth 100 -DateKind String
-    if(-not(Test-MIR4BootstrapRecordHash -Record $packageAuthority)-or-not(Test-MIR4BootstrapRecordHash -Record $sourceManifest)){return $false}
-
-    $enabledAuthorityFlags=@($presentation.authority_invariants.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
-    $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value})
+    # V2/V3 are frozen predecessor evidence.  V4 is the current successor and
+    # validates the source/ target composition plus Factorio-1 convergence.
+    $presentation=$currentPresentation
+    $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
+    $targetSemantics = @{}
+    foreach ($target in @($presentation.target_content_identities)) {
+      $targetSemantics[[string]$target.target] = "$($target.relation)|$($target.executable_content_preserved)|$($target.exact_engine_proof_required)"
+    }
     return (
+      [string]$presentation.kind -ceq 'MIR4CurrentPackagePresentationV4' -and
       [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
-      (@($presentation.package_source.roots)-join'|')-ceq'src/mod|targets'-and
-      [string]$packageAuthority.record_sha256-ceq[string]$presentation.package_authority.record_sha256-and
-      [string]$sourceManifest.record_sha256-ceq[string]$presentation.source_manifest.record_sha256-and
-      $enabledAuthorityFlags.Count-eq1-and
-      $enabledAuthorityFlags[0]-ceq'one_emitter_preserved'-and
-      $enabledTransitionGates.Count-eq0
+      (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
+      [bool]$presentation.authority_invariants.v3_receipt_immutable-and
+      [bool]$presentation.authority_invariants.factorio_two_presentation_content_changed-and
+      [bool]$presentation.authority_invariants.factorio_two_executable_content_preserved-and
+      [bool]$presentation.authority_invariants.factorio_one_semantic_content_changed-and
+      [bool]$presentation.authority_invariants.factorio_one_exact_engine_proof_required-and
+      -not[bool]$presentation.authority_invariants.candidate_allocation_authorized-and
+      -not[bool]$presentation.authority_invariants.signing_or_sealing_authorized-and
+      -not[bool]$presentation.authority_invariants.promotion_authorized-and
+      -not[bool]$presentation.authority_invariants.publication_authorized-and
+      -not[bool]$presentation.authority_invariants.public_support_authorized-and
+      $targetSemantics.Count-eq4-and
+      [string]$targetSemantics['f210']-ceq'presentation-only-content-change-executable-preserved|True|False'-and
+      [string]$targetSemantics['f200']-ceq'presentation-only-content-change-executable-preserved|True|False'-and
+      [string]$targetSemantics['f110']-ceq'changed-semantic-content-exact-engine-proof-required|False|True'-and
+      [string]$targetSemantics['f100']-ceq'changed-semantic-content-exact-engine-proof-required|False|True'-and
+      -not[bool]$presentation.transition_gate.main_promotion-and
+      -not[bool]$presentation.transition_gate.publication-and
+      ($enabledTransitionGates-join'|')-ceq'development_merge'
     )
   }catch{return $false}
+}
+
+function Get-MIR4M4202CurrentManifestBindingExpectation {
+  [CmdletBinding()]
+  [OutputType([int])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][int]$Fallback
+  )
+
+  try{
+    $receiptPath=Join-Path $RepoRoot 'assurance/repository/composable-source-layout-receipt-v1.json'
+    $schemaPath=Join-Path $RepoRoot 'contracts/repository/mir4-composable-source-layout-migration-v1.schema.json'
+    if(-not(Test-Path -LiteralPath $receiptPath -PathType Leaf)-or-not(Test-Path -LiteralPath $schemaPath -PathType Leaf)){return $Fallback}
+    $raw=Get-Content -Raw -LiteralPath $receiptPath
+    if(-not($raw|Test-Json -SchemaFile $schemaPath)){return $Fallback}
+    $receipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+    if(-not(Test-MIR4BootstrapRecordHash -Record $receipt)-or
+       [string]$receipt.current.package_source_fingerprint_sha256-cne(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot)){return $Fallback}
+    return [int]$receipt.relocation.binding_count
+  }catch{return $Fallback}
 }
 
 function Get-MIR4M4202ReadinessSuccessionV1 {
@@ -120,7 +167,11 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
       }
     }
     . (Join-Path $RepoRoot 'tools/lib/mir4/PostReleaseDocumentation.ps1')
-    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot
+    # This receipt is frozen 4.1 documentation lineage.  Later 4.2 package
+    # source changes are admitted only through the current V2 successor, so
+    # validate the documented record against its historical base instead of
+    # incorrectly requiring its former current-package fingerprint.
+    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot -Historical
     if($null -ne $documentation){
       foreach($binding in @($documentation.bindings)){
         $path=[string]$binding.path
@@ -170,14 +221,47 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
       $expectedInventorySha=[string]$readinessBinding[0].current_sha256
     }
     . (Join-Path $RepoRoot 'tools/lib/mir4/PostReleaseDocumentation.ps1')
-    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot
+    # See the matching historical-lineage validation above.  The V2 successor
+    # below owns the post-cutover current inventory binding.
+    $documentation=Get-MIR4PostReleaseDocumentation -RepoRoot $RepoRoot -Historical
     if($null -ne $documentation){
       $documentationBinding=@($documentation.bindings|Where-Object{[string]$_.path -ceq $inventoryRelativePath})
       if($documentationBinding.Count -ne 1 -or [string]$documentationBinding[0].previous_sha256 -cne $expectedInventorySha){return $null}
       $expectedInventorySha=[string]$documentationBinding[0].current_sha256
     }
-    $inventoryPath=Join-Path $RepoRoot $inventoryRelativePath
-    if((Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-cne$expectedInventorySha){return $null}
-    return [string](Get-Content -Raw -LiteralPath $inventoryPath|ConvertFrom-Json -Depth 100 -DateKind String).digest
+    # The bridge/readiness/documentation records authenticate the historical
+    # inventory succession through their final evolved binding.  The one-source
+    # cutover deliberately changes that inventory, so do not substitute the
+    # live file for the successor.  The V2 succession record is the append-only
+    # authenticated boundary: it records the exact current canonical-text hash
+    # and inventory invariants.  We return its recorded digest only after both
+    # the record and the live file agree.
+    . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
+    $successor = Read-MIR4M41ToM42ComposableSourceSuccessionV2 -RepoRoot $RepoRoot
+    if (-not (Test-MIR4BootstrapRecordHash -Record $successor)) { return $null }
+    $factorioAuthorityPath = Join-Path $RepoRoot ([string]$successor.factorio_one_successor.authority.path)
+    if ([string]$successor.factorio_one_successor.authority.path -cne 'governance/repository/factorio-one-source-convergence-v1.json' -or
+        -not (Test-Path -LiteralPath $factorioAuthorityPath -PathType Leaf) -or
+        (Get-MIR4BootstrapTextSha256 -Path $factorioAuthorityPath) -cne [string]$successor.factorio_one_successor.authority.sha256) { return $null }
+    . (Join-Path $RepoRoot 'tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1')
+    $factorioReceipt = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $RepoRoot
+    if ([string]$successor.factorio_one_successor.receipt.path -cne 'assurance/repository/factorio-one-source-convergence-v1.json' -or
+        [string]$successor.factorio_one_successor.receipt.kind -cne [string]$factorioReceipt.kind -or
+        [string]$successor.factorio_one_successor.receipt.record_sha256 -cne [string]$factorioReceipt.record_sha256) { return $null }
+    $successorInventory = $successor.current.tooling_inventory
+    if ([string]$successorInventory.path -cne $inventoryRelativePath -or
+        [string]$successorInventory.hash_mode -cne 'canonical-text-v1' -or
+        [int]$successorInventory.command_count -ne 85 -or
+        [int]$successorInventory.unknown -ne 0 -or
+        [int]$successorInventory.duplicate_command_keys -ne 0) { return $null }
+    $inventoryPath = Join-Path $RepoRoot ([string]$successorInventory.path)
+    if (-not (Test-Path -LiteralPath $inventoryPath -PathType Leaf) -or
+        (Get-MIR4BootstrapTextSha256 -Path $inventoryPath) -cne [string]$successorInventory.sha256) { return $null }
+    $inventory = Get-Content -Raw -LiteralPath $inventoryPath | ConvertFrom-Json -Depth 100 -DateKind String
+    if ([string]$inventory.digest -cne [string]$successorInventory.digest -or
+        [int]$inventory.command_count -ne [int]$successorInventory.command_count -or
+        [int]$inventory.summary.unknown -ne [int]$successorInventory.unknown -or
+        [int]$inventory.summary.duplicate_command_keys -ne [int]$successorInventory.duplicate_command_keys) { return $null }
+    return [string]$successorInventory.digest
   }catch{return $null}
 }

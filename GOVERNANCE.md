@@ -28,4 +28,4 @@ Routine implementation branches, public development pushes, pull requests, integ
 
 Read back the protected target after integration and complete required forward-port dispositions. `main` and `dev` may intentionally differ during next-release development; `dev` is not a read-only mirror. Preserve dirty or uniquely valuable local work. Immutable release evidence is never rewritten; corrections are new events.
 
-See [Contributing](CONTRIBUTING.md), [Release runbook](RELEASE-RUNBOOK.md), and [Project continuity](PROJECT-CONTINUITY.md).
+See [Contributing](CONTRIBUTING.md), [Release runbook](docs/RELEASE-RUNBOOK.md), and [Project continuity](docs/PROJECT-CONTINUITY.md).

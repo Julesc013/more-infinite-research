@@ -157,35 +157,3 @@ function Copy-MIRFileWithHardlinkFallback {
     Copy-Item -LiteralPath $Source -Destination $Destination -Force
   }
 }
-
-function Copy-MIRRepositoryModDirectory {
-  param([string]$RepoRoot, [string]$ModsDir)
-
-  $target = Remove-MIRCopiedModDirectory -Name "more-infinite-research" -ModsDir $ModsDir
-  New-Item -ItemType Directory -Force -Path $target | Out-Null
-
-  foreach ($file in @(
-    "changelog.txt",
-    "control.lua",
-    "data-final-fixes.lua",
-    "data-updates.lua",
-    "data.lua",
-    "info.json",
-    "LICENSE",
-    "README.md",
-    "settings.lua",
-    "thumbnail.png"
-  )) {
-    $source = Join-Path $RepoRoot $file
-    if (Test-Path -LiteralPath $source) {
-      Copy-Item -LiteralPath $source -Destination (Join-Path $target $file)
-    }
-  }
-
-  foreach ($directory in @("migrations", "locale", "prototypes")) {
-    $source = Join-Path $RepoRoot $directory
-    if (Test-Path -LiteralPath $source) {
-      Copy-Item -LiteralPath $source -Destination (Join-Path $target $directory) -Recurse
-    }
-  }
-}

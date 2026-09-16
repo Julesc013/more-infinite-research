@@ -15,8 +15,8 @@ $roots = [ordered]@{
   "scripts/validation" = "tools/lib/validation"
 }
 $preservedCompatibilityWrapperReferences = @{
-  "tools/lib/control/Executor.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
-  "validation/tests/tooling/Test-MIRControlPlaneExecutor.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
+  "tools/lib/control/executor/PerformanceSourceAndArtifacts.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
+  "tests/tooling/Test-MIRControlPlaneExecutor.ps1" = @("scripts/MIRCompatAudit", "scripts/validation")
 }
 
 function Get-MIRActiveToolFiles {

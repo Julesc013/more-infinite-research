@@ -16,6 +16,7 @@ $sourceLockPath = Join-Path $repoRoot ($sourceLockRelative -replace "/", "\")
 $distributionManifestPath = Join-Path $repoRoot ".mir\distributions.json"
 . (Join-Path $repoRoot "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repoRoot "tools\lib\mir4\PreFreezeRelease.ps1")
+. (Join-Path $repoRoot "tools\lib\validation\CurrentTargetPackage.ps1")
 
 if (-not (Test-Path -LiteralPath $sourceLockPath -PathType Leaf)) {
     throw "Published source-lock authority not found: $sourceLockPath"
@@ -102,9 +103,10 @@ try {
 
     # A published current-line version remains package-source immutable even
     # when package-excluded release documentation continues on the branch.
-    # This closes the gap where a documentation edit to a package-visible root
-    # (notably README.md) could silently rebuild an already published version.
-    $info = Get-Content -LiteralPath (Join-Path $repoRoot "info.json") -Raw | ConvertFrom-Json
+    # Obtain the current package metadata through the selected F210 composition,
+    # never the retired Factorio-shaped repository root.
+    $currentTarget = New-MIR4CurrentTargetPackageContext -RepoRoot $repoRoot -Target 'f210'
+    $info = Get-MIR4CurrentTargetPackageOutputText -Context $currentTarget -RelativePath 'info.json' | ConvertFrom-Json
     $releaseRecordPath = Join-Path $repoRoot ".mir\releases\records\$($info.version).json"
     if (Test-Path -LiteralPath $releaseRecordPath -PathType Leaf) {
         $releaseRecord = Get-Content -LiteralPath $releaseRecordPath -Raw | ConvertFrom-Json

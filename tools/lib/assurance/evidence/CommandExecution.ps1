@@ -13,30 +13,34 @@ function Resolve-MIRAssuranceCommandText {
   $approvedDeltaPath = if ($Command.Contains("<approved-delta-path>")) {
     Resolve-MIRAssuranceApprovedDeltaPath -VerificationProfile $Context.verification_profile
   } else { "" }
-  $values = [ordered]@{
-    "<factorio>"=[string]$Context.factorio
-    "<candidate>"=[string]$Context.candidate
-    "<prior-release>"=[string]$Context.prior_release
-    "<mods>"=[string]$Context.mods
-    "<baseline>"=[string]$Plan.baseline
-    "<seal>"=[string]$Context.seal
-    "<target>"=[string]$Context.target
-    "<upgrade-from>"=[string]$Context.verification_profile.upgrade.from_version
-    "<upgrade-to>"=[string]$Context.verification_profile.upgrade.to_version
-    "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
-    "<approved-delta-path>"=[string]$approvedDeltaPath
-    "<source-commit>"=[string]$Plan.source_commit
-    "<source-tree>"=[string]$Plan.source_tree
-    "<package-source-sha256>"=[string]$Plan.package_source_sha256
-    "<package-source-commit>"=[string]$Plan.package_source_commit
-    "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
-    "<test-output>"=[string]$TestOutput
+  # Resolve only placeholders that the selected command actually consumes.
+  # Synthetic/static rows intentionally omit unrelated candidate and release
+  # properties, and strict mode must not turn those omissions into failures.
+  $valueProviders = [ordered]@{
+    "<factorio>"={ [string]$Context.factorio }
+    "<candidate>"={ [string]$Context.candidate }
+    "<prior-release>"={ [string]$Context.prior_release }
+    "<mods>"={ [string]$Context.mods }
+    "<baseline>"={ [string]$Plan.baseline }
+    "<seal>"={ [string]$Context.seal }
+    "<target>"={ [string]$Context.target }
+    "<upgrade-from>"={ [string]$Context.verification_profile.upgrade.from_version }
+    "<upgrade-to>"={ [string]$Context.verification_profile.upgrade.to_version }
+    "<upgrade-fixture>"={ [string]$Context.verification_profile.upgrade.fixture }
+    "<approved-delta-path>"={ [string]$approvedDeltaPath }
+    "<source-commit>"={ [string]$Plan.source_commit }
+    "<source-tree>"={ [string]$Plan.source_tree }
+    "<package-source-sha256>"={ [string]$Plan.package_source_sha256 }
+    "<package-source-commit>"={ [string]$Plan.package_source_commit }
+    "<qualification-factorio-version>"={ [string]$Context.verification_profile.qualification_factorio_version }
+    "<test-output>"={ [string]$TestOutput }
   }
   $resolved = $Command
-  foreach ($entry in $values.GetEnumerator()) {
+  foreach ($entry in $valueProviders.GetEnumerator()) {
     if ($resolved.Contains([string]$entry.Key)) {
-      if ([string]::IsNullOrWhiteSpace([string]$entry.Value)) { throw "Command requires $($entry.Key), but no matching option was supplied." }
-      $resolved = $resolved.Replace([string]$entry.Key, (Quote-MIRAssuranceCommandArgument -Value ([string]$entry.Value)))
+      $value = [string](& $entry.Value)
+      if ([string]::IsNullOrWhiteSpace($value)) { throw "Command requires $($entry.Key), but no matching option was supplied." }
+      $resolved = $resolved.Replace([string]$entry.Key, (Quote-MIRAssuranceCommandArgument -Value $value))
     }
   }
   if ($resolved -match '<[^>]+>') { throw "Unresolved assurance command placeholder: $resolved" }
@@ -53,7 +57,7 @@ function Invoke-MIRAssuranceCommandText {
     [string]$TestOutput = ""
   )
   $resolved = Resolve-MIRAssuranceCommandText -Command $Command -Context $Context -Plan $Plan -TestOutput $TestOutput
-  $tokens = [Management.Automation.PSParser]::Tokenize($resolved, [ref]$null) | Where-Object { $_.Type -notin @("Comment", "NewLine") }
+  $tokens = @([Management.Automation.PSParser]::Tokenize($resolved, [ref]$null) | Where-Object { $_.Type -notin @("Comment", "NewLine") })
   if ($tokens.Count -eq 0) { throw "Empty assurance command." }
   $commandPath = [string]$tokens[0].Content
   if ($commandPath.StartsWith("./")) { $commandPath = Join-Path $repo $commandPath.Substring(2) }

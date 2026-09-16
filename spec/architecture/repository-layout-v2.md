@@ -44,7 +44,7 @@ This is the normative directory and ownership contract for the MIR dual-plane re
 └─ repository metadata and entrypoint files
 ```
 
-The standard repository integration roots `.github/`, `.agents/`, and `.codex/` remain hidden at root. `AGENTS.md`, `CONTRIBUTING.md`, `EXTENSION-PROTOCOL.md`, `FORKING.md`, `GOVERNANCE.md`, `MAINTAINER-HANDOFF.md`, `PROJECT-CONTINUITY.md`, `RELEASE-RUNBOOK.md`, `SECURITY.md`, `SUPPORT.md`, `README.md`, `LICENSE`, `.gitignore`, and `.gitattributes` remain at root by convention. The non-package Markdown guides are repository-policy documents owned by documentation governance.
+The standard repository integration roots `.github/`, `.agents/`, and `.codex/` remain hidden at root. `AGENTS.md`, `CONTRIBUTING.md`, `FORKING.md`, `GOVERNANCE.md`, `SECURITY.md`, `SUPPORT.md`, `README.md`, `LICENSE`, `.gitignore`, and `.gitattributes` remain at root by convention. Specialist repository-policy guides live under `docs/`: `EXTENSION-PROTOCOL.md`, `MAINTAINER-HANDOFF.md`, `PROJECT-CONTINUITY.md`, and `RELEASE-RUNBOOK.md`. The non-package Markdown guides are owned by documentation governance.
 
 `migrations/` is reserved exclusively for Factorio save and prototype migrations. Release comparison records belong under `.mir/releases/deltas/`.
 

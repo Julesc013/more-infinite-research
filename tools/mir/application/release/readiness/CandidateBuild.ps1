@@ -15,6 +15,7 @@ function New-MIR441FourTargetCandidate {
   Assert-MIR441CleanTrackedSource -RepoRoot $repo
   Assert-MIR441MainAncestor -RepoRoot $repo|Out-Null
   $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
+  Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation 'private_build'
   $work=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $WorkRoot -Name WorkRoot
   $evidence=Assert-MIR441ExternalRoot -RepoRoot $repo -Path $EvidenceRoot -Name EvidenceRoot
   if((Test-MIR441PathContained -Root $work -Path $evidence -AllowEqual)-or(Test-MIR441PathContained -Root $evidence -Path $work -AllowEqual)){throw '[mir441-build-root-overlap]'}

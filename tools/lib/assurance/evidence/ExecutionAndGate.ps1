@@ -300,19 +300,24 @@ function Invoke-MIRAssuranceTest {
   )
   New-Item -ItemType Directory -Force -Path $evidenceRoot | Out-Null
   $id = [string]$Test.id
-  if ([bool]$Test.requires_factorio -and (-not $Context.factorio -or -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf))) {
+  $requiresFactorio = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_factorio'
+  $requiresCandidate = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_candidate'
+  $inputs = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'inputs'
+  $plannedFingerprint = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'fingerprint'
+  $forceFresh = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'force_fresh'
+  if ([bool]$requiresFactorio -and (-not $Context.factorio -or -not (Test-Path -LiteralPath $Context.factorio -PathType Leaf))) {
     throw "Test $id requires --factorio with a matching Factorio binary."
   }
   if ($id -eq "runtime.upgrade" -and (-not $Context.prior_release -or -not (Test-Path -LiteralPath $Context.prior_release -PathType Leaf))) {
     throw "Test runtime.upgrade requires --prior with the exact prior-release archive."
   }
-  if ([bool]$Test.requires_candidate -or @($Test.inputs | Where-Object { [string]$_ -eq "candidate" }).Count -gt 0) {
+  if ([bool]$requiresCandidate -or @($inputs | Where-Object { [string]$_ -eq "candidate" }).Count -gt 0) {
     if (-not (Test-Path -LiteralPath $Context.candidate -PathType Leaf)) {
       throw "Test $id requires the exact candidate archive: $($Context.candidate)"
     }
   }
 
-  $fingerprint = if ($Test.fingerprint) { $Test.fingerprint } else { Get-MIRAssuranceTestFingerprint -Test $Test -Plan $Plan -Context $Context }
+  $fingerprint = if ($null -ne $plannedFingerprint) { $plannedFingerprint } else { Get-MIRAssuranceTestFingerprint -Test $Test -Plan $Plan -Context $Context }
   # Fresh campaigns do not reuse arbitrary historical evidence.  They do,
   # however, adopt a cryptographically exact row that was completed for this
   # same immutable campaign before an interruption.  That makes the boundary
@@ -322,7 +327,7 @@ function Invoke-MIRAssuranceTest {
     Write-Host "[CHECKPOINT] $id $($fingerprint.input_key)"
     return $checkpoint
   }
-  if ([bool]$Test.force_fresh) {
+  if ([bool]$forceFresh) {
     $running = Get-MIRAssuranceRunningEvidence -Fingerprint $fingerprint -Context $Context
     if ($null -ne $running) {
       Write-Host "[WAIT] $id $($fingerprint.input_key)"
@@ -471,7 +476,13 @@ function Invoke-MIRAssuranceTest {
     layer=[string]$Test.layer
     command=[string]$Test.command
     resolved_command=$resolvedCommand
-    inputs=$fingerprint.inputs
+    inputs=if ($fingerprint -is [System.Collections.IDictionary] -and $fingerprint.Contains('inputs')) {
+      $fingerprint['inputs']
+    } elseif ($null -ne $fingerprint.PSObject.Properties['inputs']) {
+      $fingerprint.PSObject.Properties['inputs'].Value
+    } else {
+      [ordered]@{}
+    }
     producer=$evidenceProducer
     assertions=$assertions
     exit_code=$exitCode
@@ -526,9 +537,15 @@ function Invoke-MIRAssurancePlan {
       $identity = [ordered]@{
         test_id=[string]$test.id
         input_key=[string]$test.fingerprint.input_key
-        target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) { [string]$test.fingerprint.target } else { [string]$Context.target }
+        target=if ($null -ne $test.fingerprint.PSObject.Properties['target']) {
+          [string]$test.fingerprint.target
+        } elseif ($null -ne $Context.PSObject.Properties['target']) {
+          [string]$Context.target
+        } else {
+          ''
+        }
         fingerprint_sha256=[string]$test.fingerprint.fingerprint_sha256
-        definition_sha256=[string]$test.fingerprint.definition_sha256
+        definition_sha256=if ($null -ne $test.fingerprint.PSObject.Properties['definition_sha256']) { [string]$test.fingerprint.definition_sha256 } else { '' }
       }
       $quarantineState = $null
       if (-not [string]::IsNullOrWhiteSpace([string]$identity.input_key) -and
@@ -592,9 +609,10 @@ function Invoke-MIRAssuranceGate {
   $Plan = Assert-MIRAssurancePlan -Plan $Plan -Context $Context
   $checks = @()
   $evidence = @()
-  if ($Plan.domain_manifest) {
+  $domainManifest = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'domain_manifest'
+  if ($null -ne $domainManifest) {
     $currentManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
-    if ([string]$currentManifest.manifest_sha256 -ne [string]$Plan.domain_manifest.manifest_sha256) {
+    if ([string]$currentManifest.manifest_sha256 -ne [string]$domainManifest.manifest_sha256) {
       throw "Candidate domain manifest changed after the verification plan was created."
     }
   }
@@ -636,7 +654,7 @@ function Invoke-MIRAssuranceGate {
     candidate_descriptor=$Plan.candidate_descriptor
     candidate_descriptor_sha256=[string]$Plan.candidate_descriptor_sha256
     candidate=[string]$Plan.candidate
-    domain_manifest=$Plan.domain_manifest
+    domain_manifest=$domainManifest
     checks=$checks
     evidence=$evidence
     capsule_set=$capsuleDigests
@@ -664,6 +682,7 @@ function Invoke-MIRAssuranceGate {
 
 function Get-MIRAssuranceBuildFingerprint {
   param([Parameter(Mandatory)]$Context)
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target (ConvertTo-MIR4CurrentTargetKey -FactorioVersion ([string]$Context.target))
   $material = [ordered]@{
     schema=$buildReceiptSchema
     target=[string]$Context.target
@@ -671,7 +690,7 @@ function Get-MIRAssuranceBuildFingerprint {
     package_source_sha256=(Get-MIRAssurancePackageSourceHash)
     build_script_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\commands\package\Build-MIRPackage.ps1"))
     package_identity_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1"))
-    info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo "info.json"))
+    info_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'info.json'))
   }
   return [ordered]@{ material=$material; input_key=(Get-MIRAssuranceJsonHash -Value $material) }
 }
@@ -728,16 +747,18 @@ function Invoke-MIRAssuranceBuild {
     $targetRows = @($authority.targets | Where-Object { [string]$_.target_id -ceq "factorio-$([string]$Context.target)" })
     if ($targetRows.Count -ne 1) { throw "Assurance target is not governed by canonical MIR 4 package authority: $($Context.target)" }
     $candidateId = 'MIR4-ASSURANCE-' + ([string]$fingerprint.material.source_tree).ToUpperInvariant()
-    $sourceVersion = if ([string]$Context.info.version -match '^4[.]') {
-      [string]$Context.info.version
-    } else {
-      [string]$targetRows[0].baseline_source_version
-    }
+    $buildVersion = [string]$Context.info.version
     $buildArguments = @{
       Target = [string]$targetRows[0].target
       CandidateId = $candidateId
-      SourceVersion = $sourceVersion
       OutputDir = 'build/packages/assurance'
+    }
+    if ($buildVersion -match '^4[.][0-9]{1,5}[.][0-9]{5}$') {
+      $buildArguments['DistributionVersion'] = $buildVersion
+    } elseif ($buildVersion -match '^4[.][0-9]{1,5}[.][0-9]{1,2}$') {
+      $buildArguments['SourceVersion'] = $buildVersion
+    } else {
+      $buildArguments['SourceVersion'] = [string]$targetRows[0].baseline_source_version
     }
     $buildResult = & (Join-Path $repo 'tools/commands/package/Build-MIRPackage.ps1') @buildArguments
     if ([IO.Path]::GetFullPath([string]$buildResult.archive_path) -cne $candidateFullPath) {
@@ -775,14 +796,18 @@ function Get-MIRAssuranceResultCounts {
   $expected = if ($ExpectedTotal -ge 0) { $ExpectedTotal } else { $total }
   $coldExecutionSeconds = [Math]::Round([double](@($Results | Where-Object {
     [string]$_.disposition -eq "RUN"
-  } | ForEach-Object { [double]$_.duration_seconds } | Measure-Object -Sum).Sum), 3)
+  } | ForEach-Object {
+    if ($null -ne $_.PSObject.Properties['duration_seconds']) { [double]$_.duration_seconds } else { 0.0 }
+  } | Measure-Object -Sum).Sum), 3)
   $reusedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
     [string]$_.disposition -in @("REUSE", "WAIT")
   } | ForEach-Object {
     if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
       [double]$_.source_duration_seconds
-    } else {
+    } elseif ($null -ne $_.PSObject.Properties['duration_seconds']) {
       [double]$_.duration_seconds
+    } else {
+      0.0
     }
   } | Measure-Object -Sum).Sum), 3)
   $checkpointedSourceSeconds = [Math]::Round([double](@($Results | Where-Object {
@@ -790,8 +815,10 @@ function Get-MIRAssuranceResultCounts {
   } | ForEach-Object {
     if ($null -ne $_.PSObject.Properties["source_duration_seconds"]) {
       [double]$_.source_duration_seconds
-    } else {
+    } elseif ($null -ne $_.PSObject.Properties['duration_seconds']) {
       [double]$_.duration_seconds
+    } else {
+      0.0
     }
   } | Measure-Object -Sum).Sum), 3)
   return [ordered]@{
@@ -800,7 +827,9 @@ function Get-MIRAssuranceResultCounts {
     executed=@($Results | Where-Object { [string]$_.disposition -eq "RUN" }).Count
     reused=@($Results | Where-Object { [string]$_.disposition -in @("REUSE", "WAIT") }).Count
     checkpointed=@($Results | Where-Object { [string]$_.disposition -eq "CHECKPOINT" }).Count
-    quarantined=@($Results | Where-Object { [string]$_.conclusion -eq 'quarantined' }).Count
+    quarantined=@($Results | Where-Object {
+      $null -ne $_.PSObject.Properties['conclusion'] -and [string]$_.conclusion -eq 'quarantined'
+    }).Count
     cold_execution_seconds=$coldExecutionSeconds
     reused_source_seconds=$reusedSourceSeconds
     checkpointed_source_seconds=$checkpointedSourceSeconds

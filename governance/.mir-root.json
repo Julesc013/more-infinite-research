@@ -22,6 +22,8 @@
     "governance/repository/migrations/release-tooling-v1.json",
     "governance/repository/migrations/repository-characterization-v1.json",
     "governance/repository/migrations/current-product-bridge-retirement-v1.json",
+    "governance/repository/composable-source-layout-v1.json",
+    "governance/repository/factorio-one-source-convergence-v1.json",
     ".mir/control",
     ".mir/control-plane",
     ".mir/*.yml"

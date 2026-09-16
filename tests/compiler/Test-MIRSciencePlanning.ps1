@@ -17,13 +17,13 @@ New-Item -ItemType Directory -Force -Path $mod,(Join-Path $run 'userdata') | Out
 $version=(& $engine --version | Out-String)
 if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]') { throw 'This F210 module regression requires an exact Factorio 2.1 engine.' }
 $modules=[ordered]@{
- 'prototypes.mir.core.deepcopy'='src/mod/common/prototypes/mir/core/deepcopy.lua'
- 'prototypes.mir.platform.factorio.data_raw'='src/mod/common/prototypes/mir/platform/factorio/data_raw.lua'
- 'prototypes.mir.capabilities.science_integration.lab_compatibility'='src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
- 'prototypes.mir.capabilities.science_integration.science_selection_policy'='src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
- 'prototypes.mir.capabilities.science_integration.science_selector'='src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua'
- 'prototypes.mir.compatibility.policies.k2_science_phase'='targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua'
- 'prototypes.mir.planner.science'='targets/f210/files/prototypes/mir/planner/science.lua'
+ 'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
+ 'prototypes.mir.platform.factorio.data_raw'='source/prototypes/mir/platform/factorio/data_raw.lua'
+ 'prototypes.mir.capabilities.science_integration.lab_compatibility'='source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
+ 'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
+ 'prototypes.mir.capabilities.science_integration.science_selector'='source/prototypes/mir/capabilities/science_integration/science_selector.lua'
+ 'prototypes.mir.compatibility.policies.k2_science_phase'='source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua'
+ 'prototypes.mir.planner.science'='source/adapters/f210/prototypes/mir/planner/science.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')

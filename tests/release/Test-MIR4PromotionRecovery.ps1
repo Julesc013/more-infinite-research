@@ -3,6 +3,12 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/Promotion.ps1')
+# Recovery behavior is exercised against a synthetic authorized contract. The
+# repository's historical MIR 4.1 contract correctly closes current promotion.
+function Get-MIR441ReleaseReadinessContract {
+  param([string]$RepoRoot)
+  return [pscustomobject]@{transition_gate=[pscustomobject]@{promotion=$true}}
+}
 $root=Join-Path $RepoRoot ('build/tests/promotion-recovery/'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $root | Out-Null
 $script:source='a'*40;$script:original='b'*40

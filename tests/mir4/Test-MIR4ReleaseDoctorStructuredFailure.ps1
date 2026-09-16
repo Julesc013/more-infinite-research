@@ -27,7 +27,7 @@ $authorityPaths=@(
   '.mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json',
   '.mir/releases/waves/mir4-r0/MIR4-T06-Authority-Evolution-ReceiptV1.json',
-  'src/mod/package-source.json',
+  'source/package-source.json',
   'targets/package-authority.json'
 )
 $before=[ordered]@{}

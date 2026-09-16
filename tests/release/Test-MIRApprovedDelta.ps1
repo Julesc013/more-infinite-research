@@ -15,7 +15,14 @@ $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
 . (Join-Path $repo "tools\lib\control\Executor.ps1")
-$activeVersion = [string](Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json).version
+# Approved-delta records characterize the completed MIR 3 terminal line.  Their
+# identity is read from its frozen source object, never from the current MIR 4
+# composed package.
+$terminalRecord = Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/releases/records/3.2.11.json') | ConvertFrom-Json
+$terminalSourceCommit = [string]$terminalRecord.package.source_commit
+$terminalInfoText = @(& git -C $repo show "$terminalSourceCommit`:info.json") -join "`n"
+if ($LASTEXITCODE -ne 0) { throw "Approved-delta historical source is unavailable: $terminalSourceCommit" }
+$activeVersion = [string]($terminalInfoText | ConvertFrom-Json).version
 $defaultDeltaByVersion = @{
   "3.2.2" = ".mir\releases\deltas\3.2.1-to-3.2.2.json"
   "3.2.5" = ".mir\releases\deltas\3.2.3-to-3.2.5.json"

@@ -65,8 +65,8 @@ if($engineSha256 -cne $expectedEngineSha256){throw "Bob Tin progression-frontier
 $version=(& $engine --version|Out-String);if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]17'){throw 'Bob Tin progression-frontier requires exact Steam F210 2.1.17.'}
 $engineVersion=([regex]::Match($version,'Version:\s+2[.]1[.]17[^\r\n]*').Value).Trim();if([string]::IsNullOrWhiteSpace($engineVersion)){throw 'Bob Tin progression-frontier could not bind engine version.'}
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();if($sourceCommit -notmatch '^[0-9a-f]{40}$' -or $sourceTree -notmatch '^[0-9a-f]{40}$'){throw 'Bob Tin progression-frontier requires exact source commit/tree bindings.'}
-$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- src/mod);if($sourceChanges.Count -ne 0){throw "Bob Tin progression-frontier refuses a changed package-source root: $($sourceChanges -join '; ')"}
-$fixture=Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier';$dossier=Join-Path $fixture 'progression-frontier-dossier.json';$packageSource=Join-Path $repo 'src/mod/package-source.json'
+$sourceChanges=@(& git -C $repo status --porcelain --untracked-files=all -- source);if($sourceChanges.Count -ne 0){throw "Bob Tin progression-frontier refuses a changed package-source root: $($sourceChanges -join '; ')"}
+$fixture=Join-Path $repo 'fixtures/assert-bob-tin-progression-frontier';$dossier=Join-Path $fixture 'progression-frontier-dossier.json';$packageSource=Join-Path $repo 'source/package-source.json'
 try{$record=Get-Content -Raw -LiteralPath $dossier|ConvertFrom-Json -ErrorAction Stop}catch{throw "Bob Tin progression-frontier dossier JSON is invalid: $($_.Exception.Message)"};Assert-Dossier $record
 
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')

@@ -6,10 +6,12 @@ $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage=New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
 
 $before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
-Assert-MIR4CurrentPackagePresentationV2 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
-$emitterPath=Join-Path $RepoRoot 'prototypes/mir/emit/mod_data.lua'
+Assert-MIR4CurrentPackagePresentationV3 -RepoRoot $RepoRoot -PackageSourceSha256 $before|Out-Null
+$emitterPath=Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/emit/mod_data.lua'
 $emitterBefore=(Get-FileHash -LiteralPath $emitterPath -Algorithm SHA256).Hash
 
 $contract=Get-MIR4F210MepDiscoveryContractV1 -RepoRoot $RepoRoot

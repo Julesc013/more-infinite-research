@@ -11,13 +11,17 @@ function Assert-MIR441Test([bool]$Condition,[string]$Code){if(-not$Condition){th
 $packageBefore=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $contract=Get-MIR441ReleaseReadinessContract -RepoRoot $repo
 $check=Test-MIR441ReleaseReadinessContract -RepoRoot $repo
-Assert-MIR441Test ([string]$check.status-ceq'MIR-4.1-RELEASE-READINESS-CONTRACT-PASSED'-and[bool]$check.private_build_authorized-and[bool]$check.technical_seal_authorized-and[bool]$check.exact_main_promotion_authorized-and-not[bool]$check.tagging_authorized-and-not[bool]$check.publication_authorized) 'mir441-contract-gates'
+Assert-MIR441Test ([string]$check.status-ceq'MIR-4.1-RELEASE-READINESS-HISTORICAL-SUCCESSOR-CONTRACT-PASSED'-and[bool]$check.historical_contract-and-not[bool]$check.private_build_authorized-and-not[bool]$check.technical_seal_authorized-and-not[bool]$check.exact_main_promotion_authorized-and-not[bool]$check.tagging_authorized-and-not[bool]$check.publication_authorized) 'mir441-contract-gates'
+Assert-MIR441Test ([bool]$contract.historical_transition_gate.private_build-and[bool]$contract.historical_transition_gate.technical_seal-and[bool]$contract.historical_transition_gate.promotion-and-not[bool]$contract.historical_transition_gate.tagging-and-not[bool]$contract.historical_transition_gate.publication) 'mir441-historical-contract-gates'
 Assert-MIR441Test ((@($contract.targets.distribution_version)-join'|')-ceq'4.1.21000|4.1.20000|4.1.11000|4.1.10000') 'mir441-target-versions'
 Assert-MIR441Test (@($contract.targets|Where-Object qualification_role -eq 'technical-required').Count-eq4) 'mir441-four-target-technical-role'
 Assert-MIR441Test (@($contract.targets|Where-Object publication_role -eq 'primary').Count-eq2-and@($contract.targets|Where-Object publication_role -eq 'supplemental-lts').Count-eq2) 'mir441-publication-role'
-Assert-MIR441Test ([string]$contract.package_source.current_sha256-ceq$packageBefore-and[string]$contract.package_source.predecessor_sha256-ceq'0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA') 'mir441-package-source-succession'
+Assert-MIR441Test ([string]$contract.package_source.current_sha256-ceq'0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA'-and[string]$contract.package_source.predecessor_sha256-ceq'0DEDF851B388D8523110A2ABEDB3A7B2091E1CC119944F5EA7D4C1E7C01698DA'-and[string]$contract.composable_source_successor.current_package_source_sha256-ceq$packageBefore) 'mir441-package-source-succession'
+foreach($operation in @('private_build','qualification','technical_seal','promotion')){
+  try{Assert-MIR441CurrentReleaseOperationAuthorized -Contract $contract -Operation $operation;throw "[mir441-current-operation-open] $operation"}catch{Assert-MIR441Test ($_.Exception.Message-match'mir441-current-release-operation-not-authorized') "mir441-current-operation-closed-$operation"}
+}
 
-$modules=@('Common.ps1','Contract.ps1','ResourceGovernor.ps1','CandidateBuild.ps1','QualificationResume.ps1','Qualification.ps1','IndependentVerification.ps1','TechnicalSeal.ps1','Promotion.ps1')
+$modules=@('Common.ps1','Contract.ps1','ComposableSourceSuccession.ps1','ResourceGovernor.ps1','CandidateBuild.ps1','QualificationResume.ps1','Qualification.ps1','IndependentVerification.ps1','TechnicalSeal.ps1','Promotion.ps1')
 foreach($name in $modules){$path=Join-Path $repo "tools/mir/application/release/readiness/$name";$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors);Assert-MIR441Test ($errors.Count-eq0) "mir441-module-syntax-$name";Assert-MIR441Test (([IO.File]::ReadAllLines($path).Count)-le260) "mir441-module-bound-$name"}
 
 $resourceText=[IO.File]::ReadAllText((Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1'))
@@ -98,12 +102,15 @@ Assert-MIR441Test ($finalizer-match'--verify-tag'-and$finalizer-match'--draft'-a
 Assert-MIR441Test ($finalizer-match'manifest_asset[.]label'-and$finalizer-match'github_assets\)[.]Count\+1'-and$finalizer-match'mir441-final-public-manifest-byte') 'mir441-finalizer-publishes-and-verifies-manifest'
 
 & (Join-Path $repo 'tools/commands/mir4/Update-MIR441UpgradeFixtures.ps1') -RepoRoot $repo -Check|Out-Null
-& (Join-Path $repo 'tools/commands/mir4/Update-MIR441PackagePresentationAuthority.ps1') -RepoRoot $repo -Check|Out-Null
-& (Join-Path $repo 'tools/commands/mir4/Update-MIR441SourceFreezeAuthority.ps1') -RepoRoot $repo -Check|Out-Null
+# The 4.1 presentation receipt remains a historical package claim.  Its
+# source paths were deliberately retired by the governed V2 composition
+# cutover, so current release readiness is anchored by the successor record
+# rather than attempting to regenerate the frozen receipt against V2 paths.
+& (Join-Path $repo 'tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionAuthority.ps1') -RepoRoot $repo -Check|Out-Null
 $source=Update-MIR4SourceChangelogV1 -RepoRoot $repo -PlanPath 'releases/governance/MIR4-Source-Changelog-PlanV1.json' -Check
 Assert-MIR441Test ([string]$source.status-ceq'current') 'mir441-source-changelog-current'
 $cli=& (Join-Path $repo 'tools/mir.ps1') mir4 release-engine readiness-check 2>&1|Out-String
-Assert-MIR441Test ($cli-match'MIR-4.1-RELEASE-READINESS-PASSED') 'mir441-public-cli'
+Assert-MIR441Test ($cli-match'MIR-4.1-RELEASE-READINESS-HISTORICAL-SUCCESSOR-PASSED') 'mir441-public-cli'
 Assert-MIR441Test ((Get-MIRPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir441-test-package-noninterference'
 
 [pscustomobject][ordered]@{status='MIR-4.1-RELEASE-READINESS-STATIC-PROOF-PASSED';module_count=$modules.Count;targets=4;publisher_can_build=$false;package_source_sha256=$packageBefore}

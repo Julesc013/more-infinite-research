@@ -58,20 +58,23 @@ function Get-MIRStreamKeysFromSource {
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$policyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
-$contractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
-$capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
-$manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
-$continuationManifestPath = Join-Path $repo "prototypes\mir\streams\generated_continuation_manifest.json"
-$baseDefaultsPath = Join-Path $repo "prototypes\mir\settings\defaults.lua"
-$productivityStreamsPath = Join-Path $repo "prototypes\streams\productivity.lua"
-$directEffectStreamsPath = Join-Path $repo "prototypes\streams\direct-effects.lua"
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+function Get-MIRCurrentPackagePath { param([string]$RelativePath) Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath }
+$policyPath = Get-MIRCurrentPackagePath "prototypes\mir\policy\capabilities.lua"
+$contractPath = Get-MIRCurrentPackagePath "prototypes\mir\capabilities\contract.lua"
+$capabilityRegistryPath = Get-MIRCurrentPackagePath "prototypes\mir\capabilities\registry.lua"
+$manifestPath = Get-MIRCurrentPackagePath "prototypes\mir\streams\generated_stream_manifest.json"
+$continuationManifestPath = Get-MIRCurrentPackagePath "prototypes\mir\streams\generated_continuation_manifest.json"
+$baseDefaultsPath = Get-MIRCurrentPackagePath "prototypes\mir\settings\defaults.lua"
+$productivityStreamsPath = Get-MIRCurrentPackagePath "prototypes\streams\productivity.lua"
+$directEffectStreamsPath = Get-MIRCurrentPackagePath "prototypes\streams\direct-effects.lua"
 $claimsPath = Join-Path $repo "spec\compatibility\claims.json"
 $supportLanePath = Join-Path $repo "spec\compatibility\support-lanes.json"
 $compatibilityManifestPath = Join-Path $repo ".mir\compatibility.yml"
 $streamsManifestPath = Join-Path $repo ".mir\streams.yml"
 $claimLevelsDocPath = Join-Path $repo "docs\compatibility\claim-levels.md"
-$luaClaimRegistryPath = Join-Path $repo "prototypes\mir\compatibility\claim_registry.lua"
+$luaClaimRegistryPath = Get-MIRCurrentPackagePath "prototypes\mir\compatibility\claim_registry.lua"
 
 $policyText = Get-Content -Raw -LiteralPath $policyPath
 $contractText = Get-Content -Raw -LiteralPath $contractPath

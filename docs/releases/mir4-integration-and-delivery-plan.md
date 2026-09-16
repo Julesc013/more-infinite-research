@@ -241,7 +241,7 @@ The reusable mechanism is expanded only after this dossier, implementation, play
 
 ## Component destinations and safety
 
-The following destinations account for the full reviewed inventory. They are delivery obligations, not maturity upgrades. Preserve current authoring roots `src/mod/common`, `src/mod/families`, `src/mod/generation`, `src/mod/package-source.json`, and target overlays.
+The following destinations account for the full reviewed inventory. They are delivery obligations, not maturity upgrades. Preserve current authoring roots `source/common`, `source/families`, `source/generation`, `source/package-source.json`, and target overlays.
 
 | Component | Destination | Next obligation |
 | --- | --- | --- |

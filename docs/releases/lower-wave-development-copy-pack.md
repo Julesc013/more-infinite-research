@@ -34,7 +34,7 @@ The repository root remains the only active implementation. Historical source is
 | Portable fixes and lessons | `.mir/portable-return.yml` | Reuse cross-version correctness, tooling, fixture, and target-profile lessons. |
 | Release notes and synthesis | `docs/releases/` | Copy maintained release summaries, checklists, migrations, and decisions. |
 | Player-facing history | `changelog.txt` | Use the consolidated Factorio-format changelog. |
-| Current and historical work list | `todo.md` and `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md` | Use current work truth or audit the pre-consolidation plan. |
+| Current and historical work list | `TODO.md` and `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md` | Use current work truth or audit the pre-consolidation plan. |
 
 Do not overlay an entire historical source materialization onto the repository root. Reconstruct into a disposable worktree and copy only the target-specific material you intend to study or reuse. Source-lock authorities and all `.mir` control records stay excluded from release ZIPs.
 
@@ -113,7 +113,7 @@ The full records, source commits, fixtures, decisions, and replayed target commi
 
 ## Changelog, TODO, Notes, And Evidence
 
-`changelog.txt` has a source-faithful section for every published line and the active 3.2.0 development candidate. `todo.md` records completed consolidation and only the remaining manual, portal, reliability, and future-development gates. The exact earlier TODO is retained as lower-wave evidence so no plan or note was lost during cleanup.
+`changelog.txt` has a source-faithful section for every published line and the active 3.2.0 development candidate. `TODO.md` records completed consolidation and only the remaining manual, portal, reliability, and future-development gates. The exact earlier TODO is retained as lower-wave evidence so no plan or note was lost during cleanup.
 
 The release synthesis documents explain decisions and limitations rather than duplicating raw ledgers:
 

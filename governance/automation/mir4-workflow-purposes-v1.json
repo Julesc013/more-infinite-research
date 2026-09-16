@@ -81,7 +81,7 @@
       "purpose": "release",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "AF3B982EE58208149F3E4B737CFEAA0BEC8CC3B1E206DA7A741D4E3DDAEF4E49"
+      "sha256": "1F5C6D506E787BC196C0F2182BEF86D7146C371BC1EF1F0F8A58D2F4B3118FFB"
     },
     {
       "file": ".github/workflows/extended-compat-audit.yml",
@@ -185,7 +185,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "F0A1D60DB1B462628742F7B69B57CF1B985554D4E13FF7FB94C98776E4409ACF"
+      "sha256": "60720CB0E8EB942EDDEE80A44DF9214A59C9FE94920AC4F6CED13261277781C2"
     }
   ],
   "summary": {
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:0a6485d7f616b608dff46b8746d69eccef06aed83d3e927a1e65a0b9daea17cf"
+  "digest": "sha256:cb7b0740f73971812396812e8947921870c8434a448e937b8c0b065870e5da7f"
 }

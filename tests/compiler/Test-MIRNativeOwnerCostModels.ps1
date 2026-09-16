@@ -7,6 +7,13 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
+$RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
+
+function Read-MIRCurrentPackageText([string]$RelativePath) {
+  return Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath $RelativePath
+}
 
 $manifestPath = Join-Path $RepoRoot ".mir\native-owner-cost-models.json"
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
@@ -25,16 +32,16 @@ $expected = [ordered]@{
 
 $contracts = @($manifest.contracts)
 if ($contracts.Count -ne $expected.Count) { throw "Expected exactly five native-owner balance contracts." }
-$streamSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\streams\productivity.lua")
+$streamSource = Read-MIRCurrentPackageText 'prototypes/streams/productivity.lua'
 $settingsManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\settings.yml")
-$costModelSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\native_owner\cost_model.lua")
-$researchCostSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\model.lua")
-$formulaSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\formula.lua")
-$classificationSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\classification.lua")
-$bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\planner\native_owner_binding.lua")
-$transitionSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\research_cost\transition_descriptor.lua")
-$emitterSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\emit\transactions\productivity_family_adoption.lua")
-$runtimeSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\runtime\productivity_family_adoption.lua")
+$costModelSource = Read-MIRCurrentPackageText 'prototypes/mir/domain/native_owner/cost_model.lua'
+$researchCostSource = Read-MIRCurrentPackageText 'prototypes/mir/domain/research_cost/model.lua'
+$formulaSource = Read-MIRCurrentPackageText 'prototypes/mir/domain/research_cost/formula.lua'
+$classificationSource = Read-MIRCurrentPackageText 'prototypes/mir/domain/research_cost/classification.lua'
+$bindingSource = Read-MIRCurrentPackageText 'prototypes/mir/planner/native_owner_binding.lua'
+$transitionSource = Read-MIRCurrentPackageText 'prototypes/mir/domain/research_cost/transition_descriptor.lua'
+$emitterSource = Read-MIRCurrentPackageText 'prototypes/mir/emit/transactions/productivity_family_adoption.lua'
+$runtimeSource = Read-MIRCurrentPackageText 'prototypes/mir/runtime/productivity_family_adoption.lua'
 $progressFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-native-owner-progress\control.lua")
 $compilerContractFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-compiler-contracts\data-final-fixes.lua")
 $adoptionFixtureSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\assert-vanilla-family-adoption\data-final-fixes.lua")

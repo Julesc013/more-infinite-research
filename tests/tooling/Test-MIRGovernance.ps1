@@ -10,6 +10,9 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+$currentTargetInfo = Get-MIR4CurrentTargetPackageOutputText -Context $targetPackage -RelativePath 'info.json' | ConvertFrom-Json
 $docsRoot = Join-Path $repo "docs"
 $mirRoot = Join-Path $repo ".mir"
 
@@ -27,16 +30,32 @@ function Get-MIRRelativePath {
 
 function Test-MIRRepoPath {
   param([Parameter(Mandatory)][string]$RelativePath)
+  $currentTargetPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -ne $currentTargetPath) { return Test-Path -LiteralPath $currentTargetPath }
   return Test-Path -LiteralPath (Join-Path $repo $RelativePath)
 }
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)
-  $path = Join-Path $repo $RelativePath
+  $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath -AllowMissing
+  if ($null -eq $path) {
+    $path = Join-Path $repo $RelativePath
+  }
   if (-not (Test-Path -LiteralPath $path)) {
     throw "Missing required governance file: $RelativePath"
   }
   return Get-Content -Raw -LiteralPath $path
+}
+
+function Get-MIRPinnedTerminalInfo {
+  # .mir/convergence.yml records terminal MIR3.  Its release block remains
+  # bound to its pre-cutover package object, not the composed MIR4 target.
+  $preCutoverCommit = '297aa5cc902da96847165a4f9caa1048608839fb'
+  $text = @(& git -C $repo show "${preCutoverCommit}:info.json")
+  if ($LASTEXITCODE -ne 0 -or $text.Count -eq 0) {
+    throw "Unable to read pinned terminal info.json from $preCutoverCommit."
+  }
+  return (($text -join "`n") | ConvertFrom-Json)
 }
 
 function Get-MIRFrontmatter {
@@ -157,9 +176,8 @@ $releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-
 if ($releaseLedger.schema -ne 1 -or [string]$releaseLedger.authority -ne "canonical-release-ledger") {
   throw ".mir/releases.json must use canonical release-ledger schema 1."
 }
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
-  throw ".mir/targets.json has no profile for current Factorio $($repoInfo.factorio_version)."
+if (-not $targetManifest.profiles.PSObject.Properties[$currentTargetInfo.factorio_version]) {
+  throw ".mir/targets.json has no profile for current Factorio $($currentTargetInfo.factorio_version)."
 }
 
 $docsManifestText = Read-MIRText -RelativePath ".mir/docs.yml"
@@ -294,7 +312,7 @@ foreach ($match in [regex]::Matches($fixturesText, "(?m)^\s+(path|assertion_path
 }
 
 $convergenceText = Read-MIRText -RelativePath ".mir/convergence.yml"
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$terminalInfo = Get-MIRPinnedTerminalInfo
 $releaseMatch = [regex]::Match(
   $convergenceText,
   '(?ms)^release:\r?\n(?<body>(?:^  [^\r\n]*\r?\n?)*)'
@@ -313,11 +331,11 @@ foreach ($requiredField in @("version", "branch", "factorio_version", "baseline_
     throw ".mir/convergence.yml release is missing required field $requiredField."
   }
 }
-if ([string]$releaseFields.version -ne [string]$repoInfo.version) {
-  throw ".mir/convergence.yml release version does not match info.json."
+if ([string]$releaseFields.version -ne [string]$terminalInfo.version) {
+  throw ".mir/convergence.yml release version does not match the pinned terminal info.json."
 }
-if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_version) {
-  throw ".mir/convergence.yml Factorio version does not match info.json."
+if ([string]$releaseFields.factorio_version -ne [string]$terminalInfo.factorio_version) {
+  throw ".mir/convergence.yml Factorio version does not match the pinned terminal info.json."
 }
 if ([string]$releaseFields.objective -notin @(
   "behavioral-superset-implementation-subset",
@@ -425,7 +443,9 @@ if (($profilesCodeLines -join "`n") -match "data:extend|data\.raw") {
 }
 
 $capabilityLuaFiles = @(
-  Get-ChildItem -LiteralPath (Join-Path $repo "prototypes/mir/capabilities") -Recurse -File -Filter "*.lua" -ErrorAction SilentlyContinue
+  Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'prototypes/mir/capabilities/' |
+    Where-Object { $_.output_path -like '*.lua' } |
+    ForEach-Object { Get-Item -LiteralPath $_.source_file }
 )
 foreach ($file in $capabilityLuaFiles) {
   $text = Get-Content -Raw -LiteralPath $file.FullName

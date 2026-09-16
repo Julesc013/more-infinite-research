@@ -11,6 +11,31 @@ if (-not (Get-Command Get-MIRFileContentIdentity -ErrorAction SilentlyContinue))
   . (Join-Path $mir4PackageAuthorityRoot 'tools/lib/validation/PackageIdentity.ps1')
 }
 
+function Read-MIR4CanonicalPackageAuthorityRecord {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$Kind,
+    [Parameter(Mandatory)][string]$Schema,
+    [string]$Code = 'mir4-package-authority-record'
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $path = Join-Path $repo $RelativePath
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[$Code-missing] $RelativePath" }
+  $raw = Get-Content -Raw -LiteralPath $path
+  $schemaPath = Join-Path $repo $Schema
+  $schemaValid = $false
+  try { $schemaValid = $raw | Test-Json -SchemaFile $schemaPath -ErrorAction Stop } catch { $schemaValid = $false }
+  if (-not $schemaValid) { throw "[$Code-schema] $RelativePath" }
+  $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([string]$record.kind -cne $Kind -or -not (Test-MIR4BootstrapRecordHash -Record $record)) {
+    throw "[$Code-hash] $RelativePath"
+  }
+  return $record
+}
+
 function Get-MIR4CanonicalPackageAuthority {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -19,24 +44,37 @@ function Get-MIR4CanonicalPackageAuthority {
   $relative = 'targets/package-authority.json'
   $path = Join-Path $repo $relative
   $raw = Get-Content -Raw -LiteralPath $path
-  if (-not ($raw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v1.schema.json'))) {
+  if (-not ($raw | Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v2.schema.json'))) {
     throw '[mir4-package-authority-schema]'
   }
   $authority = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $authority)) { throw '[mir4-package-authority-record-hash]' }
-  foreach ($bindingName in @('source_manifest','target_registry','support_policy')) {
+  $recordDefinitions = [ordered]@{
+    source_manifest = [ordered]@{ kind = 'MIR4ComposablePackageSourceV2'; schema = 'spec/schemas/mir4-composable-package-source-v2.schema.json' }
+    target_registry = [ordered]@{ kind = 'MIR4TargetRegistryV2'; schema = 'spec/schemas/mir4-target-registry-v2.schema.json' }
+    support_policy = [ordered]@{ kind = 'MIR4TargetSupportPolicyV1'; schema = 'spec/schemas/mir4-target-support-policy-v1.schema.json' }
+  }
+  $records = [ordered]@{}
+  foreach ($bindingName in $recordDefinitions.Keys) {
     $binding = $authority.$bindingName
-    $bindingPath = Join-Path $repo ([string]$binding.path)
-    $record = Get-Content -Raw -LiteralPath $bindingPath | ConvertFrom-Json -Depth 100 -DateKind String
-    if ([string]$record.record_sha256 -cne [string]$binding.record_sha256 -or
-        -not (Test-MIR4BootstrapRecordHash -Record $record)) {
+    $definition = $recordDefinitions[$bindingName]
+    $record = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$binding.path) -Kind ([string]$definition.kind) -Schema ([string]$definition.schema) -Code 'mir4-package-authority-binding'
+    if ([string]$record.record_sha256 -cne [string]$binding.record_sha256) {
       throw "[mir4-package-authority-binding] $bindingName"
     }
+    $records[$bindingName] = $record
   }
   $versionBinding = $authority.versioning_authority
   $versionPath = Join-Path $repo ([string]$versionBinding.path)
   if ((Get-MIR4BootstrapTextSha256 -Path $versionPath) -cne [string]$versionBinding.file_sha256) {
     throw '[mir4-package-authority-binding] versioning_authority'
+  }
+  foreach ($registryTarget in @($records.target_registry.targets)) {
+    $composition = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$registryTarget.composition) -Kind 'MIR4TargetCompositionV2' -Schema 'spec/schemas/mir4-target-composition-v2.schema.json' -Code 'mir4-package-authority-composition'
+    if ([string]$composition.target -cne [string]$registryTarget.target -or
+        [string]$composition.materializer_abi -cne [string]$authority.materializer_abi) {
+      throw "[mir4-package-authority-composition] $($registryTarget.target)"
+    }
   }
   return $authority
 }
@@ -101,7 +139,47 @@ function Resolve-MIR4CanonicalPackageIdentity {
 }
 
 function Get-MIR4CanonicalPackageSourceRoots {
-  return @('src/mod','targets')
+  return @('source','targets')
+}
+
+function Resolve-MIR4CanonicalPackageSourcePath {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $portable = $RelativePath.Replace('\','/')
+  if ([IO.Path]::IsPathRooted($portable) -or $portable -match '(^|/)\.\.(/|$)') {
+    throw "[mir4-package-source-relocation-path] $RelativePath"
+  }
+  $direct = [IO.Path]::GetFullPath((Join-Path $repo $portable))
+  $repoPrefix = $repo.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  if (-not $direct.StartsWith($repoPrefix,[StringComparison]::OrdinalIgnoreCase)) {
+    throw "[mir4-package-source-relocation-boundary] $RelativePath"
+  }
+  if (Test-Path -LiteralPath $direct -PathType Leaf) { return $portable }
+
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV2' -Schema 'spec/schemas/mir4-composable-package-source-v2.schema.json' -Code 'mir4-package-source-relocation-manifest'
+  if ([string]$manifest.record_sha256 -cne [string]$authority.source_manifest.record_sha256) {
+    throw '[mir4-package-source-relocation-manifest]'
+  }
+  $matches = @($manifest.bindings | Where-Object { [string]$_.predecessor_source_path -ceq $portable })
+  if ($matches.Count -ne 1) { throw "[mir4-package-source-relocation-ambiguous] $RelativePath" }
+  $current = [string]$matches[0].source_path
+  $currentPath = [IO.Path]::GetFullPath((Join-Path $repo $current))
+  if (-not $currentPath.StartsWith($repoPrefix,[StringComparison]::OrdinalIgnoreCase) -or
+      -not (Test-Path -LiteralPath $currentPath -PathType Leaf)) {
+    throw "[mir4-package-source-relocation-missing] $current"
+  }
+  $bytes = [IO.File]::ReadAllBytes($currentPath)
+  if ([int64]$bytes.Length -ne [int64]$matches[0].source_bytes -or
+      (Get-MIR4Sha256Bytes -Bytes $bytes) -cne [string]$matches[0].source_sha256) {
+    throw "[mir4-package-source-relocation-identity] $current"
+  }
+  return $current
 }
 
 function Get-MIR4CanonicalPackageSourceFiles {

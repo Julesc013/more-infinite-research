@@ -7,6 +7,7 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 
 $ErrorActionPreference = "Stop"
 if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path }
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 
 & (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1") self-test
 if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
@@ -301,7 +302,7 @@ if ($performanceTest.Count -ne 1 -or
   throw "runtime.performance-regression must produce fresh evidence inside its unique assurance work root without reading or writing tracked historical evidence."
 }
 foreach ($requiredPerformanceIsolationSnippet in @(
-  '"<test-output>"=[string]$TestOutput',
+  '"<test-output>"={ [string]$TestOutput }',
   '$testOutputPath = Join-Path $workRoot "test-output.json"',
   '-TestOutput $testOutputPath',
   '-CampaignPath (Resolve-MIRAssurancePerformanceCampaignPath -Context $Context)',
@@ -602,6 +603,7 @@ foreach ($requiredSuccessorFingerprint in @(
 }
 
 $coreScript = Join-Path $RepoRoot "tools\lib\assurance\Core.ps1"
+$repo = $RepoRoot
 . $coreScript
 . (Join-Path $RepoRoot "tools\lib\assurance\Hashing.ps1")
 $nfcText = "caf$([char]0x00E9)`npolicy`n"
@@ -667,7 +669,8 @@ try {
   $script:MIRAssurancePatternFingerprintCache = @{}
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
-$candidateInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidateContext = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
+$candidateInfo = Get-MIR4CurrentTargetPackageOutputText -Context $candidateContext -RelativePath 'info.json' | ConvertFrom-Json
 $candidateSourceTree = (& git -C $RepoRoot rev-parse "HEAD^{tree}").Trim()
 $candidatePath = (Get-MIRAssuranceDevelopmentCandidatePath -Info $candidateInfo -SourceTree $candidateSourceTree -Target '2.1').Replace("\", "/")
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
@@ -810,6 +813,10 @@ foreach ($requiredWorkflowSnippet in @(
   'path: ${{ env.MIR_DEVELOPMENT_CANDIDATE }}',
   'mir-verification-plan-${{ github.run_id }}-${{ github.run_attempt }}',
   'mir-development-candidate-${{ github.run_id }}-${{ github.run_attempt }}',
+  'plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}',
+  'candidate_artifact: ${{ steps.artifact-names.outputs.candidate_artifact }}',
+  'name: ${{ needs.plan.outputs.plan_artifact }}',
+  'name: ${{ needs.plan.outputs.candidate_artifact }}',
   'mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}',
   '$plan.candidate_descriptor.path',
   '[IO.Path]::IsPathRooted($candidateRelative)',
@@ -966,16 +973,21 @@ try {
   # The roots need independent indexes and working trees for LF/CRLF proof, not
   # duplicate copies of the immutable repository object store. Sharing objects
   # prevents this regression from becoming a disk-capacity false failure.
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=false clone --quiet --shared $RepoRoot $plannerRoot
+  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" clone -c core.autocrlf=false --quiet --shared $RepoRoot $plannerRoot
   if ($LASTEXITCODE -ne 0) { throw "Unable to create the LF planner root." }
-  & git -c "safe.directory=$RepoRoot" -c "safe.directory=$sourceGitRoot" -c core.autocrlf=true clone --quiet --shared $RepoRoot $workerRoot
-  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root." }
+  if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
+    & git -C $plannerRoot apply --index --whitespace=nowarn $stagedPatchPath
+    if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $plannerRoot" }
+    # Give both line-ending configurations a real clean checkout of the same
+    # staged tree. Applying a patch independently under core.autocrlf=true can
+    # leave newly relocated raw-hashed files in non-canonical working bytes.
+    & git -C $plannerRoot -c user.name='MIR assurance self-test' -c user.email='mir-assurance@invalid.local' commit --quiet -m 'self-test: materialize staged equivalence tree'
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to commit the staged equivalence tree in the disposable planner root.' }
+  }
+  & git -c "safe.directory=$plannerRoot" clone -c core.autocrlf=true --quiet --shared $plannerRoot $workerRoot
+  if ($LASTEXITCODE -ne 0) { throw "Unable to create the CRLF worker root from the exact staged tree." }
 
   foreach ($root in @($plannerRoot, $workerRoot)) {
-    if ((Get-Item -LiteralPath $stagedPatchPath).Length -gt 0) {
-      & git -C $root apply --index --whitespace=nowarn $stagedPatchPath
-      if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the exact staged tree in separate root: $root" }
-    }
     & $pwshPath -NoProfile -File (Join-Path $root "tools\mir.ps1") assurance build --target 2.1 --output build/results/assurance/development-build.json
     if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
   }

@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
 
+# Historical MIR 4.1 implementation. Execute only from the source-freeze
+# checkout recorded by MIR4-M41-Source-Freeze-Authority-EvolutionV1; current
+# source composition deliberately does not provide its retired target inputs.
+
 if (-not (Get-Command Get-MIR4ReleaseNarrativeMaterialV1 -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../release/ReleaseNarratives.ps1')
 }

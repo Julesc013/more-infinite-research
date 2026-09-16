@@ -193,8 +193,8 @@ if ($manifest.summary.unclassified -ne 0 -or $manifest.summary.case_collisions -
   throw "Layout manifest contains unsafe or unclassified paths: $($manifest.summary | ConvertTo-Json -Compress)"
 }
 foreach ($guide in @(
-  'EXTENSION-PROTOCOL.md','FORKING.md','GOVERNANCE.md','MAINTAINER-HANDOFF.md',
-  'PROJECT-CONTINUITY.md','RELEASE-RUNBOOK.md','SECURITY.md','SUPPORT.md'
+  'FORKING.md','GOVERNANCE.md','SECURITY.md','SUPPORT.md',
+  'docs/EXTENSION-PROTOCOL.md','docs/MAINTAINER-HANDOFF.md','docs/PROJECT-CONTINUITY.md','docs/RELEASE-RUNBOOK.md'
 )) {
   $row = @($manifest.entries | Where-Object path -ceq $guide)
   if ($row.Count -ne 1 -or [string]$row[0].class -cne 'repository-policy' -or
@@ -522,8 +522,8 @@ foreach ($wrapper in $validationCompatibilityTests) {
     throw "Validation test entrypoint is not a classified thin compatibility forwarder: $($wrapper.FullName.Substring($repo.Length + 1))"
   }
 }
-$registryText = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')
-if ($registryText -match 'validation[/\\]tests[/\\]') {
+$registry = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+if (@($registry.tests | Where-Object { $_.PSObject.Properties['command'] -and [string]$_.command -match '^[.]?[\\/]?validation[/\\]tests[/\\]' }).Count -ne 0) {
   throw 'Executable test registry still selects the validation compatibility namespace.'
 }
 $legacySchemaGlob = ("verification/" + "schema/**")

@@ -165,9 +165,9 @@ function New-A02Record {
   $ownerById = @{}
   foreach ($owner in $owners) { $ownerById[[string]$owner.id] = $owner }
   $delta = Get-A02RetainedDelta
-  $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
+  $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
   $sourcePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  foreach ($binding in @($manifest.bindings)) { [void]$sourcePaths.Add([string]$binding.source_path) }
+  foreach ($binding in @($manifest.bindings)) { [void]$sourcePaths.Add([string]$binding.predecessor_source_path) }
   $overlays = @('targets/f210/overlay.json','targets/f200/overlay.json','targets/f110/overlay.json','targets/f100/overlay.json')
   $targetZipRows = @($Proof.targets | Sort-Object target | ForEach-Object { [ordered]@{target=[string]$_.target;archive_sha256=[string]$_.archive_a;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count;composition_record_sha256=[string]$_.composition_record_a} })
 

@@ -1,8 +1,10 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
+Set-StrictMode -Version Latest
 $ErrorActionPreference='Stop'
 $repo=(Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 . (Join-Path $repo 'tools\lib\mir4\PlatformPreview.ps1')
-Invoke-MIR4PlatformGenerate -RepoRoot $repo -Check|Out-Null
+# Test-MIR4PlatformConformance performs the same fixed-point check before any
+# other assertion. Avoid rebuilding the complete generated graph twice.
 Test-MIR4PlatformConformance -RepoRoot $repo|Out-Null
 if((ConvertTo-MIR4PlatformCanonicalJson ([ordered]@{empty=@()})) -cne '{"empty":[]}'){throw '[mir4-platform-canonical-empty-array]'}
 $lineEndingProbeRoot=Join-Path $repo 'build/results/mir4-platform-line-ending-probe'

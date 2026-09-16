@@ -152,7 +152,7 @@ function New-MIRCPPerformanceSourceOverlay {
   })
   if ($unexpected.Count -ne 0) { throw "Performance authority overlay contains changes outside its governed package-excluded files." }
   $canonicalPackageLayout = (
-    (Test-Path -LiteralPath (Join-Path $destination 'src/mod/package-source.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $destination 'source/package-source.json') -PathType Leaf) -and
     (Test-Path -LiteralPath (Join-Path $destination 'targets/package-authority.json') -PathType Leaf)
   )
   $packageSha256 = if ($canonicalPackageLayout) {

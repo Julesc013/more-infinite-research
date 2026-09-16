@@ -1,3 +1,16 @@
+$script:MIRAssurancePatternFingerprintCache = @{}
+
+function Get-MIRAssuranceOptionalObjectValue {
+  param([AllowNull()]$Object, [Parameter(Mandatory)][string]$Name)
+  if ($null -eq $Object) { return $null }
+  if ($Object -is [System.Collections.IDictionary] -and $Object.Contains($Name)) {
+    return $Object[$Name]
+  }
+  $property = $Object.PSObject.Properties[$Name]
+  if ($null -ne $property) { return $property.Value }
+  return $null
+}
+
 function Get-MIRAssurancePatternFingerprint {
   param([Parameter(Mandatory)][string[]]$Patterns)
   if ($null -eq $script:MIRAssurancePatternFingerprintCache) { $script:MIRAssurancePatternFingerprintCache = @{} }
@@ -131,7 +144,7 @@ function Get-MIRAssuranceApprovedDeltaTransitionFingerprint {
         @($authority.forbidden) -notcontains 'production-signing' -or
         @($authority.forbidden) -notcontains 'tagging' -or
         @($authority.forbidden) -notcontains 'publication' -or
-        [string]$registry.kind -ne 'MIR4TargetRegistryV1' -or
+        [string]$registry.kind -ne 'MIR4TargetRegistryV2' -or
         $targetRows.Count -ne 1) {
       throw 'Development approved-delta execution context boundary is invalid.'
     }
@@ -508,10 +521,11 @@ function Get-MIRAssuranceInputFingerprint {
       return [ordered]@{ kind="evidence"; file_count=$paths.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $paths) }
     }
     "runtime.full" {
+      $domainManifest = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'domain_manifest'
       $material = [ordered]@{
         target=[string]$Context.target
         scenario_registry_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath)
-        domain_manifest_sha256=if ($Plan.domain_manifest) { [string]$Plan.domain_manifest.manifest_sha256 } else { "" }
+        domain_manifest_sha256=if ($null -ne $domainManifest) { [string]$domainManifest.manifest_sha256 } else { "" }
         harness=(Get-MIRAssuranceScenarioHarnessFingerprint).sha256
       }
       return [ordered]@{ kind="required-runtime-set"; sha256=(Get-MIRAssuranceJsonHash -Value $material) }
@@ -530,15 +544,21 @@ function Get-MIRAssuranceTestFingerprint {
     [Parameter(Mandatory)]$Plan,
     [Parameter(Mandatory)]$Context
   )
+  $templateId = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'template_id'
+  $domainDependencies = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'domain_dependencies'
+  $scenario = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'scenario'
+  $requiresFactorio = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_factorio'
+  $requiresCandidate = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'requires_candidate'
+  $inputs = Get-MIRAssuranceOptionalObjectValue -Object $Test -Name 'inputs'
   $definition = [ordered]@{
     id=[string]$Test.id
-    template_id=[string]$Test.template_id
+    template_id=if ($null -ne $templateId) { [string]$templateId } else { '' }
     kind=[string]$Test.kind
     layer=[string]$Test.layer
     command=[string]$Test.command
-    requires_factorio=[bool]$Test.requires_factorio
-    requires_candidate=[bool]$Test.requires_candidate
-    inputs=@($Test.inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+    requires_factorio=if ($null -ne $requiresFactorio) { [bool]$requiresFactorio } else { $false }
+    requires_candidate=if ($null -ne $requiresCandidate) { [bool]$requiresCandidate } else { $false }
+    inputs=if ($null -ne $inputs) { @($inputs | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
     captured_artifacts=@(
       foreach ($artifact in @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)) {
         [ordered]@{
@@ -548,8 +568,8 @@ function Get-MIRAssuranceTestFingerprint {
         }
       }
     )
-    domain_dependencies=@($Test.domain_dependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique)
-    scenario_sha256=if ($Test.scenario) { Get-MIRAssuranceJsonHash -Value $Test.scenario } else { "" }
+    domain_dependencies=if ($null -ne $domainDependencies) { @($domainDependencies | ForEach-Object { [string]$_ } | Sort-Object -Unique) } else { @() }
+    scenario_sha256=if ($null -ne $scenario) { Get-MIRAssuranceJsonHash -Value $scenario } else { "" }
   }
   $definitionHash = Get-MIRAssuranceJsonHash -Value $definition
   $inputFingerprints = [ordered]@{}

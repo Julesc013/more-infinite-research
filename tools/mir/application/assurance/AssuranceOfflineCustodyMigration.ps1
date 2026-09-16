@@ -128,13 +128,15 @@ function Test-MIR4AssuranceOfflineCustodyDeclaredConsumersV1 {
 function Get-MIR4AssuranceOfflineCustodyFunctionalParityV1 {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
   $critical=Get-MIR4W08CriticalPath -Tasks @([pscustomobject]@{id='capture';p95_seconds=3;depends_on=@()},[pscustomobject]@{id='verify';p95_seconds=5;depends_on=@('capture')},[pscustomobject]@{id='review';p95_seconds=4;depends_on=@('capture')},[pscustomobject]@{id='close';p95_seconds=2;depends_on=@('verify','review')})
   $proof=New-MIR4W08ProofCover -Obligations @([pscustomobject]@{id='f210';target='f210';environment='exact';trust='local'},[pscustomobject]@{id='f200';target='f200';environment='exact';trust='local'}) -Candidates @([pscustomobject]@{id='reuse-f200';covers=@('f200');target='f200';environment='exact';trust='local';action='REUSE';evidence_digest=('b'*64)},[pscustomobject]@{id='run-f210';covers=@('f210');target='f210';environment='exact';trust='local';action='RUN';evidence_digest=('a'*64)})
   $expected=@([pscustomobject]@{task_id='a';identity_key='i1';candidate_sha256='c1';target='f210';abi=1;trust='local'},[pscustomobject]@{task_id='b';identity_key='i2';candidate_sha256='c2';target='f200';abi=1;trust='local'})
   $completed=@([pscustomobject]@{task_id='a';identity_key='i1';candidate_sha256='c1';target='f210';abi=1;trust='local';status='passed';revoked=$false;object_digest='o1'})
   $recovery=Resolve-MIR4W08PartialRecovery -Expected $expected -Completed $completed
   $environment=New-MIR4ReferenceEnvironmentEvidenceV1 -RepoRoot $repo
-  $binding=New-MIR4CustodyRecordBindingV1 -Role 'player-source-identity' -Record ([pscustomobject]@{kind='MIR4MigrationProbeV1';record_sha256=('c'*64)}) -Path (Join-Path $repo 'info.json')
+  $currentPackage=New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target f210
+  $binding=New-MIR4CustodyRecordBindingV1 -Role 'player-source-identity' -Record ([pscustomobject]@{kind='MIR4MigrationProbeV1';record_sha256=('c'*64)}) -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentPackage -RelativePath 'info.json')
   $invalidMode='';try{Assert-MIR4OfflineCustodyModeV1 -Mode 'publish' -Allowed 'proof-only'}catch{$invalidMode=$_.Exception.Message}
   $record=[ordered]@{
     w08=[ordered]@{critical_path=$critical;proof_cover=$proof;recovery=$recovery}

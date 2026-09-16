@@ -22,11 +22,12 @@ Assert-MIR4M4202CompilerOrchestrator (Test-MIR4M4202PackageSourceSuccession -Rep
 $evolvedPaths=@($receipt.evolved_bindings|ForEach-Object{[string]$_.path})
 Assert-MIR4M4202CompilerOrchestrator ($evolvedPaths.Count-eq16-and@($evolvedPaths|Sort-Object -Unique).Count-eq16-and'.mir/control/paths.yml'-in$evolvedPaths-and'.mir/modules.yml'-in$evolvedPaths-and'tests/compiler/Test-MIR4EffectOwnershipDecompositionM4202.ps1'-in$evolvedPaths-and'governance/automation/mir4-command-inventory-v1.json'-in$evolvedPaths) 'evolved-authority-bindings'
 
-$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'src/mod/package-source.json')|ConvertFrom-Json -Depth 100
-Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings).Count-eq441) 'manifest-binding-count'
-Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)"}|Sort-Object -Unique).Count-eq441) 'manifest-binding-uniqueness'
+$manifest=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json')|ConvertFrom-Json -Depth 100
+$expectedManifestBindings=Get-MIR4M4202CurrentManifestBindingExpectation -RepoRoot $repo -Fallback 441
+Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings).Count-eq$expectedManifestBindings) 'manifest-binding-count'
+Assert-MIR4M4202CompilerOrchestrator (@($manifest.bindings|ForEach-Object{"$($_.layer)|$($_.output_path)|$(@($_.target_scope)-join',')"}|Sort-Object -Unique).Count-eq$expectedManifestBindings) 'manifest-binding-identity-uniqueness'
 
-$sourceRoot='src/mod/families/modern/prototypes/mir/pipeline'
+$sourceRoot='source/prototypes/mir/pipeline'
 $facade=Get-Content -Raw -LiteralPath (Join-Path $repo "$sourceRoot/compiler_orchestrator.lua")
 $responsibilities=@('context_construction','phase_invocation','contract_checks','publication')
 $outputs=@('prototypes/mir/pipeline/compiler_orchestrator.lua')+@($responsibilities|ForEach-Object{"prototypes/mir/pipeline/compiler_orchestrator/$_.lua"})
@@ -50,7 +51,7 @@ Assert-MIR4M4202CompilerOrchestrator (@(Get-Content -LiteralPath (Join-Path $rep
 Assert-MIR4M4202CompilerOrchestrator (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/compiler_orchestrator/phase_invocation.lua")).Count-le50) 'phase-invocation-size'
 Assert-MIR4M4202CompilerOrchestrator (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/compiler_orchestrator/contract_checks.lua")).Count-le120) 'contract-checks-size'
 Assert-MIR4M4202CompilerOrchestrator (@(Get-Content -LiteralPath (Join-Path $repo "$sourceRoot/compiler_orchestrator/publication.lua")).Count-le180) 'publication-size'
-$rows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'families.modern'-and[string]$_.output_path-in$outputs})
+$rows=@($manifest.bindings|Where-Object{[string]$_.layer-ceq'capability'-and[string]$_.output_path-in$outputs})
 Assert-MIR4M4202CompilerOrchestrator ($rows.Count-eq5-and@($rows|Where-Object{@($_.target_scope)-join'|'-cne'f210|f200'}).Count-eq0) 'package-bindings'
 foreach($row in $rows){Assert-MIR4M4202CompilerOrchestrator ((Get-FileHash -LiteralPath (Join-Path $repo ([string]$row.source_path)) -Algorithm SHA256).Hash-ceq[string]$row.source_sha256) "source-hash-$([string]$row.output_path)"}
 foreach($target in @('f210','f200','f110','f100')){

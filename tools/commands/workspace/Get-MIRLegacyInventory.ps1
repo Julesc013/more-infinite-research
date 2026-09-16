@@ -22,6 +22,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
   $OutputRoot = Join-Path $repo "build\results\legacy-inventory"
 }
@@ -31,8 +33,20 @@ $output = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   Join-Path $repo $OutputRoot
 }
 
+function Get-MIRCollectionCount {
+  param([AllowNull()][object[]]$Items)
+  if ($null -eq $Items) { return 0 }
+  return $Items.Length
+}
+
 function Get-MIRRelativePath {
   param([Parameter(Mandatory)][string]$Path)
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  foreach ($entry in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage) {
+    if ((Resolve-Path -LiteralPath $entry.source_file).Path -ceq $resolved) {
+      return [string]$entry.output_path
+    }
+  }
   return [System.IO.Path]::GetRelativePath($repo, $Path).Replace("\", "/")
 }
 
@@ -48,30 +62,16 @@ function Get-MIRCodeLines {
 function Test-MIRShimOnlyLua {
   param([Parameter(Mandatory)][string]$Text)
   $lines = @(Get-MIRCodeLines -Text $Text)
-  return $lines.Count -eq 1 -and $lines[0] -match '^return\s+require\("prototypes\.'
+  return (Get-MIRCollectionCount -Items $lines) -eq 1 -and $lines[0] -match '^return\s+require\("prototypes\.'
 }
 
 function Get-MIRLuaFiles {
-  $roots = @(
-    "prototypes"
+  return @(
+    Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage |
+      Where-Object { [string]$_.output_path -match '^(?:prototypes/.+|settings\.lua|data\.lua|data-updates\.lua|data-final-fixes\.lua|control\.lua)$' -and [string]$_.output_path -match '\.lua$' } |
+      ForEach-Object { Get-Item -LiteralPath $_.source_file } |
+      Sort-Object FullName -Unique
   )
-
-  $files = @()
-  foreach ($root in $roots) {
-    $path = Join-Path $repo $root
-    if (Test-Path -LiteralPath $path) {
-      $files += @(Get-ChildItem -LiteralPath $path -Recurse -File -Filter "*.lua")
-    }
-  }
-
-  foreach ($rootFile in @("settings.lua", "data.lua", "data-updates.lua", "data-final-fixes.lua", "control.lua")) {
-    $path = Join-Path $repo $rootFile
-    if (Test-Path -LiteralPath $path) {
-      $files += @(Get-Item -LiteralPath $path)
-    }
-  }
-
-  return @($files | Sort-Object FullName -Unique)
 }
 
 function Get-MIRMatches {
@@ -133,18 +133,16 @@ function Get-MIRModuleInventory {
     [Parameter(Mandatory)][string]$Label
   )
 
-  $root = Join-Path $repo $RelativeRoot
   $rows = @()
-  if (Test-Path -LiteralPath $root) {
-    foreach ($file in @(Get-ChildItem -LiteralPath $root -Recurse -File -Filter "*.lua" | Sort-Object FullName)) {
-      $text = Get-Content -Raw -LiteralPath $file.FullName
+  $prefix = $RelativeRoot.Replace("\", "/").TrimEnd('/') + '/'
+  foreach ($entry in @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix | Where-Object { [string]$_.output_path -match '\.lua$' })) {
+      $text = Get-Content -Raw -LiteralPath $entry.source_file
       $rows += [pscustomobject]@{
-        path = Get-MIRRelativePath -Path $file.FullName
+        path = [string]$entry.output_path
         area = $Label
         shim_only = [bool](Test-MIRShimOnlyLua -Text $text)
-        code_lines = @(Get-MIRCodeLines -Text $text).Count
+        code_lines = Get-MIRCollectionCount -Items @(Get-MIRCodeLines -Text $text)
       }
-    }
   }
   return $rows
 }
@@ -171,7 +169,10 @@ $shimDirectories = @(
   "prototypes\lib",
   "prototypes\mir\legacy",
   "prototypes\planner"
-) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
+) | Where-Object {
+  $prefix = $_.Replace("\", "/").TrimEnd('/') + '/'
+  (Get-MIRCollectionCount -Items @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $prefix)) -gt 0
+}
 
 $oldRootHelperFiles = @(
   "defaults.lua",
@@ -186,13 +187,12 @@ $oldRootHelperFiles = @(
   "prototypes\technology-effect-safety.lua",
   "prototypes\util.lua",
   "prototypes\weapon-speed-adjustments.lua"
-) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
-
-$runtimeControlLuaFiles = @()
-$controlDir = Join-Path $repo "control"
-if (Test-Path -LiteralPath $controlDir) {
-  $runtimeControlLuaFiles = @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+) | Where-Object {
+  $path = $_.Replace("\", "/")
+  (Get-MIRCollectionCount -Items @($targetPackage.outputs.Keys | Where-Object { $_ -ceq $path })) -gt 0
 }
+
+$runtimeControlLuaFiles = @(Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix 'control/' | Where-Object { [string]$_.output_path -match '\.lua$' })
 
 $legacyRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.mir\.legacy')
 $compatRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.compat')
@@ -211,10 +211,10 @@ $dataRawOutsidePlatform = @(Get-MIRMatchesOutsideRoots -Matches $dataRawMatches 
 ))
 
 $sourceStreamKeys = @(
-  Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\productivity.lua")
-  Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  Get-MIRStreamKeysFromSource -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/streams/productivity.lua')
+  Get-MIRStreamKeysFromSource -Path (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/streams/direct-effects.lua')
 )
-$manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
+$manifestPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/streams/generated_stream_manifest.json'
 $manifestRows = @()
 if (Test-Path -LiteralPath $manifestPath) {
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
@@ -228,33 +228,36 @@ foreach ($row in $manifestRows) {
   }
 }
 $missingManifestKeys = @($sourceStreamKeys | Where-Object { -not $manifestStreamKeys[[string]$_] } | Sort-Object -Unique)
+$legacyActiveModules = @($legacyModules | Where-Object { -not $_.shim_only })
+$compatActiveModules = @($compatModules | Where-Object { -not $_.shim_only })
+$libActiveModules = @($libModules | Where-Object { -not $_.shim_only })
 
 $shipped = [pscustomobject]@{
   schema = 1
   generated_at = (Get-Date).ToString("o")
   counts = [pscustomobject]@{
-    lua_files = $luaFiles.Count
-    mir_legacy_modules = $legacyModules.Count
-    mir_legacy_active_modules = @($legacyModules | Where-Object { -not $_.shim_only }).Count
-    compat_modules = $compatModules.Count
-    compat_active_modules = @($compatModules | Where-Object { -not $_.shim_only }).Count
-    lib_modules = $libModules.Count
-    lib_active_modules = @($libModules | Where-Object { -not $_.shim_only }).Count
-    requires_mir_legacy = $legacyRequires.Count
-    requires_compat = $compatRequires.Count
-    requires_lib = $libRequires.Count
-    requires_config = $configRequires.Count
-    requires_util = $utilRequires.Count
-    requires_diagnostics = $diagnosticsRequires.Count
-    shim_directories_present = $shimDirectories.Count
-    old_root_helper_files_present = $oldRootHelperFiles.Count
-    runtime_control_lua_files = $runtimeControlLuaFiles.Count
-    data_extend_matches = $dataExtendMatches.Count
-    data_extend_matches_outside_allowed = $dataExtendOutsideAllowed.Count
-    data_raw_matches = $dataRawMatches.Count
-    data_raw_matches_outside_platform = $dataRawOutsidePlatform.Count
-    source_stream_keys = $sourceStreamKeys.Count
-    generated_streams_without_manifest = $missingManifestKeys.Count
+    lua_files = Get-MIRCollectionCount -Items $luaFiles
+    mir_legacy_modules = Get-MIRCollectionCount -Items $legacyModules
+    mir_legacy_active_modules = Get-MIRCollectionCount -Items $legacyActiveModules
+    compat_modules = Get-MIRCollectionCount -Items $compatModules
+    compat_active_modules = Get-MIRCollectionCount -Items $compatActiveModules
+    lib_modules = Get-MIRCollectionCount -Items $libModules
+    lib_active_modules = Get-MIRCollectionCount -Items $libActiveModules
+    requires_mir_legacy = Get-MIRCollectionCount -Items $legacyRequires
+    requires_compat = Get-MIRCollectionCount -Items $compatRequires
+    requires_lib = Get-MIRCollectionCount -Items $libRequires
+    requires_config = Get-MIRCollectionCount -Items $configRequires
+    requires_util = Get-MIRCollectionCount -Items $utilRequires
+    requires_diagnostics = Get-MIRCollectionCount -Items $diagnosticsRequires
+    shim_directories_present = Get-MIRCollectionCount -Items $shimDirectories
+    old_root_helper_files_present = Get-MIRCollectionCount -Items $oldRootHelperFiles
+    runtime_control_lua_files = Get-MIRCollectionCount -Items $runtimeControlLuaFiles
+    data_extend_matches = Get-MIRCollectionCount -Items $dataExtendMatches
+    data_extend_matches_outside_allowed = Get-MIRCollectionCount -Items $dataExtendOutsideAllowed
+    data_raw_matches = Get-MIRCollectionCount -Items $dataRawMatches
+    data_raw_matches_outside_platform = Get-MIRCollectionCount -Items $dataRawOutsidePlatform
+    source_stream_keys = Get-MIRCollectionCount -Items $sourceStreamKeys
+    generated_streams_without_manifest = Get-MIRCollectionCount -Items $missingManifestKeys
   }
   modules = [pscustomobject]@{
     mir_legacy = $legacyModules
@@ -322,12 +325,12 @@ $repoLegacy = [pscustomobject]@{
   schema = 1
   generated_at = (Get-Date).ToString("o")
   root_policy = [pscustomobject]@{
-    todo_md_present = [bool](Test-Path -LiteralPath (Join-Path $repo "todo.md"))
+    todo_md_present = [bool](Test-Path -LiteralPath (Join-Path $repo "TODO.md"))
     dist_dir_present = [bool](Test-Path -LiteralPath (Join-Path $repo "dist"))
     artifacts_dir_present = [bool](Test-Path -LiteralPath (Join-Path $repo "artifacts"))
   }
   scripts = [pscustomobject]@{
-    count = @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Recurse -File -Filter "*.ps1").Count
+    count = Get-MIRCollectionCount -Items @(Get-ChildItem -LiteralPath (Join-Path $repo "scripts") -Recurse -File -Filter "*.ps1")
     mir_cli_present = [bool](Test-Path -LiteralPath (Join-Path $repo "scripts\mir.ps1"))
     legacy_inventory_command = ".\tools\mir.ps1 legacy inventory"
   }

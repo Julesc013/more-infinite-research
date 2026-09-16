@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-09-15.
+Current-page navigation generated from Markdown front matter as of 2026-09-16.
 
 ## developer
 
@@ -83,7 +83,6 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [Generated ID Reference](../../reference/generated-id-reference.md)
 - [Generated Stream Manifest And Migration Policy](../../reference/schemas/stream-manifest.md)
 - [GenerationPlan Schema](../../reference/schemas/generation-plan.md)
-- [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md)
 - [MEP V1 Fragment Reference](../../developer/mep-fragment-reference.md)
 - [MIR 4 API and SDK V1 Preview](../../reference/generated/mir4-api-sdk-v1.md)
 - [MIR 4 API Versioning](../../developer/api-versioning.md)
@@ -97,6 +96,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [MIR 4 Whole Platform Matrix](../../reference/generated/mir4-whole-platform-matrix.md)
 - [MIR Canonical JSON V1](../../developer/canonicalization.md)
 - [MIR Canonical JSON V1](../../reference/mir4-canonical-json-v1.md)
+- [MIR Extension Protocol](../../EXTENSION-PROTOCOL.md)
 - [MIR Published Lines Development Copy Pack](../../releases/lower-wave-development-copy-pack.md)
 - [RecipeFactV2 And Relationship Indexes](../../reference/schemas/recipe-fact-v2.md)
 - [Reports](../../reference/reports/README.md)
@@ -131,7 +131,6 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [ADR 0005: Generated ID And Migration Policy](../../adr/0005-generated-id-and-migration-policy.md)
 - [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md)
 - [ADR 0006: Science And Lab Planning Policy](../../adr/0006-science-and-lab-planning-policy.md)
-- [ADR 0007: MIR 4.1 Foundation Completion Boundary](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md)
 - [ADR 0007: Native Modifier Ownership Policy](../../adr/0007-native-modifier-ownership-policy.md)
 - [ADR 0008: Loop-Risk Policy](../../adr/0008-loop-risk-policy.md)
 - [ADR 0009: Compatibility Claim Levels](../../adr/0009-compatibility-claim-levels.md)
@@ -164,8 +163,8 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [Automatic Family Compiler](../../architecture/automatic-family-compiler.md)
 - [Factorio Lifecycle Boundaries](../../architecture/factorio-lifecycle.md)
 - [MIR 3.0.0 Compatibility Compiler Charter](../../architecture/compatibility-compiler-charter.md)
-- [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md)
 - [MIR 4 Assurance Scale and Offline Drill](../../architecture/mir4-assurance-scale.md)
+- [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md)
 - [MIR 4 repository characterization](../../architecture/mir4-repository-characterization.md)
 - [MIR Control Plane v5](../../architecture/control-plane-v5.md)
 - [Native Owner Binding](../../architecture/native-owner-binding.md)
@@ -181,6 +180,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [Fixture Workflow](../../maintainer/fixture-workflow.md)
 - [Local Artifact Retention And Storage](../../maintainer/artifact-retention.md)
 - [Localization Governance](../../maintainer/localization.md)
+- [Maintainer Handoff](../../MAINTAINER-HANDOFF.md)
 - [Manual Test Plan](../../maintainer/manual-test-plan.md)
 - [MIR 4 Continuity, Incident, and Successor Operations](../../maintainer/mir4-continuity.md)
 - [MIR 4 Full-Platform Private Closeout](../../maintainer/mir4-full-platform-closeout.md)
@@ -214,8 +214,10 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [MIR 4 Exact Release Compatibility Canaries](../../compatibility/mir4-release-canaries.md)
 - [MIR 4 maintainer authority map](../../maintainer/mir4-authority-map.md)
 - [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md)
+- [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md)
 - [More Infinite Research 4 documentation](../../README.md)
 - [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md)
+- [Project Continuity](../../PROJECT-CONTINUITY.md)
 - [Screenshots](../../assets/screenshots/README.md)
 - [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md)
 - [Technology Quality And Promotion Inventory](../../reference/generated/technology-quality-and-promotion.md)
@@ -346,6 +348,7 @@ Current-page navigation generated from Markdown front matter as of 2026-09-15.
 - [MIR 4 Qualification and Promotion](../../maintainer/mir4-qualification-and-promotion.md)
 - [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md)
 - [MIR 4 Release Operations](../../maintainer/mir4-release-operations.md)
+- [MIR 4 Release Runbook](../../RELEASE-RUNBOOK.md)
 - [MIR 4 Supply-Chain and Preservation](../../maintainer/mir4-supply-chain-preservation.md)
 - [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md)
 - [Modpack Campaigns](../../maintainer/modpack-campaigns.md)

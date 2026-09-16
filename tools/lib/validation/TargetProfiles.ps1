@@ -12,6 +12,29 @@ function Get-MIRTargetManifest {
   return $manifest
 }
 
+function Resolve-MIRTargetProfileImplementationPath {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$FactorioVersion,
+    [Parameter(Mandatory)][string]$PackagePath
+  )
+  $targetByFactorioVersion = @{
+    '2.1' = 'f210'
+    '2.0' = 'f200'
+    '1.1' = 'f110'
+    '1.0' = 'f100'
+  }
+  $target = [string]$targetByFactorioVersion[$FactorioVersion]
+  if ([string]::IsNullOrWhiteSpace($target)) {
+    throw "Factorio $FactorioVersion feature implementation has no current target composition: $PackagePath"
+  }
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  return Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $PackagePath -AllowMissing
+}
+
 function Get-MIRTargetProfile {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -90,8 +113,12 @@ function Get-MIRTargetProfile {
       }
     }
     foreach ($implementation in @([string]$requirements.runtime_consumer, [string]$requirements.data_stage_emitter)) {
+      $resolvedImplementation = if ([string]::IsNullOrWhiteSpace($implementation)) { $null } else {
+        Resolve-MIRTargetProfileImplementationPath -RepoRoot $RepoRoot -FactorioVersion $FactorioVersion -PackagePath $implementation
+      }
       if ([string]::IsNullOrWhiteSpace($implementation) -or
-          -not (Test-Path -LiteralPath (Join-Path $RepoRoot $implementation) -PathType Leaf)) {
+          [string]::IsNullOrWhiteSpace($resolvedImplementation) -or
+          -not (Test-Path -LiteralPath $resolvedImplementation -PathType Leaf)) {
         throw "Factorio $FactorioVersion feature $feature references a missing implementation: $implementation"
       }
     }

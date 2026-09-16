@@ -14,13 +14,13 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-15.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-09-16.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
 | architecture-decision-record-index | [Architecture Decision Records](../../architecture/decisions/README.md) | current |
 | architecture-overview | [Architecture](../../architecture/README.md) | current |
-| authority-projection-command-boundaries | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| authority-projection-command-boundaries | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | automatic-family-balance | [Automatic Family Balance And Scope](../../architecture/automatic-family-balance.md) | current |
 | automatic-family-compiler | [Automatic Family Compiler](../../architecture/automatic-family-compiler.md) | current |
 | automatic-family-release-scope | [Automatic Family Balance And Scope](../../architecture/automatic-family-balance.md) | current |
@@ -86,12 +86,13 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | generated-quality-promotion-view | [Technology Quality And Promotion Inventory](../../reference/generated/technology-quality-and-promotion.md) | current |
 | generation-plan-schema | [GenerationPlan Schema](../../reference/schemas/generation-plan.md) | current |
 | github-administration-preflight | [MIR 3 Terminal Repository Protections](../../maintainer/mir3-terminal-repository-protections.md) | current |
+| historical-maximum-level-binding-policy-v3 | [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md) | historical-checkpoint |
 | legacy-coefficient-anchor-projection | [ResearchCostModel Schema](../../reference/schemas/research-cost-model.md) | current |
 | local-artifact-retention | [Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | localization-governance | [Localization Governance](../../maintainer/localization.md) | current |
 | localization-projection-command | [Localization Governance](../../maintainer/localization.md) | current |
+| maintainer-handoff | [Maintainer Handoff](../../MAINTAINER-HANDOFF.md) | current |
 | manual-release-review-attestation | [Manual Test Plan](../../maintainer/manual-test-plan.md) | current |
-| maximum-level-binding-policy-v3 | [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md) | current |
 | maximum-level-contract | [MIR 3 Post-Terminal Emergency Hotfix](../../releases/mir3-post-terminal-emergency-hotfix.md) | current |
 | mir-0.10.0-release-notes | [More Infinite Research 0.10.0 Release Notes](../../releases/notes/release-notes-0.10.0.md) | current |
 | mir-0.11.0-release-notes | [More Infinite Research 0.11.0 Release Notes](../../releases/notes/release-notes-0.11.0.md) | current |
@@ -162,6 +163,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir-c31-obligation-cancellation | [ADR 0028: MIR 3.2.5 convergence release](../../adr/0028-3-2-5-convergence-release.md) | current |
 | mir-control-plane-v5 | [MIR Control Plane v5](../../architecture/control-plane-v5.md) | current |
 | mir-dual-plane-repository | [ADR 0029: Dual-Plane Repository](../../adr/0029-dual-plane-repository.md) | current |
+| mir-extension-protocol | [MIR Extension Protocol](../../EXTENSION-PROTOCOL.md) | current |
 | mir-extension-protocol-v1-decision | [ADR 0030: Host-Neutral MIR Extension Protocol v1](../../adr/0030-host-neutral-extension-protocol.md) | current |
 | mir-local-artifact-lane-authorization-v1 | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
 | mir-logical-repository-paths | [ADR 0029: Dual-Plane Repository](../../adr/0029-dual-plane-repository.md) | current |
@@ -186,7 +188,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-target-changelog-copy | [MIR 4.0 Publication Copy](../../releases/mir4-4.0-publication-copy.md) | current |
 | mir4-4.0-whole-platform-consolidation | [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md) | current |
 | mir4-4.0.0-candidate-release-notes | [More Infinite Research 4.0.0 Candidate Release Notes](../../releases/notes/release-notes-4.0.0-candidate.md) | current |
-| mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | current |
+| mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary (Historical)](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | historical-checkpoint |
 | mir4-4.1-one-minute-playtest-gate | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
 | mir4-4.1-release-readiness | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
 | mir4-4.1-resource-bounded-release | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
@@ -291,6 +293,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-release-ledger-policy | [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md) | current |
 | mir4-release-operations-runbook | [MIR 4 Release Operations](../../maintainer/mir4-release-operations.md) | current |
 | mir4-release-readiness-reconciliation | [MIR 4 Full-Platform Private Closeout](../../maintainer/mir4-full-platform-closeout.md) | current |
+| mir4-release-runbook | [MIR 4 Release Runbook](../../RELEASE-RUNBOOK.md) | current |
 | mir4-repository-layout | [ADR 0002: MIR 4 Repository Layout](../../architecture/decisions/0002-mir4-repository-layout.md) | current |
 | mir4-reproducer-preserving-minimization | [MIR 4 Environment Evidence V1](../../reference/mir4-environment-evidence.md) | current |
 | mir4-runtime-feature-spec-v1 | [MIR 4 Runtime, State, Migration, and Continuity](../../architecture/mir4-runtime-continuity.md) | current |
@@ -321,9 +324,10 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-visible-root-authority-migration | [MIR 4 Repository Fixed Point](../../architecture/mir4-repository-fixed-point.md) | current |
 | mir4-w09-historical-museum-matrix | [MIR 4 Historical, Museum, and Successor-Host Closure](../../architecture/mir4-historical-succession.md) | current |
 | mir4-w09-manual-playtest-checklist | [MIR 4 W09 Manual Playtest Handoff](../../maintainer/mir4-w09-manual-playtest.md) | current |
+| mir410-local-delivery-index | [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | modpack-campaign-evidence-contract | [Modpack Campaigns](../../maintainer/modpack-campaigns.md) | current |
-| module-boundaries | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| module-boundaries | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | native-owner-binding-contract | [Native Owner Binding](../../architecture/native-owner-binding.md) | current |
 | offline-family-rule-synthesis | [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md) | current |
 | package-qualification-source-authority | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
@@ -331,6 +335,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | portable-player-surfaces | [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md) | current |
 | portable-return-ledger | [Portable Return Ledger](../../compatibility/portable-return-ledger.md) | current |
 | prequalification-approved-delta-pending-binding | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
+| project-continuity | [Project Continuity](../../PROJECT-CONTINUITY.md) | current |
 | protected-release-capsule-transfer | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | protected-release-sequence | [Release Process](../../maintainer/release-process.md) | current |
 | provider-metrics-schema | [Compiler Runtime Contracts](../../reference/schemas/compiler-runtime-contracts.md) | current |
@@ -358,7 +363,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | research-surface-host-ownership | [ADR 0031: Portable Player Surfaces and Research Host Ownership](../../adr/0031-portable-player-surfaces.md) | current |
 | runtime-performance-release-gate | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | scenario-manifest-schema | [Scenario Manifest Schema](../../reference/schemas/scenario-manifest.md) | current |
-| science-pack-production-route-authority | [MIR 3.0.0 Repository Structure](../../architecture/module-boundaries.md) | current |
+| science-pack-production-route-authority | [MIR 4 Repository and Module Boundaries](../../architecture/module-boundaries.md) | current |
 | semantic-mod-interaction-graph | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | settings-governance | [Settings Governance](../../maintainer/settings-governance.md) | current |
 | settings-reference | [Settings Reference](../../reference/settings.md) | current |

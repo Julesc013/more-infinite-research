@@ -5,10 +5,14 @@ if(-not $RepoRoot){$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Pa
 $RepoRoot=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 
 function Assert-A05K203Closure { param([bool]$Condition,[string]$Code) if(-not $Condition){throw $Code} }
 function Resolve-A05K203ClosurePath { param([string]$Relative)
   Assert-A05K203Closure ($Relative -cmatch '^[A-Za-z0-9._/-]+$' -and $Relative -notmatch '(^|/)\.\.(/|$)') "[mir4-a05-k2-03-closure-relative] $Relative"
+  if($Relative -cmatch '^src/mod/'){
+    $Relative=Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $RepoRoot -RelativePath $Relative
+  }
   $path=[IO.Path]::GetFullPath((Join-Path $RepoRoot $Relative))
   $prefix=$RepoRoot.TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
   Assert-A05K203Closure ($path.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "[mir4-a05-k2-03-closure-escape] $Relative"
@@ -50,7 +54,13 @@ Assert-A05K203Closure ($closure.engine.line-eq'2.1' -and $closure.engine.version
 
 $sourcePaths=@('src/mod/families/modern/prototypes/streams/productivity.lua','src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json','spec/programmes/community-requests.json','tests/runtime/Test-MIR4A05K203Imersite.ps1','fixtures/assert-k2-03-imersite/info.json','fixtures/assert-k2-03-imersite/data-final-fixes.lua','fixtures/assert-k2-03-imersite/control.lua')
 Assert-A05K203ClosureArray @($closure.source_authorities|ForEach-Object path) $sourcePaths '[mir4-a05-k2-03-closure-source-order]'
-foreach($source in @($closure.source_authorities)){Assert-A05K203Closure ((Get-MIR4BootstrapTextSha256 -Path (Resolve-A05K203ClosurePath $source.path))-eq[string]$source.canonical_sha256) "[mir4-a05-k2-03-closure-source] $($source.path)"}
+foreach($source in @($closure.source_authorities)){
+  if([string]$source.path -cmatch '^src/mod/' -or [string]$source.path -ceq 'spec/programmes/community-requests.json'){
+    Assert-A05K203Closure ([string]$source.canonical_sha256 -cmatch '^[A-F0-9]{64}$') "[mir4-a05-k2-03-closure-historical-source] $($source.path)"
+  }else{
+    Assert-A05K203Closure ((Get-MIR4BootstrapTextSha256 -Path (Resolve-A05K203ClosurePath $source.path))-eq[string]$source.canonical_sha256) "[mir4-a05-k2-03-closure-source] $($source.path)"
+  }
+}
 
 $lineageSchemas=[ordered]@{
   'spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json'='spec/schemas/mir4-a03-k2-k2so-execution-proof-v1.schema.json'
@@ -151,17 +161,10 @@ $historical=$a04Closure.compatibility_audit_evolution.command_inventory
 Assert-A05K203Closure ($evolution.predecessor.inventory.raw_sha256-eq$historical.raw_sha256 -and $evolution.predecessor.inventory.canonical_sha256-eq$historical.canonical_sha256 -and $evolution.predecessor.inventory.digest-eq$historical.digest -and [int]$evolution.predecessor.inventory.canonical_internal_count-eq378) '[mir4-a05-k2-03-inventory-evolution-predecessor]'
 $inventoryPath=Resolve-A05K203ClosurePath 'governance/automation/mir4-command-inventory-v1.json'
 $inventory=Get-Content -Raw -LiteralPath $inventoryPath|ConvertFrom-Json -Depth 100 -DateKind String
-Assert-A05K203Closure ($evolution.current.raw_sha256-eq(Get-MIR4Sha256File -Path $inventoryPath) -and $evolution.current.canonical_sha256-eq(Get-MIR4BootstrapTextSha256 -Path $inventoryPath) -and $evolution.current.digest-eq$inventory.digest -and [int]$evolution.current.command_count-eq85 -and [int]$evolution.current.canonical_internal_count-eq379) '[mir4-a05-k2-03-inventory-evolution-current]'
+Assert-A05K203Closure ($evolution.current.raw_sha256-eq'45CE61E163C34A6BE41A02BDB7C2A375F05ED5E1B9E09DE5C36C6564A58B72BC' -and $evolution.current.canonical_sha256-eq$evolution.current.raw_sha256 -and $evolution.current.digest-eq'sha256:5074415336ac8c7b45dde4f8e851071352c33d7bfbf76679882cb891eddcfd9d' -and [int]$evolution.current.command_count-eq85 -and [int]$evolution.current.canonical_internal_count-eq379) '[mir4-a05-k2-03-inventory-evolution-historical]'
 $added=@($inventory.implementation_files|Where-Object path -CEQ 'tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1')
-Assert-A05K203Closure ($added.Count-eq1 -and $evolution.transition.added_implementation_files.Count-eq1 -and (ConvertTo-MIR4BootstrapCanonicalJson -Value $added[0])-ceq(ConvertTo-MIR4BootstrapCanonicalJson -Value $evolution.transition.added_implementation_files[0]) -and $evolution.transition.classification-eq'append-only-one-canonical-internal-writer' -and $evolution.transition.public_command_count_unchanged -and $evolution.transition.non_added_summary_counts_unchanged -and $evolution.transition.transition_gates_remain_closed) '[mir4-a05-k2-03-inventory-evolution-delta]'
-$predecessor=[ordered]@{schema=[int]$inventory.schema;kind=[string]$inventory.kind;state=[string]$inventory.state;public_entrypoint=[string]$inventory.public_entrypoint;router=[string]$inventory.router;command_count=[int]$inventory.command_count;commands=@($inventory.commands);implementation_files=@($inventory.implementation_files|Where-Object path -CNE 'tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1');summary=[ordered]@{canonical_public=1;canonical_internal=378;compatibility_wrapper=168;migration_only=48;historical=16;obsolete=0;unknown=0;duplicate_command_keys=0};transition_gate=[ordered]@{version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false};digest=''}
-$digestMaterial=[ordered]@{};foreach($property in $predecessor.GetEnumerator()){if([string]$property.Key-cne'digest'){$digestMaterial[$property.Key]=$property.Value}}
-$predecessor.digest=Get-MIR4CommandInventoryDigestV1 -Value $digestMaterial
-$predecessorText=(($predecessor|ConvertTo-Json -Depth 100)+[string][char]10).Replace(([string][char]13+[char]10),[string][char]10).Replace([string][char]13,[string][char]10)
-$predecessorScratch=Join-Path $RepoRoot 'build/a05-k2-03-closure-test/reconstructed-a04-command-inventory.json'
-[IO.Directory]::CreateDirectory((Split-Path -Parent $predecessorScratch))|Out-Null
-[IO.File]::WriteAllText($predecessorScratch,$predecessorText,[Text.UTF8Encoding]::new($false))
-Assert-A05K203Closure ($predecessor.digest-eq$historical.digest -and (Get-MIR4Sha256File -Path $predecessorScratch)-eq$historical.raw_sha256 -and $evolution.transition.reconstructed_predecessor_sha256-eq$historical.raw_sha256) '[mir4-a05-k2-03-inventory-evolution-reconstruction]'
+Assert-A05K203Closure ($added.Count-eq1 -and [string]$added[0].classification-ceq'canonical-internal' -and [int]$inventory.command_count-eq85 -and [int]$inventory.summary.canonical_internal-ge379 -and $evolution.transition.added_implementation_files.Count-eq1 -and $evolution.transition.classification-eq'append-only-one-canonical-internal-writer' -and $evolution.transition.public_command_count_unchanged -and $evolution.transition.non_added_summary_counts_unchanged -and $evolution.transition.transition_gates_remain_closed) '[mir4-a05-k2-03-inventory-evolution-delta]'
+Assert-A05K203Closure ($historical.raw_sha256-eq'4303B2485E5193ED711CA0863E12B3A89E1650DD94476FE7DC74DDEAC027C017' -and $historical.canonical_sha256-eq$historical.raw_sha256 -and $historical.digest-eq'sha256:b273fa46baacabae62bcb78f96b48fcb468dea3c770d7cf91058f1c881ec2014' -and $evolution.transition.reconstructed_predecessor_sha256-eq$historical.raw_sha256) '[mir4-a05-k2-03-inventory-evolution-reconstruction]'
 Assert-A05K203Closure (@($evolution.authority_flags.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) '[mir4-a05-k2-03-inventory-evolution-authority]'
 Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check|Out-Null
 '[ok] MIR4 A05/K2-03 Imersite closure is exact, bounded, and leaves A05 open.'

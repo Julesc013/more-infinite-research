@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/package/mir4-factorio-one-source-convergence-proof-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "baseline_revision", "historical_characterization", "current_source", "targets", "invariants", "exact_engine_proof_required", "release_transition_authority", "record_sha256"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "MIR4FactorioOneSourceConvergenceProofV1"},
+    "status": {"const": "passed-static-source-convergence-engine-proof-required"},
+    "baseline_revision": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "historical_characterization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["factorio_one_pair_count", "convergence_classes", "byte_divergent_pair_count"],
+      "properties": {
+        "factorio_one_pair_count": {"const": 81},
+        "convergence_classes": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "integer", "minimum": 1}},
+        "byte_divergent_pair_count": {"type": "integer", "minimum": 0, "maximum": 81}
+      }
+    },
+    "current_source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["binding_count", "physical_source_count", "whole_factorio_one_tree_present", "factorio_one_adapter_sources"],
+      "properties": {
+        "binding_count": {"const": 358},
+        "physical_source_count": {"const": 358},
+        "whole_factorio_one_tree_present": {"const": false},
+        "factorio_one_adapter_sources": {
+          "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^source/adapters/.+[.]lua$"}
+        }
+      }
+    },
+    "targets": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/target"}
+    },
+    "invariants": {
+      "type": "object", "minProperties": 9,
+      "additionalProperties": {"const": true}
+    },
+    "exact_engine_proof_required": {"const": true},
+    "release_transition_authority": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "stringArray": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["target", "binding_count", "omission_count", "output_count", "literal_require_count", "unresolved_literal_requires", "entrypoints", "adapter_sources", "unsupported_bitwise_or_integer_division_sources", "storage_reference_sources", "prototype_defines_reference_sources"],
+      "properties": {
+        "target": {"enum": ["f110", "f100"]},
+        "binding_count": {"const": 277},
+        "omission_count": {"const": 56},
+        "output_count": {"const": 277},
+        "literal_require_count": {"type": "integer", "minimum": 1},
+        "unresolved_literal_requires": {"type": "array", "maxItems": 0},
+        "entrypoints": {"type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true, "items": {"type": "string"}},
+        "adapter_sources": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"type": "string"}},
+        "unsupported_bitwise_or_integer_division_sources": {"type": "array", "maxItems": 0},
+        "storage_reference_sources": {"$ref": "#/$defs/stringArray"},
+        "prototype_defines_reference_sources": {"$ref": "#/$defs/stringArray"}
+      }
+    }
+  }
+}

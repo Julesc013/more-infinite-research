@@ -42,14 +42,14 @@ if ($Command -in @('baseline','baseline-check')) {
   return
 }
 if ($Command -in @('model','model-check')) {
-  . (Join-Path $repo 'tools/mir/application/package/ShadowSourceModel.ps1')
-  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-shadow-source-model-v1.json' }
-  $model = Write-MIR4ShadowSourceModel -RepoRoot $repo -OutputPath $OutputPath -Check:($Command -ceq 'model-check')
+  . (Join-Path $repo 'tools/mir/application/package/ComposableSourceModel.ps1')
+  if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = 'build/reports/package-source/mir4-composable-source-model-v2.json' }
+  $model = Write-MIR4ComposableSourceModel -RepoRoot $repo -OutputPath $OutputPath -Check:($Command -ceq 'model-check')
   [pscustomobject][ordered]@{
     status=[string]$model.status
     bindings=@($model.bindings).Count
-    targets=@($model.target_overlays).Count
-    omissions=@($model.target_overlays.operations | Where-Object semantic_class -ceq 'target-omission').Count
+    targets=@($model.targets).Count
+    omissions=@($model.targets | ForEach-Object { [int]$_.composition.omission_count } | Measure-Object -Sum).Sum
     output=$OutputPath
     record_sha256=[string]$model.record_sha256
   } | ConvertTo-Json -Depth 6

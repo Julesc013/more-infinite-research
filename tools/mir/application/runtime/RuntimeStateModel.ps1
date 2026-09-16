@@ -1,4 +1,30 @@
 # MIR4-RUNTIME-CONTINUITY-CANONICAL-APPLICATION
+function Get-MIR4RuntimeCurrentTargetPackageContext {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $cached = Get-Variable -Scope Script -Name MIR4RuntimeCurrentTargetPackageContext -ErrorAction SilentlyContinue
+  if ($null -eq $cached -or $null -eq $cached.Value -or [string]$cached.Value.repo -cne $repo) {
+    $script:MIR4RuntimeCurrentTargetPackageContext = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
+  }
+  return $script:MIR4RuntimeCurrentTargetPackageContext
+}
+
+function Resolve-MIR4RuntimeProgrammePath {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RelativePath)
+  $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  if (-not (Get-Command Resolve-MIR4CurrentTargetPackageOutputPath -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $relative = $RelativePath.Replace('\','/')
+  $targetPackage = Get-MIR4RuntimeCurrentTargetPackageContext -RepoRoot $repo
+  $packagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $relative -AllowMissing
+  if ($null -ne $packagePath) { return $packagePath }
+  return Join-Path $repo $relative
+}
+
 function Get-MIR4RuntimeContinuityAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
@@ -13,7 +39,8 @@ function Get-MIR4RuntimeContinuityAuthority {
   if (@($authority.registration_groups.id | Sort-Object -Unique).Count -ne 9) { throw '[mir4-registration-group-count]' }
   if (@($authority.migration_edges.id | Sort-Object -Unique).Count -ne 10) { throw '[mir4-migration-edge-count]' }
   foreach ($relative in @($authority.terminal_player_authority)) {
-    if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$relative)) -PathType Leaf)) { throw "[mir4-runtime-terminal-authority] $relative" }
+    $path = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath ([string]$relative)
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-runtime-terminal-authority] $relative" }
   }
   return $authority
 }
@@ -70,7 +97,7 @@ function New-MIR4RuntimeFeatureSpecs {
   return @(
     foreach ($feature in @($authority.runtime_features | Sort-Object id)) {
       $source = [string]$feature.source
-      $path = Join-Path $repo $source
+      $path = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath $source
       $text = Get-Content -Raw -LiteralPath $path
       foreach ($handler in @($feature.handlers)) {
         if ($text -notmatch ("function\s+M\." + [regex]::Escape([string]$handler) + "\s*\(")) { throw "[mir4-runtime-handler-missing] $($feature.id):$handler" }
@@ -136,10 +163,14 @@ function Assert-MIR4RuntimeRegistrationPlan {
 function New-MIR4RuntimeRegistrationPlan {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$RuntimeFeatures)
   $repo = Get-MIR4PlatformRepoRoot $RepoRoot
+  if (-not (Get-Command New-MIR4CurrentTargetPackageContext -ErrorAction SilentlyContinue)) {
+    . (Join-Path $repo 'tools/lib/validation/CurrentTargetPackage.ps1')
+  }
+  $targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
   $authority = Get-MIR4RuntimeContinuityAuthority -RepoRoot $repo
   $featureById = @{}; foreach ($feature in @($RuntimeFeatures)) { $featureById[[string]$feature.id] = $feature }
-  $dispatcherPath = Join-Path $repo 'prototypes/mir/runtime/scripted_techs.lua'
-  $stagePath = Join-Path $repo 'prototypes/mir/stage/control.lua'
+  $dispatcherPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/runtime/scripted_techs.lua'
+  $stagePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/stage/control.lua'
   $dispatcherText = Get-Content -Raw -LiteralPath $dispatcherPath
   $stageText = Get-Content -Raw -LiteralPath $stagePath
   $groups = @(
@@ -229,7 +260,7 @@ function New-MIR4MigrationGraphMatrix {
     foreach ($edge in @($authority.migration_edges | Sort-Object precedence,id)) {
       $evidence = @(
         foreach ($relative in @($edge.evidence)) {
-          $path = Join-Path $repo ([string]$relative)
+          $path = Resolve-MIR4RuntimeProgrammePath -RepoRoot $repo -RelativePath ([string]$relative)
           if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[mir4-migration-evidence-missing] $relative" }
           [ordered]@{path=[string]$relative;sha256=(Get-MIR4PlatformInputSha256 $path)}
         }
