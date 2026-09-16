@@ -1,7 +1,7 @@
 ---
-title: "Local Artifact Retention And Storage"
+title: "MIR 4 Local Artifact Retention And Storage"
 status: current
-applies_to: "3.2.0+"
+applies_to: "MIR 4.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
@@ -10,11 +10,13 @@ supersedes: []
 superseded_by: []
 source_of_truth_for:
   - local-artifact-retention
+  - mir4-local-artifact-classes
+  - mir4-worktree-and-run-state-retention
 ---
 
-# Local Artifact Retention And Storage
+# MIR 4 Local Artifact Retention And Storage
 
-Local validation must leave enough evidence to diagnose and summarize a run without turning every worktree into a permanent copy of transient Factorio staging data.
+Local storage retains enough exact material to replay or diagnose a result without turning every worktree, engine run, or staging directory into a second archive. This page is the current retention policy. It does not widen a cleanup command's implementation scope or grant deletion, candidate, release, or publication authority.
 
 ## Storage Classes
 
@@ -70,12 +72,12 @@ Cleanup is dry-run-first unless `--apply` is present. Its typed roots are immedi
 
 The scanner holds only pending directory paths, not an entire copied mod library or checkout in memory. It batches tracked-reference inspection per selected worktree instead of starting one Git search for each candidate. A normal audit has a 90-second whole-audit limit and a 250,000-entry no-follow limit per candidate; it prints periodic progress and stops before deletion when the whole-audit limit is reached. A candidate that reaches the per-candidate limit is reported as `scan-budget-exceeded` and is never selected. A root newer than the retention cutoff can be reported as recent without recursively sizing every member, but it remains ineligible; any stale candidate must complete the no-follow scan before selection and again immediately before deletion. `logical_size=not-scanned` means the row was already ineligible and was intentionally not recursively sized, not that it consumes zero bytes. The canonical command also accepts the distinct `campaign` artifact type; keep the public CLI router and command inventory synchronized when exposing that selector.
 
-The retired `.work/` path is forbidden and its reappearance fails the layout gate. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is a read-only legacy quarantine until the post-2.5.5 storage inventory; ordinary commands must not write there, and this focused migration does not delete it.
+The retired `.work/` path is forbidden and its reappearance fails the layout gate. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is a read-only legacy quarantine until an explicit governed retirement records its disposition; ordinary commands must not write there, and routine cleanup does not delete it.
 
 ## Run Finalization
 
-When a run finishes, retain its compact summary, failure packet, or authority-bound evidence in the governed destination, verify that the retained record identifies the exact source, candidate, verifier, and target where applicable, then remove the bulky run directory. Do not retain copied Factorio installations, scenario mod directories, decompressed caches, duplicate candidate archives, or raw performance campaigns merely because they may be useful later. `Invoke-MIRPerformanceQualification.ps1` enforces this by keeping raw performance directories on failure and removing them after compact evidence validates successfully; pass `-KeepArtifacts` only for a deliberate diagnostic investigation.
+When a run finishes, retain its compact summary, failure packet, or authority-bound evidence in the governed destination, verify that the retained record identifies the exact source, candidate, verifier, target, and input/evidence identity where applicable, then remove the bulky run directory. A reused immutable input is not an independent cold construction or qualification observation. Do not retain copied Factorio installations, scenario mod directories, decompressed caches, duplicate candidate archives, or raw performance campaigns merely because they may be useful later. `Invoke-MIRPerformanceQualification.ps1` enforces this by keeping raw performance directories on failure and removing them after compact evidence validates successfully; pass `-KeepArtifacts` only for a deliberate diagnostic investigation.
 
-The scenario runners already prefer NTFS hardlinks for verified immutable local mod ZIPs when the source and staging directory share a volume. Windows and Explorer report each hardlink path in logical directory totals even though the file content occupies physical disk once, so logical artifact size can substantially exceed physical storage use. Keep `testmods_*` as the shared source library and remove stale staging links instead of deleting or duplicating the library. Never junction or symlink a whole mutable `mods` directory, profile, mod-list, settings override, save, userdata, or log tree into a run: each run owns those mutable files privately. Cross-volume hardlinks are unavailable, so use an explicit verified copy fallback rather than silently changing the shared input; do not clear read-only attributes or alter permissions through a hardlink alias.
+The scenario runners may use an NTFS hardlink for a verified immutable local mod ZIP when the source and staging directory share a volume. An input materializer must verify the expected identity before and after use and record whether it realized a `hardlink` or a `copy`; a compatible runner may copy when a link is preferred. Hardlinks are not copy-on-write isolation: aliases share bytes, attributes, and security metadata. Windows and Explorer report each alias in logical directory totals even though the file content occupies physical disk once, so logical artifact size can substantially exceed physical storage use. Keep `testmods_*` as the shared source library and remove stale staging links instead of deleting or duplicating the library. Never junction or symlink a whole mutable `mods` directory, profile, mod-list, settings override, save, userdata, or log tree into a run: each run owns those mutable files privately. Cross-volume hardlinks are unavailable; uncertain identities, mutable inputs, reparse points, and link/access failures require an explicit verified private-copy fallback after capacity admission. Do not clear read-only attributes or alter permissions through a hardlink alias.
 
 Use a different output drive for deliberately long campaigns when practical. The retention rules still apply to that output root, but the repository cleanup command intentionally operates only on worktrees registered to the current Git common directory and does not roam arbitrary disks.

@@ -547,8 +547,9 @@ Before testing, inspect or materialize the MIR verification plan and run the nar
 ```powershell
 .\tools\mir.ps1 docs check
 .\tools\mir.ps1 mir4 package-source materialize --target f210 --output build/packages/local/f210
-.\tools\mir.ps1 mir4 release-engine readiness-check --work-root <external-work-root>
 ```
+
+The retained `mir4 release-engine readiness-check` command evaluates the fail-closed historical MIR 4.1 successor contract. It is not the MIR 4.2 candidate executor and cannot authorize a private build, tag, or publication.
 
 Use [testing guidance](docs/maintainer/testing.md) and the [release runbook](docs/RELEASE-RUNBOOK.md) for exact prerequisites and release authority. Build and qualify before sealing; after maintainer GO, publish the prepared bytes and verify delivery. A repository README correction does not rebuild a published package.
 

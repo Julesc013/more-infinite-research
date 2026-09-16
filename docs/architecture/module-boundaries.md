@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-09-15
+last_reviewed: 2026-09-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -15,13 +15,27 @@ source_of_truth_for:
 ---
 # MIR 4 Repository and Module Boundaries
 
-Updated: 2026-09-15
+Updated: 2026-09-16
 
-This note records current MIR 4 authority and package boundaries while retaining the explicitly labelled historical transitions that explain them. The organizing rule is:
+This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
-The shipped compiler layout below now sits inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation are visible; release state and evidence authority remain under `.mir/`. Canonical test implementations live under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files are parameter-compatible forwarding wrappers for historical commands only. Canonical assurance, CLI, compatibility, control-plane, localization, museum, and validation libraries live under `tools/lib/<domain>/`; their former `scripts/` modules only dot-source the canonical implementation for historical imports. During 3.2.5, legacy paths remain read-only aliases while package bytes stay frozen.
+## Current MIR 4 boundaries
 
-Commands that project a machine authority into checked-in source are owned by the domain they project: target profiles under `tools/commands/targets/`, compiler authorities under `tools/commands/compiler/`, and locales under `tools/commands/localization/`. Their `scripts/` predecessors are thin parameter-compatible wrappers, not alternate implementations. The generated target-profile Lua deliberately retains its historical generator attribution until the C32 package source lock is bound, so this repository-only ownership move cannot change frozen candidate bytes. Immutable backport worktrees may still call the wrapper path that existed in their source commit.
+`source/` is the sole editable player-source authority. `source/package-source.json`, `targets/package-authority.json`, `targets/registry.json`, and `targets/support-policy.json` define the source-to-target contract; target composition selects shared components and narrow platform adapters, not a second editable mod tree. `tools/mir/application/package/TargetMaterializer.ps1` is the sole current package writer and writes to the caller's explicit output root; current development and qualification runners keep their generated packages beneath ignored `build/` roots. The repository-root Factorio-shaped projection remains historical reconstruction material and cannot be reactivated as package source.
+
+The package-excluded operational plane consists of documentation, fixtures, tests, tools, contracts, governance, `build`, `dist`, and `.mir` authorities. `.mir/control/paths.yml` owns their current logical paths, `.mir/modules.yml` assigns module ownership, and Markdown front matter owns editable document metadata. `tools/commands/docs/Update-MIRDocumentationIndex.ps1` is the writer for `.mir/docs.yml` and generated documentation views; never hand-edit those projections. A preview, shadow, compatibility reader, or historical reconstruction does not gain player mutation, package, release, signing, promotion, tagging, or publication authority merely by existing.
+
+## Change and release narrative boundary
+
+Accepted change facts live under `changes/unreleased/` and released historical facts under `changes/history/`. `tools/mir/application/release/ReleaseNarratives.ps1` is the only narrative orchestrator; six focused renderers consume an immutable plan and explicit surface and target dispositions. They may write package-excluded shadow reports and the generated root `CHANGELOG.md` source-family projection. They cannot inspect Git history for changes, infer target support, mutate packages, allocate versions, or grant release transitions. The complete contract is documented in `docs/architecture/mir4-change-and-release-authority.md`.
+
+## Historical MIR 3 compiler and transition context
+
+The following architecture explanation is retained for reconstruction and migration context. Its package-relative `prototypes/mir/` paths and historical `scripts/` aliases do not prescribe current MIR 4 authoring roots, target selection, package authority, or release procedure.
+
+The shipped compiler layout then sat inside the dual-plane repository contract in `spec/architecture/repository-layout-v2.md`. Product specifications, validation, fixtures, tools, and documentation were visible; release state and evidence authority remained under `.mir/`. Canonical test implementations lived under `validation/tests/<domain>/`; the matching `scripts/Test-MIR*.ps1` files were parameter-compatible forwarding wrappers for historical commands only. Canonical assurance, CLI, compatibility, control-plane, localization, museum, and validation libraries lived under `tools/lib/<domain>/`; their former `scripts/` modules only dot-sourced the canonical implementation for historical imports. During 3.2.5, legacy paths remained read-only aliases while package bytes stayed frozen.
+
+Commands that projected a machine authority into checked-in source were owned by the domain they projected: target profiles under `tools/commands/targets/`, compiler authorities under `tools/commands/compiler/`, and locales under `tools/commands/localization/`. Their `scripts/` predecessors were thin parameter-compatible wrappers, not alternate implementations. The generated target-profile Lua deliberately retained its historical generator attribution until the C32 package source lock was bound, so that repository-only ownership move could not change frozen candidate bytes. Immutable backport worktrees could still call the wrapper path that existed in their source commit.
 
 ```text
 Factorio root files stay thin.
@@ -35,11 +49,7 @@ Old compatibility, library, legacy, and broad root-helper shim paths do not
 ship on the main 3.x line.
 ```
 
-This is the current structure target for the MIR 3 shipped mod. Backport branches may carry temporary compatibility surfaces only when branch policy requires them; those surfaces must not merge back into the main 3.x line.
-
-## Change and release narrative boundary
-
-Accepted change facts live under `changes/unreleased/` and released historical facts under `changes/history/`. `tools/mir/application/release/ReleaseNarratives.ps1` is the only narrative orchestrator; six focused renderers consume an immutable plan and explicit surface and target dispositions. They may write package-excluded shadow reports and the generated root `CHANGELOG.md` source-family projection. They cannot inspect Git history for changes, infer target support, mutate packages, allocate versions, or grant release transitions. The complete contract is documented in `docs/architecture/mir4-change-and-release-authority.md`.
+This was the structure target for the MIR 3 shipped mod. Backport branches could carry temporary compatibility surfaces only when branch policy required them; those surfaces could not merge back into the main 3.x line.
 
 ## Factorio Shell
 
@@ -55,7 +65,7 @@ Factorio imposes the outer shell:
 
 That means MIR should not be structured like a normal application with dynamic file I/O or arbitrary runtime loading. MIR is primarily a deterministic data-stage compiler.
 
-Before implementing this refactor, re-check these Factorio documentation surfaces:
+When changing this package layout, re-check these Factorio documentation surfaces:
 
 - `https://lua-api.factorio.com/latest/auxiliary/mod-structure.html`
 - `https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html`
@@ -64,7 +74,7 @@ Before implementing this refactor, re-check these Factorio documentation surface
 - `https://lua-api.factorio.com/latest/auxiliary/instrument.html`
 - `https://wiki.factorio.com/Tutorial:Localisation`
 
-Root files should stay thin:
+Unless a path is prefixed with `source/`, the Lua paths below are materialized package-relative paths; their editable authority is `source/<that path>`. Package root files should stay thin:
 
 ```lua
 require("prototypes.mir.stage.data_final_fixes").run()
@@ -82,7 +92,7 @@ data-final-fixes.lua
 control.lua, only if runtime code is genuinely needed
 ```
 
-`control.lua` is not part of the prototype compiler. It is Factorio's runtime entrypoint for save/session behavior such as event handlers, commands, remote interfaces, GUI, storage, and configuration-change handling. MIR should not add or keep `control.lua` for normal generated technology emission. This branch keeps it only because scripted technology candidates already have bounded runtime handlers under `prototypes/mir/runtime/`.
+`control.lua` is not part of the prototype compiler. It is Factorio's runtime entrypoint for save/session behavior such as event handlers, commands, remote interfaces, GUI, storage, and configuration-change handling. MIR should not add or keep `control.lua` for normal generated technology emission. MIR includes it only because scripted technology candidates have bounded runtime handlers under package-relative `prototypes/mir/runtime/`.
 
 Runtime control files must not inspect `data.raw`, call `data:extend`, or create generated technology prototypes. Those responsibilities remain in the data stage, primarily behind `data-final-fixes.lua`.
 

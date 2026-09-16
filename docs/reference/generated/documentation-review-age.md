@@ -79,7 +79,7 @@ Ages are measured against the newest governed review date, 2026-09-16, so checko
 | docs/architecture/mir4-runtime-continuity.md | current | 2026-08-23 | 24 | current-window |
 | docs/architecture/mir4-semantic-compiler.md | current | 2026-08-23 | 24 | current-window |
 | docs/architecture/mir4-target-compiler.md | current | 2026-08-28 | 19 | current-window |
-| docs/architecture/module-boundaries.md | current | 2026-09-15 | 1 | current-window |
+| docs/architecture/module-boundaries.md | current | 2026-09-16 | 0 | current-window |
 | docs/architecture/native-owner-binding.md | current | 2026-07-20 | 58 | current-window |
 | docs/architecture/procedural-compatibility-kernel.md | current | 2026-08-03 | 44 | current-window |
 | docs/architecture/README.md | current | 2026-08-08 | 39 | current-window |
@@ -187,7 +187,7 @@ Ages are measured against the newest governed review date, 2026-09-16, so checko
 | docs/maintainer/localization.md | current | 2026-08-03 | 44 | current-window |
 | docs/maintainer/manual-test-plan.md | current | 2026-07-21 | 57 | current-window |
 | docs/maintainer/mir3-terminal-repository-protections.md | current | 2026-08-15 | 32 | current-window |
-| docs/maintainer/mir4-4.1-release-readiness.md | current | 2026-09-05 | 11 | current-window |
+| docs/maintainer/mir4-4.1-release-readiness.md | historical-checkpoint | 2026-09-16 | 0 | current-window |
 | docs/maintainer/mir4-authority-map.md | current | 2026-09-05 | 11 | current-window |
 | docs/maintainer/mir4-continuity.md | current | 2026-08-26 | 21 | current-window |
 | docs/maintainer/mir4-f2d-runtime-replay.md | current | 2026-09-02 | 14 | current-window |
@@ -196,7 +196,7 @@ Ages are measured against the newest governed review date, 2026-09-16, so checko
 | docs/maintainer/mir4-pre-freeze-hardening.md | current | 2026-09-09 | 7 | current-window |
 | docs/maintainer/mir4-qualification-and-promotion.md | current | 2026-08-18 | 29 | current-window |
 | docs/maintainer/mir4-release-governance.md | current | 2026-08-27 | 20 | current-window |
-| docs/maintainer/mir4-release-operations.md | current | 2026-09-05 | 11 | current-window |
+| docs/maintainer/mir4-release-operations.md | current | 2026-09-16 | 0 | current-window |
 | docs/maintainer/mir4-spark-sol-handoff.md | current | 2026-08-20 | 27 | current-window |
 | docs/maintainer/mir4-supply-chain-preservation.md | current | 2026-08-31 | 16 | current-window |
 | docs/maintainer/mir4-w09-manual-playtest.md | current | 2026-08-29 | 18 | current-window |
@@ -283,7 +283,7 @@ Ages are measured against the newest governed review date, 2026-09-16, so checko
 | docs/reference/schemas/technology-lifecycle.md | current | 2026-08-03 | 44 | current-window |
 | docs/reference/settings-reference.md | archived | 2026-07-07 | 71 | current-window |
 | docs/reference/settings.md | current | 2026-08-03 | 44 | current-window |
-| docs/RELEASE-RUNBOOK.md | current | 2026-09-15 | 1 | current-window |
+| docs/RELEASE-RUNBOOK.md | current | 2026-09-16 | 0 | current-window |
 | docs/releases/0.x-factorio-version-metadata-correction.md | current | 2026-07-16 | 62 | current-window |
 | docs/releases/3.2.1-emergency-build-trigger.md | historical-checkpoint | 2026-07-26 | 52 | current-window |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | current | 2026-07-31 | 47 | current-window |

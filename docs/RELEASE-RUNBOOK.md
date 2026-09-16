@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-09-15
+last_reviewed: 2026-09-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -36,9 +36,9 @@ Resolve and rehearse promotion topology and effective rules before freeze. A rou
 4. Build each target committed by the accepted candidate plan twice, serially, from the frozen source and retain the accepted archives plus compact construction receipts. Do not silently omit a committed target.
 5. Qualify each committed target independently on its exact engine, including its required predecessor upgrade and reload evidence. F210 re-observes the current installed experimental engine immediately before its lane. A previous four-target result does not qualify a new candidate or replace its target commitments.
 6. Independently recompute package, engine, runtime, transition, resource, and custody identities; create the technical seal and pass the offline restore drill.
-7. Prepare and verify the signed annotated tag locally without pushing it. Promote only the exact qualified candidate through the prospectively accepted and rehearsed path, with required checks and protections intact. Unresolved ancestry or rules are a preflight blocker, not permission to suspend them.
-8. Obtain the candidate-bound human gameplay acceptance in the order required by the current release contract; this summary does not change the acceptance/promotion ordering. On `NO-GO`, publish nothing and correct forward through a new candidate. Only with actual `GO` and publication authority, push the existing tag and publish the existing assets without rebuilding or rewriting their source.
-9. Read back public bytes and close publication receipts. Mod Portal upload remains a separate maintainer action using the identical sealed target ZIPs and prepared copy.
+7. Promote only the exact qualified candidate through the accepted protected procedure, with required checks and protections intact. Read back the resulting `main` commit and require the exact qualified tree and package bytes before recording its commit rebinding. Unresolved ancestry, rules, tree identity, or package identity is a preflight blocker, not permission to suspend protections.
+8. Present the candidate-bound human gameplay playtest against the sealed packages represented by read-back `main`. On `NO-GO`, publish nothing and correct forward through a new candidate. Until actual `GO`, do not create, push, or publish a tag.
+9. Only with actual `GO` and publication authority, prepare and push the tag against verified `main` and publish the existing sealed assets without rebuilding or rewriting their source. Read back public bytes and close publication receipts. Mod Portal upload remains a separate maintainer action using the identical sealed target ZIPs and prepared copy.
 
 ## Historical MIR 4.1 closeout
 
