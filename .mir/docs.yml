@@ -1251,13 +1251,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
   - path: docs/maintainer/artifact-retention.md
-    title: "Local Artifact Retention And Storage"
+    title: "MIR 4 Local Artifact Retention And Storage"
     status: current
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
       - local-artifact-retention
+      - mir4-local-artifact-classes
+      - mir4-worktree-and-run-state-retention
   - path: docs/maintainer/backport-reconstruction.md
     title: "Deterministic Backport Reconstruction"
     status: current
@@ -1341,8 +1343,8 @@ docs:
       - terminal-repository-protection-handoff
       - github-administration-preflight
   - path: docs/maintainer/mir4-4.1-release-readiness.md
-    title: "MIR 4.1 Release Readiness"
-    status: current
+    title: "MIR 4.1 Release Readiness (Historical Checkpoint)"
+    status: historical-checkpoint
     audience: release-manager
     doc_type: how-to
     owner: mir-maintainers

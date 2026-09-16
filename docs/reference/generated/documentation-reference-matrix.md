@@ -88,7 +88,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | github-administration-preflight | [MIR 3 Terminal Repository Protections](../../maintainer/mir3-terminal-repository-protections.md) | current |
 | historical-maximum-level-binding-policy-v3 | [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md) | historical-checkpoint |
 | legacy-coefficient-anchor-projection | [ResearchCostModel Schema](../../reference/schemas/research-cost-model.md) | current |
-| local-artifact-retention | [Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
+| local-artifact-retention | [MIR 4 Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | localization-governance | [Localization Governance](../../maintainer/localization.md) | current |
 | localization-projection-command | [Localization Governance](../../maintainer/localization.md) | current |
 | maintainer-handoff | [Maintainer Handoff](../../MAINTAINER-HANDOFF.md) | current |
@@ -189,9 +189,9 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-4.0-whole-platform-consolidation | [MIR 4.0 Whole Platform Programme](../../releases/mir4-4.0-whole-platform-programme.md) | current |
 | mir4-4.0.0-candidate-release-notes | [More Infinite Research 4.0.0 Candidate Release Notes](../../releases/notes/release-notes-4.0.0-candidate.md) | current |
 | mir4-4.1-foundation-completion-boundary | [ADR 0007: MIR 4.1 Foundation Completion Boundary (Historical)](../../architecture/decisions/0007-mir4-4.1-foundation-completion-boundary.md) | historical-checkpoint |
-| mir4-4.1-one-minute-playtest-gate | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
-| mir4-4.1-release-readiness | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
-| mir4-4.1-resource-bounded-release | [MIR 4.1 Release Readiness](../../maintainer/mir4-4.1-release-readiness.md) | current |
+| mir4-4.1-one-minute-playtest-gate | [MIR 4.1 Release Readiness (Historical Checkpoint)](../../maintainer/mir4-4.1-release-readiness.md) | historical-checkpoint |
+| mir4-4.1-release-readiness | [MIR 4.1 Release Readiness (Historical Checkpoint)](../../maintainer/mir4-4.1-release-readiness.md) | historical-checkpoint |
+| mir4-4.1-resource-bounded-release | [MIR 4.1 Release Readiness (Historical Checkpoint)](../../maintainer/mir4-4.1-release-readiness.md) | historical-checkpoint |
 | mir4-api-sdk-v0-migration-policy | [MIR 4 API and SDK V0 Stability Policy](../../reference/mir4-api-sdk-v0-stability.md) | deprecated |
 | mir4-api-sdk-v1-preview | [MIR 4 Module Ecosystem](../../architecture/mir4-module-ecosystem.md) | current |
 | mir4-api-versioning-developer-policy | [MIR 4 API Versioning](../../developer/api-versioning.md) | current |
@@ -253,6 +253,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-inspector-v1-preview | [MIR 4 Inspector and Compatibility Factory](../../architecture/mir4-inspector-compatibility.md) | current |
 | mir4-integration-and-delivery-plan | [MIR 4 Integration and Delivery Plan](../../releases/mir4-integration-and-delivery-plan.md) | current |
 | mir4-key-recovery-and-revocation | [MIR 4 Release Governance](../../maintainer/mir4-release-governance.md) | current |
+| mir4-local-artifact-classes | [MIR 4 Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | mir4-local-playtest-shadow-boundary | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
 | mir4-m4c01-execution-order | [MIR 4 M4C01 Candidate Runbook](../../maintainer/mir4-m4c01-runbook.md) | current |
 | mir4-m4c01-next-work-plan | [MIR 4 Spark To Sol Handoff And Completion Plan](../../maintainer/mir4-spark-sol-handoff.md) | current |
@@ -324,6 +325,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir4-visible-root-authority-migration | [MIR 4 Repository Fixed Point](../../architecture/mir4-repository-fixed-point.md) | current |
 | mir4-w09-historical-museum-matrix | [MIR 4 Historical, Museum, and Successor-Host Closure](../../architecture/mir4-historical-succession.md) | current |
 | mir4-w09-manual-playtest-checklist | [MIR 4 W09 Manual Playtest Handoff](../../maintainer/mir4-w09-manual-playtest.md) | current |
+| mir4-worktree-and-run-state-retention | [MIR 4 Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | mir410-local-delivery-index | [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md) | current |
 | mod-interaction-graph-command | [Semantic Mod Interaction Graph](../../reference/mod-interaction-graph.md) | current |
 | modpack-campaign-evidence-contract | [Modpack Campaigns](../../maintainer/modpack-campaigns.md) | current |

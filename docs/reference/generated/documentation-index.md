@@ -79,7 +79,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-09-15 |
+| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-09-16 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -176,7 +176,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/adding-a-family-rule.md | Adding A Family Rule | current | developer | how-to | mir-maintainers | 2026-07-12 |
 | docs/maintainer/adding-a-generated-stream.md | Adding A Generated Stream | current | developer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/adding-a-policy-overlay.md | Adding A Policy Overlay | current | developer | how-to | mir-maintainers | 2026-07-07 |
-| docs/maintainer/artifact-retention.md | Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-09-16 |
+| docs/maintainer/artifact-retention.md | MIR 4 Local Artifact Retention And Storage | current | maintainer | how-to | mir-maintainers | 2026-09-16 |
 | docs/maintainer/backport-reconstruction.md | Deterministic Backport Reconstruction | current | maintainer | how-to | mir-maintainers | 2026-08-08 |
 | docs/maintainer/backporting.md | Target-Line Versioning And Backports | current | maintainer | how-to | mir-maintainers | 2026-08-17 |
 | docs/maintainer/build-and-package.md | Build And Package | current | maintainer | how-to | mir-maintainers | 2026-07-20 |
@@ -187,7 +187,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
-| docs/maintainer/mir4-4.1-release-readiness.md | MIR 4.1 Release Readiness | current | release-manager | how-to | mir-maintainers | 2026-09-05 |
+| docs/maintainer/mir4-4.1-release-readiness.md | MIR 4.1 Release Readiness (Historical Checkpoint) | historical-checkpoint | release-manager | how-to | mir-maintainers | 2026-09-16 |
 | docs/maintainer/mir4-authority-map.md | MIR 4 maintainer authority map | current | maintainer | reference | mir-maintainers | 2026-09-05 |
 | docs/maintainer/mir4-continuity.md | MIR 4 Continuity, Incident, and Successor Operations | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/mir4-f2d-runtime-replay.md | MIR 4.1 F2D Runtime Replay | current | maintainer | how-to | mir-maintainers | 2026-09-02 |
@@ -196,7 +196,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-09-09 |
 | docs/maintainer/mir4-qualification-and-promotion.md | MIR 4 Qualification and Promotion | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-release-governance.md | MIR 4 Release Governance | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
-| docs/maintainer/mir4-release-operations.md | MIR 4 Release Operations | current | release-manager | how-to | mir-maintainers | 2026-09-05 |
+| docs/maintainer/mir4-release-operations.md | MIR 4 Release Operations | current | release-manager | how-to | mir-maintainers | 2026-09-16 |
 | docs/maintainer/mir4-spark-sol-handoff.md | MIR 4 Spark To Sol Handoff And Completion Plan | current | release-manager | release-plan | mir-maintainers | 2026-08-20 |
 | docs/maintainer/mir4-supply-chain-preservation.md | MIR 4 Supply-Chain and Preservation | current | release-manager | how-to | mir-maintainers | 2026-08-31 |
 | docs/maintainer/mir4-w09-manual-playtest.md | MIR 4 W09 Manual Playtest Handoff | current | maintainer | how-to | mir-maintainers | 2026-08-29 |
@@ -283,7 +283,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-08-03 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-08-03 |
-| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-09-15 |
+| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-09-16 |
 | docs/releases/0.x-factorio-version-metadata-correction.md | MIR 0.x Factorio Version Metadata Correction | current | release-manager | reference | mir-maintainers | 2026-07-16 |
 | docs/releases/3.2.1-emergency-build-trigger.md | MIR 3.2.1 Emergency Build Trigger | historical-checkpoint | release-manager | release-plan | mir-maintainers | 2026-07-26 |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | MIR 3.2.2 To 3.2.3 Repository Change Report | current | release-manager | reference | mir-maintainers | 2026-07-31 |
