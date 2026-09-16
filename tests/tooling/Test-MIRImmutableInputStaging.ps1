@@ -156,6 +156,49 @@ try {
     }
   }
 
+  $adoptedK2Harnesses = @(
+    'tests/runtime/Test-MIR4A03K2K2SOIntake.ps1',
+    'tests/runtime/Test-MIR4A05K2Materials.ps1',
+    'tests/runtime/Test-MIR4A05K203Imersite.ps1'
+  )
+  foreach ($relativeHarness in $adoptedK2Harnesses) {
+    $harnessPath = Join-Path $RepoRoot $relativeHarness
+    $tokens = $null
+    $parseErrors = $null
+    [Management.Automation.Language.Parser]::ParseFile($harnessPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
+    if (@($parseErrors).Count -ne 0) {
+      throw "$relativeHarness no longer parses after immutable-input adoption: $(@($parseErrors)[0].Message)"
+    }
+    $harnessSource = [IO.File]::ReadAllText($harnessPath)
+    foreach ($requiredText in @(
+      'ImmutableInputStaging.ps1',
+      'New-MIRImmutableInputLease',
+      'Get-MIRImmutableInputLeaseReceipt',
+      'Complete-MIRImmutableInputLease',
+      'input_staging=$inputStaging',
+      'Outcome failed'
+    )) {
+      if (-not $harnessSource.Contains($requiredText, [StringComparison]::Ordinal)) {
+        throw "$relativeHarness omitted required immutable-input contract text: $requiredText"
+      }
+    }
+    if ($harnessSource -match 'Copy-Item\s+-LiteralPath\s+\$candidate\s+-Destination\s+\$mods' -or
+        $harnessSource -match 'Copy-Item\s+-LiteralPath\s+\$source\s+-Destination\s+\$mods') {
+      throw "$relativeHarness restored private copies of an immutable candidate or dependency archive."
+    }
+    if ($harnessSource -match 'New-Item\s+-ItemType\s+(?:SymbolicLink|Junction)') {
+      throw "$relativeHarness introduced a whole-directory link instead of immutable archive staging."
+    }
+    $settingsCopy = if ($relativeHarness -ceq 'tests/runtime/Test-MIR4A03K2K2SOIntake.ps1') {
+      'Copy-Item -LiteralPath $settingsSourcePath -Destination (Join-Path $mods $settingsSourceItem.Name)'
+    } else {
+      "Copy-Item -LiteralPath `$settings -Destination (Join-Path `$mods 'mod-settings.dat')"
+    }
+    if (-not $harnessSource.Contains($settingsCopy, [StringComparison]::Ordinal)) {
+      throw "$relativeHarness must retain a private copy of mutable mod-settings.dat."
+    }
+  }
+
   $failedRun = Join-Path $fixtureRoot 'failed-run'
   New-Item -ItemType Directory -Force -Path $failedRun | Out-Null
   $rejected = $false

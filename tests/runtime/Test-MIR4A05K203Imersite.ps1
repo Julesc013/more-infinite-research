@@ -10,6 +10,7 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..'
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
 
 function Assert-A05 { param([bool]$Condition,[string]$Code) if (-not $Condition) { throw "[mir4-a05-k2-03] $Code" } }
 function Get-A05Sha256 { param([string]$Path) (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
@@ -105,53 +106,63 @@ function Get-A05Observation { param([string]$LogPath,[string]$CaseId,[string]$Ex
 }
 
 function Invoke-A05Case { param([string]$CaseId,[string]$K2SOPath,[string]$K2SOHash,[bool]$IncludeXy,[bool]$Reload,[string]$PhaseStatus)
-  $caseRoot = [IO.Path]::GetFullPath((Join-Path $outputRoot $CaseId))
-  $prefix = $outputRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
-  Assert-A05 ($caseRoot.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "$CaseId-root"
-  if (Test-Path -LiteralPath $caseRoot) { Remove-Item -LiteralPath $caseRoot -Recurse -Force }
-  $mods = Join-Path $caseRoot 'mods'
-  [IO.Directory]::CreateDirectory($mods) | Out-Null
-  [IO.Directory]::CreateDirectory((Join-Path $caseRoot 'saves')) | Out-Null
-  $archives = @()
-  foreach ($entry in $common) {
-    $source = Join-Path $lockedSource $entry.name
-    Assert-A05 ((Get-A05Sha256 $source) -ceq $entry.sha256) "$CaseId-archive:$($entry.name)"
-    $destination = Join-Path $mods $entry.name
-    Copy-Item -LiteralPath $source -Destination $destination
-    $archives += Get-A05Artifact $destination
+  $inputLease = $null
+  try {
+    $caseRoot = [IO.Path]::GetFullPath((Join-Path $outputRoot $CaseId))
+    $prefix = $outputRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+    Assert-A05 ($caseRoot.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "$CaseId-root"
+    if (Test-Path -LiteralPath $caseRoot) { Remove-Item -LiteralPath $caseRoot -Recurse -Force }
+    $mods = Join-Path $caseRoot 'mods'
+    [IO.Directory]::CreateDirectory($mods) | Out-Null
+    [IO.Directory]::CreateDirectory((Join-Path $caseRoot 'saves')) | Out-Null
+    $inputRecords = @()
+    foreach ($entry in $common) {
+      $source = Join-Path $lockedSource $entry.name
+      Assert-A05 ((Get-A05Sha256 $source) -ceq $entry.sha256) "$CaseId-archive:$($entry.name)"
+      $inputRecords += [ordered]@{source_path=$source;file_name=$entry.name;expected_sha256=$entry.sha256;role='dependency-mod';identity=[ordered]@{archive=$entry.name;sha256=$entry.sha256};provenance=[ordered]@{kind='locked-k2-archive';archive_root=$lockedSource};immutable=$true}
+    }
+    Assert-A05 ((Get-A05Sha256 $K2SOPath) -ceq $K2SOHash) "$CaseId-k2so-hash"
+    $inputRecords += [ordered]@{source_path=$K2SOPath;file_name=(Split-Path -Leaf $K2SOPath);expected_sha256=$K2SOHash;role='dependency-mod';identity=[ordered]@{archive=(Split-Path -Leaf $K2SOPath);sha256=$K2SOHash};provenance=[ordered]@{kind=if($K2SOPath.StartsWith($lockedSource,[StringComparison]::OrdinalIgnoreCase)){'locked-k2so-archive'}else{'current-k2so-cache'};archive_root=(Split-Path -Parent $K2SOPath)};immutable=$true}
+    if ($IncludeXy) {
+      $xy = Join-Path $lockedSource 'xy-k2so-enhancements-nulls-fork_0.8.3.zip'
+      $xyHash = '930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE'
+      Assert-A05 ((Get-A05Sha256 $xy) -ceq $xyHash) "$CaseId-xy-hash"
+      $inputRecords += [ordered]@{source_path=$xy;file_name=(Split-Path -Leaf $xy);expected_sha256=$xyHash;role='dependency-mod';identity=[ordered]@{archive=(Split-Path -Leaf $xy);sha256=$xyHash};provenance=[ordered]@{kind='locked-k2so-enhancement-archive';archive_root=$lockedSource};immutable=$true}
+    }
+    $candidateHash = '99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E'
+    $inputRecords += [ordered]@{source_path=$candidate;file_name=(Split-Path -Leaf $candidate);expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{target='f210';sha256=$candidateHash};provenance=[ordered]@{kind='locked-development-contract-candidate';path=$expectedCandidate};immutable=$true}
+    $inputLease = New-MIRImmutableInputLease -RunRoot $caseRoot -StageDirectory $mods -Inputs $inputRecords
+    $fixtureArchive = Publish-MIRModDirectoryArchive -Source (Join-Path $RepoRoot 'fixtures/assert-k2-03-imersite') -Name 'mir-fixture-assert-k2-03-imersite' -Version '0.1.0' -ModsDir $mods
+    $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research')
+    if ($IncludeXy) { $enabled += 'xy-k2so-enhancements-nulls-fork' }
+    $enabled += 'mir-fixture-assert-k2-03-imersite'
+    $modList = [pscustomobject][ordered]@{mods=@($enabled | ForEach-Object {[pscustomobject][ordered]@{name=$_;enabled=$true}})}
+    [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($modList|ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
+    $settings = Join-Path $lockedSource 'mod-settings.dat'
+    Assert-A05 ((Get-A05Sha256 $settings) -ceq '6AF4D7F55D19D9F105BCD540FFCA61267613843BC7AFEB457241BFB3703977A4') "$CaseId-settings-hash"
+    Copy-Item -LiteralPath $settings -Destination (Join-Path $mods 'mod-settings.dat')
+    $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $caseRoot -ScenarioName $CaseId -ScenarioTimeoutSeconds 300
+    Assert-A05 ($load.passed -and -not $load.timed_out -and $load.exit_code -eq 0) "$CaseId-load"
+    Assert-A05 ($load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$CaseId-stderr"
+    $observation = Get-A05Observation -LogPath $load.factorio_log -CaseId $CaseId -ExpectedPhaseStatus $PhaseStatus
+    $reloadResult = $null
+    if ($Reload) {
+      $reloadResult = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $caseRoot -ScenarioName $CaseId -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments '[MIR4_A05_K2_03_IMERSITE_PROGRESS] technology=recipe-prod-research_material_imersite-1 progress=0.42'
+      Assert-A05 ([bool]$reloadResult.passed) "$CaseId-reloads"
+    }
+    $inputStaging = Get-MIRImmutableInputLeaseReceipt -Lease $inputLease
+    $archives = @($inputStaging.inputs | Where-Object { $_.role -ceq 'dependency-mod' } | ForEach-Object { Get-A05Artifact $_.stage_path })
+    $candidateInput = @($inputStaging.inputs | Where-Object { $_.role -ceq 'candidate' })
+    Assert-A05 ($candidateInput.Count -eq 1) "$CaseId-candidate-input-count"
+    $caseResult = [pscustomobject][ordered]@{case_id=$CaseId;k2so=[pscustomobject][ordered]@{version=if($K2SOPath -match '_([0-9]+\.[0-9]+\.[0-9]+)[.]zip$'){$matches[1]}else{''};archive_sha256=$K2SOHash};xy_enabled=$IncludeXy;fresh_load=[pscustomobject][ordered]@{passed=$true;duration_seconds=$load.duration_seconds;save=Get-A05Artifact $load.save;stdout=Get-A05Artifact $load.stdout;stderr=Get-A05Artifact $load.stderr;factorio_log=Get-A05Artifact $load.factorio_log};reloads=$reloadResult;mod_closure=[pscustomobject][ordered]@{enabled_mods=$enabled;archives=@($archives|Sort-Object path);fixture=Get-A05Artifact $fixtureArchive;candidate=Get-A05Artifact $candidateInput[0].stage_path;mod_list=Get-A05Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$inputStaging};observation=$observation}
+    Complete-MIRImmutableInputLease -Lease $inputLease | Out-Null
+    $inputLease = $null
+    return $caseResult
+  } catch {
+    $failure = $_
+    if ($null -ne $inputLease -and -not $inputLease.closed) { try { Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed | Out-Null } catch {} }
+    throw $failure
   }
-  Assert-A05 ((Get-A05Sha256 $K2SOPath) -ceq $K2SOHash) "$CaseId-k2so-hash"
-  $k2soDestination = Join-Path $mods (Split-Path -Leaf $K2SOPath)
-  Copy-Item -LiteralPath $K2SOPath -Destination $k2soDestination
-  $archives += Get-A05Artifact $k2soDestination
-  if ($IncludeXy) {
-    $xy = Join-Path $lockedSource 'xy-k2so-enhancements-nulls-fork_0.8.3.zip'
-    Assert-A05 ((Get-A05Sha256 $xy) -ceq '930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE') "$CaseId-xy-hash"
-    $xyDestination = Join-Path $mods (Split-Path -Leaf $xy)
-    Copy-Item -LiteralPath $xy -Destination $xyDestination
-    $archives += Get-A05Artifact $xyDestination
-  }
-  $candidateDestination = Join-Path $mods 'more-infinite-research_4.2.21000.zip'
-  Copy-Item -LiteralPath $candidate -Destination $candidateDestination
-  $fixtureArchive = Publish-MIRModDirectoryArchive -Source (Join-Path $RepoRoot 'fixtures/assert-k2-03-imersite') -Name 'mir-fixture-assert-k2-03-imersite' -Version '0.1.0' -ModsDir $mods
-  $enabled = @('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research')
-  if ($IncludeXy) { $enabled += 'xy-k2so-enhancements-nulls-fork' }
-  $enabled += 'mir-fixture-assert-k2-03-imersite'
-  $modList = [pscustomobject][ordered]@{mods=@($enabled | ForEach-Object {[pscustomobject][ordered]@{name=$_;enabled=$true}})}
-  [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($modList|ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
-  $settings = Join-Path $lockedSource 'mod-settings.dat'
-  Assert-A05 ((Get-A05Sha256 $settings) -ceq '6AF4D7F55D19D9F105BCD540FFCA61267613843BC7AFEB457241BFB3703977A4') "$CaseId-settings-hash"
-  Copy-Item -LiteralPath $settings -Destination (Join-Path $mods 'mod-settings.dat')
-  $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $caseRoot -ScenarioName $CaseId -ScenarioTimeoutSeconds 300
-  Assert-A05 ($load.passed -and -not $load.timed_out -and $load.exit_code -eq 0) "$CaseId-load"
-  Assert-A05 ($load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$CaseId-stderr"
-  $observation = Get-A05Observation -LogPath $load.factorio_log -CaseId $CaseId -ExpectedPhaseStatus $PhaseStatus
-  $reloadResult = $null
-  if ($Reload) {
-    $reloadResult = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $caseRoot -ScenarioName $CaseId -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments '[MIR4_A05_K2_03_IMERSITE_PROGRESS] technology=recipe-prod-research_material_imersite-1 progress=0.42'
-    Assert-A05 ([bool]$reloadResult.passed) "$CaseId-reloads"
-  }
-  [pscustomobject][ordered]@{case_id=$CaseId;k2so=[pscustomobject][ordered]@{version=if($K2SOPath -match '_([0-9]+\.[0-9]+\.[0-9]+)[.]zip$'){$matches[1]}else{''};archive_sha256=$K2SOHash};xy_enabled=$IncludeXy;fresh_load=[pscustomobject][ordered]@{passed=$true;duration_seconds=$load.duration_seconds;save=Get-A05Artifact $load.save;stdout=Get-A05Artifact $load.stdout;stderr=Get-A05Artifact $load.stderr;factorio_log=Get-A05Artifact $load.factorio_log};reloads=$reloadResult;mod_closure=[pscustomobject][ordered]@{enabled_mods=$enabled;archives=@($archives|Sort-Object path);fixture=Get-A05Artifact $fixtureArchive;candidate=Get-A05Artifact $candidateDestination;mod_list=Get-A05Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05Artifact (Join-Path $mods 'mod-settings.dat')};observation=$observation}
 }
 
 $locked = Invoke-A05Case -CaseId 'locked-2.0.13' -K2SOPath (Join-Path $lockedSource 'Krastorio2-spaced-out_2.0.13.zip') -K2SOHash 'A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242' -IncludeXy $true -Reload $true -PhaseStatus 'already-normalized'
