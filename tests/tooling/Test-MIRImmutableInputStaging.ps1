@@ -117,6 +117,36 @@ try {
   if ($bindingText -notmatch 'supplied[.]candidate[.]sha256 differs') { throw "F200 production-gain mismatch was not rejected by its candidate binding: $bindingText" }
   if ($bindingText -match 'must-not-resolve-factorio|must-not-resolve-bob-mods') { throw "F200 candidate-binding-only path reached an engine or dependency lookup: $bindingText" }
 
+  $adoptedA06Harnesses = @(
+    'tests/runtime/Test-MIRA06BobLeadQualification.ps1',
+    'tests/runtime/Test-MIRA06BobGoldQualification.ps1',
+    'tests/runtime/Test-MIRA06BobAluminiumQualification.ps1'
+  )
+  foreach ($relativeHarness in $adoptedA06Harnesses) {
+    $harnessPath = Join-Path $RepoRoot $relativeHarness
+    $tokens = $null
+    $parseErrors = $null
+    [Management.Automation.Language.Parser]::ParseFile($harnessPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
+    if (@($parseErrors).Count -ne 0) {
+      throw "$relativeHarness no longer parses after immutable-input adoption: $(@($parseErrors)[0].Message)"
+    }
+    $harnessSource = [IO.File]::ReadAllText($harnessPath)
+    foreach ($requiredText in @(
+      'New-MIRImmutableInputLease',
+      'Get-MIRImmutableInputLeaseReceipt',
+      'Complete-MIRImmutableInputLease',
+      'input_staging=$inputStaging'
+    )) {
+      if (-not $harnessSource.Contains($requiredText, [StringComparison]::Ordinal)) {
+        throw "$relativeHarness omitted required immutable-input contract text: $requiredText"
+      }
+    }
+    if ($harnessSource -match 'Copy-Item\s+-LiteralPath\s+\$candidateZip\s+-Destination\s+\$mods' -or
+        $harnessSource -match 'Copy-Item\s+-LiteralPath\s+\$source\s+-Destination\s+\$mods') {
+      throw "$relativeHarness restored private copies of an immutable candidate or dependency archive."
+    }
+  }
+
   $failedRun = Join-Path $fixtureRoot 'failed-run'
   New-Item -ItemType Directory -Force -Path $failedRun | Out-Null
   $rejected = $false
