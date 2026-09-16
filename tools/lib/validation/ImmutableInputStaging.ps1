@@ -407,3 +407,28 @@ function Get-MIRImmutableInputLeaseLiveness {
   }
   return [pscustomobject]@{ present = $true; active = $false; ambiguous = $false; state = [string]$record.state; reason = 'lease lock is not held and owner PID is not live'; record = $record }
 }
+
+function Assert-MIRImmutableInputLeaseReclaimable {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RunRoot,
+    [Parameter(Mandatory)][string]$Context
+  )
+
+  $liveness = Get-MIRImmutableInputLeaseLiveness -RunRoot $RunRoot
+  # Only a completed lease with verified terminal hashes and a released owner
+  # is safe to reclaim. Any other record is active, ambiguous, failed, or
+  # orphaned recovery custody.
+  $completed = $liveness.present -and
+    -not $liveness.active -and
+    -not $liveness.ambiguous -and
+    $liveness.state -ceq 'completed' -and
+    $null -ne $liveness.record -and
+    [bool]$liveness.record.inputs_sha256_match -and
+    $null -eq $liveness.record.owner_pid -and
+    -not [string]::IsNullOrWhiteSpace([string]$liveness.record.completed_owner_pid)
+  if ($liveness.present -and -not $completed) {
+    throw "$Context retains immutable-input custody and may not be removed: state=$($liveness.state); reason=$($liveness.reason)"
+  }
+  return $liveness
+}

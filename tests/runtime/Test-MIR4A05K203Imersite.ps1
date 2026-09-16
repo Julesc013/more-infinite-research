@@ -111,7 +111,10 @@ function Invoke-A05Case { param([string]$CaseId,[string]$K2SOPath,[string]$K2SOH
     $caseRoot = [IO.Path]::GetFullPath((Join-Path $outputRoot $CaseId))
     $prefix = $outputRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
     Assert-A05 ($caseRoot.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "$CaseId-root"
-    if (Test-Path -LiteralPath $caseRoot) { Remove-Item -LiteralPath $caseRoot -Recurse -Force }
+    if (Test-Path -LiteralPath $caseRoot) {
+      $null = Assert-MIRImmutableInputLeaseReclaimable -RunRoot $caseRoot -Context "[mir4-a05-k2-03] $CaseId"
+      Remove-Item -LiteralPath $caseRoot -Recurse -Force
+    }
     $mods = Join-Path $caseRoot 'mods'
     [IO.Directory]::CreateDirectory($mods) | Out-Null
     [IO.Directory]::CreateDirectory((Join-Path $caseRoot 'saves')) | Out-Null
@@ -150,13 +153,12 @@ function Invoke-A05Case { param([string]$CaseId,[string]$K2SOPath,[string]$K2SOH
       $reloadResult = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $caseRoot -ScenarioName $CaseId -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments '[MIR4_A05_K2_03_IMERSITE_PROGRESS] technology=recipe-prod-research_material_imersite-1 progress=0.42'
       Assert-A05 ([bool]$reloadResult.passed) "$CaseId-reloads"
     }
-    $inputStaging = Get-MIRImmutableInputLeaseReceipt -Lease $inputLease
-    $archives = @($inputStaging.inputs | Where-Object { $_.role -ceq 'dependency-mod' } | ForEach-Object { Get-A05Artifact $_.stage_path })
-    $candidateInput = @($inputStaging.inputs | Where-Object { $_.role -ceq 'candidate' })
-    Assert-A05 ($candidateInput.Count -eq 1) "$CaseId-candidate-input-count"
-    $caseResult = [pscustomobject][ordered]@{case_id=$CaseId;k2so=[pscustomobject][ordered]@{version=if($K2SOPath -match '_([0-9]+\.[0-9]+\.[0-9]+)[.]zip$'){$matches[1]}else{''};archive_sha256=$K2SOHash};xy_enabled=$IncludeXy;fresh_load=[pscustomobject][ordered]@{passed=$true;duration_seconds=$load.duration_seconds;save=Get-A05Artifact $load.save;stdout=Get-A05Artifact $load.stdout;stderr=Get-A05Artifact $load.stderr;factorio_log=Get-A05Artifact $load.factorio_log};reloads=$reloadResult;mod_closure=[pscustomobject][ordered]@{enabled_mods=$enabled;archives=@($archives|Sort-Object path);fixture=Get-A05Artifact $fixtureArchive;candidate=Get-A05Artifact $candidateInput[0].stage_path;mod_list=Get-A05Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$inputStaging};observation=$observation}
-    Complete-MIRImmutableInputLease -Lease $inputLease | Out-Null
+    $terminalInputStaging = Complete-MIRImmutableInputLease -Lease $inputLease
     $inputLease = $null
+    $archives = @($terminalInputStaging.inputs | Where-Object { $_.role -ceq 'dependency-mod' } | ForEach-Object { Get-A05Artifact $_.stage_path })
+    $candidateInput = @($terminalInputStaging.inputs | Where-Object { $_.role -ceq 'candidate' })
+    Assert-A05 ($candidateInput.Count -eq 1) "$CaseId-candidate-input-count"
+    $caseResult = [pscustomobject][ordered]@{case_id=$CaseId;k2so=[pscustomobject][ordered]@{version=if($K2SOPath -match '_([0-9]+\.[0-9]+\.[0-9]+)[.]zip$'){$matches[1]}else{''};archive_sha256=$K2SOHash};xy_enabled=$IncludeXy;fresh_load=[pscustomobject][ordered]@{passed=$true;duration_seconds=$load.duration_seconds;save=Get-A05Artifact $load.save;stdout=Get-A05Artifact $load.stdout;stderr=Get-A05Artifact $load.stderr;factorio_log=Get-A05Artifact $load.factorio_log};reloads=$reloadResult;mod_closure=[pscustomobject][ordered]@{enabled_mods=$enabled;archives=@($archives|Sort-Object path);fixture=Get-A05Artifact $fixtureArchive;candidate=Get-A05Artifact $candidateInput[0].stage_path;mod_list=Get-A05Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$terminalInputStaging};observation=$observation}
     return $caseResult
   } catch {
     $failure = $_

@@ -289,7 +289,8 @@ foreach ($lab in @($observation.compatible_labs)) { Assert-A03Sequence -Actual @
 
 $archiveHashes = [ordered]@{}
 foreach ($file in @(Get-ChildItem -LiteralPath $mods -File | Sort-Object Name)) { $archiveHashes[$file.Name] = Get-A03Sha256 -Path $file.FullName }
-$inputStaging = Get-MIRImmutableInputLeaseReceipt -Lease $inputLease
+$terminalInputStaging = Complete-MIRImmutableInputLease -Lease $inputLease
+$inputLease = $null
 $result = [pscustomobject][ordered]@{
   schema = 1
   kind = 'MIR4A03K2K2SOIntakeRuntimeResultV1'
@@ -309,12 +310,10 @@ $result = [pscustomobject][ordered]@{
   save_sha256 = Get-A03Sha256 -Path $save
   observer_marker_count = $markers.Count
   observation = $observation
-  input_staging=$inputStaging
+  input_staging=$terminalInputStaging
 }
 $resultPath = Join-Path $root 'a03-k2-k2so-f210-intake-runtime-result.json'
 $resultHash = Write-MIR4BootstrapRecord -Record $result -Path $resultPath
  $persistedResult = Get-Content -Raw -LiteralPath $resultPath | ConvertFrom-Json -Depth 100 -DateKind String
 if (-not (Test-MIR4BootstrapRecordHash -Record $persistedResult)) { throw '[mir4-a03-runtime-result-self-hash]' }
-Complete-MIRImmutableInputLease -Lease $inputLease | Out-Null
-$inputLease = $null
 Write-Host "[MIR4_A03_RUNTIME_RESULT] path=$resultPath sha256=$resultHash"

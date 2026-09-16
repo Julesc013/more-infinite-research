@@ -84,6 +84,10 @@ try {
   if ($completedLiveness.active -or $completedLiveness.ambiguous -or $completedLiveness.state -cne 'completed' -or $null -ne $completedLiveness.record.owner_pid -or [string]::IsNullOrWhiteSpace([string]$completedLiveness.record.completed_owner_pid)) {
     throw 'Completed immutable input lease did not clear active ownership into an unambiguous terminal record.'
   }
+  $completedReclaimable = Assert-MIRImmutableInputLeaseReclaimable -RunRoot $runOne -Context 'completed immutable-input fixture'
+  if ($completedReclaimable.present -ne $true -or $completedReclaimable.state -cne 'completed') {
+    throw 'Completed immutable input lease was not the sole reclaimable terminal custody state.'
+  }
 
   $secondLease = New-MIRImmutableInputLease -RunRoot $runTwo -StageDirectory (Join-Path $runTwo 'mods') -ForceCopy -Inputs @(
     [ordered]@{
@@ -173,9 +177,8 @@ try {
     foreach ($requiredText in @(
       'ImmutableInputStaging.ps1',
       'New-MIRImmutableInputLease',
-      'Get-MIRImmutableInputLeaseReceipt',
       'Complete-MIRImmutableInputLease',
-      'input_staging=$inputStaging',
+      'input_staging=$terminalInputStaging',
       'Outcome failed'
     )) {
       if (-not $harnessSource.Contains($requiredText, [StringComparison]::Ordinal)) {
@@ -188,6 +191,17 @@ try {
     }
     if ($harnessSource -match 'New-Item\s+-ItemType\s+(?:SymbolicLink|Junction)') {
       throw "$relativeHarness introduced a whole-directory link instead of immutable archive staging."
+    }
+    $terminalCompletion = [regex]::Match($harnessSource, '\$terminalInputStaging\s*=\s*Complete-MIRImmutableInputLease\s+-Lease\s+\$inputLease')
+    $terminalBinding = [regex]::Match($harnessSource, 'input_staging\s*=\s*\$terminalInputStaging')
+    if (-not $terminalCompletion.Success -or -not $terminalBinding.Success -or $terminalCompletion.Index -gt $terminalBinding.Index) {
+      throw "$relativeHarness did not persist the terminal immutable-input lease receipt in its result."
+    }
+    if ($harnessSource -match 'input_staging\s*=\s*\$inputStaging') {
+      throw "$relativeHarness persisted an earlier receipt-captured lease state instead of the terminal receipt."
+    }
+    if ($relativeHarness -ne 'tests/runtime/Test-MIR4A03K2K2SOIntake.ps1' -and -not $harnessSource.Contains('Assert-MIRImmutableInputLeaseReclaimable', [StringComparison]::Ordinal)) {
+      throw "$relativeHarness deletes a fixed K2 case root without checking immutable-input lease liveness."
     }
     $settingsCopy = if ($relativeHarness -ceq 'tests/runtime/Test-MIR4A03K2K2SOIntake.ps1') {
       'Copy-Item -LiteralPath $settingsSourcePath -Destination (Join-Path $mods $settingsSourceItem.Name)'
@@ -220,6 +234,13 @@ try {
   if (-not $rejected) { throw 'Immutable input staging accepted an incorrect source hash.' }
   $failedRecord = Get-Content -Raw -LiteralPath (Join-Path $failedRun 'mir-immutable-input-lease.json') | ConvertFrom-Json
   if ($failedRecord.state -cne 'staging-failed') { throw 'Failed staging did not leave a recovery record.' }
+  $failedReclaimRejected = $false
+  try {
+    Assert-MIRImmutableInputLeaseReclaimable -RunRoot $failedRun -Context 'failed immutable-input fixture' | Out-Null
+  } catch {
+    $failedReclaimRejected = $_.Exception.Message -match 'retains immutable-input custody'
+  }
+  if (-not $failedReclaimRejected) { throw 'Failed immutable input custody was considered reclaimable.' }
 
   $orphanLockRun = Join-Path $fixtureRoot 'orphan-lock-run'
   New-Item -ItemType Directory -Force -Path $orphanLockRun | Out-Null
@@ -236,6 +257,13 @@ try {
   if (-not $orphanRecovered.present -or $orphanRecovered.active -or $orphanRecovered.state -cne 'missing-record') {
     throw 'An interrupted lease lock was not retained for recovery classification.'
   }
+  $orphanReclaimRejected = $false
+  try {
+    Assert-MIRImmutableInputLeaseReclaimable -RunRoot $orphanLockRun -Context 'orphaned immutable-input fixture' | Out-Null
+  } catch {
+    $orphanReclaimRejected = $_.Exception.Message -match 'retains immutable-input custody'
+  }
+  if (-not $orphanReclaimRejected) { throw 'Orphaned immutable input custody was considered reclaimable.' }
 } finally {
   if ($null -ne $firstLease -and -not $firstLease.closed) {
     try { Complete-MIRImmutableInputLease -Lease $firstLease -Outcome failed | Out-Null } catch {}

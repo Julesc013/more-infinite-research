@@ -64,7 +64,7 @@ function Assert-A05K2Observation([string]$log,[string]$case){
 function Invoke-A05K2Case([string]$Id,[string]$K2SO,[string]$K2SOHash,[bool]$IncludeXy){
   $inputLease=$null
   try {
-    $root=[IO.Path]::GetFullPath((Join-Path $output $Id));Assert-A05K2 $root.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase) "$Id-output-containment";if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force};New-Item -ItemType Directory -Force -Path (Join-Path $root 'mods'),(Join-Path $root 'saves')|Out-Null
+    $root=[IO.Path]::GetFullPath((Join-Path $output $Id));Assert-A05K2 $root.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase) "$Id-output-containment";if(Test-Path -LiteralPath $root){$null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context "[mir4-a05-k2-materials] $Id";Remove-Item -LiteralPath $root -Recurse -Force};New-Item -ItemType Directory -Force -Path (Join-Path $root 'mods'),(Join-Path $root 'saves')|Out-Null
     $mods=Join-Path $root 'mods'
     $inputRecords=@()
     foreach($entry in $common){
@@ -90,12 +90,11 @@ function Invoke-A05K2Case([string]$Id,[string]$K2SO,[string]$K2SOHash,[bool]$Inc
     Copy-Item -LiteralPath $settings -Destination (Join-Path $mods 'mod-settings.dat')
     $load=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -ScenarioTimeoutSeconds 300;Assert-A05K2 ($load.passed -and -not $load.timed_out -and $load.exit_code -eq 0) "$Id-load";Assert-A05K2 ($load.stderr_sha256-ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$Id-stderr";$pavingRoutes=Assert-A05K2Observation $load.factorio_log $Id
     $reload=Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments $progressMarkers;Assert-A05K2 ([bool]$reload.passed) "$Id-reloads"
-    $inputStaging=Get-MIRImmutableInputLeaseReceipt -Lease $inputLease
-    $archives=@($inputStaging.inputs|Where-Object{$_.role-ceq 'dependency-mod'}|ForEach-Object{Get-A05K2Artifact $_.stage_path})
-    $candidateInput=@($inputStaging.inputs|Where-Object{$_.role-ceq 'candidate'});Assert-A05K2 ($candidateInput.Count-eq 1) "$Id-candidate-input-count"
-    $caseResult=[pscustomobject][ordered]@{id=$Id;k2so=[ordered]@{archive_sha256=$K2SOHash;version=if($K2SO-match '_([0-9]+[.][0-9]+[.][0-9]+)[.]zip$'){$matches[1]}else{''}};xy_enabled=$IncludeXy;fresh_load=[ordered]@{passed=$true;save=Get-A05K2Artifact $load.save;stdout=Get-A05K2Artifact $load.stdout;stderr=Get-A05K2Artifact $load.stderr;factorio_log=Get-A05K2Artifact $load.factorio_log};reloads=$reload;mod_archives=@($archives|Sort-Object path);fixture=Get-A05K2Artifact $fixture;candidate=Get-A05K2Artifact $candidateInput[0].stage_path;mod_list=Get-A05K2Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05K2Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$inputStaging;paving_routes=@($pavingRoutes)}
-    Complete-MIRImmutableInputLease -Lease $inputLease|Out-Null
+    $terminalInputStaging=Complete-MIRImmutableInputLease -Lease $inputLease
     $inputLease=$null
+    $archives=@($terminalInputStaging.inputs|Where-Object{$_.role-ceq 'dependency-mod'}|ForEach-Object{Get-A05K2Artifact $_.stage_path})
+    $candidateInput=@($terminalInputStaging.inputs|Where-Object{$_.role-ceq 'candidate'});Assert-A05K2 ($candidateInput.Count-eq 1) "$Id-candidate-input-count"
+    $caseResult=[pscustomobject][ordered]@{id=$Id;k2so=[ordered]@{archive_sha256=$K2SOHash;version=if($K2SO-match '_([0-9]+[.][0-9]+[.][0-9]+)[.]zip$'){$matches[1]}else{''}};xy_enabled=$IncludeXy;fresh_load=[ordered]@{passed=$true;save=Get-A05K2Artifact $load.save;stdout=Get-A05K2Artifact $load.stdout;stderr=Get-A05K2Artifact $load.stderr;factorio_log=Get-A05K2Artifact $load.factorio_log};reloads=$reload;mod_archives=@($archives|Sort-Object path);fixture=Get-A05K2Artifact $fixture;candidate=Get-A05K2Artifact $candidateInput[0].stage_path;mod_list=Get-A05K2Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05K2Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$terminalInputStaging;paving_routes=@($pavingRoutes)}
     return $caseResult
   } catch {
     $failure=$_
