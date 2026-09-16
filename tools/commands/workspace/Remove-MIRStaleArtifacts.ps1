@@ -309,6 +309,9 @@ function Get-MIRArtifactCandidates {
       $discoveryEntryCount++
       $item = Get-Item -LiteralPath $path -Force
       if ($item.Name -in @($Definition.excluded_child_names)) { continue }
+      # Explicit campaign scope owns immediate child run directories. Files at
+      # the campaign root are campaign metadata/evidence, never run candidates.
+      if ([string]$Definition.artifact_type -ceq 'campaign' -and -not $item.PSIsContainer) { continue }
       [pscustomobject]@{
         item = $item
         boundary = 'direct-child'

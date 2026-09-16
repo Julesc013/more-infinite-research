@@ -117,6 +117,15 @@ try {
   if ($bindingText -notmatch 'supplied[.]candidate[.]sha256 differs') { throw "F200 production-gain mismatch was not rejected by its candidate binding: $bindingText" }
   if ($bindingText -match 'must-not-resolve-factorio|must-not-resolve-bob-mods') { throw "F200 candidate-binding-only path reached an engine or dependency lookup: $bindingText" }
 
+  $aluminiumHarness = Join-Path $RepoRoot 'tests/runtime/Test-MIRA06BobAluminiumQualification.ps1'
+  $aluminiumBindingOutput = @(& pwsh -NoProfile -File $aluminiumHarness -RepoRoot $RepoRoot -CandidateZip $mismatchedCandidate -FactorioBin (Join-Path $fixtureRoot 'must-not-resolve-factorio.exe') -BobModsDir (Join-Path $fixtureRoot 'must-not-resolve-bob-mods') -VerifyCandidateBindingOnly 2>&1)
+  $aluminiumBindingExitCode = $LASTEXITCODE
+  $global:LASTEXITCODE = 0
+  if ($aluminiumBindingExitCode -eq 0) { throw 'A06 Aluminium harness accepted supplied bytes that differ from current F210 materialization.' }
+  $aluminiumBindingText = $aluminiumBindingOutput | Out-String
+  if ($aluminiumBindingText -notmatch 'supplied candidate bytes differ') { throw "A06 Aluminium mismatch was not rejected by its candidate binding: $aluminiumBindingText" }
+  if ($aluminiumBindingText -match 'must-not-resolve-factorio|must-not-resolve-bob-mods') { throw "A06 Aluminium candidate-binding-only path reached an engine or dependency lookup: $aluminiumBindingText" }
+
   $adoptedA06Harnesses = @(
     'tests/runtime/Test-MIRA06BobLeadQualification.ps1',
     'tests/runtime/Test-MIRA06BobGoldQualification.ps1',

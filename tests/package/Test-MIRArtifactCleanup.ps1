@@ -82,6 +82,7 @@ try {
   $custodyScopedRun = Join-Path $scopedCampaign 'custody-run'
   $activeLeaseScopedRun = Join-Path $scopedCampaign 'active-lease-run'
   $recentScopedRun = Join-Path $scopedCampaign 'recent-run'
+  $scopedCampaignResult = Join-Path $scopedCampaign 'result.json'
   $activeCampaignLeaseRun = Join-Path $activeLeaseCampaign 'candidate/inputs'
   $ambiguousCampaignLeaseRun = Join-Path $ambiguousLeaseCampaign 'candidate/inputs'
   $interruptedCampaignLeaseRun = Join-Path $interruptedLeaseCampaign 'candidate/inputs'
@@ -115,6 +116,7 @@ try {
   '{"kind":"unique-evidence"}' | Set-Content -LiteralPath (Join-Path $custodyScopedRun 'evidence.json') -Encoding UTF8
   '{"status":"active"}' | Set-Content -LiteralPath (Join-Path $activeLeaseScopedRun 'result.json') -Encoding UTF8
   '{"status":"recent"}' | Set-Content -LiteralPath (Join-Path $recentScopedRun 'result.json') -Encoding UTF8
+  '{"status":"campaign-root-evidence"}' | Set-Content -LiteralPath $scopedCampaignResult -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $staleDevelopmentContract 'receipt.json') -Encoding UTF8
   "{}" | Set-Content -LiteralPath (Join-Path $referencedDevelopmentContract 'receipt.json') -Encoding UTF8
   @('build/packages/development-contracts/33333333333333333333333333333333','build/mir4/scoped-campaign/referenced-run/result.json') | Set-Content -LiteralPath (Join-Path $fixtureRoot 'tracked-reference.txt') -Encoding UTF8
@@ -143,6 +145,7 @@ try {
     Get-ChildItem -LiteralPath $stalePath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $stalePath).LastWriteTimeUtc = $staleTimestamp
   }
+  (Get-Item -LiteralPath $scopedCampaignResult).LastWriteTimeUtc = $staleTimestamp
   foreach ($protectedPath in @($protectedAssurance, $protectedValidation)) {
     Get-ChildItem -LiteralPath $protectedPath -Force -Recurse | ForEach-Object { $_.LastWriteTimeUtc = $staleTimestamp }
     (Get-Item -LiteralPath $protectedPath).LastWriteTimeUtc = $staleTimestamp
@@ -259,6 +262,9 @@ try {
   }
 
   $scopedCampaignPreview = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -PassThru)
+  if (@($scopedCampaignPreview | Where-Object { $_.relative_path -ceq 'build/mir4/scoped-campaign/result.json' }).Count -ne 0) {
+    throw 'Scoped campaign cleanup treated root evidence as a child run candidate.'
+  }
   foreach ($expected in @(
     @{path='build/mir4/scoped-campaign/stale-result-run';status='eligible'},
     @{path='build/mir4/scoped-campaign/referenced-run';status='pinned-reference'},
@@ -278,6 +284,7 @@ try {
 
   $scopedCampaignApplied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
   if (Test-Path -LiteralPath $staleScopedRun) { throw 'Scoped campaign cleanup retained an eligible superseded result run.' }
+  if (-not (Test-Path -LiteralPath $scopedCampaignResult -PathType Leaf)) { throw 'Scoped campaign cleanup removed campaign-root evidence.' }
   foreach ($retained in @($referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun)) {
     if (-not (Test-Path -LiteralPath $retained)) { throw "Scoped campaign cleanup removed protected state: $retained" }
   }
