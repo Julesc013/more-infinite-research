@@ -323,16 +323,28 @@ function Get-MIRAssuranceScenarioHarnessFingerprint {
 }
 
 function Get-MIRAssuranceBalanceContractFingerprint {
-  return Get-MIRAssurancePatternFingerprint -Patterns @(
-    "prototypes/streams/**",
-    "prototypes/mir/planner/costs.lua",
-    "prototypes/mir/domain/native_owner/**",
-    "prototypes/mir/planner/native_owner_binding.lua",
-    "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+  $source = [ordered]@{}
+  foreach ($pattern in @(
+    "source/prototypes/streams/**",
+    "source/prototypes/mir/planner/costs.lua",
+    "source/prototypes/mir/domain/native_owner/**",
+    "source/prototypes/mir/planner/native_owner_binding.lua",
+    "source/prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+  )) {
+    $source[$pattern] = Get-MIRAssuranceRequiredSourceInputFingerprint -Pattern $pattern
+  }
+  $policy = Get-MIRAssurancePatternFingerprint -Patterns @(
     ".mir/streams.yml",
     ".mir/settings.yml",
     ".mir/native-owner-cost-models.json"
   )
+  if ([int]$policy.file_count -ne 3) { throw '[mir-assurance-required-balance-policy-no-match]' }
+  return [ordered]@{
+    kind='balance-contract'
+    source=$source
+    policy=$policy
+    sha256=(Get-MIRAssuranceJsonHash -Value ([ordered]@{source=$source;policy=$policy}))
+  }
 }
 
 function Select-MIRAssuranceMatrixScenarios {

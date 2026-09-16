@@ -1,6 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 param(
-  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\..\locale"),
+  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\..\source\locale"),
   [string]$PolicyPath = (Join-Path $PSScriptRoot "..\..\.mir\locales\manifest.json"),
   [string]$FactorioLocaleRoot,
   [switch]$AllowMissingSupportedLanguages
