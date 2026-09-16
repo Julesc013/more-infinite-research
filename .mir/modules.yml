@@ -289,6 +289,22 @@ package_excluded_modules:
     historical_mir41_lineage_immutable: true
     f210_f200_exact_engine_qualification_required: true
     f110_f100_progression_capability_omitted_nonclaim: true
+  mir4_m41_to_m42_composable_source_succession_v4:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
+    progression_package_presentation: spec/distribution/mir4-current-package-presentation-v5.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    proof_input_authorities_typed_and_fail_closed: true
+    f210_f200_exact_engine_qualification_required: true
+    f110_f100_progression_capability_omitted_nonclaim: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1

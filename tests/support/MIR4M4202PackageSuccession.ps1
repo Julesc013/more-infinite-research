@@ -189,26 +189,29 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
         $ExpectedBindingSha[$path]=[string]$binding.current_sha256
       }
     }
-    # The V3 composable-source successor is the sole current binding that may
-    # advance a frozen M42-02 module expectation. It is deliberately narrow:
-    # only an authenticated evolved path may move, and it grants no release
-    # operation authority.
+    # V3 is frozen progression evidence and V4 is the current proof-input
+    # successor. Only their authenticated evolved paths may advance a frozen
+    # M42-02 module expectation; neither grants release operation authority.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
-    $successor = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot
-    $inventoryPath = [string]$successor.current.tooling_inventory.path
-    if ($ExpectedBindingSha.ContainsKey($inventoryPath)) {
-      if ([string]$successor.current.tooling_inventory_predecessor_sha256 -cne [string]$ExpectedBindingSha[$inventoryPath] -or
-          [string]$successor.current.tooling_inventory.sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
-      $ExpectedBindingSha[$inventoryPath] = [string]$successor.current.tooling_inventory.sha256
-    }
-    foreach($binding in @($successor.evolved_bindings)){
-      $path=[string]$binding.path
-      if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
-      if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path] -or
-         [string]$binding.hash_mode -cne 'canonical-text-v1' -or
-         [bool]$binding.package_visible -or
-         [bool]$binding.release_authority){return $false}
-      $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+    foreach ($successor in @(
+      Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot
+      Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot
+    )) {
+      $inventoryPath = [string]$successor.current.tooling_inventory.path
+      if ($ExpectedBindingSha.ContainsKey($inventoryPath)) {
+        if ([string]$successor.current.tooling_inventory_predecessor_sha256 -cne [string]$ExpectedBindingSha[$inventoryPath] -or
+            [string]$successor.current.tooling_inventory.sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+        $ExpectedBindingSha[$inventoryPath] = [string]$successor.current.tooling_inventory.sha256
+      }
+      foreach($binding in @($successor.evolved_bindings)){
+        $path=[string]$binding.path
+        if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
+        if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path] -or
+           [string]$binding.hash_mode -cne 'canonical-text-v1' -or
+           [bool]$binding.package_visible -or
+           [bool]$binding.release_authority){return $false}
+        $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+      }
     }
     return $true
   }catch{return $false}
@@ -263,9 +266,9 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     # inventory succession through their final evolved binding.  The one-source
     # cutover deliberately changes that inventory, so do not substitute the
     # live file for the successor. V2 is the immutable Factorio-1 predecessor;
-    # V3 is the append-only current boundary that records the live inventory
-    # alongside the progression source successor. We return its digest only
-    # after the historical custody and current live binding both agree.
+    # V3 is immutable progression evidence and V4 records the live inventory
+    # alongside the proof-input/control-plane successor. We return its digest
+    # only after historical custody and current live binding both agree.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
     $historicalSuccessor = Get-MIR4M41ToM42ComposableSourceSuccessionV2Historical -RepoRoot $RepoRoot
     $factorioAuthorityPath = Join-Path $RepoRoot ([string]$historicalSuccessor.factorio_one_successor.authority.path)
@@ -277,7 +280,7 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     if ([string]$historicalSuccessor.factorio_one_successor.receipt.path -cne 'assurance/repository/factorio-one-source-convergence-v1.json' -or
         [string]$historicalSuccessor.factorio_one_successor.receipt.kind -cne [string]$factorioReceipt.kind -or
         [string]$historicalSuccessor.factorio_one_successor.receipt.record_sha256 -cne [string]$factorioReceipt.record_sha256) { return $null }
-    $successorInventory = (Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot).current.tooling_inventory
+    $successorInventory = (Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot).current.tooling_inventory
     if ([string]$successorInventory.path -cne $inventoryRelativePath -or
         [string]$successorInventory.hash_mode -cne 'canonical-text-v1' -or
         [int]$successorInventory.command_count -ne 85 -or
