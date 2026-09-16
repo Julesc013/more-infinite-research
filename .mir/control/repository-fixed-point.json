@@ -2,7 +2,7 @@
   "schema": 2,
   "kind": "MIR4RepositoryFixedPointV2",
   "programme_id": "M4C02-09-24H",
-  "state": "MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE",
+  "state": "MIR42-PROGRESSION-SOURCE-SUCCESSION",
   "unknown_policy": "block-deletion-and-release",
   "physical_cutover": true,
   "current_package_source_remains_authoritative": false,
@@ -27,7 +27,8 @@
     {"migration_id":"M41-05A-M42-00A-REPOSITORY-CHARACTERIZATION-V1","authority":"governance/repository/migrations/repository-characterization-v1.json","receipt":"releases/migrations/MIR4-M41-05A-M42-00A-Repository-Characterization-Authority-EvolutionV1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1","authority":"governance/repository/migrations/current-product-bridge-retirement-v1.json","receipt":"releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"MIR4-COMPOSABLE-SOURCE-LAYOUT-V1","authority":"governance/repository/composable-source-layout-v1.json","receipt":"assurance/repository/composable-source-layout-receipt-v1.json","state":"accepted-immutable-predecessor"},
-    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2","authority":"governance/repository/factorio-one-source-convergence-v1.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json","state":"current-append-only-successor"}
+    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2","authority":"governance/repository/factorio-one-source-convergence-v1.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json","state":"accepted-immutable-predecessor"},
+    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V3","authority":"spec/distribution/mir4-current-package-presentation-v5.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json","state":"current-append-only-successor"}
   ],
   "root_markers": ".mir-root.json",
   "classification_order": [
@@ -75,8 +76,8 @@
     "rollback-recorded"
   ],
   "remaining_move": {
-    "classification": "none-factorio-one-source-convergence-static-complete-engine-proof-required",
-    "reason": "The sole editable player source is one package-shaped source root without a parallel Factorio 1 tree. F210/F200 changed only their presentation README content while preserving executable content; F110/F100 have a reviewed semantic content change and retain an exact-engine proof obligation.",
-    "rollback": "Revert the exact Factorio-1 convergence successor to the immutable composable-source-layout predecessor and rerun its four-target materialization proof; never silently reactivate src, era lanes, or a parallel Factorio-1 tree."
+    "classification": "none-progression-source-succession-static-complete-exact-engine-qualification-required",
+    "reason": "The sole editable player source remains one package-shaped source root without a parallel Factorio 1 tree. Schema-3 maximum-level policy is composed for F210/F200, explicitly omitted for F110/F100, and all affected target identities retain exact-engine qualification obligations.",
+    "rollback": "Revert the exact progression source successor to the immutable Factorio-1 convergence predecessor and rerun its four-target materialization proof; never silently reactivate src, era lanes, or a parallel Factorio-1 tree."
   }
 }

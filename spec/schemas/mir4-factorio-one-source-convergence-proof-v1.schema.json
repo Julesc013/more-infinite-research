@@ -22,8 +22,8 @@
       "type": "object", "additionalProperties": false,
       "required": ["binding_count", "physical_source_count", "whole_factorio_one_tree_present", "factorio_one_adapter_sources"],
       "properties": {
-        "binding_count": {"const": 358},
-        "physical_source_count": {"const": 358},
+        "binding_count": {"const": 359},
+        "physical_source_count": {"const": 359},
         "whole_factorio_one_tree_present": {"const": false},
         "factorio_one_adapter_sources": {
           "type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true,
@@ -52,7 +52,7 @@
       "properties": {
         "target": {"enum": ["f110", "f100"]},
         "binding_count": {"const": 277},
-        "omission_count": {"const": 56},
+        "omission_count": {"const": 57},
         "output_count": {"const": 277},
         "literal_require_count": {"type": "integer", "minimum": 1},
         "unresolved_literal_requires": {"type": "array", "maxItems": 0},

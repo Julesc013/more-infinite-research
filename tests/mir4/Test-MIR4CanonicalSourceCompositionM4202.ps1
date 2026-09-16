@@ -53,7 +53,23 @@ Assert-MIR4ComposableSource ([string]$manifest.predecessor_record_sha256-ceq[str
 Assert-MIR4ComposableSource ([string]$receipt.predecessor.package_source_fingerprint_sha256-ceq'BD29DCCC6818E3B2593B2DD182E62F8AA68827EC58E1E27AC1CBA915C582AF57'-and[string]$receipt.current.package_source_fingerprint_sha256-ceq'7B0A39E3C5286624C8B6B272E32D1F6DE21F86FE91187E39AEF42FB80FCFC9ED') 'mir4-composable-source-historical-package-fingerprint'
 Assert-MIR4ComposableSource ([string]$receipt.current.package_source_fingerprint_sha256-cne(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'mir4-composable-source-current-semantic-succession'
 Assert-MIR4ComposableSource ([string]$receipt.predecessor_proof.implementation-ceq'tools/mir/application/package/SourceCompositionProof.ps1'-and[string]$receipt.predecessor_proof.schema-ceq'spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json'-and[string]$receipt.predecessor_proof.record_sha256-ceq[string]$predecessorProof.record_sha256) 'mir4-composable-source-predecessor-proof-receipt'
-Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq358-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq358-and@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-eq358) 'mir4-composable-source-cardinality'
+Assert-MIR4ComposableSource (@($manifest.bindings).Count-eq359-and@($manifest.bindings.source_path|Sort-Object -Unique).Count-eq359-and@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-eq359) 'mir4-composable-source-cardinality'
+
+# publication.lua executes target-line capability decisions after module load.
+# Keep its dependency explicit and prove every target composition closes over the
+# imported module; otherwise a source move can materialize successfully while
+# failing only when the compiler publishes a plan.
+$publicationPath='prototypes/mir/pipeline/compiler_orchestrator/publication.lua'
+$targetLinePath='prototypes/mir/platform/factorio/target_line.lua'
+$publicationBinding=@($manifest.bindings|Where-Object{[string]$_.output_path-ceq$publicationPath})
+Assert-MIR4ComposableSource ($publicationBinding.Count-eq1-and[bool]($publicationBinding[0].target_scope -contains 'f210')-and[bool]($publicationBinding[0].target_scope -contains 'f200')-and[bool]($publicationBinding[0].target_scope -contains 'f110')-and[bool]($publicationBinding[0].target_scope -contains 'f100')) 'mir4-composable-source-publication-target-scope'
+$publicationText=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$publicationBinding[0].source_path))
+Assert-MIR4ComposableSource ($publicationText-match'(?m)^local target_line = require\("prototypes\.mir\.platform\.factorio\.target_line"\)$'-and$publicationText-match'target_line\.feature_enabled\(' -and$publicationText-match'target_line\.factorio_version') 'mir4-composable-source-publication-target-line-import'
+foreach($target in @('f210','f200','f110','f100')){
+  $selection=Get-MIR4TargetMaterializationBindings -State (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target)
+  $selected=@($selection.bindings.output_path)
+  Assert-MIR4ComposableSource ($publicationPath-in$selected-and$targetLinePath-in$selected) "mir4-composable-source-publication-target-line-closure-$target"
+}
 
 $declared=@($manifest.bindings.source_path|Sort-Object -Unique -CaseSensitive)
 $physical=@(Get-ChildItem -LiteralPath (Join-Path $repo 'source') -Recurse -File|Where-Object{$_.FullName-notin@((Join-Path $repo 'source/package-source.json'),(Join-Path $repo 'source/.mir-root.json'))}|ForEach-Object{[IO.Path]::GetRelativePath($repo,$_.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/')}|Sort-Object -Unique -CaseSensitive)
@@ -86,6 +102,6 @@ Assert-MIR4ComposableSource (Test-MIR4BootstrapRecordHash $convergence) 'mir4-co
 Assert-MIR4ComposableSource ([string]$convergence.status-ceq'passed-static-source-convergence-engine-proof-required'-and[bool]$convergence.exact_engine_proof_required-and-not[bool]$convergence.release_transition_authority) 'mir4-composable-source-convergence-boundary'
 $proof=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/composable-source-layout-current.json'
 Assert-MIR4ComposableSource (@($proof.targets).Count-eq4-and@($proof.targets|Where-Object{-not[bool]$_.deterministic_archive_bytes}).Count-eq0) 'mir4-composable-source-current-determinism'
-$expectedContent=[ordered]@{f210='56670789F9A759EC81B09214C996B58F07A072B49D5B161228618226A778C852';f200='0FF10FEA35841F9484735C76ECF37F8D52D0AD723D5C66DD693096FAA5891D82';f110='73D29EF07F02B8C7AC267280B5551F094D35E7FA86496C8A3CB21C9061D4E89B';f100='1EE69576BD18F4062BE2428F04CF965191C542614852A75E1FB40FBF2AC5D780'}
+$expectedContent=[ordered]@{f210='BE53413DDE7FF02A65208585E8FDE4DC23865E75E8E7FF99C743841141D1D809';f200='33CF1DE7EA04DBAE2B01172CEFF957D06257AD0A40DE40F0719BAC9F38A82B20';f110='8875C5A56DDAD8B50C804A7BAFD6AA20D7BA6E0B9B5A00CEF2F46BF44004FC26';f100='7CBBE40B3A94D4D5EF114B78BCEB8B8DBABAA733F0E0469F7C288B82F45F6291'}
 foreach($target in $expectedContent.Keys){$row=@($proof.targets|Where-Object target -ceq $target);Assert-MIR4ComposableSource ($row.Count-eq1-and[string]$row[0].content_sha256-ceq[string]$expectedContent[$target]) 'mir4-composable-source-reviewed-semantic-identity'}
 [pscustomobject][ordered]@{status='passed';test_id='static.mir4-composable-source-layout-v1';bindings=@($manifest.bindings).Count;physical_sources=$physical.Count;deduplicated_bindings=(@($manifest.bindings).Count-$physical.Count);targets=@($proof.targets).Count;factorio_1_historical_pairs=[int]$convergence.historical_characterization.factorio_one_pair_count;factorio_1_exact_engine_proof_required=$true;release_authority=$false}|ConvertTo-Json -Depth 10

@@ -340,6 +340,7 @@ function M.on_research_finished(event) refresh_open(event.research.force) end
 M.on_research_reversed = M.on_research_finished
 M.on_research_queued = M.on_research_finished
 function M.on_technology_effects_reset() refresh_open() end
+function M.on_force_reset(event) refresh_open(event and event.force) end
 function M.on_forces_merged() refresh_open() end
 function M.register()
   remote.add_interface("more-infinite-research-browser", {

@@ -99,15 +99,15 @@ function Get-MIR4FactorioOneSourceConvergenceStaticProof {
       [string]$proof.status -cne 'passed-static-source-convergence-engine-proof-required' -or
       [string]$proof.baseline_revision -cne $policy.baseline_revision -or
       [int]$proof.historical_characterization.factorio_one_pair_count -ne 81 -or
-      [int]$proof.current_source.binding_count -ne 358 -or
-      [int]$proof.current_source.physical_source_count -ne 358 -or
+      [int]$proof.current_source.binding_count -ne 359 -or
+      [int]$proof.current_source.physical_source_count -ne 359 -or
       [bool]$proof.current_source.whole_factorio_one_tree_present -or
       -not [bool]$proof.exact_engine_proof_required -or [bool]$proof.release_transition_authority) {
     throw '[mir4-factorio-one-convergence-static-proof]'
   }
   foreach ($target in @('f110','f100')) {
     $row = @($proof.targets | Where-Object { [string]$_.target -ceq $target })
-    if ($row.Count -ne 1 -or [int]$row[0].binding_count -ne 277 -or [int]$row[0].omission_count -ne 56 -or
+    if ($row.Count -ne 1 -or [int]$row[0].binding_count -ne 277 -or [int]$row[0].omission_count -ne 57 -or
         @($row[0].unresolved_literal_requires).Count -ne 0 -or @($row[0].unsupported_bitwise_or_integer_division_sources).Count -ne 0) {
       throw "[mir4-factorio-one-convergence-static-proof-target] $target"
     }
@@ -555,20 +555,17 @@ function Test-MIR4FactorioOneSourceConvergenceReceipt {
   try { $schemaValid = [bool]((ConvertTo-MIR4FactorioOneSourceConvergenceCanonicalJson -Value $Receipt) | Test-Json -SchemaFile (Join-Path $repo $policy.receipt_schema) -ErrorAction Stop) } catch { $schemaValid = $false }
   if (-not $schemaValid) { throw '[mir4-factorio-one-convergence-receipt-schema]' }
   if (-not (Test-MIR4BootstrapRecordHash -Record $Receipt)) { throw '[mir4-factorio-one-convergence-receipt-hash]' }
-  Assert-MIR4FactorioOneSourceConvergenceReceiptCurrent -RepoRoot $repo -Receipt $Receipt | Out-Null
-  if ($VerifyMaterialization) {
-    $materialization = Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/factorio-one-source-convergence-v1.json'
-    foreach ($target in @('f210','f200','f110','f100')) {
-      $actual = @($materialization.targets | Where-Object { [string]$_.target -ceq $target })
-      $recorded = @($Receipt.target_content_identities | Where-Object { [string]$_.target -ceq $target })
-      if ($actual.Count -ne 1 -or $recorded.Count -ne 1 -or -not [bool]$actual[0].deterministic_archive_bytes -or
-          [string]$actual[0].content_sha256 -cne [string]$recorded[0].content_sha256 -or [int]$actual[0].entry_count -ne [int]$recorded[0].entry_count) {
-        throw "[mir4-factorio-one-convergence-receipt-materialization] $target"
-      }
-    }
+  # V1 is frozen convergence evidence. Do not rebuild its F210/F200 equality
+  # claim against a later semantic progression package or overwrite it.
+  if ($VerifyMaterialization) { throw '[mir4-factorio-one-convergence-historical-materialization-not-current]' }
+  if ([string]$Receipt.record_sha256 -cne '9821BD60F0E36F32DA9888477CD8F48674A5A0601AA16D06CF396266AD02AB47' -or
+      [string]$Receipt.current.package_source_fingerprint_sha256 -cne '909D8F0F1CA8B59E42CFBED5C854734B57DE40308D2E05752BD8694E1EC1821E' -or
+      -not [bool]$Receipt.invariants.factorio_two_executable_content_preserved -or
+      [bool]$Receipt.invariants.release_transition_authority) {
+    throw '[mir4-factorio-one-convergence-historical-integrity]'
   }
   return [pscustomobject][ordered]@{
-    status = 'passed-static-factorio-one-source-convergence-exact-engine-proof-required'
+    status = 'passed-historical-factorio-one-source-convergence'
     factorio_one_exact_engine_proof_required = $true
     release_transition_authority = $false
     record_sha256 = [string]$Receipt.record_sha256

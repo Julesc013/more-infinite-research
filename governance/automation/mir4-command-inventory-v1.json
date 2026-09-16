@@ -2499,9 +2499,17 @@
     {
       "path": "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1",
       "classification": "migration-only",
-      "sha256": "54D153E4CB794C48E1E4A066AF62E799B5CF08E4EC2C1BF7C984C8C14149838F",
+      "sha256": "D51D7D437643D3E6FA591A88AB41A03832C95E8B5F77DEF524148A7E7FF5E259",
       "hash_mode": "canonical-text-v1",
-      "lines": 33,
+      "lines": 31,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority.ps1",
+      "classification": "migration-only",
+      "sha256": "18558A62D5DDA4687195D24E4D3448B21179A5B5671B5BF338DD938E5108B856",
+      "hash_mode": "canonical-text-v1",
+      "lines": 34,
       "package_visible": false
     },
     {
@@ -2515,9 +2523,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "F7DCBD855919553670EF4A887E1F830CA074D0AF886ADC38D9212CD274F82994",
+      "sha256": "AB86C53AD8BF498CDCA3B137AC147A8C461C8BE0B1C19B84F385C279B982FC49",
       "hash_mode": "canonical-text-v1",
-      "lines": 30,
+      "lines": 26,
       "package_visible": false
     },
     {
@@ -2659,9 +2667,17 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1",
       "classification": "migration-only",
-      "sha256": "332F0DDC7B4D4202959DEA5F18461EA1FDE5A251F21080AC7C1907D86E51E17D",
+      "sha256": "084DB47919ADA18488D541EF40CAA2B300F39310DED5DAB3287C82BBFF76E8F3",
       "hash_mode": "canonical-text-v1",
       "lines": 29,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority.ps1",
+      "classification": "migration-only",
+      "sha256": "1092424B90838643B24287F6C3CCF1FA4289F4A2B3CF2D485A958BD7C66FF387",
+      "hash_mode": "canonical-text-v1",
+      "lines": 11,
       "package_visible": false
     },
     {
@@ -3843,9 +3859,9 @@
     {
       "path": "tools/lib/mir4/PackagePresentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "42FD240DB6AEBD5C765822C6D380DAE15DF423BEE17626A1041AE016C47F2D63",
+      "sha256": "186F45DED05938E3E4FDC142A7BB85976F77E9069DA3667FE68ED344A4006758",
       "hash_mode": "canonical-text-v1",
-      "lines": 474,
+      "lines": 644,
       "package_visible": false
     },
     {
@@ -3867,9 +3883,9 @@
     {
       "path": "tools/lib/mir4/PostReleaseDocumentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "06E46C18073A90D6E29D5B8D543A727BBF69586CD955B1FD364C745F620F9071",
+      "sha256": "148AAF2FCC5BA75FD12837C9B6E2B24C59C41513570364B35FF090B9BB8312B8",
       "hash_mode": "canonical-text-v1",
-      "lines": 68,
+      "lines": 100,
       "package_visible": false
     },
     {
@@ -4835,9 +4851,9 @@
     {
       "path": "tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1",
       "classification": "canonical-internal",
-      "sha256": "6569B352ED01EF8D3734034A9B9E4FC17BE296B220FAAAD155CAEE197D881E7F",
+      "sha256": "1D2B4E6E8618B6BA04FC8D5EFCC95EF16E2FD9F47A406771B3BABED8C0BAC3F0",
       "hash_mode": "canonical-text-v1",
-      "lines": 577,
+      "lines": 574,
       "package_visible": false
     },
     {
@@ -5051,9 +5067,9 @@
     {
       "path": "tools/mir/application/release/readiness/ComposableSourceSuccession.ps1",
       "classification": "canonical-internal",
-      "sha256": "782BBD461B6E1EFF9EECD7B2FFEFF89BFE34BFEFAD7838C7AB284FE8D655DD2F",
+      "sha256": "29B59CB080820B3FB74345EC8F18E5FF68ED3B638C2F4052434B37484602B287",
       "hash_mode": "canonical-text-v1",
-      "lines": 488,
+      "lines": 613,
       "package_visible": false
     },
     {
@@ -5675,9 +5691,9 @@
     {
       "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
       "classification": "canonical-internal",
-      "sha256": "C1D513B410726ACF107DA8C0D9243D92606CC42CF7A5D174EAE36AFE378011C8",
+      "sha256": "9FE24E378B3FCC6AD8527B4FD34EDD328AAC7D196F800FF77AF4D1A9D871FC32",
       "hash_mode": "canonical-text-v1",
-      "lines": 157,
+      "lines": 159,
       "package_visible": false
     },
     {
@@ -5709,7 +5725,7 @@
     "canonical_public": 1,
     "canonical_internal": 387,
     "compatibility_wrapper": 168,
-    "migration_only": 54,
+    "migration_only": 56,
     "historical": 17,
     "obsolete": 0,
     "unknown": 0,
@@ -5722,5 +5738,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4884bb1fc3e4e25549e94608def72cecb83636be9159f4f753a62cb97be8db65"
+  "digest": "sha256:5d29c319fe855bd1a9a051884dba5f3b36eb24dcdd2e297a4173fa8cb12b6efe"
 }

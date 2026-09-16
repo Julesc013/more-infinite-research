@@ -23,18 +23,18 @@ function Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected([scriptblock]$
 $writer = Join-Path $repo 'tools/commands/mir4/Update-MIR4FactorioOneSourceConvergenceAuthority.ps1'
 & $writer -RepoRoot $repo -Check | Out-Null
 $receipt = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo
-$proof = Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $receipt -VerifyMaterialization
-Assert-MIR4FactorioOneSourceConvergenceAuthority ([string]$proof.status -ceq 'passed-static-factorio-one-source-convergence-exact-engine-proof-required' -and [bool]$proof.factorio_one_exact_engine_proof_required -and -not [bool]$proof.release_transition_authority) 'mir4-factorio-one-convergence-positive'
+$proof = Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $receipt
+Assert-MIR4FactorioOneSourceConvergenceAuthority ([string]$proof.status -ceq 'passed-historical-factorio-one-source-convergence' -and [bool]$proof.factorio_one_exact_engine_proof_required -and -not [bool]$proof.release_transition_authority) 'mir4-factorio-one-convergence-positive'
 
 $tamperedIdentity = Copy-MIR4FactorioOneSourceConvergenceAuthority $receipt
 $tamperedIdentity.target_content_identities[2].relation = 'presentation-only-content-change-executable-preserved'
 $tamperedIdentity.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $tamperedIdentity
-Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected { Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $tamperedIdentity | Out-Null } 'mir4-factorio-one-convergence-receipt-identity'
+Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected { Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $tamperedIdentity | Out-Null } 'mir4-factorio-one-convergence-historical-integrity'
 
 $tamperedExecutableContentProof = Copy-MIR4FactorioOneSourceConvergenceAuthority $receipt
 $tamperedExecutableContentProof.factorio_two_executable_content_proof.record_sha256 = '0' * 64
 $tamperedExecutableContentProof.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $tamperedExecutableContentProof
-Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected { Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $tamperedExecutableContentProof | Out-Null } 'mir4-factorio-one-convergence-receipt-current-binding'
+Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected { Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $tamperedExecutableContentProof | Out-Null } 'mir4-factorio-one-convergence-historical-integrity'
 
 $tamperedGate = Copy-MIR4FactorioOneSourceConvergenceAuthority $receipt
 $tamperedGate.transition_gate.main_promotion = $true
@@ -46,4 +46,4 @@ $unknown | Add-Member -NotePropertyName unauthorized_gate -NotePropertyValue $tr
 $unknown.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $unknown
 Assert-MIR4FactorioOneSourceConvergenceAuthorityRejected { Test-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -Receipt $unknown | Out-Null } 'mir4-factorio-one-convergence-receipt-schema'
 
-[pscustomobject][ordered]@{status='passed';test_id='static.mir4-factorio-one-source-convergence-authority-v1';exact_engine_proof_required=$true;release_authority=$false;record_sha256=[string]$receipt.record_sha256} | ConvertTo-Json -Compress
+[pscustomobject][ordered]@{status='passed';test_id='static.mir4-factorio-one-source-convergence-authority-v1';historical=$true;exact_engine_proof_required=$true;release_authority=$false;record_sha256=[string]$receipt.record_sha256} | ConvertTo-Json -Compress

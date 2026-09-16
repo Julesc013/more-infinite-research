@@ -10,7 +10,6 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $writer = Join-Path $repo 'tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1'
 
 $record = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $repo
-Assert-MIR4CurrentPackagePresentationV4LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) | Out-Null
 if ([string]$record.predecessor.record_sha256 -cne '0E66F8BD58371E54BF3783200A73423703BCC539D9538526D1BEABA05C494790' -or
     [string]$record.factorio_one_convergence.receipt.record_sha256 -cne '9821BD60F0E36F32DA9888477CD8F48674A5A0601AA16D06CF396266AD02AB47' -or
     [string]$record.factorio_one_convergence.factorio_two_executable_content_proof.record_sha256 -cne 'F7192DC6BFBF6A21B24CC24922189B376381532B9694E6143DDBAB350D0938D9' -or
@@ -37,4 +36,5 @@ if (-not $stale -or (Test-Path -LiteralPath $scratch)) { throw '[mir4-package-pr
 $immutable = $false
 try { & $writer -RepoRoot $repo -RecordedAt '2026-09-16T09:20:01+10:00' | Out-Null } catch { $immutable = $_.Exception.Message -eq '[mir4-package-presentation-v4-authority-immutable-overwrite]' }
 if (-not $immutable) { throw '[mir4-package-presentation-v4-overwrite]' }
-Write-Host '[ok] MIR4 package presentation V4 binds the immutable V3 receipt and current Factorio-1 convergence authority.'
+& $writer -RepoRoot $repo -Check | Out-Null
+Write-Host '[ok] MIR4 package presentation V4 remains immutable historical evidence for the Factorio-1 convergence authority.'

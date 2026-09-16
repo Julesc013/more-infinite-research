@@ -29,11 +29,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4RepositoryJsonV1 -RepoRoot $repo -Path $script:MIR4RepositoryFixedPointAuthorityPath
   if ([int]$authority.schema -ne 2 -or [string]$authority.kind -cne 'MIR4RepositoryFixedPointV2') { throw '[mir4-repository-authority-schema]' }
-  if ([string]$authority.state -cne 'MIR42-FACTORIO-ONE-SOURCE-CONVERGENCE' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
+  if ([string]$authority.state -cne 'MIR42-PROGRESSION-SOURCE-SUCCESSION' -or -not [bool]$authority.physical_cutover -or [bool]$authority.current_package_source_remains_authoritative) {
     throw '[mir4-repository-cutover-boundary]'
   }
   if ([string]$authority.migration_authority -cne $script:MIR4RepositoryMigrationAuthorityPath) { throw '[mir4-repository-migration-authority-binding]' }
-  if (@($authority.migration_sequence).Count -ne 20 -or
+  if (@($authority.migration_sequence).Count -ne 21 -or
       [string]$authority.migration_sequence[0].migration_id -cne 'MIR4-REPOSITORY-FIXED-POINT-TOOLING-V1' -or
       [string]$authority.migration_sequence[0].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[1].migration_id -cne 'MIR4-CANONICALIZATION-TOOLING-V1' -or
@@ -73,9 +73,11 @@ function Get-MIR4RepositoryFixedPointAuthority {
       [string]$authority.migration_sequence[18].migration_id -cne 'MIR4-COMPOSABLE-SOURCE-LAYOUT-V1' -or
       [string]$authority.migration_sequence[18].state -cne 'accepted-immutable-predecessor' -or
       [string]$authority.migration_sequence[19].migration_id -cne 'MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2' -or
-      [string]$authority.migration_sequence[19].authority -cne 'governance/repository/factorio-one-source-convergence-v1.json' -or
-      [string]$authority.migration_sequence[19].receipt -cne 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json' -or
-      [string]$authority.migration_sequence[19].state -cne 'current-append-only-successor') {
+      [string]$authority.migration_sequence[19].state -cne 'accepted-immutable-predecessor' -or
+      [string]$authority.migration_sequence[20].migration_id -cne 'MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V3' -or
+      [string]$authority.migration_sequence[20].authority -cne 'spec/distribution/mir4-current-package-presentation-v5.json' -or
+      [string]$authority.migration_sequence[20].receipt -cne 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json' -or
+      [string]$authority.migration_sequence[20].state -cne 'current-append-only-successor') {
     throw '[mir4-repository-migration-sequence]'
   }
   $ids = @($authority.visible_roots | ForEach-Object { [string]$_.id })

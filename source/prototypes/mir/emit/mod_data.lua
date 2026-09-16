@@ -55,7 +55,7 @@ function M.emit_maximum_level_policy(artifact)
   return emit({
     type = "mod-data",
     name = "more-infinite-research-maximum-level-policy",
-    data_type = "more-infinite-research.maximum-level-policy-v2",
+    data_type = "more-infinite-research.maximum-level-policy-v3",
     data = artifact
   })
 end

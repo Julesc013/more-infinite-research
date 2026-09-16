@@ -9,7 +9,7 @@
     "kind": {"const": "MIR4ComposableSourceModelProofV2"},
     "status": {"const": "passed-canonical-composable-source-model"},
     "source_authority": {"$ref": "#/$defs/sourceAuthority"},
-    "bindings": {"type": "array", "minItems": 358, "maxItems": 358, "items": {"$ref": "#/$defs/binding"}},
+    "bindings": {"type": "array", "minItems": 359, "maxItems": 359, "items": {"$ref": "#/$defs/binding"}},
     "targets": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/target"}},
     "semantic_class_counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
     "declaration_order_probe_sha256": {"$ref": "#/$defs/sha256"},

@@ -1,0 +1,384 @@
+local technology_name = "recipe-prod-research_copper-1"
+local setting_name = "ips-max-level-research_copper"
+local blocker_name = "late-mir42-cap-binding-blocker"
+local policy_blocker_name = "late-mir42-policy-binding-blocker"
+local storage_key = "mir42_cap_ownership_multiforce"
+local browser_provider = require("__more-infinite-research__/prototypes/mir/runtime/research_browser_mir_provider")
+
+local terminal_pending = false
+local terminal_logged = false
+
+local function fail(message)
+  error("[mir42-cap-ownership-multiforce] " .. message)
+end
+
+local function selected_cap()
+  local setting = settings.startup[setting_name]
+  local value = setting and tonumber(setting.value) or nil
+  if not value or value <= 0 then return 0 end
+  return math.floor(value)
+end
+
+local function blocker_active()
+  return script.active_mods[blocker_name] ~= nil
+end
+
+local function policy_blocker_active()
+  return script.active_mods[policy_blocker_name] ~= nil
+end
+
+local function any_blocker_active()
+  return blocker_active() or policy_blocker_active()
+end
+
+local function browser_cap()
+  local values = browser_provider.policy_caps_for_test()
+  local row = values and values[technology_name]
+  return row and row.selected or 0
+end
+
+local function technology_for(force)
+  local technology = force and force.technologies[technology_name]
+  if not technology then fail("Copper technology is absent for force " .. tostring(force and force.name)) end
+  return technology
+end
+
+local function configure_force(force, level, enabled, visible_when_disabled)
+  force.enable_all_prototypes()
+  local technology = technology_for(force)
+  technology.level = level
+  technology.enabled = enabled
+  technology.visible_when_disabled = visible_when_disabled
+  return technology
+end
+
+local function configure_force_before_cap_transition(force, level, enabled, visible_when_disabled)
+  force.enable_all_prototypes()
+  local technology = technology_for(force)
+  technology.enabled = enabled
+  technology.visible_when_disabled = visible_when_disabled
+  technology.level = level
+  return technology
+end
+
+local function force_state(force_name)
+  local force = game.forces[force_name]
+  if not force then fail("named force is absent " .. force_name) end
+  local technology = technology_for(force)
+  return {
+    name = force.name,
+    index = force.index,
+    level = technology.level,
+    enabled = technology.enabled,
+    visible_when_disabled = technology.visible_when_disabled
+  }
+end
+
+local function quote(value)
+  return "\"" .. tostring(value):gsub("\\", "\\\\"):gsub("\"", "\\\"") .. "\""
+end
+
+local function bool(value)
+  return value and "true" or "false"
+end
+
+local function state_json(stage)
+  local state = storage[storage_key]
+  local rows = {}
+  local event_queue = {}
+  for _, name in ipairs(state.force_names) do
+    local row = force_state(name)
+    rows[#rows + 1] = "{\"name\":" .. quote(row.name)
+      .. ",\"index\":" .. tostring(row.index)
+      .. ",\"level\":" .. tostring(row.level)
+      .. ",\"enabled\":" .. bool(row.enabled)
+      .. ",\"visible_when_disabled\":" .. bool(row.visible_when_disabled) .. "}"
+  end
+  for _, technology in ipairs((game.forces["event-probe"] and game.forces["event-probe"].research_queue) or {}) do
+    event_queue[#event_queue + 1] = quote(technology.name)
+  end
+  return "{\"stage\":" .. quote(stage)
+    .. ",\"cap\":" .. tostring(selected_cap())
+    .. ",\"browser_cap\":" .. tostring(browser_cap())
+    .. ",\"blocker\":" .. bool(blocker_active())
+    .. ",\"policy_blocker\":" .. bool(policy_blocker_active())
+    .. ",\"configuration_changed_events\":" .. tostring(state.configuration_changed_events)
+    .. ",\"force_reset_events\":" .. tostring(state.force_reset_events)
+    .. ",\"merge_source_index\":" .. tostring(state.merge_source_index or 0)
+    .. ",\"merge_destination_index\":" .. tostring(state.merge_destination_index or 0)
+    .. ",\"reused_force_index\":" .. tostring(state.reused_force_index or 0)
+    .. ",\"merge_source_was_capped\":" .. bool(state.merge_source_was_capped)
+    .. ",\"source_index_reused\":" .. bool(state.source_index_reused)
+    .. ",\"event_probe_queue\":[" .. table.concat(event_queue, ",") .. "]"
+    .. ",\"forces\":[" .. table.concat(rows, ",") .. "]}"
+end
+
+local function log_state(stage)
+  log("[mir42-cap-ownership-multiforce] STATE JSON " .. state_json(stage))
+end
+
+local function expect(name, level, enabled, visible_when_disabled)
+  local row = force_state(name)
+  if row.level ~= level or row.enabled ~= enabled
+      or row.visible_when_disabled ~= visible_when_disabled then
+    fail("force state differs name=" .. name
+      .. " level=" .. tostring(row.level) .. "/" .. tostring(level)
+      .. " enabled=" .. tostring(row.enabled) .. "/" .. tostring(enabled)
+      .. " visible=" .. tostring(row.visible_when_disabled)
+      .. "/" .. tostring(visible_when_disabled))
+  end
+end
+
+local function expect_seed()
+  expect("owned", 4, true, false)
+  expect("foreign-disabled", 4, false, false)
+  expect("below-cap", 2, true, false)
+  expect("event-probe", 4, true, false)
+  expect("reset-probe", 4, true, false)
+end
+
+local function expect_capped_base()
+  expect("owned", 4, false, true)
+  expect("foreign-disabled", 4, false, true)
+  expect("below-cap", 2, true, false)
+  expect("event-probe", 4, false, true)
+  expect("reset-probe", 4, false, true)
+end
+
+local function expect_event_probe()
+  expect_capped_base()
+  expect("new-force", 4, true, false)
+  expect("merge-destination", 4, false, true)
+  expect("merge-reuse", 4, true, false)
+  local queue = game.forces["event-probe"].research_queue or {}
+  if #queue ~= 1 or queue[1].name ~= "automation" then
+    fail("event-probe native queue changed outside MIR-owned copper normalization")
+  end
+end
+
+local function expect_removed()
+  expect("owned", 4, true, false)
+  expect("foreign-disabled", 4, false, false)
+  expect("below-cap", 2, true, false)
+  expect("event-probe", 4, true, false)
+  -- LuaForce.reset invalidates the old ownership record. The post-reset
+  -- foreign presentation must not be changed back to the pre-reset baseline
+  -- when the cap is later removed.
+  expect("reset-probe", 4, false, true)
+  -- This force was deliberately changed after its synchronous creation event,
+  -- so MIR owns no restoration record for it. Factorio reapplies the prior
+  -- data-stage presentation value during the next prototype transition; MIR
+  -- must leave that unowned value alone while preserving enablement.
+  expect("new-force", 4, true, true)
+  expect("merge-destination", 4, true, false)
+  expect("merge-reuse", 4, true, true)
+end
+
+local function save_successor(phase, observation_stage, name)
+  local state = storage[storage_key]
+  state.phase = phase
+  log_state(observation_stage)
+  game.server_save(name)
+end
+
+local function advance_seed_to_capped()
+  local state = storage[storage_key]
+  if selected_cap() ~= 3 or any_blocker_active() then return end
+  if state.configuration_changed_events < 1 then
+    fail("Capped stage did not observe configuration change")
+  end
+  expect_capped_base()
+  log_state("capped")
+
+  local event_force = game.forces["event-probe"]
+  configure_force(event_force, 4, true, false)
+  local new_force = game.create_force("new-force")
+  -- on_force_created has returned before the force is deliberately seeded
+  -- above the cap. The following reset must therefore touch event-probe only.
+  configure_force(new_force, 4, true, false)
+  if not event_force.reset_technology_effects then
+    fail("event-probe does not expose reset_technology_effects")
+  end
+  event_force.reset_technology_effects()
+
+  local reset_force = game.forces["reset-probe"]
+  if not reset_force.reset then fail("reset-probe does not expose LuaForce.reset") end
+  reset_force.reset()
+  -- This is a deliberate post-reset foreign state. The controller must have
+  -- cleared the old record before reconciling this force, so cap removal
+  -- cannot restore the pre-reset enabled/hidden state.
+  configure_force_before_cap_transition(reset_force, 4, false, true)
+  expect("reset-probe", 4, false, true)
+
+  local automation = event_force.technologies["automation"]
+  if not automation then fail("event-probe automation technology is absent") end
+  event_force.research_queue = {automation}
+  if event_force.research_queue[1] and event_force.research_queue[1].name == technology_name then
+    fail("event-probe queue unexpectedly contains the cap-managed Copper technology")
+  end
+
+  state.force_names[#state.force_names + 1] = "new-force"
+
+  local merge_destination = game.create_force("merge-destination")
+  local merge_source = game.create_force("merge-source")
+  -- Establish the foreign baseline before crossing the cap. Assigning an
+  -- infinite technology level raises research events immediately, so doing
+  -- this in the opposite order would make the engine-default visibility the
+  -- value MIR truthfully owns and restores.
+  configure_force_before_cap_transition(merge_destination, 4, true, false)
+  configure_force_before_cap_transition(merge_source, 4, true, false)
+  merge_destination.reset_technology_effects()
+  merge_source.reset_technology_effects()
+  expect("merge-destination", 4, false, true)
+  expect("merge-source", 4, false, true)
+  state.merge_source_was_capped = true
+  state.merge_source_index = merge_source.index
+  state.merge_destination_index = merge_destination.index
+
+  -- Re-open only the destination immediately before the merge. Factorio
+  -- completes the merge and raises on_forces_merged after this callback;
+  -- the next-tick phase verifies that handler capped the destination again
+  -- and cleared every bucket still keyed by the removed source index.
+  configure_force(merge_destination, 4, true, false)
+  game.merge_forces(merge_source, merge_destination)
+  state.phase = "merge-pending"
+end
+
+local function complete_merge_probe()
+  local state = storage[storage_key]
+  local retired_source = game.forces["merge-source"]
+  if retired_source and retired_source.valid then fail("merged source force still exists") end
+  expect("merge-destination", 4, false, true)
+
+  local reused_force = game.create_force("merge-reuse")
+  state.reused_force_index = reused_force.index
+  state.source_index_reused = reused_force.index == state.merge_source_index
+  if not state.source_index_reused then
+    fail("exact Factorio force index was not reused after merge")
+  end
+  configure_force(reused_force, 4, true, false)
+  state.force_names[#state.force_names + 1] = "merge-destination"
+  state.force_names[#state.force_names + 1] = "merge-reuse"
+  expect_event_probe()
+  save_successor("capped", "event-probe", "mir42-cap-ownership-multiforce-capped")
+end
+
+local function advance_capped_to_policy_blocked()
+  local state = storage[storage_key]
+  if selected_cap() ~= 3 or blocker_active() or not policy_blocker_active() then return end
+  if state.configuration_changed_events < 2 then
+    fail("Policy-blocked stage did not observe configuration change")
+  end
+  -- An invalid transported policy is authoritative enough to stop both
+  -- runtime mutation and browser claims, but not to restore prior ownership.
+  expect_event_probe()
+  save_successor("policy-blocked", "policy-blocked",
+    "mir42-cap-ownership-multiforce-policy-blocked")
+end
+
+local function advance_policy_blocked_to_blocked()
+  local state = storage[storage_key]
+  if selected_cap() ~= 3 or not blocker_active() or policy_blocker_active() then return end
+  if state.configuration_changed_events < 3 then
+    fail("Blocked stage did not observe configuration change")
+  end
+  -- A late finalizer conflict must leave both MIR-owned and unowned force
+  -- state untouched; it must neither retry capping nor restore eligibility.
+  expect_event_probe()
+  save_successor("blocked", "blocked", "mir42-cap-ownership-multiforce-blocked")
+end
+
+local function advance_blocked_to_removal()
+  local state = storage[storage_key]
+  if selected_cap() ~= 0 or any_blocker_active() then return end
+  if state.configuration_changed_events < 4 then
+    fail("Removal stage did not observe configuration change")
+  end
+  expect_removed()
+  save_successor("removal", "removal", "mir42-cap-ownership-multiforce-removal")
+end
+
+script.on_init(function()
+  if selected_cap() ~= 0 or any_blocker_active() then
+    fail("Seed requires an infinite cap and no late blocker")
+  end
+  local names = {"owned", "foreign-disabled", "below-cap", "event-probe", "reset-probe"}
+  for _, name in ipairs(names) do
+    if game.forces[name] then fail("seed force already exists " .. name) end
+    game.create_force(name)
+  end
+  configure_force(game.forces["owned"], 4, true, false)
+  configure_force(game.forces["foreign-disabled"], 4, false, false)
+  configure_force(game.forces["below-cap"], 2, true, false)
+  configure_force(game.forces["event-probe"], 4, true, false)
+  configure_force(game.forces["reset-probe"], 4, true, false)
+  storage[storage_key] = {
+    phase = "seed",
+    configuration_changed_events = 0,
+    force_reset_events = 0,
+    merge_source_index = 0,
+    merge_destination_index = 0,
+    reused_force_index = 0,
+    merge_source_was_capped = false,
+    source_index_reused = false,
+    force_names = names
+  }
+  expect_seed()
+  log_state("seed")
+end)
+
+script.on_configuration_changed(function()
+  local state = storage[storage_key]
+  if not state then return end
+  state.configuration_changed_events = state.configuration_changed_events + 1
+  log("[mir42-cap-ownership-multiforce] CONFIGURATION-CHANGED count="
+    .. tostring(state.configuration_changed_events)
+    .. " phase=" .. tostring(state.phase)
+    .. " cap=" .. tostring(selected_cap())
+    .. " blocker=" .. bool(blocker_active())
+    .. " policy-blocker=" .. bool(policy_blocker_active()))
+end)
+
+script.on_event(defines.events.on_force_reset, function(event)
+  local state = storage[storage_key]
+  if state and event and event.force and event.force.name == "reset-probe" then
+    state.force_reset_events = state.force_reset_events + 1
+  end
+end)
+
+script.on_load(function()
+  local state = storage[storage_key]
+  terminal_pending = state ~= nil and state.phase == "removal"
+  terminal_logged = false
+end)
+
+script.on_event(defines.events.on_tick, function()
+  local state = storage[storage_key]
+  if not state then fail("fixture state is absent") end
+
+  if terminal_pending then
+    if selected_cap() ~= 0 or any_blocker_active() then
+      fail("terminal reload no longer represents the removal candidate")
+    end
+    if not terminal_logged then
+      expect_removed()
+      log_state("terminal")
+      terminal_logged = true
+    end
+    return
+  end
+
+  if state.phase == "seed" then
+    advance_seed_to_capped()
+  elseif state.phase == "merge-pending" then
+    complete_merge_probe()
+  elseif state.phase == "capped" then
+    advance_capped_to_policy_blocked()
+  elseif state.phase == "policy-blocked" then
+    advance_policy_blocked_to_blocked()
+  elseif state.phase == "blocked" then
+    advance_blocked_to_removal()
+  elseif state.phase ~= "removal" then
+    fail("unknown fixture phase " .. tostring(state.phase))
+  end
+end)

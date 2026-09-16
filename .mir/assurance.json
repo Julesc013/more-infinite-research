@@ -37,8 +37,10 @@
     "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
     "mir4-current-package-presentation-v3": ["static.mir4-current-package-presentation-v3"],
     "mir4-current-package-presentation-v4": ["static.mir4-current-package-presentation-v4"],
+    "mir4-current-package-presentation-v5": ["static.mir4-current-package-presentation-v5"],
     "mir4-factorio-one-source-convergence": ["static.mir4-factorio-one-source-convergence"],
     "mir4-m41-to-m42-composable-source-succession-v2": ["static.mir4-m41-to-m42-composable-source-succession-v2"],
+    "mir4-m41-to-m42-composable-source-succession-v3": ["static.mir4-m41-to-m42-composable-source-succession-v3"],
     "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
     "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
     "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
@@ -53,7 +55,10 @@
     "f200-bob-tin-persisted-state": ["runtime.f200-bob-tin-persisted-state"],
     "angel-tin-final-state-audit-f210": ["runtime.angel-tin-final-state-audit"],
     "bob-angel-tin-final-state-audit-f210": ["runtime.bob-angel-tin-final-state-audit"],
-    "bob-angel-tin-route-safety-f210": ["runtime.bob-angel-tin-route-safety"]
+    "bob-angel-tin-route-safety-f210": ["runtime.bob-angel-tin-route-safety"],
+    "maximum-level-cap-ownership-multiforce-f210": ["runtime.maximum-level-cap-ownership-multiforce-f210"],
+    "maximum-level-settings-derived-cap-transition-f200": ["runtime.maximum-level-settings-derived-cap-transition-f200"],
+    "maximum-level-v2-v3-migration-f210": ["runtime.maximum-level-v2-v3-migration-f210"]
   },
   "classes": [
     {
@@ -75,6 +80,11 @@
       "id": "mir4-current-package-presentation-v4",
       "patterns": ["^spec/distribution/mir4-current-package-presentation-v4\\.json$", "^spec/schemas/mir4-current-package-presentation-v4\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v3\\.json$", "^(?:governance|assurance)/repository/factorio-one-source-convergence-v1\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/FactorioOneSourceConvergenceAuthority\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV4\\.ps1$"],
       "tests": ["static.mir4-current-package-presentation-v4"]
+    },
+    {
+      "id": "mir4-current-package-presentation-v5",
+      "patterns": ["^spec/distribution/mir4-current-package-presentation-v[45]\\.json$", "^spec/schemas/mir4-current-package-presentation-v[45]\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/mir/application/package/(?:PackageAuthority|TargetMaterializer)\\.ps1$", "^tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority\\.ps1$", "^tests/mir4/Test-MIR4CurrentPackagePresentationV5\\.ps1$"],
+      "tests": ["static.mir4-current-package-presentation-v5"]
     },
     {
       "id": "mir4-factorio-one-source-convergence",
@@ -125,6 +135,11 @@
       "id": "mir4-m41-to-m42-composable-source-succession-v2",
       "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[12]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[12]\\.schema\\.json$", "^(?:governance|assurance)/repository/factorio-one-source-convergence-v1\\.json$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV2\\.ps1$"],
       "tests": ["static.mir4-m41-to-m42-composable-source-succession-v2"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession-v3",
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[23]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[23]\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v[45]\\.json$", "^spec/schemas/mir4-current-package-presentation-v5\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/lib/mir4/pre-freeze-release/AuthorityValidation\\.ps1$", "^tools/mir/application/package/TargetMaterializer\\.ps1$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority\\.ps1$", "^tests/support/MIR4M4202PackageSuccession\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3\\.ps1$"],
+      "tests": ["static.mir4-m41-to-m42-composable-source-succession-v3"]
     },
     {
       "id": "mir4-package-source-runtime-replay",
@@ -360,6 +375,21 @@
       "id": "a06-bob-ordinary-alloys-qualification-f210",
       "patterns": ["^fixtures/assert-a06-bob-ordinary-alloys-qualification/", "^tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification[.]ps1$", "^source/prototypes/mir/settings/profile_codec[.]lua$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/(?:mutations/maximum_level_presentation|recipe_productivity_permissions)|index/productivity_owners|policy/competing_productivity|runtime/(?:maximum_level_control|startup_settings))[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
       "tests": ["runtime.a06-bob-ordinary-alloys-qualification"]
+    },
+    {
+      "id": "maximum-level-cap-ownership-multiforce-f210",
+      "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-(?:cap|policy)-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^source/prototypes/mir/(?:core/fingerprint|domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/(?:maximum_level_control|research_browser.*))[.]lua$", "^source/package-source[.]json$", "^source/adapters/(?:f210|f200)/prototypes/mir/runtime/scripted_techs[.]lua$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-cap-ownership-multiforce-f210"]
+    },
+    {
+      "id": "maximum-level-settings-derived-cap-transition-f200",
+      "patterns": ["^fixtures/assert-mir42-f200-settings-cap-transition/", "^tests/runtime/Test-MIR42F200SettingsCapTransition[.]ps1$", "^source/prototypes/mir/runtime/maximum_level_control[.]lua$", "^source/package-source[.]json$", "^source/adapters/f200/prototypes/mir/(?:runtime/scripted_techs|platform/factorio/target_profiles)[.]lua$", "^targets/f200/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-settings-derived-cap-transition-f200"]
+    },
+    {
+      "id": "maximum-level-v2-v3-migration-f210",
+      "patterns": ["^fixtures/assert-mir42-v2-v3-cap-migration/", "^tests/runtime/Test-MIR42V2V3CapMigration[.]ps1$", "^source/prototypes/mir/platform/factorio/target_line[.]lua$", "^source/prototypes/mir/(?:domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/maximum_level_control)[.]lua$", "^source/package-source[.]json$", "^source/adapters/f200/prototypes/mir/platform/factorio/target_profiles[.]lua$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["runtime.maximum-level-v2-v3-migration-f210"]
     },
     {
       "id": "k2-materials-bounded-f210",

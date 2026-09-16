@@ -274,6 +274,21 @@ package_excluded_modules:
     historical_mir41_lineage_immutable: true
     factorio_two_executable_content_preserved: true
     factorio_one_exact_engine_proof_required: true
+  mir4_m41_to_m42_composable_source_succession_v3:
+    historical_record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
+    historical_record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
+    progression_package_presentation: spec/distribution/mir4-current-package-presentation-v5.json
+    record: assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json
+    record_schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
+    implementation: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
+    writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority.ps1
+    proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3.ps1
+    package_visible: false
+    package_cutover_authority: false
+    release_transition_authority: false
+    historical_mir41_lineage_immutable: true
+    f210_f200_exact_engine_qualification_required: true
+    f110_f100_progression_capability_omitted_nonclaim: true
   mir4_whole_platform_programme_v1:
     authority: .mir/releases/waves/mir4-r0/MIR4-Whole-Platform-ProgrammeV1.json
     implementation: tools/mir/application/platform/WholePlatform.ps1
@@ -447,9 +462,11 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v4.json
-    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
-    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV4Authority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v5.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
+    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority.ps1
+    frozen_package_presentation_v4: spec/distribution/mir4-current-package-presentation-v4.json
+    frozen_package_presentation_v4_schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
     frozen_package_presentation_v3: spec/distribution/mir4-current-package-presentation-v3.json
     frozen_package_presentation_v3_schema: spec/schemas/mir4-current-package-presentation-v3.schema.json
     frozen_package_presentation_v2: spec/distribution/mir4-current-package-presentation-v2.json
@@ -1218,6 +1235,7 @@ modules:
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
     - prototypes/mir/domain/technology/technology_candidate.lua
+    - prototypes/mir/domain/technology/maximum_level_binding.lua
     - prototypes/mir/domain/technology/technology_risk.lua
     - prototypes/mir/domain/technology/technology_design.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
