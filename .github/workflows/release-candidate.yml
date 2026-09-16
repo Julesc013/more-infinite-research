@@ -93,7 +93,9 @@ jobs:
           Push-Location $candidate
           try {
             ./tools/commands/package/Build-MIRPackage.ps1
-            $info = Get-Content info.json -Raw | ConvertFrom-Json
+            . (Join-Path $candidate 'tools/lib/validation/CurrentTargetPackage.ps1')
+            $candidatePackage = New-MIR4CurrentTargetPackageContext -RepoRoot $candidate -Target f210
+            $info = Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json
           } finally {
             Pop-Location
           }
@@ -116,7 +118,9 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
-          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          . (Join-Path $controller 'tools/lib/validation/CurrentTargetPackage.ps1')
+          $controllerPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $controller -Target f210
+          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $controllerPackage -RelativePath 'info.json' | ConvertFrom-Json).version
           $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
           if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
@@ -180,7 +184,9 @@ jobs:
           if ($disallowedControllerPaths.Count -ne 0) {
             throw "Prior exact-dist evidence was invalidated by controller changes: $($disallowedControllerPaths -join ', ')"
           }
-          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
+          . (Join-Path $candidate 'tools/lib/validation/CurrentTargetPackage.ps1')
+          $candidatePackage = New-MIR4CurrentTargetPackageContext -RepoRoot $candidate -Target f210
+          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json).version
           $releaseRecord = Get-Content -Raw -LiteralPath (Join-Path $controller ".mir/releases/records/$version.json") | ConvertFrom-Json
           $summary = Get-Content -Raw -LiteralPath $priorSummaryPath | ConvertFrom-Json
           if ([string]$summary.status -ne 'passed' -or
@@ -204,7 +210,9 @@ jobs:
           MIR_COMPAT_RUNTIME_ROOT: 'C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}'
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
-          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $controller 'info.json') | ConvertFrom-Json).version
+          . (Join-Path $controller 'tools/lib/validation/CurrentTargetPackage.ps1')
+          $controllerPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $controller -Target f210
+          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $controllerPackage -RelativePath 'info.json' | ConvertFrom-Json).version
           $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
           if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
@@ -230,7 +238,9 @@ jobs:
           $controller = '${{ steps.roots.outputs.controller }}'
           $candidate = '${{ steps.roots.outputs.candidate }}'
           $evidenceRoot = Join-Path $authority 'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}'
-          $version = [string](Get-Content -Raw -LiteralPath (Join-Path $candidate 'info.json') | ConvertFrom-Json).version
+          . (Join-Path $candidate 'tools/lib/validation/CurrentTargetPackage.ps1')
+          $candidatePackage = New-MIR4CurrentTargetPackageContext -RepoRoot $candidate -Target f210
+          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json).version
           if (Test-Path -LiteralPath $evidenceRoot) { throw "Protected evidence root already exists: $evidenceRoot" }
           New-Item -ItemType Directory -Path $evidenceRoot | Out-Null
           foreach ($row in @(

@@ -15,6 +15,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $sourceRepo = (Resolve-Path -LiteralPath $SourceRepoRoot).Path
 $context = (Resolve-Path -LiteralPath $ContextPath).Path
 . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
+. (Join-Path $repo "tools/lib/validation/CurrentTargetPackage.ps1")
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
@@ -75,7 +76,8 @@ if (($actualEntries -join "`n") -ne (($expectedEntries | Sort-Object) -join "`n"
 
 $rebuilds = @()
 if ($Check -eq "determinism") {
-  $info = Get-Content -Raw -LiteralPath (Join-Path $sourceRepo "info.json") | ConvertFrom-Json
+  $sourceTargetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $sourceRepo -Target 'f210'
+  $info = Get-MIR4CurrentTargetPackageOutputText -Context $sourceTargetPackage -RelativePath 'info.json' | ConvertFrom-Json
   $archiveName = "$($info.name)_$($info.version).zip"
   foreach ($relativeOutput in @("build/control-plane-v5-package-a", "build/control-plane-v5-package-b")) {
     & (Resolve-MIRPackageCommandPath -RepoRoot $sourceRepo -Command build) -OutputDir $relativeOutput -CompressionLevel Optimal | Out-Host

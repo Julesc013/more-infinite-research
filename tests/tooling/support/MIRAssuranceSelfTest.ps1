@@ -30,10 +30,10 @@ function Invoke-MIRAssuranceSelfTest {
   }
 
   $cases = @(
-    @{path="control.lua"; class="runtime-or-migration"},
-    @{path="migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
-    @{path="settings.lua"; class="settings"},
-    @{path="locale/en/more-infinite-research.cfg"; class="locale"},
+    @{path="source/generation/lifecycle/control.lua.template"; class="runtime-or-migration"},
+    @{path="source/migrations/more-infinite-research_3.1.9.json"; class="runtime-or-migration"},
+    @{path="source/prototypes/mir/settings/catalog.lua"; class="settings"},
+    @{path="source/locale/en/more-infinite-research.cfg"; class="locale"},
     @{path="docs/maintainer/example.md"; class="repository-docs"},
     @{path="scripts/Invoke-MIRValidation.ps1"; class="test-harness"},
     @{path="unclassified.future"; class="unknown"}

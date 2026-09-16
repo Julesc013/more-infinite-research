@@ -243,32 +243,32 @@
     },
     {
       "id": "runtime-or-migration",
-      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
+      "patterns": ["^source/generation/lifecycle/control\\.lua\\.template$", "^source/migrations/", "^source/prototypes/mir/domain/research_cost/", "^source/prototypes/mir/runtime/", "^source/prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
       "tests": ["static.full", "runtime.full", "runtime.upgrade"]
     },
     {
       "id": "settings",
-      "patterns": ["^settings", "^prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
+      "patterns": ["^source/generation/lifecycle/settings\\.lua\\.template$", "^source/prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
       "tests": ["static.settings", "static.locales", "static.compiler", "runtime.affected", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^source/generation/lifecycle/data(?:-updates|-final-fixes)?\\.lua\\.template$", "^source/prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "balance",
-      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
+      "patterns": ["^source/prototypes/mir/planner/costs\\.lua$", "^source/prototypes/streams/", "^source/prototypes/mir/domain/native_owner/", "^source/prototypes/mir/planner/native_owner_binding\\.lua$", "^source/prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
       "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "locale",
-      "patterns": ["^locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
+      "patterns": ["^source/locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
       "tests": ["static.locales", "static.package", "runtime.exact-zip"]
     },
     {
       "id": "metadata-dependencies",
-      "patterns": ["^info\\.json$"],
+      "patterns": ["^source/presentation/f(?:210|200|110|100)/info\\.json\\.template$"],
       "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
@@ -278,7 +278,7 @@
     },
     {
       "id": "packaged-non-runtime",
-      "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
+      "patterns": ["^(?:source/presentation/f(?:210|200|110|100)/(?:README\\.md|changelog\\.txt)\\.template|source/assets/thumbnail\\.png\\.base64|source/LICENSE)$"],
       "tests": ["static.package", "runtime.exact-zip"]
     },
     {
@@ -418,7 +418,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^todo\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
+      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^TODO\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
       "tests": ["docs.check"]
     },
     {
