@@ -9,9 +9,9 @@ function Test-MIR4M4202PackageSourceSuccession {
 
   try{
     . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
-    # V3 is frozen layout evidence.  Current package presentation is V4 and
-    # binds the approved Factorio-1 convergence successor.
-    $currentPresentation = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $RepoRoot
+    # V3 is frozen layout evidence and V4 is frozen Factorio-1 convergence
+    # evidence. V5 is the current progression successor.
+    $currentPresentation = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $RepoRoot
     if ([string]$currentPresentation.package_source.fingerprint_sha256 -cne $CurrentSha256 -or
         (@($currentPresentation.package_source.roots) -join '|') -cne 'source|targets') { return $false }
     if($PredecessorSha256-ceq$CurrentSha256){return $true}
@@ -54,35 +54,44 @@ function Test-MIR4M4202PackageSourceSuccession {
       }
     }
 
-    # V2/V3 are frozen predecessor evidence.  V4 is the current successor and
-    # validates the source/ target composition plus Factorio-1 convergence.
+    # V2/V3/V4 are frozen predecessor evidence. V5 is the current successor
+    # and validates the progression composition plus the explicit F1 nonclaim.
     $presentation=$currentPresentation
     $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
     $targetSemantics = @{}
     foreach ($target in @($presentation.target_content_identities)) {
-      $targetSemantics[[string]$target.target] = "$($target.relation)|$($target.executable_content_preserved)|$($target.exact_engine_proof_required)"
+      $targetSemantics[[string]$target.target] = "$($target.relation)|$($target.capability_state)|$($target.exact_engine_qualification_required)"
     }
     return (
-      [string]$presentation.kind -ceq 'MIR4CurrentPackagePresentationV4' -and
+      [string]$presentation.kind -ceq 'MIR4CurrentPackagePresentationV5' -and
       [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
-      (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
-      [bool]$presentation.authority_invariants.v3_receipt_immutable-and
-      [bool]$presentation.authority_invariants.factorio_two_presentation_content_changed-and
-      [bool]$presentation.authority_invariants.factorio_two_executable_content_preserved-and
-      [bool]$presentation.authority_invariants.factorio_one_semantic_content_changed-and
-      [bool]$presentation.authority_invariants.factorio_one_exact_engine_proof_required-and
+       (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
+       [bool]$presentation.authority_invariants.v4_receipt_immutable-and
+       [bool]$presentation.authority_invariants.factorio_one_convergence_historical-and
+       [bool]$presentation.authority_invariants.historical_protected_prefix_semantics_accounted-and
+       [bool]$presentation.authority_invariants.promotion_custody_revalidation_required-and
+       [bool]$presentation.authority_invariants.f210_f200_progression_capability_applied-and
+      [bool]$presentation.authority_invariants.f110_f100_progression_capability_omitted_nonclaim-and
+      [bool]$presentation.authority_invariants.exact_engine_qualification_required-and
       -not[bool]$presentation.authority_invariants.candidate_allocation_authorized-and
       -not[bool]$presentation.authority_invariants.signing_or_sealing_authorized-and
       -not[bool]$presentation.authority_invariants.promotion_authorized-and
       -not[bool]$presentation.authority_invariants.publication_authorized-and
-      -not[bool]$presentation.authority_invariants.public_support_authorized-and
-      $targetSemantics.Count-eq4-and
-      [string]$targetSemantics['f210']-ceq'presentation-only-content-change-executable-preserved|True|False'-and
-      [string]$targetSemantics['f200']-ceq'presentation-only-content-change-executable-preserved|True|False'-and
-      [string]$targetSemantics['f110']-ceq'changed-semantic-content-exact-engine-proof-required|False|True'-and
-      [string]$targetSemantics['f100']-ceq'changed-semantic-content-exact-engine-proof-required|False|True'-and
+       -not[bool]$presentation.authority_invariants.public_support_authorized-and
+       [string]$presentation.historical_custody.historical_protected_prefix.revision-ceq'a38735d22257aa7ab46237a111dc94c961fd04c0'-and
+       [string]$presentation.historical_custody.historical_protected_prefix.record_sha256-ceq'DF6B284C201062589497481E7491A742A48314FC42E8EBF8F4FC79565322ACD9'-and
+       [string]$presentation.historical_custody.historical_protected_prefix.mode-ceq'protected-remote-prefix-v1'-and
+       [string]$presentation.historical_custody.reviewed_successor.mode-ceq'immutable-v4-predecessor-v5-self-hash-current-binding-v1'-and
+       -not[bool]$presentation.historical_custody.reviewed_successor.historical_prefix_runtime_enforcement-and
+       [bool]$presentation.historical_custody.reviewed_successor.promotion_custody_revalidation_required-and
+       -not[bool]$presentation.historical_custody.reviewed_successor.release_authority_granted-and
+       $targetSemantics.Count-eq4-and
+      [string]$targetSemantics['f210']-ceq'progression-semantic-content-changed-exact-engine-qualification-required|applied|True'-and
+      [string]$targetSemantics['f200']-ceq'progression-semantic-content-changed-exact-engine-qualification-required|applied|True'-and
+      [string]$targetSemantics['f110']-ceq'progression-capability-omitted-nonclaim-exact-engine-qualification-required|omitted-nonclaim|True'-and
+      [string]$targetSemantics['f100']-ceq'progression-capability-omitted-nonclaim-exact-engine-qualification-required|omitted-nonclaim|True'-and
       -not[bool]$presentation.transition_gate.main_promotion-and
       -not[bool]$presentation.transition_gate.publication-and
       ($enabledTransitionGates-join'|')-ceq'development_merge'
@@ -180,6 +189,27 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
         $ExpectedBindingSha[$path]=[string]$binding.current_sha256
       }
     }
+    # The V3 composable-source successor is the sole current binding that may
+    # advance a frozen M42-02 module expectation. It is deliberately narrow:
+    # only an authenticated evolved path may move, and it grants no release
+    # operation authority.
+    . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
+    $successor = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot
+    $inventoryPath = [string]$successor.current.tooling_inventory.path
+    if ($ExpectedBindingSha.ContainsKey($inventoryPath)) {
+      if ([string]$successor.current.tooling_inventory_predecessor_sha256 -cne [string]$ExpectedBindingSha[$inventoryPath] -or
+          [string]$successor.current.tooling_inventory.sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+      $ExpectedBindingSha[$inventoryPath] = [string]$successor.current.tooling_inventory.sha256
+    }
+    foreach($binding in @($successor.evolved_bindings)){
+      $path=[string]$binding.path
+      if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
+      if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path] -or
+         [string]$binding.hash_mode -cne 'canonical-text-v1' -or
+         [bool]$binding.package_visible -or
+         [bool]$binding.release_authority){return $false}
+      $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+    }
     return $true
   }catch{return $false}
 }
@@ -232,23 +262,22 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     # The bridge/readiness/documentation records authenticate the historical
     # inventory succession through their final evolved binding.  The one-source
     # cutover deliberately changes that inventory, so do not substitute the
-    # live file for the successor.  The V2 succession record is the append-only
-    # authenticated boundary: it records the exact current canonical-text hash
-    # and inventory invariants.  We return its recorded digest only after both
-    # the record and the live file agree.
+    # live file for the successor. V2 is the immutable Factorio-1 predecessor;
+    # V3 is the append-only current boundary that records the live inventory
+    # alongside the progression source successor. We return its digest only
+    # after the historical custody and current live binding both agree.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
-    $successor = Read-MIR4M41ToM42ComposableSourceSuccessionV2 -RepoRoot $RepoRoot
-    if (-not (Test-MIR4BootstrapRecordHash -Record $successor)) { return $null }
-    $factorioAuthorityPath = Join-Path $RepoRoot ([string]$successor.factorio_one_successor.authority.path)
-    if ([string]$successor.factorio_one_successor.authority.path -cne 'governance/repository/factorio-one-source-convergence-v1.json' -or
+    $historicalSuccessor = Get-MIR4M41ToM42ComposableSourceSuccessionV2Historical -RepoRoot $RepoRoot
+    $factorioAuthorityPath = Join-Path $RepoRoot ([string]$historicalSuccessor.factorio_one_successor.authority.path)
+    if ([string]$historicalSuccessor.factorio_one_successor.authority.path -cne 'governance/repository/factorio-one-source-convergence-v1.json' -or
         -not (Test-Path -LiteralPath $factorioAuthorityPath -PathType Leaf) -or
-        (Get-MIR4BootstrapTextSha256 -Path $factorioAuthorityPath) -cne [string]$successor.factorio_one_successor.authority.sha256) { return $null }
+        (Get-MIR4BootstrapTextSha256 -Path $factorioAuthorityPath) -cne [string]$historicalSuccessor.factorio_one_successor.authority.sha256) { return $null }
     . (Join-Path $RepoRoot 'tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1')
     $factorioReceipt = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $RepoRoot
-    if ([string]$successor.factorio_one_successor.receipt.path -cne 'assurance/repository/factorio-one-source-convergence-v1.json' -or
-        [string]$successor.factorio_one_successor.receipt.kind -cne [string]$factorioReceipt.kind -or
-        [string]$successor.factorio_one_successor.receipt.record_sha256 -cne [string]$factorioReceipt.record_sha256) { return $null }
-    $successorInventory = $successor.current.tooling_inventory
+    if ([string]$historicalSuccessor.factorio_one_successor.receipt.path -cne 'assurance/repository/factorio-one-source-convergence-v1.json' -or
+        [string]$historicalSuccessor.factorio_one_successor.receipt.kind -cne [string]$factorioReceipt.kind -or
+        [string]$historicalSuccessor.factorio_one_successor.receipt.record_sha256 -cne [string]$factorioReceipt.record_sha256) { return $null }
+    $successorInventory = (Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot).current.tooling_inventory
     if ([string]$successorInventory.path -cne $inventoryRelativePath -or
         [string]$successorInventory.hash_mode -cne 'canonical-text-v1' -or
         [int]$successorInventory.command_count -ne 85 -or

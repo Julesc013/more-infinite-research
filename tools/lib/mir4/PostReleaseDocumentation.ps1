@@ -22,6 +22,40 @@ function Get-MIR4PostReleaseDocumentationPaths {
   )
 }
 
+# Historical bindings are canonical text hashes.  Capturing `git show` through
+# PowerShell's native-command text pipeline made the result depend on the host
+# output encoding (notably profile versus -NoProfile validation runners). Read
+# the committed blob bytes directly, normalize only line endings, and keep the
+# frozen receipt's original canonical-text contract intact.
+function Get-MIR4PostReleaseDocumentationGitBlobCanonicalSha256 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Object)
+
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = 'git'
+  $startInfo.UseShellExecute = $false
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  foreach ($argument in @('-C', $RepoRoot, 'cat-file', 'blob', $Object)) {
+    [void]$startInfo.ArgumentList.Add($argument)
+  }
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  if (-not $process.Start()) { throw '[mir4-post-release-docs-prior-start]' }
+  $bytes = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw '[mir4-post-release-docs-prior-object] ' + $stderr.Trim() }
+    $text = [Text.UTF8Encoding]::new($false).GetString($bytes.ToArray()).Replace("`r`n", "`n").Replace("`r", "`n")
+    return Get-MIR4Sha256String -Value $text
+  } finally {
+    $bytes.Dispose()
+    $process.Dispose()
+  }
+}
+
 function Get-MIR4PostReleaseDocumentation {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Historical)
@@ -49,9 +83,7 @@ function Get-MIR4PostReleaseDocumentation {
     $object=([string]$record.base_commit)+':'+$name
     & git -C $RepoRoot cat-file -e $object 2>$null
     if($LASTEXITCODE -eq 0){
-      $prior=@(& git -C $RepoRoot show $object)
-      if($LASTEXITCODE -ne 0){throw '[mir4-post-release-docs-prior-object]'}
-      $priorHash=Get-MIR4Sha256String -Value (($prior -join "`n")+"`n")
+      $priorHash=Get-MIR4PostReleaseDocumentationGitBlobCanonicalSha256 -RepoRoot $RepoRoot -Object $object
       if($priorHash -cne [string]$binding.previous_sha256){throw "[mir4-post-release-docs-prior] $name"}
     }elseif($null -ne $binding.previous_sha256){throw "[mir4-post-release-docs-new-path] $name"}
   }

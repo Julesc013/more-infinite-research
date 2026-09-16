@@ -11,7 +11,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/package/FactorioOneSourceConvergenceAuthority.ps1')
 
 $policy = Get-MIR4FactorioOneSourceConvergenceAuthorityPolicy
-$record = New-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo -RecordedAt $RecordedAt
+$record = Read-MIR4FactorioOneSourceConvergenceReceipt -RepoRoot $repo
 $path = Join-Path $repo $policy.receipt_path
 $json = (ConvertTo-MIR4FactorioOneSourceConvergenceCanonicalJson -Value $record) + "`n"
 if ($Check) {
@@ -19,11 +19,7 @@ if ($Check) {
       [IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n") -cne $json) {
     throw '[mir4-factorio-one-convergence-receipt-stale]'
   }
-} elseif (Test-Path -LiteralPath $path -PathType Leaf) {
-  if ([IO.File]::ReadAllText($path).Replace("`r`n", "`n").Replace("`r", "`n") -cne $json) {
-    throw '[mir4-factorio-one-convergence-receipt-immutable-overwrite]'
-  }
 } else {
-  [IO.File]::WriteAllText($path, $json, [Text.UTF8Encoding]::new($false))
+  throw '[mir4-factorio-one-convergence-receipt-immutable-overwrite]'
 }
 return [pscustomobject][ordered]@{status=$(if($Check){'current'}else{'generated'});path=$policy.receipt_path;record_sha256=[string]$record.record_sha256;exact_engine_proof_required=$true;release_authority=$false}

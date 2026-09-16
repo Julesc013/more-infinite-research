@@ -12,7 +12,7 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
 
-$record = New-MIR4CurrentPackagePresentationV4 -RepoRoot $repo -RecordedAt $RecordedAt
+$record = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $repo
 $json = (ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + "`n"
 $authorityPath = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v4.json'
 if (-not [string]::IsNullOrWhiteSpace($CheckAuthorityPath)) {
@@ -24,9 +24,7 @@ if (-not [string]::IsNullOrWhiteSpace($CheckAuthorityPath)) {
 }
 if ($Check) {
   if (-not (Test-Path -LiteralPath $authorityPath -PathType Leaf) -or [IO.File]::ReadAllText($authorityPath).Replace("`r`n", "`n").Replace("`r", "`n") -cne $json) { throw '[mir4-package-presentation-v4-stale]' }
-} elseif (Test-Path -LiteralPath $authorityPath -PathType Leaf) {
-  if ([IO.File]::ReadAllText($authorityPath).Replace("`r`n", "`n").Replace("`r", "`n") -cne $json) { throw '[mir4-package-presentation-v4-authority-immutable-overwrite]' }
 } else {
-  [IO.File]::WriteAllText($authorityPath, $json, [Text.UTF8Encoding]::new($false))
+  throw '[mir4-package-presentation-v4-authority-immutable-overwrite]'
 }
 return $record

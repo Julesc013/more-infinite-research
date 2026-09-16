@@ -56,7 +56,7 @@ try {
 } finally {
   if (Test-Path -LiteralPath $schemaScratch -PathType Container) { Remove-Item -LiteralPath $schemaScratch -Recurse -Force }
 }
-if(@($manifest.bindings).Count-ne358-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne358-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne358){throw '[mir4-editable-source-binding-uniqueness]'}
+if(@($manifest.bindings).Count-ne359-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne359-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne359){throw '[mir4-editable-source-binding-uniqueness]'}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
@@ -133,7 +133,7 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $expectedDelta=if($target-in@('f210','f200')){32}else{103}
+  $expectedDelta=if($target-in@('f210','f200')){33}else{103}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

@@ -102,6 +102,10 @@ function M.register()
     run_all("on_force_created", event)
   end)
 
+  register_event(defines.events.on_force_reset, function(event)
+    run_all("on_force_reset", event)
+  end)
+
   register_event(defines.events.on_forces_merged, function(event)
     run_all("on_forces_merged", event)
   end)

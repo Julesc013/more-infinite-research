@@ -4,6 +4,7 @@
 local profile_codec = require("prototypes.mir.settings.profile_codec")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {schema = 2, catalogue_limit = 30000}
 
@@ -43,6 +44,15 @@ local function dense_array(value)
     count = count + 1
   end
   return #value == count
+end
+
+local function fingerprint_matches(record, field)
+  if type(record) ~= "table" or not bounded_string(record[field]) then return false end
+  local material = {}
+  for key, value in pairs(record) do material[key] = value end
+  material[field] = nil
+  local ok, actual = pcall(fingerprint.of, material)
+  return ok and actual == record[field]
 end
 
 local function only_fields(value, allowed)
@@ -193,21 +203,68 @@ function M.next_level_has_effective_benefit(technology, selected_cap, recipes)
   return false
 end
 
-local function policy_caps(artifact)
+local INFINITE_RUNTIME_MAX_LEVEL = 4294967295
+local MAXIMUM_LEVEL_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
+
+local function prototype_is_runtime_infinite(technology_id, prototype_table)
+  local technologies = prototype_table
+    or (prototypes and prototypes.technology)
+  local technology = technologies and technologies[technology_id]
+  local maximum = technology and technology.max_level or nil
+  return maximum == "infinite"
+    or (type(maximum) == "number" and maximum >= INFINITE_RUNTIME_MAX_LEVEL)
+end
+
+local function policy_caps(artifact, prototype_table)
   artifact = artifact or mod_data("more-infinite-research-maximum-level-policy")
-  if type(artifact) ~= "table" or artifact.schema ~= 2
-    or artifact.kind ~= "MIRMaximumLevelPolicyV2" or not dense_array(artifact.bindings) then
+  if type(artifact) ~= "table" or not dense_array(artifact.bindings) then
     return {}
   end
   local values, counts = {}, {}
-  for _, binding in ipairs(artifact.bindings) do
-    if type(binding) == "table" and type(binding.technology) == "string" then
-      counts[binding.technology] = (counts[binding.technology] or 0) + 1
-      if finite_positive_integer(binding.selected)
-        and type(binding.setting) == "string" and binding.setting ~= "" then
-        values[binding.technology] = {selected = binding.selected, setting = binding.setting}
+  if artifact.schema == 3 and artifact.kind == "MIRMaximumLevelPolicyV3" then
+    if artifact.finalizer_status ~= "accepted"
+        or artifact.finalizer_adapter ~= MAXIMUM_LEVEL_FINALIZER_ADAPTER
+        or not fingerprint_matches(artifact, "artifact_fingerprint") then return {} end
+    for _, binding in ipairs(artifact.bindings) do
+      if type(binding) == "table" and binding.schema == 3
+          and binding.record_type == "MaximumLevelBinding"
+          and bounded_string(binding.technology_id) then
+        local technology_id = binding.technology_id
+        counts[technology_id] = (counts[technology_id] or 0) + 1
+        local setting = binding.setting
+        local cap = binding.cap
+        local diagnostics = binding.diagnostics
+        local finalizer = binding.finalizer_observation
+        local prototype_strategy = binding.prototype_strategy
+        local strategy = binding.runtime_strategy
+        local requirements = binding.target_requirements
+        if fingerprint_matches(binding, "binding_fingerprint")
+          and type(setting) == "table" and bounded_string(setting.name)
+          and type(cap) == "table" and finite_positive_integer(cap.effective)
+          and type(diagnostics) == "table" and diagnostics.status == "accepted"
+          and type(prototype_strategy) == "table"
+          and prototype_strategy.mode == "lossless-infinite-prototype"
+          and prototype_strategy.max_level == "infinite"
+          and type(strategy) == "table" and strategy.mode == "absolute-cap-controller"
+          and type(requirements) == "table"
+          and requirements.scripted_techs == true
+          and requirements.scripted_techs_supported == true
+          and requirements.mod_data_transport_supported == true
+          and requirements.finalizer_adapter == MAXIMUM_LEVEL_FINALIZER_ADAPTER
+          and type(finalizer) == "table" and finalizer.status == "accepted"
+          and finalizer.adapter == MAXIMUM_LEVEL_FINALIZER_ADAPTER
+          and finalizer.observed_prototype_max_level == "infinite"
+          and prototype_is_runtime_infinite(technology_id, prototype_table) then
+          values[technology_id] = {selected = cap.effective, setting = setting.name}
+        end
       end
     end
+  elseif artifact.schema == 2 and artifact.kind == "MIRMaximumLevelPolicyV2" then
+    -- The V3 runtime controller deliberately cannot enforce a V2 transport,
+    -- so the browser must not advertise those legacy caps as effective.
+    return {}
+  else
+    return {}
   end
   for technology, count in pairs(counts) do
     if count ~= 1 then values[technology] = nil end
@@ -215,8 +272,8 @@ local function policy_caps(artifact)
   return values
 end
 
-function M.policy_caps_for_test(artifact)
-  return policy_caps(artifact)
+function M.policy_caps_for_test(artifact, prototype_table)
+  return policy_caps(artifact, prototype_table)
 end
 
 local function valid_public_row(row)
@@ -275,7 +332,7 @@ local function detail_for_row(row, recipes, disposition, caps, force)
   local ingredients = science_ingredients(technology.prototype)
   if not effects or not benefits or not ingredients or not same_array(observed_recipes, recipes) then return nil end
   local level = tonumber(technology.level)
-  if not level or level < 1 or level ~= math.floor(level) then return nil end
+  if not finite_positive_integer(level) then return nil end
   return {
     schema = 1,
     family = row.stream_id,
