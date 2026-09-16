@@ -3275,17 +3275,17 @@
     {
       "path": "tools/lib/assurance/evidence/ExecutionAndGate.ps1",
       "classification": "canonical-internal",
-      "sha256": "C68690223FF7F9208025783BD860C8DD43639E564C64D35E92D504ECE3CF3BB3",
+      "sha256": "EE51571CEF6E453F6BAD97D22CE561228DB2D74035294C8471B3D6775E3B0BF9",
       "hash_mode": "canonical-text-v1",
-      "lines": 840,
+      "lines": 841,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "5C2FD1B4E32252601844DC39A9FC7F39AFCC38E63FB77586C9354F49564A4C5C",
+      "sha256": "69DC0201E97C2E3B4A6027313365625DC1F708295C7840B41FD0A24B771E0D73",
       "hash_mode": "canonical-text-v1",
-      "lines": 602,
+      "lines": 603,
       "package_visible": false
     },
     {
@@ -5722,5 +5722,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:42648da372a976b954e7f1dfdbb97a9f1cf28659daff1db4c13b8de6b4ecd333"
+  "digest": "sha256:b6da097a45e485d3ad0e0177d0c2ceaa10ea0f0110061ea596d1da1faaa10a84"
 }

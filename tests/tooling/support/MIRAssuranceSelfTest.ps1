@@ -1760,6 +1760,22 @@ function Invoke-MIRAssuranceSelfTest {
   } catch { $truncatedPlanRejected = $true }
   if (-not $truncatedPlanRejected) { throw "Truncated verification plan was accepted." }
 
+  foreach ($planWithoutManifest in @([ordered]@{}, [pscustomobject][ordered]@{})) {
+    if ($null -ne (Get-MIRAssuranceOptionalObjectValue -Object $planWithoutManifest -Name 'domain_manifest')) {
+      throw 'An absent optional plan domain manifest was not normalized to null.'
+    }
+  }
+  $manifestSentinel = [pscustomobject][ordered]@{manifest_sha256=('A' * 64)}
+  foreach ($planWithManifest in @(
+    [ordered]@{domain_manifest=$manifestSentinel},
+    [pscustomobject][ordered]@{domain_manifest=$manifestSentinel}
+  )) {
+    $resolvedManifest = Get-MIRAssuranceOptionalObjectValue -Object $planWithManifest -Name 'domain_manifest'
+    if ([string]$resolvedManifest.manifest_sha256 -cne [string]$manifestSentinel.manifest_sha256) {
+      throw 'An optional plan domain manifest was not preserved across supported plan object types.'
+    }
+  }
+
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }

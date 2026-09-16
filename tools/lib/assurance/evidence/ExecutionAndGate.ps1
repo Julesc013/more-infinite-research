@@ -609,9 +609,10 @@ function Invoke-MIRAssuranceGate {
   $Plan = Assert-MIRAssurancePlan -Plan $Plan -Context $Context
   $checks = @()
   $evidence = @()
-  if ($Plan.domain_manifest) {
+  $domainManifest = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'domain_manifest'
+  if ($null -ne $domainManifest) {
     $currentManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
-    if ([string]$currentManifest.manifest_sha256 -ne [string]$Plan.domain_manifest.manifest_sha256) {
+    if ([string]$currentManifest.manifest_sha256 -ne [string]$domainManifest.manifest_sha256) {
       throw "Candidate domain manifest changed after the verification plan was created."
     }
   }
@@ -653,7 +654,7 @@ function Invoke-MIRAssuranceGate {
     candidate_descriptor=$Plan.candidate_descriptor
     candidate_descriptor_sha256=[string]$Plan.candidate_descriptor_sha256
     candidate=[string]$Plan.candidate
-    domain_manifest=$Plan.domain_manifest
+    domain_manifest=$domainManifest
     checks=$checks
     evidence=$evidence
     capsule_set=$capsuleDigests

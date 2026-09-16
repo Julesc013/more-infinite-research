@@ -521,10 +521,11 @@ function Get-MIRAssuranceInputFingerprint {
       return [ordered]@{ kind="evidence"; file_count=$paths.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $paths) }
     }
     "runtime.full" {
+      $domainManifest = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'domain_manifest'
       $material = [ordered]@{
         target=[string]$Context.target
         scenario_registry_sha256=(Get-MIRAssuranceCanonicalJsonFileHash -Path $scenarioRegistryPath)
-        domain_manifest_sha256=if ($Plan.domain_manifest) { [string]$Plan.domain_manifest.manifest_sha256 } else { "" }
+        domain_manifest_sha256=if ($null -ne $domainManifest) { [string]$domainManifest.manifest_sha256 } else { "" }
         harness=(Get-MIRAssuranceScenarioHarnessFingerprint).sha256
       }
       return [ordered]@{ kind="required-runtime-set"; sha256=(Get-MIRAssuranceJsonHash -Value $material) }
