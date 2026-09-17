@@ -160,11 +160,11 @@ paths:
   mir4.package-source.factorio-one-convergence-proof: tests/mir4/Test-MIR4FactorioOneSourceConvergenceAuthority.ps1
   mir4.package-source.composable-predecessor-proof: tools/mir/application/package/SourceCompositionProof.ps1
   mir4.package-source.composable-predecessor-proof-schema: spec/schemas/mir4-composable-source-predecessor-proof-v1.schema.json
-  mir4.release.m41-to-m42-composable-source-succession: assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json
-  mir4.release.m41-to-m42-composable-source-succession-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
+  mir4.release.m41-to-m42-composable-source-succession: assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json
+  mir4.release.m41-to-m42-composable-source-succession-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json
   mir4.release.m41-to-m42-composable-source-succession-application: tools/mir/application/release/readiness/ComposableSourceSuccession.ps1
-  mir4.release.m41-to-m42-composable-source-succession-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority.ps1
-  mir4.release.m41-to-m42-composable-source-succession-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3.ps1
+  mir4.release.m41-to-m42-composable-source-succession-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1
   mir4.release.m41-to-m42-composable-source-succession-v2: assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json
   mir4.release.m41-to-m42-composable-source-succession-v2-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v2.schema.json
   mir4.release.m41-to-m42-composable-source-succession-v2-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV2Authority.ps1
@@ -173,6 +173,10 @@ paths:
   mir4.release.m41-to-m42-composable-source-succession-v3-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json
   mir4.release.m41-to-m42-composable-source-succession-v3-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority.ps1
   mir4.release.m41-to-m42-composable-source-succession-v3-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v4: assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json
+  mir4.release.m41-to-m42-composable-source-succession-v4-schema: contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json
+  mir4.release.m41-to-m42-composable-source-succession-v4-writer: tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1
+  mir4.release.m41-to-m42-composable-source-succession-v4-proof: tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV4.ps1
   mir4.m42-02.stream-compiler.receipt: releases/migrations/MIR4-M42-02-Stream-Compiler-DecompositionV1.json
   mir4.m42-02.stream-compiler.receipt-schema: contracts/repository/mir4-m42-02-stream-compiler-decomposition-v1.schema.json
   mir4.m42-02.stream-compiler.historical-verifier: tools/commands/mir4/Update-MIR4M4202StreamCompilerDecompositionAuthority.ps1

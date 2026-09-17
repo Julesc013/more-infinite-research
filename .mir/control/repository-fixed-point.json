@@ -2,7 +2,7 @@
   "schema": 2,
   "kind": "MIR4RepositoryFixedPointV2",
   "programme_id": "M4C02-09-24H",
-  "state": "MIR42-PROGRESSION-SOURCE-SUCCESSION",
+  "state": "MIR42-PROOF-INPUT-CONTROL-PLANE-SUCCESSION",
   "unknown_policy": "block-deletion-and-release",
   "physical_cutover": true,
   "current_package_source_remains_authoritative": false,
@@ -28,7 +28,8 @@
     {"migration_id":"M41-CURRENT-PRODUCT-BRIDGE-RETIREMENT-V1","authority":"governance/repository/migrations/current-product-bridge-retirement-v1.json","receipt":"releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"MIR4-COMPOSABLE-SOURCE-LAYOUT-V1","authority":"governance/repository/composable-source-layout-v1.json","receipt":"assurance/repository/composable-source-layout-receipt-v1.json","state":"accepted-immutable-predecessor"},
     {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V2","authority":"governance/repository/factorio-one-source-convergence-v1.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v2.json","state":"accepted-immutable-predecessor"},
-    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V3","authority":"spec/distribution/mir4-current-package-presentation-v5.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json","state":"current-append-only-successor"}
+    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V3","authority":"spec/distribution/mir4-current-package-presentation-v5.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json","state":"accepted-immutable-predecessor"},
+    {"migration_id":"MIR4-M41-TO-M42-COMPOSABLE-SOURCE-SUCCESSION-V4","authority":"spec/distribution/mir4-current-package-presentation-v5.json","receipt":"assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json","state":"current-append-only-successor"}
   ],
   "root_markers": ".mir-root.json",
   "classification_order": [

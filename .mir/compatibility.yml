@@ -193,31 +193,6 @@ technology_prerequisite_cycle_repairs:
     claim_level: diagnostic-only
     public_scope: bounded startup-cycle interoperability repair only
 
-loader_schema_repairs:
-  - id: cubium-ambient-sound-planets
-    mod: cubium
-    exact_version: "1.0.30"
-    factorio_line: "2.1"
-    trigger: ambient-sound-planet-singular-field-rejected-by-factorio-2.1
-    mutation: move-cubium-ambient-sound-planet-to-single-entry-planets-table
-    implementation: prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua
-    exact_real_campaign: local-2-1-cubium-production-routes
-    exact_real_roots: [cubium, mir-fixture-assert-cubium-production-routes]
-    claim_level: diagnostic-only
-    public_scope: exact-version loader-schema and science-route interoperability only
-
-  - id: corrundum-ambient-sound-planets
-    mod: corrundum
-    exact_version: "1.0.47"
-    factorio_line: "2.1"
-    trigger: ambient-sound-planet-singular-field-rejected-by-factorio-2.1
-    mutation: move-corrundum-ambient-sound-planet-to-single-entry-planets-table
-    implementation: prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua
-    exact_real_campaign: local-2-1-corrundum-maxcap-13
-    exact_real_roots: [PlanetsLib, corrundum]
-    claim_level: diagnostic-only
-    public_scope: exact-version loader-schema interoperability repair only
-
 load_order_requirements:
   - id: space-exploration-finalized-recipe-set
     mod: space-exploration
@@ -430,34 +405,32 @@ targets:
       mod: corrundum
       doc: docs/compatibility/targets/corrundum.md
       claim_level: diagnostic-only
-      maturity: local-exact-campaign
-      behavior: loader-schema-repair
-      scope: exact-version-interoperability
-      public_claim: exact-version Factorio 2.1 loader-schema repair only
+      maturity: current-repair-withheld
+      behavior: no-current-loader-schema-repair
+      scope: exact-version-loader-schema-claim-withheld
+      public_claim: no current Factorio 2.1 loader-schema repair claim
       fixtures: []
       streams: []
       diagnostic_only:
+        - former-exact-loader-schema-campaign-is-historical-only
         - exact-automated-maximum-level-runtime-contract-passed-manual-visual-review-unproven
         - science-pack-prerequisite-selection-until-runtime-proof
-      schema_repairs:
-        - factorio_2_1_ambient_sound_schema:corrundum_1.0.47
 
     cubium:
       mod: cubium
       doc: docs/compatibility/targets/cubium.md
       claim_level: diagnostic-only
-      maturity: exact-runtime-fixture-qualified
-      behavior: repaired
-      scope: named-behavior
-      public_claim: exact Cubium 1.0.30 loader-schema and science production-route interoperability only
+      maturity: current-loader-schema-repair-withheld
+      behavior: science-production-route-policy-without-loader-schema-repair
+      scope: named-production-route-policy-only
+      public_claim: no current Cubium 1.0.30 loader-schema repair claim
       fixtures:
         - fixtures/assert-cubium-production-routes
       streams: []
       diagnostic_only:
         - broad-cubium-support
+        - former-exact-loader-schema-campaign-is-historical-only
         - progression-beyond-science-production-route-selection
-      schema_repairs:
-        - factorio_2_1_ambient_sound_schema:cubium_1.0.30
 
     recycler-progression:
       mod: recycler-progression

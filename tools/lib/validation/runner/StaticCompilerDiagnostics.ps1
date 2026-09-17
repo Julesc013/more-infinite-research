@@ -236,48 +236,6 @@ Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
   }
 }
 
-Invoke-RepoCheck "Corrundum Factorio 2.1 ambient-sound schema repair is bounded and governed" {
-  $registryText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/registry.lua")
-  $repairText = Get-Content -Raw -LiteralPath (Get-MIRValidationPath -RelativePath "prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua")
-  $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
-  $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
-  $docsText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\docs.yml")
-  $targetDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\targets\corrundum.md")
-  $scenarioText = Get-Content -Raw -LiteralPath (Join-Path $repo "validation\scenarios\local-2.1.json")
-  $testImpactText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\test-impact.yml")
-  $sanitationBudgetText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\sanitation-budgets.json")
-  $compatAuditText = @(
-    Get-Content -Raw -LiteralPath (Join-Path $repo "tools\commands\compatibility\Invoke-MIRCompatAudit.ps1")
-    Get-ChildItem -LiteralPath (Join-Path $repo "tools\commands\compatibility\compat-audit") -File -Filter "*.ps1" |
-      Sort-Object Name |
-      ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName }
-  ) -join "`n"
-  foreach ($check in @(
-    @{ File = "registry.lua"; Text = $registryText; Snippet = 'require("prototypes.mir.compatibility.repairs.factorio_2_1_ambient_sound_schema").apply()' },
-    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = '["1.0.47"] = true' },
-    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'sound.planets = {sound.planet}' },
-    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'sound.planet = nil' },
-    @{ File = "factorio_2_1_ambient_sound_schema.lua"; Text = $repairText; Snippet = 'D.rule_mutation({' },
-    @{ File = ".mir\modules.yml"; Text = $modulesText; Snippet = 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' },
-    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'factorio_2_1_ambient_sound_schema:corrundum_1.0.47' },
-    @{ File = ".mir\compatibility.yml"; Text = $compatibilityText; Snippet = 'exact_real_roots: [PlanetsLib, corrundum]' },
-    @{ File = ".mir\docs.yml"; Text = $docsText; Snippet = 'docs/compatibility/targets/corrundum.md' },
-    @{ File = "docs\compatibility\targets\corrundum.md"; Text = $targetDocText; Snippet = 'exact-version Factorio `2.1` loader-schema repair' },
-    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"name": "local-2-1-corrundum-maxcap-13"' },
-    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"PlanetsLib"' },
-    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"required_log_fragments"' },
-    @{ File = "validation\scenarios\local-2.1.json"; Text = $scenarioText; Snippet = '"Maximum-level conflict"' },
-    @{ File = "Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = '$runtimeContractPassed' },
-    @{ File = "Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'required_audit_assertions = $requiredAuditAssertions' },
-    @{ File = ".mir\test-impact.yml"; Text = $testImpactText; Snippet = '"scenarios": ["local-2-1-corrundum-maxcap-13", "local-2-1-cubium-production-routes"]' },
-    @{ File = ".mir\sanitation-budgets.json"; Text = $sanitationBudgetText; Snippet = '"local-2-1-corrundum-maxcap-13": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0}' }
-  )) {
-    if (-not $check.Text.Contains($check.Snippet)) {
-      throw "Missing governed Corrundum ambient-sound schema repair wiring in $($check.File): $($check.Snippet)"
-    }
-  }
-}
-
 Invoke-RepoCheck "current composed maximum-level publication is explicit and does not claim historical V3 equivalence" {
   if ($null -ne (Get-MIRValidationPath -RelativePath "prototypes/mir/domain/technology/maximum_level_binding.lua" -AllowMissing)) {
     throw "Current F210 package must not regain the undeclared historical MaximumLevelBinding module."

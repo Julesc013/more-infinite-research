@@ -12,12 +12,8 @@ superseded_by: []
 
 # Corrundum Compatibility
 
-Claim: MIR provides an exact-version Factorio `2.1` loader-schema repair for `corrundum_1.0.47` only.
+Current claim: MIR has no active Factorio `2.1` loader-schema repair for `corrundum_1.0.47`.
 
-Corrundum `1.0.47` declares the obsolete singular `ambient-sound.planet` field. On the tested Factorio `2.1.14` engine, prototype validation rejects that field and requires the `ambient-sound.planets` table instead.
+The current F210 package does not bind the former `ambient-sound.planet` repair. Do not treat the old repair, its historical package source, or the old local campaign as evidence that a current MIR candidate makes Corrundum `1.0.47` load on Factorio `2.1`.
 
-When this exact Corrundum version is active on Factorio `2.1`, MIR moves the Corrundum planet selector into a one-entry `planets` table and removes the obsolete field. The repair does not change sounds, recipes, ingredients, results, technologies, unlocks, science requirements, progression, or balance.
-
-The governed local campaign `local-2-1-corrundum-maxcap-13` roots the exact locally locked `PlanetsLib_1.19.5` and `corrundum_1.0.47` archives. It passed its loader-repair assertion and all ten maximum-level log assertions on Factorio `2.1.14`: nine capped technologies reported an effective absolute cap of `13`, and no maximum-level conflict was emitted.
-
-That is exact automated runtime evidence, not broad Corrundum support. Manual visual UI review is still unproven, and science-prerequisite behavior remains diagnostic-only until its separate exact runtime assertions pass.
+The governed `local-2-1-corrundum-maxcap-13` record remains a historical reproduction envelope for the exact locally locked `PlanetsLib_1.19.5` and `corrundum_1.0.47` archives on Factorio `2.1.14`; it is not a current compatibility claim. Manual visual UI review and science-prerequisite behavior remain unproven.

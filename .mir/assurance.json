@@ -41,6 +41,7 @@
     "mir4-factorio-one-source-convergence": ["static.mir4-factorio-one-source-convergence"],
     "mir4-m41-to-m42-composable-source-succession-v2": ["static.mir4-m41-to-m42-composable-source-succession-v2"],
     "mir4-m41-to-m42-composable-source-succession-v3": ["static.mir4-m41-to-m42-composable-source-succession-v3"],
+    "mir4-m41-to-m42-composable-source-succession-v4": ["static.mir4-m41-to-m42-composable-source-succession-v4"],
     "k2-k2so-intake-f210": ["runtime.k2-k2so-f210-intake"],
     "k2-k2so-intake-closure": ["static.mir4-a03-k2-k2so-intake-closure"],
     "a02-component-reconciliation": ["static.mir4-a02-component-reconciliation"],
@@ -138,8 +139,13 @@
     },
     {
       "id": "mir4-m41-to-m42-composable-source-succession-v3",
-      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[23]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[23]\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v[45]\\.json$", "^spec/schemas/mir4-current-package-presentation-v5\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^tools/lib/mir4/PackagePresentation\\.ps1$", "^tools/lib/mir4/pre-freeze-release/AuthorityValidation\\.ps1$", "^tools/mir/application/package/TargetMaterializer\\.ps1$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority\\.ps1$", "^tests/support/MIR4M4202PackageSuccession\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3\\.ps1$"],
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v3\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v3\\.schema\\.json$", "^tools/mir/application/release/readiness/ComposableSourceSuccession\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV3Authority\\.ps1$", "^tests/release/Test-MIR4M41ToM42ComposableSourceSuccessionV3\\.ps1$"],
       "tests": ["static.mir4-m41-to-m42-composable-source-succession-v3"]
+    },
+    {
+      "id": "mir4-m41-to-m42-composable-source-succession-v4",
+      "patterns": ["^assurance/repository/mir4-m41-to-m42-composable-source-succession-v[34]\\.json$", "^contracts/repository/mir4-m41-to-m42-composable-source-succession-v[34]\\.schema\\.json$", "^spec/distribution/mir4-current-package-presentation-v5\\.json$", "^spec/schemas/mir4-current-package-presentation-v5\\.schema\\.json$", "^source/package-source\\.json$", "^targets/(?:package-authority|registry|support-policy)\\.json$", "^targets/f(?:210|200|110|100)/composition\\.json$", "^governance/automation/mir4-command-inventory-v1\\.json$", "^\\.github/workflows/release-candidate\\.yml$", "^\\.mir/(?:assurance\\.json|compatibility\\.yml|test-impact\\.yml|modules\\.yml|control/(?:paths\\.yml|repository-fixed-point\\.json))$", "^assurance/catalog/tests\\.json$", "^docs/compatibility/targets/(?:corrundum|cubium)\\.md$", "^tests/(?:package/Test-MIRContextPackage|tooling/(?:Test-MIRAssurance|support/MIRAssuranceSelfTest)|repository/Test-MIR4RepositoryFixedPoint|support/MIR4M4202PackageSuccession|release/Test-MIR4M41ToM42ComposableSourceSuccessionV4)\\.ps1$", "^tools/lib/(?:assurance/(?:Domains|evidence/Fingerprints)|validation/runner/StaticCompilerDiagnostics|mir4/PackagePresentation|mir4/pre-freeze-release/AuthorityValidation)\\.ps1$", "^tools/mir/application/(?:package/(?:PackageAuthority|TargetMaterializer)|release/readiness/ComposableSourceSuccession)\\.ps1$", "^tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority\\.ps1$", "^validation/(?:scenarios/local-2\\.1\\.json|tests\\.yml)$"],
+      "tests": ["static.mir4-m41-to-m42-composable-source-succession-v4"]
     },
     {
       "id": "mir4-package-source-runtime-replay",
@@ -243,32 +249,32 @@
     },
     {
       "id": "runtime-or-migration",
-      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/domain/research_cost/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
+      "patterns": ["^source/generation/lifecycle/control\\.lua\\.template$", "^source/migrations/", "^source/prototypes/mir/domain/research_cost/", "^source/prototypes/mir/runtime/", "^source/prototypes/mir/stage/control\\.lua$", "^tests/runtime/Test-MIRUpgrade(?:Matrix)?\\.ps1$"],
       "tests": ["static.full", "runtime.full", "runtime.upgrade"]
     },
     {
       "id": "settings",
-      "patterns": ["^settings", "^prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
+      "patterns": ["^source/generation/lifecycle/settings\\.lua\\.template$", "^source/prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
       "tests": ["static.settings", "static.locales", "static.compiler", "runtime.affected", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
       "id": "compiler-data-stage",
-      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
+      "patterns": ["^source/generation/lifecycle/data(?:-updates|-final-fixes)?\\.lua\\.template$", "^source/prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities|compiler-contract-coverage)\\.yml$", "^\\.mir/(compiler-schema-authority|module-dependencies|public-artifact-budgets|research-cost-contract-3\\.2\\.5|rule-synthesis|sanitation-budgets|technology-(?:effect-targets|governance|hard-gates|lifecycle|quality-profiles|review-corpus|review-snapshots))\\.json$"],
       "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "balance",
-      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
+      "patterns": ["^source/prototypes/mir/planner/costs\\.lua$", "^source/prototypes/streams/", "^source/prototypes/mir/domain/native_owner/", "^source/prototypes/mir/planner/native_owner_binding\\.lua$", "^source/prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
       "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
     },
     {
       "id": "locale",
-      "patterns": ["^locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
+      "patterns": ["^source/locale/", "^\\.mir/locales/", "^tools/lib/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
       "tests": ["static.locales", "static.package", "runtime.exact-zip"]
     },
     {
       "id": "metadata-dependencies",
-      "patterns": ["^info\\.json$"],
+      "patterns": ["^source/presentation/f(?:210|200|110|100)/info\\.json\\.template$"],
       "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
     },
     {
@@ -278,7 +284,7 @@
     },
     {
       "id": "packaged-non-runtime",
-      "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
+      "patterns": ["^(?:source/presentation/f(?:210|200|110|100)/(?:README\\.md|changelog\\.txt)\\.template|source/assets/thumbnail\\.png\\.base64|source/LICENSE)$"],
       "tests": ["static.package", "runtime.exact-zip"]
     },
     {
@@ -418,7 +424,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^todo\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
+      "patterns": ["^docs/", "^spec/architecture/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^\\.mir/docs-immutable-source-truth\\.json$", "^(?:README|CONTRIBUTING|AGENTS|GOVERNANCE|SECURITY|PROJECT-CONTINUITY|FORKING|MAINTAINER-HANDOFF|EXTENSION-PROTOCOL|RELEASE-RUNBOOK|SUPPORT)\\.md$", "^TODO\\.md$", "^tools/commands/docs/Update-MIR(?:DocumentationIndex|PipelineDocumentation|READMEStreamDefaults|PostReleaseDocumentation)\\.ps1$", "^tests/tooling/Test-MIRGovernance\\.ps1$", "^contracts/repository/mir4-post-release-documentation-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-Readme-RestorationV1\\.json$"],
       "tests": ["docs.check"]
     },
     {
