@@ -87,10 +87,12 @@ local function plan_stream(key, raw_spec)
   local science_phase_fields = {
     science_phase_policy_id = science_phase_decision.policy_id,
     science_phase_policy_status = science_phase_decision.status,
-    science_phase_removed_packs = table.concat(science_phase_decision.removed_packs or {}, ",")
+    science_phase_removed_packs = table.concat(science_phase_decision.removed_packs or {}, ","),
+    science_phase_requested_packs = table.concat(science_phase_decision.requested_packs or {}, ","),
+    science_phase_required_packs = table.concat(science_phase_decision.retained_required_packs or {}, ",")
   }
   if not ingredients or #ingredients == 0 then
-    return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status, nil, {
+    return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status, science_phase_fields, {
       science_compatible = {evidence = "science-selector:no-compatible-set", reason = "no_lab_compatible_science"},
       lab_compatible = {evidence = "lab-matrix:no-accepting-lab", reason = "no_lab_compatible_science"}
     })
@@ -99,7 +101,7 @@ local function plan_stream(key, raw_spec)
   if direct_effects and #direct_effects > 0 then
     local prerequisites, prerequisite_reason = planner_prerequisites.build_for(key, ingredients)
     if prerequisite_reason then
-      return skip_row(key, spec, prerequisite_reason, ingredients, direct_effects, lab_status, nil, {
+      return skip_row(key, spec, prerequisite_reason, ingredients, direct_effects, lab_status, science_phase_fields, {
         progression_safe = {evidence = "prerequisite-planner:" .. prerequisite_reason, reason = prerequisite_reason}
       })
     end
@@ -129,7 +131,7 @@ local function plan_stream(key, raw_spec)
   end
 
   if not target_line.feature_enabled("recipe_productivity") then
-    return skip_row(key, spec, "recipe_productivity_unsupported", ingredients, {}, lab_status, nil, {
+    return skip_row(key, spec, "recipe_productivity_unsupported", ingredients, {}, lab_status, science_phase_fields, {
       target_supported = {evidence = "target-profile:recipe-productivity-disabled", reason = "recipe_productivity_unsupported"}
     })
   end
@@ -145,9 +147,11 @@ local function plan_stream(key, raw_spec)
       D.stream_fields(key, spec, "adopted", adoption.operation, ingredients, nil, adopted_effects, lab_status, {
         owners = adoption_owner_name,
         recipes = owner_policy.recipe_names_from_effects(adopted_effects),
-        science_phase_policy_id = science_phase_fields.science_phase_policy_id,
-        science_phase_policy_status = science_phase_fields.science_phase_policy_status,
-        science_phase_removed_packs = science_phase_fields.science_phase_removed_packs
+          science_phase_policy_id = science_phase_fields.science_phase_policy_id,
+          science_phase_policy_status = science_phase_fields.science_phase_policy_status,
+          science_phase_removed_packs = science_phase_fields.science_phase_removed_packs,
+          science_phase_requested_packs = science_phase_fields.science_phase_requested_packs,
+          science_phase_required_packs = science_phase_fields.science_phase_required_packs
       }), {
         adoption = adoption,
         science_phase_policy = science_phase_decision
@@ -172,12 +176,12 @@ local function plan_stream(key, raw_spec)
         owner_conflict_free = {evidence = "owner-index:blocking-owner", reason = reason}
       }
     end
-    return skip_row(key, spec, reason, ingredients, effects, lab_status, nil, failed_gates)
+    return skip_row(key, spec, reason, ingredients, effects, lab_status, science_phase_fields, failed_gates)
   end
 
   local prerequisites, prerequisite_reason = planner_prerequisites.build_for(key, ingredients)
   if prerequisite_reason then
-    return skip_row(key, spec, prerequisite_reason, ingredients, effects, lab_status, nil, {
+    return skip_row(key, spec, prerequisite_reason, ingredients, effects, lab_status, science_phase_fields, {
       progression_safe = {evidence = "prerequisite-planner:" .. prerequisite_reason, reason = prerequisite_reason}
     })
   end

@@ -138,11 +138,7 @@ end
 
 function M.resolve_ingredients(spec, base_unit, key)
   local selected = science_selector.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_unit, key))
-  local resolved, lab_status = science_packs.best_lab_compatible_ingredients(selected, key)
-  lab_status = lab_status or "full"
-  local science_phase_decision
-  resolved, science_phase_decision = planner_science.normalize_ingredients(resolved)
-  return resolved, lab_status, science_phase_decision
+  return planner_science.ingredients_for_selected(key, selected)
 end
 
 function M.append_end_game_prerequisite(prereqs, ingredients)

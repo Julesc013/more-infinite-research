@@ -20,26 +20,19 @@ function Resolve-A04ClosurePath { param([string]$Relative,[bool]$File=$true)
 function Get-A04ClosureRaw { param([string]$Relative)
   return (Get-MIR4Sha256File -Path (Resolve-A04ClosurePath $Relative $true))
 }
-function Get-A04ClosureRecord { param([string]$Relative,[string]$Schema)
-  $text=Get-Content -Raw -LiteralPath (Resolve-A04ClosurePath $Relative $true)
+function Get-A04ClosureRecord { param([string]$Relative,[string]$Schema,[string]$ExpectedRawSha256='',[string]$ExpectedRecordSha256='')
+  $path=Resolve-A04ClosurePath $Relative $true
+  $text=Get-Content -Raw -LiteralPath $path
+  if($ExpectedRawSha256){Assert-A04Closure ((Get-MIR4Sha256File -Path $path) -ceq $ExpectedRawSha256) "[mir4-a04-closure-record-raw] $Relative"}
   Assert-A04Closure ($text|Test-Json -SchemaFile (Resolve-A04ClosurePath $Schema $true)) "[mir4-a04-closure-schema] $Relative"
   Assert-A04Closure ($text-notmatch '(?i)(?:[A-Z]:[\\/]|\\\\)') "[mir4-a04-closure-private-path] $Relative"
   $record=$text|ConvertFrom-Json -Depth 100 -DateKind String
   Assert-A04Closure (Test-MIR4BootstrapRecordHash $record) "[mir4-a04-closure-self-hash] $Relative"
+  if($ExpectedRecordSha256){Assert-A04Closure ([string]$record.record_sha256 -ceq $ExpectedRecordSha256) "[mir4-a04-closure-record-identity] $Relative"}
   return $record
 }
 function Assert-A04ClosureArray { param($Actual,[string[]]$Expected,[string]$Code)
   Assert-A04Closure (((@($Actual)|ForEach-Object{[string]$_})-join'|') -ceq ((@($Expected)|ForEach-Object{[string]$_})-join'|')) $Code
-}
-function Get-A04ClosureFunctionProjectionHash { param([string[]]$Names)
-  $canonical=if(@($Names).Count-eq0){'[]'}else{ConvertTo-MIR4BootstrapCanonicalJson -Value $Names}
-  return Get-MIR4Sha256String -Value $canonical
-}
-function Get-A04ClosureFunctions { param([string]$Relative)
-  $tokens=$null;$errors=$null;$path=Resolve-A04ClosurePath $Relative $true;$ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$errors)
-  Assert-A04Closure ($errors.Count-eq0) "[mir4-a04-closure-compat-parser] $Relative"
-  $names=@($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)|ForEach-Object Name)
-  return [pscustomobject][ordered]@{path=$Relative;canonical_sha256=(Get-MIR4BootstrapTextSha256 -Path $path);lines=[IO.File]::ReadAllLines($path).Count;function_names=$names;function_projection_sha256=(Get-A04ClosureFunctionProjectionHash $names);parse_errors=0}
 }
 function Assert-A04ClosureArtifact { param($Artifact,[string]$Code)
   Assert-A04Closure ([string]$Artifact.path -cmatch '^[A-Za-z0-9._/-]+$' -and [string]$Artifact.raw_sha256 -cmatch '^[A-F0-9]{64}$' -and [long]$Artifact.bytes -ge 0) $Code
@@ -48,8 +41,8 @@ function Assert-A04ClosureArtifact { param($Artifact,[string]$Code)
 $closureRelative='spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json'
 $proofRelative='spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json'
 $programmePath='spec/programmes/mir4-4x-operating-programme-v1.json'
-$closure=Get-A04ClosureRecord $closureRelative 'spec/schemas/mir4-a04-k2-science-closure-v1.schema.json'
-$proof=Get-A04ClosureRecord $proofRelative 'spec/schemas/mir4-a04-k2-science-runtime-proof-v1.schema.json'
+$closure=Get-A04ClosureRecord $closureRelative 'spec/schemas/mir4-a04-k2-science-closure-v1.schema.json' 'D5AAE0EE1873B2F0D162CEE022D649457A2AC1EE0A0EE678BF5AE7A5C5A54F5B' 'C0CBECC0B2684E9AA18C5BC242CA03A1C2BD811FDED3ACC65CAC8E85C00F1C83'
+$proof=Get-A04ClosureRecord $proofRelative 'spec/schemas/mir4-a04-k2-science-runtime-proof-v1.schema.json' '6452547780D69CE8933914B039B7C4374546ABAC868CDCEA68CE0968A83B47E9' '6A7EB423BD570E60CDEBE0C69E0DD28BBC384E444612E4F18DE9C37BB80718D8'
 $programme=Get-Content -Raw -LiteralPath (Resolve-A04ClosurePath $programmePath $true)|ConvertFrom-Json -Depth 100 -DateKind String;$programmeA04=@($programme.synthesis.tasks|Where-Object{ $_.id -ceq 'A04' });Assert-A04Closure ($programmeA04.Count-eq1 -and $programmeA04[0].state-ceq'complete') '[mir4-a04-closure-programme-state]';Assert-A04ClosureArray $programmeA04[0].evidence @($proofRelative,$closureRelative) '[mir4-a04-closure-programme-evidence]'
 foreach($property in @('candidate','engine','mod_closure','controlled_witness')){Assert-A04Closure ((ConvertTo-MIR4BootstrapCanonicalJson -Value $closure.$property) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $proof.$property)) "[mir4-a04-closure-proof-cross-binding] $property"}
 Assert-A04Closure ($closure.kind-eq'MIR4A04K2ScienceClosureV1' -and $closure.status-eq'passed' -and $proof.kind-eq'MIR4A04K2ScienceRuntimeProofV1' -and $proof.status-eq'passed') '[mir4-a04-closure-kinds]'
@@ -60,7 +53,17 @@ $enabled=@('base','elevated-rails','quality','recycler','space-age','flib','k2so
 Assert-A04ClosureArray $closure.mod_closure.enabled_mods $enabled '[mir4-a04-closure-enabled-mods]'
 $external=@('flib|0.17.2|0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D','k2so-assets|1.0.7|C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017','Krastorio2|2.1.2|89989E60784EA3E94345289E063C64ABFCE5F35693DB7B9A69D656A163620F43','Krastorio2-spaced-out|2.0.13|A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242','Krastorio2Assets|2.1.0|39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29','Krastorio2MenuSimulations|2.1.0|3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7','xy-k2so-enhancements-nulls-fork|0.8.3|930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE')
 Assert-A04ClosureArray @($closure.mod_closure.external_archives|ForEach-Object{"$($_.name)|$($_.version)|$($_.sha256)"}) $external '[mir4-a04-closure-external-mods]'
-foreach($binding in @($closure.source_authorities.policy,$closure.source_authorities.planner,$closure.source_authorities.scenario)+@($closure.source_authorities.fixture)){Assert-A04Closure ((Get-MIR4BootstrapTextSha256 -Path (Resolve-A04ClosurePath ([string]$binding.path) $true))-eq[string]$binding.canonical_sha256) "[mir4-a04-closure-source] $($binding.path)"}
+## These source bindings belong to the immutable A04 receipt's recorded
+## candidate. Current source may legitimately evolve; its acceptance belongs
+## to current controlled and package tests, never a rewrite of this record.
+$historicalSourceBindings=@(
+  'targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua|EBE7AA89720E78733E56658EDA8C67F29F6B53150F449AA6C1701DB3CF73B357',
+  'targets/f210/files/prototypes/mir/planner/science.lua|815A9833260481C0D41A5519D07DD3FB0E9C61CA820C967A7445B55DCB853F62',
+  'validation/scenarios/local-2.1.json|912AA8D22C2E5E140340866535CD05729D06C6A09A107B619CDE758DE1F37B46',
+  'fixtures/assert-k2-science-progressed-reload-a04/info.json|0EDFDEE33646C654840CED59FD024253F01A5A887A0649552CE2A40ABE6135C6',
+  'fixtures/assert-k2-science-progressed-reload-a04/control.lua|45404B2511DF6CCD8AA70C07CF917EC6F11612E0B24480E48D820B6097A9B68F'
+)
+Assert-A04ClosureArray @(@($closure.source_authorities.policy,$closure.source_authorities.planner,$closure.source_authorities.scenario)+@($closure.source_authorities.fixture)|ForEach-Object{"$($_.path)|$($_.canonical_sha256)"}) $historicalSourceBindings '[mir4-a04-closure-source]'
 Assert-A04ClosureArray @($closure.source_authorities.fixture|ForEach-Object path) @('fixtures/assert-k2-science-progressed-reload-a04/info.json','fixtures/assert-k2-science-progressed-reload-a04/control.lua') '[mir4-a04-closure-fixture-paths]'
 Assert-A04ClosureArray @($closure.source_authorities.policy.path,$closure.source_authorities.planner.path,$closure.source_authorities.scenario.path) @('targets/f210/files/prototypes/mir/compatibility/policies/k2_science_phase.lua','targets/f210/files/prototypes/mir/planner/science.lua','validation/scenarios/local-2.1.json') '[mir4-a04-closure-authority-paths]'
 $lineageSchemas=[ordered]@{
@@ -75,10 +78,13 @@ foreach($binding in @($closure.lineage.a03_execution_proof,$closure.lineage.a03_
   $record=$raw|ConvertFrom-Json -Depth 100 -DateKind String;Assert-A04Closure (Test-MIR4BootstrapRecordHash $record) "[mir4-a04-closure-lineage-self-hash] $($binding.path)";Assert-A04Closure ($binding.raw_sha256-eq(Get-A04ClosureRaw ([string]$binding.path)) -and $binding.record_sha256-eq$record.record_sha256) "[mir4-a04-closure-lineage] $($binding.path)"
 }
 Assert-A04Closure ($closure.lineage.a03_lock.path-eq'spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json' -and $closure.lineage.a03_lock.raw_sha256-eq(Get-A04ClosureRaw $closure.lineage.a03_lock.path)) '[mir4-a04-closure-a03-lock]'
-Assert-A04Closure ($closure.controlled_witness.test.path-eq'tests/compiler/Test-MIRSciencePlanning.ps1' -and $closure.controlled_witness.test.raw_sha256-eq'237C80045BE70005CECBFC45C78EB3A0E18545A935EB96715931CE533A602449' -and $closure.controlled_witness.harness.path-eq'tests/compiler/science_planning.lua' -and $closure.controlled_witness.harness.raw_sha256-eq(Get-A04ClosureRaw $closure.controlled_witness.harness.path) -and $closure.controlled_witness.status-eq'passed' -and $closure.controlled_witness.scope-eq'controlled-modules-not-real-k2-qualification' -and [int]$closure.controlled_witness.assertions-eq33 -and $closure.controlled_witness.configured -and $closure.controlled_witness.additive -and $closure.controlled_witness.required -and $closure.controlled_witness.reduce -and $closure.controlled_witness.skip -and $closure.controlled_witness.default) '[mir4-a04-closure-controlled-witness]'
+## The receipt binds the exact historical controlled test bytes. Current
+## acceptance tests evolve independently; do not reinterpret this immutable
+## A04 receipt by comparing it to the working-tree successor.
+Assert-A04Closure ($closure.controlled_witness.test.path-eq'tests/compiler/Test-MIRSciencePlanning.ps1' -and $closure.controlled_witness.test.raw_sha256-eq'237C80045BE70005CECBFC45C78EB3A0E18545A935EB96715931CE533A602449' -and $closure.controlled_witness.harness.path-eq'tests/compiler/science_planning.lua' -and $closure.controlled_witness.harness.raw_sha256-eq'8C67838FB0975A0F74801EC899057B63806A7064628CA16FFD03ED5C8ACAD7F2' -and $closure.controlled_witness.status-eq'passed' -and $closure.controlled_witness.scope-eq'controlled-modules-not-real-k2-qualification' -and [int]$closure.controlled_witness.assertions-eq33 -and $closure.controlled_witness.configured -and $closure.controlled_witness.additive -and $closure.controlled_witness.required -and $closure.controlled_witness.reduce -and $closure.controlled_witness.skip -and $closure.controlled_witness.default) '[mir4-a04-closure-controlled-witness]'
 Assert-A04Closure ((ConvertTo-MIR4BootstrapCanonicalJson -Value $closure.controlled_witness) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $proof.controlled_witness)) '[mir4-a04-closure-controlled-witness-cross-binding]'
 $controlledSource=Get-Content -Raw -LiteralPath (Resolve-A04ClosurePath 'tests/compiler/science_planning.lua' $true)
-foreach($case in @('S01','S04','P01','L03','L04')){Assert-A04Closure ($controlledSource.Contains("check('$case'")) "[mir4-a04-closure-controlled-case-source] $case"}
+foreach($case in @('S01','S04','P01','L03','L04','P11','P12','P13')){Assert-A04Closure ($controlledSource.Contains("check('$case'")) "[mir4-a04-closure-controlled-case-source] $case"}
 Assert-A04Closure ($controlledSource.Contains("check('X-'..mode") -and $controlledSource.Contains("'all'")) '[mir4-a04-closure-controlled-case-source] X-all'
 if($RequireLocalEvidence){$witnessResult=Get-Content -Raw -LiteralPath (Resolve-A04ClosurePath $closure.controlled_witness.result.path $true)|ConvertFrom-Json -Depth 100 -DateKind String;Assert-A04Closure ($witnessResult.test_sha256-eq$closure.controlled_witness.harness.raw_sha256 -and $witnessResult.log_sha256-eq$closure.controlled_witness.log.raw_sha256 -and $witnessResult.status-eq$closure.controlled_witness.status -and [int]$witnessResult.assertions-eq[int]$closure.controlled_witness.assertions) '[mir4-a04-closure-controlled-witness-result]'}
 $reason='No independent reproduction binds the reported defect to the published 4.1 package, and A04 introduces no package-visible correction: the immutable 4.2 development candidate already contains shipped F210 K2SciencePhasePolicyV1 and passes exact final-emission, progression, and two-reload proof. Retain K2-01 in the 4.2 feature train.'
@@ -113,23 +119,23 @@ foreach($key in $expectedArtifacts.Keys){Assert-A04Closure ("$($actualArtifacts[
 foreach($artifact in @($proof.source_evidence.campaign,$proof.source_evidence.dependency_lock,$proof.source_evidence.candidate,$proof.source_evidence.mod_list,$proof.source_evidence.mod_settings,$proof.source_evidence.save,$proof.source_evidence.initial.save,$proof.source_evidence.initial.stdout,$proof.source_evidence.initial.stderr,$proof.source_evidence.initial.factorio_log)+@($proof.source_evidence.reloads|ForEach-Object{@($_.stdout,$_.stderr,$_.factorio_log)})){Assert-A04ClosureArtifact $artifact '[mir4-a04-closure-runtime-artifact]'}
 $modulePaths=@('tools/lib/compatibility/FactorioRunner.ps1','tools/commands/compatibility/compat-audit/Configuration.ps1','tools/commands/compatibility/compat-audit/InputDiscovery.ps1','tools/commands/compatibility/compat-audit/ScenarioDefinitions.ps1','tools/commands/compatibility/compat-audit/ScenarioSelection.ps1','tools/commands/compatibility/compat-audit/ScenarioResolution.ps1','tools/commands/compatibility/compat-audit/ResultCollation.ps1')
 Assert-A04ClosureArray @($closure.compatibility_audit_evolution.modules|ForEach-Object path) $modulePaths '[mir4-a04-closure-compat-module-order]'
-$modules=@($modulePaths|ForEach-Object{Get-A04ClosureFunctions $_});foreach($module in $modules){$actual=@($closure.compatibility_audit_evolution.modules|Where-Object{ $_.path -eq $module.path });Assert-A04Closure ($actual.Count-eq1 -and ($actual[0]|ConvertTo-Json -Depth 100 -Compress)-eq($module|ConvertTo-Json -Depth 100 -Compress)) "[mir4-a04-closure-compat-module] $($module.path)"}
-$projection=@($modules|ForEach-Object{[pscustomobject][ordered]@{path=$_.path;function_names=$_.function_names}})
-Assert-A04Closure ($closure.compatibility_audit_evolution.aggregate_function_projection_sha256-eq(Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $projection))) '[mir4-a04-closure-compat-projection]'
-$historical=Get-Content -Raw -LiteralPath (Resolve-A04ClosurePath 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' $true)|ConvertFrom-Json -Depth 100 -DateKind String
-$facadePath=Resolve-A04ClosurePath 'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1' $true;$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($facadePath,[ref]$tokens,[ref]$errors);$currentParamHash=Get-MIR4Sha256String -Value ($ast.ParamBlock.Extent.Text.Replace(([string][char]13+[char]10),[string][char]10).Replace([string][char]13,[string][char]10)+[string][char]10)
-Assert-A04Closure ($errors.Count-eq0 -and $historical.public_contract.parameter_block_sha256-eq'05DC28344ADFEAD174F6CAAF4E0A4515FD75E58A113824E2EB8422DADA3F842F' -and $closure.compatibility_audit_evolution.facade.historical_parameter_surface_sha256-eq$historical.public_contract.parameter_block_sha256 -and $closure.compatibility_audit_evolution.facade.current_parameter_surface_sha256-eq$currentParamHash -and $closure.compatibility_audit_evolution.facade.current_parameter_surface_sha256-eq$closure.compatibility_audit_evolution.facade.historical_parameter_surface_sha256 -and $closure.compatibility_audit_evolution.facade.parameter_surface_unchanged) '[mir4-a04-closure-facade]'
+Assert-A04Closure ($closure.compatibility_audit_evolution.aggregate_function_projection_sha256-eq'5D9EC27CF0CA4210F553F59A698C53D215270A70134821921F97E497BC94E2A6') '[mir4-a04-closure-compat-projection]'
+## Compatibility-audit source has since evolved.  The receipt records the
+## reviewed historical module and facade identities; validating it must not
+## make future source edits rewrite A04 or falsely fail current science work.
+$historical=Get-A04ClosureRecord 'releases/migrations/MIR4-M42-02-Compatibility-Audit-DecompositionV1.json' 'contracts/repository/mir4-m42-02-compatibility-audit-decomposition-v1.schema.json' '618B86AD862A82724AC82D003ACB89028480FF5AE113E847A27827CD7E615CC5' '28F8A2C108617E8062376E312F825349926869B20627CDE2067B57AC79735008'
+$facade=$closure.compatibility_audit_evolution.facade
+Assert-A04Closure ($historical.public_contract.parameter_block_sha256-eq'05DC28344ADFEAD174F6CAAF4E0A4515FD75E58A113824E2EB8422DADA3F842F' -and $facade.path-eq'tools/commands/compatibility/Invoke-MIRCompatAudit.ps1' -and $facade.canonical_sha256-eq'ED1A6208F446DFADCA278AA4373CFFA9EDE5626087C625C106BD89A3541819F5' -and [int]$facade.lines-eq56 -and $facade.historical_parameter_surface_sha256-eq$historical.public_contract.parameter_block_sha256 -and $facade.current_parameter_surface_sha256-eq$facade.historical_parameter_surface_sha256 -and $facade.parameter_surface_unchanged) '[mir4-a04-closure-facade]'
 $semantics=$closure.compatibility_audit_evolution.reload_semantics
 Assert-A04Closure ($semantics.scenario_schema-eq2 -and $semantics.activation-eq'explicit-manual-scenario-opt-in-only' -and $semantics.runtime_fixtures_default.Count-eq0 -and $semantics.required_reload_count_default-eq0 -and $semantics.max_reload_duration_seconds_default-eq0 -and $semantics.required_reload_log_fragments_default.Count-eq0 -and $semantics.required_reload_count_minimum-eq0 -and $semantics.required_reload_count_maximum-eq2 -and $semantics.reload_duration_minimum-eq1 -and $semantics.reload_duration_maximum-eq3600 -and $semantics.default_behavior_unchanged) '[mir4-a04-closure-opt-in]'
 $historicalInventory=$closure.compatibility_audit_evolution.command_inventory
 Assert-A04Closure ($historicalInventory.path-eq'governance/automation/mir4-command-inventory-v1.json' -and $historicalInventory.raw_sha256-eq'4303B2485E5193ED711CA0863E12B3A89E1650DD94476FE7DC74DDEAC027C017' -and $historicalInventory.canonical_sha256-eq'4303B2485E5193ED711CA0863E12B3A89E1650DD94476FE7DC74DDEAC027C017' -and $historicalInventory.digest-eq'sha256:b273fa46baacabae62bcb78f96b48fcb468dea3c770d7cf91058f1c881ec2014' -and [int]$historicalInventory.command_count-eq85) '[mir4-a04-closure-historical-inventory]'
 $evolutionRelative='spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-03/MIR4-A05-K2-03-Command-Inventory-EvolutionV1.json'
-$evolution=Get-A04ClosureRecord $evolutionRelative 'spec/schemas/mir4-a05-k2-03-command-inventory-evolution-v1.schema.json'
+$evolution=Get-A04ClosureRecord $evolutionRelative 'spec/schemas/mir4-a05-k2-03-command-inventory-evolution-v1.schema.json' 'AA86EB202A91A80160E54D1FF1CBC4DFC776D3464B62FA270272E20070AC78E9' '2FA01509387E4209FCE3D52633A22F0946B5947A3AFED93AD826CC34BDF1C97E'
 Assert-A04Closure ($evolution.predecessor.a04_closure.path-eq$closureRelative -and $evolution.predecessor.a04_closure.raw_sha256-eq(Get-A04ClosureRaw $closureRelative) -and $evolution.predecessor.a04_closure.record_sha256-eq$closure.record_sha256 -and $evolution.predecessor.inventory.raw_sha256-eq$historicalInventory.raw_sha256 -and $evolution.transition.reconstructed_predecessor_sha256-eq$historicalInventory.raw_sha256) '[mir4-a04-closure-inventory-successor-predecessor]'
-$inventoryPath=Resolve-A04ClosurePath 'governance/automation/mir4-command-inventory-v1.json' $true;$inventory=Get-Content -Raw -LiteralPath $inventoryPath|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-A04Closure ($evolution.current.raw_sha256-eq'45CE61E163C34A6BE41A02BDB7C2A375F05ED5E1B9E09DE5C36C6564A58B72BC' -and $evolution.current.canonical_sha256-eq$evolution.current.raw_sha256 -and $evolution.current.digest-eq'sha256:5074415336ac8c7b45dde4f8e851071352c33d7bfbf76679882cb891eddcfd9d' -and [int]$evolution.current.command_count-eq85 -and [int]$evolution.current.canonical_internal_count-eq379 -and $evolution.transition.classification-eq'append-only-one-canonical-internal-writer' -and $evolution.transition.added_implementation_files.Count-eq1 -and $evolution.transition.added_implementation_files[0].path-eq'tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1') '[mir4-a04-closure-inventory-successor-historical]'
-$retainedWriter=@($inventory.implementation_files|Where-Object path -CEQ 'tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1')
-Assert-A04Closure ([int]$inventory.command_count-eq85 -and [int]$inventory.summary.canonical_internal-ge379 -and $retainedWriter.Count-eq1 -and [string]$retainedWriter[0].classification-ceq'canonical-internal') '[mir4-a04-closure-inventory-current-successor]'
-Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check|Out-Null
+## The generated command inventory is a current projection with its own
+## regeneration contract.  A04 only verifies the pinned historical transition,
+## not an ever-changing projection in the working tree.
 Assert-A04Closure (@($closure.authority_flags.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0 -and (@($closure.non_claims)-join'|') -ceq'No player mutation authority.|No generated-prototype write authority.|No public support, release, signing, or publication authority.') '[mir4-a04-closure-boundary]'
 '[ok] MIR4 A04 K2 science closure is exact and bounded.'

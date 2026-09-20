@@ -27,10 +27,10 @@ local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
 end
 
-local function route_for_unlocker(recipe_name, technology_name, visiting_packs)
+local function route_for_unlocker(recipe_name, technology_name, visiting_packs, visiting_technologies)
   local rejection = technology_researchability_reason(technology_name, {
     visiting_packs = visiting_packs,
-    visiting_technologies = {},
+    visiting_technologies = visiting_technologies or {},
     unlock_recipe_name = recipe_name
   })
   local index = graph_index()
@@ -75,7 +75,7 @@ local function route_for_unlocker(recipe_name, technology_name, visiting_packs)
   }
 end
 
-local function production_routes(recipe_status, visiting_packs)
+local function production_routes(recipe_status, visiting_packs, excluded_unlocker, visiting_technologies)
   local routes = {}
   for _, recipe_name in ipairs(recipe_status.recipes or {}) do
     local recipe = canonical_recipe_facts.view(recipe_name)
@@ -99,44 +99,102 @@ local function production_routes(recipe_status, visiting_packs)
       })
     else
       for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
-        table.insert(routes, route_for_unlocker(recipe_name, technology_name, visiting_packs))
+        if technology_name ~= excluded_unlocker then
+          table.insert(routes, route_for_unlocker(
+            recipe_name,
+            technology_name,
+            visiting_packs,
+            visiting_technologies
+          ))
+        end
       end
     end
   end
   return routes
 end
 
-function M.pack_production_status(pack_name, visiting_packs)
-  local cache = science_pack_resolution_cache()
-  local cached = cache[pack_name]
-  if cached then return cached.status, cached.prerequisite end
+local function has_active_traversal(visiting_packs, visiting_technologies)
+  for _ in pairs(visiting_packs or {}) do return true end
+  for _ in pairs(visiting_technologies or {}) do return true end
+  return false
+end
+
+local function copy_visitation_without(visiting_packs, pack_name)
+  local out = {}
+  for name, active in pairs(visiting_packs or {}) do
+    if name ~= pack_name and active then out[name] = true end
+  end
+  return out
+end
+
+function M.pack_production_status(pack_name, visiting_packs, visiting_technologies)
   if not pack_name or not pack_registry.science_pack_exists(pack_name) then return "unreachable", nil end
 
   visiting_packs = visiting_packs or {}
   if visiting_packs[pack_name] then return "unreachable", nil end
+  -- A nonempty visitation set makes this result conditional on the caller's
+  -- current traversal. Never retain a rejection (or provisional success) from
+  -- that branch as a reusable context-wide answer.
+  local reusable = not has_active_traversal(visiting_packs, visiting_technologies)
+  local cache = science_pack_resolution_cache()
+  local cached = reusable and cache[pack_name] or nil
+  if cached then return cached.status, cached.prerequisite end
+
   local recipe_status = recipe_facts.pack_recipe_status(pack_name)
   if recipe_status and recipe_status.has_recipe then
     visiting_packs[pack_name] = true
-    local selected = route_policy.select(production_routes(recipe_status, visiting_packs))
+    local selected = route_policy.select(production_routes(
+      recipe_status,
+      visiting_packs,
+      nil,
+      visiting_technologies
+    ))
     visiting_packs[pack_name] = nil
     if selected then
       local status = selected.initial and "initial" or "research"
-      cache[pack_name] = {status = status, prerequisite = selected.unlocker, route = selected}
+      if reusable then cache[pack_name] = {status = status, prerequisite = selected.unlocker, route = selected} end
       return status, selected.unlocker
     end
-    cache[pack_name] = {status = "unreachable"}
+    if reusable then cache[pack_name] = {status = "unreachable"} end
     return "unreachable", nil
   end
 
   if technology_researchability_reason(pack_name, {
     visiting_packs = visiting_packs,
-    visiting_technologies = {}
+    visiting_technologies = visiting_technologies or {}
   }) == nil then
-    cache[pack_name] = {status = "non-recipe", prerequisite = pack_name}
+    if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
     return "non-recipe", pack_name
   end
-  cache[pack_name] = {status = "non-recipe"}
+  if reusable then cache[pack_name] = {status = "non-recipe"} end
   return "non-recipe", nil
+end
+
+-- A recipe unlocked by the technology currently being evaluated cannot prove
+-- that its own research ingredient was already obtainable. This narrow query
+-- proves an alternative concrete production route while retaining every other
+-- active traversal guard. It is deliberately uncached: the excluded unlocker
+-- and inherited traversal make it a contextual witness, not a global fact.
+function M.independent_pack_acquisition_witness(
+  pack_name,
+  excluded_unlocker,
+  visiting_packs,
+  visiting_technologies
+)
+  if not pack_name or not excluded_unlocker or not pack_registry.science_pack_exists(pack_name) then return nil end
+  local recipe_status = recipe_facts.pack_recipe_status(pack_name)
+  if not recipe_status or not recipe_status.has_recipe then return nil end
+
+  local witness_visiting = copy_visitation_without(visiting_packs, pack_name)
+  witness_visiting[pack_name] = true
+  local selected = route_policy.select(production_routes(
+    recipe_status,
+    witness_visiting,
+    excluded_unlocker,
+    visiting_technologies
+  ))
+  witness_visiting[pack_name] = nil
+  return selected and deepcopy(selected) or nil
 end
 
 function M.researchable_unlockers_for_recipe(recipe_name)

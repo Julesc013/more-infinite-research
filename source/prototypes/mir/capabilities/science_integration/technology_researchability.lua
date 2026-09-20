@@ -14,6 +14,12 @@ local function pack_production_status(...)
   return service(...)
 end
 
+local function independent_pack_acquisition_witness(...)
+  local service = compiler_context.current():service("science.independent_pack_acquisition_witness")
+  if not service then error("MIR independent science-pack acquisition service is not registered in CompilerContext.", 2) end
+  return service(...)
+end
+
 local function graph_index()
   return compiler_context.current():state_view("technology_researchability_index", researchability_index.build)
 end
@@ -24,7 +30,7 @@ local function enabled_and_reachable(tech_name)
   return not graph_index().structural_failures[tech_name]
 end
 
-local function research_mechanism_reason(technology, context)
+local function research_mechanism_reason(technology, technology_name, context)
   if technology.research_trigger then return nil end
   local unit = technology.unit
   local ingredients = unit and unit.ingredients or nil
@@ -40,10 +46,27 @@ local function research_mechanism_reason(technology, context)
       if not pack_registry.science_pack_exists(pack_name) then
         return "unrecognized-science-" .. pack_name
       end
+      local independently_acquired = false
       if unlock_recipe and recipe_facts.recipe_outputs_item(unlock_recipe, pack_name) then
-        return "science-self-lock-" .. pack_name
+        local witness = independent_pack_acquisition_witness(
+          pack_name,
+          technology_name,
+          context.visiting_packs or {},
+          context.visiting_technologies or {}
+        )
+        if not witness then return "science-self-lock-" .. pack_name end
+        independently_acquired = true
       end
-      if pack_production_status(pack_name, context.visiting_packs or {}) == "unreachable" then
+      -- The active route deliberately marks its output pack as visiting.
+      -- Once the narrow witness above has proved an independent acquisition
+      -- route, asking the generic traversal status again would only rediscover
+      -- that in-progress marker and falsely reject the same technology.
+      if not independently_acquired
+        and pack_production_status(
+          pack_name,
+          context.visiting_packs or {},
+          context.visiting_technologies or {}
+        ) == "unreachable" then
         return "unreachable-science-" .. pack_name
       end
     end
@@ -73,7 +96,7 @@ local function reason(tech_name, context)
   telemetry.count("technology_graph_index_queries", 1)
   for _, candidate_name in ipairs(candidates) do
     local candidate = data_raw.technology(candidate_name)
-    local rejection = research_mechanism_reason(candidate, {
+    local rejection = research_mechanism_reason(candidate, candidate_name, {
       visiting_packs = context.visiting_packs,
       visiting_technologies = visiting_technologies,
       unlock_recipe_name = context.unlock_recipe_name
