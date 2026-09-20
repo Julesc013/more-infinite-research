@@ -37,7 +37,12 @@ param(
   [switch]$Apply,
   [switch]$PassThru,
   [Parameter(DontShow)]
-  [switch]$SkipActiveProcessCheck
+  [switch]$SkipActiveProcessCheck,
+  # Deterministic test seam for exercising plan-to-apply races. Production
+  # callers never need this; every mutation it makes is still subject to the
+  # complete exact-boundary and no-follow pre-delete audit.
+  [Parameter(DontShow)]
+  [scriptblock]$BeforeApplyTestHook
 )
 
 $ErrorActionPreference = 'Stop'
@@ -85,6 +90,8 @@ $comparison = [StringComparison]::OrdinalIgnoreCase
 $now = [DateTime]::UtcNow
 $cutoff = $now.AddDays(-$OlderThanDays)
 $auditStopwatch = [Diagnostics.Stopwatch]::StartNew()
+$cleanupApplyStarted = $false
+$cleanupDeletedCount = 0
 $progressStopwatch = [Diagnostics.Stopwatch]::StartNew()
 $progressIntervalSeconds = 5
 $currentAuditWorktreeRoot = $null
@@ -123,6 +130,9 @@ $artifactRootDefinitions = @(@(
 
 function Assert-MIRArtifactAuditBudget {
   if ($auditStopwatch.Elapsed.TotalSeconds -ge $MaxAuditSeconds) {
+    if ($cleanupApplyStarted) {
+      throw "Artifact cleanup revalidation reached its bounded $MaxAuditSeconds-second limit after $cleanupDeletedCount exact removals; no further removal was attempted. Re-audit the remaining typed roots before retrying."
+    }
     throw "Artifact cleanup audit reached its bounded $MaxAuditSeconds-second limit; no removal was attempted. Narrow -ArtifactType or investigate the reported roots before retrying."
   }
 }
@@ -850,13 +860,63 @@ function Test-MIRArtifactStillCandidate {
     [Parameter(Mandatory)][string]$WorktreeRoot,
     [Parameter(Mandatory)]$Definition,
     [Parameter(Mandatory)][string]$ArtifactRoot,
-    [Parameter(Mandatory)][string]$Path
+    [Parameter(Mandatory)]$Row
   )
 
-  foreach ($candidate in (Get-MIRArtifactCandidates -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $ArtifactRoot)) {
-    if ([bool]$candidate.canonical_candidate -and [IO.Path]::GetFullPath($candidate.item.FullName).Equals([IO.Path]::GetFullPath($Path), $comparison)) { return $true }
+  $fullPath = [IO.Path]::GetFullPath([string]$Row.full_path)
+  if (-not (Test-Path -LiteralPath $fullPath)) { return $false }
+  if (-not (Test-MIRArtifactPathWithin -Path $fullPath -Root $ArtifactRoot)) { return $false }
+
+  $item = Get-Item -LiteralPath $fullPath -Force
+  $currentKind = if ($item.PSIsContainer) { 'directory' } else { 'file' }
+  if ($currentKind -cne [string]$Row.kind -or
+      -not (Test-MIRArtifactCanonicalCandidate -Definition $Definition -Item $item)) {
+    return $false
   }
-  return $false
+
+  if ([bool]$Definition.direct_children_only) {
+    $parent = [IO.Path]::GetFullPath((Split-Path -Parent $fullPath)).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+    $root = [IO.Path]::GetFullPath($ArtifactRoot).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+    if (-not $parent.Equals($root, $comparison)) { return $false }
+    if ([string]$Definition.artifact_type -ceq 'campaign' -and -not $item.PSIsContainer) { return $false }
+    return $true
+  }
+
+  # Recursive discovery stops at the first protected name, reparse point, or
+  # run boundary. Recheck only this candidate's ancestor chain so a newly
+  # created parent marker cannot turn an audited child into private live run
+  # state between planning and deletion.
+  $root = [IO.Path]::GetFullPath($ArtifactRoot).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+  $ancestor = if ($item.PSIsContainer) { $item.Parent } else { $item.Directory }
+  while ($null -ne $ancestor) {
+    try { $ancestorItem = Get-Item -LiteralPath $ancestor.FullName -Force } catch { return $false }
+    $ancestorPath = [IO.Path]::GetFullPath($ancestorItem.FullName).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+    if ($ancestorPath.Equals($root, $comparison)) { break }
+    if (-not (Test-MIRArtifactPathWithin -Path $ancestorPath -Root $root) -or
+        $ancestorItem.Name -in $protectedNames -or
+        ($ancestorItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+        (Test-MIRArtifactRunBoundary -Definition $Definition -Item $ancestorItem)) {
+      return $false
+    }
+    $ancestor = $ancestorItem.Parent
+  }
+  if ($null -eq $ancestor) { return $false }
+
+  switch ([string]$Row.boundary) {
+    'run-or-file' {
+      return (Test-MIRArtifactRunBoundary -Definition $Definition -Item $item)
+    }
+    'empty-directory' {
+      if (-not $item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { return $false }
+      $enumerator = [IO.Directory]::EnumerateFileSystemEntries($item.FullName).GetEnumerator()
+      try { return (-not $enumerator.MoveNext()) } finally { $enumerator.Dispose() }
+    }
+    default {
+      # Unreadable or otherwise unrecognized discovery boundaries never
+      # qualify for deletion during the exact pre-delete audit.
+      return $false
+    }
+  }
 }
 
 function Assert-MIRArtifactEligibleForDeletion {
@@ -876,7 +936,12 @@ function Assert-MIRArtifactEligibleForDeletion {
     throw "Cleanup target escaped its typed artifact root: $fullPath"
   }
   if (-not (Test-Path -LiteralPath $fullPath)) { return $false }
-  if (-not (Test-MIRArtifactStillCandidate -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $artifactRoot -Path $fullPath)) {
+  # Revalidate the exact audited path and its typed boundary in constant time.
+  # Re-enumerating the entire artifact root once per eligible row makes an
+  # apply O(n^2) and can hit the global audit deadline after partially
+  # deleting a large stale set. The later no-follow facts walk still proves
+  # every candidate's complete contents immediately before removal.
+  if (-not (Test-MIRArtifactStillCandidate -WorktreeRoot $WorktreeRoot -Definition $Definition -ArtifactRoot $artifactRoot -Row $Row)) {
     throw "Cleanup target is no longer an exact typed-root candidate: $fullPath"
   }
   $item = Get-Item -LiteralPath $fullPath -Force
@@ -988,12 +1053,17 @@ if ($Apply -and $eligible.Count -gt 0 -and -not $SkipActiveProcessCheck) {
   }
 }
 
+if ($Apply -and $null -ne $BeforeApplyTestHook) {
+  & $BeforeApplyTestHook
+}
+
 $physicalFreeBefore = if ($Apply) { Get-MIRArtifactDriveFreeBytes -Path $RepoRoot } else { $null }
 if ($Apply) {
   $revalidatedWorktrees = @(Get-MIRArtifactWorktrees -CurrentRepoRoot $RepoRoot -IncludeAll:$AllWorktrees)
   if ((@($revalidatedWorktrees | Sort-Object) -join "`n") -cne (@($worktrees | Sort-Object) -join "`n")) {
     throw 'Registered worktree scope changed after the cleanup audit; refusing deletion.'
   }
+  $cleanupApplyStarted = $true
   foreach ($row in $eligible) {
     $worktreeRoot = [string]$row.worktree_root
     if (-not ($worktreeRoot -in $worktrees)) { throw "Unable to resolve audited worktree for cleanup target: $($row.full_path)" }
@@ -1006,6 +1076,7 @@ if ($Apply) {
       Remove-Item -LiteralPath $row.full_path -Recurse -Force
       $row.status = 'deleted'
       $row.reason = 'deleted after second typed-root audit'
+      $cleanupDeletedCount++
     }
   }
 }
