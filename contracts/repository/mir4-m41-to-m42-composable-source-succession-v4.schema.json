@@ -15,7 +15,7 @@
     "evolved_bindings": {"type": "array", "minItems": 16, "maxItems": 16, "items": {"$ref": "#/$defs/evolvedBinding"}},
     "invariants": {"$ref": "#/$defs/invariants"},
     "transition_gate": {"$ref": "#/$defs/gates"},
-    "record_sha256": {"const": "92BCB2E9A479E30254AC8DEC80BC49AE25AC4AD4F9FD22829770C7A02233C5BC"}
+    "record_sha256": {"const": "F32EEB86C0AEE584C932AB7C48B36400C69DAE2B8A356FFE1A254B84C0CE0C3B"}
   },
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},

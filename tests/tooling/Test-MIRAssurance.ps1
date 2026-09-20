@@ -884,7 +884,7 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'git clone --quiet --shared --no-checkout',
   'git -C $authority cat-file -e',
   'Checked-out controller does not match the workflow source commit.',
-  'Archive SHA mismatch for ${archive}',
+  'Built archive SHA mismatch:',
   'resume_exact_dist_evidence_run:',
   'Admit prior passing exact-dist evidence',
   'Prior exact-dist evidence was invalidated by controller changes',
@@ -904,7 +904,8 @@ foreach ($requiredReleaseCandidateSnippet in @(
   "--candidate `$candidateArchive",
   '--candidate-source $env:MIR_RC_CANDIDATE_SHA',
   "--output 'build/results/release-gate'",
-  'MIRProtectedReleaseCandidateRunV1',
+  'MIRProtectedReleaseCandidateRunV2',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
   'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}',
   "runtime-evidence",
   'runtime_evidence = $runtimeEvidenceRows'
