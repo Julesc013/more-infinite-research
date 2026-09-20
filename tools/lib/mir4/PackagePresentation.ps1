@@ -568,39 +568,101 @@ function New-MIR4CurrentPackagePresentationV5 {
   return $record
 }
 
-function Get-MIR4CurrentPackagePresentationV5 {
+function Get-MIR4CurrentPackagePresentationV5Historical {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v5.json'
   $raw = Get-Content -Raw -LiteralPath $path
   $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
-  if (-not (Test-MIR4CurrentPackagePresentationV5Schema -Record $record -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10)) { throw '[mir4-package-presentation-v5-integrity]' }
-  $inputs = Get-MIR4CurrentPackagePresentationV5Inputs -RepoRoot $repo
-  $expectedCustody = Get-MIR4CurrentPackagePresentationV5HistoricalCustody
-  if ([string]$record.predecessor.record_sha256 -cne [string]$inputs.v4.record_sha256 -or
-      [string]$record.package_authority.record_sha256 -cne [string]$inputs.authority.record_sha256 -or
-      [string]$record.source_manifest.record_sha256 -cne [string]$inputs.manifest.record_sha256 -or
-      [string]$record.package_source.fingerprint_sha256 -cne [string]$inputs.fingerprint -or
-      (@($record.package_source.roots) -join '|') -cne 'source|targets' -or
-      [string]$record.package_source.sole_writer -cne [string]$inputs.authority.writer.implementation -or
-      (ConvertTo-MIR4BootstrapCanonicalJson -Value $record.historical_custody) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expectedCustody)) { throw '[mir4-package-presentation-v5-current-binding]' }
-  foreach ($target in @('f210','f200','f110','f100')) {
-    $stored = @($record.target_content_identities | Where-Object { [string]$_.target -ceq $target })
-    $composition = @($inputs.compositions | Where-Object { [string]$_.target -ceq $target })
-    $storedComposition = @($record.target_compositions | Where-Object { [string]$_.target -ceq $target })
-    if ($stored.Count -ne 1 -or $composition.Count -ne 1 -or $storedComposition.Count -ne 1 -or
-        [string]$stored[0].relation -cne [string]$composition[0].capability.relation -or
-        [string]$stored[0].capability_state -cne [string]$composition[0].capability.state -or
-        -not [bool]$stored[0].exact_engine_qualification_required -or
-        [string]$storedComposition[0].record_sha256 -cne [string]$composition[0].record_sha256) { throw "[mir4-package-presentation-v5-target-binding] $target" }
+  if (-not (Test-MIR4CurrentPackagePresentationV5Schema -Record $record -RepoRoot $repo) -or
+      -not (Test-MIR4BootstrapRecordHash -Record $record) -or
+      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10) -or
+      [string]$record.record_sha256 -cne 'D2C73297B4A7BA404B13EEC0AB29C5CDE56357F04ED4B48C9B1099F2F2DA7470') {
+    throw '[mir4-package-presentation-v5-historical-integrity]'
   }
+  $v4 = Get-MIR4CurrentPackagePresentationV4 -RepoRoot $repo
+  $expectedCustody = Get-MIR4CurrentPackagePresentationV5HistoricalCustody
+  if ([string]$record.predecessor.record_sha256 -cne [string]$v4.record_sha256 -or
+      [string]$record.package_authority.record_sha256 -cne '79FE8F85E4AE8DDF5003DC68DE40DC6C578754D1B630559FC4CB85FFE07AB30B' -or
+      [string]$record.source_manifest.record_sha256 -cne 'A7E7CD37C0D7F4CBBEA5CAB869BCBD94440DA7240963A19988EF113293AD154A' -or
+      [string]$record.package_source.fingerprint_sha256 -cne 'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F' -or
+      (@($record.package_source.roots) -join '|') -cne 'source|targets' -or
+      [string]$record.package_source.sole_writer -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $record.historical_custody) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expectedCustody)) { throw '[mir4-package-presentation-v5-historical-binding]' }
   if (-not [bool]$record.authority_invariants.v4_receipt_immutable -or -not [bool]$record.authority_invariants.factorio_one_convergence_historical -or
       -not [bool]$record.authority_invariants.historical_protected_prefix_semantics_accounted -or -not [bool]$record.authority_invariants.promotion_custody_revalidation_required -or
       -not [bool]$record.authority_invariants.f210_f200_progression_capability_applied -or -not [bool]$record.authority_invariants.f110_f100_progression_capability_omitted_nonclaim -or
       -not [bool]$record.authority_invariants.exact_engine_qualification_required -or
       [bool]$record.authority_invariants.candidate_allocation_authorized -or [bool]$record.authority_invariants.promotion_authorized -or [bool]$record.authority_invariants.publication_authorized) { throw '[mir4-package-presentation-v5-firewall]' }
   return $record
+}
+
+function Get-MIR4CurrentPackagePresentationV5 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  return Get-MIR4CurrentPackagePresentationV5Historical -RepoRoot $RepoRoot
+}
+
+function Get-MIR4CurrentPackageContract {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  $inputs = Get-MIR4CurrentPackagePresentationV5Inputs -RepoRoot $repo
+  # A live fingerprint is not sufficient if the source manifest still names
+  # old bytes. Direct consumers of this contract must receive the same
+  # fail-closed materializability guarantee as the development test suite.
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check | Out-Null
+  $targets = [Collections.Generic.List[object]]::new()
+  foreach ($target in @('f210','f200','f110','f100')) {
+    $composition = @($inputs.compositions | Where-Object { [string]$_.target -ceq $target })
+    $expectedState = if ($target -in @('f210','f200')) { 'applied' } else { 'omitted-nonclaim' }
+    $expectedRelation = if ($target -in @('f210','f200')) {
+      'progression-semantic-content-changed-exact-engine-qualification-required'
+    } else {
+      'progression-capability-omitted-nonclaim-exact-engine-qualification-required'
+    }
+    if ($composition.Count -ne 1 -or
+        [string]$composition[0].capability.state -cne $expectedState -or
+        [string]$composition[0].capability.relation -cne $expectedRelation -or
+        -not [bool]$composition[0].capability.exact_engine_qualification_required) {
+      throw "[mir4-current-package-contract-target] $target"
+    }
+    $targets.Add([pscustomobject][ordered]@{
+      target = $target
+      composition_path = [string]$composition[0].path
+      composition_record_sha256 = [string]$composition[0].record_sha256
+      capability_state = [string]$composition[0].capability.state
+      relation = [string]$composition[0].capability.relation
+      exact_engine_qualification_required = $true
+    })
+  }
+  if ([string]$inputs.authority.writer.implementation -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
+      [string]$inputs.manifest.kind -cne 'MIR4ComposablePackageSourceV2' -or
+      [string]$inputs.manifest.materializer_abi -cne 'mir4-target-materializer/1' -or
+      [string]$inputs.fingerprint -cnotmatch '^[A-F0-9]{64}$') {
+    throw '[mir4-current-package-contract-authority]'
+  }
+  return [pscustomobject][ordered]@{
+    kind = 'MIR4CurrentPackageContractV1'
+    package_source_sha256 = [string]$inputs.fingerprint
+    roots = @('source','targets')
+    sole_writer = [string]$inputs.authority.writer.implementation
+    package_authority_record_sha256 = [string]$inputs.authority.record_sha256
+    source_manifest_record_sha256 = [string]$inputs.manifest.record_sha256
+    targets = @($targets)
+    exact_engine_qualification_required = $true
+    release_authority = $false
+  }
+}
+
+function Assert-MIR4CurrentPackageContract {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[string]$RequiredPackageSourceSha256)
+  $contract = Get-MIR4CurrentPackageContract -RepoRoot $RepoRoot
+  if (-not [string]::IsNullOrWhiteSpace($RequiredPackageSourceSha256) -and
+      [string]$contract.package_source_sha256 -cne $RequiredPackageSourceSha256) {
+    throw '[mir4-current-package-contract-fingerprint]'
+  }
+  return $contract
 }
 
 function Assert-MIR4CurrentPackagePresentationV5LiveFingerprint {
@@ -612,16 +674,16 @@ function Assert-MIR4CurrentPackagePresentationV5LiveFingerprint {
 
 function Assert-MIR4CurrentPackagePresentationV5 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
-  $record = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $RepoRoot
-  return Assert-MIR4CurrentPackagePresentationV5LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
+  $contract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $PackageSourceSha256
+  return [string]$contract.package_source_sha256
 }
 
-# Current consumers deliberately route through V5. V1--V4 remain available
-# only under their explicit historical reader names/contracts.
+# Current source consumers route through the live package contract. V1--V5
+# remain immutable historical records under their explicit readers.
 function Get-MIR4CurrentPackageSourceSha256 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
-  $record = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $RepoRoot
-  return Assert-MIR4CurrentPackagePresentationV5LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256)
+  $contract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot
+  return [string]$contract.package_source_sha256
 }
 
 # Compatibility entry points retain their names for existing package-excluded

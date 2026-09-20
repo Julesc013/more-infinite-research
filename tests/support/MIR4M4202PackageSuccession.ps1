@@ -9,11 +9,12 @@ function Test-MIR4M4202PackageSourceSuccession {
 
   try{
     . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
-    # V3 is frozen layout evidence and V4 is frozen Factorio-1 convergence
-    # evidence. V5 is the current progression successor.
-    $currentPresentation = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $RepoRoot
-    if ([string]$currentPresentation.package_source.fingerprint_sha256 -cne $CurrentSha256 -or
-        (@($currentPresentation.package_source.roots) -join '|') -cne 'source|targets') { return $false }
+    # V3--V5 are frozen package-presentation evidence. Current development is
+    # validated by the non-receipt package contract so ordinary source changes
+    # do not require an artificial V6 historical receipt.
+    $historicalPresentation = Get-MIR4CurrentPackagePresentationV5Historical -RepoRoot $RepoRoot
+    $currentContract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $CurrentSha256
+    if ((@($currentContract.roots) -join '|') -cne 'source|targets' -or [bool]$currentContract.release_authority) { return $false }
     if($PredecessorSha256-ceq$CurrentSha256){return $true}
 
     $receiptPath=Join-Path $RepoRoot 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
@@ -56,7 +57,7 @@ function Test-MIR4M4202PackageSourceSuccession {
 
     # V2/V3/V4 are frozen predecessor evidence. V5 is the current successor
     # and validates the progression composition plus the explicit F1 nonclaim.
-    $presentation=$currentPresentation
+    $presentation=$historicalPresentation
     $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
     $targetSemantics = @{}
     foreach ($target in @($presentation.target_content_identities)) {
@@ -64,7 +65,7 @@ function Test-MIR4M4202PackageSourceSuccession {
     }
     return (
       [string]$presentation.kind -ceq 'MIR4CurrentPackagePresentationV5' -and
-      [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
+      [string]$currentContract.package_source_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
        (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and
@@ -189,26 +190,48 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
         $ExpectedBindingSha[$path]=[string]$binding.current_sha256
       }
     }
-    # The V3 composable-source successor is the sole current binding that may
-    # advance a frozen M42-02 module expectation. It is deliberately narrow:
-    # only an authenticated evolved path may move, and it grants no release
-    # operation authority.
+    # V3 is frozen progression evidence and V4 is the current proof-input
+    # successor. Only their authenticated evolved paths may advance a frozen
+    # M42-02 module expectation; neither grants release operation authority.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
-    $successor = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot
-    $inventoryPath = [string]$successor.current.tooling_inventory.path
-    if ($ExpectedBindingSha.ContainsKey($inventoryPath)) {
-      if ([string]$successor.current.tooling_inventory_predecessor_sha256 -cne [string]$ExpectedBindingSha[$inventoryPath] -or
-          [string]$successor.current.tooling_inventory.sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
-      $ExpectedBindingSha[$inventoryPath] = [string]$successor.current.tooling_inventory.sha256
+    foreach ($successor in @(
+      Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot
+      Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot
+    )) {
+      $inventoryPath = [string]$successor.current.tooling_inventory.path
+      if ($ExpectedBindingSha.ContainsKey($inventoryPath)) {
+        if ([string]$successor.current.tooling_inventory_predecessor_sha256 -cne [string]$ExpectedBindingSha[$inventoryPath] -or
+            [string]$successor.current.tooling_inventory.sha256 -notmatch '^[A-F0-9]{64}$') { return $false }
+        $ExpectedBindingSha[$inventoryPath] = [string]$successor.current.tooling_inventory.sha256
+      }
+      foreach($binding in @($successor.evolved_bindings)){
+        $path=[string]$binding.path
+        if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
+        if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path] -or
+           [string]$binding.hash_mode -cne 'canonical-text-v1' -or
+           [bool]$binding.package_visible -or
+           [bool]$binding.release_authority){return $false}
+        $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+      }
     }
-    foreach($binding in @($successor.evolved_bindings)){
-      $path=[string]$binding.path
-      if(-not $ExpectedBindingSha.ContainsKey($path)){continue}
-      if([string]$binding.previous_sha256 -cne [string]$ExpectedBindingSha[$path] -or
-         [string]$binding.hash_mode -cne 'canonical-text-v1' -or
-         [bool]$binding.package_visible -or
-         [bool]$binding.release_authority){return $false}
-      $ExpectedBindingSha[$path]=[string]$binding.current_sha256
+
+    # The succession records above are immutable historical evidence. Current
+    # package-excluded development files have a separate live contract: they
+    # must exist at safe repository-relative paths and the command inventory
+    # must be at its generated fixed point, but an ordinary later edit does
+    # not require manufacturing V5/V6 historical receipts.
+    . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check | Out-Null
+    foreach ($path in @($ExpectedBindingSha.Keys)) {
+      $portable = ([string]$path).Replace('\','/').TrimStart('/')
+      if ([string]::IsNullOrWhiteSpace($portable) -or
+          [IO.Path]::IsPathRooted([string]$path) -or
+          $portable -match '(^|/)\.\.(/|$)' -or
+          $portable -ceq 'source' -or $portable.StartsWith('source/',[StringComparison]::Ordinal) -or
+          $portable -ceq 'targets' -or $portable.StartsWith('targets/',[StringComparison]::Ordinal)) { return $false }
+      $livePath = Join-Path $RepoRoot $portable
+      if (-not (Test-Path -LiteralPath $livePath -PathType Leaf)) { return $false }
+      $ExpectedBindingSha[$path] = Get-MIR4BootstrapTextSha256 -Path $livePath
     }
     return $true
   }catch{return $false}
@@ -263,9 +286,9 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     # inventory succession through their final evolved binding.  The one-source
     # cutover deliberately changes that inventory, so do not substitute the
     # live file for the successor. V2 is the immutable Factorio-1 predecessor;
-    # V3 is the append-only current boundary that records the live inventory
-    # alongside the progression source successor. We return its digest only
-    # after the historical custody and current live binding both agree.
+    # V3 and V4 are immutable historical evidence. Validate their exact
+    # custody, then evaluate the current generated inventory independently so
+    # later development does not rewrite those records.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
     $historicalSuccessor = Get-MIR4M41ToM42ComposableSourceSuccessionV2Historical -RepoRoot $RepoRoot
     $factorioAuthorityPath = Join-Path $RepoRoot ([string]$historicalSuccessor.factorio_one_successor.authority.path)
@@ -277,20 +300,18 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     if ([string]$historicalSuccessor.factorio_one_successor.receipt.path -cne 'assurance/repository/factorio-one-source-convergence-v1.json' -or
         [string]$historicalSuccessor.factorio_one_successor.receipt.kind -cne [string]$factorioReceipt.kind -or
         [string]$historicalSuccessor.factorio_one_successor.receipt.record_sha256 -cne [string]$factorioReceipt.record_sha256) { return $null }
-    $successorInventory = (Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot).current.tooling_inventory
+    $successorInventory = (Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot).current.tooling_inventory
     if ([string]$successorInventory.path -cne $inventoryRelativePath -or
         [string]$successorInventory.hash_mode -cne 'canonical-text-v1' -or
         [int]$successorInventory.command_count -ne 85 -or
         [int]$successorInventory.unknown -ne 0 -or
         [int]$successorInventory.duplicate_command_keys -ne 0) { return $null }
-    $inventoryPath = Join-Path $RepoRoot ([string]$successorInventory.path)
-    if (-not (Test-Path -LiteralPath $inventoryPath -PathType Leaf) -or
-        (Get-MIR4BootstrapTextSha256 -Path $inventoryPath) -cne [string]$successorInventory.sha256) { return $null }
-    $inventory = Get-Content -Raw -LiteralPath $inventoryPath | ConvertFrom-Json -Depth 100 -DateKind String
-    if ([string]$inventory.digest -cne [string]$successorInventory.digest -or
-        [int]$inventory.command_count -ne [int]$successorInventory.command_count -or
-        [int]$inventory.summary.unknown -ne [int]$successorInventory.unknown -or
-        [int]$inventory.summary.duplicate_command_keys -ne [int]$successorInventory.duplicate_command_keys) { return $null }
-    return [string]$successorInventory.digest
+    . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    $currentInventory = Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check
+    if ([int]$currentInventory.command_count -ne 85 -or
+        [int]$currentInventory.summary.unknown -ne 0 -or
+        [int]$currentInventory.summary.duplicate_command_keys -ne 0 -or
+        [string]$currentInventory.digest -cnotmatch '^sha256:[a-f0-9]{64}$') { return $null }
+    return [string]$currentInventory.digest
   }catch{return $null}
 }

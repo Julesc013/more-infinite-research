@@ -95,15 +95,6 @@
         "mode": "load-only",
         "required_result": "passed",
         "maximum_dependency_failures": 0,
-        "required_audit_rows": [
-          {
-            "kind": "rule_mutation",
-            "key": "factorio_2_1_ambient_sound_schema",
-            "status": "repaired",
-            "mod": "corrundum",
-            "observed_value": "1.0.47"
-          }
-        ],
         "required_log_fragments": [
           "Maximum-level state force=player technology=braking-force-8 selected-cap=13 effective-cap=13 prototype-max=4294967295",
           "Maximum-level state force=player technology=low-density-structure-productivity selected-cap=13 effective-cap=13 prototype-max=4294967295",
@@ -121,7 +112,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Corrundum 1.0.47 and PlanetsLib 1.19.5 loader-schema and maximum-cap-13 reproduction envelope on Factorio 2.1.14."
+      "notes": "Historical Corrundum 1.0.47 and PlanetsLib 1.19.5 maximum-cap-13 reproduction envelope on Factorio 2.1.14. The removed ambient-sound repair is not a current-source claim."
     },
     {
       "name": "local-2-1-cubium-production-routes",
@@ -145,15 +136,6 @@
         "mode": "load-only",
         "required_result": "passed",
         "maximum_dependency_failures": 0,
-        "required_audit_rows": [
-          {
-            "kind": "rule_mutation",
-            "key": "factorio_2_1_ambient_sound_schema",
-            "status": "repaired",
-            "mod": "cubium",
-            "observed_value": "1.0.30"
-          }
-        ],
         "required_log_fragments": [
           "[mir-fixture-assert-cubium-production-routes] PASS packs=11 selected=ordinary-primary late-route=cube-mastery-4"
         ],
@@ -163,7 +145,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Cubium 1.0.30 route-selection assertion harness on Factorio 2.1.14. The harness proves that all eleven Cubium cubic alternates remain later routes rather than first-acquisition prerequisites."
+      "notes": "Historical Cubium 1.0.30 route-selection assertion harness on Factorio 2.1.14. The removed ambient-sound repair is not a current-source claim; the archived harness records eleven cubic alternates as later routes rather than first-acquisition prerequisites."
     },
     {
       "name": "local-2-1-recycler-progression-routes",

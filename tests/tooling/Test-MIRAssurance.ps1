@@ -33,6 +33,8 @@ $releaseAssuranceSource = @(
 ) -join "`n"
 $assuranceSelfTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tests\tooling\support\MIRAssuranceSelfTest.ps1")
 $assuranceEntryPointSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
+$releaseCandidateWorkflowSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\release-candidate.yml")
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 $assuranceEvidenceSource = @(
   Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
   Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\evidence") -File -Filter "*.ps1" |
@@ -51,6 +53,73 @@ foreach ($requiredTrustSelfTestSnippet in @(
 
 if ($releaseAssuranceFacadeSource.Contains('function Invoke-MIRAssuranceSelfTest')) { throw 'Release authority still embeds assurance self-test implementation.' }
 if (-not $assuranceEntryPointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) { throw 'Assurance self-test command does not load canonical test support.' }
+if (([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('CurrentTargetPackage.ps1'))).Count -lt 3 -or
+    ([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('Get-MIR4CurrentTargetPackageOutputText'))).Count -lt 3 -or
+    $releaseCandidateWorkflowSource.Contains('Get-Content info.json -Raw') -or
+    $releaseCandidateWorkflowSource.Contains("Join-Path `$candidate 'info.json'") -or
+    $releaseCandidateWorkflowSource.Contains("Join-Path `$controller 'info.json'")) {
+  throw 'Release-candidate workflow must derive current package metadata from the canonical materialized target, not a retired repository-root info.json.'
+}
+foreach ($requiredExactArchiveSnippet in @(
+  '$build = @(./tools/commands/package/Build-MIRPackage.ps1)',
+  '$candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
+  ". (Join-Path `$controller 'tools/lib/validation/CurrentTargetPackage.ps1')",
+  'Get-MIR4ExactRetainedCandidateArchive',
+  '-ExpectedSha256 $env:MIR_RC_ARCHIVE_SHA256',
+  'sha256 = [string]$retainedCandidate.sha256',
+  "kind = 'MIRProtectedReleaseCandidateRunV2'",
+  "archive_origin = 'candidate-build-result'",
+  'role = [string]$retainedCandidate.role'
+)) {
+  if (-not $releaseCandidateWorkflowSource.Contains($requiredExactArchiveSnippet)) {
+    throw "Release-candidate workflow does not retain its exact candidate build result: $requiredExactArchiveSnippet"
+  }
+}
+
+function Assert-MIR4ExactRetainedCandidateArchiveRegression {
+  $root=Join-Path ([IO.Path]::GetTempPath()) ('mir-retained-candidate-'+[guid]::NewGuid().ToString('N'))
+  $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  if(-not[IO.Path]::GetFullPath($root).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir-retained-candidate-test-root]' }
+  try {
+    $candidate=Join-Path $root 'candidate'
+    New-Item -ItemType Directory -Path $candidate -Force|Out-Null
+    $archive=Join-Path $candidate 'candidate.zip'
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    $sha=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+    $row=Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha
+    if([string]$row.path-cne'candidate/candidate.zip'-or[string]$row.sha256-cne$sha-or[int64]$row.bytes-ne8){throw '[mir-retained-candidate-test-positive]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52,0))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-sha256'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-corruption]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    [IO.File]::WriteAllBytes((Join-Path $candidate 'extra.zip'),[byte[]](80,75,3,4))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-count'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-extra-archive]'}
+
+    $outside=Join-Path $root 'outside'
+    New-Item -ItemType Directory -Path $outside|Out-Null
+    [IO.File]::WriteAllBytes((Join-Path $outside 'candidate.zip'),[byte[]](80,75,3,4,77,73,82,52))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $outside -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-directory'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-directory]'}
+  } finally {
+    if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force}
+  }
+}
+Assert-MIR4ExactRetainedCandidateArchiveRegression
+foreach ($forbiddenDistCandidateSnippet in @(
+  'Join-Path $candidate "dist/more-infinite-research_',
+  'Join-Path $controller "dist/more-infinite-research_'
+)) {
+  if ($releaseCandidateWorkflowSource.Contains($forbiddenDistCandidateSnippet)) {
+    throw "Release-candidate workflow must not substitute a dist archive for the candidate build result: $forbiddenDistCandidateSnippet"
+  }
+}
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
@@ -624,8 +693,81 @@ if ([string]$jsonDigestA.policy_id -ne "json-sorted-properties-utf8-nfc-lf-final
 }
 $script:repo = $RepoRoot
 . (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
+. (Join-Path $RepoRoot "tools\lib\assurance\Domains.ps1")
+$retiredCurrentInputPattern = '^(?:src(?:/|$)|prototypes(?:/|$)|locale(?:/|$)|settings[^/]*\.lua$|info\.json$)'
+$typedInputCounts = [ordered]@{ source = 0; package = 0; historical = 0 }
+foreach ($test in @($catalog.tests)) {
+  $testInputs = Get-MIRAssuranceOptionalObjectValue -Object $test -Name 'inputs'
+  foreach ($input in @($testInputs)) {
+    $inputName = [string]$input
+    if ($inputName -match $retiredCurrentInputPattern) {
+      throw "Current assurance input revives a retired product root: $($test.id) -> $inputName"
+    }
+    if ($inputName.StartsWith('source/', [StringComparison]::Ordinal)) {
+      throw "Current source assurance input must declare source: authority: $($test.id) -> $inputName"
+    }
+    if ($inputName.StartsWith('source:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.source++
+      if (-not $inputName.Substring('source:'.Length).StartsWith('source/', [StringComparison]::Ordinal)) {
+        throw "Current source assurance input is outside the canonical source root: $($test.id) -> $inputName"
+      }
+    } elseif ($inputName.StartsWith('package:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.package++
+    } elseif ($inputName.StartsWith('historical:', [StringComparison]::Ordinal)) {
+      $typedInputCounts.historical++
+      if ($inputName -notmatch '^historical:[0-9a-f]{40}:[^:]+$') {
+        throw "Historical assurance input is not commit-pinned: $($test.id) -> $inputName"
+      }
+    }
+  }
+}
+foreach ($kind in $typedInputCounts.Keys) {
+  if ([int]$typedInputCounts[$kind] -eq 0) {
+    throw "Assurance catalog must exercise explicit $kind proof-input authority."
+  }
+}
+$typedFingerprintContext = [pscustomobject]@{ target = '2.1' }
+$typedFingerprintPlan = [pscustomobject]@{}
+$typedFingerprintTest = [pscustomobject]@{}
+$sourceFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'source:source/prototypes/mir/settings/**' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$packageFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'package:info.json' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$historicalFingerprint = Get-MIRAssuranceInputFingerprint -InputName 'historical:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+$balanceFingerprint = Get-MIRAssuranceBalanceContractFingerprint
+if ([string]$sourceFingerprint.kind -ne 'current-source' -or [int]$sourceFingerprint.file_count -le 0 -or
+    [string]$packageFingerprint.kind -ne 'materialized-package' -or [string]$packageFingerprint.target -ne 'f210' -or [int]$packageFingerprint.file_count -ne 1 -or
+    [string]$historicalFingerprint.kind -ne 'pinned-historical' -or [string]$historicalFingerprint.commit -ne '297aa5cc902da96847165a4f9caa1048608839fb' -or
+    [string]$balanceFingerprint.kind -ne 'balance-contract' -or @($balanceFingerprint.source.Keys).Count -ne 5) {
+  throw 'Typed assurance proof-input fingerprints did not retain their distinct current-source, materialized-package, and pinned-historical authorities.'
+}
+try {
+  $null = Get-MIRAssuranceInputFingerprint -InputName 'source:source/does-not-exist/**' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+  throw 'A required missing current-source assurance input was accepted.'
+} catch {
+  if ($_.Exception.Message -notmatch '^\[mir-assurance-required-source-input-no-match\] source/does-not-exist/\*\*$') { throw }
+}
+try {
+  $null = Get-MIRAssuranceInputFingerprint -InputName 'source:source\..\README.md' -Plan $typedFingerprintPlan -Context $typedFingerprintContext -Test $typedFingerprintTest
+  throw 'A Windows-separator source traversal assurance input was accepted.'
+} catch {
+  if ($_.Exception.Message -cne '[mir-assurance-source-input-path] source\..\README.md') { throw }
+}
+$currentTargetContext = Get-MIRAssuranceMaterializedPackageContext -Target 'f210'
+$ambientRepairOutput = Resolve-MIR4CurrentTargetPackageOutputPath -Context $currentTargetContext -RelativePath 'prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua' -AllowMissing
+$currentCompatibilitySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/compatibility.yml')
+$currentCompilerDiagnosticsSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'tools/lib/validation/runner/StaticCompilerDiagnostics.ps1')
+if ($null -ne $ambientRepairOutput -or
+    $currentCompatibilitySource.Contains('factorio_2_1_ambient_sound_schema') -or
+    $currentCompilerDiagnosticsSource.Contains('factorio_2_1_ambient_sound_schema')) {
+  throw 'Current source or F210 materialization revived the retired ambient-sound schema repair instead of preserving it as historical-only evidence.'
+}
 $campaignFingerprintRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-performance-campaign-" + [guid]::NewGuid().ToString("N"))
 $originalAssuranceRepo = $script:repo
+$originalAssuranceRepositoryFilesCache = $script:MIRAssuranceRepositoryFilesCache
+$originalAssurancePatternFingerprintCache = $script:MIRAssurancePatternFingerprintCache
+$originalAssuranceGitIndexBlobs = $script:MIRAssuranceGitIndexBlobs
+$originalAssuranceDirtyPaths = $script:MIRAssuranceDirtyPaths
+$originalAssuranceBlobCache = $script:MIRAssuranceBlobCache
+$originalAssuranceTreeHashCache = $script:MIRAssuranceTreeHashCache
 try {
   $campaignRoot = Join-Path $campaignFingerprintRoot ".mir"
   $versionedCampaignRoot = Join-Path $campaignRoot "performance-campaigns"
@@ -640,7 +782,12 @@ try {
   & git -C $campaignFingerprintRoot add -- .mir
   if ($LASTEXITCODE -ne 0) { throw "Unable to materialize the performance campaign fingerprint fixture Git index." }
   $script:repo = $campaignFingerprintRoot
+  $script:MIRAssuranceRepositoryFilesCache = $null
   $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceGitIndexBlobs = $null
+  $script:MIRAssuranceDirtyPaths = $null
+  $script:MIRAssuranceBlobCache = $null
+  $script:MIRAssuranceTreeHashCache = $null
   $campaignContext = [pscustomobject]@{target="2.1"}
   $resolvedCampaignPath = Resolve-MIRAssurancePerformanceCampaignPath -Context $campaignContext
   $beforeCampaignFingerprint = Get-MIRAssurancePerformanceCampaignFingerprint -Context $campaignContext
@@ -666,7 +813,12 @@ try {
   }
 } finally {
   $script:repo = $originalAssuranceRepo
-  $script:MIRAssurancePatternFingerprintCache = @{}
+  $script:MIRAssuranceRepositoryFilesCache = $originalAssuranceRepositoryFilesCache
+  $script:MIRAssurancePatternFingerprintCache = $originalAssurancePatternFingerprintCache
+  $script:MIRAssuranceGitIndexBlobs = $originalAssuranceGitIndexBlobs
+  $script:MIRAssuranceDirtyPaths = $originalAssuranceDirtyPaths
+  $script:MIRAssuranceBlobCache = $originalAssuranceBlobCache
+  $script:MIRAssuranceTreeHashCache = $originalAssuranceTreeHashCache
   if (Test-Path -LiteralPath $campaignFingerprintRoot) { Remove-Item -LiteralPath $campaignFingerprintRoot -Recurse -Force }
 }
 $candidateContext = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target f210
@@ -773,7 +925,7 @@ foreach ($requiredReleaseCandidateSnippet in @(
   'git clone --quiet --shared --no-checkout',
   'git -C $authority cat-file -e',
   'Checked-out controller does not match the workflow source commit.',
-  'Archive SHA mismatch for ${archive}',
+  'Built archive SHA mismatch:',
   'resume_exact_dist_evidence_run:',
   'Admit prior passing exact-dist evidence',
   'Prior exact-dist evidence was invalidated by controller changes',
@@ -793,7 +945,8 @@ foreach ($requiredReleaseCandidateSnippet in @(
   "--candidate `$candidateArchive",
   '--candidate-source $env:MIR_RC_CANDIDATE_SHA',
   "--output 'build/results/release-gate'",
-  'MIRProtectedReleaseCandidateRunV1',
+  'MIRProtectedReleaseCandidateRunV2',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
   'build/results/protected-release-candidate/${{ github.run_id }}-${{ github.run_attempt }}',
   "runtime-evidence",
   'runtime_evidence = $runtimeEvidenceRows'

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.more-infinite-research.invalid/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "recorded_at", "predecessor", "progression_package_presentation", "current", "evolved_bindings", "invariants", "transition_gate", "record_sha256"],
+  "properties": {
+    "schema": {"const": 4},
+    "kind": {"const": "MIR4M41ToM42ComposableSourceSuccessionV4"},
+    "status": {"const": "MIR41-HISTORICAL-LINEAGE-PRESERVED-MIR42-PROOF-INPUT-CONTROL-PLANE-SUCCESSOR-STATIC-VERIFIED"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {"$ref": "#/$defs/predecessor"},
+    "progression_package_presentation": {"$ref": "#/$defs/presentation"},
+    "current": {"$ref": "#/$defs/current"},
+    "evolved_bindings": {"type": "array", "minItems": 16, "maxItems": 16, "items": {"$ref": "#/$defs/evolvedBinding"}},
+    "invariants": {"$ref": "#/$defs/invariants"},
+    "transition_gate": {"$ref": "#/$defs/gates"},
+    "record_sha256": {"const": "F4C9D487B5E1A304978020391069DC7EE8BF84C0FB5946C87E78B45C033CCEFB"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "record_sha256", "immutable_historical_receipt"],
+      "properties": {
+        "path": {"const": "assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json"},
+        "kind": {"const": "MIR4M41ToM42ComposableSourceSuccessionV3"},
+        "record_sha256": {"const": "387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53"},
+        "immutable_historical_receipt": {"const": true}
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "kind", "record_sha256"],
+      "properties": {
+        "path": {"const": "spec/distribution/mir4-current-package-presentation-v5.json"},
+        "kind": {"const": "MIR4CurrentPackagePresentationV5"},
+        "record_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["package_source_sha256", "package_authority", "tooling_inventory_predecessor_sha256", "tooling_inventory", "f210_f200_exact_engine_qualification_required", "f110_f100_progression_capability_nonclaim"],
+      "properties": {
+        "package_source_sha256": {"const": "A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F"},
+        "package_authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "kind", "record_sha256"],
+          "properties": {
+            "path": {"const": "targets/package-authority.json"},
+            "kind": {"const": "MIR4CanonicalPackageAuthorityV2"},
+            "record_sha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "tooling_inventory_predecessor_sha256": {"const": "59F98A68D36A085DEDF47B9B60AA8C4157BF6BB9A7A0D3FB4331B0DC772BF35D"},
+        "tooling_inventory": {"$ref": "#/$defs/toolingInventoryBinding"},
+        "f210_f200_exact_engine_qualification_required": {"const": true},
+        "f110_f100_progression_capability_nonclaim": {"const": true}
+      }
+    },
+    "evolvedBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "previous_sha256", "current_sha256", "hash_mode", "package_visible", "release_authority"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "previous_sha256": {"$ref": "#/$defs/sha256"},
+        "current_sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "package_visible": {"const": false},
+        "release_authority": {"const": false}
+      }
+    },
+    "toolingInventoryBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "hash_mode", "digest", "command_count", "unknown", "duplicate_command_keys"],
+      "properties": {
+        "path": {"const": "governance/automation/mir4-command-inventory-v1.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "hash_mode": {"const": "canonical-text-v1"},
+        "digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "command_count": {"const": 85},
+        "unknown": {"const": 0},
+        "duplicate_command_keys": {"const": 0}
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["historical_mir41_lineage_immutable", "v3_progression_successor_immutable", "v5_package_presentation_immutable", "proof_input_authorities_typed_and_fail_closed", "f210_f200_exact_engine_qualification_required", "f110_f100_progression_capability_omitted_nonclaim", "current_mir41_release_operations_authorized"],
+      "properties": {
+        "historical_mir41_lineage_immutable": {"const": true},
+        "v3_progression_successor_immutable": {"const": true},
+        "v5_package_presentation_immutable": {"const": true},
+        "proof_input_authorities_typed_and_fail_closed": {"const": true},
+        "f210_f200_exact_engine_qualification_required": {"const": true},
+        "f110_f100_progression_capability_omitted_nonclaim": {"const": true},
+        "current_mir41_release_operations_authorized": {"const": false}
+      }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["development_merge", "private_build", "qualification", "technical_seal", "main_promotion", "version_allocation", "tagging", "signing", "sealing", "publication"],
+      "properties": {
+        "development_merge": {"const": true},
+        "private_build": {"const": false},
+        "qualification": {"const": false},
+        "technical_seal": {"const": false},
+        "main_promotion": {"const": false},
+        "version_allocation": {"const": false},
+        "tagging": {"const": false},
+        "signing": {"const": false},
+        "sealing": {"const": false},
+        "publication": {"const": false}
+      }
+    }
+  }
+}

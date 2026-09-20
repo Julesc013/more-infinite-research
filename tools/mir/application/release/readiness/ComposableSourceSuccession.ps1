@@ -589,8 +589,22 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionV3 {
   $raw = Get-Content -Raw -LiteralPath (Join-Path $repo $policy.output_path)
   $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema)) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10)) { throw '[mir4-m41-m42-succession-v3-integrity]' }
-  $expected = New-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $repo -RecordedAt ([string]$record.recorded_at)
-  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) { throw '[mir4-m41-m42-succession-v3-stale]' }
+  # V3 is immutable evidence for the progression successor.  It must not be
+  # regenerated against later control-plane changes; those changes belong to
+  # V4 and bind V3 by this exact record identity.
+  if ([string]$record.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV3' -or
+      [string]$record.status -cne 'MIR41-HISTORICAL-LINEAGE-PRESERVED-MIR42-PROGRESSION-SOURCE-SUCCESSOR-STATIC-VERIFIED' -or
+      [string]$record.record_sha256 -cne '387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53' -or
+      [string]$record.predecessor.path -cne $policy.v2_path -or
+      [string]$record.predecessor.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV2' -or
+      [string]$record.predecessor.record_sha256 -cne '26D782754CD2FB05715279C9A5AAC0847C54E0AA639839FCCF906D069059FE26' -or
+      -not [bool]$record.predecessor.immutable_historical_receipt -or
+      [string]$record.progression_package_presentation.path -cne $policy.presentation_path -or
+      [string]$record.progression_package_presentation.kind -cne 'MIR4CurrentPackagePresentationV5' -or
+      [string]$record.progression_package_presentation.record_sha256 -cne 'D2C73297B4A7BA404B13EEC0AB29C5CDE56357F04ED4B48C9B1099F2F2DA7470' -or
+      [string]$record.current.package_source_sha256 -cne 'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F') {
+    throw '[mir4-m41-m42-succession-v3-historical-integrity]'
+  }
   Assert-MIR4M41ToM42SourceSuccessionGate -Gate $record.transition_gate -Code 'mir4-m41-m42-succession-v3-gate'
   return $record
 }
@@ -598,9 +612,249 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionV3 {
 function Test-MIR4M41ToM42ComposableSourceSuccessionV3 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[object]$SuccessionRecord)
   if ($null -eq $SuccessionRecord) { $SuccessionRecord = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot }
-  $expected = New-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot -RecordedAt ([string]$SuccessionRecord.recorded_at)
-  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $SuccessionRecord) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected)) { throw '[mir4-m41-m42-succession-v3-stale]' }
+  if (-not (Test-MIR4BootstrapRecordHash -Record $SuccessionRecord) -or
+      [string]$SuccessionRecord.record_sha256 -cne '387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53') {
+    throw '[mir4-m41-m42-succession-v3-historical-integrity]'
+  }
+  Assert-MIR4M41ToM42SourceSuccessionGate -Gate $SuccessionRecord.transition_gate -Code 'mir4-m41-m42-succession-v3-gate'
   return [pscustomobject][ordered]@{status='passed-historical-mir41-to-current-mir42-progression-source-succession';current_release_operations_authorized=$false;factorio_one_exact_engine_proof_required=$true;current_package_source_sha256=[string]$SuccessionRecord.current.package_source_sha256;record_sha256=[string]$SuccessionRecord.record_sha256}
+}
+
+# V4 is the append-only proof-input/control-plane successor. It preserves V3
+# byte-for-byte while binding the typed proof-input repair and its exact
+# package-excluded control-plane identities to the unchanged V5 package.
+function Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy {
+  return [ordered]@{
+    output_path = 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v4.json'
+    output_schema = 'contracts/repository/mir4-m41-to-m42-composable-source-succession-v4.schema.json'
+    v3_path = 'assurance/repository/mir4-m41-to-m42-composable-source-succession-v3.json'
+    v3_schema = 'contracts/repository/mir4-m41-to-m42-composable-source-succession-v3.schema.json'
+    presentation_path = 'spec/distribution/mir4-current-package-presentation-v5.json'
+    presentation_schema = 'spec/schemas/mir4-current-package-presentation-v5.schema.json'
+    v3_record_sha256 = '387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53'
+    v3_tooling_inventory_sha256 = '59F98A68D36A085DEDF47B9B60AA8C4157BF6BB9A7A0D3FB4331B0DC772BF35D'
+    v5_record_sha256 = 'D2C73297B4A7BA404B13EEC0AB29C5CDE56357F04ED4B48C9B1099F2F2DA7470'
+    package_source_sha256 = 'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F'
+    package_authority_record_sha256 = '79FE8F85E4AE8DDF5003DC68DE40DC6C578754D1B630559FC4CB85FFE07AB30B'
+    control_plane_bindings = @(
+      [pscustomobject][ordered]@{path='.github/workflows/release-candidate.yml';previous_sha256='E8D63D687601D1889CAB08619FF08897E92416BF57B56FD87A7268F2B99D49DC'}
+      [pscustomobject][ordered]@{path='.mir/assurance.json';previous_sha256='5116211C95BE060474B091C50971637C337EA4015B9312D99BE4C825CE56EAA2'}
+      [pscustomobject][ordered]@{path='.mir/compatibility.yml';previous_sha256='72F8024B9E3DC448377BDADCEC84BB4E7808FBE5DD7EE46303BCCC4144191095'}
+      [pscustomobject][ordered]@{path='.mir/test-impact.yml';previous_sha256='927BB6AF61D261D19A9A573596198EDC529FDD3FA3E4BAB16EFA709B54B54170'}
+      [pscustomobject][ordered]@{path='assurance/catalog/tests.json';previous_sha256='C0F358186B2B770A376BD881F211EE072963A2F3360E7AD64D0C0F9C1125FF7D'}
+      [pscustomobject][ordered]@{path='docs/compatibility/targets/corrundum.md';previous_sha256='998A27579611C67B240C07EA0809D08793063CB3EBE451704AC233123D09B7D9'}
+      [pscustomobject][ordered]@{path='docs/compatibility/targets/cubium.md';previous_sha256='EA1AC5710D489076B49E9769A62AC8D05EB879AE15AD0458B45ADC1DEF391621'}
+      [pscustomobject][ordered]@{path='tests/package/Test-MIRContextPackage.ps1';previous_sha256='133CB8A6D32B222AC3F5A9515F4D67B253170D27F3FD899E8CC29768D7E00231'}
+      [pscustomobject][ordered]@{path='tests/repository/Test-MIR4DevelopmentContracts.ps1';previous_sha256='FD2132D3430AE8ED703B23308DE3E8A3B7C360176F14EE199E7DF75EB7095FA7'}
+      [pscustomobject][ordered]@{path='tests/tooling/Test-MIRAssurance.ps1';previous_sha256='4353D89895DF35CAC6CC1109A1FD4070777F26160CBDCD72E99AEEE9D7B7DBED'}
+      [pscustomobject][ordered]@{path='tests/tooling/support/MIRAssuranceSelfTest.ps1';previous_sha256='E4ABF9B8685BEF1ADDF0F64FDF41BF13E5E170254264102B942C8A08C4AB37C7'}
+      [pscustomobject][ordered]@{path='tools/lib/assurance/Domains.ps1';previous_sha256='28DC1A8F9369D81FEDFCBFB68FE0998CC94A575EED2321B9510AC8D6C457BBAD'}
+      [pscustomobject][ordered]@{path='tools/lib/assurance/evidence/Fingerprints.ps1';previous_sha256='69DC0201E97C2E3B4A6027313365625DC1F708295C7840B41FD0A24B771E0D73'}
+      [pscustomobject][ordered]@{path='tools/lib/validation/runner/StaticCompilerDiagnostics.ps1';previous_sha256='A144C5ACF98BBAFF6EB61D6A4FCE7712F9E2FBB4C7B78FB43159742210B6F476'}
+      [pscustomobject][ordered]@{path='validation/scenarios/local-2.1.json';previous_sha256='912AA8D22C2E5E140340866535CD05729D06C6A09A107B619CDE758DE1F37B46'}
+      [pscustomobject][ordered]@{path='validation/tests.yml';previous_sha256='B6D415F82816BC100D817A518A3FAC09A190DE1CBAA571F82A89753310F8D004'}
+    )
+  }
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV4ExpectedRecordSha256 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+  $schema = Get-Content -Raw -LiteralPath (Join-Path $repo $policy.output_schema) |
+    ConvertFrom-Json -Depth 100 -DateKind String
+  $expected = [string]$schema.properties.record_sha256.const
+  if ($expected -cnotmatch '^[A-F0-9]{64}$') {
+    throw '[mir4-m41-m42-succession-v4-schema-record-identity]'
+  }
+  return $expected
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV4EvolvedBindings {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+  $bindings = [Collections.Generic.List[object]]::new()
+  foreach ($spec in @($policy.control_plane_bindings)) {
+    $path = Join-Path $repo ([string]$spec.path)
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+      throw "[mir4-m41-m42-succession-v4-control-plane-binding-missing] $($spec.path)"
+    }
+    $currentSha256 = Get-MIR4BootstrapTextSha256 -Path $path
+    if ($currentSha256 -ceq [string]$spec.previous_sha256) {
+      throw "[mir4-m41-m42-succession-v4-control-plane-binding-unchanged] $($spec.path)"
+    }
+    $bindings.Add([pscustomobject][ordered]@{
+      path = [string]$spec.path
+      previous_sha256 = [string]$spec.previous_sha256
+      current_sha256 = $currentSha256
+      hash_mode = 'canonical-text-v1'
+      package_visible = $false
+      release_authority = $false
+    })
+  }
+  return @($bindings)
+}
+
+function Assert-MIR4M41ToM42ComposableSourceSuccessionV4Record {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][object]$Record
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+  $canonical = ConvertTo-MIR4BootstrapCanonicalJson -Value $Record
+  $schemaValid = $false
+  try {
+    $schemaValid = [bool]($canonical | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema) -ErrorAction Stop)
+  } catch {
+    $schemaValid = $false
+  }
+  if (-not $schemaValid) {
+    throw '[mir4-m41-m42-succession-v4-record-schema]'
+  }
+  $expectedRecordSha256 = Get-MIR4M41ToM42ComposableSourceSuccessionV4ExpectedRecordSha256 -RepoRoot $repo
+  if (-not (Test-MIR4BootstrapRecordHash -Record $Record) -or
+      [string]$Record.record_sha256 -cne $expectedRecordSha256) {
+    throw '[mir4-m41-m42-succession-v4-record-identity]'
+  }
+
+  # Resolve and validate the immutable predecessor itself. A matching string in
+  # V4 must never replace proof that the accepted V3 record is still present.
+  $v3 = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $repo
+  if ([string]$Record.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV4' -or
+      [string]$Record.status -cne 'MIR41-HISTORICAL-LINEAGE-PRESERVED-MIR42-PROOF-INPUT-CONTROL-PLANE-SUCCESSOR-STATIC-VERIFIED' -or
+      [string]$Record.predecessor.path -cne $policy.v3_path -or
+      [string]$Record.predecessor.kind -cne 'MIR4M41ToM42ComposableSourceSuccessionV3' -or
+      [string]$Record.predecessor.record_sha256 -cne [string]$v3.record_sha256 -or
+      [string]$Record.predecessor.record_sha256 -cne $policy.v3_record_sha256 -or
+      -not [bool]$Record.predecessor.immutable_historical_receipt -or
+      [string]$Record.progression_package_presentation.path -cne $policy.presentation_path -or
+      [string]$Record.progression_package_presentation.kind -cne 'MIR4CurrentPackagePresentationV5' -or
+      [string]$Record.progression_package_presentation.record_sha256 -cne $policy.v5_record_sha256) {
+    throw '[mir4-m41-m42-succession-v4-record-predecessor]'
+  }
+  if ([string]$Record.current.package_source_sha256 -cne $policy.package_source_sha256 -or
+      [string]$Record.current.package_authority.path -cne 'targets/package-authority.json' -or
+      [string]$Record.current.package_authority.kind -cne 'MIR4CanonicalPackageAuthorityV2' -or
+      [string]$Record.current.package_authority.record_sha256 -cne $policy.package_authority_record_sha256 -or
+      [string]$Record.current.tooling_inventory_predecessor_sha256 -cne $policy.v3_tooling_inventory_sha256 -or
+      [string]$Record.current.tooling_inventory.path -cne 'governance/automation/mir4-command-inventory-v1.json' -or
+      [string]$Record.current.tooling_inventory.sha256 -cnotmatch '^[A-F0-9]{64}$' -or
+      [string]$Record.current.tooling_inventory.hash_mode -cne 'canonical-text-v1' -or
+      [string]$Record.current.tooling_inventory.digest -cnotmatch '^sha256:[a-f0-9]{64}$' -or
+      [int]$Record.current.tooling_inventory.command_count -ne 85 -or
+      [int]$Record.current.tooling_inventory.unknown -ne 0 -or
+      [int]$Record.current.tooling_inventory.duplicate_command_keys -ne 0 -or
+      -not [bool]$Record.current.f210_f200_exact_engine_qualification_required -or
+      -not [bool]$Record.current.f110_f100_progression_capability_nonclaim) {
+    throw '[mir4-m41-m42-succession-v4-record-current]'
+  }
+
+  $recordBindings = @($Record.evolved_bindings)
+  if ($recordBindings.Count -ne @($policy.control_plane_bindings).Count -or
+      @($recordBindings.path | Sort-Object -Unique -CaseSensitive).Count -ne $recordBindings.Count) {
+    throw '[mir4-m41-m42-succession-v4-record-bindings]'
+  }
+  foreach ($expected in @($policy.control_plane_bindings)) {
+    $binding = @($recordBindings | Where-Object { [string]$_.path -ceq [string]$expected.path })
+    if ($binding.Count -ne 1 -or
+        [string]$binding[0].previous_sha256 -cne [string]$expected.previous_sha256 -or
+        [string]$binding[0].hash_mode -cne 'canonical-text-v1' -or
+        [bool]$binding[0].package_visible -or
+        [bool]$binding[0].release_authority) {
+      throw "[mir4-m41-m42-succession-v4-record-binding] $($expected.path)"
+    }
+  }
+  foreach ($name in @(
+    'historical_mir41_lineage_immutable',
+    'v3_progression_successor_immutable',
+    'v5_package_presentation_immutable',
+    'proof_input_authorities_typed_and_fail_closed',
+    'f210_f200_exact_engine_qualification_required',
+    'f110_f100_progression_capability_omitted_nonclaim'
+  )) {
+    if (-not [bool]$Record.invariants.$name) {
+      throw "[mir4-m41-m42-succession-v4-record-invariant] $name"
+    }
+  }
+  if ([bool]$Record.invariants.current_mir41_release_operations_authorized) {
+    throw '[mir4-m41-m42-succession-v4-record-release-authority]'
+  }
+  Assert-MIR4M41ToM42SourceSuccessionGate -Gate $Record.transition_gate -Code 'mir4-m41-m42-succession-v4-record-gate'
+  return $true
+}
+
+function Read-MIR4M41ToM42ComposableSourceSuccessionV4Record {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [string]$RecordPath
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+  $path = if ([string]::IsNullOrWhiteSpace($RecordPath)) {
+    Join-Path $repo $policy.output_path
+  } elseif ([IO.Path]::IsPathRooted($RecordPath)) {
+    [IO.Path]::GetFullPath($RecordPath)
+  } else {
+    Join-Path $repo $RecordPath
+  }
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw '[mir4-m41-m42-succession-v4-record-missing]'
+  }
+  $raw = Get-Content -Raw -LiteralPath $path
+  try {
+    $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  } catch {
+    throw '[mir4-m41-m42-succession-v4-record-json]'
+  }
+  if ($raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10)) {
+    throw '[mir4-m41-m42-succession-v4-record-canonical]'
+  }
+  Assert-MIR4M41ToM42ComposableSourceSuccessionV4Record -RepoRoot $repo -Record $record | Out-Null
+  return $record
+}
+
+function New-MIR4M41ToM42ComposableSourceSuccessionV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-16T12:30:00+10:00')
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/lib/mir4/PackagePresentation.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  $policy = Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+  $v3 = Get-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $repo
+  $v5 = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $repo
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  $toolingInventory = Get-MIR4M41ToM42ComposableSourceSuccessionV2ToolingInventoryBinding -RepoRoot $repo
+  $evolvedBindings = Get-MIR4M41ToM42ComposableSourceSuccessionV4EvolvedBindings -RepoRoot $repo
+  $record = [pscustomobject][ordered]@{
+    schema=4;kind='MIR4M41ToM42ComposableSourceSuccessionV4';status='MIR41-HISTORICAL-LINEAGE-PRESERVED-MIR42-PROOF-INPUT-CONTROL-PLANE-SUCCESSOR-STATIC-VERIFIED';recorded_at=$RecordedAt
+    predecessor=[pscustomobject][ordered]@{path=$policy.v3_path;kind=[string]$v3.kind;record_sha256=[string]$v3.record_sha256;immutable_historical_receipt=$true}
+    progression_package_presentation=[pscustomobject][ordered]@{path=$policy.presentation_path;kind=[string]$v5.kind;record_sha256=[string]$v5.record_sha256}
+    current=[pscustomobject][ordered]@{package_source_sha256=[string]$v5.package_source.fingerprint_sha256;package_authority=[pscustomobject][ordered]@{path='targets/package-authority.json';kind=[string]$authority.kind;record_sha256=[string]$authority.record_sha256};tooling_inventory_predecessor_sha256=[string]$policy.v3_tooling_inventory_sha256;tooling_inventory=$toolingInventory;f210_f200_exact_engine_qualification_required=$true;f110_f100_progression_capability_nonclaim=$true}
+    evolved_bindings=@($evolvedBindings)
+    invariants=[pscustomobject][ordered]@{historical_mir41_lineage_immutable=$true;v3_progression_successor_immutable=$true;v5_package_presentation_immutable=$true;proof_input_authorities_typed_and_fail_closed=$true;f210_f200_exact_engine_qualification_required=$true;f110_f100_progression_capability_omitted_nonclaim=$true;current_mir41_release_operations_authorized=$false}
+    transition_gate=[pscustomobject][ordered]@{development_merge=$true;private_build=$false;qualification=$false;technical_seal=$false;main_promotion=$false;version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}
+    record_sha256=''
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  if (-not ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) | Test-Json -SchemaFile (Join-Path $repo $policy.output_schema))) { throw '[mir4-m41-m42-succession-v4-schema]' }
+  return $record
+}
+
+function Get-MIR4M41ToM42ComposableSourceSuccessionV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  return Read-MIR4M41ToM42ComposableSourceSuccessionV4Record -RepoRoot $repo
+}
+
+function Test-MIR4M41ToM42ComposableSourceSuccessionV4 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[object]$SuccessionRecord)
+  if ($null -eq $SuccessionRecord) { $SuccessionRecord = Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot }
+  Assert-MIR4M41ToM42ComposableSourceSuccessionV4Record -RepoRoot $RepoRoot -Record $SuccessionRecord | Out-Null
+  return [pscustomobject][ordered]@{status='passed-historical-mir41-to-current-mir42-proof-input-control-plane-succession';current_release_operations_authorized=$false;factorio_one_exact_engine_proof_required=$true;current_package_source_sha256=[string]$SuccessionRecord.current.package_source_sha256;record_sha256=[string]$SuccessionRecord.record_sha256}
 }
 
 # The existing public function is deliberately routed through the newest
@@ -608,5 +862,5 @@ function Test-MIR4M41ToM42ComposableSourceSuccessionV3 {
 function Test-MIR4M41ToM42ComposableSourceSuccession {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot,[object]$SuccessionRecord)
-  return Test-MIR4M41ToM42ComposableSourceSuccessionV3 -RepoRoot $RepoRoot -SuccessionRecord $SuccessionRecord
+  return Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $RepoRoot -SuccessionRecord $SuccessionRecord
 }

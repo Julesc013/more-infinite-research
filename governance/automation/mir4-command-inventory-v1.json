@@ -2681,6 +2681,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4M41ToM42ComposableSourceSuccessionV4Authority.ps1",
+      "classification": "migration-only",
+      "sha256": "DE8393C27C1498E31BD146E2362C76A62C15F7512268EB96888E4E8243150D7F",
+      "hash_mode": "canonical-text-v1",
+      "lines": 16,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4M4201ACliReleaseConvergenceAuthority.ps1",
       "classification": "migration-only",
       "sha256": "8B48D34E0B1E0A97833858769A44044902491460EF0BC8F9A3A501400DAE9300",
@@ -3251,9 +3259,9 @@
     {
       "path": "tools/lib/assurance/Domains.ps1",
       "classification": "canonical-internal",
-      "sha256": "28DC1A8F9369D81FEDFCBFB68FE0998CC94A575EED2321B9510AC8D6C457BBAD",
+      "sha256": "2944F1684B1F25CED5DC9FD7968C6BC377C9D972DF5C48BBB223EEB7B90857FF",
       "hash_mode": "canonical-text-v1",
-      "lines": 416,
+      "lines": 428,
       "package_visible": false
     },
     {
@@ -3299,9 +3307,9 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "69DC0201E97C2E3B4A6027313365625DC1F708295C7840B41FD0A24B771E0D73",
+      "sha256": "F9C6BCEDB697A15F589F20271D909929C6A7B2C856D8302C06927C0BF85FED3A",
       "hash_mode": "canonical-text-v1",
-      "lines": 603,
+      "lines": 765,
       "package_visible": false
     },
     {
@@ -3859,9 +3867,9 @@
     {
       "path": "tools/lib/mir4/PackagePresentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "186F45DED05938E3E4FDC142A7BB85976F77E9069DA3667FE68ED344A4006758",
+      "sha256": "EDAE2CAB43863D580A5AEDD29082FEE675C0AFA2B99D36A7435D59A5AB2230C5",
       "hash_mode": "canonical-text-v1",
-      "lines": 644,
+      "lines": 706,
       "package_visible": false
     },
     {
@@ -4243,9 +4251,9 @@
     {
       "path": "tools/lib/validation/CurrentTargetPackage.ps1",
       "classification": "canonical-internal",
-      "sha256": "654528877AB8B3AB3D5DD7FB3785538080639D54F36CA269A0425692B014F4C1",
+      "sha256": "2B3CEB4642119751531BEDFF11262B3ED63AD177EAD806133BE447E6EB3A8D86",
       "hash_mode": "canonical-text-v1",
-      "lines": 115,
+      "lines": 151,
       "package_visible": false
     },
     {
@@ -4435,9 +4443,9 @@
     {
       "path": "tools/lib/validation/runner/StaticCompilerDiagnostics.ps1",
       "classification": "canonical-internal",
-      "sha256": "A144C5ACF98BBAFF6EB61D6A4FCE7712F9E2FBB4C7B78FB43159742210B6F476",
+      "sha256": "1B11256A4A88FAD99CB85A7D2DBD60AB370677B53126F3AB6045CB23AB10AA8D",
       "hash_mode": "canonical-text-v1",
-      "lines": 358,
+      "lines": 316,
       "package_visible": false
     },
     {
@@ -5067,9 +5075,9 @@
     {
       "path": "tools/mir/application/release/readiness/ComposableSourceSuccession.ps1",
       "classification": "canonical-internal",
-      "sha256": "29B59CB080820B3FB74345EC8F18E5FF68ED3B638C2F4052434B37484602B287",
+      "sha256": "254039A9EDE8ADF78E7BDE1C8292AE8F909637163B2C8DFF2B8F56E909A9065A",
       "hash_mode": "canonical-text-v1",
-      "lines": 613,
+      "lines": 867,
       "package_visible": false
     },
     {
@@ -5691,9 +5699,9 @@
     {
       "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
       "classification": "canonical-internal",
-      "sha256": "9FE24E378B3FCC6AD8527B4FD34EDD328AAC7D196F800FF77AF4D1A9D871FC32",
+      "sha256": "8E08C128707D6CB55639F95AF7DC880286DA7BFF03FFAC1BE71D482F56E31C71",
       "hash_mode": "canonical-text-v1",
-      "lines": 159,
+      "lines": 161,
       "package_visible": false
     },
     {
@@ -5725,7 +5733,7 @@
     "canonical_public": 1,
     "canonical_internal": 387,
     "compatibility_wrapper": 168,
-    "migration_only": 56,
+    "migration_only": 57,
     "historical": 17,
     "obsolete": 0,
     "unknown": 0,
@@ -5738,5 +5746,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5d29c319fe855bd1a9a051884dba5f3b36eb24dcdd2e297a4173fa8cb12b6efe"
+  "digest": "sha256:fea5b83d62dd43237d1e0bda3d2b30bed15b6d687a0d4a2c5f307ca77f7d1f99"
 }
