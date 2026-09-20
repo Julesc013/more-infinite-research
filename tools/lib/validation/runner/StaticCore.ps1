@@ -14,6 +14,10 @@ Invoke-RepoCheck "terminal baseline calibrations are exact and deterministic" {
   & (Join-Path $repo "tests\release\Test-MIRTerminalBaselineCapture.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "documented MIR 4 bootstrap routes resolve retired distributions through custody" {
+  & (Join-Path $repo "tests\release\Test-MIR4DistributionCustodyRoutes.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "MIR 4 R0 distribution identity is exact and V2-only" {
   & (Join-Path $repo "tests\release\Test-MIR4R0Identity.ps1") -RepoRoot $repo
 }

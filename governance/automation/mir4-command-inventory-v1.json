@@ -4459,9 +4459,9 @@
     {
       "path": "tools/lib/validation/runner/StaticCore.ps1",
       "classification": "canonical-internal",
-      "sha256": "98A1B5F9EB07A722B85D3AE0DAC9B0E10BB61B697A1D232D16D992BD4453A151",
+      "sha256": "5580D0E2A376A30A6E79B53BBA95CB450FA702B32A3546036A6EB8E36DB74B1E",
       "hash_mode": "canonical-text-v1",
-      "lines": 512,
+      "lines": 516,
       "package_visible": false
     },
     {
@@ -5643,9 +5643,9 @@
     {
       "path": "tools/mir/cli/router/MIR4BootstrapCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "AFECB90C0636FF5BA0B7A367E81880FF8D97A47E2080429E301766B68D3539ED",
+      "sha256": "921C4B9553D7CD6122DA4EA7CE510EE5709FB9738BE917F1FD60E27B9AEE5ABF",
       "hash_mode": "canonical-text-v1",
-      "lines": 131,
+      "lines": 210,
       "package_visible": false
     },
     {
@@ -5770,5 +5770,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:adca6126d053629da23f4545e263a14e7a9f35e8563cdf60faf15eefc4032b5b"
+  "digest": "sha256:44a29bc2883422bfdbad84818142cc1cd19ab4c4eaf1ba340b060fcdabe18cdd"
 }
