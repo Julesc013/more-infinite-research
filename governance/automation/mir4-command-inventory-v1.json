@@ -5075,9 +5075,9 @@
     {
       "path": "tools/mir/application/release/readiness/ComposableSourceSuccession.ps1",
       "classification": "canonical-internal",
-      "sha256": "B204E7A5BF8AA80C7C5D88BEF7E7AC409766DC4D0985422B2B30BD85278872DF",
+      "sha256": "AE85E031FD589ACD763997AB5CF456910AF75C4D61AA789B9EB3378249988FCD",
       "hash_mode": "canonical-text-v1",
-      "lines": 757,
+      "lines": 778,
       "package_visible": false
     },
     {
@@ -5746,5 +5746,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f5f8e11890d2fff2b523efcb602eb0832f11267da42527bf60f1478794e0fc63"
+  "digest": "sha256:ee22c4827488edfcbcf9c4941ce79d9fe7631d9ff2cc1b2155a3238b762b2383"
 }
