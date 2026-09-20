@@ -703,6 +703,8 @@ function Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings {
     [object]$CurrentToolingInventory
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
+  Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check | Out-Null
   $evolvedBindings = if ($PSBoundParameters.ContainsKey('CurrentEvolvedBindings')) {
     @($CurrentEvolvedBindings)
   } else {

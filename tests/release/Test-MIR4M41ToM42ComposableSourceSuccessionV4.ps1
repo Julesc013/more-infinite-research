@@ -11,7 +11,7 @@ Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check | Out-Null
 $result=Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo
 if([string]$result.status-cne'passed-historical-mir41-to-current-mir42-proof-input-control-plane-succession'-or[bool]$result.current_release_operations_authorized-or-not[bool]$result.factorio_one_exact_engine_proof_required){throw '[mir4-m41-m42-succession-v4-positive]'}
 $record=Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo
-if([string]$record.record_sha256-cne'197457B233E18FE9EE88B66E8A6EEC124E052272FF8AB619CE73D5EBCF42869A'-or
+if([string]$record.record_sha256-cne'3B57C5ED6B3B85AA3E18A78E644EA5E7DD0C0752A2D5C12D9CFF96B4CCAAEFA6'-or
    [string]$record.predecessor.record_sha256-cne'387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53'-or
    [string]$record.current.package_source_sha256-cne'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F'-or
    [string]$record.current.tooling_inventory_predecessor_sha256-cne'59F98A68D36A085DEDF47B9B60AA8C4157BF6BB9A7A0D3FB4331B0DC772BF35D'-or
@@ -35,6 +35,23 @@ $driftTooling=$liveTooling|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
 $driftTooling.digest='sha256:0000000000000000000000000000000000000000000000000000000000000000'
 $rejected=$false;try{Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings -RepoRoot $repo -Record $record -CurrentEvolvedBindings $liveBindings -CurrentToolingInventory $driftTooling|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-tooling-inventory-current'}
 if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-live-tooling-drift]'}
+$probeRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir-v4-inventory-drift-'+[guid]::NewGuid().ToString('N'))
+$tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+if(-not[IO.Path]::GetFullPath($probeRoot).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)){throw '[mir4-m41-m42-succession-v4-probe-root]'}
+try{
+  & git clone --quiet --shared --no-checkout $repo $probeRoot
+  if($LASTEXITCODE-ne0){throw '[mir4-m41-m42-succession-v4-probe-clone]'}
+  & git -C $probeRoot checkout --quiet HEAD
+  if($LASTEXITCODE-ne0){throw '[mir4-m41-m42-succession-v4-probe-checkout]'}
+  $probeSource=Join-Path $probeRoot 'tools/mir/domain/safety/SafetyKernel.ps1'
+  [IO.File]::AppendAllText($probeSource,"`n# isolated V4 inventory drift probe`n",[Text.UTF8Encoding]::new($false))
+  . (Join-Path $probeRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+  . (Join-Path $probeRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
+  $rejected=$false;try{Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $probeRoot|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-command-inventory-stale'}
+  if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-inventory-source-drift]'}
+}finally{
+  if(Test-Path -LiteralPath $probeRoot){Remove-Item -LiteralPath $probeRoot -Recurse -Force}
+}
 $tampered=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
 $tampered.transition_gate.publication=$true;$tampered.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tampered
 $rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-historical-integrity'}
