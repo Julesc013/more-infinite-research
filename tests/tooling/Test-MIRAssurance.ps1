@@ -64,6 +64,7 @@ foreach ($requiredExactArchiveSnippet in @(
   '$build = @(./tools/commands/package/Build-MIRPackage.ps1)',
   '$candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)',
   'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
+  ". (Join-Path `$controller 'tools/lib/validation/CurrentTargetPackage.ps1')",
   'Get-MIR4ExactRetainedCandidateArchive',
   '-ExpectedSha256 $env:MIR_RC_ARCHIVE_SHA256',
   'sha256 = [string]$retainedCandidate.sha256',

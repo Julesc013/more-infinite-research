@@ -248,6 +248,9 @@ jobs:
           . (Join-Path $candidate 'tools/lib/validation/CurrentTargetPackage.ps1')
           $candidatePackage = New-MIR4CurrentTargetPackageContext -RepoRoot $candidate -Target f210
           $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json).version
+          # Retention is a controller operation. The candidate may correctly
+          # predate this helper and must not be required to provide it.
+          . (Join-Path $controller 'tools/lib/validation/CurrentTargetPackage.ps1')
           if (Test-Path -LiteralPath $evidenceRoot) { throw "Protected evidence root already exists: $evidenceRoot" }
           New-Item -ItemType Directory -Path $evidenceRoot | Out-Null
           $candidateArchive = $env:MIR_RC_CANDIDATE_ARCHIVE
