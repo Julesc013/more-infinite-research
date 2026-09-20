@@ -2725,16 +2725,20 @@
       "inputs": [
         ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json",
-        ".mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json",
         "spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json",
         "spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json",
-        "spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json",
         "tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1",
-        "tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1",
+        "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
+        "source/presentation/f210/info.json.template",
+        "validation/profiles/factorio-2.1.json",
         "repository"
       ]
     },

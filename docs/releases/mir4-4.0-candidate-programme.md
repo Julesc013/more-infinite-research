@@ -34,7 +34,7 @@ The five governed maturity classes are Stable, Shadow, Preview, Experimental and
 
 | Target | Distribution | Predecessor | Candidate role | 4.0 admission rule |
 | --- | --- | --- | --- | --- |
-| F210 | `4.0.21000` | `3.2.11` | Mandatory | Before freeze, select and exactly bind the installed official Steam experimental 2.1.x at or above 2.1.8; freeze that exact engine at T19; after 2.1 stable, qualify exact stable-minimum 2.1.8 and latest-stable lanes |
+| F210 | `4.0.21000` | `3.2.11` | Mandatory | Before freeze, select and exactly bind the installed official Steam experimental 2.1.x at or above 2.1.18; freeze that exact engine at T19; after 2.1 stable, qualify a stable-minimum lane resolved as the numeric maximum of 2.1.18, the first stable patch, and any later accepted mandatory floor, plus the latest-stable lane |
 | F200 | `4.0.20000` | `2.5.11` | Mandatory | Must be fully qualified on exact Factorio 2.0.77 with maximum representable parity |
 | F110 | `4.0.11000` | `1.9.9` | Conditional | Independent qualification or explicit deferral |
 | F100 | `4.0.10000` | `1.8.9` | Conditional | Independent qualification or explicit deferral |
@@ -47,7 +47,7 @@ The five governed maturity classes are Stable, Shadow, Preview, Experimental and
 
 Padded historical distribution identities are canonical archive identities. Factorio 0.x may normalize the numeric patch component when displaying it in logs; evidence records both forms.
 
-The append-only F210 qualification policy changes future selection, not historical evidence: the development-plan and T17 2.1.14 records remain intact. Any selected-engine drift invalidates the affected F210 build and qualification. The policy neither widens the `base >= 2.1.8` support floor nor authorizes source freeze or release.
+The current append-only F210 qualification-policy successor changes future selection and the F210 `base >= 2.1.18` floor, not historical evidence: the development-plan, T17, and V1 2.1.8/2.1.17 records remain intact. Any selected-engine drift invalidates the affected F210 build and qualification. The successor does not authorize source freeze or release.
 
 ## 4.0 platform contents
 

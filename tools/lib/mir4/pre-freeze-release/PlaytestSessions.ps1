@@ -162,7 +162,7 @@ function New-MIR4PlaytestSession {
   $t15Path = Join-Path $repo '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json'
   $t15 = Read-MIR4PreFreezeJson -RepoRoot $repo -RelativePath '.mir/releases/waves/mir4-r0/MIR4-T15-Authority-Evolution-ReceiptV1.json' -Kind 'MIR4T15AuthorityEvolutionReceiptV1'
   $f210Resolution = $null
-  $f210PolicyPath = Join-Path $repo $script:MIR4F210PolicyRelativePath
+  $f210PolicyPath = Join-Path $repo $script:MIR4F210CurrentPolicyRelativePath
   $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq $Target })
   if ($targetRow.Count -ne 1) { throw "[mir4-playtest-target] $Target" }
   $row = $targetRow[0]
@@ -173,7 +173,7 @@ function New-MIR4PlaytestSession {
   }
   if ([string]::IsNullOrWhiteSpace($PredecessorPath)) { $PredecessorPath = Join-Path $repo ([string]$row.predecessor.path) }
   if ($Target -ceq 'F210') {
-    $f210Resolution = Get-MIR4F210EngineResolutionV1 -RepoRoot $repo -FactorioBin $FactorioBin
+    $f210Resolution = Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin
     $FactorioBin = [string]$f210Resolution.engine.path
   } elseif ([string]::IsNullOrWhiteSpace($FactorioBin)) { $FactorioBin = [string]$row.engine.path }
   foreach ($required in @($CandidatePath,$PredecessorPath,$FactorioBin)) {
@@ -418,7 +418,7 @@ function Complete-MIR4PlaytestSession {
   }
   $targetRow = @($plan.targets | Where-Object { [string]$_.target -ceq [string]$session.target })
   $expectedEngineSha256 = if ([string]$session.target -ceq 'F210') {
-    $resolution = Get-MIR4F210EngineResolutionV1 -RepoRoot $repo -FactorioBin ([string]$session.engine.path)
+    $resolution = Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin ([string]$session.engine.path)
     if ($null -eq $session.authority.f210_engine_policy -or
         (Get-MIR4PreFreezeFileSha256 ([string]$session.authority.f210_engine_policy.path)) -cne [string]$session.authority.f210_engine_policy.sha256 -or
         [string]$resolution.record_sha256 -cne [string]$session.authority.f210_engine_resolution.record_sha256) {

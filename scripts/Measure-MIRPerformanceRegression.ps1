@@ -159,7 +159,7 @@ function Copy-MIRCampaignProbe {
   if ([string]$info.name -ne "mir-fixture-performance-regression-probe") {
     throw "Performance probe metadata has an unexpected mod identity."
   }
-  $minimumBase = if ($FactorioLine -eq "2.1") { "2.1.8" } else { "2.0.0" }
+  $minimumBase = if ($FactorioLine -eq "2.1") { "2.1.18" } else { "2.0.0" }
   $info.factorio_version = $FactorioLine
   $info.dependencies = @("base >= $minimumBase", "more-infinite-research")
   $info | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $infoPath -Encoding UTF8

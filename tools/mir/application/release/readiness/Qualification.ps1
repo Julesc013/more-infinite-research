@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 if (-not (Get-Command Resolve-MIR4FactorioQualificationProfile -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../../../../lib/validation/FactorioVersionPolicy.ps1')
 }
-if (-not (Get-Command Get-MIR4F210EngineResolutionV1 -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command Get-MIR4F210EngineResolutionV2 -ErrorAction SilentlyContinue)) {
   . (Join-Path $PSScriptRoot '../F210QualificationPolicy.ps1')
 }
 
@@ -25,7 +25,7 @@ function Get-MIR441TargetEngineIdentity {
   $effective=Resolve-MIR4FactorioQualificationProfile -Profile $profile -FactorioBin $binary -RepoRoot $RepoRoot
   if([string]$effective.qualification_factorio_version-cne$version){throw "[mir441-engine-profile] $([string]$Target.target)"}
   if([string]$Target.target-ceq'f210'){
-    $channel=Get-MIR4F210EngineResolutionV1 -RepoRoot $RepoRoot -FactorioBin $binary
+    $channel=Get-MIR4F210EngineResolutionV2 -RepoRoot $RepoRoot -FactorioBin $binary
     if([string]$channel.engine.sha256-cne[string]$identity.binary_sha256){throw '[mir441-f210-engine-channel]'}
     $identity|Add-Member -NotePropertyName policy -NotePropertyValue 'latest-installed-official-experimental-exact-lock'
     $identity|Add-Member -NotePropertyName channel_record_sha256 -NotePropertyValue ([string]$channel.record_sha256)
