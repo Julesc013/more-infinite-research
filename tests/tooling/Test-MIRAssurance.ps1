@@ -52,12 +52,32 @@ foreach ($requiredTrustSelfTestSnippet in @(
 
 if ($releaseAssuranceFacadeSource.Contains('function Invoke-MIRAssuranceSelfTest')) { throw 'Release authority still embeds assurance self-test implementation.' }
 if (-not $assuranceEntryPointSource.Contains('tests/tooling/support/MIRAssuranceSelfTest.ps1')) { throw 'Assurance self-test command does not load canonical test support.' }
-if (([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('CurrentTargetPackage.ps1'))).Count -lt 5 -or
-    ([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('Get-MIR4CurrentTargetPackageOutputText'))).Count -lt 5 -or
+if (([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('CurrentTargetPackage.ps1'))).Count -lt 3 -or
+    ([regex]::Matches($releaseCandidateWorkflowSource, [regex]::Escape('Get-MIR4CurrentTargetPackageOutputText'))).Count -lt 3 -or
     $releaseCandidateWorkflowSource.Contains('Get-Content info.json -Raw') -or
     $releaseCandidateWorkflowSource.Contains("Join-Path `$candidate 'info.json'") -or
     $releaseCandidateWorkflowSource.Contains("Join-Path `$controller 'info.json'")) {
   throw 'Release-candidate workflow must derive current package metadata from the canonical materialized target, not a retired repository-root info.json.'
+}
+foreach ($requiredExactArchiveSnippet in @(
+  '$build = @(./tools/commands/package/Build-MIRPackage.ps1)',
+  '$candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)',
+  'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
+  "kind = 'MIRProtectedReleaseCandidateRunV2'",
+  "archive_origin = 'candidate-build-result'",
+  "role = 'candidate-built'"
+)) {
+  if (-not $releaseCandidateWorkflowSource.Contains($requiredExactArchiveSnippet)) {
+    throw "Release-candidate workflow does not retain its exact candidate build result: $requiredExactArchiveSnippet"
+  }
+}
+foreach ($forbiddenDistCandidateSnippet in @(
+  'Join-Path $candidate "dist/more-infinite-research_',
+  'Join-Path $controller "dist/more-infinite-research_'
+)) {
+  if ($releaseCandidateWorkflowSource.Contains($forbiddenDistCandidateSnippet)) {
+    throw "Release-candidate workflow must not substitute a dist archive for the candidate build result: $forbiddenDistCandidateSnippet"
+  }
 }
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)

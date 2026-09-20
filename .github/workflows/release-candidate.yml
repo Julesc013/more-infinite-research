@@ -92,24 +92,29 @@ jobs:
           $candidate = '${{ steps.roots.outputs.candidate }}'
           Push-Location $candidate
           try {
-            ./tools/commands/package/Build-MIRPackage.ps1
+            $build = @(./tools/commands/package/Build-MIRPackage.ps1)
+            if ($build.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$build[0].archive_path)) {
+              throw 'Candidate build did not return exactly one archive path.'
+            }
             . (Join-Path $candidate 'tools/lib/validation/CurrentTargetPackage.ps1')
             $candidatePackage = New-MIR4CurrentTargetPackageContext -RepoRoot $candidate -Target f210
             $info = Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json
           } finally {
             Pop-Location
           }
-          $candidateArchive = Join-Path $candidate "dist/more-infinite-research_$($info.version).zip"
-          $controllerArchive = Join-Path $controller "dist/more-infinite-research_$($info.version).zip"
-          foreach ($archive in @($candidateArchive, $controllerArchive)) {
-            if (-not (Test-Path -LiteralPath $archive -PathType Leaf)) {
-              throw "Required exact candidate archive is absent: $archive"
-            }
-            $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
-            if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
-              throw "Archive SHA mismatch for ${archive}: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
-            }
+          $buildRoot = [IO.Path]::GetFullPath((Join-Path $candidate 'build/packages')).TrimEnd([IO.Path]::DirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+          $candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)
+          if (-not $candidateArchive.StartsWith($buildRoot, [StringComparison]::OrdinalIgnoreCase) -or
+              -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) {
+            throw "Candidate build returned an absent or out-of-custody archive: $candidateArchive"
           }
+          $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
+          if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
+            throw "Built archive SHA mismatch: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
+          }
+          $candidateRelative = [IO.Path]::GetRelativePath($candidate, $candidateArchive).Replace('\', '/')
+          "MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "MIR_RC_CANDIDATE_ARCHIVE_RELATIVE=$candidateRelative" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
 
       - name: Run complete exact-dist validation
         if: ${{ inputs.resume_exact_dist_evidence_run == '' }}
@@ -118,10 +123,10 @@ jobs:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
-          . (Join-Path $controller 'tools/lib/validation/CurrentTargetPackage.ps1')
-          $controllerPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $controller -Target f210
-          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $controllerPackage -RelativePath 'info.json' | ConvertFrom-Json).version
-          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $candidateArchive = $env:MIR_RC_CANDIDATE_ARCHIVE
+          if ([string]::IsNullOrWhiteSpace($candidateArchive) -or -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) {
+            throw 'The exact archive returned by the candidate build is unavailable.'
+          }
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
           if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
             throw "Exact validation archive drifted before execution: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
@@ -153,15 +158,17 @@ jobs:
             }
           }
           $priorReceipt = Get-Content -Raw -LiteralPath $priorReceiptPath | ConvertFrom-Json
-          if ([string]$priorReceipt.kind -ne 'MIRProtectedReleaseCandidateRunV1' -or
+          if ([string]$priorReceipt.kind -ne 'MIRProtectedReleaseCandidateRunV2' -or
               [string]$priorReceipt.candidate_commit -ne $env:MIR_RC_CANDIDATE_SHA -or
-              [string]$priorReceipt.expected_archive_sha256 -ne $env:MIR_RC_ARCHIVE_SHA256) {
+              [string]$priorReceipt.expected_archive_sha256 -ne $env:MIR_RC_ARCHIVE_SHA256 -or
+              [string]$priorReceipt.archive_origin -ne 'candidate-build-result' -or
+              [string]$priorReceipt.candidate_archive_relative_path -notlike 'build/packages/*') {
             throw 'Prior protected receipt does not bind the requested candidate commit and archive.'
           }
           $priorArchives = @($priorReceipt.archives)
-          if ($priorArchives.Count -ne 2 -or
+          if ($priorArchives.Count -ne 1 -or [string]$priorArchives[0].role -ne 'candidate-built' -or
               @($priorArchives | Where-Object { [string]$_.sha256 -ne $env:MIR_RC_ARCHIVE_SHA256 }).Count -ne 0) {
-            throw 'Prior protected receipt does not contain both exact candidate archives.'
+            throw 'Prior protected receipt does not contain the exact candidate-built archive.'
           }
           $priorController = [string]$priorReceipt.controller_commit
           if ($priorController -notmatch '^[0-9a-f]{40}$') {
@@ -210,10 +217,10 @@ jobs:
           MIR_COMPAT_RUNTIME_ROOT: 'C:\tmp\mir-compat-runtime\${{ github.run_id }}-${{ github.run_attempt }}'
         run: |
           $controller = '${{ steps.roots.outputs.controller }}'
-          . (Join-Path $controller 'tools/lib/validation/CurrentTargetPackage.ps1')
-          $controllerPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $controller -Target f210
-          $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $controllerPackage -RelativePath 'info.json' | ConvertFrom-Json).version
-          $candidateArchive = Join-Path $controller "dist/more-infinite-research_$version.zip"
+          $candidateArchive = $env:MIR_RC_CANDIDATE_ARCHIVE
+          if ([string]::IsNullOrWhiteSpace($candidateArchive) -or -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) {
+            throw 'The exact archive returned by the candidate build is unavailable to the targeted gate.'
+          }
           $actual = (Get-FileHash -LiteralPath $candidateArchive -Algorithm SHA256).Hash
           if ($actual -ne $env:MIR_RC_ARCHIVE_SHA256) {
             throw "Targeted-gate archive drifted before execution: expected $($env:MIR_RC_ARCHIVE_SHA256), got $actual"
@@ -243,17 +250,13 @@ jobs:
           $version = [string](Get-MIR4CurrentTargetPackageOutputText -Context $candidatePackage -RelativePath 'info.json' | ConvertFrom-Json).version
           if (Test-Path -LiteralPath $evidenceRoot) { throw "Protected evidence root already exists: $evidenceRoot" }
           New-Item -ItemType Directory -Path $evidenceRoot | Out-Null
-          foreach ($row in @(
-            @{ source = $candidate; destination = 'candidate' },
-            @{ source = $controller; destination = 'controller' }
-          )) {
-            $archive = @(Get-ChildItem -LiteralPath (Join-Path $row.source 'dist') -Filter "more-infinite-research_$version.zip" -File)
-            if ($archive.Count -eq 1) {
-              $destination = Join-Path $evidenceRoot $row.destination
-              New-Item -ItemType Directory -Path $destination | Out-Null
-              Copy-Item -LiteralPath $archive[0].FullName -Destination $destination
-            }
+          $candidateArchive = $env:MIR_RC_CANDIDATE_ARCHIVE
+          if ([string]::IsNullOrWhiteSpace($candidateArchive) -or -not (Test-Path -LiteralPath $candidateArchive -PathType Leaf)) {
+            throw 'The exact archive returned by the candidate build is unavailable for retention.'
           }
+          $candidateDestination = Join-Path $evidenceRoot 'candidate'
+          New-Item -ItemType Directory -Path $candidateDestination | Out-Null
+          Copy-Item -LiteralPath $candidateArchive -Destination $candidateDestination
           foreach ($relative in @('build/results/validation', 'build/results/release-gate')) {
             $source = Join-Path $controller $relative
             if (Test-Path -LiteralPath $source) {
@@ -286,6 +289,7 @@ jobs:
           $archiveRows = @(
             Get-ChildItem -LiteralPath $evidenceRoot -Recurse -Filter '*.zip' -File | Sort-Object FullName | ForEach-Object {
               [ordered]@{
+                role = 'candidate-built'
                 path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
                 bytes = $_.Length
                 sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
@@ -305,13 +309,15 @@ jobs:
           )
           $receipt = [ordered]@{
             schema = 1
-            kind = 'MIRProtectedReleaseCandidateRunV1'
+            kind = 'MIRProtectedReleaseCandidateRunV2'
             status = '${{ job.status }}'
             run_id = '${{ github.run_id }}'
             run_attempt = '${{ github.run_attempt }}'
             controller_commit = '${{ github.sha }}'
             candidate_commit = $env:MIR_RC_CANDIDATE_SHA
             expected_archive_sha256 = $env:MIR_RC_ARCHIVE_SHA256
+            archive_origin = 'candidate-build-result'
+            candidate_archive_relative_path = $env:MIR_RC_CANDIDATE_ARCHIVE_RELATIVE
             resumed_exact_dist_evidence_run = $env:MIR_RC_RESUME_EXACT_DIST_RUN
             archives = $archiveRows
             runtime_evidence = $runtimeEvidenceRows
