@@ -9,7 +9,8 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $result=Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo
 if([string]$result.status-cne'passed-historical-mir41-to-current-mir42-proof-input-control-plane-succession'-or[bool]$result.current_release_operations_authorized-or-not[bool]$result.factorio_one_exact_engine_proof_required){throw '[mir4-m41-m42-succession-v4-positive]'}
 $record=Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo
-if([string]$record.predecessor.record_sha256-cne'387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53'-or
+if([string]$record.record_sha256-cne'C728ED2B4CF40A3C5988AB19BC453510CC08196EFA33C4F20B21C1EB7AD04122'-or
+   [string]$record.predecessor.record_sha256-cne'387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53'-or
    [string]$record.current.package_source_sha256-cne'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F'-or
    [string]$record.current.tooling_inventory_predecessor_sha256-cne'59F98A68D36A085DEDF47B9B60AA8C4157BF6BB9A7A0D3FB4331B0DC772BF35D'-or
    @($record.evolved_bindings).Count-ne16){throw '[mir4-m41-m42-succession-v4-predecessor-or-binding-count]'}
@@ -22,10 +23,14 @@ foreach($expected in @($policy.control_plane_bindings)){
 }
 $tampered=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
 $tampered.transition_gate.publication=$true;$tampered.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tampered
-$rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-gate'}
+$rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-historical-integrity'}
 if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-gate]'}
 $tampered=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
 $tampered.current.package_source_sha256='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';$tampered.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tampered
 $rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-historical-integrity'}
 if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-package-binding]'}
+$tampered=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+$tampered.evolved_bindings[0].current_sha256='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';$tampered.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tampered
+$rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-historical-integrity'}
+if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-evolved-binding]'}
 [pscustomobject][ordered]@{status='passed';test_id='static.mir4-m41-to-m42-composable-source-succession-v4';exact_engine_proof_required=$true;release_authority=$false;record_sha256=[string]$record.record_sha256}|ConvertTo-Json -Compress
