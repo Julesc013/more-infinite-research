@@ -4979,9 +4979,9 @@
     {
       "path": "tools/mir/application/platform/WholePlatform.ps1",
       "classification": "canonical-internal",
-      "sha256": "64CDD8E2473220281AE8898A7C646F5817D76E8BE423CBE3FB4F45998849F06D",
+      "sha256": "610EDEF55F597733FD7434BB5F549053B6BFFE022868FF1BF4853D63E0BADF06",
       "hash_mode": "canonical-text-v1",
-      "lines": 147,
+      "lines": 212,
       "package_visible": false
     },
     {
@@ -5770,5 +5770,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:44a29bc2883422bfdbad84818142cc1cd19ab4c4eaf1ba340b060fcdabe18cdd"
+  "digest": "sha256:11d54678244a4cb5692d7ce8331f4f36c1699b8e597749135074b9cf1e878734"
 }

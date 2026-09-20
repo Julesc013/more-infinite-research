@@ -18,6 +18,64 @@ function Get-MIR4WholePlatformProgramme {
   return $raw | ConvertFrom-Json -Depth 100
 }
 
+function Resolve-MIR4WholePlatformImplementation {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$RelativePath,
+    [string]$PackageSourcePath
+  )
+
+  $repo = Get-MIR4WholePlatformRepoRoot -RepoRoot $RepoRoot
+  $packagePath = $RelativePath.Replace('\', '/').TrimEnd('/')
+  $requiresPackageBinding = $packagePath.StartsWith('prototypes/', [StringComparison]::Ordinal) -or
+    $packagePath -ceq 'migrations' -or
+    $packagePath.StartsWith('migrations/', [StringComparison]::Ordinal)
+  $directPath = Join-Path $repo $RelativePath
+  if (-not $requiresPackageBinding -and (Test-Path -LiteralPath $directPath -PathType Leaf)) {
+    return @((Resolve-Path -LiteralPath $directPath).Path)
+  }
+
+  if ([string]::IsNullOrWhiteSpace($PackageSourcePath)) {
+    $PackageSourcePath = Join-Path $repo 'source/package-source.json'
+  }
+  if (-not (Test-Path -LiteralPath $PackageSourcePath -PathType Leaf)) {
+    throw "[mir4-whole-platform-package-source] Package-source manifest is missing: $PackageSourcePath"
+  }
+
+  $manifest = Get-Content -Raw -LiteralPath $PackageSourcePath | ConvertFrom-Json -Depth 100
+  if ([int]$manifest.schema -lt 2 -or [string]$manifest.kind -cne 'MIR4ComposablePackageSourceV2') {
+    throw '[mir4-whole-platform-package-source] Package-source manifest has an unsupported contract.'
+  }
+
+  $exact = @($manifest.bindings | Where-Object { ([string]$_.output_path).Replace('\', '/') -ceq $packagePath })
+  $matches = if ($exact.Count -gt 0) {
+    $exact
+  } else {
+    $prefix = $packagePath + '/'
+    @($manifest.bindings | Where-Object { ([string]$_.output_path).Replace('\', '/').StartsWith($prefix, [StringComparison]::Ordinal) })
+  }
+  if ($matches.Count -eq 0) {
+    throw "[mir4-whole-platform-package-source] No current source binding resolves implementation locator: $RelativePath"
+  }
+
+  $resolved = @()
+  $sourceRoot = (Resolve-Path -LiteralPath (Join-Path $repo 'source')).Path
+  $sourceRootPrefix = $sourceRoot.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+  foreach ($outputGroup in @($matches | Group-Object { ([string]$_.output_path).Replace('\', '/') })) {
+    $sourcePaths = @($outputGroup.Group | ForEach-Object { [string]$_.source_path } | Sort-Object -Unique)
+    if ($sourcePaths.Count -ne 1) {
+      throw "[mir4-whole-platform-package-source] Ambiguous current source binding for package path: $($outputGroup.Name)"
+    }
+    $sourceFullPath = [IO.Path]::GetFullPath((Join-Path $repo $sourcePaths[0]))
+    if (-not $sourceFullPath.StartsWith($sourceRootPrefix, [StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath $sourceFullPath -PathType Leaf)) {
+      throw "[mir4-whole-platform-package-source] Current source binding is missing or outside the canonical source root: $($sourcePaths[0])"
+    }
+    $resolved += $sourceFullPath
+  }
+  return @($resolved | Sort-Object -Unique)
+}
+
 function Get-MIR4WholePlatformMatrix {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
@@ -33,8 +91,15 @@ function Get-MIR4WholePlatformMatrix {
   $rows = @()
   foreach ($area in @($programme.areas)) {
     $missing = @()
-    foreach ($relativePath in @($area.authorities) + @($area.implementations) + @($area.verification)) {
+    foreach ($relativePath in @($area.authorities) + @($area.verification)) {
       if (-not (Test-Path -LiteralPath (Join-Path $repo ([string]$relativePath)))) {
+        $missing += [string]$relativePath
+      }
+    }
+    foreach ($relativePath in @($area.implementations)) {
+      try {
+        Resolve-MIR4WholePlatformImplementation -RepoRoot $repo -RelativePath ([string]$relativePath) | Out-Null
+      } catch {
         $missing += [string]$relativePath
       }
     }
