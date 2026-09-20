@@ -694,6 +694,36 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionV4EvolvedBindings {
   return @($bindings)
 }
 
+function Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][object]$Record,
+    [object[]]$CurrentEvolvedBindings,
+    [object]$CurrentToolingInventory
+  )
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $evolvedBindings = if ($PSBoundParameters.ContainsKey('CurrentEvolvedBindings')) {
+    @($CurrentEvolvedBindings)
+  } else {
+    @(Get-MIR4M41ToM42ComposableSourceSuccessionV4EvolvedBindings -RepoRoot $repo)
+  }
+  $toolingInventory = if ($PSBoundParameters.ContainsKey('CurrentToolingInventory')) {
+    $CurrentToolingInventory
+  } else {
+    Get-MIR4M41ToM42ComposableSourceSuccessionV2ToolingInventoryBinding -RepoRoot $repo
+  }
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value @($Record.evolved_bindings)) -cne
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value @($evolvedBindings))) {
+    throw '[mir4-m41-m42-succession-v4-evolved-bindings-current]'
+  }
+  if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record.current.tooling_inventory) -cne
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $toolingInventory)) {
+    throw '[mir4-m41-m42-succession-v4-tooling-inventory-current]'
+  }
+  return $true
+}
+
 function New-MIR4M41ToM42ComposableSourceSuccessionV4 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-16T12:30:00+10:00')
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -750,6 +780,7 @@ function Get-MIR4M41ToM42ComposableSourceSuccessionV4 {
       [string]$record.current.tooling_inventory_predecessor_sha256 -cne $policy.v3_tooling_inventory_sha256) {
     throw '[mir4-m41-m42-succession-v4-historical-integrity]'
   }
+  Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings -RepoRoot $repo -Record $record | Out-Null
   Assert-MIR4M41ToM42SourceSuccessionGate -Gate $record.transition_gate -Code 'mir4-m41-m42-succession-v4-gate'
   return $record
 }
@@ -764,6 +795,7 @@ function Test-MIR4M41ToM42ComposableSourceSuccessionV4 {
       [string]$SuccessionRecord.current.package_source_sha256 -cne 'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F') {
     throw '[mir4-m41-m42-succession-v4-historical-integrity]'
   }
+  Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings -RepoRoot $RepoRoot -Record $SuccessionRecord | Out-Null
   Assert-MIR4M41ToM42SourceSuccessionGate -Gate $SuccessionRecord.transition_gate -Code 'mir4-m41-m42-succession-v4-gate'
   return [pscustomobject][ordered]@{status='passed-historical-mir41-to-current-mir42-proof-input-control-plane-succession';current_release_operations_authorized=$false;factorio_one_exact_engine_proof_required=$true;current_package_source_sha256=[string]$SuccessionRecord.current.package_source_sha256;record_sha256=[string]$SuccessionRecord.record_sha256}
 }

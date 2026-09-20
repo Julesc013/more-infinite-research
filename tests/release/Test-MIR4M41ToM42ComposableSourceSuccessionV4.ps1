@@ -11,18 +11,30 @@ Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check | Out-Null
 $result=Test-MIR4M41ToM42ComposableSourceSuccession -RepoRoot $repo
 if([string]$result.status-cne'passed-historical-mir41-to-current-mir42-proof-input-control-plane-succession'-or[bool]$result.current_release_operations_authorized-or-not[bool]$result.factorio_one_exact_engine_proof_required){throw '[mir4-m41-m42-succession-v4-positive]'}
 $record=Get-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo
-if([string]$record.record_sha256-cne'F32EEB86C0AEE584C932AB7C48B36400C69DAE2B8A356FFE1A254B84C0CE0C3B'-or
+if([string]$record.record_sha256-cne'197457B233E18FE9EE88B66E8A6EEC124E052272FF8AB619CE73D5EBCF42869A'-or
    [string]$record.predecessor.record_sha256-cne'387ECBA18CB90C6F92D6C4D8FA76EF54E85FB21278F93EFD455A55CA7998FA53'-or
    [string]$record.current.package_source_sha256-cne'A476DDAFA5AB62BD6AEC69054E1A162C570DDB946520AF9234FC8FE0D79BEC2F'-or
    [string]$record.current.tooling_inventory_predecessor_sha256-cne'59F98A68D36A085DEDF47B9B60AA8C4157BF6BB9A7A0D3FB4331B0DC772BF35D'-or
    @($record.evolved_bindings).Count-ne16){throw '[mir4-m41-m42-succession-v4-predecessor-or-binding-count]'}
 $policy=Get-MIR4M41ToM42ComposableSourceSuccessionV4Policy
+$liveBindings=@(Get-MIR4M41ToM42ComposableSourceSuccessionV4EvolvedBindings -RepoRoot $repo)
 foreach($expected in @($policy.control_plane_bindings)){
   $binding=@($record.evolved_bindings|Where-Object{[string]$_.path-ceq[string]$expected.path})
+  $liveBinding=@($liveBindings|Where-Object{[string]$_.path-ceq[string]$expected.path})
   if($binding.Count-ne1-or[string]$binding[0].previous_sha256-cne[string]$expected.previous_sha256-or
-     [string]$binding[0].current_sha256-notmatch'^[A-F0-9]{64}$'-or
+     $liveBinding.Count-ne1-or
+     (ConvertTo-MIR4BootstrapCanonicalJson -Value $binding[0])-cne(ConvertTo-MIR4BootstrapCanonicalJson -Value $liveBinding[0])-or
      [string]$binding[0].hash_mode-cne'canonical-text-v1'-or[bool]$binding[0].package_visible-or[bool]$binding[0].release_authority){throw "[mir4-m41-m42-succession-v4-binding] $($expected.path)"}
 }
+$liveTooling=Get-MIR4M41ToM42ComposableSourceSuccessionV2ToolingInventoryBinding -RepoRoot $repo
+$driftBindings=$liveBindings|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+$driftBindings[0].current_sha256='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+$rejected=$false;try{Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings -RepoRoot $repo -Record $record -CurrentEvolvedBindings $driftBindings -CurrentToolingInventory $liveTooling|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-evolved-bindings-current'}
+if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-live-binding-drift]'}
+$driftTooling=$liveTooling|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+$driftTooling.digest='sha256:0000000000000000000000000000000000000000000000000000000000000000'
+$rejected=$false;try{Assert-MIR4M41ToM42ComposableSourceSuccessionV4CurrentBindings -RepoRoot $repo -Record $record -CurrentEvolvedBindings $liveBindings -CurrentToolingInventory $driftTooling|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-tooling-inventory-current'}
+if(-not$rejected){throw '[mir4-m41-m42-succession-v4-negative-live-tooling-drift]'}
 $tampered=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
 $tampered.transition_gate.publication=$true;$tampered.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $tampered
 $rejected=$false;try{Test-MIR4M41ToM42ComposableSourceSuccessionV4 -RepoRoot $repo -SuccessionRecord $tampered|Out-Null}catch{$rejected=$_.Exception.Message-match'v4-historical-integrity'}
