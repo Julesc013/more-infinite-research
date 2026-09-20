@@ -12,6 +12,89 @@ if ((@($matrix.areas.former_slot) -join '|') -cne (@(0..17 | ForEach-Object { "4
   throw 'Former 4.x slots are not in exact numeric order.'
 }
 
+$packageSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'source/package-source.json') | ConvertFrom-Json -Depth 100
+foreach ($historicalLocator in @(
+  'prototypes/mir/settings/registry.lua',
+  'prototypes/mir/planner/compiler.lua',
+  'prototypes/mir/emit/technology_operation_executor.lua',
+  'prototypes/mir/stage/control.lua',
+  'migrations'
+)) {
+  $resolved = @(Resolve-MIR4WholePlatformImplementation -RepoRoot $RepoRoot -RelativePath $historicalLocator)
+  if ($resolved.Count -eq 0 -or @($resolved | Where-Object { -not $_.StartsWith((Join-Path $RepoRoot 'source'), [StringComparison]::OrdinalIgnoreCase) }).Count -gt 0) {
+    throw "Historical package locator did not resolve through the current source manifest: $historicalLocator"
+  }
+}
+
+$directImplementation = 'tools/mir/application/platform/WholePlatform.ps1'
+$directResolved = @(Resolve-MIR4WholePlatformImplementation -RepoRoot $RepoRoot -RelativePath $directImplementation -PackageSourcePath (Join-Path $RepoRoot 'missing-package-source.json'))
+if ($directResolved.Count -ne 1 -or $directResolved[0] -cne (Resolve-Path -LiteralPath (Join-Path $RepoRoot $directImplementation)).Path) {
+  throw 'A direct current implementation path was unnecessarily remapped.'
+}
+
+$ambiguousOutput = 'prototypes/mir/settings/registry.lua'
+$ambiguousRows = @($packageSource.bindings | Where-Object { [string]$_.output_path -ceq $ambiguousOutput })
+if ($ambiguousRows.Count -ne 1) {
+  throw 'Whole-platform ambiguity fixture expected one current settings binding.'
+}
+$ambiguousManifest = [ordered]@{
+  schema = 2
+  kind = 'MIR4ComposablePackageSourceV2'
+  bindings = @(
+    $ambiguousRows[0],
+    [ordered]@{ output_path = $ambiguousOutput; source_path = 'source/prototypes/mir/planner/compiler.lua' }
+  )
+}
+$ambiguousPath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-ambiguous-' + [guid]::NewGuid().ToString('N') + '.json')
+$missingPath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-missing-' + [guid]::NewGuid().ToString('N') + '.json')
+$missingSourcePath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-missing-source-' + [guid]::NewGuid().ToString('N') + '.json')
+$outsideRepoPath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-outside-repo-' + [guid]::NewGuid().ToString('N') + '.json')
+$outsideSourcePath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-outside-source-' + [guid]::NewGuid().ToString('N') + '.json')
+$staleLeafPath = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-stale-leaf-' + [guid]::NewGuid().ToString('N') + '.json')
+$directDirectoryRoot = Join-Path ([IO.Path]::GetTempPath()) ('mir4-whole-platform-direct-directory-' + [guid]::NewGuid().ToString('N'))
+try {
+  $ambiguousManifest | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $ambiguousPath -Encoding UTF8
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @() } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $missingPath -Encoding UTF8
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @([ordered]@{ output_path = 'prototypes/mir/absent-source.lua'; source_path = 'source/prototypes/mir/absent-source.lua' }) } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $missingSourcePath -Encoding UTF8
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @([ordered]@{ output_path = 'prototypes/mir/outside-repo.lua'; source_path = '../outside-repo.lua' }) } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $outsideRepoPath -Encoding UTF8
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @([ordered]@{ output_path = 'prototypes/mir/outside-source.lua'; source_path = $directImplementation }) } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $outsideSourcePath -Encoding UTF8
+  New-Item -ItemType Directory -Path (Join-Path $directDirectoryRoot 'migrations') -Force | Out-Null
+  New-Item -ItemType Directory -Path (Join-Path $directDirectoryRoot 'source') -Force | Out-Null
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @() } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $directDirectoryRoot 'source/package-source.json') -Encoding UTF8
+  $staleRelative = 'prototypes/mir/settings/registry.lua'
+  $staleFullPath = Join-Path $directDirectoryRoot $staleRelative
+  $canonicalRelative = 'source/current/settings_registry.lua'
+  $canonicalFullPath = Join-Path $directDirectoryRoot $canonicalRelative
+  New-Item -ItemType Directory -Path (Split-Path -Parent $staleFullPath) -Force | Out-Null
+  New-Item -ItemType Directory -Path (Split-Path -Parent $canonicalFullPath) -Force | Out-Null
+  Set-Content -LiteralPath $staleFullPath -Value 'stale historical leaf' -Encoding UTF8
+  Set-Content -LiteralPath $canonicalFullPath -Value 'canonical source leaf' -Encoding UTF8
+  [ordered]@{ schema = 2; kind = 'MIR4ComposablePackageSourceV2'; bindings = @([ordered]@{ output_path = $staleRelative; source_path = $canonicalRelative }) } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $staleLeafPath -Encoding UTF8
+  $caught = $false
+  try { Resolve-MIR4WholePlatformImplementation -RepoRoot $RepoRoot -RelativePath $ambiguousOutput -PackageSourcePath $ambiguousPath | Out-Null } catch { $caught = $_.Exception.Message.StartsWith('[mir4-whole-platform-package-source] Ambiguous') }
+  if (-not $caught) { throw 'An ambiguous package-to-source binding was accepted.' }
+  $caught = $false
+  try { Resolve-MIR4WholePlatformImplementation -RepoRoot $RepoRoot -RelativePath 'prototypes/mir/absent.lua' -PackageSourcePath $missingPath | Out-Null } catch { $caught = $_.Exception.Message.StartsWith('[mir4-whole-platform-package-source] No current source binding') }
+  if (-not $caught) { throw 'A missing package-to-source binding was accepted.' }
+  foreach ($negative in @(
+    @{ label = 'missing source file'; locator = 'prototypes/mir/absent-source.lua'; manifest = $missingSourcePath; root = $RepoRoot },
+    @{ label = 'outside-repository traversal'; locator = 'prototypes/mir/outside-repo.lua'; manifest = $outsideRepoPath; root = $RepoRoot },
+    @{ label = 'inside-repository but outside-source path'; locator = 'prototypes/mir/outside-source.lua'; manifest = $outsideSourcePath; root = $RepoRoot },
+    @{ label = 'direct directory collision'; locator = 'migrations'; manifest = (Join-Path $directDirectoryRoot 'source/package-source.json'); root = $directDirectoryRoot }
+  )) {
+    $caught = $false
+    try { Resolve-MIR4WholePlatformImplementation -RepoRoot $negative.root -RelativePath $negative.locator -PackageSourcePath $negative.manifest | Out-Null } catch { $caught = $_.Exception.Message.StartsWith('[mir4-whole-platform-package-source]') }
+    if (-not $caught) { throw "An invalid $($negative.label) implementation locator was accepted." }
+  }
+  $staleResolution = @(Resolve-MIR4WholePlatformImplementation -RepoRoot $directDirectoryRoot -RelativePath $staleRelative -PackageSourcePath $staleLeafPath)
+  if ($staleResolution.Count -ne 1 -or $staleResolution[0] -cne (Resolve-Path -LiteralPath $canonicalFullPath).Path) {
+    throw 'A stale historical package leaf bypassed the canonical source binding.'
+  }
+} finally {
+  Remove-Item -LiteralPath @($ambiguousPath,$missingPath,$missingSourcePath,$outsideRepoPath,$outsideSourcePath,$staleLeafPath) -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $directDirectoryRoot -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 $upper = New-MIR4TargetKeyProjection -Target 'F210'
 $lower = New-MIR4TargetKeyProjection -Target 'f210'
 if ($upper.target -cne 'F210' -or $lower.target -cne 'F210' -or $upper.legacy_target -cne 'f210' -or $lower.distribution_target_code -cne '210') {
