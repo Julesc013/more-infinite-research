@@ -54,6 +54,76 @@ try {
 
     $failures = [System.Collections.Generic.List[string]]::new()
 
+    $tamperSource = @($distributionCustody.distributions | Select-Object -First 1)
+    if ($tamperSource.Count -ne 1) {
+        $failures.Add('distribution custody has no row for the altered-hash negative check')
+    }
+    else {
+        $tamperedDistribution = [pscustomobject][ordered]@{
+            version=[string]$tamperSource[0].version
+            path=[string]$tamperSource[0].path
+            sha256=$(if ([string]$tamperSource[0].sha256 -match '^A') { 'B' } else { 'A' }) + ([string]$tamperSource[0].sha256).Substring(1)
+            bytes=[int64]$tamperSource[0].bytes
+        }
+        $tamperRejected = $false
+        try { Test-MIR4DistributionHistoricalCustody -RepoRoot $repoRoot -Distribution $tamperedDistribution | Out-Null }
+        catch { $tamperRejected = $_.Exception.Message -match '\[mir4-distribution-custody-sha256\]' }
+        if (-not $tamperRejected) {
+            $failures.Add('same-size distribution custody with an altered expected hash was not rejected')
+        }
+    }
+
+    $junctionId = [Guid]::NewGuid().ToString('N')
+    $junctionParent = Join-Path $repoRoot 'build/results/distribution-custody-confinement'
+    $junctionPath = Join-Path $junctionParent $junctionId
+    $outsideTarget = Join-Path ([IO.Path]::GetTempPath()) ("mir4-distribution-custody-$junctionId")
+    try {
+        [void](New-Item -ItemType Directory -Force -Path $junctionParent)
+        [void](New-Item -ItemType Directory -Path $outsideTarget)
+        [void](New-Item -ItemType Junction -Path $junctionPath -Target $outsideTarget)
+        $junctionRejected = $false
+        try { Resolve-MIR4DistributionCustodyOutputRoot -RepoRoot $repoRoot -OutputRoot (Join-Path $junctionPath 'redirected') | Out-Null }
+        catch { $junctionRejected = $_.Exception.Message -match '\[mir4-distribution-custody-output-reparse\]' }
+        if (-not $junctionRejected) {
+            $failures.Add('distribution output confinement accepted a reparse-point ancestor below build')
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $junctionPath) { [IO.Directory]::Delete($junctionPath, $false) }
+        if (Test-Path -LiteralPath $outsideTarget -PathType Container) { [IO.Directory]::Delete($outsideTarget, $true) }
+    }
+
+    $sharedRepoRoot = Get-MIR4DistributionCustodySharedRepoRoot -RepoRoot $repoRoot
+    $primaryWorktreeLine = @(& git -C $repoRoot worktree list --porcelain 2>$null | Where-Object { $_.StartsWith('worktree ', [StringComparison]::Ordinal) } | Select-Object -First 1)
+    if ($LASTEXITCODE -ne 0 -or $primaryWorktreeLine.Count -ne 1) {
+        $failures.Add('distribution custody cannot independently resolve the registered primary worktree')
+    }
+    else {
+        $expectedSharedRepoRoot = [IO.Path]::GetFullPath(([string]$primaryWorktreeLine[0]).Substring(9))
+        $commonGitDirectory = [IO.Path]::GetFullPath((@(& git -C $repoRoot rev-parse --path-format=absolute --git-common-dir 2>$null)[0]).Trim())
+        if ($expectedSharedRepoRoot.Equals($commonGitDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+            $configuredPrimaryWorktree = @(& git -C $repoRoot config --path --get core.worktree 2>$null)
+            if ($configuredPrimaryWorktree.Count -eq 1) {
+                $expectedSharedRepoRoot = [IO.Path]::GetFullPath(([string]$configuredPrimaryWorktree[0]).Trim())
+            }
+        }
+        if (-not $sharedRepoRoot.Equals($expectedSharedRepoRoot, [StringComparison]::OrdinalIgnoreCase)) {
+            $failures.Add('distribution custody does not share immutable archives through the registered primary checkout')
+        }
+        $expectedCacheRoot = [IO.Path]::GetFullPath((Join-Path $expectedSharedRepoRoot 'build/cache/mir-distributions'))
+        $savedCacheHome = [Environment]::GetEnvironmentVariable('MIR_CACHE_HOME', 'Process')
+        try {
+            [Environment]::SetEnvironmentVariable('MIR_CACHE_HOME', $null, 'Process')
+            $actualCacheRoot = Get-MIR4DistributionCustodyCacheRoot -RepoRoot $repoRoot
+        }
+        finally {
+            [Environment]::SetEnvironmentVariable('MIR_CACHE_HOME', $savedCacheHome, 'Process')
+        }
+        if (-not $actualCacheRoot.Equals($expectedCacheRoot, [StringComparison]::OrdinalIgnoreCase)) {
+            $failures.Add('default distribution cache is not shared across linked worktrees')
+        }
+    }
+
     $selectedSourceLockBlob = @(& git rev-parse "$rootTree`:$sourceLockRelative" 2>$null)
     if ($LASTEXITCODE -ne 0 -or
         $selectedSourceLockBlob.Count -ne 1 -or
@@ -367,6 +437,9 @@ try {
                 $restored = Restore-MIR4DistributionArchive -RepoRoot $repoRoot -Version $version
                 if ([string]$restored.sha256 -cne [string]$entry.dist_sha256 -or [int64]$restored.bytes -ne [int64]$inventoryRows[0].bytes) {
                     $failures.Add("${version}: restored distribution identity disagrees with the source lock")
+                }
+                if ([string]$restored.custody.object_state -cne 'present-hash-verified') {
+                    $failures.Add("${version}: historical distribution custody did not verify the pinned blob digest")
                 }
             }
             catch {

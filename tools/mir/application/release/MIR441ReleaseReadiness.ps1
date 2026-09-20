@@ -1,5 +1,7 @@
 Set-StrictMode -Version Latest
 
+. (Join-Path $PSScriptRoot '../package/DistributionCustody.ps1')
+
 foreach($module in @('readiness/Common.ps1','readiness/Contract.ps1','readiness/ResourceGovernor.ps1','readiness/CandidateBuild.ps1','readiness/QualificationResume.ps1','readiness/Qualification.ps1','readiness/IndependentVerification.ps1','readiness/TechnicalSeal.ps1','readiness/Promotion.ps1')){
   . (Join-Path $PSScriptRoot $module)
 }

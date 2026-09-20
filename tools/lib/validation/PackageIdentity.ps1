@@ -20,6 +20,34 @@ function Get-MIRPackageSourceRoots {
   return @('source', 'targets')
 }
 
+function Get-MIRPackageSourceLayoutFromPaths {
+  param([Parameter(Mandatory)][AllowEmptyCollection()][string[]]$Paths)
+
+  $pathSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  foreach ($path in @($Paths)) { $null = $pathSet.Add(([string]$path).Replace('\', '/')) }
+  if ($pathSet.Contains('source/package-source.json') -and
+      $pathSet.Contains('targets/package-authority.json')) {
+    return [pscustomobject][ordered]@{
+      kind = 'canonical-materializer-source'
+      roots = @(Get-MIRPackageSourceRoots)
+    }
+  }
+  if ($pathSet.Contains('src/mod/package-source.json') -and
+      $pathSet.Contains('targets/package-authority.json')) {
+    return [pscustomobject][ordered]@{
+      kind = 'canonical-materializer-source-v1'
+      roots = @('src/mod', 'targets')
+    }
+  }
+  if ($pathSet.Contains('info.json') -and $pathSet.Contains('data.lua')) {
+    return [pscustomobject][ordered]@{
+      kind = 'historical-legacy-root'
+      roots = @(Get-MIRLegacyRootPackageSourceRoots)
+    }
+  }
+  throw 'Paths do not contain a recognized package-source layout.'
+}
+
 function Get-MIRPackageSourceLayoutAtCommit {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -29,27 +57,8 @@ function Get-MIRPackageSourceLayoutAtCommit {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $trackedPaths = @(& git -C $repo ls-tree -r --name-only $Commit 2>$null)
   if ($LASTEXITCODE -ne 0) { throw "Unable to inspect package-source layout at commit $Commit." }
-  if ($trackedPaths -ccontains 'source/package-source.json' -and
-      $trackedPaths -ccontains 'targets/package-authority.json') {
-    return [pscustomobject][ordered]@{
-      kind = 'canonical-materializer-source'
-      roots = @(Get-MIRPackageSourceRoots)
-    }
-  }
-  if ($trackedPaths -ccontains 'src/mod/package-source.json' -and
-      $trackedPaths -ccontains 'targets/package-authority.json') {
-    return [pscustomobject][ordered]@{
-      kind = 'canonical-materializer-source-v1'
-      roots = @('src/mod', 'targets')
-    }
-  }
-  if ($trackedPaths -ccontains 'info.json' -and $trackedPaths -ccontains 'data.lua') {
-    return [pscustomobject][ordered]@{
-      kind = 'historical-legacy-root'
-      roots = @(Get-MIRLegacyRootPackageSourceRoots)
-    }
-  }
-  throw "Commit does not contain a recognized package-source layout: $Commit"
+  try { return Get-MIRPackageSourceLayoutFromPaths -Paths $trackedPaths }
+  catch { throw "Commit does not contain a recognized package-source layout: $Commit" }
 }
 
 function Get-MIRPackageOutputPaths {

@@ -15,6 +15,11 @@ $repo = (Resolve-Path (Join-Path $MirLegacyScriptRoot "..")).Path
 . (Join-Path $repo "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repo "tools\lib\control\Core.ps1")
 . (Join-Path $repo "tools\lib\control\Executor.ps1")
+. (Join-Path $repo "tools\mir\application\package\DistributionCustody.ps1")
+
+function Get-MIRApprovedDeltaHistoricalArchive([string]$Version) {
+  return [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version $Version).cache_path
+}
 # Approved-delta records characterize the completed MIR 3 terminal line.  Their
 # identity is read from its frozen source object, never from the current MIR 4
 # composed package.
@@ -54,7 +59,7 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
     $overridePath = Join-Path $repo ".mir/releases/emergency/MIR3PostTerminalEmergencyHotfixMaintainerReleaseOverrideV1.json"
     $changeSet = Get-Content -Raw -LiteralPath $changeSetPath | ConvertFrom-Json
     $override = Get-Content -Raw -LiteralPath $overridePath | ConvertFrom-Json
-    $candidatePath = Join-Path $repo ([string]$activeRelease.package.archive)
+    $candidatePath = Get-MIRApprovedDeltaHistoricalArchive -Version $activeVersion
     if ([string]$changeSet.status -ne "one-finding-admitted" -or
         (@($changeSet.finding_records) -join "|") -ne ".mir/releases/emergency/findings/MIR3-TERM-0032.json" -or
         [string]$override.status -ne "accepted-for-immediate-promotion" -or
@@ -74,7 +79,7 @@ if (Test-Path -LiteralPath $activeReleasePath -PathType Leaf) {
     $changeSet = Get-Content -Raw -LiteralPath $changeSetPath | ConvertFrom-Json
     $override = Get-Content -Raw -LiteralPath $overridePath | ConvertFrom-Json
     $qualification = Get-Content -Raw -LiteralPath $qualificationPath | ConvertFrom-Json
-    $candidatePath = Join-Path $repo ([string]$activeRelease.package.archive)
+    $candidatePath = Get-MIRApprovedDeltaHistoricalArchive -Version $activeVersion
     if ([string]$changeSet.status -ne "two-findings-admitted" -or
         (@($changeSet.finding_records) -join "|") -ne ".mir/releases/emergency/findings/MIR3-TERM-0033.json|.mir/releases/emergency/findings/MIR3-TERM-0034.json" -or
         [string]$override.status -ne "accepted-for-immediate-promotion" -or
@@ -98,7 +103,7 @@ if ([string]::IsNullOrWhiteSpace($Path)) {
   $Path = [string]$defaultDeltaByVersion[$activeVersion]
 }
 if ([string]::IsNullOrWhiteSpace($Candidate)) {
-  $Candidate = "dist\more-infinite-research_$activeVersion.zip"
+  $Candidate = Get-MIRApprovedDeltaHistoricalArchive -Version $activeVersion
 }
 if ($activeVersion -eq "3.2.2") {
   $arguments = @{
@@ -212,7 +217,7 @@ if ($activeVersion -eq "3.2.5") {
   if ([int]$artifact.schema -ne 1 -or [string]$artifact.kind -ne "mir-control-plane-v5-approved-patch-delta") {
     throw "MIR 3.2.5 approved delta must use the native Control Plane v5 patch-delta schema."
   }
-  $baselinePath = Join-Path $repo "dist\more-infinite-research_3.2.3.zip"
+  $baselinePath = Get-MIRApprovedDeltaHistoricalArchive -Version '3.2.3'
   $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
   foreach ($requiredArchive in @($baselinePath, $candidatePath)) {
     if (-not (Test-Path -LiteralPath $requiredArchive -PathType Leaf)) {

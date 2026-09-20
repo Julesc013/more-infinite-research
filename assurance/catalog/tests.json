@@ -112,6 +112,8 @@
         "approved-delta-transition",
         "tests/release/Test-MIRApprovedDelta.ps1",
         "tests/release/Test-MIRApprovedPatchDelta.ps1",
+        ".mir/distributions.json",
+        "tools/mir/application/package/DistributionCustody.ps1",
         "tools/lib/validation/PackageIdentity.ps1"
       ],
       "captured_artifacts": [],
@@ -4977,19 +4979,14 @@
         "spec/schemas/mir3-*.schema.json",
         "spec/schemas/mir4-*.schema.json",
         "tools/commands/release/New-MIR3Dot9TerminalBaselines.ps1",
+        "tools/commands/release/New-MIR3PostTerminalHotfixBaselineContinuationV2.ps1",
+        "tools/commands/release/New-MIR3Factorio20PostTerminalHotfixBaselineContinuationV2.ps1",
         "tools/commands/release/Import-MIR3TerminalBaselines.ps1",
         "tools/commands/release/New-MIR4BootstrapRootSet.ps1",
         "tools/commands/release/Test-MIR4R0Bootstrap.ps1",
         "tools/lib/validation/MIR4DistributionIdentity.ps1",
-        "dist/more-infinite-research_3.2.9.zip",
-        "dist/more-infinite-research_2.5.9.zip",
-        "dist/more-infinite-research_1.9.9.zip",
-        "dist/more-infinite-research_1.8.9.zip",
-        "dist/more-infinite-research_1.7.9.zip",
-        "dist/more-infinite-research_1.6.9.zip",
-        "dist/more-infinite-research_1.5.9.zip",
-        "dist/more-infinite-research_1.4.9.zip",
-        "dist/more-infinite-research_1.3.9.zip",
+        ".mir/distributions.json",
+        "tools/mir/application/package/DistributionCustody.ps1",
         ".mir/evidence/mir4-r0/2026-08-16/MIR4-Bootstrap-Engine-Availability-ObservationV1.json",
         ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-CustodyObservationV1.json",
         ".mir/evidence/terminal-publication/2026-08-16/mod-portal/MIR3-Dot9-ModPortal-VisibilityRecheckV1.json",
@@ -7038,5 +7035,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b7bd5f475c2083fcbbd2ade420f1af37b6b964f2b7da64f5e863e12cc097fc9d"
+  "digest": "sha256:845169e1b3eb4acc12d9a10247c2e9bd781109d4e987f8f35d4ac6f39f2ea76c"
 }

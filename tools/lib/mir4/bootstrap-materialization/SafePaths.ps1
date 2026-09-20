@@ -181,6 +181,11 @@ function Add-MIR4PortableArchivePath {
 function Get-MIR4SourceFiles {
   param([Parameter(Mandatory)][string]$SourceRoot)
 
-  Assert-MIR4SourceTreeSafe -SourceRoot $SourceRoot
-  return @(Get-MIRPackageSourceFiles -RepoRoot $SourceRoot | Sort-Object -Unique)
+  $root = (Resolve-Path -LiteralPath $SourceRoot).Path
+  Assert-MIR4SourceTreeSafe -SourceRoot $root
+  return @(
+    Get-ChildItem -LiteralPath $root -Recurse -File -Force |
+      ForEach-Object { [IO.Path]::GetRelativePath($root, $_.FullName).Replace('\', '/') } |
+      Sort-Object -Unique
+  )
 }

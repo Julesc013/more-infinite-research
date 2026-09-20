@@ -6,6 +6,49 @@ function Get-MIR4DistributionCustodyRepoRoot {
   return (Resolve-Path -LiteralPath $RepoRoot).Path
 }
 
+function Get-MIR4DistributionCustodySharedRepoRoot {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = Get-MIR4DistributionCustodyRepoRoot -RepoRoot $RepoRoot
+  $commonGitDirectory = @(& git -C $repo rev-parse --path-format=absolute --git-common-dir 2>$null)
+  if ($LASTEXITCODE -ne 0 -or $commonGitDirectory.Count -ne 1 -or [string]::IsNullOrWhiteSpace([string]$commonGitDirectory[0])) {
+    throw '[mir4-distribution-custody-git-common-directory]'
+  }
+  $commonGitDirectory = [IO.Path]::GetFullPath(([string]$commonGitDirectory[0]).Trim())
+
+  $configuredPrimaryWorktree = @(& git -C $repo config --path --get core.worktree 2>$null)
+  if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 1) {
+    throw '[mir4-distribution-custody-primary-worktree-config]'
+  }
+  if ($configuredPrimaryWorktree.Count -gt 1) {
+    throw '[mir4-distribution-custody-primary-worktree-ambiguous]'
+  }
+  $configuredPrimaryWorktree = if ($configuredPrimaryWorktree.Count -eq 1 -and -not [string]::IsNullOrWhiteSpace([string]$configuredPrimaryWorktree[0])) {
+    [IO.Path]::GetFullPath(([string]$configuredPrimaryWorktree[0]).Trim())
+  }
+  else { $null }
+
+  $worktreeLines = @(& git -C $repo worktree list --porcelain 2>$null)
+  if ($LASTEXITCODE -ne 0) { throw '[mir4-distribution-custody-worktree-list]' }
+  $primaryLine = @($worktreeLines | Where-Object { $_.StartsWith('worktree ', [StringComparison]::Ordinal) } | Select-Object -First 1)
+  if ($primaryLine.Count -ne 1) { throw '[mir4-distribution-custody-primary-worktree-missing]' }
+  $primary = [IO.Path]::GetFullPath(([string]$primaryLine[0]).Substring(9))
+  if ($primary.Equals($commonGitDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+    if ($null -eq $configuredPrimaryWorktree) { throw '[mir4-distribution-custody-primary-worktree-unresolved]' }
+    $primary = $configuredPrimaryWorktree
+  }
+  if (-not (Test-Path -LiteralPath $primary -PathType Container)) {
+    throw '[mir4-distribution-custody-primary-worktree-unavailable]'
+  }
+  $primaryCommonGitDirectory = @(& git -C $primary rev-parse --path-format=absolute --git-common-dir 2>$null)
+  if ($LASTEXITCODE -ne 0 -or
+      $primaryCommonGitDirectory.Count -ne 1 -or
+      -not ([IO.Path]::GetFullPath(([string]$primaryCommonGitDirectory[0]).Trim()).Equals($commonGitDirectory, [StringComparison]::OrdinalIgnoreCase))) {
+    throw '[mir4-distribution-custody-primary-worktree-mismatch]'
+  }
+  return $primary
+}
+
 function Get-MIR4DistributionCustodyManifest {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -50,7 +93,8 @@ function Get-MIR4DistributionCustodyCacheRoot {
       $CacheRoot = Join-Path $env:MIR_CACHE_HOME 'distributions'
     }
     else {
-      $CacheRoot = Join-Path $repo 'build/cache/mir-distributions'
+      $sharedRepo = Get-MIR4DistributionCustodySharedRepoRoot -RepoRoot $repo
+      $CacheRoot = Join-Path $sharedRepo 'build/cache/mir-distributions'
     }
   }
   if (-not [IO.Path]::IsPathRooted($CacheRoot)) { $CacheRoot = Join-Path $repo $CacheRoot }
@@ -69,6 +113,17 @@ function Resolve-MIR4DistributionCustodyOutputRoot {
   )
   foreach ($allowed in $allowedRoots) {
     if ($resolved -ceq $allowed -or $resolved.StartsWith($allowed + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+      $relative = $resolved.Substring($repo.Length).TrimStart([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+      $cursor = $repo
+      foreach ($component in @($relative -split '[\\/]')) {
+        if ([string]::IsNullOrWhiteSpace($component)) { continue }
+        $cursor = Join-Path $cursor $component
+        if (-not (Test-Path -LiteralPath $cursor)) { continue }
+        $item = Get-Item -LiteralPath $cursor -Force
+        if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+          throw "[mir4-distribution-custody-output-reparse] $cursor"
+        }
+      }
       return $resolved
     }
   }
@@ -93,6 +148,36 @@ function Test-MIR4DistributionCustodyFile {
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash -ceq [string]$Distribution.sha256
 }
 
+function Get-MIR4DistributionGitBlobSha256 {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$GitSpec)
+  $startInfo = [Diagnostics.ProcessStartInfo]::new()
+  $startInfo.FileName = 'git'
+  $null = $startInfo.ArgumentList.Add('-C')
+  $null = $startInfo.ArgumentList.Add($RepoRoot)
+  $null = $startInfo.ArgumentList.Add('cat-file')
+  $null = $startInfo.ArgumentList.Add('blob')
+  $null = $startInfo.ArgumentList.Add($GitSpec)
+  $startInfo.UseShellExecute = $false
+  $startInfo.RedirectStandardOutput = $true
+  $startInfo.RedirectStandardError = $true
+  $process = [Diagnostics.Process]::new()
+  $process.StartInfo = $startInfo
+  if (-not $process.Start()) { throw '[mir4-distribution-custody-git-start]' }
+  $sha = [Security.Cryptography.SHA256]::Create()
+  try {
+    $digest = $sha.ComputeHash($process.StandardOutput.BaseStream)
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "[mir4-distribution-custody-git-blob] $stderr" }
+    return [BitConverter]::ToString($digest).Replace('-', '')
+  }
+  finally {
+    $sha.Dispose()
+    $process.Dispose()
+  }
+}
+
 function Test-MIR4DistributionHistoricalCustody {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Distribution)
@@ -114,6 +199,10 @@ function Test-MIR4DistributionHistoricalCustody {
   if ($LASTEXITCODE -ne 0 -or $size.Count -ne 1 -or [int64]$size[0] -ne [int64]$Distribution.bytes) {
     throw "[mir4-distribution-custody-bytes] $relativePath"
   }
+  $actualSha256 = Get-MIR4DistributionGitBlobSha256 -RepoRoot $repo -GitSpec "$commit`:$relativePath"
+  if ($actualSha256 -cne ([string]$Distribution.sha256).ToUpperInvariant()) {
+    throw "[mir4-distribution-custody-sha256] $relativePath"
+  }
   return [pscustomobject][ordered]@{
     version=[string]$Distribution.version
     path=$relativePath
@@ -121,7 +210,7 @@ function Test-MIR4DistributionHistoricalCustody {
     tree=([string]$manifest.custody.predecessor_tree).ToUpperInvariant()
     bytes=[int64]$Distribution.bytes
     sha256=[string]$Distribution.sha256
-    object_state='present-size-verified'
+    object_state='present-hash-verified'
   }
 }
 

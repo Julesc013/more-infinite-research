@@ -60,7 +60,7 @@ function Invoke-MIR441TargetQualification {
   if([string]$candidateManifest.source.commit-cne[string]$source.commit-or[string]$candidateManifest.source.tree-cne[string]$source.tree){throw '[mir441-qualification-source-drift]'}
   $candidate=Join-Path $evidence "assets/$([string]$candidateRow.asset.path)"
   if((Get-FileHash -LiteralPath $candidate -Algorithm SHA256).Hash-cne[string]$candidateRow.asset.sha256){throw '[mir441-qualification-candidate-drift]'}
-  $predecessor=Join-Path $repo "dist/more-infinite-research_$([string]$targetRow.predecessor).zip"
+  $predecessor=[string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$targetRow.predecessor)).cache_path
   if(-not(Test-Path -LiteralPath $predecessor -PathType Leaf)){throw "[mir441-qualification-predecessor] $Target"}
   $engine=Get-MIR441TargetEngineIdentity -RepoRoot $repo -Target $targetRow
   $resultPath=Join-Path $targetEvidence 'target-qualification.json'

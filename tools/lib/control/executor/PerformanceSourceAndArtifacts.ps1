@@ -74,16 +74,48 @@ function New-MIRCPPerformanceSourceOverlay {
   $authorityRelativePath = Get-MIRCPPerformanceCampaignRelativePath -Descriptor $Descriptor -RepoRoot $repo
   $authorityPath = Join-Path $repo $authorityRelativePath
   $authority = Assert-MIRCPPerformanceCampaignAuthority -Path $authorityPath -Descriptor $Descriptor -TargetProfile $TargetProfile -RepoRoot $repo
-  $root = Join-Path $repo "build/results/control-plane-v5/source-overlays/$([string]$State.context.context_id)"
+  # v2 overlays require a shared object store. Keeping the root versioned makes
+  # pre-repair full-copy clones inert instead of treating them as valid cache
+  # entries or destructively replacing a directory created by an older run.
+  $root = Join-Path $repo "build/results/control-plane-v5/source-overlays-v2/$([string]$State.context.context_id)"
   $destination = Join-Path $root "performance"
   if (-not (Test-Path -LiteralPath $destination -PathType Container)) {
     [void](New-Item -ItemType Directory -Force -Path $root)
-    $staging = Join-Path $root ("performance-staging-" + [guid]::NewGuid().ToString("N"))
-    & git clone --local --no-hardlinks --no-checkout -- ([string]$Source.path) $staging 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Could not clone the immutable qualification source for the performance authority overlay." }
-    & git -C $staging checkout --detach ([string]$Source.commit) 2>$null
-    if ($LASTEXITCODE -ne 0) { throw "Could not check out the immutable qualification source for the performance authority overlay." }
-    Move-Item -LiteralPath $staging -Destination $destination
+    $stagingRoot = Join-Path $repo 'build/temp'
+    [void](New-Item -ItemType Directory -Force -Path $stagingRoot)
+    $staging = Join-Path $stagingRoot ("mircp-performance-" + [guid]::NewGuid().ToString("N"))
+    try {
+      # The qualification source is immutable and retained for the life of the
+      # overlay. Reuse its Git object store instead of copying multi-gigabyte
+      # packs into every private working directory.
+      $cloneOutput = @(& git -c core.longpaths=true clone --shared --no-checkout -- ([string]$Source.path) $staging 2>&1)
+      if ($LASTEXITCODE -ne 0) {
+        throw "Could not clone the immutable qualification source for the performance authority overlay: $($cloneOutput -join ' ')"
+      }
+      $stagingGitDir = Join-Path $staging '.git'
+      if (-not (Test-Path -LiteralPath $stagingGitDir -PathType Container)) {
+        throw 'Performance authority staging clone lacks its private Git directory.'
+      }
+      $checkoutOutput = @(& git -c core.longpaths=true "--git-dir=$stagingGitDir" "--work-tree=$staging" checkout --force --detach ([string]$Source.commit) 2>&1)
+      if ($LASTEXITCODE -ne 0) {
+        throw "Could not check out the immutable qualification source for the performance authority overlay: $($checkoutOutput -join ' ')"
+      }
+      Move-Item -LiteralPath $staging -Destination $destination
+    }
+    finally {
+      if (Test-Path -LiteralPath $staging -PathType Container) {
+        Get-ChildItem -LiteralPath $staging -Recurse -Force | ForEach-Object {
+          if (($_.Attributes -band [IO.FileAttributes]::ReadOnly) -ne 0) {
+            $_.Attributes = $_.Attributes -band (-bnot [IO.FileAttributes]::ReadOnly)
+          }
+        }
+        Remove-Item -LiteralPath $staging -Recurse -Force
+      }
+    }
+  }
+  $overlayAlternates = Join-Path $destination '.git/objects/info/alternates'
+  if (-not (Test-Path -LiteralPath $overlayAlternates -PathType Leaf)) {
+    throw 'Performance authority overlay does not reuse its immutable source object store.'
   }
   $head = ([string](& git -C $destination rev-parse HEAD)).Trim()
   if ($LASTEXITCODE -ne 0 -or $head -ne [string]$Source.commit) { throw "Performance authority overlay source commit differs from the immutable context source." }

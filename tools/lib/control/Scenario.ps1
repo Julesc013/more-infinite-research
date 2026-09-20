@@ -98,7 +98,13 @@ function Get-MIRCPScenarioInvocationAuthority {
     $fixtureStatic = $true
     if ($fixtureParameter.Count -gt 0) {
       $fixtureStatic = @($fixtureParameter | Where-Object { -not [bool]$_.static }).Count -eq 0
-      if ($fixtureStatic) { $fixtureNames = @($fixtureParameter.literal_strings | Sort-Object -Unique) }
+      if ($fixtureStatic) {
+        $fixtureNames = @(
+          $fixtureParameter |
+            ForEach-Object { @($_.literal_strings) } |
+            Sort-Object -Unique
+        )
+      }
     }
     $records.Add([pscustomobject][ordered]@{
       command = [string]$command.GetCommandName()

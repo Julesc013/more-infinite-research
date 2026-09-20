@@ -16,13 +16,21 @@ foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "
 
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
 $candidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$release.release)).cache_path
-$performanceSource = Join-Path $repo "build/results/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
+# v2 sources are guaranteed to be shared clones. Legacy full-copy cache roots
+# remain inert until bounded retention cleanup accounts for them.
+$performanceSource = Join-Path $repo "build/results/control-plane-v5-self-test/performance-sources-v2/$([string]$release.package.source_commit)"
 if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceSource))
-  & git -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --local --no-hardlinks --no-checkout -- $repo $performanceSource 2>$null
+  & git -c core.longpaths=true -c "safe.directory=$repo" -c "safe.directory=$(Join-Path $repo '.git')" clone --shared --no-checkout -- $repo $performanceSource 2>$null
   if ($LASTEXITCODE -ne 0) { throw "Could not clone exact performance source for executor self-test." }
-  & git -C $performanceSource checkout --detach ([string]$release.package.source_commit) 2>$null
+  $performanceGitDir = Join-Path $performanceSource '.git'
+  if (-not (Test-Path -LiteralPath $performanceGitDir -PathType Container)) { throw 'Performance source clone lacks its private Git directory.' }
+  & git -c core.longpaths=true "--git-dir=$performanceGitDir" "--work-tree=$performanceSource" checkout --force --detach ([string]$release.package.source_commit) 2>$null
   if ($LASTEXITCODE -ne 0) { throw "Could not check out exact performance source for executor self-test." }
+}
+$performanceAlternates = Join-Path $performanceSource '.git/objects/info/alternates'
+if (-not (Test-Path -LiteralPath $performanceAlternates -PathType Leaf)) {
+  throw 'Executor self-test performance source does not reuse the immutable local Git object store.'
 }
 $historicalInputTask = [pscustomobject][ordered]@{
   id = "historical-input-self-test"

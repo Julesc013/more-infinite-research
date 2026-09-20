@@ -50,7 +50,7 @@ The repository does not track historical ZIP payloads in current trees. `.mir/di
 .\tools\mir.ps1 mir4 distribution restore --version 4.0.21000 --output dist
 ```
 
-`MIR_CACHE_HOME` selects a reusable cache root; otherwise the cache is under ignored `build/cache/mir-distributions`. No materializer downloads from GitHub or claims that GitHub assets are complete custody. The current observation records that 72 of 74 historical inventory rows match a GitHub asset digest and size, while `2.0.0` and `2.2.0` do not. The pinned Git predecessor is therefore required to recover all recorded historical bytes. This path has no tag, release, upload, or publication authority.
+`MIR_CACHE_HOME` selects a reusable cache root; otherwise every linked worktree resolves the registered primary checkout through Git metadata and shares its ignored `build/cache/mir-distributions`. Only immutable, digest-verified archives are shared. Mutable mod lists, settings, saves, logs, fixtures, and run output remain private to their run. No materializer downloads from GitHub or claims that GitHub assets are complete custody. The current observation records that 72 of 74 historical inventory rows match a GitHub asset digest and size, while `2.0.0` and `2.2.0` do not. The pinned Git predecessor is therefore required to recover all recorded historical bytes. This path has no tag, release, upload, or publication authority.
 
 ## Audit And Cleanup
 
