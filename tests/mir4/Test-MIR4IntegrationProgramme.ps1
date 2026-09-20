@@ -174,13 +174,12 @@ function Get-MIR4CommunityByteSha256([byte[]]$Bytes) {
 }
 $scienceRelativePath='spec/programmes/evidence/synthesis-2026-09-06/science-modules.json'
 $scienceEvidence=Resolve-MIR4CommunityRepositoryPath $scienceRelativePath
-$scienceSnapshotCommitRows=@(& git -C $RepoRoot log -1 --format=%H -- $scienceRelativePath 2>$null)
-if($LASTEXITCODE -ne 0 -or $scienceSnapshotCommitRows.Count -ne 1) { throw '[synthesis-science-proof-snapshot-commit]' }
-$scienceSnapshotCommit=([string]$scienceSnapshotCommitRows[0]).Trim()
-if($scienceSnapshotCommit -cnotmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { throw '[synthesis-science-proof-snapshot-commit]' }
+$scienceSnapshotCommit='abe152a332741db268a39b5088866e5aab634fed'
+$scienceSnapshotBlob='1b2fda97662d1e281f2a21781f937c48d467c277'
 & git -C $RepoRoot merge-base --is-ancestor $scienceSnapshotCommit HEAD 2>$null
 if($LASTEXITCODE -ne 0) { throw '[synthesis-science-proof-snapshot-not-ancestor]' }
 $scienceSnapshot=Get-MIR4CommunityGitBlob $scienceSnapshotCommit $scienceRelativePath
+if($scienceSnapshot.object_id -cne $scienceSnapshotBlob) { throw '[synthesis-science-proof-snapshot-blob]' }
 $scienceCurrentBytes=[IO.File]::ReadAllBytes($scienceEvidence)
 if(-not(Test-MIR4CommunityByteIdentity $scienceSnapshot.bytes $scienceCurrentBytes)) { throw '[synthesis-science-proof-record-bytes]' }
 $science=[Text.Encoding]::UTF8.GetString($scienceSnapshot.bytes)|ConvertFrom-Json -Depth 100
@@ -195,13 +194,12 @@ if((Get-MIR4CommunityByteSha256 $historicalScienceTest.bytes) -cne [string]$scie
 $communityRelativePath='spec/programmes/evidence/community-2026-09-06/outcomes.json'
 $communityPath=Resolve-MIR4CommunityRepositoryPath $communityRelativePath
 if(-not (Test-Path -LiteralPath $communityPath -PathType Leaf)) { throw '[community-evidence-snapshot-record]' }
-$snapshotCommitRows=@(& git -C $RepoRoot log -1 --format=%H -- $communityRelativePath 2>$null)
-if($LASTEXITCODE -ne 0 -or $snapshotCommitRows.Count -ne 1) { throw '[community-evidence-snapshot-commit]' }
-$snapshotCommit=([string]$snapshotCommitRows[0]).Trim()
-if($snapshotCommit -cnotmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { throw '[community-evidence-snapshot-commit]' }
+$snapshotCommit='464e7bef0e0962fd8472809a7e2e6fe9889682bb'
+$snapshotBlob='1d1670295c94700573f49dbb6199f9ec8d23d388'
 & git -C $RepoRoot merge-base --is-ancestor $snapshotCommit HEAD 2>$null
 if($LASTEXITCODE -ne 0) { throw '[community-evidence-snapshot-not-ancestor]' }
 $snapshotOutcomes=Get-MIR4CommunityGitBlob $snapshotCommit $communityRelativePath
+if($snapshotOutcomes.object_id -cne $snapshotBlob) { throw '[community-evidence-snapshot-blob]' }
 $currentOutcomesBytes=[IO.File]::ReadAllBytes($communityPath)
 if(-not (Test-MIR4CommunityByteIdentity $snapshotOutcomes.bytes $currentOutcomesBytes)) { throw '[community-evidence-snapshot-record-bytes]' }
 $community=[Text.Encoding]::UTF8.GetString($snapshotOutcomes.bytes) | ConvertFrom-Json -Depth 100
