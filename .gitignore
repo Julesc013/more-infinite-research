@@ -1,5 +1,7 @@
 /build/
 /dist/
+# Kept explicit for the stable local-playtest exclusion contract.
+/dist/playtest/
 /tmp/
 /temp/
 /artifacts/

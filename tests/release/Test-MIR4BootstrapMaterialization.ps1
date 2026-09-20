@@ -9,6 +9,7 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 }
 
 . (Join-Path $RepoRoot "tools/lib/mir4/BootstrapMaterialization.ps1")
+. (Join-Path $RepoRoot "tools/mir/application/package/DistributionCustody.ps1")
 
 function Assert-True([bool]$Condition, [string]$Message) {
   if (-not $Condition) { throw $Message }
@@ -30,11 +31,15 @@ Assert-True (@($plan.targets).Count -eq 4) "MIR4 bootstrap plan must bind four r
 Assert-True (@($plan.targets.target_key | Sort-Object -Unique).Count -eq 4) "MIR4 bootstrap target keys must be unique."
 
 $expected = [ordered]@{ f210 = "4.0.21000"; f200 = "4.0.20000"; f110 = "4.0.11000"; f100 = "4.0.10000" }
+$predecessorPaths = @{}
 foreach ($target in $plan.targets) {
   Assert-True ($expected.Contains([string]$target.target_key)) "Unexpected bootstrap target $($target.target_key)."
   Assert-True ([string]$target.distribution_version -eq [string]$expected[[string]$target.target_key]) "Distribution projection is wrong for $($target.target_key)."
   Assert-True ([int]$target.distribution_target_code * 100 -eq [int](([string]$target.distribution_version -split '\.')[2])) "Distribution codec arithmetic is wrong for $($target.target_key)."
-  $archivePath = Join-Path $RepoRoot ([string]$target.predecessor.archive_path)
+  $archivePath = [string](Restore-MIR4DistributionArchive `
+    -RepoRoot $RepoRoot `
+    -Version ([string]$target.predecessor.release)).cache_path
+  $predecessorPaths[[string]$target.target_key] = $archivePath
   Assert-True ((Get-MIR4Sha256File -Path $archivePath) -eq [string]$target.predecessor.archive_sha256) "Terminal predecessor archive changed for $($target.target_key)."
   Assert-True ((Get-MIR4GitTree -RepoRoot $RepoRoot -Commit ([string]$target.source.candidate_commit)) -eq [string]$target.source.source_tree) "Terminal predecessor source tree changed for $($target.target_key)."
 }
@@ -307,7 +312,7 @@ if (Test-Path -LiteralPath $governedManifest -PathType Leaf) {
     foreach ($argument in @(
       '-NoLogo', '-NoProfile', '-NonInteractive', '-File', $runnerA,
       '-CapsulePath', $aliasCapsule, '-EnvelopePath', $aliasEnvelope,
-      '-PredecessorPath', (Join-Path $RepoRoot ([string]$f210.predecessor.archive_path)),
+      '-PredecessorPath', [string]$predecessorPaths['f210'],
       '-ToolchainRoot', $PSHOME, '-OutputRoot', $aliasOutput
     )) { $null = $probeInfo.ArgumentList.Add([string]$argument) }
     $probeProcess = [Diagnostics.Process]::new()

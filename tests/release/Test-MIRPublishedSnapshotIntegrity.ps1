@@ -17,6 +17,7 @@ $distributionManifestPath = Join-Path $repoRoot ".mir\distributions.json"
 . (Join-Path $repoRoot "tools\lib\validation\PackageIdentity.ps1")
 . (Join-Path $repoRoot "tools\lib\mir4\PreFreezeRelease.ps1")
 . (Join-Path $repoRoot "tools\lib\validation\CurrentTargetPackage.ps1")
+. (Join-Path $repoRoot "tools\mir\application\package\DistributionCustody.ps1")
 
 if (-not (Test-Path -LiteralPath $sourceLockPath -PathType Leaf)) {
     throw "Published source-lock authority not found: $sourceLockPath"
@@ -36,6 +37,7 @@ if ($sourceLocks.schema -ne 1 -or
 if ($distributionManifest.schema -ne 1 -or -not $distributionManifest.distributions) {
     throw "Unsupported or empty distribution inventory: $distributionManifestPath"
 }
+$distributionCustody = Get-MIR4DistributionCustodyManifest -RepoRoot $repoRoot
 
 Push-Location $repoRoot
 try {
@@ -296,7 +298,6 @@ try {
         $version = [string]$entry.version
         $legacySnapshotRelative = [string]$entry.legacy_snapshot
         $distRelative = [string]$entry.dist
-        $distPath = Join-Path $repoRoot ($distRelative -replace "/", "\")
 
         if ([string]::IsNullOrWhiteSpace($version) -or $seenVersions.ContainsKey($version)) {
             $failures.Add("published source-lock versions must be nonempty and unique: '$version'")
@@ -354,16 +355,6 @@ try {
             $failures.Add("${version}: byte count $byteCount does not match $($entry.bytes)")
         }
 
-        if (-not (Test-Path -LiteralPath $distPath -PathType Leaf)) {
-            $failures.Add("${version}: missing distribution $distRelative")
-        }
-        else {
-            $distHash = (Get-FileHash -LiteralPath $distPath -Algorithm SHA256).Hash
-            if ($distHash -ne [string]$entry.dist_sha256) {
-                $failures.Add("${version}: distribution SHA-256 $distHash does not match $($entry.dist_sha256)")
-            }
-        }
-
         $inventoryRows = @($distributionManifest.distributions | Where-Object { [string]$_.path -eq $distRelative })
         if ($inventoryRows.Count -ne 1 -or
             [string]$inventoryRows[0].version -ne $version -or
@@ -371,46 +362,50 @@ try {
             [string]$inventoryRows[0].source_ref -ne [string]$entry.tag) {
             $failures.Add("${version}: source lock and distribution inventory disagree")
         }
+        else {
+            try {
+                $restored = Restore-MIR4DistributionArchive -RepoRoot $repoRoot -Version $version
+                if ([string]$restored.sha256 -cne [string]$entry.dist_sha256 -or [int64]$restored.bytes -ne [int64]$inventoryRows[0].bytes) {
+                    $failures.Add("${version}: restored distribution identity disagrees with the source lock")
+                }
+            }
+            catch {
+                $failures.Add("${version}: unable to restore and hash-verify pinned distribution custody: $($_.Exception.Message)")
+            }
+        }
 
         Write-Host "PASS ${version}: tag/commit and retired snapshot resolve the same tree, files, bytes, and distribution"
     }
 
-    $expectedDistributionPaths = @($distributionManifest.distributions | ForEach-Object { [string]$_.path })
-    $actualDistributionPaths = @(
-        Get-ChildItem -LiteralPath (Join-Path $repoRoot "dist") -File -Filter "*.zip" |
-            ForEach-Object { "dist/$($_.Name)" } |
-            Sort-Object
-    )
-    if ($actualDistributionPaths.Count -ne [int]$distributionManifest.distribution_count) {
-        $failures.Add("root dist count $($actualDistributionPaths.Count) does not match $($distributionManifest.distribution_count)")
-    }
-    $distributionPathDelta = @(Compare-Object ($expectedDistributionPaths | Sort-Object) $actualDistributionPaths)
-    if ($distributionPathDelta.Count -gt 0) {
-        $failures.Add("root dist paths do not exactly match .mir/distributions.json")
-    }
-    $treeDistributionPaths = @(
+    $expectedDistributionPaths = @($distributionManifest.distributions | ForEach-Object { [string]$_.path } | Sort-Object)
+    $currentTreeDistributionPaths = @(
         & git ls-tree -r --name-only $rootTree -- dist |
             Where-Object { $_ -like "dist/*.zip" } |
             Sort-Object
     )
-    $treeDistributionPathDelta = @(Compare-Object ($expectedDistributionPaths | Sort-Object) $treeDistributionPaths)
-    if ($treeDistributionPathDelta.Count -gt 0) {
-        $failures.Add("selected Git tree dist paths do not exactly match .mir/distributions.json")
+    if ($currentTreeDistributionPaths.Count -ne 0) {
+        $failures.Add("selected Git tree must not track distribution ZIPs after local-dist retirement")
     }
-
+    $historicalRows = @(& git ls-tree -r -l ([string]$distributionCustody.custody.predecessor_commit) -- dist)
+    if ($LASTEXITCODE -ne 0) {
+        $failures.Add('pinned historical distribution tree cannot be enumerated')
+    }
+    $historicalSizes = @{}
+    foreach ($row in $historicalRows) {
+        if ([string]$row -match '^\d+\s+blob\s+[0-9a-f]+\s+(\d+)\tdist/(?<name>[^/]+[.]zip)$') {
+            $historicalSizes["dist/$($Matches.name)"] = [int64]$Matches[1]
+        }
+    }
+    $historicalPaths = @($historicalSizes.Keys | Sort-Object)
+    if ([int]$distributionManifest.distribution_count -ne $expectedDistributionPaths.Count -or
+        $historicalPaths.Count -ne [int]$distributionManifest.distribution_count -or
+        @(Compare-Object $expectedDistributionPaths $historicalPaths).Count -gt 0) {
+        $failures.Add('distribution inventory does not exactly match the pinned historical archive tree')
+    }
     foreach ($distribution in $distributionManifest.distributions) {
-        $distributionPath = Join-Path $repoRoot ([string]$distribution.path -replace "/", "\")
-        if (-not (Test-Path -LiteralPath $distributionPath -PathType Leaf)) {
-            $failures.Add("$($distribution.version): missing inventory distribution $($distribution.path)")
-            continue
-        }
-        $distributionFile = Get-Item -LiteralPath $distributionPath
-        if ($distributionFile.Length -ne [long]$distribution.bytes) {
-            $failures.Add("$($distribution.version): distribution bytes $($distributionFile.Length) do not match $($distribution.bytes)")
-        }
-        $distributionHash = (Get-FileHash -LiteralPath $distributionPath -Algorithm SHA256).Hash
-        if ($distributionHash -ne [string]$distribution.sha256) {
-            $failures.Add("$($distribution.version): inventory SHA-256 $distributionHash does not match $($distribution.sha256)")
+        $path = [string]$distribution.path
+        if (-not $historicalSizes.ContainsKey($path) -or [int64]$historicalSizes[$path] -ne [int64]$distribution.bytes) {
+            $failures.Add("$($distribution.version): pinned historical archive size disagrees with distribution inventory")
         }
     }
 
@@ -423,7 +418,7 @@ try {
 
     Write-Host "Published source-lock integrity passed for $($sourceLocks.versions.Count) compact source locks."
     Write-Host "Retired snapshot custody remains reconstructable from immutable Git history; offline bundle custody is still pending."
-    Write-Host "Distribution integrity passed for $($distributionManifest.distributions.Count) root archives."
+    Write-Host "Distribution custody passed for $($distributionManifest.distributions.Count) ignored local archives pinned in Git history."
 }
 finally {
     Pop-Location

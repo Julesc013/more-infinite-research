@@ -22,7 +22,7 @@ This is the normative directory and ownership contract for the MIR dual-plane re
 4. Durable records use logical path IDs or repository-relative `/` paths.
 5. New writes use canonical paths. Historical aliases are read-only.
 6. Factorio package construction is whitelist-based and cannot include development directories.
-7. Disposable construction state lives under `build/`; local validation results live under `build/results/`; distributable and playtest-ready packages live under `dist/`.
+7. Disposable construction state lives under `build/`; local validation results live under `build/results/`; local distributable and playtest-ready packages live under ignored `dist/`.
 8. Historical evidence text is not rewritten to follow directory moves.
 
 ## Root
@@ -149,7 +149,7 @@ The repository has two generated-data roots with non-overlapping purposes. All d
 | Root | Purpose | Retention |
 | --- | --- | --- |
 | `build/` | Disposable package staging, caches, generated target material, temporary files, and local/CI results | Reconstructible and safe to delete when no command is active after compact authorities have been promoted. |
-| `dist/` | Exact candidate/release ZIPs and the ignored local `dist/playtest/` handoff | Candidate and released archives are governed; playtest copies are replaceable views over qualified bytes. |
+| `dist/` | Ignored local candidate, portal-upload, and playtest ZIPs | Local delivery cache only. Historical archive identity is governed by `.mir/distributions.json` and its pinned Git predecessor; packages may be restored with SHA-256 verification without making `dist/` tracked. |
 
 `.work/` is retired and must never be recreated. Ordinary tools write generated output only beneath `build/`. Existing ignored `artifacts/`, `out/`, and root `tmp/` content is legacy read-only material pending the post-2.5.5 storage migration; it is not canonical and this change does not delete it. Git worktrees must be siblings of the repository or use an explicitly selected external path; they must never be nested in the repository.
 

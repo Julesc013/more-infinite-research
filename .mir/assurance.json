@@ -109,7 +109,7 @@
     },
     {
       "id": "mir4-package-source-baseline",
-      "patterns": ["^changes/unreleased/MIR4-CHG-2026-0004\\.json$", "^contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1\\.json$", "^spec/distribution/mir4-golden-four-target-baseline-v1\\.json$", "^spec/schemas/mir4-golden-four-target-baseline-v1\\.schema\\.json$", "^tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority\\.ps1$", "^tools/mir/application/package/GoldenTargetBaselines\\.ps1$", "^tools/mir/cli/Invoke-MIR4PackageSource\\.ps1$", "^tests/mir4/Test-MIR4(?:GoldenFourTargetBaseline|PreFreezeHardening)\\.ps1$", "^dist/more-infinite-research_4\\.0\\.(?:21000|20000|11000|10000)\\.zip$"],
+      "patterns": ["^changes/unreleased/MIR4-CHG-2026-0004\\.json$", "^contracts/repository/mir4-m41-f1-golden-four-target-baseline-authority-evolution-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1\\.json$", "^\\.mir/distributions\\.json$", "^spec/distribution/mir4-golden-four-target-baseline-v1\\.json$", "^spec/schemas/mir4-golden-four-target-baseline-v1\\.schema\\.json$", "^tools/commands/mir4/Update-MIR4M41F1GoldenBaselineAuthority\\.ps1$", "^tools/mir/application/package/(?:DistributionCustody|GoldenTargetBaselines)\\.ps1$", "^tools/mir/cli/Invoke-MIR4(?:DistributionCustody|PackageSource)\\.ps1$", "^tests/mir4/Test-MIR4(?:GoldenFourTargetBaseline|PreFreezeHardening)\\.ps1$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-golden-four-target-baseline-m41-f1", "static.mir4-pre-freeze-hardening"]
     },
     {
@@ -149,7 +149,7 @@
     },
     {
       "id": "mir4-package-source-runtime-replay",
-      "patterns": ["^tools/lib/validation/FactorioVersionPolicy\\.ps1$", "^tools/mir/application/package/RuntimeReplay(?:AggregateVerifier|Verifier)?\\.ps1$", "^tools/commands/mir4/Update-MIR4M41F2D(?:TargetRuntimeReplayAuthority|FourTargetRuntimeReplayAggregate)\\.ps1$", "^contracts/repository/mir4-m41-f2d-(?:target-runtime-replay-authority-evolution|four-target-runtime-replay-aggregate)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2D-(?:F(?:210|200|110|100)-Runtime-Replay-Authority-EvolutionV1|Four-Target-Runtime-Replay-AggregateV1)\\.json$", "^changes/unreleased/MIR4-CHG-2026-00(?:08|09|10|11|12)\\.json$", "^tests/mir4/Test-MIR4RuntimeReplayF2D\\.ps1$", "^docs/maintainer/mir4-f2d-runtime-replay\\.md$"],
+      "patterns": ["^\\.mir/distributions\\.json$", "^tools/lib/validation/FactorioVersionPolicy\\.ps1$", "^tools/mir/application/package/(?:DistributionCustody|RuntimeReplay(?:AggregateVerifier|Verifier)?)\\.ps1$", "^tools/commands/mir4/Update-MIR4M41F2D(?:TargetRuntimeReplayAuthority|FourTargetRuntimeReplayAggregate)\\.ps1$", "^contracts/repository/mir4-m41-f2d-(?:target-runtime-replay-authority-evolution|four-target-runtime-replay-aggregate)-v1\\.schema\\.json$", "^releases/migrations/MIR4-M41-F2D-(?:F(?:210|200|110|100)-Runtime-Replay-Authority-EvolutionV1|Four-Target-Runtime-Replay-AggregateV1)\\.json$", "^changes/unreleased/MIR4-CHG-2026-00(?:08|09|10|11|12)\\.json$", "^tests/mir4/Test-MIR4RuntimeReplayF2D\\.ps1$", "^docs/maintainer/mir4-f2d-runtime-replay\\.md$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "static.mir4-factorio-2.1-experimental-channel", "static.mir4-f2d-runtime-replay", "static.mir4-pre-freeze-hardening"]
     },
     {

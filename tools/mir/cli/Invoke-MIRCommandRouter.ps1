@@ -78,6 +78,7 @@ Usage:
   .\tools\mir.ps1 mir4 historical-tooling-migration <generate|check|show> [--output <path>]
   .\tools\mir.ps1 mir4 historical-succession <export|check> [--output <path>]
   .\tools\mir.ps1 mir4 package-source <refresh|refresh-check|baseline|baseline-check|shadow|shadow-check|model|model-check|materialize|materialize-check|runtime-replay|runtime-replay-check> [--target <f210|f200|f110|f100>] [--source-version <4.MINOR.PATCH>] [--distribution-version <4.MINOR.ENCODED>] [--candidate-id <id>] [--factorio <path>] [--work-root <path>] [--evidence-root <path>] [--retention <OnFailure|Always|Never>] [--output <path>]
+  .\tools\mir.ps1 mir4 distribution <status|verify|restore> [--version <version>] [--output <dist-or-build-root>] [--cache-root <path>]
   .\tools\mir.ps1 mir4 targets <contracts|laws|build|check> [--target <all|FNNN>] [--output <path>]
   .\tools\mir.ps1 mir4 semantic <export|check|laws> [--output <path>]
   .\tools\mir.ps1 mir4 runtime-continuity <export|check|laws> [--candidate <path>] [--output <path>]

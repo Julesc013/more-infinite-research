@@ -28,6 +28,7 @@ $OutputRoot = [IO.Path]::GetFullPath($OutputRoot)
 
 . (Join-Path $RepoRoot "tools/lib/mir4/BootstrapMaterialization.ps1")
 . (Join-Path $RepoRoot "tools/lib/validation/MIR4DistributionIdentity.ps1")
+. (Join-Path $RepoRoot "tools/mir/application/package/DistributionCustody.ps1")
 
 $allowedOutputRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/mir4'))
 $OutputRoot = Assert-MIR4DescendantPath -Root $allowedOutputRoot -Path $OutputRoot
@@ -340,7 +341,9 @@ function Test-MIR4ExistingCandidate {
     throw 'Candidate capsule construction claims do not describe the required A/B/delete/C sequence.'
   }
 
-  $predecessorPath = Join-Path $RepoRoot ([string]$PlanTarget.predecessor.archive_path)
+  $predecessorPath = [string](Restore-MIR4DistributionArchive `
+    -RepoRoot $RepoRoot `
+    -Version ([string]$PlanTarget.predecessor.release)).cache_path
   $actualComparison = Compare-MIR4PlanCandidate -PlanTarget $PlanTarget -CandidatePath $archivePath -PredecessorPath $predecessorPath
   if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $actualComparison) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $manifest.equivalence)) {
     throw "Candidate equivalence record is stale or incomplete."
@@ -655,7 +658,9 @@ $manifests = @()
 foreach ($targetPlan in $targets) {
   $correction = Get-MIR4PlanCorrection -PlanTarget $targetPlan
   $rootRow = Assert-MIR4PlanTarget -PlanTarget $targetPlan -TerminalImport $terminalImport -Registry $registry -CodecRegistry $codecRegistry -VersionAuthority $versionAuthority -RootSet $rootSet
-  $predecessorPath = Join-Path $RepoRoot ([string]$targetPlan.predecessor.archive_path)
+  $predecessorPath = [string](Restore-MIR4DistributionArchive `
+    -RepoRoot $RepoRoot `
+    -Version ([string]$targetPlan.predecessor.release)).cache_path
   $predecessor = Get-MIR4ArchiveInventory -Path $predecessorPath
   Assert-Equal ([string]$predecessor.archive_sha256) ([string]$targetPlan.predecessor.archive_sha256) "$($targetPlan.target_key) predecessor archive on disk"
   Assert-Equal ([string]$predecessor.content_sha256) ([string]$targetPlan.predecessor.content_sha256) "$($targetPlan.target_key) predecessor content on disk"

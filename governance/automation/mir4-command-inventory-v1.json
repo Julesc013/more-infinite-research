@@ -4,7 +4,7 @@
   "state": "M42-01-CANONICAL",
   "public_entrypoint": "tools/mir.ps1",
   "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
-  "command_count": 85,
+  "command_count": 86,
   "commands": [
     {
       "key": "architecture check",
@@ -225,6 +225,14 @@
     {
       "key": "mir4 diagnostics-migration",
       "public_syntax": ".\\tools\\mir.ps1 mir4 diagnostics-migration <check|show> [--output <path>]",
+      "public_entrypoint": "tools/mir.ps1",
+      "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "classification": "canonical-public-command",
+      "implementation_count": 1
+    },
+    {
+      "key": "mir4 distribution",
+      "public_syntax": ".\\tools\\mir.ps1 mir4 distribution <status|verify|restore> [--version <version>] [--output <dist-or-build-root>] [--cache-root <path>]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -2651,9 +2659,9 @@
     {
       "path": "tools/commands/mir4/Update-MIR4M41F2DTargetRuntimeReplayAuthority.ps1",
       "classification": "migration-only",
-      "sha256": "257C95454E13779EFB64CF34A2892A027BED9D3F0CBCA2FAC39B6ECF46D4E1F8",
+      "sha256": "AF262382998092C5E8C9570EE271314B37E2EDCF9C6DFA3A5F171BAABCC54029",
       "hash_mode": "canonical-text-v1",
-      "lines": 182,
+      "lines": 186,
       "package_visible": false
     },
     {
@@ -3067,9 +3075,9 @@
     {
       "path": "tools/commands/release/New-MIR4BootstrapLocalCandidate.ps1",
       "classification": "canonical-internal",
-      "sha256": "C0CCDBC646B9C964490A1D5E6F78ADB5C0891C05E2FBAF979F7B7FAD16714222",
+      "sha256": "D716647C9954C348FB27F92B55FC270FD0F17AE4D48ADB8505D85DE2D94C4B7D",
       "hash_mode": "canonical-text-v1",
-      "lines": 989,
+      "lines": 994,
       "package_visible": false
     },
     {
@@ -3307,9 +3315,9 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "F9C6BCEDB697A15F589F20271D909929C6A7B2C856D8302C06927C0BF85FED3A",
+      "sha256": "22ACFA761401521D4360B60C1FC61D8047E1F871BDCD64F0B9247D6ABF0FCA7B",
       "hash_mode": "canonical-text-v1",
-      "lines": 765,
+      "lines": 769,
       "package_visible": false
     },
     {
@@ -4635,9 +4643,9 @@
     {
       "path": "tools/mir/application/custody/offline-candidate-custody/Admission.ps1",
       "classification": "canonical-internal",
-      "sha256": "685A674E65E47498A337E8774C56C92B64BE04025547BB7AB9AFE651BA612F19",
+      "sha256": "2C4AE3CAFEEB3C5C3F31FA85900D41D8D2C10A9C32C30D4DBFA2265FDACCE22D",
       "hash_mode": "canonical-text-v1",
-      "lines": 126,
+      "lines": 131,
       "package_visible": false
     },
     {
@@ -4849,6 +4857,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/application/package/DistributionCustody.ps1",
+      "classification": "canonical-internal",
+      "sha256": "EDF9F4B1CB44E7E75F54179E537575BE0262CA5B615149CAEF3B44524DD88E18",
+      "hash_mode": "canonical-text-v1",
+      "lines": 229,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/application/package/FactorioOneSourceConvergence.ps1",
       "classification": "canonical-internal",
       "sha256": "C6A80EF41FED83A53791BCDADBB12C556B81BDD59B557B3B2FFD44EA3E6B66E1",
@@ -4867,9 +4883,9 @@
     {
       "path": "tools/mir/application/package/GoldenTargetBaselines.ps1",
       "classification": "canonical-internal",
-      "sha256": "EEBD03566B7D15093D335C16BC9233010FAC2D87A4F32272D69DB8CEC1715168",
+      "sha256": "E60618730767BA9E46688F201D774B94FCBCD5B153AD01D3D4F81F8CF1906B41",
       "hash_mode": "canonical-text-v1",
-      "lines": 211,
+      "lines": 225,
       "package_visible": false
     },
     {
@@ -4907,17 +4923,17 @@
     {
       "path": "tools/mir/application/package/RuntimeReplay.ps1",
       "classification": "canonical-internal",
-      "sha256": "3EEE17C70E26F187C62548132651F62C636531DE4922B197BBA29A6A1527372D",
+      "sha256": "66BA819BA5A09B44C9F03FFBCF7BC90C18AF94363225088A60A04D8B5B2181F0",
       "hash_mode": "canonical-text-v1",
-      "lines": 205,
+      "lines": 207,
       "package_visible": false
     },
     {
       "path": "tools/mir/application/package/RuntimeReplayAggregateVerifier.ps1",
       "classification": "canonical-internal",
-      "sha256": "579B20FE52DAAD02D0D6B556D87957164E6C28769F7E3DA6384F2C9B5E514732",
+      "sha256": "F51ADBB0AD45250F7F18E65A9EB872647ACC90C709F4042777EC4F3812BA8ADE",
       "hash_mode": "canonical-text-v1",
-      "lines": 176,
+      "lines": 182,
       "package_visible": false
     },
     {
@@ -5401,6 +5417,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/cli/Invoke-MIR4DistributionCustody.ps1",
+      "classification": "canonical-internal",
+      "sha256": "D5210A971DC32730A9EA422BCF1DC33D318DC587D5742FB230FF25C9FE676002",
+      "hash_mode": "canonical-text-v1",
+      "lines": 32,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/cli/Invoke-MIR4EnvironmentEvidence.ps1",
       "classification": "canonical-internal",
       "sha256": "B82B0614936D33ECBFC1E746F74D27F9486ADF0B93DB959A0F897B7C653D0AF5",
@@ -5571,9 +5595,9 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "BA8386A0C3FFBE62CA96D6DB15C57DF3E8C7EC86860552D2B366C3CB14CC245B",
+      "sha256": "BE733EF8F254B767CA3337AA8DDD7BE2A3A8C3803D5E14822C9072FE45D38E95",
       "hash_mode": "canonical-text-v1",
-      "lines": 137,
+      "lines": 138,
       "package_visible": false
     },
     {
@@ -5611,9 +5635,9 @@
     {
       "path": "tools/mir/cli/router/MIR4ApplicationCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "CD37CB40D469B14272AB327BCA43806DD3E2A98FD50F9C087A355D716FF71575",
+      "sha256": "EEE1F2E071493EE9DCB7AF8D6E028F8144514A000C57A7968A12D75DEE6FD6B3",
       "hash_mode": "canonical-text-v1",
-      "lines": 149,
+      "lines": 160,
       "package_visible": false
     },
     {
@@ -5627,7 +5651,7 @@
     {
       "path": "tools/mir/cli/router/MIR4CommandDispatcher.ps1",
       "classification": "canonical-internal",
-      "sha256": "BAAC5784602015B5EE6F3422BA5A8E574E4ABE1A12888BA829A51D699DB0C60F",
+      "sha256": "A199F56E79D71897A52467041ED528CE0D1CA82326E323574993AE921FBAF293",
       "hash_mode": "canonical-text-v1",
       "lines": 21,
       "package_visible": false
@@ -5731,7 +5755,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 387,
+    "canonical_internal": 389,
     "compatibility_wrapper": 168,
     "migration_only": 57,
     "historical": 17,
@@ -5746,5 +5770,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:fea5b83d62dd43237d1e0bda3d2b30bed15b6d687a0d4a2c5f307ca77f7d1f99"
+  "digest": "sha256:1d89384959aee1da102715cd15c60f9245d395bc6d74d38adee53a5a57452da9"
 }

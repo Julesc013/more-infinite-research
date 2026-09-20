@@ -749,3 +749,6 @@ paths:
   workspace.build.mir4: build/mir4
   distributions.root: dist
   distributions.playtest: dist/playtest
+  distributions.inventory: .mir/distributions.json
+  distributions.custody-application: tools/mir/application/package/DistributionCustody.ps1
+  distributions.custody-cli: tools/mir/cli/Invoke-MIR4DistributionCustody.ps1

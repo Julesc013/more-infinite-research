@@ -12,12 +12,10 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 foreach ($module in @("Core", "Records", "Planner", "Scenario", "Observation", "Evidence", "Views", "Context", "Executor")) {
   . (Join-Path $repo "tools/lib/control/$module.ps1")
 }
+. (Join-Path $repo 'tools/mir/application/package/DistributionCustody.ps1')
 
 $release = Get-MIRCPReleaseByVersion -Release "3.2.2" -RepoRoot $repo
-$candidate = Join-Path $repo ([string]$release.package.archive)
-if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
-  & (Join-Path $repo "tools/commands/package/Build-MIRPackage.ps1") | Out-Host
-}
+$candidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$release.release)).cache_path
 $performanceSource = Join-Path $repo "build/results/control-plane-v5-self-test/performance-sources/$([string]$release.package.source_commit)"
 if (-not (Test-Path -LiteralPath $performanceSource -PathType Container)) {
   [void](New-Item -ItemType Directory -Force -Path (Split-Path -Parent $performanceSource))
@@ -182,7 +180,7 @@ if ([string]$overlay.package_source_sha256 -ne [string]$candidateDescriptor.sour
     $overlayStatus -notcontains "?? validation/scenarios/local-2.1.json") {
   throw "Performance source overlay is not exact, checkout-independent, and package-preserving."
 }
-$baselineCandidate = Join-Path $repo "dist/more-infinite-research_3.2.1.zip"
+$baselineCandidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.1').cache_path
 $baselineObservation = Get-MIRCPZipPackageObservation -Path $baselineCandidate
 $currentObservation = Get-MIRCPZipPackageObservation -Path $canonicalCandidate
 $baselinePaths = @{}
@@ -200,7 +198,7 @@ if ($deltaPolicy.Count -ne 1 -or [string]$baselineObservation.archive_sha256 -ne
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_removed_paths) -Actual $removedPaths) -or
     -not (Test-MIRCPExactPathSet -Expected @($deltaPolicy[0].allowed_changed_paths) -Actual $changedPaths)) {
   throw "Native C24 approved-delta policy does not accept only the exact immutable four-path patch."
-}$c30Observation = Get-MIRCPZipPackageObservation -Path (Join-Path $repo "dist/more-infinite-research_3.2.3.zip")
+}$c30Observation = Get-MIRCPZipPackageObservation -Path ([string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.3').cache_path)
 $c30Paths = @{}
 foreach ($file in @($c30Observation.files)) { $c30Paths[[string]$file.path] = [string]$file.sha256 }
 $c30AddedPaths = @($c30Paths.Keys | Where-Object { -not $currentPaths.ContainsKey($_) } | Sort-Object)
@@ -218,10 +216,7 @@ $selectedC30Policies = @(Get-MIRCPNativePatchDeltaPolicy -Target "2.1" -FromVers
 if ($selectedC30Policies.Count -ne 1 -or [string]$selectedC30Policies[0].id -ne "c30-platform-logistics-hotfix-v1") {
   throw "Public C30 approved-delta dispatch does not select the exact native C30 policy."
 }
-$c32Candidate = Join-Path $repo "dist/more-infinite-research_3.2.5.zip"
-if (-not (Test-Path -LiteralPath $c32Candidate -PathType Leaf)) {
-  throw "C32 approved-delta regression requires the exact governed 3.2.5 candidate archive."
-}
+$c32Candidate = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version '3.2.5').cache_path
 $c32Observation = Get-MIRCPZipPackageObservation -Path $c32Candidate
 $c32Paths = @{}
 foreach ($file in @($c32Observation.files)) { $c32Paths[[string]$file.path] = [string]$file.sha256 }

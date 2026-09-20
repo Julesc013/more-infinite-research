@@ -97,15 +97,30 @@ package_excluded_modules:
     command: tools/mir/cli/Invoke-MIR4PackageSource.ps1
     public_facade: tools/mir.ps1
     proof: tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
-    immutable_archives:
-      - dist/more-infinite-research_4.0.21000.zip
-      - dist/more-infinite-research_4.0.20000.zip
-      - dist/more-infinite-research_4.0.11000.zip
-      - dist/more-infinite-research_4.0.10000.zip
+    immutable_archives: git-pinned-local-custody
+    archive_custody: .mir/distributions.json
+    archive_materializer: tools/mir/application/package/DistributionCustody.ps1
     package_visible: false
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
+  mir4_distribution_custody_v1:
+    authority: .mir/distributions.json
+    implementation: tools/mir/application/package/DistributionCustody.ps1
+    command: tools/mir/cli/Invoke-MIR4DistributionCustody.ps1
+    public_facade: tools/mir.ps1
+    proof:
+      - tests/mir4/Test-MIR4GoldenFourTargetBaseline.ps1
+      - tests/release/Test-MIRPublishedSnapshotIntegrity.ps1
+      - tests/release/Test-MIR4BootstrapMaterialization.ps1
+      - tests/mir4/Test-MIR4RuntimeReplayF2D.ps1
+      - tests/tooling/Test-MIRControlPlaneExecutor.ps1
+    historical_predecessor_commit: D82395F1DAB2E8E5E135EB2F57E97767DF6C0C87
+    local_cache_only: true
+    network_retrieval_permitted: false
+    history_rewrite_authority: false
+    release_transition_authority: false
+    publication_authority: false
   mir4_m41_f1_golden_baseline_authority_evolution_v1:
     predecessor: releases/migrations/MIR4-M41-F0-Truth-Reconciliation-Authority-EvolutionV1.json
     receipt: releases/migrations/MIR4-M41-F1-Golden-Four-Target-Baseline-Authority-EvolutionV1.json
