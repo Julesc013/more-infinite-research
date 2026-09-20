@@ -31,6 +31,15 @@ if (@($requiredF210Dependencies | Where-Object { $_ -notin @($f210GenerationInpu
     @($f210GenerationInput.dependencies | Where-Object { $_ -match '^(base|\? recycler|\? space-age) >= 2\.1\.(8|17)$' }).Count -ne 0) {
   throw '[mir4-f210-current-generation-input-floor]'
 }
+$staticCoreSource = [IO.File]::ReadAllText((Join-Path $repo 'tools/lib/validation/runner/StaticCore.ps1'))
+foreach ($requiredF210Dependency in $requiredF210Dependencies) {
+  if (-not $staticCoreSource.Contains(('"' + $requiredF210Dependency + '"'), [StringComparison]::Ordinal)) {
+    throw "[mir4-f210-current-static-validator-floor] $requiredF210Dependency"
+  }
+}
+if ($staticCoreSource -match '"(?:base|\? recycler|\? space-age) >= 2\.1\.(?:8|17)"') {
+  throw '[mir4-f210-stale-static-validator-floor]'
+}
 $f210Profile = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/profiles/factorio-2.1.json') | ConvertFrom-Json -Depth 20
 if ([string]$f210Profile.minimum_factorio_version -cne '2.1.18') { throw '[mir4-f210-current-profile-floor]' }
 if ([string]$policy.kind -cne 'MIR4F210CurrentQualificationPolicyV2' -or

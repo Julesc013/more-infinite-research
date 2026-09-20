@@ -4467,7 +4467,7 @@
     {
       "path": "tools/lib/validation/runner/StaticCore.ps1",
       "classification": "canonical-internal",
-      "sha256": "5580D0E2A376A30A6E79B53BBA95CB450FA702B32A3546036A6EB8E36DB74B1E",
+      "sha256": "6723B18EE9299B76FB9B9DA93AF6BD862D3E222C31132FA864602B24B0B209D7",
       "hash_mode": "canonical-text-v1",
       "lines": 516,
       "package_visible": false
@@ -5778,5 +5778,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:81a03a55dc2fa333b546fdc460c4471f54821b1ac1124c401da45694c603d478"
+  "digest": "sha256:ac49a5f7346bb80e729b948270853a2ca44d3e80a8bf05c4fd2e5e72ba701f53"
 }
