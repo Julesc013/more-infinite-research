@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 193,
+  "test_count": 194,
   "tests": [
     {
       "id": "docs.check",
@@ -1097,6 +1097,36 @@
         "source:source/prototypes/mir/capabilities/science_integration/**",
         "source:source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/adapters/f210/prototypes/mir/planner/science.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "runtime.technology-design-characterization",
+      "proposition": "The governed test 'runtime.technology-design-characterization' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1 -FactorioBin <factorio>",
+      "canonical_implementation": "tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1",
+        "tests/compiler/technology_design_characterization.lua",
+        "source:source/prototypes/mir/core/deepcopy.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/prototypes/mir/core/trusted_record.lua",
+        "source:source/prototypes/mir/domain/effects/metadata.lua",
+        "source:source/prototypes/mir/domain/effects/generated_target_contracts.lua",
+        "source:source/prototypes/mir/integrity/effect_contracts.lua",
+        "source:source/prototypes/mir/domain/technology/gate.lua",
+        "source:source/prototypes/mir/domain/technology/technology_design.lua"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7050,11 +7080,11 @@
     "cohorts": {
       "package-repository": 65,
       "tooling-release": 54,
-      "runtime-upgrade": 42,
+      "runtime-upgrade": 43,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 181,
+    "canonical_test_commands": 182,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7067,5 +7097,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a16f8e31b498d7727500dff7f06ff3c1da19eef9833706d17f95bf49a0e23418"
+  "digest": "sha256:ae3a521df25ab9a1a83ad0c018dfbd9f1b6689df5bfce217b9bc3bc7132c1a04"
 }
