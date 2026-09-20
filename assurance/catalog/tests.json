@@ -6990,6 +6990,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/release-candidate.yml",
         "scripts/Invoke-MIRAssurance.ps1",
         "tools/lib/assurance/**",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
@@ -7041,5 +7042,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ead3e1e935e13480ad8f8e6dd7f8486aade74bf0ff8b56c65cc5f7dd57557c16"
+  "digest": "sha256:355d8b77b9170146e60432b99ab2a7c5c133eafb137ad8c00a1db1f58bb28fe2"
 }

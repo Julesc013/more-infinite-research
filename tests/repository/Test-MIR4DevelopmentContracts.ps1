@@ -313,6 +313,27 @@ function Assert-MIRDevelopmentContractsInputFingerprintRegression {
   }
 }
 
+function Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $probeRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir-development-command-inventory-'+[guid]::NewGuid().ToString('N'))
+  $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  if(-not[IO.Path]::GetFullPath($probeRoot).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir4-development-command-inventory-probe-root]' }
+  try {
+    & git clone --quiet --shared --no-checkout $RepoRoot $probeRoot
+    if($LASTEXITCODE-ne0) { throw '[mir4-development-command-inventory-probe-clone]' }
+    & git -C $probeRoot checkout --quiet HEAD
+    if($LASTEXITCODE-ne0) { throw '[mir4-development-command-inventory-probe-checkout]' }
+    $probeSource=Join-Path $probeRoot 'tools/mir/domain/safety/SafetyKernel.ps1'
+    [IO.File]::AppendAllText($probeSource,"`n# isolated development-contract inventory drift probe`n",[Text.UTF8Encoding]::new($false))
+    . (Join-Path $probeRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    $rejected=$false
+    try { Update-MIR4CommandInventoryV1 -RepoRoot $probeRoot -Check|Out-Null } catch { $rejected=$_.Exception.Message-match'mir4-command-inventory-stale' }
+    if(-not$rejected) { throw '[mir4-development-command-inventory-source-drift]' }
+  } finally {
+    if(Test-Path -LiteralPath $probeRoot) { Remove-Item -LiteralPath $probeRoot -Recurse -Force }
+  }
+}
+
 $epoch=Get-Content -Raw (Join-Path $repo 'governance/repository/development-epoch-v1.json') | ConvertFrom-Json
 if($epoch.schema -ne 1 -or $epoch.current_profile -cne 'mir4-development' -or $epoch.release_authority -or $epoch.protection_mutation_authority -or $epoch.historical_receipt_rewrite_authority) { throw '[mir4-development-authority]' }
 Assert-MIRDevelopmentContractsReparseGuardRegression
@@ -327,6 +348,7 @@ Assert-MIRDevelopmentContractsCommittedSourceRegression
 Assert-MIRDevelopmentContractsReceiptSchemaRegression -SchemaPath $receiptSchema
 . (Join-Path $repo 'tools/mir/application/tooling/CommandInventory.ps1')
 $commandInventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
+Assert-MIRDevelopmentContractsCommandInventorySourceDriftRegression -RepoRoot $repo
 . (Join-Path $repo 'tools/mir/application/tooling/TestWorkflowCatalogues.ps1')
 [void](Update-MIR4ToolingCatalogueV1 -RepoRoot $repo -Catalogue tests -Check)
 $testCatalogue=Get-Content -Raw -LiteralPath (Join-Path $repo 'assurance/catalog/tests.json') | ConvertFrom-Json -Depth 100

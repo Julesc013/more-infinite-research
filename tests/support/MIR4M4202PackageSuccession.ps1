@@ -9,11 +9,12 @@ function Test-MIR4M4202PackageSourceSuccession {
 
   try{
     . (Join-Path $RepoRoot 'tools/lib/mir4/PackagePresentation.ps1')
-    # V3 is frozen layout evidence and V4 is frozen Factorio-1 convergence
-    # evidence. V5 is the current progression successor.
-    $currentPresentation = Get-MIR4CurrentPackagePresentationV5 -RepoRoot $RepoRoot
-    if ([string]$currentPresentation.package_source.fingerprint_sha256 -cne $CurrentSha256 -or
-        (@($currentPresentation.package_source.roots) -join '|') -cne 'source|targets') { return $false }
+    # V3--V5 are frozen package-presentation evidence. Current development is
+    # validated by the non-receipt package contract so ordinary source changes
+    # do not require an artificial V6 historical receipt.
+    $historicalPresentation = Get-MIR4CurrentPackagePresentationV5Historical -RepoRoot $RepoRoot
+    $currentContract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $CurrentSha256
+    if ((@($currentContract.roots) -join '|') -cne 'source|targets' -or [bool]$currentContract.release_authority) { return $false }
     if($PredecessorSha256-ceq$CurrentSha256){return $true}
 
     $receiptPath=Join-Path $RepoRoot 'releases/migrations/MIR4-M41-Current-Product-Bridge-RetirementV1.json'
@@ -56,7 +57,7 @@ function Test-MIR4M4202PackageSourceSuccession {
 
     # V2/V3/V4 are frozen predecessor evidence. V5 is the current successor
     # and validates the progression composition plus the explicit F1 nonclaim.
-    $presentation=$currentPresentation
+    $presentation=$historicalPresentation
     $enabledTransitionGates=@($presentation.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}|ForEach-Object{[string]$_.Name})
     $targetSemantics = @{}
     foreach ($target in @($presentation.target_content_identities)) {
@@ -64,7 +65,7 @@ function Test-MIR4M4202PackageSourceSuccession {
     }
     return (
       [string]$presentation.kind -ceq 'MIR4CurrentPackagePresentationV5' -and
-      [string]$presentation.package_source.fingerprint_sha256-ceq$CurrentSha256-and
+      [string]$currentContract.package_source_sha256-ceq$CurrentSha256-and
       [string]$presentation.package_source.materializer_abi-ceq'mir4-target-materializer/1'-and
       [string]$presentation.package_source.sole_writer-ceq'tools/mir/application/package/TargetMaterializer.ps1'-and
        (@($presentation.package_source.roots)-join'|')-ceq'source|targets'-and

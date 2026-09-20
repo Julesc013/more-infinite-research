@@ -24,6 +24,7 @@
       "command": "./tests/tooling/Test-MIRAssurance.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/release-candidate.yml",
         "scripts/Invoke-MIRAssurance.ps1",
         "tools/lib/assurance/**",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
