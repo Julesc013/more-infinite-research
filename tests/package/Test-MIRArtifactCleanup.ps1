@@ -20,6 +20,7 @@ $allWorktreesFixtureRoot = $null
 $allWorktreesLinkedRoot = $null
 $allWorktreesFixtureGitDirectory = $null
 $wideDiscoveryFixtureRoot = $null
+$raceFixtureRoots = [Collections.Generic.List[string]]::new()
 $cleanupScript = Join-Path $RepoRoot "tools\commands\workspace\Remove-MIRStaleArtifacts.ps1"
 $activeLeaseLock = $null
 $nestedCampaignLeaseLock = $null
@@ -35,6 +36,24 @@ foreach ($name in $gitEnvironmentNames) {
     $savedGitEnvironment[$name] = [string]$item.Value
     Remove-Item -LiteralPath "Env:$name"
   }
+}
+
+function New-MIRArtifactCleanupRaceFixture {
+  param([Parameter(Mandatory)][string]$Name)
+
+  $root = Join-Path $tempRoot ("mir-artifact-cleanup-{0}-{1}" -f $Name, [guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $root -Force | Out-Null
+  & git -C $root init --quiet
+  if ($LASTEXITCODE -ne 0) { throw "Unable to initialize the $Name cleanup-race fixture repository." }
+  '/build/' | Set-Content -LiteralPath (Join-Path $root '.gitignore') -Encoding UTF8
+  & git -C $root config user.email 'mir-artifact-cleanup@example.invalid'
+  & git -C $root config user.name 'MIR artifact cleanup test'
+  & git -C $root add -- .gitignore
+  if ($LASTEXITCODE -ne 0) { throw "Unable to stage the $Name cleanup-race fixture policy." }
+  & git -C $root commit --quiet -m "fixture: establish $Name cleanup-race root"
+  if ($LASTEXITCODE -ne 0) { throw "Unable to commit the $Name cleanup-race fixture policy." }
+  $raceFixtureRoots.Add($root)
+  return $root
 }
 
 try {
@@ -282,7 +301,52 @@ try {
     if (-not $invalidCampaignCaught) { throw "Scoped campaign cleanup accepted an invalid root: $invalidCampaignRoot" }
   }
 
-  $scopedCampaignApplied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
+  # Mutations made after planning but before apply must be observed by the
+  # exact-boundary check.  These isolated fixtures make the race deterministic
+  # without weakening or bypassing the production re-audit.
+  $emptyRaceRoot = New-MIRArtifactCleanupRaceFixture -Name 'empty-boundary'
+  $emptyRaceTarget = Join-Path $emptyRaceRoot 'build/tests/series/empty-target'
+  New-Item -ItemType Directory -Path $emptyRaceTarget -Force | Out-Null
+  (Get-Item -LiteralPath $emptyRaceTarget).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath (Split-Path -Parent $emptyRaceTarget)).LastWriteTimeUtc = $staleTimestamp
+  $emptyRaceState = @{ called = $false }
+  $emptyRaceHook = {
+    $emptyRaceState.called = $true
+    'arrived after planning' | Set-Content -LiteralPath (Join-Path $emptyRaceTarget 'late-child.txt') -Encoding UTF8
+  }.GetNewClosure()
+  $emptyRaceCaught = $false
+  try {
+    & $cleanupScript -RepoRoot $emptyRaceRoot -OlderThanDays 7 -ArtifactType test -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $emptyRaceHook | Out-Null
+  } catch {
+    $emptyRaceCaught = $_.Exception.Message -match 'no longer an exact typed-root candidate'
+  }
+  if (-not $emptyRaceState.called -or -not $emptyRaceCaught) { throw 'Apply did not reject an initially empty candidate that gained content after planning.' }
+  if (-not (Test-Path -LiteralPath (Join-Path $emptyRaceTarget 'late-child.txt') -PathType Leaf)) { throw 'Apply removed an empty-directory candidate after it gained content.' }
+
+  $ancestorRaceRoot = New-MIRArtifactCleanupRaceFixture -Name 'ancestor-boundary'
+  $ancestorRaceParent = Join-Path $ancestorRaceRoot 'build/tests/series/new-run-boundary'
+  $ancestorRaceTarget = Join-Path $ancestorRaceParent 'empty-target'
+  New-Item -ItemType Directory -Path $ancestorRaceTarget -Force | Out-Null
+  (Get-Item -LiteralPath $ancestorRaceTarget).LastWriteTimeUtc = $staleTimestamp
+  (Get-Item -LiteralPath $ancestorRaceParent).LastWriteTimeUtc = $staleTimestamp
+  $ancestorRaceState = @{ called = $false }
+  $ancestorRaceHook = {
+    $ancestorRaceState.called = $true
+    '[path]' | Set-Content -LiteralPath (Join-Path $ancestorRaceParent 'config.ini') -Encoding UTF8
+  }.GetNewClosure()
+  $ancestorRaceCaught = $false
+  try {
+    & $cleanupScript -RepoRoot $ancestorRaceRoot -OlderThanDays 7 -ArtifactType test -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $ancestorRaceHook | Out-Null
+  } catch {
+    $ancestorRaceCaught = $_.Exception.Message -match 'no longer an exact typed-root candidate'
+  }
+  if (-not $ancestorRaceState.called -or -not $ancestorRaceCaught) { throw 'Apply did not reject a child after its ancestor became a run boundary.' }
+  if (-not (Test-Path -LiteralPath $ancestorRaceTarget -PathType Container)) { throw 'Apply removed a child whose ancestor became a run boundary after planning.' }
+
+  $scopedApplyHookState = @{ called = $false }
+  $scopedApplyHook = { $scopedApplyHookState.called = $true }.GetNewClosure()
+  $scopedCampaignApplied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -ArtifactType campaign -CampaignRoot 'build/mir4/scoped-campaign' -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $scopedApplyHook)
+  if (-not $scopedApplyHookState.called) { throw 'Scoped campaign apply did not pass through the controlled revalidation point.' }
   if (Test-Path -LiteralPath $staleScopedRun) { throw 'Scoped campaign cleanup retained an eligible superseded result run.' }
   if (-not (Test-Path -LiteralPath $scopedCampaignResult -PathType Leaf)) { throw 'Scoped campaign cleanup removed campaign-root evidence.' }
   foreach ($retained in @($referencedScopedRun, $custodyScopedRun, $activeLeaseScopedRun, $recentScopedRun)) {
@@ -295,7 +359,10 @@ try {
   "new write before apply" | Set-Content -LiteralPath (Join-Path $changingTestRun 'result.txt') -Encoding UTF8
   (Get-Item -LiteralPath $changingTestRun).LastWriteTimeUtc = [DateTime]::UtcNow
 
-  $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false)
+  $directApplyHookState = @{ called = $false }
+  $directApplyHook = { $directApplyHookState.called = $true }.GetNewClosure()
+  $applied = @(& $cleanupScript -RepoRoot $fixtureRoot -OlderThanDays 7 -Apply -PassThru -SkipActiveProcessCheck -Confirm:$false -BeforeApplyTestHook $directApplyHook)
+  if (-not $directApplyHookState.called) { throw 'Direct-child apply did not pass through the controlled revalidation point.' }
   if (Test-Path -LiteralPath $staleRun) { throw "Applied cleanup retained the stale artifact." }
   if ((Test-Path -LiteralPath $staleTestRun) -or (Test-Path -LiteralPath $staleGuidTestRun) -or (Test-Path -LiteralPath $wideGuidTestRun) -or (Test-Path -LiteralPath $stalePackage) -or (Test-Path -LiteralPath $staleCampaign) -or (Test-Path -LiteralPath $terminalLeaseCampaign) -or (Test-Path -LiteralPath $staleDevelopmentContract)) { throw 'Applied cleanup retained an eligible typed-root artifact.' }
   if (-not (Test-Path -LiteralPath $recentRun)) { throw "Applied cleanup removed a recent artifact." }
@@ -422,6 +489,11 @@ try {
   }
   if ($null -ne $wideDiscoveryFixtureRoot -and (Test-Path -LiteralPath $wideDiscoveryFixtureRoot)) {
     Remove-Item -LiteralPath $wideDiscoveryFixtureRoot -Recurse -Force
+  }
+  foreach ($raceFixtureRoot in $raceFixtureRoots) {
+    if (Test-Path -LiteralPath $raceFixtureRoot) {
+      Remove-Item -LiteralPath $raceFixtureRoot -Recurse -Force
+    }
   }
   foreach ($name in $gitEnvironmentNames) {
     if ($savedGitEnvironment.ContainsKey($name)) { Set-Item -LiteralPath "Env:$name" -Value $savedGitEnvironment[$name] }
