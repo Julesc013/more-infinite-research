@@ -1563,9 +1563,9 @@
     {
       "path": "scripts/Test-MIRLocales.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "A371ECD4C63F2BAB78DAAE623AE30B2E9D2F88ED6E351A575D5181141C7F3F84",
+      "sha256": "BA77F3CF71EFA5C3BB13F312CCCE54B18A58CDD7163F6B763ACA722B3F5215C8",
       "hash_mode": "canonical-text-v1",
-      "lines": 10,
+      "lines": 11,
       "package_visible": false
     },
     {
@@ -2219,9 +2219,9 @@
     {
       "path": "tools/commands/localization/Update-MIRLocales.ps1",
       "classification": "canonical-internal",
-      "sha256": "F28F0CDF067B05B794CAB575F9CC60D2EE1DE230047E504177C4FB217507544A",
+      "sha256": "061576721467161651C82E6BA203B7DC96D953C47DB55546D5F9331192E7753B",
       "hash_mode": "canonical-text-v1",
-      "lines": 346,
+      "lines": 375,
       "package_visible": false
     },
     {
@@ -5770,5 +5770,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4197599c43e5892157210938c4bf2c8231648ce0c5e1734d89489f5cdf478d9e"
+  "digest": "sha256:92110044bb65102d4cda2600dcb0e421f9d230644f8820c75f99ad8bffa6a597"
 }

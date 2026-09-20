@@ -1417,7 +1417,7 @@
     {
       "key": "string-mod-setting.mir-recycling-return-chance-engine-default",
       "source_sha256": "5A6175D3E09A8271341D1D27FE29C8AB1C9E89229370743CFA12455DEFCE7453",
-      "translation": "⟧ 25% (i pandryshuar)",
+      "translation": "25% (i pandryshuar)",
       "provenance": "machine-assisted"
     },
     {
@@ -1897,7 +1897,7 @@
     {
       "key": "string-mod-setting-description.mir-automatic-productivity-action-apply",
       "source_sha256": "92E11F848448324C3A8E53E69C9053E7965A1CC505DA0929FC30795B36E12B13",
-      "translation": "⟧ E paracaktuar. Zbulon kandidatët dhe bashkëngjit vetëm receta të vërtetuara nga siguria në kërkimin ekzistues MIR të përputhshëm. Ai nuk krijon kërkime në vetvete; dy kutitë e kontrollit më poshtë rregullojnë krijimin.",
+      "translation": "E paracaktuar. Zbulon kandidatët dhe bashkëngjit vetëm receta të vërtetuara nga siguria në kërkimin ekzistues MIR të përputhshëm. Ai nuk krijon kërkime në vetvete; dy kutitë e kontrollit më poshtë rregullojnë krijimin.",
       "provenance": "machine-assisted"
     },
     {
@@ -2588,6 +2588,180 @@
       "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-100000",
       "source_sha256": "CFDBF0233077ECA0D9FD02C1F6A1C7574534FF31A705FF73460DE6E62D700301",
       "translation": "Shkruani tavanin maksimal të efektit të cilësisë së Factorio në mënyrë eksplicite. Ndryshe nga e pandryshuara, kjo mbishkruan kufijtë e poshtëm të personalizuar.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.title",
+      "source_sha256": "424656A0B79ABCD44A76F63998D25BAF40B02A948E61A78C0B58A6B599C96096",
+      "translation": "Shfletuesi Kërkimor MIR",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.command",
+      "source_sha256": "4CFCE6F49352192F1DCC3F247CFDF3FCD51C7C8DDBAE3F0CE682B9D3749CA981",
+      "translation": "Hapni shfletuesin personal të kërkimit dhe cilësimeve MIR.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research",
+      "source_sha256": "979D6300FD9884FF8D8E03391D524FED8E88CD5560788F065BA2444DB3B7B20C",
+      "translation": "Hulumtim",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings",
+      "source_sha256": "74A883A037BC227F91891AB654A753D3A99F31AB06AE5B5D2B6E594A692B41F8",
+      "translation": "Cilësimet",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.refresh",
+      "source_sha256": "0E91610117029A62A478B7FA7DF0B8598BEBE3AB1E192D4B1882E310719C9671",
+      "translation": "Rifresko",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.close",
+      "source_sha256": "7D9EB7ACB13E24625C404401D8E88B2350E32162455885F18276CF802F7701ED",
+      "translation": "Mbylle",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.search",
+      "source_sha256": "EF0296F00BBD080D00276450B6EFC488556E176C3DF869CD0C187386B1A94D24",
+      "translation": "Kërkoni ID-të ose familjet e teknologjisë, më pas shtypni Enter.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.all",
+      "source_sha256": "A52ACE420F2175D08B1577A1BEA5445E36801229C074EF9ED6C55A73401FD9C2",
+      "translation": "Të gjitha",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.finite",
+      "source_sha256": "740FAD6A41C1E12ACFD6FC72C16234082CA3007F010BA1657A89DB3C97C55B84",
+      "translation": "E fundme",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.infinite",
+      "source_sha256": "C1C929EBFBB2E174834282E005FAE609D0EAC2863EA68A0268E8E95B669CBC06",
+      "translation": "Pafund",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.available",
+      "source_sha256": "E674447337E83C1346F6122ED69F35BF5526E2A11842B2F2B788F3FB67D714CA",
+      "translation": "Në dispozicion",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.locked",
+      "source_sha256": "A424E33D90931D1ED22F2AF37A3F3491A5C9DE0DFAE079F6F3FF4EDF0309E07F",
+      "translation": "E kyçur",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queued",
+      "source_sha256": "661FF40A07E037BBD5F7D4EC97A4DF1503096CA910E7C9E2D7A4E9ABD4E4E1A0",
+      "translation": "Në radhë",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue",
+      "source_sha256": "662236229115E59A27DFDCCBF0C19905673BFA8503224F213A8AC02F322A1779",
+      "translation": "Radha aktuale e forcës:",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.count",
+      "source_sha256": "A3736B02CCB984B76080E4497BDF708627A359D8EF29F8B701EB626071A64B67",
+      "translation": "__1__ teknologjitë që përputhen",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.family-owner",
+      "source_sha256": "CA2E45846A38D6CD559ABED9DF9D8C76A07FBC4371B53829427B4B258F80449B",
+      "translation": "Familja: __1__ | Pronari i efektit: __2__ | Zgjedhja: __3__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.cap",
+      "source_sha256": "616A5781464FA924BA30AF9BA60CF45E7F081574E6131BFEF0D00392F01D891D",
+      "translation": "Niveli maksimal efektiv: __1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue",
+      "source_sha256": "A867FF0276CC7FEC22216F9FF61F6C34AA8638E41549269F965EE11A442CADC7",
+      "translation": "Shto në radhën e kërkimit",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.hide",
+      "source_sha256": "C411CA188AC03C675358C33532FE8B53997CAD20F2598D5815144B02E6785F9B",
+      "translation": "Fshihu nga pamja ime",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show",
+      "source_sha256": "5F9602FC8E73AA7EC8022EC57227494750D869973C3A0B0D36E8DDF19ED15A33",
+      "translation": "Shfaq në pamjen time",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show-hidden",
+      "source_sha256": "E22FB6E065BF1E52C440DF2712467D9B1C3E2CED73C8D1132E4818D6B9F17587",
+      "translation": "Trego të gjitha teknologjitë e fshehura",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue-failed",
+      "source_sha256": "202E74E794ECAB7B02564D3A7A75C3EA1825EA95812CB6C0F328194CE4219263",
+      "translation": "Kërkimi nuk mund të vihej në radhë. Kontrolloni parakushtet, lejet, radhën aktuale dhe disponueshmërinë e teknologjisë.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.startup-note",
+      "source_sha256": "B4E5134C0969C56D37D4537DDD8841B80B9ED558B6C31549E1633703EF90B472",
+      "translation": "Cilësimet e nisjes kërkojnë një rinisje. Vlerat e shfaqura përfshijnë profilin aktiv MIR. Cilësimet e kohës së ekzekutimit zbatohen vetëm brenda fushës së tyre të shfaqur.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.export",
+      "source_sha256": "AF3CEF2D7931E76F6927151E111A64A8C0C83067572177F734CDA219C7868CE5",
+      "translation": "Eksporto profilin e nisjes",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.exported",
+      "source_sha256": "AAEBFE164359C3FECD14589F11CE9E4A87A2A9E72B898FAA794449B89D2D27D1",
+      "translation": "U eksportua script-output/more-infinite-research/settings/browser-profile.txt. Ngjitni vargun MIRSET1 në cilësimin e importit të profilit të nisjes MIR dhe rinisni.",
+      "provenance": "maintainer-override"
+    },
+    {
+      "key": "mir-browser.invalid-profile",
+      "source_sha256": "D018D8EF606C11AD635FC1A9D6B04F2A47011D2466AF932EA57DAA0EF908A35D",
+      "translation": "Eksporti u ndal sepse profili efektiv përmban vlera të pavlefshme.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.catalogue-limit",
+      "source_sha256": "63C62BCC9A9D858ECCB669FD47DCEFBDE4CB20FFEEF1A489AC0C475522553B46",
+      "translation": "Mjedisi tejkalon kufirin e katalogut të shfletuesit të teknologjive __1__.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.omission-note",
+      "source_sha256": "6FEB33C8AAB7BE7D06686AA0412867D2B09E44F8ECE989BBE718DA2EF4330C9C",
+      "translation": "Efektet e mësipërme janë efektet aktuale të teknologjisë. Detajet e lëshimit të rrugës kërkojnë raportin e mbulimit të Inspektorit; itineraret që mungojnë nuk cilësohen nga kjo pikëpamje.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue-more",
+      "source_sha256": "F62A6A08C94A6BDCF69CFB550158DB28B27E91ED67F998EF8604E543CB0AA67E",
+      "translation": "__1__ më shumë hyrje në radhën e kërkimit vendas.",
       "provenance": "machine-assisted"
     }
   ]

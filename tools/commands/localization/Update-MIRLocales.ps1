@@ -2,6 +2,7 @@ param(
   [string]$RepositoryRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "../../..")).Path,
   [string]$PolicyPath,
   [ValidateSet('f210','f200','f110','f100')][string]$Target = 'f210',
+  [string[]]$SelectedLocale,
   [switch]$MachineTranslateMissing,
   [switch]$RefreshMachineTranslations
 )
@@ -16,6 +17,13 @@ if ([string]::IsNullOrWhiteSpace($PolicyPath)) {
 
 Import-Module (Join-Path $repo "tools\lib\localization\MIRLocalization.psm1") -Force
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
+$supportedLocaleCodes = @($policy.supported_factorio_locales | ForEach-Object { [string]$_.code })
+if ($SelectedLocale.Count -gt 0) {
+  $unknownLocales = @($SelectedLocale | Where-Object { $_ -notin $supportedLocaleCodes })
+  if ($unknownLocales.Count -gt 0) {
+    throw "Requested locale is not governed by the localization policy: $($unknownLocales -join ', ')."
+  }
+}
 $sourcePath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath ([string]$policy.source_file)
 $source = Read-MIRLocaleFile -Path $sourcePath
 $memoryRoot = Join-Path $repo ($policy.translation_memory_directory -replace '/', '\')
@@ -27,7 +35,7 @@ function Protect-MIRTranslationSyntax {
   param([string]$Text, [int]$EntryIndex)
   $tokens = [ordered]@{}
   $counter = [pscustomobject]@{ Value = 0 }
-  $protected = [regex]::Replace($Text, '__\d+__|\[[^\]]+\]', {
+  $protected = [regex]::Replace($Text, 'script-output/more-infinite-research/settings/browser-profile\.txt|MIRSET1|__\d+__|\[[^\]]+\]', {
     param($match)
     $token = "⟪MIRP$('{0:D4}' -f $EntryIndex)$('{0:D2}' -f $counter.Value)⟫"
     $counter.Value++
@@ -56,6 +64,10 @@ function Test-MIRReusablePreexistingTranslation {
   $sourceFormatting = (Get-MIRFormattingSequence -Text $SourceText) -join '|'
   $translationFormatting = (Get-MIRFormattingSequence -Text $Translation) -join '|'
   if ($sourceFormatting -ne $translationFormatting) { return $false }
+  $sourceLiterals = (Get-MIRTechnicalLiteralSequence -Text $SourceText) -join '|'
+  $translationLiterals = (Get-MIRTechnicalLiteralSequence -Text $Translation) -join '|'
+  if ($sourceLiterals -ne $translationLiterals) { return $false }
+  if (-not (Test-MIRTranslationMarkersAbsent -Text $Translation)) { return $false }
 
   $sourceWords = @([regex]::Matches($SourceText.ToLowerInvariant(), '[a-z]{3,}') | ForEach-Object { $_.Value } | Sort-Object -Unique)
   $translationWords = @([regex]::Matches($Translation.ToLowerInvariant(), '[a-z]{3,}') | ForEach-Object { $_.Value } | Sort-Object -Unique)
@@ -70,13 +82,30 @@ function Test-MIRReusablePreexistingTranslation {
 function Test-MIRTranslationStructure {
   param([string]$SourceText, [string]$Translation)
   if ([string]::IsNullOrWhiteSpace($Translation)) { return $false }
-  if ($Translation -match 'MIRP\d|⟦MIR|⟪MIR') { return $false }
+  if (-not (Test-MIRTranslationMarkersAbsent -Text $Translation)) { return $false }
   $sourcePlaceholders = (Get-MIRPlaceholderSequence -Text $SourceText) -join '|'
   $translationPlaceholders = (Get-MIRPlaceholderSequence -Text $Translation) -join '|'
   if ($sourcePlaceholders -ne $translationPlaceholders) { return $false }
   $sourceFormatting = (Get-MIRFormattingSequence -Text $SourceText) -join '|'
   $translationFormatting = (Get-MIRFormattingSequence -Text $Translation) -join '|'
-  return $sourceFormatting -eq $translationFormatting
+  if ($sourceFormatting -ne $translationFormatting) { return $false }
+  $sourceLiterals = (Get-MIRTechnicalLiteralSequence -Text $SourceText) -join '|'
+  $translationLiterals = (Get-MIRTechnicalLiteralSequence -Text $Translation) -join '|'
+  return $sourceLiterals -eq $translationLiterals
+}
+
+function Get-MIRTechnicalLiteralSequence {
+  param([string]$Text)
+  return @([regex]::Matches($Text, 'script-output/more-infinite-research/settings/browser-profile\.txt|MIRSET1') | ForEach-Object { $_.Value })
+}
+
+function Test-MIRTranslationMarkersAbsent {
+  param([string]$Text)
+
+  # These brackets are internal batch/syntax sentinels, not player text.  Do
+  # not key this guard on ASCII "MIR": translation services can transliterate
+  # it (for example, Serbian "МИР") while retaining the same leaked wrapper.
+  return $Text -notmatch 'MIRP\d|⟦|⟧|⟪|⟫'
 }
 
 function Invoke-MIRRawMachineTranslation {
@@ -97,11 +126,11 @@ function Invoke-MIRRawMachineTranslation {
 
 function Invoke-MIRStructureSafeTranslation {
   param([string]$SourceText, [string]$TargetLanguage)
-  $parts = [regex]::Split($SourceText, '(__\d+__|\[[^\]]+\])')
+  $parts = [regex]::Split($SourceText, '(script-output/more-infinite-research/settings/browser-profile\.txt|MIRSET1|__\d+__|\[[^\]]+\])')
   $output = [System.Text.StringBuilder]::new()
   foreach ($part in $parts) {
     if ([string]::IsNullOrEmpty($part)) { continue }
-    if ($part -match '^__\d+__$|^\[[^\]]+\]$') {
+    if ($part -match '^script-output/more-infinite-research/settings/browser-profile\.txt$|^MIRSET1$|^__\d+__$|^\[[^\]]+\]$') {
       [void]$output.Append($part)
       continue
     }
@@ -230,7 +259,7 @@ if (-not (Test-Path -LiteralPath $memoryRoot)) {
 
 foreach ($locale in $policy.supported_factorio_locales) {
   $code = [string]$locale.code
-  if ($code -eq $policy.source_locale) { continue }
+  if ($code -eq $policy.source_locale -or ($SelectedLocale.Count -gt 0 -and $code -notin $SelectedLocale)) { continue }
 
   $outputPath = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath "locale/$code/$($policy.generated_file_name)"
   $memoryPath = Join-Path $memoryRoot "$code.json"

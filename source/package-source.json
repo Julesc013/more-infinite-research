@@ -1637,10 +1637,10 @@
       "source_path": "source/locale/af/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/af/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 47526,
-      "source_sha256": "E8D01029DFDB33D7F9C3A25713966D516551E5382D60EFF895F156D78770EC36",
-      "output_bytes": 47526,
-      "output_sha256": "E8D01029DFDB33D7F9C3A25713966D516551E5382D60EFF895F156D78770EC36"
+      "source_bytes": 49119,
+      "source_sha256": "09F0E3D94B9001D74CCEAA96B84FB01FD72F690DE3E093FC1C00E3D0B832F8D2",
+      "output_bytes": 49119,
+      "output_sha256": "09F0E3D94B9001D74CCEAA96B84FB01FD72F690DE3E093FC1C00E3D0B832F8D2"
     },
     {
       "layer": "capability",
@@ -1653,10 +1653,10 @@
       "source_path": "source/locale/ar/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ar/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 64405,
-      "source_sha256": "CAD7CCB56C4853156AA6D9D14FB9B6C7AD431967F44202BBCC1CC8574A4DB69B",
-      "output_bytes": 64405,
-      "output_sha256": "CAD7CCB56C4853156AA6D9D14FB9B6C7AD431967F44202BBCC1CC8574A4DB69B"
+      "source_bytes": 66655,
+      "source_sha256": "52B3A69CDA085E72D31E32B4C8EF7F2C8D4C9684C772CB0773B3CD49231102E1",
+      "output_bytes": 66655,
+      "output_sha256": "52B3A69CDA085E72D31E32B4C8EF7F2C8D4C9684C772CB0773B3CD49231102E1"
     },
     {
       "layer": "capability",
@@ -1669,10 +1669,10 @@
       "source_path": "source/locale/be/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/be/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 75114,
-      "source_sha256": "CF6FD26268D2EEE3035170F12E2C735281802DE4D7D8590625E11A660383BB4C",
-      "output_bytes": 75114,
-      "output_sha256": "CF6FD26268D2EEE3035170F12E2C735281802DE4D7D8590625E11A660383BB4C"
+      "source_bytes": 77727,
+      "source_sha256": "D53F46CC3ED1EFFF037A2FFBA1EA28E65CB490D0417DEC3F2F4404F9067D0CF0",
+      "output_bytes": 77727,
+      "output_sha256": "D53F46CC3ED1EFFF037A2FFBA1EA28E65CB490D0417DEC3F2F4404F9067D0CF0"
     },
     {
       "layer": "capability",
@@ -1685,10 +1685,10 @@
       "source_path": "source/locale/bg/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/bg/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 78664,
-      "source_sha256": "AB48FB1BCC92FDBAAF9771F54B64628817D8B56ECBE0FDF914E56A6AFEAFEC16",
-      "output_bytes": 78664,
-      "output_sha256": "AB48FB1BCC92FDBAAF9771F54B64628817D8B56ECBE0FDF914E56A6AFEAFEC16"
+      "source_bytes": 81475,
+      "source_sha256": "341C6A5CB8D4B022FEAAF30FD2CA1C6833A7EE03AC02ED17B411B2157EBB99AF",
+      "output_bytes": 81475,
+      "output_sha256": "341C6A5CB8D4B022FEAAF30FD2CA1C6833A7EE03AC02ED17B411B2157EBB99AF"
     },
     {
       "layer": "capability",
@@ -1701,10 +1701,10 @@
       "source_path": "source/locale/ca/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ca/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52522,
-      "source_sha256": "ED9845FD31A8AC27B80B5BA809B59A522BB0B1D346A4B7BE5DD18E7EDCF2437F",
-      "output_bytes": 52522,
-      "output_sha256": "ED9845FD31A8AC27B80B5BA809B59A522BB0B1D346A4B7BE5DD18E7EDCF2437F"
+      "source_bytes": 54242,
+      "source_sha256": "1B022DF82928AC565C70881E43BC6A19251231E40331BC3C6FC3513E4A900B2C",
+      "output_bytes": 54242,
+      "output_sha256": "1B022DF82928AC565C70881E43BC6A19251231E40331BC3C6FC3513E4A900B2C"
     },
     {
       "layer": "capability",
@@ -1717,10 +1717,10 @@
       "source_path": "source/locale/cs/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/cs/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 50939,
-      "source_sha256": "862D19310B7646B0C1EA82700C3EE3C0793A60839A811E6A95265C48FEE8A7DA",
-      "output_bytes": 50939,
-      "output_sha256": "862D19310B7646B0C1EA82700C3EE3C0793A60839A811E6A95265C48FEE8A7DA"
+      "source_bytes": 52621,
+      "source_sha256": "0B12390DAFB5025FEB289D492557307A56DA19DC76A8B6F5181749EB39AC061B",
+      "output_bytes": 52621,
+      "output_sha256": "0B12390DAFB5025FEB289D492557307A56DA19DC76A8B6F5181749EB39AC061B"
     },
     {
       "layer": "capability",
@@ -1733,10 +1733,10 @@
       "source_path": "source/locale/da/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/da/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 48631,
-      "source_sha256": "B6DC72DDF3C351CFC954BEBF4A353D68F5DF542E5536357A998E4D652256B900",
-      "output_bytes": 48631,
-      "output_sha256": "B6DC72DDF3C351CFC954BEBF4A353D68F5DF542E5536357A998E4D652256B900"
+      "source_bytes": 50199,
+      "source_sha256": "34B41DF8737D4E41A6A5A706DC4631FC9BB0CDCECB19966E6E8CAC9B65412044",
+      "output_bytes": 50199,
+      "output_sha256": "34B41DF8737D4E41A6A5A706DC4631FC9BB0CDCECB19966E6E8CAC9B65412044"
     },
     {
       "layer": "capability",
@@ -1751,10 +1751,10 @@
       "source_path": "source/locale/de/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/de/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 53950,
-      "source_sha256": "A06C5C5CB0EFB530386C2503A32D9738FB2D8C086BA0A57C684459042136A26C",
-      "output_bytes": 53950,
-      "output_sha256": "A06C5C5CB0EFB530386C2503A32D9738FB2D8C086BA0A57C684459042136A26C"
+      "source_bytes": 55786,
+      "source_sha256": "59B5F999D52DA0ABC157714B85F020CF6DC03B81260B8B38A2E4DCD2C63C640A",
+      "output_bytes": 55786,
+      "output_sha256": "59B5F999D52DA0ABC157714B85F020CF6DC03B81260B8B38A2E4DCD2C63C640A"
     },
     {
       "layer": "capability",
@@ -1767,10 +1767,10 @@
       "source_path": "source/locale/el/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/el/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 79344,
-      "source_sha256": "B97BD265FCF7B7E393296D9DDC589292E435D78A097B579A498EBDB90E94E65E",
-      "output_bytes": 79344,
-      "output_sha256": "B97BD265FCF7B7E393296D9DDC589292E435D78A097B579A498EBDB90E94E65E"
+      "source_bytes": 82255,
+      "source_sha256": "128BD1E194F9D142BBB2821EC2624B8812C6A6FD01FBB13A70ECBC3F8DE097FA",
+      "output_bytes": 82255,
+      "output_sha256": "128BD1E194F9D142BBB2821EC2624B8812C6A6FD01FBB13A70ECBC3F8DE097FA"
     },
     {
       "layer": "capability",
@@ -1801,10 +1801,10 @@
       "source_path": "source/locale/eo/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/eo/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 47135,
-      "source_sha256": "36CFAA838B19E477CC9505D8E2C1B289F5F86E2D9D91DB382DB3E1B2F5F569B4",
-      "output_bytes": 47135,
-      "output_sha256": "36CFAA838B19E477CC9505D8E2C1B289F5F86E2D9D91DB382DB3E1B2F5F569B4"
+      "source_bytes": 48686,
+      "source_sha256": "25E393A546CEEC8CC32B44E8BCC89F2259B5007DE049E4266263325765E04F32",
+      "output_bytes": 48686,
+      "output_sha256": "25E393A546CEEC8CC32B44E8BCC89F2259B5007DE049E4266263325765E04F32"
     },
     {
       "layer": "capability",
@@ -1819,10 +1819,10 @@
       "source_path": "source/locale/es-ES/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/es-ES/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 53680,
-      "source_sha256": "B26DDEE6684DAC6B9BBB59531C836843E796D373BC55541CF4F41B5EE30B98DC",
-      "output_bytes": 53680,
-      "output_sha256": "B26DDEE6684DAC6B9BBB59531C836843E796D373BC55541CF4F41B5EE30B98DC"
+      "source_bytes": 55436,
+      "source_sha256": "805A936C46688E24C8873E54AA7718B6BB48442C94511E09EAC42B5B946D7482",
+      "output_bytes": 55436,
+      "output_sha256": "805A936C46688E24C8873E54AA7718B6BB48442C94511E09EAC42B5B946D7482"
     },
     {
       "layer": "capability",
@@ -1835,10 +1835,10 @@
       "source_path": "source/locale/et/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/et/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 48238,
-      "source_sha256": "A27FFDC4B0E37239D1167F5C8D346FBA1735CC03BDCE0B2649A58428125971E3",
-      "output_bytes": 48238,
-      "output_sha256": "A27FFDC4B0E37239D1167F5C8D346FBA1735CC03BDCE0B2649A58428125971E3"
+      "source_bytes": 49817,
+      "source_sha256": "6DAA4FC70FEDBF7169F28B5CA163ECA8BBDA6DC24902CDC83DFFF3E1DA656E5A",
+      "output_bytes": 49817,
+      "output_sha256": "6DAA4FC70FEDBF7169F28B5CA163ECA8BBDA6DC24902CDC83DFFF3E1DA656E5A"
     },
     {
       "layer": "capability",
@@ -1851,10 +1851,10 @@
       "source_path": "source/locale/eu/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/eu/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 50689,
-      "source_sha256": "D446B1E924B5E3AD02BDB0E794D6447364531B2E117645BCE2F948D38184E9BA",
-      "output_bytes": 50689,
-      "output_sha256": "D446B1E924B5E3AD02BDB0E794D6447364531B2E117645BCE2F948D38184E9BA"
+      "source_bytes": 52332,
+      "source_sha256": "1C3060694B9C249753D832D44A2F280A9850F449EB39F75FC59CA3D9986C8AF3",
+      "output_bytes": 52332,
+      "output_sha256": "1C3060694B9C249753D832D44A2F280A9850F449EB39F75FC59CA3D9986C8AF3"
     },
     {
       "layer": "capability",
@@ -1867,10 +1867,10 @@
       "source_path": "source/locale/fa/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/fa/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 65878,
-      "source_sha256": "6C9DAC1BA2241A3510209E7009AC8A20A6171612AEF71076BB5F03F8C2B88F1F",
-      "output_bytes": 65878,
-      "output_sha256": "6C9DAC1BA2241A3510209E7009AC8A20A6171612AEF71076BB5F03F8C2B88F1F"
+      "source_bytes": 68005,
+      "source_sha256": "E70B0A811E4E70AD18C2046806D9B09E583D94933F867CF22FEE74059BDED7BF",
+      "output_bytes": 68005,
+      "output_sha256": "E70B0A811E4E70AD18C2046806D9B09E583D94933F867CF22FEE74059BDED7BF"
     },
     {
       "layer": "capability",
@@ -1883,10 +1883,10 @@
       "source_path": "source/locale/fi/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/fi/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 49761,
-      "source_sha256": "5E9895481F5C25AD69D6E89B58922CCDA2E6B67D1335FD856FC46984F1D71D5A",
-      "output_bytes": 49761,
-      "output_sha256": "5E9895481F5C25AD69D6E89B58922CCDA2E6B67D1335FD856FC46984F1D71D5A"
+      "source_bytes": 51401,
+      "source_sha256": "EB51B710217DDD51F216C1056E90CDE19CED80A62EB19A1DACBEFA32E8D5AFCC",
+      "output_bytes": 51401,
+      "output_sha256": "EB51B710217DDD51F216C1056E90CDE19CED80A62EB19A1DACBEFA32E8D5AFCC"
     },
     {
       "layer": "capability",
@@ -1899,10 +1899,10 @@
       "source_path": "source/locale/fil/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/fil/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 54343,
-      "source_sha256": "413A5FA862D2853A72638653F4157D3D00AD3D3CD247821531CD15C46C1C3FF0",
-      "output_bytes": 54343,
-      "output_sha256": "413A5FA862D2853A72638653F4157D3D00AD3D3CD247821531CD15C46C1C3FF0"
+      "source_bytes": 56165,
+      "source_sha256": "8AC7AE88CE4A34864A3C1B1F4F8FA1A511F8105D86AACCEFCDF75727312B3E95",
+      "output_bytes": 56165,
+      "output_sha256": "8AC7AE88CE4A34864A3C1B1F4F8FA1A511F8105D86AACCEFCDF75727312B3E95"
     },
     {
       "layer": "capability",
@@ -1917,10 +1917,10 @@
       "source_path": "source/locale/fr/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/fr/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 54727,
-      "source_sha256": "08D33AF1FFDD70AB9BF3115D28B42D976A101B169F671C587D150A9B54D4B2A5",
-      "output_bytes": 54727,
-      "output_sha256": "08D33AF1FFDD70AB9BF3115D28B42D976A101B169F671C587D150A9B54D4B2A5"
+      "source_bytes": 56618,
+      "source_sha256": "B62730F2017AF2D86F1300E2597B9D0737A9DED2DB1C1522C50713F24748EF37",
+      "output_bytes": 56618,
+      "output_sha256": "B62730F2017AF2D86F1300E2597B9D0737A9DED2DB1C1522C50713F24748EF37"
     },
     {
       "layer": "capability",
@@ -1933,10 +1933,10 @@
       "source_path": "source/locale/fy-NL/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/fy-NL/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 48033,
-      "source_sha256": "DC05B173890142E34510AB4A176006553B04ECF1FACAFEA5A80C657D6E06E892",
-      "output_bytes": 48033,
-      "output_sha256": "DC05B173890142E34510AB4A176006553B04ECF1FACAFEA5A80C657D6E06E892"
+      "source_bytes": 49670,
+      "source_sha256": "27D4AD38B5BDC8B4A12DFE7E69291FA8270EDF15909BF97279D7C6F7E78FE52A",
+      "output_bytes": 49670,
+      "output_sha256": "27D4AD38B5BDC8B4A12DFE7E69291FA8270EDF15909BF97279D7C6F7E78FE52A"
     },
     {
       "layer": "capability",
@@ -1949,10 +1949,10 @@
       "source_path": "source/locale/ga-IE/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ga-IE/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 53390,
-      "source_sha256": "BEFC5C97D853BBF039B57A89B5F8910F21DCEA582631841E6528B9055E7002FB",
-      "output_bytes": 53390,
-      "output_sha256": "BEFC5C97D853BBF039B57A89B5F8910F21DCEA582631841E6528B9055E7002FB"
+      "source_bytes": 55203,
+      "source_sha256": "94BCD8D53A17FE288A9DA633163A454028715DE594030A513AFCBB1AFA9EB268",
+      "output_bytes": 55203,
+      "output_sha256": "94BCD8D53A17FE288A9DA633163A454028715DE594030A513AFCBB1AFA9EB268"
     },
     {
       "layer": "capability",
@@ -1965,10 +1965,10 @@
       "source_path": "source/locale/he/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/he/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 59864,
-      "source_sha256": "E7C67AF0109B892FFBCF2DEBDC7568F49537CB1B4AD32B3EABF91010480217C9",
-      "output_bytes": 59864,
-      "output_sha256": "E7C67AF0109B892FFBCF2DEBDC7568F49537CB1B4AD32B3EABF91010480217C9"
+      "source_bytes": 61840,
+      "source_sha256": "03940CAACCB90EC745CDD59ACFA94C7F25655CD2DD8113A1DA1481583701A7C2",
+      "output_bytes": 61840,
+      "output_sha256": "03940CAACCB90EC745CDD59ACFA94C7F25655CD2DD8113A1DA1481583701A7C2"
     },
     {
       "layer": "capability",
@@ -1981,10 +1981,10 @@
       "source_path": "source/locale/hr/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/hr/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 50057,
-      "source_sha256": "0E4530E0ED2BB28EE05CA916329457BC752A38DFA8431416208338F94A3C2136",
-      "output_bytes": 50057,
-      "output_sha256": "0E4530E0ED2BB28EE05CA916329457BC752A38DFA8431416208338F94A3C2136"
+      "source_bytes": 51708,
+      "source_sha256": "73DA5985670EF4FAC7728866DFA3B0308EB62E38D317983ACF453BD94C4EC6EC",
+      "output_bytes": 51708,
+      "output_sha256": "73DA5985670EF4FAC7728866DFA3B0308EB62E38D317983ACF453BD94C4EC6EC"
     },
     {
       "layer": "capability",
@@ -1997,10 +1997,10 @@
       "source_path": "source/locale/hu/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/hu/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 54205,
-      "source_sha256": "23F49D8133807D0675867383F542B5F25393C48CE43CA48B213B048D87C40D66",
-      "output_bytes": 54205,
-      "output_sha256": "23F49D8133807D0675867383F542B5F25393C48CE43CA48B213B048D87C40D66"
+      "source_bytes": 56075,
+      "source_sha256": "47171A30997F94BF6481294BD27E8A8871D2CEA488A28207956B8ACD78C11C88",
+      "output_bytes": 56075,
+      "output_sha256": "47171A30997F94BF6481294BD27E8A8871D2CEA488A28207956B8ACD78C11C88"
     },
     {
       "layer": "capability",
@@ -2013,10 +2013,10 @@
       "source_path": "source/locale/id/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/id/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 48962,
-      "source_sha256": "CB7CF0963D2A3ABE409AD718C21AAAB60E4DE76073C5FCFC04108B4A731F5F1C",
-      "output_bytes": 48962,
-      "output_sha256": "CB7CF0963D2A3ABE409AD718C21AAAB60E4DE76073C5FCFC04108B4A731F5F1C"
+      "source_bytes": 50519,
+      "source_sha256": "252759C1DB4E7A8C2A269EEC9C394C7AA46E670DD28B873435028E1407D86F6A",
+      "output_bytes": 50519,
+      "output_sha256": "252759C1DB4E7A8C2A269EEC9C394C7AA46E670DD28B873435028E1407D86F6A"
     },
     {
       "layer": "capability",
@@ -2029,10 +2029,10 @@
       "source_path": "source/locale/is/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/is/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 47830,
-      "source_sha256": "FCAB392D8ED3952F45676D9BAF5BCF5AD9543A786516CF2F3D55D4F3EB257B61",
-      "output_bytes": 47830,
-      "output_sha256": "FCAB392D8ED3952F45676D9BAF5BCF5AD9543A786516CF2F3D55D4F3EB257B61"
+      "source_bytes": 49437,
+      "source_sha256": "66884B256DAFA1E624C20010627B7C0376262C209E0B120CFB62DD61D704AD60",
+      "output_bytes": 49437,
+      "output_sha256": "66884B256DAFA1E624C20010627B7C0376262C209E0B120CFB62DD61D704AD60"
     },
     {
       "layer": "capability",
@@ -2047,10 +2047,10 @@
       "source_path": "source/locale/it/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/it/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52883,
-      "source_sha256": "750807A19BFCC071F5FF2E6D92CDD535EF4F1F03BB1F86D399F010750A79476B",
-      "output_bytes": 52883,
-      "output_sha256": "750807A19BFCC071F5FF2E6D92CDD535EF4F1F03BB1F86D399F010750A79476B"
+      "source_bytes": 54578,
+      "source_sha256": "1B331821F03B05895250F687484B3A56A6C8F65A0317E42F7D6FB5A45FCB7BAB",
+      "output_bytes": 54578,
+      "output_sha256": "1B331821F03B05895250F687484B3A56A6C8F65A0317E42F7D6FB5A45FCB7BAB"
     },
     {
       "layer": "capability",
@@ -2063,10 +2063,10 @@
       "source_path": "source/locale/ja/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ja/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 57603,
-      "source_sha256": "8F8709FADD58DA2258FB278BCD954034F87CBEE0ECF16529C63842D86D2D4500",
-      "output_bytes": 57603,
-      "output_sha256": "8F8709FADD58DA2258FB278BCD954034F87CBEE0ECF16529C63842D86D2D4500"
+      "source_bytes": 59699,
+      "source_sha256": "BF7BD58DBCD4538EACAF262BDF11FD158EB228C4AFC238E9784A22E95560B48D",
+      "output_bytes": 59699,
+      "output_sha256": "BF7BD58DBCD4538EACAF262BDF11FD158EB228C4AFC238E9784A22E95560B48D"
     },
     {
       "layer": "capability",
@@ -2079,10 +2079,10 @@
       "source_path": "source/locale/ka/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ka/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 100310,
-      "source_sha256": "010AAE330C696F8F24F096B278351FA4059BCE5439A269E6BC060F01418DCBC6",
-      "output_bytes": 100310,
-      "output_sha256": "010AAE330C696F8F24F096B278351FA4059BCE5439A269E6BC060F01418DCBC6"
+      "source_bytes": 103927,
+      "source_sha256": "D3CC73BABC2736E09FFC2467E7FE8350F4518BDC20E1771D7947B8AF7038EB61",
+      "output_bytes": 103927,
+      "output_sha256": "D3CC73BABC2736E09FFC2467E7FE8350F4518BDC20E1771D7947B8AF7038EB61"
     },
     {
       "layer": "capability",
@@ -2095,10 +2095,10 @@
       "source_path": "source/locale/kk/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/kk/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 72816,
-      "source_sha256": "D1F169CF9A1A77CCC76A6F2BD8B2528533DF510CC2CD050D0ECF1CAFA29FA1C0",
-      "output_bytes": 72816,
-      "output_sha256": "D1F169CF9A1A77CCC76A6F2BD8B2528533DF510CC2CD050D0ECF1CAFA29FA1C0"
+      "source_bytes": 75546,
+      "source_sha256": "3492AD7AFAC6D21C24093CD864085419E85A1F80C1E4A025FA3A397E69CEC193",
+      "output_bytes": 75546,
+      "output_sha256": "3492AD7AFAC6D21C24093CD864085419E85A1F80C1E4A025FA3A397E69CEC193"
     },
     {
       "layer": "capability",
@@ -2111,10 +2111,10 @@
       "source_path": "source/locale/ko/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ko/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52176,
-      "source_sha256": "3DFBB50D2499460CC1A4B4B5E088CACE02A1CAE91B60E19A0AB176844669E6E0",
-      "output_bytes": 52176,
-      "output_sha256": "3DFBB50D2499460CC1A4B4B5E088CACE02A1CAE91B60E19A0AB176844669E6E0"
+      "source_bytes": 53879,
+      "source_sha256": "42556564FD9094D2B81D3C71F291BEA179C1E241EA7E5F4DA9757338F182C2D9",
+      "output_bytes": 53879,
+      "output_sha256": "42556564FD9094D2B81D3C71F291BEA179C1E241EA7E5F4DA9757338F182C2D9"
     },
     {
       "layer": "capability",
@@ -2127,10 +2127,10 @@
       "source_path": "source/locale/lt/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/lt/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 49694,
-      "source_sha256": "ED7DFFD28AD526BAFE0673B24F3801D3FE0EA1708C6BD7FBF74E8A511EA8E196",
-      "output_bytes": 49694,
-      "output_sha256": "ED7DFFD28AD526BAFE0673B24F3801D3FE0EA1708C6BD7FBF74E8A511EA8E196"
+      "source_bytes": 51353,
+      "source_sha256": "CE11335C03338B0F5B1BA4F2259316CBC3ED9AC0AC50170BF1CFA742CC4B7C65",
+      "output_bytes": 51353,
+      "output_sha256": "CE11335C03338B0F5B1BA4F2259316CBC3ED9AC0AC50170BF1CFA742CC4B7C65"
     },
     {
       "layer": "capability",
@@ -2143,10 +2143,10 @@
       "source_path": "source/locale/lv/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/lv/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52074,
-      "source_sha256": "703EE865749C8A85F136CF9E098784E7437030116303D46293DF3D6EFD868616",
-      "output_bytes": 52074,
-      "output_sha256": "703EE865749C8A85F136CF9E098784E7437030116303D46293DF3D6EFD868616"
+      "source_bytes": 53816,
+      "source_sha256": "2E9AB6A0234A3CA455F4A6FA889BD5371588550938E45CF915BBE112B9DF9C7E",
+      "output_bytes": 53816,
+      "output_sha256": "2E9AB6A0234A3CA455F4A6FA889BD5371588550938E45CF915BBE112B9DF9C7E"
     },
     {
       "layer": "capability",
@@ -2159,10 +2159,10 @@
       "source_path": "source/locale/nl/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/nl/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 51419,
-      "source_sha256": "F72536BE312E5270B6EC59A3E60C5897CF74D0234D5ECE86F26FD0CD06BD69FC",
-      "output_bytes": 51419,
-      "output_sha256": "F72536BE312E5270B6EC59A3E60C5897CF74D0234D5ECE86F26FD0CD06BD69FC"
+      "source_bytes": 53192,
+      "source_sha256": "C61AB06E294A1F2B2B194F3B009D02B191742188731363FF389DEB22E1CACC0C",
+      "output_bytes": 53192,
+      "output_sha256": "C61AB06E294A1F2B2B194F3B009D02B191742188731363FF389DEB22E1CACC0C"
     },
     {
       "layer": "capability",
@@ -2175,10 +2175,10 @@
       "source_path": "source/locale/no/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/no/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 47707,
-      "source_sha256": "F2405886752EF66FDA07E7C12DF6138AE18D0FEC04A27C638FA239D0724DE355",
-      "output_bytes": 47707,
-      "output_sha256": "F2405886752EF66FDA07E7C12DF6138AE18D0FEC04A27C638FA239D0724DE355"
+      "source_bytes": 49294,
+      "source_sha256": "F7C828B10276ECF6B7B720C225977ABBBBF229C78D2CEC331EA72061C1633023",
+      "output_bytes": 49294,
+      "output_sha256": "F7C828B10276ECF6B7B720C225977ABBBBF229C78D2CEC331EA72061C1633023"
     },
     {
       "layer": "capability",
@@ -2193,10 +2193,10 @@
       "source_path": "source/locale/pl/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/pl/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52128,
-      "source_sha256": "C498751F3D9CD4968AC8978294128FEA0BEA9B58D8B645119F9FF6D5DB785977",
-      "output_bytes": 52128,
-      "output_sha256": "C498751F3D9CD4968AC8978294128FEA0BEA9B58D8B645119F9FF6D5DB785977"
+      "source_bytes": 53834,
+      "source_sha256": "AB63B1F14F6AC304AF0883EB69698E51F11B032840D96C452657FA8E727F752B",
+      "output_bytes": 53834,
+      "output_sha256": "AB63B1F14F6AC304AF0883EB69698E51F11B032840D96C452657FA8E727F752B"
     },
     {
       "layer": "capability",
@@ -2211,10 +2211,10 @@
       "source_path": "source/locale/pt-BR/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/pt-BR/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 51706,
-      "source_sha256": "FD4281E125D43889327866364C3DFFDF78D45F06A16BAC74EFF61E804A10078A",
-      "output_bytes": 51706,
-      "output_sha256": "FD4281E125D43889327866364C3DFFDF78D45F06A16BAC74EFF61E804A10078A"
+      "source_bytes": 53440,
+      "source_sha256": "B34925F3A715FF0B58E592E4446F82BB2E7C923E612E950EC9313CDCD7DF2727",
+      "output_bytes": 53440,
+      "output_sha256": "B34925F3A715FF0B58E592E4446F82BB2E7C923E612E950EC9313CDCD7DF2727"
     },
     {
       "layer": "capability",
@@ -2227,10 +2227,10 @@
       "source_path": "source/locale/pt-PT/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/pt-PT/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 51688,
-      "source_sha256": "CD8E7ABEF0B9559BADB8E17A4F012891D21940E5CDB53FDE45EFA39A8374486C",
-      "output_bytes": 51688,
-      "output_sha256": "CD8E7ABEF0B9559BADB8E17A4F012891D21940E5CDB53FDE45EFA39A8374486C"
+      "source_bytes": 53422,
+      "source_sha256": "57F330A9579E28C506D18FBAD3EAF1F6138DACB3D23F71F72668CB35D6DDC137",
+      "output_bytes": 53422,
+      "output_sha256": "57F330A9579E28C506D18FBAD3EAF1F6138DACB3D23F71F72668CB35D6DDC137"
     },
     {
       "layer": "capability",
@@ -2243,10 +2243,10 @@
       "source_path": "source/locale/ro/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ro/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 52555,
-      "source_sha256": "735D706E030DB6C4AFC30CC56640D8AD36356550BD3C2039BC7FFC294AAE290B",
-      "output_bytes": 52555,
-      "output_sha256": "735D706E030DB6C4AFC30CC56640D8AD36356550BD3C2039BC7FFC294AAE290B"
+      "source_bytes": 54247,
+      "source_sha256": "56C61A1A41E3BDA52A930C17408A8D8AEBF3D435AF94D01AD151F9B2F46A6E15",
+      "output_bytes": 54247,
+      "output_sha256": "56C61A1A41E3BDA52A930C17408A8D8AEBF3D435AF94D01AD151F9B2F46A6E15"
     },
     {
       "layer": "capability",
@@ -2261,10 +2261,10 @@
       "source_path": "source/locale/ru/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/ru/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 79710,
-      "source_sha256": "A69994D17F8B51F1C4306C836332D514B8849561B943A496220FE73105557A21",
-      "output_bytes": 79710,
-      "output_sha256": "A69994D17F8B51F1C4306C836332D514B8849561B943A496220FE73105557A21"
+      "source_bytes": 82558,
+      "source_sha256": "FF5A7B4EE59E74E2E4944669634CEFC042EA97002F61655604E6DF4372B8D8CD",
+      "output_bytes": 82558,
+      "output_sha256": "FF5A7B4EE59E74E2E4944669634CEFC042EA97002F61655604E6DF4372B8D8CD"
     },
     {
       "layer": "capability",
@@ -2277,10 +2277,10 @@
       "source_path": "source/locale/sk/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/sk/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 50726,
-      "source_sha256": "0CC91FD83830ECE28B873426195E615FD19C90BA597F211B8153E9C9D4F1C3AC",
-      "output_bytes": 50726,
-      "output_sha256": "0CC91FD83830ECE28B873426195E615FD19C90BA597F211B8153E9C9D4F1C3AC"
+      "source_bytes": 52402,
+      "source_sha256": "F32E107D67C98DC8B7E1AB2510BAD20EE910A6B7FCB4D0F67A78885BD6A91C8E",
+      "output_bytes": 52402,
+      "output_sha256": "F32E107D67C98DC8B7E1AB2510BAD20EE910A6B7FCB4D0F67A78885BD6A91C8E"
     },
     {
       "layer": "capability",
@@ -2293,10 +2293,10 @@
       "source_path": "source/locale/sl/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/sl/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 49214,
-      "source_sha256": "4E6503A9A28A147D0AE1BF5608698FCF6EAF554108696768D9A3048FB4C62459",
-      "output_bytes": 49214,
-      "output_sha256": "4E6503A9A28A147D0AE1BF5608698FCF6EAF554108696768D9A3048FB4C62459"
+      "source_bytes": 50845,
+      "source_sha256": "81C7EF046BBE20A1807CB75ADDC3A0496CD164D3DFD241F5861B465717BEC7EF",
+      "output_bytes": 50845,
+      "output_sha256": "81C7EF046BBE20A1807CB75ADDC3A0496CD164D3DFD241F5861B465717BEC7EF"
     },
     {
       "layer": "capability",
@@ -2309,10 +2309,10 @@
       "source_path": "source/locale/sq/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/sq/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 53622,
-      "source_sha256": "9537AD5F4745F187AF4E40AB9A22D3F9E27986AC920AEAEEA03415187B047EE6",
-      "output_bytes": 53622,
-      "output_sha256": "9537AD5F4745F187AF4E40AB9A22D3F9E27986AC920AEAEEA03415187B047EE6"
+      "source_bytes": 55319,
+      "source_sha256": "B3469BF2109F77C08AD5B7A9DEC4C15E16AF18D632E86868EE103344C9875A08",
+      "output_bytes": 55319,
+      "output_sha256": "B3469BF2109F77C08AD5B7A9DEC4C15E16AF18D632E86868EE103344C9875A08"
     },
     {
       "layer": "capability",
@@ -2325,10 +2325,10 @@
       "source_path": "source/locale/sr/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/sr/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 76941,
-      "source_sha256": "64F209E20FF4B74731DCB10722350D9E0A10F69C1306E7F51AEA678E5EFA6744",
-      "output_bytes": 76941,
-      "output_sha256": "64F209E20FF4B74731DCB10722350D9E0A10F69C1306E7F51AEA678E5EFA6744"
+      "source_bytes": 75124,
+      "source_sha256": "BAE12EC17A792894A6D924100A095E6BD93EA0C2C2281ABA5BA7D5027E041F62",
+      "output_bytes": 75124,
+      "output_sha256": "BAE12EC17A792894A6D924100A095E6BD93EA0C2C2281ABA5BA7D5027E041F62"
     },
     {
       "layer": "capability",
@@ -2341,10 +2341,10 @@
       "source_path": "source/locale/sv-SE/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/sv-SE/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 48573,
-      "source_sha256": "64A77B5D1FCF7A53755B48D80A78A9C963099BFF1CDFD002872B27A55697C7AB",
-      "output_bytes": 48573,
-      "output_sha256": "64A77B5D1FCF7A53755B48D80A78A9C963099BFF1CDFD002872B27A55697C7AB"
+      "source_bytes": 50156,
+      "source_sha256": "AC0D2E267E299780BBD7601714CEC71D61861916D475AA12E5F47285FC89B416",
+      "output_bytes": 50156,
+      "output_sha256": "AC0D2E267E299780BBD7601714CEC71D61861916D475AA12E5F47285FC89B416"
     },
     {
       "layer": "capability",
@@ -2357,10 +2357,10 @@
       "source_path": "source/locale/th/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/th/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 93813,
-      "source_sha256": "B5DDA081CB999DD4381102FFEAC5FCD39BE2936F2F4E064C902505008C872026",
-      "output_bytes": 93813,
-      "output_sha256": "B5DDA081CB999DD4381102FFEAC5FCD39BE2936F2F4E064C902505008C872026"
+      "source_bytes": 97204,
+      "source_sha256": "E34A71D7D9FE01E84417432A22AAF682318F3367558841FB65BDFA598A3D6FA5",
+      "output_bytes": 97204,
+      "output_sha256": "E34A71D7D9FE01E84417432A22AAF682318F3367558841FB65BDFA598A3D6FA5"
     },
     {
       "layer": "capability",
@@ -2373,10 +2373,10 @@
       "source_path": "source/locale/tr/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/tr/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 50841,
-      "source_sha256": "CF1586B5B00A083699B986C87400770F33107F3A29DE7EB1C566A2F7E2A0BBC6",
-      "output_bytes": 50841,
-      "output_sha256": "CF1586B5B00A083699B986C87400770F33107F3A29DE7EB1C566A2F7E2A0BBC6"
+      "source_bytes": 52560,
+      "source_sha256": "B5570EF59ABAAF34EC08A81703B433488E9D3904459FD11FA15633B3E66C1A4D",
+      "output_bytes": 52560,
+      "output_sha256": "B5570EF59ABAAF34EC08A81703B433488E9D3904459FD11FA15633B3E66C1A4D"
     },
     {
       "layer": "capability",
@@ -2389,10 +2389,10 @@
       "source_path": "source/locale/uk/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/uk/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 74327,
-      "source_sha256": "DE03C4AD19C04269CEF476FA30831DB1441842F8255486EA4A632505578681CF",
-      "output_bytes": 74327,
-      "output_sha256": "DE03C4AD19C04269CEF476FA30831DB1441842F8255486EA4A632505578681CF"
+      "source_bytes": 76993,
+      "source_sha256": "0A9CE6CB9379FB98C8013D9D9097AAA763A5BFB38AF6048DAE882A5ECD4E2F73",
+      "output_bytes": 76993,
+      "output_sha256": "0A9CE6CB9379FB98C8013D9D9097AAA763A5BFB38AF6048DAE882A5ECD4E2F73"
     },
     {
       "layer": "capability",
@@ -2405,10 +2405,10 @@
       "source_path": "source/locale/vi/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/vi/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 59024,
-      "source_sha256": "D0C1A82D946DB3BB67043D97E92C3711A9AEB79664E392A80BA354B7CCBACF7A",
-      "output_bytes": 59024,
-      "output_sha256": "D0C1A82D946DB3BB67043D97E92C3711A9AEB79664E392A80BA354B7CCBACF7A"
+      "source_bytes": 61032,
+      "source_sha256": "0910F6E7785E1CB3DCC385CF0575E85D45ABAB7AB976C92875E5ADCAEE4C4D84",
+      "output_bytes": 61032,
+      "output_sha256": "0910F6E7785E1CB3DCC385CF0575E85D45ABAB7AB976C92875E5ADCAEE4C4D84"
     },
     {
       "layer": "capability",
@@ -2423,10 +2423,10 @@
       "source_path": "source/locale/zh-CN/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/zh-CN/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 42446,
-      "source_sha256": "7E4FA8E69B31752FB757AEE171C896DE5CBCDEFE6C895BBA324CF78F4D03A021",
-      "output_bytes": 42446,
-      "output_sha256": "7E4FA8E69B31752FB757AEE171C896DE5CBCDEFE6C895BBA324CF78F4D03A021"
+      "source_bytes": 43813,
+      "source_sha256": "5D42E190A1F87E56BDE077B55B0345AEA3EC7E876622A9701C0F10CE85D99DA1",
+      "output_bytes": 43813,
+      "output_sha256": "5D42E190A1F87E56BDE077B55B0345AEA3EC7E876622A9701C0F10CE85D99DA1"
     },
     {
       "layer": "capability",
@@ -2439,10 +2439,10 @@
       "source_path": "source/locale/zh-TW/more-infinite-research.cfg",
       "predecessor_source_path": "src/mod/families/modern/locale/zh-TW/more-infinite-research.cfg",
       "transform": "copy-exact-bytes",
-      "source_bytes": 42554,
-      "source_sha256": "EBD8A12BB436571D09B83E72E48F7DBEBED8F5BCD092B7EF3D9D8815E09CF91D",
-      "output_bytes": 42554,
-      "output_sha256": "EBD8A12BB436571D09B83E72E48F7DBEBED8F5BCD092B7EF3D9D8815E09CF91D"
+      "source_bytes": 43897,
+      "source_sha256": "60BC82D1A0DC60F1E609AFD2986530AA8E7853BB37A2AE2AB262989E5040E9D5",
+      "output_bytes": 43897,
+      "output_sha256": "60BC82D1A0DC60F1E609AFD2986530AA8E7853BB37A2AE2AB262989E5040E9D5"
     },
     {
       "layer": "capability",
@@ -6270,5 +6270,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "2AB9E8818D9BB780E63C34EB6EC0DCC2A28F5DD5CDCD33F7FC380F9BA91F0B4F"
+  "record_sha256": "906E92515FC22C012DC81F2F044A493B8129490E7BC17FABC3D427DEABB1D47A"
 }

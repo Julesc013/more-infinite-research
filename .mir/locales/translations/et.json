@@ -2589,6 +2589,180 @@
       "source_sha256": "CFDBF0233077ECA0D9FD02C1F6A1C7574534FF31A705FF73460DE6E62D700301",
       "translation": "Kirjutage selgelt Factorio maksimaalset kvaliteeti mõjutav lagi. Erinevalt muutumatust kirjutab see kohandatud alampiirid üle.",
       "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.title",
+      "source_sha256": "424656A0B79ABCD44A76F63998D25BAF40B02A948E61A78C0B58A6B599C96096",
+      "translation": "MIR-uuringute brauser",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.command",
+      "source_sha256": "4CFCE6F49352192F1DCC3F247CFDF3FCD51C7C8DDBAE3F0CE682B9D3749CA981",
+      "translation": "Avage isiklik MIR-uuringute ja seadete brauser.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research",
+      "source_sha256": "979D6300FD9884FF8D8E03391D524FED8E88CD5560788F065BA2444DB3B7B20C",
+      "translation": "Uurimine",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings",
+      "source_sha256": "74A883A037BC227F91891AB654A753D3A99F31AB06AE5B5D2B6E594A692B41F8",
+      "translation": "Seaded",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.refresh",
+      "source_sha256": "0E91610117029A62A478B7FA7DF0B8598BEBE3AB1E192D4B1882E310719C9671",
+      "translation": "Värskenda",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.close",
+      "source_sha256": "7D9EB7ACB13E24625C404401D8E88B2350E32162455885F18276CF802F7701ED",
+      "translation": "Sule",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.search",
+      "source_sha256": "EF0296F00BBD080D00276450B6EFC488556E176C3DF869CD0C187386B1A94D24",
+      "translation": "Otsingutehnoloogia ID-d või perekonnad, seejärel vajutage sisestusklahvi.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.all",
+      "source_sha256": "A52ACE420F2175D08B1577A1BEA5445E36801229C074EF9ED6C55A73401FD9C2",
+      "translation": "Kõik",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.finite",
+      "source_sha256": "740FAD6A41C1E12ACFD6FC72C16234082CA3007F010BA1657A89DB3C97C55B84",
+      "translation": "Lõplik",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.infinite",
+      "source_sha256": "C1C929EBFBB2E174834282E005FAE609D0EAC2863EA68A0268E8E95B669CBC06",
+      "translation": "Lõpmatu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.available",
+      "source_sha256": "E674447337E83C1346F6122ED69F35BF5526E2A11842B2F2B788F3FB67D714CA",
+      "translation": "Saadaval",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.locked",
+      "source_sha256": "A424E33D90931D1ED22F2AF37A3F3491A5C9DE0DFAE079F6F3FF4EDF0309E07F",
+      "translation": "Lukustatud",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queued",
+      "source_sha256": "661FF40A07E037BBD5F7D4EC97A4DF1503096CA910E7C9E2D7A4E9ABD4E4E1A0",
+      "translation": "Järjekorras",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue",
+      "source_sha256": "662236229115E59A27DFDCCBF0C19905673BFA8503224F213A8AC02F322A1779",
+      "translation": "Praegune jõujärjekord:",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.count",
+      "source_sha256": "A3736B02CCB984B76080E4497BDF708627A359D8EF29F8B701EB626071A64B67",
+      "translation": "__1__ sobitustehnoloogiad",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.family-owner",
+      "source_sha256": "CA2E45846A38D6CD559ABED9DF9D8C76A07FBC4371B53829427B4B258F80449B",
+      "translation": "Perekond: __1__ | Efekti omanik: __2__ | Valik: __3__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.cap",
+      "source_sha256": "616A5781464FA924BA30AF9BA60CF45E7F081574E6131BFEF0D00392F01D891D",
+      "translation": "Efektiivne maksimumtase: __1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue",
+      "source_sha256": "A867FF0276CC7FEC22216F9FF61F6C34AA8638E41549269F965EE11A442CADC7",
+      "translation": "Lisa uurimisjärjekorda",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.hide",
+      "source_sha256": "C411CA188AC03C675358C33532FE8B53997CAD20F2598D5815144B02E6785F9B",
+      "translation": "Peida mu vaate eest",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show",
+      "source_sha256": "5F9602FC8E73AA7EC8022EC57227494750D869973C3A0B0D36E8DDF19ED15A33",
+      "translation": "Näita minu vaates",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show-hidden",
+      "source_sha256": "E22FB6E065BF1E52C440DF2712467D9B1C3E2CED73C8D1132E4818D6B9F17587",
+      "translation": "Kuva kõik peidetud tehnoloogiad",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue-failed",
+      "source_sha256": "202E74E794ECAB7B02564D3A7A75C3EA1825EA95812CB6C0F328194CE4219263",
+      "translation": "Uuringut ei saanud järjekorda panna. Kontrollige eeltingimusi, õigusi, praegust järjekorda ja tehnoloogia saadavust.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.startup-note",
+      "source_sha256": "B4E5134C0969C56D37D4537DDD8841B80B9ED558B6C31549E1633703EF90B472",
+      "translation": "Käivitusseaded nõuavad taaskäivitamist. Näidatud väärtused hõlmavad aktiivset MIR-profiili. Käitusaja sätted kehtivad ainult nende kuvatavas ulatuses.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.export",
+      "source_sha256": "AF3CEF2D7931E76F6927151E111A64A8C0C83067572177F734CDA219C7868CE5",
+      "translation": "Käivitusprofiili eksportimine",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.exported",
+      "source_sha256": "AAEBFE164359C3FECD14589F11CE9E4A87A2A9E72B898FAA794449B89D2D27D1",
+      "translation": "Eksporditud fail script-output/more-infinite-research/settings/browser-profile.txt. Kleepige string MIRSET1 MIR-i käivitusprofiili impordiseadesse ja taaskäivitage.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.invalid-profile",
+      "source_sha256": "D018D8EF606C11AD635FC1A9D6B04F2A47011D2466AF932EA57DAA0EF908A35D",
+      "translation": "Eksport peatati, kuna kehtiv profiil sisaldab kehtetuid väärtusi.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.catalogue-limit",
+      "source_sha256": "63C62BCC9A9D858ECCB669FD47DCEFBDE4CB20FFEEF1A489AC0C475522553B46",
+      "translation": "Keskkond ületab __1__ tehnoloogiate brauseri kataloogipiirangu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.omission-note",
+      "source_sha256": "6FEB33C8AAB7BE7D06686AA0412867D2B09E44F8ECE989BBE718DA2EF4330C9C",
+      "translation": "Ülaltoodud efektid on tegelikud tehnoloogilised efektid. Marsruudi väljajätmise üksikasjad nõuavad inspektori katvuse aruannet; puuduvaid marsruute see vaade ei kvalifitseeri.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue-more",
+      "source_sha256": "F62A6A08C94A6BDCF69CFB550158DB28B27E91ED67F998EF8604E543CB0AA67E",
+      "translation": "__1__ rohkem kirjeid algses uurimisjärjekorras.",
+      "provenance": "machine-assisted"
     }
   ]
 }

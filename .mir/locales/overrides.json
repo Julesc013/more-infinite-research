@@ -1,7 +1,38 @@
 {
   "schema": 1,
   "locales": {
+    "be": {
+      "mir-browser.title": "Браўзер даследаванняў MIR"
+    },
+    "da": {
+      "mir-browser.title": "MIR-forskningsbrowser",
+      "mir-browser.finite": "Endelig"
+    },
+    "el": {
+      "mir-browser.title": "Πρόγραμμα περιήγησης έρευνας MIR"
+    },
+    "ar": {
+      "mir-browser.exported": "تم تصدير script-output/more-infinite-research/settings/browser-profile.txt. الصق سلسلة MIRSET1 في إعداد استيراد ملف تعريف بدء تشغيل MIR ثم أعد التشغيل."
+    },
+    "es-ES": {
+      "mir-browser.exported": "Se exportó script-output/more-infinite-research/settings/browser-profile.txt. Pegue la cadena MIRSET1 en la configuración de importación del perfil de inicio MIR y reinicie."
+    },
+    "fa": {
+      "mir-browser.refresh": "تازه‌سازی",
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt صادر شد. رشته MIRSET1 را در تنظیمات وارد کردن نمایه راه‌اندازی MIR قرار دهید و دوباره راه‌اندازی کنید."
+    },
+    "fr": {
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt a été exporté. Collez la chaîne MIRSET1 dans le paramètre d’importation du profil de démarrage MIR et redémarrez."
+    },
+    "ga-IE": {
+      "mir-browser.exported": "Easpórtáladh script-output/more-infinite-research/settings/browser-profile.txt. Greamaigh an teaghrán MIRSET1 isteach sa socrú iompórtála próifíle tosaithe MIR agus atosaigh."
+    },
+    "id": {
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt telah diekspor. Rekatkan string MIRSET1 ke pengaturan impor profil startup MIR dan mulai ulang."
+    },
     "fil": {
+      "mir-browser.title": "Browser ng Pananaliksik ng MIR",
+      "mir-browser.available": "Magagamit",
       "technology-name.more-infinite-research.research_lithium": "Produktibidad ng lithium",
       "technology-name.more-infinite-research.research_rockets": "Produktibidad ng rocket",
       "technology-name.more-infinite-research.research_cargo_bay_unloading_distance": "Distansya ng pagbababa ng cargo bay",
@@ -11,6 +42,8 @@
       "mod-setting-name.mir-prototype-positive-power-floor": "[font=default-bold][color=cyan]Pagiging tugma:[/color][/font] Pinakamababang lakas na hindi sero"
     },
     "fy-NL": {
+      "mir-browser.title": "MIR-ûndersyksblêder",
+      "mir-browser.finite": "Eindich",
       "modifier-description.character-logistic-trash-slots": "Logistike ôffalfakken fan it personaazje: +__1__",
       "string-mod-setting.mir-science-pack-ingredient-policy-mod-progression": "Mod-oanpaste foarútgong"
     },
@@ -19,8 +52,36 @@
       "mod-setting-description.mir-prototype-pollution-cap": "汚染低減効果によって機械の汚染をどこまで削減できるかを設定します。-80%（変更なし）では既存の汚染制限を維持します。より大きな削減値では、エネルギー消費量を変更せずに汚染をゼロ近くまで下げられます。",
       "mod-setting-description.mir-prototype-speed-cap": "MIR が機械の速度効果制限を変更しないか、新しい正の速度上限を設定するかを選択します。+100000%（変更なし）では既存の制限を維持し、低い値では非常に大きな速度ボーナスを意図的に制限します。"
     },
+    "kk": {
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt экспортталды. MIRSET1 жолын MIR іске қосу профилін импорттау параметріне қойып, қайта іске қосыңыз."
+    },
+    "nl": {
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt is geëxporteerd. Plak de MIRSET1-tekenreeks in de importinstelling van het MIR-opstartprofiel en start opnieuw op."
+    },
+    "no": {
+      "mir-browser.title": "MIR-forskningsleser"
+    },
+    "pl": {
+      "mir-browser.exported": "Wyeksportowano script-output/more-infinite-research/settings/browser-profile.txt. Wklej ciąg MIRSET1 do ustawienia importu profilu startowego MIR i uruchom ponownie."
+    },
+    "ro": {
+      "mir-browser.title": "Navigator de cercetare MIR"
+    },
     "sq": {
-      "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-off": "Çaktivizuar"
+      "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-off": "Çaktivizuar",
+      "mir-browser.exported": "U eksportua script-output/more-infinite-research/settings/browser-profile.txt. Ngjitni vargun MIRSET1 në cilësimin e importit të profilit të nisjes MIR dhe rinisni."
+    },
+    "sr": {
+      "mir-browser.exported": "Извезен је script-output/more-infinite-research/settings/browser-profile.txt. Налепите ниску MIRSET1 у поставку за увоз MIR почетног профила и поново покрените."
+    },
+    "sv-SE": {
+      "mir-browser.title": "MIR-forskningswebbläsare"
+    },
+    "tr": {
+      "mir-browser.exported": "script-output/more-infinite-research/settings/browser-profile.txt dışa aktarıldı. MIRSET1 dizesini MIR başlangıç profili içe aktarma ayarına yapıştırın ve yeniden başlatın."
+    },
+    "vi": {
+      "mir-browser.exported": "Đã xuất script-output/more-infinite-research/settings/browser-profile.txt. Dán chuỗi MIRSET1 vào cài đặt nhập hồ sơ khởi động MIR và khởi động lại."
     }
   }
 }
