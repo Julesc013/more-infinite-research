@@ -34,6 +34,7 @@ $releaseAssuranceSource = @(
 $assuranceSelfTestSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tests\tooling\support\MIRAssuranceSelfTest.ps1")
 $assuranceEntryPointSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRAssurance.ps1")
 $releaseCandidateWorkflowSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\release-candidate.yml")
+. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
 $assuranceEvidenceSource = @(
   Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
   Get-ChildItem -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\evidence") -File -Filter "*.ps1" |
@@ -63,14 +64,53 @@ foreach ($requiredExactArchiveSnippet in @(
   '$build = @(./tools/commands/package/Build-MIRPackage.ps1)',
   '$candidateArchive = [IO.Path]::GetFullPath([string]$build[0].archive_path)',
   'MIR_RC_CANDIDATE_ARCHIVE=$candidateArchive',
+  'Get-MIR4ExactRetainedCandidateArchive',
+  '-ExpectedSha256 $env:MIR_RC_ARCHIVE_SHA256',
+  'sha256 = [string]$retainedCandidate.sha256',
   "kind = 'MIRProtectedReleaseCandidateRunV2'",
   "archive_origin = 'candidate-build-result'",
-  "role = 'candidate-built'"
+  'role = [string]$retainedCandidate.role'
 )) {
   if (-not $releaseCandidateWorkflowSource.Contains($requiredExactArchiveSnippet)) {
     throw "Release-candidate workflow does not retain its exact candidate build result: $requiredExactArchiveSnippet"
   }
 }
+
+function Assert-MIR4ExactRetainedCandidateArchiveRegression {
+  $root=Join-Path ([IO.Path]::GetTempPath()) ('mir-retained-candidate-'+[guid]::NewGuid().ToString('N'))
+  $tempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+  if(-not[IO.Path]::GetFullPath($root).StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase)) { throw '[mir-retained-candidate-test-root]' }
+  try {
+    $candidate=Join-Path $root 'candidate'
+    New-Item -ItemType Directory -Path $candidate -Force|Out-Null
+    $archive=Join-Path $candidate 'candidate.zip'
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    $sha=(Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+    $row=Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha
+    if([string]$row.path-cne'candidate/candidate.zip'-or[string]$row.sha256-cne$sha-or[int64]$row.bytes-ne8){throw '[mir-retained-candidate-test-positive]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52,0))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-sha256'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-corruption]'}
+
+    [IO.File]::WriteAllBytes($archive,[byte[]](80,75,3,4,77,73,82,52))
+    [IO.File]::WriteAllBytes((Join-Path $candidate 'extra.zip'),[byte[]](80,75,3,4))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $candidate -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-count'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-extra-archive]'}
+
+    $outside=Join-Path $root 'outside'
+    New-Item -ItemType Directory -Path $outside|Out-Null
+    [IO.File]::WriteAllBytes((Join-Path $outside 'candidate.zip'),[byte[]](80,75,3,4,77,73,82,52))
+    $rejected=$false
+    try{Get-MIR4ExactRetainedCandidateArchive -EvidenceRoot $root -CandidateDirectory $outside -ExpectedSha256 $sha|Out-Null}catch{$rejected=$_.Exception.Message-match'mir4-retained-candidate-directory'}
+    if(-not$rejected){throw '[mir-retained-candidate-test-directory]'}
+  } finally {
+    if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force}
+  }
+}
+Assert-MIR4ExactRetainedCandidateArchiveRegression
 foreach ($forbiddenDistCandidateSnippet in @(
   'Join-Path $candidate "dist/more-infinite-research_',
   'Join-Path $controller "dist/more-infinite-research_'

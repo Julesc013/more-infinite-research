@@ -28,6 +28,7 @@
         "scripts/Invoke-MIRAssurance.ps1",
         "tools/lib/assurance/**",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/validation/CurrentTargetPackage.ps1",
         "tests/tooling/Test-MIRAssurance.ps1",
         "tests/release/Test-MIRTerminalGovernance.ps1",
         "tests/release/Test-MIRGitHubAdministration.ps1",

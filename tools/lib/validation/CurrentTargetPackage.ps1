@@ -112,3 +112,39 @@ function Get-MIR4CurrentTargetPackageOutputBytes {
   [byte[]]$bytes = @(Read-MIR4CanonicalSourceBindingBytes -State $Context.state -Binding $entry.binding)
   return ,$bytes
 }
+
+function Get-MIR4ExactRetainedCandidateArchive {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$EvidenceRoot,
+    [Parameter(Mandatory)][string]$CandidateDirectory,
+    [Parameter(Mandatory)][string]$ExpectedSha256
+  )
+  if ($ExpectedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+    throw '[mir4-retained-candidate-expected-sha256]'
+  }
+  $evidence = (Resolve-Path -LiteralPath $EvidenceRoot).Path
+  $candidate = (Resolve-Path -LiteralPath $CandidateDirectory).Path
+  $expectedCandidate = [IO.Path]::GetFullPath((Join-Path $evidence 'candidate'))
+  if ($candidate -cne $expectedCandidate) {
+    throw '[mir4-retained-candidate-directory]'
+  }
+  $items = @(Get-ChildItem -LiteralPath $candidate -Force)
+  if ($items.Count -ne 1 -or $items[0].PSIsContainer -or [IO.Path]::GetExtension($items[0].Name) -cne '.zip') {
+    throw '[mir4-retained-candidate-count]'
+  }
+  $relative = [IO.Path]::GetRelativePath($evidence, $items[0].FullName).Replace('\','/')
+  if (-not $relative.StartsWith('candidate/',[StringComparison]::Ordinal) -or $relative -match '(^|/)\.\.(/|$)') {
+    throw '[mir4-retained-candidate-path]'
+  }
+  $sha256 = (Get-FileHash -LiteralPath $items[0].FullName -Algorithm SHA256).Hash
+  if ($sha256 -cne $ExpectedSha256) {
+    throw '[mir4-retained-candidate-sha256]'
+  }
+  return [pscustomobject][ordered]@{
+    role = 'candidate-built'
+    path = $relative
+    bytes = [int64]$items[0].Length
+    sha256 = $sha256
+  }
+}

@@ -606,7 +606,12 @@ function Get-MIR4CurrentPackagePresentationV5 {
 function Get-MIR4CurrentPackageContract {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   $inputs = Get-MIR4CurrentPackagePresentationV5Inputs -RepoRoot $repo
+  # A live fingerprint is not sufficient if the source manifest still names
+  # old bytes. Direct consumers of this contract must receive the same
+  # fail-closed materializability guarantee as the development test suite.
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check | Out-Null
   $targets = [Collections.Generic.List[object]]::new()
   foreach ($target in @('f210','f200','f110','f100')) {
     $composition = @($inputs.compositions | Where-Object { [string]$_.target -ceq $target })

@@ -19,6 +19,22 @@ foreach ($target in @('f210','f200','f110','f100')) {
   $current = @($contract.targets | Where-Object { [string]$_.target -ceq $target })
   if ($actual.Count -ne 1 -or $current.Count -ne 1 -or -not [bool]$actual[0].deterministic_archive_bytes -or -not [bool]$current[0].exact_engine_qualification_required) { throw "[mir4-package-presentation-v5-materialization] $target" }
 }
+$sourceDriftRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir-v5-current-contract-source-drift-'+[guid]::NewGuid().ToString('N'))
+try {
+  & git clone --quiet --shared --no-checkout $repo $sourceDriftRoot
+  if($LASTEXITCODE-ne0){throw '[mir4-package-presentation-v5-source-drift-clone]'}
+  & git -C $sourceDriftRoot checkout --quiet HEAD
+  if($LASTEXITCODE-ne0){throw '[mir4-package-presentation-v5-source-drift-checkout]'}
+  $sourceManifest=Get-Content -Raw -LiteralPath (Join-Path $sourceDriftRoot 'source/package-source.json')|ConvertFrom-Json -Depth 100 -DateKind String
+  $sourcePath=Join-Path $sourceDriftRoot ([string]$sourceManifest.bindings[0].source_path)
+  [IO.File]::AppendAllText($sourcePath,"`n-- isolated current-package source drift probe`n",[Text.UTF8Encoding]::new($false))
+  . (Join-Path $sourceDriftRoot 'tools/lib/mir4/PackagePresentation.ps1')
+  $sourceDriftRejected=$false
+  try { Assert-MIR4CurrentPackageContract -RepoRoot $sourceDriftRoot|Out-Null } catch { $sourceDriftRejected=$_.Exception.Message-match'mir4-source-refresh-stale' }
+  if(-not$sourceDriftRejected){throw '[mir4-package-presentation-v5-source-drift-admitted]'}
+} finally {
+  if(Test-Path -LiteralPath $sourceDriftRoot){Remove-Item -LiteralPath $sourceDriftRoot -Recurse -Force}
+}
 foreach ($mutation in @(
   @{id='unknown'; mutate={param($r) $r | Add-Member -NotePropertyName unauthorized_gate -NotePropertyValue $true}},
   @{id='v4'; mutate={param($r) $r.predecessor.immutable_historical_receipt=$false}},

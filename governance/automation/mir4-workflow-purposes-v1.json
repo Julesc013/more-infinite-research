@@ -177,7 +177,7 @@
       "purpose": "release",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "B1E3473256F96E51570B5500E62773541A6CE189487602D18042441FA2AD3A72"
+      "sha256": "0B7A807B69D896101DF17B96C7BDB274662F7ABC964124B8DBA075FF6DCDB7A0"
     },
     {
       "file": ".github/workflows/validate.yml",
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a292fd2872f50f0a5493010767bed03abaaa8792a0b38514a6adf6059d7c944b"
+  "digest": "sha256:77b25f55a8b3800044a5e7847db4e576f8712aab93cf332a3cf36223e616471a"
 }

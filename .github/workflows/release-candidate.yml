@@ -257,6 +257,10 @@ jobs:
           $candidateDestination = Join-Path $evidenceRoot 'candidate'
           New-Item -ItemType Directory -Path $candidateDestination | Out-Null
           Copy-Item -LiteralPath $candidateArchive -Destination $candidateDestination
+          $retainedCandidate = Get-MIR4ExactRetainedCandidateArchive `
+            -EvidenceRoot $evidenceRoot `
+            -CandidateDirectory $candidateDestination `
+            -ExpectedSha256 $env:MIR_RC_ARCHIVE_SHA256
           foreach ($relative in @('build/results/validation', 'build/results/release-gate')) {
             $source = Join-Path $controller $relative
             if (Test-Path -LiteralPath $source) {
@@ -286,16 +290,12 @@ jobs:
               }
             }
           }
-          $archiveRows = @(
-            Get-ChildItem -LiteralPath $evidenceRoot -Recurse -Filter '*.zip' -File | Sort-Object FullName | ForEach-Object {
-              [ordered]@{
-                role = 'candidate-built'
-                path = [IO.Path]::GetRelativePath($evidenceRoot, $_.FullName).Replace('\', '/')
-                bytes = $_.Length
-                sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
-              }
-            }
-          )
+          $archiveRows = @([ordered]@{
+            role = [string]$retainedCandidate.role
+            path = [string]$retainedCandidate.path
+            bytes = [int64]$retainedCandidate.bytes
+            sha256 = [string]$retainedCandidate.sha256
+          })
           $runtimeEvidenceRows = @(
             if (Test-Path -LiteralPath $runtimeEvidenceRoot) {
               Get-ChildItem -LiteralPath $runtimeEvidenceRoot -Recurse -File | Sort-Object FullName | ForEach-Object {
