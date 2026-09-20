@@ -451,7 +451,7 @@
     {
       "key": "technology-description.more-infinite-research.cargo_bay_unloading_distance",
       "source_sha256": "A5A7DC0CBDC15B11C3B145B53C6C653E5EE153AE6E6C7556139CDDF0A0BECFB8",
-      "translation": "⟧ حداکثر فاصله بین سکوی فرود بار و سوله های تخلیه متصل را افزایش می دهد.",
+      "translation": "حداکثر فاصله بین سکوی فرود بار و سوله های تخلیه متصل را افزایش می دهد.",
       "provenance": "machine-assisted"
     },
     {
@@ -475,7 +475,7 @@
     {
       "key": "technology-description.more-infinite-research.spoilage_preservation",
       "source_sha256": "48B298E08D2A2827C45FD9207203BE4868779C8164A898161D08D21F180687F1",
-      "translation": "⟧ اصلاح کننده زمان خراب شدن جهانی را از طریق یک افکت اسکریپت محدود افزایش می دهد. آیتم‌های فاسد شدنی موجود ممکن است مهلت‌های خراب شدن فعلی خود را تا زمانی که در بازی آزمایش شوند حفظ کنند.",
+      "translation": "اصلاح کننده زمان خراب شدن جهانی را از طریق یک افکت اسکریپت محدود افزایش می دهد. آیتم‌های فاسد شدنی موجود ممکن است مهلت‌های خراب شدن فعلی خود را تا زمانی که در بازی آزمایش شوند حفظ کنند.",
       "provenance": "machine-assisted"
     },
     {
@@ -859,7 +859,7 @@
     {
       "key": "mod-setting-description.mir-automatic-compiler-mode",
       "source_sha256": "3EA62411BC01934C7BA49E02CE0A583AB6C9B9AC724080B1DD453CC940C627C0",
-      "translation": "⟧ پل سازگاری پنهان برای پروفایل هایی که قبل از تقسیم کنترل های بهره وری خودکار ایجاد شده اند. یک مقدار قدیمی غیر پیش‌فرض تنها زمانی که همه کنترل‌های جدید در حالت پیش‌فرض باقی می‌مانند، رعایت می‌شود. هر کنترل جدیدی را برای کنترل صریح تغییر دهید.",
+      "translation": "پل سازگاری پنهان برای پروفایل هایی که قبل از تقسیم کنترل های بهره وری خودکار ایجاد شده اند. یک مقدار قدیمی غیر پیش‌فرض تنها زمانی که همه کنترل‌های جدید در حالت پیش‌فرض باقی می‌مانند، رعایت می‌شود. هر کنترل جدیدی را برای کنترل صریح تغییر دهید.",
       "provenance": "machine-assisted"
     },
     {
@@ -943,7 +943,7 @@
     {
       "key": "mod-setting-description.mir-adjust-vanilla-weapon-speed-techs",
       "source_sha256": "642F7B8B58121EC3E1A975E20D2C9B012DEBF78B4706E8338D2B22986AD94C2C",
-      "translation": "⟧ کنترل می‌کند که آیا MIR پاداش‌های سرعت موشک و گلوله توپ را از ادامه سرعت شلیک سلاح تولیدی خود در زمانی که پوشش جایگزینی بی‌نهایتی در دسترس است حذف می‌کند یا خیر. فن‌آوری‌های سرعت تیراندازی با سلاح وانیلی محدود، امتیازات اصلی خود را حفظ می‌کنند.",
+      "translation": "کنترل می‌کند که آیا MIR پاداش‌های سرعت موشک و گلوله توپ را از ادامه سرعت شلیک سلاح تولیدی خود در زمانی که پوشش جایگزینی بی‌نهایتی در دسترس است حذف می‌کند یا خیر. فن‌آوری‌های سرعت تیراندازی با سلاح وانیلی محدود، امتیازات اصلی خود را حفظ می‌کنند.",
       "provenance": "machine-assisted"
     },
     {
@@ -991,7 +991,7 @@
     {
       "key": "mod-setting-description.mir-prototype-pollution-cap",
       "source_sha256": "4B6B286EE5A7BD31157D8FA9A62EF202A00B6C75C11DA0BF3742C1C3F712D359",
-      "translation": "⟧ انتخاب می کند که اثرات کاهش آلودگی تا چه حد ممکن است آلودگی ماشین را کاهش دهد. -80% (بدون تغییر) محدودیت های موجود آلودگی را به حال خود رها می کند. کاهش عمیق تر می تواند بدون تغییر در مصرف انرژی به آلودگی صفر نزدیک شود.",
+      "translation": "انتخاب می کند که اثرات کاهش آلودگی تا چه حد ممکن است آلودگی ماشین را کاهش دهد. -80% (بدون تغییر) محدودیت های موجود آلودگی را به حال خود رها می کند. کاهش عمیق تر می تواند بدون تغییر در مصرف انرژی به آلودگی صفر نزدیک شود.",
       "provenance": "machine-assisted"
     },
     {
@@ -1045,7 +1045,7 @@
     {
       "key": "mod-setting-description.mir-lab-incompatibility-policy",
       "source_sha256": "6179D6BF999F16B909B01F31ACC543BE6F7F6C49541F5B459CFE6A4AFB29B84D",
-      "translation": "⟧ انتخاب می‌کند که وقتی بسته‌های علمی انتخاب شده توسط هیچ آزمایشگاه فعالی قابل تحقیق نباشد، MIR چه کاری انجام می‌دهد.",
+      "translation": "انتخاب می‌کند که وقتی بسته‌های علمی انتخاب شده توسط هیچ آزمایشگاه فعالی قابل تحقیق نباشد، MIR چه کاری انجام می‌دهد.",
       "provenance": "machine-assisted"
     },
     {
@@ -1885,7 +1885,7 @@
     {
       "key": "string-mod-setting-description.mir-automatic-productivity-action-disabled",
       "source_sha256": "4E035A9B54AB5846DA84635F6164BCC3259A48096598EA0BE741557B49155DC3",
-      "translation": "⟧ هیچ کشف، پیوست یا ایجاد خودکاری را انجام نمی دهد. تحقیقات ثابت MIR بدون تغییر باقی می ماند.",
+      "translation": "هیچ کشف، پیوست یا ایجاد خودکاری را انجام نمی دهد. تحقیقات ثابت MIR بدون تغییر باقی می ماند.",
       "provenance": "machine-assisted"
     },
     {
@@ -1897,7 +1897,7 @@
     {
       "key": "string-mod-setting-description.mir-automatic-productivity-action-apply",
       "source_sha256": "92E11F848448324C3A8E53E69C9053E7965A1CC505DA0929FC30795B36E12B13",
-      "translation": "⟧ پیش‌فرض. کاندیداها را کشف می کند و فقط دستور العمل های اثبات شده ایمنی را به تحقیقات سازگار موجود MIR پیوست می کند. این به خودی خود تحقیق ایجاد نمی کند. دو چک باکس زیر ایجاد را کنترل می کنند.",
+      "translation": "پیش‌فرض. کاندیداها را کشف می کند و فقط دستور العمل های اثبات شده ایمنی را به تحقیقات سازگار موجود MIR پیوست می کند. این به خودی خود تحقیق ایجاد نمی کند. دو چک باکس زیر ایجاد را کنترل می کنند.",
       "provenance": "machine-assisted"
     },
     {
@@ -2011,7 +2011,7 @@
     {
       "key": "string-mod-setting-description.mir-lab-incompatibility-policy-engine-default",
       "source_sha256": "AB822AB78DD4645D1A8560A862333F2B0BCCD847B1AD1A7317FBBCB9A11ABD2F",
-      "translation": "⟧ هرگز مجموعه علمی بسته انتخابی را بازنویسی نکنید. MIR یک مجموعه ایمن قابل تحقیق را بدون تغییر حفظ می کند و زمانی که Factorio نمی تواند آن مجموعه دقیق را تحقیق کند، فناوری تولید شده را حذف می کند.",
+      "translation": "هرگز مجموعه علمی بسته انتخابی را بازنویسی نکنید. MIR یک مجموعه ایمن قابل تحقیق را بدون تغییر حفظ می کند و زمانی که Factorio نمی تواند آن مجموعه دقیق را تحقیق کند، فناوری تولید شده را حذف می کند.",
       "provenance": "machine-assisted"
     },
     {
@@ -2065,13 +2065,13 @@
     {
       "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-250",
       "source_sha256": "D4E61177C69829679B2C13F19824C3DED0836A8DD5E8AF29EB00B08A8695BB1C",
-      "translation": "⟧ سقف های بهره وری دستور غیر پارامتری را روی 250% تنظیم کنید. این مقدار کمی زیر کلاه معمولی است.",
+      "translation": "سقف های بهره وری دستور غیر پارامتری را روی 250% تنظیم کنید. این مقدار کمی زیر کلاه معمولی است.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-400",
       "source_sha256": "405E5A446E83649B72FC9B622F74F7FAF312415A7605FF8B337C2A17B16B4DF8",
-      "translation": "⟧ سقف های بهره وری دستور غیر پارامتری را روی 400% تنظیم کنید. این مقیاس بهره وری را فراتر از سقف معمولی گسترش می دهد.",
+      "translation": "سقف های بهره وری دستور غیر پارامتری را روی 400% تنظیم کنید. این مقیاس بهره وری را فراتر از سقف معمولی گسترش می دهد.",
       "provenance": "machine-assisted"
     },
     {
@@ -2101,13 +2101,13 @@
     {
       "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-5000",
       "source_sha256": "12D87879DF9FD73694456ABFE160D94F75533E89ACD743049E6112F459541AFF",
-      "translation": "⟧ سقف های بهره وری دستور غیر پارامتری را روی 5000% تنظیم کنید.",
+      "translation": "سقف های بهره وری دستور غیر پارامتری را روی 5000% تنظیم کنید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-10000",
       "source_sha256": "01D6092988105612B1383857A398045EC0C0FAD60EDA009026E45CBF3C71761B",
-      "translation": "⟧ سقف های بهره وری دستور غیر پارامتری را روی 10000% تنظیم کنید. فقط برای پوسته پوسته شدن طولانی مدت استفاده کنید.",
+      "translation": "سقف های بهره وری دستور غیر پارامتری را روی 10000% تنظیم کنید. فقط برای پوسته پوسته شدن طولانی مدت استفاده کنید.",
       "provenance": "machine-assisted"
     },
     {
@@ -2137,67 +2137,67 @@
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-25",
       "source_sha256": "2DC2CC135C29BE29938A310055DDF5C5AD23E309221759F8368FAC78D1233CD3",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد معمولی 25٪ نگه دارید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد معمولی 25٪ نگه دارید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-20",
       "source_sha256": "0C54CB14EA9B3148247D3484F61B43DA13E243D228160B4A1535CBAC772C511A",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را تا 20 درصد بازده مواد مقیاس کنید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را تا 20 درصد بازده مواد مقیاس کنید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-15",
       "source_sha256": "E5194B29D78CC5298E7A1A957D891417601415E9CA60B1B0B84A090F88431110",
-      "translation": "⟧ دستور العمل‌های بازیافت تولید شده پنهان را تا 15% بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل‌های بازیافت تولید شده پنهان را تا 15% بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-12-5",
       "source_sha256": "8E513417B79BE41CC5FD387A3E9E7F64C2905475B12C5AF256EB13F7F8309C5F",
-      "translation": "⟧ دستور العمل‌های بازیافت تولید شده پنهان را تا 12.5 درصد بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل‌های بازیافت تولید شده پنهان را تا 12.5 درصد بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-10",
       "source_sha256": "8240156F23D151C00DA40530B84742BA3E50FC8CE192877565E347B12ED67B0C",
-      "translation": "⟧ دستور العمل‌های بازیافت تولید شده پنهان را تا 10 درصد بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل‌های بازیافت تولید شده پنهان را تا 10 درصد بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-7-5",
       "source_sha256": "82A93BDDCF949D3FF3116AE564717199E588613110E26A7AD6A717253F9F1378",
-      "translation": "⟧ دستور العمل‌های بازیافت مخفی تولید شده را با بازگشت مواد 7.5 درصد مقیاس کنید.",
+      "translation": "دستور العمل‌های بازیافت مخفی تولید شده را با بازگشت مواد 7.5 درصد مقیاس کنید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-5",
       "source_sha256": "C305915C316E92EA11C413208D3EAD68CA584BE07DE02D9768174F8CE1FE13D4",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد 5 درصد مقیاس کنید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد 5 درصد مقیاس کنید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-2-5",
       "source_sha256": "AEFE19BBE761EE1287AE1B265A883F0ECB9390DEA13E36C04BB44C4E10E68575",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد 2.5 درصد مقیاس کنید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را با بازگشت مواد 2.5 درصد مقیاس کنید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-1",
       "source_sha256": "91BA2ABEDCF15E083B3F365038B7D807615B9183EF3B37E52CE54CFE39459497",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را تا 1% بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را تا 1% بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-0-5",
       "source_sha256": "38FBD655C03FC9973833A4F420EA15EF9BB741A55FCD512F531F4E96BF946E54",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را تا 0.5 درصد بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را تا 0.5 درصد بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-recycling-return-chance-percent-0-1",
       "source_sha256": "958BCBF3DEC8DC139BE7D74EA2C60425230CE19D0313AB8F9EC81F1E6315A7F5",
-      "translation": "⟧ دستور العمل های بازیافت تولید شده پنهان را تا 0.1% بازده مواد مقیاس دهید.",
+      "translation": "دستور العمل های بازیافت تولید شده پنهان را تا 0.1% بازده مواد مقیاس دهید.",
       "provenance": "machine-assisted"
     },
     {
@@ -2221,7 +2221,7 @@
     {
       "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-75",
       "source_sha256": "A238C13AFAA9D6827CCE139BAC9FCAC48CADC92FBC17F9D11005A9E4FC4A96D0",
-      "translation": "⟧ یک سرپوش مصرف انرژی -75% بنویسید. مصرف انرژی فعال پس از اثرات مصرف انرژی بر روی ماشین‌های پشتیبانی شده در ۲۵٪ یا بیشتر باقی می‌ماند.",
+      "translation": "یک سرپوش مصرف انرژی -75% بنویسید. مصرف انرژی فعال پس از اثرات مصرف انرژی بر روی ماشین‌های پشتیبانی شده در ۲۵٪ یا بیشتر باقی می‌ماند.",
       "provenance": "machine-assisted"
     },
     {
@@ -2245,13 +2245,13 @@
     {
       "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-999",
       "source_sha256": "B2BD562339280891B0600D33631FABF597AECBF0F0417484301225266AF15C88",
-      "translation": "⟧ یک سرپوش مصرف انرژی -99.9% بنویسید. مصرف انرژی فعال می تواند تا 0.1٪ کاهش یابد.",
+      "translation": "یک سرپوش مصرف انرژی -99.9% بنویسید. مصرف انرژی فعال می تواند تا 0.1٪ کاهش یابد.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-9999",
       "source_sha256": "8C39785269CE286A838EA5BE2FE40E44FB4A5AA24FB2C584C005680C47DFAF8E",
-      "translation": "⟧ یک سرپوش مصرف انرژی -99.99% بنویسید. این مصرف انرژی فعال نزدیک به صفر است، نه بازنویسی نمونه اولیه با توان صفر.",
+      "translation": "یک سرپوش مصرف انرژی -99.99% بنویسید. این مصرف انرژی فعال نزدیک به صفر است، نه بازنویسی نمونه اولیه با توان صفر.",
       "provenance": "machine-assisted"
     },
     {
@@ -2335,25 +2335,25 @@
     {
       "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-90",
       "source_sha256": "2AB5FD1A3F2803DD1EC4BE1930C9CC0DB6A8EE5690B454B1D2B23F29B85C2520",
-      "translation": "⟧ اجازه دهید اثرات منفی سرعت تا -90٪، حداقل 10٪ سرعت باقی بماند.",
+      "translation": "اجازه دهید اثرات منفی سرعت تا -90٪، حداقل 10٪ سرعت باقی بماند.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-95",
       "source_sha256": "5069AA4E1FADEE671FA80117C8F770F05A3905FEFE807CD979D0E852E0676526",
-      "translation": "⟧ اجازه دهید اثرات منفی سرعت تا -95٪، حداقل 5٪ سرعت باقی بماند.",
+      "translation": "اجازه دهید اثرات منفی سرعت تا -95٪، حداقل 5٪ سرعت باقی بماند.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-99",
       "source_sha256": "391D479AD0F64495F4BC85B9D2219E2F2540B3A30854BCC72524D229314EE34A",
-      "translation": "⟧ اجازه دهید اثرات منفی سرعت تا -99٪، حداقل 1٪ سرعت باقی بماند.",
+      "translation": "اجازه دهید اثرات منفی سرعت تا -99٪، حداقل 1٪ سرعت باقی بماند.",
       "provenance": "machine-assisted"
     },
     {
       "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-999",
       "source_sha256": "CCD1D8AD1BEF32626B0806BAF55FC7844F6C4F4260FDB3AEB1A3156948382388",
-      "translation": "⟧ اجازه دهید تا اثرات منفی سرعت تا 99.9-٪ کاهش یابد، حداقل سرعت 0.1٪ باقی بماند.",
+      "translation": "اجازه دهید تا اثرات منفی سرعت تا 99.9-٪ کاهش یابد، حداقل سرعت 0.1٪ باقی بماند.",
       "provenance": "machine-assisted"
     },
     {
@@ -2587,7 +2587,181 @@
     {
       "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-100000",
       "source_sha256": "CFDBF0233077ECA0D9FD02C1F6A1C7574534FF31A705FF73460DE6E62D700301",
-      "translation": "⟧ حداکثر سقف اثر کیفیت فاکتوریو را به صراحت بنویسید. برخلاف موارد بدون تغییر، این محدودیت‌های سفارشی را بازنویسی می‌کند.",
+      "translation": "حداکثر سقف اثر کیفیت فاکتوریو را به صراحت بنویسید. برخلاف موارد بدون تغییر، این محدودیت‌های سفارشی را بازنویسی می‌کند.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.title",
+      "source_sha256": "424656A0B79ABCD44A76F63998D25BAF40B02A948E61A78C0B58A6B599C96096",
+      "translation": "مرورگر تحقیقاتی MIR",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.command",
+      "source_sha256": "4CFCE6F49352192F1DCC3F247CFDF3FCD51C7C8DDBAE3F0CE682B9D3749CA981",
+      "translation": "مرورگر شخصی تحقیقات و تنظیمات MIR را باز کنید.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.research",
+      "source_sha256": "979D6300FD9884FF8D8E03391D524FED8E88CD5560788F065BA2444DB3B7B20C",
+      "translation": "تحقیق",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.settings",
+      "source_sha256": "74A883A037BC227F91891AB654A753D3A99F31AB06AE5B5D2B6E594A692B41F8",
+      "translation": "تنظیمات",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.refresh",
+      "source_sha256": "0E91610117029A62A478B7FA7DF0B8598BEBE3AB1E192D4B1882E310719C9671",
+      "translation": "تازه‌سازی",
+      "provenance": "maintainer-override"
+    },
+    {
+      "key": "mir-browser.close",
+      "source_sha256": "7D9EB7ACB13E24625C404401D8E88B2350E32162455885F18276CF802F7701ED",
+      "translation": "بستن",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.search",
+      "source_sha256": "EF0296F00BBD080D00276450B6EFC488556E176C3DF869CD0C187386B1A94D24",
+      "translation": "شناسه‌های فناوری یا خانواده‌ها را جستجو کنید، سپس Enter را فشار دهید.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.all",
+      "source_sha256": "A52ACE420F2175D08B1577A1BEA5445E36801229C074EF9ED6C55A73401FD9C2",
+      "translation": "همه",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.finite",
+      "source_sha256": "740FAD6A41C1E12ACFD6FC72C16234082CA3007F010BA1657A89DB3C97C55B84",
+      "translation": "محدود",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.infinite",
+      "source_sha256": "C1C929EBFBB2E174834282E005FAE609D0EAC2863EA68A0268E8E95B669CBC06",
+      "translation": "بی نهایت",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.available",
+      "source_sha256": "E674447337E83C1346F6122ED69F35BF5526E2A11842B2F2B788F3FB67D714CA",
+      "translation": "موجود است",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.locked",
+      "source_sha256": "A424E33D90931D1ED22F2AF37A3F3491A5C9DE0DFAE079F6F3FF4EDF0309E07F",
+      "translation": "قفل شده است",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queued",
+      "source_sha256": "661FF40A07E037BBD5F7D4EC97A4DF1503096CA910E7C9E2D7A4E9ABD4E4E1A0",
+      "translation": "در صف",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue",
+      "source_sha256": "662236229115E59A27DFDCCBF0C19905673BFA8503224F213A8AC02F322A1779",
+      "translation": "صف نیروی فعلی:",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.count",
+      "source_sha256": "A3736B02CCB984B76080E4497BDF708627A359D8EF29F8B701EB626071A64B67",
+      "translation": "__1__ تطبیق فناوری ها",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.family-owner",
+      "source_sha256": "CA2E45846A38D6CD559ABED9DF9D8C76A07FBC4371B53829427B4B258F80449B",
+      "translation": "خانواده: __1__ | صاحب اثر: __2__ | انتخاب: __3__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.cap",
+      "source_sha256": "616A5781464FA924BA30AF9BA60CF45E7F081574E6131BFEF0D00392F01D891D",
+      "translation": "حداکثر سطح موثر: __1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue",
+      "source_sha256": "A867FF0276CC7FEC22216F9FF61F6C34AA8638E41549269F965EE11A442CADC7",
+      "translation": "افزودن به صف تحقیق",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.hide",
+      "source_sha256": "C411CA188AC03C675358C33532FE8B53997CAD20F2598D5815144B02E6785F9B",
+      "translation": "از دید من پنهان شو",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show",
+      "source_sha256": "5F9602FC8E73AA7EC8022EC57227494750D869973C3A0B0D36E8DDF19ED15A33",
+      "translation": "در نظر من نمایش داده شود",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.show-hidden",
+      "source_sha256": "E22FB6E065BF1E52C440DF2712467D9B1C3E2CED73C8D1132E4818D6B9F17587",
+      "translation": "نمایش تمام فناوری های پنهان",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.enqueue-failed",
+      "source_sha256": "202E74E794ECAB7B02564D3A7A75C3EA1825EA95812CB6C0F328194CE4219263",
+      "translation": "تحقیقات در صف قرار نگرفت. پیش نیازها، مجوزها، صف فعلی و در دسترس بودن فناوری را بررسی کنید.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.startup-note",
+      "source_sha256": "B4E5134C0969C56D37D4537DDD8841B80B9ED558B6C31549E1633703EF90B472",
+      "translation": "تنظیمات راه‌اندازی نیاز به راه‌اندازی مجدد دارند. مقادیر نشان داده شده شامل نمایه MIR فعال است. تنظیمات زمان اجرا فقط در محدوده نمایش داده شده آنها اعمال می شود.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.export",
+      "source_sha256": "AF3CEF2D7931E76F6927151E111A64A8C0C83067572177F734CDA219C7868CE5",
+      "translation": "صادرات نمایه راه اندازی",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.exported",
+      "source_sha256": "AAEBFE164359C3FECD14589F11CE9E4A87A2A9E72B898FAA794449B89D2D27D1",
+      "translation": "script-output/more-infinite-research/settings/browser-profile.txt صادر شد. رشته MIRSET1 را در تنظیمات وارد کردن نمایه راه‌اندازی MIR قرار دهید و دوباره راه‌اندازی کنید.",
+      "provenance": "maintainer-override"
+    },
+    {
+      "key": "mir-browser.invalid-profile",
+      "source_sha256": "D018D8EF606C11AD635FC1A9D6B04F2A47011D2466AF932EA57DAA0EF908A35D",
+      "translation": "صادرات متوقف شد زیرا نمایه موثر حاوی مقادیر نامعتبر است.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.catalogue-limit",
+      "source_sha256": "63C62BCC9A9D858ECCB669FD47DCEFBDE4CB20FFEEF1A489AC0C475522553B46",
+      "translation": "محیط از محدودیت کاتالوگ مرورگر فناوری‌های __1__ فراتر رفته است.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.omission-note",
+      "source_sha256": "6FEB33C8AAB7BE7D06686AA0412867D2B09E44F8ECE989BBE718DA2EF4330C9C",
+      "translation": "جلوه‌های بالا، جلوه‌های واقعی فناوری هستند. جزئیات حذف مسیر نیازمند گزارش پوشش بازرس است. مسیرهای غایب با این دیدگاه واجد شرایط نیستند.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mir-browser.queue-more",
+      "source_sha256": "F62A6A08C94A6BDCF69CFB550158DB28B27E91ED67F998EF8604E543CB0AA67E",
+      "translation": "__1__ ورودی های بیشتر در صف تحقیقات بومی.",
       "provenance": "machine-assisted"
     }
   ]

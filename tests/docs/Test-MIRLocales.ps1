@@ -1,6 +1,6 @@
 # MIR4-CANONICAL-EXECUTABLE-TEST
 param(
-  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\..\locale"),
+  [string]$LocaleRoot = (Join-Path $PSScriptRoot "..\..\source\locale"),
   [string]$PolicyPath = (Join-Path $PSScriptRoot "..\..\.mir\locales\manifest.json"),
   [string]$FactorioLocaleRoot,
   [switch]$AllowMissingSupportedLanguages
@@ -13,6 +13,42 @@ $MirLegacyScriptRoot = Join-Path $MirRepoRoot "scripts"
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath (Join-Path $MirLegacyScriptRoot "..")).Path
 Import-Module (Join-Path $MirLegacyScriptRoot "localization\MIRLocalization.psm1") -Force
+
+function Get-MIRTechnicalLiteralSequence {
+  param([string]$Text)
+  $pattern = '(?<![\p{L}\p{M}\p{N}_./\\-])script-output/more-infinite-research/settings/browser-profile\.txt(?![\p{L}\p{M}\p{N}_/\\-]|[.][\p{L}\p{M}\p{N}_-])|(?<![\p{L}\p{M}\p{N}_])MIRSET1(?![\p{L}\p{M}\p{N}_])'
+  return @([regex]::Matches($Text, $pattern) | ForEach-Object { $_.Value })
+}
+
+function Test-MIRTranslationMarkersAbsent {
+  param([string]$Text)
+
+  # A translation service can transliterate the internal "MIR" label.  The
+  # delimiter glyphs themselves are therefore the stable rejection boundary.
+  return $Text -notmatch 'MIRP\d|⟦|⟧|⟪|⟫'
+}
+
+# Keep these probes local to the canonical validator.  They specifically cover
+# the transliterated Serbian form which an ASCII-only `MIR` pattern misses.
+if (Test-MIRTranslationMarkersAbsent -Text '⟦МИР0001⟧ leaked batch marker') {
+  throw '[mir-locales-transliterated-marker-regression]'
+}
+$technicalProbe = 'script-output/more-infinite-research/settings/browser-profile.txt MIRSET1'
+$technicalDriftProbe = 'script-output/more-infinite-research/settings/browser-profile.txt МИРСЕТ1'
+if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -eq ((Get-MIRTechnicalLiteralSequence -Text $technicalDriftProbe) -join '|')) {
+  throw '[mir-locales-technical-literal-regression]'
+}
+$technicalTokenExtensionProbe = 'script-output/more-infinite-research/settings/browser-profile.txt MIRSET1X'
+$technicalPathExtensionProbe = 'script-output/more-infinite-research/settings/browser-profile.txt.bak MIRSET1'
+foreach ($invalidProbe in @($technicalTokenExtensionProbe, $technicalPathExtensionProbe)) {
+  if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -eq ((Get-MIRTechnicalLiteralSequence -Text $invalidProbe) -join '|')) {
+    throw '[mir-locales-technical-literal-extension-regression]'
+  }
+}
+$technicalPunctuationProbe = 'script-output/more-infinite-research/settings/browser-profile.txt. MIRSET1.'
+if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -ne ((Get-MIRTechnicalLiteralSequence -Text $technicalPunctuationProbe) -join '|')) {
+  throw '[mir-locales-technical-literal-punctuation-regression]'
+}
 
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
 $localeRootPath = (Resolve-Path -LiteralPath $LocaleRoot).Path
@@ -87,7 +123,7 @@ foreach ($locale in $expectedLocales) {
     if ($translatedText -match '[\x00-\x08\x0B\x0C\x0E-\x1F]' -or $translatedText.Contains([char]0xFFFD)) {
       throw "$path`:$line contains an invalid control or Unicode replacement character in $key."
     }
-    if ($translatedText -match 'MIRP\d|⟦MIR|⟪MIR') {
+    if (-not (Test-MIRTranslationMarkersAbsent -Text $translatedText)) {
       throw "$path`:$line contains an internal translation sentinel in $key."
     }
     $sourcePlaceholders = (Get-MIRPlaceholderSequence -Text $sourceText) -join "|"
@@ -99,6 +135,11 @@ foreach ($locale in $expectedLocales) {
     $translatedFormatting = (Get-MIRFormattingSequence -Text $translatedText) -join "|"
     if ($sourceFormatting -ne $translatedFormatting) {
       throw "$path`:$line has Factorio rich-text tag drift in $key."
+    }
+    $sourceLiterals = (Get-MIRTechnicalLiteralSequence -Text $sourceText) -join '|'
+    $translatedLiterals = (Get-MIRTechnicalLiteralSequence -Text $translatedText) -join '|'
+    if ($sourceLiterals -ne $translatedLiterals) {
+      throw "$path`:$line has technical-literal drift in $key."
     }
     $limit = Get-MIRSectionLengthLimit -FullKey $key -Policy $policy
     $length = Get-MIRVisibleTextLength -Text $translatedText
