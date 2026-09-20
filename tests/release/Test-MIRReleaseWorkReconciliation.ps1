@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot 'tools/lib/workspace/RepoPaths.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/package/DistributionCustody.ps1')
 $recordPath = Join-Path $RepoRoot ".mir/releases/reconciliations/3.2.5.json"
 if (-not (Test-Path -LiteralPath $recordPath -PathType Leaf)) {
   throw "MIR 3.2.5 work-package reconciliation is missing."
@@ -219,16 +220,19 @@ if ([string]$c31Closure.disposition -ne "superseded-unpublished" -or
   throw "C31 must remain superseded-unpublished in favor of 3.2.5."
 }
 $distributions = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/distributions.json") | ConvertFrom-Json
-# Local delivery may include newer untracked public assets. The historical
-# projection owns Git-tracked root archives, not the entire working directory.
+# Local delivery may contain a candidate, retained upload bytes, or no archive
+# at all. Current Git tracks the custody manifest, not distribution payloads.
 $trackedArchivePaths = @(& git -C $RepoRoot ls-files -- 'dist/*.zip' | Where-Object { $_ -match '^dist/[^/]+[.]zip$' })
 if ($LASTEXITCODE -ne 0) { throw 'Unable to inspect tracked distribution paths.' }
-$trackedArchives = @($trackedArchivePaths | ForEach-Object { Get-Item -LiteralPath (Join-Path $RepoRoot $_) -ErrorAction Stop })
+$custody = Get-MIR4DistributionCustodyManifest -RepoRoot $RepoRoot
+$historicalArchivePaths = @(& git -C $RepoRoot ls-tree -r --name-only ([string]$custody.custody.predecessor_commit) -- dist | Where-Object { $_ -match '^dist/[^/]+[.]zip$' } | Sort-Object)
 if ([int]$distributions.distribution_count -ne @($distributions.distributions).Count -or
-    [int]$distributions.distribution_count -ne $trackedArchives.Count -or
+    [string]$distributions.status -ne 'ignored-local-distribution-inventory' -or
+    $trackedArchivePaths.Count -ne 0 -or
+    $historicalArchivePaths.Count -ne [int]$distributions.distribution_count -or
     @($distributions.distributions | Where-Object { [string]$_.version -eq "3.2.4" }).Count -ne 0 -or
-    (Test-Path -LiteralPath (Join-Path $RepoRoot "dist/more-infinite-research_3.2.4.zip") -PathType Leaf)) {
-  throw "The tracked distribution inventory must contain only present root archives; superseded-unpublished C31 is record-authoritative, not an active distribution."
+    ($historicalArchivePaths -contains 'dist/more-infinite-research_3.2.4.zip')) {
+  throw "The distribution inventory must resolve to the pinned historical archive tree while current dist remains untracked; superseded-unpublished C31 is record-authoritative, not distribution custody."
 }
 $packageLocks = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir/control-plane/package-locks.json") | ConvertFrom-Json
 $c31Lock = @($packageLocks.locks | Where-Object { [string]$_.release -eq "3.2.4" -and [string]$_.candidate_id -eq "C31" })

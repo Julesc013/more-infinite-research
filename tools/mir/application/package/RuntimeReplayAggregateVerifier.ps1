@@ -1,5 +1,9 @@
 Set-StrictMode -Version Latest
 
+if (-not (Get-Command Restore-MIR4DistributionArchive -ErrorAction SilentlyContinue)) {
+  . (Join-Path $PSScriptRoot 'DistributionCustody.ps1')
+}
+
 function Assert-MIR4F2DAggregateV1 {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
   if (-not $Condition) { throw "[$Code]" }
@@ -83,7 +87,9 @@ function New-MIR4M41F2DFourTargetRuntimeReplayVerificationV1 {
     Assert-MIR4F2DAggregateV1 ($baseline.Count -eq 1) 'mir4-f2d-aggregate-baseline'
     $baseline = $baseline[0]
     Assert-MIR4F2DAggregateV1 ([string]$proof.package.distribution_version -ceq [string]$baseline.distribution_version -and [string]$proof.package.content_sha256 -ceq [string]$baseline.archive.content_sha256 -and [int]$proof.package.entry_count -eq [int]$baseline.archive.entry_count -and [string]$proof.package.archive_sha256 -match '^[A-F0-9]{64}$') 'mir4-f2d-aggregate-package'
-    $predecessorArchive = Join-Path $repo "dist/more-infinite-research_$([string]$baseline.predecessor).zip"
+    $predecessorArchive = [string](Restore-MIR4DistributionArchive `
+      -RepoRoot $repo `
+      -Version ([string]$baseline.predecessor)).cache_path
     Assert-MIR4F2DAggregateV1 ([string]$proof.predecessor.version -ceq [string]$baseline.predecessor -and (Get-MIR4F2DAggregateFileSha256V1 $predecessorArchive) -ceq [string]$proof.predecessor.archive_sha256) 'mir4-f2d-aggregate-predecessor-package'
 
     if ([string]$config.target -ceq 'f210') {

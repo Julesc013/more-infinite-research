@@ -25,7 +25,7 @@ Local storage retains enough exact material to replay or diagnose a result witho
 | `C:\Projects\Factorio\testmods_*` | Shared local mod library | Protected; never cleaned by repository tooling. |
 | `C:\Projects\Factorio\qualification-installs` | Exact local runtime installation | Protected; never cleaned by repository tooling. |
 | `.mir/evidence/` | Tracked portable evidence | Governed release evidence; never cleaned as a local artifact. |
-| `dist/` tracked release archives | Release authority | Never cleaned as a local artifact. |
+| `dist/` | Ignored local delivery and upload cache | Keep only the exact candidate, playtest, or portal-upload bytes needed on this machine. It is never Git-tracked custody and is not selected by routine build cleanup. |
 | `build/results/assurance/` | Local content-addressed assurance and reuse copies | Protected from routine stale-result cleanup; promote any durable authority before deleting `build/`. |
 | `build/results/validation/` | Current validation diagnostics and failure packets | Protected from routine stale-result cleanup. |
 | Other `build/results/<run>` directories and top-level files | Ephemeral run output | Delete after the useful result has been summarized; the default stale threshold is seven days. |
@@ -34,6 +34,23 @@ Local storage retains enough exact material to replay or diagnose a result witho
 | `build/mir4/<campaign>/<run>` | Governed campaign-run scope | Audited only when the operator explicitly selects its immediate parent with `--campaign-root`. A run-level `result.json` identifies the attempt but is not permanent custody by itself; exact tracked references, other custody markers, live/interrupted leases, recent writes, and reparse points still retain the run. |
 | `build/` | The sole repository-local generated root: package staging, caches, generated target material, temporary files, results, and any active linked-worktree placement selected by the resolved worktree policy | Reconstructible output may be removed after active commands have stopped and required compact authorities have been promoted. Git worktrees remain governed by the resolved `MIR_WORKTREE_HOME` policy and are never cleanup candidates merely because they are physically beneath `build/`. |
 | `dist/playtest/` | Current local playtest handoff | May be refreshed only from qualified exact bytes; immutable rolling revisions are never overwritten. |
+
+## Historical Distribution Custody
+
+The repository does not track historical ZIP payloads in current trees. `.mir/distributions.json` binds every retained historical identity to one pinned Git predecessor tree, with its byte count and SHA-256. The materializer streams one requested blob into an ignored content-addressed cache, verifies its size and SHA-256 before use, and can make a verified private output copy beneath `build/` or `dist/`.
+
+```powershell
+# Inspect the pinned inventory without writing an archive.
+.\tools\mir.ps1 mir4 distribution status
+
+# Verify a historical blob exists and has its recorded Git-object size.
+.\tools\mir.ps1 mir4 distribution verify --version 4.0.21000
+
+# Restore exact local upload bytes only when they are needed.
+.\tools\mir.ps1 mir4 distribution restore --version 4.0.21000 --output dist
+```
+
+`MIR_CACHE_HOME` selects a reusable cache root; otherwise every linked worktree resolves the registered primary checkout through Git metadata and shares its ignored `build/cache/mir-distributions`. Only immutable, digest-verified archives are shared. Mutable mod lists, settings, saves, logs, fixtures, and run output remain private to their run. No materializer downloads from GitHub or claims that GitHub assets are complete custody. The current observation records that 72 of 74 historical inventory rows match a GitHub asset digest and size, while `2.0.0` and `2.2.0` do not. The pinned Git predecessor is therefore required to recover all recorded historical bytes. This path has no tag, release, upload, or publication authority.
 
 ## Audit And Cleanup
 

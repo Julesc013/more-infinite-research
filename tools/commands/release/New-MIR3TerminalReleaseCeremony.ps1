@@ -9,6 +9,7 @@ $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo "tools/lib/control/Core.ps1")
 . (Join-Path $repo "tools/lib/validation/PackageIdentity.ps1")
+. (Join-Path $repo "tools/mir/application/package/DistributionCustody.ps1")
 
 $family = @("3.2.9", "2.5.9", "1.9.9", "1.8.9", "1.7.9", "1.6.9", "1.5.9", "1.4.9", "1.3.9")
 $allocationPath = Join-Path $repo ".mir/releases/terminal/MIR3-Terminal-Candidate-AllocationV1.json"
@@ -132,7 +133,7 @@ if ($Check) {
   $acceptanceSha = Get-AuthorityTextSha $acceptanceRelative
   foreach ($row in $allocation.allocations) {
     $release = [string]$row.release
-    $zip = Join-Path $repo "dist/more-infinite-research_$release.zip"
+    $zip = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version $release).cache_path
     if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne $row.archive_sha256 -or
         (Get-MIRZipContentFingerprint -Path $zip) -ne $row.content_sha256 -or
         (Get-Item -LiteralPath $zip).Length -ne [long]$row.bytes) { throw "Frozen candidate identity drifted: $release" }
@@ -237,7 +238,7 @@ $checksumLines = @()
 foreach ($row in $allocation.allocations) {
   $release = [string]$row.release
   $zipRelative = "dist/more-infinite-research_$release.zip"
-  $zip = Join-Path $repo $zipRelative
+  $zip = [string](Restore-MIR4DistributionArchive -RepoRoot $repo -Version $release).cache_path
   if ((Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash -ne $row.archive_sha256 -or
       (Get-MIRZipContentFingerprint -Path $zip) -ne $row.content_sha256 -or
       (Get-Item -LiteralPath $zip).Length -ne [long]$row.bytes) { throw "Frozen candidate identity drifted: $release" }

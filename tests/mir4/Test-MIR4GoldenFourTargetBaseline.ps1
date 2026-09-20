@@ -12,7 +12,9 @@ function Assert-MIR4Golden([bool]$Condition,[string]$Id,[string]$Detail='') {
 $packageBefore = Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $path = Join-Path $repo 'spec/distribution/mir4-golden-four-target-baseline-v1.json'
 $schema = Join-Path $repo 'spec/schemas/mir4-golden-four-target-baseline-v1.schema.json'
-$record = Write-MIR4GoldenTargetBaseline -RepoRoot $repo -Check
+$custodyCache = Join-Path $repo 'build/mir4/test-golden-four-target-baseline/custody-cache'
+$custodyOutput = Join-Path $repo 'build/mir4/test-golden-four-target-baseline/restored'
+$record = Write-MIR4GoldenTargetBaseline -RepoRoot $repo -Check -CacheRoot $custodyCache
 $text = Get-Content -Raw -LiteralPath $path
 Assert-MIR4Golden ($text | Test-Json -SchemaFile $schema) 'mir4-golden-schema'
 Assert-MIR4Golden (Test-MIR4BootstrapRecordHash -Record ($text | ConvertFrom-Json -Depth 100 -DateKind String)) 'mir4-golden-self-hash'
@@ -24,6 +26,11 @@ $expected = [ordered]@{
   f100=@('4.0.10000','EA495B37C0B91F0728226290CDAEFDF4BBD3C1DBA7D0997AAF5E5107FE79AD3F','1ABDA788DE4B287A48AB0B8787C8F7826256E4ECAB7085C3A6FDDD1E9DF145B2',174)
 }
 Assert-MIR4Golden (@($record.targets).Count -eq 4) 'mir4-golden-target-count'
+$manifest = Get-MIR4DistributionCustodyManifest -RepoRoot $repo
+Assert-MIR4Golden ([string]$manifest.status -ceq 'ignored-local-distribution-inventory') 'mir4-golden-custody-status'
+Assert-MIR4Golden ([string]$manifest.custody.predecessor_commit -ceq 'D82395F1DAB2E8E5E135EB2F57E97767DF6C0C87') 'mir4-golden-custody-predecessor'
+Assert-MIR4Golden (-not [bool]$manifest.custody.network_retrieval_permitted -and -not [bool]$manifest.custody.working_tree_archives_tracked) 'mir4-golden-custody-boundary'
+Assert-MIR4Golden (@($manifest.custody.github_release_asset_digest_mismatch_versions | ForEach-Object { [string]$_ } | Sort-Object) -join '|' -ceq '2.0.0|2.2.0') 'mir4-golden-custody-github-exceptions'
 foreach ($target in @($record.targets)) {
   $row = $expected[[string]$target.target]
   Assert-MIR4Golden ([string]$target.distribution_version -ceq $row[0]) 'mir4-golden-version' ([string]$target.target)
@@ -33,8 +40,11 @@ foreach ($target in @($record.targets)) {
   Assert-MIR4Golden (@($target.identity_surface.lifecycle_entrypoints).Count -ge 4) 'mir4-golden-lifecycle' ([string]$target.target)
   Assert-MIR4Golden (@($target.identity_surface.state_namespaces).Count -eq 1) 'mir4-golden-state-namespace' ([string]$target.target)
   Assert-MIR4Golden ([string]$target.runtime_proof.fresh_load_reload_upgrade_replay -ceq 'required-before-package-authority-cutover') 'mir4-golden-runtime-boundary' ([string]$target.target)
-  $tracked = & git -C $repo ls-files --error-unmatch -- ([string]$target.archive.path) 2>$null
-  Assert-MIR4Golden ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace(($tracked -join ''))) 'mir4-golden-archive-tracked' ([string]$target.target)
+  $restored = Restore-MIR4DistributionArchive -RepoRoot $repo -Version ([string]$target.distribution_version) -CacheRoot $custodyCache -OutputRoot $custodyOutput
+  Assert-MIR4Golden (Test-MIR4DistributionCustodyFile -Path ([string]$restored.cache_path) -Distribution (Get-MIR4DistributionCustodyEntry -RepoRoot $repo -Version ([string]$target.distribution_version))) 'mir4-golden-archive-cache' ([string]$target.target)
+  Assert-MIR4Golden (Test-MIR4DistributionCustodyFile -Path ([string]$restored.output_path) -Distribution (Get-MIR4DistributionCustodyEntry -RepoRoot $repo -Version ([string]$target.distribution_version))) 'mir4-golden-archive-output' ([string]$target.target)
+  $tracked = @(& git -C $repo ls-files -- ([string]$target.archive.path))
+  Assert-MIR4Golden ($LASTEXITCODE -eq 0 -and $tracked.Count -eq 0) 'mir4-golden-archive-untracked' ([string]$target.target)
 }
 
 $classification = $record.classification

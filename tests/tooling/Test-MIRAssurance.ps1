@@ -1145,15 +1145,16 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Content-addressed candidate build failed in separate root: $root" }
   }
 
-  # A normal planner must not consume mutable worktree bytes from published
-  # dist. Corrupt one worker-root copy after the isolated candidate exists.
+  # A normal planner must not consume mutable local staging bytes from dist.
+  # Create a worker-private ignored decoy after the isolated candidate exists.
   $dirtyPublicDist = Join-Path $workerRoot "dist\more-infinite-research_3.2.5.zip"
-  $stream = [IO.File]::Open($dirtyPublicDist, [IO.FileMode]::Append, [IO.FileAccess]::Write, [IO.FileShare]::None)
-  try { $stream.WriteByte(0) } finally { $stream.Dispose() }
-  $dirtyPublishedDistPaths = @(& git -C $workerRoot diff --name-only -- dist)
-  if ($dirtyPublishedDistPaths.Count -ne 1 -or
-      [string]$dirtyPublishedDistPaths[0] -ne "dist/more-infinite-research_3.2.5.zip") {
-    throw "Separate-root regression did not create the intended dirty published-dist decoy."
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dirtyPublicDist) | Out-Null
+  [IO.File]::WriteAllBytes($dirtyPublicDist, [byte[]](80,75,3,4,77,73,82,52))
+  $ignoredPublishedDistPaths = @(& git -C $workerRoot check-ignore --no-index -- 'dist/more-infinite-research_3.2.5.zip')
+  if ($LASTEXITCODE -ne 0 -or $ignoredPublishedDistPaths.Count -ne 1 -or
+      [string]$ignoredPublishedDistPaths[0] -ne "dist/more-infinite-research_3.2.5.zip" -or
+      @(& git -C $workerRoot diff --name-only -- dist).Count -ne 0) {
+    throw "Separate-root regression did not create the intended ignored local-dist decoy."
   }
 
   & $pwshPath -NoProfile -File (Join-Path $plannerRoot "tools\mir.ps1") verify plan --target 2.1 --profile fast --output build/results/assurance/verification-plan.json

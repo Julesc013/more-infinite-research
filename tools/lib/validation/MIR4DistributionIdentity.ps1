@@ -186,7 +186,9 @@ function Assert-MIR4R0DistributionIdentity {
     }
   }
 
-  Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4TargetRegistryV2Path -SchemaRelativePath "spec/schemas/mir4-target-registry-v2.schema.json"
+  # The filename of the V2 schema was later reassigned to the four-target
+  # composed registry. This validator below retains the complete historical
+  # 17-target R0 contract and must not validate it against the successor shape.
   Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4VersionAuthorityV2Path -SchemaRelativePath "spec/schemas/mir4-versioning-distribution-identity-v2.schema.json"
   Assert-MIR4IdentitySchema -RepoRoot $RepoRoot -RelativePath $script:MIR4CodecVectorsV2Path -SchemaRelativePath "spec/schemas/mir4-distribution-version-codec-vectors-v2.schema.json"
 

@@ -428,7 +428,11 @@ function Get-MIRAssuranceInputFingerprint {
       if ([int]$sourceLock.file_count -ne 1) {
         throw "Unable to resolve the staged compact source-lock authority for release-history fingerprinting."
       }
-      $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(".mir/distributions.json", "dist")
+      $inventory = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
+        ".mir/distributions.json",
+        "tools/mir/application/package/DistributionCustody.ps1",
+        "tools/mir/cli/Invoke-MIR4DistributionCustody.ps1"
+      )
       $successorAuthority = Get-MIRAssuranceGitIndexFingerprint -Pathspecs @(
         ".gitattributes",
         ".mir/assurance.json",

@@ -142,6 +142,17 @@ function Invoke-MIR4ApplicationCommandGroup {
             }
             & (Join-Path $repo "tools/mir/cli/Invoke-MIR4PackageSource.ps1") @packageSourceArguments
           }
+          "distribution" {
+            if ($Args.Count -lt 3) { throw "mir4 distribution requires status, verify, or restore." }
+            $subcommand = [string]$Args[2]
+            if ($subcommand -notin @('status','verify','restore')) { throw "Unknown mir4 distribution command: $subcommand" }
+            $distributionArguments = @{ Command=$subcommand; RepoRoot=$repo.Path }
+            foreach ($option in @(@{name='--version';property='Version'},@{name='--output';property='OutputRoot'},@{name='--cache-root';property='CacheRoot'})) {
+              $value = Get-MIRArgValue -Items $Args -Name $option.name
+              if (-not [string]::IsNullOrWhiteSpace($value)) { $distributionArguments[$option.property] = $value }
+            }
+            & (Join-Path $repo "tools/mir/cli/Invoke-MIR4DistributionCustody.ps1") @distributionArguments
+          }
       default { throw '[mir4-router-application-command]' }
     }
   } $RepoRoot $ScriptRoot $Verb @CommandArguments

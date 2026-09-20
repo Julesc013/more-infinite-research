@@ -9,6 +9,11 @@
 
 # Byte-compared generated terminal authorities and their generator must retain
 # canonical LF bytes even when a maintainer has core.autocrlf enabled globally.
+.mir/releases/terminal/**/*.json text eol=crlf
+.mir/evidence/terminal-publication/2026-08-15/**/*.json text eol=crlf
+.mir/evidence/terminal-publication/2026-08-15/*.json text eol=crlf
+.mir/releases/terminal/mod-portal-descriptions/*.md text eol=crlf
+.mir/releases/terminal/release-bodies/*.md text eol=crlf
 .mir/releases/terminal/baselines/**/*.json text eol=lf
 # The imported .5 bundle manifests are sealed historical CRLF inputs.
 .mir/releases/terminal/baselines/*.5/baseline-manifest.json text eol=crlf
