@@ -4378,8 +4378,8 @@
         "tools/lib/compatibility/FactorioRunner.ps1",
         "validation/scenarios/local-2.1.json",
         "fixtures/assert-k2-science-progressed-reload-a04/**",
-        "source:source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/science.lua",
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/planner/science.lua",
         "spec/programmes/community-requests.json",
         "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json",
         "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json",
@@ -4557,8 +4557,28 @@
         "source:source/prototypes/mir/core/deepcopy.lua",
         "source:source/prototypes/mir/platform/factorio/data_raw.lua",
         "source:source/prototypes/mir/capabilities/science_integration/**",
-        "source:source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/science.lua"
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/planner/science.lua"
+      ]
+    },
+    {
+      "id": "runtime.researchability-planning-contract",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRResearchabilityPlanning.ps1 -FactorioBin <factorio>",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
+        "tests/compiler/researchability_planning.lua",
+        "source:source/prototypes/mir/core/deepcopy.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/prototypes/mir/graph/**",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       ]
     },
     {

@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 194,
+  "test_count": 195,
   "tests": [
     {
       "id": "docs.check",
@@ -1075,6 +1075,36 @@
       "matrix": null
     },
     {
+      "id": "runtime.researchability-planning-contract",
+      "proposition": "The governed test 'runtime.researchability-planning-contract' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRResearchabilityPlanning.ps1 -FactorioBin <factorio>",
+      "canonical_implementation": "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
+        "tests/compiler/researchability_planning.lua",
+        "source:source/prototypes/mir/core/deepcopy.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/prototypes/mir/graph/**",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "runtime.science-planning-contract",
       "proposition": "The governed test 'runtime.science-planning-contract' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -1095,8 +1125,8 @@
         "source:source/prototypes/mir/core/deepcopy.lua",
         "source:source/prototypes/mir/platform/factorio/data_raw.lua",
         "source:source/prototypes/mir/capabilities/science_integration/**",
-        "source:source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/science.lua"
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/planner/science.lua"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -1588,8 +1618,8 @@
         "tools/lib/compatibility/FactorioRunner.ps1",
         "validation/scenarios/local-2.1.json",
         "fixtures/assert-k2-science-progressed-reload-a04/**",
-        "source:source/adapters/f210/prototypes/mir/compatibility/policies/k2_science_phase.lua",
-        "source:source/adapters/f210/prototypes/mir/planner/science.lua",
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/planner/science.lua",
         "spec/programmes/community-requests.json",
         "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-Runtime-ProofV1.json",
         "spec/programmes/evidence/synthesis-2026-09-10/a04-k2-science/MIR4-A04-K2-Science-ClosureV1.json",
@@ -7080,11 +7110,11 @@
     "cohorts": {
       "package-repository": 65,
       "tooling-release": 54,
-      "runtime-upgrade": 43,
+      "runtime-upgrade": 44,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 182,
+    "canonical_test_commands": 183,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7097,5 +7127,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ae3a521df25ab9a1a83ad0c018dfbd9f1b6689df5bfce217b9bc3bc7132c1a04"
+  "digest": "sha256:44df01a2b18c4b43a7790d49befb2e0bfa8c2e211415365c7e7205dc5db8a081"
 }

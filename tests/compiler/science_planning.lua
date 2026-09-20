@@ -9,7 +9,8 @@ local unreachable = {}
 local active_mods = {Krastorio2='2.1.2', ['Krastorio2-spaced-out']='2.0.13'}
 local known = {'automation-science-pack','logistic-science-pack','military-science-pack',
   'chemical-science-pack','production-science-pack','utility-science-pack','space-science-pack',
-  'cryogenic-science-pack','kr-basic-tech-card','kr-matter-tech-card'}
+  'cryogenic-science-pack','kr-basic-tech-card','kr-matter-tech-card',
+  'wood-science-pack','steam-science-pack'}
 local exists = {}; for _, n in ipairs(known) do exists[n]=true end
 _G.log = function(_) end
 _G.data = {raw={lab={},technology={}}, extend=function() error('Unexpected prototype mutation') end}
@@ -151,4 +152,33 @@ data.raw.lab={z={inputs={'utility-science-pack'}},a={inputs={'production-science
 result,status=lab.best_lab_compatible_ingredients(ties,'tie',{})
 check('P09',result and result[1][1]=='production-science-pack' and result[1][2]==7,'Lab tie is lexical and preserves ingredient amounts')
 check('P10',ties[1][2]==7 and #ties==2,'Lab reduction does not mutate caller input')
+-- A restricted early lab must not redefine the intended later science stage.
+-- This is a controlled provenance law, not a Lignumis package qualification.
+active_mods={}
+local lignumis_stage={
+  'wood-science-pack','steam-science-pack','automation-science-pack',
+  'logistic-science-pack','chemical-science-pack','production-science-pack'
+}
+data.raw.lab={
+ wood={inputs={'wood-science-pack','steam-science-pack'}},
+ late={inputs=lignumis_stage}
+}
+result,status,phase=planner.ingredients_for_stream('research_science_pack_productivity',{science_packs=lignumis_stage})
+check('P11',result and #result==6 and status=='full' and #phase.phase_required_packs==6,
+ 'A complete later lab retains the declared science-productivity stage: '..names(result))
+for _, pack in ipairs({'automation-science-pack','logistic-science-pack','chemical-science-pack','production-science-pack'}) do
+ unreachable[pack]=true
+end
+result,status,phase=planner.ingredients_for_stream('research_science_pack_productivity',{science_packs=lignumis_stage})
+check('P12',result==nil and status=='required-unreachable' and #phase.retained_required_packs==6,
+ 'Unavailable declared late ingredients block instead of silently reducing to the restricted early lab')
+unreachable={}
+-- K2 retirement is an explicit phase action, so its retired early cards do
+-- not remain as requirements while the retained late cards still do.
+active_mods={Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.13'}
+data.raw.lab={late={inputs={'space-science-pack','kr-matter-tech-card'}}}
+result,status,phase=planner.ingredients_for_stream('research_science_pack_productivity',mixed)
+check('P13',result and #result==2 and status=='full' and has(result,'space-science-pack')
+  and not has(result,'automation-science-pack') and #phase.retained_required_packs==2,
+ 'Explicit K2 retirement preserves only the intended retained late requirements: '..names(result))
 print('MIR-SCIENCE-PLANNING-PASS '..checks)

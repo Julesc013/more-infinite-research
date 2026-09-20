@@ -27,6 +27,8 @@ function S.ensure_services(context)
       technology_researchability.reason_with_context)
     context:set_service(SERVICE_PREFIX .. "pack_production_status",
       pack_production_reachability.pack_production_status)
+    context:set_service(SERVICE_PREFIX .. "independent_pack_acquisition_witness",
+      pack_production_reachability.independent_pack_acquisition_witness)
     context:set_service(SERVICE_PREFIX .. "prereq_tech_for_science_pack",
       pack_production_reachability.prereq_tech_for_science_pack)
   end

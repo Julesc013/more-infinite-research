@@ -257,4 +257,22 @@ function M.required_science_packs_for_stream(key)
   return deepcopy(STREAM_REQUIRED_PACKS[key] or {})
 end
 
+-- Science-pack productivity is meaningful only at the currently selected
+-- ecosystem stage. Those selected packs are phase requirements: a named
+-- phase policy may retire them, but laboratory reduction must not silently
+-- redefine the stage by dropping whichever packs were hard to acquire.
+function M.phase_required_science_packs_for_stream(key, selected)
+  if key ~= "research_science_pack_productivity" then return {} end
+  local out, seen = {}, {}
+  for _, ingredient in ipairs(selected or {}) do
+    local name = ingredient_name(ingredient)
+    if name and not seen[name] then
+      seen[name] = true
+      table.insert(out, name)
+    end
+  end
+  table.sort(out)
+  return out
+end
+
 return M

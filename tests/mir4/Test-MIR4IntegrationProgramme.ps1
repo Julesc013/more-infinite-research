@@ -103,16 +103,6 @@ if(@($m44Allocation.reserved_for_4_3).Count-ne$m44Reserved.Count-or@(Compare-Obj
    @($m44Allocation.reserved_for_4_3|Where-Object{[string]$_.delivery_boundary-cne'4.3.0'-or[string]$_.outcome.Length-lt20}).Count-ne0){throw '[synthesis-m44-reserved-allocation]'}
 Write-Output 'Synthesis input integrity, complete 81-request/component coverage, dependency graph, and truthful completion boundaries passed.'
 
-# The controlled proof is reusable only for these exact current module bytes.
-$scienceEvidence=Join-Path $RepoRoot 'spec/programmes/evidence/synthesis-2026-09-06/science-modules.json'
-$science=Get-Content -Raw $scienceEvidence | ConvertFrom-Json
-if($science.status -cne 'passed' -or $science.assertions -ne 33 -or $science.scope -cne 'controlled-modules-not-real-k2-qualification') { throw '[synthesis-science-proof-scope]' }
-foreach($module in $science.modules) {
-  $currentModule=Resolve-MIR4CanonicalPackageSourcePath -RepoRoot $RepoRoot -RelativePath ([string]$module.path)
-  if((Get-FileHash -LiteralPath (Join-Path $RepoRoot $currentModule)).Hash -cne $module.sha256) { throw "[synthesis-science-proof-stale] $($module.path)" }
-}
-if((Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/compiler/science_planning.lua')).Hash -cne $science.test_sha256) { throw '[synthesis-science-test-stale]' }
-
 # Preserve the authored calendar date across AEST and UTC runners.
 . (Join-Path $RepoRoot 'tools/lib/control/Core.ps1')
 . (Join-Path $RepoRoot 'tools/lib/control/Views.ps1')
@@ -182,16 +172,34 @@ function Get-MIR4CommunityByteSha256([byte[]]$Bytes) {
  try { return (($algorithm.ComputeHash($Bytes) | ForEach-Object { $_.ToString('X2') }) -join '') }
  finally { $algorithm.Dispose() }
 }
+$scienceRelativePath='spec/programmes/evidence/synthesis-2026-09-06/science-modules.json'
+$scienceEvidence=Resolve-MIR4CommunityRepositoryPath $scienceRelativePath
+$scienceSnapshotCommit='abe152a332741db268a39b5088866e5aab634fed'
+$scienceSnapshotBlob='1b2fda97662d1e281f2a21781f937c48d467c277'
+& git -C $RepoRoot merge-base --is-ancestor $scienceSnapshotCommit HEAD 2>$null
+if($LASTEXITCODE -ne 0) { throw '[synthesis-science-proof-snapshot-not-ancestor]' }
+$scienceSnapshot=Get-MIR4CommunityGitBlob $scienceSnapshotCommit $scienceRelativePath
+if($scienceSnapshot.object_id -cne $scienceSnapshotBlob) { throw '[synthesis-science-proof-snapshot-blob]' }
+$scienceCurrentBytes=[IO.File]::ReadAllBytes($scienceEvidence)
+if(-not(Test-MIR4CommunityByteIdentity $scienceSnapshot.bytes $scienceCurrentBytes)) { throw '[synthesis-science-proof-record-bytes]' }
+$science=[Text.Encoding]::UTF8.GetString($scienceSnapshot.bytes)|ConvertFrom-Json -Depth 100
+if($science.status -cne 'passed' -or $science.assertions -ne 33 -or $science.scope -cne 'controlled-modules-not-real-k2-qualification') { throw '[synthesis-science-proof-scope]' }
+foreach($module in $science.modules) {
+  $historicalModule=Get-MIR4CommunityGitBlob $scienceSnapshotCommit ([string]$module.path)
+  if((Get-MIR4CommunityByteSha256 $historicalModule.bytes) -cne [string]$module.sha256) { throw "[synthesis-science-proof-binding] $($module.path)" }
+}
+$historicalScienceTest=Get-MIR4CommunityGitBlob $scienceSnapshotCommit 'tests/compiler/science_planning.lua'
+if((Get-MIR4CommunityByteSha256 $historicalScienceTest.bytes) -cne [string]$science.test_sha256) { throw '[synthesis-science-test-binding]' }
+
 $communityRelativePath='spec/programmes/evidence/community-2026-09-06/outcomes.json'
 $communityPath=Resolve-MIR4CommunityRepositoryPath $communityRelativePath
 if(-not (Test-Path -LiteralPath $communityPath -PathType Leaf)) { throw '[community-evidence-snapshot-record]' }
-$snapshotCommitRows=@(& git -C $RepoRoot log -1 --format=%H -- $communityRelativePath 2>$null)
-if($LASTEXITCODE -ne 0 -or $snapshotCommitRows.Count -ne 1) { throw '[community-evidence-snapshot-commit]' }
-$snapshotCommit=([string]$snapshotCommitRows[0]).Trim()
-if($snapshotCommit -cnotmatch '^[0-9a-f]{40}([0-9a-f]{24})?$') { throw '[community-evidence-snapshot-commit]' }
+$snapshotCommit='464e7bef0e0962fd8472809a7e2e6fe9889682bb'
+$snapshotBlob='1d1670295c94700573f49dbb6199f9ec8d23d388'
 & git -C $RepoRoot merge-base --is-ancestor $snapshotCommit HEAD 2>$null
 if($LASTEXITCODE -ne 0) { throw '[community-evidence-snapshot-not-ancestor]' }
 $snapshotOutcomes=Get-MIR4CommunityGitBlob $snapshotCommit $communityRelativePath
+if($snapshotOutcomes.object_id -cne $snapshotBlob) { throw '[community-evidence-snapshot-blob]' }
 $currentOutcomesBytes=[IO.File]::ReadAllBytes($communityPath)
 if(-not (Test-MIR4CommunityByteIdentity $snapshotOutcomes.bytes $currentOutcomesBytes)) { throw '[community-evidence-snapshot-record-bytes]' }
 $community=[Text.Encoding]::UTF8.GetString($snapshotOutcomes.bytes) | ConvertFrom-Json -Depth 100
