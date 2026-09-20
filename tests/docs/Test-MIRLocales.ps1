@@ -16,7 +16,8 @@ Import-Module (Join-Path $MirLegacyScriptRoot "localization\MIRLocalization.psm1
 
 function Get-MIRTechnicalLiteralSequence {
   param([string]$Text)
-  return @([regex]::Matches($Text, 'script-output/more-infinite-research/settings/browser-profile\.txt|MIRSET1') | ForEach-Object { $_.Value })
+  $pattern = '(?<![\p{L}\p{M}\p{N}_./\\-])script-output/more-infinite-research/settings/browser-profile\.txt(?![\p{L}\p{M}\p{N}_/\\-]|[.][\p{L}\p{M}\p{N}_-])|(?<![\p{L}\p{M}\p{N}_])MIRSET1(?![\p{L}\p{M}\p{N}_])'
+  return @([regex]::Matches($Text, $pattern) | ForEach-Object { $_.Value })
 }
 
 function Test-MIRTranslationMarkersAbsent {
@@ -36,6 +37,17 @@ $technicalProbe = 'script-output/more-infinite-research/settings/browser-profile
 $technicalDriftProbe = 'script-output/more-infinite-research/settings/browser-profile.txt МИРСЕТ1'
 if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -eq ((Get-MIRTechnicalLiteralSequence -Text $technicalDriftProbe) -join '|')) {
   throw '[mir-locales-technical-literal-regression]'
+}
+$technicalTokenExtensionProbe = 'script-output/more-infinite-research/settings/browser-profile.txt MIRSET1X'
+$technicalPathExtensionProbe = 'script-output/more-infinite-research/settings/browser-profile.txt.bak MIRSET1'
+foreach ($invalidProbe in @($technicalTokenExtensionProbe, $technicalPathExtensionProbe)) {
+  if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -eq ((Get-MIRTechnicalLiteralSequence -Text $invalidProbe) -join '|')) {
+    throw '[mir-locales-technical-literal-extension-regression]'
+  }
+}
+$technicalPunctuationProbe = 'script-output/more-infinite-research/settings/browser-profile.txt. MIRSET1.'
+if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -ne ((Get-MIRTechnicalLiteralSequence -Text $technicalPunctuationProbe) -join '|')) {
+  throw '[mir-locales-technical-literal-punctuation-regression]'
 }
 
 $policy = Read-MIRLocalePolicy -Path $PolicyPath

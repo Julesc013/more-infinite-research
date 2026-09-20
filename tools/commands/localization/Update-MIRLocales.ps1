@@ -96,7 +96,8 @@ function Test-MIRTranslationStructure {
 
 function Get-MIRTechnicalLiteralSequence {
   param([string]$Text)
-  return @([regex]::Matches($Text, 'script-output/more-infinite-research/settings/browser-profile\.txt|MIRSET1') | ForEach-Object { $_.Value })
+  $pattern = '(?<![\p{L}\p{M}\p{N}_./\\-])script-output/more-infinite-research/settings/browser-profile\.txt(?![\p{L}\p{M}\p{N}_/\\-]|[.][\p{L}\p{M}\p{N}_-])|(?<![\p{L}\p{M}\p{N}_])MIRSET1(?![\p{L}\p{M}\p{N}_])'
+  return @([regex]::Matches($Text, $pattern) | ForEach-Object { $_.Value })
 }
 
 function Test-MIRTranslationMarkersAbsent {
@@ -106,6 +107,19 @@ function Test-MIRTranslationMarkersAbsent {
   # not key this guard on ASCII "MIR": translation services can transliterate
   # it (for example, Serbian "МИР") while retaining the same leaked wrapper.
   return $Text -notmatch 'MIRP\d|⟦|⟧|⟪|⟫'
+}
+
+$technicalLiteralProbe = 'script-output/more-infinite-research/settings/browser-profile.txt MIRSET1'
+foreach ($invalidProbe in @(
+  'script-output/more-infinite-research/settings/browser-profile.txt MIRSET1X',
+  'script-output/more-infinite-research/settings/browser-profile.txt.bak MIRSET1'
+)) {
+  if (Test-MIRTranslationStructure -SourceText $technicalLiteralProbe -Translation $invalidProbe) {
+    throw '[mir-locales-updater-technical-literal-extension-regression]'
+  }
+}
+if (-not (Test-MIRTranslationStructure -SourceText $technicalLiteralProbe -Translation 'script-output/more-infinite-research/settings/browser-profile.txt. MIRSET1.')) {
+  throw '[mir-locales-updater-technical-literal-punctuation-regression]'
 }
 
 function Invoke-MIRRawMachineTranslation {
