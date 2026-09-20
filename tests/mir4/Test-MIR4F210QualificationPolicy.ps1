@@ -40,6 +40,13 @@ foreach ($requiredF210Dependency in $requiredF210Dependencies) {
 if ($staticCoreSource -match '"(?:base|\? recycler|\? space-age) >= 2\.1\.(?:8|17)"') {
   throw '[mir4-f210-stale-static-validator-floor]'
 }
+$testAuthority = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+$policyTest = @($testAuthority.tests | Where-Object { [string]$_.id -ceq 'static.mir4-f210-qualification-policy' })
+if ($policyTest.Count -ne 1 -or
+    @($policyTest[0].inputs | Where-Object { [string]$_ -ceq 'source:source/presentation/f210/info.json.template' }).Count -ne 1 -or
+    @($policyTest[0].inputs | Where-Object { [string]$_ -ceq 'source/presentation/f210/info.json.template' }).Count -ne 0) {
+  throw '[mir4-f210-current-source-proof-input-authority]'
+}
 $f210Profile = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/profiles/factorio-2.1.json') | ConvertFrom-Json -Depth 20
 if ([string]$f210Profile.minimum_factorio_version -cne '2.1.18') { throw '[mir4-f210-current-profile-floor]' }
 if ([string]$policy.kind -cne 'MIR4F210CurrentQualificationPolicyV2' -or

@@ -3309,7 +3309,7 @@
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
-        "source/presentation/f210/info.json.template",
+        "source:source/presentation/f210/info.json.template",
         "validation/profiles/factorio-2.1.json",
         "repository"
       ],
@@ -7131,5 +7131,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5fd3032f6ee89dd99a7764e902139c1dac9f4e770f4356871184e9a771677f76"
+  "digest": "sha256:21b29cfe71bdf253a19ead033c613b15cc9509116776c67fa287ee0e906e1be6"
 }

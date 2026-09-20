@@ -2737,7 +2737,7 @@
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
-        "source/presentation/f210/info.json.template",
+        "source:source/presentation/f210/info.json.template",
         "validation/profiles/factorio-2.1.json",
         "repository"
       ]
