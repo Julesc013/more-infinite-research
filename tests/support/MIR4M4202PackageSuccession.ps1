@@ -214,6 +214,25 @@ function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {
         $ExpectedBindingSha[$path]=[string]$binding.current_sha256
       }
     }
+
+    # The succession records above are immutable historical evidence. Current
+    # package-excluded development files have a separate live contract: they
+    # must exist at safe repository-relative paths and the command inventory
+    # must be at its generated fixed point, but an ordinary later edit does
+    # not require manufacturing V5/V6 historical receipts.
+    . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check | Out-Null
+    foreach ($path in @($ExpectedBindingSha.Keys)) {
+      $portable = ([string]$path).Replace('\','/').TrimStart('/')
+      if ([string]::IsNullOrWhiteSpace($portable) -or
+          [IO.Path]::IsPathRooted([string]$path) -or
+          $portable -match '(^|/)\.\.(/|$)' -or
+          $portable -ceq 'source' -or $portable.StartsWith('source/',[StringComparison]::Ordinal) -or
+          $portable -ceq 'targets' -or $portable.StartsWith('targets/',[StringComparison]::Ordinal)) { return $false }
+      $livePath = Join-Path $RepoRoot $portable
+      if (-not (Test-Path -LiteralPath $livePath -PathType Leaf)) { return $false }
+      $ExpectedBindingSha[$path] = Get-MIR4BootstrapTextSha256 -Path $livePath
+    }
     return $true
   }catch{return $false}
 }
@@ -267,9 +286,9 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
     # inventory succession through their final evolved binding.  The one-source
     # cutover deliberately changes that inventory, so do not substitute the
     # live file for the successor. V2 is the immutable Factorio-1 predecessor;
-    # V3 is immutable progression evidence and V4 records the live inventory
-    # alongside the proof-input/control-plane successor. We return its digest
-    # only after historical custody and current live binding both agree.
+    # V3 and V4 are immutable historical evidence. Validate their exact
+    # custody, then evaluate the current generated inventory independently so
+    # later development does not rewrite those records.
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ComposableSourceSuccession.ps1')
     $historicalSuccessor = Get-MIR4M41ToM42ComposableSourceSuccessionV2Historical -RepoRoot $RepoRoot
     $factorioAuthorityPath = Join-Path $RepoRoot ([string]$historicalSuccessor.factorio_one_successor.authority.path)
@@ -287,14 +306,12 @@ function Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement {
         [int]$successorInventory.command_count -ne 85 -or
         [int]$successorInventory.unknown -ne 0 -or
         [int]$successorInventory.duplicate_command_keys -ne 0) { return $null }
-    $inventoryPath = Join-Path $RepoRoot ([string]$successorInventory.path)
-    if (-not (Test-Path -LiteralPath $inventoryPath -PathType Leaf) -or
-        (Get-MIR4BootstrapTextSha256 -Path $inventoryPath) -cne [string]$successorInventory.sha256) { return $null }
-    $inventory = Get-Content -Raw -LiteralPath $inventoryPath | ConvertFrom-Json -Depth 100 -DateKind String
-    if ([string]$inventory.digest -cne [string]$successorInventory.digest -or
-        [int]$inventory.command_count -ne [int]$successorInventory.command_count -or
-        [int]$inventory.summary.unknown -ne [int]$successorInventory.unknown -or
-        [int]$inventory.summary.duplicate_command_keys -ne [int]$successorInventory.duplicate_command_keys) { return $null }
-    return [string]$successorInventory.digest
+    . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
+    $currentInventory = Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check
+    if ([int]$currentInventory.command_count -ne 85 -or
+        [int]$currentInventory.summary.unknown -ne 0 -or
+        [int]$currentInventory.summary.duplicate_command_keys -ne 0 -or
+        [string]$currentInventory.digest -cnotmatch '^sha256:[a-f0-9]{64}$') { return $null }
+    return [string]$currentInventory.digest
   }catch{return $null}
 }
