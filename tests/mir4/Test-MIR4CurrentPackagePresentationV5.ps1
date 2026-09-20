@@ -21,9 +21,13 @@ foreach ($target in @('f210','f200','f110','f100')) {
 }
 $sourceDriftRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir-v5-current-contract-source-drift-'+[guid]::NewGuid().ToString('N'))
 try {
+  $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
+  if($LASTEXITCODE-ne0-or$sourceCommit-cnotmatch'^[0-9a-f]{40}$'){throw '[mir4-package-presentation-v5-source-drift-commit]'}
   & git clone --quiet --shared --no-checkout $repo $sourceDriftRoot
   if($LASTEXITCODE-ne0){throw '[mir4-package-presentation-v5-source-drift-clone]'}
-  & git -C $sourceDriftRoot checkout --quiet HEAD
+  & git -C $sourceDriftRoot config core.autocrlf false
+  if($LASTEXITCODE-ne0){throw '[mir4-package-presentation-v5-source-drift-line-endings]'}
+  & git -C $sourceDriftRoot checkout --quiet --detach $sourceCommit
   if($LASTEXITCODE-ne0){throw '[mir4-package-presentation-v5-source-drift-checkout]'}
   $sourceManifest=Get-Content -Raw -LiteralPath (Join-Path $sourceDriftRoot 'source/package-source.json')|ConvertFrom-Json -Depth 100 -DateKind String
   $sourcePath=Join-Path $sourceDriftRoot ([string]$sourceManifest.bindings[0].source_path)
