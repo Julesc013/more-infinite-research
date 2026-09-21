@@ -1317,6 +1317,7 @@ modules:
     - prototypes/mir/capabilities/science_integration/pack_registry.lua
     - prototypes/mir/capabilities/science_integration/lab_compatibility.lua
     - prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua
+    - prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
     - prototypes/mir/capabilities/science_integration/production_route_policy.lua

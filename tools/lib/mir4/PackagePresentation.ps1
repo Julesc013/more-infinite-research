@@ -931,6 +931,51 @@ function Test-MIR4CurrentPackagePresentationV7Schema {
   try{return [bool]((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record)|Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v7.schema.json') -ErrorAction Stop)}catch{return $false}
 }
 
+function Get-MIR4ComposablePackageSourceV2Predecessor {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $blob='bf270a79680f859395e6b4222d3883934c8beb23'
+  $lines=@(& git -C $repo cat-file blob $blob 2>&1|ForEach-Object{[string]$_})
+  if($LASTEXITCODE-ne0-or$lines.Count-eq0){throw '[mir4-package-presentation-v7-predecessor-blob]'}
+  try{$record=($lines-join"`n")|ConvertFrom-Json -Depth 100 -DateKind String}catch{throw '[mir4-package-presentation-v7-predecessor-blob]'}
+  if(-not((ConvertTo-MIR4BootstrapCanonicalJson -Value $record)|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-composable-package-source-v2.schema.json') -ErrorAction SilentlyContinue)-or
+     -not(Test-MIR4BootstrapRecordHash -Record $record)-or
+     [string]$record.kind-cne'MIR4ComposablePackageSourceV2'-or
+     [string]$record.record_sha256-cne'3A62C8DA1B9C98D1F13A100ECF45A0F467640CFF8DBC3AACB91B967828C0B991'){
+    throw '[mir4-package-presentation-v7-predecessor-blob]'
+  }
+  return $record
+}
+
+function Assert-MIR4ComposablePackageSourceV3Succession {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Current,[Parameter(Mandatory)]$Predecessor)
+  $migrated=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
+  $introduced=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
+  if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
+     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne1-or
+     [string]$introduced[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'-or
+     [string]$introduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
+     [string]$introduced[0].output_path-cne'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
+     (@($introduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+    throw '[mir4-package-presentation-v7-source-succession]'
+  }
+  $currentByPredecessor=@{}
+  foreach($binding in $migrated){
+    $key=[string]$binding.provenance.predecessor_source_path
+    if([string]::IsNullOrWhiteSpace($key)-or$currentByPredecessor.ContainsKey($key)){throw '[mir4-package-presentation-v7-source-succession]'}
+    $currentByPredecessor[$key]=$binding
+  }
+  foreach($prior in @($Predecessor.bindings)){
+    $key=[string]$prior.predecessor_source_path
+    if(-not$currentByPredecessor.ContainsKey($key)){throw '[mir4-package-presentation-v7-source-succession]'}
+    $current=$currentByPredecessor[$key]
+    $priorProjection=[pscustomobject][ordered]@{layer=[string]$prior.layer;target_scope=@($prior.target_scope);output_path=[string]$prior.output_path;semantic_class=[string]$prior.semantic_class;source_path=[string]$prior.source_path;predecessor_source_path=[string]$prior.predecessor_source_path;transform=[string]$prior.transform}
+    $currentProjection=[pscustomobject][ordered]@{layer=[string]$current.layer;target_scope=@($current.target_scope);output_path=[string]$current.output_path;semantic_class=[string]$current.semantic_class;source_path=[string]$current.source_path;predecessor_source_path=[string]$current.provenance.predecessor_source_path;transform=[string]$current.transform}
+    if((ConvertTo-MIR4BootstrapCanonicalJson -Value $currentProjection)-cne(ConvertTo-MIR4BootstrapCanonicalJson -Value $priorProjection)){throw '[mir4-package-presentation-v7-source-succession]'}
+  }
+  return [pscustomobject][ordered]@{predecessor=$Predecessor;migrated=$migrated;introduced=$introduced}
+}
+
 function Get-MIR4CurrentPackagePresentationV7Inputs {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Materialize)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
@@ -940,17 +985,14 @@ function Get-MIR4CurrentPackagePresentationV7Inputs {
   $contract=Assert-MIR4CurrentPackageContract -RepoRoot $repo
   $authority=Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $manifest=Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3' -Schema 'spec/schemas/mir4-composable-package-source-v3.schema.json' -Code 'mir4-package-presentation-v7-source-manifest'
-  $migrated=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
-  $introduced=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
-  if($migrated.Count-ne359-or$introduced.Count-ne1-or
-     @($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359-or
-     [string]$introduced[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'-or
-     [string]$manifest.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256){
+  $predecessorManifest=Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo
+  $succession=Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor $predecessorManifest
+  if([string]$predecessorManifest.record_sha256-cne[string]$v6.source_manifest.record_sha256){
     throw '[mir4-package-presentation-v7-source-succession]'
   }
   $materialization=$null
   if($Materialize){$materialization=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-package-presentation-v7-materialization.json'}
-  return [pscustomobject][ordered]@{v6=$v6;contract=$contract;authority=$authority;manifest=$manifest;migrated=$migrated;introduced=$introduced;localization=(Get-MIR4CurrentPackagePresentationV6LocalizationInputs -RepoRoot $repo);materialization=$materialization}
+  return [pscustomobject][ordered]@{v6=$v6;contract=$contract;authority=$authority;manifest=$manifest;predecessor_manifest=$predecessorManifest;migrated=@($succession.migrated);introduced=@($succession.introduced);localization=(Get-MIR4CurrentPackagePresentationV6LocalizationInputs -RepoRoot $repo);materialization=$materialization}
 }
 
 function New-MIR4CurrentPackagePresentationV7 {

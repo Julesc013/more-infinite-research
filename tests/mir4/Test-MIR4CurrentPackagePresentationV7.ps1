@@ -12,6 +12,7 @@ $writer=Join-Path $repo 'tools/commands/mir4/Update-MIR4CurrentPackagePresentati
 $record=Get-MIR4CurrentPackagePresentationV7 -RepoRoot $repo
 $v6=Get-MIR4CurrentPackagePresentationV6Historical -RepoRoot $repo
 $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
+$predecessorManifest=Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo
 Assert-MIR4CurrentPackagePresentationV7LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)|Out-Null
 Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check|Out-Null
 
@@ -23,6 +24,19 @@ if([string]$record.predecessor.record_sha256-cne[string]$v6.record_sha256-or
    [string]$introduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
    [string]$introduced[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'-or
    @($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359){throw '[mir4-package-presentation-v7-source-succession]'}
+
+foreach($forgery in @(
+  @{id='substituted-predecessor';mutate={param($r)$r.bindings[0].provenance.predecessor_source_path='src/mod/forged/predecessor.lua'}},
+  @{id='missing-predecessor';mutate={param($r)$r.bindings=@($r.bindings|Select-Object -Skip 1)}},
+  @{id='duplicated-predecessor';mutate={param($r)$r.bindings[1]=($r.bindings[0]|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20)}},
+  @{id='changed-scope';mutate={param($r)$r.bindings[0].target_scope=@('f210')}}
+)){
+  $copy=$manifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+  &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy
+  if(-not(Test-MIR4BootstrapRecordHash -Record $copy)){throw "[mir4-package-presentation-v7-forgery-hash] $($forgery.id)"}
+  $rejected=$false;try{Assert-MIR4ComposablePackageSourceV3Succession -Current $copy -Predecessor $predecessorManifest|Out-Null}catch{$rejected=$_.Exception.Message-eq'[mir4-package-presentation-v7-source-succession]'}
+  if(-not$rejected){throw "[mir4-package-presentation-v7-source-succession-forgery] $($forgery.id)"}
+}
 
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target

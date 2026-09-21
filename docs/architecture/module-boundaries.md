@@ -138,6 +138,8 @@ The technology graph semantics no longer belong separately to planner and emitte
 
 Presentation construction lives in `prototypes/mir/presentation/icon_builder.lua`; `emit/icon_builder.lua` is a compatibility facade. Pure blocked-effect policy lives in `domain/technology/effect_safety_policy.lua`, while the emit facade owns mutation. `.mir/module-dependencies.json` and `validation/tests/architecture/Test-MIRModuleDependencies.ps1` enforce forbidden planner-to-emitter imports, overlay mutation boundaries, command authority, and an exact bounded baseline for the few remaining legacy cycles.
 
+The science-integration decomposition also includes `prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua`, which owns typed structural recipe and natural-source feasibility without granting gameplay-support authority.
+
 ### Technology Catalog Construction Ownership
 
 `prototypes/mir/domain/technology/technology_risk.lua` is the shared technology-risk authority for startup-setting order, compiler classification, and automatic localized tooltip warnings. Its risk class and reason remain independent of the enable default: a risky technology can default on without falling out of the first attention bucket or losing its warning.

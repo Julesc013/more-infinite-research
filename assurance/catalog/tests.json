@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 199,
+  "test_count": 200,
   "tests": [
     {
       "id": "docs.check",
@@ -1049,6 +1049,48 @@
       "matrix": null
     },
     {
+      "id": "runtime.recipe-source-epoch-contract",
+      "proposition": "The governed test 'runtime.recipe-source-epoch-contract' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "runtime",
+      "layer": "F3",
+      "command": "./tests/compiler/Test-MIRRecipeSourceEpoch.ps1 -FactorioBin <factorio>",
+      "canonical_implementation": "tests/compiler/Test-MIRRecipeSourceEpoch.ps1",
+      "target_scope": "exact-selected-factorio-target",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": true,
+      "inputs": [
+        "factorio",
+        "tests/compiler/Test-MIRRecipeSourceEpoch.ps1",
+        "tests/compiler/recipe_source_epoch.lua",
+        "tools/mir/application/release/F210QualificationPolicy.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        "source:source/prototypes/mir/core/deepcopy.lua",
+        "source:source/prototypes/mir/core/fingerprint.lua",
+        "source:source/prototypes/mir/domain/compiler/execution_mode.lua",
+        "source:source/prototypes/mir/domain/facts/recipe_semantics.lua",
+        "source:source/prototypes/mir/platform/factorio/data_raw.lua",
+        "source:source/prototypes/mir/pipeline/compiler_context.lua",
+        "source:source/prototypes/mir/report/compiler_telemetry.lua",
+        "source:source/prototypes/mir/graph/**",
+        "source:source/prototypes/mir/index/recipe_facts.lua",
+        "source:source/prototypes/mir/index/recipe_unlocks.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "runtime.research-browser",
       "proposition": "The governed test 'runtime.research-browser' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -1093,14 +1135,21 @@
         "factorio",
         "tests/compiler/Test-MIRResearchabilityPlanning.ps1",
         "tests/compiler/researchability_planning.lua",
+        "tools/mir/application/release/F210QualificationPolicy.ps1",
+        "tools/lib/mir4/BootstrapMaterialization.ps1",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/graph/**",
         "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
         "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
         "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "source:source/prototypes/mir/index/recipe_unlocks.lua",
+        "source:source/prototypes/mir/platform/factorio/data_raw.lua"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -3187,6 +3236,8 @@
         "targets/f110/**",
         "targets/f100/**",
         "spec/distribution/mir4-golden-four-target-baseline-v1.json",
+        "spec/distribution/mir4-current-package-presentation-v7.json",
+        "spec/schemas/mir4-current-package-presentation-v7.schema.json",
         "spec/schemas/mir4-composable-package-source-v3.schema.json",
         "spec/schemas/mir4-target-registry-v2.schema.json",
         "spec/schemas/mir4-target-support-policy-v1.schema.json",
@@ -3195,6 +3246,7 @@
         "spec/schemas/mir4-editable-source-materializer-proof-v1.schema.json",
         "spec/schemas/mir4-current-source-materializer-proof-v1.schema.json",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
+        "tools/lib/mir4/PackagePresentation.ps1",
         "tools/mir/application/package/GoldenTargetBaselines.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tools/mir/cli/Invoke-MIR4PackageSource.ps1",
@@ -7277,11 +7329,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 54,
-      "runtime-upgrade": 44,
+      "runtime-upgrade": 45,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 187,
+    "canonical_test_commands": 188,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7294,5 +7346,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:252e9443f82b471fa78452a3c5badb7fa657413faab54a46b1c73e1744369883"
+  "digest": "sha256:e1ef2bc843bc0ee0ecbdf1ce73977ec507b718052c5a5b489cba71d10ba2a232"
 }

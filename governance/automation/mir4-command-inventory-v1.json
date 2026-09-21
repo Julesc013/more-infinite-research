@@ -3891,9 +3891,9 @@
     {
       "path": "tools/lib/mir4/PackagePresentation.ps1",
       "classification": "canonical-internal",
-      "sha256": "C7CF0AF9A0AE2221D823D35A82C6DFD8A334BC37466294F8C31A55CF06FE3CF2",
+      "sha256": "D810440791ECB294120BEE69D9F7F1F903793385996E7C2CD611B32014623239",
       "hash_mode": "canonical-text-v1",
-      "lines": 1053,
+      "lines": 1095,
       "package_visible": false
     },
     {
@@ -3963,9 +3963,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
       "classification": "canonical-internal",
-      "sha256": "F13C32297D15FDC4973329CAE18304B1BAF732AEDA18B2A9AE7047818493E2E4",
+      "sha256": "A23A697821BDFA6023B2C51CE01B94DA581799AE09CEC7B030C49DBE6374C31C",
       "hash_mode": "canonical-text-v1",
-      "lines": 694,
+      "lines": 699,
       "package_visible": false
     },
     {
@@ -5794,5 +5794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f3ccc64fead59a9fc68243e383ec30e10b1c64b7b0885fd5761c66ced7444738"
+  "digest": "sha256:0bb5d053fa7925a689926249f75448f315d10b97811502a81768d71e3124a681"
 }

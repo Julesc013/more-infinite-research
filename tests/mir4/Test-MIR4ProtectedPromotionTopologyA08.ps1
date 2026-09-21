@@ -148,8 +148,8 @@ exit /b 13
       [pscustomobject][ordered]@{target='f210';content_sha256=$f210Presentation.content_sha256;entry_count=$f210Presentation.entry_count},
       [pscustomobject][ordered]@{target='f200';content_sha256=$f200Presentation.content_sha256;entry_count=$f200Presentation.entry_count}
     )
-    authority_invariants=[pscustomobject][ordered]@{current_package_contract_bound=$true;promotion_authorized=$false}
-    transition_gate=[pscustomobject][ordered]@{main_promotion=$false}
+    authority_invariants=[pscustomobject][ordered]@{v6_predecessor_immutable=$true;package_source_v3_provenance_complete=$true;all_governed_locales_complete=$true;package_visible_locale_coverage_bound=$true;current_package_contract_bound=$true;f210_f200_progression_capability_applied=$true;f110_f100_progression_capability_omitted_nonclaim=$true;exact_engine_qualification_required=$true;candidate_allocation_authorized=$false;signing_or_sealing_authorized=$false;promotion_authorized=$false;publication_authorized=$false;public_support_authorized=$false}
+    transition_gate=[pscustomobject][ordered]@{development_merge=$true;private_build=$false;qualification=$false;technical_seal=$false;main_promotion=$false;version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}
     record_sha256=''
   }
   $presentation.record_sha256=Get-MIR4A08SelfSha256 $presentation 'record_sha256'
@@ -163,6 +163,35 @@ exit /b 13
   $forged=$plan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$forged.promotion.deletion_authorized=$true;$forged.plan_sha256=Get-MIR4A08PlanSha256 $forged;Expect-A08Failure {Assert-MIR4A08Plan $forged} '[mir4-a08-plan-invalid]';$script:policyState=New-A08Policy -Enabled:$false;Expect-A08Failure {New-MIR4ProtectedPromotionTopologyPlan -RepoRoot $testRoot -MainRef refs/heads/main -SourceRef refs/heads/dev -CandidateRef refs/heads/candidate/mir42-a08-policy -PolicyProvider $policyProvider -Rehearsal} '[mir4-a08-policy-incompatible]';$script:policyState=New-A08Policy
   Expect-A08Failure {New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan} '[mir4-a08-external-effect-not-authorized]';if($null-ne(Get-MIR4A08OptionalRef -RepoRoot $testRoot -Ref $candidateRef)){throw '[mir4-a08-production-candidate-allocation]'};$candidate=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan -Rehearsal;$adopted=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $plan;if (-not[bool]$candidate.created-or[bool]$adopted.created-or[string]$candidate.commit-cne[string]$adopted.commit){throw '[mir4-a08-candidate-recovery]'}
   $qualification=New-A08Qualification -Root $packageRoot -Candidate $candidate;$qualificationPath=Join-Path $testRoot 'qualification.json';Write-A08Json $qualificationPath $qualification;if (-not((Get-Content -Raw -LiteralPath $qualificationPath)|Test-Json -SchemaFile $qualificationSchema)){throw '[mir4-a08-qualification-schema]'}
+  $closedPresentationFields=@(
+    [pscustomobject]@{container='authority_invariants';field='candidate_allocation_authorized'},
+    [pscustomobject]@{container='authority_invariants';field='signing_or_sealing_authorized'},
+    [pscustomobject]@{container='authority_invariants';field='promotion_authorized'},
+    [pscustomobject]@{container='authority_invariants';field='publication_authorized'},
+    [pscustomobject]@{container='authority_invariants';field='public_support_authorized'},
+    [pscustomobject]@{container='transition_gate';field='private_build'},
+    [pscustomobject]@{container='transition_gate';field='qualification'},
+    [pscustomobject]@{container='transition_gate';field='technical_seal'},
+    [pscustomobject]@{container='transition_gate';field='main_promotion'},
+    [pscustomobject]@{container='transition_gate';field='version_allocation'},
+    [pscustomobject]@{container='transition_gate';field='tagging'},
+    [pscustomobject]@{container='transition_gate';field='signing'},
+    [pscustomobject]@{container='transition_gate';field='sealing'},
+    [pscustomobject]@{container='transition_gate';field='publication'}
+  )
+  foreach($case in $closedPresentationFields){
+    $branch='forged-presentation-'+$case.container.Replace('_','-')+'-'+$case.field.Replace('_','-')
+    $null=Invoke-A08Git $testRoot @('switch','-q','-c',$branch,$source)
+    $forgedPresentation=Get-Content -Raw -LiteralPath (Join-Path $testRoot 'spec/distribution/mir4-current-package-presentation-v7.json')|ConvertFrom-Json -Depth 100
+    $forgedPresentation.PSObject.Properties[$case.container].Value.PSObject.Properties[$case.field].Value=$true
+    $forgedPresentation.record_sha256=Get-MIR4A08SelfSha256 $forgedPresentation 'record_sha256'
+    Write-A08Json (Join-Path $testRoot 'spec/distribution/mir4-current-package-presentation-v7.json') $forgedPresentation
+    $null=Invoke-A08Git $testRoot @('add','spec/distribution/mir4-current-package-presentation-v7.json');$null=Invoke-A08Git $testRoot @('commit','-q','-m',("forge presentation " + $case.container + '.' + $case.field))
+    $forgedCommit=((Invoke-A08Git $testRoot @('rev-parse','HEAD'))-join'').Trim();$forgedTree=((Invoke-A08Git $testRoot @('rev-parse','HEAD^{tree}'))-join'').Trim();$forgedCandidate=[pscustomobject][ordered]@{ref=$candidate.ref;commit=$forgedCommit;tree=$forgedTree}
+    $forgedQualification=New-A08Qualification -Root $packageRoot -Candidate $forgedCandidate;$forgedQualificationPath=Join-Path $testRoot ($branch+'.json');Write-A08Json $forgedQualificationPath $forgedQualification
+    Expect-A08Failure {Read-MIR4A08QualificationRecord -RepoRoot $testRoot -Plan $plan -Candidate $forgedCandidate -RecordPath $forgedQualificationPath -PackageRoot $packageRoot -Rehearsal} '[mir4-a08-package-presentation]'
+  }
+  $null=Invoke-A08Git $testRoot @('switch','-q','dev')
   $null=Invoke-A08Git $testRoot @('switch','-q','-c','stale-package-source',$source);$staleManifest=Get-Content -Raw -LiteralPath (Join-Path $testRoot 'source/package-source.json')|ConvertFrom-Json -Depth 100;$staleManifest|Add-Member marker 'changed-after-presentation';$staleManifest.record_sha256=Get-MIR4A08SelfSha256 $staleManifest 'record_sha256';Write-A08Json (Join-Path $testRoot 'source/package-source.json') $staleManifest;$stalePresentation=Get-Content -Raw -LiteralPath (Join-Path $testRoot 'spec/distribution/mir4-current-package-presentation-v7.json')|ConvertFrom-Json -Depth 100;$stalePresentation.source_manifest.record_sha256=$staleManifest.record_sha256;$stalePresentation.record_sha256=Get-MIR4A08SelfSha256 $stalePresentation 'record_sha256';Write-A08Json (Join-Path $testRoot 'spec/distribution/mir4-current-package-presentation-v7.json') $stalePresentation;$null=Invoke-A08Git $testRoot @('add','source/package-source.json','spec/distribution/mir4-current-package-presentation-v7.json');$null=Invoke-A08Git $testRoot @('commit','-q','-m','stale package source fingerprint');$staleCommit=((Invoke-A08Git $testRoot @('rev-parse','HEAD'))-join'').Trim();$staleTree=((Invoke-A08Git $testRoot @('rev-parse','HEAD^{tree}'))-join'').Trim();$null=Invoke-A08Git $testRoot @('switch','-q','dev');$staleCandidate=[pscustomobject][ordered]@{ref=$candidate.ref;commit=$staleCommit;tree=$staleTree};$staleQualification=New-A08Qualification -Root $packageRoot -Candidate $staleCandidate;$staleQualificationPath=Join-Path $testRoot 'stale-package-source.json';Write-A08Json $staleQualificationPath $staleQualification;Expect-A08Failure {Read-MIR4A08QualificationRecord -RepoRoot $testRoot -Plan $plan -Candidate $staleCandidate -RecordPath $staleQualificationPath -PackageRoot $packageRoot -Rehearsal} '[mir4-a08-package-presentation]'
   $selfIssued=$qualification|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$selfIssued.targets[0].authority.issuer_id='forged-target-authority';$selfIssued.record_sha256=Get-MIR4A08SelfSha256 $selfIssued 'record_sha256';$selfIssuedPath=Join-Path $testRoot 'self-issued.json';Write-A08Json $selfIssuedPath $selfIssued;Expect-A08Failure {Read-MIR4A08QualificationRecord -RepoRoot $testRoot -Plan $plan -Candidate $candidate -RecordPath $selfIssuedPath -PackageRoot $packageRoot -Rehearsal} '[mir4-a08-qualification-authority]'
   $badEngine=$qualification|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100;$badEngine.targets[0].proof.engine.binary_sha256='not-a-sha256';$badEngine.record_sha256=Get-MIR4A08SelfSha256 $badEngine 'record_sha256';$badEnginePath=Join-Path $testRoot 'bad-engine.json';Write-A08Json $badEnginePath $badEngine;Expect-A08Failure {Read-MIR4A08QualificationRecord -RepoRoot $testRoot -Plan $plan -Candidate $candidate -RecordPath $badEnginePath -PackageRoot $packageRoot -Rehearsal} '[mir4-a08-qualification-record]'
