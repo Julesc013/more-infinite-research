@@ -50,6 +50,30 @@ if (((Get-MIRTechnicalLiteralSequence -Text $technicalProbe) -join '|') -ne ((Ge
   throw '[mir-locales-technical-literal-punctuation-regression]'
 }
 
+$canonicalJsonProbeRoot = Join-Path $repo ('build/tests/locales/canonical-json-' + [guid]::NewGuid().ToString('N'))
+$canonicalJsonProbePath = Join-Path $canonicalJsonProbeRoot 'probe.json'
+New-Item -ItemType Directory -Force -Path $canonicalJsonProbeRoot | Out-Null
+try {
+  $canonicalJsonProbe = [ordered]@{schema=1;values=@('alpha','beta');nested=[ordered]@{enabled=$true}}
+  Write-MIRCanonicalJson -Value $canonicalJsonProbe -Path $canonicalJsonProbePath
+  $firstCanonicalBytes = [IO.File]::ReadAllBytes($canonicalJsonProbePath)
+  if ($firstCanonicalBytes.Length -lt 2 -or $firstCanonicalBytes[0] -eq 0xEF -or $firstCanonicalBytes -contains 0x0D -or $firstCanonicalBytes[-1] -ne 0x0A) {
+    throw '[mir-locales-canonical-json-bytes]'
+  }
+  Write-MIRCanonicalJson -Value $canonicalJsonProbe -Path $canonicalJsonProbePath
+  $secondCanonicalBytes = [IO.File]::ReadAllBytes($canonicalJsonProbePath)
+  if (-not [Linq.Enumerable]::SequenceEqual([byte[]]$firstCanonicalBytes,[byte[]]$secondCanonicalBytes)) {
+    throw '[mir-locales-canonical-json-idempotence]'
+  }
+  $canonicalJsonProbeRoundTrip = [Text.UTF8Encoding]::new($false).GetString($secondCanonicalBytes) | ConvertFrom-Json -Depth 100
+  if ([int]$canonicalJsonProbeRoundTrip.schema -ne 1 -or @($canonicalJsonProbeRoundTrip.values).Count -ne 2 -or -not [bool]$canonicalJsonProbeRoundTrip.nested.enabled) {
+    throw '[mir-locales-canonical-json-round-trip]'
+  }
+} finally {
+  if (Test-Path -LiteralPath $canonicalJsonProbePath -PathType Leaf) { Remove-Item -LiteralPath $canonicalJsonProbePath -Force }
+  if (Test-Path -LiteralPath $canonicalJsonProbeRoot -PathType Container) { Remove-Item -LiteralPath $canonicalJsonProbeRoot -Force }
+}
+
 $policy = Read-MIRLocalePolicy -Path $PolicyPath
 $localeRootPath = (Resolve-Path -LiteralPath $LocaleRoot).Path
 $englishPath = Join-Path $localeRootPath "$($policy.source_locale)\$($policy.generated_file_name)"

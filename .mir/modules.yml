@@ -493,9 +493,11 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v5.json
-    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
-    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority.ps1
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v6.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v6.schema.json
+    current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1
+    frozen_package_presentation_v5: spec/distribution/mir4-current-package-presentation-v5.json
+    frozen_package_presentation_v5_schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
     frozen_package_presentation_v4: spec/distribution/mir4-current-package-presentation-v4.json
     frozen_package_presentation_v4_schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
     frozen_package_presentation_v3: spec/distribution/mir4-current-package-presentation-v3.json

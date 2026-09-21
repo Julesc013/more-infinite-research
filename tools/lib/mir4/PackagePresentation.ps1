@@ -35,6 +35,43 @@ function Get-MIR4FrozenPackagePresentationV1SourceSha256 {
   return [string](Get-MIR4CurrentPackagePresentationBaselineV1 -RepoRoot $RepoRoot).current.package_source_sha256
 }
 
+function Read-MIR4PackagePresentationCanonicalText {
+  [CmdletBinding()]
+  param([Parameter(Mandatory)][string]$Path)
+
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  $bytes = [IO.File]::ReadAllBytes($resolved)
+  $hasBom =
+    ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) -or
+    ($bytes.Length -ge 2 -and $bytes[0] -eq 0xFF -and $bytes[1] -eq 0xFE) -or
+    ($bytes.Length -ge 2 -and $bytes[0] -eq 0xFE -and $bytes[1] -eq 0xFF) -or
+    ($bytes.Length -ge 4 -and $bytes[0] -eq 0x00 -and $bytes[1] -eq 0x00 -and $bytes[2] -eq 0xFE -and $bytes[3] -eq 0xFF)
+  if ($hasBom) { throw "[mir4-package-presentation-text-bom] $Path" }
+
+  try {
+    return [Text.UTF8Encoding]::new($false, $true).GetString($bytes)
+  } catch {
+    throw "[mir4-package-presentation-text-utf8] $Path"
+  }
+}
+
+function Test-MIR4PackagePresentationCanonicalText {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][AllowEmptyString()][string]$Raw,
+    [Parameter(Mandatory)]$Record
+  )
+
+  # A Windows checkout can present CRLF even when the authority's canonical
+  # representation is LF. Normalize that platform pair only, then require the
+  # exact canonical JSON text and its single terminal newline. Lone CR,
+  # whitespace, missing/extra content, and reordered properties still fail;
+  # the byte reader rejects BOMs and malformed UTF-8 before this comparison.
+  $normalized = $Raw.Replace("`r`n", "`n")
+  $canonical = (ConvertTo-MIR4BootstrapCanonicalJson -Value $Record) + [char]10
+  return [string]::Equals($normalized, $canonical, [StringComparison]::Ordinal)
+}
+
 function Assert-MIR4PackagePresentationV1 {
   [CmdletBinding()]
   param(
@@ -235,11 +272,11 @@ function Get-MIR4CurrentPackagePresentationV3 {
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
   $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v3.json'
-  $raw = Get-Content -Raw -LiteralPath $path
+  $raw = Read-MIR4PackagePresentationCanonicalText -Path $path
   $v3 = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4CurrentPackagePresentationV3Schema -Record $v3 -RepoRoot $repo) -or
       -not (Test-MIR4BootstrapRecordHash -Record $v3) -or
-      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $v3) + [char]10)) {
+      -not (Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $v3)) {
     throw '[mir4-package-presentation-v3-schema]'
   }
   $v2 = Get-MIR4CurrentPackagePresentationV2 -RepoRoot $repo
@@ -346,11 +383,11 @@ function Get-MIR4CurrentPackagePresentationV3Historical {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v3.json'
-  $raw = Get-Content -Raw -LiteralPath $path
+  $raw = Read-MIR4PackagePresentationCanonicalText -Path $path
   $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4CurrentPackagePresentationV3Schema -Record $record -RepoRoot $repo) -or
       -not (Test-MIR4BootstrapRecordHash -Record $record) -or
-      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10) -or
+      -not (Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $record) -or
       [string]$record.kind -cne 'MIR4CurrentPackagePresentationV3' -or
       [string]$record.status -cne 'accepted-current-composable-source-package-presentation' -or
       [string]$record.record_sha256 -cne '0E66F8BD58371E54BF3783200A73423703BCC539D9538526D1BEABA05C494790' -or
@@ -423,9 +460,9 @@ function Get-MIR4CurrentPackagePresentationV4 {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v4.json'
-  $raw = Get-Content -Raw -LiteralPath $path
+  $raw = Read-MIR4PackagePresentationCanonicalText -Path $path
   $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
-  if (-not (Test-MIR4CurrentPackagePresentationV4Schema -Record $record -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10)) { throw '[mir4-package-presentation-v4-integrity]' }
+  if (-not (Test-MIR4CurrentPackagePresentationV4Schema -Record $record -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or -not (Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $record)) { throw '[mir4-package-presentation-v4-integrity]' }
   # V4 is the immutable Factorio-1 source-convergence receipt.  Later player
   # semantic work is represented by an append-only successor; do not rebuild
   # this record against live bytes or make its historical F210/F200 equality
@@ -573,11 +610,11 @@ function Get-MIR4CurrentPackagePresentationV5Historical {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   . (Join-Path $repo 'tools/lib/mir4/BootstrapMaterialization.ps1')
   $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v5.json'
-  $raw = Get-Content -Raw -LiteralPath $path
+  $raw = Read-MIR4PackagePresentationCanonicalText -Path $path
   $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4CurrentPackagePresentationV5Schema -Record $record -RepoRoot $repo) -or
       -not (Test-MIR4BootstrapRecordHash -Record $record) -or
-      $raw -cne ((ConvertTo-MIR4BootstrapCanonicalJson -Value $record) + [char]10) -or
+      -not (Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $record) -or
       [string]$record.record_sha256 -cne 'D2C73297B4A7BA404B13EEC0AB29C5CDE56357F04ED4B48C9B1099F2F2DA7470') {
     throw '[mir4-package-presentation-v5-historical-integrity]'
   }
@@ -676,6 +713,201 @@ function Assert-MIR4CurrentPackagePresentationV5 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
   $contract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $PackageSourceSha256
   return [string]$contract.package_source_sha256
+}
+
+function Test-MIR4CurrentPackagePresentationV6Schema {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)][string]$RepoRoot)
+  try { return [bool]((ConvertTo-MIR4BootstrapCanonicalJson -Value $Record) | Test-Json -SchemaFile (Join-Path $RepoRoot 'spec/schemas/mir4-current-package-presentation-v6.schema.json') -ErrorAction Stop) } catch { return $false }
+}
+
+function Get-MIR4CurrentPackagePresentationV6BrowserKeys {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$Path)
+  $keys = [Collections.Generic.List[string]]::new()
+  $inBrowserSection = $false
+  foreach ($line in Get-Content -LiteralPath $Path -Encoding UTF8) {
+    if ($line -match '^\[([^\]]+)\]\s*$') {
+      $inBrowserSection = $Matches[1] -ceq 'mir-browser'
+      continue
+    }
+    if ($inBrowserSection -and $line -match '^([^=\r\n]+)=') { $keys.Add([string]$Matches[1]) | Out-Null }
+  }
+  if ($keys.Count -ne 29 -or @($keys | Sort-Object -Unique).Count -ne 29) { throw "[mir4-package-presentation-v6-browser-key-count] $Path" }
+  return @($keys | Sort-Object)
+}
+
+function Get-MIR4CurrentPackagePresentationV6LocalizationInputs {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  $policyPath = Join-Path $repo '.mir/locales/manifest.json'
+  $policy = Get-Content -Raw -LiteralPath $policyPath | ConvertFrom-Json -Depth 100 -DateKind String
+  if ([int]$policy.schema -ne 1 -or [string]$policy.source_locale -cne 'en' -or
+      [string]$policy.generated_file_name -cne 'more-infinite-research.cfg' -or
+      [string]$policy.source_file -cne 'locale/en/more-infinite-research.cfg') { throw '[mir4-package-presentation-v6-locale-policy]' }
+  $codes = @($policy.supported_factorio_locales | ForEach-Object { [string]$_.code })
+  if ($codes.Count -ne 50 -or @($codes | Sort-Object -Unique).Count -ne 50 -or 'en' -notin $codes) { throw '[mir4-package-presentation-v6-governed-locale-set]' }
+  $sourceRoot = Join-Path $repo 'source/locale'
+  $englishKeys = Get-MIR4CurrentPackagePresentationV6BrowserKeys -Path (Join-Path $sourceRoot 'en/more-infinite-research.cfg')
+  foreach ($code in $codes) {
+    $localePath = Join-Path $sourceRoot "$code/more-infinite-research.cfg"
+    if (-not (Test-Path -LiteralPath $localePath -PathType Leaf) -or
+        ((Get-MIR4CurrentPackagePresentationV6BrowserKeys -Path $localePath) -join '|') -cne ($englishKeys -join '|')) { throw "[mir4-package-presentation-v6-governed-locale-completion] $code" }
+  }
+  $coverage = [Collections.Generic.List[object]]::new()
+  foreach ($target in @('f210','f200','f110','f100')) {
+    $state = Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
+    $targetCodes = [Collections.Generic.List[string]]::new()
+    foreach ($code in $codes) {
+      $sourcePath = "source/locale/$code/more-infinite-research.cfg"
+      $outputPath = "locale/$code/more-infinite-research.cfg"
+      $binding = @($state.manifest.bindings | Where-Object { [string]$_.source_path -ceq $sourcePath -and [string]$_.output_path -ceq $outputPath })
+      $operation = @($state.composition.operations | Where-Object { [string]$_.path -ceq $outputPath })
+      if ($binding.Count -ne 1 -or $operation.Count -ne 1) { throw "[mir4-package-presentation-v6-locale-materialization-cardinality] $target $code" }
+      if ($target -in @($binding[0].target_scope)) {
+        if ([string]$operation[0].operation -cne 'add' -or [string]$operation[0].source_path -cne $sourcePath -or [string]$operation[0].expected_sha256 -cne [string]$binding[0].output_sha256) { throw "[mir4-package-presentation-v6-locale-materialization] $target $code" }
+        $targetCodes.Add($code) | Out-Null
+      } elseif ([string]$operation[0].operation -cne 'omit') {
+        throw "[mir4-package-presentation-v6-locale-omission] $target $code"
+      }
+    }
+    $expected = if ($target -in @('f210','f200')) { 50 } else { 9 }
+    if ($targetCodes.Count -ne $expected) { throw "[mir4-package-presentation-v6-locale-coverage] $target" }
+    $coverage.Add([pscustomobject][ordered]@{target=$target;locale_count=$targetCodes.Count}) | Out-Null
+  }
+  return [pscustomobject][ordered]@{
+    policy_sha256 = Get-MIR4BootstrapTextSha256 -Path $policyPath
+    browser_keys = @($englishKeys)
+    governed_locale_count = $codes.Count
+    target_locale_coverage = @($coverage)
+  }
+}
+
+function Get-MIR4CurrentPackagePresentationV6Inputs {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Materialize)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
+  $v5 = Get-MIR4CurrentPackagePresentationV5Historical -RepoRoot $repo
+  $contract = Assert-MIR4CurrentPackageContract -RepoRoot $repo
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2' -Schema 'spec/schemas/mir4-composable-package-source-v2.schema.json' -Code 'mir4-package-presentation-v6-source-manifest'
+  $materialization = $null
+  if ($Materialize) { $materialization = Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-package-presentation-v6-materialization.json' }
+  return [pscustomobject][ordered]@{
+    v5 = $v5
+    contract = $contract
+    authority = $authority
+    manifest = $manifest
+    localization = Get-MIR4CurrentPackagePresentationV6LocalizationInputs -RepoRoot $repo
+    materialization = $materialization
+  }
+}
+
+function New-MIR4CurrentPackagePresentationV6 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[string]$RecordedAt='2026-09-21T12:50:00+10:00')
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $inputs = Get-MIR4CurrentPackagePresentationV6Inputs -RepoRoot $repo -Materialize
+  $targets = [Collections.Generic.List[object]]::new()
+  foreach ($target in @('f210','f200','f110','f100')) {
+    $actual = @($inputs.materialization.targets | Where-Object { [string]$_.target -ceq $target })
+    $prior = @($inputs.v5.target_content_identities | Where-Object { [string]$_.target -ceq $target })
+    $current = @($inputs.contract.targets | Where-Object { [string]$_.target -ceq $target })
+    if ($actual.Count -ne 1 -or $prior.Count -ne 1 -or $current.Count -ne 1 -or -not [bool]$actual[0].deterministic_archive_bytes) { throw "[mir4-package-presentation-v6-materialization] $target" }
+    $targets.Add([pscustomobject][ordered]@{
+      target=$target;content_sha256=[string]$actual[0].content_sha256;entry_count=[int]$actual[0].entry_count
+      predecessor_content_sha256=[string]$prior[0].content_sha256;predecessor_entry_count=[int]$prior[0].entry_count
+      relation='current-development-content-changed-exact-engine-qualification-required'
+      progression_capability_state=[string]$current[0].capability_state
+      deterministic_archive_bytes=$true;exact_engine_qualification_required=$true
+    }) | Out-Null
+  }
+  $record = [pscustomobject][ordered]@{
+    schema=1;kind='MIR4CurrentPackagePresentationV6';status='accepted-development-current-package-presentation-exact-engine-qualification-required';recorded_at=$RecordedAt
+    predecessor=[pscustomobject][ordered]@{path='spec/distribution/mir4-current-package-presentation-v5.json';kind=[string]$inputs.v5.kind;record_sha256=[string]$inputs.v5.record_sha256;immutable_historical_receipt=$true}
+    package_authority=[pscustomobject][ordered]@{path='targets/package-authority.json';kind=[string]$inputs.authority.kind;record_sha256=[string]$inputs.authority.record_sha256}
+    source_manifest=[pscustomobject][ordered]@{path='source/package-source.json';kind=[string]$inputs.manifest.kind;record_sha256=[string]$inputs.manifest.record_sha256}
+    package_source=[pscustomobject][ordered]@{fingerprint_sha256=[string]$inputs.contract.package_source_sha256;materializer_abi=[string]$inputs.manifest.materializer_abi;roots=@('source','targets');sole_writer=[string]$inputs.contract.sole_writer;legacy_root_state=[string]$inputs.authority.legacy_root_projection.compatibility_state}
+    target_compositions=@($inputs.contract.targets | ForEach-Object { [pscustomobject][ordered]@{target=[string]$_.target;path=[string]$_.composition_path;record_sha256=[string]$_.composition_record_sha256} })
+    target_content_identities=@($targets)
+    progression_baseline=@($inputs.v5.target_content_identities | ForEach-Object { [pscustomobject][ordered]@{target=[string]$_.target;relation=[string]$_.relation;capability_state=[string]$_.capability_state} })
+    localization=[pscustomobject][ordered]@{policy_path='.mir/locales/manifest.json';policy_sha256=[string]$inputs.localization.policy_sha256;source_locale='en';source_root='source/locale';generated_file_name='more-infinite-research.cfg';browser_section='mir-browser';browser_discovery_key_count=$inputs.localization.browser_keys.Count;governed_locale_count=[int]$inputs.localization.governed_locale_count;all_governed_locales_complete=$true;package_visible_locale_coverage_bound=$true;target_locale_coverage=@($inputs.localization.target_locale_coverage)}
+    qualification_obligations=@('schema-3-maximum-level-policy-fail-closed-validation','per-force-cap-ownership-and-reset-merge-reused-index-continuity','v2-to-v3-save-migration','browser-refresh-after-force-reset','f210-and-f200-exact-engine-replay','f110-and-f100-capability-omission-nonclaim','browser-localization-governed-locale-package-materialization','current-development-effects-and-science-exact-package-requalification')
+    authority_invariants=[pscustomobject][ordered]@{v5_predecessor_immutable=$true;all_governed_locales_complete=$true;package_visible_locale_coverage_bound=$true;current_package_contract_bound=$true;f210_f200_progression_capability_applied=$true;f110_f100_progression_capability_omitted_nonclaim=$true;exact_engine_qualification_required=$true;candidate_allocation_authorized=$false;signing_or_sealing_authorized=$false;promotion_authorized=$false;publication_authorized=$false;public_support_authorized=$false}
+    transition_gate=[pscustomobject][ordered]@{development_merge=$true;private_build=$false;qualification=$false;technical_seal=$false;main_promotion=$false;version_allocation=$false;tagging=$false;signing=$false;sealing=$false;publication=$false}
+    record_sha256=''
+  }
+  $record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $record
+  if (-not (Test-MIR4CurrentPackagePresentationV6Schema -Record $record -RepoRoot $repo)) { throw '[mir4-package-presentation-v6-schema]' }
+  return $record
+}
+
+function Assert-MIR4CurrentPackagePresentationV6TargetBindings {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$Inputs)
+  foreach ($target in @('f210','f200','f110','f100')) {
+    $stored = @($Record.target_content_identities | Where-Object { [string]$_.target -ceq $target })
+    $current = @($Inputs.contract.targets | Where-Object { [string]$_.target -ceq $target })
+    $storedComposition = @($Record.target_compositions | Where-Object { [string]$_.target -ceq $target })
+    $baseline = @($Record.progression_baseline | Where-Object { [string]$_.target -ceq $target })
+    $v5Baseline = @($Inputs.v5.target_content_identities | Where-Object { [string]$_.target -ceq $target })
+    if ($stored.Count -ne 1 -or $current.Count -ne 1 -or $storedComposition.Count -ne 1 -or $baseline.Count -ne 1 -or $v5Baseline.Count -ne 1 -or
+        [string]$stored[0].predecessor_content_sha256 -cne [string]$v5Baseline[0].content_sha256 -or
+        [int]$stored[0].predecessor_entry_count -ne [int]$v5Baseline[0].entry_count -or
+        [string]$stored[0].progression_capability_state -cne [string]$current[0].capability_state -or
+        [string]$storedComposition[0].record_sha256 -cne [string]$current[0].composition_record_sha256 -or
+        [string]$baseline[0].relation -cne [string]$v5Baseline[0].relation -or
+        [string]$baseline[0].capability_state -cne [string]$v5Baseline[0].capability_state -or
+        -not [bool]$stored[0].exact_engine_qualification_required) { throw "[mir4-package-presentation-v6-target-binding] $target" }
+  }
+  return $Record
+}
+
+function Assert-MIR4CurrentPackagePresentationV6SemanticBindings {
+  [CmdletBinding()] param([Parameter(Mandatory)]$Record,[Parameter(Mandatory)]$Inputs)
+  if ([string]$Record.predecessor.path -cne 'spec/distribution/mir4-current-package-presentation-v5.json' -or
+      [string]$Record.predecessor.kind -cne [string]$Inputs.v5.kind -or
+      [string]$Record.predecessor.record_sha256 -cne [string]$Inputs.v5.record_sha256 -or
+      [string]$Record.package_authority.path -cne 'targets/package-authority.json' -or
+      [string]$Record.package_authority.kind -cne [string]$Inputs.authority.kind -or
+      [string]$Record.package_authority.record_sha256 -cne [string]$Inputs.authority.record_sha256 -or
+      [string]$Record.source_manifest.path -cne 'source/package-source.json' -or
+      [string]$Record.source_manifest.kind -cne [string]$Inputs.manifest.kind -or
+      [string]$Record.source_manifest.record_sha256 -cne [string]$Inputs.manifest.record_sha256 -or
+      [string]$Record.package_source.fingerprint_sha256 -cne [string]$Inputs.contract.package_source_sha256 -or
+      [string]$Record.localization.policy_sha256 -cne [string]$Inputs.localization.policy_sha256 -or
+      [int]$Record.localization.browser_discovery_key_count -ne $Inputs.localization.browser_keys.Count -or
+      [int]$Record.localization.governed_locale_count -ne [int]$Inputs.localization.governed_locale_count -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $Record.localization.target_locale_coverage) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $Inputs.localization.target_locale_coverage)) { throw '[mir4-package-presentation-v6-current-binding]' }
+  Assert-MIR4CurrentPackagePresentationV6TargetBindings -Record $Record -Inputs $Inputs | Out-Null
+  if (-not [bool]$Record.authority_invariants.v5_predecessor_immutable -or -not [bool]$Record.authority_invariants.all_governed_locales_complete -or
+      -not [bool]$Record.authority_invariants.package_visible_locale_coverage_bound -or -not [bool]$Record.authority_invariants.current_package_contract_bound -or
+      -not [bool]$Record.authority_invariants.f210_f200_progression_capability_applied -or -not [bool]$Record.authority_invariants.f110_f100_progression_capability_omitted_nonclaim -or -not [bool]$Record.authority_invariants.exact_engine_qualification_required -or
+      [bool]$Record.authority_invariants.candidate_allocation_authorized -or [bool]$Record.authority_invariants.signing_or_sealing_authorized -or [bool]$Record.authority_invariants.promotion_authorized -or [bool]$Record.authority_invariants.publication_authorized -or [bool]$Record.authority_invariants.public_support_authorized) { throw '[mir4-package-presentation-v6-firewall]' }
+  return $Record
+}
+
+function Get-MIR4CurrentPackagePresentationV6 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $path = Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v6.json'
+  $raw = Read-MIR4PackagePresentationCanonicalText -Path $path
+  $record = $raw | ConvertFrom-Json -Depth 100 -DateKind String
+  if (-not (Test-MIR4CurrentPackagePresentationV6Schema -Record $record -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $record) -or -not (Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $record)) { throw '[mir4-package-presentation-v6-integrity]' }
+  $inputs = Get-MIR4CurrentPackagePresentationV6Inputs -RepoRoot $repo
+  Assert-MIR4CurrentPackagePresentationV6SemanticBindings -Record $record -Inputs $inputs | Out-Null
+  return $record
+}
+
+function Assert-MIR4CurrentPackagePresentationV6LiveFingerprint {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$StoredPackageSourceSha256,[Parameter(Mandatory)][string]$RequiredPackageSourceSha256)
+  $contract = Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot -RequiredPackageSourceSha256 $RequiredPackageSourceSha256
+  if ($StoredPackageSourceSha256 -notmatch '^[A-F0-9]{64}$' -or $StoredPackageSourceSha256 -cne [string]$contract.package_source_sha256) { throw '[mir4-package-presentation-v6-live-fingerprint]' }
+  return $StoredPackageSourceSha256
+}
+
+function Assert-MIR4CurrentPackagePresentationV6 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
+  $record = Get-MIR4CurrentPackagePresentationV6 -RepoRoot $RepoRoot
+  return Assert-MIR4CurrentPackagePresentationV6LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
 }
 
 # Current source consumers route through the live package contract. V1--V5
