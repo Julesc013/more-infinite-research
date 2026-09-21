@@ -480,7 +480,7 @@ function Get-MIRImmutableInputLeaseLiveness {
     return [pscustomobject]@{ present = $false; active = $false; ambiguous = $false; state = $null; reason = $null; record = $null }
   }
   try {
-    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -ErrorAction Stop
+    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 20 -DateKind String -ErrorAction Stop
   } catch {
     return [pscustomobject]@{ present = $true; active = $false; ambiguous = $true; state = 'invalid'; reason = 'lease record is invalid'; record = $null }
   }

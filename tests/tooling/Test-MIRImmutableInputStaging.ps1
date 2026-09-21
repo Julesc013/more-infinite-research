@@ -239,6 +239,14 @@ try {
     'static.mir4-a05-k2-materials-closure'
   )
   $testRegistry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+  $stagingDefinition = @($testRegistry.tests | Where-Object { [string]$_.id -ceq 'static.immutable-input-staging' })
+  $stagingDirectInputs = @(
+    'tests/runtime/Test-MIR4A05K2Materials.ps1',
+    'targets/f210/composition.json'
+  )
+  if ($stagingDefinition.Count -ne 1 -or @($stagingDirectInputs | Where-Object { $_ -cnotin @($stagingDefinition[0].inputs | ForEach-Object { [string]$_ }) }).Count -ne 0) {
+    throw 'Immutable-input staging proof does not fingerprint its F210 Materials binding-negative inputs.'
+  }
   foreach ($testId in $governedK2Tests) {
     $definition = @($testRegistry.tests | Where-Object { [string]$_.id -ceq $testId })
     if ($definition.Count -ne 1 -or $stagingLibraryRelative -cnotin @($definition[0].inputs | ForEach-Object { [string]$_ })) {
