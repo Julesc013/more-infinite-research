@@ -107,6 +107,15 @@ try {
   $secondReceipt = Complete-MIRImmutableInputLease -Lease $secondLease
   $secondLease = $null
   if ($secondReceipt.inputs_sha256_match -ne $true) { throw 'Copy fallback did not preserve the exact input hash.' }
+  $secondInput = @($secondReceipt.inputs)[0]
+  [IO.File]::WriteAllText([string]$secondInput.stage_path, 'mutated only after the terminal receipt released its lease', [Text.UTF8Encoding]::new($false))
+  if ((Get-MIRImmutableInputSha256 -Path ([string]$secondInput.stage_path)) -ceq [string]$secondInput.expected_sha256) {
+    throw 'Post-completion mutation fixture did not change the unlocked private copy.'
+  }
+  $receiptArtifact = ConvertTo-MIRImmutableInputArtifact -Receipt $secondReceipt -Input $secondInput -Locator 'run-two/mods/more-infinite-research_4.2.21000.zip'
+  if ($receiptArtifact.raw_sha256 -cne $hashOne -or $receiptArtifact.bytes -ne ([Text.UTF8Encoding]::new($false).GetByteCount('candidate bytes'))) {
+    throw 'Immutable artifact identity was reread from bytes changed after terminal receipt capture.'
+  }
 
   $mismatchedCandidate = Join-Path $fixtureRoot 'mismatched-f200-candidate.zip'
   [IO.File]::WriteAllText($mismatchedCandidate, 'not the current F200 materialization', [Text.UTF8Encoding]::new($false))
@@ -129,6 +138,15 @@ try {
   $aluminiumBindingText = $aluminiumBindingOutput | Out-String
   if ($aluminiumBindingText -notmatch 'supplied candidate bytes differ') { throw "A06 Aluminium mismatch was not rejected by its candidate binding: $aluminiumBindingText" }
   if ($aluminiumBindingText -match 'must-not-resolve-factorio|must-not-resolve-bob-mods') { throw "A06 Aluminium candidate-binding-only path reached an engine or dependency lookup: $aluminiumBindingText" }
+
+  $materialsHarness = Join-Path $RepoRoot 'tests/runtime/Test-MIR4A05K2Materials.ps1'
+  $materialsBindingOutput = @(& pwsh -NoProfile -File $materialsHarness -RepoRoot $RepoRoot -CandidateZip $mismatchedCandidate -FactorioBin (Join-Path $fixtureRoot 'must-not-resolve-factorio.exe') -VerifyCandidateBindingOnly 2>&1)
+  $materialsBindingExitCode = $LASTEXITCODE
+  $global:LASTEXITCODE = 0
+  if ($materialsBindingExitCode -eq 0) { throw 'A05 K2 Materials harness accepted supplied bytes that differ from current F210 materialization.' }
+  $materialsBindingText = $materialsBindingOutput | Out-String
+  if ($materialsBindingText -notmatch 'supplied candidate bytes differ') { throw "A05 K2 Materials mismatch was not rejected by its candidate binding: $materialsBindingText" }
+  if ($materialsBindingText -match 'must-not-resolve-factorio') { throw "A05 K2 Materials candidate-binding-only path reached an engine lookup: $materialsBindingText" }
 
   $adoptedA06Harnesses = @(
     'tests/runtime/Test-MIRA06BobLeadQualification.ps1',
@@ -178,6 +196,7 @@ try {
       'ImmutableInputStaging.ps1',
       'New-MIRImmutableInputLease',
       'Complete-MIRImmutableInputLease',
+      'ConvertTo-MIRImmutableInputArtifact',
       'input_staging=$terminalInputStaging',
       'Outcome failed'
     )) {
@@ -213,6 +232,28 @@ try {
     }
   }
 
+  $stagingLibraryRelative = 'tools/lib/validation/ImmutableInputStaging.ps1'
+  $governedK2Tests = @(
+    'runtime.k2-k2so-f210-intake',
+    'static.mir4-a05-k2-03-imersite-closure',
+    'static.mir4-a05-k2-materials-closure'
+  )
+  $testRegistry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/tests.yml') | ConvertFrom-Json -Depth 100
+  foreach ($testId in $governedK2Tests) {
+    $definition = @($testRegistry.tests | Where-Object { [string]$_.id -ceq $testId })
+    if ($definition.Count -ne 1 -or $stagingLibraryRelative -cnotin @($definition[0].inputs | ForEach-Object { [string]$_ })) {
+      throw "$testId does not fingerprint the immutable-input staging implementation."
+    }
+  }
+  $assurancePolicy = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot '.mir/assurance.json') | ConvertFrom-Json -Depth 100
+  $stagingImpact = @($assurancePolicy.classes | Where-Object { [string]$_.id -ceq 'k2-immutable-input-staging' })
+  $expectedImpactTests = @('runtime.k2-k2so-f210-intake', 'static.immutable-input-staging', 'static.mir4-a05-k2-03-imersite-closure', 'static.mir4-a05-k2-materials-closure')
+  if ($stagingImpact.Count -ne 1 -or
+      '^tools/lib/validation/ImmutableInputStaging[.]ps1$' -cnotin @($stagingImpact[0].patterns | ForEach-Object { [string]$_ }) -or
+      (@($stagingImpact[0].tests | ForEach-Object { [string]$_ } | Sort-Object) -join "`n") -cne (($expectedImpactTests | Sort-Object) -join "`n")) {
+    throw 'Immutable-input staging changes do not select the complete governed K2 proof set.'
+  }
+
   $failedRun = Join-Path $fixtureRoot 'failed-run'
   New-Item -ItemType Directory -Force -Path $failedRun | Out-Null
   $rejected = $false
@@ -241,6 +282,34 @@ try {
     $failedReclaimRejected = $_.Exception.Message -match 'retains immutable-input custody'
   }
   if (-not $failedReclaimRejected) { throw 'Failed immutable input custody was considered reclaimable.' }
+
+  $forgedRun = Join-Path $fixtureRoot 'forged-completed-run'
+  New-Item -ItemType Directory -Force -Path $forgedRun | Out-Null
+  $forgedLease = New-MIRImmutableInputLease -RunRoot $forgedRun -StageDirectory (Join-Path $forgedRun 'mods') -ForceCopy -Inputs @(
+    [ordered]@{
+      source_path = $sourceOne
+      file_name = 'candidate.zip'
+      expected_sha256 = $hashOne
+      role = 'candidate'
+      identity = [ordered]@{ target = 'f210'; sha256 = $hashOne }
+      provenance = [ordered]@{ kind = 'fixture' }
+      immutable = $true
+    }
+  )
+  $null = Complete-MIRImmutableInputLease -Lease $forgedLease -Outcome failed
+  $forgedRecordPath = Join-Path $forgedRun 'mir-immutable-input-lease.json'
+  $forgedRecord = Get-Content -Raw -LiteralPath $forgedRecordPath | ConvertFrom-Json -Depth 20
+  $forgedRecord.state = 'completed'
+  $forgedRecord.outcome = 'passed'
+  $forgedRecord.inputs_sha256_match = $true
+  [IO.File]::WriteAllText($forgedRecordPath, (($forgedRecord | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
+  $forgedReclaimRejected = $false
+  try {
+    Assert-MIRImmutableInputLeaseReclaimable -RunRoot $forgedRun -Context 'forged completed immutable-input fixture' | Out-Null
+  } catch {
+    $forgedReclaimRejected = $_.Exception.Message -match 'retains immutable-input custody'
+  }
+  if (-not $forgedReclaimRejected) { throw 'A forged completed receipt was considered reclaimable.' }
 
   $orphanLockRun = Join-Path $fixtureRoot 'orphan-lock-run'
   New-Item -ItemType Directory -Force -Path $orphanLockRun | Out-Null

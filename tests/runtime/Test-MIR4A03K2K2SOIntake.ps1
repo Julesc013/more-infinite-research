@@ -291,6 +291,9 @@ $archiveHashes = [ordered]@{}
 foreach ($file in @(Get-ChildItem -LiteralPath $mods -File | Sort-Object Name)) { $archiveHashes[$file.Name] = Get-A03Sha256 -Path $file.FullName }
 $terminalInputStaging = Complete-MIRImmutableInputLease -Lease $inputLease
 $inputLease = $null
+$candidateInput = @($terminalInputStaging.inputs | Where-Object { $_.role -ceq 'candidate' })
+Assert-A03Equal -Actual $candidateInput.Count -Expected 1 -Code '[mir4-a03-candidate-input-count]'
+$candidateArtifact = ConvertTo-MIRImmutableInputArtifact -Receipt $terminalInputStaging -Input $candidateInput[0] -Locator $candidate
 $result = [pscustomobject][ordered]@{
   schema = 1
   kind = 'MIR4A03K2K2SOIntakeRuntimeResultV1'
@@ -298,7 +301,7 @@ $result = [pscustomobject][ordered]@{
   target = 'f210'
   attempt_root = $root
   factorio = [ordered]@{ version = '2.1.17'; executable_sha256 = Get-A03Sha256 -Path $engine }
-  candidate = [ordered]@{ path = $candidate; sha256 = Get-A03Sha256 -Path $candidate; bytes = (Get-Item -LiteralPath $candidate).Length }
+  candidate = [ordered]@{ path = $candidateArtifact.path; sha256 = $candidateArtifact.raw_sha256; bytes = $candidateArtifact.bytes }
   initial_observation_artifacts = [ordered]@{ observer_archive_sha256 = Get-A03Sha256 -Path $initialObserverArchive; observer_source_sha256 = [ordered]@{ data_final_fixes = Get-A03Sha256 -Path (Join-Path $initialObserverSource 'data-final-fixes.lua'); info = Get-A03Sha256 -Path (Join-Path $initialObserverSource 'info.json') } }
   governed_run_observer = [ordered]@{ archive_sha256 = Get-A03Sha256 -Path $governedObserverArchive; source_sha256 = [ordered]@{ data_final_fixes = Get-A03Sha256 -Path (Join-Path $governedObserverSource 'data-final-fixes.lua'); info = Get-A03Sha256 -Path (Join-Path $governedObserverSource 'info.json') } }
   closure_archives = $archiveHashes

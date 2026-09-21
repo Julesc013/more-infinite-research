@@ -4407,6 +4407,7 @@
       "inputs": [
         "tests/mir4/Test-MIR4A05K203ImersiteClosure.ps1",
         "tests/runtime/Test-MIR4A05K203Imersite.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/bootstrap-materialization/**",
@@ -4444,6 +4445,7 @@
       "inputs": [
         "tests/mir4/Test-MIR4A05K2MaterialsClosure.ps1",
         "tests/runtime/Test-MIR4A05K2Materials.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/bootstrap-materialization/**",
@@ -4530,6 +4532,7 @@
         "factorio",
         "candidate",
         "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "fixtures/assert-k2-k2so-f210-intake/**",
         "tools/lib/compatibility/FactorioRunner.ps1",
         "tools/lib/validation/FactorioProcess.ps1",
