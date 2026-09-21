@@ -1726,7 +1726,7 @@ fixtures:
     exact_target:
       factorio_line: "2.0"
       factorio_version: "2.0.77"
-      mod_lock: exact-engine-2.0.77-base-only
+      mod_lock: exact-engine-2.0.77-base-only-explicit-elevated-rails-quality-space-age-disabled
     validates:
       - F200-no-mod-data-policy-transport-uses-settings-derived-V3-controller-records
       - F200-finite-cap-three-disables-MIR-owned-and-preserves-foreign-disabled-enablement

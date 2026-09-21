@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 200,
+  "test_count": 201,
   "tests": [
     {
       "id": "docs.check",
@@ -870,6 +870,7 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "fixtures/assert-mir42-f200-settings-cap-transition/**",
         "source:source/prototypes/mir/runtime/maximum_level_control.lua",
         "source:source/package-source.json",
@@ -1404,6 +1405,29 @@
         ".mir/public-artifact-budgets.json",
         "tools/commands/technology/Export-MIRCompilerPreview.ps1",
         "tests/compiler/Test-MIRCompilerPreviewExport.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.f200-base-only-settings-cap-transition-harness",
+      "proposition": "The governed test 'static.f200-base-only-settings-cap-transition-harness' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+        "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "fixtures/assert-mir42-f200-settings-cap-transition/**",
+        ".mir/fixtures.yml"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7349,11 +7373,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 54,
-      "runtime-upgrade": 45,
+      "runtime-upgrade": 46,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 188,
+    "canonical_test_commands": 189,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7366,5 +7390,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:06d35cc2072552b91a3ef0eadccb97ef8225238c77947355faa97c32023c6cb3"
+  "digest": "sha256:88d27a8cbfd4cb6111518c0a1886a7692ee754a8379b4efa0e6183f4b01819f9"
 }
