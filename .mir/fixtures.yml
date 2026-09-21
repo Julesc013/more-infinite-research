@@ -1665,12 +1665,17 @@ fixtures:
       - coolant-returning-wire-coils-and-unpermitted-direct-wire-remain-withheld
       - exact-Bob-bullet-heavy-ammo-and-rocket-manufacturing-stream-composition
       - no-manufacturing-route-is-bound-to-a-direct-damage-or-firing-speed-stream
+      - exact-hash-Angel-Petrochem-source-intake-for-nitric-hydrochloric-hydrofluoric-acid-and-glycerol
+      - Angel-Petrochem-void-and-coproduct-hazards-remain-admission-blockers
+      - nitroglycerin-recipe-resolves-to-explosives-without-inventing-a-distinct-output-subject
       - canonical-productivity-byte-parity-and-deterministic-materialization-for-f210-f200-f110-and-f100
     non_claims:
       - Factorio-engine-qualification-or-production-gain
       - F210-2.1.18-or-later-capsule-pass
       - broad-Bob-or-Angel-compatibility
       - capsule-or-laser-battery-ammunition-admission
+      - Angel-Petrochem-technology-or-effect-emission
+      - Py-acid-gas-or-glycerol-intake
       - save-upgrade-migration-or-release-readiness
 
   maximum-level-cap-ownership-multiforce-f210:
