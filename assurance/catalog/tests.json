@@ -1283,8 +1283,16 @@
         "targets/**",
         ".mir/modules.yml",
         ".mir/module-dependencies.json",
-        "tools/lib/validation/CurrentTargetPackage.ps1",
-        "tests/architecture/Test-MIRArchitecture.ps1"
+        "scripts/Invoke-MIRValidation.ps1",
+        "tools/lib/validation/**",
+        "tools/lib/control/**",
+        "tools/commands/docs/Update-MIRDocumentationIndex.ps1",
+        "tools/commands/docs/Update-MIRPipelineDocumentation.ps1",
+        "tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1",
+        "tools/commands/workspace/Get-MIRLegacyInventory.ps1",
+        "tests/tooling/Test-MIRGovernance.ps1",
+        "tests/compiler/Test-MIRSettingsVisibility.ps1",
+        "tests/architecture/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7346,5 +7354,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e1ef2bc843bc0ee0ecbdf1ce73977ec507b718052c5a5b489cba71d10ba2a232"
+  "digest": "sha256:b6380a7560d5dcd0a82412cc38e6a54fe98948edbcbc0e6e0c3154d760651c2b"
 }
