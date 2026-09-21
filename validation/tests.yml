@@ -2336,6 +2336,7 @@
       "command": "./tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/control-plane-v5.yml",
         "source/package-source.json",
         "targets/package-authority.json",
         "targets/f210/composition.json",

@@ -246,6 +246,7 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
   [CmdletBinding()]
   param([string]$GhExecutable = 'gh')
   $invokeRest = ${function:Invoke-MIR4A08GitHubRestJson}
+  $assertPropertyNames = ${function:Assert-MIR4A08PropertyNames}
   $provider = {
     param([object]$Authority,[object]$Candidate)
     $producer = $Authority.producer
@@ -259,18 +260,57 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
       $name = [string]$_.name
       $name -ceq [string]$producer.job -or $name.EndsWith(" / $([string]$producer.job)", [StringComparison]::Ordinal)
     })
-    if ([int64]$run.id -ne [int64]$producer.run_id -or [string]$run.name -cne [string]$producer.workflow -or
-        [string]$run.event -cne [string]$producer.event -or [string]$run.head_sha -cne [string]$Candidate.commit -or
-        [int]$run.run_attempt -ne [int]$producer.run_attempt -or [string]$run.status -cne 'completed' -or
-        [string]$run.conclusion -cne 'success' -or [string]$run.actor.login -cne [string]$producer.actor -or
-        $matchingJobs.Count -ne 1) {
-      throw '[mir4-a08-qualification-run-identity]'
+    $runChecks = [ordered]@{
+      run_id = [int64]$run.id -eq [int64]$producer.run_id
+      workflow = [string]$run.name -ceq [string]$producer.workflow
+      event = [string]$run.event -ceq [string]$producer.event
+      workflow_commit = [string]$run.head_sha -ceq [string]$producer.workflow_commit
+      run_attempt = [int]$run.run_attempt -eq [int]$producer.run_attempt
+      status = [string]$run.status -ceq 'completed'
+      conclusion = [string]$run.conclusion -ceq 'success'
+      actor = [string]$run.actor.login -ceq [string]$producer.actor
+      qualification_job = $matchingJobs.Count -eq 1
     }
+    $failedRunChecks = @($runChecks.GetEnumerator() | Where-Object { -not [bool]$_.Value } | ForEach-Object { [string]$_.Key })
+    if ($failedRunChecks.Count -ne 0) { throw "[mir4-a08-qualification-run-identity] $($failedRunChecks -join ',')" }
     $job = $matchingJobs[0]
     $labels = @($job.labels | ForEach-Object { ([string]$_).ToLowerInvariant() })
     if ([string]$job.status -cne 'completed' -or [string]$job.conclusion -cne 'success' -or
         [string]::IsNullOrWhiteSpace([string]$job.runner_name) -or 'self-hosted' -notin $labels -or 'windows' -notin $labels) {
       throw '[mir4-a08-qualification-job-identity]'
+    }
+    $workflowRef = "refs/heads/$([string]$run.head_branch)"
+    if ($workflowRef -cne [string]$producer.workflow_ref) { throw '[mir4-a08-qualification-run-identity]' }
+    $artifactName = "mir-v5-qualification-source-$([string]$run.id)-attempt-$([string]$run.run_attempt)"
+    $artifacts = & $invokeRest -GhExecutable $GhExecutable -Arguments @('api','-X','GET','-f',"name=$artifactName",'-f','per_page=100',"repos/$repository/actions/runs/$([string]$run.id)/artifacts") -Code '[mir4-a08-qualification-source-artifact]'
+    $matches = @($artifacts.artifacts | Where-Object { [string]$_.name -ceq $artifactName -and -not [bool]$_.expired })
+    if ($matches.Count -ne 1 -or [long]$matches[0].size_in_bytes -lt 1 -or [long]$matches[0].size_in_bytes -gt 131072) {
+      throw '[mir4-a08-qualification-source-artifact]'
+    }
+    if ($null -ne $matches[0].workflow_run -and [int64]$matches[0].workflow_run.id -ne [int64]$run.id) {
+      throw '[mir4-a08-qualification-source-artifact]'
+    }
+    $scratch = Join-Path ([IO.Path]::GetTempPath()) ("mir4-a08-source-attestation-" + [guid]::NewGuid().ToString('N'))
+    [IO.Directory]::CreateDirectory($scratch) | Out-Null
+    try {
+      $download = @(& $GhExecutable run download ([string]$run.id) --repo $repository --name $artifactName --dir $scratch 2>&1 | ForEach-Object { [string]$_ })
+      if ($LASTEXITCODE -ne 0) { throw "[mir4-a08-qualification-source-artifact] $($download -join ' ')" }
+      $attestationFiles = @(Get-ChildItem -LiteralPath $scratch -File -Recurse | Where-Object { $_.Name -ceq 'qualification-source-attestation.json' })
+      if ($attestationFiles.Count -ne 1 -or $attestationFiles[0].Length -gt 65536) { throw '[mir4-a08-qualification-source-artifact]' }
+      try { $attestation = Get-Content -Raw -LiteralPath $attestationFiles[0].FullName | ConvertFrom-Json -Depth 20 -DateKind String }
+      catch { throw '[mir4-a08-qualification-source-artifact]' }
+      & $assertPropertyNames $attestation @('schema','kind','repository','workflow','workflow_run_id','workflow_run_attempt','workflow_job','workflow_ref','workflow_commit','source_ref','source_commit','source_tree','context_id') '[mir4-a08-qualification-source-artifact]'
+      if ([int]$attestation.schema -ne 1 -or [string]$attestation.kind -cne 'MIR4QualificationSourceAttestationV1' -or
+          [string]$attestation.repository -cne $repository -or [string]$attestation.workflow -cne [string]$run.name -or
+          [string]$attestation.workflow_run_id -cne [string]$run.id -or [string]$attestation.workflow_run_attempt -cne [string]$run.run_attempt -or
+          -not (([string]$job.name -ceq [string]$attestation.workflow_job) -or ([string]$job.name).EndsWith(" / $([string]$attestation.workflow_job)",[StringComparison]::Ordinal)) -or
+          [string]$attestation.workflow_ref -cne $workflowRef -or [string]$attestation.workflow_commit -cne [string]$run.head_sha -or
+          [string]$attestation.source_ref -cne [string]$Candidate.commit -or [string]$attestation.source_commit -cne [string]$Candidate.commit -or
+          [string]$attestation.source_tree -cne [string]$Candidate.tree -or [string]$attestation.context_id -cnotmatch '^[A-Fa-f0-9]{64}$') {
+        throw '[mir4-a08-qualification-source-artifact]'
+      }
+    } finally {
+      if (Test-Path -LiteralPath $scratch) { [IO.Directory]::Delete($scratch,$true) }
     }
     return [pscustomobject][ordered]@{
       run_id = [string]$run.id
@@ -278,11 +318,14 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
       workflow = [string]$run.name
       event = [string]$run.event
       actor = [string]$run.actor.login
-      commit = [string]$run.head_sha
+      workflow_commit = [string]$run.head_sha
+      workflow_ref = $workflowRef
+      source_commit = [string]$attestation.source_commit
+      source_tree = [string]$attestation.source_tree
       job = [string]$job.name
       runner_name = [string]$job.runner_name
       runner_identity = 'self-hosted-windows'
-      ref = "refs/heads/$([string]$run.head_branch)"
+      source_attestation_artifact = $artifactName
     }
   }
   return $provider.GetNewClosure()
@@ -449,9 +492,9 @@ function Assert-MIR4A08PresentationBinding {
 
 function Assert-MIR4A08TrustedIssuer {
   param([Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$CanonicalRepository,[scriptblock]$QualificationAuthorityProvider=$null,[switch]$Rehearsal)
-  Assert-MIR4A08PropertyNames $Authority @('kind','issuer_id','trust_policy','producer') '[mir4-a08-qualification-authority]';Assert-MIR4A08PropertyNames $Authority.producer @('repository','workflow','run_id','run_attempt','job','actor','commit','ref','event','environment','runner_identity','trust_class','verifier_sha256','policy_sha256') '[mir4-a08-qualification-authority]';$producer=$Authority.producer
-  if ([string]$Authority.kind-cne'MIR4GovernedIndependentQualificationAuthorityV1'-or[string]::IsNullOrWhiteSpace([string]$Authority.issuer_id)-or[string]$Authority.trust_policy-cne'validation/trust.json'-or[string]$producer.repository-cne$CanonicalRepository-or[string]$producer.commit-cne[string]$Candidate.commit-or[string]$producer.job-cne[string]$Authority.issuer_id-or[string]$producer.verifier_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$producer.policy_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir4-a08-qualification-authority]'}
-  if ($Rehearsal){if ([string]$producer.trust_class-cne'synthetic-protected-release'-or[string]$producer.workflow-cne'synthetic-independent-verification'-or[string]$producer.event-cne'synthetic-merge'){throw '[mir4-a08-qualification-authority]'}}else{$trustPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../../validation/trust.json'));$trust=Get-Content -Raw -LiteralPath $trustPath|ConvertFrom-Json -Depth 30;$class=$trust.classes.'protected-release';if ([string]$producer.trust_class-cne'protected-release'-or$null-eq$class-or-not[bool]$class.release_eligible-or[string]$producer.workflow-notin@($class.workflows)-or[string]$producer.event-notin@($class.events)-or[string]$producer.ref-notin@($class.refs)-or[string]$producer.environment-cne[string]$class.environment-or[string]$producer.runner_identity-cne[string]$class.runner_identity-or[string]$producer.policy_sha256-cne(Get-MIR4A08FileSha256 $trustPath)){throw '[mir4-a08-qualification-authority]'};if($null-eq$QualificationAuthorityProvider){$QualificationAuthorityProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider};try{$observed=&$QualificationAuthorityProvider $Authority $Candidate}catch{throw "[mir4-a08-qualification-authority-provider] $($_.Exception.Message)"};Assert-MIR4A08PropertyNames $observed @('run_id','run_attempt','workflow','event','actor','commit','job','runner_name','runner_identity','ref') '[mir4-a08-qualification-authority-provider]';if([string]$observed.run_id-cne[string]$producer.run_id-or[string]$observed.run_attempt-cne[string]$producer.run_attempt-or[string]$observed.workflow-cne[string]$producer.workflow-or[string]$observed.event-cne[string]$producer.event-or[string]$observed.actor-cne[string]$producer.actor-or[string]$observed.commit-cne[string]$producer.commit-or[string]$observed.runner_identity-cne[string]$producer.runner_identity-or[string]$observed.ref-cne[string]$producer.ref-or-not(([string]$observed.job-ceq[string]$producer.job)-or([string]$observed.job).EndsWith(" / $([string]$producer.job)",[StringComparison]::Ordinal))){throw '[mir4-a08-qualification-authority-provider]'}};return $Authority
+  Assert-MIR4A08PropertyNames $Authority @('kind','issuer_id','trust_policy','producer') '[mir4-a08-qualification-authority]';Assert-MIR4A08PropertyNames $Authority.producer @('repository','workflow','run_id','run_attempt','job','actor','workflow_commit','workflow_ref','source_commit','source_tree','event','environment','runner_identity','trust_class','verifier_sha256','policy_sha256') '[mir4-a08-qualification-authority]';$producer=$Authority.producer
+  if ([string]$Authority.kind-cne'MIR4GovernedIndependentQualificationAuthorityV1'-or[string]::IsNullOrWhiteSpace([string]$Authority.issuer_id)-or[string]$Authority.trust_policy-cne'validation/trust.json'-or[string]$producer.repository-cne$CanonicalRepository-or[string]$producer.source_commit-cne[string]$Candidate.commit-or[string]$producer.source_tree-cne[string]$Candidate.tree-or[string]$producer.workflow_commit-cnotmatch'^[0-9a-f]{40}$'-or[string]$producer.job-cne[string]$Authority.issuer_id-or[string]$producer.verifier_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$producer.policy_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir4-a08-qualification-authority]'}
+  if ($Rehearsal){if ([string]$producer.trust_class-cne'synthetic-protected-release'-or[string]$producer.workflow-cne'synthetic-independent-verification'-or[string]$producer.event-cne'synthetic-merge'){throw '[mir4-a08-qualification-authority]'}}else{$trustPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../../validation/trust.json'));$trust=Get-Content -Raw -LiteralPath $trustPath|ConvertFrom-Json -Depth 30;$class=$trust.classes.'protected-release';if ([string]$producer.trust_class-cne'protected-release'-or$null-eq$class-or-not[bool]$class.release_eligible-or[string]$producer.workflow-notin@($class.workflows)-or[string]$producer.event-notin@($class.events)-or[string]$producer.workflow_ref-notin@($class.refs)-or[string]$producer.environment-cne[string]$class.environment-or[string]$producer.runner_identity-cne[string]$class.runner_identity-or[string]$producer.policy_sha256-cne(Get-MIR4A08FileSha256 $trustPath)){throw '[mir4-a08-qualification-authority]'};if($null-eq$QualificationAuthorityProvider){$QualificationAuthorityProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider};try{$observed=&$QualificationAuthorityProvider $Authority $Candidate}catch{throw "[mir4-a08-qualification-authority-provider] $($_.Exception.Message)"};Assert-MIR4A08PropertyNames $observed @('run_id','run_attempt','workflow','event','actor','workflow_commit','workflow_ref','source_commit','source_tree','job','runner_name','runner_identity','source_attestation_artifact') '[mir4-a08-qualification-authority-provider]';if([string]$observed.run_id-cne[string]$producer.run_id-or[string]$observed.run_attempt-cne[string]$producer.run_attempt-or[string]$observed.workflow-cne[string]$producer.workflow-or[string]$observed.event-cne[string]$producer.event-or[string]$observed.actor-cne[string]$producer.actor-or[string]$observed.workflow_commit-cne[string]$producer.workflow_commit-or[string]$observed.workflow_ref-cne[string]$producer.workflow_ref-or[string]$observed.source_commit-cne[string]$producer.source_commit-or[string]$observed.source_tree-cne[string]$producer.source_tree-or[string]$observed.runner_identity-cne[string]$producer.runner_identity-or-not(([string]$observed.job-ceq[string]$producer.job)-or([string]$observed.job).EndsWith(" / $([string]$producer.job)",[StringComparison]::Ordinal))){throw '[mir4-a08-qualification-authority-provider]'}};return $Authority
 }
 function Assert-MIR4A08QualificationReceipts {
   param([Parameter(Mandatory)]$Row,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Observed,[switch]$Rehearsal)

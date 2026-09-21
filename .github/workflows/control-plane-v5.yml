@@ -544,6 +544,38 @@ jobs:
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence | Out-Host
           ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot build/results/evidence |
             Tee-Object -FilePath build/results/control-plane-v5/promotion-result.json
+      - name: Record exact qualification-source attestation
+        shell: pwsh
+        env:
+          MIR_CP_CONTEXT_ID: ${{ needs.context.outputs.context_id }}
+          MIR_CP_SOURCE_REF: ${{ inputs.source_ref }}
+        run: |
+          $sourceCommit = (git -C source rev-parse HEAD).Trim()
+          $sourceTree = (git -C source rev-parse 'HEAD^{tree}').Trim()
+          if ($sourceCommit -cne $env:MIR_CP_SOURCE_REF) { throw 'Qualification source checkout mismatch.' }
+          $record = [ordered]@{
+            schema = 1
+            kind = 'MIR4QualificationSourceAttestationV1'
+            repository = $env:GITHUB_REPOSITORY
+            workflow = $env:GITHUB_WORKFLOW
+            workflow_run_id = $env:GITHUB_RUN_ID
+            workflow_run_attempt = $env:GITHUB_RUN_ATTEMPT
+            workflow_job = $env:GITHUB_JOB
+            workflow_ref = $env:GITHUB_REF
+            workflow_commit = $env:GITHUB_SHA
+            source_ref = $env:MIR_CP_SOURCE_REF
+            source_commit = $sourceCommit
+            source_tree = $sourceTree
+            context_id = $env:MIR_CP_CONTEXT_ID
+          }
+          $path = 'build/results/control-plane-v5/qualification-source-attestation.json'
+          [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($path))) | Out-Null
+          [IO.File]::WriteAllText($path, ($record | ConvertTo-Json -Depth 10), [Text.UTF8Encoding]::new($false))
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: mir-v5-qualification-source-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: build/results/control-plane-v5/qualification-source-attestation.json
+          if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()
         with:

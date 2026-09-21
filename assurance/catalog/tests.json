@@ -5129,6 +5129,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/control-plane-v5.yml",
         "source/package-source.json",
         "targets/package-authority.json",
         "targets/f210/composition.json",
@@ -7255,5 +7256,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a38cbcad43f553c9bd0625c9f8d91214b0d24021090580d0643e69897e790c47"
+  "digest": "sha256:2f636b504d6fdb7e1a3eacd8aa378ea8b267dae70ffd7418ab835978c7b2fbe9"
 }
