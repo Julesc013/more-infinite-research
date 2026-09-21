@@ -26,9 +26,12 @@ end
 local function configure(force, enabled)
   force.enable_all_prototypes()
   local technology = technology_for(force)
+  -- Advancing an infinite technology can restore Factorio's default
+  -- enablement. Apply the intended seed state after the level write so the
+  -- foreign-disabled force is genuinely disabled before MIR owns anything.
+  technology.level = 4
   technology.visible_when_disabled = false
   technology.enabled = enabled
-  technology.level = 4
 end
 
 local function expect(force_name, enabled, visible)
