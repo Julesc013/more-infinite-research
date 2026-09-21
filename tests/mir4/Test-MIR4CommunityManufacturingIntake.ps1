@@ -237,6 +237,11 @@ Assert-CMI ((@($a19[0].evidence)-join '|') -ceq ($a19Evidence-join '|')) 'A19 ev
 
 Assert-CMI ($sourceText.Contains('local function bob_or_angel_wire_material_family(material)',[StringComparison]::Ordinal)) 'wire family must use the shared material-family mechanism.'
 Assert-CMI ($sourceText.Contains('if aluminium_mod_active("angelssmelting") and not aluminium_mod_active("bobplates") then',[StringComparison]::Ordinal)) 'wire family must exclude Bob plates to prevent serial plate/wire ownership.'
+$wireFamilyStart=$sourceText.IndexOf('local function bob_or_angel_wire_material_family(material)',[StringComparison]::Ordinal)
+$wireFamilyEnd=$sourceText.IndexOf("`n`n-- Separate requested materials",$wireFamilyStart,[StringComparison]::Ordinal)
+Assert-CMI ($wireFamilyStart -ge 0 -and $wireFamilyEnd -gt $wireFamilyStart) 'wire family declaration boundary is absent.'
+$wireFamilyDeclaration=$sourceText.Substring($wireFamilyStart,$wireFamilyEnd-$wireFamilyStart)
+Assert-CMI (-not $wireFamilyDeclaration.Contains('require_exact_route_certificate',[StringComparison]::Ordinal) -and -not $wireFamilyDeclaration.Contains('reviewed_forward_routes',[StringComparison]::Ordinal)) 'Angel wire declarations cannot require an exact certificate without exact certificate data.'
 foreach($wire in @($fixture.wire_routes)){
   $request=@($requestRows|Where-Object{$_.id -ceq $wire.request_id})[0]
   $declaration=$request.material_route_declaration.angel_only_wire_intake
@@ -256,6 +261,7 @@ foreach($stream in @('research_bullets','research_heavy_ammo','research_rockets'
   Assert-CMI ($row.Contains('capability: recipe-productivity',[StringComparison]::Ordinal)) "manufacturing stream is not recipe-productivity: $stream"
   Assert-CMI ($row.Contains('fixtures/assert-community-manufacturing-intake',[StringComparison]::Ordinal)) "manufacturing stream lacks static fixture evidence: $stream"
   Assert-CMI (-not $directEffects.Contains("  $stream = {",[StringComparison]::Ordinal)) "manufacturing stream was also declared as a direct effect: $stream"
+  Assert-CMI (-not $streamBlocks[$stream].Contains('require_exact_route_certificate',[StringComparison]::Ordinal) -and -not $streamBlocks[$stream].Contains('reviewed_forward_routes',[StringComparison]::Ordinal)) "Bob ammunition declaration cannot require an exact certificate without exact certificate data: $stream"
 }
 
 $declaredAmmo=@()
