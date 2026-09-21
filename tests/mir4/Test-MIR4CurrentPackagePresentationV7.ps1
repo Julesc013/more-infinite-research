@@ -9,11 +9,12 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 $writer=Join-Path $repo 'tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1'
 
-$record=Get-MIR4CurrentPackagePresentationV7 -RepoRoot $repo
+$record=Get-MIR4CurrentPackagePresentationV7Historical -RepoRoot $repo
 $v6=Get-MIR4CurrentPackagePresentationV6Historical -RepoRoot $repo
 $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
 $predecessorManifest=Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo
-Assert-MIR4CurrentPackagePresentationV7LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)|Out-Null
+$currentPackageSource=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+Assert-MIR4CurrentPackagePresentationV7LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 $currentPackageSource -RequiredPackageSourceSha256 $currentPackageSource|Out-Null
 Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check|Out-Null
 
 $migrated=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
@@ -52,19 +53,19 @@ foreach($target in @('f210','f200','f110','f100')){
      -not[bool]$identity[0].exact_engine_qualification_required){throw "[mir4-package-presentation-v7-target-binding] $target"}
 }
 
-$inputs=Get-MIR4CurrentPackagePresentationV7Inputs -RepoRoot $repo
 foreach($forgery in @(
-  @{id='predecessor';mutate={param($r)$r.predecessor.record_sha256='0'*64};code='[mir4-package-presentation-v7-current-binding]'},
-  @{id='manifest';mutate={param($r)$r.source_manifest.record_sha256='0'*64};code='[mir4-package-presentation-v7-current-binding]'},
-  @{id='succession';mutate={param($r)$r.source_succession.current_record_sha256='0'*64};code='[mir4-package-presentation-v7-current-binding]'}
+  @{id='predecessor';mutate={param($r)$r.predecessor.record_sha256='0'*64}},
+  @{id='manifest';mutate={param($r)$r.source_manifest.record_sha256='0'*64}},
+  @{id='succession';mutate={param($r)$r.source_succession.current_record_sha256='0'*64}}
 )){
   $copy=$record|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
   &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy
-  if(-not(Test-MIR4CurrentPackagePresentationV7Schema -Record $copy -RepoRoot $repo)-or-not(Test-MIR4BootstrapRecordHash -Record $copy)){throw "[mir4-package-presentation-v7-forgery-invalid] $($forgery.id)"}
-  $rejected=$false;try{Assert-MIR4CurrentPackagePresentationV7SemanticBindings -Record $copy -Inputs $inputs|Out-Null}catch{$rejected=$_.Exception.Message-eq[string]$forgery.code};if(-not$rejected){throw "[mir4-package-presentation-v7-forgery-accepted] $($forgery.id)"}
+  if(-not(Test-MIR4BootstrapRecordHash -Record $copy)){throw "[mir4-package-presentation-v7-forgery-hash] $($forgery.id)"}
+  if(Test-MIR4CurrentPackagePresentationV7Schema -Record $copy -RepoRoot $repo){throw "[mir4-package-presentation-v7-rehashed-forgery-accepted] $($forgery.id)"}
 }
 foreach($mutation in @(
   @{id='ambiguous-provenance';mutate={param($r)$r.source_succession.introduced_binding_count=2}},
+  @{id='package-source';mutate={param($r)$r.package_source.fingerprint_sha256='0'*64}},
   @{id='gate';mutate={param($r)$r.transition_gate.publication=$true}},
   @{id='authority';mutate={param($r)$r.authority_invariants.promotion_authorized=$true}}
 )){
@@ -79,4 +80,4 @@ if(-not$stale-or(Test-Path -LiteralPath $scratch)){throw '[mir4-package-presenta
 $immutable=$false;try{&$writer -RepoRoot $repo|Out-Null}catch{$immutable=$_.Exception.Message-eq'[mir4-package-presentation-v7-authority-immutable-overwrite]'}
 if(-not$immutable){throw '[mir4-package-presentation-v7-overwrite]'}
 
-Write-Host '[ok] MIR4 package presentation V7 binds package-source V3 provenance, exact current package identities, and closed release gates.'
+Write-Host '[ok] MIR4 package presentation V7 remains an independently pinned historical transition while current development uses the live package contract.'

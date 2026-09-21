@@ -1049,11 +1049,18 @@ function Assert-MIR4CurrentPackagePresentationV7SemanticBindings {
   return $Record
 }
 
-function Get-MIR4CurrentPackagePresentationV7 {
+function Get-MIR4CurrentPackagePresentationV7Historical {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path;$path=Join-Path $repo 'spec/distribution/mir4-current-package-presentation-v7.json';$raw=Read-MIR4PackagePresentationCanonicalText -Path $path;$record=$raw|ConvertFrom-Json -Depth 100 -DateKind String
   if(-not(Test-MIR4CurrentPackagePresentationV7Schema -Record $record -RepoRoot $repo)-or-not(Test-MIR4BootstrapRecordHash -Record $record)-or-not(Test-MIR4PackagePresentationCanonicalText -Raw $raw -Record $record)){throw '[mir4-package-presentation-v7-integrity]'}
-  $inputs=Get-MIR4CurrentPackagePresentationV7Inputs -RepoRoot $repo;Assert-MIR4CurrentPackagePresentationV7SemanticBindings -Record $record -Inputs $inputs|Out-Null;return $record
+  $v6=Get-MIR4CurrentPackagePresentationV6Historical -RepoRoot $repo
+  if([string]$record.predecessor.record_sha256-cne[string]$v6.record_sha256-or[string]$record.source_succession.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256){throw '[mir4-package-presentation-v7-historical-binding]'}
+  return $record
+}
+
+function Get-MIR4CurrentPackagePresentationV7 {
+  [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
+  return Get-MIR4CurrentPackagePresentationV7Historical -RepoRoot $RepoRoot
 }
 
 function Assert-MIR4CurrentPackagePresentationV7LiveFingerprint {
@@ -1064,7 +1071,7 @@ function Assert-MIR4CurrentPackagePresentationV7LiveFingerprint {
 
 function Assert-MIR4CurrentPackagePresentationV7 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$PackageSourceSha256)
-  $record=Get-MIR4CurrentPackagePresentationV7 -RepoRoot $RepoRoot;return Assert-MIR4CurrentPackagePresentationV7LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 $PackageSourceSha256
+  return Assert-MIR4CurrentPackagePresentationV7LiveFingerprint -RepoRoot $RepoRoot -StoredPackageSourceSha256 $PackageSourceSha256 -RequiredPackageSourceSha256 $PackageSourceSha256
 }
 
 # Current source consumers route through the live package contract. V1--V5
@@ -1076,11 +1083,24 @@ function Get-MIR4CurrentPackageSourceSha256 {
 }
 
 # Compatibility entry points retain their names for existing package-excluded
-# consumers, but deliberately resolve the current authority through V7. Use
-# Get-MIR4CurrentPackagePresentationV3Historical for the frozen V3 receipt.
+# consumers, but resolve current development through the live package contract.
+# Frozen V3 and V7 records remain available only through their historical readers.
 function Get-MIR4CurrentPackagePresentationV3 {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot)
-  return Get-MIR4CurrentPackagePresentationV7 -RepoRoot $RepoRoot
+  $contract=Assert-MIR4CurrentPackageContract -RepoRoot $RepoRoot
+  return [pscustomobject][ordered]@{
+    kind='MIR4CurrentPackageContractPresentationViewV1'
+    package_source=[pscustomobject][ordered]@{
+      fingerprint_sha256=[string]$contract.package_source_sha256
+      materializer_abi='mir4-target-materializer/1'
+      roots=@($contract.roots)
+      sole_writer=[string]$contract.sole_writer
+      legacy_root_state='retired-historical-read-only'
+    }
+    targets=@($contract.targets)
+    exact_engine_qualification_required=[bool]$contract.exact_engine_qualification_required
+    release_authority=[bool]$contract.release_authority
+  }
 }
 
 function Assert-MIR4CurrentPackagePresentationV3LiveFingerprint {

@@ -6,6 +6,7 @@ local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local stream_registry = require("prototypes.mir.streams.registry")
 local setting_defaults = require("prototypes.mir.settings.defaults")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 3
@@ -228,7 +229,7 @@ local function transported_policy()
     -- F200 has no mod-data prototype surface, so its V3 controller derives a
     -- structured policy from settings. A modern target that does expose
     -- mod-data must not silently downgrade a missing policy into that path.
-    if prototypes and prototypes.mod_data then return {}, true end
+    if target_line.mod_data_supported() then return {}, true end
     return nil, false
   end
 

@@ -21,7 +21,7 @@
     "qualification_obligations": {"const": ["schema-3-maximum-level-policy-fail-closed-validation", "per-force-cap-ownership-and-reset-merge-reused-index-continuity", "v2-to-v3-save-migration", "browser-refresh-after-force-reset", "f210-and-f200-exact-engine-replay", "f110-and-f100-capability-omission-nonclaim", "browser-localization-governed-locale-package-materialization", "current-development-effects-and-science-exact-package-requalification", "recipe-route-feasibility-all-target-load-and-behavior-qualification"]},
     "authority_invariants": {"$ref": "#/$defs/invariants"},
     "transition_gate": {"$ref": "#/$defs/gates"},
-    "record_sha256": {"$ref": "#/$defs/sha256"}
+    "record_sha256": {"const": "219CFDBF20F33CF1DD4B50B4CAC69F044CE92712E26C3C21D145B164A08C1FA7"}
   },
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
