@@ -557,8 +557,13 @@
           "Absent subjects do not count as delivered",
           "Ownership/progression/save proof"
         ],
-        "state": "queued",
-        "evidence": []
+        "state": "active",
+        "evidence": [
+          "fixtures/assert-a06-bob-ordinary-alloys-qualification/qualification-dossier.json",
+          "tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification.ps1",
+          "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json",
+          "tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1"
+        ]
       },
       {
         "id": "A07",

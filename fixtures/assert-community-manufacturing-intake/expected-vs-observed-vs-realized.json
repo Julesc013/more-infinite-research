@@ -5,10 +5,12 @@
   "authority": {
     "request_ids": ["BA-02", "BA-05", "BA-06", "NATIVE-01"],
     "new_request_records": 0,
+    "source_intake_subjects": 4,
     "engine_qualification": false,
     "public_support_authority": false
   },
   "archives": {
+    "angelspetrochem_2.1.2.zip": "9B4CC14156CF16C9F41784108CCA5E767180A7330B1AF23A387231653CE10A49",
     "angelssmelting_2.1.1.zip": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9",
     "bobwarfare_3.0.1.zip": "903A09740B494E3A249A39C54D33260AC527A716D56C29482DB5022BC4DB8DFF"
   },
@@ -112,6 +114,137 @@
       "reason": "laser-rifle batteries are not admitted to the bullet-heavy-ammo-rocket manufacturing families"
     }
   ],
+  "angel_petrochem_source_intake": {
+    "archive": "angelspetrochem_2.1.2.zip",
+    "status": "exact-hash-source-observed-admission-blocked",
+    "subjects": [
+      {
+        "display_term": "nitric acid",
+        "identity": "angels-liquid-nitric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-nitric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-nitrogen.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-nitrogen-dioxide", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-nitric-acid", "amount": 50}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "hydrochloric acid",
+        "identity": "angels-liquid-hydrochloric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-hydrochloric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-hydrogen-chloride", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrochloric-acid", "amount": 50}
+            ]
+          },
+          {
+            "recipe": "angels-liquid-hydrochloric-acid-solid-sodium-sulfate",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "angels-liquifying",
+            "ingredients": [
+              {"type": "item", "name": "angels-solid-salt", "amount": 6},
+              {"type": "fluid", "name": "sulfuric-acid", "amount": 120}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrochloric-acid", "amount": 70},
+              {"type": "item", "name": "angels-solid-sodium-sulfate", "amount": 3}
+            ],
+            "auto_recycle": false,
+            "coproduct_hazard": true
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "hydrofluoric acid",
+        "identity": "angels-liquid-hydrofluoric-acid",
+        "routes": [
+          {
+            "recipe": "angels-liquid-hydrofluoric-acid",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-sulfur.lua",
+            "category": "angels-liquifying",
+            "ingredients": [
+              {"type": "item", "name": "angels-fluorite-ore", "amount": 5},
+              {"type": "fluid", "name": "sulfuric-acid", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrofluoric-acid", "amount": 50},
+              {"type": "item", "name": "angels-solid-calcium-sulfate", "amount": 1}
+            ],
+            "auto_recycle": false,
+            "coproduct_hazard": true
+          },
+          {
+            "recipe": "angels-hydrogen-fluoride-dissolving",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-sulfur.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-hydrogen-fluoride", "amount": 90},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 40}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-hydrofluoric-acid", "amount": 60}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      },
+      {
+        "display_term": "glycerol",
+        "identity": "angels-liquid-glycerol",
+        "routes": [
+          {
+            "recipe": "angels-liquid-glycerol",
+            "member": "angelspetrochem/prototypes/recipes/petrochem-chlorine.lua",
+            "category": "chemistry",
+            "ingredients": [
+              {"type": "fluid", "name": "angels-gas-epichlorohydrin", "amount": 100},
+              {"type": "fluid", "name": "angels-water-purified", "amount": 50}
+            ],
+            "results": [
+              {"type": "fluid", "name": "angels-liquid-glycerol", "amount": 50}
+            ]
+          }
+        ],
+        "void_route_generated": true,
+        "disposition": "source-observed-admission-blocked"
+      }
+    ],
+    "rejected_subjects": [
+      {
+        "display_term": "nitroglycerin",
+        "observed_recipe": "angels-solid-nitroglycerin",
+        "member": "angelspetrochem/prototypes/recipes/petrochem-solids.lua",
+        "actual_result": {"type": "item", "name": "explosives", "amount": 2},
+        "disposition": "rejected-no-distinct-output-identity"
+      }
+    ],
+    "remaining_obligations": [
+      "Capture finalized prototypes in a dependency-valid exact Angel environment on F210 2.1.18 or later.",
+      "Resolve final productivity permission, native owner, unlock, science, laboratory and settings semantics.",
+      "Prove that admitted bonuses cannot exploit voids, coproducts, returns or closed loops.",
+      "Keep Py acid gas and Py glycerol in a separate selected-suite intake."
+    ]
+  },
   "realization": {
     "targets": ["f210", "f200", "f110", "f100"],
     "source_path": "source/prototypes/streams/productivity.lua",
@@ -122,6 +255,8 @@
     "No Factorio engine execution or F210 >=2.1.18 capsule pass.",
     "No broad Bob, Angel, or combined-environment compatibility claim.",
     "No save, migration, balance, native-owner, or public-release qualification.",
-    "No admission of direct Angel wire, coolant-returning wire coils, capsules, or laser-rifle batteries."
+    "No admission of direct Angel wire, coolant-returning wire coils, capsules, or laser-rifle batteries.",
+    "No technology/effect emission for the Angel Petrochem source-intake subjects.",
+    "No Py acid-gas or glycerol claim and no distinct nitroglycerin subject."
   ]
 }
