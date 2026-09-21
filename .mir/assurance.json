@@ -298,6 +298,11 @@
       "tests": ["static.mir4-a00-current-authority-observation"]
     },
     {
+      "id": "k2-immutable-input-staging",
+      "patterns": ["^tools/lib/validation/ImmutableInputStaging[.]ps1$"],
+      "tests": ["static.immutable-input-staging", "runtime.k2-k2so-f210-intake", "static.mir4-a05-k2-03-imersite-closure", "static.mir4-a05-k2-materials-closure"]
+    },
+    {
       "id": "k2-k2so-intake-f210",
       "patterns": ["^fixtures/assert-k2-k2so-f210-intake/", "^tests/(?:runtime/Test-MIR4A03K2K2SOIntake|mir4/Test-MIR4A03K2K2SOIntakeClosure)[.]ps1$", "^spec/programmes/mir4-4x-operating-programme-v1[.]json$", "^spec/programmes/evidence/synthesis-2026-09-10/(?:a00-current-authority-observation|a03-k2-k2so-f210-(?:current[.]lock|execution-proof|intake-(?:dossier|receipt)))[.]json$", "^spec/schemas/(?:mir4-a00-current-authority-observation-v1|mir4-a03-k2-k2so-(?:execution-proof|intake-(?:dossier|receipt))-v1)[.]schema[.]json$", "^spec/schemas/preview/mir4-environment-lock-v1[.]schema[.]json$", "^tools/commands/mir4/(?:Write-MIR4A00A03Evidence|Write-MIR4A03K2K2SOExecutionProof)[.]ps1$", "^tools/mir/application/assurance/EnvironmentEvidence[.]ps1$", "^tools/lib/(?:compatibility/FactorioRunner|validation/FactorioProcess)[.]ps1$"],
       "tests": ["static.mir4-a03-k2-k2so-intake-closure", "runtime.k2-k2so-f210-intake"]

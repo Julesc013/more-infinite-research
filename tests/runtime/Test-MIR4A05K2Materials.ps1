@@ -4,27 +4,30 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$CandidateZip='',
-  [string]$OutputRoot='build/mir4/a05-k2-materials/k2-materials-runtime'
+  [string]$OutputRoot='build/mir4/a05-k2-materials/k2-materials-runtime',
+  [Parameter(DontShow)][switch]$VerifyCandidateBindingOnly
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $generatedAt=(Get-Date).ToUniversalTime().ToString('o')
-$engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
+. (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1')
+. (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
 function Assert-A05K2([bool]$value,[string]$code){if(-not $value){throw "[mir4-a05-k2-materials] $code"}}
 function Get-A05K2Sha([string]$path){(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()}
 function Get-A05K2Relative([string]$path){$full=[IO.Path]::GetFullPath($path);$prefix=$repo.TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar;Assert-A05K2 $full.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase) 'artifact-outside-repository';$full.Substring($prefix.Length).Replace('\','/')}
 function Get-A05K2Artifact([string]$path){$item=Get-Item -LiteralPath $path;[pscustomobject][ordered]@{path=Get-A05K2Relative $item.FullName;bytes=[int64]$item.Length;raw_sha256=Get-A05K2Sha $item.FullName}}
+$suppliedCandidate=$CandidateZip
+$freshPackage=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('A05-K2-MATERIALS-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/mir4/a05-k2-materials/candidate'
+$materializedCandidate=(Resolve-Path -LiteralPath ([string]$freshPackage.archive_path)).Path
+$materializedCandidateSha256=Get-A05K2Sha $materializedCandidate
+if([string]::IsNullOrWhiteSpace($suppliedCandidate)){$candidate=$materializedCandidate}else{$candidate=(Resolve-Path -LiteralPath $suppliedCandidate).Path;Assert-A05K2 ((Get-A05K2Sha $candidate)-ceq $materializedCandidateSha256) 'supplied candidate bytes differ from a fresh F210 materialization of the reported source.'}
+if($VerifyCandidateBindingOnly){[pscustomobject]@{status='passed';target='F210';candidate_sha256=(Get-A05K2Sha $candidate);materialized_candidate_sha256=$materializedCandidateSha256;supplied_candidate=(-not[string]::IsNullOrWhiteSpace($suppliedCandidate))}|ConvertTo-Json -Depth 5;return}
+$engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 Assert-A05K2 ((Get-A05K2Sha $engine) -ceq '710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8') 'engine-sha256'
 Assert-A05K2 ((Get-Item -LiteralPath $engine).VersionInfo.ProductVersion -ceq '2.1.17') 'engine-version'
-if([string]::IsNullOrWhiteSpace($CandidateZip)){
-  . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-  $candidate=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('A05-K2-MATERIALS-'+[guid]::NewGuid().ToString('N').Substring(0,8).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/mir4/a05-k2-materials/candidate'
-  $CandidateZip=[string]$candidate.archive_path
-}
-$candidate=(Resolve-Path -LiteralPath $CandidateZip).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot));$outputPrefix=$output.TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
 Assert-A05K2 $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) 'output-outside-build'
 $lockedSource=Join-Path $repo 'build/synthesis-20260906/k2-engine-candidate/runs/u-ad28370088e7/mods'
@@ -61,17 +64,46 @@ function Assert-A05K2Observation([string]$log,[string]$case){
   return $pavingRoutes
 }
 function Invoke-A05K2Case([string]$Id,[string]$K2SO,[string]$K2SOHash,[bool]$IncludeXy){
-  $root=[IO.Path]::GetFullPath((Join-Path $output $Id));Assert-A05K2 $root.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase) "$Id-output-containment";if(Test-Path -LiteralPath $root){Remove-Item -LiteralPath $root -Recurse -Force};New-Item -ItemType Directory -Force -Path (Join-Path $root 'mods'),(Join-Path $root 'saves')|Out-Null
-  $mods=Join-Path $root 'mods';$archives=@()
-  foreach($entry in $common){$source=Join-Path $lockedSource $entry.name;Assert-A05K2 ((Get-A05K2Sha $source)-ceq $entry.sha256) "$Id-common:$($entry.name)";$destination=Join-Path $mods $entry.name;Copy-Item -LiteralPath $source -Destination $destination;$archives+=Get-A05K2Artifact $destination}
-  Assert-A05K2 ((Get-A05K2Sha $K2SO)-ceq $K2SOHash) "$Id-k2so";$k2soDestination=Join-Path $mods (Split-Path -Leaf $K2SO);Copy-Item -LiteralPath $K2SO -Destination $k2soDestination;$archives+=Get-A05K2Artifact $k2soDestination
-  if($IncludeXy){$xy=Join-Path $lockedSource 'xy-k2so-enhancements-nulls-fork_0.8.3.zip';Assert-A05K2 ((Get-A05K2Sha $xy)-ceq '930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE') "$Id-xy";$xyDestination=Join-Path $mods (Split-Path -Leaf $xy);Copy-Item -LiteralPath $xy -Destination $xyDestination;$archives+=Get-A05K2Artifact $xyDestination}
-  $candidateDestination=Join-Path $mods 'more-infinite-research_4.2.21000.zip';Copy-Item -LiteralPath $candidate -Destination $candidateDestination
-  $fixture=Publish-MIRModDirectoryArchive -Source (Join-Path $repo 'fixtures/assert-k2-materials') -Name 'mir-fixture-assert-k2-materials' -Version '0.1.0' -ModsDir $mods
-  $enabled=@('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research');if($IncludeXy){$enabled+='xy-k2so-enhancements-nulls-fork'};$enabled+='mir-fixture-assert-k2-materials';$list=[ordered]@{mods=@($enabled|ForEach-Object{[ordered]@{name=$_;enabled=$true}})};[IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($list|ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false));$settings=Join-Path $lockedSource 'mod-settings.dat';Copy-Item -LiteralPath $settings -Destination (Join-Path $mods 'mod-settings.dat')
-  $load=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -ScenarioTimeoutSeconds 300;Assert-A05K2 ($load.passed -and -not $load.timed_out -and $load.exit_code -eq 0) "$Id-load";Assert-A05K2 ($load.stderr_sha256-ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$Id-stderr";$pavingRoutes=Assert-A05K2Observation $load.factorio_log $Id
-  $reload=Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments $progressMarkers;Assert-A05K2 ([bool]$reload.passed) "$Id-reloads"
-  [pscustomobject][ordered]@{id=$Id;k2so=[ordered]@{archive_sha256=$K2SOHash;version=if($K2SO-match '_([0-9]+[.][0-9]+[.][0-9]+)[.]zip$'){$matches[1]}else{''}};xy_enabled=$IncludeXy;fresh_load=[ordered]@{passed=$true;save=Get-A05K2Artifact $load.save;stdout=Get-A05K2Artifact $load.stdout;stderr=Get-A05K2Artifact $load.stderr;factorio_log=Get-A05K2Artifact $load.factorio_log};reloads=$reload;mod_archives=@($archives|Sort-Object path);fixture=Get-A05K2Artifact $fixture;candidate=Get-A05K2Artifact $candidateDestination;mod_list=Get-A05K2Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05K2Artifact (Join-Path $mods 'mod-settings.dat');paving_routes=@($pavingRoutes)}
+  $inputLease=$null
+  try {
+    $root=[IO.Path]::GetFullPath((Join-Path $output $Id));Assert-A05K2 $root.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase) "$Id-output-containment";if(Test-Path -LiteralPath $root){$null=Assert-MIRImmutableInputLeaseReclaimable -RunRoot $root -Context "[mir4-a05-k2-materials] $Id";Remove-Item -LiteralPath $root -Recurse -Force};New-Item -ItemType Directory -Force -Path (Join-Path $root 'mods'),(Join-Path $root 'saves')|Out-Null
+    $mods=Join-Path $root 'mods'
+    $inputRecords=@()
+    foreach($entry in $common){
+      $source=Join-Path $lockedSource $entry.name
+      Assert-A05K2 ((Get-A05K2Sha $source)-ceq $entry.sha256) "$Id-common:$($entry.name)"
+      $inputRecords += [ordered]@{source_path=$source;file_name=$entry.name;expected_sha256=$entry.sha256;role='dependency-mod';identity=[ordered]@{archive=$entry.name;sha256=$entry.sha256};provenance=[ordered]@{kind='locked-k2-archive';archive_root=$lockedSource};immutable=$true}
+    }
+    Assert-A05K2 ((Get-A05K2Sha $K2SO)-ceq $K2SOHash) "$Id-k2so"
+    $inputRecords += [ordered]@{source_path=$K2SO;file_name=(Split-Path -Leaf $K2SO);expected_sha256=$K2SOHash;role='dependency-mod';identity=[ordered]@{archive=(Split-Path -Leaf $K2SO);sha256=$K2SOHash};provenance=[ordered]@{kind=if($K2SO.StartsWith($lockedSource,[StringComparison]::OrdinalIgnoreCase)){'locked-k2so-archive'}else{'current-k2so-cache'};archive_root=(Split-Path -Parent $K2SO)};immutable=$true}
+    if($IncludeXy){
+      $xy=Join-Path $lockedSource 'xy-k2so-enhancements-nulls-fork_0.8.3.zip'
+      $xyHash='930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE'
+      Assert-A05K2 ((Get-A05K2Sha $xy)-ceq $xyHash) "$Id-xy"
+      $inputRecords += [ordered]@{source_path=$xy;file_name=(Split-Path -Leaf $xy);expected_sha256=$xyHash;role='dependency-mod';identity=[ordered]@{archive=(Split-Path -Leaf $xy);sha256=$xyHash};provenance=[ordered]@{kind='locked-k2so-enhancement-archive';archive_root=$lockedSource};immutable=$true}
+    }
+    $candidateHash=Get-A05K2Sha $candidate
+    $inputRecords += [ordered]@{source_path=$candidate;file_name=(Split-Path -Leaf $candidate);expected_sha256=$candidateHash;role='candidate';identity=[ordered]@{target='f210';sha256=$candidateHash};provenance=[ordered]@{kind=if([string]::IsNullOrWhiteSpace($suppliedCandidate)){'fresh-target-materializer'}else{'supplied-candidate-verified-against-fresh-materialization'};path=$candidate;materialized_candidate_sha256=$materializedCandidateSha256};immutable=$true}
+    $inputLease=New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords
+    $fixture=Publish-MIRModDirectoryArchive -Source (Join-Path $repo 'fixtures/assert-k2-materials') -Name 'mir-fixture-assert-k2-materials' -Version '0.1.0' -ModsDir $mods
+    $enabled=@('base','elevated-rails','quality','recycler','space-age','flib','k2so-assets','Krastorio2','Krastorio2-spaced-out','Krastorio2Assets','Krastorio2MenuSimulations','mir-validation-settings-overrides','more-infinite-research');if($IncludeXy){$enabled+='xy-k2so-enhancements-nulls-fork'};$enabled+='mir-fixture-assert-k2-materials';$list=[ordered]@{mods=@($enabled|ForEach-Object{[ordered]@{name=$_;enabled=$true}})};[IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($list|ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
+    $settings=Join-Path $lockedSource 'mod-settings.dat'
+    Assert-A05K2 ((Get-A05K2Sha $settings)-ceq '6AF4D7F55D19D9F105BCD540FFCA61267613843BC7AFEB457241BFB3703977A4') "$Id-settings"
+    Copy-Item -LiteralPath $settings -Destination (Join-Path $mods 'mod-settings.dat')
+    $load=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -ScenarioTimeoutSeconds 300;Assert-A05K2 ($load.passed -and -not $load.timed_out -and $load.exit_code -eq 0) "$Id-load";Assert-A05K2 ($load.stderr_sha256-ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') "$Id-stderr";$pavingRoutes=Assert-A05K2Observation $load.factorio_log $Id
+    $reload=Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $root -ScenarioName $Id -SavePath $load.save -RequiredReloadCount 2 -MaxReloadDurationSeconds 300 -RequiredLogFragments $progressMarkers;Assert-A05K2 ([bool]$reload.passed) "$Id-reloads"
+    $terminalInputStaging=Complete-MIRImmutableInputLease -Lease $inputLease
+    $inputLease=$null
+    $archives=@($terminalInputStaging.inputs|Where-Object{$_.role-ceq 'dependency-mod'}|ForEach-Object{ConvertTo-MIRImmutableInputArtifact -Receipt $terminalInputStaging -Input $_ -Locator (Get-A05K2Relative ([string]$_.stage_path))})
+    $candidateInput=@($terminalInputStaging.inputs|Where-Object{$_.role-ceq 'candidate'});Assert-A05K2 ($candidateInput.Count-eq 1) "$Id-candidate-input-count"
+    $candidateArtifact=ConvertTo-MIRImmutableInputArtifact -Receipt $terminalInputStaging -Input $candidateInput[0] -Locator (Get-A05K2Relative ([string]$candidateInput[0].stage_path))
+    $caseResult=[pscustomobject][ordered]@{id=$Id;k2so=[ordered]@{archive_sha256=$K2SOHash;version=if($K2SO-match '_([0-9]+[.][0-9]+[.][0-9]+)[.]zip$'){$matches[1]}else{''}};xy_enabled=$IncludeXy;fresh_load=[ordered]@{passed=$true;save=Get-A05K2Artifact $load.save;stdout=Get-A05K2Artifact $load.stdout;stderr=Get-A05K2Artifact $load.stderr;factorio_log=Get-A05K2Artifact $load.factorio_log};reloads=$reload;mod_archives=@($archives|Sort-Object path);fixture=Get-A05K2Artifact $fixture;candidate=$candidateArtifact;mod_list=Get-A05K2Artifact (Join-Path $mods 'mod-list.json');mod_settings=Get-A05K2Artifact (Join-Path $mods 'mod-settings.dat');input_staging=$terminalInputStaging;paving_routes=@($pavingRoutes)}
+    return $caseResult
+  } catch {
+    $failure=$_
+    if($null -ne $inputLease -and -not $inputLease.closed){try{Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed|Out-Null}catch{}}
+    throw $failure
+  }
 }
 $locked=Invoke-A05K2Case -Id 'locked-2.0.13' -K2SO (Join-Path $lockedSource 'Krastorio2-spaced-out_2.0.13.zip') -K2SOHash 'A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242' -IncludeXy $true
 $current=Invoke-A05K2Case -Id 'current-2.0.17' -K2SO (Join-Path $currentSource 'Krastorio2-spaced-out_2.0.17.zip') -K2SOHash '0D48E22858FB4D1259413B65FFA7E5A0C5B5C2439A4918D58BDACC9411FA9284' -IncludeXy $false
@@ -80,5 +112,7 @@ $fixtureArtifacts=@(
   Get-A05K2Artifact (Join-Path $repo 'fixtures/assert-k2-materials/data-final-fixes.lua')
   Get-A05K2Artifact (Join-Path $repo 'fixtures/assert-k2-materials/control.lua')
 )
-$result=[ordered]@{schema=1;kind='MIR4A05K2MaterialsRuntimeResultV1';generated_at=$generatedAt;engine=[ordered]@{version='2.1.17';executable_sha256=Get-A05K2Sha $engine};candidate=Get-A05K2Artifact $candidate;fixture=$fixtureArtifacts;locked=$locked;current=$current;non_claims=@('Casting remains withheld because its final dirty-water result has ignored_by_productivity=5.','Black and white paving remain withheld by final productivity denial.','This finite three-tier evidence does not establish an infinite continuation or authorize release.')}
+Assert-A05K2 ($locked.candidate.raw_sha256-ceq $current.candidate.raw_sha256 -and $locked.candidate.bytes-eq $current.candidate.bytes) 'case-candidate-receipt-parity'
+$candidateArtifact=[pscustomobject][ordered]@{path=Get-A05K2Relative $candidate;bytes=[long]$locked.candidate.bytes;raw_sha256=[string]$locked.candidate.raw_sha256}
+$result=[ordered]@{schema=1;kind='MIR4A05K2MaterialsRuntimeResultV1';generated_at=$generatedAt;engine=[ordered]@{version='2.1.17';executable_sha256=Get-A05K2Sha $engine};candidate=$candidateArtifact;fixture=$fixtureArtifacts;locked=$locked;current=$current;non_claims=@('Casting remains withheld because its final dirty-water result has ignored_by_productivity=5.','Black and white paving remain withheld by final productivity denial.','This finite three-tier evidence does not establish an infinite continuation or authorize release.')}
 $resultPath=Join-Path $output 'result.json';[IO.File]::WriteAllText($resultPath,(ConvertTo-Json $result -Depth 100 -Compress),[Text.UTF8Encoding]::new($false));Write-Host "[MIR4_A05_K2_MATERIALS_RUNTIME] $(Get-A05K2Relative $resultPath)"

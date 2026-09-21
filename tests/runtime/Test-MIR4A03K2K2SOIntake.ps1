@@ -12,6 +12,16 @@ $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
+. (Join-Path $RepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+
+$inputLease = $null
+trap {
+  $failure = $_
+  if ($null -ne $inputLease -and -not $inputLease.closed) {
+    try { Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed | Out-Null } catch {}
+  }
+  throw $failure
+}
 
 function Assert-A03Equal {
   param([object]$Actual, [object]$Expected, [string]$Code)
@@ -135,21 +145,47 @@ $ownedInitial = @((Get-ChildItem -LiteralPath $root -Force | Select-Object -Expa
 Assert-A03Sequence -Actual $ownedInitial -Expected @('mods', 'saves') -Code '[mir4-a03-attempt-root-owned-state]'
 $mods = Join-Path $root 'mods'
 
+$inputRecords = @()
 foreach ($entry in $thirdPartyArchives.GetEnumerator()) {
   $source = Join-Path $closureSource $entry.Key
   if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "[mir4-a03-third-party-archive-missing] $($entry.Key)" }
   Assert-A03Equal -Actual (Get-A03Sha256 -Path $source) -Expected $entry.Value -Code "[mir4-a03-third-party-archive-sha256] $($entry.Key)"
-  Copy-Item -LiteralPath $source -Destination (Join-Path $mods $entry.Key)
+  $inputRecords += [ordered]@{
+    source_path = $source
+    file_name = $entry.Key
+    expected_sha256 = $entry.Value
+    role = 'dependency-mod'
+    identity = [ordered]@{ archive = $entry.Key; sha256 = $entry.Value }
+    provenance = [ordered]@{ kind = 'locked-k2-k2so-archive'; archive_root = $closureSource }
+    immutable = $true
+  }
 }
 
 $settingsArchive = Join-Path $initialArtifactSource 'mir-validation-settings-overrides_0.1.0.zip'
 $initialObserverArchive = Join-Path $initialArtifactSource 'mir4-a03-k2-intake-observer_0.1.0.zip'
 Assert-A03GovernedArchive -Archive $settingsArchive -ExpectedSha256 '0A6AAA9E8D89DDCC9E421F8AB065124554531588C4E4F91EC5E4D52EC0E10E26' -ArchiveRoot 'mir-validation-settings-overrides_0.1.0' -SourceRoot $settingsHelperSource -SourceFiles @('info.json', 'settings-updates.lua') -Code '[mir4-a03-settings-helper-archive]'
 Assert-A03GovernedArchive -Archive $initialObserverArchive -ExpectedSha256 'D8547266E67E5C9E3CA1B1CDCAF1830EF3DEB9A4E706776189663FE0F9478F8B' -ArchiveRoot 'mir4-a03-k2-intake-observer_0.1.0' -SourceRoot $initialObserverSource -SourceFiles @('data-final-fixes.lua', 'info.json') -Code '[mir4-a03-initial-observer-archive]'
-Copy-Item -LiteralPath $settingsArchive -Destination (Join-Path $mods (Get-Item -LiteralPath $settingsArchive).Name)
+$inputRecords += [ordered]@{
+  source_path = $settingsArchive
+  file_name = (Get-Item -LiteralPath $settingsArchive).Name
+  expected_sha256 = '0A6AAA9E8D89DDCC9E421F8AB065124554531588C4E4F91EC5E4D52EC0E10E26'
+  role = 'dependency-mod'
+  identity = [ordered]@{ archive = (Get-Item -LiteralPath $settingsArchive).Name; sha256 = '0A6AAA9E8D89DDCC9E421F8AB065124554531588C4E4F91EC5E4D52EC0E10E26' }
+  provenance = [ordered]@{ kind = 'governed-settings-override-archive'; archive_root = $initialArtifactSource }
+  immutable = $true
+}
+$inputRecords += [ordered]@{
+  source_path = $candidate
+  file_name = (Get-Item -LiteralPath $candidate).Name
+  expected_sha256 = '99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E'
+  role = 'candidate'
+  identity = [ordered]@{ target = 'f210'; sha256 = '99C020CBA2800179FF2D76EE35F58B27A97CF2A7D89993CFFE06403DC140090E' }
+  provenance = [ordered]@{ kind = 'locked-development-contract-candidate'; path = $expectedCandidate }
+  immutable = $true
+}
+$inputLease = New-MIRImmutableInputLease -RunRoot $root -StageDirectory $mods -Inputs $inputRecords
 $governedObserverArchive = Publish-MIRModDirectoryArchive -Source $governedObserverSource -Name 'mir4-a03-k2-intake-observer' -Version '0.1.0' -ModsDir $mods
 Assert-A03Equal -Actual (Get-A03Sha256 -Path $governedObserverArchive) -Expected '8031F2310B30E7B66A33EDD125AA86137B9ABA0B9DBFF1E23CD3C31435BE8D31' -Code '[mir4-a03-governed-observer-archive-sha256]'
-Copy-Item -LiteralPath $candidate -Destination (Join-Path $mods (Get-Item -LiteralPath $candidate).Name)
 
 $settingsSourcePath = Join-Path $closureSource 'mod-settings.dat'
 $settingsSourceItem = Get-Item -LiteralPath $settingsSourcePath
@@ -253,6 +289,11 @@ foreach ($lab in @($observation.compatible_labs)) { Assert-A03Sequence -Actual @
 
 $archiveHashes = [ordered]@{}
 foreach ($file in @(Get-ChildItem -LiteralPath $mods -File | Sort-Object Name)) { $archiveHashes[$file.Name] = Get-A03Sha256 -Path $file.FullName }
+$terminalInputStaging = Complete-MIRImmutableInputLease -Lease $inputLease
+$inputLease = $null
+$candidateInput = @($terminalInputStaging.inputs | Where-Object { $_.role -ceq 'candidate' })
+Assert-A03Equal -Actual $candidateInput.Count -Expected 1 -Code '[mir4-a03-candidate-input-count]'
+$candidateArtifact = ConvertTo-MIRImmutableInputArtifact -Receipt $terminalInputStaging -Input $candidateInput[0] -Locator $candidate
 $result = [pscustomobject][ordered]@{
   schema = 1
   kind = 'MIR4A03K2K2SOIntakeRuntimeResultV1'
@@ -260,7 +301,7 @@ $result = [pscustomobject][ordered]@{
   target = 'f210'
   attempt_root = $root
   factorio = [ordered]@{ version = '2.1.17'; executable_sha256 = Get-A03Sha256 -Path $engine }
-  candidate = [ordered]@{ path = $candidate; sha256 = Get-A03Sha256 -Path $candidate; bytes = (Get-Item -LiteralPath $candidate).Length }
+  candidate = [ordered]@{ path = $candidateArtifact.path; sha256 = $candidateArtifact.raw_sha256; bytes = $candidateArtifact.bytes }
   initial_observation_artifacts = [ordered]@{ observer_archive_sha256 = Get-A03Sha256 -Path $initialObserverArchive; observer_source_sha256 = [ordered]@{ data_final_fixes = Get-A03Sha256 -Path (Join-Path $initialObserverSource 'data-final-fixes.lua'); info = Get-A03Sha256 -Path (Join-Path $initialObserverSource 'info.json') } }
   governed_run_observer = [ordered]@{ archive_sha256 = Get-A03Sha256 -Path $governedObserverArchive; source_sha256 = [ordered]@{ data_final_fixes = Get-A03Sha256 -Path (Join-Path $governedObserverSource 'data-final-fixes.lua'); info = Get-A03Sha256 -Path (Join-Path $governedObserverSource 'info.json') } }
   closure_archives = $archiveHashes
@@ -272,6 +313,7 @@ $result = [pscustomobject][ordered]@{
   save_sha256 = Get-A03Sha256 -Path $save
   observer_marker_count = $markers.Count
   observation = $observation
+  input_staging=$terminalInputStaging
 }
 $resultPath = Join-Path $root 'a03-k2-k2so-f210-intake-runtime-result.json'
 $resultHash = Write-MIR4BootstrapRecord -Record $result -Path $resultPath

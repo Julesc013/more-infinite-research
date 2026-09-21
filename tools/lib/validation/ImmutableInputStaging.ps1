@@ -144,6 +144,82 @@ function Write-MIRImmutableInputLeaseRecord {
   }
 }
 
+function Get-MIRImmutableInputRecordSha256 {
+  param([Parameter(Mandatory)]$Record)
+
+  $unsigned = [ordered]@{}
+  if ($Record -is [Collections.IDictionary]) {
+    foreach ($name in $Record.Keys) {
+      if ([string]$name -cne 'terminal_record_sha256') { $unsigned[[string]$name] = $Record[$name] }
+    }
+  } else {
+    foreach ($property in $Record.PSObject.Properties) {
+      if ($property.Name -cne 'terminal_record_sha256') { $unsigned[$property.Name] = $property.Value }
+    }
+  }
+  $bytes = [Text.UTF8Encoding]::new($false).GetBytes(($unsigned | ConvertTo-Json -Depth 20 -Compress))
+  return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
+}
+
+function Assert-MIRImmutableInputTerminalReceipt {
+  param([Parameter(Mandatory)]$Receipt, [string]$Context = 'Immutable input terminal receipt')
+
+  if ([int](Get-MIRImmutableInputProperty $Receipt 'schema' 0) -ne 1 -or
+      [string](Get-MIRImmutableInputProperty $Receipt 'kind') -cne 'MIRImmutableInputLeaseV1' -or
+      [string](Get-MIRImmutableInputProperty $Receipt 'state') -cne 'completed' -or
+      [string](Get-MIRImmutableInputProperty $Receipt 'outcome') -cne 'passed' -or
+      -not [bool](Get-MIRImmutableInputProperty $Receipt 'inputs_sha256_match' $false) -or
+      $null -ne (Get-MIRImmutableInputProperty $Receipt 'owner_pid')) {
+    throw "$Context is not a completed passed immutable-input receipt."
+  }
+  $completedOwner = 0
+  if (-not [int]::TryParse([string](Get-MIRImmutableInputProperty $Receipt 'completed_owner_pid'), [ref]$completedOwner) -or $completedOwner -le 0) {
+    throw "$Context does not identify its completed owner."
+  }
+  foreach ($timestampName in @('started_utc', 'receipt_captured_utc', 'completed_utc')) {
+    $timestampValue = Get-MIRImmutableInputProperty $Receipt $timestampName
+    $timestamp = [DateTimeOffset]::MinValue
+    $validTimestamp = $timestampValue -is [DateTime] -or $timestampValue -is [DateTimeOffset]
+    if (-not $validTimestamp) {
+      $validTimestamp = [DateTimeOffset]::TryParse([string]$timestampValue, [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::RoundtripKind, [ref]$timestamp)
+    }
+    if (-not $validTimestamp) {
+      throw "$Context has an invalid $timestampName value."
+    }
+  }
+  $inputs = @(Get-MIRImmutableInputProperty $Receipt 'inputs' @())
+  if ($inputs.Count -eq 0) { throw "$Context contains no immutable inputs." }
+  $seenNames = @{}
+  foreach ($input in $inputs) {
+    $fileName = [string](Get-MIRImmutableInputProperty $input 'file_name')
+    $expected = [string](Get-MIRImmutableInputProperty $input 'expected_sha256')
+    $bytes = -1L
+    if ($fileName -notmatch '^[^\\/:*?"<>|]+$' -or $fileName -in @('.', '..') -or $seenNames.ContainsKey($fileName)) {
+      throw "$Context contains an invalid or duplicated input file name."
+    }
+    $seenNames[$fileName] = $true
+    if ($expected -notmatch '^[0-9A-F]{64}$' -or
+        [string](Get-MIRImmutableInputProperty $input 'source_pre_sha256') -cne $expected -or
+        [string](Get-MIRImmutableInputProperty $input 'staged_pre_sha256') -cne $expected -or
+        [string](Get-MIRImmutableInputProperty $input 'source_post_sha256') -cne $expected -or
+        [string](Get-MIRImmutableInputProperty $input 'staged_post_sha256') -cne $expected -or
+        -not [bool](Get-MIRImmutableInputProperty $input 'hashes_match' $false)) {
+      throw "$Context contains an input without complete matching pre/post hashes: $fileName"
+    }
+    if (-not [long]::TryParse([string](Get-MIRImmutableInputProperty $input 'bytes'), [ref]$bytes) -or $bytes -lt 0 -or
+        [string]::IsNullOrWhiteSpace([string](Get-MIRImmutableInputProperty $input 'source_path')) -or
+        [string]::IsNullOrWhiteSpace([string](Get-MIRImmutableInputProperty $input 'stage_path')) -or
+        [string]::IsNullOrWhiteSpace([string](Get-MIRImmutableInputProperty $input 'role'))) {
+      throw "$Context contains an incomplete immutable input: $fileName"
+    }
+  }
+  $recordSha256 = [string](Get-MIRImmutableInputProperty $Receipt 'terminal_record_sha256')
+  if ($recordSha256 -notmatch '^[0-9A-F]{64}$' -or $recordSha256 -cne (Get-MIRImmutableInputRecordSha256 -Record $Receipt)) {
+    throw "$Context failed its terminal-record integrity check."
+  }
+  return $Receipt
+}
+
 function Close-MIRImmutableInputLeaseHandles {
   param([Parameter(Mandatory)]$Lease)
 
@@ -349,12 +425,41 @@ function Complete-MIRImmutableInputLease {
   $Lease.record.inputs_sha256_match = $matches
   $Lease.record.completed_owner_pid = $Lease.record.owner_pid
   $Lease.record.owner_pid = $null
+  $Lease.record['terminal_record_sha256'] = Get-MIRImmutableInputRecordSha256 -Record $Lease.record
   Write-MIRImmutableInputLeaseRecord -Record $Lease.record -Path $Lease.record_path
   Close-MIRImmutableInputLeaseHandles -Lease $Lease
   if (-not $matches) {
     throw 'Immutable input lease detected an input mutation; private run output was retained for investigation.'
   }
   return [pscustomobject]$Lease.record
+}
+
+function ConvertTo-MIRImmutableInputArtifact {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)]$Receipt,
+    [Parameter(Mandatory)][Alias('Input')]$InputRecord,
+    [Parameter(Mandatory)][string]$Locator
+  )
+
+  $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $Receipt
+  if ([string]::IsNullOrWhiteSpace($Locator)) { throw 'Immutable input artifact requires a non-empty logical locator.' }
+  $fileName = [string](Get-MIRImmutableInputProperty $InputRecord 'file_name')
+  $sourcePath = [string](Get-MIRImmutableInputProperty $InputRecord 'source_path')
+  $stagePath = [string](Get-MIRImmutableInputProperty $InputRecord 'stage_path')
+  $expected = [string](Get-MIRImmutableInputProperty $InputRecord 'expected_sha256')
+  $matches = @(@(Get-MIRImmutableInputProperty $Receipt 'inputs' @()) | Where-Object {
+    [string](Get-MIRImmutableInputProperty $_ 'file_name') -ceq $fileName -and
+    [string](Get-MIRImmutableInputProperty $_ 'source_path') -ceq $sourcePath -and
+    [string](Get-MIRImmutableInputProperty $_ 'stage_path') -ceq $stagePath -and
+    [string](Get-MIRImmutableInputProperty $_ 'expected_sha256') -ceq $expected
+  })
+  if ($matches.Count -ne 1) { throw "Immutable input artifact does not identify exactly one terminal receipt input: $fileName" }
+  return [pscustomobject][ordered]@{
+    path = $Locator
+    bytes = [long](Get-MIRImmutableInputProperty $matches[0] 'bytes')
+    raw_sha256 = $expected
+  }
 }
 
 function Get-MIRImmutableInputLeaseLiveness {
@@ -375,7 +480,7 @@ function Get-MIRImmutableInputLeaseLiveness {
     return [pscustomobject]@{ present = $false; active = $false; ambiguous = $false; state = $null; reason = $null; record = $null }
   }
   try {
-    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -ErrorAction Stop
+    $record = Get-Content -Raw -LiteralPath $recordPath | ConvertFrom-Json -Depth 20 -DateKind String -ErrorAction Stop
   } catch {
     return [pscustomobject]@{ present = $true; active = $false; ambiguous = $true; state = 'invalid'; reason = 'lease record is invalid'; record = $null }
   }
@@ -406,4 +511,31 @@ function Get-MIRImmutableInputLeaseLiveness {
     return [pscustomobject]@{ present = $true; active = $false; ambiguous = $true; state = [string]$record.state; reason = 'lease owner PID is live but the lease lock is absent'; record = $record }
   }
   return [pscustomobject]@{ present = $true; active = $false; ambiguous = $false; state = [string]$record.state; reason = 'lease lock is not held and owner PID is not live'; record = $record }
+}
+
+function Assert-MIRImmutableInputLeaseReclaimable {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RunRoot,
+    [Parameter(Mandatory)][string]$Context
+  )
+
+  $liveness = Get-MIRImmutableInputLeaseLiveness -RunRoot $RunRoot
+  # Only a completed lease with verified terminal hashes and a released owner
+  # is safe to reclaim. Any other record is active, ambiguous, failed, or
+  # orphaned recovery custody.
+  $completed = $liveness.present -and
+    -not $liveness.active -and
+    -not $liveness.ambiguous -and
+    $liveness.state -ceq 'completed' -and
+    $null -ne $liveness.record
+  $terminalError = $null
+  if ($completed) {
+    try { $null = Assert-MIRImmutableInputTerminalReceipt -Receipt $liveness.record -Context $Context } catch { $completed = $false; $terminalError = $_.Exception.Message }
+  }
+  if ($liveness.present -and -not $completed) {
+    $reason = if ([string]::IsNullOrWhiteSpace($terminalError)) { $liveness.reason } else { $terminalError }
+    throw "$Context retains immutable-input custody and may not be removed: state=$($liveness.state); reason=$reason"
+  }
+  return $liveness
 }

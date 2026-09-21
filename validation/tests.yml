@@ -132,11 +132,20 @@
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/runtime/Test-MIRF200BobTinProductionGain.ps1",
+        "tests/runtime/Test-MIRA06BobLeadQualification.ps1",
+        "tests/runtime/Test-MIRA06BobGoldQualification.ps1",
+        "tests/runtime/Test-MIRA06BobAluminiumQualification.ps1",
+        "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+        "tests/runtime/Test-MIR4A05K2Materials.ps1",
+        "tests/runtime/Test-MIR4A05K203Imersite.ps1",
         "tools/mir/application/package/TargetMaterializer.ps1",
+        ".mir/assurance.json",
+        "validation/tests.yml",
         "source:source/package-source.json",
         "governance/automation/mir4-command-inventory-v1.json",
         "targets/package-authority.json",
-        "targets/f200/composition.json"
+        "targets/f200/composition.json",
+        "targets/f210/composition.json"
       ]
     },
     {
@@ -4407,6 +4416,7 @@
       "inputs": [
         "tests/mir4/Test-MIR4A05K203ImersiteClosure.ps1",
         "tests/runtime/Test-MIR4A05K203Imersite.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/commands/mir4/Write-MIR4A05K203ImersiteClosure.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/bootstrap-materialization/**",
@@ -4444,6 +4454,7 @@
       "inputs": [
         "tests/mir4/Test-MIR4A05K2MaterialsClosure.ps1",
         "tests/runtime/Test-MIR4A05K2Materials.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/commands/mir4/Write-MIR4A05K2MaterialsClosure.ps1",
         "tools/lib/mir4/BootstrapMaterialization.ps1",
         "tools/lib/mir4/bootstrap-materialization/**",
@@ -4530,6 +4541,7 @@
         "factorio",
         "candidate",
         "tests/runtime/Test-MIR4A03K2K2SOIntake.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
         "fixtures/assert-k2-k2so-f210-intake/**",
         "tools/lib/compatibility/FactorioRunner.ps1",
         "tools/lib/validation/FactorioProcess.ps1",
