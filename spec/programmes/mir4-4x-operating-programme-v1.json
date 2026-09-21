@@ -900,7 +900,9 @@
         ],
         "state": "active",
         "evidence": [
-          "spec/programmes/evidence/community-2026-09-06/outcomes.json"
+          "spec/programmes/evidence/community-2026-09-06/outcomes.json",
+          "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json",
+          "tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1"
         ]
       },
       {

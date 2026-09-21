@@ -1656,7 +1656,7 @@ fixtures:
     exact_target:
       factorio_line: "2.1"
       external_input_custody: committed-provenance-safe-source-observation-fixture-v1
-      archive_locks: angelssmelting-2.1.1-and-bobwarfare-3.0.1-source-observation-only
+      archive_locks: Angel-Bob-and-selected-eight-archive-Py-source-observation-only
       hosted_evaluation: fixture-and-canonical-source-only
       offline_replay: explicit-ArchiveRoot-hash-bound-source-observation-only
     validates:
@@ -1668,6 +1668,10 @@ fixtures:
       - exact-hash-Angel-Petrochem-source-intake-for-nitric-hydrochloric-hydrofluoric-acid-and-glycerol
       - Angel-Petrochem-void-and-coproduct-hazards-remain-admission-blockers
       - nitroglycerin-recipe-resolves-to-explosives-without-inventing-a-distinct-output-subject
+      - exact-hash-eight-archive-Py-source-intake-for-acidgas-glycerol-plant-samples-tree-and-wood-identities
+      - thirteen-Py-acidgas-and-four-glycerol-source-routes-with-coproduct-return-probability-and-loop-hazards
+      - selected-Py-source-suite-contains-no-nitroglycerin-nitro-glycerin-or-nitro_glycerin-identity
+      - ECO-PY-remains-active-with-final-data-raw-engine-save-and-safety-qualification-open
       - canonical-productivity-byte-parity-and-deterministic-materialization-for-f210-f200-f110-and-f100
     non_claims:
       - Factorio-engine-qualification-or-production-gain
@@ -1675,7 +1679,7 @@ fixtures:
       - broad-Bob-or-Angel-compatibility
       - capsule-or-laser-battery-ammunition-admission
       - Angel-Petrochem-technology-or-effect-emission
-      - Py-acid-gas-or-glycerol-intake
+      - Py-gameplay-engine-finalized-prototype-permission-safety-progression-save-migration-or-public-support
       - save-upgrade-migration-or-release-readiness
 
   maximum-level-cap-ownership-multiforce-f210:
