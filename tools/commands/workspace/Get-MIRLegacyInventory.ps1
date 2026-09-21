@@ -84,6 +84,9 @@ function Get-MIRMatches {
   foreach ($file in $Files) {
     $relative = Get-MIRRelativePath -Path $file.FullName
     foreach ($match in @(Select-String -LiteralPath $file.FullName -Pattern $Pattern)) {
+      # This inventory governs executable package behavior. Prose in Lua line
+      # comments may name a forbidden API while documenting its boundary.
+      if ($match.Line.TrimStart().StartsWith('--')) { continue }
       $matches += [pscustomobject]@{
         path = $relative
         line = $match.LineNumber
