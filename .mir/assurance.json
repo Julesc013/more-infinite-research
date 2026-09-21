@@ -33,7 +33,7 @@
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"],
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "runtime.researchability-planning-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
-    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
+    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.mir4-community-manufacturing-intake", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07"],
     "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
     "mir4-current-package-presentation-v3": ["static.mir4-current-package-presentation-v3"],
     "mir4-current-package-presentation-v4": ["static.mir4-current-package-presentation-v4"],
@@ -386,6 +386,11 @@
       "id": "a06-bob-ordinary-alloys-qualification-f210",
       "patterns": ["^fixtures/assert-a06-bob-ordinary-alloys-qualification/", "^tests/runtime/Test-MIRA06BobOrdinaryAlloysQualification[.]ps1$", "^source/prototypes/mir/settings/profile_codec[.]lua$", "^source/prototypes/mir/capabilities/recipe_productivity/recipe_matching[.]lua$", "^source/prototypes/mir/(?:pipeline/(?:mutations/maximum_level_presentation|recipe_productivity_permissions)|index/productivity_owners|policy/competing_productivity|runtime/(?:maximum_level_control|startup_settings))[.]lua$", "^source/prototypes/streams/productivity[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
       "tests": ["runtime.a06-bob-ordinary-alloys-qualification"]
+    },
+    {
+      "id": "community-manufacturing-intake-static",
+      "patterns": ["^fixtures/assert-community-manufacturing-intake/", "^tests/mir4/Test-MIR4CommunityManufacturingIntake[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/streams/direct-effects[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200|f110|f100)/composition[.]json$", "^targets/package-authority[.]json$", "^spec/programmes/community-requests[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|streams[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["static.mir4-community-manufacturing-intake"]
     },
     {
       "id": "maximum-level-cap-ownership-multiforce-f210",

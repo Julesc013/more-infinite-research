@@ -611,6 +611,16 @@
       "proposed_scope": "Reuse existing MIR streams",
       "rationale": "Native gun-speed exists; MIR already declares rocket, cannon and other speed streams.",
       "implementation": "Preserve native owners, check missing ammo categories and saturation, and surface why an existing stream is omitted.",
+      "manufacturing_intake": {
+        "source": "source/prototypes/streams/productivity.lua",
+        "owned_streams": [
+          "research_bullets",
+          "research_heavy_ammo",
+          "research_rockets"
+        ],
+        "effect_boundary": "recipe-productivity only; native gun-speed, damage, and firing-speed streams retain their independent owners",
+        "qualification": "static archive observation and canonical source materialization only; no engine or public-support claim"
+      },
       "acceptance": [
         "No duplicate effect owner",
         "Each supported ammo category produces an actual change",
@@ -2070,7 +2080,14 @@
         "science": "derive-from-unlocks",
         "safety": "positive-productivity-permission-and-no-recipe-return-path",
         "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
-        "infinite_continuation": "not-implemented"
+        "infinite_continuation": "not-implemented",
+        "angel_only_wire_intake": {
+          "condition": "angelssmelting present and bobplates absent",
+          "output": "angels-wire-gold",
+          "recipes": ["angels-wire-gold-2"],
+          "withheld": ["angels-wire-gold", "angels-wire-coil-gold-2"],
+          "serial_double_count_guard": "the Bob plate route is selected whenever bobplates is present"
+        }
       },
       "remaining_obligations": [
         "Later infinite continuation",
@@ -2335,7 +2352,14 @@
         "science": "derive-from-unlocks",
         "safety": "positive-productivity-permission-and-no-recipe-return-path",
         "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
-        "infinite_continuation": "not-implemented"
+        "infinite_continuation": "not-implemented",
+        "angel_only_wire_intake": {
+          "condition": "angelssmelting present and bobplates absent",
+          "output": "angels-wire-platinum",
+          "recipes": ["angels-wire-platinum-2"],
+          "withheld": ["angels-wire-platinum", "angels-wire-coil-platinum-2"],
+          "serial_double_count_guard": "the Bob plate route is selected whenever bobplates is present"
+        }
       },
       "remaining_obligations": [
         "Later infinite continuation",
@@ -2423,7 +2447,14 @@
         "science": "derive-from-unlocks",
         "safety": "positive-productivity-permission-and-no-recipe-return-path",
         "qualification": "exact-retained-environment-load-and-audit; broader-process-and-save-qualification-open",
-        "infinite_continuation": "not-implemented"
+        "infinite_continuation": "not-implemented",
+        "angel_only_wire_intake": {
+          "condition": "angelssmelting present and bobplates absent",
+          "output": "angels-wire-silver",
+          "recipes": ["angels-wire-silver-2"],
+          "withheld": ["angels-wire-silver", "angels-wire-coil-silver-2"],
+          "serial_double_count_guard": "the Bob plate route is selected whenever bobplates is present"
+        }
       },
       "remaining_obligations": [
         "Later infinite continuation",
