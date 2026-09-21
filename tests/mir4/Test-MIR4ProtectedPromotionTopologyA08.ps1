@@ -90,6 +90,29 @@ function New-A08Qualification {
 $authorityPath=Join-Path $repo 'spec/releases/mir4-protected-main-promotion-topology-v1.json';$authoritySchema=Join-Path $repo 'spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json';$qualificationSchema=Join-Path $repo 'spec/schemas/mir4-protected-main-qualification-v1.schema.json'
 if (-not((Get-Content -Raw -LiteralPath $authorityPath)|Test-Json -SchemaFile $authoritySchema)){throw '[mir4-a08-authority-schema]'}
 $null=Test-MIR4A08PromotionTopologyAuthority -RepoRoot $repo
+foreach ($url in @(
+  'https://github.com/Julesc013/more-infinite-research',
+  'https://github.com/Julesc013/more-infinite-research.git',
+  'https://github.com/Julesc013/more-infinite-research/',
+  'https://github.com/Julesc013/more-infinite-research.git/'
+)) {
+  if (-not (Test-MIR4A08CanonicalGitHubRemote -Url $url -Repository 'Julesc013/more-infinite-research')) {
+    throw "[mir4-a08-canonical-remote-accepted] $url"
+  }
+}
+foreach ($url in @(
+  'http://github.com/Julesc013/more-infinite-research.git',
+  'git@github.com:Julesc013/more-infinite-research.git',
+  'ssh://git@github.com/Julesc013/more-infinite-research.git',
+  'https://github.com/Julesc013/other-repository.git',
+  'https://evilgithub.com/Julesc013/more-infinite-research.git',
+  'https://user@github.com/Julesc013/more-infinite-research.git',
+  'https://github.com/Julesc013/more-infinite-research.git?ref=main'
+)) {
+  if (Test-MIR4A08CanonicalGitHubRemote -Url $url -Repository 'Julesc013/more-infinite-research') {
+    throw "[mir4-a08-canonical-remote-rejected] $url"
+  }
+}
 $testRoot=Join-Path $repo ('build/tests/protected-promotion-a08/'+[guid]::NewGuid().ToString('N'));$remoteRoot=Join-Path $testRoot 'protected-remote.git';$packageRoot=Join-Path $testRoot 'qualified-packages';$stateRoot=Join-Path $testRoot 'state';New-Item -ItemType Directory -Force -Path $testRoot,$packageRoot,$stateRoot|Out-Null
 try {
   $queuedProgramme=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/programmes/mir4-4x-operating-programme-v1.json')|ConvertFrom-Json -Depth 100
