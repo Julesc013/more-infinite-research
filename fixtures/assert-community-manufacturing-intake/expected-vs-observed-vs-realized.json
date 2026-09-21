@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "kind": "MIR4CommunityManufacturingIntakeStaticFixtureV1",
+  "status": "static-archive-observation-and-canonical-materialization-only",
+  "authority": {
+    "request_ids": ["BA-02", "BA-05", "BA-06", "NATIVE-01"],
+    "new_request_records": 0,
+    "engine_qualification": false,
+    "public_support_authority": false
+  },
+  "archives": {
+    "angelssmelting_2.1.1.zip": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9",
+    "bobwarfare_3.0.1.zip": "903A09740B494E3A249A39C54D33260AC527A716D56C29482DB5022BC4DB8DFF"
+  },
+  "wire_routes": [
+    {
+      "request_id": "BA-02",
+      "material": "gold",
+      "stream": "research_material_gold",
+      "technology": "recipe-prod-research_material_gold-1",
+      "recipe": "angels-wire-gold-2",
+      "product": "angels-wire-gold",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-gold.lua",
+      "unpermitted_direct_recipe": "angels-wire-gold",
+      "coolant_return_recipe": "angels-wire-coil-gold-2"
+    },
+    {
+      "request_id": "BA-05",
+      "material": "platinum",
+      "stream": "research_material_platinum",
+      "technology": "recipe-prod-research_material_platinum-1",
+      "recipe": "angels-wire-platinum-2",
+      "product": "angels-wire-platinum",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-platinum.lua",
+      "unpermitted_direct_recipe": "angels-wire-platinum",
+      "coolant_return_recipe": "angels-wire-coil-platinum-2"
+    },
+    {
+      "request_id": "BA-06",
+      "material": "silver",
+      "stream": "research_material_silver",
+      "technology": "recipe-prod-research_material_silver-1",
+      "recipe": "angels-wire-silver-2",
+      "product": "angels-wire-silver",
+      "recipe_member": "angelssmelting/prototypes/recipes/smelting-silver.lua",
+      "unpermitted_direct_recipe": "angels-wire-silver",
+      "coolant_return_recipe": "angels-wire-coil-silver-2"
+    }
+  ],
+  "ammunition_groups": [
+    {
+      "stream": "research_bullets",
+      "per_level": 0.1,
+      "products": ["bob-bullet-magazine", "bob-better-shotgun-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.05,
+      "products": ["bob-ap-bullet-magazine", "bob-shotgun-ap-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.02,
+      "products": ["bob-shotgun-uranium-shell"]
+    },
+    {
+      "stream": "research_bullets",
+      "per_level": 0.01,
+      "products": ["bob-he-bullet-magazine", "bob-flame-bullet-magazine", "bob-acid-bullet-magazine", "bob-poison-bullet-magazine", "bob-electric-bullet-magazine", "bob-plasma-bullet-magazine", "bob-shotgun-electric-shell", "bob-shotgun-explosive-shell", "bob-shotgun-flame-shell", "bob-shotgun-acid-shell", "bob-shotgun-poison-shell", "bob-shotgun-plasma-shell"]
+    },
+    {
+      "stream": "research_heavy_ammo",
+      "per_level": 0.01,
+      "products": ["bob-scatter-cannon-shell", "bob-poison-artillery-shell", "bob-fire-artillery-shell", "bob-explosive-artillery-shell", "bob-distractor-artillery-shell", "bob-atomic-artillery-shell"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.1,
+      "products": ["bob-rocket"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.05,
+      "products": ["bob-explosive-rocket"]
+    },
+    {
+      "stream": "research_rockets",
+      "per_level": 0.01,
+      "products": ["bob-piercing-rocket", "bob-electric-rocket", "bob-acid-rocket", "bob-flame-rocket", "bob-poison-rocket", "bob-plasma-rocket"]
+    }
+  ],
+  "ammunition_negative_controls": [
+    {
+      "recipe": "bob-fire-capsule",
+      "reason": "capsules are not admitted to the bullet-heavy-ammo-rocket manufacturing families"
+    },
+    {
+      "recipe": "bob-laser-rifle-battery",
+      "reason": "laser-rifle batteries are not admitted to the bullet-heavy-ammo-rocket manufacturing families"
+    }
+  ],
+  "realization": {
+    "targets": ["f210", "f200", "f110", "f100"],
+    "source_path": "source/prototypes/streams/productivity.lua",
+    "output_path": "prototypes/streams/productivity.lua",
+    "materialize_target": "f210"
+  },
+  "non_claims": [
+    "No Factorio engine execution or F210 >=2.1.18 capsule pass.",
+    "No broad Bob, Angel, or combined-environment compatibility claim.",
+    "No save, migration, balance, native-owner, or public-release qualification.",
+    "No admission of direct Angel wire, coolant-returning wire coils, capsules, or laser-rifle batteries."
+  ]
+}

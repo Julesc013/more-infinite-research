@@ -388,6 +388,11 @@
       "tests": ["runtime.a06-bob-ordinary-alloys-qualification"]
     },
     {
+      "id": "community-manufacturing-intake-static",
+      "patterns": ["^fixtures/assert-community-manufacturing-intake/", "^tests/mir4/Test-MIR4CommunityManufacturingIntake[.]ps1$", "^source/prototypes/streams/productivity[.]lua$", "^source/prototypes/streams/direct-effects[.]lua$", "^source/package-source[.]json$", "^targets/(?:f210|f200|f110|f100)/composition[.]json$", "^targets/package-authority[.]json$", "^spec/programmes/community-requests[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml|streams[.]yml)$", "^validation/tests[.]yml$"],
+      "tests": ["static.mir4-community-manufacturing-intake"]
+    },
+    {
       "id": "maximum-level-cap-ownership-multiforce-f210",
       "patterns": ["^fixtures/(?:assert-mir42-cap-ownership-multiforce|late-mir42-(?:cap|policy)-binding-blocker)/", "^tests/runtime/Test-MIR42CapOwnershipMultiforce[.]ps1$", "^source/prototypes/mir/(?:core/fingerprint|domain/technology/maximum_level_binding|emit/mod_data|pipeline/compiler_orchestrator/(?:context_construction|publication)|pipeline/mutations/maximum_level_presentation|runtime/(?:maximum_level_control|research_browser.*))[.]lua$", "^source/package-source[.]json$", "^source/adapters/(?:f210|f200)/prototypes/mir/runtime/scripted_techs[.]lua$", "^targets/(?:f210|f200)/composition[.]json$", "^targets/package-authority[.]json$", "^[.]mir/(?:assurance[.]json|fixtures[.]yml)$", "^validation/tests[.]yml$"],
       "tests": ["runtime.maximum-level-cap-ownership-multiforce-f210"]

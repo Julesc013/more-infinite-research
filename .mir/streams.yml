@@ -302,6 +302,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_cannon_shooting_speed-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_cannon_shooting_speed-1
@@ -691,6 +692,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_holmium-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_holmium-1
@@ -1101,6 +1103,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_science_pack_productivity-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_science_pack_productivity-1
@@ -1479,6 +1482,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_material_gunmetal-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_gunmetal-1
@@ -1619,6 +1623,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_material_rare_metals-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_rare_metals-1
@@ -1679,6 +1684,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-community-manufacturing-intake
 
     recipe-prod-research_material_tin-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_tin-1

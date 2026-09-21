@@ -4303,6 +4303,29 @@
       ]
     },
     {
+      "id": "static.mir4-community-manufacturing-intake",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1",
+        "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json",
+        "spec/programmes/community-requests.json",
+        ".mir/fixtures.yml",
+        ".mir/streams.yml",
+        "source:source/prototypes/streams/productivity.lua",
+        "source:source/prototypes/streams/direct-effects.lua",
+        "source:source/package-source.json",
+        "source:targets/f210/composition.json",
+        "source:targets/f200/composition.json",
+        "source:targets/f110/composition.json",
+        "source:targets/f100/composition.json",
+        "source:targets/package-authority.json",
+        "tools/mir/application/package/TargetMaterializer.ps1"
+      ]
+    },
+    {
       "id": "static.mir42-support-export-a14",
       "kind": "static",
       "layer": "F0",

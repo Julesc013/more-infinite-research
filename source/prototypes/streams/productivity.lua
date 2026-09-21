@@ -569,10 +569,15 @@ local streams = {
   } },
 
   research_bullets = { icon_tech="military", groups = {
-    { change=0.10, items={"firearm-magazine","shotgun-shell"} },
-    { change=0.05, items={"piercing-rounds-magazine","piercing-shotgun-shell"} },
-    { change=0.02, items={"uranium-rounds-magazine","uranium-shotgun-shell"} },
-    { change=0.01, item_patterns={
+    { change=0.10, items={"firearm-magazine","shotgun-shell","bob-bullet-magazine","bob-better-shotgun-shell"} },
+    { change=0.05, items={"piercing-rounds-magazine","piercing-shotgun-shell","bob-ap-bullet-magazine","bob-shotgun-ap-shell"} },
+    { change=0.02, items={"uranium-rounds-magazine","uranium-shotgun-shell","bob-shotgun-uranium-shell"} },
+    { change=0.01, items={
+      "bob-he-bullet-magazine","bob-flame-bullet-magazine","bob-acid-bullet-magazine",
+      "bob-poison-bullet-magazine","bob-electric-bullet-magazine","bob-plasma-bullet-magazine",
+      "bob-shotgun-electric-shell","bob-shotgun-explosive-shell","bob-shotgun-flame-shell",
+      "bob-shotgun-acid-shell","bob-shotgun-poison-shell","bob-shotgun-plasma-shell"
+    }, item_patterns={
       "^plutonium%-.+magazine$","^plutonium%-.+shotgun%-shell$",
       "^tungsten%-.+magazine$","^tungsten%-.+shotgun%-shell$"
     } }
@@ -582,16 +587,23 @@ local streams = {
     { change=0.10, items={"cannon-shell"} },
     { change=0.05, items={"explosive-cannon-shell"} },
     { change=0.02, items={"uranium-cannon-shell","explosive-uranium-cannon-shell"} },
-    { change=0.01, items={"artillery-shell","railgun-ammo"}, item_patterns={
+    { change=0.01, items={
+      "artillery-shell","railgun-ammo","bob-scatter-cannon-shell","bob-poison-artillery-shell",
+      "bob-fire-artillery-shell","bob-explosive-artillery-shell","bob-distractor-artillery-shell",
+      "bob-atomic-artillery-shell"
+    }, item_patterns={
       "^.+%-cannon%-shell$","^.+%-artillery%-shell$","^.+%-railgun%-ammo$"
     } }
   }},
 
   research_rockets = { icon_tech="rocketry", groups = {
-    { change=0.10, items={"rocket"} },
-    { change=0.05, items={"explosive-rocket"} },
+    { change=0.10, items={"rocket","bob-rocket"} },
+    { change=0.05, items={"explosive-rocket","bob-explosive-rocket"} },
     { change=0.02, items={"atomic-bomb"} },
-    { change=0.01, items={"plutonium-bomb"}, item_patterns={"^plutonium%-bomb$","^plutonium%-.+bomb$"} }
+    { change=0.01, items={
+      "plutonium-bomb","bob-piercing-rocket","bob-electric-rocket","bob-acid-rocket",
+      "bob-flame-rocket","bob-poison-rocket","bob-plasma-rocket"
+    }, item_patterns={"^plutonium%-bomb$","^plutonium%-.+bomb$"} }
   }},
 
   research_armor_components = { icon_tech="power-armor", groups = {
@@ -786,13 +798,27 @@ local function aluminium_material_family()
   return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
 end
 
+-- Gold, Platinum, and Silver use the pre-existing stable material technology
+-- identities.  Angel-only wire is admitted only when Bob plates are absent,
+-- so a plate-to-wire chain cannot collect two MIR productivity technologies.
+-- The selected wire finals are the explicit Angel productivity-permitted
+-- routes; direct wire and coolant-returning coil routes remain outside this
+-- declaration and continue through the shared recipe safety guard.
+local function bob_or_angel_wire_material_family(material)
+  if aluminium_mod_active("angelssmelting") and not aluminium_mod_active("bobplates") then
+    local item = "angels-wire-" .. material
+    return material_family(item, {item .. "-2"}, {"angelssmelting"})
+  end
+  return material_family("bob-" .. material .. "-plate", {"bob-" .. material .. "-plate"}, {"bobplates", "angelssmelting"})
+end
+
 -- Separate requested materials share policy, never translated-name matching.
 streams.research_material_aluminium = aluminium_material_family()
-streams.research_material_gold = material_family("bob-gold-plate", {"bob-gold-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_gold = bob_or_angel_wire_material_family("gold")
 streams.research_material_lead = material_family("bob-lead-plate", {"bob-lead-plate", "bob-lead-plate-2"}, {"bobplates", "angelssmelting"})
 streams.research_material_nickel = material_family("bob-nickel-plate", {"bob-nickel-plate"}, {"bobplates", "angelssmelting"})
-streams.research_material_platinum = material_family("bob-platinum-plate", {"bob-platinum-plate"}, {"bobplates", "angelssmelting"})
-streams.research_material_silver = material_family("bob-silver-plate", {"bob-silver-plate"}, {"bobplates", "angelssmelting"})
+streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
+streams.research_material_silver = bob_or_angel_wire_material_family("silver")
 streams.research_material_tin = material_family("bob-tin-plate", {"bob-tin-plate"}, {"bobplates", "angelssmelting"})
 streams.research_material_titanium = material_family("bob-titanium-plate", {"bob-titanium-plate"}, {"bobplates", "angelssmelting"})
 streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
