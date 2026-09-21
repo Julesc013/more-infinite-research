@@ -204,7 +204,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/offline-continuity-and-final-release-runbook.md | MIR 2.5.0 Offline Continuity And Final Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/playtest-intake.md | Playtest Intake | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/README.md | MIR 4 maintainer guide | current | maintainer | how-to | mir-maintainers | 2026-08-31 |
-| docs/maintainer/release-assurance.md | Release Assurance And Candidate Sealing | current | release-manager | how-to | mir-maintainers | 2026-08-10 |
+| docs/maintainer/release-assurance.md | Release Assurance And Candidate Sealing | current | release-manager | how-to | mir-maintainers | 2026-09-22 |
 | docs/maintainer/release-process.md | Release Process | current | release-manager | how-to | mir-maintainers | 2026-08-14 |
 | docs/maintainer/report-diffing.md | Report Diffing | current | developer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/settings-governance.md | Settings Governance | current | maintainer | how-to | mir-maintainers | 2026-07-12 |

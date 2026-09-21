@@ -24,6 +24,7 @@ jobs:
     environment: release-candidate
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -52,10 +53,15 @@ jobs:
         run: |
           $plan = Get-Content -Raw -LiteralPath build/results/assurance/verification-plan.json | ConvertFrom-Json
           "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - id: artifact-names
+        name: Bind attempt-qualified plan and candidate transport
+        shell: pwsh
+        run: |
+          "plan_artifact=mir-targeted-plan-and-candidate-${{ github.run_id }}-${{ github.run_attempt }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           include-hidden-files: true
-          name: mir-targeted-plan-and-candidate
+          name: ${{ steps.artifact-names.outputs.plan_artifact }}
           path: |
             build/results/assurance/verification-plan.json
             dist/*.zip
@@ -80,7 +86,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: mir-targeted-plan-and-candidate
+          name: ${{ needs.plan.outputs.plan_artifact }}
           path: .
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
@@ -100,7 +106,7 @@ jobs:
         if: always()
         with:
           include-hidden-files: true
-          name: mir-targeted-evidence-${{ matrix.safe_test_id }}
+          name: mir-targeted-evidence-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
           path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}
           if-no-files-found: warn
 
@@ -119,7 +125,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          name: mir-targeted-plan-and-candidate
+          name: ${{ needs.plan.outputs.plan_artifact }}
           path: .
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
@@ -131,14 +137,14 @@ jobs:
         continue-on-error: true
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          pattern: mir-targeted-evidence-*
+          pattern: mir-targeted-evidence-${{ github.run_id }}-*
           path: build/results/assurance/worker-evidence
       - name: Import exact worker evidence deterministically
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
           MIR_ASSURANCE_TARGET: ${{ inputs.target }}
-        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --workers build/results/assurance/worker-evidence --artifact-prefix mir-targeted-evidence-
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_ASSURANCE_TARGET --plan build/results/assurance/verification-plan.json --factorio $env:FACTORIO_BIN --workers build/results/assurance/worker-evidence --artifact-prefix mir-targeted-evidence-${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}
       - name: Aggregate targeted gate
         shell: pwsh
         env:

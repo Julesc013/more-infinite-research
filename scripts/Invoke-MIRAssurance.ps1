@@ -180,11 +180,18 @@ switch ($command) {
     if ([string]::IsNullOrWhiteSpace($workers) -or [string]::IsNullOrWhiteSpace($artifactPrefix)) {
       throw "import-workers requires --workers <directory> and --artifact-prefix <prefix>."
     }
+    $retryAcrossAttempts = Test-MIRAssuranceSwitch -Name "--retry-across-attempts"
+    $currentRunAttempt = Get-MIRAssuranceOption -Name "--current-run-attempt"
+    if ($retryAcrossAttempts -and [string]::IsNullOrWhiteSpace($currentRunAttempt)) {
+      throw "import-workers with --retry-across-attempts requires --current-run-attempt <positive aggregate attempt>."
+    }
     $workerImport = Import-MIRAssuranceWorkerEvidence `
       -Plan $plan `
       -Context $context `
       -WorkerRoot $workers `
-      -ArtifactPrefix $artifactPrefix
+      -ArtifactPrefix $artifactPrefix `
+      -RetryAcrossAttempts:$retryAcrossAttempts `
+      -CurrentRunAttempt $currentRunAttempt
     Write-MIRAssuranceJson -Value $workerImport -DefaultPath "build/results/assurance/worker-import.json"
     if ([string]$workerImport.status -ne "passed") {
       throw "Worker evidence import did not close the active plan: failed=$(@($workerImport.failed).Count), missing=$(@($workerImport.missing).Count), rejected=$(@($workerImport.rejected).Count), duplicates=$(@($workerImport.duplicates).Count)."
