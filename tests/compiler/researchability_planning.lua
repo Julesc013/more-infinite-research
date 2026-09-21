@@ -219,6 +219,19 @@ improved_reason = researchability.reason_with_context("TechA", {
 })
 check("I01A", improved_reason == nil,
   "The independent A witness remains valid during the active A route traversal")
+
+-- An independent direct source is equally valid. A later self-output recipe
+-- must not hide that source merely because a recipe row exists for the pack.
+local source_seeded_improved = improved_world(false)
+source_seeded_improved.resources = {A_source = {minable = {result = "A", count = 1}}}
+reset(source_seeded_improved, {"item"})
+improved_reason = researchability.reason_with_context("TechA", {
+  visiting_packs = {}, visiting_technologies = {}, unlock_recipe_name = "A-improved"
+})
+improved_unlockers = production.researchable_unlockers_for_recipe("A-improved")
+check("I01B", improved_reason == nil and production.pack_production_status("A", {}) == "non-recipe"
+  and #improved_unlockers == 1 and improved_unlockers[1] == "TechA",
+  "An independent direct source permits an improved A producer despite its self-output recipe")
 reset(improved_world(false), {"item"})
 improved_reason = researchability.reason_with_context("TechA", {
   visiting_packs = {}, visiting_technologies = {}, unlock_recipe_name = "A-improved"

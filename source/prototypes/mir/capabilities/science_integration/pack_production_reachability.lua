@@ -163,6 +163,15 @@ function M.pack_production_status(pack_name, visiting_packs, visiting_technologi
   local cached = reusable and cache[pack_name] or nil
   if cached then return cached.status, cached.prerequisite end
 
+  -- A declared direct source is an independent acquisition seed even when a
+  -- later recipe for the same pack also exists. A locked self-output
+  -- "improved" recipe cannot erase an earlier natural source and turn its
+  -- own research into a false self-lock.
+  if route_feasibility.source_witness(pack_name) then
+    if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
+    return "non-recipe", pack_name
+  end
+
   local recipe_status = recipe_facts.pack_recipe_status(pack_name)
   if recipe_status and recipe_status.has_recipe then
     visiting_packs[pack_name] = true
@@ -182,10 +191,6 @@ function M.pack_production_status(pack_name, visiting_packs, visiting_technologi
     return "unreachable", nil
   end
 
-  if route_feasibility.source_witness(pack_name) then
-    if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
-    return "non-recipe", pack_name
-  end
   if reusable then cache[pack_name] = {status = "unreachable"} end
   return "unreachable", nil
 end
@@ -202,6 +207,11 @@ function M.independent_pack_acquisition_witness(
   visiting_technologies
 )
   if not pack_name or not excluded_unlocker or not pack_registry.science_pack_exists(pack_name) then return nil end
+  -- This witness is deliberately independent of an unlocker. A direct source
+  -- remains valid even if the pack also has a recipe unlocked by the
+  -- technology under assessment.
+  local direct_source = route_feasibility.source_witness(pack_name)
+  if direct_source then return direct_source end
   local recipe_status = recipe_facts.pack_recipe_status(pack_name)
   if not recipe_status or not recipe_status.has_recipe then return nil end
 
