@@ -1,13 +1,12 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 
 local M = {}
 
-local unlockers_by_recipe = nil
-
 local function build_index()
-  if unlockers_by_recipe then return unlockers_by_recipe end
-
-  unlockers_by_recipe = {}
+  local unlockers_by_recipe = {}
   local technology_names = {}
   for name, _ in pairs(data_raw.prototypes("technology")) do
     table.insert(technology_names, name)
@@ -30,12 +29,26 @@ local function build_index()
   return unlockers_by_recipe
 end
 
-function M.for_recipe(recipe_name)
-  local out = {}
-  for _, technology_name in ipairs(build_index()[recipe_name] or {}) do
-    table.insert(out, technology_name)
+local function current_index()
+  local context = compiler_context.current()
+  local source_epoch = recipe_facts.source_epoch()
+  local cached = context:state_view("recipe_unlock_index")
+  if cached and cached.recipe_source_epoch == source_epoch then return cached.unlockers_by_recipe end
+
+  local value = {
+    recipe_source_epoch = source_epoch,
+    unlockers_by_recipe = build_index()
+  }
+  if cached then
+    context:replace_epoch("recipe_unlock_index", value, context:state_epoch("recipe_unlock_index"))
+  else
+    context:set_state("recipe_unlock_index", value)
   end
-  return out
+  return value.unlockers_by_recipe
+end
+
+function M.for_recipe(recipe_name)
+  return deepcopy(current_index()[recipe_name] or {})
 end
 
 return M

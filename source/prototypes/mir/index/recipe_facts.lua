@@ -8,9 +8,43 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local M = {}
 local SCHEMA = 2
 
+-- replace_source() is a controlled pre-snapshot operation, not a general
+-- mutable-prototype escape hatch. The science indexes below deliberately
+-- key themselves to recipe_source_epoch, but these immutable compiler
+-- snapshots have broader recipe-derived closure and cannot be soundly
+-- rewritten by replacing one recipe map in place.
+local RECIPE_SNAPSHOT_STATE_NAMES = {
+  "relationship_indexes",
+  "recipe_risk_index",
+  "mod_progression_cache",
+  "material_route_graph",
+  "stream_match_index",
+  "family_resolution",
+  "family_resolution_query_index",
+  "generation_plan",
+  "compilation_snapshot",
+  "qualification_snapshot",
+  "compiler_input",
+  "pure_compilation",
+  "compilation_plan",
+  "technology_candidate_catalog",
+  "technology_qualifications",
+  "compiler_result",
+  "final_compiler_result",
+  "coverage_report"
+}
+
 local function name_of(entry)
   if type(entry) == "string" then return entry end
   return type(entry) == "table" and (entry.name or entry[1]) or nil
+end
+
+-- Recipe ingredients and products share a textual namespace only by
+-- coincidence.  Keep the legacy name-only projections for existing callers,
+-- but give route planning an exact type/name projection so an item called
+-- "water" can never satisfy a fluid requirement called "water".
+local function identity_key(entry_type, name)
+  return tostring(entry_type or "item") .. "\0" .. tostring(name or "")
 end
 
 local function amount_of(entry)
@@ -92,7 +126,7 @@ local function aggregate_io(recipe, field)
     for _, entry in pairs(entries_for(variant.value, field)) do
       local name = name_of(entry)
       if name then
-        local identity = ((type(entry) == "table" and entry.type) or "item") .. "\0" .. name
+        local identity = identity_key((type(entry) == "table" and entry.type) or "item", name)
         local aggregate = by_name[identity] or {
           type = (type(entry) == "table" and entry.type) or "item",
           name = name,
@@ -111,7 +145,7 @@ local function aggregate_io(recipe, field)
     end
   end
   table.sort(names)
-  local out = {}
+  local out, identities = {}, {}
   for _, identity in ipairs((function()
     local identities = {}
     for key, _ in pairs(by_name) do table.insert(identities, key) end
@@ -119,8 +153,9 @@ local function aggregate_io(recipe, field)
     return identities
   end)()) do
     table.insert(out, by_name[identity])
+    table.insert(identities, by_name[identity])
   end
-  return out, names
+  return out, names, identities
 end
 
 local function normalized_variant(variant)
@@ -184,19 +219,31 @@ local function variant_facts(recipe)
   return out
 end
 
-local function productive_result_names(recipe)
-  local seen, out = {}, {}
+local function productive_results(recipe)
+  local seen_names, seen_identities, names, identities = {}, {}, {}, {}
   for _, variant in ipairs(variants(recipe)) do
     for _, entry in pairs(entries_for(variant.value, "results")) do
       local name = name_of(entry)
-      if name and productive_amount(entry) > 0 and not seen[name] then
-        seen[name] = true
-        table.insert(out, name)
+      local entry_type = (type(entry) == "table" and entry.type) or "item"
+      local key = identity_key(entry_type, name)
+      if name and productive_amount(entry) > 0 then
+        if not seen_names[name] then
+          seen_names[name] = true
+          table.insert(names, name)
+        end
+        if not seen_identities[key] then
+          seen_identities[key] = true
+          table.insert(identities, {type = entry_type, name = name})
+        end
       end
     end
   end
-  table.sort(out)
-  return out
+  table.sort(names)
+  table.sort(identities, function(a, b)
+    if a.type ~= b.type then return a.type < b.type end
+    return a.name < b.name
+  end)
+  return names, identities
 end
 
 local function categories_for(recipe)
@@ -258,7 +305,9 @@ end
 
 local function build_index(recipe_prototypes)
   local facts = {}
-  local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
+  local by_output, by_output_identity = {}, {}
+  local by_productive_output, by_productive_output_identity = {}, {}
+  local by_ingredient, by_ingredient_identity, by_category, names = {}, {}, {}, {}
   for recipe_name, recipe in pairs(recipe_prototypes or {}) do
     local semantics = recipe_semantics.resolve(recipe, recipe, target_profiles.current())
     local normalized_variants = variant_facts(recipe)
@@ -271,11 +320,11 @@ local function build_index(recipe_prototypes)
         effective_maximum_productivity = variant_maximum
       end
     end
-    local ingredients, ingredient_names = aggregate_io(recipe, "ingredients")
-    local results, result_names = aggregate_io(recipe, "results")
+    local ingredients, ingredient_names, ingredient_identities = aggregate_io(recipe, "ingredients")
+    local results, result_names, result_identities = aggregate_io(recipe, "results")
     local categories = categories_for(recipe)
     local is_hidden = hidden(recipe)
-    local productive_outputs = productive_result_names(recipe)
+    local productive_outputs, productive_output_identities = productive_results(recipe)
     facts[recipe_name] = {
       schema = SCHEMA,
       name = recipe_name,
@@ -283,9 +332,12 @@ local function build_index(recipe_prototypes)
       categories = categories,
       ingredients = ingredients,
       ingredient_names = ingredient_names,
+      ingredient_identities = ingredient_identities,
       results = results,
       result_names = result_names,
+      result_identities = result_identities,
       productive_result_names = productive_outputs,
+      productive_result_identities = productive_output_identities,
       main_product = main_product(recipe, result_names),
       hidden = is_hidden,
       enabled_without_research = enabled_without_research(recipe),
@@ -304,12 +356,25 @@ local function build_index(recipe_prototypes)
     }
     table.insert(names, recipe_name)
     for _, output_name in ipairs(result_names) do append_index(by_output, output_name, recipe_name) end
+    for _, output in ipairs(result_identities) do
+      append_index(by_output_identity, identity_key(output.type, output.name), recipe_name)
+    end
     for _, output_name in ipairs(productive_outputs) do append_index(by_productive_output, output_name, recipe_name) end
+    for _, output in ipairs(productive_output_identities) do
+      append_index(by_productive_output_identity, identity_key(output.type, output.name), recipe_name)
+    end
     for _, ingredient_name in ipairs(ingredient_names) do append_index(by_ingredient, ingredient_name, recipe_name) end
+    for _, ingredient in ipairs(ingredient_identities) do
+      append_index(by_ingredient_identity, identity_key(ingredient.type, ingredient.name), recipe_name)
+    end
     for _, category in ipairs(categories) do append_index(by_category, category, recipe_name) end
   end
   table.sort(names)
-  for _, index in pairs({by_output, by_productive_output, by_ingredient, by_category}) do
+  for _, index in pairs({
+    by_output, by_output_identity,
+    by_productive_output, by_productive_output_identity,
+    by_ingredient, by_ingredient_identity, by_category
+  }) do
     for _, recipe_names in pairs(index) do table.sort(recipe_names) end
   end
   local canonical = {
@@ -317,25 +382,50 @@ local function build_index(recipe_prototypes)
     facts = facts,
     names = names,
     by_output = by_output,
+    by_output_identity = by_output_identity,
     by_productive_output = by_productive_output,
+    by_productive_output_identity = by_productive_output_identity,
     by_ingredient = by_ingredient,
+    by_ingredient_identity = by_ingredient_identity,
     by_category = by_category
   }
   return canonical
+end
+
+-- Recipe facts are a snapshot, not a live view of data.raw.  A writer that
+-- changes recipes after this module has been queried must replace the source
+-- through replace_source().  That single operation advances the Context
+-- epoch and gives all epoch-aware consumers an unambiguous invalidation point.
+local function source_prototypes(context)
+  return context:state_view("recipe_source", function()
+    return data_raw.prototypes("recipe")
+  end)
+end
+
+local function source_epoch(context)
+  source_prototypes(context)
+  return context:state_epoch("recipe_source") or 1
+end
+
+local function rebuild(context)
+  telemetry.start_phase("snapshot")
+  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
+  metrics.scan_count = metrics.scan_count + 1
+  local canonical = build_index(source_prototypes(context))
+  telemetry.count("recipe_index_scans", 1)
+  telemetry.count("recipes", #canonical.names)
+  telemetry.finish_phase("snapshot")
+  if context:has_state("recipe_index") then
+    return context:replace_epoch("recipe_index", canonical, context:state_epoch("recipe_index"))
+  end
+  return context:set_state("recipe_index", canonical)
 end
 
 local function build()
   local context = compiler_context.current()
   local cached = context:state_view("recipe_index")
   if cached then return cached end
-  telemetry.start_phase("snapshot")
-  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
-  metrics.scan_count = metrics.scan_count + 1
-  local canonical = build_index(data_raw.prototypes("recipe"))
-  telemetry.count("recipe_index_scans", 1)
-  telemetry.count("recipes", #canonical.names)
-  telemetry.finish_phase("snapshot")
-  return context:set_state("recipe_index", canonical)
+  return rebuild(context)
 end
 
 -- Builds the same canonical index from an explicit prototype map.
@@ -346,6 +436,46 @@ function M.index_prototypes(recipe_prototypes)
     error("recipe_facts.index_prototypes expects a recipe prototype map", 2)
   end
   return build_index(recipe_prototypes)
+end
+
+-- Replace the active recipe source for the current CompilerContext.  This is
+-- deliberately an explicit operation: direct data.raw mutation after a fact
+-- snapshot has been built cannot safely invalidate derived planning state.
+-- The returned epoch is the dependency key for recipe-aware caches.
+function M.replace_source(recipe_prototypes, expected_epoch)
+  if type(recipe_prototypes) ~= "table" then
+    error("recipe_facts.replace_source expects a recipe prototype map", 2)
+  end
+  local context = compiler_context.current()
+  for _, state_name in ipairs(RECIPE_SNAPSHOT_STATE_NAMES) do
+    if context:has_state(state_name) then
+      error("recipe_facts.replace_source must run before recipe-derived compiler snapshots: " .. state_name, 2)
+    end
+  end
+  local current_epoch = source_epoch(context)
+  if expected_epoch ~= nil and expected_epoch ~= current_epoch then
+    error("recipe_facts.replace_source epoch mismatch: expected " .. tostring(expected_epoch)
+      .. ", current " .. tostring(current_epoch), 2)
+  end
+  context:replace_epoch("recipe_source", recipe_prototypes, current_epoch)
+  local next_epoch = context:state_epoch("recipe_source")
+
+  -- Rebuild the direct index immediately so callers holding no other cache
+  -- never observe a stale recipe snapshot.  Downstream caches key themselves
+  -- to source_epoch() and refresh lazily on their next query.
+  if context:has_state("recipe_index") then rebuild(context) end
+  if context:has_state("recipe_index_fingerprint") then
+    context:replace_epoch(
+      "recipe_index_fingerprint",
+      require("prototypes.mir.core.fingerprint").of(build()),
+      context:state_epoch("recipe_index_fingerprint")
+    )
+  end
+  return next_epoch
+end
+
+function M.source_epoch()
+  return source_epoch(compiler_context.current())
 end
 
 function M.get(recipe_name)
@@ -387,6 +517,12 @@ function M.recipes_by_output_view(name)
   return build().by_output[name] or {}
 end
 
+-- Exact type/name query for consumers that cannot safely use the historical
+-- name-only convenience index (notably recipe-route feasibility).
+function M.recipes_by_output_identity_view(entry_type, name)
+  return build().by_output_identity[identity_key(entry_type, name)] or {}
+end
+
 function M.all_names()
   return deepcopy(build().names)
 end
@@ -416,6 +552,10 @@ end
 
 function M.recipes_by_output(name)
   return deepcopy(build().by_output[name] or {})
+end
+
+function M.recipes_by_output_identity(entry_type, name)
+  return deepcopy(build().by_output_identity[identity_key(entry_type, name)] or {})
 end
 
 function M.recipes_by_ingredient(name)

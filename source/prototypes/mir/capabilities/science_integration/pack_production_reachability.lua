@@ -6,6 +6,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
 local route_policy = require("prototypes.mir.capabilities.science_integration.production_route_policy")
+local route_feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
 
 local M = {}
 
@@ -16,7 +17,17 @@ local function technology_researchability_reason(...)
 end
 
 local function science_pack_resolution_cache()
-  return compiler_context.current():state_view("science_pack_production", function() return {} end)
+  local context = compiler_context.current()
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local cached = context:state_view("science_pack_production")
+  if cached and cached.recipe_source_epoch == source_epoch then return cached.entries end
+  local value = {recipe_source_epoch = source_epoch, entries = {}}
+  if cached then
+    context:replace_epoch("science_pack_production", value, context:state_epoch("science_pack_production"))
+  else
+    context:set_state("science_pack_production", value)
+  end
+  return value.entries
 end
 
 local function graph_index()
@@ -80,32 +91,44 @@ local function production_routes(recipe_status, visiting_packs, excluded_unlocke
   for _, recipe_name in ipairs(recipe_status.recipes or {}) do
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      table.insert(routes, {
-        recipe = recipe_name,
-        initial = true,
-        unlockers = {},
-        prerequisite_closure = {},
-        science_burden = {},
-        reachable = true,
-        reachability = {status = "reachable"},
-        progression_key = {
-          science_burden_count = 0,
-          prerequisite_count = 0,
-          unlock_depth = 0,
-          research_count = 0,
-          research_time = 0
-        },
-        provenance = {route_policy = route_policy.policy_id, recipe = recipe_name}
-      })
+      local witness = route_feasibility.initial_recipe_witness(recipe_name, recipe_status.pack_name)
+      if witness then
+        table.insert(routes, {
+          recipe = recipe_name,
+          initial = true,
+          unlockers = {},
+          prerequisite_closure = {},
+          science_burden = {},
+          reachable = true,
+          reachability = {status = "reachable"},
+          progression_key = {
+            science_burden_count = 0,
+            prerequisite_count = 0,
+            unlock_depth = 0,
+            research_count = 0,
+            research_time = 0
+          },
+          provenance = {
+            route_policy = route_policy.policy_id,
+            recipe = recipe_name,
+            structural_route_witness = witness.kind
+          }
+        })
+      end
     else
-      for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
-        if technology_name ~= excluded_unlocker then
-          table.insert(routes, route_for_unlocker(
-            recipe_name,
-            technology_name,
-            visiting_packs,
-            visiting_technologies
-          ))
+      local witness = route_feasibility.recipe_witness(recipe_name, recipe_status.pack_name)
+      if witness then
+        for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
+          if technology_name ~= excluded_unlocker then
+            local route = route_for_unlocker(
+              recipe_name,
+              technology_name,
+              visiting_packs,
+              visiting_technologies
+            )
+            route.provenance.structural_route_witness = witness.kind
+            table.insert(routes, route)
+          end
         end
       end
     end
@@ -159,15 +182,12 @@ function M.pack_production_status(pack_name, visiting_packs, visiting_technologi
     return "unreachable", nil
   end
 
-  if technology_researchability_reason(pack_name, {
-    visiting_packs = visiting_packs,
-    visiting_technologies = visiting_technologies or {}
-  }) == nil then
+  if route_feasibility.source_witness(pack_name) then
     if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
     return "non-recipe", pack_name
   end
-  if reusable then cache[pack_name] = {status = "non-recipe"} end
-  return "non-recipe", nil
+  if reusable then cache[pack_name] = {status = "unreachable"} end
+  return "unreachable", nil
 end
 
 -- A recipe unlocked by the technology currently being evaluated cannot prove
