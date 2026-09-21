@@ -122,9 +122,57 @@ local function reviewed_routes(subject, route, risk, route_certificate, active_m
   return buckets[1].recipes
 end
 
+local function certificate_required_routes(subject, route, risk, route_certificate, active_mods, graph_override, include_return)
+  local available = {[subject]=route}
+  if include_return then available.reclaim=canonical_route("reclaim", "plate", "ore") end
+  environment(available)
+  risks={[subject]=risk}
+  mods=active_mods or {Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13"}
+  if graph_override then cached.material_route_graph=graph_override end
+  local buckets=matcher.recipes_for_stream({
+    items={"plate"},
+    require_acyclic_process=true,
+    require_exact_route_certificate=true,
+    reviewed_forward_routes={[subject]=route_certificate}
+  },0.02)
+  return buckets[1].recipes
+end
+
+local function ordinary_acyclic_routes(subject, route, risk)
+  environment({[subject]=route})
+  risks={[subject]=risk}
+  mods={Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13"}
+  local buckets=matcher.recipes_for_stream({
+    items={"plate"},
+    require_acyclic_process=true
+  },0.02)
+  return buckets[1].recipes
+end
+
 local valid_route=canonical_route("smelting","ore","plate")
 local valid_certificate=certificate("ore","plate")
 local valid_risk_row=risk_row("smelting")
+check(table.concat(ordinary_acyclic_routes("smelting",valid_route,valid_risk_row),",")=="smelting","ordinary acyclic route remains admitted without opting into certificates")
+check(table.concat(certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate),",")=="smelting","exact certificate can require an ordinary acyclic route")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,nil)==0,"certificate-required route rejects absent certificate despite acyclic graph")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="9.9.9"})==0,"certificate-required route rejects wrong locked mod")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13",extra="1.0.0"})==0,"certificate-required route rejects extra mod")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,certificate("ore","gear"))==0,"certificate-required route rejects output mismatch")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=false})==0,"certificate-required route cannot override graph budget")
+local search_edges={}
+local previous="plate"
+for index=1,30001 do
+  local next_name="search-node-"..index
+  search_edges[previous]={[next_name]=true}
+  previous=next_name
+end
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,{complete=true,edges=search_edges})==0,"certificate-required route cannot override search budget")
+check(table.concat(certificate_required_routes("smelting",valid_route,valid_risk_row,valid_certificate,nil,nil,true),",")=="smelting","certificate-required reviewed return accepts exact certificate")
+check(#certificate_required_routes("smelting",valid_route,valid_risk_row,certificate("ore","gear"),nil,nil,true)==0,"certificate-required reviewed return rejects invalid certificate")
+local certificate_denied_route=canonical_route("smelting","ore","plate")
+certificate_denied_route.declared_allow_productivity=false
+check(#certificate_required_routes("smelting",certificate_denied_route,valid_risk_row,valid_certificate)==0,"certificate-required route preserves productivity denial")
+check(#certificate_required_routes("smelting",valid_route,risk_row("smelting",{review_flags={"cleaning_or_recovery_loop"}}),valid_certificate)==0,"certificate-required route rejects canonical risk")
 local observer_certificate=certificate("ore","plate")
 observer_certificate.profiles[1].observer_mod_locks={observer="0.1.0"}
 check(table.concat(reviewed_routes("smelting",valid_route,valid_risk_row,observer_certificate,{Krastorio2="2.1.2",["Krastorio2-spaced-out"]="2.0.13"}),",")=="smelting","optional observer may be absent")

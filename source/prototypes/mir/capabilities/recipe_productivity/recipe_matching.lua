@@ -318,13 +318,28 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
   return true, "accepted"
 end
 local function should_skip_recipe(recipe_name, recipe, options)
+  local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
+  local certificate_required = options.require_exact_route_certificate == true
+  local certificate_admitted, certificate_reason = false, "certificate-not-required"
+  if certificate_required then
+    certificate_admitted, certificate_reason = reviewed_forward_routes.admits(
+      recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods)
+    if not certificate_admitted then
+      if log then log("[more-infinite-research] Material route omitted recipe=" .. recipe_name .. " reason=certificate-rejected:" .. certificate_reason) end
+      return true
+    end
+  end
   if options.require_acyclic_process then
     local admitted, reason = R.material_route_is_acyclic(recipe)
     if not admitted then
-      local certificate = options.reviewed_forward_routes and options.reviewed_forward_routes[recipe_name]
-      local certified, certificate_reason = false, "certificate-not-applicable"
+      local certified = false
+      certificate_reason = "certificate-not-applicable"
       if string.sub(reason, 1, 22) == "potential-return-path:" and certificate then
-        certified, certificate_reason = reviewed_forward_routes.admits(recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods)
+        if certificate_required then
+          certified = certificate_admitted
+        else
+          certified, certificate_reason = reviewed_forward_routes.admits(recipe_name, recipe, recipe_risk_facts.view(recipe_name), certificate, mods)
+        end
       end
       if not certified then
         local reported_reason = certificate and ("certificate-rejected:" .. certificate_reason) or reason
@@ -467,6 +482,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
           place_result_entity_types = g.place_result_entity_types,
           reject_explicit_productivity_denial = g.reject_explicit_productivity_denial,
           require_acyclic_process = g.require_acyclic_process or spec.require_acyclic_process,
+          require_exact_route_certificate = g.require_exact_route_certificate or spec.require_exact_route_certificate,
           reviewed_forward_routes = g.reviewed_forward_routes or spec.reviewed_forward_routes,
           match_mode = g.mode or spec.mode,
           match_stream = g.match and g or spec
@@ -511,6 +527,7 @@ local function recipes_for_stream_uncached(spec, per_level_default)
     place_result_entity_types = spec.place_result_entity_types,
     reject_explicit_productivity_denial = spec.reject_explicit_productivity_denial,
     require_acyclic_process = spec.require_acyclic_process,
+    require_exact_route_certificate = spec.require_exact_route_certificate,
     reviewed_forward_routes = spec.reviewed_forward_routes,
     match_mode = spec.mode,
     match_stream = spec
