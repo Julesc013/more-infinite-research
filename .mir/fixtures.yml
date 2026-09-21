@@ -1655,14 +1655,17 @@ fixtures:
     harness: tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1
     exact_target:
       factorio_line: "2.1"
+      external_input_custody: committed-provenance-safe-source-observation-fixture-v1
       archive_locks: angelssmelting-2.1.1-and-bobwarfare-3.0.1-source-observation-only
+      hosted_evaluation: fixture-and-canonical-source-only
+      offline_replay: explicit-ArchiveRoot-hash-bound-source-observation-only
     validates:
       - existing-BA-02-BA-05-and-BA-06-authorities-reused-without-duplicate-intake
       - Angel-only-permission-granted-Gold-Platinum-and-Silver-wire-finals
       - coolant-returning-wire-coils-and-unpermitted-direct-wire-remain-withheld
       - exact-Bob-bullet-heavy-ammo-and-rocket-manufacturing-stream-composition
       - no-manufacturing-route-is-bound-to-a-direct-damage-or-firing-speed-stream
-      - canonical-source-materialization-is-deterministic-for-the-affected-targets
+      - canonical-productivity-byte-parity-and-deterministic-materialization-for-f210-f200-f110-and-f100
     non_claims:
       - Factorio-engine-qualification-or-production-gain
       - F210-2.1.18-or-later-capsule-pass

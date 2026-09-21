@@ -4317,11 +4317,11 @@
         "source:source/prototypes/streams/productivity.lua",
         "source:source/prototypes/streams/direct-effects.lua",
         "source:source/package-source.json",
-        "source:targets/f210/composition.json",
-        "source:targets/f200/composition.json",
-        "source:targets/f110/composition.json",
-        "source:targets/f100/composition.json",
-        "source:targets/package-authority.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "targets/package-authority.json",
         "tools/mir/application/package/TargetMaterializer.ps1"
       ]
     },

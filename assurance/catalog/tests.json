@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 195,
+  "test_count": 196,
   "tests": [
     {
       "id": "docs.check",
@@ -2306,6 +2306,39 @@
         "contracts/repository/mir4-release-application-dag-v1.schema.json",
         "tests/tooling/Test-MIR4CliReleaseConvergence.ps1",
         "package-source"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.mir4-community-manufacturing-intake",
+      "proposition": "The governed test 'static.mir4-community-manufacturing-intake' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1",
+      "canonical_implementation": "tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/mir4/Test-MIR4CommunityManufacturingIntake.ps1",
+        "fixtures/assert-community-manufacturing-intake/expected-vs-observed-vs-realized.json",
+        "spec/programmes/community-requests.json",
+        ".mir/fixtures.yml",
+        ".mir/streams.yml",
+        "source:source/prototypes/streams/productivity.lua",
+        "source:source/prototypes/streams/direct-effects.lua",
+        "source:source/package-source.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "targets/package-authority.json",
+        "tools/mir/application/package/TargetMaterializer.ps1"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7124,13 +7157,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 65,
+      "package-repository": 66,
       "tooling-release": 54,
       "runtime-upgrade": 44,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 183,
+    "canonical_test_commands": 184,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7143,5 +7176,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:5de8af47e9006ea82e442438717bad21fbd2657fbfdd475516b1ef5fde0fc4cc"
+  "digest": "sha256:c0e3556f34f089268d4d832268cedf9885cd60ca79deaaccf2a7ef10222d6a81"
 }

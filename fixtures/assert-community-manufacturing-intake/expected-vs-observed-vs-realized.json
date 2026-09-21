@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR4CommunityManufacturingIntakeStaticFixtureV1",
-  "status": "static-archive-observation-and-canonical-materialization-only",
+  "status": "static-provenance-fixture-and-canonical-materialization-only",
   "authority": {
     "request_ids": ["BA-02", "BA-05", "BA-06", "NATIVE-01"],
     "new_request_records": 0,
@@ -11,6 +11,19 @@
   "archives": {
     "angelssmelting_2.1.1.zip": "1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9",
     "bobwarfare_3.0.1.zip": "903A09740B494E3A249A39C54D33260AC527A716D56C29482DB5022BC4DB8DFF"
+  },
+  "external_input_custody": {
+    "kind": "MIR4CommittedProvenanceSafeExternalObservationFixtureV1",
+    "archive_bytes_vendored": false,
+    "hosted_evaluation": "fixture-and-canonical-source-only",
+    "offline_replay": {
+      "parameter": "ArchiveRoot",
+      "archive_root_must_be_explicit": true,
+      "archive_hashes_must_match": true,
+      "purpose": "hash-bound-source-observation-replay-only",
+      "engine_qualification": false,
+      "public_support_authority": false
+    }
   },
   "wire_routes": [
     {
@@ -103,7 +116,7 @@
     "targets": ["f210", "f200", "f110", "f100"],
     "source_path": "source/prototypes/streams/productivity.lua",
     "output_path": "prototypes/streams/productivity.lua",
-    "materialize_target": "f210"
+    "materialize_target": "all-declared-targets"
   },
   "non_claims": [
     "No Factorio engine execution or F210 >=2.1.18 capsule pass.",
