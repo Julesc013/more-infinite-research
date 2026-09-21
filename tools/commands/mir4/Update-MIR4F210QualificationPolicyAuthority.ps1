@@ -16,6 +16,27 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PreFreezeRelease.ps1')
 
+# V1 is a published historical authority.  It remains readable and verifiable,
+# but all current changes must append through the V2 successor writer.
+if (-not $Check) {
+  throw '[mir4-f210-historical-policy-receipt-immutable] Use Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1 for current authority.'
+}
+$historical = Test-MIR4F210HistoricalPolicyV1 -RepoRoot $RepoRoot
+$historicalReceiptPath = Join-Path $RepoRoot $script:MIR4F210HistoricalPolicyEvolutionReceiptRelativePath
+$historicalReceiptSchema = Join-Path $RepoRoot 'spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json'
+if (-not ((Get-Content -Raw -LiteralPath $historicalReceiptPath) | Test-Json -SchemaFile $historicalReceiptSchema -ErrorAction SilentlyContinue)) {
+  throw '[mir4-f210-historical-policy-evolution-receipt-schema]'
+}
+[pscustomobject][ordered]@{
+  status = 'historical-immutable-current-authority-is-v2-successor'
+  policy_path = $script:MIR4F210HistoricalPolicyRelativePath
+  policy_sha256 = $script:MIR4F210HistoricalPolicySha256
+  policy_record_sha256 = [string]$historical.record_sha256
+  receipt_path = $script:MIR4F210HistoricalPolicyEvolutionReceiptRelativePath
+  receipt_sha256 = $script:MIR4F210HistoricalPolicyEvolutionReceiptSha256
+}
+return
+
 $outputRelative = '.mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json'
 $schemaRelative = 'spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json'
 $predecessorRelative = 'releases/migrations/MIR4-Release-Tooling-MigrationV1.json'

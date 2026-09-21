@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "predecessor", "target", "factorio_line", "support_floor", "pre_freeze", "freeze", "post_stable", "qualification", "boundaries", "status", "record_sha256"],
+  "properties": {
+    "schema": {"const": 2},
+    "kind": {"const": "MIR4F210CurrentQualificationPolicyV2"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {"type": "object", "additionalProperties": false, "required": ["policy", "authority_evolution_receipt"], "properties": {
+      "policy": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json"}, "sha256": {"const": "386DA641FF9661CECADB4E23619ACCB0AD5F52EF97886B27E217956DC5569E4E"}, "record_sha256": {"const": "7DC4D7CBD8B1F5AB8FB0B0CDF819489C9BAA18008607EDA1A27AD3EE297F504F"}}},
+      "authority_evolution_receipt": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"const": ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json"}, "sha256": {"$ref": "#/$defs/sha256"}}}
+    }},
+    "target": {"const": "F210"},
+    "factorio_line": {"const": "2.1"},
+    "support_floor": {"const": "2.1.18"},
+    "pre_freeze": {"type": "object", "additionalProperties": false, "required": ["phase", "selection", "steam", "execution_binding", "drift", "engine_admission"], "properties": {
+      "phase": {"const": "experimental"}, "selection": {"const": "highest-official-experimental-installed-on-single-authorized-steam-path-at-execution-time"},
+      "steam": {"type": "object", "additionalProperties": false, "required": ["app_id", "branch", "app_manifest", "factorio_binary"], "properties": {"app_id": {"const": "427520"}, "branch": {"const": "experimental"}, "app_manifest": {"type": "string", "minLength": 1}, "factorio_binary": {"type": "string", "minLength": 1}}},
+      "execution_binding": {"const": "exact-version-build-file-version-binary-sha256-steam-build-id-manifest-sha256-api-prototype-data-and-mod-closure"}, "drift": {"const": "invalidate-prior-execution-and-rerun-affected-build-and-qualification"}, "engine_admission": {"const": "pending-exact-engine-api-prototype-data-and-official-mod-capsule"}
+    }},
+    "freeze": {"type": "object", "additionalProperties": false, "required": ["trigger", "lock", "drift"], "properties": {"trigger": {"const": "explicit-T19-source-freeze-authorization"}, "lock": {"const": "exact-selected-version-build-file-version-binary-sha256-steam-build-id-manifest-sha256-api-prototype-data-and-mod-closure"}, "drift": {"const": "candidate-invalid-rebuild-and-full-f210-requalification-required"}}},
+    "post_stable": {"type": "object", "additionalProperties": false, "required": ["activation", "minimum_lane", "latest_lane", "candidate_lock"], "properties": {
+      "activation": {"const": "official-2.1-stable-availability-plus-append-only-transition-authority"},
+      "minimum_lane": {"type": "object", "additionalProperties": false, "required": ["id", "channel", "floor_rule", "operands"], "properties": {"id": {"const": "stable-minimum"}, "channel": {"const": "stable"}, "floor_rule": {"const": "numeric-version-max(requested-2.1.18,first-official-stable-2.1-patch,later-accepted-mandatory-floor)"}, "operands": {"const": ["requested-2.1.18", "first-official-stable-2.1-patch", "later-accepted-mandatory-floor"]}}},
+      "latest_lane": {"type": "object", "additionalProperties": false, "required": ["id", "selection", "channel"], "properties": {"id": {"const": "stable-latest"}, "selection": {"const": "latest-official-stable-2.1.x"}, "channel": {"const": "stable"}}},
+      "candidate_lock": {"const": "each-lane-exact-version-build-binary-and-official-data-identities"}
+    }},
+    "qualification": {"type": "object", "additionalProperties": false, "required": ["current_engine_api_prototype_data_mod_capsule_admitted", "current_engine_qualification_passed", "stable_transition_recorded", "stable_qualification_passed"], "properties": {"current_engine_api_prototype_data_mod_capsule_admitted": {"const": false}, "current_engine_qualification_passed": {"const": false}, "stable_transition_recorded": {"const": false}, "stable_qualification_passed": {"const": false}}},
+    "boundaries": {"type": "object", "additionalProperties": false, "required": ["compatibility_floor_changed", "prototype_mutation_authorized", "source_freeze_authorized", "candidate_allocation_authorized", "signing_authorized", "promotion_to_main_authorized", "publication_authorized"], "properties": {"compatibility_floor_changed": {"const": true}, "prototype_mutation_authorized": {"const": false}, "source_freeze_authorized": {"const": false}, "candidate_allocation_authorized": {"const": false}, "signing_authorized": {"const": false}, "promotion_to_main_authorized": {"const": false}, "publication_authorized": {"const": false}}},
+    "status": {"const": "active-current-experimental-policy-engine-admission-and-qualification-pending"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"}}
+}

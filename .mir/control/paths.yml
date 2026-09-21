@@ -17,6 +17,11 @@ paths:
   mir4.package-presentation.frozen-v2-evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
   mir4.package-presentation.frozen-v2-verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
   mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority.ps1
+  mir4.f210.current-qualification-policy: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
+  mir4.f210.current-qualification-policy-succession: .mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json
+  mir4.f210.current-qualification-policy-schema: spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json
+  mir4.f210.current-qualification-policy-succession-schema: spec/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json
+  mir4.f210.current-qualification-policy-writer: tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1
   mir4.a03.authority-observation: spec/programmes/evidence/synthesis-2026-09-10/a00-current-authority-observation.json
   mir4.a03.environment-lock: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-current.lock.json
   mir4.a03.execution-proof: spec/programmes/evidence/synthesis-2026-09-10/a03-k2-k2so-f210-execution-proof.json
@@ -432,6 +437,8 @@ paths:
   spec.schemas.mir4-playtest-evidence-v1: spec/schemas/mir4-playtest-evidence-v1.schema.json
   spec.schemas.mir4-f210-release-qualification-policy-v1: spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json
   spec.schemas.mir4-f210-qualification-policy-authority-evolution-receipt-v1: spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json
+  spec.schemas.mir4-f210-current-qualification-policy-v2: spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json
+  spec.schemas.mir4-f210-current-qualification-policy-succession-v1: spec/schemas/mir4-f210-current-qualification-policy-succession-v1.schema.json
   spec.schemas.mir4-final-mile-tooling-authority-evolution-receipt-v1: spec/schemas/mir4-final-mile-tooling-authority-evolution-receipt-v1.schema.json
   spec.schemas.mir4-t17-machine-preparation-authority-evolution-receipt-v1: spec/schemas/mir4-t17-machine-preparation-authority-evolution-receipt-v1.schema.json
   spec.templates.mir4-protected-signing-ceremony-receipt-v1: spec/templates/mir4-protected-signing-ceremony-receipt-v1.template.json
@@ -584,6 +591,7 @@ paths:
   tools.mir.application.release.f210-qualification-policy: tools/mir/application/release/F210QualificationPolicy.ps1
   tools.mir.application.release.release-narratives: tools/mir/application/release/ReleaseNarratives.ps1
   tools.commands.mir4.update-f210-qualification-policy-authority: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
+  tools.commands.mir4.update-f210-current-qualification-policy-v2-authority: tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1
   tools.commands.mir4.update-final-mile-tooling-authority: tools/commands/mir4/Update-MIR4FinalMileToolingAuthority.ps1
   tools.commands.mir4.update-final-release-closure-authority: tools/commands/mir4/Update-MIR4FinalReleaseClosureAuthority.ps1
   tools.mir.application.release.migration: tools/mir/application/release/ReleaseToolingMigration.ps1
@@ -683,6 +691,8 @@ paths:
   releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
   releases.waves.mir4-r0-f210-release-qualification-policy: .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
   releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
+  control.mir4-f210-current-qualification-policy: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
+  control.mir4-f210-current-qualification-policy-succession: .mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json
   releases.waves.mir4-r0-final-mile-tooling-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Tooling-Authority-Evolution-ReceiptV1.json
   releases.waves.mir4-r0-maintainer-final-github-release-authorization: .mir/releases/waves/mir4-r0/MIR4-Maintainer-Final-GitHub-Release-AuthorizationV1.json
   releases.waves.mir4-r0-final-mile-playtest-candidate-authority: .mir/releases/waves/mir4-r0/MIR4-Final-Mile-Playtest-Candidate-AuthorityV1.json

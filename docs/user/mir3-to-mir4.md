@@ -27,7 +27,7 @@ MIR 4 keeps the technology IDs, settings, research behavior, migrations and runt
 
 Historical packages are private experimental candidates until separately admitted. Do not infer public support for them from an archive existing.
 
-Before the MIR 4.0 source freeze, F210 qualification follows the exact official Steam experimental 2.1.x installed on the authorized path at or above the unchanged 2.1.8 compatibility floor. The freeze binds one exact engine identity; any later drift requires a rebuilt and requalified candidate. F110 and F100 are reduced LTS targets with explicit omissions and do not claim feature parity with F210 or F200.
+Before source freeze, F210 qualification follows the exact official Steam experimental 2.1.x installed on the authorized path at or above the current 2.1.18 compatibility floor. The freeze binds one exact engine identity; any later drift requires a rebuilt and requalified candidate. F110 and F100 are reduced LTS targets with explicit omissions and do not claim feature parity with F210 or F200.
 
 ## Before upgrading
 
