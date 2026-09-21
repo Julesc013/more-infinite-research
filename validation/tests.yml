@@ -97,8 +97,16 @@
         "targets/**",
         ".mir/modules.yml",
         ".mir/module-dependencies.json",
-        "tools/lib/validation/CurrentTargetPackage.ps1",
-        "tests/architecture/Test-MIRArchitecture.ps1"
+        "scripts/Invoke-MIRValidation.ps1",
+        "tools/lib/validation/**",
+        "tools/lib/control/**",
+        "tools/commands/docs/Update-MIRDocumentationIndex.ps1",
+        "tools/commands/docs/Update-MIRPipelineDocumentation.ps1",
+        "tools/commands/docs/Update-MIRGeneratedAuthorityDocs.ps1",
+        "tools/commands/workspace/Get-MIRLegacyInventory.ps1",
+        "tests/tooling/Test-MIRGovernance.ps1",
+        "tests/compiler/Test-MIRSettingsVisibility.ps1",
+        "tests/architecture/**"
       ]
     },
     {
