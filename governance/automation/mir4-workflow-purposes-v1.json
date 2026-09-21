@@ -49,7 +49,7 @@
       "purpose": "nightly",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "744AB438F612D5396B843895755F2BD7820CF9EB493A8922D88ADE5E7925CB1B"
+      "sha256": "E404CDB16CD31623FCB2BE92BD9E88AAFB4D0DC87926BE57565EDCB259EC3EB0"
     },
     {
       "file": ".github/workflows/assurance-targeted.yml",
@@ -57,7 +57,7 @@
       "purpose": "qualification",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "A7C432B94B46B81490052DF05A4903BDB9158B382D0E3C0FA1A83D090B3AFA42"
+      "sha256": "4E18B003BC3F24903E6183E82C3DA897DBAA4933E7A6298B17C9FA72D33AEFCE"
     },
     {
       "file": ".github/workflows/branch-policy.yml",
@@ -185,7 +185,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "60720CB0E8EB942EDDEE80A44DF9214A59C9FE94920AC4F6CED13261277781C2"
+      "sha256": "D94CBCB8C3158524B75DF2DC4E40797B031D1DB3666A4857BD8B8698A6126F95"
     }
   ],
   "summary": {
@@ -211,5 +211,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e394306c34ba2f2c070cf61eadbd6e5950eccd78ca08878a955702063806d721"
+  "digest": "sha256:eea718dc581a2e985db4d0a6bdf7469051500272de9e06533ba2facd62a1359a"
 }
