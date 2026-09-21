@@ -981,11 +981,16 @@ foreach ($requiredWorkflowSnippet in @(
   'no_op = $true',
   '${{ matrix.no_op != true }}',
   '${{ matrix.no_op == true }}',
-  '${{ always() && matrix.no_op != true }}'
+  '${{ always() && matrix.no_op != true }}',
+  'pattern: mir-evidence-${{ github.run_id }}-*',
+  '--artifact-prefix mir-evidence-${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}'
 )) {
   if (-not $validateWorkflow.Contains($requiredWorkflowSnippet)) {
     throw "Hosted validation workflow does not safely handle an all-reuse plan: $requiredWorkflowSnippet"
   }
+}
+if ($validateWorkflow.Contains('pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*')) {
+  throw "Hosted aggregate fan-in must retain verified worker artifacts from earlier attempts of the same workflow run."
 }
 if ($validateWorkflow.Contains('Remove-Item -LiteralPath $source -Force')) {
   throw "Hosted planning must preserve the tracked candidate source so every clean worker reconstructs the same canonical repository state."
@@ -1025,7 +1030,9 @@ foreach ($fanInCase in @(
     'path: build/results/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}',
     'path: build/results/assurance/worker-evidence',
     'verify import-workers',
-    "--artifact-prefix $($fanInCase.Prefix)",
+    ('name: ' + $fanInCase.Prefix + '${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}'),
+    ('pattern: ' + $fanInCase.Prefix + '${{ github.run_id }}-*'),
+    ('--artifact-prefix ' + $fanInCase.Prefix + '${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}'),
     'build/results/assurance/worker-import.json'
   )) {
     if (-not $fanInWorkflow.Contains($requiredFanInSnippet)) {
@@ -1034,6 +1041,29 @@ foreach ($fanInCase in @(
   }
   if ($fanInWorkflow.Contains("merge-multiple: true")) {
     throw "Assurance workflow '$($fanInCase.Path)' still extracts mutable worker pointers into one shared directory."
+  }
+}
+
+foreach ($planTransportCase in @(
+  @{Path=".github\workflows\validate.yml"; Artifact="mir-verification-plan-"},
+  @{Path=".github\workflows\assurance-targeted.yml"; Artifact="mir-targeted-plan-and-candidate-"},
+  @{Path=".github\workflows\assurance-scheduled.yml"; Artifact="mir-scheduled-plan-and-candidate-"}
+)) {
+  $planTransportWorkflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $planTransportCase.Path)
+  foreach ($requiredPlanTransportSnippet in @(
+    'plan_artifact: ${{ steps.artifact-names.outputs.plan_artifact }}',
+    'id: artifact-names',
+    ('"plan_artifact=' + $planTransportCase.Artifact + '${{ github.run_id }}-${{ github.run_attempt }}"'),
+    'name: ${{ steps.artifact-names.outputs.plan_artifact }}',
+    'name: ${{ needs.plan.outputs.plan_artifact }}'
+  )) {
+    if (-not $planTransportWorkflow.Contains($requiredPlanTransportSnippet)) {
+      throw "Assurance workflow '$($planTransportCase.Path)' omits attempt-qualified exact plan/candidate transport: $requiredPlanTransportSnippet"
+    }
+  }
+  $attemptInvariantName = [regex]::Escape([string]$planTransportCase.Artifact.TrimEnd('-'))
+  if ($planTransportWorkflow -match "(?m)^\s*name:\s*$attemptInvariantName\s*$") {
+    throw "Assurance workflow '$($planTransportCase.Path)' retains an attempt-invariant plan/candidate artifact name."
   }
 }
 
@@ -1074,7 +1104,15 @@ foreach ($requiredIngestionGuard in @(
   'max_entries_per_artifact',
   'max_expanded_bytes_per_artifact',
   'max_file_bytes',
-  'duplicate canonical object paths'
+  'duplicate canonical object paths',
+  'receipt_material_sha256',
+  'RetryAcrossAttempts',
+  'CurrentRunAttempt',
+  'Publish-MIRAssuranceWorkerObject',
+  'bounded tree scan',
+  'superseded-by-later-run-attempt',
+  'stale-plan-transport',
+  'selected transport run and attempt'
 )) {
   if (-not $assuranceEvidence.Contains($requiredIngestionGuard)) {
     throw "Assurance worker ingestion omits structural guard: $requiredIngestionGuard"
@@ -1084,6 +1122,11 @@ $assuranceEntry = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\In
 foreach ($requiredCheckpointSnippet in @('time-budget-minutes', 'status -eq "checkpointed"', 'TimeBudgetSeconds')) {
   if (-not $assuranceEntry.Contains($requiredCheckpointSnippet)) {
     throw "Assurance checkpoint facade omits required contract: $requiredCheckpointSnippet"
+  }
+}
+foreach ($requiredRetryImportSnippet in @('--current-run-attempt', 'RetryAcrossAttempts', 'CurrentRunAttempt')) {
+  if (-not $assuranceEntry.Contains($requiredRetryImportSnippet)) {
+    throw "Assurance import facade omits the independently bound aggregate retry attempt: $requiredRetryImportSnippet"
   }
 }
 $assuranceCore = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "tools\lib\assurance\Core.ps1")

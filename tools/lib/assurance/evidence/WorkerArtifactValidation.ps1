@@ -1,7 +1,8 @@
 function Test-MIRAssuranceCapturedArtifactBindings {
   param(
     [Parameter(Mandatory)]$Capsule,
-    [Parameter(Mandatory)]$Test
+    [Parameter(Mandatory)]$Test,
+    [string]$SourceRoot = ""
   )
 
   $declarations = @(Get-MIRAssuranceCapturedArtifactDeclarations -Test $Test)
@@ -33,7 +34,15 @@ function Test-MIRAssuranceCapturedArtifactBindings {
     if ([string]::IsNullOrWhiteSpace($sourcePath) -or -not $sourceMatches) {
       return [ordered]@{valid=$false;reason='captured-artifact-source-mismatch'}
     }
-    $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+    $artifactPath = if ([string]::IsNullOrWhiteSpace($SourceRoot)) {
+      Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+    } else {
+      $evidencePaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$Capsule.test_id) -InputKey ([string]$Capsule.input_key)
+      Resolve-MIRAssuranceWorkerObjectPath `
+        -SourceRoot $SourceRoot `
+        -DestinationRoot $evidencePaths.root `
+        -RepoRelativePath ([string]$artifact.path)
+    }
     try {
       $record = Test-MIRAssuranceCapturedArtifactJson -Path $artifactPath -Declaration $declaration -TestId ([string]$Test.id)
       if ([string]$declaration.kind -ceq 'MIR4DevelopmentContractsLocalResultV1') {
@@ -54,7 +63,8 @@ function Test-MIRAssuranceCapsule {
     [Parameter(Mandatory)]$Capsule,
     [Parameter(Mandatory)]$Fingerprint,
     [Parameter(Mandatory)]$Context,
-    $Test = $null
+    $Test = $null,
+    [string]$SourceRoot = ""
   )
   if ([int]$Capsule.schema -ne $evidenceSchema) { return [ordered]@{valid=$false; reason="schema-mismatch"} }
   if ([string]$Capsule.conclusion -ne "passed" -or [string]$Capsule.status -ne "passed") { return [ordered]@{valid=$false; reason="not-passing"} }
@@ -69,7 +79,21 @@ function Test-MIRAssuranceCapsule {
       [string]$Capsule.result.status -ne "passed") {
     return [ordered]@{valid=$false; reason="missing-or-invalid-structured-result"}
   }
-  $resultPath = Resolve-MIRAssurancePath -Path ([string]$Capsule.result.path)
+  $evidencePaths = $null
+  if (-not [string]::IsNullOrWhiteSpace($SourceRoot)) {
+    $evidencePaths = Get-MIRAssuranceEvidencePaths -TestId ([string]$Capsule.test_id) -InputKey ([string]$Capsule.input_key)
+  }
+  $resolveEvidencePath = {
+    param([Parameter(Mandatory)][string]$RepoRelativePath)
+    if ([string]::IsNullOrWhiteSpace($SourceRoot)) {
+      return Resolve-MIRAssurancePath -Path $RepoRelativePath
+    }
+    return Resolve-MIRAssuranceWorkerObjectPath `
+      -SourceRoot $SourceRoot `
+      -DestinationRoot $evidencePaths.root `
+      -RepoRelativePath $RepoRelativePath
+  }
+  $resultPath = & $resolveEvidencePath ([string]$Capsule.result.path)
   if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) { return [ordered]@{valid=$false; reason="structured-result-missing"} }
   if ((Get-MIRAssuranceSha256 -Path $resultPath) -ne [string]$Capsule.result.sha256) {
     return [ordered]@{valid=$false; reason="structured-result-digest-mismatch"}
@@ -95,7 +119,7 @@ function Test-MIRAssuranceCapsule {
     return [ordered]@{valid=$false; reason="structured-result-artifact-mismatch"}
   }
   foreach ($artifact in @($Capsule.artifacts)) {
-    $artifactPath = Resolve-MIRAssurancePath -Path ([string]$artifact.path)
+    $artifactPath = & $resolveEvidencePath ([string]$artifact.path)
     if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) { return [ordered]@{valid=$false; reason="artifact-missing"} }
     $item = Get-Item -LiteralPath $artifactPath
     if ($item.Length -ne [long]$artifact.bytes -or (Get-MIRAssuranceSha256 -Path $artifactPath) -ne [string]$artifact.sha256) {
@@ -103,7 +127,7 @@ function Test-MIRAssuranceCapsule {
     }
   }
   if ($null -ne $Test) {
-    $capturedValidation = Test-MIRAssuranceCapturedArtifactBindings -Capsule $Capsule -Test $Test
+    $capturedValidation = Test-MIRAssuranceCapturedArtifactBindings -Capsule $Capsule -Test $Test -SourceRoot $SourceRoot
     if (-not [bool]$capturedValidation.valid) { return $capturedValidation }
   }
   $expectedDigest = Get-MIRAssuranceCapsuleDigest -Capsule $Capsule

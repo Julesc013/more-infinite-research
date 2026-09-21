@@ -302,7 +302,11 @@ jobs:
         continue-on-error: true
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          pattern: mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-*
+          # A partial rerun retains successful workers from earlier attempts in
+          # the same workflow run.  The importer verifies the plan, candidate,
+          # trust lineage and artifact attempt before selecting the latest
+          # contribution for each row; do not discard attempt-1 successes here.
+          pattern: mir-evidence-${{ github.run_id }}-*
           path: build/results/assurance/worker-evidence
       - name: Record artifact transport classification
         shell: pwsh
@@ -322,7 +326,7 @@ jobs:
           )
       - name: Import exact worker evidence deterministically
         shell: pwsh
-        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --workers build/results/assurance/worker-evidence --artifact-prefix mir-evidence-${{ github.run_id }}-${{ github.run_attempt }}-
+        run: ./tools/mir.ps1 verify import-workers --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --workers build/results/assurance/worker-evidence --artifact-prefix mir-evidence-${{ github.run_id }}- --retry-across-attempts --current-run-attempt ${{ github.run_attempt }}
       - name: Require exact trusted evidence for every planned instance
         shell: pwsh
         run: ./tools/mir.ps1 verify gate --target $env:MIR_VALIDATION_TARGET --candidate $env:MIR_DEVELOPMENT_CANDIDATE --plan build/results/assurance/verification-plan.json --output build/results/assurance/evidence-bundle.json
