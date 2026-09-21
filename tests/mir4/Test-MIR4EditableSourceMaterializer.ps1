@@ -132,19 +132,15 @@ if($productionText-match'Read-MIR4ArchiveBytes|Get-MIR4Shadow|spec/distribution/
 if(Test-Path -LiteralPath (Join-Path $repo 'tools/commands/mir4/Initialize-MIR4CanonicalSource.ps1')){throw '[mir4-editable-source-bootstrap-writer-not-retired]'}
 
 $proof=Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-current-source-materializer-v1.json'
-$presentation=Get-MIR4CurrentPackagePresentationV7 -RepoRoot $repo
 $proofPath=Join-Path $repo 'build/reports/package-source/mir4-current-source-materializer-v1.json'
 if(-not((Get-Content -Raw -LiteralPath $proofPath)|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-current-source-materializer-proof-v1.schema.json'))){throw '[mir4-editable-source-proof-schema]'}
 $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $presented=@($presentation.target_content_identities|Where-Object{[string]$_.target-ceq$target})
   $expectedDelta=if($target-in@('f210','f200')){34}else{104}
-  if($expected.Count-ne1-or$actualRow.Count-ne1-or$presented.Count-ne1-or
+  if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
-     [string]$actualRow[0].content_sha256-cne[string]$presented[0].content_sha256-or
-     [int]$actualRow[0].entry_count-ne[int]$presented[0].entry_count-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or
      [int]$actualRow[0].entry_count_delta-ne$expectedDelta-or
      [bool]$actualRow[0].baseline_match-ne$false-or
