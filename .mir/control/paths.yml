@@ -228,6 +228,12 @@ paths:
   mir4.m42-02.pre-freeze-release.receipt-schema: contracts/repository/mir4-m42-02-pre-freeze-release-decomposition-v1.schema.json
   mir4.m42-02.pre-freeze-release.writer: tools/commands/mir4/Update-MIR4M4202PreFreezeReleaseDecompositionAuthority.ps1
   mir4.m42-02.pre-freeze-release.test: tests/tooling/Test-MIR4PreFreezeReleaseDecompositionM4202.ps1
+  mir4.a08.protected-main-promotion-topology.authority: spec/releases/mir4-protected-main-promotion-topology-v1.json
+  mir4.a08.protected-main-promotion-topology.schema: spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json
+  mir4.a08.protected-main-promotion-topology.qualification-schema: spec/schemas/mir4-protected-main-qualification-v1.schema.json
+  mir4.a08.protected-main-promotion-topology.implementation: tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1
+  mir4.a08.protected-main-promotion-topology.command: tools/commands/mir4/Invoke-MIR4PreFreeze.ps1
+  mir4.a08.protected-main-promotion-topology.test: tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1
   mir4.m42-02.bootstrap-materialization.facade: tools/lib/mir4/BootstrapMaterialization.ps1
   mir4.m42-02.bootstrap-materialization.modules: tools/lib/mir4/bootstrap-materialization
   mir4.m42-02.bootstrap-materialization.receipt: releases/migrations/MIR4-M42-02-Bootstrap-Materialization-DecompositionV1.json

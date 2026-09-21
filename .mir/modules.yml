@@ -1005,6 +1005,10 @@ package_excluded_modules:
       - .mir/releases/governance/mir4/ruleset-snapshot-2026-08-24.json
     implementation: tools/lib/mir4/PreFreezeRelease.ps1
     implementation_modules: tools/lib/mir4/pre-freeze-release
+    protected_main_promotion_topology: spec/releases/mir4-protected-main-promotion-topology-v1.json
+    protected_main_promotion_topology_schema: spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json
+    protected_main_qualification_schema: spec/schemas/mir4-protected-main-qualification-v1.schema.json
+    protected_main_promotion_topology_implementation: tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1
     f210_qualification_policy_implementation: tools/mir/application/release/F210QualificationPolicy.ps1
     f210_historical_qualification_policy_immutability_checker: tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1
     f210_current_qualification_policy_authority_writer: tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1
@@ -1084,6 +1088,7 @@ package_excluded_modules:
       - tests/mir4/Test-MIR4ReleaseAdaptersT05.ps1
       - tests/mir4/Test-MIR4ReleaseOperatorRecoveryA07.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorT06.ps1
+      - tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1
       - tests/mir4/Test-MIR4ReleaseDoctorStructuredFailure.ps1
       - tests/canonicalization/Test-MIR4CanonicalizationDiagnostics.ps1
       - validation/tests/mir4/Test-MIR4CanonicalizationDiagnosticsT07.ps1
@@ -1097,7 +1102,7 @@ package_excluded_modules:
       - tests/release/Test-MIRTerminalGovernance.ps1
     validator: tests/mir4/Test-MIR4PreFreezeHardening.ps1
     documentation: docs/maintainer/mir4-pre-freeze-hardening.md
-    boundary: package-excluded release preparation, immutable historical F210 policy evidence plus current 2.1.18 F210 Steam experimental selection, numeric stable-minimum floor resolution, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, and fail-closed workflow control only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
+    boundary: package-excluded release preparation, immutable historical F210 policy evidence plus current 2.1.18 F210 Steam experimental selection, numeric stable-minimum floor resolution, exact-input validation, non-production event-sourced phase attempts, all ten attempt-local lifecycle rehearsal adapters, typed phase-specific fault injection, playtest handoff, ruleset audit, fail-closed workflow control, and isolated synthetic protected-main topology rehearsal only; production-shaped rehearsal grants no actual source freeze, candidate allocation, human playtest decision, key generation, signing, sealing, promotion, tagging, publication, main mutation, or legacy mutation authority
     stability: stable-pre-freeze-control-plane-with-exact-f210-execution-locks-t03-t06-non-production-rehearsal-and-human-and-freeze-blockers
   mir4_platform_preview_v0:
     authority: spec/platform/mir4-preview-v0/platform.json

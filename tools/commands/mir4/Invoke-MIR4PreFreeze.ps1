@@ -1,5 +1,5 @@
 param(
-  [Parameter(Mandatory)][ValidateSet('release-doctor','rulesets-audit','playtest-prepare','playtest-capture','playtest-finalize')][string]$Command,
+  [Parameter(Mandatory)][ValidateSet('release-doctor','rulesets-audit','protected-promotion-a08-preflight','playtest-prepare','playtest-capture','playtest-finalize')][string]$Command,
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path,
   [switch]$Json,
   [switch]$DryRun,
@@ -17,15 +17,22 @@ param(
   [string]$ObservationsPath = '',
   [ValidateSet('','ACCEPTED','CHANGES-REQUESTED','REJECTED')][string]$Decision = '',
   [string]$Reviewer = '',
-  [string]$Notes = ''
+  [string]$Notes = '',
+  [string]$CandidateRef = '',
+  [string]$GhExecutable = 'gh'
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/lib/mir4/PreFreezeRelease.ps1')
+. (Join-Path $RepoRoot 'tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1')
 
 $result = switch ($Command) {
   'release-doctor' { Get-MIR4ReleaseDoctor -RepoRoot $RepoRoot -Explain:$Explain }
   'rulesets-audit' { Test-MIR4RulesetSnapshot -RepoRoot $RepoRoot }
+  'protected-promotion-a08-preflight' {
+    if ([string]::IsNullOrWhiteSpace($CandidateRef)) { throw 'protected promotion A08 preflight requires --candidate-ref.' }
+    Get-MIR4A08ProtectedPromotionPreflight -RepoRoot $RepoRoot -CandidateRef $CandidateRef -GhExecutable $GhExecutable
+  }
   'playtest-prepare' {
     $parameters = @{
       RepoRoot=$RepoRoot;Target=$Target;CandidatePath=$CandidatePath;PredecessorPath=$PredecessorPath
