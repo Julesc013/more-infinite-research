@@ -2330,6 +2330,37 @@
       ]
     },
     {
+      "id": "static.mir4-protected-promotion-topology-a08",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source/package-source.json",
+        "targets/package-authority.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "spec/distribution/mir4-current-package-presentation-v6.json",
+        "spec/schemas/mir4-current-package-presentation-v6.schema.json",
+        "spec/programmes/mir4-4x-operating-programme-v1.json",
+        "spec/releases/mir4-protected-main-promotion-topology-v1.json",
+        "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
+        "spec/schemas/mir4-protected-main-qualification-v1.schema.json",
+        "spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json",
+        "spec/schemas/mir4-independent-verification-receipt-v1.schema.json",
+        "validation/trust.json",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
+        "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
+        "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1",
+        "validation/tests.yml",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-release-doctor-structured-failure",
       "kind": "static",
       "layer": "F0",

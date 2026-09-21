@@ -601,8 +601,11 @@
           "Checks/no-force/no-delete isolated from any accepted workflow exception",
           "Test ref drift and recovery"
         ],
-        "state": "queued",
-        "evidence": []
+        "state": "complete",
+        "evidence": [
+          "spec/releases/mir4-protected-main-promotion-topology-v1.json",
+          "tests/mir4/Test-MIR4ProtectedPromotionTopologyA08.ps1"
+        ]
       },
       {
         "id": "A09",
