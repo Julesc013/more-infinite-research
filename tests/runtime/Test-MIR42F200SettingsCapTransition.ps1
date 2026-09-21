@@ -49,7 +49,10 @@ $freshZip=(Resolve-Path -LiteralPath ([string]$fresh.archive_path)).Path
 if([string]::IsNullOrWhiteSpace($CandidateZip)){$candidateZip=$freshZip}else{$candidateZip=(Resolve-Path -LiteralPath $CandidateZip).Path;Assert-Exact 'supplied candidate SHA-256' (Get-Sha $candidateZip) (Get-Sha $freshZip)}
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive=[IO.Compression.ZipFile]::OpenRead($candidateZip)
-try{$forbidden=@($archive.Entries|Where-Object{$_.FullName-match'(^|/)(fixtures|tests|docs|[.]mir|build|dist)(/|$)'});Assert-MIR42F200 ($forbidden.Count-eq0) "candidate has package-excluded path $($forbidden[0].FullName)"}finally{$archive.Dispose()}
+try{
+  $forbidden=@($archive.Entries|Where-Object{$_.FullName-match'(^|/)(fixtures|tests|docs|[.]mir|build|dist)(/|$)'})
+  if($forbidden.Count-ne0){throw "[mir42-f200-settings-cap-transition] candidate has package-excluded path $($forbidden[0].FullName)"}
+}finally{$archive.Dispose()}
 
 $engineRoot=Split-Path (Split-Path (Split-Path $engine -Parent)-Parent)-Parent
 function New-Stage([string]$Name,[int]$Cap){
