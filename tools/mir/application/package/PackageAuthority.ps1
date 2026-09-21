@@ -50,7 +50,7 @@ function Get-MIR4CanonicalPackageAuthority {
   $authority = $raw | ConvertFrom-Json -Depth 100 -DateKind String
   if (-not (Test-MIR4BootstrapRecordHash -Record $authority)) { throw '[mir4-package-authority-record-hash]' }
   $recordDefinitions = [ordered]@{
-    source_manifest = [ordered]@{ kind = 'MIR4ComposablePackageSourceV2'; schema = 'spec/schemas/mir4-composable-package-source-v2.schema.json' }
+    source_manifest = [ordered]@{ kind = 'MIR4ComposablePackageSourceV3'; schema = 'spec/schemas/mir4-composable-package-source-v3.schema.json' }
     target_registry = [ordered]@{ kind = 'MIR4TargetRegistryV2'; schema = 'spec/schemas/mir4-target-registry-v2.schema.json' }
     support_policy = [ordered]@{ kind = 'MIR4TargetSupportPolicyV1'; schema = 'spec/schemas/mir4-target-support-policy-v1.schema.json' }
   }
@@ -162,11 +162,14 @@ function Resolve-MIR4CanonicalPackageSourcePath {
   if (Test-Path -LiteralPath $direct -PathType Leaf) { return $portable }
 
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
-  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV2' -Schema 'spec/schemas/mir4-composable-package-source-v2.schema.json' -Code 'mir4-package-source-relocation-manifest'
+  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV3' -Schema 'spec/schemas/mir4-composable-package-source-v3.schema.json' -Code 'mir4-package-source-relocation-manifest'
   if ([string]$manifest.record_sha256 -cne [string]$authority.source_manifest.record_sha256) {
     throw '[mir4-package-source-relocation-manifest]'
   }
-  $matches = @($manifest.bindings | Where-Object { [string]$_.predecessor_source_path -ceq $portable })
+  $matches = @($manifest.bindings | Where-Object {
+    [string]$_.provenance.kind -ceq 'migrated-predecessor' -and
+    [string]$_.provenance.predecessor_source_path -ceq $portable
+  })
   if ($matches.Count -ne 1) { throw "[mir4-package-source-relocation-ambiguous] $RelativePath" }
   $current = [string]$matches[0].source_path
   $currentPath = [IO.Path]::GetFullPath((Join-Path $repo $current))

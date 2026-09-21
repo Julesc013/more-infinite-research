@@ -43,7 +43,10 @@ function Resolve-MIR4WholePlatformImplementation {
   }
 
   $manifest = Get-Content -Raw -LiteralPath $PackageSourcePath | ConvertFrom-Json -Depth 100
-  if ([int]$manifest.schema -lt 2 -or [string]$manifest.kind -cne 'MIR4ComposablePackageSourceV2') {
+  $supportedManifest =
+    ([int]$manifest.schema -eq 2 -and [string]$manifest.kind -ceq 'MIR4ComposablePackageSourceV2') -or
+    ([int]$manifest.schema -eq 3 -and [string]$manifest.kind -ceq 'MIR4ComposablePackageSourceV3')
+  if (-not $supportedManifest) {
     throw '[mir4-whole-platform-package-source] Package-source manifest has an unsupported contract.'
   }
 

@@ -470,10 +470,10 @@ function Assert-MIR4A08PresentationBinding {
   Assert-MIR4A08PropertyNames $Binding @('path','kind','git_blob','record_sha256','package_source_fingerprint_sha256','source_manifest','package_authority') '[mir4-a08-package-presentation]'
   Assert-MIR4A08PropertyNames $Binding.source_manifest @('path','kind','git_blob','record_sha256') '[mir4-a08-package-presentation]'
   Assert-MIR4A08PropertyNames $Binding.package_authority @('path','kind','git_blob','record_sha256') '[mir4-a08-package-presentation]'
-  if ([string]$Binding.path-cne'spec/distribution/mir4-current-package-presentation-v6.json'-or
-      [string]$Binding.kind-cne'MIR4CurrentPackagePresentationV6'-or
+  if ([string]$Binding.path-cne'spec/distribution/mir4-current-package-presentation-v7.json'-or
+      [string]$Binding.kind-cne'MIR4CurrentPackagePresentationV7'-or
       [string]$Binding.source_manifest.path-cne'source/package-source.json'-or
-      [string]$Binding.source_manifest.kind-cne'MIR4ComposablePackageSourceV2'-or
+      [string]$Binding.source_manifest.kind-cne'MIR4ComposablePackageSourceV3'-or
       [string]$Binding.package_authority.path-cne'targets/package-authority.json'-or
       [string]$Binding.package_authority.kind-cne'MIR4CanonicalPackageAuthorityV2') {
     throw '[mir4-a08-package-presentation]'
@@ -489,6 +489,14 @@ function Assert-MIR4A08PresentationBinding {
   $manifest=Read-MIR4A08CommitJson -RepoRoot $RepoRoot -Commit ([string]$Candidate.commit) -Path ([string]$Binding.source_manifest.path) -Code '[mir4-a08-package-presentation]'
   $authority=Read-MIR4A08CommitJson -RepoRoot $RepoRoot -Commit ([string]$Candidate.commit) -Path ([string]$Binding.package_authority.path) -Code '[mir4-a08-package-presentation]'
   $candidatePackageSourceFingerprint=Get-MIR4A08CommitPackageSourceFingerprint -RepoRoot $RepoRoot -Commit ([string]$Candidate.commit)
+  $invariantNames=@('v6_predecessor_immutable','package_source_v3_provenance_complete','all_governed_locales_complete','package_visible_locale_coverage_bound','current_package_contract_bound','f210_f200_progression_capability_applied','f110_f100_progression_capability_omitted_nonclaim','exact_engine_qualification_required','candidate_allocation_authorized','signing_or_sealing_authorized','promotion_authorized','publication_authorized','public_support_authorized')
+  $gateNames=@('development_merge','private_build','qualification','technical_seal','main_promotion','version_allocation','tagging','signing','sealing','publication')
+  Assert-MIR4A08PropertyNames $presentation.authority_invariants $invariantNames '[mir4-a08-package-presentation]'
+  Assert-MIR4A08PropertyNames $presentation.transition_gate $gateNames '[mir4-a08-package-presentation]'
+  foreach($name in @('v6_predecessor_immutable','package_source_v3_provenance_complete','all_governed_locales_complete','package_visible_locale_coverage_bound','current_package_contract_bound','f210_f200_progression_capability_applied','f110_f100_progression_capability_omitted_nonclaim','exact_engine_qualification_required')){Assert-MIR4A08Boolean -Value $presentation.authority_invariants.$name -Expected $true -Code '[mir4-a08-package-presentation]'}
+  foreach($name in @('candidate_allocation_authorized','signing_or_sealing_authorized','promotion_authorized','publication_authorized','public_support_authorized')){Assert-MIR4A08Boolean -Value $presentation.authority_invariants.$name -Expected $false -Code '[mir4-a08-package-presentation]'}
+  Assert-MIR4A08Boolean -Value $presentation.transition_gate.development_merge -Expected $true -Code '[mir4-a08-package-presentation]'
+  foreach($name in @('private_build','qualification','technical_seal','main_promotion','version_allocation','tagging','signing','sealing','publication')){Assert-MIR4A08Boolean -Value $presentation.transition_gate.$name -Expected $false -Code '[mir4-a08-package-presentation]'}
   if ((Resolve-MIR4A08Blob -RepoRoot $RepoRoot -Commit ([string]$Candidate.commit) -Path ([string]$Binding.path))-cne[string]$Binding.git_blob-or
       [string]$presentation.kind-cne[string]$Binding.kind-or
       [string]$presentation.record_sha256-cne[string]$Binding.record_sha256-or
@@ -497,10 +505,7 @@ function Assert-MIR4A08PresentationBinding {
       [string]$presentation.package_source.fingerprint_sha256-cne[string]$candidatePackageSourceFingerprint-or
       [string]$presentation.package_source.sole_writer-cne'tools/mir/application/package/TargetMaterializer.ps1'-or
       [string]$presentation.package_source.materializer_abi-cne'mir4-target-materializer/1'-or
-      (@($presentation.package_source.roots)-join'|')-cne'source|targets'-or
-      -not[bool]$presentation.authority_invariants.current_package_contract_bound-or
-      [bool]$presentation.authority_invariants.promotion_authorized-or
-      [bool]$presentation.transition_gate.main_promotion) {
+      (@($presentation.package_source.roots)-join'|')-cne'source|targets') {
     throw '[mir4-a08-package-presentation]'
   }
   $expectedCompositions=[ordered]@{f210='targets/f210/composition.json';f200='targets/f200/composition.json';f110='targets/f110/composition.json';f100='targets/f100/composition.json'}

@@ -59,7 +59,9 @@ function Test-A02RecordContract {
 
   $manifest = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/package-source.json') | ConvertFrom-Json -Depth 100 -DateKind String
   $sourcePaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
-  foreach ($binding in @($manifest.bindings)) { [void]$sourcePaths.Add([string]$binding.predecessor_source_path) }
+  foreach ($binding in @($manifest.bindings | Where-Object { [string]$_.provenance.kind -ceq 'migrated-predecessor' })) {
+    [void]$sourcePaths.Add([string]$binding.provenance.predecessor_source_path)
+  }
   foreach ($component in @($Record.components)) {
     Stop-A02Test (@($component.canonical_owned_paths).Count -gt 0) 'mir4-a02-unbound-component'
     Stop-A02Test ([bool]$component.assessment.assessed -and [bool]$component.assessment.complete -and -not [bool]$component.assessment.unresolved) 'mir4-a02-not-assessed-complete'

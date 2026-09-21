@@ -60,38 +60,13 @@ try {
 } finally {
   if (Test-Path -LiteralPath $textScratch) { Remove-Item -LiteralPath $textScratch -Force }
 }
-$record = Get-MIR4CurrentPackagePresentationV6 -RepoRoot $repo
-Assert-MIR4CurrentPackagePresentationV6LiveFingerprint -RepoRoot $repo -StoredPackageSourceSha256 ([string]$record.package_source.fingerprint_sha256) -RequiredPackageSourceSha256 (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo) | Out-Null
-$proof = Invoke-MIR4CurrentSourceMaterializerProof -RepoRoot $repo -OutputRoot 'build/packages' -ReportPath 'build/reports/package-source/mir4-package-presentation-v6-materialization.json'
-foreach ($target in @('f210','f200','f110','f100')) {
-  $stored = @($record.target_content_identities | Where-Object { [string]$_.target -ceq $target })
-  $actual = @($proof.targets | Where-Object { [string]$_.target -ceq $target })
-  if ($stored.Count -ne 1 -or $actual.Count -ne 1 -or [string]$stored[0].content_sha256 -cne [string]$actual[0].content_sha256 -or [int]$stored[0].entry_count -ne [int]$actual[0].entry_count -or -not [bool]$actual[0].deterministic_archive_bytes) { throw "[mir4-package-presentation-v6-materialization] $target" }
-}
+$record = Get-MIR4CurrentPackagePresentationV6Historical -RepoRoot $repo
+$current = Get-MIR4CurrentPackagePresentationV7 -RepoRoot $repo
+if ([string]$current.predecessor.record_sha256 -cne [string]$record.record_sha256 -or
+    [string]$current.source_succession.predecessor_record_sha256 -cne [string]$record.source_manifest.record_sha256 -or
+    [string]$record.source_manifest.kind -cne 'MIR4ComposablePackageSourceV2') { throw '[mir4-package-presentation-v6-successor-binding]' }
 $coverage = @($record.localization.target_locale_coverage | ForEach-Object { "$($_.target):$($_.locale_count)" }) -join '|'
 if ([int]$record.localization.governed_locale_count -ne 50 -or [int]$record.localization.browser_discovery_key_count -ne 29 -or -not [bool]$record.localization.all_governed_locales_complete -or -not [bool]$record.localization.package_visible_locale_coverage_bound -or -not [bool]$record.authority_invariants.current_package_contract_bound -or $coverage -cne 'f210:50|f200:50|f110:9|f100:9') { throw '[mir4-package-presentation-v6-localization-completion]' }
-$inputs = Get-MIR4CurrentPackagePresentationV6Inputs -RepoRoot $repo
-$forgedPredecessor = $record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
-$forgedPredecessor.target_content_identities[0].predecessor_content_sha256 = '0' * 64
-$forgedPredecessor.target_content_identities[0].predecessor_entry_count = 1
-$forgedPredecessor.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedPredecessor
-if (-not (Test-MIR4CurrentPackagePresentationV6Schema -Record $forgedPredecessor -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $forgedPredecessor)) { throw '[mir4-package-presentation-v6-forged-predecessor-test-invalid]' }
-$forgedPredecessorRejected = $false
-try { Assert-MIR4CurrentPackagePresentationV6SemanticBindings -Record $forgedPredecessor -Inputs $inputs | Out-Null } catch { $forgedPredecessorRejected = $_.Exception.Message -eq '[mir4-package-presentation-v6-target-binding] f210' }
-if (-not $forgedPredecessorRejected) { throw '[mir4-package-presentation-v6-forged-predecessor-accepted]' }
-foreach ($forgery in @(
-  @{id='package-authority'; property='package_authority'},
-  @{id='source-manifest'; property='source_manifest'}
-)) {
-  $forgedBinding = $record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
-  $forgedBinding.($forgery.property).path = 'substituted-authority.json'
-  $forgedBinding.($forgery.property).kind = 'SubstitutedAuthority'
-  $forgedBinding.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedBinding
-  if (-not (Test-MIR4CurrentPackagePresentationV6Schema -Record $forgedBinding -RepoRoot $repo) -or -not (Test-MIR4BootstrapRecordHash -Record $forgedBinding)) { throw "[mir4-package-presentation-v6-forged-binding-test-invalid] $($forgery.id)" }
-  $forgedBindingRejected = $false
-  try { Assert-MIR4CurrentPackagePresentationV6SemanticBindings -Record $forgedBinding -Inputs $inputs | Out-Null } catch { $forgedBindingRejected = $_.Exception.Message -eq '[mir4-package-presentation-v6-current-binding]' }
-  if (-not $forgedBindingRejected) { throw "[mir4-package-presentation-v6-forged-binding-accepted] $($forgery.id)" }
-}
 foreach ($mutation in @(
   @{id='unknown'; mutate={param($r) $r | Add-Member -NotePropertyName unauthorized_gate -NotePropertyValue $true}},
   @{id='predecessor'; mutate={param($r) $r.predecessor.immutable_historical_receipt=$false}},
@@ -106,9 +81,9 @@ foreach ($mutation in @(
 }
 $scratch = Join-Path $repo ('build/mir4/test-package-presentation-v6-' + [guid]::NewGuid().ToString('N') + '.json')
 $stale = $false
-try { & $writer -RepoRoot $repo -Check -CheckAuthorityPath $scratch | Out-Null } catch { $stale = $_.Exception.Message -eq '[mir4-package-presentation-v6-stale]' }
+try { & $writer -RepoRoot $repo -AuthorityVersion 6 -Check -CheckAuthorityPath $scratch | Out-Null } catch { $stale = $_.Exception.Message -eq '[mir4-package-presentation-v6-stale]' }
 if (-not $stale -or (Test-Path -LiteralPath $scratch)) { throw '[mir4-package-presentation-v6-check-isolation]' }
 $immutable = $false
-try { & $writer -RepoRoot $repo -RecordedAt '2026-09-16T12:31:00+10:00' | Out-Null } catch { $immutable = $_.Exception.Message -eq '[mir4-package-presentation-v6-authority-immutable-overwrite]' }
+try { & $writer -RepoRoot $repo -AuthorityVersion 6 -RecordedAt '2026-09-16T12:31:00+10:00' | Out-Null } catch { $immutable = $_.Exception.Message -eq '[mir4-package-presentation-v6-authority-immutable-overwrite]' }
 if (-not $immutable) { throw '[mir4-package-presentation-v6-overwrite]' }
-Write-Host '[ok] MIR4 package presentation V6 preserves V5 and binds current package, governed browser-localization coverage, and pending exact-engine qualification.'
+Write-Host '[ok] MIR4 package presentation V6 remains an immutable historical predecessor of current V7.'
