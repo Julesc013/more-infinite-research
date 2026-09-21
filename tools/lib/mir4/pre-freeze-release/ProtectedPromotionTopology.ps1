@@ -248,10 +248,12 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
   $invokeRest = ${function:Invoke-MIR4A08GitHubRestJson}
   $assertPropertyNames = ${function:Assert-MIR4A08PropertyNames}
   $provider = {
-    param([object]$Authority,[object]$Candidate)
+    param([object]$Authority,[object]$Candidate,[string]$Target)
     $producer = $Authority.producer
     $repository = [string]$producer.repository
-    if ($repository -cne 'Julesc013/more-infinite-research' -or [string]$producer.run_id -notmatch '^[0-9]+$') {
+    if ($repository -cne 'Julesc013/more-infinite-research' -or [string]$producer.run_id -notmatch '^[0-9]+$' -or
+        [string]$producer.workflow_ref -cne 'refs/heads/dev' -or [string]$producer.workflow_commit -cne [string]$Candidate.source_commit -or
+        [string]$producer.target -cne $Target -or [string]$producer.factorio_version -cne (Get-MIR4A08ExpectedFactorioVersion $Target)) {
       throw '[mir4-a08-qualification-run-identity]'
     }
     $run = & $invokeRest -GhExecutable $GhExecutable -Arguments @('api',"repos/$repository/actions/runs/$([string]$producer.run_id)") -Code '[mir4-a08-qualification-run]'
@@ -281,34 +283,53 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
     }
     $workflowRef = "refs/heads/$([string]$run.head_branch)"
     if ($workflowRef -cne [string]$producer.workflow_ref) { throw '[mir4-a08-qualification-run-identity]' }
-    $artifactName = "mir-v5-qualification-source-$([string]$run.id)-attempt-$([string]$run.run_attempt)"
+    $artifactName = "mir-v5-target-qualification-$([string]$producer.factorio_version)-$([string]$run.id)-attempt-$([string]$run.run_attempt)"
     $artifacts = & $invokeRest -GhExecutable $GhExecutable -Arguments @('api','-X','GET','-f',"name=$artifactName",'-f','per_page=100',"repos/$repository/actions/runs/$([string]$run.id)/artifacts") -Code '[mir4-a08-qualification-source-artifact]'
     $matches = @($artifacts.artifacts | Where-Object { [string]$_.name -ceq $artifactName -and -not [bool]$_.expired })
-    if ($matches.Count -ne 1 -or [long]$matches[0].size_in_bytes -lt 1 -or [long]$matches[0].size_in_bytes -gt 131072) {
+    if ($matches.Count -ne 1 -or [long]$matches[0].size_in_bytes -lt 256 -or [long]$matches[0].size_in_bytes -gt 131072) {
       throw '[mir4-a08-qualification-source-artifact]'
     }
     if ($null -ne $matches[0].workflow_run -and [int64]$matches[0].workflow_run.id -ne [int64]$run.id) {
       throw '[mir4-a08-qualification-source-artifact]'
     }
-    $scratch = Join-Path ([IO.Path]::GetTempPath()) ("mir4-a08-source-attestation-" + [guid]::NewGuid().ToString('N'))
+    $scratch = Join-Path ([IO.Path]::GetTempPath()) ("mir4-a08-target-attestation-" + [guid]::NewGuid().ToString('N'))
     [IO.Directory]::CreateDirectory($scratch) | Out-Null
     try {
       $download = @(& $GhExecutable run download ([string]$run.id) --repo $repository --name $artifactName --dir $scratch 2>&1 | ForEach-Object { [string]$_ })
       if ($LASTEXITCODE -ne 0) { throw "[mir4-a08-qualification-source-artifact] $($download -join ' ')" }
-      $attestationFiles = @(Get-ChildItem -LiteralPath $scratch -File -Recurse | Where-Object { $_.Name -ceq 'qualification-source-attestation.json' })
+      $attestationFiles = @(Get-ChildItem -LiteralPath $scratch -File -Recurse | Where-Object { $_.Name -ceq 'target-qualification-attestation.json' })
       if ($attestationFiles.Count -ne 1 -or $attestationFiles[0].Length -gt 65536) { throw '[mir4-a08-qualification-source-artifact]' }
       try { $attestation = Get-Content -Raw -LiteralPath $attestationFiles[0].FullName | ConvertFrom-Json -Depth 20 -DateKind String }
       catch { throw '[mir4-a08-qualification-source-artifact]' }
-      & $assertPropertyNames $attestation @('schema','kind','repository','workflow','workflow_run_id','workflow_run_attempt','workflow_job','workflow_ref','workflow_commit','source_ref','source_commit','source_tree','context_id') '[mir4-a08-qualification-source-artifact]'
-      if ([int]$attestation.schema -ne 1 -or [string]$attestation.kind -cne 'MIR4QualificationSourceAttestationV1' -or
-          [string]$attestation.repository -cne $repository -or [string]$attestation.workflow -cne [string]$run.name -or
+      & $assertPropertyNames $attestation @('schema','kind','repository','workflow','workflow_run_id','workflow_run_attempt','workflow_job','workflow_ref','workflow_commit','source_ref','source_commit','source_tree','target','factorio_version','context','package','engine','evidence') '[mir4-a08-qualification-source-artifact]'
+      & $assertPropertyNames $attestation.context @('id','release','candidate_id','plan_id','manifest_sha256','candidate_descriptor_sha256','environment_locks_sha256') '[mir4-a08-qualification-source-artifact]'
+      & $assertPropertyNames $attestation.package @('archive_sha256','content_sha256','bytes','entry_count','source_sha256') '[mir4-a08-qualification-source-artifact]'
+      & $assertPropertyNames $attestation.engine @('version','installation_sha256','binary_sha256','binary_bytes','official_data_sha256','official_data_file_count') '[mir4-a08-qualification-source-artifact]'
+      & $assertPropertyNames $attestation.evidence @('qualification_manifest_sha256','aggregate_result_sha256','worker_import_sha256','seal_result_sha256','promotion_result_sha256','seal_object_sha256','seal_task_object_sha256','promotion_task_object_sha256') '[mir4-a08-qualification-source-artifact]'
+      if ([int]$attestation.schema -ne 1 -or [string]$attestation.kind -cne 'MIR4TargetQualificationAttestationV1' -or
+           [string]$attestation.repository -cne $repository -or [string]$attestation.workflow -cne [string]$run.name -or
           [string]$attestation.workflow_run_id -cne [string]$run.id -or [string]$attestation.workflow_run_attempt -cne [string]$run.run_attempt -or
           -not (([string]$job.name -ceq [string]$attestation.workflow_job) -or ([string]$job.name).EndsWith(" / $([string]$attestation.workflow_job)",[StringComparison]::Ordinal)) -or
           [string]$attestation.workflow_ref -cne $workflowRef -or [string]$attestation.workflow_commit -cne [string]$run.head_sha -or
-          [string]$attestation.source_ref -cne [string]$Candidate.commit -or [string]$attestation.source_commit -cne [string]$Candidate.commit -or
-          [string]$attestation.source_tree -cne [string]$Candidate.tree -or [string]$attestation.context_id -cnotmatch '^[A-Fa-f0-9]{64}$') {
+           [string]$attestation.source_ref -cne [string]$Candidate.commit -or [string]$attestation.source_commit -cne [string]$Candidate.commit -or
+           [string]$attestation.source_tree -cne [string]$Candidate.tree -or [string]$attestation.target -cne $Target -or
+           [string]$attestation.factorio_version -cne [string]$producer.factorio_version -or
+           [string]$attestation.context.id -cnotmatch '^[A-Fa-f0-9]{64}$' -or [string]::IsNullOrWhiteSpace([string]$attestation.context.release) -or
+           [string]::IsNullOrWhiteSpace([string]$attestation.context.candidate_id) -or [string]$attestation.context.plan_id -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.context.manifest_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.context.candidate_descriptor_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.context.environment_locks_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.package.archive_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.package.content_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or [int64]$attestation.package.bytes -le 0 -or [int]$attestation.package.entry_count -le 0 -or
+           [string]$attestation.package.source_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]::IsNullOrWhiteSpace([string]$attestation.engine.version) -or [string]$attestation.engine.installation_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or
+           [string]$attestation.engine.binary_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or [int64]$attestation.engine.binary_bytes -le 0 -or
+           [string]$attestation.engine.official_data_sha256 -cnotmatch '^[A-Fa-f0-9]{64}$' -or [int]$attestation.engine.official_data_file_count -le 0 -or
+           @($attestation.evidence.PSObject.Properties | Where-Object { [string]$_.Value -cnotmatch '^[A-Fa-f0-9]{64}$' }).Count -ne 0) {
         throw '[mir4-a08-qualification-source-artifact]'
       }
+      try { Assert-MIR4A08ExactEngineVersion -Target $Target -Version ([string]$attestation.engine.version) }
+      catch { throw '[mir4-a08-qualification-source-artifact]' }
     } finally {
       if (Test-Path -LiteralPath $scratch) { [IO.Directory]::Delete($scratch,$true) }
     }
@@ -325,7 +346,8 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
       job = [string]$job.name
       runner_name = [string]$job.runner_name
       runner_identity = 'self-hosted-windows'
-      source_attestation_artifact = $artifactName
+      target_attestation_artifact = $artifactName
+      attestation = $attestation
     }
   }
   return $provider.GetNewClosure()
@@ -421,6 +443,17 @@ function Get-MIR4A08ExpectedFactorioVersion {
     default { throw '[mir4-a08-package-target]' }
   }
 }
+function Assert-MIR4A08ExactEngineVersion {
+  param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$Version)
+  if ($Target -eq 'F200') {
+    if ($Version -cne '2.0.77') { throw '[mir4-a08-qualification-record]' }
+    return
+  }
+  if ($Target -ne 'F210' -or $Version -notmatch '^2\.1\.([0-9]+)$') { throw '[mir4-a08-qualification-record]' }
+  $profilePath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../../validation/profiles/factorio-2.1.json'))
+  try { $profile=Get-Content -Raw -LiteralPath $profilePath|ConvertFrom-Json -Depth 20; $floor=[version]([string]$profile.minimum_factorio_version); $actual=[version]$Version } catch { throw '[mir4-a08-qualification-record]' }
+  if ($floor.Major-ne2-or$floor.Minor-ne1-or$actual -lt $floor) { throw '[mir4-a08-qualification-record]' }
+}
 function Get-MIR4A08PackageObservation {
   param([Parameter(Mandatory)][string]$PackagePath,[Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$RelativePath)
   try{$archive=[IO.Compression.ZipFile]::OpenRead($PackagePath)}catch{throw '[mir4-a08-package-archive]'};try{$entries=@($archive.Entries|Where-Object{-not[string]::IsNullOrEmpty($_.Name)}|Sort-Object -Property FullName -CaseSensitive);$roots=@($entries|ForEach-Object{([string]$_.FullName).Split('/')[0]}|Sort-Object -Unique);if ($entries.Count-eq0-or$roots.Count-ne1-or@($entries.FullName|Sort-Object -Unique).Count-ne$entries.Count){throw '[mir4-a08-package-archive]'};$info=@($entries|Where-Object{[string]$_.FullName-ceq"$($roots[0])/info.json"});if ($info.Count-ne1){throw '[mir4-a08-package-target-identity]'};try{$reader=[IO.StreamReader]::new($info[0].Open(),[Text.UTF8Encoding]::new($false),$true);try{$metadata=$reader.ReadToEnd()|ConvertFrom-Json -Depth 30 -DateKind String}finally{$reader.Dispose()}}catch{throw '[mir4-a08-package-target-identity]'};$expectedVersion=Get-MIR4A08ExpectedFactorioVersion $Target;if ([string]$metadata.factorio_version-cne$expectedVersion-or[string]::IsNullOrWhiteSpace([string]$metadata.name)){throw '[mir4-a08-package-target-identity]'};$content=[Text.StringBuilder]::new();foreach ($entry in $entries){$stream=$entry.Open();$hash=[Security.Cryptography.SHA256]::Create();try{$entrySha=[Convert]::ToHexString($hash.ComputeHash($stream))}finally{$hash.Dispose();$stream.Dispose()};[void]$content.Append($entry.FullName).Append([char]0).Append([string]$entry.Length).Append([char]0).Append($entrySha).Append("`n")};$contentSha=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($content.ToString())));return [pscustomobject][ordered]@{target=$Target;relative_path=$RelativePath;archive_sha256=(Get-MIR4A08FileSha256 $PackagePath);content_sha256=$contentSha;bytes=[long](Get-Item -LiteralPath $PackagePath).Length;entry_count=$entries.Count;root=[string]$roots[0];factorio_version=[string]$metadata.factorio_version}}finally{$archive.Dispose()}
@@ -491,17 +524,45 @@ function Assert-MIR4A08PresentationBinding {
 }
 
 function Assert-MIR4A08TrustedIssuer {
-  param([Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$CanonicalRepository,[scriptblock]$QualificationAuthorityProvider=$null,[switch]$Rehearsal)
-  Assert-MIR4A08PropertyNames $Authority @('kind','issuer_id','trust_policy','producer') '[mir4-a08-qualification-authority]';Assert-MIR4A08PropertyNames $Authority.producer @('repository','workflow','run_id','run_attempt','job','actor','workflow_commit','workflow_ref','source_commit','source_tree','event','environment','runner_identity','trust_class','verifier_sha256','policy_sha256') '[mir4-a08-qualification-authority]';$producer=$Authority.producer
-  if ([string]$Authority.kind-cne'MIR4GovernedIndependentQualificationAuthorityV1'-or[string]::IsNullOrWhiteSpace([string]$Authority.issuer_id)-or[string]$Authority.trust_policy-cne'validation/trust.json'-or[string]$producer.repository-cne$CanonicalRepository-or[string]$producer.source_commit-cne[string]$Candidate.commit-or[string]$producer.source_tree-cne[string]$Candidate.tree-or[string]$producer.workflow_commit-cnotmatch'^[0-9a-f]{40}$'-or[string]$producer.job-cne[string]$Authority.issuer_id-or[string]$producer.verifier_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$producer.policy_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir4-a08-qualification-authority]'}
-  if ($Rehearsal){if ([string]$producer.trust_class-cne'synthetic-protected-release'-or[string]$producer.workflow-cne'synthetic-independent-verification'-or[string]$producer.event-cne'synthetic-merge'){throw '[mir4-a08-qualification-authority]'}}else{$trustPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../../validation/trust.json'));$trust=Get-Content -Raw -LiteralPath $trustPath|ConvertFrom-Json -Depth 30;$class=$trust.classes.'protected-release';if ([string]$producer.trust_class-cne'protected-release'-or$null-eq$class-or-not[bool]$class.release_eligible-or[string]$producer.workflow-notin@($class.workflows)-or[string]$producer.event-notin@($class.events)-or[string]$producer.workflow_ref-notin@($class.refs)-or[string]$producer.environment-cne[string]$class.environment-or[string]$producer.runner_identity-cne[string]$class.runner_identity-or[string]$producer.policy_sha256-cne(Get-MIR4A08FileSha256 $trustPath)){throw '[mir4-a08-qualification-authority]'};if($null-eq$QualificationAuthorityProvider){$QualificationAuthorityProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider};try{$observed=&$QualificationAuthorityProvider $Authority $Candidate}catch{throw "[mir4-a08-qualification-authority-provider] $($_.Exception.Message)"};Assert-MIR4A08PropertyNames $observed @('run_id','run_attempt','workflow','event','actor','workflow_commit','workflow_ref','source_commit','source_tree','job','runner_name','runner_identity','source_attestation_artifact') '[mir4-a08-qualification-authority-provider]';if([string]$observed.run_id-cne[string]$producer.run_id-or[string]$observed.run_attempt-cne[string]$producer.run_attempt-or[string]$observed.workflow-cne[string]$producer.workflow-or[string]$observed.event-cne[string]$producer.event-or[string]$observed.actor-cne[string]$producer.actor-or[string]$observed.workflow_commit-cne[string]$producer.workflow_commit-or[string]$observed.workflow_ref-cne[string]$producer.workflow_ref-or[string]$observed.source_commit-cne[string]$producer.source_commit-or[string]$observed.source_tree-cne[string]$producer.source_tree-or[string]$observed.runner_identity-cne[string]$producer.runner_identity-or-not(([string]$observed.job-ceq[string]$producer.job)-or([string]$observed.job).EndsWith(" / $([string]$producer.job)",[StringComparison]::Ordinal))){throw '[mir4-a08-qualification-authority-provider]'}};return $Authority
+  param([Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$CanonicalRepository,[scriptblock]$QualificationAuthorityProvider=$null,[switch]$Rehearsal)
+  $factorioVersion = Get-MIR4A08ExpectedFactorioVersion $Target
+  Assert-MIR4A08PropertyNames $Authority @('kind','issuer_id','trust_policy','producer') '[mir4-a08-qualification-authority]'
+  Assert-MIR4A08PropertyNames $Authority.producer @('repository','workflow','run_id','run_attempt','job','actor','workflow_commit','workflow_ref','source_commit','source_tree','target','factorio_version','event','environment','runner_identity','trust_class','verifier_sha256','policy_sha256') '[mir4-a08-qualification-authority]'
+  $producer=$Authority.producer
+  if ([string]$Authority.kind-cne'MIR4GovernedTargetQualificationAuthorityV2'-or[string]::IsNullOrWhiteSpace([string]$Authority.issuer_id)-or[string]$Authority.trust_policy-cne'validation/trust.json'-or[string]$producer.repository-cne$CanonicalRepository-or[string]$producer.source_commit-cne[string]$Candidate.commit-or[string]$producer.source_tree-cne[string]$Candidate.tree-or[string]$producer.target-cne$Target-or[string]$producer.factorio_version-cne$factorioVersion-or[string]$producer.workflow_commit-cnotmatch'^[0-9a-f]{40}$'-or[string]$producer.job-cne[string]$Authority.issuer_id-or[string]$producer.verifier_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$producer.policy_sha256-cnotmatch'^[A-F0-9]{64}$'){throw '[mir4-a08-qualification-authority]'}
+  if ($Rehearsal) {
+    if ([string]$producer.trust_class-cne'synthetic-protected-release'-or[string]$producer.workflow-cne'synthetic-target-qualification'-or[string]$producer.event-cne'synthetic-merge') { throw '[mir4-a08-qualification-authority]' }
+    return $null
+  }
+  $trustPath=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../../validation/trust.json'))
+  $trust=Get-Content -Raw -LiteralPath $trustPath|ConvertFrom-Json -Depth 30
+  $class=$trust.classes.'protected-release'
+  if ([string]$producer.trust_class-cne'protected-release'-or$null-eq$class-or-not[bool]$class.release_eligible-or[string]$producer.workflow-notin@($class.workflows)-or[string]$producer.event-notin@($class.events)-or[string]$producer.workflow_ref-notin@($class.refs)-or[string]$producer.workflow_ref-cne'refs/heads/dev'-or[string]$producer.workflow_commit-cne[string]$Candidate.source_commit-or[string]$producer.environment-cne[string]$class.environment-or[string]$producer.runner_identity-cne[string]$class.runner_identity-or[string]$producer.policy_sha256-cne(Get-MIR4A08FileSha256 $trustPath)){throw '[mir4-a08-qualification-authority]'}
+  if($null-eq$QualificationAuthorityProvider){$QualificationAuthorityProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider}
+  try {$observed=&$QualificationAuthorityProvider $Authority $Candidate $Target} catch {throw "[mir4-a08-qualification-authority-provider] $($_.Exception.Message)"}
+  Assert-MIR4A08PropertyNames $observed @('run_id','run_attempt','workflow','event','actor','workflow_commit','workflow_ref','source_commit','source_tree','job','runner_name','runner_identity','target_attestation_artifact','attestation') '[mir4-a08-qualification-authority-provider]'
+  if([string]$observed.run_id-cne[string]$producer.run_id-or[string]$observed.run_attempt-cne[string]$producer.run_attempt-or[string]$observed.workflow-cne[string]$producer.workflow-or[string]$observed.event-cne[string]$producer.event-or[string]$observed.actor-cne[string]$producer.actor-or[string]$observed.workflow_commit-cne[string]$producer.workflow_commit-or[string]$observed.workflow_ref-cne[string]$producer.workflow_ref-or[string]$observed.source_commit-cne[string]$producer.source_commit-or[string]$observed.source_tree-cne[string]$producer.source_tree-or[string]$observed.runner_identity-cne[string]$producer.runner_identity-or-not(([string]$observed.job-ceq[string]$producer.job)-or([string]$observed.job).EndsWith(" / $([string]$producer.job)",[StringComparison]::Ordinal))){throw '[mir4-a08-qualification-authority-provider]'}
+  return $observed
 }
-function Assert-MIR4A08QualificationReceipts {
-  param([Parameter(Mandatory)]$Row,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)]$Observed,[switch]$Rehearsal)
-  Assert-MIR4A08PropertyNames $Row.worker_receipt @('schema','kind','producer_id','source_commit','source_tree','release_plan_digest','target','distribution_version','package','engine','evidence_sha256','status','release_identity','publication_authorized','record_sha256') '[mir4-a08-qualification-record]';Assert-MIR4A08PropertyNames $Row.worker_receipt.package @('sha256','content_sha256','bytes','entry_count') '[mir4-a08-qualification-record]';Assert-MIR4A08PropertyNames $Row.worker_receipt.engine @('version','path','sha256') '[mir4-a08-qualification-record]';Assert-MIR4A08PropertyNames $Row.independent_receipt @('schema','kind','producer_id','independent','source_commit','source_tree','release_plan_digest','target','distribution_version','package_sha256','engine_sha256','evidence_sha256','status','release_identity','publication_authorized','record_sha256') '[mir4-a08-qualification-record]';$worker=$Row.worker_receipt;$independent=$Row.independent_receipt
-  if ([int]$worker.schema-ne1-or[string]$worker.kind-cne'MIR4TargetQualificationWorkerReceiptV1'-or[string]$worker.status-cne'passed'-or[string]$worker.record_sha256-cne(Get-MIR4A08SelfSha256 $worker 'record_sha256')-or[string]$worker.source_commit-cne[string]$Candidate.commit-or[string]$worker.source_tree-cne[string]$Candidate.tree-or[string]$worker.target-cne[string]$Row.target-or[string]$worker.distribution_version-cne[string]$Row.distribution_version-or[string]$worker.package.sha256-cne[string]$Observed.archive_sha256-or[string]$worker.package.content_sha256-cne[string]$Observed.content_sha256-or[long]$worker.package.bytes-ne[long]$Observed.bytes-or[int]$worker.package.entry_count-ne[int]$Observed.entry_count-or[string]::IsNullOrWhiteSpace([string]$worker.engine.version)-or[string]::IsNullOrWhiteSpace([string]$worker.engine.path)-or[string]$worker.engine.sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$worker.release_plan_digest-cnotmatch'^[A-F0-9]{64}$'-or[string]$worker.evidence_sha256-cnotmatch'^[A-F0-9]{64}$'-or[bool]$worker.release_identity-or[bool]$worker.publication_authorized){throw '[mir4-a08-qualification-record]'}
-  if ([int]$independent.schema-ne1-or[string]$independent.kind-cne'MIR4IndependentVerificationReceiptV1'-or[string]$independent.status-cne'passed'-or-not[bool]$independent.independent-or[string]$independent.record_sha256-cne(Get-MIR4A08SelfSha256 $independent 'record_sha256')-or[string]$independent.source_commit-cne[string]$Candidate.commit-or[string]$independent.source_tree-cne[string]$Candidate.tree-or[string]$independent.target-cne[string]$Row.target-or[string]$independent.distribution_version-cne[string]$Row.distribution_version-or[string]$independent.package_sha256-cne[string]$Observed.archive_sha256-or[string]$independent.release_plan_digest-cne[string]$worker.release_plan_digest-or[string]$independent.producer_id-cne[string]$Authority.issuer_id-or[string]$worker.producer_id-ceq[string]$Authority.issuer_id-or[string]$independent.evidence_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$independent.engine_sha256-cnotmatch'^[A-F0-9]{64}$'-or[string]$independent.engine_sha256-cne[string]$worker.engine.sha256-or[bool]$independent.release_identity-or[bool]$independent.publication_authorized){throw '[mir4-a08-qualification-record]'}
-  Assert-MIR4A08QualifiedEngine -Worker $worker -Independent $independent -Target ([string]$Row.target) -Rehearsal:$Rehearsal
+function Assert-MIR4A08TargetQualificationProof {
+  param([Parameter(Mandatory)]$Row,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$Observed,$AuthorityObservation=$null,[switch]$Rehearsal)
+  $proof=$Row.proof
+  Assert-MIR4A08PropertyNames $proof @('context','package','engine','evidence') '[mir4-a08-qualification-record]'
+  Assert-MIR4A08PropertyNames $proof.context @('id','release','candidate_id','plan_id','manifest_sha256','candidate_descriptor_sha256','environment_locks_sha256') '[mir4-a08-qualification-record]'
+  Assert-MIR4A08PropertyNames $proof.package @('archive_sha256','content_sha256','bytes','entry_count','source_sha256') '[mir4-a08-qualification-record]'
+  Assert-MIR4A08PropertyNames $proof.engine @('version','installation_sha256','binary_sha256','binary_bytes','official_data_sha256','official_data_file_count') '[mir4-a08-qualification-record]'
+  Assert-MIR4A08PropertyNames $proof.evidence @('qualification_manifest_sha256','aggregate_result_sha256','worker_import_sha256','seal_result_sha256','promotion_result_sha256','seal_object_sha256','seal_task_object_sha256','promotion_task_object_sha256') '[mir4-a08-qualification-record]'
+  $allHashes=@([string]$proof.context.id,[string]$proof.context.manifest_sha256,[string]$proof.context.candidate_descriptor_sha256,[string]$proof.context.environment_locks_sha256,[string]$proof.package.archive_sha256,[string]$proof.package.content_sha256,[string]$proof.package.source_sha256,[string]$proof.engine.installation_sha256,[string]$proof.engine.binary_sha256,[string]$proof.engine.official_data_sha256)+@($proof.evidence.PSObject.Properties|ForEach-Object{[string]$_.Value})
+  if(@($allHashes|Where-Object{$_-cnotmatch'^[A-F0-9]{64}$'}).Count-ne0-or[string]::IsNullOrWhiteSpace([string]$proof.context.release)-or[string]::IsNullOrWhiteSpace([string]$proof.context.candidate_id)-or[string]$proof.context.plan_id-cnotmatch'^[A-F0-9]{64}$'-or[long]$proof.package.bytes-ne[long]$Observed.bytes-or[int]$proof.package.entry_count-ne[int]$Observed.entry_count-or[string]$proof.package.archive_sha256-cne[string]$Observed.archive_sha256-or[string]$proof.package.content_sha256-cne[string]$Observed.content_sha256-or[long]$proof.engine.binary_bytes-le0-or[int]$proof.engine.official_data_file_count-le0){throw '[mir4-a08-qualification-record]'}
+  Assert-MIR4A08ExactEngineVersion -Target ([string]$Row.target) -Version ([string]$proof.engine.version)
+  if (-not $Rehearsal) {
+    $attestation=$AuthorityObservation.attestation
+    if ([string]$attestation.target-cne[string]$Row.target-or[string]$attestation.factorio_version-cne[string]$Row.factorio_version-or[string]$attestation.source_commit-cne[string]$Candidate.commit-or[string]$attestation.source_tree-cne[string]$Candidate.tree-or
+        [string]$attestation.context.id-cne[string]$proof.context.id-or[string]$attestation.context.release-cne[string]$proof.context.release-or[string]$attestation.context.candidate_id-cne[string]$proof.context.candidate_id-or[string]$attestation.context.plan_id-cne[string]$proof.context.plan_id-or[string]$attestation.context.manifest_sha256-cne[string]$proof.context.manifest_sha256-or[string]$attestation.context.candidate_descriptor_sha256-cne[string]$proof.context.candidate_descriptor_sha256-or[string]$attestation.context.environment_locks_sha256-cne[string]$proof.context.environment_locks_sha256-or
+        [string]$attestation.package.archive_sha256-cne[string]$proof.package.archive_sha256-or[string]$attestation.package.content_sha256-cne[string]$proof.package.content_sha256-or[long]$attestation.package.bytes-ne[long]$proof.package.bytes-or[int]$attestation.package.entry_count-ne[int]$proof.package.entry_count-or[string]$attestation.package.source_sha256-cne[string]$proof.package.source_sha256-or
+        [string]$attestation.engine.version-cne[string]$proof.engine.version-or[string]$attestation.engine.installation_sha256-cne[string]$proof.engine.installation_sha256-or[string]$attestation.engine.binary_sha256-cne[string]$proof.engine.binary_sha256-or[long]$attestation.engine.binary_bytes-ne[long]$proof.engine.binary_bytes-or[string]$attestation.engine.official_data_sha256-cne[string]$proof.engine.official_data_sha256-or[int]$attestation.engine.official_data_file_count-ne[int]$proof.engine.official_data_file_count-or
+        [string]$attestation.evidence.qualification_manifest_sha256-cne[string]$proof.evidence.qualification_manifest_sha256-or[string]$attestation.evidence.aggregate_result_sha256-cne[string]$proof.evidence.aggregate_result_sha256-or[string]$attestation.evidence.worker_import_sha256-cne[string]$proof.evidence.worker_import_sha256-or[string]$attestation.evidence.seal_result_sha256-cne[string]$proof.evidence.seal_result_sha256-or[string]$attestation.evidence.promotion_result_sha256-cne[string]$proof.evidence.promotion_result_sha256-or[string]$attestation.evidence.seal_object_sha256-cne[string]$proof.evidence.seal_object_sha256-or[string]$attestation.evidence.seal_task_object_sha256-cne[string]$proof.evidence.seal_task_object_sha256-or[string]$attestation.evidence.promotion_task_object_sha256-cne[string]$proof.evidence.promotion_task_object_sha256){throw '[mir4-a08-qualification-authority-provider]'}
+  }
 }
 function Read-MIR4A08QualificationRecord {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Plan,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)][string]$RecordPath,[Parameter(Mandatory)][string]$PackageRoot,[scriptblock]$QualificationAuthorityProvider=$null,[switch]$Rehearsal)
@@ -511,10 +572,10 @@ function Read-MIR4A08QualificationRecord {
   } catch {
     throw '[mir4-a08-qualification-record]'
   }
-  Assert-MIR4A08PropertyNames $record @('schema','kind','status','candidate','materializer','package_presentation','authority','expected_targets','targets','release_authority','publication_authority','record_sha256') '[mir4-a08-qualification-record]'
+  Assert-MIR4A08PropertyNames $record @('schema','kind','status','candidate','materializer','package_presentation','expected_targets','targets','release_authority','publication_authority','record_sha256') '[mir4-a08-qualification-record]'
   Assert-MIR4A08PropertyNames $record.candidate @('ref','commit','tree') '[mir4-a08-qualification-record]'
   Assert-MIR4A08PropertyNames $record.materializer @('path','git_blob') '[mir4-a08-qualification-record]'
-  if ([int]$record.schema-ne1-or[string]$record.kind-cne'MIR42ProtectedMainQualificationBindingV3'-or
+  if ([int]$record.schema-ne1-or[string]$record.kind-cne'MIR42ProtectedMainQualificationBindingV4'-or
       [string]$record.status-cne'independently-qualified'-or
       [string]$record.record_sha256-cne(Get-MIR4A08SelfSha256 $record 'record_sha256')-or
       [string]$record.candidate.ref-cne[string]$Candidate.ref-or
@@ -528,11 +589,10 @@ function Read-MIR4A08QualificationRecord {
   }
   $presentationBinding=Assert-MIR4A08PresentationBinding -RepoRoot $RepoRoot -Candidate $Candidate -Binding $record.package_presentation
   $presentation=Read-MIR4A08CommitJson -RepoRoot $RepoRoot -Commit ([string]$Candidate.commit) -Path ([string]$presentationBinding.path) -Code '[mir4-a08-package-presentation]'
-  $authority=Assert-MIR4A08TrustedIssuer -Authority $record.authority -Candidate $Candidate -CanonicalRepository ([string]$Plan.policy.repository) -QualificationAuthorityProvider $QualificationAuthorityProvider -Rehearsal:$Rehearsal
   $observed=@()
-  if (@($record.targets).Count-ne2) { throw '[mir4-a08-qualification-record]' }
+  if (@($record.targets).Count-ne2-or(@($record.targets|ForEach-Object{[string]$_.target}|Sort-Object -Unique).Count-ne2)) { throw '[mir4-a08-qualification-record]' }
   foreach ($row in @($record.targets)) {
-    Assert-MIR4A08PropertyNames $row @('target','distribution_version','relative_path','archive_sha256','content_sha256','bytes','entry_count','root','factorio_version','worker_receipt','independent_receipt') '[mir4-a08-qualification-record]'
+    Assert-MIR4A08PropertyNames $row @('target','distribution_version','relative_path','archive_sha256','content_sha256','bytes','entry_count','root','factorio_version','authority','proof') '[mir4-a08-qualification-record]'
     if ([string]$row.target-notin@($Plan.qualification.expected_targets)-or[string]$row.distribution_version-eq'') { throw '[mir4-a08-qualification-record]' }
     $path=Resolve-MIR4A08ContainedFile -Root $PackageRoot -RelativePath ([string]$row.relative_path) -Code '[mir4-a08-qualification-record]'
     $actual=Get-MIR4A08PackageObservation -PackagePath $path -Target ([string]$row.target) -RelativePath ([string]$row.relative_path)
@@ -543,7 +603,8 @@ function Read-MIR4A08QualificationRecord {
     if ($targetIdentity.Count-ne1-or[string]$targetIdentity[0].content_sha256-cne[string]$actual.content_sha256-or[int]$targetIdentity[0].entry_count-ne[int]$actual.entry_count) {
       throw '[mir4-a08-package-presentation-target-mismatch]'
     }
-    Assert-MIR4A08QualificationReceipts -Row $row -Candidate $Candidate -Authority $authority -Observed $actual -Rehearsal:$Rehearsal
+    $authorityObservation=Assert-MIR4A08TrustedIssuer -Authority $row.authority -Candidate $Candidate -Target ([string]$row.target) -CanonicalRepository ([string]$Plan.policy.repository) -QualificationAuthorityProvider $QualificationAuthorityProvider -Rehearsal:$Rehearsal
+    Assert-MIR4A08TargetQualificationProof -Row $row -Candidate $Candidate -Observed $actual -AuthorityObservation $authorityObservation -Rehearsal:$Rehearsal
     $observed+=$actual
   }
   $setSha=Get-MIR4A08PackageSetSha256 $observed
@@ -555,7 +616,6 @@ function Read-MIR4A08QualificationRecord {
     candidate=[pscustomobject][ordered]@{ref=[string]$Candidate.ref;commit=[string]$Candidate.commit;tree=[string]$Candidate.tree}
     materializer=$record.materializer
     package_presentation=$presentationBinding
-    authority=$authority
     package_set_sha256=$setSha
     packages=@($observed|Sort-Object target)
   }

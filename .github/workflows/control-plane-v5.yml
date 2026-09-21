@@ -544,18 +544,81 @@ jobs:
             -SourceRepoRoot source -TrustClass protected-release -EvidenceRoot build/results/evidence | Out-Host
           ./tools/commands/control/Invoke-MIRControlPlane.ps1 promotion -ContextPath $context -EvidenceRoot build/results/evidence |
             Tee-Object -FilePath build/results/control-plane-v5/promotion-result.json
-      - name: Record exact qualification-source attestation
+      - name: Record exact target qualification attestation
         shell: pwsh
         env:
           MIR_CP_CONTEXT_ID: ${{ needs.context.outputs.context_id }}
           MIR_CP_SOURCE_REF: ${{ inputs.source_ref }}
+          MIR_CP_TARGET: ${{ inputs.target }}
         run: |
           $sourceCommit = (git -C source rev-parse HEAD).Trim()
           $sourceTree = (git -C source rev-parse 'HEAD^{tree}').Trim()
           if ($sourceCommit -cne $env:MIR_CP_SOURCE_REF) { throw 'Qualification source checkout mismatch.' }
+          $target = switch ($env:MIR_CP_TARGET) {
+            '2.0' { 'F200' }
+            '2.1' { 'F210' }
+            default { throw 'Qualification target is unsupported.' }
+          }
+          $context = "build/results/verification-context/$env:MIR_CP_CONTEXT_ID"
+          $candidate = Get-Content -Raw -LiteralPath (Join-Path $context 'candidate-descriptor.json') | ConvertFrom-Json -Depth 20
+          $environmentLocks = Get-Content -Raw -LiteralPath (Join-Path $context 'environment-locks.json') | ConvertFrom-Json -Depth 20
+          $contextManifestPath = Join-Path $context 'context-manifest.json'
+          $contextManifest = Get-Content -Raw -LiteralPath $contextManifestPath | ConvertFrom-Json -Depth 20
+          $factorioLocks = @($environmentLocks.factorio | Where-Object { [string]$_.source -ceq 'context-materialization' })
+          if ($factorioLocks.Count -ne 1) { throw 'Qualification context must bind exactly one materialized Factorio lock.' }
+          $factorio = $factorioLocks[0]
+          if ([string]$candidate.target -cne $env:MIR_CP_TARGET -or [string]$environmentLocks.target -cne $env:MIR_CP_TARGET -or
+              [string]$candidate.source_commit -cne $sourceCommit -or [string]$candidate.source_tree -cne $sourceTree) {
+            throw 'Qualification context does not bind the nested source and requested target.'
+          }
+          foreach ($path in @(
+            (Join-Path $context 'candidate-descriptor.json'),
+            (Join-Path $context 'environment-locks.json'),
+            $contextManifestPath,
+            'build/results/control-plane-v5/aggregate-result.json',
+            'build/results/control-plane-v5/worker-import.json',
+            'build/results/control-plane-v5/seal-result.json',
+            'build/results/control-plane-v5/promotion-result.json'
+          )) {
+            if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Qualification attestation input is missing: $path" }
+          }
+          $aggregate = Get-Content -Raw -LiteralPath 'build/results/control-plane-v5/aggregate-result.json' | ConvertFrom-Json -Depth 20
+          $seal = Get-Content -Raw -LiteralPath 'build/results/control-plane-v5/seal-result.json' | ConvertFrom-Json -Depth 20
+          $promotion = Get-Content -Raw -LiteralPath 'build/results/control-plane-v5/promotion-result.json' | ConvertFrom-Json -Depth 20
+          if ([string]$aggregate.status -cne 'passed' -or [string]$aggregate.context_digest -cne $env:MIR_CP_CONTEXT_ID -or
+              [string]$aggregate.plan_id -cne [string]$contextManifest.plan_id -or [string]$aggregate.aggregate_task -cne 'qualification.full' -or
+              [string]$aggregate.manifest_object -notmatch '^[A-Fa-f0-9]{64}$' -or [string]$seal.status -cne 'passed' -or
+              [string]$seal.context_digest -cne $env:MIR_CP_CONTEXT_ID -or [string]$seal.release -cne [string]$candidate.release -or
+              [string]$seal.seal_object -notmatch '^[A-Fa-f0-9]{64}$' -or [string]$seal.task_object -notmatch '^[A-Fa-f0-9]{64}$' -or
+              [string]$promotion.status -cne 'passed' -or [string]$promotion.context_digest -cne $env:MIR_CP_CONTEXT_ID -or
+              [string]$promotion.task_id -cne 'promotion' -or [string]$promotion.object_digest -notmatch '^[A-Fa-f0-9]{64}$') {
+            throw 'Qualification aggregate does not bind the exact successful context.'
+          }
+          if ([string]$factorio.version -eq '' -or [string]$factorio.installation_sha256 -notmatch '^[A-Fa-f0-9]{64}$' -or
+              [string]$factorio.binary.sha256 -notmatch '^[A-Fa-f0-9]{64}$' -or [int64]$factorio.binary.bytes -le 0 -or
+              [string]$factorio.official_data.sha256 -notmatch '^[A-Fa-f0-9]{64}$' -or [int]$factorio.official_data.file_count -le 0) {
+            throw 'Qualification context Factorio lock is incomplete.'
+          }
+          if ($target -eq 'F200' -and [string]$factorio.version -cne '2.0.77') {
+            throw 'F200 qualification requires exact Factorio 2.0.77.'
+          }
+          if ($target -eq 'F210') {
+            try {
+              $profile = Get-Content -Raw -LiteralPath 'source/validation/profiles/factorio-2.1.json' | ConvertFrom-Json -Depth 20
+              $floor = [version]([string]$profile.minimum_factorio_version)
+              $actual = [version]([string]$factorio.version)
+            } catch { throw 'F210 qualification engine version is invalid.' }
+            if ($actual.Major -ne 2 -or $actual.Minor -ne 1 -or $actual -lt $floor) {
+              throw "F210 qualification requires Factorio 2.1.x at or above $floor."
+            }
+          }
+          $sha256 = {
+            param([string]$Path)
+            return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash.ToUpperInvariant()
+          }
           $record = [ordered]@{
             schema = 1
-            kind = 'MIR4QualificationSourceAttestationV1'
+            kind = 'MIR4TargetQualificationAttestationV1'
             repository = $env:GITHUB_REPOSITORY
             workflow = $env:GITHUB_WORKFLOW
             workflow_run_id = $env:GITHUB_RUN_ID
@@ -566,15 +629,50 @@ jobs:
             source_ref = $env:MIR_CP_SOURCE_REF
             source_commit = $sourceCommit
             source_tree = $sourceTree
-            context_id = $env:MIR_CP_CONTEXT_ID
+            target = $target
+            factorio_version = $env:MIR_CP_TARGET
+            context = [ordered]@{
+              id = $env:MIR_CP_CONTEXT_ID
+              release = [string]$candidate.release
+              candidate_id = [string]$candidate.candidate_id
+              plan_id = [string]$contextManifest.plan_id
+              manifest_sha256 = & $sha256 $contextManifestPath
+              candidate_descriptor_sha256 = & $sha256 (Join-Path $context 'candidate-descriptor.json')
+              environment_locks_sha256 = & $sha256 (Join-Path $context 'environment-locks.json')
+            }
+            package = [ordered]@{
+              archive_sha256 = [string]$candidate.archive_sha256
+              content_sha256 = [string]$candidate.content_sha256
+              bytes = [int64]$candidate.bytes
+              entry_count = [int]$candidate.entries
+              source_sha256 = [string]$candidate.source_sha256
+            }
+            engine = [ordered]@{
+              version = [string]$factorio.version
+              installation_sha256 = [string]$factorio.installation_sha256
+              binary_sha256 = [string]$factorio.binary.sha256
+              binary_bytes = [int64]$factorio.binary.bytes
+              official_data_sha256 = [string]$factorio.official_data.sha256
+              official_data_file_count = [int]$factorio.official_data.file_count
+            }
+            evidence = [ordered]@{
+              qualification_manifest_sha256 = ([string]$aggregate.manifest_object).ToUpperInvariant()
+              aggregate_result_sha256 = & $sha256 'build/results/control-plane-v5/aggregate-result.json'
+              worker_import_sha256 = & $sha256 'build/results/control-plane-v5/worker-import.json'
+              seal_result_sha256 = & $sha256 'build/results/control-plane-v5/seal-result.json'
+              promotion_result_sha256 = & $sha256 'build/results/control-plane-v5/promotion-result.json'
+              seal_object_sha256 = ([string]$seal.seal_object).ToUpperInvariant()
+              seal_task_object_sha256 = ([string]$seal.task_object).ToUpperInvariant()
+              promotion_task_object_sha256 = ([string]$promotion.object_digest).ToUpperInvariant()
+            }
           }
-          $path = 'build/results/control-plane-v5/qualification-source-attestation.json'
+          $path = 'build/results/control-plane-v5/target-qualification-attestation.json'
           [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($path))) | Out-Null
           [IO.File]::WriteAllText($path, ($record | ConvertTo-Json -Depth 10), [Text.UTF8Encoding]::new($false))
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: mir-v5-qualification-source-${{ github.run_id }}-attempt-${{ github.run_attempt }}
-          path: build/results/control-plane-v5/qualification-source-attestation.json
+          name: mir-v5-target-qualification-${{ inputs.target }}-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: build/results/control-plane-v5/target-qualification-attestation.json
           if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         if: always()

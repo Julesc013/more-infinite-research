@@ -5130,7 +5130,7 @@
       "requires_factorio": false,
       "inputs": [
         ".github/workflows/control-plane-v5.yml",
-        "source/package-source.json",
+        "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/f210/composition.json",
         "targets/f200/composition.json",
@@ -5142,8 +5142,8 @@
         "spec/releases/mir4-protected-main-promotion-topology-v1.json",
         "spec/schemas/mir4-protected-main-promotion-topology-v1.schema.json",
         "spec/schemas/mir4-protected-main-qualification-v1.schema.json",
-        "spec/schemas/mir4-target-qualification-worker-receipt-v1.schema.json",
-        "spec/schemas/mir4-independent-verification-receipt-v1.schema.json",
+        "validation/profiles/factorio-2.0.json",
+        "validation/profiles/factorio-2.1.json",
         "validation/trust.json",
         "tools/mir/application/package/TargetMaterializer.ps1",
         "tools/lib/validation/PackageIdentity.ps1",
@@ -7256,5 +7256,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2f636b504d6fdb7e1a3eacd8aa378ea8b267dae70ffd7418ab835978c7b2fbe9"
+  "digest": "sha256:53f45c2550abb4e7adcf18fd90d1f2ed35f38a747be237bc468cf81b66b56992"
 }
