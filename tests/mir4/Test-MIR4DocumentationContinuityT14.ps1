@@ -3,6 +3,7 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 . (Join-Path $RepoRoot 'tools/lib/validation/PackageIdentity.ps1')
 . (Join-Path $RepoRoot 'tools/lib/mir4/PlatformPreview.ps1')
+$before=Get-MIRPackageSourceFingerprint -RepoRoot $RepoRoot
 
 $authorityPath=Join-Path $RepoRoot '.mir/releases/waves/mir4-r0/MIR4-Documentation-Continuity-T14V1.json'
 $authorityText=Get-Content -Raw -LiteralPath $authorityPath
