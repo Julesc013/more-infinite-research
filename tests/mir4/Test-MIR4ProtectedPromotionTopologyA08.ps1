@@ -199,7 +199,21 @@ if not errorlevel 1 (
 )
 echo %A08_RUN_JSON%
 '@,[Text.UTF8Encoding]::new($false))
-  $qualificationProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider -GhExecutable $fakeGh;$null=Assert-MIR4A08TrustedIssuer -Authority $productionAuthority -Candidate $candidate -Target F200 -CanonicalRepository 'Julesc013/more-infinite-research' -QualificationAuthorityProvider $qualificationProvider
+  $qualificationProvider=New-MIR4A08GitHubRestQualificationAuthorityProvider -GhExecutable $fakeGh
+  # The production provider is returned as a closure and can execute after the
+  # module/function scope that created it has gone away.  Shadow the ambient
+  # helpers to prove that every helper used by the closure was captured.
+  $savedExpectedFactorioVersion=${function:Get-MIR4A08ExpectedFactorioVersion};$savedAssertExactEngineVersion=${function:Assert-MIR4A08ExactEngineVersion}
+  try {
+    Set-Item Function:Get-MIR4A08ExpectedFactorioVersion {throw '[mir4-a08-test-leaked-function-scope]'}
+    Set-Item Function:Assert-MIR4A08ExactEngineVersion {throw '[mir4-a08-test-leaked-function-scope]'}
+    $isolatedProviderObservation=& $qualificationProvider $productionAuthority $candidate F200
+    if ([string]$isolatedProviderObservation.target_attestation_artifact-cne$artifactName) {throw '[mir4-a08-provider-closure]'}
+  } finally {
+    Set-Item Function:Get-MIR4A08ExpectedFactorioVersion $savedExpectedFactorioVersion
+    Set-Item Function:Assert-MIR4A08ExactEngineVersion $savedAssertExactEngineVersion
+  }
+  $null=Assert-MIR4A08TrustedIssuer -Authority $productionAuthority -Candidate $candidate -Target F200 -CanonicalRepository 'Julesc013/more-infinite-research' -QualificationAuthorityProvider $qualificationProvider
   # protected-release currently permits main as a general trust-class ref, but
   # A08 attestations must prove the workflow implementation came from the
   # exact frozen dev source, not merely any allowed controller branch.

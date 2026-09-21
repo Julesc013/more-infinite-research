@@ -247,13 +247,15 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
   param([string]$GhExecutable = 'gh')
   $invokeRest = ${function:Invoke-MIR4A08GitHubRestJson}
   $assertPropertyNames = ${function:Assert-MIR4A08PropertyNames}
+  $expectedFactorioVersion = ${function:Get-MIR4A08ExpectedFactorioVersion}
+  $assertExactEngineVersion = ${function:Assert-MIR4A08ExactEngineVersion}
   $provider = {
     param([object]$Authority,[object]$Candidate,[string]$Target)
     $producer = $Authority.producer
     $repository = [string]$producer.repository
     if ($repository -cne 'Julesc013/more-infinite-research' -or [string]$producer.run_id -notmatch '^[0-9]+$' -or
         [string]$producer.workflow_ref -cne 'refs/heads/dev' -or [string]$producer.workflow_commit -cne [string]$Candidate.source_commit -or
-        [string]$producer.target -cne $Target -or [string]$producer.factorio_version -cne (Get-MIR4A08ExpectedFactorioVersion $Target)) {
+        [string]$producer.target -cne $Target -or [string]$producer.factorio_version -cne (& $expectedFactorioVersion $Target)) {
       throw '[mir4-a08-qualification-run-identity]'
     }
     $run = & $invokeRest -GhExecutable $GhExecutable -Arguments @('api',"repos/$repository/actions/runs/$([string]$producer.run_id)") -Code '[mir4-a08-qualification-run]'
@@ -328,7 +330,7 @@ function New-MIR4A08GitHubRestQualificationAuthorityProvider {
            @($attestation.evidence.PSObject.Properties | Where-Object { [string]$_.Value -cnotmatch '^[A-Fa-f0-9]{64}$' }).Count -ne 0) {
         throw '[mir4-a08-qualification-source-artifact]'
       }
-      try { Assert-MIR4A08ExactEngineVersion -Target $Target -Version ([string]$attestation.engine.version) }
+      try { & $assertExactEngineVersion -Target $Target -Version ([string]$attestation.engine.version) }
       catch { throw '[mir4-a08-qualification-source-artifact]' }
     } finally {
       if (Test-Path -LiteralPath $scratch) { [IO.Directory]::Delete($scratch,$true) }
