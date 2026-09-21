@@ -3963,9 +3963,9 @@
     {
       "path": "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
       "classification": "canonical-internal",
-      "sha256": "E476C95AA61672302E393607CF830E02FE920FB2FC7CE02E89A9BBE3F4716285",
+      "sha256": "1BBE20393BF8B391DF4288EAE110AE9A27B03408EAF38FB1727A4225C9B2E7AB",
       "hash_mode": "canonical-text-v1",
-      "lines": 536,
+      "lines": 589,
       "package_visible": false
     },
     {
@@ -5794,5 +5794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:30d56a3f350c61e8c601143a8c99c611b56cdac47e98ebfb6ce533d82c522d3e"
+  "digest": "sha256:b8fab00d9701a318fc01b51e559cebc797e93fa02d5ea2653a795e24b072abf1"
 }

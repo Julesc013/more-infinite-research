@@ -2352,6 +2352,7 @@
         "spec/schemas/mir4-independent-verification-receipt-v1.schema.json",
         "validation/trust.json",
         "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/lib/validation/PackageIdentity.ps1",
         "tools/lib/mir4/PackagePresentation.ps1",
         "tools/lib/mir4/pre-freeze-release/ProtectedPromotionTopology.ps1",
         "tools/commands/mir4/Invoke-MIR4PreFreeze.ps1",
