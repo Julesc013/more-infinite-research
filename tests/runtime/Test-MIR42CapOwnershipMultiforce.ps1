@@ -2,7 +2,8 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
+  [string]$FactorioBin='',
+  [string]$SteamManifest='',
   [string]$CandidateZip='',
   [string]$OutputRoot='build/tests/mir42-cap-ownership-multiforce'
 )
@@ -11,14 +12,19 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-$engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 $buildRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build'))+[IO.Path]::DirectorySeparatorChar
 if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
   throw 'MIR42 cap ownership/multiforce evidence outputs must be under build.'
 }
 
-$engineSha='710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8'
+. (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
+$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
+if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
+  throw '[mir42-cap-ownership-multiforce-engine-admission-pending]'
+}
+$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
 $blockerName='late-mir42-cap-binding-blocker'
 $policyBlockerName='late-mir42-policy-binding-blocker'
@@ -172,10 +178,7 @@ function Get-MIR42SemanticStateJson($State){
   }|ConvertTo-Json -Depth 8 -Compress)
 }
 
-Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) $engineSha
-$engineVersion=(& $engine --version|Out-String)
-Assert-MIR42 ($LASTEXITCODE -eq 0 -and $engineVersion -match 'Version: 2[.]1[.]17') 'requires exact Steam Factorio 2.1.17.'
-$engineVersion=([regex]::Match($engineVersion,'Version:\s+2[.]1[.]17[^\r\n]*').Value).Trim()
+Assert-Exact 'Factorio executable SHA-256' (Get-MIR42Sha $engine) ([string]$engineResolution.engine.sha256)
 
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
@@ -493,7 +496,18 @@ $result=[ordered]@{
   kind='MIR42F210CapOwnershipMultiforceQualificationV1'
   status='passed-current-f210-candidate-cap-ownership-multiforce-only'
   scope='Freshly materialized F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.'
-  target=[ordered]@{factorio_line='2.1';factorio_version='2.1.17';engine_sha256=$engineSha}
+  target=[ordered]@{
+    factorio_line='2.1'
+    factorio_version=[string]$engineResolution.engine.version
+    engine_build=[int]$engineResolution.engine.build
+    engine_file_version=[string]$engineResolution.engine.file_version
+    engine_sha256=[string]$engineResolution.engine.sha256
+    engine_resolution_record_sha256=[string]$engineResolution.record_sha256
+    steam_app_id=[string]$engineResolution.steam.app_id
+    steam_branch=[string]$engineResolution.steam.branch
+    steam_build_id=[string]$engineResolution.steam.build_id
+    steam_manifest_sha256=[string]$engineResolution.steam.app_manifest_sha256
+  }
   source=[ordered]@{
     commit=$sourceCommit
     tree=$sourceTree

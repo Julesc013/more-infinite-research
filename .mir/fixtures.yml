@@ -1691,8 +1691,10 @@ fixtures:
     harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.17"
-      mod_lock: exact-engine-2.1.17-official-expansions-only
+      minimum_factorio_version: "2.1.18"
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
+      engine_admission: pending-exact-engine-api-prototype-data-and-official-mod-capsule
+      mod_lock: current-f210-policy-official-expansions-only
     validates:
       - canonical-schema-3-copper-binding-and-transport
       - strict-runtime-and-browser-refusal-of-late-forged-schema-3-policy-identities
@@ -1745,9 +1747,11 @@ fixtures:
     harness: tests/runtime/Test-MIR42V2V3CapMigration.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.17"
+      minimum_factorio_version: "2.1.18"
       predecessor_commit: f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e
-      mod_lock: exact-engine-2.1.17-official-expansions-only
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
+      engine_admission: pending-exact-engine-api-prototype-data-and-official-mod-capsule
+      mod_lock: current-f210-policy-official-expansions-only
     validates:
       - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
       - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3

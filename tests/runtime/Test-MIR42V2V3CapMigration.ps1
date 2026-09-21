@@ -2,7 +2,8 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
+  [string]$FactorioBin='',
+  [string]$SteamManifest='',
   [string]$OutputRoot='build/tests/m42mig'
 )
 
@@ -10,7 +11,6 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-$engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 $buildRoot=[IO.Path]::GetFullPath((Join-Path $repo 'build'))+[IO.Path]::DirectorySeparatorChar
 if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
@@ -18,7 +18,13 @@ if(-not $output.StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase)){
 }
 
 $predecessorCommit='f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e'
-$expectedEngineSha='710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8'
+. (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
+$qualificationPolicy=Get-MIR4F210CurrentQualificationPolicyV2 -RepoRoot $repo
+if(-not [bool]$qualificationPolicy.qualification.current_engine_api_prototype_data_mod_capsule_admitted){
+  throw '[mir42-v2-v3-cap-migration-engine-admission-pending]'
+}
+$engineResolution=Get-MIR4F210EngineResolutionV2 -RepoRoot $repo -FactorioBin $FactorioBin -SteamManifest $SteamManifest
+$engine=[string]$engineResolution.engine.path
 $fixtureName='mir-fixture-assert-mir42-v2-v3-cap-migration'
 $technologyName='recipe-prod-research_copper-1'
 $nonClaims=@(
@@ -104,10 +110,7 @@ function Assert-State([object]$State,[string]$Stage,[int]$ExpectedSchema,[int]$E
   }
 }
 
-Assert-Exact 'Factorio executable SHA-256' (Get-MigrationSha $engine) $expectedEngineSha
-$engineVersion=(& $engine --version|Out-String)
-Assert-Migration ($LASTEXITCODE -eq 0 -and $engineVersion -match 'Version: 2[.]1[.]17') 'Requires exact Steam Factorio 2.1.17.'
-$engineVersion=([regex]::Match($engineVersion,'Version:\s+2[.]1[.]17[^\r\n]*').Value).Trim()
+Assert-Exact 'Factorio executable SHA-256' (Get-MigrationSha $engine) ([string]$engineResolution.engine.sha256)
 Assert-Exact 'Pinned predecessor commit' ((& git -C $repo rev-parse $predecessorCommit).Trim()) $predecessorCommit
 
 $currentCommit=(& git -C $repo rev-parse HEAD).Trim()
@@ -278,7 +281,18 @@ $result=[ordered]@{
   kind='MIR42F210V2ToV3MaximumLevelMigrationQualificationV1'
   status='passed-current-f210-v2-to-v3-cap-migration-only'
   scope='Pinned origin/dev F210 V2 package reconstructed at f7f9bab, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into a freshly materialized current F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.'
-  target=[ordered]@{factorio_line='2.1';factorio_version='2.1.17';engine_sha256=$expectedEngineSha}
+  target=[ordered]@{
+    factorio_line='2.1'
+    factorio_version=[string]$engineResolution.engine.version
+    engine_build=[int]$engineResolution.engine.build
+    engine_file_version=[string]$engineResolution.engine.file_version
+    engine_sha256=[string]$engineResolution.engine.sha256
+    engine_resolution_record_sha256=[string]$engineResolution.record_sha256
+    steam_app_id=[string]$engineResolution.steam.app_id
+    steam_branch=[string]$engineResolution.steam.branch
+    steam_build_id=[string]$engineResolution.steam.build_id
+    steam_manifest_sha256=[string]$engineResolution.steam.app_manifest_sha256
+  }
   predecessor=[ordered]@{commit=$predecessorCommit;tree=$predecessorCommitTree;candidate=Get-Artifact $predecessorCandidate;transport='maximum-level-policy-v2';runtime_controller_policy_version=1}
   source=[ordered]@{commit=$currentCommit;tree=$currentTree;package_source_sha256=Get-MigrationSha (Join-Path $repo 'source/package-source.json');candidate_materialization_closure=$candidateClosure;candidate_materialization_closure_clean=$true}
   current_candidate=Get-Artifact $currentCandidate
