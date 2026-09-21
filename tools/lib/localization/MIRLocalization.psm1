@@ -149,6 +149,16 @@ function Write-MIRLocaleFile {
   Set-Content -LiteralPath $Path -Value $lines -Encoding utf8
 }
 
+function Write-MIRCanonicalJson {
+  param(
+    [Parameter(Mandatory)]$Value,
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  $json = (($Value | ConvertTo-Json -Depth 100) + "`n").Replace("`r`n", "`n").Replace("`r", "`n")
+  [System.IO.File]::WriteAllText($Path, $json, [System.Text.UTF8Encoding]::new($false))
+}
+
 Export-ModuleMember -Function @(
   'ConvertTo-MIRPropertyMap',
   'Get-MIRFormattingSequence',
@@ -159,5 +169,6 @@ Export-ModuleMember -Function @(
   'Read-MIRLocaleFile',
   'Read-MIRLocalePolicy',
   'Test-MIRFormatInvariantValue',
+  'Write-MIRCanonicalJson',
   'Write-MIRLocaleFile'
 )

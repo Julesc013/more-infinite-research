@@ -261,8 +261,7 @@ if (-not (Test-Path -LiteralPath $categoryPath)) {
     }
     $categoryLocales[[string]$locale.code] = $labels
   }
-  [ordered]@{schema=1;source_locale=[string]$policy.source_locale;locales=$categoryLocales} |
-    ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $categoryPath -Encoding utf8
+  Write-MIRCanonicalJson -Value ([ordered]@{schema=1;source_locale=[string]$policy.source_locale;locales=$categoryLocales}) -Path $categoryPath
 }
 $categoryDocument = Get-Content -Raw -LiteralPath $categoryPath -Encoding UTF8 | ConvertFrom-Json
 $categoryByLocale = ConvertTo-MIRPropertyMap -Object $categoryDocument.locales
@@ -380,7 +379,7 @@ foreach ($locale in $policy.supported_factorio_locales) {
     source_locale = [string]$policy.source_locale
     entries = @($orderedRecords)
   }
-  $memoryDocument | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $memoryPath -Encoding utf8
+  Write-MIRCanonicalJson -Value $memoryDocument -Path $memoryPath
   Write-MIRLocaleFile -Template $source -Values $values -Path $outputPath
   Write-Host "[ok] ${code}: generated $($values.Count) values."
 }

@@ -2631,6 +2631,33 @@
       ]
     },
     {
+      "id": "static.mir4-current-package-presentation-v6",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/mir4/Test-MIR4CurrentPackagePresentationV6.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "spec/distribution/mir4-current-package-presentation-v6.json",
+        "spec/schemas/mir4-current-package-presentation-v6.schema.json",
+        "spec/distribution/mir4-current-package-presentation-v5.json",
+        ".mir/locales/manifest.json",
+        "source:source/locale/**",
+        "source:source/package-source.json",
+        "targets/package-authority.json",
+        "targets/registry.json",
+        "targets/f210/composition.json",
+        "targets/f200/composition.json",
+        "targets/f110/composition.json",
+        "targets/f100/composition.json",
+        "tools/lib/mir4/PackagePresentation.ps1",
+        "tools/mir/application/package/PackageAuthority.ps1",
+        "tools/mir/application/package/TargetMaterializer.ps1",
+        "tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1",
+        "tests/mir4/Test-MIR4CurrentPackagePresentationV6.ps1",
+        "repository"
+      ]
+    },
+    {
       "id": "static.mir4-factorio-one-source-convergence",
       "kind": "static",
       "layer": "F0",

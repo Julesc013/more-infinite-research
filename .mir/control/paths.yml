@@ -5,8 +5,10 @@ paths:
   package.root: source
   package.targets: targets
   package.generated: build/packages
-  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v5.json
-  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
+  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v6.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v6.schema.json
+  mir4.package-presentation.frozen-v5: spec/distribution/mir4-current-package-presentation-v5.json
+  mir4.package-presentation.frozen-v5-schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
   mir4.package-presentation.frozen-v4: spec/distribution/mir4-current-package-presentation-v4.json
   mir4.package-presentation.frozen-v4-schema: spec/schemas/mir4-current-package-presentation-v4.schema.json
   mir4.package-presentation.frozen-v3: spec/distribution/mir4-current-package-presentation-v3.json
@@ -16,7 +18,7 @@ paths:
   mir4.package-presentation.frozen-v2-schema: spec/schemas/mir4-current-package-presentation-v2.schema.json
   mir4.package-presentation.frozen-v2-evolution-receipt: spec/distribution/mir4-current-package-presentation-v2-evolution-receipt.json
   mir4.package-presentation.frozen-v2-verifier: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV2Authority.ps1
-  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV5Authority.ps1
+  mir4.package-presentation.current-writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1
   mir4.f210.current-qualification-policy: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
   mir4.f210.current-qualification-policy-succession: .mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV1.json
   mir4.f210.current-qualification-policy-schema: spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json
