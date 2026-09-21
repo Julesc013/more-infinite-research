@@ -14,6 +14,7 @@ function Read-MIR4TargetMaterializerRecord {
   $definitions = [ordered]@{
     MIR4CanonicalPackageAuthorityV2 = 'spec/schemas/mir4-canonical-package-authority-v2.schema.json'
     MIR4ComposablePackageSourceV2 = 'spec/schemas/mir4-composable-package-source-v2.schema.json'
+    MIR4ComposablePackageSourceV3 = 'spec/schemas/mir4-composable-package-source-v3.schema.json'
     MIR4TargetRegistryV2 = 'spec/schemas/mir4-target-registry-v2.schema.json'
     MIR4TargetSupportPolicyV1 = 'spec/schemas/mir4-target-support-policy-v1.schema.json'
     MIR4TargetCompositionV2 = 'spec/schemas/mir4-target-composition-v2.schema.json'
@@ -27,7 +28,7 @@ function Get-MIR4TargetMaterializerState {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $registry = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV2'
   $support = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
   $targetRows = @($registry.targets | Where-Object { [string]$_.target -ceq $Target })
@@ -222,7 +223,7 @@ function Invoke-MIR4TargetMaterializerParity {
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$a.tree_path))
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$b.tree_path))
   }
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $report = [pscustomobject][ordered]@{schema=1;kind='MIR4EditableSourceMaterializerProofV1';status='passed-four-target-canonical-package-authority-parity';materializer_abi=[string]$manifest.materializer_abi;package_authority_sha256=[string]$authority.record_sha256;package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo);source_manifest_sha256=[string]$manifest.record_sha256;targets=@($rows);invariants=[pscustomobject][ordered]@{four_target_determinism=$true;historical_archives_are_comparison_fixtures_only=$true;production_materializer_has_no_archive_input=$true;accepted_baseline_reconstruction=$true;package_cutover_complete=$true};transition_gate=[pscustomobject][ordered]@{package_cutover=$true;old_writer_retirement=$true;tagging=$false;signing=$false;sealing=$false;version_allocation=$false;publication=$false};record_sha256=''}
   $report.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $report
@@ -292,7 +293,7 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$a.tree_path))
     Remove-MIR4BuildTree -OutputRoot $absoluteOutput -Path (Split-Path -Parent ([string]$b.tree_path))
   }
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $report = [pscustomobject][ordered]@{
     schema=1
@@ -337,7 +338,7 @@ function Update-MIR4CurrentSourceBindings {
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   # Refresh only existing, admitted paths. Membership, target scope, transforms,
   # versioning and support remain separately reviewed authorities.
-  $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/package-authority.json' -Kind 'MIR4CanonicalPackageAuthorityV2'
   $records=[ordered]@{}
   $identities=@{}
@@ -364,7 +365,7 @@ function Update-MIR4CurrentSourceBindings {
     $identities[$relative]=$sha
   }
   $manifest.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $manifest
-  $records['source/package-source.json']=@{record=$manifest;schema='mir4-composable-package-source-v2.schema.json'}
+  $records['source/package-source.json']=@{record=$manifest;schema='mir4-composable-package-source-v3.schema.json'}
   foreach($target in @('f210','f200','f110','f100')) {
     $path="targets/$target/composition.json"
     $composition=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $path -Kind 'MIR4TargetCompositionV2'

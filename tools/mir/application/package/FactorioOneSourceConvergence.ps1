@@ -72,7 +72,7 @@ function Get-MIR4FactorioOneConvergenceCharacterization {
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $baselineManifestBytes = Read-MIR4GitBlobBytes -RepoRoot $repo -Commit $BaselineRevision -RelativePath 'source/package-source.json'
   $baselineManifest = ([Text.UTF8Encoding]::new($false).GetString($baselineManifestBytes) | ConvertFrom-Json -Depth 100 -DateKind String)
-  $currentManifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $currentManifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $baselineF1 = @($baselineManifest.bindings | Where-Object { [string]$_.source_path -like 'source/compatibility/factorio-1/*' } | Sort-Object output_path -CaseSensitive)
   if ($baselineF1.Count -ne 81) { throw "[mir4-factorio-one-convergence-baseline-cardinality] $($baselineF1.Count)" }
   $baselinePeers = @{}
@@ -146,7 +146,7 @@ function Get-MIR4FactorioOneSourceConvergenceProof {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+  $manifest = Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $characterization = Get-MIR4FactorioOneConvergenceCharacterization -RepoRoot $repo -BaselineRevision $BaselineRevision
   $physical = @(
     Get-ChildItem -LiteralPath (Join-Path $repo 'source') -File -Recurse |

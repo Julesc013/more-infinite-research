@@ -118,11 +118,11 @@ function Get-MIR4FactorioOneSourceConvergenceStaticProof {
 function Get-MIR4FactorioOneSourceConvergenceCurrentAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $manifest = Read-MIR4FactorioOneSourceConvergenceRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -SchemaRelativePath 'spec/schemas/mir4-composable-package-source-v2.schema.json' -Code 'mir4-factorio-one-convergence-manifest'
+  $manifest = Read-MIR4FactorioOneSourceConvergenceRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -SchemaRelativePath 'spec/schemas/mir4-composable-package-source-v3.schema.json' -Code 'mir4-factorio-one-convergence-manifest'
   $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
   $registry = Read-MIR4FactorioOneSourceConvergenceRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -SchemaRelativePath 'spec/schemas/mir4-target-registry-v2.schema.json' -Code 'mir4-factorio-one-convergence-registry'
   if (-not (Test-MIR4BootstrapRecordHash -Record $manifest) -or -not (Test-MIR4BootstrapRecordHash -Record $authority) -or -not (Test-MIR4BootstrapRecordHash -Record $registry) -or
-      [string]$manifest.kind -cne 'MIR4ComposablePackageSourceV2' -or [string]$manifest.source_state -cne 'canonical-composable-package-source' -or
+      [string]$manifest.kind -cne 'MIR4ComposablePackageSourceV3' -or [string]$manifest.source_state -cne 'canonical-composable-package-source' -or
       [string]$authority.writer.implementation -cne 'tools/mir/application/package/TargetMaterializer.ps1' -or
       [string]$authority.source_manifest.path -cne 'source/package-source.json') {
     throw '[mir4-factorio-one-convergence-current-authority]'

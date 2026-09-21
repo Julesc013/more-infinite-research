@@ -207,10 +207,10 @@ package_excluded_modules:
     package_cutover_authority: false
     release_transition_authority: false
     runtime_replay_required_before_cutover: true
-  mir4_composable_source_materializer_v2:
+  mir4_composable_source_materializer_v3:
     predecessor: releases/migrations/MIR4-M41-F2B-Shadow-Source-Model-Authority-EvolutionV1.json
     source_manifest: source/package-source.json
-    source_manifest_schema: spec/schemas/mir4-composable-package-source-v2.schema.json
+    source_manifest_schema: spec/schemas/mir4-composable-package-source-v3.schema.json
     package_authority: targets/package-authority.json
     package_authority_schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
     package_authority_application: tools/mir/application/package/PackageAuthority.ps1
@@ -493,8 +493,8 @@ package_excluded_modules:
     automation_authority_cutover_receipt: releases/migrations/MIR4-Post-Release-Automation-Authority-CutoverV1.json
     automation_authority_cutover_schema: contracts/repository/mir4-post-release-automation-authority-cutover-v1.schema.json
     automation_authority_cutover_writer: tools/commands/mir4/Update-MIR4PostReleaseAutomationAuthorityCutover.ps1
-    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v6.json
-    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v6.schema.json
+    current_package_presentation_authority: spec/distribution/mir4-current-package-presentation-v7.json
+    current_package_presentation_schema: spec/schemas/mir4-current-package-presentation-v7.schema.json
     current_package_presentation_writer: tools/commands/mir4/Update-MIR4CurrentPackagePresentationV6Authority.ps1
     frozen_package_presentation_v5: spec/distribution/mir4-current-package-presentation-v5.json
     frozen_package_presentation_v5_schema: spec/schemas/mir4-current-package-presentation-v5.schema.json

@@ -5,8 +5,8 @@ paths:
   package.root: source
   package.targets: targets
   package.generated: build/packages
-  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v6.json
-  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v6.schema.json
+  mir4.package-presentation.current: spec/distribution/mir4-current-package-presentation-v7.json
+  mir4.package-presentation.current-schema: spec/schemas/mir4-current-package-presentation-v7.schema.json
   mir4.package-presentation.frozen-v5: spec/distribution/mir4-current-package-presentation-v5.json
   mir4.package-presentation.frozen-v5-schema: spec/schemas/mir4-current-package-presentation-v5.schema.json
   mir4.package-presentation.frozen-v4: spec/distribution/mir4-current-package-presentation-v4.json
@@ -131,7 +131,7 @@ paths:
   mir4.package-source.composable-source-model-proof-schema: spec/schemas/mir4-composable-source-model-proof-v2.schema.json
   mir4.package-source.composable-source-model-proof: tests/mir4/Test-MIR4ComposableSourceModelM4202.ps1
   mir4.package-source.editable-source-manifest: source/package-source.json
-  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-composable-package-source-v2.schema.json
+  mir4.package-source.editable-source-manifest-schema: spec/schemas/mir4-composable-package-source-v3.schema.json
   mir4.package-source.canonical-authority: targets/package-authority.json
   mir4.package-source.canonical-authority-schema: spec/schemas/mir4-canonical-package-authority-v2.schema.json
   mir4.package-source.canonical-authority-application: tools/mir/application/package/PackageAuthority.ps1

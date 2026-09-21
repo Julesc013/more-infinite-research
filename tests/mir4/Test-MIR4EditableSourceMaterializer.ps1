@@ -12,7 +12,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $historicalPackage='8D59F97AC6A42917A22E160E492ED94854D3D377C57D22C3FE27AE6A9C77A336'
 $historicalReadme='DF5D4D801DC4A416E4F7C9826EB2E3AE6CFD915937C8599CA7307CCEB343F947'
 $schemaPairs=[ordered]@{
-  'source/package-source.json'='spec/schemas/mir4-composable-package-source-v2.schema.json'
+  'source/package-source.json'='spec/schemas/mir4-composable-package-source-v3.schema.json'
   'targets/package-authority.json'='spec/schemas/mir4-canonical-package-authority-v2.schema.json'
   'targets/registry.json'='spec/schemas/mir4-target-registry-v2.schema.json'
   'targets/support-policy.json'='spec/schemas/mir4-target-support-policy-v1.schema.json'
@@ -24,7 +24,7 @@ $schemaPairs=[ordered]@{
 foreach($pair in $schemaPairs.GetEnumerator()){
   if(-not((Get-Content -Raw -LiteralPath (Join-Path $repo $pair.Key))|Test-Json -SchemaFile (Join-Path $repo $pair.Value))){throw "[mir4-editable-source-schema] $($pair.Key)"}
 }
-$manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV2'
+$manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
 $registry=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/registry.json' -Kind 'MIR4TargetRegistryV2'
 $support=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/support-policy.json' -Kind 'MIR4TargetSupportPolicyV1'
 $schemaScratchRelative = 'build/mir4/test-canonical-package-record-schema-' + [guid]::NewGuid().ToString('N')
@@ -35,7 +35,9 @@ try {
     [pscustomobject]@{id='authority-unknown';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
     [pscustomobject]@{id='authority-invalid-gate';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)$r.transition_gate.publication=$true}},
     [pscustomobject]@{id='authority-missing-writer';path='targets/package-authority.json';kind='MIR4CanonicalPackageAuthorityV2';schema='spec/schemas/mir4-canonical-package-authority-v2.schema.json';mutate={param($r)[void]$r.PSObject.Properties.Remove('writer')}},
-    [pscustomobject]@{id='manifest-unknown';path='source/package-source.json';kind='MIR4ComposablePackageSourceV2';schema='spec/schemas/mir4-composable-package-source-v2.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
+    [pscustomobject]@{id='manifest-unknown';path='source/package-source.json';kind='MIR4ComposablePackageSourceV3';schema='spec/schemas/mir4-composable-package-source-v3.schema.json';mutate={param($r)$r|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}},
+    [pscustomobject]@{id='manifest-missing-provenance';path='source/package-source.json';kind='MIR4ComposablePackageSourceV3';schema='spec/schemas/mir4-composable-package-source-v3.schema.json';mutate={param($r)[void]$r.bindings[0].PSObject.Properties.Remove('provenance')}},
+    [pscustomobject]@{id='manifest-ambiguous-provenance';path='source/package-source.json';kind='MIR4ComposablePackageSourceV3';schema='spec/schemas/mir4-composable-package-source-v3.schema.json';mutate={param($r)$introduced=@($r.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'});$introduced[0].provenance|Add-Member -NotePropertyName predecessor_source_path -NotePropertyValue 'src/mod/forged.lua'}},
     [pscustomobject]@{id='registry-invalid-target';path='targets/registry.json';kind='MIR4TargetRegistryV2';schema='spec/schemas/mir4-target-registry-v2.schema.json';mutate={param($r)$r.targets[0].target='f999'}},
     [pscustomobject]@{id='support-missing';path='targets/support-policy.json';kind='MIR4TargetSupportPolicyV1';schema='spec/schemas/mir4-target-support-policy-v1.schema.json';mutate={param($r)[void]$r.PSObject.Properties.Remove('invariants')}},
     [pscustomobject]@{id='composition-unknown';path='targets/f210/composition.json';kind='MIR4TargetCompositionV2';schema='spec/schemas/mir4-target-composition-v2.schema.json';mutate={param($r)$r.operations[0]|Add-Member -NotePropertyName unexpected -NotePropertyValue $true}}
@@ -56,7 +58,9 @@ try {
 } finally {
   if (Test-Path -LiteralPath $schemaScratch -PathType Container) { Remove-Item -LiteralPath $schemaScratch -Recurse -Force }
 }
-if(@($manifest.bindings).Count-ne359-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne359-or@($manifest.bindings.predecessor_source_path|Sort-Object -Unique).Count-ne359){throw '[mir4-editable-source-binding-uniqueness]'}
+$migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
+$introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
+if(@($manifest.bindings).Count-ne360-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne360-or$migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or$introducedBindings.Count-ne1-or[string]$introducedBindings[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'){throw '[mir4-editable-source-binding-uniqueness]'}
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
 if(@($targetOutputs|Sort-Object -Unique).Count-ne$targetOutputs.Count){throw '[mir4-editable-source-target-output-uniqueness]'}
 if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or(@($support.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'){throw '[mir4-editable-source-four-target-authority]'}
@@ -133,7 +137,7 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  $expectedDelta=if($target-in@('f210','f200')){33}else{103}
+  $expectedDelta=if($target-in@('f210','f200')){34}else{104}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

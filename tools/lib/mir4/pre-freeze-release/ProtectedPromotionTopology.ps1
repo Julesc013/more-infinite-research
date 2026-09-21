@@ -470,10 +470,10 @@ function Assert-MIR4A08PresentationBinding {
   Assert-MIR4A08PropertyNames $Binding @('path','kind','git_blob','record_sha256','package_source_fingerprint_sha256','source_manifest','package_authority') '[mir4-a08-package-presentation]'
   Assert-MIR4A08PropertyNames $Binding.source_manifest @('path','kind','git_blob','record_sha256') '[mir4-a08-package-presentation]'
   Assert-MIR4A08PropertyNames $Binding.package_authority @('path','kind','git_blob','record_sha256') '[mir4-a08-package-presentation]'
-  if ([string]$Binding.path-cne'spec/distribution/mir4-current-package-presentation-v6.json'-or
-      [string]$Binding.kind-cne'MIR4CurrentPackagePresentationV6'-or
+  if ([string]$Binding.path-cne'spec/distribution/mir4-current-package-presentation-v7.json'-or
+      [string]$Binding.kind-cne'MIR4CurrentPackagePresentationV7'-or
       [string]$Binding.source_manifest.path-cne'source/package-source.json'-or
-      [string]$Binding.source_manifest.kind-cne'MIR4ComposablePackageSourceV2'-or
+      [string]$Binding.source_manifest.kind-cne'MIR4ComposablePackageSourceV3'-or
       [string]$Binding.package_authority.path-cne'targets/package-authority.json'-or
       [string]$Binding.package_authority.kind-cne'MIR4CanonicalPackageAuthorityV2') {
     throw '[mir4-a08-package-presentation]'

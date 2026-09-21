@@ -43,8 +43,8 @@ function New-MIR4ComposableSourceModel {
   $manifest = Read-MIR4ComposableSourceModelRecord `
     -RepoRoot $repo `
     -RelativePath $manifestRelative `
-    -SchemaRelativePath 'spec/schemas/mir4-composable-package-source-v2.schema.json' `
-    -ExpectedKind 'MIR4ComposablePackageSourceV2'
+    -SchemaRelativePath 'spec/schemas/mir4-composable-package-source-v3.schema.json' `
+    -ExpectedKind 'MIR4ComposablePackageSourceV3'
   if ([string]$manifest.record_sha256 -cne [string]$authority.source_manifest.record_sha256) {
     throw '[mir4-composable-source-model-manifest-authority]'
   }
