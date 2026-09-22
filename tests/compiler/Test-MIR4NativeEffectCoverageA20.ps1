@@ -112,6 +112,7 @@ Assert-MIR4NativeCoverage (-not $basePlan.Contains('planned_overlap_identities =
 
 $weaponPolicy = Read-MIR4NativeCoverageOutput $f210 'prototypes/mir/policy/weapon_speed.lua'
 foreach ($snippet in @(
+  'require("prototypes.mir.platform.factorio.data_raw")',
   'require("prototypes.streams.direct-effects")',
   'local function has_non_continuation_owner',
   'is_mir_weapon_speed_base_extension_owner(owner)',

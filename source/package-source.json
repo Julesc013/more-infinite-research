@@ -1305,10 +1305,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/policy/weapon_speed.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3067,
-      "source_sha256": "A24E6337A50D62CEABC957C578211A0A8BD0523FDED295066B5E38464BBAA146",
-      "output_bytes": 3067,
-      "output_sha256": "A24E6337A50D62CEABC957C578211A0A8BD0523FDED295066B5E38464BBAA146"
+      "source_bytes": 3137,
+      "source_sha256": "50533F3EC3026F2E18C53E350206083F0BD15ED18E491129D4D602D978A16B11",
+      "output_bytes": 3137,
+      "output_sha256": "50533F3EC3026F2E18C53E350206083F0BD15ED18E491129D4D602D978A16B11"
     },
     {
       "layer": "shared",
@@ -7369,5 +7369,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "E34592F6D40EEEB136F36851524E83481BF44BFFBFB11CD42BA96D8C91B38661"
+  "record_sha256": "EE4D6EE49FD537B6D4A74F0549BBBA0E60142DF535ECB69CE7B1A7B15488150D"
 }

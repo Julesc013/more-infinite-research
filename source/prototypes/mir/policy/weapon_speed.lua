@@ -1,3 +1,4 @@
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
