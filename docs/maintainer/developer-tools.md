@@ -79,7 +79,7 @@ Reusable defaults live in `fixtures/run-profiles/`.
 | `local-bz-smoke` | Narrow BZ Space Age local smoke. |
 | `top25-space-age` | Credentialed top-25 Space Age compatibility audit. |
 
-Run `Test-MIRLocalModLibraryCatalog.ps1` before expensive local sweeps to verify that the local zip library contains the root mods named by the committed local-library scenario file. This is metadata-only; it does not launch Factorio or call the Mod Portal.
+Run `Test-MIRLocalModLibraryCatalog.ps1` before expensive local sweeps to verify that the local zip library contains every external root mod named by the committed local-library scenario file. Checked-in assertion fixtures are resolved by mod identity and reported separately. This is metadata-only; it does not launch Factorio or call the Mod Portal.
 
 Prefer adding or editing a profile over hardcoding paths in `mir.ps1`. Local machine paths are acceptable in profiles because they are explicit operator defaults and easy to override.
 

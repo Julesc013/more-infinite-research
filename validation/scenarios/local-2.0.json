@@ -156,8 +156,7 @@
       "roots": [
         "angelsrefining",
         "angelssmelting",
-        "angelspetrochem",
-        "angelsindustries"
+        "angelspetrochem"
       ],
       "settings": {},
       "expected_plan": {
@@ -167,7 +166,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Core Angel scenario for legacy overhaul compatibility checks."
+      "notes": "Dependency-valid Factorio 2.0 Angel core scenario. Angel's Industries is omitted because no Factorio 2.0 artifact is available in the governed local library."
     },
     {
       "name": "local-2-0-bob-angels",
@@ -189,8 +188,7 @@
         "bobtech",
         "angelsrefining",
         "angelssmelting",
-        "angelspetrochem",
-        "angelsindustries"
+        "angelspetrochem"
       ],
       "settings": {},
       "expected_plan": {
@@ -200,7 +198,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Combined Bob and Angel legacy scenario. Dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
+      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
     },
     {
       "name": "local-2-0-krastorio2",

@@ -4467,9 +4467,9 @@
     {
       "path": "tools/lib/validation/runner/StaticCompatibilityTooling.ps1",
       "classification": "canonical-internal",
-      "sha256": "62BF5CB8F482800F4BADDA0CD0516F3A425FB0B5AB1ABD2B9C109A6894A6EF89",
+      "sha256": "60DE0F19D8746CD5CF5B951D4A6160CC7C2F8BE1EE25E6D4ACF099656BD94C9C",
       "hash_mode": "canonical-text-v1",
-      "lines": 245,
+      "lines": 247,
       "package_visible": false
     },
     {
@@ -5794,5 +5794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:7a34fab0fcc0a58616e26094a886f2633aead83d4a6ad05a28fe3680ce80fdbe"
+  "digest": "sha256:8337f73d6829fbfcbc4afa72db0de8ca437065371f172de7397e2eb5cfa8a55d"
 }
