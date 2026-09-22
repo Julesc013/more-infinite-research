@@ -517,6 +517,34 @@ function Test-MIR4M4202CurrentBindingHashes {
   } catch { return $false }
 }
 
+function Test-MIR4M4202CommittedWorktreeFileConsistency {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string[]]$RelativePaths
+  )
+
+  # HEAD is an integrity reference for the current worktree, not a semantic
+  # authority.  This guard can reject uncommitted drift in named files, but it
+  # cannot authenticate a current contract merely by deriving expectations
+  # from those same committed bytes.
+  try {
+    $expected = @{}
+    foreach ($path in @($RelativePaths)) {
+      $portable = ([string]$path).Replace('\', '/').TrimStart('/')
+      if ([string]::IsNullOrWhiteSpace($portable) -or
+          [IO.Path]::IsPathRooted([string]$path) -or
+          $portable -match '(^|/)\.\.(/|$)') {
+        return $false
+      }
+      $expected[$portable] = $null
+    }
+    if ($expected.Count -eq 0) { return $false }
+    return Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $RepoRoot -ExpectedBindingSha $expected
+  } catch { return $false }
+}
+
 function Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint {
   [CmdletBinding()]
   [OutputType([bool])]

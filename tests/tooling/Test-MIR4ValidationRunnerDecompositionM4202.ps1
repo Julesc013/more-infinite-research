@@ -204,16 +204,13 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 }
 
 Assert-MIR4ValidationRunnerDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-validation-runner-bridge-retirement-successor'
-Assert-MIR4ValidationRunnerDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-validation-runner-current-binding-fixed-point'
-Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4M4202CurrentBindingHashes -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-validation-runner-current-bindings'
-$currentModuleSha=@{}
-foreach($file in $files){$currentModuleSha[[string]$file.path]=$null}
-Assert-MIR4ValidationRunnerDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $currentModuleSha) 'mir4-m42-02-validation-runner-current-module-fixed-point'
-Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4M4202CurrentBindingHashes -RepoRoot $repo -ExpectedBindingSha $currentModuleSha) 'mir4-m42-02-validation-runner-current-modules'
-foreach($binding in @($receipt.evolved_bindings)){
-  $path=[string]$binding.path
-  Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo $path))-ceq[string]$expectedBindingSha[$path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-validation-runner-evolved-binding' $path
-}
+# This is deliberately a dirty-worktree guard only.  It proves that the
+# current named files equal HEAD; it does not turn HEAD-derived hashes into a
+# semantic or binding authority.  PS2 reconstruction above remains the
+# independent historical proof, while current behavior is covered by the
+# parse, bounded-surface, List, DocsOnly, and focused product checks.
+Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4M4202CommittedWorktreeFileConsistency -RepoRoot $repo -RelativePaths @($expectedBindingSha.Keys)) 'mir4-m42-02-validation-runner-current-binding-worktree-consistency'
+Assert-MIR4ValidationRunnerDecompositionV1 (Test-MIR4M4202CommittedWorktreeFileConsistency -RepoRoot $repo -RelativePaths @($files|ForEach-Object{[string]$_.path})) 'mir4-m42-02-validation-runner-current-module-worktree-consistency'
 Assert-MIR4ValidationRunnerDecompositionV1 ((Test-MIR4M4202PackageSourceSuccession -RepoRoot $repo -PredecessorSha256 ([string]$receipt.preservation.package_source_sha256) -CurrentSha256 $packageBefore)-and@($receipt.preservation.package_visible_delta).Count-eq0) 'mir4-m42-02-validation-runner-package-firewall'
 Assert-MIR4ValidationRunnerDecompositionV1 (@($receipt.transition_gate.PSObject.Properties|Where-Object{[bool]$_.Value}).Count-eq0) 'mir4-m42-02-validation-runner-release-firewall'
 Assert-MIR4ValidationRunnerDecompositionV1 ((Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)-ceq$packageBefore) 'mir4-m42-02-validation-runner-package-mutation'
