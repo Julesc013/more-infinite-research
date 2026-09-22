@@ -211,23 +211,32 @@ local function minable_results(source)
   return minable.results or {}
 end
 
-local function default_source_catalog(state)
-  if state.source_catalog then return state.source_catalog end
-  local sources = {}
-  for _, resource in pairs(data_raw.prototypes("resource")) do
-    for _, result in ipairs(minable_results(resource)) do
+local function append_minable_sources(sources, prototype_type, witness_kind)
+  for _, source in pairs(data_raw.prototypes(prototype_type)) do
+    for _, result in ipairs(minable_results(source)) do
       local identity = normalize_identity(result)
       if identity and entry_positive(result) then
         local key = identity_key(identity)
         sources[key] = sources[key] or {}
         table.insert(sources[key], {
-          kind = "minable-resource",
+          kind = witness_kind,
           product = identity,
-          surface_conditions = deepcopy(resource.surface_conditions)
+          surface_conditions = deepcopy(source.surface_conditions)
         })
       end
     end
   end
+end
+
+local function default_source_catalog(state)
+  if state.source_catalog then return state.source_catalog end
+  local sources = {}
+  append_minable_sources(sources, "resource", "minable-resource")
+  -- Trees are concrete natural acquisition sources (for example, the
+  -- starting wood used by an early electronics board).  They are not stored
+  -- in data.raw.resource, so omitting their MinableProperties turns a real
+  -- seeded route into a false no-source cycle.
+  append_minable_sources(sources, "tree", "minable-entity")
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     local identity = normalize_identity({type = "fluid", name = pump.fluid})
     if identity then
@@ -343,6 +352,10 @@ local function cacheable(options)
   return type(options.source_witness) ~= "function"
     and type(options.machine_category_witness) ~= "function"
     and type(options.surface_witness) ~= "function"
+    -- An unlock witness is contextual: its caller carries the active
+    -- technology/science traversal.  A conclusion from that branch must not
+    -- become a reusable acquisition answer for another traversal.
+    and type(options.research_unlock_witness) ~= "function"
 end
 
 -- A source witness or one enabled recipe alternative proves a product. The
@@ -377,6 +390,20 @@ acquisition_witness = function(output_identity, options, state)
       return witness
     end
   end
+  -- An enabled route is preferred, but an ingredient can also be supplied by
+  -- a concrete recipe whose unlock technology is already researchable.  The
+  -- caller supplies that proof because this generic structural module neither
+  -- owns the technology graph nor decides which research mechanisms qualify.
+  -- Keep the output active while asking for it so a locked reciprocal route
+  -- remains an unseeded cycle rather than becoming a bootstrap witness.
+  if type(options.research_unlock_witness) == "function" then
+    local witness = options.research_unlock_witness(deepcopy(output_identity), state)
+    if witness then
+      state.visiting[key] = nil
+      if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
+      return witness
+    end
+  end
   state.visiting[key] = nil
   if may_cache then state.acquisition_memo[key] = false end
   return nil
@@ -392,11 +419,17 @@ end
 -- Prove a concrete route for a named output. Locked recipes may be checked as
 -- future production routes with require_enabled=false; their inputs still use
 -- only enabled alternatives or declared natural sources.
-function M.recipe_witness(recipe_name, output, options)
+function M.recipe_witness(recipe_name, output, options, state)
   local output_identity = normalize_identity(output)
   if not output_identity then return nil end
   local resolved = resolved_options(options)
-  return route_for_recipe(recipe_name, output_identity, resolved, new_state(resolved.recipe_index), resolved.require_enabled == true)
+  return route_for_recipe(
+    recipe_name,
+    output_identity,
+    resolved,
+    query_state(state, resolved.recipe_index),
+    resolved.require_enabled == true
+  )
 end
 
 function M.initial_recipe_witness(recipe_name, output, options)

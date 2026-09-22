@@ -120,7 +120,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/capabilities/README.md | Capabilities | current | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/capabilities/recipe-productivity.md | Recipe Productivity Capability | current | developer | explanation | mir-maintainers | 2026-07-12 |
 | docs/capabilities/rule-surfaces.md | Rule Surfaces Capability | current | developer | explanation | mir-maintainers | 2026-07-07 |
-| docs/capabilities/science-integration.md | Science Integration Capability | current | developer | explanation | mir-maintainers | 2026-07-10 |
+| docs/capabilities/science-integration.md | Science Integration Capability | current | developer | explanation | mir-maintainers | 2026-09-22 |
 | docs/capabilities/tile-surfaces.md | Tile Surfaces Capability | draft | developer | explanation | mir-maintainers | 2026-07-07 |
 | docs/compatibility/backport-ledger.md | 3.0.5 Backport Behavior Ledger | current | maintainer | reference | mir-maintainers | 2026-07-11 |
 | docs/compatibility/campaigns/factorio-2.0-lane.md | Factorio 2.0 Lane | draft | release-manager | release-plan | mir-maintainers | 2026-07-07 |

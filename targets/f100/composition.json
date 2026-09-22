@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 10432,
-      "expected_sha256": "B3EE1ADF007284C5501E66B333A4F21AFD5F5B9A8EB12B3E38662D4DF38E484B",
+      "expected_bytes": 15228,
+      "expected_sha256": "E1B115BDFE8FAE21DB730CAE296908ED48A9CED2AFFBD71C9117C664502C5056",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16111,
-      "expected_sha256": "825896AD24077BD563600B308FDBCCEE5050AA74684BE5A15040283A0327C836",
+      "expected_bytes": 17669,
+      "expected_sha256": "D91E0C2249238AA32093E9330CDD2731C24C869E9C4CD6A2E6B66CBEE2CD9C53",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3630,
-      "expected_sha256": "95305C1745565238F9728C2CE8850F139FE898D9948E4DD3640CA7A6CC3CB63D",
+      "expected_bytes": 3036,
+      "expected_sha256": "8EA572F60D2EA4B77431D630E74E7D5ABCE283B6368F687EBDA2A94F2A797B61",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "182523B3DA9EFA9E5C7AF80E3273913B25A435B69FD84BE19642C3EA65C25B72"
+  "record_sha256": "73CADEFEF8BADF0E8D26E628EAF671FFCE3CCB60837C6C85B881A1C5827BC37E"
 }

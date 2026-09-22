@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10432,
-      "source_sha256": "B3EE1ADF007284C5501E66B333A4F21AFD5F5B9A8EB12B3E38662D4DF38E484B",
-      "output_bytes": 10432,
-      "output_sha256": "B3EE1ADF007284C5501E66B333A4F21AFD5F5B9A8EB12B3E38662D4DF38E484B"
+      "source_bytes": 15228,
+      "source_sha256": "E1B115BDFE8FAE21DB730CAE296908ED48A9CED2AFFBD71C9117C664502C5056",
+      "output_bytes": 15228,
+      "output_sha256": "E1B115BDFE8FAE21DB730CAE296908ED48A9CED2AFFBD71C9117C664502C5056"
     },
     {
       "layer": "capability",
@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 16111,
-      "source_sha256": "825896AD24077BD563600B308FDBCCEE5050AA74684BE5A15040283A0327C836",
-      "output_bytes": 16111,
-      "output_sha256": "825896AD24077BD563600B308FDBCCEE5050AA74684BE5A15040283A0327C836"
+      "source_bytes": 17669,
+      "source_sha256": "D91E0C2249238AA32093E9330CDD2731C24C869E9C4CD6A2E6B66CBEE2CD9C53",
+      "output_bytes": 17669,
+      "output_sha256": "D91E0C2249238AA32093E9330CDD2731C24C869E9C4CD6A2E6B66CBEE2CD9C53"
     },
     {
       "layer": "capability",
@@ -3007,10 +3007,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3630,
-      "source_sha256": "95305C1745565238F9728C2CE8850F139FE898D9948E4DD3640CA7A6CC3CB63D",
-      "output_bytes": 3630,
-      "output_sha256": "95305C1745565238F9728C2CE8850F139FE898D9948E4DD3640CA7A6CC3CB63D"
+      "source_bytes": 3036,
+      "source_sha256": "8EA572F60D2EA4B77431D630E74E7D5ABCE283B6368F687EBDA2A94F2A797B61",
+      "output_bytes": 3036,
+      "output_sha256": "8EA572F60D2EA4B77431D630E74E7D5ABCE283B6368F687EBDA2A94F2A797B61"
     },
     {
       "layer": "capability",
@@ -7369,5 +7369,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "2D5204060DAB6E496EA30E207BE9C3878230A21CB8B40D54E02F5AB724E7893D"
+  "record_sha256": "A02B1F40B132EE4029CDC4263D6788FF5D75E0EA1469B6BA888C91191B3F3214"
 }

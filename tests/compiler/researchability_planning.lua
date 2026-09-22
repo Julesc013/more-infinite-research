@@ -1,5 +1,5 @@
 -- Controlled module tests, not a package, save, or ecosystem qualification.
-local world, context, target_profile
+local world, context
 local checks = 0
 
 local function stub(name, value) package.loaded[name] = value end
@@ -13,9 +13,6 @@ _G.log = function(_) end
 _G.data = {raw = {}, extend = function() error("Unexpected prototype mutation") end}
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   item_prototype = function(name) return world.item_prototypes[name] end
-})
-stub("prototypes.mir.platform.factorio.target_profiles", {
-  current = function() return target_profile end
 })
 stub("prototypes.mir.capabilities.science_integration.lab_compatibility", {
   ingredient_name = function(ingredient) return ingredient.name or ingredient[1] end,
@@ -55,15 +52,15 @@ local production = require("prototypes.mir.capabilities.science_integration.pack
 local researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
 local feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
 
-local function reset(next_world, kinds)
+local function reset(next_world)
   world = next_world
-  target_profile = {prototype_shapes = {science_pack_prototype_kinds = kinds}}
   data.raw = {
     lab = world.labs or {},
     technology = world.techs or {},
     recipe = world.recipe_prototypes or {},
     character = world.characters or {player = {crafting_categories = {"crafting"}}},
     resource = world.resources or {},
+    tree = world.trees or {},
     ["offshore-pump"] = world.offshore_pumps or {},
     surface = world.surfaces or {},
     ["space-location"] = world.space_locations or {},
@@ -108,17 +105,24 @@ local function representation_world(prototypes)
   }
 end
 
--- Representation follows the selected target contract, never the name or
--- content shape of automation-science-pack (which is absent from this world).
-reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}), {"item"})
-check("R01", registry.science_pack_exists("custom-item-pack") and not registry.science_pack_exists("custom-tool-pack"),
-  "F210 item contract accepts an item science pack without a vanilla-name probe")
-reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}), {"tool"})
-check("R02", registry.science_pack_exists("custom-tool-pack") and not registry.science_pack_exists("custom-item-pack"),
-  "F200 tool contract accepts the tool representation")
-reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}), {"item", "tool"})
-check("R03", registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
-  "A declared mixed representation accepts both kinds deterministically")
+-- A physical item listed by a lab is a research pack regardless of a target
+-- profile's nominal prototype kind.  No vanilla-named pack is present here,
+-- and this harness deliberately provides no target-profile module: accidental
+-- reintroduction of representation inference makes the controlled load fail.
+reset(representation_world({["custom-item-pack"] = {type = "item"}, ["custom-tool-pack"] = {type = "tool"}}))
+check("R01", registry.science_pack_exists("custom-item-pack") and registry.science_pack_exists("custom-tool-pack"),
+  "Lab-listed physical item and tool packs are admitted without a vanilla-name or target-kind probe")
+check("R02", table.concat(registry.all_lab_inputs(), ",") == "custom-item-pack,custom-tool-pack",
+  "Lab-input admission remains deterministic across concrete item representations")
+reset({
+  item_prototypes = {orphan = {type = "item"}},
+  labs = {lab = {inputs = {"missing-prototype"}}},
+  techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}
+})
+check("R03", not registry.science_pack_exists("orphan"),
+  "A physical item absent from every lab remains excluded")
+check("R04", not registry.science_pack_exists("missing-prototype"),
+  "A lab input without a physical item prototype remains excluded")
 
 local function technology(pack, unlock_recipe)
   local technology = {enabled = true, unit = {count = 1, time = 1, ingredients = {{name = pack, amount = 1}}}}
@@ -153,34 +157,34 @@ local function pack_world(seed, initial_first)
 end
 
 -- An initially available A must make B researchable in both cold query orders.
-reset(pack_world(true, true), {"item"})
+reset(pack_world(true, true))
 local a = production.pack_production_status("A", {})
 local b = production.pack_production_status("B", {})
 check("C01", a == "initial" and b == "research" and context.states.science_pack_production.entries.B.status == "research",
   "A then B is order-independent and caches only the resolved B route")
 check("C02", production.pack_production_status("B", {}) == "research",
   "Warm B query reuses the resolved root result")
-reset(pack_world(true, true), {"item"})
+reset(pack_world(true, true))
 b = production.pack_production_status("B", {})
 a = production.pack_production_status("A", {})
 check("C03", a == "initial" and b == "research",
   "B then A reaches the same seeded acquisition closure")
-reset(pack_world(true, false), {"item"})
+reset(pack_world(true, false))
 a = production.pack_production_status("A", {})
 b = production.pack_production_status("B", {})
 check("C04", a == "initial" and b == "research",
   "Producer declaration order cannot change the seeded closure")
-reset(pack_world(false, true), {"item"})
+reset(pack_world(false, true))
 a = production.pack_production_status("A", {})
 b = production.pack_production_status("B", {})
 check("C05", a == "unreachable" and b == "unreachable",
   "A genuinely unseeded production cycle remains rejected")
-reset(pack_world(false, true), {"item"})
+reset(pack_world(false, true))
 b = production.pack_production_status("B", {})
 a = production.pack_production_status("A", {})
 check("C06", a == "unreachable" and b == "unreachable",
   "The unseeded rejection is also query-order independent")
-reset(pack_world(true, true), {"item"})
+reset(pack_world(true, true))
 local conditional_b = production.pack_production_status("B", {}, {TechA = true})
 b = production.pack_production_status("B", {})
 check("C07", conditional_b == "unreachable" and b == "research",
@@ -207,7 +211,7 @@ local function improved_world(seed)
   }
 end
 
-reset(improved_world(true), {"item"})
+reset(improved_world(true))
 local improved_reason = researchability.reason_with_context("TechA", {
   visiting_packs = {}, visiting_technologies = {}, unlock_recipe_name = "A-improved"
 })
@@ -224,7 +228,7 @@ check("I01A", improved_reason == nil,
 -- must not hide that source merely because a recipe row exists for the pack.
 local source_seeded_improved = improved_world(false)
 source_seeded_improved.resources = {A_source = {minable = {result = "A", count = 1}}}
-reset(source_seeded_improved, {"item"})
+reset(source_seeded_improved)
 improved_reason = researchability.reason_with_context("TechA", {
   visiting_packs = {}, visiting_technologies = {}, unlock_recipe_name = "A-improved"
 })
@@ -232,7 +236,7 @@ improved_unlockers = production.researchable_unlockers_for_recipe("A-improved")
 check("I01B", improved_reason == nil and production.pack_production_status("A", {}) == "non-recipe"
   and #improved_unlockers == 1 and improved_unlockers[1] == "TechA",
   "An independent direct source permits an improved A producer despite its self-output recipe")
-reset(improved_world(false), {"item"})
+reset(improved_world(false))
 improved_reason = researchability.reason_with_context("TechA", {
   visiting_packs = {}, visiting_technologies = {}, unlock_recipe_name = "A-improved"
 })
@@ -267,7 +271,7 @@ end
 -- the active TechA. The active technology traversal must cross the nested
 -- alternative-route query so the dependency-mediated self-lock terminates and
 -- remains rejected.
-reset(dependency_self_lock_world(), {"item"})
+reset(dependency_self_lock_world())
 local dependency_status = production.pack_production_status("A", {})
 local self_unlockers = production.researchable_unlockers_for_recipe("A-self")
 local alternate_unlockers = production.researchable_unlockers_for_recipe("A-alt")
@@ -281,7 +285,7 @@ check("I04", #self_unlockers == 0 and #alternate_unlockers == 0,
 -- real recipe_facts.replace_source()/CompilerContext replacement operation.
 -- The first direction proves a formerly negative root does not remain
 -- poisoned after a source dependency change.
-reset(pack_world(false, true), {"item"})
+reset(pack_world(false, true))
 check("E01", production.pack_production_status("A", {}) == "unreachable",
   "The unseeded root begins unreachable before the source replacement")
 world.recipe_facts["A-initial"] = {enabled_without_research = true, result_names = {"A"}}
@@ -295,7 +299,7 @@ check("E03", #recipe_unlock_facts.unlockers_for_recipe("B-from-A") == 1,
 
 -- The reverse direction is equally important: removal must not leave a
 -- formerly positive acquisition route available through the warm root cache.
-reset(pack_world(true, true), {"item"})
+reset(pack_world(true, true))
 check("E04", production.pack_production_status("B", {}) == "research",
   "The seeded route begins researchable before removal")
 world.recipe_facts["A-initial"] = nil
@@ -351,7 +355,7 @@ local function feasibility_world()
   }
 end
 
-reset(feasibility_world(), {"item"})
+reset(feasibility_world())
 check("F01", feasibility.initial_recipe_witness("pack-from-ore", "pack") ~= nil,
   "An enabled recipe is initial only after every ingredient has a concrete source witness")
 check("F02", feasibility.initial_recipe_witness("pack-from-locked", "locked-pack") == nil,
@@ -394,7 +398,7 @@ local cycle_with_ore = {
   producers = {A = {"a-from-b", "a-from-ore"}, B = {"b-from-a"}},
   resources = {ore = {minable = {result = "ore", count = 1}}}
 }
-reset(cycle_with_ore, {"item"})
+reset(cycle_with_ore)
 local cycle_with_ore_state = {}
 check("F09AA", feasibility.acquisition_witness("A", nil, cycle_with_ore_state) ~= nil
   and feasibility.acquisition_witness("B", nil, cycle_with_ore_state) ~= nil,
@@ -416,7 +420,7 @@ check("F09AB", feasibility.acquisition_witness("switch", {recipe_index = indexed
 -- A reusable traversal state may retain raw-prototype scan results only while
 -- its recipe-source epoch matches. The same state object must not retain a
 -- positive raw source after the owning context moves to a replacement epoch.
-reset(feasibility_world(), {"item"})
+reset(feasibility_world())
 local shared_query_state = {}
 check("F09AC", feasibility.acquisition_witness("pack", nil, shared_query_state) ~= nil,
   "One acquisition query may reuse its bounded source scan")
@@ -440,15 +444,15 @@ local function source_surface_world(surfaces, planets, space_locations)
     surfaces = surfaces, planets = planets, space_locations = space_locations
   }
 end
-reset(source_surface_world({high_pressure = {surface_properties = {pressure = 1000}}}), {"item"})
+reset(source_surface_world({high_pressure = {surface_properties = {pressure = 1000}}}))
 check("F09AE", feasibility.source_witness("ore") ~= nil
   and feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
   "A real SurfacePrototype satisfies resource and offshore-pump source conditions")
-reset(source_surface_world(nil, nil, {orbit = {surface_properties = {pressure = 1000}}}), {"item"})
+reset(source_surface_world(nil, nil, {orbit = {surface_properties = {pressure = 1000}}}))
 check("F09AF", feasibility.source_witness("ore") == nil
   and feasibility.source_witness({type = "fluid", name = "water"}) == nil,
   "A non-surface space-location cannot satisfy natural-source feasibility")
-reset(source_surface_world({low_pressure = {surface_properties = {pressure = 100}}}), {"item"})
+reset(source_surface_world({low_pressure = {surface_properties = {pressure = 100}}}))
 check("F09AG", feasibility.source_witness("ore") == nil
   and feasibility.source_witness({type = "fluid", name = "water"}) == nil,
   "Impossible source surface conditions reject resource and offshore-pump witnesses")
@@ -483,10 +487,21 @@ reset({
   item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
   resources = {same_resource = {minable = {result = "same", count = 1}}},
   offshore_pumps = {same_pump = {fluid = "same"}}
-}, {"item"})
+})
 check("F09C", feasibility.source_witness("same").kind == "minable-resource"
   and feasibility.source_witness({type = "fluid", name = "same"}).kind == "offshore-pump",
   "A same-name natural item source is not reused as a fluid source")
+
+-- Natural minable entities are separate from resource prototypes.  Trees are
+-- a real early wood source, so a route consuming wood must not be treated as
+-- an unseeded cycle merely because it is absent from data.raw.resource.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  trees = {tree = {minable = {result = "wood", count = 1}}}
+})
+check("F09CA", feasibility.source_witness("wood").kind == "minable-entity"
+  and feasibility.source_witness("ore") == nil,
+  "A minable tree is an item source without inventing a resource-prototype witness")
 
 reset({
   item_prototypes = {same = {type = "item"}},
@@ -499,7 +514,7 @@ reset({
   },
   producers = {same = {"fluid-same"}},
   producers_identity = {["fluid\0same"] = {"fluid-same"}}
-}, {"item"})
+})
 check("F09D", recipe_unlock_facts.recipe_outputs_item("fluid-same", "same") == false
   and production.pack_production_status("same", {}) == "unreachable",
   "A same-name fluid result neither reports as an item output nor seeds an item science pack")
@@ -511,8 +526,109 @@ reset({
   labs = {lab = {inputs = {"trigger_pack"}}},
   techs = {trigger_pack = {enabled = true, research_trigger = {type = "mine-entity"}}},
   recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}
-}, {"item"})
+})
 check("F10", production.pack_production_status("trigger_pack", {}) == "unreachable",
   "A trigger and accepting lab are not a production-source witness")
+
+-- A science-pack recipe may legitimately consume an intermediate unlocked by
+-- the same reachable technology as another necessary component. The unlocker
+-- is a contextual proof, never a source by itself: a concrete route for each
+-- recipe remains required (F10 covers trigger-only false admission).
+local function same_unlocker_world(unseeded_cycle)
+  local unlocks = {
+    {type = "unlock-recipe", recipe = "A-from-B"},
+    {type = "unlock-recipe", recipe = unseeded_cycle and "B-from-A" or "B-from-trigger"}
+  }
+  return {
+    item_prototypes = {A = {type = "item"}, B = {type = "item"}},
+    labs = {lab = {inputs = {"A", "B"}}},
+    techs = {
+      SharedUnlock = {
+        enabled = true,
+        research_trigger = {type = "craft-item", item = "lab"},
+        effects = unlocks
+      }
+    },
+    recipe_prototypes = {
+      ["A-from-B"] = {name = "A-from-B"},
+      [unseeded_cycle and "B-from-A" or "B-from-trigger"] = {
+        name = unseeded_cycle and "B-from-A" or "B-from-trigger"
+      }
+    },
+    recipe_facts = {
+      ["A-from-B"] = route_fact("A", {{name = "B", amount = 1}}, {enabled = false}),
+      [unseeded_cycle and "B-from-A" or "B-from-trigger"] = route_fact(
+        "B",
+        unseeded_cycle and {{name = "A", amount = 1}} or {},
+        {enabled = false}
+      )
+    },
+    producers = {A = {"A-from-B"}, B = {unseeded_cycle and "B-from-A" or "B-from-trigger"}}
+  }
+end
+
+-- A research-unlocked item route may need a research-unlocked fluid output.
+-- The output lookup must retain the exact fluid identity; item-only indexing
+-- would reject this seeded route before its unlocker and ingredient proof run.
+local function fluid_intermediate_world()
+  return {
+    item_prototypes = {fluid_pack = {type = "item"}},
+    labs = {lab = {inputs = {"fluid_pack"}}},
+    techs = {
+      SharedFluidUnlock = {
+        enabled = true,
+        research_trigger = {type = "craft-item", item = "lab"},
+        effects = {
+          {type = "unlock-recipe", recipe = "pack-from-solder"},
+          {type = "unlock-recipe", recipe = "solder-from-molten"},
+          {type = "unlock-recipe", recipe = "molten-from-ore"}
+        }
+      }
+    },
+    recipe_prototypes = {
+      ["pack-from-solder"] = {name = "pack-from-solder"},
+      ["solder-from-molten"] = {name = "solder-from-molten"},
+      ["molten-from-ore"] = {name = "molten-from-ore"}
+    },
+    recipe_facts = {
+      ["pack-from-solder"] = route_fact("fluid_pack", {{type = "item", name = "solder", amount = 1}}, {enabled = false}),
+      ["solder-from-molten"] = route_fact("solder", {{type = "fluid", name = "molten-solder", amount = 1}}, {enabled = false}),
+      ["molten-from-ore"] = route_fact("molten-solder", {{type = "item", name = "tin-ore", amount = 1}}, {
+        enabled = false,
+        results = {{type = "fluid", name = "molten-solder", amount = 1, probability = 1}}
+      })
+    },
+    producers = {fluid_pack = {"pack-from-solder"}, solder = {"solder-from-molten"}},
+    producers_identity = {
+      ["item\0fluid_pack"] = {"pack-from-solder"},
+      ["item\0solder"] = {"solder-from-molten"},
+      ["fluid\0molten-solder"] = {"molten-from-ore"}
+    },
+    unlockers = {
+      ["pack-from-solder"] = {"SharedFluidUnlock"},
+      ["solder-from-molten"] = {"SharedFluidUnlock"},
+      ["molten-from-ore"] = {"SharedFluidUnlock"}
+    },
+    resources = {tin_ore = {minable = {result = "tin-ore", count = 1}}}
+  }
+end
+
+reset(same_unlocker_world(false))
+local same_unlocker_a_cold = production.pack_production_status("A", {})
+local same_unlocker_b_warm = production.pack_production_status("B", {})
+check("U01", same_unlocker_a_cold == "research" and same_unlocker_b_warm == "research",
+  "Nested intermediates may reuse one proved unlocker through distinct recipe pairs")
+reset(same_unlocker_world(true))
+check("U02", production.pack_production_status("A", {}) == "unreachable"
+  and production.pack_production_status("B", {}) == "unreachable",
+  "A same-unlocker, unseeded A-to-B-to-A cycle remains rejected")
+reset(same_unlocker_world(false))
+local same_unlocker_b_cold = production.pack_production_status("B", {})
+local same_unlocker_a_warm = production.pack_production_status("A", {})
+check("U03", same_unlocker_b_cold == "research" and same_unlocker_a_warm == "research",
+  "Nested unlock-pair resolution is invariant to cold query order and warm cache reuse")
+reset(fluid_intermediate_world())
+check("U04", production.pack_production_status("fluid_pack", {}) == "research",
+  "A seeded research-unlocked fluid intermediate retains its typed output route")
 
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

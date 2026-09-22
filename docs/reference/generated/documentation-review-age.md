@@ -120,7 +120,7 @@ Ages are measured against the newest governed review date, 2026-09-22, so checko
 | docs/capabilities/README.md | current | 2026-07-07 | 77 | current-window |
 | docs/capabilities/recipe-productivity.md | current | 2026-07-12 | 72 | current-window |
 | docs/capabilities/rule-surfaces.md | current | 2026-07-07 | 77 | current-window |
-| docs/capabilities/science-integration.md | current | 2026-07-10 | 74 | current-window |
+| docs/capabilities/science-integration.md | current | 2026-09-22 | 0 | current-window |
 | docs/capabilities/tile-surfaces.md | draft | 2026-07-07 | 77 | current-window |
 | docs/compatibility/backport-ledger.md | current | 2026-07-11 | 73 | current-window |
 | docs/compatibility/campaigns/factorio-2.0-lane.md | draft | 2026-07-07 | 77 | current-window |

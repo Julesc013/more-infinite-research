@@ -86,12 +86,119 @@ local function route_for_unlocker(recipe_name, technology_name, visiting_packs, 
   }
 end
 
+local function output_recipe_names(identity)
+  if not identity or type(identity.type) ~= "string" or identity.type == ""
+    or type(identity.name) ~= "string" or identity.name == "" then
+    return {}
+  end
+  local names = {}
+  -- The normalized output index is typed.  A research-unlocked fluid
+  -- intermediate (for example, molten solder) must be resolved through its
+  -- fluid identity; falling back to an item name would either reject a real
+  -- route or conflate same-named products.
+  for _, recipe_name in ipairs(canonical_recipe_facts.recipes_by_output_identity_view(identity.type, identity.name) or {}) do
+    table.insert(names, recipe_name)
+  end
+  table.sort(names)
+  return names
+end
+
+local function unlock_pair_key(recipe_name, technology_name)
+  return recipe_name .. "\0" .. technology_name
+end
+
+local function active_unlock_context(options)
+  local context = options.active_unlock_context
+  if context then return context end
+  context = {pairs = {}, technologies = {}}
+  options.active_unlock_context = context
+  return context
+end
+
+-- A normal route witness deliberately permits only enabled recipes.  Some
+-- ecosystems make an early production intermediate available through a
+-- research-trigger technology, however, and that technology has no lab
+-- ingredient dependency.  Admit such an intermediate only when the existing
+-- technology researchability service proves the concrete unlocker, and then
+-- recursively prove every ingredient of its recipe with the same active
+-- visitation state.  This is an acquisition witness, not a general license
+-- for disabled recipes: ordinary science dependencies still pass through the
+-- same pack/self-lock checks as every other technology route.
+local function research_unlocked_output_witness(identity, options, state, visiting_packs, visiting_technologies)
+  local context = active_unlock_context(options)
+  for _, recipe_name in ipairs(output_recipe_names(identity)) do
+    local fact = canonical_recipe_facts.view(recipe_name)
+    if fact and fact.enabled_without_research ~= true then
+      local unlockers = {}
+      for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
+        table.insert(unlockers, technology_name)
+      end
+      table.sort(unlockers)
+      for _, technology_name in ipairs(unlockers) do
+        local pair_key = unlock_pair_key(recipe_name, technology_name)
+        -- The precise recipe/technology pair is active while its ingredients
+        -- are being proved. Reopening that same pair is an unseeded loop, but
+        -- a different recipe unlocked by the already-proved technology is a
+        -- legitimate intermediate (for example, a component accompanying the
+        -- circuit unlocked by one early technology).
+        local rejection = context.pairs[pair_key] and "active-unlock-pair" or nil
+        if rejection == nil and context.technologies[technology_name] == nil then
+          rejection = technology_researchability_reason(technology_name, {
+            visiting_packs = visiting_packs,
+            visiting_technologies = visiting_technologies or {},
+            unlock_recipe_name = recipe_name
+          })
+        end
+        if rejection == nil then
+          local previous_technology = context.technologies[technology_name]
+          context.pairs[pair_key] = true
+          context.technologies[technology_name] = (previous_technology or 0) + 1
+          local recipe_witness = route_feasibility.recipe_witness(recipe_name, identity, options, state)
+          context.pairs[pair_key] = nil
+          if previous_technology then
+            context.technologies[technology_name] = previous_technology
+          else
+            context.technologies[technology_name] = nil
+          end
+          if recipe_witness then
+            return {
+              kind = "research-unlocked-recipe",
+              recipe = recipe_name,
+              unlocker = technology_name,
+              recipe_witness = recipe_witness
+            }
+          end
+        end
+      end
+    end
+  end
+  return nil
+end
+
+local function production_witness_options(visiting_packs, visiting_technologies)
+  -- This is query-local. It records only unlockers which have already passed
+  -- the researchability service while their concrete recipe route is being
+  -- verified; it never escapes into the science-pack result cache.
+  local options = {active_unlock_context = {pairs = {}, technologies = {}}}
+  options.research_unlock_witness = function(identity, state)
+    return research_unlocked_output_witness(
+      identity,
+      options,
+      state,
+      visiting_packs,
+      visiting_technologies
+    )
+  end
+  return options
+end
+
 local function production_routes(recipe_status, visiting_packs, excluded_unlocker, visiting_technologies)
   local routes = {}
+  local witness_options = production_witness_options(visiting_packs, visiting_technologies)
   for _, recipe_name in ipairs(recipe_status.recipes or {}) do
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      local witness = route_feasibility.initial_recipe_witness(recipe_name, recipe_status.pack_name)
+      local witness = route_feasibility.initial_recipe_witness(recipe_name, recipe_status.pack_name, witness_options)
       if witness then
         table.insert(routes, {
           recipe = recipe_name,
@@ -116,7 +223,7 @@ local function production_routes(recipe_status, visiting_packs, excluded_unlocke
         })
       end
     else
-      local witness = route_feasibility.recipe_witness(recipe_name, recipe_status.pack_name)
+      local witness = route_feasibility.recipe_witness(recipe_name, recipe_status.pack_name, witness_options)
       if witness then
         for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
           if technology_name ~= excluded_unlocker then

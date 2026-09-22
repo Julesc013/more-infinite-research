@@ -1,7 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
-local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
@@ -21,30 +20,12 @@ local VANILLA_PACK_ORDER = {
   "promethium-science-pack"
 }
 
-
-local function allowed_science_pack_prototype_kinds()
-  local profile = target_profiles.current()
-  local shapes = profile and profile.prototype_shapes or nil
-  local declared_kinds = shapes and shapes.science_pack_prototype_kinds or nil
-  if type(declared_kinds) ~= "table" or #declared_kinds == 0 then
-    error("MIR target profile does not declare science-pack prototype kinds.", 2)
-  end
-
-  local allowed = {}
-  for _, kind in ipairs(declared_kinds) do
-    if type(kind) ~= "string" or kind == "" then
-      error("MIR target profile declares an invalid science-pack prototype kind.", 2)
-    end
-    allowed[kind] = true
-  end
-  return allowed
-end
-
 function M.research_pack_prototype(name)
-  local prototype = lookup.item_prototype(name)
-  if not prototype then return nil end
-  if not allowed_science_pack_prototype_kinds()[prototype.type] then return nil end
-  return prototype
+  -- Target profiles describe known engine shapes; they do not decide whether
+  -- a particular ecosystem's lab input is research consumable.  Factorio
+  -- exposes the concrete item through the platform lookup, while the lab
+  -- input relation below is the authoritative research-use admission.
+  return lookup.item_prototype(name)
 end
 
 function M.all_lab_inputs()
