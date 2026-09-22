@@ -34,6 +34,105 @@ function Add-MIRAssurancePlanDecisions {
     run=@($decorated | Where-Object disposition -eq "RUN").Count
     invalid=@($decorated | Where-Object disposition -eq "INVALID").Count
   }
+
+  $affectedTests = @($decorated | Where-Object {
+    [string](Get-MIRAssuranceOptionalObjectValue -Object $_ -Name 'template_id') -eq 'runtime.affected'
+  })
+  $fullTests = @($decorated | Where-Object {
+    [string](Get-MIRAssuranceOptionalObjectValue -Object $_ -Name 'template_id') -eq 'runtime.full'
+  })
+  $requiresFull = [bool](Get-MIRAssuranceOptionalObjectValue -Object $Plan.impact_selection -Name 'requires_full')
+
+  # The affected runtime matrix used to retain only the positive selector
+  # inputs.  That made a narrow plan hard to review: a reader could see what
+  # ran, but not every proposition deliberately left out.  Record a
+  # deterministic, candidate-bound ledger only when a plan actually selects
+  # a runtime matrix.  A plan without one makes no claim that absent runtime
+  # propositions are unaffected.
+  if ($affectedTests.Count -eq 0 -and $fullTests.Count -eq 0 -and -not $requiresFull) {
+    return $Plan
+  }
+
+  . (Join-Path $repo "tools\lib\validation\ScenarioRegistry.ps1")
+  $registry = Import-MIRScenarioRegistry -Path $scenarioRegistryPath -TargetProfile ([string]$Plan.target)
+  $records = @($registry.records | Where-Object kind -ne "gate" | Sort-Object name)
+  $actualNames = @(
+    @($affectedTests + $fullTests) |
+      ForEach-Object { [string](Get-MIRAssuranceOptionalObjectValue -Object (Get-MIRAssuranceOptionalObjectValue -Object $_ -Name 'scenario') -Name 'name') } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+      Sort-Object -Unique
+  )
+  $selectionMode = 'not-selected'
+  $selectedNames = @()
+  $omitted = @()
+  if ($fullTests.Count -gt 0 -or $requiresFull) {
+    $selectionMode = if ($requiresFull) { 'full-escalation' } else { 'full-profile' }
+    $selectedNames = @($records | ForEach-Object { [string]$_.name })
+    if (@(Compare-Object $selectedNames $actualNames).Count -ne 0) {
+      throw "[mir-assurance-impact-full-selection-mismatch]"
+    }
+  } elseif ($affectedTests.Count -gt 0) {
+    $selectionMode = 'declared-semantic-impact'
+    $expectedRecords = @(Select-MIRAssuranceMatrixScenarios -Registry $registry -Selector 'affected' -ImpactSelection $Plan.impact_selection)
+    $selectedNames = @($expectedRecords | ForEach-Object { [string]$_.name } | Sort-Object -Unique)
+    if (@(Compare-Object $selectedNames $actualNames).Count -ne 0) {
+      throw "[mir-assurance-impact-selection-mismatch]"
+    }
+    $omitted = @(
+      foreach ($record in @($records | Where-Object { $selectedNames -notcontains [string]$_.name })) {
+        [ordered]@{
+          proposition="scenario/$([string]$Plan.target)/$([string]$record.name)"
+          scenario=[string]$record.name
+          reason='unaffected-by-declared-semantic-impact'
+        }
+      }
+    )
+  }
+  $selected = @(
+    foreach ($record in @($records | Where-Object { $selectedNames -contains [string]$_.name })) {
+      $reasons = @()
+      if ($selectionMode -eq 'full-escalation') { $reasons += 'full-escalation-after-unmapped-runtime-impact' }
+      elseif ($selectionMode -eq 'full-profile') { $reasons += 'full-profile' }
+      else {
+        if (@($Plan.impact_selection.scenarios) -contains [string]$record.name) { $reasons += 'declared-scenario' }
+        if (@($Plan.impact_selection.groups) -contains [string]$record.group) { $reasons += 'declared-group' }
+        if (@($record.tags | Where-Object { @($Plan.impact_selection.tags) -contains [string]$_ }).Count -gt 0) { $reasons += 'declared-tag' }
+      }
+      if ($reasons.Count -eq 0) { throw "[mir-assurance-impact-selected-without-declared-impact] $([string]$record.name)" }
+      [ordered]@{
+        proposition="scenario/$([string]$Plan.target)/$([string]$record.name)"
+        scenario=[string]$record.name
+        selected_by=@($reasons | Sort-Object -Unique)
+      }
+    }
+  )
+  $candidateDescriptor = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'candidate_descriptor'
+  if ($null -eq $candidateDescriptor) { $candidateDescriptor = Get-MIRAssuranceCandidateDescriptor -Context $Context }
+  $ledger = [ordered]@{
+    schema='mir-assurance-impact-proposition-ledger-v1'
+    selection_mode=$selectionMode
+    candidate_binding=[ordered]@{
+      target=[string]$Plan.target
+      source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_commit')
+      source_tree=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_tree')
+      package_source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_commit')
+      package_source_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_sha256')
+      candidate_descriptor_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $candidateDescriptor -Name 'descriptor_sha256')
+    }
+    declared_semantic_impact=[ordered]@{
+      scenarios=@($Plan.impact_selection.scenarios | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      groups=@($Plan.impact_selection.groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      tags=@($Plan.impact_selection.tags | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      mapped_paths=@($Plan.impact_selection.mapped_paths | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      unmapped_runtime_paths=@($Plan.impact_selection.unmapped_runtime_paths | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+      requires_full=$requiresFull
+    }
+    universe_count=$records.Count
+    selected=$selected
+    omitted_unaffected=$omitted
+  }
+  $ledger['ledger_sha256'] = Get-MIRAssuranceJsonHash -Value $ledger
+  $Plan['impact_proposition_ledger'] = $ledger
   return $Plan
 }
 
@@ -201,6 +300,13 @@ function Assert-MIRAssurancePlan {
   }
   if ([string]$expected.plan_material_sha256 -ne [string]$Plan.plan_material_sha256) {
     throw "Verification plan does not match the canonical profile, catalog, inputs, candidate, source, or policy."
+  }
+  $actualImpactLedger = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'impact_proposition_ledger'
+  $expectedImpactLedger = Get-MIRAssuranceOptionalObjectValue -Object $expected -Name 'impact_proposition_ledger'
+  if (($null -eq $actualImpactLedger) -xor ($null -eq $expectedImpactLedger) -or
+      ($null -ne $actualImpactLedger -and
+       (Get-MIRAssuranceJsonHash -Value $actualImpactLedger) -ne (Get-MIRAssuranceJsonHash -Value $expectedImpactLedger))) {
+    throw "Verification plan impact-proposition ledger does not match the canonical candidate-bound selection."
   }
   return $Plan
 }

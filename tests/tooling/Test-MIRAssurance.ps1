@@ -694,6 +694,242 @@ if ([string]$jsonDigestA.policy_id -ne "json-sorted-properties-utf8-nfc-lf-final
 $script:repo = $RepoRoot
 . (Join-Path $RepoRoot "tools\lib\assurance\Evidence.ps1")
 . (Join-Path $RepoRoot "tools\lib\assurance\Domains.ps1")
+. (Join-Path $RepoRoot "tools\lib\validation\ScenarioRegistry.ps1")
+$scenarioRegistryPath = Join-Path $RepoRoot "validation\scenarios\runtime.json"
+$evidenceSchema = 4
+$assuranceRunnerVersion = '4'
+
+# A13: the runtime selector must leave a candidate-bound, deterministic
+# account of both the propositions it selected and every proposition it
+# deliberately omitted as unaffected.  Exercise the actual plan decoration
+# path with real registry records, but use no Factorio process or mutable
+# evidence store.
+$a13Registry = Import-MIRScenarioRegistry -Path $scenarioRegistryPath -TargetProfile '2.1'
+$a13Records = @($a13Registry.records | Where-Object kind -ne 'gate' | Sort-Object name)
+$a13Baseline = @($a13Records | Where-Object { [string]$_.name -eq 'compiler-contracts' })
+if ($a13Records.Count -lt 2 -or $a13Baseline.Count -ne 1) {
+  throw 'A13 impact-selection regression requires the named compiler-contracts baseline and at least one omittable scenario.'
+}
+$a13Impact = [ordered]@{
+  schema=1
+  scenarios=@('compiler-contracts')
+  groups=@()
+  tags=@()
+  mapped_paths=@('source/prototypes/mir/settings/automatic_compiler_policy.lua')
+  unmapped_runtime_paths=@()
+  requires_full=$false
+}
+$a13Expected = @(Select-MIRAssuranceMatrixScenarios -Registry $a13Registry -Selector 'affected' -ImpactSelection $a13Impact)
+if ($a13Expected.Count -ne 1 -or [string]$a13Expected[0].name -ne 'compiler-contracts') {
+  throw 'A13 impact-selection regression did not isolate the declared compiler-contracts proposition.'
+}
+$a13NewPlan = {
+  param(
+    [Parameter(Mandatory)]$Impact,
+    [Parameter(Mandatory)]$Records,
+    [string]$TemplateId = 'runtime.affected',
+    [string]$SourceCommit = ('A' * 40),
+    [string]$SourceTree = ('B' * 40),
+    [string]$PackageSourceCommit = ('C' * 40),
+    [string]$PackageSourceSha256 = ('D' * 64),
+    [string]$CandidateDescriptorSha256 = ('E' * 64),
+    [string]$VerificationProfileSha = ('F' * 64)
+  )
+  $tests = @(
+    foreach ($record in @($Records)) {
+      [pscustomobject][ordered]@{
+        id="scenario/2.1/$([string]$record.name)"
+        template_id=$TemplateId
+        safe_test_id=("scenario_2.1_" + ([string]$record.name -replace '[^A-Za-z0-9._-]', '_'))
+        kind='factorio-scenario'
+        layer='F3'
+        command='./synthetic-a13.ps1'
+        requires_factorio=$false
+        requires_candidate=$false
+        inputs=@('spec/programmes/mir4-4x-operating-programme-v1.json')
+        domain_dependencies=@()
+        scenario=$record
+      }
+    }
+  )
+  return [ordered]@{
+    target='2.1'
+    profile='auto'
+    source_commit=$SourceCommit
+    source_tree=$SourceTree
+    package_source_commit=$PackageSourceCommit
+    package_source_sha256=$PackageSourceSha256
+    verification_profile_sha256=$VerificationProfileSha
+    candidate_descriptor=[ordered]@{descriptor_sha256=$CandidateDescriptorSha256}
+    impact_selection=$Impact
+    tests=$tests
+  }
+}
+$a13Context = [pscustomobject][ordered]@{
+  target='2.1'
+  candidate=''
+  reuse_enabled=$false
+  rerun_tests=@()
+}
+$a13Plan = & $a13NewPlan -Impact $a13Impact -Records $a13Expected
+$null = Add-MIRAssurancePlanDecisions -Plan $a13Plan -Context $a13Context
+$a13NoRuntimePlan = & $a13NewPlan -Impact $a13Impact -Records @() -TemplateId 'static.synthetic'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13NoRuntimePlan -Context $a13Context
+if ($a13NoRuntimePlan.Contains('impact_proposition_ledger')) {
+  throw 'A13 non-runtime plan incorrectly claimed a runtime impact selection or unaffected omissions.'
+}
+$a13Repeat = & $a13NewPlan -Impact $a13Impact -Records $a13Expected
+$null = Add-MIRAssurancePlanDecisions -Plan $a13Repeat -Context $a13Context
+$a13Ledger = $a13Plan.impact_proposition_ledger
+$a13RepeatLedger = $a13Repeat.impact_proposition_ledger
+$a13SelectedNames = @($a13Ledger.selected | ForEach-Object { [string]$_.scenario } | Sort-Object -Unique)
+$a13OmittedNames = @($a13Ledger.omitted_unaffected | ForEach-Object { [string]$_.scenario } | Sort-Object -Unique)
+$a13AllNames = @($a13Records | ForEach-Object { [string]$_.name } | Sort-Object -Unique)
+if ([string]$a13Ledger.selection_mode -ne 'declared-semantic-impact' -or
+    [string]$a13Ledger.ledger_sha256 -ne [string]$a13RepeatLedger.ledger_sha256 -or
+    @(Compare-Object $a13SelectedNames @('compiler-contracts')).Count -ne 0 -or
+    @(Compare-Object (@($a13SelectedNames + $a13OmittedNames | Sort-Object -Unique)) $a13AllNames).Count -ne 0 -or
+    @($a13Ledger.omitted_unaffected | Where-Object {
+      [string]$_.proposition -ne "scenario/2.1/$([string]$_.scenario)" -or
+      [string]$_.reason -ne 'unaffected-by-declared-semantic-impact'
+    }).Count -ne 0 -or
+    @($a13Ledger.selected | Where-Object { @($_.selected_by).Count -eq 0 }).Count -ne 0 -or
+    [string]$a13Ledger.candidate_binding.target -ne '2.1' -or
+    [string]$a13Ledger.candidate_binding.source_commit -ne ('A' * 40) -or
+    [string]$a13Ledger.candidate_binding.source_tree -ne ('B' * 40) -or
+    [string]$a13Ledger.candidate_binding.package_source_commit -ne ('C' * 40) -or
+    [string]$a13Ledger.candidate_binding.package_source_sha256 -ne ('D' * 64) -or
+    [string]$a13Ledger.candidate_binding.candidate_descriptor_sha256 -ne ('E' * 64)) {
+  throw 'A13 impact selection did not produce a deterministic candidate-bound selected/omitted proposition ledger.'
+}
+$a13Extra = @($a13Expected + @($a13Records | Where-Object { [string]$_.name -ne 'compiler-contracts' } | Select-Object -First 1))
+$a13OverSelectionRejected = $false
+try {
+  $a13OverSelectedPlan = & $a13NewPlan -Impact $a13Impact -Records $a13Extra
+  $null = Add-MIRAssurancePlanDecisions -Plan $a13OverSelectedPlan -Context $a13Context
+} catch { $a13OverSelectionRejected = $_.Exception.Message -match '\[mir-assurance-impact-selection-mismatch\]' }
+if (-not $a13OverSelectionRejected) {
+  throw 'A13 impact selection accepted a runtime proposition outside the declared semantic impact.'
+}
+$a13FullImpact = [ordered]@{
+  schema=1
+  scenarios=@('compiler-contracts')
+  groups=@()
+  tags=@()
+  mapped_paths=@()
+  unmapped_runtime_paths=@('source/prototypes/mir/unknown-runtime.lua')
+  requires_full=$true
+}
+$a13FullPlan = & $a13NewPlan -Impact $a13FullImpact -Records $a13Records -TemplateId 'runtime.full'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13FullPlan -Context $a13Context
+if ([string]$a13FullPlan.impact_proposition_ledger.selection_mode -ne 'full-escalation' -or
+    @($a13FullPlan.impact_proposition_ledger.selected).Count -ne $a13Records.Count -or
+    @($a13FullPlan.impact_proposition_ledger.omitted_unaffected).Count -ne 0) {
+  throw 'A13 full escalation incorrectly made a scoped unaffected-omission claim.'
+}
+$a13FullProfilePlan = & $a13NewPlan -Impact $a13Impact -Records $a13Records -TemplateId 'runtime.full'
+$null = Add-MIRAssurancePlanDecisions -Plan $a13FullProfilePlan -Context $a13Context
+if ([string]$a13FullProfilePlan.impact_proposition_ledger.selection_mode -ne 'full-profile' -or
+    @($a13FullProfilePlan.impact_proposition_ledger.selected).Count -ne $a13Records.Count -or
+    @($a13FullProfilePlan.impact_proposition_ledger.omitted_unaffected).Count -ne 0) {
+  throw 'A13 runtime.full without escalation did not record full-profile coverage without scoped omissions.'
+}
+$a13Fingerprint = $a13Plan.tests[0].fingerprint
+$a13CandidateMutations = @(
+  [ordered]@{ field='source_commit'; parameter='SourceCommit'; value=('1' * 40) },
+  [ordered]@{ field='source_tree'; parameter='SourceTree'; value=('2' * 40) },
+  [ordered]@{ field='package_source_commit'; parameter='PackageSourceCommit'; value=('3' * 40) },
+  [ordered]@{ field='package_source_sha256'; parameter='PackageSourceSha256'; value=('4' * 64) },
+  [ordered]@{ field='candidate_descriptor_sha256'; parameter='CandidateDescriptorSha256'; value=('5' * 64) }
+)
+$a13CandidateMutationFingerprints = @(
+  foreach ($mutation in $a13CandidateMutations) {
+    $arguments = @{ Impact=$a13Impact; Records=$a13Expected }
+    $arguments[[string]$mutation.parameter] = [string]$mutation.value
+    $mutationPlan = & $a13NewPlan @arguments
+    $null = Add-MIRAssurancePlanDecisions -Plan $mutationPlan -Context $a13Context
+    [pscustomobject][ordered]@{
+      field=[string]$mutation.field
+      fingerprint_sha256=[string]$mutationPlan.tests[0].fingerprint.fingerprint_sha256
+    }
+  }
+)
+$a13ChangedEnvironmentPlan = & $a13NewPlan -Impact $a13Impact -Records $a13Expected -VerificationProfileSha ('8' * 64)
+$null = Add-MIRAssurancePlanDecisions -Plan $a13ChangedEnvironmentPlan -Context $a13Context
+$a13ChangedCommand = $a13Plan.tests[0].PSObject.Copy()
+$a13ChangedCommand.command = './synthetic-a13-different-command.ps1'
+$a13ChangedCommandFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13ChangedCommand -Plan $a13Plan -Context $a13Context
+$a13ChangedTargetContext = $a13Context.PSObject.Copy()
+$a13ChangedTargetContext.target = '2.0'
+$a13ChangedTargetFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13Plan.tests[0] -Plan $a13Plan -Context $a13ChangedTargetContext
+$a13ChangedInput = $a13Plan.tests[0].PSObject.Copy()
+$a13ChangedInput.inputs = @('spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json')
+$a13ChangedInputFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13ChangedInput -Plan $a13Plan -Context $a13Context
+$a13EvaluatorPatterns = @(
+  'scripts/Invoke-MIRAssurance.ps1',
+  'tools/mir.ps1',
+  'tools/lib/assurance/**',
+  'tools/lib/validation/CurrentTargetPackage.ps1',
+  'tools/lib/validation/FactorioVersionPolicy.ps1',
+  'tools/lib/validation/ScenarioRegistry.ps1',
+  'tools/mir_verify/**',
+  'spec/schemas/**'
+)
+$a13EvaluatorCacheKey = @($a13EvaluatorPatterns | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique) -join "`n"
+$a13OriginalEvaluator = $script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey]
+$script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey] = [ordered]@{
+  kind='repository-patterns'
+  patterns=@($a13EvaluatorPatterns | Sort-Object -Unique)
+  file_count=[int]$a13OriginalEvaluator.file_count
+  sha256=('7' * 64)
+}
+try {
+  $a13ChangedEvaluatorFingerprint = Get-MIRAssuranceTestFingerprint -Test $a13Plan.tests[0] -Plan $a13Plan -Context $a13Context
+} finally {
+  $script:MIRAssurancePatternFingerprintCache[$a13EvaluatorCacheKey] = $a13OriginalEvaluator
+}
+if ([string]$a13Fingerprint.inputs.'candidate-source'.kind -ne 'candidate-source' -or
+    [string]$a13Fingerprint.inputs.'assurance-environment'.kind -ne 'assurance-environment' -or
+    [string]$a13Fingerprint.inputs.'assurance-evaluator'.kind -ne 'assurance-evaluator' -or
+    [string]$a13Fingerprint.inputs.'candidate-source'.source_tree -ne ('B' * 40) -or
+    [string]$a13Fingerprint.inputs.'spec/programmes/mir4-4x-operating-programme-v1.json'.kind -ne 'repository-patterns' -or
+    @($a13CandidateMutationFingerprints).Count -ne $a13CandidateMutations.Count -or
+    @($a13CandidateMutationFingerprints | Where-Object { [string]$_.fingerprint_sha256 -eq [string]$a13Fingerprint.fingerprint_sha256 }).Count -ne 0 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedEnvironmentPlan.tests[0].fingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedCommandFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedTargetFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedInputFingerprint.fingerprint_sha256 -or
+    [string]$a13Fingerprint.fingerprint_sha256 -eq [string]$a13ChangedEvaluatorFingerprint.fingerprint_sha256) {
+  throw 'A13 exact-reuse fingerprint did not bind target, candidate source, environment, command, evaluator, and declared input components.'
+}
+$a13Programme = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'spec/programmes/mir4-4x-operating-programme-v1.json') | ConvertFrom-Json -Depth 100
+$a13Task = @($a13Programme.synthesis.tasks | Where-Object { [string]$_.id -eq 'A13' })
+$a13ImpactReceiptPath = Join-Path $RepoRoot 'spec/programmes/evidence/mir42/a13-impact-selection.json'
+$a13ReuseReceiptPath = Join-Path $RepoRoot 'spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json'
+if ($a13Task.Count -ne 1 -or [string]$a13Task[0].state -ne 'active' -or
+    (@($a13Task[0].evidence | ForEach-Object { [string]$_ }) -join '|') -ne
+      'spec/programmes/evidence/mir42/a13-impact-selection.json|spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json' -or
+    -not (Test-Path -LiteralPath $a13ImpactReceiptPath -PathType Leaf) -or
+    -not (Test-Path -LiteralPath $a13ReuseReceiptPath -PathType Leaf)) {
+  throw 'A13 programme state does not retain the two candidate-bound implementation receipts without claiming candidate completion.'
+}
+$a13ImpactReceipt = Get-Content -Raw -LiteralPath $a13ImpactReceiptPath | ConvertFrom-Json -Depth 100
+$a13ReuseReceipt = Get-Content -Raw -LiteralPath $a13ReuseReceiptPath | ConvertFrom-Json -Depth 100
+if ([int]$a13ImpactReceipt.schema -ne 1 -or [string]$a13ImpactReceipt.kind -ne 'MIR42A13ImpactSelectionReceiptV1' -or
+    [string]$a13ImpactReceipt.candidate_bound_plan.ledger_schema -ne 'mir-assurance-impact-proposition-ledger-v1' -or
+    @($a13ImpactReceipt.candidate_bound_plan.candidate_fields).Count -ne 6 -or
+    @($a13ImpactReceipt.candidate_bound_plan.selection_modes).Count -ne 3 -or
+    [bool]$a13ImpactReceipt.release_authority -or [bool]$a13ImpactReceipt.publication_authority -or
+    [int]$a13ReuseReceipt.schema -ne 1 -or [string]$a13ReuseReceipt.kind -ne 'MIR42A13ExactFingerprintReuseReceiptV1' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.candidate_source -ne 'fingerprint.inputs.candidate-source' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.environment -notmatch 'assurance-environment' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.command -ne 'fingerprint.definition.command' -or
+    [string]$a13ReuseReceipt.fingerprint_contract.evaluator -ne 'fingerprint.inputs.assurance-evaluator' -or
+    [string]$a13ReuseReceipt.contradiction_policy.required_action -ne 'independent-fresh-reproduction-required' -or
+    @($a13ReuseReceipt.timing.observed_fields).Count -ne 3 -or
+    [bool]$a13ReuseReceipt.release_authority -or [bool]$a13ReuseReceipt.publication_authority) {
+  throw 'A13 receipts do not state the selected/omitted, exact-reuse, timing, and no-release-authority contract.'
+}
 $retiredCurrentInputPattern = '^(?:src(?:/|$)|prototypes(?:/|$)|locale(?:/|$)|settings[^/]*\.lua$|info\.json$)'
 $typedInputCounts = [ordered]@{ source = 0; package = 0; historical = 0 }
 foreach ($test in @($catalog.tests)) {
