@@ -26,7 +26,18 @@ function ConvertTo-MIR4CanonicalExecutableTestProjectionV1 {
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   if ($RelativePath -in @('.mir/assurance.json','.mir/test-impact.yml')) {
-    return $Text.Replace('validation/tests/','tests/')
+    $projected = $Text
+    $retainedWholePlatformForwarderPattern = '^validation/tests/mir4/Test-MIR4WholePlatform\\.ps1$'
+    $placeholder = '__MIR4_RETAINED_WHOLE_PLATFORM_TEST_FORWARDER_V1__'
+    if ($RelativePath -eq '.mir/assurance.json') {
+      if ($projected.Contains($placeholder)) { throw '[mir4-test-authority-forwarder-placeholder-collision]' }
+      $projected = $projected.Replace($retainedWholePlatformForwarderPattern,$placeholder)
+    }
+    $projected = $projected.Replace('validation/tests/','tests/')
+    if ($RelativePath -eq '.mir/assurance.json') {
+      $projected = $projected.Replace($placeholder,$retainedWholePlatformForwarderPattern)
+    }
+    return $projected
   }
   return [regex]::Replace($Text,'validation/tests/(?<relative>[A-Za-z0-9._/-]+\.ps1)',{
     param($match)

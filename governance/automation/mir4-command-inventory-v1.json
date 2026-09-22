@@ -5331,9 +5331,9 @@
     {
       "path": "tools/mir/application/tooling/ExecutableTestAuthority.ps1",
       "classification": "canonical-internal",
-      "sha256": "568894BB1E5512DD3B8FA32F0991CAC071ED0D32A7308AA9774AF519998D67A5",
+      "sha256": "7FCE75D7001D46037A5C63750C32F36E5A84DE1A2F28637696959D11AED0B607",
       "hash_mode": "canonical-text-v1",
-      "lines": 85,
+      "lines": 96,
       "package_visible": false
     },
     {
@@ -5794,5 +5794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:042de568e9c29525a72f62655bb99914d2b15db0bf20a2d3757103556f286d52"
+  "digest": "sha256:7a34fab0fcc0a58616e26094a886f2633aead83d4a6ad05a28fe3680ce80fdbe"
 }
