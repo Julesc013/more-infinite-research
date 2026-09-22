@@ -28,6 +28,14 @@ local plan_row = diagnostics.plan_row
 local skip_row = diagnostics.skip_row
 local attach_family_recipes = ownership.attach_family_recipes
 
+local function merge_fields(...)
+  local out = {}
+  for _, fields in ipairs({...}) do
+    for field, value in pairs(fields or {}) do out[field] = value end
+  end
+  return out
+end
+
 local function plan_stream(key, raw_spec)
   if raw_spec.automatic_family then
     local authorization = compatibility_policy.authorizes_family_stream(key)
@@ -64,6 +72,7 @@ local function plan_stream(key, raw_spec)
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
+  local native_effect_fields = {}
   if spec.direct_effects then
     direct_effects = direct_effects_planner.available_for_stream(key, spec)
     if #direct_effects == 0 then
@@ -71,13 +80,38 @@ local function plan_stream(key, raw_spec)
         effect_valid = {evidence = "direct-effect-planner:empty", reason = "no_available_direct_effects"}
       })
     end
-    if spec.adopt_exact_native_effect_owner and not native_effect_coverage.prefer_mir() then
-      local covered, owners = native_effect_coverage.external_coverage_for_effects(direct_effects)
-      if covered then
+    if spec.adopt_exact_native_effect_owner then
+      local native_coverage = native_effect_coverage.resolve_direct_effect_ownership(direct_effects)
+      native_effect_fields = native_effect_coverage.direct_effect_diagnostics(native_coverage)
+      native_effect_fields.owners = native_effect_fields.native_effect_owners
+      if #(native_coverage.invalid_identities or {}) > 0 then
+        return skip_row(key, spec, "no_useful_native_effect_increment", nil, direct_effects, nil,
+          native_effect_fields, {
+            effect_valid = {
+              evidence = "native-effect-coverage:non-positive-direct-effect",
+              reason = "no_useful_native_effect_increment"
+            }
+          })
+      end
+      direct_effects = native_coverage.emitted_effects
+      if #direct_effects == 0 then
         return skip_row(key, spec, "covered_by_existing_infinite_native_modifier", nil, direct_effects, nil, {
-          owners = table.concat(owners, ",")
+          owners = native_effect_fields.native_effect_owners,
+          native_effect_policy = native_effect_fields.native_effect_policy,
+          native_effect_owners = native_effect_fields.native_effect_owners,
+          native_effect_replaced_owners = native_effect_fields.native_effect_replaced_owners,
+          native_effect_emitted_identities = native_effect_fields.native_effect_emitted_identities,
+          native_effect_covered_identities = native_effect_fields.native_effect_covered_identities,
+          native_effect_emitted_categories = native_effect_fields.native_effect_emitted_categories,
+          native_effect_covered_categories = native_effect_fields.native_effect_covered_categories,
+          native_effect_invalid_identities = native_effect_fields.native_effect_invalid_identities,
+          native_effect_saturation = native_effect_fields.native_effect_saturation,
+          native_effect_paid_noop_guard = native_effect_fields.native_effect_paid_noop_guard
         }, {
-          owner_conflict_free = {evidence = "owner-index:existing-native-owner", reason = "covered_by_existing_infinite_native_modifier"}
+          owner_conflict_free = {
+            evidence = "native-effect-coverage:positive-identity-owner",
+            reason = "covered_by_existing_infinite_native_modifier"
+          }
         })
       end
     end
@@ -92,7 +126,8 @@ local function plan_stream(key, raw_spec)
     science_phase_required_packs = table.concat(science_phase_decision.retained_required_packs or {}, ",")
   }
   if not ingredients or #ingredients == 0 then
-    return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status, science_phase_fields, {
+    return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status,
+      merge_fields(science_phase_fields, native_effect_fields), {
       science_compatible = {evidence = "science-selector:no-compatible-set", reason = "no_lab_compatible_science"},
       lab_compatible = {evidence = "lab-matrix:no-accepting-lab", reason = "no_lab_compatible_science"}
     })
@@ -101,7 +136,8 @@ local function plan_stream(key, raw_spec)
   if direct_effects and #direct_effects > 0 then
     local prerequisites, prerequisite_reason = planner_prerequisites.build_for(key, ingredients)
     if prerequisite_reason then
-      return skip_row(key, spec, prerequisite_reason, ingredients, direct_effects, lab_status, science_phase_fields, {
+      return skip_row(key, spec, prerequisite_reason, ingredients, direct_effects, lab_status,
+        merge_fields(science_phase_fields, native_effect_fields), {
         progression_safe = {evidence = "prerequisite-planner:" .. prerequisite_reason, reason = prerequisite_reason}
       })
     end
@@ -120,7 +156,7 @@ local function plan_stream(key, raw_spec)
     }
     return plan_row(key, spec, "emit", "direct_effect",
       D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects,
-        lab_status, science_phase_fields), {
+        lab_status, merge_fields(science_phase_fields, native_effect_fields)), {
         technology_name = technology_name,
         fields = fields,
         planned_max_level = max_level,

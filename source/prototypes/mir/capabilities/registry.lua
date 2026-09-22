@@ -5,6 +5,7 @@ local policies = require("prototypes.mir.policy.capabilities")
 local schema = require("prototypes.mir.core.schema")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local family_resolver = require("prototypes.mir.families.resolver")
+local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 
 local C = {}
 
@@ -12,14 +13,61 @@ local C = {}
 -- explain how existing MIR streams treat it; they do not emit technologies.
 
 local NATIVE_MODIFIERS = {
-  ["belt-stack-size-bonus"] = "native_logistics_modifier",
-  ["inserter-stack-size-bonus"] = "native_logistics_modifier",
-  ["laboratory-productivity"] = "science_modifier",
-  ["laboratory-speed"] = "science_modifier",
-  ["mining-drill-productivity-bonus"] = "native_mining_yield",
-  ["worker-robot-battery"] = "robot_modifier",
-  ["worker-robot-speed"] = "robot_modifier",
-  ["worker-robot-storage"] = "robot_modifier"
+  ["gun-speed"] = {
+    subfamily = "weapon_firing_speed",
+    request_id = "NATIVE-01",
+    semantic_scope = "ammo-category-firing-rate",
+    semantic_exclusions = "ammo-damage,ammo-stack-size,energy-capacity,recipe-productivity",
+    useful_level_status = "positive-effect-and-owner-identity-only",
+    paid_noop_guard = "positive-effect-and-single-owner-required",
+    required_proof = "exact-engine-ammo-throughput-and-energy-observation",
+    throughput_disposition = "not-proven-by-static-analysis"
+  },
+  ["belt-stack-size-bonus"] = {
+    subfamily = "belt_stack_size",
+    request_id = "STACK-02",
+    semantic_scope = "belt-lane-item-stack-size",
+    semantic_exclusions = "item-stack-size,character-inventory-slots,character-reach,pipeline-extent,underground-belt-distance",
+    useful_level_status = "withheld-until-exact-transport-cap-proof",
+    paid_noop_guard = "no-mir-emission-without-cap-and-conservation-proof",
+    required_proof = "exact-engine-visual-transport-throughput-and-conservation"
+  },
+  ["inserter-stack-size-bonus"] = {
+    subfamily = "inserter_stack_size",
+    request_id = "STACK-02",
+    semantic_scope = "inserter-held-item-stack-size",
+    semantic_exclusions = "belt-stack-size,item-stack-size,character-inventory-slots,character-reach,pipeline-extent,underground-belt-distance",
+    useful_level_status = "withheld-until-exact-transport-cap-proof",
+    paid_noop_guard = "no-mir-emission-without-cap-and-conservation-proof",
+    required_proof = "exact-engine-inserter-loader-splitter-and-conservation",
+    current_mir_base_continuation = "unqualified-pending-exact-cap-and-conservation-proof"
+  },
+  ["stack-inserter-capacity-bonus"] = {
+    subfamily = "inserter_stack_size",
+    request_id = "STACK-02",
+    semantic_scope = "stack-inserter-held-item-capacity",
+    semantic_exclusions = "belt-stack-size,item-stack-size,character-inventory-slots,character-reach,pipeline-extent,underground-belt-distance",
+    useful_level_status = "withheld-until-exact-transport-cap-proof",
+    paid_noop_guard = "no-mir-emission-without-cap-and-conservation-proof",
+    required_proof = "exact-engine-inserter-loader-splitter-and-conservation",
+    current_mir_base_continuation = "unqualified-pending-exact-cap-and-conservation-proof"
+  },
+  ["bulk-inserter-capacity-bonus"] = {
+    subfamily = "inserter_stack_size",
+    request_id = "STACK-02",
+    semantic_scope = "bulk-inserter-held-item-capacity",
+    semantic_exclusions = "belt-stack-size,item-stack-size,character-inventory-slots,character-reach,pipeline-extent,underground-belt-distance",
+    useful_level_status = "withheld-until-exact-transport-cap-proof",
+    paid_noop_guard = "no-mir-emission-without-cap-and-conservation-proof",
+    required_proof = "exact-engine-inserter-loader-splitter-and-conservation",
+    current_mir_base_continuation = "unqualified-pending-exact-cap-and-conservation-proof"
+  },
+  ["laboratory-productivity"] = {subfamily = "science_modifier"},
+  ["laboratory-speed"] = {subfamily = "science_modifier"},
+  ["mining-drill-productivity-bonus"] = {subfamily = "native_mining_yield"},
+  ["worker-robot-battery"] = {subfamily = "robot_modifier"},
+  ["worker-robot-speed"] = {subfamily = "robot_modifier"},
+  ["worker-robot-storage"] = {subfamily = "robot_modifier"}
 }
 
 local RESOLVERS = {
@@ -140,27 +188,66 @@ local function emit_recipe_capability_decisions(registry, resolver, classified_c
   return #candidates, generated, proposed, diagnosed
 end
 
+local function new_native_owner_row(effect_type, policy)
+  return {
+    effect_type = effect_type,
+    subfamily = policy.subfamily,
+    policy = policy,
+    technologies = {}, technologies_seen = {},
+    subjects = {}, subjects_seen = {},
+    qualified_technologies = {}, qualified_technologies_seen = {},
+    unqualified_technologies = {}, unqualified_technologies_seen = {},
+    mir_base_continuation_technologies = {}, mir_base_continuation_technologies_seen = {},
+    mir_stream = 0,
+    mir_base_continuation = 0,
+    external = 0,
+    qualified_external = 0,
+    qualified = 0,
+    unqualified_sightings = 0,
+    unqualified_reasons = {}, unqualified_reasons_seen = {}
+  }
+end
+
+-- Registry ownership is only a sighting until the same positive,
+-- enabled/reachable-infinite identity predicate used by direct ownership
+-- accepts it. This prevents a finite, disabled, zero-value, or
+-- science-unreachable technology from becoming diagnostic coverage.
 local function native_owner_summary(registry)
   local by_effect = {}
 
   for _, owner in ipairs(registry.owners or {}) do
-    local subfamily = NATIVE_MODIFIERS[owner.effect_type]
-    if subfamily then
-      by_effect[owner.effect_type] = by_effect[owner.effect_type] or {
-        effect_type = owner.effect_type,
-        subfamily = subfamily,
-        technologies = {},
-        technologies_seen = {},
-        mir = 0,
-        external = 0
-      }
-
+    local policy = NATIVE_MODIFIERS[owner.effect_type]
+    if policy then
+      by_effect[owner.effect_type] = by_effect[owner.effect_type]
+        or new_native_owner_row(owner.effect_type, policy)
       local row = by_effect[owner.effect_type]
       push_unique(row.technologies, row.technologies_seen, owner.technology)
-      if owner.mod_owner == "more-infinite-research" then
-        row.mir = row.mir + 1
+      push_unique(row.subjects, row.subjects_seen, owner.subject)
+
+      local is_mir_stream = owner.mod_owner == "more-infinite-research"
+      local is_mir_base_continuation = owner.policy == "native_continuation_owner"
+      if is_mir_base_continuation then
+        row.mir_base_continuation = row.mir_base_continuation + 1
+        push_unique(row.mir_base_continuation_technologies,
+          row.mir_base_continuation_technologies_seen, owner.technology)
+      elseif is_mir_stream then
+        row.mir_stream = row.mir_stream + 1
       else
         row.external = row.external + 1
+      end
+
+      local qualification_reason = native_effect_coverage.technology_effect_identity_qualification_reason(
+        owner.technology, owner.effect, {positive_numeric_value = true})
+      if qualification_reason == nil then
+        row.qualified = row.qualified + 1
+        push_unique(row.qualified_technologies, row.qualified_technologies_seen, owner.technology)
+        if not is_mir_stream and not is_mir_base_continuation then
+          row.qualified_external = row.qualified_external + 1
+        end
+      else
+        row.unqualified_sightings = row.unqualified_sightings + 1
+        push_unique(row.unqualified_technologies, row.unqualified_technologies_seen, owner.technology)
+        push_unique(row.unqualified_reasons, row.unqualified_reasons_seen, qualification_reason)
       end
     end
   end
@@ -173,32 +260,83 @@ local function emit_native_modifier_decisions(registry, resolver, discovered_row
   local total = 0
   local warnings = 0
 
-  for _, effect_type in ipairs(sorted_keys(rows)) do
-    local row = rows[effect_type]
+  for _, effect_type in ipairs(sorted_keys(NATIVE_MODIFIERS)) do
+    local policy = NATIVE_MODIFIERS[effect_type]
+    local row = rows[effect_type] or new_native_owner_row(effect_type, policy)
     total = total + 1
-    if row.external > 0 then warnings = warnings + 1 end
+    if row.qualified_external > 0 then warnings = warnings + 1 end
+
+    local observed = row.qualified
+    local reason
+    local decision
+    local emitted = "false"
+    local policy_name = "diagnose_only"
+    local current_emission_status = "none"
+    if policy.current_mir_base_continuation and row.mir_base_continuation > 0 then
+      reason = "existing_mir_base_continuation_pending_exact_cap_and_conservation_proof"
+      decision = "report_existing_mir_base_continuation_pending_exact_proof"
+      emitted = "true"
+      policy_name = "existing-mir-base-continuation-unqualified"
+      current_emission_status = policy.current_mir_base_continuation
+    elseif observed == 0 then
+      reason = row.unqualified_sightings > 0 and "unqualified_native_modifier_sighting"
+        or "native_modifier_not_observed"
+    elseif row.qualified_external > 0 then
+      reason = "native_modifier_external_owner_observed"
+    else
+      reason = "native_modifier_mir_owner_observed"
+    end
+    if not decision then
+      decision = observed > 0 and "observe_existing_owner" or "withhold_until_exact_observation"
+    end
+    if emitted == "false" and row.mir_stream > 0 then
+      emitted = "true"
+      current_emission_status = "existing-mir-stream-observed"
+    end
+    local confidence = observed > 0 and "owner=1,total=1" or "owner=0,total=0"
+    local blocker = policy.required_proof or ""
+    local risk = observed > 0 and row.qualified_external > 0 and "duplicate_native_modifier_owner" or ""
+    if policy.paid_noop_guard then
+      risk = risk ~= "" and (risk .. "," .. policy.paid_noop_guard) or policy.paid_noop_guard
+    end
 
     D.decision({
       key = effect_type,
       status = "diagnostic",
-      reason = row.external > 0 and "native_modifier_external_owner_observed" or "native_modifier_mir_owner_observed",
+      reason = reason,
       subject_type = "modifier",
       subject = effect_type,
       capability = resolver.id,
       family = resolver.family,
       subfamily = row.subfamily,
-      confidence = "owner=1,total=1",
+      confidence = confidence,
       source = resolver.source,
-      policy = row.external > 0 and "prefer_existing_owner" or resolver.policy,
-      decision = "observe_existing_owner",
-      emitted = "false",
-      blockers = row.external > 0 and "external_native_modifier_owner" or "",
-      risks = row.external > 0 and "duplicate_native_modifier_owner" or "",
+      policy = observed > 0 and row.qualified_external > 0 and "prefer_existing_owner" or policy_name,
+      decision = decision,
+      emitted = emitted,
+      blockers = blocker,
+      risks = risk,
       technologies = join_names(row.technologies),
+      target = join_names(row.subjects),
       evidence = "technology_effect_type:" .. effect_type,
-      total = tostring(row.mir + row.external),
-      mir_owned = tostring(row.mir),
-      external_owned_unknown = tostring(row.external)
+      total = tostring(observed),
+      raw_sightings = tostring(#row.technologies),
+      unqualified_sightings = tostring(row.unqualified_sightings),
+      qualified_technologies = join_names(row.qualified_technologies),
+      unqualified_technologies = join_names(row.unqualified_technologies),
+      unqualified_reasons = join_names(row.unqualified_reasons),
+      mir_owned = tostring(row.mir_stream),
+      mir_base_continuation = tostring(row.mir_base_continuation),
+      mir_base_continuation_technologies = join_names(row.mir_base_continuation_technologies),
+      external_owned_unknown = tostring(row.external),
+      qualified_external_owners = tostring(row.qualified_external),
+      request_id = policy.request_id or "",
+      semantic_scope = policy.semantic_scope or "",
+      semantic_exclusions = policy.semantic_exclusions or "",
+      useful_level_status = policy.useful_level_status or "not-applicable",
+      paid_noop_guard = policy.paid_noop_guard or "",
+      throughput_disposition = policy.throughput_disposition or "",
+      current_emission_status = current_emission_status
     })
   end
 
@@ -342,8 +480,8 @@ end
 local function classify_native_state(state)
   require_stage(state, "discovered", "classified")
   for _, row in pairs(state.rows) do
-    row.decision = "observe_existing_owner"
-    row.has_conflict = row.external > 0
+    row.decision = row.qualified > 0 and "observe_existing_owner" or "withhold_until_exact_observation"
+    row.has_conflict = row.qualified_external > 0
   end
   return state
 end
