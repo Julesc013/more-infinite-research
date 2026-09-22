@@ -5,6 +5,7 @@ local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local relationships = require("prototypes.mir.index.relationships")
 local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 
 local R = {}
 
@@ -222,8 +223,11 @@ local function build_lab_facts()
 end
 
 local function owner_status(tech_name, effect)
-  if productivity_owners.is_mir_recipe_productivity_tech(tech_name) then
+  if generated_registry.get(tech_name) and generated_registry.get(tech_name).kind == "stream" then
     return "mir_owned"
+  end
+  if generated_registry.get(tech_name) and generated_registry.get(tech_name).kind == "base_extension" then
+    return "native_continuation_owner"
   end
   if effect.type == "change-recipe-productivity" then
     return "external_owned_exact"
@@ -261,9 +265,11 @@ local function build_owner_facts()
             subject_type = subject_type,
             subject = subject,
             effect_type = effect.type,
+            effect = deepcopy(effect),
             change_value = effect.change or effect.modifier,
             technology = tech_name,
-            mod_owner = productivity_owners.is_mir_recipe_productivity_tech(tech_name) and "more-infinite-research" or "external",
+            mod_owner = generated_registry.get(tech_name) and generated_registry.get(tech_name).kind == "stream"
+              and "more-infinite-research" or "external",
             infinite = tech.max_level == "infinite",
             finite_lead_in = tech.max_level ~= "infinite",
             exact_overlap = effect.type == "change-recipe-productivity",

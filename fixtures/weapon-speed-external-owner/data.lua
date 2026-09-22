@@ -49,7 +49,38 @@ local unreachable_owner = table.deepcopy(owner)
 unreachable_owner.name = "mir-fixture-unreachable-weapon-speed-owner"
 unreachable_owner.unit.ingredients = {{unreachable_pack.name, 1}}
 
-data:extend({owner, unreachable_pack, unreachable_recipe, unreachable_owner})
+-- This is intentionally numbered before MIR's compilation runs.  A name that
+-- resembles a base continuation is not MIR authority: the generated registry
+-- must prove that MIR created the base extension before it can be replaced.
+local numbered_continuation = table.deepcopy(owner)
+numbered_continuation.name = "weapon-shooting-speed-99"
+numbered_continuation.localised_name = "MIR fixture external weapon speed continuation"
+numbered_continuation.localised_description =
+  "Pre-compilation external numbered continuation; MIR must preserve its exact owners."
+numbered_continuation.level = 99
+
+-- These deliberately non-qualifying native-owner sightings exercise the
+-- NATIVE-01 / STACK-02 diagnostics. They must remain visible as raw sightings
+-- without becoming confidence, coverage, or duplicate-owner authority.
+local finite_native_owner = table.deepcopy(owner)
+finite_native_owner.name = "mir-fixture-finite-belt-stack-owner"
+finite_native_owner.effects = {{type = "belt-stack-size-bonus", modifier = 1}}
+finite_native_owner.max_level = 1
+finite_native_owner.level = 1
+
+local disabled_native_owner = table.deepcopy(owner)
+disabled_native_owner.name = "mir-fixture-disabled-inserter-stack-owner"
+disabled_native_owner.effects = {{type = "inserter-stack-size-bonus", modifier = 1}}
+disabled_native_owner.enabled = false
+
+local zero_native_owner = table.deepcopy(owner)
+zero_native_owner.name = "mir-fixture-zero-stack-inserter-owner"
+zero_native_owner.effects = {{type = "stack-inserter-capacity-bonus", modifier = 0}}
+
+data:extend({
+  owner, numbered_continuation, unreachable_pack, unreachable_recipe, unreachable_owner,
+  finite_native_owner, disabled_native_owner, zero_native_owner
+})
 
 for _, lab in pairs(data.raw.lab or {}) do
   lab.inputs = lab.inputs or {}

@@ -50,12 +50,19 @@ end
 
 local techs = data.raw.technology or {}
 
-local function exact_infinite_owner(name, category)
+local function positive_infinite_owner(name, category)
   return with_isolated_compiler_context(function()
-    return native_effect_coverage.technology_has_exact_effect(name, {
+    return native_effect_coverage.technology_has_effect_identity(name, {
       type = "gun-speed",
-      ammo_category = category,
-      modifier = 0.1
+      ammo_category = category
+    }, {positive_numeric_value = true})
+  end)
+end
+
+local function unqualified_native_owner_reason(name, effect)
+  return with_isolated_compiler_context(function()
+    return native_effect_coverage.technology_effect_identity_qualification_reason(name, effect, {
+      positive_numeric_value = true
     })
   end)
 end
@@ -76,12 +83,11 @@ local function replacement_coverage(category)
     }, { positive_numeric_value = true })
   end)
   if dedicated_coverage then return true end
-  if prefer_mir then return false end
 
   for name, _ in pairs(techs) do
     if not string.match(name, "^recipe%-prod%-")
       and not string.match(name, "^weapon%-shooting%-speed%-%d+$")
-      and exact_infinite_owner(name, category)
+      and positive_infinite_owner(name, category)
     then
       return true
     end
@@ -138,6 +144,7 @@ if not artifacts_visible then
   -- assertions while MIR itself continues to use scoped compiler state.
   for name, tech in pairs(techs) do
     if string.match(name, "^weapon%-shooting%-speed%-%d+$")
+      and name ~= "weapon-shooting-speed-99"
       and tech.unit
       and tech.unit.count_formula
       and not generated_seen[name]
@@ -151,11 +158,13 @@ table.sort(generated_names)
 
 for _, name in ipairs(generated_names) do
   local tech = techs[name]
-  if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.unit and tech.unit.count_formula then
+  if name ~= "weapon-shooting-speed-99"
+    and string.match(name, "^weapon%-shooting%-speed%-%d+$")
+    and tech.unit and tech.unit.count_formula
+  then
     generated_count = generated_count + 1
     for _, category in ipairs({"rocket", "cannon-shell"}) do
-      local should_strip = mode == "always"
-        or (mode == "only-when-dedicated-tech-enabled" and replacement_coverage(category))
+      local should_strip = mode ~= "off" and replacement_coverage(category)
       local present = has_gun_speed(tech, category)
       if should_strip and present then
         fail(name .. " retained " .. category .. " despite replacement coverage in mode " .. mode)
@@ -200,8 +209,8 @@ if external_owner then
   if techs[dedicated_names.rocket] or techs[dedicated_names["cannon-shell"]] then
     fail("MIR dedicated rocket or cannon technology was not suppressed by exact external coverage")
   end
-  if not exact_infinite_owner("mir-fixture-external-weapon-speed-owner", "rocket")
-    or not exact_infinite_owner("mir-fixture-external-weapon-speed-owner", "cannon-shell")
+  if not positive_infinite_owner("mir-fixture-external-weapon-speed-owner", "rocket")
+    or not positive_infinite_owner("mir-fixture-external-weapon-speed-owner", "cannon-shell")
   then
     fail("external owner does not provide exact reachable infinite replacement coverage")
   end
@@ -215,17 +224,46 @@ if external_owner then
     fail("science-unreachable external owner was accepted as replacement coverage")
   end
 
-  if artifacts_visible then
-    local external_continuation = table.deepcopy(external_owner)
-    external_continuation.name = "weapon-shooting-speed-99"
-    external_continuation.localised_name = "MIR fixture external weapon speed continuation"
-    data:extend({external_continuation})
+  local negative_native_owners = {
+    {
+      name = "mir-fixture-finite-belt-stack-owner",
+      effect = {type = "belt-stack-size-bonus"},
+      reason = "technology_not_infinite"
+    },
+    {
+      name = "mir-fixture-disabled-inserter-stack-owner",
+      effect = {type = "inserter-stack-size-bonus"},
+      reason = "technology_disabled"
+    },
+    {
+      name = "mir-fixture-zero-stack-inserter-owner",
+      effect = {type = "stack-inserter-capacity-bonus"},
+      reason = "effect_identity_nonpositive_or_non_numeric"
+    },
+    {
+      name = "mir-fixture-unreachable-weapon-speed-owner",
+      effect = {type = "gun-speed", ammo_category = "rocket"},
+      reason = "technology_science_unreachable"
+    }
+  }
+  for _, expected in ipairs(negative_native_owners) do
+    if unqualified_native_owner_reason(expected.name, expected.effect) ~= expected.reason then
+      fail("non-qualifying native owner was not classified as " .. expected.reason .. ": " .. expected.name)
+    end
+  end
 
-    -- Re-run the cleanup after the external continuation exists. The
-    -- production CompilerContext is closed by this fixture stage, so replay
-    -- the published generated identities inside an explicit isolated context.
-    -- Old broad name scanning would mutate the external continuation;
-    -- registry-scoped cleanup must not.
+  local external_continuation = techs["weapon-shooting-speed-99"]
+  if not external_continuation
+    or not positive_infinite_owner("weapon-shooting-speed-99", "rocket")
+    or not positive_infinite_owner("weapon-shooting-speed-99", "cannon-shell")
+  then
+    fail("pre-compilation external numbered continuation was not present with exact positive owners")
+  end
+
+  if artifacts_visible then
+    -- The continuation existed before compilation. Re-run the cleanup after
+    -- compiling: a broad numbered-name scan would mutate it; registry-scoped
+    -- cleanup must preserve the external owner.
     with_isolated_compiler_context(function()
       for _, name in ipairs(generated_names) do generated_registry.register(name) end
       weapon_speed_mutation.apply()
@@ -236,9 +274,10 @@ if external_owner then
     then
       fail("external weapon shooting speed continuation was mutated")
     end
-
-    -- Factorio forbids a numbered level after an infinite continuation. The
-    -- transient prototype exists only long enough to exercise policy scope.
-    techs["weapon-shooting-speed-99"] = nil
   end
+
+  -- It was available throughout MIR compilation and this assertion stage.
+  -- Factorio forbids a numbered level following an infinite continuation, so
+  -- remove the counterexample before final prototype validation.
+  techs["weapon-shooting-speed-99"] = nil
 end

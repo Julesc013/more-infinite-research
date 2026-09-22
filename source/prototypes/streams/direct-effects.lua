@@ -208,6 +208,11 @@ return {
     icon_tech = "flamethrower",
     localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
     required_technologies = {"flamethrower"},
+    -- Ownership is per ammo-category identity.  This stream must either
+    -- replace the native continuation through the governed overlap policy or
+    -- leave that positive native owner untouched; it never stacks a second
+    -- paid firing-speed effect.
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","space-science-pack"
@@ -225,6 +230,10 @@ return {
     },
     required_technologies = {"discharge-defense-equipment"},
     localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
+    -- Tesla and older electric ammunition are separate identities.  The
+    -- compiler may keep one and omit the other when their native ownership
+    -- differs; it must not treat the pair as an all-or-nothing bonus.
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"

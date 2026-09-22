@@ -111,6 +111,7 @@ if (-not $publicProjector.Contains('artifact_budget.limit(artifact and artifact.
     -not $coveragePublisher.Contains('public_artifacts.assert_byte_budget(public)')) {
   throw "One or more public compiler artifacts bypass the hard canonical-byte budget."
 }
+& (Join-Path $repo 'tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1') -RepoRoot $repo
 $expectedActions = @("disabled", "preview", "apply")
 if (@(Compare-Object $expectedActions @($manifest.automatic_actions)).Count -ne 0) { throw "Automatic action contract coverage is incomplete." }
 if (($expectedActions -join "|") -ne (@($manifest.automatic_actions) -join "|")) { throw "Automatic actions must stay ordered from no changes to applied changes." }

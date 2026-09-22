@@ -13,6 +13,7 @@ local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local compiler_result = require("prototypes.mir.domain.compiler.compiler_result")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local effect_target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory")
+local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local model = require("prototypes.mir.planner.compilation_plan.model")
 local validation = require("prototypes.mir.planner.compilation_plan.validate")
 local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.fingerprint")
@@ -316,48 +317,67 @@ local function materialized_stream_operations(artifact, options)
   return out
 end
 
+local function gun_speed_category(effect)
+  if effect and effect.type == "gun-speed" and type(effect.ammo_category) == "string" then
+    return effect.ammo_category
+  end
+  return nil
+end
+
+local function owner_list_contains_non_continuation(owner_list)
+  for owner in string.gmatch(owner_list or "", "[^,]+") do
+    if not native_effect_coverage.is_mir_weapon_speed_base_extension_owner(owner) then return true end
+  end
+  return false
+end
+
+-- The direct-stream qualifier has already established whether each category
+-- has a positive, exact owner.  This projection removes only categories that
+-- a dedicated emitted stream or a different native owner owns.  It never uses
+-- the setting's "always" value to create a paid no-op by stripping a base
+-- category without such an owner.
 local function apply_weapon_overlap_policy(operation, stream_operations, stream_rows, mode)
   if operation.key ~= "weapon-shooting-speed" then return operation end
   if mode == "off" then
-    operation.planned_policy = "weapon-speed-overlap-retained"
-    operation.planned_overlap_identities = {
-      [generation_plan.effect_identity({type = "gun-speed", ammo_category = "rocket"})] = true,
-      [generation_plan.effect_identity({type = "gun-speed", ammo_category = "cannon-shell"})] = true
-    }
+    operation.planned_policy = "weapon-speed-native-owner-preserved"
     return operation
   end
   local strip = {}
-  if mode == "always" then
-    strip.rocket = true
-    strip["cannon-shell"] = true
-  else
-    for _, stream_operation in ipairs(stream_operations) do
-      for _, effect in ipairs((stream_operation.technology and stream_operation.technology.effects) or {}) do
-        if effect.type == "gun-speed" and (effect.ammo_category == "rocket" or effect.ammo_category == "cannon-shell") then
-          strip[effect.ammo_category] = true
-        end
+  for _, stream_operation in ipairs(stream_operations) do
+    for _, effect in ipairs((stream_operation.technology and stream_operation.technology.effects) or {}) do
+      local category = gun_speed_category(effect)
+      if category then strip[category] = true end
+    end
+  end
+  -- A non-continuation native owner suppresses a direct stream.  It can still
+  -- own the category that the generic continuation would otherwise emit, so
+  -- keep that skip decision in the same single-emitter projection.
+  for _, row in ipairs(stream_rows or {}) do
+    local diagnostics = row.diagnostics or {}
+    if owner_list_contains_non_continuation(diagnostics.owners) then
+      -- A partially emitted direct stream retains this exact list, so an
+      -- external owner of Tesla, for example, does not leave the base
+      -- continuation as a second owner while electric may still emit.
+      for category in string.gmatch(diagnostics.native_effect_covered_categories or "", "[^,]+") do
+        strip[category] = true
       end
     end
-    -- An exact external infinite owner suppresses the MIR stream but still
-    -- takes over the same category. Preserve that finalized skip decision in
-    -- the base-operation plan so the later mutation and output validator use
-    -- one authority.
-    for _, row in ipairs(stream_rows or {}) do
-      if row.action == "skip" and row.reason == "covered_by_existing_infinite_native_modifier" then
-        for _, effect in ipairs((row.spec and row.spec.direct_effects) or {}) do
-          if effect.type == "gun-speed" and (effect.ammo_category == "rocket" or effect.ammo_category == "cannon-shell") then
-            strip[effect.ammo_category] = true
-          end
-        end
+    if row.action == "skip" and row.reason == "covered_by_existing_infinite_native_modifier"
+      and owner_list_contains_non_continuation(diagnostics.owners)
+    then
+      for _, effect in ipairs((row.spec and row.spec.direct_effects) or {}) do
+        local category = gun_speed_category(effect)
+        if category then strip[category] = true end
       end
     end
   end
   local filtered = {}
   for _, effect in ipairs(operation.technology.effects or {}) do
-    if not (effect.type == "gun-speed" and strip[effect.ammo_category]) then table.insert(filtered, effect) end
+    if not (gun_speed_category(effect) and strip[effect.ammo_category]) then table.insert(filtered, effect) end
   end
   operation.technology.effects = filtered
-  operation.planned_policy = "weapon-speed-overlap"
+  operation.planned_policy = next(strip) and "weapon-speed-overlap-resolved"
+    or "weapon-speed-native-owner-preserved"
   return operation
 end
 
