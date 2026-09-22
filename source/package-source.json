@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 42401,
-      "source_sha256": "B9D4A127FB02C2F0DD22E12518523C7B31178CE873CA65E59A39502AC252D5F6",
-      "output_bytes": 42401,
-      "output_sha256": "B9D4A127FB02C2F0DD22E12518523C7B31178CE873CA65E59A39502AC252D5F6"
+      "source_bytes": 44684,
+      "source_sha256": "4521FA2BCB71A51769073017D188237A1CB0BCCFCF448BF06AD049EB865F0E66",
+      "output_bytes": 44684,
+      "output_sha256": "4521FA2BCB71A51769073017D188237A1CB0BCCFCF448BF06AD049EB865F0E66"
     },
     {
       "layer": "capability",
@@ -2986,10 +2986,10 @@
         "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 26563,
-      "source_sha256": "0E10D99189E86A83F7DE845B6DAEFD699CE18500EF43CDDD203350EC7CD2D714",
-      "output_bytes": 26563,
-      "output_sha256": "0E10D99189E86A83F7DE845B6DAEFD699CE18500EF43CDDD203350EC7CD2D714"
+      "source_bytes": 29831,
+      "source_sha256": "C77CAEAD3357421FD216FE3B6F77B8D7B69CC1D5B509C36E1675B87F53723563",
+      "output_bytes": 29831,
+      "output_sha256": "C77CAEAD3357421FD216FE3B6F77B8D7B69CC1D5B509C36E1675B87F53723563"
     },
     {
       "layer": "capability",
@@ -6588,10 +6588,10 @@
         "predecessor_source_path": "targets/f200/generation/info.json.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 516,
-      "source_sha256": "658FB982FC22D3D5430BABA30A0722094757076334CDDBAD25FB55C1AD3E2AFB",
-      "output_bytes": 516,
-      "output_sha256": "658FB982FC22D3D5430BABA30A0722094757076334CDDBAD25FB55C1AD3E2AFB"
+      "source_bytes": 542,
+      "source_sha256": "74BF74CF28786AF3B18A6CCD436D31736BEC59538E353EDD0D896246B9BD1FEE",
+      "output_bytes": 542,
+      "output_sha256": "74BF74CF28786AF3B18A6CCD436D31736BEC59538E353EDD0D896246B9BD1FEE"
     },
     {
       "layer": "adapter",
@@ -7369,5 +7369,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "EE4D6EE49FD537B6D4A74F0549BBBA0E60142DF535ECB69CE7B1A7B15488150D"
+  "record_sha256": "D9D38579FE5C5DE458AD63B13693AB840C35F53DE535A795C97680D42DEC47DB"
 }

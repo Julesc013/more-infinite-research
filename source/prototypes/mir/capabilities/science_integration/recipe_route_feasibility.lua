@@ -160,6 +160,7 @@ local function reset_state(state, epoch, context, recipe_index)
   state.recipe_index = recipe_index
   state.visiting = {}
   state.acquisition_memo = {}
+  state.stable_acquisition_memo = {}
   state.machine_categories = nil
   state.source_catalog = nil
   state.surface_locations = nil
@@ -294,6 +295,53 @@ local function append_minable_sources(sources, prototype_type, witness_kind, opt
   return true
 end
 
+local function has_unconditional_source(sources, identity)
+  for _, witness in ipairs(sources[identity_key(identity)] or {}) do
+    if type(witness.surface_conditions) ~= "table" or #witness.surface_conditions == 0 then
+      return true
+    end
+  end
+  return false
+end
+
+-- Boilers are prototype-defined fluid conversions rather than recipes. A
+-- boiler whose input fluid already has an unconditional natural source gives
+-- a concrete acquisition route for its declared output fluid. As with recipe
+-- machine checks, this witness deliberately does not claim machine, fuel,
+-- power, throughput, or placement acquisition. Surface-constrained boiler or
+-- input sources remain conservative until a same-surface witness is modeled.
+local function append_boiler_sources(sources, options)
+  for _, boiler in pairs(data_raw.prototypes("boiler")) do
+    if not diagnostic_visit(options) then return false end
+    local input = normalize_identity({
+      type = "fluid",
+      name = boiler.fluid_box and boiler.fluid_box.filter
+    })
+    local output = normalize_identity({
+      type = "fluid",
+      name = boiler.output_fluid_box and boiler.output_fluid_box.filter
+    })
+    local target_temperature = tonumber(boiler.target_temperature)
+    if input and output and not same_identity(input, output)
+      and finite_positive(target_temperature)
+      and boiler.energy_consumption ~= nil
+      and type(boiler.energy_source) == "table"
+      and (type(boiler.surface_conditions) ~= "table" or #boiler.surface_conditions == 0)
+      and has_unconditional_source(sources, input) then
+      local key = identity_key(output)
+      sources[key] = sources[key] or {}
+      table.insert(sources[key], {
+        kind = "boiler-conversion",
+        prototype = boiler.name,
+        product = output,
+        input = input,
+        target_temperature = target_temperature
+      })
+    end
+  end
+  return true
+end
+
 local function default_source_catalog(state, options)
   if state.source_catalog then return state.source_catalog end
   local sources = {}
@@ -316,6 +364,7 @@ local function default_source_catalog(state, options)
       })
     end
   end
+  if not append_boiler_sources(sources, options) then return sources end
   state.source_catalog = sources
   return sources
 end
@@ -527,6 +576,30 @@ local function cacheable(options)
     and type(options.research_unlock_witness) ~= "function"
 end
 
+local function stable_cacheable(options)
+  return options.diagnostic_observer == nil
+    and type(options.source_witness) ~= "function"
+    and type(options.machine_category_witness) ~= "function"
+    and type(options.surface_witness) ~= "function"
+end
+
+local STABLE_SOURCE_KINDS = {
+  ["minable-resource"] = true,
+  ["minable-entity"] = true,
+  ["offshore-pump"] = true,
+  ["boiler-conversion"] = true
+}
+
+local function stable_acquisition_witness(witness)
+  if type(witness) ~= "table" then return false end
+  if STABLE_SOURCE_KINDS[witness.kind] then return true end
+  if witness.kind ~= "recipe" then return false end
+  for _, ingredient in ipairs(witness.ingredients or {}) do
+    if not stable_acquisition_witness(ingredient) then return false end
+  end
+  return true
+end
+
 -- A source witness or one enabled recipe alternative proves a product. The
 -- active type/name set makes recursive requirements AND, recipe alternatives
 -- OR, and rejects unseeded cycles. Default raw-prototype scans are cached only
@@ -534,6 +607,10 @@ end
 local function acquisition_witness_impl(output_identity, options, state)
   if not diagnostic_visit(options) then return nil end
   local key = identity_key(output_identity)
+  local may_use_stable = stable_cacheable(options)
+  if may_use_stable and state.stable_acquisition_memo[key] ~= nil then
+    return deepcopy(state.stable_acquisition_memo[key])
+  end
   -- A recursive answer is conditional on the caller's active cycle set. Only
   -- a root query can safely memoize a positive or negative acquisition result;
   -- recursive calls still reuse the bounded raw-prototype scan indexes.
@@ -554,6 +631,9 @@ local function acquisition_witness_impl(output_identity, options, state)
 
   local direct = source_witness(output_identity, options, state)
   if direct then
+    if may_use_stable and stable_acquisition_witness(direct) then
+      state.stable_acquisition_memo[key] = deepcopy(direct)
+    end
     if may_cache then state.acquisition_memo[key] = deepcopy(direct) end
     return direct
   end
@@ -575,6 +655,9 @@ local function acquisition_witness_impl(output_identity, options, state)
       -- provisional failures from other producers cannot be propagated as the
       -- selected branch's explanation.
       diagnostic_rollback(options, acquisition_checkpoint)
+      if may_use_stable and stable_acquisition_witness(witness) then
+        state.stable_acquisition_memo[key] = deepcopy(witness)
+      end
       if may_cache then state.acquisition_memo[key] = deepcopy(witness) end
       return witness
     end
@@ -648,12 +731,12 @@ function M.recipe_witness(recipe_name, output, options, state)
   )
 end
 
-function M.initial_recipe_witness(recipe_name, output, options)
+function M.initial_recipe_witness(recipe_name, output, options, state)
   -- Never mutate the caller's option table: a caller can safely reuse it for a
   -- later locked-route query without inheriting require_enabled=true.
   local initial_options = copy_options(options)
   initial_options.require_enabled = true
-  return M.recipe_witness(recipe_name, output, initial_options)
+  return M.recipe_witness(recipe_name, output, initial_options, state)
 end
 
 return M

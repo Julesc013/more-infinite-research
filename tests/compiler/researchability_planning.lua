@@ -148,6 +148,7 @@ local function reset(next_world)
     resource = world.resources or {},
     tree = world.trees or {},
     ["offshore-pump"] = world.offshore_pumps or {},
+    boiler = world.boilers or {},
     surface = world.surfaces or {},
     ["space-location"] = world.space_locations or {},
     planet = world.planets or {}
@@ -573,6 +574,89 @@ reset({
 check("F09CA", feasibility.source_witness("wood").kind == "minable-entity"
   and feasibility.source_witness("ore") == nil,
   "A minable tree is an item source without inventing a resource-prototype witness")
+
+local function boiler_source_world(input_source, boiler_conditions)
+  return {
+    item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+    offshore_pumps = input_source and {pump = {fluid = "water"}} or {},
+    boilers = {boiler = {
+      name = "boiler",
+      fluid_box = {filter = "water"},
+      output_fluid_box = {filter = "steam"},
+      target_temperature = 165,
+      energy_consumption = "1.8MW",
+      energy_source = {type = "burner"},
+      surface_conditions = boiler_conditions
+    }}
+  }
+end
+reset(boiler_source_world(true))
+local steam_witness = feasibility.source_witness({type = "fluid", name = "steam"})
+check("F09CB", steam_witness and steam_witness.kind == "boiler-conversion"
+  and steam_witness.prototype == "boiler" and steam_witness.input.type == "fluid"
+  and steam_witness.input.name == "water" and steam_witness.target_temperature == 165,
+  "A boiler converts an unconditional naturally pumped input into an exact typed fluid source")
+check("F09CC", feasibility.source_witness("steam") == nil,
+  "A boiler fluid output never supplies a same-named item identity")
+reset(boiler_source_world(false))
+check("F09CD", feasibility.source_witness({type = "fluid", name = "steam"}) == nil,
+  "A boiler output without an independently sourced input fluid remains unavailable")
+reset(boiler_source_world(true, {{property = "pressure", min = 1000}}))
+check("F09CE", feasibility.source_witness({type = "fluid", name = "steam"}) == nil,
+  "A surface-constrained boiler remains conservative until same-surface input proof exists")
+
+-- A contextual unlock callback disables the ordinary acquisition memo. Even
+-- then, two sibling recipes may safely share a proved source/enabled-recipe
+-- route from one explicit query state. The returned copy must remain
+-- defensive, and a research-unlocked witness must never enter that stable
+-- cache.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, unlockers = {},
+  recipe_facts = {}, producers = {},
+  resources = {shared_ore = {minable = {result = "shared-ore", count = 1}}}
+})
+local shared_fact_reads = 0
+local shared_facts = {
+  ["shared-enabled"] = route_fact("shared-item", {{name = "shared-ore", amount = 1}}),
+  ["top-one"] = route_fact("top-one", {{name = "shared-item", amount = 1}}),
+  ["top-two"] = route_fact("top-two", {{name = "shared-item", amount = 1}})
+}
+local shared_index = {
+  facts = setmetatable({}, {__index = function(_, name)
+    if name == "shared-enabled" then shared_fact_reads = shared_fact_reads + 1 end
+    return shared_facts[name]
+  end}),
+  by_output = {
+    ["shared-item"] = {"shared-enabled"},
+    ["top-one"] = {"top-one"},
+    ["top-two"] = {"top-two"}
+  }
+}
+local shared_options = {
+  recipe_index = shared_index,
+  research_unlock_witness = function() return nil end
+}
+local shared_state = {}
+local top_one = feasibility.recipe_witness("top-one", "top-one", shared_options, shared_state)
+if top_one then top_one.ingredients[1].recipe = "forged" end
+local top_two = feasibility.recipe_witness("top-two", "top-two", shared_options, shared_state)
+check("F09CF", top_one and top_two and top_two.ingredients[1].recipe == "shared-enabled"
+  and shared_fact_reads == 1,
+  "Sibling routes reuse a defensive copy of one context-free enabled acquisition witness")
+
+local contextual_calls = 0
+local contextual_options = {
+  recipe_index = {facts = {}, by_output = {}},
+  research_unlock_witness = function(identity)
+    contextual_calls = contextual_calls + 1
+    return {kind = "research-unlocked-recipe", identity = identity, marker = contextual_calls}
+  end
+}
+local contextual_state = {}
+local contextual_one = feasibility.acquisition_witness("contextual-item", contextual_options, contextual_state)
+local contextual_two = feasibility.acquisition_witness("contextual-item", contextual_options, contextual_state)
+check("F09CG", contextual_calls == 2 and contextual_one.marker == 1 and contextual_two.marker == 2,
+  "Research-unlocked witnesses remain query-contextual and are never stored as stable acquisitions")
 
 reset({
   item_prototypes = {same = {type = "item"}},
@@ -1248,6 +1332,52 @@ before_projection = context_observation_snapshot()
 check("U04A", production.pack_production_rejection_projection("fluid_pack") == nil
   and context_observation_unchanged(before_projection),
   "Typed seeded fluid routes remain projection-free without mutating root caches or telemetry")
+
+-- One pack may expose many producer recipes which all reach the same locked
+-- intermediate. The technology decision is contextual, so it cannot use the
+-- global pack cache; it can nevertheless be reused inside the one exact
+-- route query when recipe, unlocker, and active visitation sets are identical.
+local function contextual_reason_fanout_world(width)
+  local facts, prototypes, pack_recipes = {
+    ["shared-inner-recipe"] = route_fact(
+      "shared-inner", {{name = "shared-ore", amount = 1}}, {enabled = false})
+  }, { ["shared-inner-recipe"] = {name = "shared-inner-recipe"} }, {}
+  for index = 1, width do
+    local name = string.format("fanout-pack-%02d", index)
+    facts[name] = route_fact("fanout-pack", {{name = "shared-inner", amount = 1}})
+    prototypes[name] = {name = name}
+    table.insert(pack_recipes, name)
+  end
+  return {
+    item_prototypes = {
+      ["fanout-pack"] = {type = "item"},
+      ["shared-inner"] = {type = "item"}
+    },
+    labs = {lab = {inputs = {"fanout-pack"}}},
+    techs = {SharedInnerUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}}},
+    recipe_prototypes = prototypes,
+    recipe_facts = facts,
+    producers = {
+      ["fanout-pack"] = pack_recipes,
+      ["shared-inner"] = {"shared-inner-recipe"}
+    },
+    unlockers = {["shared-inner-recipe"] = {"SharedInnerUnlock"}},
+    resources = {shared_ore = {minable = {result = "shared-ore", count = 1}}}
+  }
+end
+
+reset(contextual_reason_fanout_world(24))
+local contextual_reason_calls = 0
+context.services["science.technology_researchability_reason"] = function(_, reason_context)
+  contextual_reason_calls = contextual_reason_calls + 1
+  check("U05A", reason_context.visiting_packs["fanout-pack"] == true
+    and reason_context.unlock_recipe_name == "shared-inner-recipe",
+    "The query-local memo is bound to the active pack and exact unlock recipe")
+  return "fixture-contextual-rejection"
+end
+check("U05", production.pack_production_status("fanout-pack", {}) == "unreachable"
+  and contextual_reason_calls == 1,
+  "Repeated producer fan-out reuses one exact contextual technology rejection")
 
 -- The bounded status pass needs exactly four visits to establish that this
 -- physical lab input has no recipe. An old trace then repeated the existence

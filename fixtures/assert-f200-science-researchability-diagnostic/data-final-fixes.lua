@@ -7,6 +7,10 @@ local reachability = require(
   "__more-infinite-research__.prototypes.mir.capabilities.science_integration.pack_production_reachability")
 local compiler_context = require(
   "__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
+local recipe_unlocks = require(
+  "__more-infinite-research__.prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
+local technology_researchability = require(
+  "__more-infinite-research__.prototypes.mir.capabilities.science_integration.technology_researchability")
 
 local function fail(message)
   error("MIR F200 science researchability diagnostic assertion failed: " .. message)
@@ -35,6 +39,14 @@ local subjects = {
   }
 }
 
+local no_lab_omissions = {
+  "research_character_crafting_speed",
+  "research_character_mining_speed",
+  "research_character_reach",
+  "research_character_walking_speed",
+  "research_inventory_capacity"
+}
+
 local function contains(values, expected)
   for _, value in ipairs(values or {}) do
     if value == expected then return true end
@@ -44,6 +56,55 @@ end
 
 local function ingredient_name(ingredient)
   return type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
+end
+
+local function ingredient_type(ingredient)
+  return type(ingredient) == "table" and (ingredient.type or "item") or nil
+end
+
+local function recipe_ingredient_names(recipe_name)
+  local recipe = data.raw.recipe[recipe_name]
+  if not recipe then fail("missing finalized recipe " .. recipe_name) end
+  local names = {}
+  for _, ingredient in ipairs(recipe.ingredients or {}) do
+    table.insert(names, ingredient_name(ingredient))
+  end
+  table.sort(names)
+  return names
+end
+
+local function assert_names(actual, expected, label)
+  local actual_text = table.concat(actual or {}, ",")
+  local sorted_expected = {}
+  for _, value in ipairs(expected or {}) do table.insert(sorted_expected, value) end
+  table.sort(sorted_expected)
+  local expected_text = table.concat(sorted_expected, ",")
+  if actual_text ~= expected_text then
+    fail(label .. " expected=" .. expected_text .. " actual=" .. actual_text)
+  end
+end
+
+local function technology_uses_pack(technology_name, pack_name)
+  local technology = data.raw.technology[technology_name]
+  if not technology then return false end
+  for _, ingredient in ipairs(((technology.unit or {}).ingredients) or {}) do
+    if ingredient_name(ingredient) == pack_name then return true end
+  end
+  return false
+end
+
+local function assert_unlocker(recipe_name, technology_name)
+  if not contains(recipe_unlocks.unlockers_for_recipe(recipe_name), technology_name) then
+    fail(recipe_name .. " is not unlocked by finalized technology " .. technology_name)
+  end
+  local rejection = technology_researchability.reason_with_context(technology_name, {
+    visiting_packs = {},
+    visiting_technologies = {},
+    unlock_recipe_name = recipe_name
+  })
+  if rejection ~= nil then
+    fail(technology_name .. " is not researchable for " .. recipe_name .. ": " .. tostring(rejection))
+  end
 end
 
 -- Return the real technology in this prerequisite closure which consumes the
@@ -84,6 +145,56 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
   if type(parent_recipe_index) ~= "table" then
     fail("canonical parent recipe index did not initialize")
   end
+  assert_names(recipe_ingredient_names("logistic-science-pack"), {
+    "electronic-circuit", "inserter", "transport-belt"
+  }, "finalized logistic science ingredients")
+  assert_names(recipe_ingredient_names("electronic-circuit"), {
+    "bob-basic-electronic-components", "bob-solder", "bob-wooden-board"
+  }, "finalized electronic circuit ingredients")
+  assert_names(recipe_ingredient_names("bob-basic-electronic-components"), {
+    "angels-solid-carbon", "bob-tinned-copper-cable"
+  }, "finalized basic electronic component ingredients")
+  local solder_recipe = data.raw.recipe["angels-solder"]
+  if not solder_recipe or #(solder_recipe.ingredients or {}) ~= 1
+    or ingredient_name(solder_recipe.ingredients[1]) ~= "angels-liquid-molten-solder"
+    or ingredient_type(solder_recipe.ingredients[1]) ~= "fluid" then
+    fail("finalized Angel solder route is not the typed molten-solder route")
+  end
+  local logistic_unlock = data.raw.technology["logistic-science-pack"]
+  if not logistic_unlock or not technology_uses_pack("logistic-science-pack", "automation-science-pack") then
+    fail("logistic-science-pack is not the finalized automation-science consumer")
+  end
+  local boiler = data.raw.boiler and data.raw.boiler["boiler"]
+  if not boiler or not boiler.fluid_box or boiler.fluid_box.filter ~= "water"
+    or not boiler.output_fluid_box or boiler.output_fluid_box.filter ~= "steam" then
+    fail("base boiler does not provide the finalized water-to-steam conversion")
+  end
+  if not technology_uses_pack("bob-electronics", "automation-science-pack") then
+    fail("bob-electronics is not the finalized automation-science consumer")
+  end
+  assert_unlocker("logistic-science-pack", "logistic-science-pack")
+  assert_unlocker("electronic-circuit", "bob-electronics")
+  assert_unlocker("bob-basic-electronic-components", "bob-electronics")
+  assert_unlocker("angels-solder", "angels-solder-smelting-1")
+
+  local status, prerequisite = reachability.pack_production_status("logistic-science-pack", {})
+  local route = reachability.production_route_for_pack("logistic-science-pack")
+  if status ~= "research" or prerequisite ~= "logistic-science-pack"
+    or not route or route.recipe ~= "logistic-science-pack"
+    or route.unlocker ~= "logistic-science-pack" then
+    fail("finalized logistic-science acquisition route was not selected")
+  end
+  if reachability.pack_production_rejection_projection("logistic-science-pack", {
+    limits = {candidates = 16, nodes = 128, depth = 32, bytes = 32768}
+  }) ~= nil then
+    fail("reachable finalized logistic-science route retained a rejection projection")
+  end
+  log("[mir-fixture-assert-f200-science-researchability-diagnostic] final-route"
+    .. " pack=logistic-science-pack status=" .. status
+    .. " prerequisite=" .. prerequisite
+    .. " recipe=" .. route.recipe .. " unlocker=" .. route.unlocker
+    .. " steam_witness=boiler-conversion")
+
   for index, subject in ipairs(subjects) do
     local generated = data.raw.technology[subject.generated_technology]
     if not generated then
@@ -99,42 +210,24 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
     if not logistic_consumer then
       fail(subject.stream .. " prerequisite chain does not consume logistic-science-pack")
     end
-    local projection = reachability.pack_production_rejection_projection(
-      "logistic-science-pack",
-      {
-        limits = {candidates = 16, nodes = 128, depth = 32, bytes = 32768},
-        subject = {
-          stream = subject.stream,
-          generated_technology = subject.generated_technology,
-          prerequisite = subject.prerequisite,
-          logistic_consumer = logistic_consumer
-        }
-      }
-    )
-    if projection and projection.status == "indeterminate" then
-      fail(subject.stream .. " logistic-science observation exhausted its diagnostic work budget")
-    end
-    if not projection or projection.status ~= "unreachable"
-      or projection.pack_name ~= "logistic-science-pack" or #projection.candidates == 0
-      or not projection.subject or projection.subject.stream ~= subject.stream
-      or projection.subject.prerequisite ~= subject.prerequisite
-      or projection.subject.logistic_consumer ~= logistic_consumer then
-      fail(subject.stream .. " did not retain a bounded unreachable logistic-science projection")
-    end
-    local first = projection.first_failure or {}
-    log("[mir-fixture-assert-f200-science-researchability-diagnostic] projection=" .. index
+    log("[mir-fixture-assert-f200-science-researchability-diagnostic] emission=" .. index
       .. " stream=" .. subject.stream
       .. " generated=" .. subject.generated_technology
       .. " prerequisite=" .. subject.prerequisite
       .. " logistic_consumer=" .. logistic_consumer
-      .. " pack=logistic-science-pack"
-      .. " status=" .. projection.status
-      .. " candidates=" .. tostring(#projection.candidates) .. "/" .. tostring(projection.candidate_count)
-      .. " first_kind=" .. tostring(first.kind)
-      .. " first_reason=" .. tostring(first.reason)
-      .. " truncated=" .. table.concat(projection.truncation.truncated or {}, "+"))
+      .. " pack=logistic-science-pack status=generated")
+  end
+
+  for index, stream in ipairs(no_lab_omissions) do
+    local technology_name = "recipe-prod-" .. stream .. "-1"
+    if data.raw.technology[technology_name] then
+      fail(stream .. " unexpectedly generated without lab-compatible science")
+    end
+    log("[mir-fixture-assert-f200-science-researchability-diagnostic] omission=" .. index
+      .. " stream=" .. stream .. " generated=" .. technology_name .. " status=absent")
   end
 end)
 
-log("[mir-fixture-assert-f200-science-researchability-diagnostic] PASS projections=4"
+log("[mir-fixture-assert-f200-science-researchability-diagnostic] PASS"
+  .. " final_route=reachable emissions=4 no_lab_omissions=5"
   .. " player-mutation=false prototype-write=false")

@@ -197,11 +197,17 @@
         "required_result": "passed",
         "maximum_dependency_failures": 0,
         "required_log_fragments": [
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=1",
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=2",
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=3",
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=4",
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] PASS projections=4"
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] final-route pack=logistic-science-pack status=research",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=1",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=2",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=3",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=4",
+          "Skipping stream research_character_crafting_speed because no_lab_compatible_science.",
+          "Skipping stream research_character_mining_speed because no_lab_compatible_science.",
+          "Skipping stream research_character_reach because no_lab_compatible_science.",
+          "Skipping stream research_character_walking_speed because no_lab_compatible_science.",
+          "Skipping stream research_inventory_capacity because no_lab_compatible_science.",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] PASS final_route=reachable emissions=4 no_lab_omissions=5"
         ],
         "forbidden_log_fragments": [
           "MIR F200 science researchability diagnostic assertion failed"
@@ -209,7 +215,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. The package-excluded F200 diagnostic fixture emits four bounded logistic-science rejection projections for the residual prerequisite paths without player or prototype mutation. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
+      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. The package-excluded F200 diagnostic fixture proves the finalized research-unlocked logistic-science route, including its boiler-defined steam source, four generated direct-effect streams, and five intentional no-lab omissions without player or prototype mutation. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
     },
     {
       "name": "local-2-0-krastorio2",

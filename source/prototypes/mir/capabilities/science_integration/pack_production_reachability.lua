@@ -391,6 +391,62 @@ local function active_unlock_context(options)
   return context
 end
 
+local function active_set_key(values)
+  local names = {}
+  for name, active in pairs(values or {}) do
+    if active then table.insert(names, tostring(name)) end
+  end
+  table.sort(names)
+  return table.concat(names, "\1")
+end
+
+-- Technology researchability is contextual, but one structural route query
+-- can ask the exact same recipe/unlocker question thousands of times while it
+-- explores sibling producer recipes. Reuse only that exact query-local
+-- decision. The active pack and technology sets remain part of the key, and
+-- diagnostic traversals deliberately bypass the memo so their work budget and
+-- failure trace remain observationally exact.
+local function contextual_technology_researchability_reason(
+  technology_name,
+  recipe_name,
+  options,
+  visiting_packs,
+  visiting_technologies
+)
+  if options.diagnostic_observer then
+    return technology_researchability_reason(technology_name, {
+      visiting_packs = visiting_packs,
+      visiting_technologies = visiting_technologies or {},
+      unlock_recipe_name = recipe_name,
+      diagnostic_observer = options.diagnostic_observer,
+      diagnostic_depth = options.diagnostic_depth
+    })
+  end
+  local memo = options.technology_reason_memo
+  if not memo then
+    return technology_researchability_reason(technology_name, {
+      visiting_packs = visiting_packs,
+      visiting_technologies = visiting_technologies or {},
+      unlock_recipe_name = recipe_name
+    })
+  end
+  local key = table.concat({
+    recipe_name,
+    technology_name,
+    active_set_key(visiting_packs),
+    active_set_key(visiting_technologies)
+  }, "\0")
+  local cached = memo[key]
+  if cached ~= nil then return cached == false and nil or cached end
+  local rejection = technology_researchability_reason(technology_name, {
+    visiting_packs = visiting_packs,
+    visiting_technologies = visiting_technologies or {},
+    unlock_recipe_name = recipe_name
+  })
+  memo[key] = rejection or false
+  return rejection
+end
+
 -- This observer is populated only by the explicit rejection projection below.
 -- It must never participate in normal route selection, cache population, or
 -- feasibility decisions.
@@ -453,13 +509,13 @@ local function research_unlocked_output_witness(identity, options, state, visiti
         -- circuit unlocked by one early technology).
         local rejection = context.pairs[pair_key] and "active-unlock-pair" or nil
         if rejection == nil and context.technologies[technology_name] == nil then
-          rejection = technology_researchability_reason(technology_name, {
-            visiting_packs = visiting_packs,
-            visiting_technologies = visiting_technologies or {},
-            unlock_recipe_name = recipe_name,
-            diagnostic_observer = options.diagnostic_observer,
-            diagnostic_depth = options.diagnostic_depth
-          })
+          rejection = contextual_technology_researchability_reason(
+            technology_name,
+            recipe_name,
+            options,
+            visiting_packs,
+            visiting_technologies
+          )
         end
         if rejection == nil then
           local previous_technology = context.technologies[technology_name]
@@ -512,6 +568,7 @@ local function production_witness_options(visiting_packs, visiting_technologies,
   -- verified; it never escapes into the science-pack result cache.
   local options = {
     active_unlock_context = {pairs = {}, technologies = {}},
+    technology_reason_memo = {},
     diagnostic_observer = diagnostic_observer
   }
   options.research_unlock_witness = function(identity, state)
@@ -529,11 +586,18 @@ end
 local function production_routes(recipe_status, visiting_packs, excluded_unlocker, visiting_technologies, observer)
   local routes = {}
   local witness_options = production_witness_options(visiting_packs, visiting_technologies, observer)
+  -- All candidates belong to one immutable recipe snapshot and exact active
+  -- traversal. Sharing the query state reuses only raw indexes and the
+  -- context-free positive witnesses owned by recipe_route_feasibility; its
+  -- contextual research decisions remain in witness_options and its active
+  -- cycle set is cleared by every completed candidate.
+  local witness_state = {}
   for _, recipe_name in ipairs(recipe_status.recipes or {}) do
     if not diagnostic_visit(observer, 0) then break end
     local recipe = canonical_recipe_facts.view(recipe_name)
     if recipe and recipe.enabled_without_research == true then
-      local witness = route_feasibility.initial_recipe_witness(recipe_name, recipe_status.pack_name, witness_options)
+      local witness = route_feasibility.initial_recipe_witness(
+        recipe_name, recipe_status.pack_name, witness_options, witness_state)
       if witness then
         table.insert(routes, {
           recipe = recipe_name,
@@ -558,7 +622,8 @@ local function production_routes(recipe_status, visiting_packs, excluded_unlocke
         })
       end
     else
-      local witness = route_feasibility.recipe_witness(recipe_name, recipe_status.pack_name, witness_options)
+      local witness = route_feasibility.recipe_witness(
+        recipe_name, recipe_status.pack_name, witness_options, witness_state)
       if witness then
         for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
           if not diagnostic_visit(observer, 0) then break end
