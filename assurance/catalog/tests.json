@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 201,
+  "test_count": 202,
   "tests": [
     {
       "id": "docs.check",
@@ -1543,6 +1543,35 @@
         "tests/docs/Test-MIRLocales.ps1",
         "package:prototypes/mir/settings/**",
         "package:prototypes/streams/**"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.mir-artifact-storage-optimization",
+      "proposition": "The governed test 'static.mir-artifact-storage-optimization' passes for its exact selected inputs.",
+      "cohort": "tooling-release",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/tooling/Test-MIRArtifactStorageOptimization.ps1",
+      "canonical_implementation": "tests/tooling/Test-MIRArtifactStorageOptimization.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+        "tools/lib/validation/ImmutableInputStaging.ps1",
+        "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+        "tools/mir/cli/router/RepositoryCommands.ps1",
+        "tests/tooling/Test-MIRArtifactStorageOptimization.ps1",
+        ".mir/assurance.json",
+        ".mir/control/paths.yml",
+        ".mir/modules.yml",
+        "validation/tests.yml",
+        "governance/automation/mir4-command-inventory-v1.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -7372,12 +7401,12 @@
   "summary": {
     "cohorts": {
       "package-repository": 69,
-      "tooling-release": 54,
+      "tooling-release": 55,
       "runtime-upgrade": 46,
       "compiler-static": 19,
       "compatibility-historical": 13
     },
-    "canonical_test_commands": 189,
+    "canonical_test_commands": 190,
     "aggregate_commands": 9,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -7390,5 +7419,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:88d27a8cbfd4cb6111518c0a1886a7692ee754a8379b4efa0e6183f4b01819f9"
+  "digest": "sha256:4f6ce9cd78d18fd2196abdc646a1a9b36cbeaf212e88f9bc6d5c25445386511a"
 }

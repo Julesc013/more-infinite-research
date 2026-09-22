@@ -484,6 +484,7 @@ paths:
   tools.commands.workspace: tools/commands/workspace
   tools.commands.workspace.inventory: tools/commands/workspace/Get-MIRLegacyInventory.ps1
   tools.commands.workspace.cleanup: tools/commands/workspace/Remove-MIRStaleArtifacts.ps1
+  tools.commands.workspace.optimize-storage: tools/commands/workspace/Optimize-MIRArtifactStorage.ps1
   tools.commands.docs: tools/commands/docs
   tools.commands.docs.format: tools/commands/docs/Format-MIRMarkdown.ps1
   tools.commands.docs.index: tools/commands/docs/Update-MIRDocumentationIndex.ps1

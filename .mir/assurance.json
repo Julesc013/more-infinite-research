@@ -33,7 +33,7 @@
     "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"],
     "synthesis": ["static.mir4-integration-programme", "runtime.science-planning-contract", "runtime.researchability-planning-contract", "runtime.recipe-source-epoch-contract", "docs.check", "static.architecture", "static.compiler", "static.package", "static.mir4-platform-preview", "static.mir4-local-delivery", "static.mir4-promotion-recovery"],
-    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.mir4-community-manufacturing-intake", "static.mir4-current-package-presentation-v7", "static.mir4-editable-source-materializer-m41-f2c", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07", "static.mir4-protected-promotion-topology-a08"],
+    "mir4-development": ["static.mir4-historical-baseline", "static.mir4-development-contracts", "static.mir4-a00-current-authority-observation", "static.mir4-a02-component-reconciliation", "docs.check", "tooling.self-test", "static.immutable-input-staging", "static.mir-artifact-storage-optimization", "static.mir4-community-manufacturing-intake", "static.mir4-current-package-presentation-v7", "static.mir4-editable-source-materializer-m41-f2c", "static.package", "static.branch-policy", "static.architecture", "static.compiler", "static.mir4-repository-characterization-m42-00a", "static.mir4-platform-preview", "static.mir4-integration-programme", "static.mir4-local-delivery", "static.mir4-promotion-recovery", "static.mir4-release-operator-recovery-a07", "static.mir4-protected-promotion-topology-a08"],
     "mir4-current-package-presentation-v2": ["static.mir4-current-package-presentation-v2"],
     "mir4-current-package-presentation-v3": ["static.mir4-current-package-presentation-v3"],
     "mir4-current-package-presentation-v4": ["static.mir4-current-package-presentation-v4"],
@@ -323,6 +323,11 @@
       "id": "k2-immutable-input-staging",
       "patterns": ["^tools/lib/validation/ImmutableInputStaging[.]ps1$"],
       "tests": ["static.immutable-input-staging", "runtime.k2-k2so-f210-intake", "static.mir4-a05-k2-03-imersite-closure", "static.mir4-a05-k2-materials-closure"]
+    },
+    {
+      "id": "artifact-storage-optimization",
+      "patterns": ["^tools/commands/workspace/Optimize-MIRArtifactStorage[.]ps1$", "^tests/tooling/Test-MIRArtifactStorageOptimization[.]ps1$", "^tools/mir/cli/(?:Invoke-MIRCommandRouter|router/RepositoryCommands)[.]ps1$"],
+      "tests": ["static.mir-artifact-storage-optimization", "tooling.self-test"]
     },
     {
       "id": "k2-k2so-intake-f210",

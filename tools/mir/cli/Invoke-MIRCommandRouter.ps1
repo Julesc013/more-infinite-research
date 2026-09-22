@@ -108,6 +108,7 @@ Usage:
   .\tools\mir.ps1 backport materialize --source <tag> --baseline <tag> --target <line> --manifest <path> --worktree <path> [--receipt <path>]
   .\tools\mir.ps1 storage audit [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>]
   .\tools\mir.ps1 storage clean [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>] --apply
+  .\tools\mir.ps1 storage optimize [--library-root <path>] [--older-than-days <days>] [--apply]
   .\tools\mir.ps1 technology quality-assessment --catalog <path> --candidate <id> --profile <path> [--metrics <path>] --output <path>
   .\tools\mir.ps1 technology review-dossier --catalog <path> --candidate <id> [--assessment <path>] --output <path>
   .\tools\mir.ps1 technology promotion-gate --catalog <path> --assessment <path> --approval <path> --promotion <path> --profile <path> [--migration <path>] --output <path>
