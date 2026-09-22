@@ -742,6 +742,54 @@ function Get-MIRAssuranceTestFingerprint {
   $runnerHash = Get-MIRAssuranceRunnerHash
   if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($Test.id) runner" }
   $inputFingerprints["assurance-runner"] = [ordered]@{ kind="runner"; version=$assuranceRunnerVersion; sha256=$runnerHash }
+  # A test's command definition is necessary but not sufficient to identify
+  # its evaluator.  The command router, assurance implementation and the
+  # target/scenario adapters can change independently of a catalogue row.
+  # Bind their current source as a separate, named input so reused evidence
+  # cannot silently cross an evaluator revision.
+  $evaluator = Get-MIRAssurancePatternFingerprint -Patterns @(
+    "scripts/Invoke-MIRAssurance.ps1",
+    "tools/mir.ps1",
+    "tools/lib/assurance/**",
+    "tools/lib/validation/CurrentTargetPackage.ps1",
+    "tools/lib/validation/FactorioVersionPolicy.ps1",
+    "tools/lib/validation/ScenarioRegistry.ps1",
+    "tools/mir_verify/**",
+    "spec/schemas/**"
+  )
+  $evaluator["kind"] = "assurance-evaluator"
+  $inputFingerprints["assurance-evaluator"] = $evaluator
+
+  # Candidate archive bytes alone do not state which authored package source
+  # produced them.  Keep the package-source and source identity alongside the
+  # candidate descriptor.  This permits unrelated repository changes to be
+  # handled by impact selection while refusing evidence from a different
+  # candidate source.
+  $candidateDescriptor = Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'candidate_descriptor'
+  if ($null -eq $candidateDescriptor) {
+    $candidateDescriptor = Get-MIRAssuranceCandidateDescriptor -Context $Context
+  }
+  $candidateSource = [ordered]@{
+    kind="candidate-source"
+    package_source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_commit')
+    source_commit=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_commit')
+    source_tree=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'source_tree')
+    package_source_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'package_source_sha256')
+    candidate_descriptor_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $candidateDescriptor -Name 'descriptor_sha256')
+  }
+  $candidateSource["sha256"] = Get-MIRAssuranceJsonHash -Value $candidateSource
+  $inputFingerprints["candidate-source"] = $candidateSource
+
+  # Static rows have no machine runtime to fingerprint, while runtime rows
+  # declare Factorio, mod and scenario inputs below.  Both classes still bind
+  # the target's verification-profile environment contract here.
+  $environment = [ordered]@{
+    kind="assurance-environment"
+    target=[string]$Context.target
+    verification_profile_sha256=[string](Get-MIRAssuranceOptionalObjectValue -Object $Plan -Name 'verification_profile_sha256')
+  }
+  $environment["sha256"] = Get-MIRAssuranceJsonHash -Value $environment
+  $inputFingerprints["assurance-environment"] = $environment
   foreach ($inputName in @($definition.inputs)) {
     if ($env:MIR_ASSURANCE_TIMING) { Write-Host "[assurance-timing] fingerprint $($Test.id) input=$inputName start" }
     $inputFingerprints[$inputName] = Get-MIRAssuranceInputFingerprint -InputName $inputName -Plan $Plan -Context $Context -Test $Test

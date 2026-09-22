@@ -3331,17 +3331,17 @@
     {
       "path": "tools/lib/assurance/evidence/Fingerprints.ps1",
       "classification": "canonical-internal",
-      "sha256": "22ACFA761401521D4360B60C1FC61D8047E1F871BDCD64F0B9247D6ABF0FCA7B",
+      "sha256": "1A7F7F6B3629ED9850C0C5CB3EA6614C450795CD0973847282581491D8D15A09",
       "hash_mode": "canonical-text-v1",
-      "lines": 769,
+      "lines": 817,
       "package_visible": false
     },
     {
       "path": "tools/lib/assurance/evidence/Plans.ps1",
       "classification": "canonical-internal",
-      "sha256": "E6236BC30F0D719685A4AF8DD40C772520D90B4201F406D875182A2D96276CF0",
+      "sha256": "21262543014A5DFAD65CE465690F3F43A1B167F93A2546BF66F7F2EBA3CD1E6D",
       "hash_mode": "canonical-text-v1",
-      "lines": 239,
+      "lines": 345,
       "package_visible": false
     },
     {
@@ -5794,5 +5794,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8337f73d6829fbfcbc4afa72db0de8ca437065371f172de7397e2eb5cfa8a55d"
+  "digest": "sha256:696cd3de95e58d2094665c9bcf0716b444cb6a6fcaddd09f67a626546973c85c"
 }

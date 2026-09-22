@@ -721,8 +721,11 @@
           "Same-fingerprint contradiction quarantined",
           "Report actual cold/reused times"
         ],
-        "state": "queued",
-        "evidence": []
+        "state": "active",
+        "evidence": [
+          "spec/programmes/evidence/mir42/a13-impact-selection.json",
+          "spec/programmes/evidence/mir42/a13-exact-fingerprint-reuse.json"
+        ]
       },
       {
         "id": "A14",
