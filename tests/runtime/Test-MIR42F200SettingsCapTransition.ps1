@@ -45,7 +45,9 @@ function Assert-MIR42F200BaseOnlyStageModList($Stage){
   [ordered]@{stage=$Stage.name;declared_mods=@($rows|Sort-Object name|ForEach-Object{[ordered]@{name=[string]$_.name;enabled=[bool]$_.enabled}})}
 }
 function Get-MIR42F200EffectiveEngineLoadedClosure([string]$Text,[string]$Stage){
-  $rows=@([regex]::Matches($Text,'(?m)^.*?Loading mod (?<name>[^\s]+) (?<version>[^\s]+) \((?<phase>[^)]+)\)\s*$')|ForEach-Object{[pscustomobject][ordered]@{name=$_.Groups['name'].Value;version=$_.Groups['version'].Value;phase=$_.Groups['phase'].Value}})
+  $dataRows=@([regex]::Matches($Text,'(?m)^.*?Loading mod (?!settings )(?<name>[^\s]+) (?<version>[^\s]+) \((?<phase>[^)]+)\)\s*$')|ForEach-Object{[pscustomobject][ordered]@{name=$_.Groups['name'].Value;version=$_.Groups['version'].Value;phase=$_.Groups['phase'].Value}})
+  $settingsRows=@([regex]::Matches($Text,'(?m)^.*?Loading mod settings (?<name>[^\s]+) (?<version>[^\s]+) \((?<phase>[^)]+)\)\s*$')|ForEach-Object{[pscustomobject][ordered]@{name=$_.Groups['name'].Value;version=$_.Groups['version'].Value;phase=$_.Groups['phase'].Value}})
+  $rows=@($dataRows+$settingsRows)
   Assert-MIR42F200 ($rows.Count-gt0) "stage $Stage has no Factorio mod-load records."
   $mods=@(foreach($name in @($rows.name|Sort-Object -Unique)){$matching=@($rows|Where-Object{[string]$_.name-ceq$name});$versions=@($matching.version|Sort-Object -Unique);Assert-MIR42F200 ($versions.Count-eq1) "stage $Stage loaded $name with multiple versions.";[ordered]@{name=$name;version=$versions[0];phases=@($matching.phase|Sort-Object -Unique)}})
   Assert-Exact "stage.$Stage.engine_loaded_mod_names" ((@($mods.name|Sort-Object)-join"`n")) ($expectedEngineLoadedModNames-join"`n")
