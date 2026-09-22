@@ -227,6 +227,123 @@ function Find-MIR4M4202HistoricalTextByCanonicalSha256 {
   throw "[mir4-m42-02-historical-blob-unavailable] $Path"
 }
 
+function Get-MIR4M4202HistoricalValidationRunnerSegmentText {
+  [CmdletBinding()]
+  [OutputType([string])]
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][AllowEmptyString()][string[]]$SourceLines,
+    [Parameter(Mandatory)][int]$Start,
+    [Parameter(Mandatory)][int]$End
+  )
+
+  if ($Start -lt 1 -or $End -lt $Start -or $End -ge $SourceLines.Count) {
+    throw '[mir4-m42-02-validation-runner-historical-segment-range]'
+  }
+  $lines = [Collections.Generic.List[string]]::new()
+  foreach ($line in @($SourceLines[($Start - 1)..($End - 1)])) {
+    [void]$lines.Add($line)
+  }
+
+  # PS2 recorded two transformations needed when the monolithic runner was
+  # split: explicit early-completion handoffs in Bootstrap, and the reduced
+  # campaign completion handoff in DefaultCampaign00.  Reconstruct only those
+  # fixed edits from the schema-pinned historical source; do not consult the
+  # mutable current modules as evidence of the decomposition.
+  if ($Name -ceq 'Bootstrap.ps1') {
+    $earlyCompletionCount = 0
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+      if ($lines[$index] -ceq '  exit 0') {
+        $lines[$index] = '  $validationRunnerCompleted = $true'
+        $lines.Insert($index + 1, '  return')
+        $earlyCompletionCount++
+        $index++
+      }
+    }
+    if ($earlyCompletionCount -ne 2) {
+      throw '[mir4-m42-02-validation-runner-historical-early-completion]'
+    }
+    $listReturn = -1
+    for ($index = 1; $index -lt $lines.Count; $index++) {
+      if ($lines[$index] -ceq '  return' -and $lines[$index - 1] -like '  $listed.records*') {
+        if ($listReturn -ne -1) {
+          throw '[mir4-m42-02-validation-runner-historical-list-completion]'
+        }
+        $listReturn = $index
+      }
+    }
+    if ($listReturn -lt 0) {
+      throw '[mir4-m42-02-validation-runner-historical-list-completion]'
+    }
+    $lines.Insert($listReturn, '  $validationRunnerCompleted = $true')
+  }
+  if ($Name -ceq 'DefaultCampaign00.ps1') {
+    $returnIndexes = @(
+      for ($index = 0; $index -lt $lines.Count; $index++) {
+        if ($lines[$index] -ceq '  return') { $index }
+      }
+    )
+    if ($returnIndexes.Count -ne 1) {
+      throw '[mir4-m42-02-validation-runner-historical-campaign-completion]'
+    }
+    $lines.Insert([int]$returnIndexes[0], '  $validationCampaignCompleted = $true')
+  }
+  return (($lines.ToArray() -join "`n") + "`n")
+}
+
+function Test-MIR4M4202HistoricalValidationRunnerDecomposition {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][object]$Receipt
+  )
+
+  try {
+    $commit = [string]$Receipt.starting_dev.commit
+    $tree = [string]$Receipt.starting_dev.tree
+    if ($commit -cne 'bb953b617c823a4834fc211735f8312cce1ef48e' -or
+        $tree -cne '6946cf5125a8b21af46757164834d5583647098a' -or
+        [string]$Receipt.characterization.path -cne 'scripts/Invoke-MIRValidation.ps1' -or
+        [string]$Receipt.decomposition.segment_algorithm -cne 'exact-canonical-source-slices-with-explicit-early-completion-handoffs-v1') {
+      return $false
+    }
+    & git -C $RepoRoot cat-file -e "$commit`^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0 -or
+        [string]((& git -C $RepoRoot rev-parse "$commit`^{tree}").Trim()) -cne $tree) {
+      return $false
+    }
+    $source = Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$commit`:scripts/Invoke-MIRValidation.ps1"
+    if (-not $source.EndsWith("`n", [StringComparison]::Ordinal) -or
+        (Get-MIR4Sha256String -Value $source) -cne [string]$Receipt.characterization.sha256) {
+      return $false
+    }
+    $sourceLines = $source.Split([char]10)
+    if ($sourceLines.Count -ne [int]$Receipt.characterization.lines -or
+        @($Receipt.decomposition.modules).Count -ne [int]$Receipt.decomposition.module_count -or
+        @($Receipt.decomposition.modules | Group-Object path | Where-Object { $_.Count -ne 1 }).Count -ne 0) {
+      return $false
+    }
+    foreach ($module in @($Receipt.decomposition.modules)) {
+      $segment = Get-MIR4M4202HistoricalValidationRunnerSegmentText -Name ([IO.Path]::GetFileName([string]$module.path)) -SourceLines $sourceLines -Start ([int]$module.source_lines.start) -End ([int]$module.source_lines.end)
+      $tokens = $null
+      $parseErrors = $null
+      $ast = [Management.Automation.Language.Parser]::ParseInput($segment, [ref]$tokens, [ref]$parseErrors)
+      $functionCount = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] }, $true)).Count
+      if ([string]$module.hash_mode -cne 'canonical-text-v1' -or
+          (Get-MIR4Sha256String -Value $segment) -cne [string]$module.sha256 -or
+          [regex]::Matches($segment, "`n").Count -ne [int]$module.lines -or
+          @($parseErrors).Count -ne [int]$module.parse_errors -or
+          $functionCount -ne [int]$module.function_count) {
+        return $false
+      }
+    }
+    return $true
+  } catch {
+    return $false
+  }
+}
+
 function Test-MIR4M4202HistoricalAssuranceEvidencePublicContract {
   [CmdletBinding()]
   [OutputType([bool])]
