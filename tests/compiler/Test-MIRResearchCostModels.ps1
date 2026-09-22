@@ -112,6 +112,9 @@ $paths = @{
   Native = "prototypes/mir/planner/native_owner_binding.lua"
   Continuations = "prototypes/mir/planner/base_continuations/plan.lua"
   MaximumLevel = "prototypes/mir/policy/max_level.lua"
+  MaximumLevelBinding = "prototypes/mir/domain/technology/maximum_level_binding.lua"
+  MaximumLevelContext = "prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua"
+  MaximumLevelPresentation = "prototypes/mir/pipeline/mutations/maximum_level_presentation.lua"
   RuntimeMaximum = "prototypes/mir/runtime/maximum_level_control.lua"
 }
 $source = @{}
@@ -235,25 +238,41 @@ foreach ($route in @("Streams", "Native", "Continuations", "MaximumLevel")) {
     throw "$route may not make prototypes infinite without the governed scripted maximum-level controller."
   }
 }
-if ($source.ModData -notmatch 'target_line\.mod_data_supported\(\)' -or
-    $source.RuntimeMaximum -notmatch 'if next\(managed\) == nil then' -or
-    $source.RuntimeMaximum -notmatch 'add_runtime_settings_policy\(managed\)' -or
+$maximumLevelBindingPath = 'prototypes/mir/domain/technology/maximum_level_binding.lua'
+foreach ($target in @('f210', 'f200')) {
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  if ($null -eq (Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $maximumLevelBindingPath -AllowMissing)) {
+    throw "Current $target composition must materialize the schema-3 MaximumLevelBinding module."
+  }
+}
+foreach ($target in @('f110', 'f100')) {
+  $context = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target $target
+  if ($null -ne (Resolve-MIR4CurrentTargetPackageOutputPath -Context $context -RelativePath $maximumLevelBindingPath -AllowMissing)) {
+    throw "Current $target composition must omit the script-owned schema-3 MaximumLevelBinding module."
+  }
+}
+foreach ($required in @(
+  'local SCHEMA = 3',
+  'local KIND = "MIRMaximumLevelPolicyV3"',
+  '["exact-technology"] = 1',
+  'semantics = "absolute-highest-technology-level"',
+  'finalizer_status = "pending"',
+  'function M.observe_finalizers'
+)) {
+  if (-not $source.MaximumLevelBinding.Contains($required)) {
+    throw "Current schema-3 MaximumLevelBinding contract is missing: $required"
+  }
+}
+if ($source.MaximumLevelContext -notmatch 'maximum_level_binding\.from_plan\(latest' -or
+    $source.MaximumLevelPresentation -notmatch 'maximum_level_binding\.observe_finalizers\(policy, observations\)' -or
+    $source.MaximumLevelPresentation -notmatch 'context:replace_epoch\(' -or
+    $source.ModData -notmatch 'more-infinite-research\.maximum-level-policy-v3' -or
+    $source.RuntimeMaximum -notmatch 'POLICY_VERSION = 3' -or
+    $source.RuntimeMaximum -notmatch 'if target_line\.mod_data_supported\(\) then return \{\}, true end' -or
+    $source.RuntimeMaximum -notmatch 'if not managed then\s+managed = \{\}\s+add_runtime_settings_policy\(managed\)' -or
+    $source.RuntimeMaximum -notmatch 'legacy-v2-read-only' -or
     $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
-  throw "Runtime maximum-level policy must use mod-data where supported and reconstruct the same binding from startup settings otherwise."
-}
-# The removed root carried a schema-3/V3 characterization.  The composed
-# current package deliberately exposes only the earlier V2 publication and a
-# V1 runtime controller while the X04 progression successor is ported.  This
-# is not an equivalence claim: preserve the old proof elsewhere as pinned
-# history and make the present limitation explicit here.
-if ($null -ne (Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath 'prototypes/mir/domain/technology/maximum_level_binding.lua' -AllowMissing)) {
-  throw "Current F210 composition must not silently regain the undeclared schema-3 MaximumLevelBinding module."
-}
-if ($source.Publication -notmatch 'kind = "MIRMaximumLevelPolicyV2"' -or
-    $source.Publication -notmatch 'semantics = "absolute-highest-technology-level"' -or
-    $source.ModData -notmatch 'more-infinite-research\.maximum-level-policy-v2' -or
-    $source.RuntimeMaximum -notmatch 'POLICY_VERSION = 1') {
-  throw "Current F210 maximum-level publication/controller shape drifted before the declared PR #286 successor ports the V3 contract."
+  throw "Current maximum-level policy must publish V3, fail closed on missing modern transport, retain read-only V2 migration, and limit settings reconstruction to targets without mod-data."
 }
 if ($source.Continuations -notmatch 'base_coefficient \* \(growth \^ \(desired_new_level - 1\)\)' -or
     $source.Continuations -notmatch 'legacy_formula_number\(base_coefficient\)' -or

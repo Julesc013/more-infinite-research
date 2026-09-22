@@ -235,7 +235,7 @@ Ages are measured against the newest governed review date, 2026-09-22, so checko
 | docs/reference/generated/stream-defaults.md | current | 2026-09-02 | 20 | current-window |
 | docs/reference/generated/technology-quality-and-promotion.md | current | 2026-08-18 | 35 | current-window |
 | docs/reference/glossary.md | draft | 2026-07-07 | 77 | current-window |
-| docs/reference/maximum-level-binding.md | historical-checkpoint | 2026-08-21 | 32 | current-window |
+| docs/reference/maximum-level-binding.md | current | 2026-09-22 | 0 | current-window |
 | docs/reference/mir4-api-sdk-v0-stability.md | deprecated | 2026-08-24 | 29 | current-window |
 | docs/reference/mir4-canonical-json-v1.md | current | 2026-08-26 | 27 | current-window |
 | docs/reference/mir4-environment-evidence.md | current | 2026-08-26 | 27 | current-window |
