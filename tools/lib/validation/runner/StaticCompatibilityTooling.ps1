@@ -149,6 +149,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'AuditFactorioVersions' },
     @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = '[Parameter(Mandatory)][string[]]$LocalModLibraryDirs' },
     @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
+    @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = '$scenario.roots' },
+    @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'repository_fixture_mod_count' },
     @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
     @{ File = "tests\compatibility\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
     @{ File = "tools\mir.ps1"; Text = $mirCliText; Snippet = ".\tools\mir.ps1 release gate" },
