@@ -6,8 +6,14 @@ param(
   [int]$OlderThanDays = 7,
   [ValidateRange(1, 100000)]
   [int]$MaxFiles = 10000,
+  [ValidateRange(1, 10000000)]
+  [int]$MaxScannedFiles = 250000,
+  [ValidateRange(1, 86400)]
+  [int]$MaxScanSeconds = 300,
   [switch]$Apply,
-  [switch]$PassThru
+  [switch]$PassThru,
+  [Parameter(DontShow)]
+  [scriptblock]$AfterReplacementTestHook
 )
 
 $ErrorActionPreference = 'Stop'
@@ -55,19 +61,36 @@ function Test-MIRStorageCompletedRun {
   param([Parameter(Mandatory)][string]$RunRoot,[Parameter(Mandatory)][datetime]$Cutoff)
   if (-not (Test-Path -LiteralPath $RunRoot -PathType Container)) { return $false }
   $runItem = Get-Item -LiteralPath $RunRoot -Force
+  $resultPath = Join-Path $RunRoot 'result.json'
+  if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) { return $false }
+  try {
+    $result = Get-Content -Raw -LiteralPath $resultPath | ConvertFrom-Json -Depth 20
+    $terminalStatus = [string]$result.status
+  } catch {
+    return $false
+  }
   return (($runItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0 -and
     $runItem.Name -cmatch '^[0-9a-f]{32}$' -and
     $runItem.LastWriteTimeUtc -lt $Cutoff -and
-    (Test-Path -LiteralPath (Join-Path $RunRoot 'result.json') -PathType Leaf) -and
+    $terminalStatus -cin @('passed','failed','blocked','skipped','cancelled','error') -and
     -not (Test-Path -LiteralPath (Join-Path $RunRoot 'mir-immutable-input-lease.json')) -and
     -not (Test-Path -LiteralPath (Join-Path $RunRoot 'mir-immutable-input-lease.lock')))
 }
 
 function Get-MIRStorageLibraryIndex {
-  param([Parameter(Mandatory)][string[]]$Roots)
+  param(
+    [Parameter(Mandatory)][string[]]$Roots,
+    [Parameter(Mandatory)][int]$MaxScannedFiles,
+    [Parameter(Mandatory)][Diagnostics.Stopwatch]$ScanWatch,
+    [Parameter(Mandatory)][int]$MaxScanSeconds
+  )
   $index = @{}
+  $scannedFiles = 0
   foreach ($root in $Roots) {
     foreach ($path in [IO.Directory]::EnumerateFiles($root, '*.zip', [IO.SearchOption]::TopDirectoryOnly)) {
+      $scannedFiles++
+      if ($scannedFiles -gt $MaxScannedFiles) { throw "Storage optimization exceeded its bounded $MaxScannedFiles-file scan; nothing was changed." }
+      if ($ScanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
       $item = Get-Item -LiteralPath $path -Force
       if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
       $key = $item.Name.ToLowerInvariant() + '|' + $item.Length
@@ -75,7 +98,7 @@ function Get-MIRStorageLibraryIndex {
       [void]$index[$key].Add($item)
     }
   }
-  return $index
+  return [pscustomobject]@{index=$index;scanned_files=$scannedFiles}
 }
 
 function Get-MIRStorageDefaultLibraryRoots {
@@ -116,15 +139,21 @@ foreach ($root in $LibraryRoot) {
 if ($resolvedLibraries.Count -eq 0) { throw 'At least one immutable mod library is required.' }
 
 $cutoff = [DateTime]::UtcNow.AddDays(-$OlderThanDays)
-$libraryIndex = Get-MIRStorageLibraryIndex -Roots $resolvedLibraries.ToArray()
+$scanWatch = [Diagnostics.Stopwatch]::StartNew()
+$libraryScan = Get-MIRStorageLibraryIndex -Roots $resolvedLibraries.ToArray() -MaxScannedFiles $MaxScannedFiles -ScanWatch $scanWatch -MaxScanSeconds $MaxScanSeconds
+$libraryIndex = $libraryScan.index
 $libraryHashes = @{}
 $plan = [Collections.Generic.List[object]]::new()
+$scannedFiles = [int]$libraryScan.scanned_files
 $enumeration = [IO.EnumerationOptions]::new()
 $enumeration.RecurseSubdirectories = $true
 $enumeration.AttributesToSkip = [IO.FileAttributes]::ReparsePoint
 $enumeration.IgnoreInaccessible = $false
 
 foreach ($path in [IO.Directory]::EnumerateFiles($buildRoot, '*.zip', $enumeration)) {
+  $scannedFiles++
+  if ($scannedFiles -gt $MaxScannedFiles) { throw "Storage optimization exceeded its bounded $MaxScannedFiles-file scan; nothing was changed." }
+  if ($scanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
   $modsToken = [IO.Path]::DirectorySeparatorChar + 'mods' + [IO.Path]::DirectorySeparatorChar
   if ($path.IndexOf($modsToken, [StringComparison]::OrdinalIgnoreCase) -lt 0) { continue }
   $item = Get-Item -LiteralPath $path -Force
@@ -139,6 +168,7 @@ foreach ($path in [IO.Directory]::EnumerateFiles($buildRoot, '*.zip', $enumerati
   $key = $item.Name.ToLowerInvariant() + '|' + $item.Length
   if (-not $libraryIndex.ContainsKey($key)) { continue }
   $artifactSha = Get-MIRImmutableInputSha256 -Path $item.FullName
+  if ($scanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
   $source = $null
   foreach ($candidate in @($libraryIndex[$key])) {
     if ([IO.Path]::GetPathRoot($candidate.FullName) -cne [IO.Path]::GetPathRoot($item.FullName)) { continue }
@@ -180,35 +210,39 @@ foreach ($row in $plan) {
       -not (Test-MIRStoragePlainPathChain -Path $target -Root $buildRoot)) {
     throw "Storage optimization eligibility changed after planning: $target"
   }
-  $current = Get-Item -LiteralPath $target -Force
-  if ([string]$current.LinkType -ceq 'HardLink') { continue }
-  if ($current.Length -ne [long]$row.bytes -or
-      (Get-MIRImmutableInputSha256 -Path $target) -cne [string]$row.sha256 -or
-      (Get-MIRImmutableInputSha256 -Path $source) -cne [string]$row.sha256) {
-    throw "Artifact identity changed after planning: $target"
-  }
   if (-not $PSCmdlet.ShouldProcess($target, "replace verified duplicate with hard link to $source")) { continue }
 
   $temporary = Join-Path (Split-Path -Parent $target) ('.mir-relink-' + [guid]::NewGuid().ToString('N') + '.tmp')
+  $rollback = Join-Path (Split-Path -Parent $target) ('.mir-relink-' + [guid]::NewGuid().ToString('N') + '.rollback')
+  $sourceHandle = $null
+  $targetHandle = $null
+  $replacementInstalled = $false
   try {
+    $sourceHandle = [IO.File]::Open($source, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+    $targetHandle = [IO.File]::Open($target, [IO.FileMode]::Open, [IO.FileAccess]::Read, ([IO.FileShare]::Read -bor [IO.FileShare]::Delete))
+    $current = Get-Item -LiteralPath $target -Force
+    if ([string]$current.LinkType -ceq 'HardLink') { continue }
+    if ($current.Length -ne [long]$row.bytes -or
+        (Get-MIRImmutableInputSha256 -Path $target) -cne [string]$row.sha256 -or
+        (Get-MIRImmutableInputSha256 -Path $source) -cne [string]$row.sha256) {
+      throw "Artifact identity changed after planning: $target"
+    }
     New-Item -ItemType HardLink -Path $temporary -Target $source -ErrorAction Stop | Out-Null
     if ((Get-MIRImmutableInputFileIdentity -Path $temporary) -cne (Get-MIRImmutableInputFileIdentity -Path $source) -or
         (Get-MIRImmutableInputSha256 -Path $temporary) -cne [string]$row.sha256) {
       throw "Temporary hard-link verification failed: $target"
     }
-    Remove-Item -LiteralPath $target -Force
-    try {
-      Move-Item -LiteralPath $temporary -Destination $target -ErrorAction Stop
-    } catch {
-      if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
-        New-Item -ItemType HardLink -Path $target -Target $source -ErrorAction Stop | Out-Null
-      }
-      throw
-    }
+    Move-Item -LiteralPath $target -Destination $rollback -ErrorAction Stop
+    Move-Item -LiteralPath $temporary -Destination $target -ErrorAction Stop
+    $replacementInstalled = $true
+    if ($null -ne $AfterReplacementTestHook) { & $AfterReplacementTestHook $row }
     if ((Get-MIRImmutableInputFileIdentity -Path $target) -cne (Get-MIRImmutableInputFileIdentity -Path $source) -or
         (Get-MIRImmutableInputSha256 -Path $target) -cne [string]$row.sha256) {
       throw "Final hard-link verification failed: $target"
     }
+    $targetHandle.Dispose()
+    $targetHandle = $null
+    Remove-Item -LiteralPath $rollback -Force -ErrorAction Stop
     [void]$converted.Add([pscustomobject][ordered]@{
       status = 'relinked'
       artifact = $target
@@ -217,7 +251,17 @@ foreach ($row in $plan) {
       bytes = [long]$row.bytes
       sha256 = [string]$row.sha256
     })
+  } catch {
+    if ($null -ne $targetHandle) { $targetHandle.Dispose(); $targetHandle = $null }
+    if ($null -ne $sourceHandle) { $sourceHandle.Dispose(); $sourceHandle = $null }
+    if (Test-Path -LiteralPath $rollback -PathType Leaf) {
+      if ($replacementInstalled -and (Test-Path -LiteralPath $target -PathType Leaf)) { Remove-Item -LiteralPath $target -Force }
+      if (-not (Test-Path -LiteralPath $target -PathType Leaf)) { Move-Item -LiteralPath $rollback -Destination $target -ErrorAction Stop }
+    }
+    throw
   } finally {
+    if ($null -ne $targetHandle) { $targetHandle.Dispose() }
+    if ($null -ne $sourceHandle) { $sourceHandle.Dispose() }
     if (Test-Path -LiteralPath $temporary -PathType Leaf) { Remove-Item -LiteralPath $temporary -Force }
   }
 }
