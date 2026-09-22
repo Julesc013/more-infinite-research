@@ -215,6 +215,19 @@
       ]
     },
     {
+      "id": "static.f200-base-only-settings-cap-transition-harness",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
+        "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "fixtures/assert-mir42-f200-settings-cap-transition/**",
+        ".mir/fixtures.yml"
+      ]
+    },
+    {
       "id": "static.locales",
       "kind": "static",
       "layer": "F0",
@@ -5213,6 +5226,7 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIR42F200SettingsCapTransition.ps1",
+        "tests/runtime/Test-MIR42F200SettingsCapTransitionStatic.ps1",
         "fixtures/assert-mir42-f200-settings-cap-transition/**",
         "source:source/prototypes/mir/runtime/maximum_level_control.lua",
         "source:source/package-source.json",
