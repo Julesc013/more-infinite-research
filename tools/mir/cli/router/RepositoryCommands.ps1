@@ -61,11 +61,19 @@ function Invoke-MIRRepositoryCommandGroup {
         }
       }
       "storage" {
-        if ($verb -notin @("audit", "clean")) { throw "Unknown storage command: $verb" }
+        if ($verb -notin @("audit", "clean", "optimize")) { throw "Unknown storage command: $verb" }
         $olderThanText = Get-MIRArgValue -Items $Args -Name "--older-than-days" -Default "7"
         [int]$olderThanDays = 0
         if (-not [int]::TryParse($olderThanText, [ref]$olderThanDays) -or $olderThanDays -lt 0) {
           throw "--older-than-days must be a non-negative integer."
+        }
+        if ($verb -eq 'optimize') {
+          $params = @{RepoRoot=$repo.Path;OlderThanDays=$olderThanDays}
+          $libraryRoot = Get-MIRArgValue -Items $Args -Name '--library-root'
+          if ($libraryRoot) { $params.LibraryRoot = @($libraryRoot) }
+          if (Test-MIRArgSwitch -Items $Args -Name '--apply') { $params.Apply = $true }
+          & (Join-Path $repo 'tools/commands/workspace/Optimize-MIRArtifactStorage.ps1') @params
+          return
         }
         $artifactTypeText = Get-MIRArgValue -Items $Args -Name "--artifact-type" -Default "result,test,package,campaign"
         [string[]]$artifactTypes = @($artifactTypeText.Split(',', [StringSplitOptions]::RemoveEmptyEntries) | ForEach-Object { $_.Trim().ToLowerInvariant() })

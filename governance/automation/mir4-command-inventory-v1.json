@@ -4,7 +4,7 @@
   "state": "M42-01-CANONICAL",
   "public_entrypoint": "tools/mir.ps1",
   "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
-  "command_count": 86,
+  "command_count": 87,
   "commands": [
     {
       "key": "architecture check",
@@ -657,6 +657,14 @@
     {
       "key": "storage clean",
       "public_syntax": ".\\tools\\mir.ps1 storage clean [--artifact-type <result|test|package|campaign>[,...]] [--campaign-root <build/mir4/name>] [--all-worktrees] [--older-than-days <days>] --apply",
+      "public_entrypoint": "tools/mir.ps1",
+      "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
+      "classification": "canonical-public-command",
+      "implementation_count": 1
+    },
+    {
+      "key": "storage optimize",
+      "public_syntax": ".\\tools\\mir.ps1 storage optimize [--library-root <path>] [--older-than-days <days>] [--apply]",
       "public_entrypoint": "tools/mir.ps1",
       "router": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-public-command",
@@ -3257,6 +3265,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
+      "classification": "canonical-internal",
+      "sha256": "924C6E46A273EB48DF3E1627CEAADFC8F77726236DB9D742FF07633758B130C0",
+      "hash_mode": "canonical-text-v1",
+      "lines": 228,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/workspace/Remove-MIRStaleArtifacts.ps1",
       "classification": "canonical-internal",
       "sha256": "5120FAF2D8435D801F8A5252A8FF93756468CE9F6DCC39234E6D81DBA152F80C",
@@ -5619,9 +5635,9 @@
     {
       "path": "tools/mir/cli/Invoke-MIRCommandRouter.ps1",
       "classification": "canonical-internal",
-      "sha256": "BE733EF8F254B767CA3337AA8DDD7BE2A3A8C3803D5E14822C9072FE45D38E95",
+      "sha256": "C7DB2E7874A0D6721B85EE639977036525B1F09B8353E1E0F355410EC9284850",
       "hash_mode": "canonical-text-v1",
-      "lines": 138,
+      "lines": 139,
       "package_visible": false
     },
     {
@@ -5707,9 +5723,9 @@
     {
       "path": "tools/mir/cli/router/RepositoryCommands.ps1",
       "classification": "canonical-internal",
-      "sha256": "FD101662EC219FAF604CB5F10672B66BB3AFAD1ADD25CC2870F3C9821A01139C",
+      "sha256": "595A676613A27E7D7261DF609D29BC555E4B9E1FB7037F216167D8A955EFBA94",
       "hash_mode": "canonical-text-v1",
-      "lines": 146,
+      "lines": 154,
       "package_visible": false
     },
     {
@@ -5779,7 +5795,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 390,
+    "canonical_internal": 391,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 17,
@@ -5794,5 +5810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:696cd3de95e58d2094665c9bcf0716b444cb6a6fcaddd09f67a626546973c85c"
+  "digest": "sha256:fa6155b5c437477eefa4501ea7b023f6fbe3ad2cc5a1a6607c34beacc7c1b533"
 }
