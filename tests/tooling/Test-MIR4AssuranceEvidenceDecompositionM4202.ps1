@@ -36,6 +36,7 @@ Assert-MIR4AssuranceEvidenceDecompositionV1 (@($receipt.decomposition.modules).C
 Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4M4202HistoricalAssuranceEvidencePublicContract -RepoRoot $repo -Receipt $receipt) 'mir4-m42-02-assurance-evidence-historical-public-contract'
 $expectedModuleSha=@{};foreach($module in @($receipt.decomposition.modules)){$expectedModuleSha[[string]$module.path]=[string]$module.sha256}
 Assert-MIR4AssuranceEvidenceDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-evidence-module-bridge-retirement-successor'
+Assert-MIR4AssuranceEvidenceDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-evidence-module-git-fixed-point'
 foreach($module in @($receipt.decomposition.modules)){
   $path=Join-Path $repo ([string]$module.path)
   $tokens=$null;$parseErrors=$null
@@ -194,6 +195,8 @@ if(Test-Path -LiteralPath $supplyChainSuccessorPath -PathType Leaf){
 }
 
 Assert-MIR4AssuranceEvidenceDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-assurance-evidence-bridge-retirement-successor'
+Assert-MIR4AssuranceEvidenceDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-assurance-evidence-git-fixed-point'
+Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4M4202CurrentBindingHashes -RepoRoot $repo -ExpectedBindingSha $expectedBindingSha) 'mir4-m42-02-assurance-evidence-current-bindings'
 foreach($binding in @($receipt.evolved_bindings)){
   Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path (Join-Path $repo ([string]$binding.path)))-ceq[string]$expectedBindingSha[[string]$binding.path]-and-not[bool]$binding.package_visible-and-not[bool]$binding.release_authority) 'mir4-m42-02-assurance-evidence-evolved-binding' ([string]$binding.path)
 }

@@ -207,19 +207,22 @@ function Find-MIR4M4202HistoricalTextByCanonicalSha256 {
       $ReceiptPath -cne 'releases/migrations/MIR4-M42-02-PowerShell-CharacterizationV1.json') {
     throw "[mir4-m42-02-historical-blob-unavailable] $Path"
   }
-  $introducingCommits = @(& git -C $RepoRoot log --format=%H --diff-filter=A HEAD -- $ReceiptPath)
-  if ($LASTEXITCODE -ne 0 -or $introducingCommits.Count -ne 1 -or
-      [string]$introducingCommits[0] -cnotmatch '^[0-9a-f]{40}$') {
+  $expectedStartingCommit = '337d60ffe6e9dd1c5493b17c4d4b278c16881e2d'
+  $expectedIntroducingCommit = '6f1f559fd110e51751cf4dcac197da7af8da5be8'
+  if ($EpochCommit -cne $expectedStartingCommit) {
     throw '[mir4-m42-02-historical-receipt-provenance]'
   }
-  $introducingCommit = [string]$introducingCommits[0]
-  $parents = @(((& git -C $RepoRoot show -s --format=%P $introducingCommit).Trim()) -split '\s+' | Where-Object { $_ -match '^[0-9a-f]{40}$' })
-  if ($LASTEXITCODE -ne 0 -or $parents.Count -lt 1 -or [string]$parents[0] -cne $EpochCommit) {
+  & git -C $RepoRoot cat-file -e "$expectedIntroducingCommit`^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw '[mir4-m42-02-historical-receipt-provenance]'
+  }
+  $parents = @(((& git -C $RepoRoot show -s --format=%P $expectedIntroducingCommit).Trim()) -split '\s+' | Where-Object { $_ -match '^[0-9a-f]{40}$' })
+  if ($LASTEXITCODE -ne 0 -or $parents.Count -ne 1 -or [string]$parents[0] -cne $expectedStartingCommit) {
     throw '[mir4-m42-02-historical-receipt-parent]'
   }
-  $text = Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$introducingCommit`:$Path"
+  $text = Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$expectedIntroducingCommit`:$Path"
   if ((Get-MIR4Sha256String -Value $text) -ceq $Sha256) {
-    return [pscustomobject]@{ commit = $introducingCommit; text = $text }
+    return [pscustomobject]@{ commit = $expectedIntroducingCommit; text = $text }
   }
   throw "[mir4-m42-02-historical-blob-unavailable] $Path"
 }
@@ -276,7 +279,8 @@ function Test-MIR4M4202HistoricalPowerShellCharacterization {
 
   try {
     $commit = [string]$Receipt.starting_dev.commit
-    if ($commit -cnotmatch '^[0-9a-f]{40}$') { return $false }
+    if ($commit -cne '337d60ffe6e9dd1c5493b17c4d4b278c16881e2d' -or
+        [string]$Receipt.starting_dev.tree -cne '9ac1d4541ff82b6b2dac37e1a25fb4f7146a7e90') { return $false }
     & git -C $RepoRoot cat-file -e "$commit`^{commit}" 2>$null
     if ($LASTEXITCODE -ne 0 -or
         [string]((& git -C $RepoRoot rev-parse "$commit`^{tree}").Trim()) -cne [string]$Receipt.starting_dev.tree) { return $false }
@@ -354,9 +358,10 @@ function Update-MIR4M4202ExpectedBindingsThroughComposableSourceSuccession {
       }
     }
 
-    # V3 and V4 remain immutable evidence.  Current package-excluded files
-    # are instead admitted by the generated inventory's live fixed point, so
-    # later development need not manufacture another historical receipt.
+    # V3 and V4 remain immutable evidence. The caller compares current files
+    # to the independently authenticated hashes reached through the accepted
+    # successor chain; never replace those expectations with the same live
+    # bytes they are meant to validate.
     . (Join-Path $RepoRoot 'tools/mir/application/tooling/CommandInventory.ps1')
     Update-MIR4CommandInventoryV1 -RepoRoot $RepoRoot -Check | Out-Null
     foreach ($path in @($ExpectedBindingSha.Keys)) {
@@ -368,10 +373,58 @@ function Update-MIR4M4202ExpectedBindingsThroughComposableSourceSuccession {
           $portable -ceq 'targets' -or $portable.StartsWith('targets/',[StringComparison]::Ordinal)) { return $false }
       $livePath = Join-Path $RepoRoot $portable
       if (-not (Test-Path -LiteralPath $livePath -PathType Leaf)) { return $false }
-      $ExpectedBindingSha[$path] = Get-MIR4BootstrapTextSha256 -Path $livePath
     }
     return $true
   }catch{return $false}
+}
+
+function Test-MIR4M4202CurrentBindingHashes {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][hashtable]$ExpectedBindingSha
+  )
+
+  try {
+    foreach ($path in @($ExpectedBindingSha.Keys)) {
+      $portable = ([string]$path).Replace('\','/').TrimStart('/')
+      if ([string]::IsNullOrWhiteSpace($portable) -or
+          [IO.Path]::IsPathRooted([string]$path) -or
+          $portable -match '(^|/)\.\.(/|$)') { return $false }
+      $livePath = Join-Path $RepoRoot $portable
+      if (-not (Test-Path -LiteralPath $livePath -PathType Leaf) -or
+          (Get-MIR4BootstrapTextSha256 -Path $livePath) -cne [string]$ExpectedBindingSha[$path]) { return $false }
+    }
+    return $true
+  } catch { return $false }
+}
+
+function Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint {
+  [CmdletBinding()]
+  [OutputType([bool])]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][hashtable]$ExpectedBindingSha
+  )
+
+  try {
+    $headCommit = [string]((& git -C $RepoRoot rev-parse --verify HEAD).Trim())
+    if ($LASTEXITCODE -ne 0 -or $headCommit -cnotmatch '^[0-9a-f]{40}$') { return $false }
+    foreach ($path in @($ExpectedBindingSha.Keys)) {
+      $portable = ([string]$path).Replace('\','/').TrimStart('/')
+      if ([string]::IsNullOrWhiteSpace($portable) -or
+          [IO.Path]::IsPathRooted([string]$path) -or
+          $portable -match '(^|/)\.\.(/|$)') { return $false }
+      $committedText = Get-MIR4M4202GitBlobCanonicalText -RepoRoot $RepoRoot -Object "$headCommit`:$portable"
+      $committedSha = Get-MIR4Sha256String -Value $committedText
+      $livePath = Join-Path $RepoRoot $portable
+      if (-not (Test-Path -LiteralPath $livePath -PathType Leaf) -or
+          (Get-MIR4BootstrapTextSha256 -Path $livePath) -cne $committedSha) { return $false }
+      $ExpectedBindingSha[$path] = $committedSha
+    }
+    return $true
+  } catch { return $false }
 }
 
 function Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement {

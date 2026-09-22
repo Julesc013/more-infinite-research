@@ -24,6 +24,10 @@ $l6Raw=Get-Content -Raw -LiteralPath $l6Path
 $l6=$l6Raw|ConvertFrom-Json -Depth 100 -DateKind String
 Assert-MIR4M4202PowerShell ((Get-FileHash -LiteralPath $l6Path -Algorithm SHA256).Hash-ceq[string]$receipt.predecessor.receipt_sha256-and[string]$l6.record_sha256-ceq[string]$receipt.predecessor.record_sha256) 'predecessor'
 Assert-MIR4M4202PowerShell (Test-MIR4M4202HistoricalPowerShellCharacterization -RepoRoot $repo -Receipt $receipt) 'historical-characterization'
+$substitutedHistoricalReceipt=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+$substitutedHistoricalReceipt.starting_dev.commit='6f1f559fd110e51751cf4dcac197da7af8da5be8'
+$substitutedHistoricalReceipt.starting_dev.tree='641d12be7658dfc11470f241f422e60547c3fdc7'
+Assert-MIR4M4202PowerShell (-not(Test-MIR4M4202HistoricalPowerShellCharacterization -RepoRoot $repo -Receipt $substitutedHistoricalReceipt)) 'historical-characterization-substituted-start-rejected'
 
 $expectedTrackedSha=@{};$expectedAuthoritySha=@{}
 foreach($row in @($receipt.tracked_files)){$expectedTrackedSha[[string]$row.path]=[string]$row.sha256}
@@ -381,6 +385,22 @@ $inventory=Update-MIR4CommandInventoryV1 -RepoRoot $repo -Check
 $currentInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $frozenInventoryDigest
 Assert-MIR4M4202PowerShell ($null-ne$currentInventoryDigest-and[string]$receipt.inventory.hash_mode-ceq'canonical-text-v1'-and(Get-MIR4BootstrapTextSha256 -Path $inventoryPath)-cmatch'^[A-F0-9]{64}$'-and[int]$inventory.command_count-gt0-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-cmatch'^sha256:[a-f0-9]{64}$') 'current-inventory'
 Assert-MIR4M4202PowerShell (Update-MIR4M4202ExpectedBindingsThroughComposableSourceSuccession -RepoRoot $repo -ExpectedBindingSha $expectedAuthoritySha) 'current-authority-successor'
+Assert-MIR4M4202PowerShell (Update-MIR4M4202ExpectedBindingsThroughGitCommitFixedPoint -RepoRoot $repo -ExpectedBindingSha $expectedAuthoritySha) 'current-authority-git-fixed-point'
+Assert-MIR4M4202PowerShell (Test-MIR4M4202CurrentBindingHashes -RepoRoot $repo -ExpectedBindingSha $expectedAuthoritySha) 'current-authority-hashes'
+$bindingProbeRoot=Join-Path ([IO.Path]::GetTempPath()) ('mir4-m42-02-binding-'+[guid]::NewGuid().ToString('N'))
+try{
+  $bindingProbePath=Join-Path $bindingProbeRoot '.mir/modules.yml'
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $bindingProbePath))|Out-Null
+  $headCommit=[string]((& git -C $repo rev-parse --verify HEAD).Trim())
+  $committedModulesText=Get-MIR4M4202GitBlobCanonicalText -RepoRoot $repo -Object "$headCommit`:.mir/modules.yml"
+  [IO.File]::WriteAllText($bindingProbePath,$committedModulesText,[Text.UTF8Encoding]::new($false))
+  $bindingProbeExpected=@{'.mir/modules.yml'=Get-MIR4Sha256String -Value $committedModulesText}
+  Assert-MIR4M4202PowerShell (Test-MIR4M4202CurrentBindingHashes -RepoRoot $bindingProbeRoot -ExpectedBindingSha $bindingProbeExpected) 'current-authority-probe-baseline'
+  [IO.File]::WriteAllText($bindingProbePath,"modules: changed`n",[Text.UTF8Encoding]::new($false))
+  Assert-MIR4M4202PowerShell (-not(Test-MIR4M4202CurrentBindingHashes -RepoRoot $bindingProbeRoot -ExpectedBindingSha $bindingProbeExpected)) 'current-authority-probe-drift-rejected'
+}finally{
+  if(Test-Path -LiteralPath $bindingProbeRoot){[IO.Directory]::Delete($bindingProbeRoot,$true)}
+}
 Assert-MIR4M4202PowerShell (@($receipt.tracked_files|Where-Object{[string]$_.decision-ceq'decompose'}).Count-eq11-and@($receipt.decomposition_sequence).Count-eq11) 'decomposition-count'
 Assert-MIR4M4202PowerShell (@($receipt.tracked_files|Where-Object{[string]$_.decision-ceq'retain-with-explicit-waiver'}).Count-eq9-and@($receipt.waivers).Count-eq9) 'waiver-count'
 Assert-MIR4M4202PowerShell (@($receipt.authority_bindings).Count-eq12-and@($receipt.authority_bindings|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'authority-binding-count'
