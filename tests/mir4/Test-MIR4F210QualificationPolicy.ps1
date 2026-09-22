@@ -42,10 +42,81 @@ if ($staticCoreSource -match '"(?:base|\? recycler|\? space-age) >= 2\.1\.(?:8|1
 }
 $testAuthority = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml') | ConvertFrom-Json -Depth 100
 $policyTest = @($testAuthority.tests | Where-Object { [string]$_.id -ceq 'static.mir4-f210-qualification-policy' })
+$requiredPolicyTestInputs = @(
+  'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1',
+  'tests/runtime/Test-MIR42V2V3CapMigration.ps1',
+  'fixtures/assert-mir42-cap-ownership-multiforce/info.json',
+  'fixtures/assert-mir42-v2-v3-cap-migration/info.json',
+  '.mir/fixtures.yml',
+  'validation/tests.yml'
+)
 if ($policyTest.Count -ne 1 -or
     @($policyTest[0].inputs | Where-Object { [string]$_ -ceq 'source:source/presentation/f210/info.json.template' }).Count -ne 1 -or
-    @($policyTest[0].inputs | Where-Object { [string]$_ -ceq 'source/presentation/f210/info.json.template' }).Count -ne 0) {
+    @($policyTest[0].inputs | Where-Object { [string]$_ -ceq 'source/presentation/f210/info.json.template' }).Count -ne 0 -or
+    @($requiredPolicyTestInputs | Where-Object { $_ -notin @($policyTest[0].inputs) }).Count -ne 0) {
   throw '[mir4-f210-current-source-proof-input-authority]'
+}
+
+$progressionHarnessContracts = @(
+  [ordered]@{
+    id = 'maximum-level-cap-ownership-multiforce-f210'
+    harness = 'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1'
+    fixture_info = 'fixtures/assert-mir42-cap-ownership-multiforce/info.json'
+    runtime_test = 'runtime.maximum-level-cap-ownership-multiforce-f210'
+    admission_marker = 'mir42-cap-ownership-multiforce-engine-admission-pending'
+  },
+  [ordered]@{
+    id = 'maximum-level-v2-v3-migration-f210'
+    harness = 'tests/runtime/Test-MIR42V2V3CapMigration.ps1'
+    fixture_info = 'fixtures/assert-mir42-v2-v3-cap-migration/info.json'
+    runtime_test = 'runtime.maximum-level-v2-v3-migration-f210'
+    admission_marker = 'mir42-v2-v3-cap-migration-engine-admission-pending'
+  }
+)
+$requiredRuntimePolicyInputs = @(
+  '.mir/control/MIR4-F210-Current-Qualification-PolicyV2.json',
+  'spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json',
+  'tools/mir/application/release/F210QualificationPolicy.ps1'
+)
+$fixtureAuthorityText = [IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
+foreach ($contract in $progressionHarnessContracts) {
+  $harnessText = [IO.File]::ReadAllText((Join-Path $repo ([string]$contract.harness)))
+  foreach ($requiredText in @(
+    'tools/mir/application/release/F210QualificationPolicy.ps1',
+    'Get-MIR4F210CurrentQualificationPolicyV2',
+    'current_engine_api_prototype_data_mod_capsule_admitted',
+    ([string]$contract.admission_marker),
+    'Get-MIR4F210EngineResolutionV2'
+  )) {
+    if (-not $harnessText.Contains($requiredText,[StringComparison]::Ordinal)) {
+      throw "[mir4-f210-progression-harness-policy-binding] $($contract.harness):$requiredText"
+    }
+  }
+  if ($harnessText -match '710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8|Version:\s+2[.]1[.]17|factorio_version=''2[.]1[.]17''') {
+    throw "[mir4-f210-progression-harness-stale-engine-lock] $($contract.harness)"
+  }
+
+  $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$contract.fixture_info)) | ConvertFrom-Json -Depth 20
+  $officialDependencies = @($fixtureInfo.dependencies | Where-Object { [string]$_ -match '^(?:base|elevated-rails|quality|recycler|space-age)\s*>=' })
+  if ($officialDependencies.Count -ne 5 -or @($officialDependencies | Where-Object { [string]$_ -notmatch '>=\s*2[.]1[.]18$' }).Count -ne 0) {
+    throw "[mir4-f210-progression-fixture-floor] $($contract.fixture_info)"
+  }
+
+  $fixturePattern = '(?ms)^  ' + [regex]::Escape([string]$contract.id) + ':\r?\n(?<body>.*?)(?=^  [^\s].*:\r?$|\z)'
+  $fixtureMatch = [regex]::Match($fixtureAuthorityText,$fixturePattern)
+  if (-not $fixtureMatch.Success -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'minimum_factorio_version:\s*"2[.]1[.]18"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Qualification-PolicyV2[.]json' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*pending-exact-engine-api-prototype-data-and-official-mod-capsule' -or
+      $fixtureMatch.Groups['body'].Value -match 'factorio_version:\s*"2[.]1[.]17"|exact-engine-2[.]1[.]17') {
+    throw "[mir4-f210-progression-fixture-authority] $($contract.id)"
+  }
+
+  $runtimeTest = @($testAuthority.tests | Where-Object { [string]$_.id -ceq [string]$contract.runtime_test })
+  if ($runtimeTest.Count -ne 1 -or
+      @($requiredRuntimePolicyInputs | Where-Object { $_ -notin @($runtimeTest[0].inputs) }).Count -ne 0) {
+    throw "[mir4-f210-progression-runtime-policy-inputs] $($contract.runtime_test)"
+  }
 }
 $f210Profile = Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/profiles/factorio-2.1.json') | ConvertFrom-Json -Depth 20
 if ([string]$f210Profile.minimum_factorio_version -cne '2.1.18') { throw '[mir4-f210-current-profile-floor]' }

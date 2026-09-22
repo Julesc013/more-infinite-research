@@ -5,11 +5,11 @@
   "author": "MIR maintainers",
   "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.1.17",
-    "elevated-rails >= 2.1.17",
-    "quality >= 2.1.17",
-    "recycler >= 2.1.17",
-    "space-age >= 2.1.17",
+    "base >= 2.1.18",
+    "elevated-rails >= 2.1.18",
+    "quality >= 2.1.18",
+    "recycler >= 2.1.18",
+    "space-age >= 2.1.18",
     "more-infinite-research >= 4.2.0"
   ]
 }

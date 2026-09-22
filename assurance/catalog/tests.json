@@ -828,6 +828,9 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        "tools/mir/application/release/F210QualificationPolicy.ps1",
         "fixtures/assert-mir42-cap-ownership-multiforce/**",
         "fixtures/late-mir42-cap-binding-blocker/**",
         "fixtures/late-mir42-policy-binding-blocker/**",
@@ -895,6 +898,9 @@
       "requires_factorio": true,
       "inputs": [
         "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v2.schema.json",
+        "tools/mir/application/release/F210QualificationPolicy.ps1",
         "fixtures/assert-mir42-v2-v3-cap-migration/**",
         "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
         "source:source/prototypes/mir/emit/mod_data.lua",
@@ -3486,6 +3492,12 @@
         "tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1",
         "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV2Authority.ps1",
         "tools/mir/application/release/F210QualificationPolicy.ps1",
+        "tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1",
+        "tests/runtime/Test-MIR42V2V3CapMigration.ps1",
+        "fixtures/assert-mir42-cap-ownership-multiforce/info.json",
+        "fixtures/assert-mir42-v2-v3-cap-migration/info.json",
+        ".mir/fixtures.yml",
+        "validation/tests.yml",
         "tools/lib/mir4/PreFreezeRelease.ps1",
         "tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
         "docs/maintainer/mir4-pre-freeze-hardening.md",
@@ -7354,5 +7366,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b6380a7560d5dcd0a82412cc38e6a54fe98948edbcbc0e6e0c3154d760651c2b"
+  "digest": "sha256:06d35cc2072552b91a3ef0eadccb97ef8225238c77947355faa97c32023c6cb3"
 }
