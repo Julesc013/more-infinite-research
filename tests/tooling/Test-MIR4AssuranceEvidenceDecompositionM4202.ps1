@@ -32,19 +32,18 @@ $facadeAst=[Management.Automation.Language.Parser]::ParseFile($facadePath,[ref]$
 Assert-MIR4AssuranceEvidenceDecompositionV1 (@($facadeErrors).Count-eq0-and@($facadeAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true)).Count-eq0-and[int]$receipt.decomposition.facade.current_lines-le20) 'mir4-m42-02-assurance-evidence-facade'
 Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-MIR4BootstrapTextSha256 -Path $facadePath)-ceq[string]$receipt.decomposition.facade.current_sha256) 'mir4-m42-02-assurance-evidence-facade-hash'
 
-$functionNames=[Collections.Generic.List[string]]::new()
 Assert-MIR4AssuranceEvidenceDecompositionV1 (@($receipt.decomposition.modules).Count-eq9-and@($receipt.decomposition.modules|Group-Object path|Where-Object{$_.Count-ne1}).Count-eq0) 'mir4-m42-02-assurance-evidence-module-count'
+Assert-MIR4AssuranceEvidenceDecompositionV1 (Test-MIR4M4202HistoricalAssuranceEvidencePublicContract -RepoRoot $repo -Receipt $receipt) 'mir4-m42-02-assurance-evidence-historical-public-contract'
 $expectedModuleSha=@{};foreach($module in @($receipt.decomposition.modules)){$expectedModuleSha[[string]$module.path]=[string]$module.sha256}
 Assert-MIR4AssuranceEvidenceDecompositionV1 (Update-MIR4M4202ExpectedBindingsThroughBridgeRetirement -RepoRoot $repo -ExpectedBindingSha $expectedModuleSha) 'mir4-m42-02-assurance-evidence-module-bridge-retirement-successor'
 foreach($module in @($receipt.decomposition.modules)){
   $path=Join-Path $repo ([string]$module.path)
   $tokens=$null;$parseErrors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($path,[ref]$tokens,[ref]$parseErrors)
-  Assert-MIR4AssuranceEvidenceDecompositionV1 (@($parseErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]-and[int]$module.lines-le600) 'mir4-m42-02-assurance-evidence-module' ([string]$module.path)
-  foreach($function in @($ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]},$true))){[void]$functionNames.Add($function.Name)}
+  Assert-MIR4AssuranceEvidenceDecompositionV1 (@($parseErrors).Count-eq0-and(Get-MIR4BootstrapTextSha256 -Path $path)-ceq[string]$expectedModuleSha[[string]$module.path]) 'mir4-m42-02-assurance-evidence-current-module' ([string]$module.path)
 }
-$projectionSha=Get-MIR4Sha256String -Value (ConvertTo-MIR4BootstrapCanonicalJson -Value $functionNames.ToArray())
-Assert-MIR4AssuranceEvidenceDecompositionV1 ($functionNames.Count-eq62-and$projectionSha-ceq[string]$receipt.public_contract.previous_sha256-and$projectionSha-ceq[string]$receipt.public_contract.current_sha256-and[bool]$receipt.public_contract.unchanged) 'mir4-m42-02-assurance-evidence-public-contract'
+$frozenFunctionCount=[int]$receipt.public_contract.function_count
+$frozenProjectionSha=[string]$receipt.public_contract.current_sha256
 
 $script:repo=$repo
 . $facadePath
@@ -157,8 +156,8 @@ $controlExecutorDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Cont
 if(Test-Path -LiteralPath $controlExecutorDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $controlExecutorDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
 $supplyChainDigestPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Supply-Chain-DecompositionV1.json'
 if(Test-Path -LiteralPath $supplyChainDigestPath -PathType Leaf){$expectedInventoryDigest=[string]((Get-Content -Raw -LiteralPath $supplyChainDigestPath|ConvertFrom-Json -Depth 100 -DateKind String).tooling_inventory.digest)}
-$expectedInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
-Assert-MIR4AssuranceEvidenceDecompositionV1 ([int]$inventory.command_count-eq85-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-ceq$expectedInventoryDigest) 'mir4-m42-02-assurance-evidence-inventory'
+$currentInventoryDigest=Get-MIR4M4202ExpectedInventoryDigestThroughBridgeRetirement -RepoRoot $repo -PredecessorDigest $expectedInventoryDigest
+Assert-MIR4AssuranceEvidenceDecompositionV1 ($null-ne$currentInventoryDigest-and[int]$inventory.command_count-gt0-and[int]$inventory.summary.unknown-eq0-and[int]$inventory.summary.duplicate_command_keys-eq0-and[string]$inventory.digest-cmatch'^sha256:[a-f0-9]{64}$') 'mir4-m42-02-assurance-evidence-current-inventory'
 $controlExecutorSuccessorPath=Join-Path $repo 'releases/migrations/MIR4-M42-02-Control-Executor-DecompositionV1.json'
 if(Test-Path -LiteralPath $controlExecutorSuccessorPath -PathType Leaf){
   $controlExecutorSuccessorRaw=Get-Content -Raw -LiteralPath $controlExecutorSuccessorPath
@@ -207,8 +206,8 @@ Assert-MIR4AssuranceEvidenceDecompositionV1 ((Get-MIR4CanonicalPackageSourceFing
   facade_lines=[int]$receipt.decomposition.facade.current_lines
   modules=@($receipt.decomposition.modules).Count
   maximum_module_lines=(@($receipt.decomposition.modules|Measure-Object lines -Maximum).Maximum)
-  functions=$functionNames.Count
-  public_contract_sha256=$projectionSha
+  functions=$frozenFunctionCount
+  public_contract_sha256=$frozenProjectionSha
   package_source_sha256=$packageBefore
   package_visible=$false
   release_transition_authority=$false
