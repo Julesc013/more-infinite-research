@@ -3267,9 +3267,9 @@
     {
       "path": "tools/commands/workspace/Optimize-MIRArtifactStorage.ps1",
       "classification": "canonical-internal",
-      "sha256": "B2744C89F63316E973986DCC860D0BD4FB2C609D1E7A06FF0E85431F40B2E574",
+      "sha256": "074072242BB089CC4DE0C3352DAB2E9EB7FD33804794F475AF3008F98D788214",
       "hash_mode": "canonical-text-v1",
-      "lines": 272,
+      "lines": 301,
       "package_visible": false
     },
     {
@@ -5810,5 +5810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e3b97244b3e0bca324b804098dd96a7fe4815e629eef9dca2307bf37e56e1119"
+  "digest": "sha256:e1e8eaa665c8d4ad257f57bb42ed1bd65df8a9c5724c6612efff032001d7fac2"
 }

@@ -7,11 +7,15 @@ param(
   [ValidateRange(1, 100000)]
   [int]$MaxFiles = 10000,
   [ValidateRange(1, 10000000)]
-  [int]$MaxScannedFiles = 250000,
+  [int]$MaxScannedEntries = 250000,
+  [ValidateRange(1, 1000000)]
+  [int]$MaxPendingDirectories = 100000,
   [ValidateRange(1, 86400)]
   [int]$MaxScanSeconds = 300,
   [switch]$Apply,
   [switch]$PassThru,
+  [Parameter(DontShow)]
+  [scriptblock]$BeforeApplyTestHook,
   [Parameter(DontShow)]
   [scriptblock]$AfterReplacementTestHook
 )
@@ -72,33 +76,45 @@ function Test-MIRStorageCompletedRun {
   return (($runItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq 0 -and
     $runItem.Name -cmatch '^[0-9a-f]{32}$' -and
     $runItem.LastWriteTimeUtc -lt $Cutoff -and
-    $terminalStatus -cin @('passed','failed','blocked','skipped','cancelled','error') -and
+    (Test-MIRStorageTerminalStatus -Status $terminalStatus) -and
     -not (Test-Path -LiteralPath (Join-Path $RunRoot 'mir-immutable-input-lease.json')) -and
     -not (Test-Path -LiteralPath (Join-Path $RunRoot 'mir-immutable-input-lease.lock')))
+}
+
+function Test-MIRStorageTerminalStatus {
+  param([AllowEmptyString()][string]$Status)
+  return ($Status -cmatch '^passed(?:-[a-z0-9]+)*$' -or
+    $Status -cin @('failed','blocked','skipped','cancelled','error','observed-not-admitted','withheld-by-acyclic-guard'))
+}
+
+function Assert-MIRStorageScanBudget {
+  param([Parameter(Mandatory)]$State,[switch]$CountEntry)
+  if ($CountEntry) { $State.scanned_entries = [long]$State.scanned_entries + 1 }
+  if ([long]$State.scanned_entries -gt [long]$State.max_scanned_entries) {
+    throw "Storage optimization exceeded its bounded $($State.max_scanned_entries)-entry scan; nothing was changed."
+  }
+  if ($State.watch.Elapsed.TotalSeconds -gt [int]$State.max_scan_seconds) {
+    throw "Storage optimization exceeded its bounded $($State.max_scan_seconds)-second scan; nothing was changed."
+  }
 }
 
 function Get-MIRStorageLibraryIndex {
   param(
     [Parameter(Mandatory)][string[]]$Roots,
-    [Parameter(Mandatory)][int]$MaxScannedFiles,
-    [Parameter(Mandatory)][Diagnostics.Stopwatch]$ScanWatch,
-    [Parameter(Mandatory)][int]$MaxScanSeconds
+    [Parameter(Mandatory)]$ScanState
   )
   $index = @{}
-  $scannedFiles = 0
   foreach ($root in $Roots) {
-    foreach ($path in [IO.Directory]::EnumerateFiles($root, '*.zip', [IO.SearchOption]::TopDirectoryOnly)) {
-      $scannedFiles++
-      if ($scannedFiles -gt $MaxScannedFiles) { throw "Storage optimization exceeded its bounded $MaxScannedFiles-file scan; nothing was changed." }
-      if ($ScanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
+    foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($root)) {
+      Assert-MIRStorageScanBudget -State $ScanState -CountEntry
       $item = Get-Item -LiteralPath $path -Force
-      if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+      if ($item.PSIsContainer -or ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or $item.Extension -cne '.zip') { continue }
       $key = $item.Name.ToLowerInvariant() + '|' + $item.Length
       if (-not $index.ContainsKey($key)) { $index[$key] = [Collections.Generic.List[object]]::new() }
       [void]$index[$key].Add($item)
     }
   }
-  return [pscustomobject]@{index=$index;scanned_files=$scannedFiles}
+  return $index
 }
 
 function Get-MIRStorageDefaultLibraryRoots {
@@ -139,24 +155,33 @@ foreach ($root in $LibraryRoot) {
 if ($resolvedLibraries.Count -eq 0) { throw 'At least one immutable mod library is required.' }
 
 $cutoff = [DateTime]::UtcNow.AddDays(-$OlderThanDays)
-$scanWatch = [Diagnostics.Stopwatch]::StartNew()
-$libraryScan = Get-MIRStorageLibraryIndex -Roots $resolvedLibraries.ToArray() -MaxScannedFiles $MaxScannedFiles -ScanWatch $scanWatch -MaxScanSeconds $MaxScanSeconds
-$libraryIndex = $libraryScan.index
+$scanState = [pscustomobject]@{
+  scanned_entries = [long]0
+  max_scanned_entries = [long]$MaxScannedEntries
+  max_scan_seconds = $MaxScanSeconds
+  watch = [Diagnostics.Stopwatch]::StartNew()
+}
+$libraryIndex = Get-MIRStorageLibraryIndex -Roots $resolvedLibraries.ToArray() -ScanState $scanState
 $libraryHashes = @{}
 $plan = [Collections.Generic.List[object]]::new()
-$scannedFiles = [int]$libraryScan.scanned_files
-$enumeration = [IO.EnumerationOptions]::new()
-$enumeration.RecurseSubdirectories = $true
-$enumeration.AttributesToSkip = [IO.FileAttributes]::ReparsePoint
-$enumeration.IgnoreInaccessible = $false
-
-foreach ($path in [IO.Directory]::EnumerateFiles($buildRoot, '*.zip', $enumeration)) {
-  $scannedFiles++
-  if ($scannedFiles -gt $MaxScannedFiles) { throw "Storage optimization exceeded its bounded $MaxScannedFiles-file scan; nothing was changed." }
-  if ($scanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
+$pendingDirectories = [Collections.Generic.Stack[string]]::new()
+$pendingDirectories.Push($buildRoot)
+while ($pendingDirectories.Count -gt 0) {
+  Assert-MIRStorageScanBudget -State $scanState
+  $directory = $pendingDirectories.Pop()
+  foreach ($path in [IO.Directory]::EnumerateFileSystemEntries($directory)) {
+    Assert-MIRStorageScanBudget -State $scanState -CountEntry
+    $entry = Get-Item -LiteralPath $path -Force
+    if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+    if ($entry.PSIsContainer) {
+      if ($pendingDirectories.Count -ge $MaxPendingDirectories) { throw "Storage optimization exceeded its bounded $MaxPendingDirectories-directory pending scan; nothing was changed." }
+      $pendingDirectories.Push($entry.FullName)
+      continue
+    }
+    if ($entry.Extension -cne '.zip') { continue }
   $modsToken = [IO.Path]::DirectorySeparatorChar + 'mods' + [IO.Path]::DirectorySeparatorChar
   if ($path.IndexOf($modsToken, [StringComparison]::OrdinalIgnoreCase) -lt 0) { continue }
-  $item = Get-Item -LiteralPath $path -Force
+  $item = $entry
   if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or [string]$item.LinkType -ceq 'HardLink') { continue }
 
   $modsRoot = Split-Path -Parent $item.FullName
@@ -168,12 +193,13 @@ foreach ($path in [IO.Directory]::EnumerateFiles($buildRoot, '*.zip', $enumerati
   $key = $item.Name.ToLowerInvariant() + '|' + $item.Length
   if (-not $libraryIndex.ContainsKey($key)) { continue }
   $artifactSha = Get-MIRImmutableInputSha256 -Path $item.FullName
-  if ($scanWatch.Elapsed.TotalSeconds -gt $MaxScanSeconds) { throw "Storage optimization exceeded its bounded $MaxScanSeconds-second scan; nothing was changed." }
+  Assert-MIRStorageScanBudget -State $scanState
   $source = $null
   foreach ($candidate in @($libraryIndex[$key])) {
     if ([IO.Path]::GetPathRoot($candidate.FullName) -cne [IO.Path]::GetPathRoot($item.FullName)) { continue }
     if (-not $libraryHashes.ContainsKey($candidate.FullName)) {
       $libraryHashes[$candidate.FullName] = Get-MIRImmutableInputSha256 -Path $candidate.FullName
+      Assert-MIRStorageScanBudget -State $scanState
     }
     if ([string]$libraryHashes[$candidate.FullName] -ceq $artifactSha) { $source = $candidate; break }
   }
@@ -187,6 +213,7 @@ foreach ($path in [IO.Directory]::EnumerateFiles($buildRoot, '*.zip', $enumerati
     bytes = [long]$item.Length
     sha256 = $artifactSha
   })
+  }
 }
 
 if (-not $Apply) {
@@ -196,18 +223,20 @@ if (-not $Apply) {
   return
 }
 
+if ($null -ne $BeforeApplyTestHook) { & $BeforeApplyTestHook @($plan) }
 if (Get-Process factorio -ErrorAction SilentlyContinue) { throw 'Factorio is running; storage optimization was not started.' }
 $converted = [Collections.Generic.List[object]]::new()
 foreach ($row in $plan) {
   if (Get-Process factorio -ErrorAction SilentlyContinue) { throw "Factorio started after $($converted.Count) conversions; no further artifact was changed." }
   $target = [IO.Path]::GetFullPath([string]$row.artifact)
   $source = [IO.Path]::GetFullPath([string]$row.source)
-  if (-not (Test-MIRStoragePathWithin -Path $target -Root $buildRoot) -or
-      @($resolvedLibraries | Where-Object { Test-MIRStoragePathWithin -Path $source -Root $_ }).Count -ne 1) {
+  $sourceLibraries = @($resolvedLibraries | Where-Object { Test-MIRStoragePathWithin -Path $source -Root $_ })
+  if (-not (Test-MIRStoragePathWithin -Path $target -Root $buildRoot) -or $sourceLibraries.Count -ne 1) {
     throw "Storage optimization boundary changed: $target"
   }
   if (-not (Test-MIRStorageCompletedRun -RunRoot ([string]$row.run) -Cutoff $cutoff) -or
-      -not (Test-MIRStoragePlainPathChain -Path $target -Root $buildRoot)) {
+      -not (Test-MIRStoragePlainPathChain -Path $target -Root $buildRoot) -or
+      -not (Test-MIRStoragePlainPathChain -Path $source -Root $sourceLibraries[0])) {
     throw "Storage optimization eligibility changed after planning: $target"
   }
   if (-not $PSCmdlet.ShouldProcess($target, "replace verified duplicate with hard link to $source")) { continue }
