@@ -473,6 +473,16 @@ fixtures:
       - recycler-1-does-not-enter-generated-prerequisites
       - rejected-recycling-route-witnesses-remain-explainable
 
+  f200-science-researchability-diagnostic:
+    requires_features: []
+    assertion_path: fixtures/assert-f200-science-researchability-diagnostic
+    exact_real_campaign: local-2-0-bob-angels
+    validates:
+      - exact-f200-bob-angels-four-logistic-science-rejection-projections
+      - isolated-query-local-science-production-observation
+      - bounded-candidate-node-depth-and-byte-diagnostic-output
+      - no-player-or-prototype-mutation-authority
+
   k2-science-phase-policy:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy

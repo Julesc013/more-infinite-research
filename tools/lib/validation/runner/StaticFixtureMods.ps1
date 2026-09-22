@@ -47,6 +47,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       "assert-generated-cap-transition-2-0" = "2.0"
       "assert-generated-max-level-2-0" = "2.0"
       "assert-recycler-progression-routes-f200" = "2.0"
+      "assert-f200-science-researchability-diagnostic" = "2.0"
       "assert-upgrade-2-5-9-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-4-0-20000" = "2.0"
       "assert-upgrade-2-5-10-to-2-5-11" = "2.0"
@@ -110,5 +111,26 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) has no data-stage entry file."
     }
   }
-}
 
+  # The F200 Bob/Angel diagnostic is explicitly allowed to prebuild the
+  # canonical recipe snapshot only in its short-lived parent context. Its
+  # child projection must borrow that snapshot, so retain a static ordering
+  # guard that catches a fixture which otherwise fails every query closed as
+  # recipe-index-unavailable.
+  $scienceDiagnosticPath = Join-Path $fixtureRootForStatic "assert-f200-science-researchability-diagnostic/data-final-fixes.lua"
+  $scienceDiagnosticText = Get-Content -Raw -LiteralPath $scienceDiagnosticPath
+  $contextStart = $scienceDiagnosticText.IndexOf('compiler_context.with_active(')
+  $recipeFactsRequire = if ($contextStart -ge 0) {
+    $scienceDiagnosticText.IndexOf('local canonical_recipe_facts = require(', $contextStart)
+  } else { -1 }
+  $recipeIndexBuild = if ($recipeFactsRequire -ge 0) {
+    $scienceDiagnosticText.IndexOf('local parent_recipe_index = canonical_recipe_facts.index_view()', $recipeFactsRequire)
+  } else { -1 }
+  $firstProjection = if ($contextStart -ge 0) {
+    $scienceDiagnosticText.IndexOf('reachability.pack_production_rejection_projection(', $contextStart)
+  } else { -1 }
+  if ($contextStart -lt 0 -or $recipeFactsRequire -lt $contextStart -or $recipeIndexBuild -lt $recipeFactsRequire -or
+    $firstProjection -lt $recipeIndexBuild) {
+    throw "F200 science researchability diagnostic must initialize its parent recipe snapshot before projections."
+  }
+}

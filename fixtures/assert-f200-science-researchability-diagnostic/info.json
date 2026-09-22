@@ -1,0 +1,19 @@
+{
+  "name": "mir-fixture-assert-f200-science-researchability-diagnostic",
+  "version": "0.1.0",
+  "title": "MIR Fixture - F200 Science Researchability Diagnostic",
+  "author": "MIR",
+  "description": "Diagnostic-only F200 Bob/Angel capture of the four logistic-science prerequisite paths.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "? boblibrary",
+    "? bobplates",
+    "? bobelectronics",
+    "? bobtech",
+    "? angelsrefining",
+    "? angelspetrochem",
+    "? angelssmelting",
+    "more-infinite-research"
+  ]
+}

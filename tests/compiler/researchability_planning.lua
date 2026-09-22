@@ -1,5 +1,6 @@
 -- Controlled module tests, not a package, save, or ecosystem qualification.
-local world, context
+local world, context, active_context, last_created_context
+local registry, recipe_unlock_facts, production, researchability, feasibility
 local checks = 0
 
 local function stub(name, value) package.loaded[name] = value end
@@ -40,17 +41,102 @@ stub("prototypes.mir.index.recipe_facts", {
   end,
   source_epoch = function() return world.recipe_source_epoch or 1 end
 })
-stub("prototypes.mir.report.compiler_telemetry", {
-  observe_max = function() end,
-  count = function() end
-})
-stub("prototypes.mir.pipeline.compiler_context", {current = function() return context end})
+local function new_context()
+  local next_context = {states = {}, epochs = {}, services = {}, services_frozen = false}
+  function next_context:execution_mode() return "SAFE" end
+  function next_context:state_view(name, factory)
+    if self.states[name] == nil and factory then
+      self.states[name] = factory()
+      self.epochs[name] = self.epochs[name] or 1
+    end
+    return self.states[name]
+  end
+  function next_context:set_state(name, value)
+    if self.states[name] ~= nil then error("fixture state assigned twice: " .. name) end
+    self.states[name] = value
+    self.epochs[name] = 1
+    return value
+  end
+  function next_context:has_state(name) return self.states[name] ~= nil end
+  function next_context:state_epoch(name) return self.epochs[name] end
+  function next_context:replace_epoch(name, value, expected_epoch)
+    if self.states[name] == nil then error("fixture missing state: " .. name) end
+    if expected_epoch ~= nil and self.epochs[name] ~= expected_epoch then error("fixture epoch mismatch: " .. name) end
+    self.states[name] = value
+    self.epochs[name] = self.epochs[name] + 1
+    return value, self.epochs[name]
+  end
+  function next_context:set_service(name, implementation)
+    if self.services_frozen then error("fixture services are frozen") end
+    if self.services[name] ~= nil then error("fixture service assigned twice: " .. name) end
+    self.services[name] = implementation
+    return implementation
+  end
+  function next_context:has_service(name)
+    return self.services[name] ~= nil
+  end
+  function next_context:freeze_services()
+    self.services_frozen = true
+  end
+  function next_context:service(name)
+    if self.services[name] then return self.services[name] end
+    if name == "science.technology_researchability_reason" then return researchability.reason_with_context end
+    if name == "science.pack_production_status" then return production.pack_production_status end
+    if name == "science.independent_pack_acquisition_witness" then return production.independent_pack_acquisition_witness end
+    if name == "science.prereq_tech_for_science_pack" then return production.prereq_tech_for_science_pack end
+    if name == "science.production_route_for_pack" then return production.production_route_for_pack end
+    error("Unexpected service: " .. tostring(name))
+  end
+  return next_context
+end
 
-local registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
-local recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
-local production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
-local researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
-local feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
+stub("prototypes.mir.pipeline.compiler_context", {
+  current = function() return active_context or context end,
+  new = function()
+    last_created_context = new_context()
+    return last_created_context
+  end,
+  with_active = function(next_context, callback, ...)
+    local previous = active_context
+    active_context = next_context
+    local results = {pcall(callback, ...)}
+    active_context = previous
+    if not results[1] then error(results[2]) end
+    return table.unpack(results, 2)
+  end
+})
+stub("prototypes.mir.report.compiler_telemetry", {
+  observe_max = function(name, value)
+    local telemetry = (active_context or context):state_view("compiler_telemetry", function()
+      return {counters = {}}
+    end)
+    telemetry.counters[name] = math.max(telemetry.counters[name] or 0, value or 0)
+  end,
+  count = function(name, amount)
+    local telemetry = (active_context or context):state_view("compiler_telemetry", function()
+      return {counters = {}}
+    end)
+    telemetry.counters[name] = (telemetry.counters[name] or 0) + (amount or 1)
+  end,
+  start_phase = function(name)
+    local telemetry = (active_context or context):state_view("compiler_telemetry", function()
+      return {counters = {}}
+    end)
+    telemetry.counters["phase-start-" .. tostring(name)] = (telemetry.counters["phase-start-" .. tostring(name)] or 0) + 1
+  end,
+  finish_phase = function(name)
+    local telemetry = (active_context or context):state_view("compiler_telemetry", function()
+      return {counters = {}}
+    end)
+    telemetry.counters["phase-finish-" .. tostring(name)] = (telemetry.counters["phase-finish-" .. tostring(name)] or 0) + 1
+  end
+})
+
+registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
+recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
+production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
+researchability = require("prototypes.mir.capabilities.science_integration.technology_researchability")
+feasibility = require("prototypes.mir.capabilities.science_integration.recipe_route_feasibility")
 
 local function reset(next_world)
   world = next_world
@@ -66,35 +152,20 @@ local function reset(next_world)
     ["space-location"] = world.space_locations or {},
     planet = world.planets or {}
   }
-  context = {states = {}, epochs = {}}
-  function context:state_view(name, factory)
-    if self.states[name] == nil and factory then
-      self.states[name] = factory()
-      self.epochs[name] = self.epochs[name] or 1
-    end
-    return self.states[name]
-  end
-  function context:set_state(name, value)
-    if self.states[name] ~= nil then error("fixture state assigned twice: " .. name) end
-    self.states[name] = value
-    self.epochs[name] = 1
-    return value
-  end
-  function context:has_state(name) return self.states[name] ~= nil end
-  function context:state_epoch(name) return self.epochs[name] end
-  function context:replace_epoch(name, value, expected_epoch)
-    if self.states[name] == nil then error("fixture missing state: " .. name) end
-    if expected_epoch ~= nil and self.epochs[name] ~= expected_epoch then error("fixture epoch mismatch: " .. name) end
-    self.states[name] = value
-    self.epochs[name] = self.epochs[name] + 1
-    return value, self.epochs[name]
-  end
-  function context:service(name)
-    if name == "science.technology_researchability_reason" then return researchability.reason_with_context end
-    if name == "science.pack_production_status" then return production.pack_production_status end
-    if name == "science.independent_pack_acquisition_witness" then return production.independent_pack_acquisition_witness end
-    error("Unexpected service: " .. tostring(name))
-  end
+  active_context = nil
+  context = new_context()
+  -- The real compiler reaches this diagnostic only after it has captured its
+  -- immutable recipe snapshot. The ordinary controlled worlds retain a small
+  -- equivalent parent snapshot while their recipe-facts facade remains stubbed;
+  -- D23 below separately exercises the actual recipe-facts module.
+  context.states.recipe_source = world.recipe_prototypes or {}
+  context.epochs.recipe_source = 1
+  context.states.recipe_index = {
+    facts = world.recipe_facts or {},
+    by_output = world.producers or {},
+    by_output_identity = world.producers_identity or {}
+  }
+  context.epochs.recipe_index = 1
 end
 
 local function representation_world(prototypes)
@@ -314,7 +385,7 @@ local function route_fact(output, ingredients, options)
   return {
     enabled_without_research = options.enabled ~= false,
     result_names = {output},
-    variants = {{
+    variants = options.variants or {{
       name = "default",
       enabled = options.enabled ~= false,
       hidden = false,
@@ -613,22 +684,718 @@ local function fluid_intermediate_world()
   }
 end
 
+-- These are diagnostic projections, not new admissions.  They intentionally
+-- use the exact production query name seen in the Bob/Angel audit while each
+-- controlled world isolates one first-rejection class.  The checks below make
+-- the trace shape deterministic without asserting any ecosystem outcome.
+local function logistic_trace_world(recipe_name, fact, tech_name, resources)
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {[tech_name] = technology('logistic-science-pack', recipe_name)},
+    recipe_prototypes = {[recipe_name] = {name = recipe_name}},
+    recipe_facts = {[recipe_name] = fact},
+    producers = {['logistic-science-pack'] = {recipe_name}},
+    unlockers = {[recipe_name] = {tech_name}},
+    resources = resources
+  }
+end
+
+local function only_candidate(projection, recipe_name)
+  return projection and projection.candidates and #projection.candidates == 1
+    and projection.candidates[1].recipe == recipe_name and projection.candidates[1] or nil
+end
+
+local observed_context_state_names = {
+  'science_pack_production',
+  'science_pack_recipe_status',
+  'technology_researchability_index',
+  'compiler_telemetry'
+}
+
+local function context_observation_snapshot()
+  local snapshot = {}
+  for _, name in ipairs(observed_context_state_names) do
+    snapshot[name] = {value = context.states[name], epoch = context.epochs[name]}
+  end
+  return snapshot
+end
+
+local function context_observation_unchanged(snapshot)
+  for _, name in ipairs(observed_context_state_names) do
+    local before = snapshot[name]
+    if context.states[name] ~= before.value or context.epochs[name] ~= before.epoch then return false end
+  end
+  return true
+end
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-missing-category',
+  route_fact('logistic-science-pack', {}, {enabled = false, categories = {'missing-crafting-category'}}),
+  'trace-category-unlocker'
+))
+local logistic_status = production.pack_production_status('logistic-science-pack', {})
+local before_projection = context_observation_snapshot()
+local logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+local logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-missing-category')
+check('D01', logistic_status == 'unreachable' and logistic_projection
+  and logistic_projection.schema == 2 and logistic_projection.kind == 'science-pack-production-rejection-projection'
+  and logistic_projection.pack_name == 'logistic-science-pack' and logistic_projection.status == 'unreachable'
+  and logistic_projection.truncation and #logistic_projection.truncation.truncated == 0
+  and logistic_projection.truncation.usage.trace_events == 1,
+  'The rejected logistic pack has one selected failure trace, excluding its bounded status preflight')
+check('D02', logistic_candidate and logistic_candidate.first_failure.kind == 'category'
+  and logistic_candidate.first_failure.category == 'missing-crafting-category'
+  and logistic_candidate.first_failure.reason == 'no-compatible-machine-category'
+  and logistic_candidate.unlockers[1].technology == 'trace-category-unlocker'
+  and logistic_candidate.unlockers[1].status == 'not-evaluated',
+  'A candidate recipe retains its first unavailable machine category and unlocker disposition')
+check('D03', context_observation_unchanged(before_projection)
+  and production.pack_production_status('logistic-science-pack', {}) == 'unreachable',
+  'Observation runs in a fresh context and leaves production, recipe, graph, and telemetry state unchanged')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-wrong-identity',
+  route_fact('wrong-output', {}, {enabled = false}),
+  'trace-identity-unlocker'
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-wrong-identity')
+check('D04', logistic_candidate and logistic_candidate.first_failure.kind == 'identity'
+  and logistic_candidate.first_failure.identity.type == 'item'
+  and logistic_candidate.first_failure.identity.name == 'logistic-science-pack'
+  and logistic_candidate.first_failure.reason == 'output-identity-mismatch',
+  'A malformed candidate retains the rejected output identity instead of matching by name alone')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-missing-ingredient',
+  route_fact('logistic-science-pack', {{name = 'missing-trace-ingredient', amount = 1}}, {enabled = false}),
+  'trace-ingredient-unlocker'
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-missing-ingredient')
+check('D05', logistic_candidate and logistic_candidate.first_failure.kind == 'ingredient'
+  and logistic_candidate.first_failure.identity.name == 'missing-trace-ingredient'
+  and logistic_candidate.first_failure.reason == 'no-enabled-acquisition-route',
+  'A candidate retains the first missing ingredient acquisition rejection')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-self-cycle',
+  route_fact('logistic-science-pack', {{name = 'logistic-science-pack', amount = 1}}, {enabled = false}),
+  'trace-cycle-unlocker'
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-self-cycle')
+check('D06', logistic_candidate and logistic_candidate.first_failure.kind == 'technology'
+  and logistic_candidate.first_failure.technology == 'trace-cycle-unlocker'
+  and logistic_candidate.first_failure.reason == 'science-self-lock-logistic-science-pack',
+  'An unseeded self-cycle remains rejected and selects its concrete self-lock technology')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-ore',
+  route_fact('logistic-science-pack', {{name = 'trace-ore', amount = 1}}, {enabled = false}),
+  'trace-self-lock-unlocker',
+  {trace_ore = {minable = {result = 'trace-ore', count = 1}}}
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-from-ore')
+check('D07', logistic_candidate and logistic_candidate.structural_route.status == 'reachable'
+  and logistic_candidate.first_failure.kind == 'technology'
+  and logistic_candidate.first_failure.technology == 'trace-self-lock-unlocker'
+  and logistic_candidate.first_failure.reason == 'science-self-lock-logistic-science-pack'
+  and logistic_candidate.unlockers[1].status == 'rejected',
+  'A structurally seeded candidate retains its rejecting self-lock technology')
+
+-- A rejected sibling variant is not part of the selected structural route.
+-- The source-fed second variant reaches the sole unlocker, whose science cost
+-- consumes the same pack. The reported first failure must therefore be that
+-- self-lock, never the discarded first variant's machine category.
+reset(logistic_trace_world(
+  'logistic-science-pack-transactional-variants',
+  route_fact('logistic-science-pack', nil, {
+    enabled = false,
+    variants = {
+      {
+        name = 'discarded-missing-category', enabled = false,
+        categories = {'missing-crafting-category'}, ingredients = {},
+        results = {{name = 'logistic-science-pack', amount = 1}}
+      },
+      {
+        name = 'selected-source-fed-route', enabled = false,
+        categories = {'crafting'}, ingredients = {{name = 'trace-ore', amount = 1}},
+        results = {{name = 'logistic-science-pack', amount = 1}}
+      }
+    }
+  }),
+  'trace-transactional-self-lock',
+  {trace_ore = {minable = {result = 'trace-ore', count = 1}}}
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack')
+logistic_candidate = only_candidate(logistic_projection, 'logistic-science-pack-transactional-variants')
+check('D08', logistic_candidate and logistic_candidate.structural_route.status == 'reachable'
+  and logistic_candidate.first_failure.kind == 'technology'
+  and logistic_candidate.first_failure.reason == 'science-self-lock-logistic-science-pack'
+  and logistic_candidate.first_failure.kind ~= 'category',
+  'A later reachable variant discards provisional structural failures before the true self-lock is selected')
+
+local function projection_truncated(projection, reason)
+  for _, candidate in ipairs((projection and projection.truncation or {}).truncated or {}) do
+    if candidate == reason then return true end
+  end
+  return false
+end
+
+local function projection_visits_within(projection, limit)
+  local truncation = projection and projection.truncation or {}
+  local usage = truncation.usage or {}
+  return truncation.stopped == true and type(usage.visits) == 'number' and usage.visits <= limit
+end
+
+reset({
+  item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+  labs = {lab = {inputs = {'logistic-science-pack'}}},
+  techs = {
+    ['a-budget-unlocker'] = technology('logistic-science-pack', 'a-logistic-budget'),
+    ['b-budget-unlocker'] = technology('logistic-science-pack', 'b-logistic-budget')
+  },
+  recipe_prototypes = {
+    ['a-logistic-budget'] = {name = 'a-logistic-budget'},
+    ['b-logistic-budget'] = {name = 'b-logistic-budget'}
+  },
+  recipe_facts = {
+    ['a-logistic-budget'] = route_fact('logistic-science-pack', {}, {enabled = false, categories = {'missing-a'}}),
+    ['b-logistic-budget'] = route_fact('logistic-science-pack', {}, {enabled = false, categories = {'missing-b'}})
+  },
+  producers = {['logistic-science-pack'] = {'a-logistic-budget', 'b-logistic-budget'}},
+  unlockers = {
+    ['a-logistic-budget'] = {'a-budget-unlocker'},
+    ['b-logistic-budget'] = {'b-budget-unlocker'}
+  }
+})
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 1, nodes = 32, depth = 8, bytes = 4096}
+})
+check('D09', logistic_projection.candidate_count == 2 and #logistic_projection.candidates == 1
+  and projection_truncated(logistic_projection, 'candidates'),
+  'Candidate output is capped deterministically with explicit truncation metadata')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-self-cycle',
+  route_fact('logistic-science-pack', {{name = 'logistic-science-pack', amount = 1}}, {enabled = false}),
+  'trace-cycle-unlocker'
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 1, depth = 8, bytes = 4096}
+})
+check('D10', projection_truncated(logistic_projection, 'nodes'),
+  'Node observations stop at the configured deterministic cap')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-depth-chain',
+  route_fact('logistic-science-pack', {{name = 'trace-middle', amount = 1}}, {enabled = false}),
+  'trace-depth-unlocker'
+))
+world.recipe_prototypes['trace-middle-from-terminal'] = {name = 'trace-middle-from-terminal'}
+world.recipe_facts['trace-middle-from-terminal'] = route_fact('trace-middle', {{name = 'trace-terminal', amount = 1}})
+world.producers['trace-middle'] = {'trace-middle-from-terminal'}
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 32, depth = 1, bytes = 4096}
+})
+check('D11', projection_truncated(logistic_projection, 'depth'),
+  'Nested acquisition observations stop at the configured deterministic depth')
+
+reset(logistic_trace_world(
+  'logistic-science-pack-from-missing-category',
+  route_fact('logistic-science-pack', {}, {enabled = false, categories = {'missing-crafting-category'}}),
+  'trace-category-unlocker'
+))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 32, depth = 8, bytes = 1}
+})
+check('D12', #logistic_projection.candidates == 0 and logistic_projection.first_failure.kind == 'budget'
+  and projection_truncated(logistic_projection, 'bytes'),
+  'Byte-limited projections omit oversized trace output with stable budget metadata')
+
+-- The work counter is deliberately not transactional.  A broad OR fan-out
+-- must stop before inspecting every sibling, even though discarded trace
+-- branches are rolled back to retain only one selected failure tree.
+local function wide_budget_world(width)
+  local recipe_facts, recipe_prototypes, recipes = {}, {}, {}
+  for index = 1, width do
+    local name = 'wide-logistic-' .. index
+    recipe_facts[name] = route_fact('logistic-science-pack', {{name = 'wide-missing-' .. index, amount = 1}}, {
+      enabled = false
+    })
+    recipe_prototypes[name] = {name = name}
+    table.insert(recipes, name)
+  end
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {}, recipe_prototypes = recipe_prototypes, recipe_facts = recipe_facts,
+    producers = {['logistic-science-pack'] = recipes}, unlockers = {}
+  }
+end
+
+reset(wide_budget_world(24))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 24, nodes = 8, depth = 32, bytes = 4096}
+})
+check('D13', projection_truncated(logistic_projection, 'nodes')
+  and projection_visits_within(logistic_projection, 8),
+  'A wide candidate fan-out cannot consume more irreversible visits than its node cap')
+
+-- A long AND chain exercises the recursive descent guard separately from a
+-- wide recipe list. Its trace may roll back, but its work budget cannot.
+local function deep_budget_world(depth)
+  local recipe_facts, recipe_prototypes, producers = {}, {}, {
+    ['logistic-science-pack'] = {'deep-logistic'}
+  }
+  recipe_facts['deep-logistic'] = route_fact('logistic-science-pack', {{name = 'deep-1', amount = 1}}, {
+    enabled = false
+  })
+  recipe_prototypes['deep-logistic'] = {name = 'deep-logistic'}
+  for index = 1, depth do
+    local item_name = 'deep-' .. index
+    local recipe_name = 'deep-recipe-' .. index
+    local ingredients = index == depth and {{name = 'deep-terminal', amount = 1}}
+      or {{name = 'deep-' .. (index + 1), amount = 1}}
+    recipe_facts[recipe_name] = route_fact(item_name, ingredients)
+    recipe_prototypes[recipe_name] = {name = recipe_name}
+    producers[item_name] = {recipe_name}
+  end
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {}, recipe_prototypes = recipe_prototypes, recipe_facts = recipe_facts,
+    producers = producers, unlockers = {}
+  }
+end
+
+reset(deep_budget_world(24))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 12, depth = 32, bytes = 4096}
+})
+check('D14', projection_truncated(logistic_projection, 'nodes')
+  and projection_visits_within(logistic_projection, 12),
+  'A deep recursive acquisition chain cannot consume more irreversible visits than its node cap')
+
+-- A bounded status pass is not allowed to turn a partial prefix of a recipe
+-- list into a negative conclusion. The only valid route is deliberately last;
+-- a narrow diagnostic budget must report indeterminate while normal admission
+-- still finds the later initial route.
+local function late_valid_route_world(invalid_count)
+  local recipe_facts, recipe_prototypes, recipes = {}, {}, {}
+  for index = 1, invalid_count do
+    local name = string.format('a-late-invalid-%02d', index)
+    recipe_facts[name] = route_fact('logistic-science-pack', {}, {
+      enabled = false, categories = {'missing-late-category'}
+    })
+    recipe_prototypes[name] = {name = name}
+    table.insert(recipes, name)
+  end
+  recipe_facts['z-late-valid'] = route_fact('logistic-science-pack', {{name = 'late-ore', amount = 1}})
+  recipe_prototypes['z-late-valid'] = {name = 'z-late-valid'}
+  table.insert(recipes, 'z-late-valid')
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {}, recipe_prototypes = recipe_prototypes, recipe_facts = recipe_facts,
+    producers = {['logistic-science-pack'] = recipes}, unlockers = {},
+    resources = {late_ore = {minable = {result = 'late-ore', count = 1}}}
+  }
+end
+
+reset(late_valid_route_world(24))
+check('D15', production.pack_production_status('logistic-science-pack', {}) == 'initial',
+  'Normal admission reaches a valid initial production route after invalid earlier alternatives')
+before_projection = context_observation_snapshot()
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 24, nodes = 8, depth = 32, bytes = 4096}
+})
+check('D15A', logistic_projection and logistic_projection.status == 'indeterminate'
+  and logistic_projection.first_failure.reason == 'diagnostic-work-budget-exhausted'
+  and #logistic_projection.candidates == 0 and projection_truncated(logistic_projection, 'nodes')
+  and projection_visits_within(logistic_projection, 8)
+  and context_observation_unchanged(before_projection),
+  'A capped status pass reports indeterminate rather than falsely rejecting a late valid route')
+
+-- Depth applies to technology prerequisites as well as recipe acquisition.
+-- The root route is structurally seeded, but the short closure cap must stop
+-- before a deep prerequisite chain can be misreported as a science rejection.
+local function deep_technology_chain_world(depth)
+  local techs = {}
+  for index = 1, depth do
+    local name = string.format('tech-depth-%02d', index)
+    techs[name] = {
+      enabled = true,
+      research_trigger = {type = 'craft-item', item = 'lab'},
+      prerequisites = index < depth and {string.format('tech-depth-%02d', index + 1)} or nil
+    }
+  end
+  techs['z-tech-depth-root'] = technology('logistic-science-pack', 'tech-depth-logistic-recipe')
+  techs['z-tech-depth-root'].prerequisites = {'tech-depth-01'}
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = techs,
+    recipe_prototypes = {['tech-depth-logistic-recipe'] = {name = 'tech-depth-logistic-recipe'}},
+    recipe_facts = {
+      ['tech-depth-logistic-recipe'] = route_fact(
+        'logistic-science-pack', {{name = 'tech-depth-ore', amount = 1}}, {enabled = false})
+    },
+    producers = {['logistic-science-pack'] = {'tech-depth-logistic-recipe'}},
+    unlockers = {['tech-depth-logistic-recipe'] = {'z-tech-depth-root'}},
+    resources = {tech_depth_ore = {minable = {result = 'tech-depth-ore', count = 1}}}
+  }
+end
+
+reset(deep_technology_chain_world(12))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 64, depth = 2, bytes = 4096}
+})
+check('D16', logistic_projection and logistic_projection.status == 'indeterminate'
+  and logistic_projection.first_failure.reason == 'diagnostic-work-budget-exhausted'
+  and projection_truncated(logistic_projection, 'depth')
+  and logistic_projection.truncation.usage.maximum_depth <= 2,
+  'Technology-prerequisite recursion enforces the diagnostic depth cap before false rejection')
+
+-- Every nested fan-out below is work-accounted. These worlds force the cap in
+-- one inner collection at a time and require indeterminate, never a rejected
+-- pack conclusion, when the collection is incomplete.
+local function fanout_lab_input_world(width)
+  local items, inputs = {['logistic-science-pack'] = {type = 'item'}}, {}
+  for index = 1, width do
+    local name = string.format('lab-fanout-%02d', index)
+    items[name] = {type = 'item'}
+    table.insert(inputs, name)
+  end
+  table.insert(inputs, 'logistic-science-pack')
+  return {
+    item_prototypes = items,
+    labs = {lab = {inputs = inputs}}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}
+  }
+end
+
+-- Eight inputs fit in the collection budget, but the target pack is last.
+-- The same fixed cap therefore reaches the separate input-to-pack comparison
+-- loop and stops there rather than merely proving the outer collection loop.
+reset(fanout_lab_input_world(7))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 12, depth = 32, bytes = 4096}
+})
+check('D17', logistic_projection and logistic_projection.status == 'indeterminate'
+  and projection_truncated(logistic_projection, 'nodes') and projection_visits_within(logistic_projection, 12),
+  'Lab-input enumeration and pack comparison fan-outs consume bounded irreversible work')
+
+local function fanout_recipe_result_world(width)
+  local results = {}
+  for index = 1, width do table.insert(results, {name = 'recipe-result-' .. index, amount = 1}) end
+  table.insert(results, {name = 'logistic-science-pack', amount = 1})
+  return logistic_trace_world(
+    'fanout-recipe-results',
+    route_fact('logistic-science-pack', {}, {enabled = false, results = results}),
+    'fanout-result-unlocker'
+  )
+end
+
+reset(fanout_recipe_result_world(24))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 8, depth = 32, bytes = 4096}
+})
+check('D18', logistic_projection and logistic_projection.status == 'indeterminate'
+  and projection_truncated(logistic_projection, 'nodes') and projection_visits_within(logistic_projection, 8),
+  'Recipe-result identity fan-outs consume bounded irreversible work')
+
+local function fanout_minable_result_world(width)
+  local results = {}
+  for index = 1, width do table.insert(results, {name = 'minable-result-' .. index, amount = 1}) end
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+    resources = {fanout_resource = {minable = {results = results}}}
+  }
+end
+
+reset(fanout_minable_result_world(24))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 8, depth = 32, bytes = 4096}
+})
+check('D19', logistic_projection and logistic_projection.status == 'indeterminate'
+  and projection_truncated(logistic_projection, 'nodes') and projection_visits_within(logistic_projection, 8),
+  'Minable-result fan-outs consume bounded irreversible work')
+
+local function fanout_technology_ingredient_world(width)
+  local ingredients = {}
+  for _ = 1, width do table.insert(ingredients, {name = 'logistic-science-pack', amount = 1}) end
+  local root = technology('logistic-science-pack', 'fanout-tech-ingredients')
+  root.unit.ingredients = ingredients
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {['fanout-tech-unlocker'] = root},
+    recipe_prototypes = {['fanout-tech-ingredients'] = {name = 'fanout-tech-ingredients'}},
+    recipe_facts = {
+      ['fanout-tech-ingredients'] = route_fact(
+        'logistic-science-pack', {{name = 'fanout-tech-ore', amount = 1}}, {enabled = false})
+    },
+    producers = {['logistic-science-pack'] = {'fanout-tech-ingredients'}},
+    unlockers = {['fanout-tech-ingredients'] = {'fanout-tech-unlocker'}},
+    resources = {fanout_tech_ore = {minable = {result = 'fanout-tech-ore', count = 1}}}
+  }
+end
+
+reset(fanout_technology_ingredient_world(48))
+logistic_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 56, depth = 32, bytes = 4096}
+})
+check('D20', logistic_projection and logistic_projection.status == 'indeterminate'
+  and projection_truncated(logistic_projection, 'nodes') and projection_visits_within(logistic_projection, 56),
+  'Technology science-ingredient enumeration consumes bounded irreversible work')
+
+local function bounded_observer(limit)
+  local observer = {visits = 0, limit = limit, stopped = false}
+  function observer:is_stopped() return self.stopped end
+  function observer:reserve_visit(_)
+    if self.stopped or self.visits >= self.limit then
+      self.stopped = true
+      return false
+    end
+    self.visits = self.visits + 1
+    return true
+  end
+  return observer
+end
+
+-- The technology's sole unlock recipe produces its own science pack, but the
+-- output identity is deliberately after a wide result list. This exercises
+-- recipe_unlock_facts.recipe_outputs_item in the self-lock path rather than
+-- only the route-feasibility result scan covered by D18.
+local function self_lock_output_fanout_world(width)
+  local results = {}
+  for index = 1, width do table.insert(results, {type = 'item', name = 'self-lock-result-' .. index, amount = 1}) end
+  table.insert(results, {type = 'item', name = 'logistic-science-pack', amount = 1})
+  local fact = route_fact('logistic-science-pack', {}, {enabled = false, results = results})
+  -- recipe_outputs_item consumes canonical typed result identities first.
+  -- Preserve that shape here so this is not accidentally satisfied by the
+  -- route_fact convenience result_names field.
+  fact.result_identities = results
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {['self-lock-result-unlocker'] = technology('logistic-science-pack', 'self-lock-result-recipe')},
+    recipe_prototypes = {['self-lock-result-recipe'] = {name = 'self-lock-result-recipe'}},
+    recipe_facts = {
+      ['self-lock-result-recipe'] = fact
+    },
+    producers = {['logistic-science-pack'] = {'self-lock-result-recipe'}},
+    unlockers = {['self-lock-result-recipe'] = {'self-lock-result-unlocker'}}
+  }
+end
+
+reset(self_lock_output_fanout_world(24))
+local self_lock_result_observer = bounded_observer(8)
+check('D21', not recipe_unlock_facts.recipe_outputs_item(
+  'self-lock-result-recipe',
+  'logistic-science-pack',
+  self_lock_result_observer
+) and self_lock_result_observer.stopped and self_lock_result_observer.visits <= 8,
+  'Self-lock result identity scanning is bounded before a late pack output')
+local self_lock_reason_observer = bounded_observer(8)
+check('D21A', researchability.reason_with_context('self-lock-result-unlocker', {
+  visiting_packs = {},
+  visiting_technologies = {},
+  unlock_recipe_name = 'self-lock-result-recipe',
+  diagnostic_observer = self_lock_reason_observer
+}) == 'diagnostic-budget-exhausted'
+  and self_lock_reason_observer.stopped and self_lock_reason_observer.visits <= 8,
+  'The same bounded result scan is reached through the technology self-lock path')
+
 reset(same_unlocker_world(false))
 local same_unlocker_a_cold = production.pack_production_status("A", {})
 local same_unlocker_b_warm = production.pack_production_status("B", {})
 check("U01", same_unlocker_a_cold == "research" and same_unlocker_b_warm == "research",
   "Nested intermediates may reuse one proved unlocker through distinct recipe pairs")
+before_projection = context_observation_snapshot()
+check("U01A", production.pack_production_rejection_projection("A") == nil
+  and context_observation_unchanged(before_projection),
+  "A successful same-unlocker route remains projection-free and observationally isolated")
 reset(same_unlocker_world(true))
 check("U02", production.pack_production_status("A", {}) == "unreachable"
   and production.pack_production_status("B", {}) == "unreachable",
   "A same-unlocker, unseeded A-to-B-to-A cycle remains rejected")
+local unseeded_projection = production.pack_production_rejection_projection("A")
+check("U02A", unseeded_projection and unseeded_projection.status == "unreachable"
+  and #unseeded_projection.candidates == 1
+  and unseeded_projection.candidates[1].unlockers[1].technology == "SharedUnlock"
+  and unseeded_projection.candidates[1].structural_route.status == "rejected"
+  and unseeded_projection.candidates[1].first_failure.kind == "technology"
+  and unseeded_projection.candidates[1].first_failure.reason == "science-self-lock-A",
+  "The diagnostic projection identifies the same-unlocker unseeded cycle at its self-lock")
 reset(same_unlocker_world(false))
 local same_unlocker_b_cold = production.pack_production_status("B", {})
 local same_unlocker_a_warm = production.pack_production_status("A", {})
 check("U03", same_unlocker_b_cold == "research" and same_unlocker_a_warm == "research",
   "Nested unlock-pair resolution is invariant to cold query order and warm cache reuse")
+before_projection = context_observation_snapshot()
+check("U03A", production.pack_production_rejection_projection("B") == nil
+  and context_observation_unchanged(before_projection),
+  "Query order and warm caches remain unchanged when a successful route is observed")
 reset(fluid_intermediate_world())
 check("U04", production.pack_production_status("fluid_pack", {}) == "research",
   "A seeded research-unlocked fluid intermediate retains its typed output route")
+before_projection = context_observation_snapshot()
+check("U04A", production.pack_production_rejection_projection("fluid_pack") == nil
+  and context_observation_unchanged(before_projection),
+  "Typed seeded fluid routes remain projection-free without mutating root caches or telemetry")
+
+-- The bounded status pass needs exactly four visits to establish that this
+-- physical lab input has no recipe. An old trace then repeated the existence
+-- scan, stopped on visit five, and incorrectly called the same pack non-lab.
+local function exact_cap_no_recipe_world()
+  return {
+    item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+    labs = {lab = {inputs = {'logistic-science-pack'}}},
+    techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {}
+  }
+end
+
+reset(exact_cap_no_recipe_world())
+local exact_cap_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 4, depth = 32, bytes = 4096}
+})
+check('D25', exact_cap_projection and exact_cap_projection.status == 'unreachable'
+  and exact_cap_projection.first_failure.reason == 'no-pack-recipe'
+  and exact_cap_projection.truncation.stopped == false
+  and exact_cap_projection.truncation.usage.visits == 4,
+  'An exactly capped root existence fact is reused without a false no-lab trace failure')
+
+-- Trace collection still may need one more fact lookup. Its exhaustion must
+-- have an explicit outcome, not return nil after the root query was already
+-- proven unreachable. The temporary controlled facade charges one lookup in
+-- each phase to isolate that boundary.
+reset(exact_cap_no_recipe_world())
+local saved_pack_recipe_status = recipe_unlock_facts.pack_recipe_status
+recipe_unlock_facts.pack_recipe_status = function(pack_name, observer)
+  if observer and type(observer.reserve_visit) == 'function' then observer:reserve_visit(0) end
+  return {pack_name = pack_name, has_recipe = false, initially_available = false, recipes = {}}
+end
+local trace_exhaustion_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 5, depth = 32, bytes = 4096}
+})
+recipe_unlock_facts.pack_recipe_status = saved_pack_recipe_status
+check('D25A', trace_exhaustion_projection and trace_exhaustion_projection.status == 'indeterminate'
+  and trace_exhaustion_projection.first_failure.reason == 'diagnostic-work-budget-exhausted'
+  and projection_truncated(trace_exhaustion_projection, 'nodes')
+  and projection_visits_within(trace_exhaustion_projection, 5),
+  'Trace-stage recipe-status exhaustion is explicit indeterminate rather than nil')
+
+-- Reload the actual lab and recipe-facts source for the assertions below. The
+-- established planner worlds above intentionally stub recipe facts, so they
+-- cannot prove that a fresh diagnostic avoids its normal full-index builder.
+for _, module_name in ipairs({
+  'prototypes.mir.index.recipe_facts',
+  'prototypes.mir.index.recipe_unlocks',
+  'prototypes.mir.capabilities.science_integration.pack_registry',
+  'prototypes.mir.capabilities.science_integration.recipe_unlock_facts',
+  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility',
+  'prototypes.mir.capabilities.science_integration.technology_researchability',
+  'prototypes.mir.capabilities.science_integration.pack_production_reachability',
+  'prototypes.mir.capabilities.science_integration.lab_compatibility'
+}) do
+  package.loaded[module_name] = nil
+end
+stub('prototypes.mir.settings.effective', {get = function() return 'reduce' end})
+local actual_lab_compatibility = require('prototypes.mir.capabilities.science_integration.lab_compatibility')
+
+world = {item_prototypes = {}, labs = {lab = {inputs = {'lab-pack-1', 'lab-pack-2', 'lab-pack-3', 'lab-pack-4'}}}}
+data.raw = {
+  lab = world.labs,
+  technology = {},
+  recipe = {},
+  character = {player = {crafting_categories = {'crafting'}}},
+  resource = {}, tree = {}, ['offshore-pump'] = {}, surface = {}, ['space-location'] = {}, planet = {}
+}
+local lab_comparison_observer = bounded_observer(11)
+check('D22', not actual_lab_compatibility.valid_research_ingredients({
+  {name = 'lab-pack-1', amount = 1},
+  {name = 'lab-pack-2', amount = 1},
+  {name = 'lab-pack-3', amount = 1},
+  {name = 'lab-pack-4', amount = 1}
+}, lab_comparison_observer) and lab_comparison_observer.stopped and lab_comparison_observer.visits <= 11,
+  'Actual any_lab_accepts_all/lab_accepts_all input and pack comparisons are bounded')
+
+-- Build the real canonical index once in the parent, erase its telemetry, and
+-- run a capped projection. The observation must borrow that exact immutable
+-- snapshot; a missing borrow would rebuild recipe facts in the fresh context
+-- and recreate recipe-index telemetry before the cap can stop traversal.
+world = {
+  item_prototypes = {['logistic-science-pack'] = {type = 'item'}},
+  labs = {lab = {inputs = {'logistic-science-pack'}}},
+  techs = {},
+  recipe_prototypes = {
+    ['real-index-logistic-recipe'] = {
+      type = 'recipe',
+      name = 'real-index-logistic-recipe',
+      enabled = false,
+      ingredients = {},
+      results = {{type = 'item', name = 'logistic-science-pack', amount = 1}}
+    }
+  }
+}
+data.raw = {
+  item = world.item_prototypes,
+  lab = world.labs,
+  technology = world.techs,
+  recipe = world.recipe_prototypes,
+  character = {player = {crafting_categories = {'crafting'}}},
+  resource = {}, tree = {}, ['offshore-pump'] = {}, surface = {}, ['space-location'] = {}, planet = {}
+}
+active_context = nil
+context = new_context()
+local actual_recipe_facts = require('prototypes.mir.index.recipe_facts')
+local parent_recipe_index = actual_recipe_facts.index_view()
+local parent_recipe_source = context.states.recipe_source
+local parent_recipe_index_epoch = context.epochs.recipe_index
+local parent_recipe_source_epoch = context.epochs.recipe_source
+-- The prebuild is intentional setup. Any telemetry or index created after
+-- this reset is attributable to the diagnostic itself.
+context.states.compiler_telemetry = nil
+context.epochs.compiler_telemetry = nil
+last_created_context = nil
+production = require('prototypes.mir.capabilities.science_integration.pack_production_reachability')
+local real_source_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 5, depth = 32, bytes = 4096}
+})
+check('D23', real_source_projection and real_source_projection.status == 'indeterminate'
+  and real_source_projection.first_failure.reason == 'diagnostic-work-budget-exhausted'
+  and last_created_context and last_created_context.states.recipe_index == parent_recipe_index
+  and last_created_context.states.recipe_source == parent_recipe_source
+  and last_created_context.states.compiler_telemetry == nil
+  and context.states.recipe_index == parent_recipe_index
+  and context.states.recipe_source == parent_recipe_source
+  and context.epochs.recipe_index == parent_recipe_index_epoch
+  and context.epochs.recipe_source == parent_recipe_source_epoch
+  and context.states.compiler_telemetry == nil,
+  'A capped diagnostic reuses the real parent recipe snapshot without a fresh full index or telemetry')
+
+-- A parent that has not built recipe facts is also safe: diagnostics refuse the
+-- query explicitly rather than asking the fresh context to construct the full
+-- canonical index before its observer can apply a cap.
+context = new_context()
+active_context = nil
+last_created_context = nil
+local unavailable_projection = production.pack_production_rejection_projection('logistic-science-pack', {
+  limits = {candidates = 4, nodes = 5, depth = 32, bytes = 4096}
+})
+check('D24', unavailable_projection and unavailable_projection.status == 'indeterminate'
+  and unavailable_projection.first_failure.reason == 'diagnostic-recipe-index-unavailable'
+  and unavailable_projection.truncation and unavailable_projection.truncation.unavailable[1] == 'recipe-index'
+  and context.states.recipe_index == nil and context.states.recipe_source == nil
+  and context.states.compiler_telemetry == nil
+  and last_created_context and last_created_context.states.recipe_index == nil
+  and last_created_context.states.recipe_source == nil
+  and last_created_context.states.compiler_telemetry == nil,
+  'A missing real parent index is explicit indeterminate without index or telemetry construction')
 
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

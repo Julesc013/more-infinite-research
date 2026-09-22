@@ -28,13 +28,25 @@ function M.research_pack_prototype(name)
   return lookup.item_prototype(name)
 end
 
-function M.all_lab_inputs()
+-- The optional observer is supplied only by the query-local rejection
+-- projection. Normal pack admission remains uncapped and uses this exact same
+-- lab/input definition.
+local function diagnostic_visit(observer)
+  if not observer then return true end
+  if type(observer.is_stopped) == "function" and observer:is_stopped() then return false end
+  if type(observer.reserve_visit) == "function" then return observer:reserve_visit(0) end
+  return true
+end
+
+function M.all_lab_inputs(diagnostic_observer)
   local context = compiler_context.current()
   local lab_inputs_cache = context:state_view("lab_input_index")
   if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
   local out, seen = {}, {}
   for _, lab in pairs(data_raw.prototypes("lab")) do
+    if not diagnostic_visit(diagnostic_observer) then break end
     for _, input in ipairs(lab.inputs or {}) do
+      if not diagnostic_visit(diagnostic_observer) then break end
       if not seen[input] and M.research_pack_prototype(input) then
         seen[input] = true
         table.insert(out, input)
@@ -46,9 +58,10 @@ function M.all_lab_inputs()
   return deepcopy(out)
 end
 
-function M.science_pack_exists(name)
+function M.science_pack_exists(name, diagnostic_observer)
   if not M.research_pack_prototype(name) then return false end
-  for _, input in ipairs(M.all_lab_inputs()) do
+  for _, input in ipairs(M.all_lab_inputs(diagnostic_observer)) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
     if input == name then return true end
   end
   return false

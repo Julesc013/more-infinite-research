@@ -188,17 +188,28 @@
         "bobtech",
         "angelsrefining",
         "angelssmelting",
-        "angelspetrochem"
+        "angelspetrochem",
+        "mir-fixture-assert-f200-science-researchability-diagnostic"
       ],
       "settings": {},
       "expected_plan": {
         "mode": "load-only",
         "required_result": "passed",
-        "maximum_dependency_failures": 0
+        "maximum_dependency_failures": 0,
+        "required_log_fragments": [
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=1",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=2",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=3",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=4",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] PASS projections=4"
+        ],
+        "forbidden_log_fragments": [
+          "MIR F200 science researchability diagnostic assertion failed"
+        ]
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
+      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. The package-excluded F200 diagnostic fixture emits four bounded logistic-science rejection projections for the residual prerequisite paths without player or prototype mutation. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
     },
     {
       "name": "local-2-0-krastorio2",

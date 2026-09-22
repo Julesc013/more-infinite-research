@@ -4507,9 +4507,9 @@
     {
       "path": "tools/lib/validation/runner/StaticFixtureMods.ps1",
       "classification": "canonical-internal",
-      "sha256": "88771FFA08AC87C0138F2C420BE5D3E1BE4FC12600456A1C03E7B499948F3029",
+      "sha256": "5F609CE510A16E9DEE47438450911261A2358DD5C11EAA08ACA6D84004B08FBC",
       "hash_mode": "canonical-text-v1",
-      "lines": 115,
+      "lines": 137,
       "package_visible": false
     },
     {
@@ -5810,5 +5810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:abdfbb19b26dd9e2a0743efaa077d05ea836a532dd209673597a1b2202bab0b3"
+  "digest": "sha256:90431ef495a2188e43e6fc19c19c828512b05f64f0212f77126830d34a1f1d28"
 }
