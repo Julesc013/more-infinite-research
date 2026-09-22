@@ -59,6 +59,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | control-plane-performance-materialization | [MIR Control Plane v5](../../architecture/control-plane-v5.md) | current |
 | control-plane-release-state-machine | [MIR Control Plane v5](../../architecture/control-plane-v5.md) | current |
 | control-plane-v5-cutover-sequence | [MIR 2.5.0 Offline Continuity And Final Release Runbook](../../maintainer/offline-continuity-and-final-release-runbook.md) | current |
+| current-maximum-level-binding-policy-v3 | [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md) | current |
 | current-verification-profile-release-binding | [Release Assurance And Candidate Sealing](../../maintainer/release-assurance.md) | current |
 | decision-record-schema | [Decision Records And Stream Specs](../../reference/schemas/decision-record.md) | current |
 | declarative-compiler-extension | [ADR 0024: Declarative Compiler Extension](../../adr/0024-declarative-compiler-extension.md) | current |
@@ -86,7 +87,6 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | generated-quality-promotion-view | [Technology Quality And Promotion Inventory](../../reference/generated/technology-quality-and-promotion.md) | current |
 | generation-plan-schema | [GenerationPlan Schema](../../reference/schemas/generation-plan.md) | current |
 | github-administration-preflight | [MIR 3 Terminal Repository Protections](../../maintainer/mir3-terminal-repository-protections.md) | current |
-| historical-maximum-level-binding-policy-v3 | [Maximum-Level Binding Contract](../../reference/maximum-level-binding.md) | historical-checkpoint |
 | legacy-coefficient-anchor-projection | [ResearchCostModel Schema](../../reference/schemas/research-cost-model.md) | current |
 | local-artifact-retention | [MIR 4 Local Artifact Retention And Storage](../../maintainer/artifact-retention.md) | current |
 | localization-governance | [Localization Governance](../../maintainer/localization.md) | current |

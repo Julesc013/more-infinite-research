@@ -4491,9 +4491,9 @@
     {
       "path": "tools/lib/validation/runner/StaticCompilerDiagnostics.ps1",
       "classification": "canonical-internal",
-      "sha256": "1B11256A4A88FAD99CB85A7D2DBD60AB370677B53126F3AB6045CB23AB10AA8D",
+      "sha256": "0C4322F2DE1DAC4F61DA021542578737EEA69B47683F9B662449E0F4A5CF50E2",
       "hash_mode": "canonical-text-v1",
-      "lines": 316,
+      "lines": 326,
       "package_visible": false
     },
     {
@@ -5810,5 +5810,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e1e8eaa665c8d4ad257f57bb42ed1bd65df8a9c5724c6612efff032001d7fac2"
+  "digest": "sha256:abdfbb19b26dd9e2a0743efaa077d05ea836a532dd209673597a1b2202bab0b3"
 }

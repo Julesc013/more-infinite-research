@@ -235,7 +235,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/generated/stream-defaults.md | Generated Stream Defaults | current | player | reference | mir-maintainers | 2026-09-02 |
 | docs/reference/generated/technology-quality-and-promotion.md | Technology Quality And Promotion Inventory | current | maintainer | reference | mir-maintainers | 2026-08-18 |
 | docs/reference/glossary.md | Glossary | draft | developer | reference | mir-maintainers | 2026-07-07 |
-| docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | historical-checkpoint | developer | reference | mir-maintainers | 2026-08-21 |
+| docs/reference/maximum-level-binding.md | Maximum-Level Binding Contract | current | developer | reference | mir-maintainers | 2026-09-22 |
 | docs/reference/mir4-api-sdk-v0-stability.md | MIR 4 API and SDK V0 Stability Policy | deprecated | developer | reference | mir-maintainers | 2026-08-24 |
 | docs/reference/mir4-canonical-json-v1.md | MIR Canonical JSON V1 | current | developer | reference | mir-maintainers | 2026-08-26 |
 | docs/reference/mir4-environment-evidence.md | MIR 4 Environment Evidence V1 | current | developer | reference | mir-maintainers | 2026-08-26 |

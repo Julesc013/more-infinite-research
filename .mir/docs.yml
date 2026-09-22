@@ -1745,12 +1745,12 @@ docs:
     source_of_truth_for: []
   - path: docs/reference/maximum-level-binding.md
     title: "Maximum-Level Binding Contract"
-    status: historical-checkpoint
+    status: current
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - historical-maximum-level-binding-policy-v3
+      - current-maximum-level-binding-policy-v3
   - path: docs/reference/mir4-api-sdk-v0-stability.md
     title: "MIR 4 API and SDK V0 Stability Policy"
     status: deprecated

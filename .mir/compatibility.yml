@@ -129,12 +129,18 @@ science_pack_production_route_policy:
   public_claim: generic-route-correction-only-exact-ecosystem-claims-remain-evidence-bound
 
 maximum_level_binding_policy:
-  status: historical-characterization-not-current-package-authority
+  status: active-current-package-authority
   id: MIRMaximumLevelPolicyV3
-  authority: pinned-git:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/domain/technology/maximum_level_binding.lua
+  authority: source/prototypes/mir/domain/technology/maximum_level_binding.lua
   transport: prototypes/mir/emit/mod_data.lua
   runtime_consumer: prototypes/mir/runtime/maximum_level_control.lua
   presentation_consumer: prototypes/mir/pipeline/mutations/maximum_level_presentation.lua
+  targets:
+    - f210
+    - f200
+  omitted_targets:
+    - f110
+    - f100
   semantics: absolute-highest-technology-level
   precedence:
     - exact-technology
@@ -152,21 +158,33 @@ maximum_level_binding_policy:
     - known-finalizer-observations-are-recorded
     - unknown-or-conflicting-finalizers-block-runtime-normalization
   fixture: fixtures/assert-compiler-contracts
-  exact_real_campaign: local-2-1-corrundum-maxcap-13
-  public_claim: historical-characterization-only
+  historical_characterization:
+    authority: pinned-git:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/domain/technology/maximum_level_binding.lua
+    exact_real_campaign: local-2-1-corrundum-maxcap-13
+    public_claim: historical-characterization-only
   current_composed_output:
-    id: MIRMaximumLevelPolicyV2
-    publication_authority: prototypes/mir/pipeline/compiler_orchestrator/publication.lua
+    id: MIRMaximumLevelPolicyV3
+    construction_authority: prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua
     transport: prototypes/mir/emit/mod_data.lua
     runtime_consumer: prototypes/mir/runtime/maximum_level_control.lua
-    runtime_policy_version: 1
+    runtime_policy_version: 3
     semantics: absolute-highest-technology-level
-    equivalence_to_v3: not-claimed
+    modern_missing_or_invalid_transport: fail-closed
+    f200_transport_fallback: settings-derived-v3
+    v2_transport: read-only-migration-input
+  succession:
+    superseded_branch: origin/agent/mir42-progression-batch@35cd8b03
+    disposition: closed-unmerged-do-not-rebase-cherry-pick-or-merge-old-src-tree
+    applied_successors:
+      - pull-request-299@d190e361
+      - pull-request-315@75bbfd3b
+      - pull-request-322@8e1408f6
+      - pull-request-324@3bfc0c85
   successor_obligation:
     id: X04
     owner: X04 progression-and-continuity delivery slice
-    implementation_context: progression PR #286 until integrated
-    required_before_v3_claim: port-and-qualify-the-schema-3-binding-save-and-queue-contract-against-current-composed-source
+    implementation_context: schema-3-port-integrated-current-head-engine-qualification-open
+    remaining_before_candidate_claim: qualify-current-head-f210-and-f200-ownership-settings-save-queue-and-v2-to-v3-migration-contracts
 
 mod_interactions:
   policy: .mir/mod-interaction-policy.json
