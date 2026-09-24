@@ -89,8 +89,70 @@ local function launch_button(player)
     player.gui.top.add{type = "button", name = PREFIX .. "open", caption = {"mir-browser.title"}, tags = {mir_browser = "open"}}
   end
 end
+
+local function same_value(left, right)
+  return type(left) == type(right) and left == right
+end
+
+local function shown_value(value)
+  local shown = tostring(value)
+  if #shown > 120 then return string.sub(shown, 1, 117) .. "..." end
+  return shown
+end
+
+-- Startup settings apply before a save loads. The surface shows the current
+-- resolver result, but it never writes startup values or activates bad input.
+local function imported_profile_summary()
+  local imported = settings.startup and settings.startup[codec.import_setting_name]
+  local text = imported and imported.value
+  if type(text) ~= "string" or text == "" then return {state = "none"} end
+  local decoded, err = codec.decode(text)
+  if not decoded then return {state = "invalid", error = tostring(err or "decode failed")} end
+  local recognized, unknown, invalid = codec.count_recognized_settings(decoded)
+  return {
+    state = "active",
+    profile = decoded,
+    recognized = recognized,
+    unknown = unknown,
+    invalid = invalid
+  }
+end
+
+local function profile_summary_caption(summary)
+  if summary.state == "active" then
+    return "MIRSET1 profile: active | recognized=" .. tostring(summary.recognized)
+      .. " | unknown=" .. tostring(summary.unknown) .. " | invalid=" .. tostring(summary.invalid)
+      .. " | valid imported entries determine effective startup values | restart-required=true"
+  end
+  if summary.state == "invalid" then
+    return "MIRSET1 profile: invalid and ignored | error=" .. shown_value(summary.error)
+      .. " | effective startup values use raw direct settings | restart-required=true"
+  end
+  return "MIRSET1 profile: not configured | effective startup values use raw direct settings | restart-required=true"
+end
+
+local function startup_comparison(name, prototype, profile_summary)
+  local direct = settings.startup and settings.startup[name]
+  local raw_direct = direct and direct.value
+  local effective = startup_settings.get(name)
+  local source = same_value(raw_direct, effective) and "direct" or "unresolved"
+  if profile_summary.state == "active" then
+    local imported = profile_summary.profile.settings and profile_summary.profile.settings[name]
+    if imported ~= nil and settings_catalog.validate_value(name, imported)
+        and same_value(imported, effective) then source = "mirset1" end
+  end
+  return {default = prototype.default_value, raw_direct = raw_direct, effective = effective, source = source}
+end
+
+local function startup_setting_caption(prototype, comparison)
+  return {"", prototype.localised_name, " (startup): default=", shown_value(comparison.default),
+    " | raw-direct=", shown_value(comparison.raw_direct), " | effective=", shown_value(comparison.effective),
+    " | source=", comparison.source, " | restart-required=true"}
+end
+
 local function settings_rows(player, parent, v)
   local groups, assigned = {}, {}
+  local profile_summary = imported_profile_summary()
   local search = string.lower(v.search or "")
   local function group(key, title, specs)
     local names, matches = {}, search == "" or string.find(string.lower(key), search, 1, true)
@@ -117,6 +179,7 @@ local function settings_rows(player, parent, v)
   local pages = math.max(1, math.ceil(#groups / core.page_size))
   v.page = math.min(v.page, pages)
   label(parent, {"mir-browser.startup-note"})
+  fact_label(parent, "profile_import", profile_summary_caption(profile_summary))
   button(parent, "export", {"mir-browser.export"})
   local rows = parent.add{type = "table", column_count = 2}
   for i = (v.page - 1) * core.page_size + 1, math.min(v.page * core.page_size, #groups) do
@@ -129,12 +192,14 @@ local function settings_rows(player, parent, v)
       local values = scope == "runtime-global" and settings.global or scope == "runtime-per-user" and settings.get_player_settings(player) or settings.startup
       local value = scope == "startup" and startup_settings.get(name) or values[name].value
       local caption = {"", prototype.localised_name, " (", scope, "): "}
-      if scope ~= "startup" and type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
+      if scope == "startup" then
+        local field = label(values_column, startup_setting_caption(
+          prototype, startup_comparison(name, prototype, profile_summary)))
+        field.tooltip = prototype.localised_description
+      elseif type(value) == "boolean" and (scope ~= "runtime-global" or player.admin) then
         values_column.add{type = "checkbox", state = value, caption = caption, tags = {mir_browser = "setting", setting = name}}
       else
-        local shown = tostring(value)
-        if #shown > 120 then shown = string.sub(shown, 1, 117) .. "..." end
-        caption[#caption + 1] = shown
+        caption[#caption + 1] = shown_value(value)
         local field = label(values_column, caption); field.tooltip = prototype.localised_description
       end
     end

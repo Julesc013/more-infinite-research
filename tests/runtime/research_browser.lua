@@ -13,6 +13,13 @@ local function has_browser_action(element, action)
   end
   return false
 end
+local function has_browser_fact(element, fact)
+  if element.tags and element.tags.mir_browser_fact == fact then return true end
+  for _, child in ipairs(element.children or {}) do
+    if has_browser_fact(child, fact) then return true end
+  end
+  return false
+end
 script.on_nth_tick(1,function()
   local count=0
   local function check(value,message) assert(value,message); count=count+1 end
@@ -72,6 +79,7 @@ script.on_nth_tick(1,function()
     check(actual.gui.screen.mir_research_browser.valid,"native frame valid")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=3,search="mir-browser-test"}),"native infinite GUI")
     check(remote.call("more-infinite-research-browser","open",actual.index,{tab="settings",search="mir-"}),"native settings GUI")
+    check(has_browser_fact(actual.gui.screen.mir_research_browser,"profile_import"),"native settings profile summary")
     check(remote.call("more-infinite-research-browser","open",actual.index,{mode=1,sort="name-desc",selected="mir-browser-test-finite"}),"native sorted technology detail GUI")
     local root=actual.gui.screen.mir_research_browser
     check(has_browser_action(root,"sort"),"native sort control")
