@@ -942,6 +942,74 @@ check('D05', logistic_candidate and logistic_candidate.first_failure.kind == 'in
   and logistic_candidate.first_failure.reason == 'no-enabled-acquisition-route',
   'A candidate retains the first missing ingredient acquisition rejection')
 
+-- Sibling output routes may have different outer unlockers while sharing a
+-- complete inner proof. The inner proof must be reused without treating the
+-- unrelated outer unlocker as part of its identity; its own recipe/unlocker
+-- pair and active acquisition identities remain checked by the memo.
+local function dependency_checked_positive_memo_world(width)
+  local facts = {
+    ["shared-inner-recipe"] = route_fact(
+      "shared-inner", {{name = "shared-ore", amount = 1}}, {enabled = false})
+  }
+  local prototypes = { ["shared-inner-recipe"] = {name = "shared-inner-recipe"} }
+  local techs = {
+    RootUnlock = {enabled = true, research_trigger = {type = "craft-item", item = "lab"}, effects = {}},
+    SharedInnerUnlock = {
+      enabled = true,
+      research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = "shared-inner-recipe"}}
+    }
+  }
+  local producers = { ["shared-inner"] = {"shared-inner-recipe"}, ["memo-pack"] = {} }
+  local unlockers = { ["shared-inner-recipe"] = {"SharedInnerUnlock"} }
+  local items = { ["memo-pack"] = {type = "item"}, ["shared-inner"] = {type = "item"} }
+  for index = 1, width do
+    local outer = string.format("memo-outer-%02d", index)
+    local outer_recipe = outer .. "-recipe"
+    local pack_recipe = string.format("memo-pack-%02d", index)
+    items[outer] = {type = "item"}
+    techs["OuterUnlock" .. index] = {
+      enabled = true,
+      research_trigger = {type = "craft-item", item = "lab"},
+      effects = {{type = "unlock-recipe", recipe = outer_recipe}}
+    }
+    facts[outer_recipe] = route_fact(outer, {{name = "shared-inner", amount = 1}}, {enabled = false})
+    facts[pack_recipe] = route_fact("memo-pack", {{name = outer, amount = 1}}, {enabled = false})
+    prototypes[outer_recipe] = {name = outer_recipe}
+    prototypes[pack_recipe] = {name = pack_recipe}
+    producers[outer] = {outer_recipe}
+    table.insert(producers["memo-pack"], pack_recipe)
+    table.insert(techs.RootUnlock.effects, {type = "unlock-recipe", recipe = pack_recipe})
+    unlockers[outer_recipe] = {"OuterUnlock" .. index}
+    unlockers[pack_recipe] = {"RootUnlock"}
+  end
+  return {
+    item_prototypes = items,
+    labs = {lab = {inputs = {"memo-pack"}}},
+    techs = techs,
+    recipe_prototypes = prototypes,
+    recipe_facts = facts,
+    producers = producers,
+    unlockers = unlockers,
+    resources = { ["shared-ore"] = {minable = {result = "shared-ore", count = 1}} }
+  }
+end
+
+reset(dependency_checked_positive_memo_world(12))
+local canonical_recipe_facts = package.loaded["prototypes.mir.index.recipe_facts"]
+local normal_shared_output_lookup = canonical_recipe_facts.recipes_by_output_identity_view
+local shared_inner_output_lookups = 0
+canonical_recipe_facts.recipes_by_output_identity_view = function(entry_type, name)
+  if entry_type == "item" and name == "shared-inner" then
+    shared_inner_output_lookups = shared_inner_output_lookups + 1
+  end
+  return normal_shared_output_lookup(entry_type, name)
+end
+local memo_status = production.pack_production_status("memo-pack", {})
+canonical_recipe_facts.recipes_by_output_identity_view = normal_shared_output_lookup
+check("U05B", memo_status == "research" and shared_inner_output_lookups == 1,
+  "A complete inner unlock witness is reused across sibling routes with unrelated active unlockers")
+
 reset(logistic_trace_world(
   'logistic-science-pack-from-self-cycle',
   route_fact('logistic-science-pack', {{name = 'logistic-science-pack', amount = 1}}, {enabled = false}),

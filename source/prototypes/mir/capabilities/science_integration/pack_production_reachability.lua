@@ -415,6 +415,10 @@ local function active_set_key(values)
   return table.concat(names, "\1")
 end
 
+local function identity_key(identity)
+  return identity.type .. "\0" .. identity.name
+end
+
 -- Technology researchability is contextual, but one structural route query
 -- can ask the exact same recipe/unlocker question thousands of times while it
 -- explores sibling producer recipes. Reuse only that exact query-local
@@ -452,7 +456,10 @@ local function contextual_technology_researchability_reason(
     active_set_key(visiting_technologies)
   }, "\0")
   local cached = memo[key]
-  if cached ~= nil then return cached == false and nil or cached end
+  if cached ~= nil then
+    if cached == false then return nil end
+    return cached
+  end
   local rejection = technology_researchability_reason(technology_name, {
     visiting_packs = visiting_packs,
     visiting_technologies = visiting_technologies or {},
@@ -496,8 +503,96 @@ end
 -- visitation state.  This is an acquisition witness, not a general license
 -- for disabled recipes: ordinary science dependencies still pass through the
 -- same pack/self-lock checks as every other technology route.
+
+-- A successful research-unlocked witness is expensive to rebuild in a wide
+-- production graph.  It is reusable only when its concrete dependency tree is
+-- still valid in the caller's active traversal.  Keep this small, positive-only
+-- memo on the production-route query rather than the public pack cache: a
+-- rejection remains contextual, and a result is never carried into another
+-- root query.
+local RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT = 8
+local RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT = 64
+
+local function witness_avoids_active_identities(witness, visiting, root_key)
+  if type(witness) ~= "table" then return true end
+  local output = witness.output or witness.product
+  if type(output) == "table" and output.type and output.name then
+    local key = identity_key(output)
+    -- The queried output is necessarily active while its acquisition is being
+    -- resolved. It is safe here because this witness has already established
+    -- one complete route for that output; every other active output remains a
+    -- cycle boundary.
+    if key ~= root_key and visiting[key] then return false end
+  end
+  if witness.recipe_witness
+    and not witness_avoids_active_identities(witness.recipe_witness, visiting, root_key) then
+    return false
+  end
+  for _, ingredient in ipairs(witness.ingredients or {}) do
+    if not witness_avoids_active_identities(ingredient, visiting, root_key) then return false end
+  end
+  return true
+end
+
+local function witness_unlock_dependencies(witness, entry_technologies, dependencies)
+  if type(witness) ~= "table" then return end
+  if witness.kind == "research-unlocked-recipe" then
+    local unlocker = witness.unlocker
+    if type(witness.recipe) == "string" and type(unlocker) == "string" then
+      dependencies.pairs[unlock_pair_key(witness.recipe, unlocker)] = true
+      -- This technology was accepted by the active-context shortcut rather
+      -- than a new researchability query. Reuse requires the same already
+      -- proven ancestor; unrelated active technologies do not enter the key.
+      if entry_technologies[unlocker] ~= nil then
+        dependencies.required_technologies[unlocker] = true
+      end
+    end
+  end
+  if witness.recipe_witness then
+    witness_unlock_dependencies(witness.recipe_witness, entry_technologies, dependencies)
+  end
+  for _, ingredient in ipairs(witness.ingredients or {}) do
+    witness_unlock_dependencies(ingredient, entry_technologies, dependencies)
+  end
+end
+
+local function positive_witness_reusable(entry, context, state, root_key)
+  for technology_name in pairs(entry.required_technologies) do
+    if context.technologies[technology_name] == nil then return false end
+  end
+  for pair_key in pairs(entry.pairs) do
+    if context.pairs[pair_key] then return false end
+  end
+  return witness_avoids_active_identities(entry.witness, state.visiting, root_key)
+end
+
+local function positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+  -- These sets are inputs to technology researchability. Active unlock pairs
+  -- and unrelated active unlock technologies are instead checked against the
+  -- returned witness tree above, which admits reuse across sibling branches.
+  return table.concat({
+    identity_key(identity),
+    active_set_key(visiting_packs),
+    active_set_key(visiting_technologies)
+  }, "\0")
+end
+
 local function research_unlocked_output_witness(identity, options, state, visiting_packs, visiting_technologies)
   local context = active_unlock_context(options)
+  local memo_key, positive_memo
+  if options.diagnostic_observer == nil then
+    positive_memo = options.research_unlock_positive_memo
+    if not positive_memo then
+      positive_memo = {}
+      options.research_unlock_positive_memo = positive_memo
+    end
+    memo_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+    for _, entry in ipairs(positive_memo[memo_key] or {}) do
+      if positive_witness_reusable(entry, context, state, identity_key(identity)) then
+        return deepcopy(entry.witness)
+      end
+    end
+  end
   local witness_checkpoint = diagnostic_checkpoint(options)
   for _, recipe_name in ipairs(output_recipe_names(identity, options.diagnostic_observer)) do
     if not diagnostic_visit(options.diagnostic_observer, options.diagnostic_depth or 0) then return nil end
@@ -547,12 +642,33 @@ local function research_unlocked_output_witness(identity, options, state, visiti
             -- A successful research-unlocked route selects this branch. Drop
             -- provisional observations from rejected recipe/unlocker pairs.
             diagnostic_rollback(options, witness_checkpoint)
-            return {
+            local result = {
               kind = "research-unlocked-recipe",
               recipe = recipe_name,
               unlocker = technology_name,
               recipe_witness = recipe_witness
             }
+            if positive_memo then
+              local entries = positive_memo[memo_key]
+              if not entries then
+                entries = {}
+                positive_memo[memo_key] = entries
+              end
+              if #entries < RESEARCH_UNLOCK_POSITIVE_MEMO_LIMIT
+                and (options.research_unlock_positive_memo_entries or 0)
+                  < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
+                local dependencies = {pairs = {}, required_technologies = {}}
+                witness_unlock_dependencies(result, context.technologies, dependencies)
+                table.insert(entries, {
+                  witness = deepcopy(result),
+                  pairs = dependencies.pairs,
+                  required_technologies = dependencies.required_technologies
+                })
+                options.research_unlock_positive_memo_entries
+                  = (options.research_unlock_positive_memo_entries or 0) + 1
+              end
+            end
+            return result
           end
         elseif rejection == "active-unlock-pair" then
           record_diagnostic_failure(options, {
