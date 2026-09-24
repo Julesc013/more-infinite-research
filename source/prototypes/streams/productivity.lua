@@ -755,11 +755,12 @@ local streams = {
 }
 
 
-local function material_family(item, routes, mod_names)
+local function material_family(item, routes, mod_names, display_item)
+  display_item = display_item or item
   return {
     required_items = {item},
-    icon_item = item,
-    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. item}},
+    icon_item = display_item,
+    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. display_item}},
     ui_visibility = {mode = "visible-if-mods-any", mods_any = mod_names, hidden_reason = "material-ecosystem-not-active"},
     identity_state = "stable-unreleased",
     science_packs = "derive-from-unlocks",
@@ -830,7 +831,10 @@ streams.research_material_invar = material_family("bob-invar-alloy", {"bob-invar
 streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", {"bob-cobalt-steel-alloy"}, {"bobplates", "angelssmelting"})
 streams.research_material_nitinol = material_family("bob-nitinol-alloy", {"bob-nitinol-alloy"}, {"bobplates", "angelssmelting"})
 streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
-streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"})
+-- K2SO's native owner retains crystal productivity. MIR owns the admitted
+-- powder route, so present its generated technology as powder while keeping
+-- crystal as the existing availability anchor.
+streams.research_material_imersite = material_family("kr-imersite-crystal", {"kr-imersite-crystal", "kr-imersite-powder"}, {"Krastorio2", "Krastorio2-spaced-out"}, "kr-imersite-powder")
 streams.research_material_silicon = material_family("kr-silicon", {"kr-silicon"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_glass = material_family("kr-glass", {"kr-glass"}, {"Krastorio2", "Krastorio2-spaced-out"})
 streams.research_material_black_paving = material_family("kr-black-reinforced-plate", {"kr-black-reinforced-plate"}, {"Krastorio2", "Krastorio2-spaced-out"})
