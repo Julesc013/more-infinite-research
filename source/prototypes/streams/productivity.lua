@@ -1,4 +1,5 @@
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
@@ -774,6 +775,20 @@ local function material_family(item, routes, mod_names, display_item)
   }
 end
 
+-- The additional Angel final routes in this batch have an exact F200
+-- combined-world observation. Keep F210 on its prior declarations until its
+-- own ordering and engine case are qualified.
+local f200_angel_material_routes = target_profiles.current().factorio_version == "2.0"
+
+local function f200_material_routes(existing, additions)
+  local routes = {}
+  for _, recipe in ipairs(existing) do routes[#routes + 1] = recipe end
+  if f200_angel_material_routes then
+    for _, recipe in ipairs(additions) do routes[#routes + 1] = recipe end
+  end
+  return routes
+end
+
 -- Aluminium uses one stable technology identity, but the eligible final
 -- manufacturing routes and the player-facing item differ by installed
 -- ecosystem. The graph guard remains responsible for withholding unsafe or
@@ -811,7 +826,7 @@ local function bob_or_angel_wire_material_family(material)
     return material_family(item, {item .. "-2"}, {"angelssmelting"})
   end
   local routes = {"bob-" .. material .. "-plate"}
-  if material == "gold" then
+  if material == "gold" and f200_angel_material_routes then
     -- The finalized combined Bob/Angel profile makes Bob's plate through
     -- these ordinary Angel recipes; its Bob recipe is hidden in that profile.
     routes[#routes + 1] = "angels-plate-gold"
@@ -823,20 +838,20 @@ end
 -- Separate requested materials share policy, never translated-name matching.
 streams.research_material_aluminium = aluminium_material_family()
 streams.research_material_gold = bob_or_angel_wire_material_family("gold")
-streams.research_material_lead = material_family("bob-lead-plate", {"bob-lead-plate", "bob-lead-plate-2", "angels-plate-lead", "angels-plate-lead-2"}, {"bobplates", "angelssmelting"})
+streams.research_material_lead = material_family("bob-lead-plate", f200_material_routes({"bob-lead-plate", "bob-lead-plate-2"}, {"angels-plate-lead", "angels-plate-lead-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_nickel = material_family("bob-nickel-plate", {"bob-nickel-plate"}, {"bobplates", "angelssmelting"})
 streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
 streams.research_material_silver = bob_or_angel_wire_material_family("silver")
-streams.research_material_tin = material_family("bob-tin-plate", {"bob-tin-plate", "angels-plate-tin", "angels-plate-tin-2"}, {"bobplates", "angelssmelting"})
-streams.research_material_titanium = material_family("bob-titanium-plate", {"bob-titanium-plate", "angels-plate-titanium", "angels-plate-titanium-2"}, {"bobplates", "angelssmelting"})
+streams.research_material_tin = material_family("bob-tin-plate", f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_titanium = material_family("bob-titanium-plate", f200_material_routes({"bob-titanium-plate"}, {"angels-plate-titanium", "angels-plate-titanium-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
-streams.research_material_zinc = material_family("bob-zinc-plate", {"bob-zinc-plate", "angels-plate-zinc", "angels-plate-zinc-2"}, {"bobplates", "angelssmelting"})
-streams.research_material_bronze = material_family("bob-bronze-alloy", {"bob-bronze-alloy", "angels-plate-bronze"}, {"bobplates", "angelssmelting"})
-streams.research_material_brass = material_family("bob-brass-alloy", {"bob-brass-alloy", "angels-plate-brass"}, {"bobplates", "angelssmelting"})
-streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", {"bob-gunmetal-alloy", "angels-plate-gunmetal"}, {"bobplates", "angelssmelting"})
-streams.research_material_invar = material_family("bob-invar-alloy", {"bob-invar-alloy", "angels-plate-invar"}, {"bobplates", "angelssmelting"})
-streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", {"bob-cobalt-steel-alloy", "angels-plate-cobalt-steel"}, {"bobplates", "angelssmelting"})
-streams.research_material_nitinol = material_family("bob-nitinol-alloy", {"bob-nitinol-alloy", "angels-plate-nitinol"}, {"bobplates", "angelssmelting"})
+streams.research_material_zinc = material_family("bob-zinc-plate", f200_material_routes({"bob-zinc-plate"}, {"angels-plate-zinc", "angels-plate-zinc-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_bronze = material_family("bob-bronze-alloy", f200_material_routes({"bob-bronze-alloy"}, {"angels-plate-bronze"}), {"bobplates", "angelssmelting"})
+streams.research_material_brass = material_family("bob-brass-alloy", f200_material_routes({"bob-brass-alloy"}, {"angels-plate-brass"}), {"bobplates", "angelssmelting"})
+streams.research_material_gunmetal = material_family("bob-gunmetal-alloy", f200_material_routes({"bob-gunmetal-alloy"}, {"angels-plate-gunmetal"}), {"bobplates", "angelssmelting"})
+streams.research_material_invar = material_family("bob-invar-alloy", f200_material_routes({"bob-invar-alloy"}, {"angels-plate-invar"}), {"bobplates", "angelssmelting"})
+streams.research_material_cobalt_steel = material_family("bob-cobalt-steel-alloy", f200_material_routes({"bob-cobalt-steel-alloy"}, {"angels-plate-cobalt-steel"}), {"bobplates", "angelssmelting"})
+streams.research_material_nitinol = material_family("bob-nitinol-alloy", f200_material_routes({"bob-nitinol-alloy"}, {"angels-plate-nitinol"}), {"bobplates", "angelssmelting"})
 streams.research_material_rare_metals = material_family("kr-rare-metals", {"kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals", "kr-casting-rare-metals"}, {"Krastorio2", "Krastorio2-spaced-out"})
 -- K2SO's native owner retains crystal productivity. MIR owns the admitted
 -- powder route, so present its generated technology as powder while keeping
