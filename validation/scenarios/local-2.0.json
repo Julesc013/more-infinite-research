@@ -220,7 +220,15 @@
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=invar",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=cobalt_steel",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=nitinol",
-          "[mir-f200-material-routes] PASS emitted=13 absent=3",
+          "[more-infinite-research] Material route admitted recipe=angels-plate-nickel reason=reviewed-forward-route:F200-BA-nickel-casting-v1",
+          "[more-infinite-research] Material route admitted recipe=angels-plate-nickel-2 reason=reviewed-forward-route:F200-BA-nickel-roll-v1",
+          "[more-infinite-research] Material route admitted recipe=angels-plate-silver reason=reviewed-forward-route:F200-BA-silver-casting-v1",
+          "[more-infinite-research] Material route admitted recipe=angels-plate-silver-2 reason=reviewed-forward-route:F200-BA-silver-roll-v1",
+          "[mir-f200-material-routes] REVIEWED_FORWARD recipe=angels-plate-nickel certificate=F200-BA-nickel-casting-v1",
+          "[mir-f200-material-routes] REVIEWED_FORWARD recipe=angels-plate-nickel-2 certificate=F200-BA-nickel-roll-v1",
+          "[mir-f200-material-routes] REVIEWED_FORWARD recipe=angels-plate-silver certificate=F200-BA-silver-casting-v1",
+          "[mir-f200-material-routes] REVIEWED_FORWARD recipe=angels-plate-silver-2 certificate=F200-BA-silver-roll-v1",
+          "[mir-f200-material-routes] PASS emitted=15 absent=1",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] frontier=1 stream=research_character_crafting_speed",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] frontier=2 stream=research_character_mining_speed",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] frontier=3 stream=research_character_reach",
@@ -234,7 +242,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "loads",
-      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. The package-excluded F200 diagnostic fixture proves finalized research-unlocked logistic and chemical science routes, including boiler-defined steam, four generated direct-effect streams, and five military-science lab-compatible character/inventory streams without player or prototype mutation. The same load checks thirteen exact ordinary material effect sets and three absent material technologies. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
+      "notes": "Combined dependency-valid Factorio 2.0 Bob and Angel core scenario. The package-excluded F200 diagnostic fixture proves finalized research-unlocked logistic and chemical science routes, including boiler-defined steam, four generated direct-effect streams, and five military-science lab-compatible character/inventory streams without player or prototype mutation. The same load checks fifteen exact ordinary material effect sets and one absent material technology. Angel's Industries is omitted because no Factorio 2.0 artifact is available; remaining dependency and modset conflicts are grouped rather than treated as automatic MIR bugs."
     },
     {
       "name": "local-2-0-krastorio2",

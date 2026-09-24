@@ -62,8 +62,14 @@ foreach ($sourceRow in $materialRows) {
 
 $acyclic = @($materialRows | Where-Object { [string]$_.Value.policy -ceq 'exact-acyclic-material-manufacturing' })
 $reviewedForward = @($materialRows | Where-Object { [string]$_.Value.policy -ceq 'exact-reviewed-forward-material-manufacturing' })
-Assert-MIR4MaterialStreamAuthority ($acyclic.Count -eq 19) '[mir4-m42-stream-authority-acyclic-count]'
-Assert-MIR4MaterialStreamAuthority ((@($reviewedForward.Value.stream_key | Sort-Object) -join '|') -ceq 'research_material_glass|research_material_rare_metals|research_material_silicon') '[mir4-m42-stream-authority-reviewed-forward-set]'
+Assert-MIR4MaterialStreamAuthority ($acyclic.Count -eq 17) '[mir4-m42-stream-authority-acyclic-count]'
+Assert-MIR4MaterialStreamAuthority ((@($reviewedForward.Value.stream_key | Sort-Object) -join '|') -ceq 'research_material_glass|research_material_nickel|research_material_rare_metals|research_material_silicon|research_material_silver') '[mir4-m42-stream-authority-reviewed-forward-set]'
+
+foreach ($stream in @('recipe-prod-research_material_nickel-1', 'recipe-prod-research_material_silver-1')) {
+  $record = Get-MIR4StreamRecordBlock -Text $authorityText -Id $stream
+  Assert-MIR4MaterialStreamAuthority ($record -match '(?m)^      policy: exact-reviewed-forward-material-manufacturing\s*$') "[mir4-m42-stream-authority-f200-reviewed-forward-policy] $stream"
+  Assert-MIR4MaterialStreamAuthority ($record -match '(?m)^          - fixtures/assert-f200-bob-angel-material-routes-observation\s*$') "[mir4-m42-stream-authority-f200-reviewed-forward-evidence] $stream"
+}
 
 $profile = Get-Content -Raw -LiteralPath $factorioOneProfilePath
 Assert-MIR4MaterialStreamAuthority ($profile -match 'current_factorio_line' -and $profile -match 'line == "1\.0" or line == "1\.1"') '[mir4-m42-stream-authority-f1-profile-selector]'
