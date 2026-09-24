@@ -179,9 +179,36 @@ end
 local function query_state(state, recipe_index)
   local epoch = recipe_source_epoch()
   local context = compiler_context.current()
-  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context
-    or state.recipe_index ~= recipe_index then
+  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
     return reset_state(state, epoch, context, recipe_index)
+  end
+  if state.recipe_index ~= recipe_index then
+    -- A direct-source preflight intentionally starts without a recipe index.
+    -- Once the same query proceeds to recipe feasibility, retain its immutable
+    -- prototype catalogs while establishing the previously absent index. An
+    -- explicit replacement with a different populated index remains a new
+    -- query identity and must discard every prior memo.
+    if state.recipe_index == nil and recipe_index ~= nil then
+      state.recipe_index = recipe_index
+      state.visiting = {}
+      state.acquisition_memo = {}
+      state.stable_acquisition_memo = {}
+      return state
+    end
+    return reset_state(state, epoch, context, recipe_index)
+  end
+  return state
+end
+
+-- Direct-source checks do not need a recipe index, but a caller may supply a
+-- state which has already acquired one. Preserve that state when its context
+-- and source epoch match so separate science-pack roots can reuse the same
+-- immutable resource, machine, and surface observations.
+local function source_query_state(state)
+  local epoch = recipe_source_epoch()
+  local context = compiler_context.current()
+  if not state or state.recipe_source_epoch ~= epoch or state.compiler_context ~= context then
+    return reset_state(state, epoch, context, nil)
   end
   return state
 end
@@ -398,12 +425,14 @@ local function source_witness(identity, options, state)
   return nil
 end
 
-function M.source_witness(identity, options)
+function M.source_witness(identity, options, state)
   local candidate = normalize_identity(identity)
   if not candidate then return nil end
   -- A direct source check does not need to materialize the potentially large
-  -- recipe index merely to inspect resources and offshore pumps.
-  return source_witness(candidate, copy_options(options), new_state())
+  -- recipe index merely to inspect resources and offshore pumps. Callers may
+  -- share a source-epoch-bound state; it contains no contextual research route
+  -- conclusion and therefore cannot alter admission semantics.
+  return source_witness(candidate, copy_options(options), source_query_state(state))
 end
 
 local function sorted_producers(index, output_identity, options)

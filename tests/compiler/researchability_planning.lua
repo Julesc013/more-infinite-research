@@ -262,6 +262,64 @@ b = production.pack_production_status("B", {})
 check("C07", conditional_b == "unreachable" and b == "research",
   "A technology-conditional rejection cannot poison the reusable root cache")
 
+-- Separate root packs can inspect the same raw resource catalog. Reuse that
+-- source-epoch-bound structural observation, while keeping each pack result
+-- independently selected and cached.
+reset({
+  item_prototypes = {P = {type = "item"}, Q = {type = "item"}},
+  labs = {lab = {inputs = {"P", "Q"}}},
+  techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  resources = {
+    ["P-source"] = {minable = {result = "P", count = 1}},
+    ["Q-source"] = {minable = {result = "Q", count = 1}}
+  }
+})
+local resource_catalog_reads = 0
+data.raw.resource = nil
+setmetatable(data.raw, {
+  __index = function(_, name)
+    if name == "resource" then
+      resource_catalog_reads = resource_catalog_reads + 1
+      return world.resources
+    end
+  end
+})
+check("C08", production.pack_production_status("P", {}) == "non-recipe"
+  and production.pack_production_status("Q", {}) == "non-recipe"
+  -- data_raw.prototypes deliberately reads raw.resource once to establish
+  -- presence and once to return it. One source-catalog construction therefore
+  -- produces two raw-table reads.
+  and resource_catalog_reads == 2,
+  "Separate root packs reuse one immutable direct-source catalog")
+world.recipe_source_epoch = 2
+check("C08A", production.pack_production_status("P", {}) == "non-recipe"
+  and resource_catalog_reads == 4,
+  "A recipe-source epoch change replaces the shared direct-source catalog")
+
+-- The planner asks root technology questions repeatedly while constructing
+-- requirements and prerequisites. Those questions have no active traversal
+-- or unlock recipe, so the exact root conclusion can be cached per source
+-- epoch without changing contextual self-lock decisions.
+reset(pack_world(true, true))
+local root_pack_checks = 0
+local normal_pack_status = context:service("science.pack_production_status")
+context.services["science.pack_production_status"] = function(...)
+  root_pack_checks = root_pack_checks + 1
+  return normal_pack_status(...)
+end
+local root_reason_first = researchability.technology_researchability_reason("TechA")
+local root_pack_checks_after_first = root_pack_checks
+local root_reason_second = researchability.technology_researchability_reason("TechA")
+check("C09", root_reason_first == nil
+  and root_reason_second == nil
+  and root_pack_checks_after_first > 0
+  and root_pack_checks == root_pack_checks_after_first,
+  "Repeated root technology researchability reuses its exact source-epoch conclusion")
+world.recipe_source_epoch = 2
+check("C09A", researchability.technology_researchability_reason("TechA") == nil
+  and root_pack_checks > root_pack_checks_after_first,
+  "A recipe-source epoch change invalidates the root technology conclusion")
+
 local function improved_world(seed)
   local recipes = { ["A-improved"] = {enabled_without_research = false, result_names = {"A"}} }
   local producers = {A = {"A-improved"}}

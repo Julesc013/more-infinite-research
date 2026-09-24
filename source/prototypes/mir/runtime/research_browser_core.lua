@@ -257,6 +257,16 @@ local function normalized_view(view)
   return {mode = mode, status = status, page = page, search = string.lower(search), family = family, sort = sort, hidden = type(view.hidden) == "table" and view.hidden or {}}
 end
 
+-- Translation belongs to a host because it is player- and locale-specific.
+-- The portable core receives only an optional bounded plain-text index and
+-- continues to fall back to stable technology and family identifiers.
+local function localized_search_text(index, key)
+  if type(index) ~= "table" then return "" end
+  local value = index[key]
+  if type(value) ~= "string" or #value > M.detail_string_limit then return "" end
+  return value
+end
+
 local function status_matches(row, status)
   if status == 1 then return true end
   if status == 2 then return row.available end
@@ -266,7 +276,7 @@ end
 
 -- Query only accepts copied, plain catalogue DTOs. It returns a fresh plain
 -- page so a consumer cannot retain adapter-owned state.
-function M.query(catalogue, view, enrichment)
+function M.query(catalogue, view, enrichment, localized_search)
   if type(catalogue) ~= "table" or catalogue.schema ~= M.schema or type(catalogue.rows) ~= "table" then return nil, "invalid-catalogue" end
   if #catalogue.rows > M.catalogue_limit then return nil, "catalogue-limit" end
   enrichment = M.normalize_enrichment(enrichment)
@@ -278,7 +288,7 @@ function M.query(catalogue, view, enrichment)
       row.cap, row.family = cap, family
       row.infinite = row.infinite and not cap
       local mode_ok = v.mode == 1 or (v.mode == 2 and not row.infinite) or (v.mode == 3 and row.infinite)
-      local search = string.lower(row.key .. " " .. family)
+      local search = string.lower(row.key .. " " .. family .. " " .. localized_search_text(localized_search, row.key))
       local search_ok = v.search == "" or string.find(search, v.search, 1, true) ~= nil
       if mode_ok and status_matches(row, v.status) and (v.family == "all" or family == v.family) and not v.hidden[row.key] and search_ok then selected[#selected + 1] = row end
     end

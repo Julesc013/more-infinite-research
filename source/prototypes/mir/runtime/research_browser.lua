@@ -9,6 +9,8 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local streams = require("prototypes.mir.streams.registry")
 local M = {requires_features = {"settings_profiles"}}
 local ROOT, PREFIX = "mir_research_browser", "mir_browser_"
+local TRANSLATION_LIMIT = 512
+local translations = {}
 
 local function state()
   local value = runtime_state.bucket("research_browser")
@@ -17,8 +19,10 @@ local function state()
 end
 local function view(player)
   local all = state().players
-  all[player.index] = all[player.index] or {mode = 1, status = 1, page = 1, search = "", tab = "research", effect_page = 1, family = "all"}
-  return all[player.index]
+  local result = all[player.index] or {mode = 1, status = 1, page = 1, search = "", tab = "research", effect_page = 1, family = "all", sort = "name-asc"}
+  all[player.index] = result
+  result.sort = result.sort == "name-desc" and "name-desc" or "name-asc"
+  return result
 end
 local function catalogue(force)
   local result = factorio_catalogue.snapshot(force)
@@ -28,6 +32,32 @@ local function catalogue(force)
   result.enrichment = mir_provider.snapshot(force)
   result.family_names = core.family_names(result.enrichment)
   return result
+end
+local function translation_cache(player)
+  local cache = translations[player.index]
+  if not cache or cache.locale ~= player.locale then
+    cache = {locale = player.locale, values = {}, requested = {}, requests = 0}
+    translations[player.index] = cache
+  end
+  return cache
+end
+local function localized_search(player)
+  return translation_cache(player).values
+end
+local function request_visible_translations(player, page, selected)
+  local cache = translation_cache(player)
+  local function request(technology)
+    if not technology or cache.requests >= TRANSLATION_LIMIT
+      or cache.values[technology.name] ~= nil or cache.requested[technology.name] then return end
+    local id = player.request_translation(technology.localised_name)
+    if type(id) == "number" then
+      cache.requested[technology.name] = id
+      cache.requested[id] = technology.name
+      cache.requests = cache.requests + 1
+    end
+  end
+  for _, row in ipairs(page.rows) do request(player.force.technologies[row.key]) end
+  request(selected and player.force.technologies[selected])
 end
 local function label(parent, caption)
   local element = parent.add{type = "label", caption = caption}
@@ -174,6 +204,7 @@ local function detail(player, parent, v, c)
   end
   local enqueue = button(parent, "enqueue", {"mir-browser.enqueue"}, {technology = tech.name})
   enqueue.enabled = actions.can_enqueue(player, tech, defines.input_action.start_research)
+  button(parent, "open-vanilla", {"controls.open-technology-gui"}, {technology = tech.name})
   button(parent, "toggle-hide", v.hidden and v.hidden[tech.name] and {"mir-browser.show"} or {"mir-browser.hide"}, {technology = tech.name})
   local effects = tech.prototype.effects
   local pages = math.max(1, math.ceil(#effects / core.page_size))
@@ -214,6 +245,7 @@ render = function(player)
     local filters = body.add{type = "flow"}
     filters.add{type = "drop-down", items = {{"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}}, selected_index = v.mode, tags = {mir_browser = "mode"}}
     filters.add{type = "drop-down", items = {{"mir-browser.all"}, {"mir-browser.available"}, {"mir-browser.locked"}, {"mir-browser.queued"}}, selected_index = v.status, tags = {mir_browser = "status"}}
+    filters.add{type = "drop-down", items = {{"gui-selector.select-min"}, {"gui-selector.select-max"}}, selected_index = v.sort == "name-desc" and 2 or 1, tags = {mir_browser = "sort"}}
     local family_index = 1
     for i,name in ipairs(c.family_names) do if name == v.family then family_index = i end end
     filters.add{type = "drop-down", items = c.family_names, selected_index = family_index, tags = {mir_browser = "family"}}
@@ -231,8 +263,9 @@ render = function(player)
       local recovery = body.add{type = "flow", direction = "horizontal", tags = {mir_browser_section = "hidden-recovery"}}
       button(recovery, "show-hidden", {"mir-browser.show-hidden"})
     end
-    local page = core.query(c, v, c.enrichment)
+    local page = core.query(c, v, c.enrichment, localized_search(player))
     v.page, pages = page.page, page.pages
+    request_visible_translations(player, page, v.selected)
     label(body, {"mir-browser.count", page.count})
     for _, row in ipairs(page.rows) do
       button(body, "select", player.force.technologies[row.key].localised_name, {technology = row.key})
@@ -304,6 +337,13 @@ local function click(event)
     if actions.can_enqueue(player, tech, defines.input_action.start_research) then
       if not player.force.add_research(tech) then player.print({"mir-browser.enqueue-failed"}) end
     else player.print({"mir-browser.enqueue-failed"}) end
+  elseif action == "open-vanilla" then
+    local tech = player.force.technologies[tags.technology]
+    if tech and tech.valid then
+      close(player)
+      player.open_technology_gui(tech)
+      return
+    end
   elseif action == "toggle-hide" then
     toggle_hidden(v, player.force, tags.technology)
   elseif action == "show-hidden" then
@@ -321,11 +361,13 @@ local function selection(event)
   local player = event_player(event)
   if not (player and event.element and event.element.valid) then return end
   local action = event.element.tags.mir_browser
-  if action ~= "mode" and action ~= "status" and action ~= "family" then return end
+  if action ~= "mode" and action ~= "status" and action ~= "family" and action ~= "sort" then return end
   local v = view(player)
   if action == "family" then
     local c = catalogue(player.force); if not c then return end
     v.family = c.family_names[event.element.selected_index]
+  elseif action == "sort" then
+    v.sort = event.element.selected_index == 2 and "name-desc" or "name-asc"
   else v[action] = event.element.selected_index end
   v.page = 1; render(player)
 end
@@ -333,6 +375,7 @@ function M.on_init()
   for _, player in pairs(game.players) do launch_button(player) end
 end
 function M.on_configuration_changed()
+  translations = {}
   for _, player in pairs(game.players) do launch_button(player) end
   refresh_open()
 end
@@ -342,6 +385,20 @@ M.on_research_queued = M.on_research_finished
 function M.on_technology_effects_reset() refresh_open() end
 function M.on_force_reset(event) refresh_open(event and event.force) end
 function M.on_forces_merged() refresh_open() end
+local function translated(event)
+  local player = event_player(event)
+  local cache = player and translations[player.index]
+  if not cache or cache.locale ~= player.locale or type(event.id) ~= "number" then return end
+  local technology = cache.requested[event.id]
+  if not technology then return end
+  cache.requested[event.id] = nil
+  if event.translated and type(event.result) == "string" then
+    cache.values[technology] = string.sub(event.result, 1, core.detail_string_limit)
+  else
+    cache.values[technology] = ""
+  end
+  if player.gui.screen[ROOT] and view(player).search ~= "" then render(player) end
+end
 function M.register()
   remote.add_interface("more-infinite-research-browser", {
     open = function(player_index, options)
@@ -367,6 +424,10 @@ function M.register()
           v.status = options.status
           reset_page = true
         end
+        if options.sort == "name-asc" or options.sort == "name-desc" then
+          v.sort = options.sort
+          reset_page = true
+        end
         if type(options.selected) == "string" and player.force.technologies[options.selected] then
           v.selected = options.selected
           v.effect_page = 1
@@ -389,6 +450,7 @@ function M.register()
   end)
   script.on_event(defines.events.on_gui_click, click)
   script.on_event(defines.events.on_gui_selection_state_changed, selection)
+  script.on_event(defines.events.on_string_translated, translated)
   script.on_event(defines.events.on_gui_confirmed, function(event)
     local player = event_player(event)
     if player and event.element and event.element.valid and event.element.tags.mir_browser == "search" then
@@ -409,7 +471,14 @@ function M.register()
     if event.element and event.element.valid and event.element.name == ROOT then close(event_player(event)) end
   end)
   script.on_event(defines.events.on_player_created, function(event) launch_button(event_player(event)) end)
-  script.on_event(defines.events.on_player_removed, function(event) state().players[event.player_index] = nil end)
+  script.on_event(defines.events.on_player_removed, function(event)
+    state().players[event.player_index] = nil
+    translations[event.player_index] = nil
+  end)
+  script.on_event(defines.events.on_player_locale_changed, function(event)
+    translations[event.player_index] = nil
+    local player = event_player(event); if player and player.gui.screen[ROOT] then render(player) end
+  end)
   script.on_event(defines.events.on_player_changed_force, function(event)
     local player = event_player(event); if player.gui.screen[ROOT] then render(player) end
   end)

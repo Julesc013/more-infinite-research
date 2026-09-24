@@ -47,6 +47,40 @@ local no_lab_omissions = {
   "research_inventory_capacity"
 }
 
+-- Capture the whole ordinary-material batch during the same exact Bob/Angel
+-- load used for science diagnosis. These observations select later assertions;
+-- a present declaration alone is not a qualified player outcome.
+local material_keys = {
+  "aluminium", "gold", "lead", "nickel", "platinum", "silver", "tin", "titanium",
+  "copper_tungsten", "zinc", "bronze", "brass", "gunmetal", "invar",
+  "cobalt_steel", "nitinol"
+}
+
+local function observe_material(key)
+  local technology_name = "recipe-prod-research_material_" .. key .. "-1"
+  local technology = data.raw.technology[technology_name]
+  if not technology then
+    log("[mir-fixture-assert-f200-science-researchability-diagnostic] material=" .. key
+      .. " technology=absent effects=- science=-")
+    return
+  end
+  local effects, packs = {}, {}
+  for _, effect in ipairs(technology.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe then
+      effects[#effects + 1] = effect.recipe .. ":" .. tostring(effect.change)
+    end
+  end
+  for _, ingredient in ipairs(((technology.unit or {}).ingredients) or {}) do
+    local name = type(ingredient) == "table" and (ingredient.name or ingredient[1]) or nil
+    if name then packs[#packs + 1] = name end
+  end
+  table.sort(effects)
+  table.sort(packs)
+  log("[mir-fixture-assert-f200-science-researchability-diagnostic] material=" .. key
+    .. " technology=present effects=" .. (#effects > 0 and table.concat(effects, ",") or "-")
+    .. " science=" .. (#packs > 0 and table.concat(packs, ",") or "-"))
+end
+
 local function contains(values, expected)
   for _, value in ipairs(values or {}) do
     if value == expected then return true end
@@ -226,8 +260,10 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
     log("[mir-fixture-assert-f200-science-researchability-diagnostic] omission=" .. index
       .. " stream=" .. stream .. " generated=" .. technology_name .. " status=absent")
   end
+
+  for _, key in ipairs(material_keys) do observe_material(key) end
 end)
 
 log("[mir-fixture-assert-f200-science-researchability-diagnostic] PASS"
   .. " final_route=reachable emissions=4 no_lab_omissions=5"
-  .. " player-mutation=false prototype-write=false")
+  .. " material_observations=16 player-mutation=false prototype-write=false")

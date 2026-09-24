@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 44684,
-      "expected_sha256": "4521FA2BCB71A51769073017D188237A1CB0BCCFCF448BF06AD049EB865F0E66",
+      "expected_bytes": 45779,
+      "expected_sha256": "0FEBE279D3BCAFFE6C670C3CB36B900D3194D2D2DD60601E0DCE77CF86E514A3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 29831,
-      "expected_sha256": "C77CAEAD3357421FD216FE3B6F77B8D7B69CC1D5B509C36E1675B87F53723563",
+      "expected_bytes": 31260,
+      "expected_sha256": "E90E2249EB225C8EC51DA58D3027CF1718FFC975E31D83F088769DDF4470A151",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1036,8 +1036,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9935,
-      "expected_sha256": "ACAF1526A2F384518484C08E29D3B685940499A0201863268F96D1AAFD87DE7B",
+      "expected_bytes": 11152,
+      "expected_sha256": "7AF0AE8FB058E783CD59D56CCFDE725079B6D6D035D9024BA3EF76F24193B642",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "46584B172C79697CE7AC0229282721FC009740AEF8222A538496B700396D6A96"
+  "record_sha256": "0EB55936472E9A230A3CA2F274B00587BB7DBE0937696A82EA33EA78358F5C5C"
 }

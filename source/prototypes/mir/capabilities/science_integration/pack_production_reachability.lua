@@ -220,18 +220,33 @@ local function technology_researchability_reason(...)
   return service(...)
 end
 
-local function science_pack_resolution_cache()
+local function science_pack_production_state()
   local context = compiler_context.current()
   local source_epoch = canonical_recipe_facts.source_epoch()
   local cached = context:state_view("science_pack_production")
-  if cached and cached.recipe_source_epoch == source_epoch then return cached.entries end
-  local value = {recipe_source_epoch = source_epoch, entries = {}}
+  if cached and cached.recipe_source_epoch == source_epoch then return cached end
+  local value = {
+    recipe_source_epoch = source_epoch,
+    entries = {},
+    -- This state owns only source-epoch-stable structural observations. It
+    -- deliberately cannot retain an acquisition result that depends on an
+    -- active science-pack or technology traversal.
+    route_witness_state = {}
+  }
   if cached then
     context:replace_epoch("science_pack_production", value, context:state_epoch("science_pack_production"))
   else
     context:set_state("science_pack_production", value)
   end
-  return value.entries
+  return value
+end
+
+local function science_pack_resolution_cache()
+  return science_pack_production_state().entries
+end
+
+local function science_pack_route_witness_state()
+  return science_pack_production_state().route_witness_state
 end
 
 local function graph_index()
@@ -583,7 +598,14 @@ local function production_witness_options(visiting_packs, visiting_technologies,
   return options
 end
 
-local function production_routes(recipe_status, visiting_packs, excluded_unlocker, visiting_technologies, observer)
+local function production_routes(
+  recipe_status,
+  visiting_packs,
+  excluded_unlocker,
+  visiting_technologies,
+  observer,
+  witness_state
+)
   local routes = {}
   local witness_options = production_witness_options(visiting_packs, visiting_technologies, observer)
   -- All candidates belong to one immutable recipe snapshot and exact active
@@ -591,7 +613,6 @@ local function production_routes(recipe_status, visiting_packs, excluded_unlocke
   -- context-free positive witnesses owned by recipe_route_feasibility; its
   -- contextual research decisions remain in witness_options and its active
   -- cycle set is cleared by every completed candidate.
-  local witness_state = {}
   for _, recipe_name in ipairs(recipe_status.recipes or {}) do
     if not diagnostic_visit(observer, 0) then break end
     local recipe = canonical_recipe_facts.view(recipe_name)
@@ -787,11 +808,22 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
   local cached = reusable and cache[pack_name] or nil
   if cached then return cached.status, cached.prerequisite, exists end
 
+  -- All normal root and nested queries share only the immutable source and
+  -- machine observations held by recipe-route feasibility. Its contextual
+  -- research-unlock answers remain uncached because their active traversal is
+  -- part of the proof. A bounded diagnostic always gets a fresh state so its
+  -- work cap still covers every inspected prototype.
+  local witness_state = observer == nil and science_pack_route_witness_state() or nil
+
   -- A declared direct source is an independent acquisition seed even when a
   -- later recipe for the same pack also exists. A locked self-output
   -- "improved" recipe cannot erase an earlier natural source and turn its
   -- own research into a false self-lock.
-  if route_feasibility.source_witness(pack_name, observer and {diagnostic_observer = observer} or nil) then
+  if route_feasibility.source_witness(
+    pack_name,
+    observer and {diagnostic_observer = observer} or nil,
+    witness_state
+  ) then
     if reusable then cache[pack_name] = {status = "non-recipe", prerequisite = pack_name} end
     return "non-recipe", pack_name, exists
   end
@@ -806,7 +838,8 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
       visiting_packs,
       nil,
       visiting_technologies,
-      observer
+      observer,
+      witness_state
     ))
     visiting_packs[pack_name] = nil
     if diagnostic_indeterminate(observer) then return "indeterminate", nil, exists end
@@ -1085,7 +1118,11 @@ function M.independent_pack_acquisition_witness(
   -- This witness is deliberately independent of an unlocker. A direct source
   -- remains valid even if the pack also has a recipe unlocked by the
   -- technology under assessment.
-  local direct_source = route_feasibility.source_witness(pack_name, observer and {diagnostic_observer = observer} or nil)
+  local direct_source = route_feasibility.source_witness(
+    pack_name,
+    observer and {diagnostic_observer = observer} or nil,
+    observer == nil and science_pack_route_witness_state() or nil
+  )
   if direct_source then return direct_source end
   local recipe_status = recipe_facts.pack_recipe_status(pack_name, observer)
   if diagnostic_indeterminate(observer) then return nil end
@@ -1098,7 +1135,8 @@ function M.independent_pack_acquisition_witness(
     witness_visiting,
     excluded_unlocker,
     visiting_technologies,
-    observer
+    observer,
+    observer == nil and science_pack_route_witness_state() or nil
   ))
   witness_visiting[pack_name] = nil
   return selected and deepcopy(selected) or nil

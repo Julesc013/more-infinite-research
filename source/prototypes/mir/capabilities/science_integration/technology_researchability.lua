@@ -2,6 +2,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lab_compatibility = require("prototypes.mir.capabilities.science_integration.lab_compatibility")
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
 local recipe_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
+local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
@@ -22,6 +23,25 @@ end
 
 local function graph_index()
   return compiler_context.current():state_view("technology_researchability_index", researchability_index.build)
+end
+
+-- Public root queries have no active science-pack or technology traversal and
+-- no unlock recipe. Their result is therefore reusable for this immutable
+-- recipe-source epoch. Contextual route checks continue through
+-- reason_with_context below and are intentionally not retained here.
+local function root_reason_cache()
+  local context = compiler_context.current()
+  local source_epoch = canonical_recipe_facts.source_epoch()
+  local cached = context:state_view("technology_researchability_root")
+  if cached and cached.recipe_source_epoch == source_epoch then return cached.entries end
+  local value = {recipe_source_epoch = source_epoch, entries = {}}
+  if cached then
+    context:replace_epoch("technology_researchability_root", value,
+      context:state_epoch("technology_researchability_root"))
+  else
+    context:set_state("technology_researchability_root", value)
+  end
+  return value.entries
 end
 
 local function enabled_and_reachable(tech_name)
@@ -223,7 +243,15 @@ function M.reason_with_context(tech_name, context)
 end
 
 function M.technology_researchability_reason(tech_name)
-  return reason(tech_name, {visiting_packs = {}, visiting_technologies = {}})
+  local cache = root_reason_cache()
+  local cached = cache[tech_name]
+  if cached ~= nil then
+    if cached == false then return nil end
+    return cached
+  end
+  local rejection = reason(tech_name, {visiting_packs = {}, visiting_technologies = {}})
+  cache[tech_name] = rejection or false
+  return rejection
 end
 
 function M.technology_is_researchable(tech_name)

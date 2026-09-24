@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 44684,
-      "expected_sha256": "4521FA2BCB71A51769073017D188237A1CB0BCCFCF448BF06AD049EB865F0E66",
+      "expected_bytes": 45779,
+      "expected_sha256": "0FEBE279D3BCAFFE6C670C3CB36B900D3194D2D2DD60601E0DCE77CF86E514A3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 29831,
-      "expected_sha256": "C77CAEAD3357421FD216FE3B6F77B8D7B69CC1D5B509C36E1675B87F53723563",
+      "expected_bytes": 31260,
+      "expected_sha256": "E90E2249EB225C8EC51DA58D3027CF1718FFC975E31D83F088769DDF4470A151",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1036,8 +1036,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9935,
-      "expected_sha256": "ACAF1526A2F384518484C08E29D3B685940499A0201863268F96D1AAFD87DE7B",
+      "expected_bytes": 11152,
+      "expected_sha256": "7AF0AE8FB058E783CD59D56CCFDE725079B6D6D035D9024BA3EF76F24193B642",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Bundled personal browser on exact qualified modern GUI targets.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 22130,
-      "expected_sha256": "217D5610C140D44FE3AB8026D5F3F0DBF3F2D61F128182316E1F8CFC45B43272",
+      "expected_bytes": 25186,
+      "expected_sha256": "45BBC025C061D6513A5CA524E4AA5435CF85E7E8080AF0D210C94015F8851A61",
       "proof_obligations": [
         "personal-filter-force-noninterference",
         "bounded-runtime-lifecycle",
@@ -3836,8 +3836,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical copied-data research query core for F210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16459,
-      "expected_sha256": "16F49B9514EB80FA698D71DC7C33B00E0D34D9C1B24000DA49C8D34749D3F763",
+      "expected_bytes": 16984,
+      "expected_sha256": "DD2532AB186900EB8ADABC9C6B44A7F04F7230FCC82EEBF5BB8E68B67C71A220",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "package-excluded-no-mir-core-fixture",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "2AC5F087130B62870F61D29189E218AA3939519B57BFCFEEA2FC2352847DA7B3"
+  "record_sha256": "7357BD8F264BB3F6DF11DD8EC602781AF557F049EA25225EF9BA75217BFC571D"
 }

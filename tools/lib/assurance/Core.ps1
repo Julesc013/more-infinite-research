@@ -573,9 +573,15 @@ function Get-MIRAssuranceImpactSelection {
       if (Test-MIRAssurancePathPattern -Path $path -Pattern ([string]$rule.pattern)) {
         $matchedRule = $true
         $mapped += $path
-        $scenarios += @($rule.scenarios | ForEach-Object { [string]$_ })
-        $groups += @($rule.groups | ForEach-Object { [string]$_ })
-        $tags += @($rule.tags | ForEach-Object { [string]$_ })
+        if ($rule.PSObject.Properties['scenarios']) {
+          $scenarios += @($rule.scenarios | ForEach-Object { [string]$_ })
+        }
+        if ($rule.PSObject.Properties['groups']) {
+          $groups += @($rule.groups | ForEach-Object { [string]$_ })
+        }
+        if ($rule.PSObject.Properties['tags']) {
+          $tags += @($rule.tags | ForEach-Object { [string]$_ })
+        }
       }
     }
     if (-not $matchedRule) {
