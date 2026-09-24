@@ -484,6 +484,15 @@ fixtures:
       - exact-five-no-lab-compatible-science-omissions
       - no-player-or-prototype-mutation-authority
 
+  f200-bob-angel-material-routes-observation:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-f200-bob-angel-material-routes-observation
+    exact_real_campaign: local-2-0-bob-angels
+    validates:
+      - exact-f200-bob-angel-thirteen-ordinary-material-recipe-effects
+      - exact-f200-bob-angel-three-unqualified-material-omissions
+      - finalized-route-observations-remain-package-excluded
+
   k2-science-phase-policy:
     requires_features: []
     assertion_path: fixtures/assert-k2-science-phase-policy

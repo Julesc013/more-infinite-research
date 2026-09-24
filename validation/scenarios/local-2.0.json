@@ -189,7 +189,8 @@
         "angelsrefining",
         "angelssmelting",
         "angelspetrochem",
-        "mir-fixture-assert-f200-science-researchability-diagnostic"
+        "mir-fixture-assert-f200-science-researchability-diagnostic",
+        "mir-fixture-assert-f200-bob-angel-material-routes-observation"
       ],
       "settings": {},
       "expected_plan": {
@@ -219,6 +220,7 @@
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=invar",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=cobalt_steel",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] material=nitinol",
+          "[mir-f200-material-routes] PASS emitted=13 absent=3",
           "Skipping stream research_character_crafting_speed because no_lab_compatible_science.",
           "Skipping stream research_character_mining_speed because no_lab_compatible_science.",
           "Skipping stream research_character_reach because no_lab_compatible_science.",

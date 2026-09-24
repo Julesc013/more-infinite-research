@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "MIR4F200BobAngelMaterialRouteObservationV1",
+  "scope": "F200 Bob plus Angel final-data observation and assertion for the sixteen ordinary material stream candidates. This fixture records normalized route and risk facts, active-mod versions, graph decisions, and emitted MIR effect ownership. It asserts thirteen exact emitted effect sets and three absent technologies without changing product prototypes.",
+  "streams": [
+    "research_material_aluminium",
+    "research_material_gold",
+    "research_material_lead",
+    "research_material_nickel",
+    "research_material_platinum",
+    "research_material_silver",
+    "research_material_tin",
+    "research_material_titanium",
+    "research_material_copper_tungsten",
+    "research_material_zinc",
+    "research_material_bronze",
+    "research_material_brass",
+    "research_material_gunmetal",
+    "research_material_invar",
+    "research_material_cobalt_steel",
+    "research_material_nitinol"
+  ],
+  "explicit_non_claims": [
+    "route admission under other mod locks",
+    "return-path exception",
+    "science reachability",
+    "technology ownership mutation",
+    "release qualification"
+  ]
+}
