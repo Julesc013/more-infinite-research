@@ -908,8 +908,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 46018,
-      "expected_sha256": "3FD5C7E3917846B6E0210A5D0447A13DE3A5AAD789EB4E12F6651F29C6A95A47",
+      "expected_bytes": 51044,
+      "expected_sha256": "8DA1EB4BF01EF625352FFA2C3D7F566DA4DE36FC041B45AF8E811D4DB95CEFCE",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -924,8 +924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 31260,
-      "expected_sha256": "E90E2249EB225C8EC51DA58D3027CF1718FFC975E31D83F088769DDF4470A151",
+      "expected_bytes": 31276,
+      "expected_sha256": "ADEEE69C12812FA575EB5EAD30ADA2F31FA339FCA554301FF07F338CC4084DCD",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 36271,
-      "expected_sha256": "15E231720AD229E9D2227851394B160E4D1B0B8FE47BA082508FE330DD45114A",
+      "expected_bytes": 37194,
+      "expected_sha256": "45710AF5067E6F0531B7CB8D295214970C05855B40C2C189B381012B30AF4538",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "83F7C8D73466D167A97DF34AC596A0FE9653FD18A1DB70E64C09CDB2658E72A5"
+  "record_sha256": "4379783459099BB72502C8AA198503F15EC50653AC307A54C58DDAE7243D07F1"
 }

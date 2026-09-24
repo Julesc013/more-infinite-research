@@ -647,7 +647,8 @@ local function acquisition_witness_impl(output_identity, options, state)
   local may_cache = root_query and cacheable(options)
   if may_cache and state.acquisition_memo[key] ~= nil then
     local cached = state.acquisition_memo[key]
-    return cached == false and nil or deepcopy(cached)
+    if cached == false then return nil end
+    return deepcopy(cached)
   end
   if state.visiting[key] then
     record_diagnostic_failure(options, {
