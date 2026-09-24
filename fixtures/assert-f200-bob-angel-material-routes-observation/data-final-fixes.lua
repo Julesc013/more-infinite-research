@@ -9,9 +9,9 @@ local subjects = {
   {stream = "research_material_aluminium", item = "bob-aluminium-plate", recipes = {"bob-aluminium-plate", "angels-plate-aluminium", "angels-plate-aluminium-2"}},
   {stream = "research_material_gold", item = "bob-gold-plate", recipes = {"bob-gold-plate"}},
   {stream = "research_material_lead", item = "bob-lead-plate", recipes = {"bob-lead-plate", "bob-lead-plate-2"}},
-  {stream = "research_material_nickel", item = "bob-nickel-plate", recipes = {"bob-nickel-plate"}},
+  {stream = "research_material_nickel", item = "bob-nickel-plate", recipes = {"bob-nickel-plate", "angels-plate-nickel", "angels-plate-nickel-2"}},
   {stream = "research_material_platinum", item = "bob-platinum-plate", recipes = {"bob-platinum-plate"}},
-  {stream = "research_material_silver", item = "bob-silver-plate", recipes = {"bob-silver-plate"}},
+  {stream = "research_material_silver", item = "bob-silver-plate", recipes = {"bob-silver-plate", "angels-plate-silver", "angels-plate-silver-2"}},
   {stream = "research_material_tin", item = "bob-tin-plate", recipes = {"bob-tin-plate"}},
   {stream = "research_material_titanium", item = "bob-titanium-plate", recipes = {"bob-titanium-plate"}},
   {stream = "research_material_copper_tungsten", item = "bob-copper-tungsten-alloy", recipes = {"bob-copper-tungsten-alloy"}},
@@ -147,13 +147,14 @@ compiler_context.with_active(compiler_context.new(), function()
   end
 end)
 
--- The current exact F200 Bob/Angel profile has thirteen ordinary finished
+-- The current exact F200 Bob/Angel profile has fifteen ordinary finished
 -- materials. Assert the emitted recipe effects, rather than inferring delivery
 -- from a declaration or from a recipe merely existing in data.raw.
 local expected_effects = {
   aluminium = {"angels-plate-aluminium", "angels-plate-aluminium-2"},
   gold = {"angels-plate-gold", "angels-plate-gold-2"},
   lead = {"angels-plate-lead", "angels-plate-lead-2"},
+  nickel = {"angels-plate-nickel", "angels-plate-nickel-2"},
   tin = {"angels-plate-tin", "angels-plate-tin-2"},
   titanium = {"angels-plate-titanium", "angels-plate-titanium-2"},
   copper_tungsten = {"bob-copper-tungsten-alloy"},
@@ -163,7 +164,8 @@ local expected_effects = {
   gunmetal = {"angels-plate-gunmetal"},
   invar = {"angels-plate-invar"},
   cobalt_steel = {"angels-plate-cobalt-steel"},
-  nitinol = {"angels-plate-nitinol"}
+  nitinol = {"angels-plate-nitinol"},
+  silver = {"angels-plate-silver", "angels-plate-silver-2"}
 }
 for key, expected in pairs(expected_effects) do
   local name = "recipe-prod-research_material_" .. key .. "-1"
@@ -183,9 +185,46 @@ for key, expected in pairs(expected_effects) do
       .. table.concat(expected, ",") .. " actual=" .. table.concat(actual, ","))
   end
 end
-for _, key in ipairs({"nickel", "platinum", "silver"}) do
+
+-- The product logs the final reviewed-forward decision while it compiles.
+-- Its selection helper has relative module imports and is intentionally not a
+-- cross-mod fixture API. Bind the exact certificate ID, its still-rejected
+-- generic return path, and its emitted effect here; the F200 scenario also
+-- requires the product's four reviewed-forward decision log records.
+local reviewed_forward_decisions = {
+  {stream = "research_material_nickel", recipe = "angels-plate-nickel", certificate = "F200-BA-nickel-casting-v1"},
+  {stream = "research_material_nickel", recipe = "angels-plate-nickel-2", certificate = "F200-BA-nickel-roll-v1"},
+  {stream = "research_material_silver", recipe = "angels-plate-silver", certificate = "F200-BA-silver-casting-v1"},
+  {stream = "research_material_silver", recipe = "angels-plate-silver-2", certificate = "F200-BA-silver-roll-v1"}
+}
+local productivity_streams = require("__more-infinite-research__/prototypes/streams/productivity")
+compiler_context.with_active(compiler_context.new(), function()
+  for _, expected in ipairs(reviewed_forward_decisions) do
+    local stream = productivity_streams[expected.stream]
+    local certificate = stream and stream.reviewed_forward_routes and stream.reviewed_forward_routes[expected.recipe]
+    if not certificate or certificate.id ~= expected.certificate then
+      error("MIR F200 reviewed-forward certificate differs for " .. expected.recipe)
+    end
+    local generic_admission, generic_reason = recipe_matching.material_route_is_acyclic(recipe_facts.view(expected.recipe))
+    if generic_admission or string.sub(tostring(generic_reason), 1, 22) ~= "potential-return-path:" then
+      error("MIR F200 reviewed-forward guard differs for " .. expected.recipe .. " reason=" .. tostring(generic_reason))
+    end
+    local technology = data.raw.technology["recipe-prod-" .. expected.stream .. "-1"]
+    local emitted = false
+    for _, effect in ipairs((technology and technology.effects) or {}) do
+      if effect.type == "change-recipe-productivity" and effect.recipe == expected.recipe and effect.change == 0.02 then
+        emitted = true
+      end
+    end
+    if not emitted then error("MIR F200 reviewed-forward route omitted " .. expected.recipe) end
+    log("[mir-f200-material-routes] REVIEWED_FORWARD recipe=" .. expected.recipe
+      .. " certificate=" .. expected.certificate .. " generic=" .. tostring(generic_reason)
+      .. " effect=present")
+  end
+end)
+for _, key in ipairs({"platinum"}) do
   if data.raw.technology["recipe-prod-research_material_" .. key .. "-1"] then
     error("MIR F200 material unexpectedly emitted " .. key)
   end
 end
-log("[mir-f200-material-routes] PASS emitted=13 absent=3")
+log("[mir-f200-material-routes] PASS emitted=15 absent=1")
