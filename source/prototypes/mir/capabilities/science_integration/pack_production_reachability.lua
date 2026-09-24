@@ -800,13 +800,17 @@ local function resolve_pack_production_status(pack_name, visiting_packs, visitin
 
   visiting_packs = visiting_packs or {}
   if visiting_packs[pack_name] then return "unreachable", nil, exists end
-  -- A nonempty visitation set makes this result conditional on the caller's
-  -- current traversal. Never retain a rejection (or provisional success) from
-  -- that branch as a reusable context-wide answer.
-  local reusable = observer == nil and not has_active_traversal(visiting_packs, visiting_technologies)
-  local cache = reusable and science_pack_resolution_cache() or nil
-  local cached = reusable and cache[pack_name] or nil
+  -- Only an empty traversal may establish a root result, but that result is a
+  -- source-epoch-bound witness independent of a later caller's active set.
+  -- Reuse it after the same-pack cycle guard above: this avoids recomputing a
+  -- proved science route for every ingredient of a contextual unlock check.
+  -- A nonempty traversal still never writes its conditional answer.
+  local root_cache = observer == nil and science_pack_resolution_cache() or nil
+  local cached = root_cache and root_cache[pack_name] or nil
   if cached then return cached.status, cached.prerequisite, exists end
+
+  local reusable = observer == nil and not has_active_traversal(visiting_packs, visiting_technologies)
+  local cache = reusable and root_cache or nil
 
   -- All normal root and nested queries share only the immutable source and
   -- machine observations held by recipe-route feasibility. Its contextual

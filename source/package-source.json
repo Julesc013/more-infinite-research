@@ -2964,10 +2964,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 45779,
-      "source_sha256": "0FEBE279D3BCAFFE6C670C3CB36B900D3194D2D2DD60601E0DCE77CF86E514A3",
-      "output_bytes": 45779,
-      "output_sha256": "0FEBE279D3BCAFFE6C670C3CB36B900D3194D2D2DD60601E0DCE77CF86E514A3"
+      "source_bytes": 46018,
+      "source_sha256": "3FD5C7E3917846B6E0210A5D0447A13DE3A5AAD789EB4E12F6651F29C6A95A47",
+      "output_bytes": 46018,
+      "output_sha256": "3FD5C7E3917846B6E0210A5D0447A13DE3A5AAD789EB4E12F6651F29C6A95A47"
     },
     {
       "layer": "capability",
@@ -7369,5 +7369,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "E7BB81E73FEC88F0E07880733F233B5056197622C1F012D496FF3CC779AFEBA2"
+  "record_sha256": "35D4ED112DFF7724DB3CF94B95CE0912A030D00228FAE031B9C084D21072CD93"
 }

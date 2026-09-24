@@ -262,6 +262,27 @@ b = production.pack_production_status("B", {})
 check("C07", conditional_b == "unreachable" and b == "research",
   "A technology-conditional rejection cannot poison the reusable root cache")
 
+-- A root result is a source-epoch-bound proof, so a different active route
+-- may reuse it. The same active pack must still be rejected before consulting
+-- that cache, or an unseeded self-cycle could be hidden.
+reset(pack_world(true, true))
+local root_recipe_status_calls = 0
+local normal_recipe_status = recipe_unlock_facts.pack_recipe_status
+recipe_unlock_facts.pack_recipe_status = function(...)
+  root_recipe_status_calls = root_recipe_status_calls + 1
+  return normal_recipe_status(...)
+end
+local root_a = production.pack_production_status("A", {})
+local root_recipe_status_calls_after_root = root_recipe_status_calls
+local active_a = production.pack_production_status("A", {B = true})
+local self_active_a = production.pack_production_status("A", {A = true})
+recipe_unlock_facts.pack_recipe_status = normal_recipe_status
+check("C07A", root_a == "initial" and active_a == "initial"
+  and self_active_a == "unreachable"
+  and root_recipe_status_calls_after_root > 0
+  and root_recipe_status_calls == root_recipe_status_calls_after_root,
+  "An active route reuses only a root-proven pack result while retaining its same-pack cycle guard")
+
 -- Separate root packs can inspect the same raw resource catalog. Reuse that
 -- source-epoch-bound structural observation, while keeping each pack result
 -- independently selected and cached.
