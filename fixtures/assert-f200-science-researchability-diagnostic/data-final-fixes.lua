@@ -39,7 +39,7 @@ local subjects = {
   }
 }
 
-local no_lab_omissions = {
+local military_frontier_streams = {
   "research_character_crafting_speed",
   "research_character_mining_speed",
   "research_character_reach",
@@ -284,17 +284,34 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
       .. " pack=logistic-science-pack status=generated")
   end
 
-  for index, stream in ipairs(no_lab_omissions) do
+  for index, stream in ipairs(military_frontier_streams) do
     local technology_name = "recipe-prod-" .. stream .. "-1"
-    if data.raw.technology[technology_name] then
-      fail(stream .. " unexpectedly generated without lab-compatible science")
+    local technology = data.raw.technology[technology_name]
+    local packs = {}
+    for _, ingredient in ipairs((technology and technology.unit and technology.unit.ingredients) or {}) do
+      packs[#packs + 1] = ingredient_name(ingredient)
     end
-    log("[mir-fixture-assert-f200-science-researchability-diagnostic] omission=" .. index
-      .. " stream=" .. stream .. " generated=" .. technology_name .. " status=absent")
+    table.sort(packs)
+    local labs = {}
+    for lab_name, lab in pairs(data.raw.lab or {}) do
+      local accepted = {}
+      for _, pack in ipairs(lab.inputs or {}) do accepted[pack] = true end
+      local all = #packs > 0
+      for _, pack in ipairs(packs) do if not accepted[pack] then all = false end end
+      if all then labs[#labs + 1] = lab_name end
+    end
+    table.sort(labs)
+    if not technology or table.concat(packs, ",") ~= "military-science-pack" or #labs == 0 then
+      fail(stream .. " lacks its military-science, lab-compatible generated frontier")
+    end
+    log("[mir-fixture-assert-f200-science-researchability-diagnostic] frontier=" .. index
+      .. " stream=" .. stream .. " generated=" .. technology_name
+      .. " status=" .. (technology and "present" or "absent")
+      .. " science=" .. table.concat(packs, ",") .. " labs=" .. table.concat(labs, ","))
   end
 
 end)
 
 log("[mir-fixture-assert-f200-science-researchability-diagnostic] PASS"
-  .. " final_route=reachable emissions=4 no_lab_omissions=5"
+  .. " final_route=reachable emissions=4 military_frontier=5"
   .. " material_observations=16 player-mutation=false prototype-write=false")
