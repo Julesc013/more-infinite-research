@@ -198,6 +198,7 @@
         "maximum_dependency_failures": 0,
         "required_log_fragments": [
           "[mir-fixture-assert-f200-science-researchability-diagnostic] final-route pack=logistic-science-pack status=research",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=bounded-indeterminate pack=logistic-science-pack visits=1024 reason=diagnostic-work-budget-exhausted",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=1",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=2",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=3",

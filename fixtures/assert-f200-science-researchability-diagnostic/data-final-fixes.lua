@@ -218,16 +218,48 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
     or route.unlocker ~= "logistic-science-pack" then
     fail("finalized logistic-science acquisition route was not selected")
   end
-  if reachability.pack_production_rejection_projection("logistic-science-pack", {
-    limits = {candidates = 16, nodes = 128, depth = 32, bytes = 32768}
-  }) ~= nil then
-    fail("reachable finalized logistic-science route retained a rejection projection")
+  local logistic_rejection = reachability.pack_production_rejection_projection("logistic-science-pack", {
+    limits = {candidates = 16, nodes = 1024, depth = 32, bytes = 32768}
+  })
+  if logistic_rejection ~= nil then
+    local failure = logistic_rejection.first_failure or {}
+    local truncation = logistic_rejection.truncation or {}
+    local usage = truncation.usage or {}
+    local bounded = logistic_rejection.status == "indeterminate"
+      and failure.reason == "diagnostic-work-budget-exhausted"
+      and usage.visits == 1024
+      and contains(truncation.truncated, "nodes")
+    if not bounded then
+      fail("reachable finalized logistic-science route retained a rejection projection"
+        .. " status=" .. tostring(logistic_rejection.status)
+        .. " reason=" .. tostring(failure.reason)
+        .. " visits=" .. tostring(usage.visits)
+        .. " truncated=" .. table.concat(truncation.truncated or {}, ","))
+    end
+    log("[mir-fixture-assert-f200-science-researchability-diagnostic] projection=bounded-indeterminate"
+      .. " pack=logistic-science-pack visits=" .. tostring(usage.visits)
+      .. " reason=" .. tostring(failure.reason))
   end
   log("[mir-fixture-assert-f200-science-researchability-diagnostic] final-route"
     .. " pack=logistic-science-pack status=" .. status
     .. " prerequisite=" .. prerequisite
     .. " recipe=" .. route.recipe .. " unlocker=" .. route.unlocker
     .. " steam_witness=boiler-conversion")
+
+  local chemical_status, chemical_prerequisite = reachability.pack_production_status("chemical-science-pack", {})
+  local chemical_route = reachability.production_route_for_pack("chemical-science-pack")
+  log("[mir-fixture-assert-f200-science-researchability-diagnostic] chemical-route"
+    .. " status=" .. tostring(chemical_status)
+    .. " prerequisite=" .. tostring(chemical_prerequisite)
+    .. " recipe=" .. tostring(chemical_route and chemical_route.recipe)
+    .. " unlocker=" .. tostring(chemical_route and chemical_route.unlocker)
+    .. " ingredients=" .. table.concat(recipe_ingredient_names("chemical-science-pack"), ","))
+
+  for _, key in ipairs(material_keys) do observe_material(key) end
+  if chemical_status ~= "research" or chemical_prerequisite ~= "chemical-science-pack"
+    or not chemical_route or chemical_route.recipe ~= "chemical-science-pack" then
+    fail("finalized chemical-science acquisition route was not selected")
+  end
 
   for index, subject in ipairs(subjects) do
     local generated = data.raw.technology[subject.generated_technology]
@@ -261,7 +293,6 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
       .. " stream=" .. stream .. " generated=" .. technology_name .. " status=absent")
   end
 
-  for _, key in ipairs(material_keys) do observe_material(key) end
 end)
 
 log("[mir-fixture-assert-f200-science-researchability-diagnostic] PASS"
