@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
-  [ValidateSet('f017')][string]$Target = 'f017',
+  [ValidateSet('f017', 'f016', 'f015')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
@@ -28,7 +28,7 @@ function Get-MIR42HistoricalTargetRecord {
   return [pscustomobject]@{ path = $path; record = $record }
 }
 
-function Assert-MIR42HistoricalSource {
+function Get-MIR42HistoricalSourceBytes {
   param($Adapter)
   $relative = [string]$Adapter.source_path
   if ($relative -notmatch '^source/') { throw "[mir42-historical-adapter-boundary] $relative" }
@@ -45,6 +45,39 @@ function Assert-MIR42HistoricalSource {
   return $bytes
 }
 
+function ConvertTo-MIR42HistoricalAdapterBytes {
+  param($Adapter, $Record)
+  $bytes = Get-MIR42HistoricalSourceBytes -Adapter $Adapter
+  $transformField = $Adapter.PSObject.Properties['transform']
+  $transform = if ($null -eq $transformField -or [string]::IsNullOrWhiteSpace([string]$transformField.Value)) { 'copy-exact-bytes' } else { [string]$transformField.Value }
+  if ($transform -eq 'copy-exact-bytes') { $output = $bytes }
+  elseif ($transform -eq 'legacy-target-profile-template-v1') {
+    $text = [Text.UTF8Encoding]::new($false).GetString($bytes)
+    $profile = $Record.profile
+    foreach ($pair in @(
+      @{ token = '@@FACTORIO_LINE@@'; value = [string]$Record.factorio_line },
+      @{ token = '@@SUPPORT_CLASS@@'; value = [string]$profile.support_class },
+      @{ token = '@@SCIENCE_FAMILY@@'; value = [string]$profile.science_family },
+      @{ token = '@@ASSET_POLICY@@'; value = [string]$profile.asset_policy },
+      @{ token = '@@LABORATORY_PRODUCTIVITY_EFFECT@@'; value = if ([bool]$profile.laboratory_productivity) { ",`n        `"laboratory-productivity`"" } else { '' } },
+      @{ token = '@@OLD_SCIENCE_VALIDATION@@'; value = if ([bool]$profile.old_science_map) { ',' + [Environment]::NewLine + '        "old-science-map"' } else { '' } }
+    )) {
+      if ([regex]::Matches($text, [regex]::Escape([string]$pair.token)).Count -lt 1) { throw "[mir42-historical-template-token] $($pair.token)" }
+      $text = $text.Replace([string]$pair.token, [string]$pair.value)
+    }
+    if ($text.Contains('@@')) { throw '[mir42-historical-template-unresolved]' }
+    $output = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  } else { throw "[mir42-historical-adapter-transform] $transform" }
+  $outputBytesField = $Adapter.PSObject.Properties['output_bytes']
+  $outputShaField = $Adapter.PSObject.Properties['output_sha256']
+  if ($null -ne $outputBytesField -and $null -ne $outputShaField -and
+      ([int64]$output.Length -ne [int64]$outputBytesField.Value -or
+      (Get-MIR4Sha256Bytes -Bytes $output) -cne [string]$outputShaField.Value)) {
+    throw "[mir42-historical-adapter-output-drift] $($Adapter.output_path)"
+  }
+  return $output
+}
+
 function Copy-MIR42HistoricalAdapter {
   param([string]$Tree, $Record)
   foreach ($adapter in @($Record.adapter_files)) {
@@ -55,7 +88,7 @@ function Copy-MIR42HistoricalAdapter {
     if (-not $destination.StartsWith($treePrefix, [StringComparison]::OrdinalIgnoreCase) -or -not (Test-Path -LiteralPath $destination -PathType Leaf)) {
       throw "[mir42-historical-adapter-output-missing] $output"
     }
-    [IO.File]::WriteAllBytes($destination, (Assert-MIR42HistoricalSource -Adapter $adapter))
+    [IO.File]::WriteAllBytes($destination, (ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $Record))
   }
   foreach ($patch in @($Record.patches)) {
     $output = [string]$patch.output_path

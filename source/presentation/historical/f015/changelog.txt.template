@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------------------------------
+Version: 4.2.01500
+
+  Playtest:
+
+    - Rebuilt the reduced eleven-stream research surface from current MIR 4.2 source.
+    - Added the Factorio 0.15 old-science target adapter and exact-engine package smoke coverage.
+    - Kept Factorio-2-only research-cost support output out of this historical target.
+
+  Status:
+
+    - Private historical playtest package. It is not a public compatibility claim or release asset.
+---------------------------------------------------------------------------------------------------
