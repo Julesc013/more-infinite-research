@@ -380,8 +380,9 @@ local function offshore_pump_output_fluid(pump)
   local declared = pump and pump.fluid
   if type(declared) == "string" and declared ~= "" then return declared end
   if target_profiles.current_factorio_version == "2.1" then
-    declared = pump and pump.fluid_box and pump.fluid_box.filter
-    if type(declared) == "string" and declared ~= "" then return declared end
+    -- A fluid-box filter alone describes a pump's connection contract, not a
+    -- natural source. In particular, modded pumps can filter molten fluids
+    -- that have no independently seeded acquisition route.
     if pump and pump.fluid_source_offset ~= nil then return "water" end
   end
   return nil

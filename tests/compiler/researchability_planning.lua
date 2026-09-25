@@ -658,7 +658,19 @@ check("F09C0", base_water_witness and base_water_witness.kind == "offshore-pump"
   and feasibility.source_witness({type = "item", name = "water"}) == nil,
   "A source-offset offshore pump supplies the exact base water fluid")
 
--- The source-offset and fluid-box interpretations are Factorio-2.1 contracts.
+-- A fluid-box filter constrains a pump connection, but cannot establish that
+-- the filtered fluid is naturally available. This must stay false even on
+-- Factorio 2.1: otherwise a modded filtered molten-fluid pump could seed an
+-- unproduced route cycle.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {filtered_pump = {fluid_box = {filter = "molten-nickel"}}}
+})
+check("F09C0A", feasibility.source_witness({type = "fluid", name = "molten-nickel"}) == nil,
+  "An F210 filtered offshore pump without a source offset is not a natural source")
+
+-- The source-offset interpretation is a Factorio-2.1 contract. A fluid-box
+-- filter remains insufficient on every target.
 -- F200 keeps its established explicit-pump-field semantics; an F200 mod can
 -- still declare a source through `fluid`.
 target_profile.current_factorio_version = "2.0"
