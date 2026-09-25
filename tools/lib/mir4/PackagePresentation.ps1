@@ -951,12 +951,16 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   [CmdletBinding()] param([Parameter(Mandatory)]$Current,[Parameter(Mandatory)]$Predecessor)
   $migrated=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
   $introduced=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
+  $scienceIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
+  $historicalIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
   if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
-     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne1-or
-     [string]$introduced[0].provenance.introduction_id-cne'MIR42-SCIENCE-ROUTE-FEASIBILITY'-or
-     [string]$introduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-     [string]$introduced[0].output_path-cne'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-     (@($introduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne13-or
+     $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or
+     [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
+     [string]$scienceIntroduced[0].output_path-cne'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
+     (@($scienceIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
+     @($historicalIntroduced|Where-Object{[string]$_.source_path-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
+     @($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|'-cne'f013|f014|f015|f016|f017'){
     throw '[mir4-package-presentation-v7-source-succession]'
   }
   $currentByPredecessor=@{}
@@ -971,6 +975,10 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     $current=$currentByPredecessor[$key]
     $priorProjection=[pscustomobject][ordered]@{layer=[string]$prior.layer;target_scope=@($prior.target_scope);output_path=[string]$prior.output_path;semantic_class=[string]$prior.semantic_class;source_path=[string]$prior.source_path;predecessor_source_path=[string]$prior.predecessor_source_path;transform=[string]$prior.transform}
     $currentProjection=[pscustomobject][ordered]@{layer=[string]$current.layer;target_scope=@($current.target_scope);output_path=[string]$current.output_path;semantic_class=[string]$current.semantic_class;source_path=[string]$current.source_path;predecessor_source_path=[string]$current.provenance.predecessor_source_path;transform=[string]$current.transform}
+    if([string]$current.source_path-ceq'source/presentation/f100/README.md.template'){
+      if((@($prior.target_scope)-join'|')-cne'f100'-or(@($current.target_scope)-join'|')-cne'f100|f017|f016|f015|f014|f013'){throw '[mir4-package-presentation-v7-source-succession]'}
+      $currentProjection.target_scope=@($prior.target_scope)
+    }
     if((ConvertTo-MIR4BootstrapCanonicalJson -Value $currentProjection)-cne(ConvertTo-MIR4BootstrapCanonicalJson -Value $priorProjection)){throw '[mir4-package-presentation-v7-source-succession]'}
   }
   return [pscustomobject][ordered]@{predecessor=$Predecessor;migrated=$migrated;introduced=$introduced}
