@@ -146,7 +146,7 @@ $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
-$isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
+$isLegacyFactorio = [string]$factorioVersionInfo.ProductVersion -match '^(?:0|1)[.]'
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
@@ -181,6 +181,7 @@ if (-not $resolvedRoot.StartsWith($containmentPrefix, [StringComparison]::Ordina
   throw "Upgrade row root escapes the admitted work root: $resolvedRoot"
 }
 $runSucceeded = $false
+$factorioProcesses = 0
 try {
 Assert-MIRFactorioPathBudget -Path (Join-Path $root "userdata\factorio-current.log") -Context "Upgrade Factorio log path"
 $mods = Join-Path $root "mods"
@@ -221,6 +222,30 @@ Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -Enab
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
 $stagedFixture = Join-Path $mods $fixtureModName
 Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
+if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
+    $ToVersion -match '^4[.]2[.](?<code>21000|20000|11000|10000)$') {
+  $code = [string]$Matches.code
+  $expectedFrom = "4.1.$code"
+  if ($FromVersion -cne $expectedFrom) { throw 'MIR 4.2 upgrade specialization requires its exact predecessor version.' }
+  $fixtureFrom = "4.0.$code"
+  $fixtureTo = "4.1.$code"
+  $stagedControlPath = Join-Path $stagedFixture 'control.lua'
+  $stagedControl = Get-Content -Raw -LiteralPath $stagedControlPath
+  $oldSaveName = 'mir-' + $fixtureTo.Replace('.', '') + '-upgraded'
+  $newSaveName = 'mir-' + $ToVersion.Replace('.', '') + '-upgraded'
+  if (-not $stagedControl.Contains($fixtureFrom) -or -not $stagedControl.Contains($fixtureTo) -or
+      -not $stagedControl.Contains($oldSaveName)) {
+    throw 'MIR 4.2 upgrade fixture version or save anchors changed.'
+  }
+  $stagedControl = $stagedControl.Replace($fixtureFrom, '__MIR_UPGRADE_FROM_VERSION__').Replace($fixtureTo, '__MIR_UPGRADE_TO_VERSION__')
+  $stagedControl = $stagedControl.Replace('__MIR_UPGRADE_FROM_VERSION__', $FromVersion).Replace('__MIR_UPGRADE_TO_VERSION__', $ToVersion).Replace($oldSaveName, $newSaveName)
+  [IO.File]::WriteAllText($stagedControlPath, $stagedControl, [Text.UTF8Encoding]::new($false))
+  $stagedInfoPath = Join-Path $stagedFixture 'info.json'
+  $stagedInfo = Get-Content -Raw -LiteralPath $stagedInfoPath
+  $dependencyFrom = "more-infinite-research >= $fixtureFrom"
+  if (-not $stagedInfo.Contains($dependencyFrom)) { throw 'MIR 4.2 upgrade fixture dependency anchor changed.' }
+  [IO.File]::WriteAllText($stagedInfoPath, $stagedInfo.Replace($dependencyFrom, "more-infinite-research >= $FromVersion"), [Text.UTF8Encoding]::new($false))
+}
 if ($FixtureName -eq "assert-upgrade-3-2-9-to-3-2-10") {
   # The emergency programme governs three predecessor lanes through one
   # contract fixture. Specialize only the disposable staged copy so the
@@ -258,6 +283,7 @@ $save = Join-Path $root "source.zip"
 Assert-MIRFactorioPathBudget -Path $save -Context "Upgrade source-save path"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
+$factorioProcesses++
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode. Temporary root: $root"
@@ -268,6 +294,7 @@ if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion
     "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
     "--start-server", $save, "--until-tick", "1"
   )
+  $factorioProcesses++
   $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
   if ($sourceInitExitCode -ne 0) {
     throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode. Temporary root: $root"
@@ -327,9 +354,11 @@ $loadArgs = if ($requiresReloadProof) {
   )
 }
 $loadExitCode = if ($requiresReloadProof) {
+  $factorioProcesses++
   Invoke-MIRUpgradeServerUntilSaved -FilePath $factorio -Arguments $loadArgs -LogPath $log `
     -Marker $governedUpgradeMarker -SavedMapPath $governedUpgradedSave
 } else {
+  $factorioProcesses++
   Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
 }
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
@@ -349,6 +378,7 @@ if ($requiresReloadProof) {
     "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
     "--benchmark", $upgradedSave, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
   )
+  $factorioProcesses++
   $reloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
   if ($reloadExitCode -ne 0) { throw "MIR $ToVersion upgraded-save reload failed with exit code $reloadExitCode. Temporary root: $root" }
   $reloadText = Get-Content -Raw -LiteralPath $log
@@ -359,6 +389,7 @@ if ($requiresReloadProof) {
   $reloadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-reload.txt"
   Copy-MIRUpgradeLogEvidence -Source $log -Destination $reloadEvidence -FactorioBinaryPath $factorio -ExpandedWorkPath $root -RepositoryRootPath $RepoRoot
 
+  $factorioProcesses++
   $secondReloadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $reloadArgs
   if ($secondReloadExitCode -ne 0) {
     throw "MIR $ToVersion upgraded-save second reload failed with exit code $secondReloadExitCode. Temporary root: $root"
@@ -441,6 +472,7 @@ $result = [ordered]@{
   archetype = if ($Archetype) { $Archetype } else { "default" }
   factorio_binary_version = $factorioVersionInfo.FileVersion
   factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
+  factorio_processes = $factorioProcesses
   from = [ordered]@{ version = $FromVersion; path = (Split-Path -Leaf $from); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = (Split-Path -Leaf $to); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   source_only_fixtures = @($SourceOnlyFixtureNames)

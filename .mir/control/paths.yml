@@ -698,6 +698,8 @@ paths:
   releases.waves.mir4-r0-post-readiness-merge-receipt: .mir/releases/waves/mir4-r0/MIR4-Post-Readiness-Merge-Receipt-SOL15V1.json
   releases.waves.mir4-r0-pr152-independent-readiness-acceptance: .mir/releases/waves/mir4-r0/MIR4-PR152-Independent-Readiness-Acceptance-LUNAV1.json
   releases.waves.mir4-r0-pre-freeze-development-plan: .mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Development-PlanV1.json
+  releases.governance.mir4-mir42-direct-predecessor-inputs: .mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json
+  releases.governance.mir4-mir42-v410-published-checksums: .mir/releases/governance/mir4/MIR42-v410-SHA256SUMS.txt
   releases.waves.mir4-r0-f210-release-qualification-policy: .mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json
   releases.waves.mir4-r0-f210-qualification-policy-authority-evolution-receipt: .mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json
   control.mir4-f210-current-qualification-policy: .mir/control/MIR4-F210-Current-Qualification-PolicyV2.json
