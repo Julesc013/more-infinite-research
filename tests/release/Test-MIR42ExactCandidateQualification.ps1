@@ -130,7 +130,7 @@ try {
 
   $manifest = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42FourTargetCandidateManifestV1'
+    kind = 'MIR42FourTargetDeterministicCandidateManifestV1'
     status = 'private-deterministic-four-target-candidate-built-unqualified'
     build_complete = $true
     source = $source

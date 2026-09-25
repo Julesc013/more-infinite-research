@@ -96,7 +96,7 @@ function Invoke-MIR42FourTargetIndependentVerification {
   $builder = Read-MIR42IndependentRecord -Path $builderPath -Code 'mir42-independent-builder'
   $qualificationPathResolved = (Resolve-Path -LiteralPath $QualificationPath).Path
   $qualification = Read-MIR42IndependentRecord -Path $qualificationPathResolved -Code 'mir42-independent-qualification'
-  if ([string]$builder.kind -cne 'MIR42FourTargetCandidateManifestV1' -or
+  if ([string]$builder.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
       [string]$builder.status -cne 'private-deterministic-four-target-candidate-built-unqualified' -or
       -not [bool]$builder.build_complete -or @($builder.failures).Count -ne 0 -or
       [string]$qualification.kind -cne 'MIR42FourTargetExactCandidateQualificationV1' -or

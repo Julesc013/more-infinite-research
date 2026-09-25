@@ -190,7 +190,7 @@ function Write-MIR42FourTargetManifest {
   $complete = $Failures.Count -eq 0 -and $Rows.Count -eq 4
   $manifest = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42FourTargetCandidateManifestV1'
+    kind = 'MIR42FourTargetDeterministicCandidateManifestV1'
     status = if ($complete) {
       'private-deterministic-four-target-candidate-built-unqualified'
     } else {

@@ -88,7 +88,7 @@ function Get-MIR42QualificationCandidateRows {
   $manifestPath = (Resolve-Path -LiteralPath $CandidateManifestPath).Path
   $root = Split-Path -Parent $manifestPath
   $manifest = Read-MIR42QualificationBootstrapRecord -Path $manifestPath -Code 'mir42-qualification-candidate-manifest'
-  if ([string]$manifest.kind -cne 'MIR42FourTargetCandidateManifestV1' -or
+  if ([string]$manifest.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
       [string]$manifest.status -cne 'private-deterministic-four-target-candidate-built-unqualified' -or
       -not [bool]$manifest.build_complete) {
     throw '[mir42-qualification-candidate-manifest-status]'
