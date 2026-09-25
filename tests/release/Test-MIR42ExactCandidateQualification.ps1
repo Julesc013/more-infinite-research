@@ -160,12 +160,13 @@ try {
   Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath | Out-Null
 
   $result = Invoke-MIR42FourTargetExactCandidateQualification -RepoRoot $repo -CandidateManifestPath $manifestPath -F210PredecessorZip $predecessors.f210 -F200PredecessorZip $predecessors.f200 -F110PredecessorZip $predecessors.f110 -F100PredecessorZip $predecessors.f100 -F210UpgradeReceipt $receipts.f210 -F200UpgradeReceipt $receipts.f200 -F110UpgradeReceipt $receipts.f110 -F100UpgradeReceipt $receipts.f100 -OutputRoot (Join-Path $testRoot 'qualification')
-  Assert-MIR42QualificationTest ($result.status -ceq 'MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED') 'result-status'
+  Assert-MIR42QualificationTest ($result.status -ceq 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED') 'result-status'
+  Assert-MIR42QualificationTest ($result.kind -ceq 'MIR42FourTargetEvidenceReconciliationV1' -and [int]$result.factorio_processes -eq 0 -and $result.release_qualification -ceq 'not-performed') 'evidence-only-boundary'
   Assert-MIR42QualificationTest (Test-MIR4BootstrapRecordHash -Record $result) 'result-self-hash'
   Assert-MIR42QualificationTest ((@($result.targets.target) -join '|') -ceq 'f210|f200|f110|f100') 'target-order'
   Assert-MIR42QualificationTest ([string]$result.source.package_source_sha256 -ceq (Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo)) 'source-package-fingerprint'
   Assert-MIR42QualificationTest ([string]$result.candidate_manifest.record_sha256 -ceq [string]$manifest.record_sha256) 'candidate-manifest-binding'
-  Assert-MIR42QualificationTest (@($result.targets | Where-Object { [string]$_.status -cne 'passed' -or [string]$_.candidate.sha256 -cne [string]$_.archive.sha256 -or [string]$_.candidate.content_sha256 -cne [string]$_.archive.content_sha256 }).Count -eq 0) 'target-contract-binding'
+  Assert-MIR42QualificationTest (@($result.targets | Where-Object { [string]$_.status -cne 'reconciled' -or [string]$_.candidate.sha256 -cne [string]$_.archive.sha256 -or [string]$_.candidate.content_sha256 -cne [string]$_.archive.content_sha256 }).Count -eq 0) 'target-contract-binding'
   Assert-MIR42QualificationTest (@($result.targets | Where-Object { @($_.harness.assertions | Where-Object { $_ -eq 'upgraded-save-second-reload-passed' }).Count -ne 1 }).Count -eq 0) 'second-reload-assertions'
   Assert-MIR42QualificationTest (-not [bool]$result.publication_authorized -and [string]$result.technical_seal -ceq 'not-performed') 'release-boundaries'
 
@@ -182,7 +183,7 @@ try {
   Assert-MIR42QualificationTest $rejected 'candidate-mismatch-fails-closed'
 
   [pscustomobject][ordered]@{
-    status = 'MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-STATIC-PASSED'
+    status = 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILIATION-STATIC-PASSED'
     targets = 4
     factorio_processes = 0
   }

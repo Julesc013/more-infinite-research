@@ -334,8 +334,12 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $output = Assert-MIR42QualificationOutputRoot -RepoRoot $repo -OutputRoot $OutputRoot
-  $null = Get-MIR42QualificationCurrentSource -RepoRoot $repo
+  $currentSource = Get-MIR42QualificationCurrentSource -RepoRoot $repo
   $candidates = Get-MIR42QualificationCandidateRows -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  if ([string]$currentSource.commit -cne [string]$candidates[0].source.commit -or
+      [string]$currentSource.tree -cne [string]$candidates[0].source.tree) {
+    throw '[mir42-reconciliation-current-source-mismatch]'
+  }
   $predecessors = [ordered]@{
     f210 = $F210PredecessorZip
     f200 = $F200PredecessorZip
@@ -358,7 +362,7 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
       target = $target
       target_id = [string]$candidate.identity.target_id
       distribution_version = [string]$candidate.identity.distribution_version
-      status = 'passed'
+      status = 'reconciled'
       source = $candidate.source
       candidate_manifest = $candidate.candidate_manifest
       candidate_target_row = $candidate.target_row
@@ -369,11 +373,12 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
       harness = [pscustomobject][ordered]@{
         implementation = 'tests/runtime/Test-MIRUpgrade.ps1'
         source_commit_reported_by_receipt = $upgrade.source_commit
+        source_commit_matches_candidate = ([string]$upgrade.source_commit -ceq [string]$candidate.source.commit)
         upgrade_receipt = $upgrade.receipt
         assertions = $upgrade.assertions
         logs = $upgrade.logs
       }
-      qualification = 'passed-exact-candidate-base-direct-predecessor-two-reload'
+      qualification = 'not-performed'
       independent_verification = 'not-performed'
       technical_seal = 'not-performed'
       publication_authorized = $false
@@ -382,9 +387,9 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
 
   $result = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42FourTargetExactCandidateQualificationV1'
-    status = 'MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
-    qualification_scope = 'exact candidate ZIP base-default normal-mod-directory load, direct predecessor upgrade, and two reloads on recorded target environment'
+    kind = 'MIR42FourTargetEvidenceReconciliationV1'
+    status = 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED'
+    reconciliation_scope = 'The four supplied upgrade receipts and logs match the exact candidate ZIP bytes and supplied predecessor archives; this command does not execute Factorio or establish governed predecessor custody.'
     source = [pscustomobject][ordered]@{
       commit = [string]$candidates[0].source.commit
       tree = [string]$candidates[0].source.tree
@@ -394,6 +399,8 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
     targets = @($rows)
     all_four_targets_required = $true
     cross_target_substitution = $false
+    factorio_processes = 0
+    release_qualification = 'not-performed'
     independent_verification = 'not-performed'
     technical_seal = 'not-performed'
     source_freeze_authorized = $false
@@ -402,11 +409,13 @@ function Invoke-MIR42FourTargetExactCandidateQualification {
     publication_authorized = $false
     nonclaims = @(
       'No source freeze, technical seal, protected signing, protected main promotion, maintainer gameplay GO, tagging, or publication authority is established.',
-      'The qualification scope is limited to the exact candidate ZIPs and recorded base-default direct-predecessor engine evidence.'
+      'Caller-supplied receipts and logs are reconciled by hash only; no Factorio process or release qualification runs in this command.',
+      'Receipt source commits may differ from the current candidate source. The archive-byte match does not confer source-bound runtime proof.',
+      'The supplied predecessor archives have no governed direct-predecessor custody assertion in this record.'
     )
     record_sha256 = ''
   }
-  $path = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath 'qualification.json'
+  $path = Resolve-MIR4ArtifactPath -OutputRoot $output -RelativePath 'evidence-reconciliation.json'
   Write-MIR4BootstrapRecord -Record $result -Path $path | Out-Null
   return $result
 }

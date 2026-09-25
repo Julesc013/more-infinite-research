@@ -83,7 +83,7 @@ function Invoke-MIR42FourTargetIndependentVerification {
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
   $evaluatorRelative = 'tools/mir/application/release/readiness/MIR42IndependentVerification.ps1'
-  $evaluatorDirty = @(& git -C $mir42IndependentRoot status --porcelain --untracked-files=no -- $evaluatorRelative 2>$null)
+  $evaluatorDirty = @(& git -C $mir42IndependentRoot status --porcelain --untracked-files=no 2>$null)
   if ($LASTEXITCODE -ne 0 -or $evaluatorDirty.Count -ne 0) { throw '[mir42-independent-evaluator-dirty]' }
   $build = [IO.Path]::GetFullPath((Join-Path $repo 'build'))
   $output = if ([IO.Path]::IsPathRooted($OutputRoot)) { [IO.Path]::GetFullPath($OutputRoot) } else { [IO.Path]::GetFullPath((Join-Path $repo $OutputRoot)) }
@@ -103,9 +103,10 @@ function Invoke-MIR42FourTargetIndependentVerification {
   if ([string]$builder.kind -cne 'MIR42FourTargetDeterministicCandidateManifestV1' -or
       [string]$builder.status -cne 'private-deterministic-four-target-candidate-built-unqualified' -or
       -not [bool]$builder.build_complete -or @($builder.failures).Count -ne 0 -or
-      [string]$qualification.kind -cne 'MIR42FourTargetExactCandidateQualificationV1' -or
-      [string]$qualification.status -cne 'MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED' -or
+      [string]$qualification.kind -cne 'MIR42FourTargetEvidenceReconciliationV1' -or
+      [string]$qualification.status -cne 'MIR-4.2-FOUR-TARGET-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' -or
       -not [bool]$qualification.all_four_targets_required -or [bool]$qualification.cross_target_substitution -or
+      [int]$qualification.factorio_processes -ne 0 -or [string]$qualification.release_qualification -cne 'not-performed' -or
       [string]$qualification.independent_verification -cne 'not-performed' -or [bool]$qualification.publication_authorized) {
     throw '[mir42-independent-input-state]'
   }
@@ -130,6 +131,9 @@ function Invoke-MIR42FourTargetIndependentVerification {
   foreach ($target in $script:MIR42IndependentTargets) {
     $summary = @($builder.targets | Where-Object { [string]$_.target -ceq $target })[0]
     $qualified = @($qualification.targets | Where-Object { [string]$_.target -ceq $target })[0]
+    if ([string]$qualified.status -cne 'reconciled' -or [string]$qualified.qualification -cne 'not-performed') {
+      throw "[mir42-independent-reconciliation-state] $target"
+    }
     $rowPath = Resolve-MIR42IndependentChild -Root $builderRoot -Relative ([string]$summary.target_row_path) -Code "mir42-independent-row-$target"
     $row = Read-MIR42IndependentRecord -Path $rowPath -Code "mir42-independent-row-$target"
     $assetPath = Resolve-MIR42IndependentChild -Root $builderRoot -Relative ([string]$summary.asset.path) -Code "mir42-independent-asset-$target"
@@ -169,6 +173,9 @@ function Invoke-MIR42FourTargetIndependentVerification {
     if ([string]$receipt.status -cne 'passed' -or [string]$receipt.to.sha256 -cne [string]$archive.archive_sha256 -or
         [string]$receipt.from.sha256 -cne [string]$predecessor.archive_sha256 -or
         [string]$receipt.factorio_binary_sha256 -cne [string]$engine.binary_sha256) { throw "[mir42-independent-upgrade-binding] $target" }
+    if ([bool]$qualified.harness.source_commit_matches_candidate -ne ([string]$receipt.git_commit -ceq $commit)) {
+      throw "[mir42-independent-receipt-source-report] $target"
+    }
     $assertions = @($receipt.assertions | ForEach-Object { [string]$_ })
     foreach ($required in @('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed')) {
       if ($required -notin $assertions -or $required -notin @($qualified.harness.assertions)) { throw "[mir42-independent-assertion] $target/$required" }
@@ -185,15 +192,15 @@ function Invoke-MIR42FourTargetIndependentVerification {
       predecessor_sha256 = [string]$predecessor.archive_sha256
       upgrade_receipt_sha256 = Get-MIR4Sha256File -Path $receiptPath
       verified_logs = @($qualified.harness.logs).Count
-      status = 'passed'
-      verification_scope = 'independently-verified-exact-base-upgrade-two-reload'
+      status = 'reconciled'
+      verification_scope = 'independent-rehash-of-supplied-candidate-and-upgrade-evidence-only'
     })
   }
 
   $result = [pscustomobject][ordered]@{
     schema = 1
-    kind = 'MIR42FourTargetIndependentVerificationV1'
-    status = 'MIR-4.2-FOUR-TARGET-INDEPENDENT-VERIFICATION-PASSED-PRIVATE-UNSEALED'
+    kind = 'MIR42FourTargetIndependentEvidenceRehashV1'
+    status = 'MIR-4.2-FOUR-TARGET-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED'
     source = [pscustomobject][ordered]@{ commit=$commit;tree=$tree;package_source_sha256=$packageSource }
     evaluator = [pscustomobject][ordered]@{
       implementation = $evaluatorRelative
@@ -204,13 +211,16 @@ function Invoke-MIR42FourTargetIndependentVerification {
     qualification = [pscustomobject][ordered]@{ path=$qualificationPathResolved;sha256=Get-MIR4Sha256File -Path $qualificationPathResolved;record_sha256=[string]$qualification.record_sha256 }
     targets = @($rows)
     all_four_targets_required = $true
+    factorio_processes = 0
+    release_qualification = 'not-performed'
+    independent_release_acceptance = 'not-performed'
     technical_seal = 'not-performed'
     signing_authorized = $false
     publication_authorized = $false
     record_sha256 = ''
   }
   New-Item -ItemType Directory -Force -Path $output | Out-Null
-  $path = Join-Path $output 'independent-verification.json'
+  $path = Join-Path $output 'independent-evidence-rehash.json'
   Write-MIR4BootstrapRecord -Record $result -Path $path | Out-Null
   return $result
 }
