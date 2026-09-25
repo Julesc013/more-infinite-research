@@ -12,6 +12,8 @@ end
 
 _G.log = function(_) end
 _G.data = {raw = {}, extend = function() error("Unexpected prototype mutation") end}
+local target_profile = {current_factorio_version = "2.1"}
+stub("prototypes.mir.platform.factorio.target_profiles", target_profile)
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   item_prototype = function(name) return world.item_prototypes[name] end
 })
@@ -642,6 +644,49 @@ reset({
 check("F09C", feasibility.source_witness("same").kind == "minable-resource"
   and feasibility.source_witness({type = "fluid", name = "same"}).kind == "offshore-pump",
   "A same-name natural item source is not reused as a fluid source")
+
+-- Current Factorio base offshore pumps expose their water source via a source
+-- offset rather than the former `fluid` field. This still proves the exact
+-- water fluid, never a same-named item identity.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {}}}
+})
+local base_water_witness = feasibility.source_witness({type = "fluid", name = "water"})
+check("F09C0", base_water_witness and base_water_witness.kind == "offshore-pump"
+  and base_water_witness.product.type == "fluid" and base_water_witness.product.name == "water"
+  and feasibility.source_witness({type = "item", name = "water"}) == nil,
+  "A source-offset offshore pump supplies the exact base water fluid")
+
+-- A fluid-box filter constrains a pump connection, but cannot establish that
+-- the filtered fluid is naturally available. This must stay false even on
+-- Factorio 2.1: otherwise a modded filtered molten-fluid pump could seed an
+-- unproduced route cycle.
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {filtered_pump = {fluid_box = {filter = "molten-nickel"}}}
+})
+check("F09C0A", feasibility.source_witness({type = "fluid", name = "molten-nickel"}) == nil,
+  "An F210 filtered offshore pump without a source offset is not a natural source")
+
+-- The source-offset interpretation is a Factorio-2.1 contract. A fluid-box
+-- filter remains insufficient on every target.
+-- F200 keeps its established explicit-pump-field semantics; an F200 mod can
+-- still declare a source through `fluid`.
+target_profile.current_factorio_version = "2.0"
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {base_pump = {fluid_source_offset = {0, -1}, fluid_box = {filter = "water"}}}
+})
+check("F09C1", feasibility.source_witness({type = "fluid", name = "water"}) == nil,
+  "An F200 source-offset or fluid-box pump does not infer a natural fluid source")
+reset({
+  item_prototypes = {}, labs = {}, techs = {}, recipe_prototypes = {}, recipe_facts = {}, producers = {}, unlockers = {},
+  offshore_pumps = {declared_pump = {fluid = "water"}}
+})
+check("F09C2", feasibility.source_witness({type = "fluid", name = "water"}) ~= nil,
+  "An F200 pump preserves an explicit fluid source declaration")
+target_profile.current_factorio_version = "2.1"
 
 -- Natural minable entities are separate from resource prototypes.  Trees are
 -- a real early wood source, so a route consuming wood must not be treated as

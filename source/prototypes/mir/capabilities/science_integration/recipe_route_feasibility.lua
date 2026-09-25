@@ -5,6 +5,7 @@
 -- behavior, balance, or ecosystem compatibility.
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
@@ -369,6 +370,24 @@ local function append_boiler_sources(sources, options)
   return true
 end
 
+local function offshore_pump_output_fluid(pump)
+  -- Factorio 2.1 base offshore pumps take their unfiltered output directly
+  -- from water tiles. Its source-offset form does not carry the former
+  -- `fluid` field. The F200 profile intentionally retains its established
+  -- explicit-field contract. Its Angel pump `fluid_box.filter` describes a
+  -- machine output shape, and must not become a natural source witness.
+  -- Preserve the legacy explicit `fluid` declaration on every target.
+  local declared = pump and pump.fluid
+  if type(declared) == "string" and declared ~= "" then return declared end
+  if target_profiles.current_factorio_version == "2.1" then
+    -- A fluid-box filter alone describes a pump's connection contract, not a
+    -- natural source. In particular, modded pumps can filter molten fluids
+    -- that have no independently seeded acquisition route.
+    if pump and pump.fluid_source_offset ~= nil then return "water" end
+  end
+  return nil
+end
+
 local function default_source_catalog(state, options)
   if state.source_catalog then return state.source_catalog end
   local sources = {}
@@ -380,7 +399,7 @@ local function default_source_catalog(state, options)
   if not append_minable_sources(sources, "tree", "minable-entity", options) then return sources end
   for _, pump in pairs(data_raw.prototypes("offshore-pump")) do
     if not diagnostic_visit(options) then return sources end
-    local identity = normalize_identity({type = "fluid", name = pump.fluid})
+    local identity = normalize_identity({type = "fluid", name = offshore_pump_output_fluid(pump)})
     if identity then
       local key = identity_key(identity)
       sources[key] = sources[key] or {}
