@@ -12,6 +12,17 @@ local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
+-- The bounded research-cost support artifact has admitted exact dispositions
+-- only for Factorio 2.0 and 2.1.  Factorio-1 packages retain their reduced
+-- research surface but do not emit a proof whose target contract they cannot
+-- satisfy.  New target lines must be admitted here deliberately.
+local RESEARCH_COST_SUPPORT_DISPOSITION_BY_TARGET = {
+  ["2.1"] = "emit",
+  ["2.0"] = "emit",
+  ["1.1"] = "omit-unqualified",
+  ["1.0"] = "omit-unqualified"
+}
+
 function M.publish(context)
   context = context or compiler_context.current()
   local plan = context_construction.compile(context)
@@ -72,18 +83,25 @@ function M.publish(context)
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
   end
   require("prototypes.mir.report.coverage").publish(context, {include_internal = include_internal})
-  local research_cost_support = research_cost_compatibility.build({
-    compiler_input = plan.compiler_input,
-    compiler_result = final_result,
-    compilation_fingerprint = plan.compilation_fingerprint,
-    qualification_fingerprint = plan.qualification_fingerprint,
-    stream_plan = plan.stream_plan,
-    base_extension_operations = plan.base_extension_operations,
-    current_target = target_line.factorio_version
-  })
-  research_cost_support = public_artifacts.research_cost_compatibility(research_cost_support)
-  local research_cost_support_bytes = public_artifacts.assert_byte_budget(research_cost_support)
-  telemetry.count("research_cost_support_public_bytes", research_cost_support_bytes)
+  local research_cost_disposition = RESEARCH_COST_SUPPORT_DISPOSITION_BY_TARGET[target_line.factorio_version]
+  if not research_cost_disposition then
+    error("Research-cost publication target is not admitted: " .. tostring(target_line.factorio_version), 2)
+  end
+  local research_cost_support
+  if research_cost_disposition == "emit" then
+    research_cost_support = research_cost_compatibility.build({
+      compiler_input = plan.compiler_input,
+      compiler_result = final_result,
+      compilation_fingerprint = plan.compilation_fingerprint,
+      qualification_fingerprint = plan.qualification_fingerprint,
+      stream_plan = plan.stream_plan,
+      base_extension_operations = plan.base_extension_operations,
+      current_target = target_line.factorio_version
+    })
+    research_cost_support = public_artifacts.research_cost_compatibility(research_cost_support)
+    local research_cost_support_bytes = public_artifacts.assert_byte_budget(research_cost_support)
+    telemetry.count("research_cost_support_public_bytes", research_cost_support_bytes)
+  end
   telemetry.observe_max("context_state_keys", context:state_key_count())
   local public_evidence
   for _ = 1, 4 do
@@ -105,7 +123,9 @@ function M.publish(context)
   public_evidence = public_artifacts.compiler_evidence(evidence_input)
   public_artifacts.assert_byte_budget(public_evidence)
   local internal_evidence = include_internal and compiler_evidence.build(evidence_input) or nil
-  require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)
+  if research_cost_support then
+    require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)
+  end
   require("prototypes.mir.emit.compiler_evidence_adapter").publish(public_evidence, internal_evidence)
   return true
 end

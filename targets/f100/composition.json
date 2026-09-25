@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 51374,
-      "expected_sha256": "90154DC0C5039738D7B117BF998A020F3FE90E9A762C6D18287628D22BCAAF24",
+      "expected_bytes": 51975,
+      "expected_sha256": "284B5B891131950F4A29DDE0346804E55B29023A89C4530F9B4BDAED5512806E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2492,8 +2492,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6538,
-      "expected_sha256": "36E55486BCD524BE154FE84EDA7D1CE95AC8FFBA5B7AD054BF1F0615525F169C",
+      "expected_bytes": 7401,
+      "expected_sha256": "C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3820,8 +3820,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4155,
-      "expected_sha256": "9AFF4782A47FA1E56CDD2A355C737C239FD2D46FFD36A6FEBBF4B2B493581E01",
+      "expected_bytes": 4040,
+      "expected_sha256": "4CA0F9F3CF491815FF641E8756512F79A89B4091873D7748EE054E94FDEB13B8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "FB41C40641A94294C36F0E4AA428615DAEE78A2914DEA363F35D442ACF9CBACD"
+  "record_sha256": "ECE92FDE2C9E9647039EBDC4C1E5B3AAD9797446ECE1EF7F91D736C0F061CBB2"
 }

@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 51356,
-      "expected_sha256": "09E3AB61A906F8A4B096E8D84EA877C7CBE21A9B8DF48C1C19082969F0CB3051",
+      "expected_bytes": 51957,
+      "expected_sha256": "363BE9E1834DEAF8090CBFB23BBF776B3AD3FA9DD7DBD0C6BA57F685F8789750",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2492,8 +2492,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6538,
-      "expected_sha256": "36E55486BCD524BE154FE84EDA7D1CE95AC8FFBA5B7AD054BF1F0615525F169C",
+      "expected_bytes": 7401,
+      "expected_sha256": "C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3820,8 +3820,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4144,
-      "expected_sha256": "4C5C1D26928192E53F2C46A5E1976F2CF49CFFBC47D5F05749C859F0F3B6DC58",
+      "expected_bytes": 4031,
+      "expected_sha256": "3A52878507230276EB2FC7010F86D097AE8FFA7580239255DE3471EDB30C164D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "129E0BFCA6EBDBBD9FAE2199AF469C345A037045182141BC11A7BB6EA6400096"
+  "record_sha256": "094EC3B84401EBB0806839469AFE10265D1BE5A6D84EB7B0993CF3FCB922E29F"
 }

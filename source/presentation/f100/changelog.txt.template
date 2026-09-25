@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.2.10000
+
+  Changes:
+
+    - Rebuilt the retained Factorio 1.0 package from the current MIR 4.2 source.
+    - Kept the reduced eleven-stream research and settings surface.
+    - Omitted the Factorio-2-only research-cost support artifact from this Factorio 1.0 package.
+
+  Bugfixes:
+
+    - Restored package loading by keeping the Factorio-2-only support proof outside the Factorio 1.0 target.
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 Version: 1.8.9
 Date: 2026-08-12
 
