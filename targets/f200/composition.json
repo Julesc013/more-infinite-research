@@ -2492,8 +2492,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compiler-orchestrator publication responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6538,
-      "expected_sha256": "36E55486BCD524BE154FE84EDA7D1CE95AC8FFBA5B7AD054BF1F0615525F169C",
+      "expected_bytes": 7401,
+      "expected_sha256": "C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "8D903B81DDF068B8439F7B1C84662BA718D3C863EB22DEA49A6F632692DA3083"
+  "record_sha256": "1F7CAEDB08726A1593EBFB5212666E59EEE11E962344FAA9DE57FCA3A69F9332"
 }

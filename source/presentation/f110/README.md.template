@@ -1,12 +1,12 @@
-# More Infinite Research 1.9.5
+# More Infinite Research 4.2.11000
 
-More Infinite Research 1.9.5 is the maintained Factorio 1.1 release.
+More Infinite Research 4.2.11000 is a Factorio 1.1 legacy-target playtest package.
 
-It is a reduced target-native projection of the MIR 3.2.5 research-cost model. It preserves the eleven supported Factorio 1.1 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
+It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.1 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
 ## Requirements
 
-- Factorio 1.1, qualified on 1.1.110.
+- Factorio 1.1, fresh-load qualified on 1.1.110.
 - `base >= 1.1`.
 - No Space Age or other optional dependency is required.
 
@@ -48,21 +48,21 @@ For maximum-level settings, `0` means the retained stream remains infinite. For 
 
 ## Compatibility Scope
 
-Public compatibility claims are limited to the exact Factorio 1.1 qualification scenarios and named fixtures recorded with this release. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
+The current claim is limited to a fresh exact-package load on Factorio 1.1.110. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.
 
 ## Upgrade
 
-The exact published 1.9.3 archive is the supported predecessor. The release gate verifies fresh load, save/reload, startup-setting retention, generated technology level, current research, fractional research progress, and `global` runtime-state retention on the matching binary.
+The exact published 1.9.3 archive remains a historical predecessor record. This 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load.
 
 ## Installation
 
-Place `more-infinite-research_1.9.4.zip` in the Factorio 1.1 `mods` directory. Do not unpack it.
+Place `more-infinite-research_4.2.11000.zip` in the Factorio 1.1 `mods` directory. Do not unpack it.
 
 The source repository contains maintainer documentation, fixtures, scripts, and evidence. Those files are intentionally excluded from the release ZIP.
 
 ## Evidence
 
-Release identity and qualification details are recorded in:
+Historical predecessor identity and qualification details are recorded in:
 
 - `docs/releases/1.9.4.md`
 - `.mir/backport-source-lock.json`

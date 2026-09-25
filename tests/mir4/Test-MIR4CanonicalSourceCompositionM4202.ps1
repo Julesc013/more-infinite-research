@@ -68,6 +68,14 @@ $publicationBinding=@($manifest.bindings|Where-Object{[string]$_.output_path-ceq
 Assert-MIR4ComposableSource ($publicationBinding.Count-eq1-and[bool]($publicationBinding[0].target_scope -contains 'f210')-and[bool]($publicationBinding[0].target_scope -contains 'f200')-and[bool]($publicationBinding[0].target_scope -contains 'f110')-and[bool]($publicationBinding[0].target_scope -contains 'f100')) 'mir4-composable-source-publication-target-scope'
 $publicationText=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$publicationBinding[0].source_path))
 Assert-MIR4ComposableSource ($publicationText-match'(?m)^local target_line = require\("prototypes\.mir\.platform\.factorio\.target_line"\)$'-and$publicationText-match'target_line\.feature_enabled\(' -and$publicationText-match'target_line\.factorio_version') 'mir4-composable-source-publication-target-line-import'
+Assert-MIR4ComposableSource (
+  $publicationText-match'\["2\.1"\]\s*=\s*"emit"'-and
+  $publicationText-match'\["2\.0"\]\s*=\s*"emit"'-and
+  $publicationText-match'\["1\.1"\]\s*=\s*"omit-unqualified"'-and
+  $publicationText-match'\["1\.0"\]\s*=\s*"omit-unqualified"'-and
+  $publicationText-match'if not research_cost_disposition then\s+error\("Research-cost publication target is not admitted:'-and
+  $publicationText-match'if research_cost_disposition == "emit" then'
+) 'mir4-composable-source-research-cost-target-disposition'
 foreach($target in @('f210','f200','f110','f100')){
   $selection=Get-MIR4TargetMaterializationBindings -State (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target)
   $selected=@($selection.bindings.output_path)
