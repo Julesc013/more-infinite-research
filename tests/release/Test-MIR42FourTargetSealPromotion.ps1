@@ -65,6 +65,7 @@ try {
   $readiness = Get-MIR42FourTargetTechnicalSealReadiness -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath
   Assert-MIR42SealTest ($readiness.status -ceq 'MIR-4.2-FOUR-TARGET-TECHNICAL-SEAL-BLOCKED') 'missing-gates-block-seal'
   Assert-MIR42SealTest ([bool]$readiness.checks.candidate -and -not [bool]$readiness.checks.qualification -and -not [bool]$readiness.checks.campaign -and -not [bool]$readiness.checks.reviewer -and -not [bool]$readiness.technical_seal_authorized) 'candidate-only-readiness'
+  Assert-MIR42SealTest (-not [bool]$readiness.checks.programme -and (@($readiness.blockers) -match 'mir42-seal-current-programme-transition-not-authorized').Count -eq 1) 'current-4-2-release-cut-blocks-unapproved-freeze'
   $mislabelledQualification = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetExactCandidateQualificationV1';status='MIR-4.2-FOUR-TARGET-EXACT-CANDIDATE-QUALIFICATION-PASSED-PRIVATE-UNSEALED'
     factorio_processes=4;release_qualification='claimed';independent_verification='not-performed';publication_authorized=$false;record_sha256=''
@@ -214,7 +215,7 @@ try {
     source=$readiness._state.candidate.source;candidate_manifest=[pscustomobject]@{sha256=$readiness._state.candidate.identity.sha256;record_sha256=$readiness._state.candidate.identity.record.record_sha256}
     frozen_dev=[pscustomobject]@{ref='refs/heads/dev';commit=$readiness._state.candidate.source.commit;tree=$readiness._state.candidate.source.tree}
     promotion_base=[pscustomobject]@{remote='origin';ref='refs/heads/main';commit=('E' * 40)}
-    programme=[pscustomobject]@{path='.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json';sha256=('F' * 64);t19_state='completed';t20_state='completed'}
+    programme=[pscustomobject]@{path='.mir/releases/governance/mir4/MIR42-Release-Cut-ProgrammeV1.json';sha256=('F' * 64);source_freeze_state='True';candidate_allocation_state='True'}
     signing_ceremony=[pscustomobject]@{sha256=('C' * 64);record_sha256=('D' * 64)}
     transition_gate=[pscustomobject]@{source_freeze=$true;candidate_allocation=$true;production_signing=$true;technical_seal=$false}
     independent_reviewer=[pscustomobject]@{identity='independent-reviewer';public_key='ssh-ed25519 AAAA reviewer';fingerprint='SHA256:reviewer'}

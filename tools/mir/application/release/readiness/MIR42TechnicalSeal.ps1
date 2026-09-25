@@ -668,20 +668,55 @@ function Assert-MIR42SealPropertyNames {
 
 function Get-MIR42LiveProgrammeTransition {
   param([Parameter(Mandatory)][string]$RepoRoot)
-  $relative = '.mir/releases/waves/mir4-r0/MIR4-Pre-Freeze-Execution-ProgrammeV1.json'
+  $relative = '.mir/releases/governance/mir4/MIR42-Release-Cut-ProgrammeV1.json'
   $path = Join-Path $RepoRoot $relative
-  $schema = Join-Path $RepoRoot 'spec/schemas/mir4-pre-freeze-execution-programme-v1.schema.json'
-  $raw = Get-Content -Raw -LiteralPath $path
-  if (-not ($raw | Test-Json -SchemaFile $schema -ErrorAction SilentlyContinue)) { throw '[mir42-seal-programme-schema]' }
-  $programme = $raw | ConvertFrom-Json -Depth 100 -DateKind String
-  $t19 = @($programme.turns | Where-Object { [string]$_.id -ceq 'T19' })
-  $t20 = @($programme.turns | Where-Object { [string]$_.id -ceq 'T20' })
-  if ($t19.Count -ne 1 -or $t20.Count -ne 1 -or [string]$t19[0].state -cne 'completed' -or [string]$t20[0].state -cne 'completed' -or
-      -not [bool]$programme.transition_gate.source_freeze -or -not [bool]$programme.transition_gate.candidate_allocation -or
-      -not [bool]$programme.transition_gate.production_signing) {
-    throw '[mir42-seal-programme-transition-not-authorized]'
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw '[mir42-seal-current-programme-missing]' }
+  $programmeReceipt = Read-MIR42SealRecord -Path $path -Code 'mir42-seal-current-programme'
+  $programme = $programmeReceipt.record
+  Assert-MIR42SealPropertyNames -Value $programme -Expected @('schema','kind','status','release_line','selected_targets','candidate','direct_predecessor_authority','direct_predecessors','required_gates','transition_gate','release_transition_authority','publication_authorized','record_sha256') -Code 'mir42-seal-current-programme-shape'
+  Assert-MIR42SealPropertyNames -Value $programme.candidate -Expected @('version_line','state','exact_candidate_required') -Code 'mir42-seal-current-programme-candidate-shape'
+  Assert-MIR42SealPropertyNames -Value $programme.direct_predecessor_authority -Expected @('path','kind','record_sha256','sha256') -Code 'mir42-seal-current-programme-predecessor-authority-shape'
+  Assert-MIR42SealPropertyNames -Value $programme.transition_gate -Expected @('source_freeze','candidate_allocation','production_signing','technical_seal','promotion','tagging','publication') -Code 'mir42-seal-current-programme-transition-shape'
+  if ([int]$programme.schema -ne 1 -or [string]$programme.kind -cne 'MIR42ReleaseCutProgrammeV1' -or
+      [string]$programme.status -notmatch '^active-current-4[.]2-release-cut-' -or [string]$programme.release_line -cne '4.2' -or
+      [string]$programme.candidate.version_line -cne '4.2' -or -not [bool]$programme.candidate.exact_candidate_required -or
+      [string]$programme.direct_predecessor_authority.path -cne '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json' -or
+      [string]$programme.direct_predecessor_authority.kind -cne 'MIR42DirectPredecessorInputsV1' -or
+      [bool]$programme.release_transition_authority -or [bool]$programme.publication_authorized) {
+    throw '[mir42-seal-current-programme-state]'
   }
-  return [pscustomobject][ordered]@{path=$relative;sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant();t19_state=[string]$t19[0].state;t20_state=[string]$t20[0].state;record=$programme}
+  Assert-MIR42SealTargetSet -Rows @($programme.selected_targets | ForEach-Object { [pscustomobject]@{target=[string]$_} }) -Code 'mir42-seal-current-programme'
+  $predecessorAuthority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference ([pscustomobject][ordered]@{
+    path = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$programme.direct_predecessor_authority.path) -Code 'mir42-seal-current-programme-predecessor-authority'
+    sha256 = [string]$programme.direct_predecessor_authority.sha256
+    record_sha256 = [string]$programme.direct_predecessor_authority.record_sha256
+  })
+  Assert-MIR42SealTargetSet -Rows @($programme.direct_predecessors) -Code 'mir42-seal-current-programme-predecessors'
+  foreach ($row in @($programme.direct_predecessors)) {
+    Assert-MIR42SealPropertyNames -Value $row -Expected @('target','version','sha256','engine') -Code 'mir42-seal-current-programme-predecessor-shape'
+    Assert-MIR42SealPropertyNames -Value $row.engine -Expected @('file_version','product_version','sha256') -Code 'mir42-seal-current-programme-predecessor-engine-shape'
+    $authorityRow = @($predecessorAuthority.record.targets | Where-Object { [string]$_.target -ceq [string]$row.target })
+    if ($authorityRow.Count -ne 1 -or [string]$row.version -cne [string]$authorityRow[0].predecessor.version -or
+        [string]$row.sha256 -cne [string]$authorityRow[0].predecessor.sha256 -or
+        [string]$row.engine.file_version -cne [string]$authorityRow[0].engine.file_version -or
+        [string]$row.engine.product_version -cne [string]$authorityRow[0].engine.product_version -or
+        [string]$row.engine.sha256 -cne [string]$authorityRow[0].engine.sha256) {
+      throw "[mir42-seal-current-programme-predecessor-binding] $([string]$row.target)"
+    }
+  }
+  $requiredGateIds = @($programme.required_gates | ForEach-Object { [string]$_.id })
+  if (($requiredGateIds -join '|') -cne 'exact-candidate-allocation|joined-real-engine-campaign|independent-acceptance|protected-signing-and-recovery|source-freeze-ledger-authorization|governed-offline-restore|human-go-after-main-readback') {
+    throw '[mir42-seal-current-programme-gate-set]'
+  }
+  foreach ($gate in @($programme.required_gates)) {
+    Assert-MIR42SealPropertyNames -Value $gate -Expected @('id','state','scope') -Code 'mir42-seal-current-programme-gate-shape'
+    if ([string]$gate.scope -cne 'four-target-release-cut') { throw '[mir42-seal-current-programme-gate-scope]' }
+  }
+  if (-not [bool]$programme.transition_gate.source_freeze -or -not [bool]$programme.transition_gate.candidate_allocation -or
+      -not [bool]$programme.transition_gate.production_signing) {
+    throw '[mir42-seal-current-programme-transition-not-authorized]'
+  }
+  return [pscustomobject][ordered]@{path=$relative;sha256=$programmeReceipt.sha256;source_freeze_state=[string]$programme.transition_gate.source_freeze;candidate_allocation_state=[string]$programme.transition_gate.candidate_allocation;record=$programme}
 }
 
 function Get-MIR42SourceFreezeLedgerPayload {
@@ -689,7 +724,7 @@ function Get-MIR42SourceFreezeLedgerPayload {
   Assert-MIR42SealPropertyNames -Value $Record -Expected @('schema','kind','status','source','frozen_dev','promotion_base','programme','candidate_manifest','signing_ceremony','independent_reviewer','transition_gate','ledger_signature','record_sha256') -Code 'mir42-seal-freeze-authority-shape'
   Assert-MIR42SealPropertyNames -Value $Record.frozen_dev -Expected @('ref','commit','tree') -Code 'mir42-seal-freeze-frozen-dev-shape'
   Assert-MIR42SealPropertyNames -Value $Record.promotion_base -Expected @('remote','ref','commit') -Code 'mir42-seal-freeze-promotion-base-shape'
-  Assert-MIR42SealPropertyNames -Value $Record.programme -Expected @('path','sha256','t19_state','t20_state') -Code 'mir42-seal-freeze-programme-shape'
+  Assert-MIR42SealPropertyNames -Value $Record.programme -Expected @('path','sha256','source_freeze_state','candidate_allocation_state') -Code 'mir42-seal-freeze-programme-shape'
   Assert-MIR42SealPropertyNames -Value $Record.ledger_signature -Expected @('identity','namespace','signature_path','signature_sha256','payload_sha256') -Code 'mir42-seal-freeze-ledger-signature-shape'
   Assert-MIR42SealPropertyNames -Value $Record.independent_reviewer -Expected @('identity','public_key','fingerprint') -Code 'mir42-seal-freeze-reviewer-shape'
   return [pscustomobject][ordered]@{
@@ -778,7 +813,7 @@ function Get-MIR42SourceFreezeAuthority {
   Assert-MIR42SourceFreezeLedgerSignature -RepoRoot $RepoRoot -Authority $authority -Signing $Signing -SshKeygenPath $SshKeygenPath
   $programme = Get-MIR42LiveProgrammeTransition -RepoRoot $RepoRoot
   if ([string]$record.programme.path -cne [string]$programme.path -or [string]$record.programme.sha256 -cne [string]$programme.sha256 -or
-      [string]$record.programme.t19_state -cne [string]$programme.t19_state -or [string]$record.programme.t20_state -cne [string]$programme.t20_state) {
+      [string]$record.programme.source_freeze_state -cne [string]$programme.source_freeze_state -or [string]$record.programme.candidate_allocation_state -cne [string]$programme.candidate_allocation_state) {
     throw '[mir42-seal-freeze-programme-binding]'
   }
   return $authority
