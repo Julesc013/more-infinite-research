@@ -3041,6 +3041,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/release/Invoke-MIR42FourTargetReleasePreflight.ps1",
+      "classification": "canonical-internal",
+      "sha256": "D26BF38EAC597AE1596410B7856F3C4319E5976A44F8479B37C7A93791E34FD7",
+      "hash_mode": "canonical-text-v1",
+      "lines": 15,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/release/Invoke-MIR4BootstrapCapsule.ps1",
       "classification": "canonical-internal",
       "sha256": "F3B5E256566BC3190586A48ECD0245F37AE4C73FDC75D5B0A664BDB73C0EA925",
@@ -3094,6 +3102,14 @@
       "sha256": "9939FCB5F9DA96AC3BDDC6B648B0783B55905A8E357F64239682C0B3B050BEAF",
       "hash_mode": "canonical-text-v1",
       "lines": 535,
+      "package_visible": false
+    },
+    {
+      "path": "tools/commands/release/New-MIR42FourTargetCandidate.ps1",
+      "classification": "canonical-internal",
+      "sha256": "91AAD2079BFA3136FAC20A015A838D715EC2D8A214C580B83749DB2253954915",
+      "hash_mode": "canonical-text-v1",
+      "lines": 21,
       "package_visible": false
     },
     {
@@ -5153,6 +5169,22 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/application/release/readiness/MIR42CandidateBuild.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B381C9BBD6C3CD34CAA12F35796DA23DADF03B5FCD558EFC89D3665A793D73D1",
+      "hash_mode": "canonical-text-v1",
+      "lines": 382,
+      "package_visible": false
+    },
+    {
+      "path": "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
+      "classification": "canonical-internal",
+      "sha256": "FB93CD7DF48E83DC26B464B21C91A9C2ED330682FFC3F5D9B04851D8DDC69A34",
+      "hash_mode": "canonical-text-v1",
+      "lines": 212,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/application/release/readiness/Promotion.ps1",
       "classification": "canonical-internal",
       "sha256": "8BF9DB021D24D4CCDAFCF7516CFD6F67F99DDEA339F18C96485390C01572A901",
@@ -5795,7 +5827,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 391,
+    "canonical_internal": 395,
     "compatibility_wrapper": 168,
     "migration_only": 59,
     "historical": 17,
@@ -5810,5 +5842,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:508609762ca56de0abe27a53ed69956eeacadb6a72f323d8d552c268208e3629"
+  "digest": "sha256:4a509632adc5f9adf5c365b56b58eb90bfa83082796b4b492909f35d34b741d8"
 }
