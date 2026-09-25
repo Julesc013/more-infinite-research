@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "MIR42HistoricalPlaytestTargetV1",
+  "target": "f014",
+  "maturity": "private-historical-playtest",
+  "base_materializer_target": "f100",
+  "factorio_line": "0.14",
+  "distribution_version": "4.2.01400",
+  "profile": {"support_class":"terminal-derived-historical","science_family":"legacy-0.15","asset_policy":"factorio-0.14-icons","laboratory_productivity":false,"old_science_map":true,"legacy_numeric_research_cost":true},
+  "engine": {"path":"D:/Programs/Factorio/0.14/bin/x64/factorio.exe","version":"0.14.23","sha256":"A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"},
+  "predecessor": {"version":"1.4.9","archive":"dist/more-infinite-research_1.4.9.zip","sha256":"1E3651E59656CE5258EC4F5FEFEA05883D577151E0BC8465342547D92CBAC872"},
+  "adapter_files": [
+    {"output_path":"info.json","source_path":"source/presentation/historical/f014/info.json.template","source_sha256":"A039B8A6144817A00049005659354829DF80D215B76E777E5125FA53A720B7E2","source_bytes":285},
+    {"output_path":"changelog.txt","source_path":"source/presentation/historical/f014/changelog.txt.template","source_sha256":"01474EFEC1E406C37DE7BB07DAD02EF59B0BB35FEBA7FBD69AFC405BBA66EA65","source_bytes":639},
+    {"output_path":"README.md","source_path":"source/presentation/f100/README.md.template","transform":"historical-readme-template-v1","source_sha256":"4CA0F9F3CF491815FF641E8756512F79A89B4091873D7748EE054E94FDEB13B8","source_bytes":4040,"output_sha256":"401A8B9FE2ACCC7F351DE12B256119A7AF6CF006423ECB1563FA66D2B86C4CA2","output_bytes":4004},
+    {"output_path":"prototypes/mir/platform/factorio/target_profiles.lua","source_path":"source/adapters/historical/legacy-reduced/target_profiles.lua.template","transform":"legacy-target-profile-template-v1","source_sha256":"DE8E810E907AA9C21632FD351BA736AF76DF44B68DFF035D8CC772D8DCC4E98F","source_bytes":3176,"output_sha256":"32F903F5BECEF19E5D0CCD553452255822FD16F73C9AB3380E9C54C78B17EDA9","output_bytes":3057}
+  ],
+  "patches": [
+    {"output_path":"prototypes/mir/pipeline/compiler_orchestrator/publication.lua","base_sha256":"C3C52BB260B728172D9786FA34081492F1E9791A0E48A5A4FE26371A3D625293","find":"  [\"1.0\"] = \"omit-unqualified\"","replace":"  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.14\"] = \"omit-unqualified\""},
+    {"output_path":"prototypes/mir/domain/technology/technology_design.lua","base_sha256":"8BED9810A8282BE0B6BF172018E0852328FE246917CEE2FC0AD735270C1A8471","find":"  local cost = {\n    count_formula = fields.count_formula or (expected.unit or {}).count_formula,\n    count = fields.count or (expected.unit or {}).count,\n    research_time = fields.research_time or (expected.unit or {}).time,\n    max_level = fields.max_level or expected.max_level\n  }","replace":"  local cost = {\n    count_formula = fields.count_formula or (expected.unit or {}).count_formula,\n    count = fields.count or (expected.unit or {}).count,\n    research_time = fields.research_time or (expected.unit or {}).time,\n    max_level = fields.max_level or expected.max_level\n  }\n  if require(\"prototypes.mir.platform.factorio.target_line\").feature_enabled(\"legacy_numeric_research_cost\") then\n    local model = fields.cost_model\n    if type(model) == \"table\" then\n      cost.count = math.ceil(model.base_cost)\n      cost.count_formula = nil\n    end\n  end"},
+    {"output_path":"prototypes/mir/planner/base_continuations/plan.lua","base_sha256":"B24EFA0FD071EC82CAD291E355CC70044AC70C7876F1FE6323B9FA1EC8B6F4C6","find":"  new.unit = {\n    count_formula = cost_model.count_formula,\n    ingredients = resolved_ingredients,\n    time = research_time\n  }","replace":"  local legacy_numeric_research_cost = target_line.feature_enabled(\"legacy_numeric_research_cost\")\n  new.unit = {\n    count_formula = legacy_numeric_research_cost and nil or cost_model.count_formula,\n    count = legacy_numeric_research_cost and math.ceil(cost_model.base_cost) or nil,\n    ingredients = resolved_ingredients,\n    time = research_time\n  }"}
+  ],
+  "public_output_authorized": false,
+  "publication_authorized": false,
+  "record_sha256": "060DCF6B29B896AB1D4AFFE3828091A2FAD1857A450B65B0DFA62ECCE7BFE697"
+}

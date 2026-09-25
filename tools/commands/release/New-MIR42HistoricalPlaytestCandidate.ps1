@@ -1,6 +1,6 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
-  [ValidateSet('f017', 'f016', 'f015')][string]$Target = 'f017',
+  [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
@@ -60,12 +60,40 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
       @{ token = '@@SCIENCE_FAMILY@@'; value = [string]$profile.science_family },
       @{ token = '@@ASSET_POLICY@@'; value = [string]$profile.asset_policy },
       @{ token = '@@LABORATORY_PRODUCTIVITY_EFFECT@@'; value = if ([bool]$profile.laboratory_productivity) { ",`n        `"laboratory-productivity`"" } else { '' } },
-      @{ token = '@@OLD_SCIENCE_VALIDATION@@'; value = if ([bool]$profile.old_science_map) { ',' + [Environment]::NewLine + '        "old-science-map"' } else { '' } }
+      @{ token = '@@OLD_SCIENCE_VALIDATION@@'; value = if ([bool]$profile.old_science_map) { ',' + [Environment]::NewLine + '        "old-science-map"' } else { '' } },
+      @{ token = '@@LEGACY_NUMERIC_RESEARCH_COST@@'; value = if ([bool]$profile.legacy_numeric_research_cost) { 'true' } else { 'false' } }
     )) {
       if ([regex]::Matches($text, [regex]::Escape([string]$pair.token)).Count -lt 1) { throw "[mir42-historical-template-token] $($pair.token)" }
       $text = $text.Replace([string]$pair.token, [string]$pair.value)
     }
     if ($text.Contains('@@')) { throw '[mir42-historical-template-unresolved]' }
+    $output = [Text.UTF8Encoding]::new($false).GetBytes($text)
+  } elseif ($transform -eq 'historical-readme-template-v1') {
+    $text = [Text.UTF8Encoding]::new($false).GetString($bytes)
+    $line = [string]$Record.factorio_line
+    $version = [string]$Record.distribution_version
+    $engineVersion = [string]$Record.engine.version
+    $predecessorVersion = [string]$Record.predecessor.version
+    $lf = [string][char]10
+    $replacements = @(
+      @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
+      @{ from = 'It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a private target-specific projection from the current MIR 4.2 source. An exact fresh load establishes only that this package loads on the named engine; emitted streams and progression remain target-state dependent.' },
+      @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
+      @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },
+      @{ from = 'Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes rocket and cannon-shell speed effects from its generated vanilla continuation only when a valid dedicated MIR or preferred exact external infinite owner exists. `off` and `always` remain available, and explicit values are preserved during the 1.8.1 to 1.8.2 upgrade.'; to = "Fresh installations default to ``only-when-dedicated-tech-enabled``. The historic $predecessorVersion predecessor is retained as the candidate continuity input; this private package does not yet claim an upgrade result." },
+      @{ from = 'The current claim is limited to a fresh exact-package load on Factorio 1.0.0. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections.'; to = "The current claim is limited to a recorded private exact-package fresh load on Factorio $engineVersion. MIR avoids mutating external infinite owners and does not claim broad compatibility with untested mod collections." },
+      @{ from = 'The exact published 1.8.1 archive remains a historical predecessor record. This 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load.'; to = "The exact published $predecessorVersion archive remains the historical predecessor record. This private 4.2 playtest package does not claim save-upgrade qualification beyond its fresh exact-package load." },
+      @{ from = ('- `docs/releases/1.8.2.md`' + $lf + '- `.mir/backport-source-lock.json`' + $lf + '- `.mir/evidence/1.8.2-qualification.json`' + $lf + '- `.mir/evidence/candidate-seals/mir-1.8.2-factorio-1.0.json`'); to = ('- `targets/historical/' + $Record.target + '/target.json`' + $lf + '- the private historical candidate manifest' + $lf + '- the exact-engine fresh-load receipt' + $lf + '- the published ' + $predecessorVersion + ' predecessor archive identity') },
+      @{ from = '4.2.10000'; to = $version },
+      @{ from = 'Factorio 1.0'; to = "Factorio $line" },
+      @{ from = '1.0.0'; to = $engineVersion }
+    )
+    foreach ($replacement in $replacements) {
+      if ([regex]::Matches($text, [regex]::Escape([string]$replacement.from)).Count -lt 1) {
+        throw "[mir42-historical-readme-anchor] $($replacement.from)"
+      }
+      $text = $text.Replace([string]$replacement.from, [string]$replacement.to)
+    }
     $output = [Text.UTF8Encoding]::new($false).GetBytes($text)
   } else { throw "[mir42-historical-adapter-transform] $transform" }
   $outputBytesField = $Adapter.PSObject.Properties['output_bytes']

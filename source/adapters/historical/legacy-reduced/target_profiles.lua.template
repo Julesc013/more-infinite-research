@@ -51,7 +51,8 @@ local M = {
         settings_profiles = false,
         scripted_techs = false,
         technology_constant_overlays = false,
-        productivity_family_adoption = false
+        productivity_family_adoption = false,
+        legacy_numeric_research_cost = @@LEGACY_NUMERIC_RESEARCH_COST@@
       },
       supported_required_mods = {},
       supported_effect_types = {
